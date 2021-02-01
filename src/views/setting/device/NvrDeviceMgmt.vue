@@ -2,8 +2,11 @@
   <el-row :style="{'min-height':varyWindowHeight - 139+'px'}" class="el-device">
     <el-col :span="24" class="el-btns">
       <div v-if="activeName === 'dash'" style="display:inline-block;">
-        <el-button :size="varWindowWidth > 1680 ? 'small' : 'mini'" class="btns" type="primary"
-                   @click="connectServer">
+        <el-button
+          :size="varWindowWidth > 1680 ? 'small' : 'mini'"
+          class="btns"
+          type="primary"
+          @click="connectServer">
           {{ $t('deviceView.submit') }}
         </el-button>
       </div>
@@ -34,8 +37,10 @@
     <el-col :span="24" class="el-tabPanels">
       <el-tabs id="en-devicetabs-content" v-model="activeName" @tab-click="handleClick">
         <el-tab-pane :label="$t('deviceView.mediaService')" name="dash">
-          <el-col :span="varWindowWidth < 1540 ? 12 : 10"
-                  :style="varWindowWidth < 1366 ? {'font-size':'12px'}:{'font-size':'14px'}" class="dash-content">
+          <el-col
+            :span="varWindowWidth < 1540 ? 12 : 10"
+            :style="varWindowWidth < 1366 ? {'font-size':'12px'}:{'font-size':'14px'}"
+            class="dash-content">
             <div class="details">
               <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{ $t('deviceView.serverIp') }}</span>
               <el-input v-model="dash.url" class="dash-input" size="mini"/>
@@ -99,8 +104,11 @@
                 <el-button class="file-cancel-btn" size="mini" style="" @click="showConfirmImport = false">
                   {{ $t('deviceView.cancle') }}
                 </el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary"
-                           @click="showImportContent=true;showConfirmImport=false">
+                <el-button
+                  class="file-confirm-btn"
+                  size="mini"
+                  type="primary"
+                  @click="showImportContent=true;showConfirmImport=false">
                   {{ $t('deviceView.confirm') }}
                 </el-button>
               </div>
@@ -149,17 +157,25 @@
                   <div v-if="item.isClick" class="proper-flag"/>
                   <div class="name-data titles">
                     <span v-if="!item.isEditing">{{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}</span>
-                    <el-input v-if="item.isEditing" v-model="item.tempDeviceName"
-                              :placeholder="$t('deviceView.inputNvrName')"size="mini" class="nvr-input"
-                              @input="(val)=>nvrNameChange(val,item)"/>
+                    <el-input
+                      v-if="item.isEditing"
+                      v-model="item.tempDeviceName"
+                      :placeholder="$t('deviceView.inputNvrName')"
+                      size="mini"
+                      class="nvr-input"
+                      @input="(val)=>nvrNameChange(val,item)"/>
                   </div>
                   <div class="store-data titles">
                     <span>{{ item.store }}</span>
                   </div>
                   <div class="count-data titles">
                     <span v-if="!item.isEditing">{{ item.tempChannelCount }}{{ $t('deviceView.unit') }}</span>
-                    <el-select v-if="item.isEditing" v-model="item.tempChannelCount"
-                               :placeholder="$t('deviceView.inputNvrNumber')" size="mini" class="nvr-select">
+                    <el-select
+                      v-if="item.isEditing"
+                      v-model="item.tempChannelCount"
+                      :placeholder="$t('deviceView.inputNvrNumber')"
+                      size="mini"
+                      class="nvr-select">
                       <el-option
                         v-for="numList in editNvrChannelNumList"
                         :key="numList.value"
@@ -240,18 +256,28 @@
           >
             <div class="dialog-content" style="overflow:hidden;width:100%;">
               <hr style="border: 0.5px solid #dfe2e9;">
-              <el-form ref="nvrForm" :model="addNvrData" :rules="rules" class="nvrForm"
-                       label-position="top" size="mini">
+              <el-form
+                ref="nvrForm"
+                :model="addNvrData"
+                :rules="rules"
+                class="nvrForm"
+                label-position="top"
+                size="mini">
                 <el-form-item label="IVS ID" prop="ivsId">
-                  <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)"
-                            @blur="notShowInputRuleTips('ivsId')"/>
+                  <el-input
+                    v-model="addNvrData.ivsId"
+                    @input="(val)=>ivsIdChange(val)"
+                    @blur="notShowInputRuleTips('ivsId')"/>
                   <span v-if="ivsIdRuletip" class="rules">{{ $t('scheduleView.scheduleNameRuletip') }}</span>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
                     <el-form-item :label="$t('deviceView.nvr')" prop="name" style="margin-bottom:0;">
-                      <el-input v-model="addNvrData.name" style="width: 100%;" @input="(val)=>nvrNameChange(val, {})"
-                                @blur="notShowInputRuleTips('Nvrname')"/>
+                      <el-input
+                        v-model="addNvrData.name"
+                        style="width: 100%;"
+                        @input="(val)=>nvrNameChange(val, {})"
+                        @blur="notShowInputRuleTips('Nvrname')"/>
                       <span v-if="NvrnameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
                     </el-form-item>
                   </el-col>
@@ -327,13 +353,21 @@
                     <span v-if="!item.isClick" class="nape-name">
                       {{ item.name.length > 15 ? item.name.substr(0,15)+'...' : item.name }}
                     </span>
-                    <el-input v-if="item.isClick" v-model="item.tempName" size="mini"
-                              class="nape-input input-details" @input="(val)=>channelNameChange(val,item)"/>
+                    <el-input
+                      v-if="item.isClick"
+                      v-model="item.tempName"
+                      size="mini"
+                      class="nape-input input-details"
+                      @input="(val)=>channelNameChange(val,item)"/>
                   </div>
                   <div class="nape-dep-data">
                     <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
-                    <el-select v-if="item.id === 0" v-model="item.channelId" size="mini" class="nvr-select"
-                               style="margin-left: 10%">
+                    <el-select
+                      v-if="item.id === 0"
+                      v-model="item.channelId"
+                      size="mini"
+                      class="nvr-select"
+                      style="margin-left: 10%">
                       <el-option
                         v-for="numList in newChannelNumList"
                         :key="numList.value"
@@ -432,21 +466,31 @@
             >
               <div class="dialog-content" style="overflow:hidden;width:100%;">
                 <hr style="border: 0.5px solid #dfe2e9;">
-                <el-form ref="channelForm" :model="addChannelData" :rules="channelRules" class="nvrForm"
-                         label-position="top" size="mini">
+                <el-form
+                  ref="channelForm"
+                  :model="addChannelData"
+                  :rules="channelRules"
+                  class="nvrForm"
+                  label-position="top"
+                  size="mini">
                   <el-form-item style="height: 57px;">
                     <el-col :span="12">
                       <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
-                        <el-input :placeholder="$t('deviceView.inputChannelName')" v-model="addChannelData.name"
-                                  style="width: 100%;" @input="(val)=>channelNameChange(val,{})"
-                                  @blur="notShowInputRuleTips('tempName')"/>
+                        <el-input
+                          :placeholder="$t('deviceView.inputChannelName')"
+                          v-model="addChannelData.name"
+                          style="width: 100%;"
+                          @input="(val)=>channelNameChange(val,{})"
+                          @blur="notShowInputRuleTips('tempName')"/>
                         <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
                       </el-form-item>
                     </el-col>
                     <el-col :span="10" :offset="2">
                       <el-form-item :label="$t('deviceView.channelOrder')" prop="channelId">
-                        <el-select v-model="addChannelData.channelId"
-                                   :placeholder="$t('deviceView.selectNvrChannel')" size="mini">
+                        <el-select
+                          v-model="addChannelData.channelId"
+                          :placeholder="$t('deviceView.selectNvrChannel')"
+                          size="mini">
                           <el-option
                             v-for="numList in newChannelNumList"
                             :key="numList.value"
@@ -796,11 +840,10 @@ export default {
     checkDashInfo() {
       const self = this;
       let msg = '';
-      if (self.dash.url.toString().trim().length === 0
-        || self.dash.httpCmdPort.toString().trim().length === 0
-        || self.dash.httpsCmdPort.toString().trim().length === 0
-        || self.dash.dataPort.toString().trim().length === 0)
-      {
+      if (self.dash.url.toString().trim().length === 0 ||
+        self.dash.httpCmdPort.toString().trim().length === 0 ||
+        self.dash.httpsCmdPort.toString().trim().length === 0 ||
+        self.dash.dataPort.toString().trim().length === 0) {
         msg = this.$t('deviceView.emptyInfo');
       }
       if (!validateURL(self.dash.url)) {
@@ -1265,16 +1308,14 @@ export default {
 
     confrimEdit(index, item) {
       if (item.id !== 0) {
-        this.updateNvrChannel(item)
-      } else {
-
+        this.updateNvrChannel(item);
       }
     },
 
     updateNvrChannel(item) {
-      let self = this;
+      const self = this;
       self.isUpdate = false;
-      let channelObj = {};
+      const channelObj = {};
       channelObj.id = self.curChannelItem.id;
       channelObj.name = self.curChannelItem.tempName;
       if (channelObj.name.trim().length === 0) {
@@ -1301,28 +1342,28 @@ export default {
           self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
         }
       })
-      .then(async() => {
-        self.channelData = await self.getChannelData();
-        self.getChannelListByNVR(self.curNVRItem.ivsId);
-      }).catch(err => {
-        console.log("NVRDeviceManagement-updateNvrChannel: " + err);
-      });
+        .then(async() => {
+          self.channelData = await self.getChannelData();
+          self.getChannelListByNVR(self.curNVRItem.ivsId);
+        }).catch(err => {
+          console.log('NVRDeviceManagement-updateNvrChannel: ' + err);
+        });
     },
 
-    addNvrChannel(item){
-      let self = this;
-      let json = {};
+    addNvrChannel(item) {
+      const self = this;
+      const json = {};
       json.name = item.tempName;
       json.storeId = self.curNVRItem.storeId;
       json.ivsId = self.curNVRItem.ivsId;
       json.channelId = item.channelId;
       json.vendor = 0;
-      let deviceArr = [];
+      const deviceArr = [];
       deviceArr.push(json);
-      let params = {};
+      const params = {};
       params.device = deviceArr;
       deviceRESTful.addDevice(params).then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
           self.curChannelItem.isClick = false;
@@ -1334,19 +1375,19 @@ export default {
           self.channelData = await self.getChannelData();
           self.getChannelListByNVR(self.curNVRItem.ivsId);
         }).catch(err => {
-        console.log("NVRDeviceManagement-addNvrChannel: " + err);
-      });
+          console.log('NVRDeviceManagement-addNvrChannel: ' + err);
+        });
     },
 
     getNVRList(params) {
-      let self = this;
+      const self = this;
       deviceRESTful.getNVRList(params).then(res => {
-        let errMsg = res.errMsg;
-        let temp = [];
+        const errMsg = res.errMsg;
+        const temp = [];
         if (errMsg != undefined && errMsg === 'Success') {
-          let data = res.data.content;
+          const data = res.data.content;
           data.forEach((item, index) => {
-            let obj = {};
+            const obj = {};
             obj.ivsId = item.ivsId;
             obj.name = item.name;
             obj.tempDeviceName = item.name;
@@ -1384,10 +1425,10 @@ export default {
     },
 
     getChannelData() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         deviceRESTful.getDeviceList().then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             resolve(res.data);
           }
@@ -1398,11 +1439,11 @@ export default {
     },
 
     getChannelListByNVR(ivsId) {
-      let self = this;
-      let temp = [];
+      const self = this;
+      const temp = [];
       self.channelData.forEach(item => {
         if (item.ivsId === ivsId) {
-          let obj = {};
+          const obj = {};
           obj.id = item.id;
           obj.name = item.name;
           obj.tempName = item.name;
@@ -1423,28 +1464,28 @@ export default {
       if (self.channelList.length === 0) {
         self.editNvrChannelNumList = self.channelNumList;
       } else {
-        let sortArr = self.channelList.sort(self.getSortFun('channelId'));
-        let lastChannel = sortArr[sortArr.length - 1];
-        let maxChannleId = lastChannel.channelId;
-        let spliceArray = self.channelNumList.filter(x => x.value >= maxChannleId);
+        const sortArr = self.channelList.sort(self.getSortFun('channelId'));
+        const lastChannel = sortArr[sortArr.length - 1];
+        const maxChannleId = lastChannel.channelId;
+        const spliceArray = self.channelNumList.filter(x => x.value >= maxChannleId);
         self.editNvrChannelNumList = spliceArray;
       }
     },
 
     async InitData() {
-      let self = this;
+      const self = this;
       if (self.varyWindowHeight >= 760) {
         self.sizeNum = 20;
       } else {
         self.sizeChange = 10;
       }
       self.$store.dispatch('GetDash').then((res) => {
-        let data = res.data;
+        const data = res.data;
         if (res.errMsg == 'Success' && res.errCode == 0) {
           self.dash = data;
         }
       });
-      let params = {
+      const params = {
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -1458,19 +1499,19 @@ export default {
     },
 
     async getAllStoreList() {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         'filter': {
           'page': 0,
           'size': 2000
         }
       };
-      let retData = await self.getStoreData(params);
-      let storeList = retData.data.content;
+      const retData = await self.getStoreData(params);
+      const storeList = retData.data.content;
       self.storeList = storeList;
-      let tempStore = [];
+      const tempStore = [];
       storeList.forEach(item => {
-        let obj = {
+        const obj = {
           storeId: item.storeId,
           label: item.name,
           value: item.name,
@@ -1483,15 +1524,15 @@ export default {
     },
 
     getBriefStoreData() {
-      let self = this;
+      const self = this;
       getBriefStoreList().then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
-          let storeList = res.data;
+          const storeList = res.data;
           self.storeList = storeList;
-          let tempStore = [];
+          const tempStore = [];
           storeList.forEach(item => {
-            let obj = {
+            const obj = {
               storeId: item.storeId,
               label: item.name,
               value: item.name,
@@ -1505,12 +1546,12 @@ export default {
     },
 
     getStoreData(params) {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         getStoreList(params).then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            let data = res.data;
+            const data = res.data;
             resolve(res);
           }
         }).catch(err => {
@@ -1521,14 +1562,14 @@ export default {
 
     // add NVR
     addSingleNvr() {
-      let self = this;
+      const self = this;
       self.$refs['nvrForm'].validate(async(valid) => {
         if (valid) {
-          let nvrParams = {};
-          let nvrArray = [];
+          const nvrParams = {};
+          const nvrArray = [];
           nvrArray.push(self.addNvrData);
           nvrParams.nvr = nvrArray;
-          let res1 = await self.addNVR(nvrParams);
+          const res1 = await self.addNVR(nvrParams);
 
           if (res1.errMsg === 'Success') {
             self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
@@ -1539,7 +1580,7 @@ export default {
           }
           self.addNvrData = { ivsId: '', name: '', channelCount: 1, storeId: self.storeDataList[0].storeId };
           self.page = 1;
-          let params = {
+          const params = {
             'filter': {
               'page': self.page - 1,
               'size': self.sizeNum
@@ -1558,32 +1599,32 @@ export default {
 
     // cancel to add nvr
     cancelAddNvr() {
-      let self = this;
+      const self = this;
       self.showAddNvrDialog = false;
     },
 
     // add channel
     addSingleChannel() {
-      let self = this;
+      const self = this;
       self.$refs['channelForm'].validate(async(valid) => {
         if (valid) {
-          let json = {};
+          const json = {};
           json.name = self.addChannelData.name;
           json.storeId = self.curNVRItem.storeId;
           json.ivsId = self.curNVRItem.ivsId;
           json.channelId = self.addChannelData.channelId;
           json.vendor = 0;
-          let deviceArr = [];
+          const deviceArr = [];
           deviceArr.push(json);
-          let devParams = {};
+          const devParams = {};
           devParams.device = deviceArr;
-          let res1 = await self.addDevice(devParams);
+          const res1 = await self.addDevice(devParams);
           if (res1.errMsg === 'Success') {
-            let fm = new FormData();
-            let channelId = res1.data[0];
+            const fm = new FormData();
+            const channelId = res1.data[0];
             fm.append('id', channelId);
             fm.append('picture', self.file);
-            let attachRes = await self.attachImageToDevice(fm);
+            const attachRes = await self.attachImageToDevice(fm);
             if (attachRes.errMsg === 'Success') {
               self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             }
@@ -1594,7 +1635,7 @@ export default {
           }
           self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
           self.page = 1;
-          let params = {
+          const params = {
             'filter': {
               'page': self.page - 1,
               'size': self.sizeNum
@@ -1614,7 +1655,7 @@ export default {
 
     // cancel to add channel
     cancelAddSingleChannel() {
-      let self = this;
+      const self = this;
       self.showAddChannelDialog = false;
       self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
     },
@@ -1630,21 +1671,21 @@ export default {
     },
 
     handleDelete(index, item) {
-      let self = this;
+      const self = this;
       self.showDeleteChannel = true;
       self.deleteChannelId = item.id;
     },
 
     deleteSingleChannel() {
-      let self = this;
+      const self = this;
       self.showDeleteChannel = false;
-      let idsArr = [];
+      const idsArr = [];
       idsArr.push(self.deleteChannelId);
-      let obj = {};
+      const obj = {};
       obj.deviceIds = idsArr;
-      let params = obj;
+      const params = obj;
       deviceRESTful.deleteDevice(params).then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
         } else {
@@ -1655,12 +1696,12 @@ export default {
           self.channelData = await self.getChannelData();
           self.getChannelListByNVR(self.curNVRItem.ivsId);
         }).catch(err => {
-        console.log("NVRDeviceManagement-deleteSingleChannel: " + err);
-      });
+          console.log('NVRDeviceManagement-deleteSingleChannel: ' + err);
+        });
     },
 
     editSingleNvr(index, item) {
-      let self = this;
+      const self = this;
       item.isEditing = true;
       self.nvrData.forEach((_item, _index) => {
         if (index !== _index) {
@@ -1670,15 +1711,15 @@ export default {
     },
 
     showAddDialog() {
-      let self = this;
+      const self = this;
       self.showAddNvrDialog = true;
       self.addNvrData = { ivsId: '', name: '', channelCount: 1, storeId: self.storeDataList[0].storeId };
     },
 
     confirmEditNvr(index, item) {
-      let self = this;
+      const self = this;
       item.name = item.tempDeviceName;
-      let obj = {};
+      const obj = {};
       obj.ivsId = item.ivsId;
       obj.name = item.tempDeviceName;
       obj.storeId = item.storeId;
@@ -1687,12 +1728,12 @@ export default {
         self.notify(self.$t('deviceView.nvrNameEmpty'), 'warning', 3000);
         return false;
       }
-      let arr = [];
+      const arr = [];
       arr.push(obj);
-      let params = {};
+      const params = {};
       params.nvr = arr;
       deviceRESTful.updateNVR(params).then(res => {
-        let errMsg = res.errMsg;
+        const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           item.isEditing = false;
@@ -1705,42 +1746,42 @@ export default {
           self.channelData = await self.getChannelData();
           self.getChannelListByNVR(self.curNVRItem.ivsId);
         }).catch(err => {
-        console.log("NVRDeviceManagement-confirmEditNvr: " + err);
-      });
+          console.log('NVRDeviceManagement-confirmEditNvr: ' + err);
+        });
     },
 
     cancelEditNvr(index, item) {
-      let self = this;
+      const self = this;
       item.isEditing = false;
       item.tempDeviceName = item.name;
       item.tempChannelCount = item.channelCount;
     },
 
     async deleteSingleNVR() {
-      let self = this;
+      const self = this;
       self.showConfirmDelete = false;
-      let ivsId = self.curNVRItem.ivsId;
-      let nvrList = [];
+      const ivsId = self.curNVRItem.ivsId;
+      const nvrList = [];
       nvrList.push(ivsId);
-      let channelList = self.channelList.map(x => x.id);
+      const channelList = self.channelList.map(x => x.id);
       try {
         if (channelList.length > 0) {
-          let res1 = await self.deleteChannel(channelList);
-          let res2 = await self.deleteNVR(nvrList);
+          const res1 = await self.deleteChannel(channelList);
+          const res2 = await self.deleteNVR(nvrList);
           if (res1.errMsg === 'Success' && res2.errMsg === 'Success') {
             self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
           } else {
             self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
           }
         } else {
-          let res2 = await self.deleteNVR(nvrList);
+          const res2 = await self.deleteNVR(nvrList);
           if (res2.errMsg === 'Success') {
             self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
           } else {
             self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
           }
         }
-        let params = {
+        const params = {
           'filter': {
             'page': self.page - 1,
             'size': self.sizeNum
@@ -1751,19 +1792,18 @@ export default {
           }
         };
         self.getNVRList(params);
-      }
-      catch (err) {
-        console.log("NVRDeviceManagement-deleteSingleNVR: " + err);
+      } catch (err) {
+        console.log('NVRDeviceManagement-deleteSingleNVR: ' + err);
       }
     },
 
     addNewChannel() {
-      let self = this;
-      let channelNum = self.curNVRItem.channelCount;
+      const self = this;
+      const channelNum = self.curNVRItem.channelCount;
       self.channelNumList.forEach(item => {
         item.disabled = false;
       });
-      let spliceArray = self.channelNumList.filter(x => x.value <= channelNum);
+      const spliceArray = self.channelNumList.filter(x => x.value <= channelNum);
       spliceArray.forEach(item => {
         self.channelList.forEach(_item => {
           if (item.value === _item.channelId) {
@@ -1771,7 +1811,7 @@ export default {
           }
         });
       });
-      let deepArray = JSON.parse(JSON.stringify(spliceArray));
+      const deepArray = JSON.parse(JSON.stringify(spliceArray));
       deepArray.forEach(item => {
         item.label = item.label.split(' ')[0];
       });
@@ -1796,14 +1836,14 @@ export default {
     ...mapMutations(['SET_DASHURL']),
 
     nvrNameChange(val, item) {
-      let self = this;
-      let comment = filterString.all(val, 20);
+      const self = this;
+      const comment = filterString.all(val, 20);
       if (Object.keys(item).length === 0) {
         self.addNvrData.name = comment;
       } else {
         item.tempDeviceName = comment;
       }
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 20) {
         this.NvrnameRuletip = true;
       } else {
@@ -1812,14 +1852,14 @@ export default {
     },
 
     channelNameChange(val, item) {
-      let self = this;
-      let comment = filterString.all(val, 20);
+      const self = this;
+      const comment = filterString.all(val, 20);
       if (Object.keys(item).length === 0) {
         self.addChannelData.name = comment;
       } else {
         item.tempName = comment;
       }
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 20) {
         this.channelNameRuletip = true;
       } else {
@@ -1828,10 +1868,10 @@ export default {
     },
 
     ivsIdChange(val) {
-      let self = this;
-      let comment = filterString.all(val, 30);
+      const self = this;
+      const comment = filterString.all(val, 30);
       self.addNvrData.ivsId = comment;
-      let length = filterString.getContentLength(val);
+      const length = filterString.getContentLength(val);
       if (length > 30) {
         this.ivsIdRuletip = true;
       } else {
