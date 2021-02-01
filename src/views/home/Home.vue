@@ -393,7 +393,8 @@ export default {
           break;
         }
         case 3: {
-          const path = this.$route.matched[1].path;
+          const path = this.$route.matched[2].path;
+          console.log(this.$route.matched[2]);
           disabled = this.setThreeChildrenCanChangeBrand(path);
           break;
         }
@@ -452,8 +453,10 @@ export default {
     setThreeChildrenCanChangeBrand(path) {
       let disabled = true;
       switch (path) {
-        case '/schedule':
-        case '/device':
+        case '/patrolSechedule':
+        case '/dashDevice':
+        case '/ezvizDevice':
+        case '/beseyeDevice':
         {
           disabled = false;
           break;
@@ -707,7 +710,6 @@ export default {
     $_isMobile() {
       const { body } = document;
       const rect = body.getBoundingClientRect();
-      console.log(rect.width - 1 < 1280);
       if (rect.width - 1 < 1280) {
         this.collapsed = true;
       }
