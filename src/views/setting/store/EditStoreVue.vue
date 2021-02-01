@@ -240,17 +240,14 @@ export default {
         const temp = [];
         if (data.length !== 0) {
           data.forEach(item => {
-            if (item.status === 1) {
-              //enable channel
-              const obj = {};
-              obj.id = item.id;
-              obj.name = item.name;
-              obj.ivsId = item.ivsId;
-              obj.value = item.id;
-              obj.label = item.name;
-              obj.disabled = false;
-              temp.push(obj);
-            }
+            const obj = {};
+            obj.id = item.id;
+            obj.name = item.name;
+            obj.ivsId = item.ivsId;
+            obj.value = item.id;
+            obj.label = item.name;
+            obj.disabled = false;
+            temp.push(obj);
           });
           self.alleList = temp;
         }
