@@ -1014,7 +1014,7 @@ export default {
         console.log('confirm');
         if (to.name != 'confirmSum') {
           //   from.meta.keepAlive=false;
-          self.previewplayer && self.previewplayer.dispose();
+          self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
         } else {
@@ -1169,7 +1169,7 @@ export default {
       const self = this;
       if (!self.isEzviz) {
         self.stopVideoPlay();
-        self.previewplayer && self.previewplayer.dispose();
+        self.playState && self.previewplayer && self.previewplayer.dispose();
       }
       if (self.isEzviz && !self.showGuide) {
         self.$refs.ezvizVideo.stopRealTime();

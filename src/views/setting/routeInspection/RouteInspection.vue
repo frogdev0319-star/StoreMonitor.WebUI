@@ -1217,7 +1217,7 @@ export default {
               obj.b = _item.__EMPTY_1!==undefined ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
               obj.c = _item.__EMPTY_2;
               obj.d = _item.__EMPTY_3;
-              obj.e = _item.__EMPTY_4!==undefined ? _item.__EMPTY_4.trim() : _item.__EMPTY_4;
+              obj.e = _item.__EMPTY_4!==undefined && typeof _item.__EMPTY_4!=='number' ? _item.__EMPTY_4.trim() : _item.__EMPTY_4;
               obj.f = _item.__EMPTY_5!==undefined ? _item.__EMPTY_5.trim() : _item.__EMPTY_5;
               temp_sheet2.push(obj);
             });

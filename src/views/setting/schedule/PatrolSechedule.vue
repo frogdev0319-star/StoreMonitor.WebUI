@@ -32,7 +32,7 @@
           </el-button>
           <el-button
             :class="lang === 'en' ? 'en-el-delete-btn' : 'el-delete-btn'"
-            :disabled="Number(activeName)  ===  0 ? true : false"
+            :disabled="paneLength===0 ? true : false"
             type="primary"
             size="mini"
             class="btn-class"

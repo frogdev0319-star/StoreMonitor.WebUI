@@ -1237,6 +1237,7 @@ export default {
       let self = this;
       let scheId = self.paneList[Number(self.activeName)].schId;
       self.showBindDialog = false;
+      self.$emit('paneList', self.paneList.length);
       let isAdd = false;
       if (scheId === 0) {
         isAdd = true;
@@ -1525,6 +1526,7 @@ export default {
               paneArr.push(item);
             }
           });
+          self.$emit('paneList', paneArr.length);
           if (paneArr.length !== 0) {
             paneArr.forEach(_item => {
               let tempScheduleData = {};
@@ -1668,13 +1670,15 @@ export default {
           return new Promise((resolve, reject) => {
             getScheduleBindList(params).then(res => {
               let errMsg = res.errMsg;
-              let data = res.data;
-              data.forEach(_item => {
-                if (self.hasBoundStoreIds.indexOf(_item) === -1) {
-                  self.hasBoundStoreIds.push(_item);
-                }
-              });
-              resolve(data);
+              if(res.errCode===0){
+                let data = res.data;
+                data.forEach(_item => {
+                  if (self.hasBoundStoreIds.indexOf(_item) === -1) {
+                    self.hasBoundStoreIds.push(_item);
+                  }
+                });
+                resolve(data);
+              }
             }).catch(err => {
               console.log("PatrolSchedule-getHasBoundStroeIds: " + err);
               reject(err)
@@ -1813,14 +1817,18 @@ export default {
     initData() {
       let self = this;
       self.paneList.splice(Number(self.activeName), 1);
-      self.activeName = '0';
-      self.scheduleId = self.paneList[0].schId;
-      self.curType = (self.paneList[0].mode).toString();
-      self.scheduleId = self.paneList[0].schId;
-      self.enable = self.paneList[0].enable;
-      self.notifyTime = self.paneList[0].notifyTime;
-      self.getHasBoundStroeIds();
-      self.searchStore();
+      if(self.paneList.length!==0){
+        self.activeName = '0';
+        self.scheduleId = self.paneList[0].schId;
+        self.curType = (self.paneList[0].mode).toString();
+        self.enable = self.paneList[0].enable;
+        self.notifyTime = self.paneList[0].notifyTime;
+        self.getHasBoundStroeIds();
+        self.searchStore();
+      }else{
+        self.$emit('paneList', self.paneList.length);
+        self.getScheduleList('noInspect');
+      }
     },
 
     formatMonthDay(array) {
