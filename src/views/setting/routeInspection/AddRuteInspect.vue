@@ -1082,7 +1082,7 @@ export default {
       const temp = [];
       const objItem = {
           subject: self.ItemName.trim(),
-          description: self.ItemDescription.trim(),
+          description: self.ItemDescription===null ? '' : self.ItemDescription.trim(),
           itemScore: itemScore,
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable
@@ -1142,7 +1142,7 @@ export default {
       const obj = {
           id: self.updateType.id,
           subject: self.ItemName.trim(),
-          description: self.ItemDescription.trim(),
+          description: self.ItemDescription===null ? '' : self.ItemDescription.trim(),
           itemScore: itemScore,
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable
