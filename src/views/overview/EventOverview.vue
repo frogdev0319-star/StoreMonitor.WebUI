@@ -156,9 +156,10 @@ import { getBriefStoreList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
 import resize from '@/components/mixins/resize';
+import SearchConditionUtil from "../../common/SearchConditionUtil";
 
 export default {
-  name: 'ExceptEvent',
+  name: 'EventOverview',
 
   components: {
     'v-chart': ECharts
@@ -195,8 +196,7 @@ export default {
       storeDataList: [],
       checkAllStore: true,
       storeIds: [],
-      curStore: this.$t('overview.all'),
-      storeName: this.$t('overview.all'),
+      curStore: "-1",
       showMonthDrap: false,
       showStoreContent: false,
       eventBySource: [
@@ -325,27 +325,22 @@ export default {
         self.rankType = 3;
         self.checkAllStore = true;
         self.storeIds = [];
-        self.storeName = this.$t('overview.all');
-        self.curStore = this.$t('overview.all');
         self.getBriefStoreData();
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-        self.params.beginTs = start;
-        self.params.endTs = end;
+        self.getSearchParams();
+        // const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+        // const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+        // self.params.beginTs = start;
+        // self.params.endTs = end;
         self.initData();
       }
     }
   },
 
   created() {
-    const self = this;
-    self.getBriefStoreData();
-    const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-    const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-    self.params.beginTs = start;
-    self.params.endTs = end;
-    self.initData();
+    this.getBriefStoreData();
+    this.getSearchParams();
+    this.initData();
   },
 
   beforeDestroy() {
@@ -385,6 +380,7 @@ export default {
       daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
       self.params.beginTs = start;
       self.params.endTs = end;
+      self.saveSearchParams();
       self.initData();
     },
 
@@ -398,7 +394,7 @@ export default {
           tempStore.push(
             { storeId: '-1',
               label: self.$t('overview.all'),
-              value: self.$t('overview.all') }
+              value: '-1' }
           );
           storeList.forEach(item => {
             const obj = {
@@ -418,45 +414,12 @@ export default {
     changeStore(val) {
       const self = this;
       self.storeIds = [];
-      if (val === -1) {
+      if (val === "-1") {
         self.storeIds = [];
       } else {
         self.storeIds.push(self.curStore);
       }
-      self.getStoreEventStatics();
-    },
-
-    choiceStore() {
-      const self = this;
-      self.showStoreContent = !self.showStoreContent;
-      self.showMonthDrap = true;
-    },
-
-    changeStoreItem(item) {
-      const self = this;
-      self.checkAllStore = false;
-      if (item === -1) {
-        self.checkAllStore = true;
-        self.storeName = self.$t('overview.all');
-        self.storeIds = [];
-        self.storeDataList.forEach(item => {
-          item.checked = true;
-        });
-      } else {
-        let daysStr = '';
-        const selectedStores = [];
-        daysStr = item.label;
-        selectedStores.push(item.storeId);
-
-        self.storeName = daysStr;
-        self.storeIds = selectedStores;
-        self.storeDataList.forEach(item => {
-          item.checked = false;
-        });
-        item.checked = true;
-      }
-      self.showStoreContent = false;
-      self.showMonthDrap = false;
+      self.saveSearchParams();
       self.getStoreEventStatics();
     },
 
@@ -1037,8 +1000,8 @@ export default {
     },
 
     changeRankType(val) {
-      const self = this;
-      self.getEventRankingInfo();
+      this.saveSearchParams();
+      this.getEventRankingInfo();
     },
 
     toPercent(point) {
@@ -1054,6 +1017,42 @@ export default {
       this.$refs.storeStatusRef && this.$refs.storeStatusRef.resize();
       this.$refs.eventSourceRef && this.$refs.eventSourceRef.resize();
       this.$refs.eventStatusRef && this.$refs.eventStatusRef.resize();
+    },
+
+    saveSearchParams(){
+      let params = {
+        beginTs: this.params.beginTs,
+        endTs: this.params.endTs,
+        storeId: this.curStore,
+        rankType: this.rankType
+      }
+      const searchConditon = {
+        path: 'eventOverview',
+        params: params
+      }
+      SearchConditionUtil.saveSearchCondition(searchConditon)
+    },
+
+    getSearchParams(){
+      const searchParams = SearchConditionUtil.getSearchCondition('eventOverview');
+      if(Object.keys(searchParams).length > 0){
+        this.dateValue[0] = new Date(searchParams.beginTs);
+        this.dateValue[1] = new Date(searchParams.endTs);
+        this.params.beginTs = searchParams.beginTs;
+        this.params.endTs = searchParams.endTs;
+        this.rankType = searchParams.rankType;
+        this.curStore = searchParams.storeId;
+        if (this.curStore === "-1") {
+          this.storeIds = [];
+        } else {
+          this.storeIds.push(this.curStore);
+        }
+      }else{
+        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
+        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+        this.params.beginTs = start;
+        this.params.endTs = end;
+      }
     }
   }
 };
