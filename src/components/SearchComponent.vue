@@ -284,7 +284,7 @@ export default {
       self.getInspectList();
     },
 
-    getInspectList(storeArray) {
+    getInspectList() {
       const self = this;
       const inspectArr = [];
       console.log(self.filterStoreIds);
@@ -349,7 +349,7 @@ export default {
         self.countryList[0].countryList = countryList;
         self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
         self.curCountry = countryList[0].value;
-        self.selectAllProAndCity(self.curCountry,true);
+        self.selectAllProAndCity(self.curCountry, true);
       }
     },
 
@@ -489,10 +489,6 @@ export default {
       this.tagNameStr = this.tagNameStr.substr(0, this.tagNameStr.length - 1);
       this.filterStore();
       this.isInspectItem || this.isPatrol ? this.getInspectList() : '';
-    },
-
-    changePatrol(){
-
     },
 
     filterStore() {
