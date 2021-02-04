@@ -196,7 +196,7 @@ export default {
       storeDataList: [],
       checkAllStore: true,
       storeIds: [],
-      curStore: "-1",
+      curStore: '',
       showMonthDrap: false,
       showStoreContent: false,
       eventBySource: [
@@ -338,9 +338,7 @@ export default {
   },
 
   created() {
-    this.getBriefStoreData();
-    this.getSearchParams();
-    this.initData();
+    this.getBriefStoreData()
   },
 
   beforeDestroy() {
@@ -391,11 +389,6 @@ export default {
         if (errMsg && errMsg === 'Success') {
           const storeList = res.data;
           const tempStore = [];
-          tempStore.push(
-            { storeId: '-1',
-              label: self.$t('overview.all'),
-              value: '-1' }
-          );
           storeList.forEach(item => {
             const obj = {
               storeId: item.storeId,
@@ -406,7 +399,18 @@ export default {
             };
             tempStore.push(obj);
           });
+          if(tempStore.length > 0){
+            tempStore.unshift(
+              {
+                storeId: '-1',
+                label: self.$t('overview.all'),
+                value: '-1'
+              }
+            );
+          }
           self.storeDataList = tempStore;
+          this.getSearchParams();
+          this.initData();
         }
       });
     },
