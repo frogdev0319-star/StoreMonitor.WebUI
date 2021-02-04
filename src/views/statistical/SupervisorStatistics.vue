@@ -67,7 +67,7 @@
                 <el-table
                   :data="supervisorTableData"
                   :highlight-current-row="true"
-                  :default-sort = "{prop: 'completionRateStr', order: 'ascending'}"
+                  :default-sort = "defaultSort"
                   :header-cell-class-name="headerClass"
                   :cell-class-name="cellClass"
                   :row-key="getRowKeys"
@@ -345,6 +345,7 @@ import {
   getInspectStatsOverPersonV2,
   getInspectScheduleOverview
 } from '@/api/inspectOverview';
+import SearchConditionUtil from "../../common/SearchConditionUtil";
 
 export default {
   name: 'SupervisorStatistics',
@@ -534,7 +535,8 @@ export default {
       insideHeaderClass: 'inside-header-class',
       insideRowClass: 'inside-row-class',
       elPDFtableData: [],
-      htmlTitle: this.$t('overview.htmltopdfC')
+      htmlTitle: this.$t('overview.htmltopdfC'),
+      defaultSort: {prop: 'completionRateStr', order: 'ascending'}
     };
   },
 
@@ -544,15 +546,13 @@ export default {
 
   watch: {
     async accountChanged(val) {
-      let self = this;
       if (val !==  0) {
-        self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-        self.params.beginTs = start;
-        self.params.endTs = end;
-        self.initDaysRange();
-        self.initData();
+        this.dateValue = [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()];
+        this.defaultSort = {prop: 'completionRateStr', order: 'ascending'};
+        this.params = {};
+        this.getSearchParams();
+        this.initDaysRange();
+        this.initData();
       }
     },
     numberOfElements(val) {
@@ -564,14 +564,10 @@ export default {
     }
   },
 
-  async created() {
-    let self = this;
-    let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-    let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-    self.params.beginTs = start;
-    self.params.endTs = end;
-    self.initDaysRange();
-    await self.initData();
+  created() {
+    this.getSearchParams();
+    this.initDaysRange();
+    this.initData();
   },
 
   methods: {
@@ -665,6 +661,7 @@ export default {
       let self = this;
       let order = col.order;
       self.order = order;
+      self.direction = col.column.property;
       let prop = '';
       let tempOrder = '';
       if (order === 'ascending') {
@@ -846,6 +843,7 @@ export default {
 
     async getInspectPersonTable() {
       let self = this;
+      self.saveSearchParams();
       let inspectItems = await self.getInspectStatsPersonInfo(self.params);
       let errCode = inspectItems.errCode;
 
@@ -885,12 +883,8 @@ export default {
       })
     },
 
-    async initData() {
-      let self = this;
-      self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.params.order = { direction: self.direction, property: self.property };
-      self.params.roleId = parseInt(self.ModelPost);
-      await self.getInspectPersonTable();
+    initData() {
+      this.getInspectPersonTable();
     },
 
     export2Excel() {
@@ -1087,6 +1081,54 @@ export default {
           self.implementTableData = [];
         }
       }
+    },
+
+    saveSearchParams(){
+      let params = {
+        beginTs: this.params.beginTs,
+        endTs: this.params.endTs,
+        storeId: this.curStore,
+        rankType: this.rankType
+      }
+      const searchConditon = {
+        path: 'supervisorStatistics',
+        params: this.params
+      }
+      SearchConditionUtil.saveSearchCondition(searchConditon)
+    },
+
+    getSearchParams(){
+      const searchParams = SearchConditionUtil.getSearchCondition('supervisorStatistics');
+      if(Object.keys(searchParams).length > 0){
+        this.dateValue[0] = new Date(searchParams.beginTs);
+        this.dateValue[1] = new Date(searchParams.endTs);
+        this.params.beginTs = searchParams.beginTs;
+        this.params.endTs = searchParams.endTs;
+        this.page = searchParams.filter.page + 1;
+        this.sizeNum = searchParams.filter.size;
+        this.direction = searchParams.order.direction;
+        this.property = searchParams.order.property;
+        this.params.filter = searchParams.filter;
+        this.params.order =  searchParams.order;
+        this.params.roleId = searchParams.roleId;
+        this.ModelPost = searchParams.roleId;
+        this.setDefaultSort();
+      }else{
+        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
+        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+        this.params.beginTs = start;
+        this.params.endTs = end;
+        this.params.filter = { page: this.page - 1, size: this.sizeNum };
+        this.params.order = { direction: this.direction, property: this.property };
+        this.params.roleId = parseInt(this.ModelPost);
+        this.ModelPost = 3;
+        this.defaultSort = {prop: 'completionRateStr', order: 'ascending'};
+      }
+    },
+
+    setDefaultSort(){
+      this.defaultSort.order = this.direction === 'asc' ? 'ascending' : 'descending';
+      this.defaultSort.prop = this.property === 'completionRate' ? 'completionRateStr': this.property;
     }
 
   }
