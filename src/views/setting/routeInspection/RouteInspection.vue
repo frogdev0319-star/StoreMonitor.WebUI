@@ -222,13 +222,20 @@
         </el-dialog>
       </el-col>
       <el-col :span="18" class="el-route-tabs">
-        <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label" :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false" >
-            <el-tabs v-if="item.data.length !== 0" id="patrltabs-content" v-model="patrolActive" :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
+        <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick" :style="{'min-height':varyWindowWidth - 250 +'px'}">
+          <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label"
+                       :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false"
+                       v-loading="isLoading"
+                       :element-loading-text="$t('insSettingView.loadingbindstore')">
+            <el-tabs v-if="item.data.length !== 0 && !isLoading" id="patrltabs-content" v-model="patrolActive"
+                     :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
                 <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{ _item.name }}</span>
                 <div v-if="_item.routeData&&!loading">
-                  <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc" :all-routedata="_item.allRoutedata" :sheet-name="_item.sheetName" :tab-name="_item.name" @refreshList="getTagList" @change-routeData="changerouteData"/>
+                  <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name"
+                                :down-src="downLoadSrc" :all-routedata="_item.allRoutedata"
+                                :sheet-name="_item.sheetName" :tab-name="_item.name" @refreshList="getTagList"
+                                @change-routeData="changerouteData"/>
                 </div>
                 <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
                   <img :src="loadingGif">
@@ -236,7 +243,7 @@
                 </div>
               </el-tab-pane>
             </el-tabs>
-            <div v-else :style="{'min-height':varyWindowWidth*0.52+'px'}" class="data-empty">
+            <div v-if="item.data.length === 0 && !isLoading" :style="{'min-height':varyWindowWidth*0.52+'px'}" class="data-empty">
               <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"/>
               <p class="empty-title">
                 {{ $t('insSettingView.please') }}
@@ -245,7 +252,8 @@
                 <span @click="showNameImport = true">{{ $t('insSettingView.thenImport') }}</span>
                 {{ $t('insSettingView.waveline') }}
               </p>
-              <input id="uploadFile" ref="loadFile" type="file" style="display: none" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
+              <input id="uploadFile" ref="loadFile" type="file" style="display: none"
+                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -351,10 +359,10 @@ export default {
       allData: [],
       tagList: ['远程巡检', '现场巡检'],
       curData: [],
-      loading: null,
       fileName: this.$t('insSettingView.patrolExample'),
       lang: this.$i18n.locale,
-      taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')]
+      taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')],
+      isLoading: true
     };
   },
 
@@ -689,7 +697,8 @@ export default {
           // self.notify(self.$t('insSettingView.importSuss'), 'success', 3000);
           self.showImportSucceed = true;
         }
-      } else {
+      }
+      else {
         self.getDownLoadURL();
         self.elTableData = [{ label: '远程巡检', data: [] }, { label: '现场巡检', data: [] }];
       }
@@ -944,6 +953,7 @@ export default {
 
     handleClick(tabObj) {
       const self = this;
+      self.isLoading = true;
       sessionStorage.setItem('TabIndex', tabObj.index);
       switch (tabObj.index) {
         case '0':
@@ -1132,9 +1142,11 @@ export default {
             self.btnList[1].enabled = false;
             self.btnList[3].enabled = false;
           }
+          self.isLoading = false;
         });
       } else {
         self.storeNum = 0;
+        self.isLoading = false;
       }
     },
 
