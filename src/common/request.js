@@ -15,7 +15,7 @@ const itempath = '/storemonitor/api/';
 axios.defaults.withCredentials = true;
 const service = axios.create({
   baseURL: baseUrl,
-  timeout: 10000
+  timeout: 30000
 });
 // download file axios
 const serviceAxios = axios.create({
