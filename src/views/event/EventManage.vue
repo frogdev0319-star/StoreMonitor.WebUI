@@ -46,7 +46,7 @@
           style="display: inline;margin-left: calc(20/1920*100vw);"
           @changeInput="changeStoreTag"/>
         <el-input
-          v-model="serachVale"
+          v-model="inputSearchValue"
           size="small"
           class="el-search"
           clearable
@@ -88,7 +88,7 @@
           ref="multiState"
           :selected="curState"
           :alltype="0"
-          :options="states"
+          :options="eventStatesList"
           :disabled="activeName!=='4'"
           style="display:inline;"
           @changeInput="handleStateChange"/>
@@ -207,9 +207,10 @@ import { getBriefStoreList, GetTagList } from '@/api/store';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import LimitSelect from '@/components/LimitSelect';
+import SearchConditionUtil from "../../common/SearchConditionUtil";
 
 export default {
-  name: 'ExceptEvent',
+  name: 'EventManage',
   components: {
     LimitSelect,
     MultiSelect,
@@ -236,7 +237,7 @@ export default {
         }
       },
       toolTipClass: 'page-login-toolTipClass',
-      states: [
+      eventStatesList: [
         { value: 0, label: this.$t('eventView.pending'), disabled: false },
         { value: 1, label: this.$t('eventView.handled'), disabled: false },
         { value: 2, label: this.$t('eventView.closed'), disabled: false },
@@ -244,7 +245,7 @@ export default {
       ],
       curState: null,
       value: 0,
-      serachVale: '',
+      inputSearchValue: '',
       serachData: '',
       tableDataList: [
         {
@@ -295,12 +296,10 @@ export default {
       attachmentVideo: require('../../../static/img/video.png'),
       attachmentImg: require('../../../static/img/photo.png'),
       attachmentAudio: require('../../../static/img/audio.png'),
-      event,
       total: 0,
       page: 1,
       sizeNum: 10,
       params: {},
-      fileName: '数据详情' + '.xlsx',
       exportDataList: [],
       exportDataHeader: [
         this.$t('eventView.name'),
@@ -330,7 +329,9 @@ export default {
         { tabIndex: 4, sortType: { prop: '', order: '' }}
       ],
       exportPng: require('../../../static/img/excel.png'),
-      selfClassName: 'self-class-name'
+      selfClassName: 'self-class-name',
+      ifGetParamsFromCash: false,
+      ifSaveParams: false
     };
   },
 
@@ -357,6 +358,7 @@ export default {
         },
         300);
         self.ifChangeAccount = true;
+        self.ifSaveParams = false;
       }
     },
 
@@ -466,7 +468,7 @@ export default {
         self.CountryList[0].label = self.$t('remotePatrol.country');
         self.CountryList[0].countryList = countryList;
         self.CountryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        self.curCountry = countryList[0].value;
+        self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value : self.curCountry;
         self.selectAllProAndCity(self.curCountry);
       }
     },
@@ -515,20 +517,20 @@ export default {
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
-      self.curProvince = provinceArr;
+      self.curProvince = (!self.ifGetParamsFromCash) ? provinceArr : self.curProvince;
 
       let cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
-      self.curCity = cityArr;
+      self.curCity = (!self.ifGetParamsFromCash) ? cityArr : self.curCity;
       self.storeDataList = tempStore;
       let storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = storeArr;
-      self.curState = [0];
+      self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
+      self.curState = (!self.ifGetParamsFromCash) ? [0]: self.curState;
       self.changeStore(self.curStore);
     },
 
@@ -733,7 +735,7 @@ export default {
         let start=typeof(val[0])==='object'?val[0].getTime():val[0];
         let end=typeof(val[1])==='object'?val[1].getTime():val[1];
         let threeMonthAgo = util.getThreeMonths(end)
-        if(end-start>end-threeMonthAgo){
+        if(end - start > end - threeMonthAgo){
             self.$message({
                 message: this.$t('eventView.changeTimeRange'),
                 type:'warning',
@@ -744,19 +746,20 @@ export default {
         else{
           self.dateValue = [new Date().setTime(start),new Date().setTime(end)]
         }
-        self.serachVale=''
-        self.tableDataList[tabIndex].page=1;
+        self.inputSearchValue=''
+        self.tableDataList[tabIndex].page = 1;
         self.getEventList(0);
         self.getEventCount();
     },
 
     handleTabClick(val) {
       let self = this;
+      this.ifGetParamsFromCash = false;
       if (Number(val.index) < 4) {
         self.curState = [Number(val.index)];
       } else {
         let stateArr = [];
-        self.states.forEach(item => {
+        self.eventStatesList.forEach(item => {
           stateArr.push(item.value);
         });
         self.curState = stateArr;
@@ -767,7 +770,7 @@ export default {
 
     searchEventList() {
       let self = this;
-      self.serachVale = '';
+      self.inputSearchValue = '';
       self.tableDataList[Number(self.activeName)].page = 1;
       self.getEventList();
       self.getEventCount();
@@ -775,7 +778,7 @@ export default {
 
     searchData() {
       let self = this;
-      self.tableDataList[Number(self.activeName)].page = 1;
+      self.tableDataList[Number(self.activeName)].page = self.page;
       self.getEventList();
       self.getEventCount();
     },
@@ -830,6 +833,8 @@ export default {
       let self = this;
       let tabIndex = Number(this.activeName);
       self.getEventListRequestParams(val);
+      this.ifSaveParams && self.saveSearchParams();
+      this.ifSaveParams = true;
       eventRESTful.getEventList(self.params).then((res) => {
         let data = res.data.content;
         let temp = [];
@@ -876,8 +881,8 @@ export default {
     getEventListRequestParams(val){
       let tabIndex = Number(this.activeName);
       let like = {};
-      if (this.serachVale.trim().length !== 0) {
-        like = { subject: this.serachVale.trim(), assignerName: this.serachVale.trim(), storeName: this.serachVale.trim() };
+      if (this.inputSearchValue.trim().length !== 0) {
+        like = { subject: this.inputSearchValue.trim(), assignerName: this.inputSearchValue.trim(), storeName: this.inputSearchValue.trim() };
       } else {
         like = {};
       }
@@ -940,6 +945,7 @@ export default {
           property: 'ts'
         };
       }
+      this.order = this.params.order;
     },
 
     sizeChange(val) {
@@ -968,8 +974,8 @@ export default {
       let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
       let storeId = self.storeStr.split('，');
       let like = {};
-      if (self.serachVale.trim().length !== 0) {
-        like = { subject: self.serachVale.trim(), assignerName: self.serachVale.trim(), storeName: self.serachVale.trim() };
+      if (self.inputSearchValue.trim().length !== 0) {
+        like = { subject: self.inputSearchValue.trim(), assignerName: self.inputSearchValue.trim(), storeName: self.inputSearchValue.trim() };
       } else {
         like = {};
       }
@@ -1113,14 +1119,16 @@ export default {
     },
 
     initData() {
+      console.log('initData');
       let self = this;
       self.activeName = '0';
       self.dateValue = [new Date(new Date().toLocaleDateString()).getTime()-3600 * 1000 * 24,new Date()];
-      self.serachVale = '';
+      self.inputSearchValue = '';
       self.total = 0;
-      self.page = 1;
-      self.sizeNum = 10;
-      self.params = {};
+      // self.page = 1;
+      // self.sizeNum = 10;
+      // self.params = {};
+      self.getSearchParams();
       self.getDeafultTime();
       let windowHeight = window.innerHeight;
       if (windowHeight > 800) {
@@ -1132,6 +1140,61 @@ export default {
       }
       catch (err) {
         console.log("EventMangement-initData: " + err)
+      }
+    },
+
+    saveSearchParams(){
+      const params = {
+        curCountry: this.curCountry,
+        curProvince: this.curProvince,
+        curCity: this.curCity,
+        curStore: this.curStore,
+        curStoreTag: this.curStoreTag,
+        inputSearchValue: this.inputSearchValue,
+        dateValue: this.dateValue,
+        curState: this.curState,
+        activeName: this.activeName,
+        sizeNum: this.params.filter.size,
+        page: this.params.filter.page,
+        order: this.order,
+        storeStr: this.params.clause.storeId,
+        searchParams: this.params
+      }
+      const searchConditon = {
+        path: 'eventManage',
+        params: params
+      }
+      SearchConditionUtil.saveSearchCondition(searchConditon)
+    },
+
+    getSearchParams(){
+      const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
+      if(Object.keys(searchParams).length > 0){
+        this.dateValue[0] = searchParams.dateValue[0];
+        this.dateValue[1] = searchParams.dateValue[1].constructor === Date ? new Date(searchParams.dateValue[1]).getTime() : searchParams.dateValue[1];
+        this.curCountry = searchParams.curCountry;
+        this.curProvince = searchParams.curProvince;
+        this.curCity = searchParams.curCity;
+        this.curStore = searchParams.curStore;
+        this.curStoreTag = searchParams.curStoreTag;
+        this.inputSearchValue = searchParams.inputSearchValue;
+        this.dateValue = searchParams.dateValue;
+        this.curState = searchParams.curState;
+        this.activeName = searchParams.activeName;
+        this.sizeNum = searchParams.sizeNum;
+        this.page = searchParams.page;
+        this.order = searchParams.order;
+        this.storeStr = searchParams.storeStr.join(',')
+        this.tableDataList[Number(this.activeName)].page = searchParams.page;
+        this.params = searchParams.searchParams;
+        console.log(this.params)
+        this.ifGetParamsFromCash = true;
+      }else{
+        this.getDeafultTime();
+        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
+        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+        this.params.beginTs = start;
+        this.params.endTs = end;
       }
     }
   },
