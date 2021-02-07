@@ -613,12 +613,30 @@ export default {
             };
             temp.push(obj);
           }
-          const obj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.name
-          };
-          tempStore.push(obj);
+          let storeObj = {};
+          if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
+            if(self.curCity.length > 0 && self.curCity !== "-1"){
+              if(self.curProvince.includes(item.province) && self.curCity.includes(item.city)){
+                storeObj = {
+                  storeId: item.storeId,
+                  label: item.name,
+                  value: item.name,
+                  userId: item.userId,
+                  userName: item.userName
+                };
+              }
+            }
+          }
+          else{
+            storeObj = {
+              storeId: item.storeId,
+              label: item.name,
+              value: item.name,
+              userId: item.userId,
+              userName: item.userName
+            };
+          }
+          Object.keys(storeObj).length > 0 && tempStore.push(storeObj);
         }
       });
       self.provinceList = temp;
@@ -626,13 +644,28 @@ export default {
       self.provinceList.forEach(_item => {
         storeList.forEach(item => {
           if (item.province === _item.value) {
-            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-              const obj = {
-                label: item.city,
-                value: item.city
-              };
-              cityTemp.push(obj);
+            let citObj = {};
+            if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
+              if(self.curCity.length > 0 && self.curCity !== "-1"){
+                if(self.curProvince.includes(item.province)){
+                  if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+                    citObj = {
+                      label: item.city,
+                      value: item.city
+                    };
+                  }
+                }
+              }
             }
+            else{
+              if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+                citObj = {
+                  label: item.city,
+                  value: item.city
+                };
+              }
+            }
+            Object.keys(citObj).length > 0 && cityTemp.push(citObj);
           }
         });
       });
@@ -654,6 +687,7 @@ export default {
         storeArr.push(item.storeId);
       });
       self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
+      self.ifGetParamsFromCash = false;
       self.isInspectItem || self.isPatrol ? await self.getAllStoreList() : '';
       self.changeStoreNew(self.curStore);
       isFirst ? await self.searchData() : null;
@@ -663,6 +697,7 @@ export default {
       this.getSelectedStoreIds();
       this.isPatrol ? this.getSelectCountryOrCity() : '';
       this.isInspectItem || this.isPatrol ? this.getInspectId() : '';
+      console.log(this.params);
       this.$emit('emitSearch', this.params, this.daysRangeList, this.curRegionI, this.curRegionII,
         this.regionMode, this.storePatrolLists, this.storeStr, this.tagNameStr, this.timeMode);
     },
@@ -784,6 +819,7 @@ export default {
         this.filter = searchParams.filter;
         //this.setDefaultSort();
         this.ifGetParamsFromCash = true;
+        console.log(this.params);
       }else{
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
@@ -793,11 +829,11 @@ export default {
     },
 
     setDefaultSort(){
-      this.defaultSort.order = this.order.direction === 'asc' ? 'ascending' : 'descending';
-      this.defaultSort.prop = this.order.property === 'completionRate' ? 'completionRateStr': this.order.property;
+      // this.defaultSort.order = this.order.direction === 'asc' ? 'ascending' : 'descending';
+      // this.defaultSort.prop = this.order.property === 'completionRate' ? 'completionRateStr': this.order.property;
       const paramsObj = {};
       paramsObj.defaultSort = this.defaultSort;
-      paramsObj.order = this.order;
+      // paramsObj.order = this.order;
       paramsObj.filter = this.filter;
       this.$emit('setDefaultSortAndPage', paramsObj);
     }
