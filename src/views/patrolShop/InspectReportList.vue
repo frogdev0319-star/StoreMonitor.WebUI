@@ -48,9 +48,22 @@
           :placeholder="$t('remotePatrol.selectStoreTag')"
           :all-select="0"
           :alltype="0"
-          :options="StoreTagList"
+          :options="storeTagList"
           style="display: inline;margin-left: calc(20/1920*100vw);"
           @changeInput="changeStoreTag"/>
+        <span>{{ $t('remotePatrol.resultType') }}</span>
+        <el-select
+          v-model="curAppraise"
+          :placeholder="$t('remotePatrol.all')"
+          size="mini"
+          class="el-province "
+        >
+          <el-option
+            v-for="item in appraiseList"
+            :key="item.status"
+            :label="item.label"
+            :value="item.status"/>
+        </el-select>
       </el-col>
       <el-col :span="24" class="header-details">
         <span :class="lang === 'en' ? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
@@ -91,18 +104,17 @@
             :label="item.label"
             :value="item.mode"/>
         </el-select>
-        <span>{{ $t('remotePatrol.resultType') }}</span>
+        <span>{{ $t('overview.patrolLists') }}</span>
         <el-select
-          v-model="curAppraise"
-          :placeholder="$t('remotePatrol.all')"
+          v-model="inspectId"
+          :placeholder="$t('insSettingView.selectPost')"
           size="mini"
-          class="el-province "
-        >
+          class="el-province">
           <el-option
-            v-for="item in appraiseList"
-            :key="item.status"
-            :label="item.label"
-            :value="item.status"/>
+            v-for="item in inspectTableList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"/>
         </el-select>
         <div class="search-content">
           <span>{{ $t('remotePatrol.keywords') }}</span>
@@ -115,9 +127,10 @@
           @click="searchData">{{ $t('remotePatrol.search') }}</el-button>
       </el-col>
     </el-col>
-    <el-col :span="24" class="report-content">
-      <el-row v-if="reportList.length!=0" class="card-content">
-        <el-col v-if="reportList.length!=0" :span="24" class="card-header">
+    <el-col :span="24" class="report-content loading">
+      <el-row v-if="reportList.length !== 0" class="card-content" v-loading="isLoading"
+              :element-loading-text="$t('insSettingView.loadingbindstore')">
+        <el-col v-if="reportList.length !== 0" :span="24" class="card-header">
           <el-radio
             v-for="(item,index) in sortTypeList"
             v-model="curSortType"
@@ -185,7 +198,7 @@
             </el-col>
           </el-scrollbar>
         </div>
-        <div v-if="!ShowCard" class="list-table">
+        <div v-else class="list-table">
           <el-table
             :data="reportList"
             :highlight-current-row="true"
@@ -239,7 +252,8 @@
             @size-change="sizeChange"/>
         </el-col>
       </el-row>
-      <el-row v-else class="card-content">
+      <el-row v-else class="card-content" v-loading="isLoading"
+              :element-loading-text="$t('insSettingView.loadingbindstore')">
         <div class="empty-content">{{ noData }}</div>
       </el-row>
     </el-col>
@@ -252,6 +266,7 @@ import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
+import SearchConditionUtil from "../../common/SearchConditionUtil";
 
 export default {
   name: 'InspectReportList',
@@ -369,7 +384,7 @@ export default {
       countryList: [],
       curProvince: [],
       curStoreTag: [],
-      StoreTagList: [],
+      storeTagList: [],
       provinceList: [],
       curCity: [],
       cityList: [],
@@ -424,7 +439,12 @@ export default {
         this.$t('remotePatrol.patrolWay'),
         this.$t('remotePatrol.patrolResult'),
         this.$t('remotePatrol.patrolScore'),
-        this.$t('remotePatrol.patrolDate')]
+        this.$t('remotePatrol.patrolDate')],
+      inspectId: '',
+      inspectTableList: [],
+      filterStoreIds: [],
+      isLoading: false,
+      isFirstIn: true
     };
   },
 
@@ -452,6 +472,7 @@ export default {
           self.$route.meta.keepAlive = true;
         },
         300);
+        this.firstIn = true;
       }
     }
   },
@@ -482,6 +503,8 @@ export default {
 
     initData() {
       let self = this;
+      self.isLoading = true;
+      self.getSearchParams();
       self.changeBrand();
       self.getCountryStore();
       self.getTagListData();
@@ -495,7 +518,7 @@ export default {
       self.showStoreContent = false;
       self.checkAllStore = false;
       self.curStore = [];
-      self.StoreTagList = [];
+      self.storeTagList = [];
     },
 
     async export2Excel() {
@@ -512,7 +535,8 @@ export default {
       that.params.beginTs = start;
       that.params.endTs = end;
       that.params.filter = { page: 0, size: that.total };
-      let storeIds = that.storeStr.split('，');
+      // let storeIds = that.storeStr.split('，');
+      let storeIds = this.filterStoreIds;
       that.params.clause = { storeId: storeIds };
       require.ensure([], async() => {
         let { export_json_to_excel } = require('@/excel/Export2Excel');
@@ -587,6 +611,7 @@ export default {
           });
           self.reportList = temp;
           self.total = res.data.totalElements;
+          self.isLoading = false;
           if (self.reportList.length === 0) {
             self.noData = self.$t('deviceView.noData');
           }
@@ -666,42 +691,58 @@ export default {
       self.params.beginTs = start;
       self.params.endTs = end;
       self.params.filter = { page: 0, size: self.sizeNum };
-      let storeIds = self.storeStr.split('，');
+      //let storeIds = self.storeStr.split('，');
+      let storeIds = self.filterStoreIds;
       self.params.clause = { storeId: storeIds };
       self.getReportList(self.params);
     },
 
-    async getCountryStore() {
+    getCountryStore() {
       let self = this;
-      try {
-        let data = await self.getBriefStoreData();
-        let temp = [];
-        if (data.errCode === 0 && data.errMsg === 'Success') {
-          self.storeList = data.data;
-          if (self.storeList.length !== 0) {
-            self.storeList.forEach(item => {
-              let country = item.country;
-              if (temp.map(x => x.label).indexOf(country) === -1) {
-                let obj = {
-                  value: country,
-                  label: country
-                };
-                temp.push(obj);
-              }
-            });
-          }
-          let countryList = temp;
-          self.countryList[0] = {};
-          self.countryList[0].label = self.$t('remotePatrol.country');
-          self.countryList[0].countryList = countryList;
-          self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-          self.curCountry = countryList[0].value;
-          self.selectAllProAndCity(self.curCountry,true);
+      const params = {
+        'filter': {
+          'page': 0,
+          'size': 2000
         }
-      }
-      catch (err) {
+      };
+      self.getStoreData(params).then(retData => {
+        self.storeList = Object.keys(retData.data).length > 0 ? retData.data.content : [];
+        let temp = [];
+        if (self.storeList.length !== 0) {
+          self.storeList.forEach(item => {
+            let country = item.country;
+            if (temp.map(x => x.label).indexOf(country) === -1) {
+              let obj = {
+                value: country,
+                label: country
+              };
+              temp.push(obj);
+            }
+          });
+        }
+        let countryList = temp;
+        self.countryList[0] = {};
+        self.countryList[0].label = self.$t('remotePatrol.country');
+        self.countryList[0].countryList = countryList;
+        self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+        self.curCountry = countryList[0].value;
+        self.selectAllProAndCity(self.curCountry, true);
+      }).catch(err => {
         console.log("InspectReportList-getCountryStore: "+ err);
-      }
+      })
+    },
+
+    getStoreData(params) {
+      return new Promise((resolve, reject) => {
+        getStoreList(params).then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
     },
 
     getBriefStoreData() {
@@ -721,7 +762,7 @@ export default {
 
     handleStoreChange(arr) {
       this.curStore = arr;
-      this.changeStore(arr);
+      this.changeStoreNew(arr);
     },
 
     handleProChange(arr) {
@@ -732,6 +773,22 @@ export default {
     handleCityChange(arr) {
       this.curCity = arr;
       this.changeCity(arr);
+    },
+
+    changeStoreNew(val) {
+      const self = this;
+      let str = '';
+      self.storeList.forEach((item, index) => {
+        val.forEach(_item => {
+          if (item.storeId === _item) {
+            str += item.name + '，';
+          }
+        });
+      });
+      str = str.substr(0, str.length - 1);
+      self.storeStr = str;
+      self.filterStore();
+      self.getInspectList();
     },
 
     changeStore(val) {
@@ -753,6 +810,36 @@ export default {
       });
       str = str.substr(0, str.length - 1);
       self.storeStr = str;
+      self.getInspectList()
+    },
+
+    filterStore() {
+      const self = this;
+      let filterStoreArray = [];
+      if (self.curStoreTag.length > 0) {
+        filterStoreArray = self.storeList.filter(storeItem => self.curStoreTag.find(tagItem => storeItem.tagIds.find(tagId => tagItem === tagId)));
+        console.log(filterStoreArray);
+      } else {
+        filterStoreArray = self.storeList;
+      }
+      console.log(filterStoreArray);
+      const filterSameStore = [];
+      filterStoreArray.forEach(store => {
+        self.curStore.forEach(selectStore => {
+          if (selectStore === store.storeId) {
+            filterSameStore.push(store);
+          }
+        });
+      });
+      console.log(filterSameStore);
+      const filterStoreIds = [];
+      let filterStoreStr = '';
+      filterSameStore.map(store => {
+        filterStoreIds.push(store.storeId);
+        filterStoreStr += `${store.name}，`;
+      });
+      self.filterStoreIds = filterStoreIds;
+      self.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
     },
 
     changePro(val) {
@@ -815,7 +902,7 @@ export default {
       });
 
       self.curStore = storeArr;
-      self.changeStore(self.curStore);
+      self.changeStoreNew(self.curStore);
     },
 
     changeCountry(val) {
@@ -878,9 +965,9 @@ export default {
 
     changeStoreTag(val) {
       let self = this;
-      let temp = [];
       self.curStoreTag = val;
-      self.changeStore(self.curStore);
+      this.filterStore();
+      this.getInspectList();
     },
 
     getTagListData() {
@@ -894,7 +981,7 @@ export default {
               obj.value = item.tagId;
               obj.label = item.tagName;
               obj.disabled = false;
-              self.StoreTagList.push(obj);
+              self.storeTagList.push(obj);
             });
             resolve(res);
           }
@@ -934,7 +1021,7 @@ export default {
         arr.push(item.value);
       });
       self.curStore = storeArr;
-      self.changeStore(self.curStore);
+      self.changeStoreNew(self.curStore);
     },
 
     clearStoreInfo() {
@@ -959,7 +1046,7 @@ export default {
       self.$refs.citySelect.input = '';
     },
 
-    selectAllProAndCity(val,isFirst) {
+    selectAllProAndCity(val, isFirst) {
       let self = this;
       let storeList = self.storeList;
       let temp = [];
@@ -1016,7 +1103,7 @@ export default {
         storeArr.push(item.storeId);
       });
       self.curStore = storeArr;
-      self.changeStore(self.curStore);
+      self.changeStoreNew(self.curStore);
       isFirst ? self.getInitReportList(0) : null;
     },
 
@@ -1076,7 +1163,8 @@ export default {
       self.params.endTs = end;
       self.page = 1;
       let clause = {};
-      clause.storeId = self.storeStr.split('，');
+      //clause.storeId = self.storeStr.split('，');
+      clause.storeId = self.filterStoreIds;
       if (self.curReportType != null && self.curReportType !== -1) {
         clause.mode = self.curReportType;
       }
@@ -1084,6 +1172,7 @@ export default {
         clause.status = self.curAppraise;
       }
       self.params.clause = clause;
+      self.params.inspectTagId = self.inspectId === "-1" ? "": self.inspectId ;
       let search = self.searchInput.trim();
       if (search.length !== 0) {
         self.params.like = {
@@ -1096,6 +1185,7 @@ export default {
       }
 
       self.params.filter = { page: 0, size: self.sizeNum };
+      self.saveSearchParams();
       self.getReportList(self.params);
     },
 
@@ -1113,6 +1203,74 @@ export default {
       let self = this;
       sessionStorage.setItem('report_data', JSON.stringify(item.routeObj));
       self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
+    },
+
+    getInspectList() {
+      const self = this;
+      const inspectArr = [];
+      self.storeList.forEach(item => {
+        if (self.filterStoreIds.indexOf(item.storeId) !== -1 && item.appliedInspect.length !== 0) {
+          inspectArr.push(item.appliedInspect);
+        }
+      });
+      const newArr = [];
+      const inspectList = [];
+      inspectArr.forEach(item => {
+        item.forEach(_item => {
+          if (!newArr.includes(_item.id)) {
+            newArr.push(_item.id);
+            inspectList.push(_item);
+          }
+        });
+      });
+      self.inspectTableList = inspectList;
+      self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
+      if (inspectList.length !== 0) {
+        self.inspectId = self.inspectTableList[0].id;
+      } else {
+        self.inspectId = '';
+      }
+    },
+
+    saveSearchParams(){
+      let tempsearchParamsObj = this.params;
+      tempsearchParamsObj.curCountry = this.curCountry;
+      tempsearchParamsObj.curProvince = this.curProvince;
+      tempsearchParamsObj.curCity = this.curCity;
+      tempsearchParamsObj.curStore = this.curStore;
+      tempsearchParamsObj.curStoreTag = this.curStoreTag;
+      tempsearchParamsObj.timeMode = this.timeMode;
+      const searchParamsObj = {
+        path: 'inspectReport',
+        params: tempsearchParamsObj
+      };
+      SearchConditionUtil.saveSearchCondition(searchParamsObj);
+    },
+
+    getSearchParams(){
+      const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
+      if(Object.keys(searchParams).length > 0){
+        this.dateValue[0] = new Date(searchParams.beginTs);
+        this.dateValue[1] = new Date(searchParams.endTs);
+        this.params.beginTs = searchParams.beginTs;
+        this.params.endTs = searchParams.endTs;
+        this.curStore = searchParams.storeIds;
+        this.timeMode = searchParams.timeMode;
+        this.curCountry = searchParams.curCountry;
+        this.curProvince = searchParams.curProvince;
+        this.curCity = searchParams.curCity;
+        this.curStore = searchParams.curStore;
+        this.curStoreTag = searchParams.curStoreTag;
+        this.order = searchParams.order;
+        this.filter = searchParams.filter;
+        //this.setDefaultSort();
+        this.ifGetParamsFromCash = true;
+      }else{
+        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
+        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+        this.params.beginTs = start;
+        this.params.endTs = end;
+      }
     },
 
     notify(msg, type, time) {
@@ -1593,14 +1751,9 @@ $suggestBack:#F1F6FE;
 </style>
 <style scoped>
     .el-select >>> .el-input__inner{
-        background: #f4f5f9 !important;
-        border: 1px solid #E4E7ED  !important;
-        /*border-radius: 0px !important;*/
-        /*border: 0 !important;*/
-        /*height: 28px !important;*/
-        /*line-height: 28px !important;*/
+      background: #f4f5f9 !important;
+      border: 1px solid #E4E7ED  !important;
     }
-    /* 浏览器滚动条样式 */
     #el-menuscrollbar .el-scrollbar__wrap {
       overflow-x: hidden;
     }
