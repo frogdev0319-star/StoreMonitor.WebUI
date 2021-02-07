@@ -20,7 +20,7 @@
           </el-col>
           <el-col :span="14" class="store-events">
             <div class="region-result">
-              <div class="charts-content">
+              <div class="charts-content" v-loading="isLoading">
                 <v-chart
                   ref="storeEventRef"
                   :options="storeEventsOptions"
@@ -452,7 +452,8 @@ export default {
       hasNoData: false,
       fontFamily: 'Roboto, Microsoft YaHei',
       ifSaveParams: false,
-      defaultSort: {prop: 'numOfTotal', order: 'ascending'}
+      defaultSort: {prop: 'numOfTotal', order: 'ascending'},
+      isLoading: true
     };
   },
 
@@ -535,6 +536,7 @@ export default {
         });
         option.dataset.source = soureceList;
       }
+      self.isLoading = false;
       self.storeEventsOptions = option;
     },
 
