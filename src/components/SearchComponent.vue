@@ -100,7 +100,7 @@
       <div class="exprotBtn" style="float:right;">
         <el-button
           :class="lang==='en'? 'en-search-btn':'search-btn' "
-          :disabled="storeDataList.length === 0"
+          :disabled="storeListLength === 0"
           size="mini"
           style="vertical-align: middle;"
           type="primary"
@@ -132,6 +132,7 @@ import { mapGetters } from 'vuex';
 import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
 import util from '../common/util.js';
 import { inpectRESTful } from '@/api/index';
+import SearchConditionUtil from "../common/SearchConditionUtil";
 
 export default {
   name: 'SearchComponent',
@@ -148,6 +149,13 @@ export default {
     isInspectItem: {
       type: Boolean,
       default: false
+    },
+    path: {
+      type: String,
+      default: ''
+    },
+    defaultSort:{
+      type:Object
     }
   },
 
@@ -186,7 +194,11 @@ export default {
       inspectTypeList: [],
       inspectList: '',
       allStoreData: [],
-      storePatrolLists: []
+      storePatrolLists: [],
+      ifGetParamsFromCash: false,
+      storeListLength: -1,
+      order: {direction: '', property: ''},
+      filter: {page: 0, size: 10}
     };
   },
 
@@ -203,6 +215,8 @@ export default {
         const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
+        self.ifGetParamsFromCash = false;
+        await this.getSearchParams();
         self.initDaysRange();
         self.initData();
         self.curStoreTag = [];
@@ -218,6 +232,7 @@ export default {
     self.params.endTs = end;
     self.params.timeMode = self.timeMode;
     self.tagNameStr = '--';
+    await this.getSearchParams();
     self.initDaysRange();
     self.initData();
   },
@@ -348,7 +363,7 @@ export default {
         self.countryList[0].label = self.$t('remotePatrol.country');
         self.countryList[0].countryList = countryList;
         self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        self.curCountry = countryList[0].value;
+        self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value : self.curCountry;
         self.selectAllProAndCity(self.curCountry, true);
       }
     },
@@ -435,6 +450,7 @@ export default {
         }
       }
       self.storeDataList = tempStore;
+      self.storeListLength = this.storeDataList.length;
       let storeArr = [], arr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
@@ -460,6 +476,7 @@ export default {
 
     getTagListData() {
       const self = this;
+      self.storeTagList = [];
       return new Promise((resolve, reject) => {
         GetTagList().then(res => {
           const errMsg = res.errMsg;
@@ -550,6 +567,7 @@ export default {
         });
       }
       self.storeDataList = tempStore;
+      self.storeListLength = this.storeDataList.length;
       let storeArr = [], arr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
@@ -623,19 +641,19 @@ export default {
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
-      self.curProvince = provinceArr;
+      self.curProvince = (!self.ifGetParamsFromCash) ? provinceArr : self.curProvince;
 
       const cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
-      self.curCity = cityArr;
+      self.curCity = (!self.ifGetParamsFromCash) ? cityArr : self.curCity;
       self.storeDataList = tempStore;
       const storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = storeArr;
+      self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
       self.isInspectItem || self.isPatrol ? await self.getAllStoreList() : '';
       self.changeStoreNew(self.curStore);
       isFirst ? await self.searchData() : null;
@@ -714,10 +732,9 @@ export default {
       }
     },
 
-    async initData() {
-      const self = this;
-      self.getCountryStore();
-      self.getTagListData();
+    initData() {
+      this.getCountryStore();
+      this.getTagListData();
     },
 
     handleExportPdf() {
@@ -735,6 +752,54 @@ export default {
           reject(err);
         });
       });
+    },
+
+    saveSearchParams(saveParamsObj){
+      const params = saveParamsObj.params;
+      params.curCountry = this.curCountry;
+      params.curProvince = this.curProvince;
+      params.curCity = this.curCity;
+      params.curStore = this.curStore;
+      params.curStoreTag = this.curStoreTag;
+      params.timeMode = this.timeMode;
+      console.log(params)
+      SearchConditionUtil.saveSearchCondition(saveParamsObj);
+    },
+
+    getSearchParams(){
+      const searchParams = SearchConditionUtil.getSearchCondition(this.path);
+      if(Object.keys(searchParams).length > 0){
+        this.dateValue[0] = new Date(searchParams.beginTs);
+        this.dateValue[1] = new Date(searchParams.endTs);
+        this.params.beginTs = searchParams.beginTs;
+        this.params.endTs = searchParams.endTs;
+        this.curStore = searchParams.storeIds;
+        this.timeMode = searchParams.timeMode;
+        this.curCountry = searchParams.curCountry;
+        this.curProvince = searchParams.curProvince;
+        this.curCity = searchParams.curCity;
+        this.curStore = searchParams.curStore;
+        this.curStoreTag = searchParams.curStoreTag;
+        this.order = searchParams.order;
+        this.filter = searchParams.filter;
+        //this.setDefaultSort();
+        this.ifGetParamsFromCash = true;
+      }else{
+        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
+        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+        this.params.beginTs = start;
+        this.params.endTs = end;
+      }
+    },
+
+    setDefaultSort(){
+      this.defaultSort.order = this.order.direction === 'asc' ? 'ascending' : 'descending';
+      this.defaultSort.prop = this.order.property === 'completionRate' ? 'completionRateStr': this.order.property;
+      const paramsObj = {};
+      paramsObj.defaultSort = this.defaultSort;
+      paramsObj.order = this.order;
+      paramsObj.filter = this.filter;
+      this.$emit('setDefaultSortAndPage', paramsObj);
     }
   }
 };
