@@ -129,7 +129,7 @@
                   @click="filterNVR"/>
               </div>
               <div :class="lang === 'en' ? 'en-model-title': 'model-title'" class="titles">
-                <span>{{ $t('deviceView.EzvizAccount') }}</span>
+                <span>{{ $t('deviceView.ezvizAccount') }}</span>
                 <i
                   :class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}"
                   class="icon-filter"
@@ -2317,12 +2317,6 @@ export default {
           }
           .en-model-title {
             width: 22%;
-            span {
-              left: 0;
-            }
-            .icon-filter {
-              left: 0;
-            }
           }
           .en-store-title {
             width: 20%;
@@ -2360,12 +2354,6 @@ export default {
             }
             .en-model-title {
               width: 23%;
-              span {
-                left: 0;
-              }
-              .icon-filter {
-                left: 0;
-              }
             }
             .en-store-title {
               width: 20%;
@@ -2404,12 +2392,6 @@ export default {
             }
             .en-model-title {
               width: 25%;
-              span {
-                left: 0;
-              }
-              .icon-filter {
-                left: 0;
-              }
             }
             .en-store-title {
               width: 20%;
@@ -2449,12 +2431,6 @@ export default {
             }
             .en-model-title {
               width: 26%;
-              span {
-                left: 0;
-              }
-              .icon-filter {
-                left: 0;
-              }
             }
             .en-store-title {
               width: 20%;
