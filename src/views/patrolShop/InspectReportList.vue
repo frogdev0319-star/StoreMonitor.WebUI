@@ -444,7 +444,8 @@ export default {
       inspectTableList: [],
       filterStoreIds: [],
       isLoading: false,
-      isFirstIn: true
+      ifSaveParams: true,
+      ifGetParamsFromCash: false
     };
   },
 
@@ -472,7 +473,7 @@ export default {
           self.$route.meta.keepAlive = true;
         },
         300);
-        this.firstIn = true;
+        self.ifSaveParams = true;
       }
     }
   },
@@ -504,10 +505,7 @@ export default {
     initData() {
       let self = this;
       self.isLoading = true;
-      self.getSearchParams();
       self.changeBrand();
-      self.getCountryStore();
-      self.getTagListData();
       self.defaultTime = [];
       self.storeStr = '';
       self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, new Date()];
@@ -519,6 +517,9 @@ export default {
       self.checkAllStore = false;
       self.curStore = [];
       self.storeTagList = [];
+      self.getSearchParams();
+      self.getCountryStore();
+      self.getTagListData();
     },
 
     async export2Excel() {
@@ -685,16 +686,18 @@ export default {
     },
 
     getInitReportList() {
-      let self = this;
-      let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-      let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-      self.params.beginTs = start;
-      self.params.endTs = end;
-      self.params.filter = { page: 0, size: self.sizeNum };
-      //let storeIds = self.storeStr.split('，');
-      let storeIds = self.filterStoreIds;
-      self.params.clause = { storeId: storeIds };
-      self.getReportList(self.params);
+      // let self = this;
+      // let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+      // let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+      // self.params.beginTs = start;
+      // self.params.endTs = end;
+      // self.params.filter = { page: 0, size: self.sizeNum };
+      // //let storeIds = self.storeStr.split('，');
+      // let storeIds = self.filterStoreIds;
+      // self.params.clause = { storeId: storeIds };
+      // self.getSearchParams();
+      console.log(this.params);
+      this.getReportList(this.params);
     },
 
     getCountryStore() {
@@ -891,7 +894,7 @@ export default {
           self.cityList.forEach(item => {
             cityArr.push(item.value);
           });
-          self.curCity = cityArr;
+          self.curCity = (!self.ifGetParamsFromCash) ? cityArr : self.curCity;
         }
       }
       self.storeDataList = tempStore;
@@ -901,7 +904,7 @@ export default {
         arr.push(item.value);
       });
 
-      self.curStore = storeArr;
+      self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
       self.changeStoreNew(self.curStore);
     },
 
@@ -1090,19 +1093,19 @@ export default {
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
-      self.curProvince = provinceArr;
+      self.curProvince = (!self.ifGetParamsFromCash) ? provinceArr: self.curProvince;
 
       let cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
-      self.curCity = cityArr;
+      self.curCity = (!self.ifGetParamsFromCash) ? cityArr: self.curCity;
       self.storeDataList = tempStore;
       let storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = storeArr;
+      self.curStore = (!self.ifGetParamsFromCash) ? storeArr: self.curStore;
       self.changeStoreNew(self.curStore);
       isFirst ? self.getInitReportList(0) : null;
     },
@@ -1233,7 +1236,8 @@ export default {
     },
 
     saveSearchParams(){
-      let tempsearchParamsObj = this.params;
+      let tempsearchParamsObj = {};
+      tempsearchParamsObj.searchCondition = this.params;
       tempsearchParamsObj.curCountry = this.curCountry;
       tempsearchParamsObj.curProvince = this.curProvince;
       tempsearchParamsObj.curCity = this.curCity;
@@ -1250,8 +1254,8 @@ export default {
     getSearchParams(){
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
       if(Object.keys(searchParams).length > 0){
-        this.dateValue[0] = new Date(searchParams.beginTs);
-        this.dateValue[1] = new Date(searchParams.endTs);
+        this.dateValue[0] = new Date(searchParams.searchCondition.beginTs);
+        this.dateValue[1] = new Date(searchParams.searchCondition.endTs);
         this.params.beginTs = searchParams.beginTs;
         this.params.endTs = searchParams.endTs;
         this.curStore = searchParams.storeIds;
@@ -1263,6 +1267,10 @@ export default {
         this.curStoreTag = searchParams.curStoreTag;
         this.order = searchParams.order;
         this.filter = searchParams.filter;
+        this.params = searchParams.searchCondition;
+        this.curAppraise = searchParams.searchCondition.clause.status;
+        this.curReportType = searchParams.searchCondition.clause.mode;
+        this.inspectId = searchParams.searchCondition.inspectTagId;
         //this.setDefaultSort();
         this.ifGetParamsFromCash = true;
       }else{
@@ -1270,6 +1278,10 @@ export default {
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
         this.params.endTs = end;
+        this.params.filter = { page: 0, size: this.sizeNum };
+        //let storeIds = self.storeStr.split('，');
+        let storeIds = this.filterStoreIds;
+        this.params.clause = { storeId: storeIds };
       }
     },
 
