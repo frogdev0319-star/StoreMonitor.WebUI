@@ -686,17 +686,6 @@ export default {
     },
 
     getInitReportList() {
-      // let self = this;
-      // let start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-      // let end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-      // self.params.beginTs = start;
-      // self.params.endTs = end;
-      // self.params.filter = { page: 0, size: self.sizeNum };
-      // //let storeIds = self.storeStr.split('，');
-      // let storeIds = self.filterStoreIds;
-      // self.params.clause = { storeId: storeIds };
-      // self.getSearchParams();
-      console.log(this.params);
       this.getReportList(this.params);
     },
 
@@ -728,7 +717,7 @@ export default {
         self.countryList[0].label = self.$t('remotePatrol.country');
         self.countryList[0].countryList = countryList;
         self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        self.curCountry = countryList[0].value;
+        self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value: self.curCountry;
         self.selectAllProAndCity(self.curCountry, true);
       }).catch(err => {
         console.log("InspectReportList-getCountryStore: "+ err);
@@ -917,55 +906,6 @@ export default {
       self.selectAllProAndCity(val,false);
     },
 
-    changeCountryss(val) {
-      let self = this;
-      self.curProvince = [];
-      self.curCity = [];
-      self.curStoreTag = [];
-      let storeList = self.storeList;
-      let tempStore = [];
-      let temp = [];
-      self.clearProviceInfo();
-      self.clearCityInfo();
-      self.clearStoreInfo();
-      if (val === '') {
-        storeList.forEach(item => {
-          let obj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.name,
-            userId: item.userId,
-            userName: item.userName
-          };
-          tempStore.push(obj);
-        });
-        // self.storeDataList=tempStore;
-        self.checkAllStore = false;
-      } else {
-        storeList.forEach(item => {
-          if (item.country === val) {
-            if (temp.map(x => x.value).indexOf(item.province) === -1) {
-              let obj = {
-                label: item.province,
-                value: item.province
-              };
-              temp.push(obj);
-            }
-            let obj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              userName: item.userName
-            };
-            tempStore.push(obj);
-          }
-        });
-      }
-      self.provinceList = temp;
-      self.storeDataList = tempStore;
-    },
-
     changeStoreTag(val) {
       let self = this;
       self.curStoreTag = val;
@@ -1063,14 +1003,30 @@ export default {
             };
             temp.push(obj);
           }
-          let obj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.name,
-            userId: item.userId,
-            userName: item.userName
-          };
-          tempStore.push(obj);
+          let storeObj = {};
+          if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
+            if(self.curCity.length > 0 && self.curCity !== "-1"){
+              if(self.curProvince.includes(item.province) && self.curCity.includes(item.city)){
+                storeObj = {
+                  storeId: item.storeId,
+                  label: item.name,
+                  value: item.name,
+                  userId: item.userId,
+                  userName: item.userName
+                };
+              }
+            }
+          }
+          else{
+            storeObj = {
+              storeId: item.storeId,
+              label: item.name,
+              value: item.name,
+              userId: item.userId,
+              userName: item.userName
+            };
+          }
+          Object.keys(storeObj).length > 0 && tempStore.push(storeObj);
         }
       });
       self.provinceList = temp;
@@ -1078,13 +1034,28 @@ export default {
       self.provinceList.forEach(_item => {
         storeList.forEach(item => {
           if (item.province === _item.value) {
-            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-              let obj = {
-                label: item.city,
-                value: item.city
-              };
-              cityTemp.push(obj);
+            let citObj = {};
+            if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
+              if(self.curCity.length > 0 && self.curCity !== "-1"){
+                if(self.curProvince.includes(item.province)){
+                  if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+                    citObj = {
+                      label: item.city,
+                      value: item.city
+                    };
+                  }
+                }
+              }
             }
+            else{
+              if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+                citObj = {
+                  label: item.city,
+                  value: item.city
+                };
+              }
+            }
+            Object.keys(citObj).length > 0 && cityTemp.push(citObj);
           }
         });
       });
@@ -1106,6 +1077,7 @@ export default {
         storeArr.push(item.storeId);
       });
       self.curStore = (!self.ifGetParamsFromCash) ? storeArr: self.curStore;
+      self.ifGetParamsFromCash = false;
       self.changeStoreNew(self.curStore);
       isFirst ? self.getInitReportList(0) : null;
     },
