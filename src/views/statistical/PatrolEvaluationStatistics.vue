@@ -2,7 +2,10 @@
   <div>
     <el-row class="statistics-container">
       <el-col :span="24">
-        <search-component :is-patrol = "true" @emitSearch = "emitSearch" @exportPdf = "exportPdf"/>
+        <search-component :is-patrol = "true" @emitSearch = "emitSearch"
+                          @exportPdf = "exportPdf" ref="inspectEvalutionSearch"
+                          path="inspectEvalutionStatistics" :defaultSort="defaultSort"
+                          @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
       <div class="statistics-content content">
         <el-col :span="24" class="region-chart">
@@ -541,7 +544,9 @@ export default {
       storeOrder: { 'direction': 'asc', 'property': 'qualifiedRate' },
       fontFamily: 'Roboto, Microsoft YaHei',
       ispdf: false,
-      regionMode: 2
+      regionMode: 2,
+      ifSaveParams: false,
+      defaultSort: {prop: 'qualifiedRateStr', order: 'ascending'}
     };
   },
 
@@ -1247,6 +1252,12 @@ export default {
       this.regionMode = regionMode;
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.ifSaveParams && this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
       this.searchData();
     },
 
@@ -1263,6 +1274,11 @@ export default {
       self.sizeNumRegion = pageObj.size;
       self.regionFilter = { page: self.pageRegion - 1, size: self.sizeNumRegion };
       self.getInspectStatsOverviewOfRegionTable();
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleRegionSortChange(order) {
@@ -1272,6 +1288,11 @@ export default {
         size: this.sizeNumRegion
       };
       this.getInspectStatsOverviewOfRegionTable();
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStorePageAndSizeChange(pageObj) {
@@ -1279,6 +1300,11 @@ export default {
       this.pageStore = pageObj.page;
       this.storeFilter = { page: this.pageStore - 1, size: this.sizeNumStore };
       this.getInspectStatsOverviewOfStore();
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStoreSortChange(order) {
@@ -1288,7 +1314,20 @@ export default {
         size: this.sizeNumStore
       };
       this.getInspectStatsOverviewOfStore();
-    }
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+    },
+
+    setDefaultSortAndPage(paramsObj){
+      console.log(paramsObj)
+      this.defaultSort = paramsObj.defaultSort;
+      this.order = this.params.order = paramsObj.order;
+      this.sizeNum = paramsObj.filter.size;
+      this.page = paramsObj.filter.page + 1;
+    },
   }
 };
 </script>

@@ -2,7 +2,10 @@
   <div>
     <div class="item-container">
       <el-col :span="24">
-        <search-component :is-inspect-item = "true" @emitSearch = "emitSearch"/>
+        <search-component :is-inspect-item = "true" @emitSearch = "emitSearch"
+                          ref="inspectItemSearch"
+                          path="inspectItemStatistics" :defaultSort="defaultSort"
+                          @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
       <el-col :span="24" class="items-content content">
         <el-col :span="24" class="contents-container">
@@ -88,7 +91,7 @@
               :highlight-current-row= "true"
               :pagesize="sizeNum"
               :current-page="page"
-              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+              :default-sort = "defaultSort"
               @handleChange="handlePageAndSizeChange"
               @sortChange="handleSortChange"/>
           </el-col>
@@ -329,7 +332,9 @@ export default {
       order: {
         direction: 'asc',
         property: 'qualifiedRate'
-      }
+      },
+      defaultSort: {prop: 'qualifiedRateStr', order: 'ascending'},
+      ifSaveParams: false
     };
   },
 
@@ -791,6 +796,12 @@ export default {
       this.storePatrolLists = storePatrolLists;
       this.storeNameStr = storeNameStr;
       this.storeTagStr = storeTagStr;
+      const searchParamsObj = {
+        path: 'inspectItemStatistics',
+        params: this.params
+      };
+      this.ifSaveParams && this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
       this.searchData();
     },
 
@@ -799,6 +810,11 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      const searchParamsObj = {
+        path: 'inspectItemStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
       self.getInspectItemsTable();
     },
 
@@ -808,8 +824,21 @@ export default {
         page: this.page - 1,
         size: this.sizeNum
       };
+      const searchParamsObj = {
+        path: 'inspectItemStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
       this.getInspectItemsTable();
-    }
+    },
+
+    setDefaultSortAndPage(paramsObj){
+      console.log(paramsObj)
+      this.defaultSort = paramsObj.defaultSort;
+      this.order = this.params.order = paramsObj.order;
+      this.sizeNum = paramsObj.filter.size;
+      this.page = paramsObj.filter.page + 1;
+    },
   }
 };
 </script>

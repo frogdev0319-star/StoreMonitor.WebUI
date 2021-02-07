@@ -2,7 +2,8 @@
   <div>
     <div class="el-overview-content">
       <el-col :span="24">
-        <search-component @emitSearch = "emitSearch" @exportPdf = "exportPdf"/>
+        <search-component @emitSearch = "emitSearch" @exportPdf = "exportPdf" ref="eventSearch"
+                          path="eventStatistics" :defaultSort="defaultSort" @changeDefaultSort="setDefaultSortAndPage"/>
       </el-col>
       <el-col :span="24" class="el-overview">
         <el-row class="first-row">
@@ -449,7 +450,9 @@ export default {
         this.$t('overview.storeMonitor')
       ],
       hasNoData: false,
-      fontFamily: 'Roboto, Microsoft YaHei'
+      fontFamily: 'Roboto, Microsoft YaHei',
+      ifSaveParams: false,
+      defaultSort: {prop: 'numOfTotal', order: 'ascending'}
     };
   },
 
@@ -460,12 +463,13 @@ export default {
   watch: {
     async accountChanged(val) {
       if (val !== 0) {
+        this.ifSaveParams = false;
         this.initData();
       }
     }
   },
 
-  async created() {
+  created() {
     this.initData();
   },
 
@@ -747,6 +751,12 @@ export default {
     async getEventTableData() {
       const self = this;
       self.params.timeMode = self.timeMode;
+      const searchParamsObj = {
+        path: 'eventStatistics',
+        params: this.params
+      };
+      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
       const eventResult = await self.getEventTableDataInfo(self.params);
       const ignorePer = 0;
       const errCode = eventResult.errCode;
@@ -953,55 +963,55 @@ export default {
       });
     },
 
-    sortChange(col) {
-      const self = this;
-      const order = col.order;
-      self.order = order;
-      let prop = '';
-      let tempOrder = '';
-      if (order === 'ascending') {
-        let property = '';
-        if (col.column.property === 'RemoteStr') {
-          property = 'numOfRemote';
-        } else if (col.column.property === 'OnsiteStr') {
-          property = 'numOfOnsite';
-        } else if (col.column.property === 'VideoStr') {
-          property = 'numOfVideo';
-        } else {
-          property = col.column.property;
-        }
-        self.order = self.params.order = {
-          'direction': 'asc',
-          'property': property
-        };
-        prop = col.column.property;
-        tempOrder = 'asc';
-      } else if (order === 'descending') {
-        let property = '';
-        if (col.column.property === 'RemoteStr') {
-          property = 'numOfRemote';
-        } else if (col.column.property === 'OnsiteStr') {
-          property = 'numOfOnsite';
-        } else if (col.column.property === 'VideoStr') {
-          property = 'numOfVideo';
-        } else {
-          property = col.column.property;
-        }
-        self.order = self.params.order = {
-          'direction': 'desc',
-          'property': property
-        };
-        prop = col.column.property;
-        tempOrder = 'desc';
-      } else {
-        self.order = self.params.order = { 'direction': 'asc', 'property': 'numOfTotal' };
-      }
-      self.params.filter = {
-        page: self.page - 1,
-        size: self.sizeNum
-      };
-      self.getEventTableData();
-    },
+    // sortChange(col) {
+    //   const self = this;
+    //   const order = col.order;
+    //   self.order = order;
+    //   let prop = '';
+    //   let tempOrder = '';
+    //   if (order === 'ascending') {
+    //     let property = '';
+    //     if (col.column.property === 'RemoteStr') {
+    //       property = 'numOfRemote';
+    //     } else if (col.column.property === 'OnsiteStr') {
+    //       property = 'numOfOnsite';
+    //     } else if (col.column.property === 'VideoStr') {
+    //       property = 'numOfVideo';
+    //     } else {
+    //       property = col.column.property;
+    //     }
+    //     self.order = self.params.order = {
+    //       'direction': 'asc',
+    //       'property': property
+    //     };
+    //     prop = col.column.property;
+    //     tempOrder = 'asc';
+    //   } else if (order === 'descending') {
+    //     let property = '';
+    //     if (col.column.property === 'RemoteStr') {
+    //       property = 'numOfRemote';
+    //     } else if (col.column.property === 'OnsiteStr') {
+    //       property = 'numOfOnsite';
+    //     } else if (col.column.property === 'VideoStr') {
+    //       property = 'numOfVideo';
+    //     } else {
+    //       property = col.column.property;
+    //     }
+    //     self.order = self.params.order = {
+    //       'direction': 'desc',
+    //       'property': property
+    //     };
+    //     prop = col.column.property;
+    //     tempOrder = 'desc';
+    //   } else {
+    //     self.order = self.params.order = { 'direction': 'asc', 'property': 'numOfTotal' };
+    //   }
+    //   self.params.filter = {
+    //     page: self.page - 1,
+    //     size: self.sizeNum
+    //   };
+    //   self.getEventTableData();
+    // },
 
     emitSearch(searchParams, dateRangeList, curRegionI, curRegionII,
       regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
@@ -1034,7 +1044,12 @@ export default {
         size: this.sizeNum
       };
       this.getEventTableData();
-    }
+    },
+
+    setDefaultSortAndPage(paramsObj){
+      this.defaultSort = paramsObj.defaultSort;
+      this.order = this.params.order = paramsObj.order;
+    },
 
   }
 };
