@@ -863,50 +863,61 @@ export default {
     async getEventList(val) {
       let self = this;
       let tabIndex = Number(this.activeName);
-      self.getEventListRequestParams(val);
-      this.ifSaveParams && self.saveSearchParams();
-      this.ifSaveParams = true;
-      eventRESTful.getEventList(self.params).then((res) => {
-        let data = res.data.content;
-        let temp = [];
-        data.forEach(item => {
-          let attachment = [];
-          if (item.initialComment.attachment.length !== 0) {
-            item.initialComment.attachment.some(x => x.mediaType === 0) ? attachment.push({ url: self.attachmentAudio }) : '';
-            item.initialComment.attachment.some(x => x.mediaType === 1) ? attachment.push({ url: self.attachmentVideo }) : '';
-            item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
-          }
-          let obj = {
-            id: item.id,
-            ts: util.getDateTime(item.ts),
-            assignee: item.assignee,
-            assignerName: item.assignerName,
-            assigneeName: item.assigneeName,
-            deviceId: item.deviceId,
-            status: item.status,
-            storeId: item.storeId,
-            storeName: item.storeName,
-            inspectTagName: item.inspectTagName,
-            subject: item.subject,
-            score: item.score,
-            sourceType: item.sourceType,
-            attachment: attachment,
-            initialComment: item.initialComment,
-            relatedDeviceIds: item.relatedDeviceIds,
-            province: item.province,
-            city: item.city,
-            code: item.code,
-          };
-          temp.push(obj);
+      
+      if(self.storeStr !== ''){
+        self.getEventListRequestParams(val);
+        this.ifSaveParams && self.saveSearchParams();
+        this.ifSaveParams = true;
+        eventRESTful.getEventList(self.params).then((res) => {
+          let data = res.data.content;
+          let temp = [];
+          data.forEach(item => {
+            let attachment = [];
+            if (item.initialComment.attachment.length !== 0) {
+              item.initialComment.attachment.some(x => x.mediaType === 0) ? attachment.push({ url: self.attachmentAudio }) : '';
+              item.initialComment.attachment.some(x => x.mediaType === 1) ? attachment.push({ url: self.attachmentVideo }) : '';
+              item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
+            }
+            let obj = {
+              id: item.id,
+              ts: util.getDateTime(item.ts),
+              assignee: item.assignee,
+              assignerName: item.assignerName,
+              assigneeName: item.assigneeName,
+              deviceId: item.deviceId,
+              status: item.status,
+              storeId: item.storeId,
+              storeName: item.storeName,
+              inspectTagName: item.inspectTagName,
+              subject: item.subject,
+              score: item.score,
+              sourceType: item.sourceType,
+              attachment: attachment,
+              initialComment: item.initialComment,
+              relatedDeviceIds: item.relatedDeviceIds,
+              province: item.province,
+              city: item.city,
+              code: item.code,
+            };
+            temp.push(obj);
+          });
+          self.tableDataList[tabIndex].tableData = temp;
+          self.tableDataList[tabIndex].total = res.data.totalElements;
+          self.tableDataList[tabIndex].eventCount = res.data.totalElements;
+          self.totalElements = res.data.totalElements;
+          self.numberOfElements = res.data.numberOfElements;
+        }).catch(err => {
+          console.log('EventManagement-getEventList:' + err);
         });
-        self.tableDataList[tabIndex].tableData = temp;
-        self.tableDataList[tabIndex].total = res.data.totalElements;
-        self.tableDataList[tabIndex].eventCount = res.data.totalElements;
-        self.totalElements = res.data.totalElements;
-        self.numberOfElements = res.data.numberOfElements;
-      }).catch(err => {
-        console.log('EventManagement-getEventList:' + err);
-      });
+      }else{
+        self.ifSaveParams && self.saveSearchParams();
+        self.ifSaveParams = true;
+        self.tableDataList[tabIndex].tableData = [];
+        self.tableDataList[tabIndex].total = 0;
+        self.tableDataList[tabIndex].eventCount = 0;
+        self.totalElements = 0;
+        self.numberOfElements = 0;
+      }
     },
 
     getEventListRequestParams(val){
