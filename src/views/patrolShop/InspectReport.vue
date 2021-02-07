@@ -145,10 +145,10 @@
                   <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn">
                     {{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}
                   </div>
-                  <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn">
+                  <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn" style="background-color:#2AC25D;">
                     {{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}
                   </div>
-                  <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" class="title-btn">
+                  <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" class="title-btn" :style="_item.grade < _item.qualifiedScore ? '' : 'background-color:#2AC25D'">
                     {{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}
                   </div>
                 </div>
@@ -571,6 +571,7 @@ export default {
             details.comment = item.comment;
             details.description = item.description;
             details.grade = item.grade;
+            details.qualifiedScore = item.qualifiedScore;
             if (item.attachment.length !== 0) {
               const _temp = [];
               const audioObj = {};

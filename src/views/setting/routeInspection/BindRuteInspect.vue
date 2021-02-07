@@ -57,7 +57,8 @@
           size="small"
           class="el-search-input"
           clearable
-          @keyup.enter.native="searchStoreInput">
+          @keyup.enter.native="searchStoreInput"
+          @clear="searchStoreInput">
           <i
             slot="prefix"
             class="iconfont icon-sousuo"
@@ -129,10 +130,11 @@
   </div>
 </template>
 <script>
-import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
+import {getBriefStoreList, GetTagList } from '@/api/store';
 import { applyItemInspectItem, UnapplyInspectItem, getInspectBindList } from '@/api/inspect';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
+import util from '@/common/util';
 
 export default {
   name: 'BindRuteInspect',
@@ -179,7 +181,8 @@ export default {
       curCitys: this.$t('storeView.cityPlaceholder'),
       showPopoVer: true,
       lang: this.$i18n.locale,
-      loadingGif: require('../../../../static/img/loading.gif')
+      loadingGif: require('../../../../static/img/loading.gif'),
+      bindStoreId:[]
     };
   },
 
@@ -233,7 +236,9 @@ export default {
     async getCountryStore() {
       const self = this;
       const data = await self.getBriefStoreData();
+      self.bindStoreId = await self.getBindStoreList();
       const temp = [];
+      self.totalCount = data.data.length;
       if (data.errCode === 0 && data.errMsg === 'Success') {
         self.tempStoreData = data.data;
         if (self.tempStoreData.length !== 0) {
@@ -315,14 +320,13 @@ export default {
         storeArr.push(item.storeId);
       });
       self.curStore = storeArr;
-      self.changeStore(self.curStore);
+      self.searchStore();
     },
 
     changeStoreTag(val) {
       const self = this;
-      const temp = [];
       self.curStoreTag = val;
-      self.changeStore(self.curStore);
+      self.searchStore();
     },
 
     changeCountry(val) {
@@ -395,7 +399,7 @@ export default {
       });
 
       self.curStore = storeArr;
-      self.changeStore(self.curStore);
+      self.searchStore();
     },
 
     changeCity(val) {
@@ -428,13 +432,13 @@ export default {
         arr.push(item.value);
       });
       self.curStore = storeArr;
-      self.changeStore(self.curStore);
+      self.searchStore();
     },
 
     handleStoreChange(arr) {
       const self = this;
       self.curStore = arr;
-      self.changeStore(arr);
+      self.searchStore();
     },
 
     handleProChange(arr) {
@@ -471,175 +475,77 @@ export default {
       self.$refs.citySelect.input = '';
     },
 
-    changeStore(val) {
-      const self = this;
-      let str = '';
-      self.tempStoreData.forEach((item) => {
-        val.forEach(_item => {
-          if (item.storeId === _item) {
-            self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
-              item.tagIds.forEach(t_item => {
-                if ((t_item === v_item && self.curCountry === item.country) || (t_item === v_item && self.curCountry === '-1')) {
-                  str += item.name + '，';
-                }
-              });
-            }) : (item.storeId === _item ? str += item.name + '，' : null);
-          }
-        });
-      });
-      str = str.substr(0, str.length - 1);
-      self.storeStr = str;
-      self.searchStore();
-    },
-
-    clearCitys() {
-      const self = this;
-      self.cityList = [];
-      self.showCityContent = false;
-      self.curCitys = self.$t('storeView.cityPlaceholder');
-      self.multeCityList.length = 0;
-    },
-
-    choiceCity() {
-      const self = this;
-      if (self.curProvince.length === 0) {
-        self.notify(self.$t('storeView.selectProviceInfo'), 'warning', 3000);
-        self.showPopoVer = true;
-        return false;
-      } else {
-        self.showPopoVer = false;
-        self.showDrap = !self.showDrap;
-      }
-    },
-
-    choiceAllCity(val) {
-      const self = this;
-      let str = '';
-      const temp = [];
-      if (!val) {
-        self.curCitys = self.$t('storeView.cityPlaceholder');
-        self.multeCityList = [];
-        self.cityList.forEach(item => {
-          item.checked = val;
-          if (val) {
-            str = str + item.cityName + ';';
-            temp.push(item.cityName);
-          }
-        });
-      } else {
-        self.cityList.forEach(item => {
-          item.checked = val;
-          if (val) {
-            str = str + item.cityName + ';';
-            temp.push(item.cityName);
-          }
-        });
-        self.isChecked = val;
-        self.curCitys = '';
-        self.curCitys = str.substring(0, str.length - 1);
-        self.multeCityList = temp;
-      }
-    },
-
-    changeCityItem(item) {
-      const self = this;
-      let str = '';
-      const temp = [];
-      self.cityList.forEach(_item => {
-        if (_item.checked) {
-          str = str + _item.cityName + ';';
-          temp.push(_item.cityName);
-        }
-      });
-      self.isChecked = temp.length !== 0;
-      self.curCitys = '';
-      self.curCitys = str.substring(0, str.length - 1);
-      self.allCityChecked = temp.length === self.cityList.length;
-      if (temp.length === 0) {
-        self.curCitys = self.$t('storeView.cityPlaceholder');
-      }
-      self.multeCityList = temp;
-    },
-
     async searchStoreInput() {
       const self = this;
-      let params = {};
-      if (self.serachVale.length !== 0) {
-        params = {
-          like: {
-            'name': self.serachVale,
-            'userName': self.serachVale
-          },
-          filter: {
-            page: 0,
-            size: 2000
+
+      const temp = [];
+      let tempArray = [];
+      const tempStore = [];
+      if(self.serachVale.length !== 0){
+        self.tempStoreData.forEach(item=>{
+          temp.push(util.getPinyinList(item.name));
+          tempStore.push(item);
+        })
+        for (var i = 0; i < temp.length; i++) {
+          if (temp[i][0].indexOf(self.serachVale.trim()) !== -1 ||
+                      temp[i][1].indexOf(self.serachVale.trim()) !== -1) {
+            tempArray.push(tempStore[i]);
           }
-        };
-      } else {
-        params = {
-          filter: {
-            page: 0,
-            size: 2000
+        }
+      }else{
+        self.tempStoreData.forEach(item => {
+          if(self.curStore.map(x=>x).indexOf(item.storeId) !== -1){
+            if(self.curStoreTag.length !== 0){
+              item.tagIds.forEach(_item=>{
+                if (self.curStoreTag.map(x => x).indexOf(_item) !== -1) {
+                  tempArray.push(item);
+                }
+              })
+            }else{
+              tempArray.push(item);
+            }
           }
-        };
+        });
       }
-      const resData = await self.getStoreData(params);
-      const data = resData.content;
-      if (resData.content.length > 0) {
+
+      if (tempArray.length > 0) {
         self.resultHavestore = true;
         self.Havestore++;
       } else {
         self.resultHavestore = false;
         self.Havestore++;
       }
-      self.getStoreByCity(data);
-
-      let count = 0;
-      self.storeList.forEach(item => {
-        if (item.checked) {
-          count++;
-        }
-      });
-      self.allData = self.storeList.length === count;
+      self.getStoreByCity(tempArray);
     },
 
     async searchStore() {
       const self = this;
+      let curStoreTemp = [];
+
+      self.tempStoreData.forEach(item => {
+        if(self.curStore.map(x=>x).indexOf(item.storeId) !== -1){
+          if(self.curStoreTag.length !== 0){
+            item.tagIds.forEach(_item=>{
+              if (self.curStoreTag.map(x => x).indexOf(_item) !== -1) {
+                curStoreTemp.push(item);
+              }
+            })
+          }else{
+            curStoreTemp.push(item);
+          }
+        }
+      });
       self.showCityContent = false;
       self.serachVale = '';
       self.storeList = [];
-      const params = {};
-      const storeList = self.storeStr.split('，');
-      if (storeList.length !== 0) {
-        params.clause = {
-          name: storeList
-        };
-      } else {
-        params.clause = {};
-      }
-      params.filter = {
-        page: 0,
-        size: 2000
-      };
-      const resData = await self.getStoreData(params);
-      self.storeData = resData.content;
-      if (resData.content.length > 0) {
+      if (curStoreTemp.length > 0) {
         self.resultHavestore = true;
         self.Havestore++;
       } else {
         self.resultHavestore = false;
         self.Havestore++;
       }
-      self.getStoreByCity(self.storeData);
-
-      self.totalCount = resData.totalElements;
-      let count = 0;
-      self.storeList.forEach(item => {
-        if (item.checked) {
-          count++;
-        }
-      });
-      self.allData = count === self.storeList.length;
+      self.getStoreByCity(curStoreTemp);
     },
 
     choiceAll(val) {
@@ -688,73 +594,15 @@ export default {
       self.allData = length === countItem;
     },
 
-    getStoreData(params) {
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    async getProvinceList() {
-      const self = this;
-      const params = {
-        filter: {
-          page: 0,
-          size: 2000
-        }
-      };
-      const resStore = await self.getStoreData(params);
-      self.storeData = resStore.content;
-      self.totalCount = resStore.totalElements;
-      const temp = [];
-      if (self.storeData != undefined && self.storeData.length !== 0) {
-        self.storeData.forEach(item => {
-          const province = item.province;
-          if (temp.map(x => x.label).indexOf(province) === -1) {
-            const obj = {
-              value: province,
-              label: province,
-              citys: []
-            };
-            temp.push(obj);
-          }
-        });
-      }
-      temp.length > 0 ? temp.unshift({ value: '', label: self.$t('storeView.provincePlaceholder') }) : temp;
-      self.provinceList = temp;
-    },
-
-    async getCityByProvince(province) {
-      const self = this;
-      const temp = [];
-
-      self.storeData.forEach(item => {
-        if (item.province === province) {
-          const obj = {};
-          obj.cityName = item.city;
-          obj.checked = false;
-          if (temp.map(x => x.cityName).indexOf(obj.cityName) === -1) {
-            temp.push(obj);
-          }
-        }
-      });
-      self.cityList = temp;
-    },
-
     async getStoreByCity(data) {
       const self = this;
-      const bindStoreId = await self.getBindStoreList();
       const cityList = [];
       const bindArr = [];
       data.forEach(item => {
         if (cityList.indexOf(item.city) === -1) {
           cityList.push(item.city);
         }
-        bindStoreId.data.forEach(_item => {
+        self.bindStoreId.data.forEach(_item => {
           if (item.storeId === _item) {
             bindArr.push(_item);
           }
@@ -787,7 +635,7 @@ export default {
         let _tempCount = 0;
         item.store.forEach(_item => {
           const _obj = {};
-          if (bindStoreId.data.indexOf(_item.storeId) === -1) {
+          if (self.bindStoreId.data.indexOf(_item.storeId) === -1) {
             _obj.checked = false;
           } else {
             _obj.checked = true;
