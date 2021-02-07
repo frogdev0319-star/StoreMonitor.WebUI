@@ -97,7 +97,7 @@
           </div>
         </div>
         <el-scrollbar id="el-menuscrollbar">
-          <div v-if="routeData.length!=0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
+          <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
             <div v-for="(item,index) in routeData" :key="index" class="data-content">
               <div v-if="index==0" class="header-content tabTitle">
                 <el-checkbox v-model="allchecked" class="allcheckBox" @change="changeAllData"/>
