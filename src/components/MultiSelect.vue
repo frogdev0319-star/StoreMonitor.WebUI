@@ -58,6 +58,11 @@ export default {
     selected(val, oldVal) {
       this.selectedArray = val;
       this.initData();
+    },
+
+    options(val){
+      this.selectedArray = [...this.selected];
+      this.initData();
     }
   },
 
