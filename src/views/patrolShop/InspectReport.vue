@@ -435,7 +435,7 @@ export default {
   },
 
   beforeDestroy() {
-    self.$refs.chartRadar && self.$refs.chartRadar.dispose();
+    this.$refs.chartRadar && this.$refs.chartRadar.dispose();
   },
 
   methods: {
