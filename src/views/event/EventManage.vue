@@ -487,14 +487,30 @@ export default {
             };
             temp.push(obj);
           }
-          let obj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.name,
-            userId: item.userId,
-            tagIds: item.tagIds
-          };
-          tempStore.push(obj);
+          let storeObj = {};
+          if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
+            if(self.curCity.length > 0 && self.curCity !== "-1"){
+              if(self.curProvince.includes(item.province) && self.curCity.includes(item.city)){
+                storeObj = {
+                  storeId: item.storeId,
+                  label: item.name,
+                  value: item.name,
+                  userId: item.userId,
+                  userName: item.userName
+                };
+              }
+            }
+          }
+          else{
+            storeObj = {
+              storeId: item.storeId,
+              label: item.name,
+              value: item.name,
+              userId: item.userId,
+              userName: item.userName
+            };
+          }
+          Object.keys(storeObj).length > 0 && tempStore.push(storeObj);
         }
       });
       self.provinceList = temp;
@@ -502,13 +518,28 @@ export default {
       self.provinceList.forEach(_item => {
         storeList.forEach(item => {
           if (item.province === _item.value) {
-            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-              let obj = {
-                label: item.city,
-                value: item.city
-              };
-              cityTemp.push(obj);
+            let citObj = {};
+            if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
+              if(self.curCity.length > 0 && self.curCity !== "-1"){
+                if(self.curProvince.includes(item.province)){
+                  if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+                    citObj = {
+                      label: item.city,
+                      value: item.city
+                    };
+                  }
+                }
+              }
             }
+            else{
+              if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
+                citObj = {
+                  label: item.city,
+                  value: item.city
+                };
+              }
+            }
+            Object.keys(citObj).length > 0 && cityTemp.push(citObj);
           }
         });
       });
