@@ -97,6 +97,7 @@
           :placeholder="$t('remotePatrol.all')"
           size="mini"
           class="el-province"
+          @change="getInspectList"
         >
           <el-option
             v-for="item in reportTypeList"
@@ -1192,9 +1193,21 @@ export default {
       const inspectList = [];
       inspectArr.forEach(item => {
         item.forEach(_item => {
-          if (!newArr.includes(_item.id)) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
+          if(self.curReportType===-1){
+            if (!newArr.includes(_item.id)) {
+              newArr.push(_item.id);
+              inspectList.push(_item);
+            }
+          }else if(self.curReportType===0){
+            if (!newArr.includes(_item.id) && _item.mode === 0) {
+              newArr.push(_item.id);
+              inspectList.push(_item);
+            }
+          }else if(self.curReportType===1){
+              if (!newArr.includes(_item.id) && _item.mode === 1) {
+                newArr.push(_item.id);
+                inspectList.push(_item);
+              }
           }
         });
       });
