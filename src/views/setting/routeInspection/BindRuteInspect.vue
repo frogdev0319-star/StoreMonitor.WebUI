@@ -181,8 +181,7 @@ export default {
       curCitys: this.$t('storeView.cityPlaceholder'),
       showPopoVer: true,
       lang: this.$i18n.locale,
-      loadingGif: require('../../../../static/img/loading.gif'),
-      bindStoreId:[]
+      loadingGif: require('../../../../static/img/loading.gif')
     };
   },
 
@@ -236,7 +235,6 @@ export default {
     async getCountryStore() {
       const self = this;
       const data = await self.getBriefStoreData();
-      self.bindStoreId = await self.getBindStoreList();
       const temp = [];
       self.totalCount = data.data.length;
       if (data.errCode === 0 && data.errMsg === 'Success') {
@@ -598,11 +596,12 @@ export default {
       const self = this;
       const cityList = [];
       const bindArr = [];
+      const bindStoreId = await self.getBindStoreList();
       data.forEach(item => {
         if (cityList.indexOf(item.city) === -1) {
           cityList.push(item.city);
         }
-        self.bindStoreId.data.forEach(_item => {
+        bindStoreId.data.forEach(_item => {
           if (item.storeId === _item) {
             bindArr.push(_item);
           }
@@ -635,7 +634,7 @@ export default {
         let _tempCount = 0;
         item.store.forEach(_item => {
           const _obj = {};
-          if (self.bindStoreId.data.indexOf(_item.storeId) === -1) {
+          if (bindStoreId.data.indexOf(_item.storeId) === -1) {
             _obj.checked = false;
           } else {
             _obj.checked = true;
