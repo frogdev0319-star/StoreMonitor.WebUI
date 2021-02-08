@@ -129,7 +129,7 @@
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
-import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
+import { getBriefStoreList, GetTagList } from '@/api/store';
 import util from '../common/util.js';
 import { inpectRESTful } from '@/api/index';
 import SearchConditionUtil from "../common/SearchConditionUtil";
@@ -198,7 +198,8 @@ export default {
       ifGetParamsFromCash: false,
       storeListLength: -1,
       order: {direction: '', property: ''},
-      filter: {page: 0, size: 10}
+      filter: {page: 0, size: 10},
+      inspectArr:[]
     };
   },
 
@@ -286,37 +287,15 @@ export default {
       self.initDaysRange();
     },
 
-    async getAllStoreList() {
-      const self = this;
-      const params = {
-        'filter': {
-          'page': 0,
-          'size': 2000
-        }
-      };
-      const retData = await self.getStoreData(params);
-      self.allStoreData = Object.keys(retData.data).length > 0 ? retData.data.content : [];
-      self.getInspectList();
-    },
-
     getInspectList() {
       const self = this;
-      const inspectArr = [];
-      console.log(self.filterStoreIds);
-      self.allStoreData.forEach(item => {
-        if (self.filterStoreIds.indexOf(item.storeId) !== -1 && item.appliedInspect.length !== 0) {
-          inspectArr.push(item.appliedInspect);
-        }
-      });
       const newArr = [];
       const inspectList = [];
-      inspectArr.forEach(item => {
-        item.forEach(_item => {
-          if (!newArr.includes(_item.id)) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        });
+      self.inspectArr.forEach(_item => {
+        if (!newArr.includes(_item.id)) {
+          newArr.push(_item.id);
+          inspectList.push(_item);
+        }
       });
       self.inspectTypeList = inspectList;
       self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
@@ -327,22 +306,10 @@ export default {
       }
     },
 
-    getStoreData(params) {
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            resolve(res);
-          }
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
     async getCountryStore() {
       const self = this;
       const data = await self.getBriefStoreData();
+      self.inspectArr = await self.getTagAll();
       const temp = [];
       if (data.errCode === 0 && data.errMsg === 'Success') {
         self.storeList = data.data;
@@ -688,7 +655,6 @@ export default {
       });
       self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
       self.ifGetParamsFromCash = false;
-      self.isInspectItem || self.isPatrol ? await self.getAllStoreList() : '';
       self.changeStoreNew(self.curStore);
       isFirst ? await self.searchData() : null;
     },
