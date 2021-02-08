@@ -1054,7 +1054,7 @@ export default {
         storeArr.push(item.storeId);
       });
       self.curStore = (!self.ifGetParamsFromCash) ? storeArr: self.curStore;
-      self.ifGetParamsFromCash = false;
+      //self.ifGetParamsFromCash = false;
       self.changeStoreNew(self.curStore);
       isFirst ? self.getInitReportList(0) : null;
     },
@@ -1183,7 +1183,8 @@ export default {
       self.inspectTableList = inspectList;
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
-        self.inspectId = self.inspectTableList[0].id;
+        self.inspectId = self.ifGetParamsFromCash ? self.inspectId : self.inspectTableList[0].id;
+        self.ifGetParamsFromCash = false;
       } else {
         self.inspectId = '';
       }
