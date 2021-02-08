@@ -562,6 +562,7 @@ export default {
       });
       self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
       self.curState = (!self.ifGetParamsFromCash) ? [0]: self.curState;
+      self.ifGetParamsFromCash = false;
       self.changeStore(self.curStore);
     },
 
@@ -785,7 +786,6 @@ export default {
 
     handleTabClick(val) {
       let self = this;
-      this.ifGetParamsFromCash = false;
       if (Number(val.index) < 4) {
         self.curState = [Number(val.index)];
       } else {
@@ -863,7 +863,7 @@ export default {
     async getEventList(val) {
       let self = this;
       let tabIndex = Number(this.activeName);
-      
+
       if(self.storeStr !== ''){
         self.getEventListRequestParams(val);
         this.ifSaveParams && self.saveSearchParams();
