@@ -1846,7 +1846,7 @@ export default {
         self.searchStore();
       }else{
         self.$emit('paneList', self.paneList.length);
-        self.getScheduleList('noInspect');
+        self.getScheduleList(self.isActivePatrol,self.isActive);
       }
     },
 
