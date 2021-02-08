@@ -260,8 +260,8 @@
   </el-row>
 </template>
 <script>
-import { getInspectReportList } from '@/api/inspect';
-import { getStoreList, getBriefStoreList, GetTagList } from '@/api/store';
+import { getInspectReportList,GetInspectTagList } from '@/api/inspect';
+import { getBriefStoreList, GetTagList } from '@/api/store';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import MultiSelect from '@/components/MultiSelect';
@@ -689,62 +689,39 @@ export default {
       this.getReportList(this.params);
     },
 
-    getCountryStore() {
-      let self = this;
-      const params = {
-        'filter': {
-          'page': 0,
-          'size': 2000
-        }
-      };
-      self.getStoreData(params).then(retData => {
-        self.storeList = Object.keys(retData.data).length > 0 ? retData.data.content : [];
-        let temp = [];
-        if (self.storeList.length !== 0) {
-          self.storeList.forEach(item => {
-            let country = item.country;
-            if (temp.map(x => x.label).indexOf(country) === -1) {
-              let obj = {
-                value: country,
-                label: country
-              };
-              temp.push(obj);
-            }
-          });
-        }
-        let countryList = temp;
-        self.countryList[0] = {};
-        self.countryList[0].label = self.$t('remotePatrol.country');
-        self.countryList[0].countryList = countryList;
-        self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value: self.curCountry;
-        self.selectAllProAndCity(self.curCountry, true);
-      }).catch(err => {
-        console.log("InspectReportList-getCountryStore: "+ err);
-      })
-    },
-
-    getStoreData(params) {
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            resolve(res);
+    async getCountryStore() {
+      const self = this;
+      self.storeList = await self.getBriefStoreData();
+      const temp = [];
+      if (self.storeList.length !== 0) {
+        self.storeList.forEach(item => {
+          let country = item.country;
+          if (temp.map(x => x.label).indexOf(country) === -1) {
+            let obj = {
+              value: country,
+              label: country
+            };
+            temp.push(obj);
           }
-        }).catch(err => {
-          reject(err);
         });
-      });
+      }
+      const countryList = temp;
+      self.countryList[0] = {};
+      self.countryList[0].label = self.$t('remotePatrol.country');
+      self.countryList[0].countryList = countryList;
+      self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+      self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value: self.curCountry;
+      self.selectAllProAndCity(self.curCountry, true);
     },
 
     getBriefStoreData() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         getBriefStoreList().then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            let data = res.data;
-            resolve(res);
+            const data = res.data;
+            resolve(data);
           }
         }).catch(err => {
           reject(err);
@@ -1180,23 +1157,28 @@ export default {
       self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
     },
 
-    getInspectList() {
+    getTagAll() {
       const self = this;
-      const inspectArr = [];
-      self.storeList.forEach(item => {
-        if (self.filterStoreIds.indexOf(item.storeId) !== -1 && item.appliedInspect.length !== 0) {
-          inspectArr.push(item.appliedInspect);
-        }
+      return new Promise((resolve, reject) => {
+        GetInspectTagList().then(res => {
+          const data = res.data;
+          resolve(data);
+        }).catch(err => {
+          reject(err);
+        });
       });
+    },
+
+    async getInspectList() {
+      const self = this;
+      const inspectArr = await self.getTagAll();
       const newArr = [];
       const inspectList = [];
-      inspectArr.forEach(item => {
-        item.forEach(_item => {
+      inspectArr.forEach(_item => {
           if (!newArr.includes(_item.id)) {
             newArr.push(_item.id);
             inspectList.push(_item);
           }
-        });
       });
       self.inspectTableList = inspectList;
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
