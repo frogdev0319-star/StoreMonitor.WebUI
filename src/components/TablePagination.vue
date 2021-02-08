@@ -8,7 +8,7 @@
       :header-cell-class-name="headerClass"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
-      empty-text="无数据"
+      :empty-text="$t('deviceView.noData')"
       align="left"
       stripe
       border
