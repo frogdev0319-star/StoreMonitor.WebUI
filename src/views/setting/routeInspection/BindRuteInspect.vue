@@ -317,8 +317,10 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = storeArr;
-      self.searchStore();
+      setTimeout(()=>{
+        self.curStore = storeArr;
+        self.searchStore();
+      },100)
     },
 
     changeStoreTag(val) {
@@ -519,7 +521,6 @@ export default {
     async searchStore() {
       const self = this;
       let curStoreTemp = [];
-
       self.tempStoreData.forEach(item => {
         if(self.curStore.map(x=>x).indexOf(item.storeId) !== -1){
           if(self.curStoreTag.length !== 0){

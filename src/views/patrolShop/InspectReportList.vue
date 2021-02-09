@@ -445,7 +445,8 @@ export default {
       filterStoreIds: [],
       isLoading: false,
       ifSaveParams: true,
-      ifGetParamsFromCash: false
+      ifGetParamsFromCash: false,
+      inspectCatch:''
     };
   },
 
@@ -692,6 +693,7 @@ export default {
     async getCountryStore() {
       const self = this;
       self.storeList = await self.getBriefStoreData();
+      await self.getInspectList();
       const temp = [];
       if (self.storeList.length !== 0) {
         self.storeList.forEach(item => {
@@ -757,7 +759,6 @@ export default {
       str = str.substr(0, str.length - 1);
       self.storeStr = str;
       self.filterStore();
-      self.getInspectList();
     },
 
     changeStore(val) {
@@ -779,7 +780,6 @@ export default {
       });
       str = str.substr(0, str.length - 1);
       self.storeStr = str;
-      self.getInspectList()
     },
 
     filterStore() {
@@ -887,7 +887,6 @@ export default {
       let self = this;
       self.curStoreTag = val;
       this.filterStore();
-      this.getInspectList();
     },
 
     getTagListData() {
@@ -1053,10 +1052,12 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = (!self.ifGetParamsFromCash) ? storeArr: self.curStore;
-      //self.ifGetParamsFromCash = false;
-      self.changeStoreNew(self.curStore);
-      isFirst ? self.getInitReportList(0) : null;
+      setTimeout(()=>{
+        self.curStore = (!self.ifGetParamsFromCash) ? storeArr: self.curStore;
+        //self.ifGetParamsFromCash = false;
+        self.changeStoreNew(self.curStore);
+        isFirst ? self.getInitReportList(0) : null;
+      })
     },
 
     dateFocus() {
@@ -1183,7 +1184,7 @@ export default {
       self.inspectTableList = inspectList;
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
-        self.inspectId = self.ifGetParamsFromCash ? self.inspectId : self.inspectTableList[0].id;
+        self.inspectId = self.ifGetParamsFromCash ? (self.inspectTableList.map(x=>x.id).indexOf(self.inspectCatch) !==-1 ? self.inspectCatch : '') : self.inspectTableList[0].id;
         self.ifGetParamsFromCash = false;
       } else {
         self.inspectId = '';
@@ -1225,7 +1226,7 @@ export default {
         this.params = searchParams.searchCondition;
         this.curAppraise = searchParams.searchCondition.clause.status;
         this.curReportType = searchParams.searchCondition.clause.mode;
-        this.inspectId = searchParams.searchCondition.inspectTagId;
+        this.inspectCatch = searchParams.searchCondition.inspectTagId;
         //this.setDefaultSort();
         this.ifGetParamsFromCash = true;
       }else{

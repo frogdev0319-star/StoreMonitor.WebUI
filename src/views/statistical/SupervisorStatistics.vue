@@ -703,51 +703,6 @@ export default {
       self.getInspectPersonTable();
     },
 
-    async getRegionInfo() {
-      let self = this;
-      let params = {
-        'filter': {
-          'page': 0,
-          'size': 2000
-        }
-      };
-      let retData = await self.getStoreData(params);
-      let storeList = retData.data.content;
-      self.storeList = storeList;
-
-      let getCountry = storeList => {
-        let temp = [];
-        temp.push({ label: self.$t('remotePatrol.country'), value: '' });
-        storeList.forEach(item => {
-          if (temp.map(x => x.value).indexOf(item.country) === -1) {
-            let obj = {
-              label: item.country,
-              value: item.country
-            };
-            temp.push(obj);
-          }
-        });
-        return temp;
-      };
-      let countryList = getCountry(storeList);
-      let tempStore = [];
-      storeList.forEach(item => {
-        let obj = {
-          storeId: item.storeId,
-          label: item.name,
-          value: item.name,
-          userId: item.userId,
-          userName: item.userName,
-          checked: false
-        };
-        tempStore.push(obj);
-      });
-      self.storeDataList = tempStore;
-      self.countryList = countryList;
-      self.curCountry = '中国';
-      self.selectAllProAndCity(self.curCountry);
-    },
-
     getBriefStoreData() {
       return new Promise((resolve, reject) => {
         getBriefStoreList().then(res => {

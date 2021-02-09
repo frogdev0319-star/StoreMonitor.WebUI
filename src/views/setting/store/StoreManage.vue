@@ -597,8 +597,10 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = storeArr;
-      self.changeStore(self.curStore);
+      setTimeout(()=>{
+        self.curStore = storeArr;
+        self.changeStore(self.curStore);
+      },100)
     },
 
     clearPage() {

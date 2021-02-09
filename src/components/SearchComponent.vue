@@ -199,7 +199,7 @@ export default {
       storeListLength: -1,
       order: {direction: '', property: ''},
       filter: {page: 0, size: 10},
-      inspectArr:[]
+      inspectCatch:''
     };
   },
 
@@ -287,11 +287,12 @@ export default {
       self.initDaysRange();
     },
 
-    getInspectList() {
+    async getInspectList() {
       const self = this;
       const newArr = [];
       const inspectList = [];
-      self.inspectArr.forEach(_item => {
+      const inspectArr = await self.getTagAll();
+      inspectArr.forEach(_item => {
         if (!newArr.includes(_item.id)) {
           newArr.push(_item.id);
           inspectList.push(_item);
@@ -300,7 +301,7 @@ export default {
       self.inspectTypeList = inspectList;
       self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
       if (inspectList.length !== 0) {
-        self.inspectList = self.inspectTypeList[0].id;
+        self.inspectList = self.ifGetParamsFromCash ? (self.inspectTypeList.map(x=>x.id).indexOf(self.inspectCatch) !==-1 ? self.inspectCatch : '') : self.inspectTypeList[0].id;
       } else {
         self.inspectList = '';
       }
@@ -309,7 +310,8 @@ export default {
     async getCountryStore() {
       const self = this;
       const data = await self.getBriefStoreData();
-      self.inspectArr = await self.getTagAll();
+      await self.getInspectList();
+      this.isInspectItem || this.isPatrol ? this.getInspectId() : '';
       const temp = [];
       if (data.errCode === 0 && data.errMsg === 'Success') {
         self.storeList = data.data;
@@ -353,7 +355,6 @@ export default {
       str = str.substr(0, str.length - 1);
       self.storeStr = str;
       self.filterStore();
-      self.isInspectItem || self.isPatrol ? self.getInspectList() : '';
     },
 
     handleProChange(arr) {
@@ -472,7 +473,6 @@ export default {
       });
       this.tagNameStr = this.tagNameStr.substr(0, this.tagNameStr.length - 1);
       this.filterStore();
-      this.isInspectItem || this.isPatrol ? this.getInspectList() : '';
     },
 
     filterStore() {
@@ -653,16 +653,17 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
-      self.ifGetParamsFromCash = false;
-      self.changeStoreNew(self.curStore);
-      isFirst ? await self.searchData() : null;
+      setTimeout(async()=>{
+        self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
+        self.ifGetParamsFromCash = false;
+        self.changeStoreNew(self.curStore);
+        isFirst ? await self.searchData() : null;
+      },100)
     },
 
     async searchData() {
       this.getSelectedStoreIds();
       this.isPatrol ? this.getSelectCountryOrCity() : '';
-      this.isInspectItem || this.isPatrol ? this.getInspectId() : '';
       console.log(this.params);
       this.$emit('emitSearch', this.params, this.daysRangeList, this.curRegionI, this.curRegionII,
         this.regionMode, this.storePatrolLists, this.storeStr, this.tagNameStr, this.timeMode);
@@ -763,6 +764,7 @@ export default {
       params.curStore = this.curStore;
       params.curStoreTag = this.curStoreTag;
       params.timeMode = this.timeMode;
+      params.inspectId = this.inspectList;
       console.log(params)
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
@@ -783,6 +785,7 @@ export default {
         this.curStoreTag = searchParams.curStoreTag;
         this.order = searchParams.order;
         this.filter = searchParams.filter;
+        this.inspectCatch = searchParams.inspectId;
         //this.setDefaultSort();
         this.ifGetParamsFromCash = true;
         console.log(this.params);

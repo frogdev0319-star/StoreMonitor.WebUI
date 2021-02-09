@@ -560,10 +560,13 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
-      self.curState = (!self.ifGetParamsFromCash) ? [0]: self.curState;
-      self.ifGetParamsFromCash = false;
-      self.changeStore(self.curStore);
+      setTimeout(()=>{
+        self.curStore = (!self.ifGetParamsFromCash) ? storeArr : (self.curStore.length===1 && self.curStore[0]==='-1' ? [] : self.curStore);
+        self.curState = (!self.ifGetParamsFromCash) ? [0]: self.curState;
+        self.ifGetParamsFromCash = false;
+        self.changeStore(self.curStore);
+      },100)
+
     },
 
     changeStoreTag(val) {
