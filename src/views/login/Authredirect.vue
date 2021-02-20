@@ -42,8 +42,8 @@ export default{
           setCookie('lang', lang);
         }
       }
-      //self.$router.push('home');
-      window.location.href = window.location.origin + window.location.pathname + '#/home';
+      // self.$router.push('home');
+      window.location.href = window.location.origin + window.location.pathname + 'home';
     },
 
     queryURL(hashValue) {
