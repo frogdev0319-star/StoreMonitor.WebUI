@@ -1,6 +1,7 @@
 <template>
   <div class="table">
     <el-table
+      ref="tablePagination"
       :data="tableData"
       v-bind="$attrs"
       :highlight-current-row="true"
@@ -8,23 +9,40 @@
       :header-cell-class-name="headerClass"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
-      :cell-style="ifSetCellStyle && setCellStyle"
-      empty-text="无数据"
+      :cell-style="ifSetCellStyle ? setCellStyle : {}"
+      :border="showBorder"
+      :stripe="isStripe"
+      :height="tableHeight"
       align="left"
-      stripe
-      border
       style="width: 100%"
       size="mini"
       v-on="$listeners"
       @sort-change="handleSortChange"
+      @row-click="handleRowClick"
     >
+      <el-table-column
+        v-if="showSelectionColumn"
+        type="selection"
+        align="center"
+        min-width="90"
+      />
       <el-table-column
         v-for="(_item,_index) in columnData"
         :key="_index"
         :prop="_item.prop"
         :label="_item.label"
         :sortable="canSortable ? _item.sortable : false"
-        :min-width="lang !== 'en' ? _item.width : _item.maxWidth"/>
+        :min-width="lang !== 'en' ? _item.width : _item.maxWidth"
+        :formatter="_item.formatter"
+      >
+        <template slot-scope="{row}">
+          <template v-if="_item.canEdit && row.isEditing">
+            <el-input v-model="row.tempDeviceName" class="edit-input" size="small" />
+          </template>
+          <span v-else-if="_item.formatter" v-html="_item.formatter(row[_item.prop])"/>
+          <span v-else>{{ row[_item.prop] }}</span>
+        </template>
+      </el-table-column>
       <el-table-column
         v-if="tableOperation.label"
         :min-width="tableOperation.minWidth"
@@ -32,16 +50,26 @@
         align="left"
         class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <i
-            v-for="(item,index) in tableOperation.operation"
-            :key="index"
-            :type="item.type"
-            :class="item.icon"
-            class="iconfont"
-            size="mini"
-            @click="handleOperationButton(item.methods, scope.row, scope.$index)">
-            {{ item.label }}
-          </i>
+          <div v-if="scope.row.isEditing">
+            <div class="iconlised" @click="confirmEdit(scope.row)">
+              <i class="el-icon-check"/>
+            </div>
+            <div class="iconrised" @click="cancelEdit(scope.row)">
+              <i class="el-icon-close"/>
+            </div>
+          </div>
+          <div v-else>
+            <i
+              v-for="(item,index) in tableOperation.operation"
+              :key="index"
+              :type="item.type"
+              :class="item.icon"
+              class="iconfont"
+              size="mini"
+              @click="handleOperationButton(item.methods, scope.row, scope.$index)">
+              {{ item.label }}
+            </i>
+          </div>
         </template>
       </el-table-column>
       <template v-if="isEvent">
@@ -92,9 +120,9 @@
         :page-sizes="[10, 20, 50, 100]"
         :page-size="pagesize"
         :total="total"
+        :layout="layout"
         background
         small
-        layout="jumper,total, prev,pager, next,sizes"
         class="pagination"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -104,6 +132,8 @@
 </template>
 
 <script>
+import util from '@/common/util';
+
 export default {
   props: {
     total: {
@@ -176,6 +206,25 @@ export default {
     ifSetCellStyle: {
       type: Boolean,
       default: false
+    },
+    showBorder: {
+      type: Boolean,
+      default: true
+    },
+    showSelectionColumn: {
+      type: Boolean,
+      default: false
+    },
+    isStripe: {
+      type: Boolean,
+      default: true
+    },
+    isDevice: {
+      type: Boolean,
+      default: false
+    },
+    tableHeight: {
+      type: Number
     }
   },
   data() {
@@ -186,10 +235,14 @@ export default {
       noData: this.$t('deviceView.noData')
     };
   },
+  computed: {
+    tableSelection() {
+      return this.$refs.tablePagination.selection;
+    }
+  },
 
   methods: {
     setCellStyle({ row, column, rowIndex, columnIndex }) {
-      console.log(row);
       let obj = {};
       if (columnIndex === 0) {
         obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
@@ -199,8 +252,10 @@ export default {
       return obj;
     },
 
-    rowClick(row) {
+    handleRowClick(row) {
       this.currentRow = row;
+      console.log(row);
+      this.$emit('emitRowClick', row);
     },
 
     handleCurrentChange(currentPage) {
@@ -251,7 +306,24 @@ export default {
     },
 
     handleOperationButton(methods, row, index) {
+      this.tableData.map(item => { item.isEditing = false; });
+      row.isEditing = this.isDevice && methods === 'edit';
       this.$emit('handleOperation', { method: methods, row: row, index: index });
+    },
+
+    confirmEdit(row) {
+      row.isEditing = false;
+      if (row.tempDeviceName.trim().length === 0) {
+        util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
+        return;
+      }
+      row.name = row.tempDeviceName;
+      this.$emit('handleEdit', row);
+    },
+
+    cancelEdit(row) {
+      row.isEditing = false;
+      row.tempDeviceName = row.name;
     }
   }
 };
@@ -277,19 +349,47 @@ export default {
     margin-right: 20px;
     font-size: calc(24/1920*100vw);
     color: #7d8cad;
+    &:last-child{
+      margin-right: 0px;
+    }
   }
   .el-table--mini{
-    font-size: 14px;
+    font-size: calc(14/1920*100vw);
+  }
+
+  .iconfont{
+    font-size: calc(24/1920*100vw);
+    color: #7d8cad;
+  }
+  .iconlised{
+    float: left;
+    position: relative;
+    background-color: #f31d65;
+    padding: 1px 6px;
+    color: #fff;
+    border-width: 1px 1px 1px 1px;
+    border-style: solid;
+    border-color: #ddd;
+    line-height: 25px;
+    height: 25px;
+    /deep/ el-button .add-btn{
+      font-size: 12px;
+    }
+  }
+  .iconrised{
+    float: left;
+    position: relative;
+    padding: 1px 6px;
+    border-width: 1px 1px 1px 0px;
+    border-style: solid;
+    border-color: #ddd;
+    background-color: rgba(255, 255, 255, 0);
+    line-height: 25px;
+    height: 25px;
   }
 </style>
 
 <style>
   @import "../assets/css/pagination.css";
-  .account-header{
-    font-size: 14px;
-    color: #7d8cad;
-    height: 47px;
-    border: none;
-  }
 </style>
 
