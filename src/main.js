@@ -95,7 +95,7 @@ router.beforeEach(async(to, from, next) => {
   // }
 });
 
-new Vue({
+const vm = new Vue({
   el: '#app',
   router,
   store,
@@ -103,3 +103,5 @@ new Vue({
   components: { App },
   template: '<App/>'
 });
+
+export default vm;
