@@ -13,7 +13,7 @@
       <span v-if="channelInfo != null" id="channelName">{{ channelInfo != null ? channelInfo.channelName : '' }}</span>
       <div v-if="channelInfo != null" class="icon-footer" >
         <div class="iconlside">
-          <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'"class= "iconfont iconplay" @click="onPlay"/>
+          <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'" class= "iconfont iconplay" @click="onPlay"/>
         </div>
         <div class="iconrside">
           <div v-if="isHistory" class="speed-content">
@@ -114,7 +114,6 @@
         :controls="showControls"
         :paused="paused"
         :muted = "muted"
-        :src="uri"
         height="83%"
         width="90%"
         prload
@@ -286,14 +285,11 @@ import { mapGetters } from 'vuex';
 import videojs from '../../static/video.js';
 import DashHttp from '@/common/DashHttp.js';
 import { getDashServerInfo } from '@/api/device.js';
-import SnapshotCanvas from './SnapshotCanvas';
 import util from '@/common/util'
 import filterString from '../common/filterString';
-import html2canvas from 'html2canvas';
 
 export default {
   name: 'DashVideo',
-  components: { SnapshotCanvas },
   props: {
     channelInfo: {
       type: Object,
@@ -589,26 +585,14 @@ export default {
   },
 
   watch: {
-    channelInfo: {
-      handler(newChannel, oldChannel) {
-        console.log(newChannel);
-        console.log(oldChannel);
-        if (Object.keys(oldChannel).length > 0 && newChannel.id !== oldChannel.id) {
-          this.isHistory ? this.startVideo(this.channelInfo.ivsId, this.channelInfo.channelId, this.startTs)
-            : this.startVideo(this.channelInfo.ivsId, this.channelInfo.channelId, null);
-        }
-      },
-      deep: true
-    },
-
     accountChanged(val) {
       console.log(val);
       const self = this;
       if (val !== 0) {
-        self.channelInfo = null;
         self.playBackState = false;
         self.currentTimeValue = 0;
         self.showError = false;
+        self.channelInfo = null;
         self.stopVideoPlay();
         self.previewplayer && self.previewplayer.dispose();
       }
@@ -903,12 +887,13 @@ export default {
         let error = this.$t('remotePatrol.dashServerError');
         if (DashHttp.getResult() != null) {
           error += DashHttp.getResult().ErrorCode;
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
-          this.isLoading = false;
-          return false;
         }
+        this.currentState = 'blank';
+        this.errorText = error;
+        this.showError = true;
+        this.isLoading = false;
+        this.destroyVideo();
+        return false;
       }
     },
 
@@ -944,6 +929,7 @@ export default {
         this.currentState = 'blank';
         this.paused = false;
         this.errorText = error;
+        this.destroyVideo();
         return false;
       }
     },
@@ -1004,6 +990,13 @@ export default {
       self.previewplayer = videojs(video);
       self.previewplayer.pause();
       self.stopTimer();
+    },
+
+    destroyVideo() {
+      const self = this;
+      var video = document.getElementById('dashVideo');
+      this.previewplayer = videojs(video);
+      self.previewplayer.dispose();
     },
 
     onPlayerWaiting(e) {

@@ -1,7 +1,4 @@
 import axios from 'axios';
-import { getDashServerInfo } from '@/api/device.js';
-import store from '../store/index.js';
-import { message } from '@/common/singleton-message';
 
 axios.defaults.withCredentials = false;
 
