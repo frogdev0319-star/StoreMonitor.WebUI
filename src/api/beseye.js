@@ -42,7 +42,7 @@ export const getStreamInfoFromTW = params => {
   });
 };
 
-export const getBeseyeList = data => {
+export const getBeseyeDeviceList = data => {
   return request({
     url: `${version}/beseye/device/list`,
     method: 'post',
@@ -80,3 +80,35 @@ export const getPlaylistInfo = params => {
     params
   });
 };
+
+export const getBeseyeUserList = params => {
+  return request({
+    url: `${version}/beseye/userlist`,
+    method: 'get',
+    params
+  })
+}
+
+export const deleteBeseyeUser = params => {
+  return request({
+    url: `${version}/beseye/user/delete`,
+    method: 'post',
+    params
+  });
+}
+
+export const beseyeAccountAuthorize = params => {
+  return request({
+    url: `${version}/beseye/account/authorize`,
+    method: 'post',
+    params
+  })
+}
+
+export const getAvailableBeseyeDevice = params => {
+  return request({
+    url: `${version}/beseye/device/unused/list`,
+    method: 'get',
+    params
+  })
+}
