@@ -360,6 +360,10 @@ export default {
           path = '/ezvizDevice';
           break;
         }
+        case '/beseyeDeviceSetting': {
+          path = '/beseyeDevice';
+          break;
+        }
         case '/ezvizDevice1': {
           path = '/ezvizDevice';
           break;
@@ -386,7 +390,6 @@ export default {
 
     brandDisabled() {
       let disabled = true;
-      console.log(this.$route.matched.length)
       switch (this.$route.matched.length) {
         case 2: {
           disabled = false;
@@ -509,7 +512,8 @@ export default {
       matched = this.$route.matched.filter(x => x.name);
       matched.length === 2 && this.setSecondLevelNavbarBread(matched, currentRoute);
       matched.length > 2 && matched[1].name === 'scheduleManage' && this.setScheduleBread(matched, currentRoute);
-      matched.length > 2 && (matched[1].name === 'deviceManage' || matched[1].name === 'ezvizDeviceMgt') &&
+      matched.length > 2 && (matched[1].name === 'deviceManage' || matched[1].name === 'ezvizDeviceMgt' ||
+        matched[1].name === 'beseyeDeviceMgt') &&
       this.setDeviceBread(matched, currentRoute);
       console.log(matched);
       this.breadList = matched;
@@ -554,6 +558,11 @@ export default {
         case '/ezvizeDeviceSetting': {
           matched[1].name = 'ezvizDeviceMgt';
           matched[1].path = '/ezvizDevice';
+          break;
+        }
+        case '/beseyeDeviceSetting': {
+          matched[1].name = 'beseyeDeviceMgt';
+          matched[1].path = '/beseyeDevice';
           break;
         }
         default: {
