@@ -67,7 +67,9 @@ export default {
     'beseyeDeviceMgt': 'Device Management (Beseye)',
     'deviceSetting': 'Device Settings',
     'storeViuAccountDeviceSetting': 'Device Settings of StoreVue Account',
-    'userAccountDeviceSetting': 'Device Settings of User Ezviz Account'
+    'userAccountDeviceSetting': 'Device Settings of User Ezviz Account',
+    'auth': 'Authorize',
+    'beseyeDeviceSetting': 'Device Settings of Beseye'
   },
 
   'overview': {
@@ -773,7 +775,17 @@ export default {
     'addMainAccountDevice': 'Add Device of Main Account',
     'addSharedDevice': 'Add Shared Device',
     'illegalSeriNum': 'Illegal serial number',
-    'selectBoundStore': 'Please Select Store'
+    'selectBoundStore': 'Please Select Store',
+    'beseyeAuthorize': 'Authorize',
+    'deleteBeseyeUserInfo': 'Delete the Beseye User?',
+    'authorizeRefused': 'Authorization refused',
+    'authorizeSucc': 'Successfully authorize',
+    'authorizeFail': 'Failed to authorize',
+    'reauthorizeSucc': 'Successfully reauthorize',
+    'reauthorizeFail': 'Failed to reauthorize',
+    'reauthorizeRefused': 'Reauthorization refused',
+    'deleteBeseyeUser': 'Delete Beseye User',
+    'selectDevice': 'Please select device'
   },
 
   // Store Management page language

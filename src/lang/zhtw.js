@@ -68,7 +68,9 @@ export default {
     'beseyeDeviceMgt': '设备管理（Beseye設備）',
     'deviceSetting': '設備配置',
     'storeViuAccountDeviceSetting': 'StoreVue賬號設備配置',
-    'userAccountDeviceSetting': '客戶螢石賬號設備配置'
+    'userAccountDeviceSetting': '客戶螢石賬號設備配置',
+    'auth': '授权',
+    'beseyeDeviceSetting': 'Beseye設備配置'
   },
 
   'overview': {
@@ -783,7 +785,18 @@ export default {
     'addMainAccountDevice': '添加主賬號設備',
     'addSharedDevice': '添加他人分享設備',
     'illegalSeriNum': '序列號不合法',
-    'selectBoundStore': '請選擇所屬門店'
+    'selectBoundStore': '請選擇所屬門店',
+    'beseyeAuthorize': '授權',
+    'deleteBeseyeUserInfo': '確認刪除該Beseye用戶？',
+    'authorizeRefused': '授權被拒絕',
+    'authorizeSucc': '授權成功',
+    'authorizeFail': '授權失敗',
+    'reauthorizeSucc': '重新授權成功',
+    'reauthorizeFail': '重新授權失敗',
+    'reauthorizeRefused': '重新授權被拒絕',
+    'deleteBeseyeUser': '刪除Beseye用戶',
+    'selectDevice': '請選擇設備'
+
   },
 
   // Store Management page language
