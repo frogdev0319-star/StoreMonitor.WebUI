@@ -31,10 +31,16 @@
             </span>
             <img :src="headUrl" alt="" class="headImg">
             <el-dropdown-menu slot="dropdown" class="dropdown">
-              <el-dropdown-item :disabeled="true" class="dropdown-item" style="width:120px;
+              <el-dropdown-item
+                :disabeled="true"
+                class="dropdown-item"
+                style="width:120px;
               padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
-              <el-dropdown-item class="dropdown-item" @click.native="fedlogout" style=" width:120px;
-              padding-left:20px;">{{ $t('route.logOut') }}</el-dropdown-item>
+              <el-dropdown-item
+                class="dropdown-item"
+                style=" width:120px;
+              padding-left:20px;"
+                @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -42,15 +48,21 @@
       <el-col
         :span="24"
         :style="($route.path === '/device' || $route.path === '/storemanage' || $route.path === '/event'
-              || $route.path === '/reinspection' || $route.path === '/storemonitor/submit' || $route.path === '/datacenter')?
+          || $route.path === '/reinspection' || $route.path === '/storemonitor/submit' || $route.path === '/datacenter')?
         {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}"
         class="main">
         <div v-if="isMobile && !collapsed" class="drawer-bg" @click="handleClickOutside" />
         <aside :class="classObj" class="aside-menu">
           <div v-if="!collapsed" class="brand-panel">
             <span class="brand-label">{{ $t('route.brand') }}</span>
-            <el-select ref="fieldSelect" v-model="accountId" :disabled="brandDisabled"
-                       placeholder="" popper-class="brandSelect" class="brand-list" @change="changeAccount">
+            <el-select
+              ref="fieldSelect"
+              v-model="accountId"
+              :disabled="brandDisabled"
+              placeholder=""
+              popper-class="brandSelect"
+              class="brand-list"
+              @change="changeAccount">
               <el-option
                 v-for="(item,index) in brandList"
                 :key="index"
@@ -85,8 +97,11 @@
                     :disabled="item.isReadOnly"
                     class="submenu-item"
                     style="text-align:left;">
-                    <i v-if="lang === 'en'" :class="item.iconCls" :style="collapsed ? {'margin-left':'0'}:{}"
-                       class="en-navIcon"/>
+                    <i
+                      v-if="lang === 'en'"
+                      :class="item.iconCls"
+                      :style="collapsed ? {'margin-left':'0'}:{}"
+                      class="en-navIcon"/>
                     <i v-else :class="item.iconCls" :style="collapsed ? {'margin-left' : '0'}:{}" class="navIcon"/>
                     <span>{{ collapsed ? '': $t(`route.${item.children[0].name}`) }}</span>
                   </el-menu-item>
@@ -99,8 +114,11 @@
                     class="el-submenu-content"
                     style="text-align:left;">
                     <template slot="title">
-                      <i v-if="lang === 'en'" :class="item.iconCls" :style="collapsed ? {'margin-left':'0'} : {}"
-                         class="en-navIcon"/>
+                      <i
+                        v-if="lang === 'en'"
+                        :class="item.iconCls"
+                        :style="collapsed ? {'margin-left':'0'} : {}"
+                        class="en-navIcon"/>
                       <i v-else :class="item.iconCls" :style="collapsed ? {'margin-left':'0'} : {}" class="navIcon"/>
                       <span :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'">{{ $t(`route.${item.name}`) }}</span>
                     </template>
@@ -132,8 +150,10 @@
                       style="padding-left: 0px">
                       <template slot="title">
                         <i class="iconfont icon-yuandian icon-content"/>
-                        <span :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'"
-                              :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'" class="third-title">
+                        <span
+                          :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'"
+                          :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'"
+                          class="third-title">
                           {{ $t(`route.${child.name}`) }}</span>
                       </template>
                       <el-menu-item
@@ -217,8 +237,8 @@ export default {
 
   computed: {
     getFullYear() {
-      let date = new Date();
-      let y = date.getFullYear();
+      const date = new Date();
+      const y = date.getFullYear();
       return y;
     },
 
@@ -267,8 +287,8 @@ export default {
     },
 
     showBorder() {
-      if ( (this.$route.path !== '/reinspection' && this.$route.path !== '/storemonitor'
-          && this.$route.path !== '/rate' && this.$route.path !== '/reinspect/confirmrein') ) {
+      if ((this.$route.path !== '/reinspection' && this.$route.path !== '/storemonitor' &&
+          this.$route.path !== '/rate' && this.$route.path !== '/reinspect/confirmrein')) {
         return true;
       }
     },
@@ -387,12 +407,12 @@ export default {
     }
   },
   created() {
-    let self = this;
+    const self = this;
     this.headUrl = './static/img/admin.png';
     console.log(this.$route.matched);
     this.getBread();
     console.log(this.$route.query);
-    let params = self.$route.query;
+    const params = self.$route.query;
     PubSub.subscribe('change-color', (event, data) => {
       self.showTag = data.showTag;
     });
@@ -441,8 +461,8 @@ export default {
     },
 
     routerHome() {
-      let self = this;
-      let url = sessionStorage.getItem('LoginURL');
+      const self = this;
+      const url = sessionStorage.getItem('LoginURL');
       window.location.href = url + '/homepage';
     },
 
@@ -455,20 +475,20 @@ export default {
 
     getBread() {
       this.breadList = [];
-      let currentRoute = this.$route.fullPath;
-      let matched = this.$route.matched.filter(x => x.name);
+      const currentRoute = this.$route.fullPath;
+      const matched = this.$route.matched.filter(x => x.name);
       if (matched.length > 2 && matched[1].name === 'scheduleManage') {
         // patrol setting
         switch (currentRoute) {
-          case "/pointCheck":{
+          case '/pointCheck': {
             matched[2].name = 'checkSchedule';
             break;
           }
-          case "/patrolSechedule":{
+          case '/patrolSechedule': {
             matched[2].name = 'patrolSecheduleManage';
             break;
           }
-          default:{
+          default: {
             break;
           }
         }
@@ -492,31 +512,38 @@ export default {
     },
 
     fedlogout() {
-      let self = this;
-      let url = sessionStorage.getItem('LoginURL');
+      const self = this;
+      const url = sessionStorage.getItem('LoginURL');
       window.location.href = url;
     },
 
     logOut() {
-      let self = this;
+      const self = this;
       self.$store.dispatch('logout').then(() => {
       });
     },
 
     getAccountList() {
-      let self = this;
+      const self = this;
       getAccountList().then(res => {
-        let data = res.data;
+        const data = res.data;
         if (res.errCode === 0) {
-          self.brandList = data;
+          const accountArr = [];
+          data.forEach(accountItem => {
+            accountItem.srp.forEach(item => {
+              item.type === 'Custom_Inspection' && item.enable && item.visible && accountArr.push(accountItem)
+            })
+          })
+          console.log(accountArr);
+          self.brandList = accountArr;
           self.getUserName();
         }
       });
     },
 
     changeAccount(accountId) {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         accountId: accountId
       };
       self.$store.dispatch('changeAccount', params).then((res) => {
@@ -530,7 +557,7 @@ export default {
     },
 
     changeRoutes() {
-      let self = this;
+      const self = this;
       self.$store.dispatch('GetUserAuthorities').then((result) => {
         if (result.errCode === 0) {
           self.$store.dispatch('generateRoutes');
@@ -539,8 +566,8 @@ export default {
     },
 
     getUserName() {
-      let self = this;
-      let userId = getCookie('UserId');
+      const self = this;
+      const userId = getCookie('UserId');
       getUserInfo().then(res => {
         console.log(res);
         self.personList = res.data;
@@ -548,7 +575,7 @@ export default {
           if (item.userId === userId) {
             self.userName = item.userName.length > 10 ? item.userName.substr(0, 10) + '...' : item.userName;
             self.accountId = item.accountId;
-            let accountId = item.accountId.toLowerCase();
+            const accountId = item.accountId.toLowerCase();
             localStorage.setItem('oss_bucket', accountId);
             self.roleId = item.roleId;
           }
@@ -561,8 +588,8 @@ export default {
     },
 
     $_isMobile() {
-      let { body } = document;
-      let rect = body.getBoundingClientRect();
+      const { body } = document;
+      const rect = body.getBoundingClientRect();
       console.log(rect.width - 1 < 1280);
       if (rect.width - 1 < 1280) {
         this.collapsed = true;
