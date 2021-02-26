@@ -549,9 +549,7 @@ export default {
         curData = await that.getReportList(that.params);
         let data = that.formatJson(filterVal, curData);
         let fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
-        sessionStorage.setItem('!merge',true);
         export_json_to_excel(tHeader, data, fileName);
-        sessionStorage.removeItem('!merge');
       });
     },
 

@@ -51,7 +51,7 @@
 
             </el-col>
             <el-col :span="12" class="evalution-pct">
-              <div class="title radar-title">
+              <div class="radar-title">
                 {{ curType === 0? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite') }}
               </div>
               <div class="inspect-catergy">
@@ -162,7 +162,7 @@
               </div>
             </el-col>
             <el-col :span="12" class="evalution-pct">
-              <div class="title radar-title">
+              <div class="radar-title">
                 {{ curType === 0 ? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite') }}
               </div>
               <div class="inspect-catergy">
@@ -1046,9 +1046,14 @@ export default {
             line-height: 222px;
           }
           .radar-title {
+            text-align: left;
+            font-size: calc(14 / 1920 * 100vw);
+            color: $tab;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-top: 20px;
+            margin-left: calc(30/1920*100vw);
           }
           .inspect-catergy {
             border-left: 1px solid $border;
@@ -1162,6 +1167,37 @@ export default {
                   color: $tab;
                   font-size: calc(14 / 1920 * 100vw);
                 }
+              }
+            }
+            .item-radar {
+              height: 100%;
+              padding-left: calc(15 / 1920 * 100vw);
+              padding-top: calc(15 / 1920 * 100vw);
+              position: relative;
+
+              .rader-panel {
+                width: 100%;
+                height: 100%;
+                .radar-title {
+                  text-align: left;
+                  font-size: calc(14 / 1920 * 100vw);
+                  color: $tab;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                }
+                .radar-content {
+                  width: 100%;
+                  height: calc(100% - 25 / 1920 * 100vw);
+                }
+              }
+              .radar-empty {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: calc(14 / 1920 * 100vw);
+                color: $tab;
               }
             }
 
