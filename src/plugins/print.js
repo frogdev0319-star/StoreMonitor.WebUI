@@ -91,15 +91,9 @@ Print.prototype = {
         if(imgs.length==0){
           var img = document.createElement("img");
           img.src = imageURL;
-          img.setAttribute('style', 'margin:0 auto;height:300px;text-align:center;');
-          img.className = 'isNeedRemove'
+          img.setAttribute('style', 'height:600px;margin:0 auto;margin-left:-475px;');
+          img.id = 'isNeedRemove';
           canvass[k4].parentNode.insertBefore(img,canvass[k4].nextElementSibling);
-        }
-        else if(imgs.length==1){
-          imgs[0].setAttribute('style', 'margin:0 auto;height:300px;text-align:center;');
-        }
-        if(sectoin.offsetLeft<=100){
-          imgs[0].setAttribute('style', 'width:'+Number(sectoin.offsetWidth-sectoin.offsetLeft*2)+'px;height:300px;text-align:center;');
         }
       }
      }

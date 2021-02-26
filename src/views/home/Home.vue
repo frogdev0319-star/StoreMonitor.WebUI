@@ -550,6 +550,8 @@ export default {
             self.accountId = item.accountId;
             let accountId = item.accountId.toLowerCase();
             localStorage.setItem('oss_bucket', accountId);
+            const idIndex = self.brandList.map(item => item.accountId).indexOf(self.accountId);
+            idIndex !== '-1' ? sessionStorage.setItem('accountName', self.brandList[idIndex].name) : null;
             self.roleId = item.roleId;
           }
         });

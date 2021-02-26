@@ -126,9 +126,20 @@ export function export_json_to_excel(th, jsonData, defaultTitle) {
 
     var data = jsonData;
     data.unshift(th);
+    const accountName = sessionStorage.getItem('accountName');
+    sessionStorage.getItem('!merge') ? data.unshift([accountName,'']) : null;
     var ws_name = "SheetJS";
 
     var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
+
+    if(sessionStorage.getItem('!merge')){
+        ws["!merges"] = [
+            {
+              s: {c: 0,r: 0},
+              e: {c: 10,r: 0}
+            }
+        ]
+    }
 
 
     /* add worksheet to workbook */
