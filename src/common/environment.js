@@ -23,7 +23,7 @@ const _Environments = {
   },
   Stable: {
     CHINA_WEBSITE: 'http://mgmt.storevue.com.cn:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://mgmt.storevue.com/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://mgmt.storevue.com/storemonitor/api/',
     USHOP_URL: 'https://portals.ushop-plus.com/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version

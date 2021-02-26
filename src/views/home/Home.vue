@@ -809,13 +809,13 @@ export default {
       bottom:0px;
       background-color: #f4f5f9;
       .drawer-bg{
-        background: #000;
-        opacity: .3;
+        background: #fff;
+        opacity: 0;
         width: 100%;
         top: 0;
         height: 100%;
         position: fixed;
-        z-index: 999;
+        z-index: 1;
       }
       .aside-menu{
         height: calc(100vh - 80px);
