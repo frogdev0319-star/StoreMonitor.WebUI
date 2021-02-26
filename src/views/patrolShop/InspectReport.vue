@@ -150,14 +150,14 @@
                       <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
                       <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
                     </div>
-                    <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
-                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn-failed" :style="isexportPDF ? 'width:160px;' : 'width:100px;'">
+                    <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn" :style="isexportPDF ? 'width:110px;' : 'width:50px;'"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
+                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn-failed" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}</span>
                     </div>
-                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn-pass" :style="isexportPDF ? 'width:160px;' : 'width:100px;'">
+                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn-pass" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}</span>
                     </div>
-                    <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:160px;' : 'width:100px;'">
+                    <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
                     </div>
                   </div>
@@ -165,7 +165,7 @@
                     v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
                     class="content-detail-main"
                     style="padding-bottom: 20px;">
-                    <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
+                    <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
                     <div v-if="_item.showAudio" class="cdm-voice">
                       <div class="speech-info" @click="startSpeechItem(_item,_index)">
                         <i class="iconfont icon-yuyin icon-speech"/>
@@ -176,7 +176,7 @@
                       <span class="often-text">{{ _item.audio.audioOftenText }}</span>
                     </div>
                     <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
-                      <span>{{ _item.comment }}</span>
+                      <span class="pdf_font_24">{{ _item.comment }}</span>
                     </div>
                     <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
                       <div
@@ -187,7 +187,7 @@
                         <div v-if="sourceitem.mediaType === 2" class="img-content">
                           <img
                             :title="imgTitle"
-                            :style="isexportPDF ? 'width:130px;' : 'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:150px;height:100px;' : 'width: calc(130/1920*100vw);'"
                             :src="sourceitem.url"
                             :height="imgHeight+'px'"
                             :onerror="deafultImg"
@@ -200,7 +200,7 @@
                           @click="playCommentVideo(sourceitem,sourceindex)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                           <img
-                            :style="isexportPDF ? 'width:130px;':'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:130px;height:100px;':'width: calc(130/1920*100vw);'"
                             :src="videoImgSrc"
                             :height="imgHeight+'px'"
                             class="imgLittle">
@@ -221,7 +221,7 @@
                   <div
                     v-if="item.showAttachment || item.description != null&&item.description !== ''"
                     class="content-detail-main">
-                    <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
+                    <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
                     <div v-if="item.showAudio" class="cdm-voice">
                       <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
                         <i class="iconfont icon-yuyin icon-speech"/>
@@ -232,7 +232,7 @@
                       <span class="often-text">{{ item.audio.audioOftenText }}</span>
                     </div>
                     <div v-if="item.description !=null && item.description !=''" class="cdm-word">
-                      <span>{{ item.description }}</span>
+                      <span class="pdf_font_24">{{ item.description }}</span>
                     </div>
                     <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
                       <div
@@ -960,9 +960,9 @@ export default {
   }
   @media print {
   .content-detail-title{ page-break-inside:avoid;}
-  .cdm-title{ page-break-inside:avoid;font-size: 18px;}
+  .cdm-title{ page-break-inside:avoid;}
   .cdm-voice{ page-break-inside:avoid;}
-  .cdm-word{ page-break-inside:avoid;font-size: 18px;}
+  .cdm-word{ page-break-inside:avoid;}
   .cdm-pic{ page-break-inside:avoid;}
   .pdf_font_16_suggest{font-size: 20px;height: 32px; line-height: 32px;}
   .pdf_font_16{font-size: 20px;}
