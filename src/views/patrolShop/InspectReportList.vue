@@ -1238,6 +1238,7 @@ export default {
         //let storeIds = self.storeStr.split('，');
         let storeIds = this.filterStoreIds;
         this.params.clause = { storeId: storeIds };
+        this.ifGetParamsFromCash = false;
       }
     },
 
