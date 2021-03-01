@@ -733,7 +733,7 @@ export default {
       }
       let mode = 0;
       const tabIndex = sessionStorage.getItem('TabIndex');
-      mode = tabIndex === '0' ? 0 : (tabIndex === '1' ? 1 : 0);
+      mode = tabIndex === '0' ? 1 : (tabIndex === '1' ? 0 : 1);
       const obj = {
         name: self.groupNameInput,
         mode: mode,

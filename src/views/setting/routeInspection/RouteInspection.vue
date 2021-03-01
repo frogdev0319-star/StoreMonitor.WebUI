@@ -771,7 +771,7 @@ export default {
 
     async addAllData(dataArry) {
       const self = this;
-      let mode = self.activeName == '0' ? mode = 0 : mode = 1; // remote mode 0,onsite  mode 1
+      let mode = self.activeName == '0' ? mode = 1 : mode = 0; // remote mode 0,onsite  mode 1
       const arr = Object.entries(dataArry);
       const tempGroups = [];
       const tempItems = [];
@@ -1108,10 +1108,10 @@ export default {
       const isGlobalWebsite = Environment.isGlobalWebsite;
       if (isGlobalWebsite) {
         const Datalength = self.elTableData[Number(self.activeName)].data.length;
-        if (Number(self.activeName) === 0 && Datalength >= 10) {
+        if (Number(self.activeName) === 1 && Datalength >= 10) {
           self.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
           return false;
-        } else if (Number(self.activeName) === 1 && Datalength >= 10) {
+        } else if (Number(self.activeName) === 0 && Datalength >= 10) {
           self.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
           return false;
         } else {
