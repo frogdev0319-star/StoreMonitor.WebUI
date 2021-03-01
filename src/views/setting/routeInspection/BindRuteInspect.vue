@@ -69,7 +69,6 @@
     </div>
     <div
       v-loading="loading"
-      :element-loading-text="$t('insSettingView.bindingstore')"
       class="el-bind-content-box"
       element-loading-background="rgba(255, 255, 255, 0.6)">
       <p v-if="lang==='en'" class="el-header-title">{{ $t('insSettingView.bindStores') }}</p>

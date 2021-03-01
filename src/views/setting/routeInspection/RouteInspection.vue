@@ -222,6 +222,10 @@
         </el-dialog>
       </el-col>
       <el-col :span="18" class="el-route-tabs">
+        <div class="loading_area"
+             :element-loading-text="$t('insSettingView.loadingbindstore')"
+             v-loading="isLoading">
+        </div>
         <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick" :style="{'min-height':varyWindowWidth - 250 +'px'}">
           <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label"
                        :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false"
@@ -280,7 +284,7 @@ export default {
   },
   data() {
     return {
-      elTableData: [{ label: '远程巡检', data: [] }, { label: '现场巡检', data: [] }],
+      elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
       loadingGif: require('../../../../static/img/loading.gif'),
       radioList: [
         {
@@ -439,9 +443,9 @@ export default {
 
     getLang(index) {
       if (index === 0) {
-        return this.$t('insSettingView.remotePatrol');
-      } else if (index === 1) {
         return this.$t('insSettingView.onsitePatrol');
+      } else if (index === 1) {
+        return this.$t('insSettingView.remotePatrol');
       } else {
         return '';
       }
@@ -450,8 +454,8 @@ export default {
     initData() {
       const self = this;
       switch (Number(self.activeName)) {
-        case 0: self.checkValue = '远程巡检'; break;
-        case 1: self.checkValue = '现场巡检'; break;
+        case 0: self.checkValue = '现场巡检'; break;
+        case 1: self.checkValue = '远程巡检'; break;
         default:self.checkValue = '新增巡检表'; break;
       }
     },
@@ -492,7 +496,7 @@ export default {
     getTagAll() {
       const self = this;
       const params = {
-        mode: parseInt(self.activeName)
+        mode: parseInt(self.activeName) === 0 ? 1 : 0
       };
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectTagList(params).then(res => {
@@ -664,9 +668,9 @@ export default {
           const tagObj = {};
           let label = '';
           if (tag_item.mode == 0) {
-            label = '远程巡检';
-          } else if (tag_item.mode == 1) {
             label = '现场巡检';
+          } else if (tag_item.mode == 1) {
+            label = '远程巡检';
           }
           tagObj.label = label;
           tagObj.name = tag_item.name;
@@ -700,7 +704,7 @@ export default {
       }
       else {
         self.getDownLoadURL();
-        self.elTableData = [{ label: '远程巡检', data: [] }, { label: '现场巡检', data: [] }];
+        self.elTableData = [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }];
       }
       self.getBindStoreList();
     },
@@ -957,9 +961,9 @@ export default {
       sessionStorage.setItem('TabIndex', tabObj.index);
       switch (tabObj.index) {
         case '0':
-          self.checkValue = '远程巡检'; break;
-        case '1':
           self.checkValue = '现场巡检'; break;
+        case '1':
+          self.checkValue = '远程巡检'; break;
         default:
           self.checkValue = '新增巡检表'; break;
       }
@@ -1594,11 +1598,11 @@ export default {
         let label = '';
         switch (Number(that.activeName)) {
           case 0: {
-            label = `[${that.$t('insSettingView.remotePatrol')}]`;
+            label = `[${that.$t('insSettingView.onsitePatrol')}]`;
             break;
           }
           case 1: {
-            label = `[${that.$t('insSettingView.onsitePatrol')}]`;
+            label = `[${that.$t('insSettingView.remotePatrol')}]`;
             break;
           }
           default: {
@@ -1745,7 +1749,6 @@ export default {
             .el-route-tabs{
                 width: 98%;
                 margin-left: calc(15/1920*100vw);
-
                 .bind-empty{
                     text-align: center;
                     img{
@@ -1924,6 +1927,13 @@ export default {
 
     .nameinput /deep/ .el-input__inner{
         border:0;
+    }
+    .loading_area /deep/ .el-loading-spinner{
+      height: calc(100vh - 180px);
+    }
+    .loading_area /deep/ .el-loading-text{
+      height: calc(100vh - 180px);
+      line-height:calc(100vh - 180px);
     }
     #en-patrltabs-content /deep/ .el-tabs__nav-scroll {
       height: 40px;
