@@ -120,7 +120,7 @@
             @click="applyNape">
             <div class="btn-area">
               <i class="iconfont icon-quxiaolianjie"/>
-              <span>{{ $t('insSettingView.confirmBound') }}</span>
+              <span>{{ $t('insSettingView.confirm') }}</span>
             </div>
           </el-button>
         </div>
