@@ -862,7 +862,7 @@ export default {
           self.cityList.forEach(item => {
             cityArr.push(item.value);
           });
-          self.curCity = (!self.ifGetParamsFromCash) ? cityArr : self.curCity;
+          self.curCity = cityArr;
         }
       }
       self.storeDataList = tempStore;
@@ -872,7 +872,7 @@ export default {
         arr.push(item.value);
       });
 
-      self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
+      self.curStore = storeArr;
       self.changeStoreNew(self.curStore);
     },
 
@@ -1042,24 +1042,23 @@ export default {
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
-      self.curProvince = (!self.ifGetParamsFromCash) ? provinceArr: self.curProvince;
+      self.curProvince = isFirst ? ((!self.ifGetParamsFromCash) ? provinceArr: self.curProvince) : provinceArr;
 
       let cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
-      self.curCity = (!self.ifGetParamsFromCash) ? cityArr: self.curCity;
+      self.curCity = isFirst ? ((!self.ifGetParamsFromCash) ? cityArr: self.curCity) : cityArr;
       self.storeDataList = tempStore;
       let storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
       setTimeout(()=>{
-        self.curStore = (!self.ifGetParamsFromCash) ? storeArr: self.curStore;
-        //self.ifGetParamsFromCash = false;
+        self.curStore = isFirst ? ((!self.ifGetParamsFromCash) ? storeArr: self.curStore) : storeArr;
         self.changeStoreNew(self.curStore);
         isFirst ? self.getInitReportList(0) : null;
-      })
+      },100)
     },
 
     dateFocus() {
@@ -1187,7 +1186,6 @@ export default {
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
         self.inspectId = self.ifGetParamsFromCash ? (self.inspectTableList.map(x=>x.id).indexOf(self.inspectCatch) !==-1 ? self.inspectCatch : '') : self.inspectTableList[0].id;
-        self.ifGetParamsFromCash = false;
       } else {
         self.inspectId = '';
       }
