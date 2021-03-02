@@ -97,6 +97,7 @@
           :placeholder="$t('remotePatrol.all')"
           size="mini"
           class="el-province"
+          @change="getInspectList"
         >
           <el-option
             v-for="item in reportTypeList"
@@ -128,8 +129,11 @@
       </el-col>
     </el-col>
     <el-col :span="24" class="report-content loading">
-      <el-row v-if="reportList.length !== 0" class="card-content" v-loading="isLoading"
-              :element-loading-text="$t('insSettingView.loadingbindstore')">
+      <el-row
+        v-loading="isLoading"
+        v-if="reportList.length !== 0"
+        :element-loading-text="$t('insSettingView.loadingbindstore')"
+        class="card-content">
         <el-col v-if="reportList.length !== 0" :span="24" class="card-header">
           <el-radio
             v-for="(item,index) in sortTypeList"
@@ -252,21 +256,24 @@
             @size-change="sizeChange"/>
         </el-col>
       </el-row>
-      <el-row v-else class="card-content" v-loading="isLoading"
-              :element-loading-text="$t('insSettingView.loadingbindstore')">
+      <el-row
+        v-loading="isLoading"
+        v-else
+        :element-loading-text="$t('insSettingView.loadingbindstore')"
+        class="card-content">
         <div class="empty-content">{{ noData }}</div>
       </el-row>
     </el-col>
   </el-row>
 </template>
 <script>
-import { getInspectReportList,GetInspectTagList } from '@/api/inspect';
+import { getInspectReportList, GetInspectTagList } from '@/api/inspect';
 import { getBriefStoreList, GetTagList } from '@/api/store';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
-import SearchConditionUtil from "../../common/SearchConditionUtil";
+import SearchConditionUtil from '../../common/SearchConditionUtil';
 
 export default {
   name: 'InspectReportList',
@@ -446,12 +453,12 @@ export default {
       isLoading: false,
       ifSaveParams: true,
       ifGetParamsFromCash: false,
-      inspectCatch:''
+      inspectCatch: ''
     };
   },
 
   created() {
-    let self = this;
+    const self = this;
     self.isFirstLoad = true;
   },
 
@@ -464,7 +471,7 @@ export default {
 
   watch: {
     accountChanged(val) {
-      let self = this;
+      const self = this;
       if (val !== 0) {
         self.storeDataList = [];
         self.$refs.multiSelect.selectedArray = [];
@@ -480,7 +487,7 @@ export default {
   },
 
   activated() {
-    let self = this;
+    const self = this;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
       self.initData();
     }
@@ -490,7 +497,7 @@ export default {
 
   methods: {
     changeBrand() {
-      let self = this;
+      const self = this;
       self.curCountry = '';
       self.countryList = [];
       self.curProvince = [];
@@ -504,7 +511,7 @@ export default {
     },
 
     initData() {
-      let self = this;
+      const self = this;
       self.isLoading = true;
       self.changeBrand();
       self.defaultTime = [];
@@ -524,7 +531,7 @@ export default {
     },
 
     async export2Excel() {
-      let that = this;
+      const that = this;
       if (that.reportList.length === 0) {
         that.$message({
           message: that.$t('remotePatrol.emptyReportList'),
@@ -532,24 +539,24 @@ export default {
         });
         return false;
       }
-      let start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
-      let end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
+      const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
+      const end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
       that.params.beginTs = start;
       that.params.endTs = end;
       that.params.filter = { page: 0, size: that.total };
       // let storeIds = that.storeStr.split('，');
-      let storeIds = this.filterStoreIds;
+      const storeIds = this.filterStoreIds;
       that.params.clause = { storeId: storeIds };
       require.ensure([], async() => {
-        let { export_json_to_excel } = require('@/excel/Export2Excel');
-        let tHeader = that.exportReportHeader;
-        let filterVal = ['province', 'city', 'code', 'storeName', 'storeTag', 'submitterName', 'tagName',
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = that.exportReportHeader;
+        const filterVal = ['province', 'city', 'code', 'storeName', 'storeTag', 'submitterName', 'tagName',
           'modeText', 'status', 'totalScore', 'datestr'];
         let curData = [];
         curData = await that.getReportList(that.params);
-        let data = that.formatJson(filterVal, curData);
-        let fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
-        sessionStorage.setItem('!merge',true);
+        const data = that.formatJson(filterVal, curData);
+        const fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
+        sessionStorage.setItem('!merge', true);
         export_json_to_excel(tHeader, data, fileName);
         sessionStorage.removeItem('!merge');
       });
@@ -570,17 +577,17 @@ export default {
     },
 
     getReportList(params) {
-      let self = this;
+      const self = this;
       return new Promise((resolve) => {
         getInspectReportList(params).then(res => {
-          let errCode = res.errCode;
+          const errCode = res.errCode;
           let data = [];
           if (errCode === 0) {
             data = res.data.content;
           }
-          let temp = [];
+          const temp = [];
           data.forEach(item => {
-            let reportObj = {};
+            const reportObj = {};
             reportObj.id = item.id;
             reportObj.datestr = util.getDateStr(item.ts);
             reportObj.storeName = item.storeName;
@@ -590,7 +597,7 @@ export default {
             reportObj.routeObj = item;
             reportObj.mode = item.mode;
             reportObj.totalScore = item.totalScore;
-            reportObj.code = item.code!==null ? item.code : '--';
+            reportObj.code = item.code !== null ? item.code : '--';
             if (item.mode === 0) {
               reportObj.modeText = self.$t('overview.remotePatrol');
             } else if (item.mode === 1) {
@@ -598,7 +605,7 @@ export default {
             }
             let storeTag = '';
             item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
-              let isuu = _index === item.tags.length - 1 ? '' : ',';
+              const isuu = _index === item.tags.length - 1 ? '' : ',';
               storeTag += _item + isuu;
             }) : storeTag = '--';
             reportObj.storeTag = storeTag;
@@ -608,7 +615,7 @@ export default {
                 reportObj.city = _item.city;
               }
             });
-            let statusAndIconObj = self.getIconSrc(item.status);
+            const statusAndIconObj = self.getIconSrc(item.status);
             reportObj.status = statusAndIconObj.status;
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
@@ -621,13 +628,13 @@ export default {
           }
           resolve(temp);
         }).catch(err => {
-          console.log("InspectReportList-getReportList: "+ err);
+          console.log('InspectReportList-getReportList: ' + err);
         });
       });
     },
 
-    getIconSrc(status){
-      let statusAndIconObj = {};
+    getIconSrc(status) {
+      const statusAndIconObj = {};
       switch (status) {
         case 0: {
           // dangerous
@@ -699,9 +706,9 @@ export default {
       const temp = [];
       if (self.storeList.length !== 0) {
         self.storeList.forEach(item => {
-          let country = item.country;
+          const country = item.country;
           if (temp.map(x => x.label).indexOf(country) === -1) {
-            let obj = {
+            const obj = {
               value: country,
               label: country
             };
@@ -714,7 +721,7 @@ export default {
       self.countryList[0].label = self.$t('remotePatrol.country');
       self.countryList[0].countryList = countryList;
       self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-      self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value: self.curCountry;
+      self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value : self.curCountry;
       self.selectAllProAndCity(self.curCountry, true);
     },
 
@@ -764,7 +771,7 @@ export default {
     },
 
     changeStore(val) {
-      let self = this;
+      const self = this;
       let str = '';
       self.storeList.forEach((item, index) => {
         val.forEach(_item => {
@@ -814,17 +821,17 @@ export default {
     },
 
     changePro(val) {
-      let self = this;
+      const self = this;
       self.curCity = [];
       self.clearCityInfo();
       self.clearStoreInfo();
-      let storeList = self.storeList;
-      let temp = [];
-      let tempStore = [];
+      const storeList = self.storeList;
+      const temp = [];
+      const tempStore = [];
       if (val === '') {
         storeList.forEach(item => {
           if (item.country === self.curCountry) {
-            let obj = {
+            const obj = {
               storeId: item.storeId,
               label: item.name,
               value: item.name,
@@ -839,13 +846,13 @@ export default {
           storeList.forEach(item => {
             if (item.province === _item) {
               if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                let obj = {
+                const obj = {
                   label: item.city,
                   value: item.city
                 };
                 temp.push(obj);
               }
-              let obj = {
+              const obj = {
                 storeId: item.storeId,
                 label: item.name,
                 value: item.name,
@@ -857,7 +864,7 @@ export default {
           });
         });
         self.cityList = temp;
-        let cityArr = [];
+        const cityArr = [];
         if (self.cityList.length !== 0) {
           self.cityList.forEach(item => {
             cityArr.push(item.value);
@@ -877,28 +884,28 @@ export default {
     },
 
     changeCountry(val) {
-      let self = this;
-      let temp = [];
+      const self = this;
+      const temp = [];
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      self.selectAllProAndCity(val,false);
+      self.selectAllProAndCity(val, false);
     },
 
     changeStoreTag(val) {
-      let self = this;
+      const self = this;
       self.curStoreTag = val;
       this.filterStore();
     },
 
     getTagListData() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         GetTagList().then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             res.data.forEach(item => {
-              let obj = {};
+              const obj = {};
               obj.value = item.tagId;
               obj.label = item.tagName;
               obj.disabled = false;
@@ -913,16 +920,16 @@ export default {
     },
 
     changeCity(val) {
-      let self = this;
+      const self = this;
       self.clearStoreInfo();
-      let storeList = self.storeList;
-      let temp = [];
+      const storeList = self.storeList;
+      const temp = [];
       if (val.length !== 0) {
         val.forEach(_item => {
           storeList.forEach(item => {
             if (item.city === _item) {
               if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                let obj = {
+                const obj = {
                   storeId: item.storeId,
                   label: item.name,
                   value: item.name,
@@ -946,7 +953,7 @@ export default {
     },
 
     clearStoreInfo() {
-      let self = this;
+      const self = this;
       self.curStore = [];
       self.storeStr = '';
       self.$refs.multiSelect.selectedArray = [];
@@ -954,37 +961,37 @@ export default {
     },
 
     clearProviceInfo() {
-      let self = this;
+      const self = this;
       self.curProvince = [];
       self.$refs.proviceSelect.selectedArray = [];
       self.$refs.proviceSelect.input = '';
     },
 
     clearCityInfo() {
-      let self = this;
+      const self = this;
       self.curCity = [];
       self.$refs.citySelect.selectedArray = [];
       self.$refs.citySelect.input = '';
     },
 
     selectAllProAndCity(val, isFirst) {
-      let self = this;
-      let storeList = self.storeList;
-      let temp = [];
-      let tempStore = [];
+      const self = this;
+      const storeList = self.storeList;
+      const temp = [];
+      const tempStore = [];
       storeList.forEach(item => {
         if (item.country === val || val === '-1') {
           if (temp.map(x => x.value).indexOf(item.province) === -1) {
-            let obj = {
+            const obj = {
               label: item.province,
               value: item.province
             };
             temp.push(obj);
           }
           let storeObj = {};
-          if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-            if(self.curCity.length > 0 && self.curCity !== "-1"){
-              if(self.curProvince.includes(item.province) && self.curCity.includes(item.city)){
+          if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
+            if (self.curCity.length > 0 && self.curCity !== '-1') {
+              if (self.curProvince.includes(item.province) && self.curCity.includes(item.city)) {
                 storeObj = {
                   storeId: item.storeId,
                   label: item.name,
@@ -994,8 +1001,7 @@ export default {
                 };
               }
             }
-          }
-          else{
+          } else {
             storeObj = {
               storeId: item.storeId,
               label: item.name,
@@ -1008,14 +1014,14 @@ export default {
         }
       });
       self.provinceList = temp;
-      let cityTemp = [];
+      const cityTemp = [];
       self.provinceList.forEach(_item => {
         storeList.forEach(item => {
           if (item.province === _item.value) {
             let citObj = {};
-            if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-              if(self.curCity.length > 0 && self.curCity !== "-1"){
-                if(self.curProvince.includes(item.province)){
+            if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
+              if (self.curCity.length > 0 && self.curCity !== '-1') {
+                if (self.curProvince.includes(item.province)) {
                   if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
                     citObj = {
                       label: item.city,
@@ -1024,8 +1030,7 @@ export default {
                   }
                 }
               }
-            }
-            else{
+            } else {
               if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
                 citObj = {
                   label: item.city,
@@ -1038,52 +1043,52 @@ export default {
         });
       });
       self.cityList = cityTemp;
-      let provinceArr = [];
+      const provinceArr = [];
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
-      self.curProvince = isFirst ? ((!self.ifGetParamsFromCash) ? provinceArr: self.curProvince) : provinceArr;
+      self.curProvince = isFirst ? ((!self.ifGetParamsFromCash) ? provinceArr : self.curProvince) : provinceArr;
 
-      let cityArr = [];
+      const cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
-      self.curCity = isFirst ? ((!self.ifGetParamsFromCash) ? cityArr: self.curCity) : cityArr;
+      self.curCity = isFirst ? ((!self.ifGetParamsFromCash) ? cityArr : self.curCity) : cityArr;
       self.storeDataList = tempStore;
-      let storeArr = [];
+      const storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      setTimeout(()=>{
-        self.curStore = isFirst ? ((!self.ifGetParamsFromCash) ? storeArr: self.curStore) : storeArr;
+      setTimeout(() => {
+        self.curStore = isFirst ? ((!self.ifGetParamsFromCash) ? storeArr : self.curStore) : storeArr;
         self.changeStoreNew(self.curStore);
         isFirst ? self.getInitReportList(0) : null;
-      },100)
+      }, 100);
     },
 
     dateFocus() {
-      let self = this;
+      const self = this;
       self.getDeafultTime();
     },
 
     getDeafultTime() {
-      let self = this;
-      let date = new Date();
-      let hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-      let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-      let second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-      let dateStr = hour + ':' + minutes + ':' + second;
-      let timeTemp = [];
+      const self = this;
+      const date = new Date();
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+      const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+      const dateStr = hour + ':' + minutes + ':' + second;
+      const timeTemp = [];
       timeTemp[0] = '00:00:00';
       timeTemp[1] = dateStr;
       self.defaultTime = timeTemp;
     },
 
     dateChange(val) {
-      let self = this;
-      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      let threeMonthAgo = util.getThreeMonths(end);
+      const self = this;
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      const threeMonthAgo = util.getThreeMonths(end);
       if (end - start > end - threeMonthAgo) {
         self.$message({
           message: this.$t('eventView.changeTimeRange'),
@@ -1095,29 +1100,29 @@ export default {
     },
 
     currentChange(val) {
-      let self = this;
+      const self = this;
       self.page = val;
       self.params.filter = { page: val - 1, size: self.sizeNum };
       self.getReportList(self.params);
     },
 
     sizeChange(val) {
-      let self = this;
+      const self = this;
       self.sizeNum = val;
       self.params.filter = { page: 0, size: val };
       self.getReportList(self.params);
     },
 
     searchData() {
-      let self = this;
-      let val = self.dateValue;
-      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      const self = this;
+      const val = self.dateValue;
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       self.params.beginTs = start;
       self.params.endTs = end;
       self.page = 1;
-      let clause = {};
-      //clause.storeId = self.storeStr.split('，');
+      const clause = {};
+      // clause.storeId = self.storeStr.split('，');
       clause.storeId = self.filterStoreIds;
       if (self.curReportType != null && self.curReportType !== -1) {
         clause.mode = self.curReportType;
@@ -1126,8 +1131,8 @@ export default {
         clause.status = self.curAppraise;
       }
       self.params.clause = clause;
-      self.params.inspectTagId = self.inspectId === "-1" ? "": self.inspectId ;
-      let search = self.searchInput.trim();
+      self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
+      const search = self.searchInput.trim();
       if (search.length !== 0) {
         self.params.like = {
           tagName: search,
@@ -1144,7 +1149,7 @@ export default {
     },
 
     checkSortType(typeId) {
-      let self = this;
+      const self = this;
       switch (typeId) {
         case 0: self.params.order = { direction: 'desc', property: 'ts' }; break;
         case 1: self.params.order = { direction: 'asc', property: 'status' }; break;
@@ -1154,7 +1159,7 @@ export default {
     },
 
     clickReport(item, index) {
-      let self = this;
+      const self = this;
       sessionStorage.setItem('report_data', JSON.stringify(item.routeObj));
       self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
     },
@@ -1177,22 +1182,34 @@ export default {
       const newArr = [];
       const inspectList = [];
       inspectArr.forEach(_item => {
+        if (self.curReportType === -1) {
           if (!newArr.includes(_item.id)) {
             newArr.push(_item.id);
             inspectList.push(_item);
           }
+        } else if (self.curReportType === 0) {
+          if (!newArr.includes(_item.id) && _item.mode === 0) {
+            newArr.push(_item.id);
+            inspectList.push(_item);
+          }
+        } else if (self.curReportType === 1) {
+          if (!newArr.includes(_item.id) && _item.mode === 1) {
+            newArr.push(_item.id);
+            inspectList.push(_item);
+          }
+        }
       });
       self.inspectTableList = inspectList;
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
-        self.inspectId = self.ifGetParamsFromCash ? (self.inspectTableList.map(x=>x.id).indexOf(self.inspectCatch) !==-1 ? self.inspectCatch : '') : self.inspectTableList[0].id;
+        self.inspectId = self.ifGetParamsFromCash ? (self.inspectTableList.map(x => x.id).indexOf(self.inspectCatch) !== -1 ? self.inspectCatch : '') : self.inspectTableList[0].id;
       } else {
         self.inspectId = '';
       }
     },
 
-    saveSearchParams(){
-      let tempsearchParamsObj = {};
+    saveSearchParams() {
+      const tempsearchParamsObj = {};
       tempsearchParamsObj.searchCondition = this.params;
       tempsearchParamsObj.curCountry = this.curCountry;
       tempsearchParamsObj.curProvince = this.curProvince;
@@ -1207,9 +1224,9 @@ export default {
       SearchConditionUtil.saveSearchCondition(searchParamsObj);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.searchCondition.beginTs);
         this.dateValue[1] = new Date(searchParams.searchCondition.endTs);
         this.params.beginTs = searchParams.beginTs;
@@ -1227,16 +1244,16 @@ export default {
         this.curAppraise = searchParams.searchCondition.clause.status;
         this.curReportType = searchParams.searchCondition.clause.mode;
         this.inspectCatch = searchParams.searchCondition.inspectTagId;
-        //this.setDefaultSort();
+        // this.setDefaultSort();
         this.ifGetParamsFromCash = true;
-      }else{
+      } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
         this.params.endTs = end;
         this.params.filter = { page: 0, size: this.sizeNum };
-        //let storeIds = self.storeStr.split('，');
-        let storeIds = this.filterStoreIds;
+        // let storeIds = self.storeStr.split('，');
+        const storeIds = this.filterStoreIds;
         this.params.clause = { storeId: storeIds };
         this.ifGetParamsFromCash = false;
       }
