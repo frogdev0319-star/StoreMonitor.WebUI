@@ -1237,7 +1237,7 @@ export default {
       tempsearchParamsObj.curCity = this.curCity;
       tempsearchParamsObj.curStore = this.curStore;
       tempsearchParamsObj.curStoreTag = this.curStoreTag;
-      tempsearchParamsObj.timeMode = this.timeMode;
+      tempsearchParamsObj.curReportType = this.curReportType;
       const searchParamsObj = {
         path: 'inspectReport',
         params: tempsearchParamsObj
@@ -1263,7 +1263,7 @@ export default {
         this.filter = searchParams.filter;
         this.params = searchParams.searchCondition;
         this.curAppraise = searchParams.searchCondition.clause.status;
-        this.curReportType = searchParams.searchCondition.clause.mode;
+        this.curReportType = searchParams.curReportType;
         this.inspectCatch = searchParams.searchCondition.inspectTagId.length === 0 ? '-1' : searchParams.searchCondition.inspectTagId;
         // this.setDefaultSort();
         this.ifGetParamsFromCash = true;
