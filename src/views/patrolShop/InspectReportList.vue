@@ -525,6 +525,7 @@ export default {
       self.checkAllStore = false;
       self.curStore = [];
       self.storeTagList = [];
+      self.curReportType = -1;
       self.getSearchParams();
       self.getCountryStore();
       self.getTagListData();
@@ -1202,7 +1203,7 @@ export default {
       self.inspectTableList = inspectList;
       self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
       if (inspectList.length !== 0) {
-        self.inspectId = self.ifGetParamsFromCash ? (self.inspectTableList.map(x => x.id).indexOf(self.inspectCatch) !== -1 ? self.inspectCatch : '') : self.inspectTableList[0].id;
+        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : self.inspectTableList[0].id;
       } else {
         self.inspectId = '';
       }
@@ -1243,7 +1244,7 @@ export default {
         this.params = searchParams.searchCondition;
         this.curAppraise = searchParams.searchCondition.clause.status;
         this.curReportType = searchParams.searchCondition.clause.mode;
-        this.inspectCatch = searchParams.searchCondition.inspectTagId;
+        this.inspectCatch = searchParams.searchCondition.inspectTagId.length === 0 ? '-1' : searchParams.searchCondition.inspectTagId;
         // this.setDefaultSort();
         this.ifGetParamsFromCash = true;
       } else {
