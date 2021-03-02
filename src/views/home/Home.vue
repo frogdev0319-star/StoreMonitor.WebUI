@@ -825,6 +825,7 @@ export default {
         text-align: left;
         padding: 30px 40px 30px calc(50/1920*100vw);
         border-bottom: 1px solid $border;
+        border-top: 1px solid #393b4c;
         .brand-label{
           display: block;
           color: #a0a4ad;
