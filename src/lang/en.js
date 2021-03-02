@@ -624,7 +624,7 @@ export default {
     'deviceModel': 'Model Number',
     'addAgain': 'Add Again',
     'serialNum': 'Serial Number',
-    'validationCode': 'Validation Vode',
+    'validationCode': 'Validation Code',
     'deviceName': 'Name',
     'deviceChannelNum': 'Channel Number',
     'selectStoreInfo': 'After selected, the store can not be edit, please choose carefully.',
