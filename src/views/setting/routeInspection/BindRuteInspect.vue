@@ -778,11 +778,11 @@ export default {
       let nameLang = '';
       switch (Number(sessionStorage.getItem('TabName'))) {
         case 0: {
-          nameLang = self.$t('insSettingView.remotePatrol');
+          nameLang = self.$t('insSettingView.onsitePatrol');
           break;
         }
         case 1: {
-          nameLang = self.$t('insSettingView.onsitePatrol');
+          nameLang = self.$t('insSettingView.remotePatrol');
           break;
         }
         default: {
