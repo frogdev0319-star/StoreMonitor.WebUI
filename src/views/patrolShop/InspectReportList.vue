@@ -1172,12 +1172,12 @@ export default {
       if (order === 'ascending') {
         self.params.order = {
           'direction': 'asc',
-          'property': col.column.property
+          'property': col.column.property === 'datestr' ? 'ts' : col.column.property
         };
       } else if (order === 'descending') {
         self.params.order = {
           'direction': 'desc',
-          'property': col.column.property
+          'property': col.column.property === 'datestr' ? 'ts' : col.column.property
         };
       } else {
         self.params.order = {};
