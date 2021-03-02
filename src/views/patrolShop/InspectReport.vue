@@ -200,7 +200,7 @@
                           @click="playCommentVideo(sourceitem,sourceindex)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                           <img
-                            :style="isexportPDF ? 'width:130px;height:100px;':'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:150px;height:100px;':'width: calc(130/1920*100vw);'"
                             :src="videoImgSrc"
                             :height="imgHeight+'px'"
                             class="imgLittle">
@@ -243,7 +243,7 @@
                         <div v-if="sourceitem.mediaType === 2" class="img-content">
                           <img
                             :title="imgTitle"
-                            :style="isexportPDF ? 'width:130px;' : 'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:150px;height:100px;' : 'width: calc(130/1920*100vw);'"
                             :src="sourceitem.url"
                             :height="imgHeight+'px'"
                             :onerror="deafultImg"
@@ -256,7 +256,7 @@
                           @click="playCommentVideo(sourceitem,index)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                           <img
-                            :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF?'width:150px;height:100px;':'width: calc(130/1920*100vw);'"
                             :src="videoImgSrc"
                             :height="imgHeight+'px'"
                             class="imgLittle">
