@@ -216,6 +216,7 @@
             style=""
             class="table-content"
             @row-click="clickReport"
+            @sort-change="sortChange"
           >
             <el-table-column
               v-for="(_item,_index) in reportInfoTable"
@@ -1163,6 +1164,25 @@ export default {
       const self = this;
       sessionStorage.setItem('report_data', JSON.stringify(item.routeObj));
       self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
+    },
+
+    sortChange(col){
+      let self = this;
+      let order = col.order;
+      if (order === 'ascending') {
+        self.params.order = {
+          'direction': 'asc',
+          'property': col.column.property
+        };
+      } else if (order === 'descending') {
+        self.params.order = {
+          'direction': 'desc',
+          'property': col.column.property
+        };
+      } else {
+        self.params.order = {};
+      }
+      self.searchData();
     },
 
     getTagAll() {
