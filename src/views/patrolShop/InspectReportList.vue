@@ -378,13 +378,13 @@ export default {
         {
           prop: 'totalScore',
           label: this.$t('remotePatrol.patrolScore'),
-          sortable: true,
+          sortable: 'custom',
           width: '110'
         },
         {
           prop: 'datestr',
           label: this.$t('remotePatrol.patrolDate'),
-          sortable: true,
+          sortable: 'custom',
           width: '164'
         }
       ],
