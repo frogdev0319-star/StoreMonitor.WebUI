@@ -22,12 +22,10 @@
       </div>
     </div>
     <div class="el-acticle">
-      <div v-if="suggest!=null&&suggest.length!=0" class="suggest">
+      <div v-if="suggest!=null&&suggest.length!=0" class="suggest" :style="isexportPDF ? 'max-height:300px;' : ''">
         <div class="suggest-content">
-          <div class="pdf_font_16_suggest">
-            <span>{{ $t('remotePatrol.advice') }}</span>
-            <span v-html="turnSuggest(suggest)"/>
-          </div>
+            <span class="pdf_suggest_font_20">{{ $t('remotePatrol.advice') }}</span>
+            <span v-html="turnSuggest(suggest)" class="pdf_font_20"/>
         </div>
       </div>
       <el-row class="report-content">
@@ -215,7 +213,7 @@
                 <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
                   <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
                     <div class="detail-title">
-                      <p class="title1">{{ index+1 }}.{{ item.subject }}</p>
+                      <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }}</span></p>
                     </div>
                   </div>
                   <div
@@ -964,7 +962,7 @@ export default {
   .cdm-voice{ page-break-inside:avoid;}
   .cdm-word{ page-break-inside:avoid;}
   .cdm-pic{ page-break-inside:avoid;}
-  .pdf_font_16_suggest{font-size: 20px;height: 32px; line-height: 32px;}
+  .pdf_suggest_font_20{font-size: 28px;width:200px;margin-right: 50px;}
   .pdf_font_16{font-size: 20px;}
   .pdf_font_18{font-size: 26px;}
   .pdf_font_20{font-size: 28px;}
@@ -1090,8 +1088,6 @@ export default {
         margin-top: 20px;
         font-size: calc(14 / 1920 * 100vw);
         font-weight: bold;
-        height: calc(20 / 1920 * 100vw);
-        line-height: 20px;
         background-color: $suggestBack;
         color: $qualified;
         padding-left: calc(30 / 1920 * 100vw);
