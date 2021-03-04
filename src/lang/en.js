@@ -61,7 +61,7 @@ export default {
     'loginAbnormal': 'The login information is abnormal, please sign in again!',
     'dashDevice': 'Dash',
     'ezvizDevice': 'Ezviz',
-    'beseyeDevice': 'Beseye',
+    'beseyeAccount': 'Beseye',
     'dashDeviceMgt': 'Device Management (Dash)',
     'ezvizDeviceMgt': 'Device Management (Ezviz)',
     'beseyeDeviceMgt': 'Device Management (Beseye)',
@@ -708,7 +708,7 @@ export default {
     'ezvizAccountSetting': 'Ezviz Account Settings',
     'addEzvizAccount': 'Add Account',
     'ezvizAccount': 'Account',
-    'accountName': 'Username',
+    'accountName': 'User Name',
     'appliedStores': 'Number of Applied Stores',
     'description': 'Description',
     'noData': 'No data',
@@ -785,7 +785,8 @@ export default {
     'reauthorizeFail': 'Failed to reauthorize',
     'reauthorizeRefused': 'Reauthorization refused',
     'deleteBeseyeUser': 'Delete Beseye User',
-    'selectDevice': 'Please select device'
+    'selectDevice': 'Please select device',
+    'isAuthorizing': 'Authorizing...'
   },
 
   // Store Management page language

@@ -62,7 +62,7 @@ export default {
     'loginAbnormal': '登錄信息異常，請重新登錄！',
     'dashDevice': 'Dash設備',
     'ezvizDevice': '螢石設備',
-    'beseyeDevice': 'Beseye設備',
+    'beseyeAccount': 'Beseye設備',
     'dashDeviceMgt': '设备管理（Dash設備）',
     'ezvizDeviceMgt': '设备管理（萤石設備）',
     'beseyeDeviceMgt': '设备管理（Beseye設備）',
@@ -795,7 +795,8 @@ export default {
     'reauthorizeFail': '重新授權失敗',
     'reauthorizeRefused': '重新授權被拒絕',
     'deleteBeseyeUser': '刪除Beseye用戶',
-    'selectDevice': '請選擇設備'
+    'selectDevice': '請選擇設備',
+    'isAuthorizing': '授權中...'
 
   },
 

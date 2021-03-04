@@ -62,7 +62,7 @@ export default {
     'loginAbnormal': '登录信息异常，请重新登录！',
     'dashDevice': 'Dash设备',
     'ezvizDevice': '萤石设备',
-    'beseyeDevice': 'Beseye设备',
+    'beseyeAccount': 'Beseye设备',
     'dashDeviceMgt': '设备管理（Dash设备）',
     'ezvizDeviceMgt': '设备管理（萤石设备）',
     'beseyeDeviceMgt': '设备管理（Beseye）',
@@ -797,7 +797,8 @@ export default {
     'reauthorizeFail': '重新授权失败',
     'reauthorizeRefused': '重新授权被拒绝',
     'deleteBeseyeUser': '删除Beseye用户',
-    'selectDevice': '请选择设备'
+    'selectDevice': '请选择设备',
+    'isAuthorizing': '授权中...'
   },
 
   // Store Management page language
