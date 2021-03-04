@@ -93,7 +93,7 @@ export async function getDeviceCapacity(data) {
       ret = false;
     } else if (!data.data.hasOwnProperty('support_modify_pwd') || data.data.support_modify_pwd == 0) {
       ret = false;
-    } else if (data.data.support_modify_pwd == 1) {
+    } else if (data.data.support_modify_pwd === 1) {
       ret = true;
     }
   })

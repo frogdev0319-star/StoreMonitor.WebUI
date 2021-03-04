@@ -65,11 +65,11 @@ export const updateBeseyeDevice = data => {
   });
 };
 
-export const deleteBeseyeDevice = params => {
+export const deleteBeseyeDevice = data => {
   return request({
     url: `${version}/beseye/device/delete`,
     method: 'post',
-    params
+    data
   });
 };
 
@@ -83,8 +83,8 @@ export const getPlaylistInfo = params => {
 
 export const getBeseyeUserList = params => {
   return request({
-    url: `${version}/beseye/userlist`,
-    method: 'get',
+    url: `${version}/beseye/account/list`,
+    method: 'post',
     params
   })
 }
@@ -97,11 +97,11 @@ export const deleteBeseyeUser = params => {
   });
 }
 
-export const beseyeAccountAuthorize = params => {
+export const beseyeAccountAuthorize = data => {
   return request({
     url: `${version}/beseye/account/authorize`,
     method: 'post',
-    params
+    data
   })
 }
 
