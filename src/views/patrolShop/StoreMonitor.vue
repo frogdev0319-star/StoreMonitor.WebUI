@@ -91,7 +91,7 @@
       >>
       </dialog-vue>
       <dash-video
-        v-if="videoPlatform === 0"
+        v-if="vendor === 0"
         ref="dashVideo"
         :store-id="store.storeId"
         :channel-info="channel"
@@ -100,7 +100,7 @@
         @confirmEzvizCanvas="editEzvizCanvas"
       />
       <ezviz-video
-        v-else-if="videoPlatform === 1"
+        v-else-if="vendor === 1"
         ref="ezvizVideo"
         :store-id="store.storeId"
         :channel-info="channel"
@@ -391,7 +391,7 @@ import {
   addFavoriteStore,
   deleteFavoriteStore,
   getFavoriteList,
-  getStoreList
+  getBriefStoreList
 } from '@/api/store';
 import {
   addComment,
@@ -399,17 +399,14 @@ import {
   getEventList,
   getStorageInfo
 } from '@/api/event';
+import { getDeviceList } from '@/api/device';
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
-import videojs from '../../../static/video.js';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import DialogVue from '@/components/DialogVue.vue';
 import filterString from '@/common/filterString.js';
 import { getCookie } from '@/common/auth';
-import { setTimeout } from 'timers';
 import EzvizVideo from '@/components/EzvizVideo.vue';
-import DashHttp from '../../common/DashHttp';
-import { getDashServerInfo } from '@/api/device.js';
 import BeseyeVideo from '@/components/BeseyeVideo.vue';
 import DashVideo from '@/components/DashVideo';
 
@@ -584,7 +581,8 @@ export default {
       dateValue: new Date(),
       changeFlag: false,
       eventNameRuletip: false,
-      eventDesRuletip: false
+      eventDesRuletip: false,
+      vendor: 0
     };
   },
 
@@ -610,10 +608,6 @@ export default {
     isEzviz() {
       const self = this;
       return self.$store.state.user.isEzviz;
-    },
-
-    videoPlatform() {
-      return this.$store.state.user.videoPlatform;
     }
 
   },
@@ -656,10 +650,12 @@ export default {
     self.isPlayingFlag = -1;
     self.timerPlayReal = null;
     self.timeid = null;
-    if (!self.isEzviz) {
+    if (self.vendor === 0) {
       // self.stopVideoPlay();
-    } else {
+    } else if (self.vendor === 1) {
       self.$refs.ezvizVideo.stopRealTime();
+    } else {
+      self.$refs.beseyeVideo.stopPlay();
     }
     if (to.name !== 'storeSubEvent') {
       from.meta.keepAlive = false;
@@ -747,7 +743,7 @@ export default {
         }
       };
       return new Promise((resolve, reject) => {
-        getStoreList(params).then((res) => {
+        getBriefStoreList(params).then((res) => {
           resolve(res);
         });
       });
@@ -900,7 +896,7 @@ export default {
       try {
         const res = await self.getAllStoreList();
         if (res.errCode === 0) {
-          const storeData = res.data.content;
+          const storeData = res.data;
           self.allInitStoreList = storeData;
           if (storeData.length === 0) {
             self.tabList[2].storeList = [];
@@ -1093,11 +1089,15 @@ export default {
         self.timeid = null;
         self.timeid = 0;
       }
-      if (!self.isEzviz) {
+      if (self.vendor === 0) {
         self.$refs.dashVideo.playHistoryVideo(self.startTs);
-      } else {
+      } else if(self.vendor === 1){
         self.changeFlag = false;
         self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
+      }else{
+        console.log('beseye')
+        self.changeFlag = false
+        self.$refs.beseyeVideo.changeHistoryTime(self.playBackTime);
       }
     },
 
@@ -1592,10 +1592,6 @@ export default {
 
     clickStore(item, index, _item, _index) {
       const self = this;
-      // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading) ) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
       self.showStoreUp = true;
 
       self.curTabIndex = index;
@@ -1603,8 +1599,9 @@ export default {
       self.curStoreIndex = _index;
       self.curStoreItem = _item;
       if (
-        (!self.isEzviz && (self.playState || self.eventName.length != 0)) || self.videoPlatform == 1 && (self.$refs.ezvizVideo.playState || self.eventName.length != 0) ||
-        (self.videoPlatform == 2 && (self.$refs.beseyeVideo.playState || self.eventName.length != 0))
+        (self.vendor === 0 && (self.playState || self.eventName.length !== 0)) ||
+          self.vendor === 1 && (self.$refs.ezvizVideo.playState || self.eventName.length !== 0) ||
+        (self.vendor === 2 && (self.$refs.beseyeVideo.playState || self.eventName.length !== 0))
       ) {
         self.changeStoreObj.dialogCosed = true;
       } else {
@@ -1623,11 +1620,11 @@ export default {
       self.hideLast = false;
       self.hideNext = false;
       self.showCutContent = false;
-      if (self.videoPlatform === 0) {
+      if (self.vendor === 0) {
         if (self.playState) {
           self.stopRealTime();
         }
-      } else if (self.videoPlatform === 1) {
+      } else if (self.vendor === 1) {
         self.$refs.ezvizVideo.showError = false;
         self.$refs.ezvizVideo.playBack && (self.$refs.ezvizVideo.startTs = self.playBackTime);
         if (self.$refs.ezvizVideo.playState) {
@@ -1639,37 +1636,79 @@ export default {
           self.$refs.beseyeVideo.stopPlay();
         }
       }
-      storeItem.device.forEach((item, index) => {
-        const obj = {};
-        obj.id = item.id;
-        obj.name = item.name;
-        obj.ivsId = item.ivsId;
-        obj.channelId = item.channelId;
-        obj.isonline = true;
-        if (index === 0) {
-          obj.isClick = true;
-          self.channel = {
-            id: item.id,
-            ivsId: item.ivsId,
-            channelId: item.channelId,
-            channelName: item.name
-          };
-        } else {
-          obj.isClick = false;
-        }
-        temp.push(obj);
+      self.getDeviceList(storeItem.storeId).then(res => {
+        console.log(res);
+        res.forEach((item, index) => {
+          const obj = {};
+          obj.id = item.id;
+          obj.name = item.name;
+          obj.ivsId = item.ivsId;
+          obj.channelId = item.channelId;
+          obj.isonline = true;
+          obj.vendor = item.vendor;
+          if (index === 0) {
+            obj.isClick = true;
+            self.channel = {
+              id: item.id,
+              ivsId: item.ivsId,
+              channelId: item.channelId,
+              channelName: item.name,
+              vendor: item.vendor
+            };
+            self.vendor = item.vendor;
+          } else {
+            obj.isClick = false;
+          }
+          temp.push(obj);
+        });
       });
+      // storeItem.device.forEach((item, index) => {
+      //   const obj = {};
+      //   obj.id = item.id;
+      //   obj.name = item.name;
+      //   obj.ivsId = item.ivsId;
+      //   obj.channelId = item.channelId;
+      //   obj.isonline = true;
+      //   obj.vendor = item.vendor;
+      //   if (index === 0) {
+      //     obj.isClick = true;
+      //     self.channel = {
+      //       id: item.id,
+      //       ivsId: item.ivsId,
+      //       channelId: item.channelId,
+      //       channelName: item.name,
+      //       vendor: item.vendor
+      //     };
+      //     self.vendor = item.vendor;
+      //   } else {
+      //     obj.isClick = false;
+      //   }
+      //   temp.push(obj);
+      // });
       self.channelBtns = temp;
       self.allChannelBtns = temp;
       self.getshowBtns(temp);
     },
 
+    getDeviceList(storeId) {
+      const params = {};
+      params.storeId = storeId;
+      return new Promise((resolve, reject) => {
+        getDeviceList(params).then((res) => {
+          const data = res.data;
+          resolve(data);
+        });
+      }).catch(err => {
+        console.log('StoreMonitor-getDeviceList: ' + err);
+        reject(err);
+      });
+    },
     getshowBtns(list) {
       const self = this;
       const width = document.getElementsByClassName('btn-content')[0]
         .offsetWidth;
       const detailsWidth = (window.innerWidth / 1440) * 15 + 60;
-      const count = parseInt(width / detailsWidth); // 当前容器最大可显示数量
+      const count = parseInt(width / detailsWidth); // the maxium channel to show
       if (count >= list.length) {
         self.showChannelBtns = list;
       } else {
@@ -1692,9 +1731,11 @@ export default {
           id: item.id,
           ivsId: item.ivsId,
           channelId: item.channelId,
-          channelName: item.name
+          channelName: item.name,
+          vendor: item.vendor
         };
         self.channel = obj;
+        self.vendor = item.vendor;
       } else {
         return false;
       }
@@ -1703,25 +1744,43 @@ export default {
           _item.isClick = false;
         }
       });
-      if (!self.isEzviz) {
-        // if (self.playBackState) {
-        //   self.$refs.dashVideo.playHistoryVideo(self.startTs);
-        // } else {
-        //   self.startVideo(self.channel.ivsId, self.channel.channelId, null);
-        // }
-      } else {
-        self.$refs.ezvizVideo.playBack &&
+      if (self.vendor === 0) {
+        self.$nextTick(() => {
+          if (self.playBackState) {
+            self.$refs.dashVideo.playHistoryVideo(self.startTs);
+          } else {
+            self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+          }
+        })
+      } else if (self.vendor === 1) {
+        self.$nextTick(async() => {
+          await self.$refs.ezvizVideo.getEzvizAccessToken(self.channel.ivsId);
+          self.$refs.ezvizVideo.playBack &&
           (self.$refs.ezvizVideo.startTs = self.playBackTime);
-        if (self.$refs.ezvizVideo.playState) {
-          self.$refs.ezvizVideo.stopRealTime();
-          self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime();
-          });
-        } else {
-          self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime();
-          });
-        }
+          if (self.$refs.ezvizVideo.playState) {
+            self.$refs.ezvizVideo.stopRealTime();
+            self.$nextTick(() => {
+              self.$refs.ezvizVideo.realTime();
+            });
+          } else {
+            self.$nextTick(() => {
+              self.$refs.ezvizVideo.realTime();
+            });
+          }
+        })
+      } else {
+        self.$nextTick(() => {
+          if (self.$refs.beseyeVideo.playState) {
+            self.$refs.beseyeVideo.stopPlay();
+            self.$nextTick(() => {
+              self.$refs.beseyeVideo.startPlay();
+            })
+          } else {
+            self.$nextTick(() => {
+              self.$refs.beseyeVideo.startPlay();
+            })
+          }
+        })
       }
     },
 
@@ -1829,15 +1888,20 @@ export default {
       self.curYear = new Date().getFullYear();
       self.curMonth = new Date().getMonth() + 1;
       self.realType = true;
-      if (!self.isEzviz) {
+      if (self.vendor === 0) {
         if (self.store.storeId != undefined) {
           self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
         }
-      } else {
+      } else if (self.vendor === 1) {
         self.playBackTime = 0;
         self.$nextTick(() => {
           self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
         });
+      } else{
+        self.playBackTime = 0;
+        self.$nextTick(() => {
+          self.$refs.beseyeVideo.changeHistoryTime(self.playBackTime);
+        })
       }
     },
 
