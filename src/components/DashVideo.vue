@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="showError" class="errorVideo-model">
+    <div v-if="showError" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
       <span>{{ errorText }}</span>
     </div>
     <div
@@ -285,7 +285,7 @@ import { mapGetters } from 'vuex';
 import videojs from '../../static/video.js';
 import DashHttp from '@/common/DashHttp.js';
 import { getDashServerInfo } from '@/api/device.js';
-import util from '@/common/util'
+import util from '@/common/util';
 import filterString from '../common/filterString';
 
 export default {
@@ -640,7 +640,7 @@ export default {
     const self = this;
     window.clearInterval(self.timerPlayReal);
     self.realTimeSpeed = 0;
-    console.log('destory')
+    console.log('destory');
     self.stopVideoPlay();
     window.removeEventListener('resize', self.resizeFun);
     window.removeEventListener('visibilitychange', self.visibilityChange);
@@ -705,7 +705,7 @@ export default {
           }
           reject(error);
         });
-      })
+      });
     },
 
     async onPlay() {
@@ -987,8 +987,10 @@ export default {
       self.playState = false;
       self.showError = false;
       var video = document.getElementById('dashVideo');
-      self.previewplayer = videojs(video);
-      self.previewplayer.pause();
+      if (video !== null) {
+        self.previewplayer = videojs(video);
+        self.previewplayer.pause();
+      }
       self.stopTimer();
     },
 
@@ -1076,7 +1078,7 @@ export default {
           imgObj.src = oGrayImg;
           self.imageCanvasList.push(imgObj);
         });
-      }else{
+      } else {
         self.showCancelContent = false;
         if (self.sourceListLength >= 10) {
           util.notify(self.$t('remotePatrol.storeMaxAttach'), 'warning', 3000);
@@ -1174,7 +1176,6 @@ export default {
     },
 
     async getProcess() {
-      console.log('getProcess');
       const self = this;
       const video = document.getElementById('dashVideo');
       const curTime = video.player.currentTime();
@@ -1425,7 +1426,7 @@ export default {
       }
       self.$emit('ezvizCutPictureFeedback', obj);
       self.showSnapshotFeedbackDialog = false;
-    },
+    }
   }
 };
 </script>
