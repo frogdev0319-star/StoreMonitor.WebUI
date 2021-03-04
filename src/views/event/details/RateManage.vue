@@ -27,8 +27,9 @@
           @mousemove="showControlInfo=true"
           @mouseleave="showControlInfo = false">
           <hr class="dialog-hr">
-          <dash-video v-if="!isEzviz" ref="dashVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
-          <ezviz-video v-else ref="ezvizVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
+          <dash-video v-if="vendor === 0" ref="dashVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
+          <ezviz-video v-else-if="vendor === 1" ref="ezvizVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
+          <beseye-video v-else ref="beseyeVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
         </div>
       </el-dialog>
       <el-dialog
@@ -277,7 +278,6 @@
 </template>
 <script>
 import util from '../../../common/util';
-import dashAPI from '@/api/dash';
 import videojs from '../../../../static/video.js';
 import 'videojs-contrib-hls';
 import { eventRESTful } from '@/api/index';
@@ -288,13 +288,15 @@ import EzvizVideo from '@/components/EzvizVideo.vue';
 import PermissionHelper from '../../../api/PermissionHelper';
 import filterString from '@/common/filterString';
 import DashVideo from '../../../components/DashVideo';
+import BeseyeVideo from '@/components/BeseyeVideo.vue';
 
 export default {
   name: 'RateManage',
   components: {
     DashVideo,
     AudioVue,
-    EzvizVideo
+    EzvizVideo,
+    BeseyeVideo
   },
   data() {
     return {
@@ -348,7 +350,8 @@ export default {
       ivsIdRuletip: false,
       videosourceList: [],
       imgsourceList: [],
-      Changestatus: ''
+      Changestatus: '',
+      vendor: 0
     };
   },
   computed: {
@@ -470,10 +473,12 @@ export default {
 
     closeRealTime() {
       const self = this;
-      if (!self.isEzviz) {
+      if (self.vendor === 0) {
         self.$refs.dashVideo.stopVideoPlay();
-      } else {
+      } else if (self.vendor === 1) {
         self.$refs.ezvizVideo.stopRealTime();
+      }else{
+        self.$refs.beseyeVideo.stopPlay();
       }
     },
 
@@ -546,6 +551,7 @@ export default {
               item.channelId = _item.channelId;
               item.name = _item.name;
               item.ivsId = _item.ivsId;
+              item.vendor = _item.vendor;
             }
           });
           temp.push(item);
@@ -651,15 +657,32 @@ export default {
       const self = this;
       self.dialogFormVisible = true;
       self.channelInfo = self.curChannel;
+      self.vendor = self.channelInfo.vendor;
       if (index != undefined) {
         self.curChannel = item;
       }
-      if (!self.isEzviz) {
+      if (self.vendor === 0) {
         self.$nextTick(() => {
           self.$refs.dashVideo.onPlay();
         })
+      } else if (self.vendor === 1) {
+        self.$nextTick(async() => {
+          await self.$refs.ezvizVideo.getEzvizAccessToken(self.channelInfo.ivsId);
+          if (self.$refs.ezvizVideo.playState) {
+            self.$refs.ezvizVideo.stopRealTime();
+            self.$nextTick(() => {
+              self.$refs.ezvizVideo.realTime();
+            });
+          } else {
+            self.$nextTick(() => {
+              self.$refs.ezvizVideo.realTime();
+            });
+          }
+        })
       } else {
-        self.channelInfo = self.curChannel;
+        self.$nextTick(() => {
+          self.$refs.beseyeVideo.startPlay();
+        })
       }
     },
 
