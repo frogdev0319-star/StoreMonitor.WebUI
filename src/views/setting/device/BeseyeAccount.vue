@@ -1,3 +1,4 @@
+<!--suppress ALL -->
 <template>
   <div class="device-container">
     <div class="btn-col">
@@ -6,7 +7,7 @@
           class="el-add-btn btn-class"
           size="mini"
           type="primary"
-          @click="authorizeBeseye"
+          @click="getBeseyeGrantCode"
         >
           <div class="btn-area">
             <i class="iconfont icon-authorize"/>
@@ -15,7 +16,7 @@
         </el-button>
       </div>
     </div>
-    <div class="table-container">
+    <div v-loading="isAuthorizing" :text="$t('deviceView.isAuthorizing')" class="table-container">
       <table-pagination
         ref="ezvizAccoutTable"
         :column-data="columnData"
@@ -67,7 +68,7 @@ import util from '@/common/util.js';
 import { mapGetters } from 'vuex';
 import BeseyeAuthorizeConfig from '@/common/BeseyeAuthorizeConfig';
 import { getBeseyeUserList, deleteBeseyeUser, beseyeAccountAuthorize } from '@/api/beseye';
-import Environment from '@/common/environment'
+import Environment from '@/common/environment';
 
 export default {
   name: 'BeseyeUser',
@@ -79,7 +80,7 @@ export default {
       tableData: [],
       columnData: [
         {
-          'prop': 'accountName',
+          'prop': 'name',
           'label': this.$t('deviceView.accountName'),
           'width': 130,
           'maxWidth': 130
@@ -107,29 +108,21 @@ export default {
           }
         ]
       },
-      ezvizAccountInfo: {},
       total: 0,
       page: 1,
       sizeNum: 10,
       lang: this.$i18n.locale,
-      errorMsg: '',
-      isAdd: true,
-      accountTitle: this.$t('deviceView.addNewAccount'),
       showDeleteBeseyeUser: false,
       deleteId: '',
-      curLength: 0,
       accountList: [],
       commentRuletip: false,
       showDeleteStoreVueAccount: false,
-      errorAccessKey: '',
-      errorAuthDeviceNum: '',
-      errorAccount: '',
       accountHead: 'account-header',
       accountCell: '',
       accountRow: '',
       grantCode: '',
       state: '',
-      accountId: '',
+      beseyeAccount: '',
       isAuthorizing: false
     };
   },
@@ -171,18 +164,16 @@ export default {
         this.grantCode = this.$route.params.code;
         this.state = this.$route.params.state;
         const stateStr = this.base64ToStr(this.state);
-        this.accountId = stateStr.split('-')[2];
-        console.log(this.accountId);
+        this.beseyeAccount = stateStr.split('-')[2];
+        console.log(this.beseyeAccount);
         this.grantCode !== 'error' && this.authorizeBeseyeAccount();
         this.grantCode === 'error' && this.getAuthorizeMsg('refuse');
       }
     },
 
     authorizeBeseyeAccount() {
-      const params = {};
-      params.grantCode = this.grantCode;
-      params.accountId = this.accountId;
       this.isAuthorizing = true;
+      const params = this.setBeseyeAccountParams();
       beseyeAccountAuthorize(params).then(res => {
         const succMsg = this.getAuthorizeMsg('success');
         util.notify(succMsg, 'sucess', 3000);
@@ -192,26 +183,25 @@ export default {
         const failMsg = this.getAuthorizeMsg('warning');
         util.notify(failMsg, 'warning', 3000);
         this.isAuthorizing = false;
-        console.log('BeseyeDevice-authorizeBeseyeAccount: ' + error);
+        console.log('BeseyeAccount-authorizeBeseyeAccount: ' + error);
       });
     },
 
-    getAuthorizeMsg(type) {
-      const succMsg = this.accountId.length > 0 ? this.$t('deviceView.reauthorizeSucc') : this.$t('deviceView.authorizeSucc');
-      const failMsg = this.accountId.length > 0 ? this.$t('deviceView.reauthorizeFail') : this.$t('deviceView.authorizeFail');
-      const refuseMsg = this.accountId.length > 0 ? this.$t('deviceView.reauthorizeRefused') : this.$t('deviceView.authorizeRefused');
-      const returnMsg = type === 'success' ? succMsg : type === 'warning' ? failMsg : refuseMsg;
-      return returnMsg;
+    setBeseyeAccountParams() {
+      const params = {};
+      params.grantCode = this.grantCode;
+      if (this.beseyeAccount.length > 0) {
+        params.beseyeAccount = this.beseyeAccount;
+      };
+      return params;
     },
 
-    setAuthorizeState() {
-      const redirectSite = Environment.REDIRECT_SITE;
-      const isGlobal = Environment.isGlobalWebsite;
-      const stateStr = `${redirectSite}-${isGlobal}-${this.userId}`;
-      const base64StateStr = this.strToBase64(stateStr);
-      BeseyeAuthorizeConfig.state = base64StateStr;
-      console.log(BeseyeAuthorizeConfig.state);
-      return stateStr;
+    getAuthorizeMsg(type) {
+      const succMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeSucc') : this.$t('deviceView.authorizeSucc');
+      const failMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeFail') : this.$t('deviceView.authorizeFail');
+      const refuseMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeRefused') : this.$t('deviceView.authorizeRefused');
+      const returnMsg = type === 'success' ? succMsg : type === 'warning' ? failMsg : refuseMsg;
+      return returnMsg;
     },
 
     strToBase64(str) {
@@ -226,9 +216,19 @@ export default {
       return str;
     },
 
-    authorizeBeseye() {
+    getBeseyeGrantCode() {
       this.setAuthorizeState();
       this.setAuthorizeUrl();
+    },
+
+    setAuthorizeState() {
+      const redirectSite = Environment.REDIRECT_SITE;
+      const isGlobal = Environment.isGlobalWebsite;
+      const stateStr = `${redirectSite}-${isGlobal}-${this.beseyeAccount}`;
+      const base64StateStr = this.strToBase64(stateStr);
+      BeseyeAuthorizeConfig.state = base64StateStr;
+      console.log(BeseyeAuthorizeConfig.state);
+      return stateStr;
     },
 
     setAuthorizeUrl() {
@@ -241,43 +241,6 @@ export default {
         state: BeseyeAuthorizeConfig.state
       }));
       window.location.href = authorUrl;
-    },
-
-    setBeseyeDevice(row) {
-      const rowData = { rowData: row };
-      sessionStorage.setItem('beseyeUserInfo', JSON.stringify(rowData));
-      this.$router.push({ name: 'beseyeDeviceSetting' });
-    },
-
-    beseyeReauthorization(row) {
-      this.userId = row.userId;
-      this.setAuthorizeState();
-      this.setAuthorizeUrl();
-    },
-
-    showDeleteBeseyeUserDialog(row) {
-      const self = this;
-      self.deleteId = row.id;
-      self.showDeleteBeseyeUser = true;
-    },
-
-    deleteBeseyeUser() {
-      const self = this;
-      const accountParams = {};
-      accountParams.userId = self.deleteId;
-      deleteBeseyeUser(accountParams).then(res => {
-        if (res.errCode === 0) {
-          util.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
-          self.showDeleteBeseyeUser = false;
-          self.getBeseyeUserList();
-        } else {
-          util.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
-          self.showDeleteBeseyeUser = false;
-        }
-      })
-        .catch(err => {
-          console.log('EzvizAccount-deleteBeseyeUser: ' + err);
-        });
     },
 
     handleEmitOperation(methodsAndRowObj) {
@@ -299,6 +262,48 @@ export default {
           break;
         }
       }
+    },
+
+    setBeseyeDevice(row) {
+      const rowData = { rowData: row };
+      sessionStorage.setItem('beseyeAccountInfo', JSON.stringify(rowData));
+      this.$router.push({ name: 'beseyeDeviceSetting' });
+    },
+
+    beseyeReauthorization(row) {
+      this.beseyeAccount = row.beseyeAccount;
+      this.setAuthorizeState();
+      this.setAuthorizeUrl();
+    },
+
+    showDeleteBeseyeUserDialog(row) {
+      const self = this;
+      self.deleteId = row.beseyeAccount;
+      self.showDeleteBeseyeUser = true;
+    },
+
+    deleteBeseyeUser() {
+      const deleteAccountParams = this.setDeleteUserParams();
+      deleteBeseyeUser(deleteAccountParams).then(res => {
+        if (res.errCode === 0) {
+          util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
+          this.showDeleteBeseyeUser = false;
+          this.getBeseyeUserList();
+        } else {
+          util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
+          this.showDeleteBeseyeUser = false;
+        }
+      })
+        .catch(err => {
+          console.log('BeseyeAccount-deleteBeseyeUser: ' + err);
+        });
+    },
+
+    setDeleteUserParams() {
+      const accountParams = {};
+      accountParams.beseyeAccount = [];
+      accountParams.beseyeAccount.push(this.deleteId);
+      return accountParams;
     }
   }
 };
