@@ -29,16 +29,7 @@ export default {
         this.code = 'error';
         this.state = '';
       }
-      // const site = enviroment.SITE;
-      // const isGlobal = enviroment.isGlobalWebsite;
-      // const stateArray = this.getSiteFromState();
-      // if (stateArray[0] === site && stateArray[1] === isGlobal) {
-      //   this.$router.push({ name: 'beseyeDevice', params: { code: this.code, state: this.state }});
-      // } else {
-      //   const redirectURL = this.setRedirectUrl(stateArray);
-      //   window.location.href = redirectURL;
-      // }
-      this.$router.push({ name: 'beseyeDevice', params: { code: this.code, state: this.state }});
+      this.$router.push({ name: 'beseyeAccount', params: { code: this.code, state: this.state }});
     },
 
     base64ToStr(base64Str) {

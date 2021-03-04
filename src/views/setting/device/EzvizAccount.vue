@@ -572,7 +572,6 @@ export default {
           } else {
             await self.updateEzvizAccount();
           }
-          await self.getAccountTableList();
         } else {
           if (self.ezvizAccountInfo.scope === 1) {
             self.errorMsg = self.$t('deviceView.enterDeveloperKey');
@@ -590,6 +589,7 @@ export default {
         if (res.errCode === 0) {
           util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
           self.showAddAccount = false;
+          self.getAccountTableList();
         } else {
           const msg = res.errMsg;
           if (self.ezvizAccountInfo.scope === 0) {
@@ -612,6 +612,7 @@ export default {
         if (res.errCode === 0) {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           self.showAddAccount = false;
+          self.getAccountTableList();
         } else {
           const msg = self.ezvizAccountInfo.scope === 0 ? res.errMsg : self.$t('deviceView.editFail');
           if (self.ezvizAccountInfo.scope === 0) {
@@ -645,12 +646,12 @@ export default {
     updateAccount(row) {
       const self = this;
       self.isAdd = false;
+      self.initEzvizAccountInfo();
       self.ezvizAccountInfo = row;
       self.ezvizAccountInfo.oldEzvizAccount = row.ezvizAccount;
       self.curLength = row.comment ? filterString.getContentLength(row.comment) : 0;
       self.deleteId = row.id;
       self.ezvizAccountInfo.authorizedDevices = row.authDeviceNumber;
-      self.ezvizAccountInfo.accessKey = '';
       self.appliedStores = row.appliedStores;
       if (row.scope === 1) {
         self.getAccessToken();
@@ -664,15 +665,18 @@ export default {
     showDeleteAccountDialog(row) {
       const self = this;
       self.isAdd = false;
+      self.errorAccessKey = '';
+      self.errorAccount = '';
       self.ezvizAccountInfo.scope = row.scope;
       self.deleteId = row.id;
-      self.ezvizAccountInfo.accessKey = row.accessKey;
+      // self.ezvizAccountInfo.accessKey = row.accessKey;
       const appliedScored = row.appliedStores;
       if (appliedScored > 0) {
         util.notify(self.$t('deviceView.canotDeleteInfo'), 'warning', 3000);
         return;
       } else {
         self.deleteId = row.id;
+        self.ezvizAccountInfo.accessKey = '';
         self.ezvizAccountInfo.scope === 0 ? self.showDeleteStoreVueAccount = true : self.showDeleteAccount = true;
       }
     },
