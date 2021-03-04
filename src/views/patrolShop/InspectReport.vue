@@ -24,7 +24,7 @@
     <div class="el-acticle">
       <div v-if="suggest!=null&&suggest.length!=0" class="suggest" :style="isexportPDF ? 'max-height:300px;' : ''">
         <div class="suggest-content">
-            <span class="pdf_suggest_font_20">{{ $t('remotePatrol.advice') }}</span>
+            <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
             <span v-html="turnSuggest(suggest)" class="pdf_font_20"/>
         </div>
       </div>
@@ -927,7 +927,12 @@ export default {
             trigger: 'item'
           }
         }
-        ]
+        ],
+        tooltip: {
+          position: function (point, params, dom, rect, size) {
+              return [point[0], '10%'];
+          }
+        }
       };
       return radarChartOption;
     },
@@ -962,7 +967,6 @@ export default {
   .cdm-voice{ page-break-inside:avoid;}
   .cdm-word{ page-break-inside:avoid;}
   .cdm-pic{ page-break-inside:avoid;}
-  .pdf_suggest_font_20{font-size: 28px;width:200px;margin-right: 50px;}
   .pdf_font_16{font-size: 20px;}
   .pdf_font_18{font-size: 26px;}
   .pdf_font_20{font-size: 28px;}
@@ -1099,8 +1103,7 @@ export default {
           display: flex;
         }
         span:first-child {
-          width:100px;
-          padding-right: calc(20 / 1920 * 100vw);
+          padding-right: 20px;
         }
         span:last-child{
           flex:1;
