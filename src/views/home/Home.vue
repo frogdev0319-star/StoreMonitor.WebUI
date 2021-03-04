@@ -361,7 +361,7 @@ export default {
           break;
         }
         case '/beseyeDeviceSetting': {
-          path = '/beseyeDevice';
+          path = '/beseyeAccount';
           break;
         }
         case '/ezvizDevice1': {
@@ -459,7 +459,7 @@ export default {
         case '/patrolSechedule':
         case '/dashDevice':
         case '/ezvizDevice':
-        case '/beseyeDevice':
+        case '/beseyeAccount':
         {
           disabled = false;
           break;
@@ -550,7 +550,7 @@ export default {
           matched.splice(1, 1);
           break;
         }
-        case '/beseyeDevice': {
+        case '/beseyeAccount': {
           matched[2].name = 'beseyeDeviceMgt';
           matched.splice(1, 1);
           break;
@@ -562,7 +562,7 @@ export default {
         }
         case '/beseyeDeviceSetting': {
           matched[1].name = 'beseyeDeviceMgt';
-          matched[1].path = '/beseyeDevice';
+          matched[1].path = '/beseyeAccount';
           break;
         }
         default: {

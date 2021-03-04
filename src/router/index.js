@@ -30,7 +30,8 @@ export const constantRoutes = [
 ];
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  mode: 'history', // require service support
+  // base: '/storemonitor_ui/',
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 });
@@ -96,7 +97,7 @@ export const navbarRoute = {
         path: '/reinspect/confirmrein',
         name: 'confirmSum',
         hidden: true,
-        component: resolve => require(['@/views/patrolShop/ConfirmAddSum'], resolve),
+        component: resolve => require(['@/views/patrolShop/ConfirmAddSum'], resolve)
       },
       {
         path: '/reinspect/submit',
@@ -305,14 +306,27 @@ export const navbarRoute = {
             component: resolve => require(['@/views/setting/device/EzvizAccount'], resolve)
           },
           {
-            path: '/beseyeDevice',
-            name: 'beseyeDevice',
-            component: resolve => require(['@/views/setting/device/BeseyeDevice'], resolve)
+            path: '/beseyeAccount',
+            name: 'beseyeAccount',
+            // hidden: true,
+            component: resolve => require(['@/views/setting/device/BeseyeAccount'], resolve)
           },
           {
             path: '/ezvizeDeviceSetting',
             name: 'deviceSetting',
             component: resolve => require(['@/views/setting/device/EzvizDeviceMgmt'], resolve),
+            hidden: true
+          },
+          {
+            path: '/beseyeDeviceSetting',
+            name: 'beseyeDeviceSetting',
+            component: resolve => require(['@/views/setting/device/BeseyeDeviceMgmt'], resolve),
+            hidden: true
+          },
+          {
+            path: '/beseye/authorize',
+            name: 'auth',
+            component: resolve => require(['@/views/setting/device/Authorize'], resolve),
             hidden: true
           }
         ]
@@ -325,7 +339,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/store/StoreManage'], resolve),
         hidden: false,
         meta: {
-          keepAlive: false, // the component is't to be cache.
+          keepAlive: false,
           requireAuth: true
         }
       },
