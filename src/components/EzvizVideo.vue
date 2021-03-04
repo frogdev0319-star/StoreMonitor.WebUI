@@ -448,13 +448,11 @@ export default {
       eventName: '',
       eventDes: '',
       showSnapshotFeedbackDialog: false,
-      feedBackVideoFileObj: {},
       timerPlayReal: null,
       realTimeSpeed: 0,
       initPlayerWidth: 0,
       initPlayerHeight: 0,
       isLoading: false,
-      lang: this.$i18n.locale,
       currentTimeValue: 0,
       durationTimeValue: 0,
       curBack: '',
@@ -485,22 +483,44 @@ export default {
       userId: '',
       blob: null,
       ezvizExpireTime: 0,
-      currentStoreId: null,
+      currentChannelId: null,
       isLoaded: false,
       editCount: 0,
       showEventNameInfo: false,
       changeId: false,
       eventNameRuletip: false,
-      eventDesRuletip: false
+      eventDesRuletip: false,
+      paused: true
     };
   },
 
   watch: {
+    channelInfo: {
+      async handler(newChannel, oldChannel) {
+        console.log(newChannel)
+        if (Object.keys(oldChannel).length > 0 && newChannel.ivsId !== oldChannel.ivsId) {
+          await this.getEzvizAccessToken(newChannel.ivsId);
+          if (this.playState) {
+            this.stopRealTime();
+            this.$nextTick(() => {
+              this.realTime();
+            });
+          } else {
+            this.$nextTick(() => {
+              this.realTime();
+            });
+          }
+        }
+      },
+      deep: true
+    },
+
     accountChanged(val) {
       console.log(val);
       const self = this;
-      if (val != 0) {
+      if (val !== 0) {
         self.channelInfo = null;
+        self.showError = false;
         self.stopVideo();
       }
     },
@@ -545,7 +565,7 @@ export default {
       }
     },
 
-    async storeId(newValue, oldValue) {
+    async ivsId(newValue, oldValue) {
       console.log(newValue);
       console.log(oldValue);
       const self = this;
@@ -557,12 +577,11 @@ export default {
 
   async mounted() {
     const self = this;
-    console.log(self.storeId);
-    console.log(self.accessToken);
-    if (!self.isStoreMonitor) {
-      const result = await self.getEzvizAccessToken(self.storeId);
-      self.checkIfEncry();
-    }
+    console.log(self.channelInfo);
+    // await self.getEzvizAccessToken(self.channelInfo.ivsId);
+    // if (!self.isStoreMonitor) {
+    //   self.checkIfEncry();
+    // }
     window.addEventListener('resize', self.resizeFun, false);
     window.addEventListener('visibilitychange', self.visibleChange, false);
   },
@@ -683,17 +702,17 @@ export default {
       }
     },
 
-    getEzvizAccessToken(storeId) {
+    getEzvizAccessToken(ivsId) {
       const self = this;
       const params = {};
-      params.storeId = storeId;
+      params.ivsId = ivsId;
       return new Promise((resolve, reject) => {
-        if (self.currentStoreId === storeId && (Date.parse(new Date()) < self.ezvizExpireTime)) {
+        if (self.currentIvsId === ivsId) {
           resolve(self.accessToken);
         } else {
           getEzvizAccessToken(params)
             .then(result => {
-              self.currentStoreId = storeId;
+              self.currentIvsId = ivsId;
               self.accessToken = result.data.accessToken;
               self.areaDomain = {
                 domain: result.data.areaDomain
@@ -1197,6 +1216,7 @@ export default {
       const self = this;
       self.times = 0;
       if (self.isStoreMonitor && !self.isLoaded) {
+        self.accessToken.length === 0 && await self.getEzvizAccessToken(self.channelInfo.ivsId);
         self.checkIfEncry();
         self.isLoaded = true;
       } else {
@@ -1436,8 +1456,6 @@ export default {
 
     confirmEdit() {
       const self = this;
-      const obj = {};
-      obj.mediaType = 2;
       const src = self.canvasEl.toDataURL('image/jpeg');
       self.$emit('confirmEzvizCanvas', src);
       self.showCutDialog = false;
@@ -1833,7 +1851,7 @@ export default {
     #{$poi}:checkRem($val);
   }
   .errorVideo-model{
-    @include point(margin,20);
+    margin: calc(25/1920*100vw);
     margin-bottom: 0;
     height: auto;
     position: relative;
