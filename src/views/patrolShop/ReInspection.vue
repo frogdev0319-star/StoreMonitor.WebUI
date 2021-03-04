@@ -97,7 +97,7 @@
       </div>
       <div v-else>
         <dash-video
-          v-if="videoPlatform === 0"
+          v-if="vendor === 0"
           ref="dashVideo"
           :store-id="store.storeId"
           :channel-info="channel"
@@ -107,8 +107,18 @@
           @ezvizCutPictureFeedback="ezvizPictureFeedback"
         />
         <ezviz-video
-          v-else
+          v-else-if="vendor === 1"
           ref="ezvizVideo"
+          :channel-info="channel"
+          :source-list-length= "sourceListLength"
+          :show-feed-back="showFeedBack"
+          :store-id="store.storeId"
+          @confirmEzvizCanvas="editEzvizCanvas"
+          @ezvizCutPictureFeedback="ezvizPictureFeedback"
+        />
+        <beseye-video
+          v-else
+          ref="beseyeVideo"
           :channel-info="channel"
           :source-list-length= "sourceListLength"
           :show-feed-back="showFeedBack"
@@ -405,7 +415,7 @@
               <i class="el-icon-arrow-down el-icon--right"/>
             </span>
             <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
-              <el-dropdown-item v-if="PatrolList.length===0">{{$t('insSettingView.noData')}}</el-dropdown-item>
+              <el-dropdown-item v-if="PatrolList.length===0">{{$t('deviceView.noData')}}</el-dropdown-item>
               <el-dropdown-item v-else v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -440,34 +450,31 @@
   </el-row>
 </template>
 <script>
-import { checkOutInspectItem, submitInspectItem, checkOutInspectItemV3 } from '@/api/inspect';
+import { checkOutInspectItemV3 } from '@/api/inspect';
 import util from '@/common/util';
 import { getStoreList, getFavoriteList, addFavoriteStore, deleteFavoriteStore, getVideoAuthority } from '@/api/store';
 import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
-import { getStorageInfo } from '@/api/event';
 import { getDeviceList } from '@/api/device';
-import videojs from '../../../static/video.js';
 import DialogVue from '@/components/DialogVue.vue';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import { getCookie } from '@/common/auth';
-import { validateInput } from '@/common/validate';
 import filterString from '@/common/filterString.js';
 import { getDashServerInfo } from '@/api/device.js';
 import DashHttp from '@/common/DashHttp.js';
 import Database from '@/common/Database.js';
-import BeseyeVue from '../../components/BeseyeVideo';
+import BeseyeVideo from '../../components/BeseyeVideo';
 import DashVideo from '../../components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 
 export default {
   name: 'ReInspection',
   components: {
-    BeseyeVue,
     DialogVue,
     ChannelIconBtn,
     EzvizVideo,
-    DashVideo
+    DashVideo,
+    BeseyeVideo
   },
   data() {
     return {
@@ -677,7 +684,6 @@ export default {
       lang: this.$i18n.locale,
       initEzviz: false,
       sourceListLength: 0,
-      realTimeSpeed: 0,
       videoAuthority: false,
       isLoading: false,
       showEventNameInfo: false,
@@ -688,7 +694,8 @@ export default {
       historyObj: null,
       beforepatrolstore: '',
       showIgnoreItem: false,
-      hasIgnoretemp: []
+      hasIgnoretemp: [],
+      vendor: 1
     };
   },
   computed: {
@@ -700,11 +707,7 @@ export default {
     }),
     ...mapGetters(
       ['isEzviz']
-    ),
-    videoPlatform() {
-      const self = this;
-      return self.$store.state.user.videoPlatform;
-    }
+    )
   },
   watch: {
     accountChanged(val, oldVal) {
@@ -713,21 +716,15 @@ export default {
       if (val !== 0) {
         self.changeBrand();
       }
-    },
-
-    realTimeSpeed(val) {
-      if (val >= 300) {
-        this.stopVideoPlay();
-        this.stopTimer();
-      }
     }
   },
 
   beforeRouteLeave(to, from, next) {
     const self = this;
-    const canLeave = (((!self.isEzviz) && self.editCount!=0 )) || ( self.videoPlatform == 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !=0
-      || self.videoPlatform == 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !=0);
-    if (canLeave && to.name != 'confirmSum') {
+    const canLeave = (((self.vendor === 0) && self.editCount !== 0 )) ||
+      ( self.vendor === 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0
+      || self.vendor === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !== 0);
+    if (canLeave && to.name !== 'confirmSum') {
       self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
         confirmButtonText: self.$t('remotePatrol.confirm'),
         cancelButtonText: self.$t('remotePatrol.cancel'),
@@ -737,24 +734,23 @@ export default {
         confirmButtonClass: 'confirmBtn'
       }).then(() => {
         console.log('confirm');
-        if (to.name != 'confirmSum') {
+        if (to.name !== 'confirmSum') {
           //   from.meta.keepAlive=false;
-          self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
         } else {
           //   from.meta.keepAlive = true;
           self.$store.dispatch('setPatrolHistory', self.historyObj);
         }
-        if (self.playState) {
-          self.stopVideoPlay();
+        if (self.vendor === 0 && !self.showGuide) {
+          self.$refs.dashVideo.stopVideoPlay();
           window.clearInterval(self.timerPlayReal);
           self.timerPlayReal = null;
         }
-        if(self.videoPlatform == 1 && !self.showGuide){
+        if (self.vendor === 1 && !self.showGuide) {
           self.$refs.ezvizVideo.stopRealTime();
         }
-        if(self.videoPlatform == 2 && !self.showGuide){
+        if (self.vendor === 2 && !self.showGuide) {
           self.$refs.beseyeVideo.stopPlay();
         }
         next();
@@ -771,15 +767,15 @@ export default {
         // from.meta.keepAlive=true;
         self.$store.dispatch('setPatrolHistory', self.historyObj);
       }
-      if (self.playState) {
-        self.stopVideoPlay();
+      if (self.vendor === 0 && !self.showGuide) {
+        self.$refs.dashVideo.stopVideoPlay();
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = null;
       }
-      if(self.videoPlatform == 1 && !self.showGuide){
+      if(self.vendor == 1 && !self.showGuide){
         self.$refs.ezvizVideo.stopRealTime();
       }
-      if(self.videoPlatform == 2 && !self.showGuide){
+      if(self.vendor == 2 && !self.showGuide){
         self.$refs.beseyeVideo.stopPlay();
       }
       next();
@@ -852,14 +848,6 @@ export default {
         ele.style.height = 'auto';
       }
     };
-    window.addEventListener('visibilitychange', self.visibilityChange, false);
-  },
-
-  beforeDestroy() {
-    const self = this;
-    window.removeEventListener('visibilitychange', self.visibilityChange);
-    window.onresize = null;
-    self.visibilityChange = null;
   },
 
   methods: {
@@ -880,29 +868,9 @@ export default {
       });
     },
 
-    visibilityChange() {
-      const self = this;
-      console.log(self.isEzviz);
-      if (!self.isEzviz) {
-        if (document.hidden) {
-          self.stopVideoPlay();
-          self.stopTimer();
-        } else {
-          console.log(self.isPlayingFlag);
-          if (this.currentState === 'loading') {
-            self.startVideo(self.channel.ivsId, self.channel.channelId, null);
-          }
-        }
-      }
-    },
-
     changeBrand() {
       const self = this;
-      if (!self.isEzviz) {
-        self.stopVideoPlay();
-        self.previewplayer && self.previewplayer.dispose();
-      }
-      if (self.isEzviz && !self.showGuide) {
+      if (self.vendor === 1 && !self.showGuide) {
         self.$refs.ezvizVideo.stopRealTime();
       }
       self.patrolStoreName = null;
@@ -1628,14 +1596,16 @@ export default {
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
-      if(self.isEzviz && self.$refs.ezvizVideo !== undefined){
-        self.$refs.ezvizVideo.editCount++;
-      }else{
+      if(self.videoPlatform === 0){
         self.editCount++;
+      } else if(self.videoPlatform === 1) {
+        self.$refs.ezvizVideo.editCount++
+      } else {
+        self.$refs.beseyeVideo.editCount++
       }
       self.curItemIndex = index;
       self.curItem = item;
-      if (item.deviceId == -1) {
+      if (item.deviceId === -1) {
         self.noBindDeviceObj.dialogCosed = true;
         return false;
       }
@@ -1643,7 +1613,23 @@ export default {
     },
     CancleIgnoreItem(item, index) {
       const self = this;
-      self.isEzviz ? self.$refs.ezvizVideo.editCount-- : self.editCount--;
+      switch (self.vendor) {
+        case 0: {
+          self.editCount--;
+          break
+        }
+        case 1: {
+          self.$refs.ezvizVideo.editCount--
+          break
+        }
+        case 2: {
+          self.$refs.beseyeVideo.editCount--
+          break
+        }
+        default: {
+          break
+        }
+      }
       self.curItemIndex = index;
       self.curItem = item;
       self.cancleIgnore();
@@ -1659,17 +1645,15 @@ export default {
     clickBtn(item, index) {
       const self = this;
       console.log(item);
-      // if ((self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
       const obj = {
         id: item.id,
         channelId: item.channelId,
         ivsId: item.ivsId,
-        channelName: item.name
+        channelName: item.name,
+        vendor: item.vendor
       };
       self.channel = obj;
+      self.vendor = item.vendor;
       item.isClick = true;
       if (self.showFeedBack) {
         self.inspectItemList.forEach(_item => {
@@ -1682,21 +1666,42 @@ export default {
           _item.isClick = false;
         }
       });
-      if (!self.isEzviz) {
-        self.curDeviceId = item.id;
-        self.startVideo(self.channel.ivsId, self.channel.channelId, null);
+      self.curDeviceId = item.id;
+      if (self.vendor === 0) {
+        self.$nextTick(() => {
+          self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+        })
+      } else if (self.vendor === 1) {
+        self.$nextTick(async() => {
+          await self.$refs.ezvizVideo.getEzvizAccessToken(self.channel.ivsId);
+          self.$refs.ezvizVideo.playBack &&
+          (self.$refs.ezvizVideo.startTs = self.playBackTime);
+          if (self.$refs.ezvizVideo.playState) {
+            self.$refs.ezvizVideo.stopRealTime();
+            self.$nextTick(() => {
+              self.$refs.ezvizVideo.realTime();
+            });
+          } else {
+            self.$nextTick(() => {
+              self.$refs.ezvizVideo.realTime();
+            });
+          }
+        })
       } else {
-        self.curDeviceId = item.id;
-        if (self.$refs.ezvizVideo.playState) {
-          self.$refs.ezvizVideo.stopRealTime();
-          self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime();
-          });
-        } else {
-          self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime();
-          });
-        }
+        self.$nextTick(() => {
+          self.curDeviceId = item.id;
+          if(self.$refs.beseyeVideo.playState){
+            self.$refs.beseyeVideo.stopPlay();
+            self.$nextTick(()=>{
+              self.$refs.beseyeVideo.startPlay();
+            })
+          }
+          else{
+            self.$nextTick(()=>{
+              self.$refs.beseyeVideo.startPlay();
+            })
+          }
+        })
       }
     },
     clickItem(item, index) {
@@ -1705,10 +1710,6 @@ export default {
       if (item.isIgnore) {
         return false;
       }
-      // if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       const obj = {};
@@ -1720,11 +1721,13 @@ export default {
           obj.ivsId = device[0].ivsId;
           obj.channelName = device[0].name;
           obj.channelId = device[0].channelId;
+          obj.vendor = device[0].vendor;
           self.channel = obj;
+          self.vendor = device[0].vendor;
           self.channelBtns = [];
           device.forEach(item => {
             self.allChannelBtns.forEach(_item => {
-              if (item.id == _item.id) {
+              if (item.id === _item.id) {
                 self.channelBtns.push(_item);
               }
             });
@@ -1734,31 +1737,32 @@ export default {
           });
           self.channelBtns.forEach((_item, _index) => {
             if (self.channel != null) {
-              if (_item.id == self.channel.id) {
+              if (_item.id === self.channel.id) {
                 _item.isClick = true;
               } else {
                 _item.isClick = false;
               }
             }
           });
-          if (!self.isEzviz) {
+          if (self.vendor === 0) {
             self.$nextTick(() => {
               self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
-            });
-          } else {
-            // Ezviz
-            if (self.$refs.ezvizVideo != undefined) {
-              if (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState) {
+            })
+          } else if (self.vendor === 1) {
+            self.$nextTick( () => {
+              if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){
                 self.$refs.ezvizVideo.stopRealTime();
-                self.$nextTick(() => {
+                self.$nextTick(()=>{
                   self.$refs.ezvizVideo.realTime();
-                });
-              } else {
-                self.$nextTick(() => {
+                })
+              } else{
+                self.$nextTick( () => {
                   self.$refs.ezvizVideo.realTime();
-                });
+                })
               }
-            }
+            })
+          } else {
+            // beseye
           }
           self.curDeviceId = item.deviceId[0];
           item.checked = true;
@@ -1818,7 +1822,13 @@ export default {
     leaveDialog() {
       const self = this;
       self.leaveObj.dialogCosed = false;
-      self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+      if (self.videoPlatform === 0) {
+        self.editCount = 0;
+      } else if(self.videoPlatform === 1) {
+        self.$refs.ezvizVideo.editCount = 0;
+      } else{
+        self.$refs.beseyeVideo.editCount = 0;
+      }
     },
     cancelLeave() {
       const self = this;
@@ -2130,19 +2140,24 @@ export default {
       self.notShowAlert = false;
       self.showIgnoreItem = false;
       _item.authorizedInspect.forEach(au_item => {
-        if (au_item.mode == 0) {
+        if (au_item.mode === 0) {
           self.PatrolList.push(au_item);
         }
       });
       _item.isActive = true;
       self.showStoreUp = true;
-      if (!self.isEzviz) {
+      if (self.vendor === 0) {
         self.editCount = 0;
-        self.stopVideoPlay();
-      } else {
+        self.$refs.dashVideo.stopVideoPlay();
+      } else if(self.vendor === 1){
         !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
         if (self.$refs.ezvizVideo != undefined) {
           self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
+        }
+      } else {
+        !self.showGuide ? self.$refs.beseyeVideo.editCount = 0 : '';
+        if (self.$refs.beseyeVideo != undefined){
+          self.$refs.beseyeVideo.playState ? self.$refs.beseyeVideo.stopPlay() : '';
         }
       }
       // self.editCount=0;
@@ -2206,7 +2221,20 @@ export default {
       const self = this;
       self.changeInspectObj.dialogCosed = false;
       self.changeInspectList(self.beforepatrolstore);
-      self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+      switch (self.vendor) {
+        case 0: {
+          self.editCount = 0
+          break
+        }
+        case 1: {
+          self.$refs.ezvizVideo.editCount = 0
+          break
+        }
+        case 2: {
+          self.$refs.beseyeVideo.editCount = 0
+          break
+        }
+      }
     },
     canceldChangeInspect() {
       const self = this;
@@ -2300,6 +2328,7 @@ export default {
         obj.channelId = item.channelId;
         obj.isonline = true;
         obj.isClick = false;
+        obj.vendor = item.vendor;
         temp.push(obj);
       });
       self.channelBtns = temp;
@@ -2320,8 +2349,9 @@ export default {
       //   self.videoLoadingObj.dialogCosed = true;
       //   return false;
       // }
-      if ((!self.isEzviz && self.editCount != 0) ||
-        (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
+      if ((self.vendor === 0 && self.editCount != 0) ||
+        (self.vendor === 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0) ||
+        (self.videoPlatform === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !== 0) ||
         (self.$store.getters.PatrolHistory != null)) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
@@ -2331,13 +2361,18 @@ export default {
     },
     changeInspectList(val) {
       const self = this;
-      if (!self.isEzviz) {
+      if (self.vendor === 0) {
         self.editCount = 0;
-        self.playState ? self.stopVideoPlay() : '';
-      } else {
+        self.$refs.dashVideo.stopVideoPlay();
+      } else if(self.vendor === 1){
         !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
         if (self.$refs.ezvizVideo != undefined) {
           self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
+        }
+      }else{
+        !self.showGuide ? self.$refs.beseyeVideo.editCount = 0 : '';
+        if(self.videoPlatform === 2 &&self.$refs.beseyeVideo != undefined){
+          self.$refs.beseyeVideo.playState ? self.$refs.beseyeVideo.stopPlay() : '';
         }
       }
       self.isDisabled = false;
@@ -2592,8 +2627,9 @@ export default {
       //   self.videoLoadingObj.dialogCosed = true;
       //   return false;
       // }
-      if ((!self.isEzviz && self.editCount != 0) ||
-        (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
+      if ((self.vendor === 0 && self.editCount != 0) ||
+        (self.vendor === 1 && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
+        (self.vendor === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount != 0) ||
         (self.$store.getters.PatrolHistory != null)) {
         self.changeStoreObj.dialogCosed = true;
       } else {
@@ -2604,6 +2640,15 @@ export default {
         }
       }
     },
+
+    checkFull() {
+      var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+      if (isFull === undefined) {
+        isFull = false;
+      }
+      return isFull;
+    },
+
     notify(msg, type, time) {
       this.$message({
         message: msg,
