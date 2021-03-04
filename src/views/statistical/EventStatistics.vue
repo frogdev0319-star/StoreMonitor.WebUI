@@ -80,7 +80,8 @@
               :current-page="page"
               :is-event = "true"
               :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
-              @handleChange="handleChangeData"/>
+              @handleChange="handlePageAndSizeChange"
+              @sortChange="handleSortChange"/>
           </el-col>
         </el-row>
       </el-col>
