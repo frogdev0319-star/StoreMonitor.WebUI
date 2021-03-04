@@ -260,7 +260,7 @@
 
 <script>
 import i18n from '../lang';
-import { getBeseyeAccessToken, getPlaylistInfo, getStreamInfo, getStreamInfoFromTW } from '../api/baseye';
+import { getBeseyeAccessToken, getPlaylistInfo, getStreamInfo, getStreamInfoFromTW } from '../api/beseye';
 import filterString from '../common/filterString';
 import { mapGetters } from 'vuex';
 
@@ -441,7 +441,7 @@ export default {
       const self = this;
       item.showContent = true;
       self.penList.forEach((_item, _index) => {
-        if (index != _index) {
+        if (index !== _index) {
           _item.showContent = false;
         }
       });
@@ -749,7 +749,7 @@ export default {
       const self = this;
       if (document.hidden) {
         if (self.playState) {
-          self.stopPlay(); // 停止视频
+          self.stopPlay();
         }
       } else {
         console.log(self.playState);
@@ -764,8 +764,7 @@ export default {
       self.showError = false;
       self.errorText = '';
       if (!self.playBack) {
-        // self.getBeseyeStreamInfo()
-        self.getStreamInfofromTW();
+        self.getBeseyeStreamInfo();
       } else {
         if (self.playBackState) {
           // paused
@@ -965,24 +964,25 @@ export default {
         duration: time
       });
     },
-    getAccessToken(storeId) {
+
+    getBeseyeAccessToken(channelId) {
       const self = this;
       const params = {};
-      params.storeId = storeId;
+      params.ivsId = channelId;
       return new Promise((resolve, reject) => {
-        if (self.currentStoreId == storeId && (Date.parse(new Date()) < self.expireTime)) {
+        if (self.currentStoreId == channelId && (Date.parse(new Date()) < self.expireTime)) {
           resolve(self.accessToken);
         } else {
           getBeseyeAccessToken(params)
             .then(result => {
               console.log(result);
-              self.currentStoreId = storeId;
+              self.currentStoreId = channelId;
               self.accessToken = result.data.accessToken;
               self.expireTime = result.data.expireTime;
               resolve(result.data.accessToken);
             })
             .catch(error => {
-              reject();
+              reject(error);
             });
         }
       });
@@ -1012,7 +1012,7 @@ export default {
         return false;
       }
       const params = {
-        'cameraId': self.channelInfo.ivsId,
+        'ivsId': self.channelInfo.ivsId,
         'platform': 1
       };
       getStreamInfo(params).then(response => {
@@ -1417,13 +1417,21 @@ export default {
         }
       }
     },
-    async storeId(newValue, oldValue) {
+    // async storeId(newValue, oldValue) {
+    //   console.log(newValue);
+    //   console.log(oldValue);
+    //   const self = this;
+    //   self.showError = false;
+    //   if (newValue.length > 0) {
+    //     self.getBeseyeAccessToken(newValue);
+    //   }
+    // },
+    async channelId(newValue, oldValue) {
       console.log(newValue);
       console.log(oldValue);
       const self = this;
-      self.showError = false;
       if (newValue.length > 0) {
-        self.getAccessToken(newValue);
+        await self.getBeseyeAccessToken(newValue);
       }
     },
     'channelInfo.ivsId'(newValue, oldValue) {
@@ -1473,6 +1481,7 @@ export default {
     self.beseyeVideo = document.getElementById('beseyeVideo');
     self.video1 = document.getElementById('video1');
     self.video2 = document.getElementById('video2');
+    self.getBeseyeAccessToken(self.channelInfo.ivsId);
     window.addEventListener('visibilitychange', self.visibleChange, false);
   }
 };
