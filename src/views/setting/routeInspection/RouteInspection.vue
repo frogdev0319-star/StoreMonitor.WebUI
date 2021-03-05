@@ -1020,7 +1020,7 @@ export default {
     toSetRules() {
       const self = this;
       const activeInpect = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)];
-      const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name,mode: Number(self.activeName)};
+      const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name,mode: Number(self.activeName) === 0 ? 1 : 0};
       sessionStorage.setItem('ruleData', JSON.stringify(params));
       self.$router.push({ name: 'setRule', params: params });
     },
