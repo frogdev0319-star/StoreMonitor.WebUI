@@ -300,9 +300,10 @@ export default {
     },
 
     setDeleteUserParams() {
+      const idArray = [];
+      idArray.push(this.deleteId);
       const accountParams = {};
-      accountParams.beseyeAccount = [];
-      accountParams.beseyeAccount.push(this.deleteId);
+      accountParams.beseyeAccounts = idArray;
       return accountParams;
     }
   }

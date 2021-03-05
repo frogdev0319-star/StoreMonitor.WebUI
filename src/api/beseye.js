@@ -89,11 +89,11 @@ export const getBeseyeUserList = params => {
   })
 }
 
-export const deleteBeseyeUser = params => {
+export const deleteBeseyeUser = data => {
   return request({
-    url: `${version}/beseye/user/delete`,
+    url: `${version}/beseye/account/delete`,
     method: 'post',
-    params
+    data
   });
 }
 
