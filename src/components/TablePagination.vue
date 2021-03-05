@@ -108,9 +108,13 @@
         </el-table-column>
       </template>
       <div slot="empty">
-        <div>
+        <div v-if="!isLoadingData">
           <i class="iconfont icon-zhengque empty-data-icon"/>
-          <span :style="{'margin-left':'20px','font-size':'16px','color':'#=7d8cad'}">{{ noData }}</span>
+          <span class="empty-text">{{ $t('deviceView.noData') }}</span>
+        </div>
+        <div v-else class="empty-content">
+          <img :src="loadingGif">
+          <span class="empty-text">{{ $t('remotePatrol.loading') }}</span>
         </div>
       </div>
     </el-table>
@@ -225,6 +229,10 @@ export default {
     },
     tableHeight: {
       type: Number
+    },
+    isLoadingData: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -232,7 +240,8 @@ export default {
       currentRow: {},
       lang: this.$i18n.locale,
       order: {},
-      noData: this.$t('deviceView.noData')
+      noData: this.$t('deviceView.noData'),
+      loadingGif: require('../../static/img/loading.gif')
     };
   },
   computed: {
@@ -386,6 +395,16 @@ export default {
     background-color: rgba(255, 255, 255, 0);
     line-height: 25px;
     height: 25px;
+  }
+  .empty-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .empty-text{
+    margin-left: 20px;
+    font-size: calc(16/1920*100vw);
+    color: #7d8cad;
   }
 </style>
 
