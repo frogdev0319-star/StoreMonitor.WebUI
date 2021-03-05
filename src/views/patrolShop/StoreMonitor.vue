@@ -1661,33 +1661,12 @@ export default {
           }
           temp.push(obj);
         });
+        self.channelBtns = temp;
+        self.allChannelBtns = temp;
+        self.getshowBtns(temp);
+      }).catch(err => {
+        console.log('StoreMonitor-getChannelByStore: ' + err);
       });
-      // storeItem.device.forEach((item, index) => {
-      //   const obj = {};
-      //   obj.id = item.id;
-      //   obj.name = item.name;
-      //   obj.ivsId = item.ivsId;
-      //   obj.channelId = item.channelId;
-      //   obj.isonline = true;
-      //   obj.vendor = item.vendor;
-      //   if (index === 0) {
-      //     obj.isClick = true;
-      //     self.channel = {
-      //       id: item.id,
-      //       ivsId: item.ivsId,
-      //       channelId: item.channelId,
-      //       channelName: item.name,
-      //       vendor: item.vendor
-      //     };
-      //     self.vendor = item.vendor;
-      //   } else {
-      //     obj.isClick = false;
-      //   }
-      //   temp.push(obj);
-      // });
-      self.channelBtns = temp;
-      self.allChannelBtns = temp;
-      self.getshowBtns(temp);
     },
 
     getDeviceList(storeId) {
@@ -1697,10 +1676,10 @@ export default {
         getDeviceList(params).then((res) => {
           const data = res.data;
           resolve(data);
+        }).catch(err => {
+          console.log('StoreMonitor-getDeviceList: ' + err);
+          reject(err);
         });
-      }).catch(err => {
-        console.log('StoreMonitor-getDeviceList: ' + err);
-        reject(err);
       });
     },
     getshowBtns(list) {
