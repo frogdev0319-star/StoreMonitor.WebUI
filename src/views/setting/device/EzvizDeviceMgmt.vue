@@ -1143,6 +1143,7 @@ export default {
           obj.pictureUrl = item.thumbnailUrl;
           obj.tempUrl = item.thumbnailUrl;
           obj.isClick = false;
+          obj.status = item.status;
           obj.checkedStatus = item.status === 1;
           temp.push(obj);
         }
