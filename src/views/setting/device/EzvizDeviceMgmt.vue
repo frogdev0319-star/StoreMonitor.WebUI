@@ -49,6 +49,7 @@
           :is-device="true"
           :total="total"
           :table-height="varyDivHeight"
+          :is-loading-data="isLoadingData"
           layout="jumper,total, prev,pager, next"
           class="device-table"
           @handleOperation="handleEmitOperation"
@@ -330,44 +331,32 @@
           <div v-if="accountScope === 1 && deviceType === 1">
             <span class="available-span">{{ $t('deviceView.availableDevice') }}</span>
             <div v-if="deviceType === 1" class="available-device-info">
-              <el-table
-                ref="availableDeviceTable"
-                :data="avilableDeviceList"
-                :cell-class-name="setSNCell"
-                tooltip-effect="dark"
-                style="width: 100%">
-                <el-table-column
-                  type="selection"
-                  width="45"/>
-                <el-table-column
-                  label="SN"
-                  prop="serialNumber"
-                  width="120"
-                />
-                <el-table-column
-                  prop="name"
-                  label="名称"
-                  width="190"/>
-                <el-table-column
-                  prop="address"
-                  label="门店"
-                  width="170"
-                >
-                  <template slot-scope="scope">
-                    <el-select
-                      v-model="scope.row.storeId"
-                      style="width: 100%;"
-                      placeholder="请选择"
-                    >
-                      <el-option
-                        v-for="item in storeDataList"
-                        :key="item.storeId"
-                        :label="item.label"
-                        :value="item.storeId"/>
-                    </el-select>
-                  </template>
-                </el-table-column>
-              </el-table>
+              <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
+                <div class="available-checkbox">
+                  <el-checkbox v-model="item.checked"/>
+                </div>
+                <div class="available-sn">
+                  <span>{{ item.serialNumber }}</span>
+                </div>
+                <div class="available-name">
+                  <span>{{ item.name }}</span>
+                </div>
+                <div class="available-store">
+                  <el-select
+                    v-model="item.storeId"
+                    :filter-method="filterStoreOption"
+                    :placeholder="$t('deviceView.selectStore')"
+                    style="width: 100%;"
+                    filterable
+                  >
+                    <el-option
+                      v-for="item in storeDataList"
+                      :key="item.storeId"
+                      :label="item.label"
+                      :value="item.storeId"/>
+                  </el-select>
+                </div>
+              </div>
             </div>
           </div>
           <div v-else class="main-device-info">
@@ -711,7 +700,8 @@ export default {
       }],
       deviceType: 0,
       deviceSource: 0,
-      avilableDeviceList: []
+      avilableDeviceList: [],
+      isLoadingData: true
     };
   },
 
@@ -725,7 +715,6 @@ export default {
     this.setBreadcrumbsName();
     this.setDeviceListParams();
     this.getBriefStoreData();
-    this.accountScope === 1 && this.getAvailableEzvizDevice();
   },
 
   methods: {
@@ -761,7 +750,7 @@ export default {
       if (val !== 0) {
         const deviceObj = {};
         deviceObj.serialNumber = val.serialNumber;
-        deviceObj.deleteFromEzviz = val.addedMethod !== 2;
+        deviceObj.deleteFromEzviz = this.accountScope === 0;
         self.deleteSerialNums.push(deviceObj);
       } else {
         const arr = [];
@@ -769,7 +758,7 @@ export default {
         selectRows.forEach(item => {
           const deviceObj = {};
           deviceObj.serialNumber = item.serialNumber;
-          deviceObj.deleteFromEzviz = item.addedMethod !== 2;
+          deviceObj.deleteFromEzviz = this.accountScope === 0;
           arr.push(deviceObj);
         });
         self.deleteSerialNums = arr;
@@ -1068,6 +1057,7 @@ export default {
 
     getDeviceList(params) {
       const self = this;
+      this.isLoadingData = true;
       ezvizRESTful.getEzvizList(params).then(res => {
         const resCode = res.errCode;
         const data = res.data;
@@ -1109,7 +1099,9 @@ export default {
             self.channelData = [];
             self.channelList = [];
           }
+          this.isLoadingData = false;
         }).catch(error => {
+          this.isLoadingData = false;
           console.log('EzvizDeviceMgmt-getDeviceList' + error);
         });
     },
@@ -1278,10 +1270,20 @@ export default {
             self.addDeviceData.ezvizAccount = self.ezvizAccount;
             nvrArray.push(self.addDeviceData);
           } else {
-            const selectDevice = self.$refs.availableDeviceTable.selection;
+            const selectDevice = self.avilableDeviceList.filter(item => item.checked === true);
             if (selectDevice.length === 0) {
               util.notify(self.$t('deviceView.selectDevice'), 'warning', 3000);
               return false;
+            } else {
+              const noSelectStore = selectDevice.some(item => !item.storeId || item.storeId.length === 0);
+              if (noSelectStore) {
+                util.notify(this.$t('deviceView.selectBoundStore'), 'warning', 3000);
+                return false;
+              } else {
+                selectDevice.map(item => {
+                  item.beseyeAccount = this.beseyeAccount;
+                });
+              }
             }
             selectDevice.forEach(item => {
               item.addedMethod = 1;
@@ -1396,6 +1398,7 @@ export default {
       this.isAddAgain = false;
       this.deviceType = 0;
       this.initAddDeviceFormData();
+      this.accountScope === 1 && this.getAvailableEzvizDevice();
     },
 
     async confirmDeleteDevice() {
@@ -2026,30 +2029,30 @@ export default {
     height: 35px;
     color: #94a4b4;
   }
-  .el-dialog__body .dialog-content .deviceForm .available-device-info .sn-class .cell{
-    padding-left: 10px;
+  .available-devices{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 calc(20/1920*100vw) 10px;
   }
-  .el-dialog__body .dialog-content .deviceForm .available-device-info  .el-checkbox__inner{
-    transform: scale(1.5, 1.5);
-  }
-  el-dialog__body .dialog-content .deviceForm .el-table-column--selection .cell{
-    padding-left: 20px !important;
-    padding-right: 5px !important;
-  }
-  .el-dialog__body .dialog-content .deviceForm .available-device-info .el-table .el-table__row{
-    height: 35px;
-  }
-  .el-dialog__body .dialog-content .deviceForm .available-device-info .el-table__header-wrapper, .el-table__footer-wrapper{
-    display: none;
-  }
-  .available-device-info .el-table-column--selection .cell{
-    padding-left: 20px ;
-    padding-right: 5px;
-  }
-  .available-device-info .el-table .cell{
+  .available-sn{
+    width: 150px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
     padding-left: 20px;
-    color: #424151;
-    font-size: calc(14/1920*100vw);
+  }
+  .available-name{
+    width: 160px;
+    padding-left: 20px;
+  }
+  .available-store{
+    padding-left: 20px;
+    width: 160px;
+  }
+  .available-device-info .el-select .el-input--medium .el-input__inner{
+    height: 35px;
+    color: #94a4b4;
   }
   .el-dialog__body .dialog-content .deviceForm .main-device-info{
     background-color: #f6fbf9;
