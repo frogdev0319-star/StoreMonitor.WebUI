@@ -417,7 +417,9 @@ export default {
     'advice': '巡檢建議：',
     'good': '優秀',
     'signature': '簽名',
-    'excellent': '優秀'
+    'excellent': '優秀',
+    'getBeseyeStreamError': '獲取Beseye視頻流信息失敗！',
+    'loading': '加載中...'
   },
 
   // event Management page language

@@ -216,7 +216,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
-    'downloading':'正在下载中......',
+    'downloading': '正在下载中......',
     'uploading': '正在上传中',
     'upload0': '共',
     'upload1': '个附件，已上传',
@@ -417,7 +417,9 @@ export default {
     'advice': '巡检建议：',
     'good': '优秀',
     'signature': '签名',
-    'excellent': '优秀'
+    'excellent': '优秀',
+    'getBeseyeStreamError': '获取Beseye视频流信息失败！',
+    'loading': '加载中...'
   },
 
   // event Management page language

@@ -213,7 +213,7 @@ export default {
 
   // Patrol page language
   'remotePatrol': {
-    'downloading':'Downloading...',
+    'downloading': 'Downloading...',
     'uploading': 'Uploading...',
     'storeTag': 'Tag',
     'patrolWay': 'Inspection Type',
@@ -411,7 +411,9 @@ export default {
     'advice': 'Advice:',
     'good': 'Good',
     'signature': 'Signature',
-    'excellent': 'Excellent'
+    'excellent': 'Excellent',
+    'getBeseyeStreamError': 'Failed to get beseye stream info!',
+    'loading': 'Loading...'
   },
 
   // event Management page language
