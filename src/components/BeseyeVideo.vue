@@ -1019,7 +1019,7 @@ export default {
         console.log(response);
         if (Object.keys(response.data).length === 0) {
           self.showError = true;
-          self.errorText = 'Invalid Token';
+          self.errorText = this.$t('remotePatrol.getBeseyeStreamError');
         } else {
           self.wsURL = response.data.wsUrl;
           self.streamInfo = response.data.streamInfo;
