@@ -28,6 +28,7 @@
         :cell-class="accountCell"
         :row-class="accountRow"
         :show-border="false"
+        :is-loading-data="isLoadingData"
         @handleOperation="handleEmitOperation"/>
     </div>
     <el-dialog
@@ -123,7 +124,8 @@ export default {
       grantCode: '',
       state: '',
       beseyeAccount: '',
-      isAuthorizing: false
+      isAuthorizing: false,
+      isLoadingData: true
     };
   },
 
@@ -143,17 +145,19 @@ export default {
   },
 
   mounted() {
-    console.log(this.$route.params);
     this.getBeseyeUserList();
     this.getCodeAndState();
   },
 
   methods: {
     getBeseyeUserList() {
+      this.isLoadingData = true;
       getBeseyeUserList().then(res => {
         this.tableData = res.data;
+        this.isLoadingData = false;
       }).catch(err => {
         this.tableData = [];
+        this.isLoadingData = false;
         console.log('BeseyeAccount-getBeseyeUserList: ' + err);
       })
     },
@@ -165,7 +169,6 @@ export default {
         this.state = this.$route.params.state;
         const stateStr = this.base64ToStr(this.state);
         this.beseyeAccount = stateStr.split('-')[2];
-        console.log(this.beseyeAccount);
         this.grantCode !== 'error' && this.authorizeBeseyeAccount();
         this.grantCode === 'error' && this.getAuthorizeMsg('refuse');
       }
