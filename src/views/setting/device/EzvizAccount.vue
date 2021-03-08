@@ -27,6 +27,7 @@
         :cell-class="accountCell"
         :row-class="accountRow"
         :show-border="false"
+        :is-loading-data="isLoadingAccount"
         @handleOperation="handleEmitOperation"/>
     </div>
     <el-dialog
@@ -419,7 +420,8 @@ export default {
       errorAccount: '',
       accountHead: 'account-header',
       accountCell: '',
-      accountRow: ''
+      accountRow: '',
+      isLoadingAccount: true
     };
   },
 
@@ -473,6 +475,7 @@ export default {
 
     getAccountTableList() {
       this.tableData = [];
+      this.isLoadingAccount = true;
       this.getEzvizAccountList().then(res => {
         this.tableData = res.data;
         const listArray = [];
@@ -480,7 +483,9 @@ export default {
           listArray.push(item.ezvizAccount);
         });
         this.accountList = listArray;
+        this.isLoadingAccount = false;
       }).catch(err => {
+        this.isLoadingAccount = false;
         console.log('EzvizAccount--getAccountTableList:' + err);
       });
     },
