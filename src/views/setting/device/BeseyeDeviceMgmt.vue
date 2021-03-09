@@ -156,7 +156,6 @@
             @current-change="currentChange"/>
         </div>
       </div>
-      <!--<div v-loading="loadingData" v-else-if="loadingData" class="no-data-container"/>-->
       <div v-else class="no-data-container">{{ $t('deviceView.noData') }}</div>
       <el-dialog
         v-if="showAddBeseyeDialog"
@@ -174,72 +173,32 @@
           <div class="deviceForm">
             <span class="available-span">{{ $t('deviceView.availableDevice') }}</span>
             <div class="available-device-info">
-              <el-table
-                ref="availableDeviceTable"
-                :data="avilableDeviceList"
-                :cell-class-name="setSNCell"
-                tooltip-effect="dark"
-                style="width: 100%">
-                <el-table-column
-                  type="selection"
-                  width="45"/>
-                <el-table-column
-                  label="SN"
-                  prop="serialNumber"
-                  width="120"
-                />
-                <el-table-column
-                  prop="name"
-                  label="名称"
-                  width="190"/>
-                <el-table-column
-                  prop="address"
-                  label="门店"
-                  width="170"
-                >
-                  <template slot-scope="scope">
-                    <el-select
-                      v-model="scope.row.storeId"
-                      :filter-method="filterStoreOption"
-                      style="width: 100%;"
-                      placeholder="请选择"
-                      filterable
-                    >
-                      <el-option
-                        v-for="item in storeDataList"
-                        :key="item.storeId"
-                        :label="item.label"
-                        :value="item.storeId"/>
-                    </el-select>
-                  </template>
-                </el-table-column>
-              </el-table>
-              <!--<div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">-->
-              <!--<div class="available-checkbox">-->
-              <!--<el-checkbox v-model="item.checked" @change="changeAvailableDeviceChecked(item, index)"/>-->
-              <!--</div>-->
-              <!--<div class="available-sn">-->
-              <!--<span>{{ item.serialNumber }}</span>-->
-              <!--</div>-->
-              <!--<div class="available-name">-->
-              <!--<span>{{ item.name }}</span>-->
-              <!--</div>-->
-              <!--<div class="available-store">-->
-              <!--<el-select-->
-              <!--v-model="item.storeId"-->
-              <!--:filter-method="filterStoreOption"-->
-              <!--style="width: 100%;"-->
-              <!--placeholder="请选择"-->
-              <!--filterable-->
-              <!--&gt;-->
-              <!--<el-option-->
-              <!--v-for="item in storeDataList"-->
-              <!--:key="item.storeId"-->
-              <!--:label="item.label"-->
-              <!--:value="item.storeId"/>-->
-              <!--</el-select>-->
-              <!--</div>-->
-              <!--</div>-->
+              <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
+                <div class="available-checkbox">
+                  <el-checkbox v-model="item.checked" @change="changeAvailableDeviceChecked(item, index)"/>
+                </div>
+                <div class="available-sn">
+                  <span>{{ item.serialNumber }}</span>
+                </div>
+                <div class="available-name">
+                  <span>{{ item.name }}</span>
+                </div>
+                <div class="available-store">
+                  <el-select
+                    v-model="item.storeId"
+                    :filter-method="filterStoreOption"
+                    :placeholder="$t('deviceView.selectStore')"
+                    style="width: 100%;"
+                    filterable
+                  >
+                    <el-option
+                      v-for="item in storeDataList"
+                      :key="item.storeId"
+                      :label="item.label"
+                      :value="item.storeId"/>
+                  </el-select>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -310,7 +269,6 @@ export default {
     this.getBriefStoreData();
     this.setBeseyeAccount();
     this.getBeseyeDeviceList(this.setParams());
-    this.getAvailableBeseyeDevice();
   },
 
   methods: {
@@ -364,8 +322,9 @@ export default {
       const params = {};
       params.beseyeAccount = this.beseyeAccount;
       getAvailableBeseyeDevice(params).then(res => {
-        this.avilableDeviceList = res.errCode === 0 && res.data.length > 0 ? res.data : [];
-        this.avilableDeviceList.forEach(item => { item.checked = false; });
+        const avilableDevices = res.errCode === 0 && res.data.length > 0 ? res.data : [];
+        avilableDevices.forEach(item => { item.checked = false; });
+        this.avilableDeviceList = [...avilableDevices];
       }).catch(error => {
         this.avilableDeviceList = [];
         console.log('BeseyeDeviceMgmt-getAvailableEzvizDevice: ' + error);
@@ -373,13 +332,8 @@ export default {
     },
 
     addBeseyeDeviceDialog() {
+      this.getAvailableBeseyeDevice();
       this.showAddBeseyeDialog = true;
-    },
-
-    setSNCell(row) {
-      if (row.columnIndex === 1) {
-        return 'sn-class';
-      }
     },
 
     changeIfCheckAllDevices(val) {
@@ -724,46 +678,57 @@ export default {
       const self = this;
       const deviceParams = {};
       const channelArray = [];
-      const selectDevice = self.$refs.availableDeviceTable.selection;
-      if (selectDevice.length === 0) {
-        util.notify(self.$t('deviceView.selectDevice'), 'warning', 3000);
-        return false;
+      const selectDevice = self.avilableDeviceList.filter(item => item.checked === true);
+      if (self.validateParams(selectDevice)) {
+        selectDevice.forEach(item => {
+          const channel = {};
+          channel.name = item.name;
+          channel.storeId = item.storeId;
+          channel.ivsId = item.serialNumber;
+          channel.channelId = 1;
+          channel.vendor = 2;
+          channelArray.push(channel);
+        });
+        deviceParams.device = selectDevice;
+        self.addBeseyeDevice(deviceParams).then((res) => {
+          console.log(res);
+          if (res.errCode === 0) {
+            const channelParams = {};
+            channelParams.device = channelArray;
+            self.addBeseyeChannel(channelParams);
+          } else {
+            return Promise.reject((new Error(res.errMsg)));
+          }
+        }).then(() => {
+          util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
+          self.showAddBeseyeDialog = false;
+          self.getBeseyeDeviceList(self.setParams());
+        }).catch(error => {
+          util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+          self.showAddBeseyeDialog = false;
+          console.log('BeseyeDeviceMgmt-confirmAddBeseyeDevice: ' + error);
+        });
       }
-      selectDevice.forEach(item => {
-        item.beseyeAccount = this.beseyeAccount;
-        if (item.storeId === '') {
-          util.notify(self.$t('deviceView.selectBoundStore'), 'warning', 3000);
-          return false;
-        }
-      });
-      selectDevice.forEach(item => {
-        const channel = {};
-        channel.name = item.name;
-        channel.storeId = item.storeId;
-        channel.ivsId = item.serialNumber;
-        channel.channelId = 1;
-        channel.vendor = 2;
-        channelArray.push(channel);
-      });
-      deviceParams.device = selectDevice;
-      self.addBeseyeDevice(deviceParams).then((res) => {
-        console.log(res);
-        if (res.errCode === 0) {
-          const channelParams = {};
-          channelParams.device = channelArray;
-          self.addBeseyeChannel(channelParams);
+    },
+
+    validateParams(selectDevice) {
+      let validate = false;
+      if (selectDevice.length === 0) {
+        util.notify(this.$t('deviceView.selectDevice'), 'warning', 3000);
+        validate = false;
+      } else {
+        const noSelectStore = selectDevice.some(item => !item.storeId || item.storeId.length === 0);
+        if (noSelectStore) {
+          util.notify(this.$t('deviceView.selectBoundStore'), 'warning', 3000);
+          validate = false;
         } else {
-          return Promise.reject((new Error(res.errMsg)));
+          selectDevice.map(item => {
+            item.beseyeAccount = this.beseyeAccount;
+          });
+          validate = true;
         }
-      }).then(() => {
-        util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
-        self.showAddBeseyeDialog = false;
-        self.getBeseyeDeviceList(self.setParams());
-      }).catch(error => {
-        util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-        self.showAddBeseyeDialog = false;
-        console.log('BeseyeDeviceMgmt-confirmAddBeseyeDevice: ' + error);
-      });
+      }
+      return validate;
     },
 
     addBeseyeDevice(params) {
@@ -818,6 +783,7 @@ export default {
 <style lang="scss" scoped>
   @import '../../../assets/css/importfile.css';
   @import '../../../assets/css/textstyle.css';
+  @import '../../../assets/sass/device.scss';
   $mainColor:#f31d65;
   $border:#e3e9f4;
   $tab: #7d8cad;
@@ -1006,6 +972,8 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: calc(16/1920*100vw);
+    color: #7d8cad;
   }
 </style>
 <style>
@@ -1164,53 +1132,34 @@ export default {
     margin-top: 10px;
     padding-top: 10px;
     padding-bottom: 10px;
+    max-height: 250px;
+    overflow-y: scroll;
   }
 
   .available-devices{
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0 calc(20/1920*100vw) 10px;
   }
   .available-sn{
-    width: 100px;
+    width: 150px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     padding-left: 20px;
   }
   .available-name{
-    width: 185px;
+    width: 160px;
     padding-left: 20px;
   }
   .available-store{
     padding-left: 20px;
-    width: 140px;
+    width: 160px;
   }
   .available-device-info .el-select .el-input--medium .el-input__inner{
     height: 35px;
     color: #94a4b4;
-  }
-  .el-dialog__body .dialog-content .deviceForm .available-device-info .sn-class .cell{
-    padding-left: 10px;
-  }
-  el-dialog__body .dialog-content .deviceForm .el-table-column--selection .cell{
-    padding-left: 20px !important;
-    padding-right: 5px !important;
-  }
-  .el-dialog__body .dialog-content .deviceForm .available-device-info .el-table .el-table__row{
-    height: 35px;
-  }
-  .el-dialog__body .dialog-content .deviceForm .available-device-info .el-table__header-wrapper, .el-table__footer-wrapper{
-    display: none;
-  }
-  .available-device-info .el-table-column--selection .cell{
-    padding-left: 20px ;
-    padding-right: 5px;
-  }
-  .available-device-info .el-table .cell{
-    padding-left: 20px;
-    color: #424151;
-    font-size: calc(14/1920*100vw);
   }
   .el-dialog__body .dialog-content .deviceForm .main-device-info{
     background-color: #f6fbf9;
