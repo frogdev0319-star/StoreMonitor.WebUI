@@ -430,7 +430,7 @@
             <div class="arrow-content">
               <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
             </div>
-            <div class="btn-content">
+            <div class="btn-content" v-if="!curItem.disabled">
               <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
                 <channel-icon-btn
                   :channel-name="item.name"
@@ -559,7 +559,7 @@ export default {
       curGroupIndex: 0,
       curItemIndex: 0,
       curSheetIndex: 0,
-      curItem: null,
+      curItem: {disabled : false},
       curItemId: 0,
       curhasIgnoreItem: 0,
 
@@ -1514,7 +1514,7 @@ export default {
       self.curItem.manualIgnore = true;
       self.curItem.disabled = true;
       if (self.showIgnoreItem) {
-        if (self.hasIgnoretemp[self.curItemIndex].dealCount == 0) {
+        if (self.hasIgnoretemp[self.curItemIndex].dealCount === 0) {
           self.hasIgnoretemp[self.curItemIndex].dealCount = 1;
         }
         if (self.hasIgnoretemp[self.curItemIndex].manualIgnore) {
@@ -1596,12 +1596,12 @@ export default {
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
-      if(self.videoPlatform === 0){
-        self.editCount++;
-      } else if(self.videoPlatform === 1) {
-        self.$refs.ezvizVideo.editCount++
+      if(self.vendor === 0){
+        self.$refs.dashVideo.editCount++;
+      } else if(self.vendor === 1) {
+        self.$refs.ezvizVideo.editCount++;
       } else {
-        self.$refs.beseyeVideo.editCount++
+        self.$refs.beseyeVideo.editCount++;
       }
       self.curItemIndex = index;
       self.curItem = item;
@@ -1609,21 +1609,49 @@ export default {
         self.noBindDeviceObj.dialogCosed = true;
         return false;
       }
+      self.stopVendorVideo();
+      self.hiddenChannelBtn();
       self.handleIgnore();
     },
+
+    stopVendorVideo(){
+      if (this.vendor === 0) {
+        this.editCount = 0;
+        this.$refs.dashVideo.stopVideoPlay();
+        this.$refs.dashVideo.showError = false;
+      } else if(this.vendor === 1){
+        !this.showGuide ? this.$refs.ezvizVideo.editCount = 0 : '';
+        if (this.$refs.ezvizVideo != undefined) {
+          this.$refs.ezvizVideo.playState ? this.$refs.ezvizVideo.stopRealTime() : '';
+          this.$refs.ezvizVideo.showError = false;
+        }
+      } else {
+        !this.showGuide ? this.$refs.beseyeVideo.editCount = 0 : '';
+        if (this.$refs.beseyeVideo != undefined){
+          this.$refs.beseyeVideo.playState ? this.$refs.beseyeVideo.stopPlay() : '';
+          this.$refs.beseyeVideo.showError = false;
+        }
+      }
+    },
+
+    hiddenChannelBtn(){
+      this.hideLast = false;
+      this.hideNext = false;
+    },
+
     CancleIgnoreItem(item, index) {
       const self = this;
       switch (self.vendor) {
         case 0: {
-          self.editCount--;
+          self.$refs.dashVideo.editCount--;
           break
         }
         case 1: {
-          self.$refs.ezvizVideo.editCount--
+          self.$refs.ezvizVideo.editCount--;
           break
         }
         case 2: {
-          self.$refs.beseyeVideo.editCount--
+          self.$refs.beseyeVideo.editCount--;
           break
         }
         default: {
