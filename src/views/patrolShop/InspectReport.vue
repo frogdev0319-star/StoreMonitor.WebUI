@@ -104,11 +104,9 @@
             <div class="item-content">
               <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                 <div v-for="_item in item.itemList" :key="_item.id" class="item-details">
-                  <div class="pdf_font_20">
                     <div class="item-blag"/>
-                    <span class="item-name">{{ index !== 2 ?_item.name : _item.subject }}</span>
+                    <span class="item-name"><span class="pdf_font_20">{{ index !== 2 ?_item.name : _item.subject }}</span></span>
                     <span class="item-des"><span class="pdf_font_18"></span></span>
-                  </div>
                 </div>
               </el-scrollbar>
               <span v-if="item.itemCount > 6 && isexportPDF" class="moreInfotip">
