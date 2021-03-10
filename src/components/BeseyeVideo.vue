@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div v-if="showError" class="errorVideo-model">
-      <span>{{ errorText }}</span>
-    </div>
-    <div v-else>
+    <div>
       <div
         v-loading="isLoading"
         id="videoContent"
@@ -16,45 +13,25 @@
           </div>
           <canvas id="vcanvas" :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"/>
         </div>
-        <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.channelName }}</span>
+        <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.name }}</span>
         <div v-if="showInfoContent" class="icon-footer">
           <div class="iconlside">
             <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="startPlay"/>
             <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopPlay"/>
           </div>
           <div class="iconrside">
-            <!--<div class="speed-content" v-if="playBackState">-->
-            <!--&lt;!&ndash;<span>{{$t('storeMonitor.speed')}}</span>&ndash;&gt;-->
-            <!--&lt;!&ndash;<el-select class="el-test" size="mini" v-model="curSpeed" :popper-class="popperClass" v-show="!fullScreen" @change="adjustSpeed">&ndash;&gt;-->
-            <!--&lt;!&ndash;<el-option&ndash;&gt;-->
-            <!--&lt;!&ndash;v-for="(item) in speedList"&ndash;&gt;-->
-            <!--&lt;!&ndash;:key="item.value"&ndash;&gt;-->
-            <!--&lt;!&ndash;:label="item.label"&ndash;&gt;-->
-            <!--&lt;!&ndash;:value="item.value"&ndash;&gt;-->
-            <!--&lt;!&ndash;&gt;&ndash;&gt;-->
-            <!--&lt;!&ndash;</el-option>&ndash;&gt;-->
-            <!--&lt;!&ndash;</el-select>&ndash;&gt;-->
-            <!--&lt;!&ndash;<el-select class="el-test" size="mini" v-model="curSpeed" :popper-class="popperClass" :popper-append-to-body='false' v-show="fullScreen" @change="adjustSpeed">&ndash;&gt;-->
-            <!--&lt;!&ndash;<el-option&ndash;&gt;-->
-            <!--&lt;!&ndash;v-for="(item) in speedList"&ndash;&gt;-->
-            <!--&lt;!&ndash;:key="item.value"&ndash;&gt;-->
-            <!--&lt;!&ndash;:label="item.label"&ndash;&gt;-->
-            <!--&lt;!&ndash;:value="item.value"&ndash;&gt;-->
-            <!--&lt;!&ndash;&gt;&ndash;&gt;-->
-            <!--&lt;!&ndash;</el-option>&ndash;&gt;-->
-            <!--&lt;!&ndash;</el-select>&ndash;&gt;-->
-            <!--<span>{{$t('storeMonitor.back')}}</span>-->
-            <!--<el-select class="el-test" size="mini" :value="curBack" :popper-class="popperClass" placeholder=' '>-->
-            <!--<el-option-->
-            <!--v-for="(item) in backList"-->
-            <!--:key="item.value"-->
-            <!--:label="item.label"-->
-            <!--:value="item.value"-->
-            <!--@click.native="adjustProcess(item.value, item.label)"-->
-            <!--&gt;-->
-            <!--</el-option>-->
-            <!--</el-select>-->
-            <!--</div>-->
+            <div v-if="playBack" class="speed-content">
+              <span>{{ $t('remotePatrol.back') }}</span>
+              <el-select :value="curBack" :popper-class="popperClass" class="el-test" size="mini" placeholder=" ">
+                <el-option
+                  v-for="(item) in backList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                  @click.native="adjustProcess(item.value, item.label)"
+                />
+              </el-select>
+            </div>
             <div class="screen-content">
               <i
                 :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
@@ -63,7 +40,7 @@
             </div>
           </div>
         </div>
-        <div class="progress-content">
+        <div v-if="playBack" class="progress-content">
           <b-progress
             id="bprogress"
             :value="currentTimeValue"
@@ -81,48 +58,53 @@
             <span>{{ $t('remotePatrol.snapshot') }}</span>
           </div>
         </transition>
-        <video
-          v-show="showVideo && !playBack"
-          id="beseyeVideo"
-          :controls="showControls"
-          height="83%"
-          width="90%"
-          prload
-          autoplay
-          style="margin: auto"
-          @waiting="onPlayerWaiting($event)"
-          @playing="onPlayerPlaying($event)"
-          @loadstart="onPlayerWaiting($event)"
-          @error="onPlayerWaiting($event)"
-          @canplay="onPlayerCanPlay()"/>
-        <video
-          v-show="playBack"
-          id="video1"
-          :controls="showControls"
-          height="83%"
-          width="90%"
-          prload
-          autoplay
-          style="margin: auto"
-          @waiting="onPlayerWaiting($event)"
-          @playing="onPlayerPlaying($event)"
-          @loadstart="onPlayerWaiting($event)"
-          @error="onPlayerWaiting($event)"
-          @canplay="onPlayerCanPlay()"/>
-        <video
-          v-show="playBack"
-          id="video2"
-          :controls="showControls"
-          height="83%"
-          width="90%"
-          prload
-          autoplay
-          style="margin: auto"
-          @waiting="onPlayerWaiting($event)"
-          @playing="onPlayerPlaying($event)"
-          @loadstart="onPlayerWaiting($event)"
-          @error="onPlayerWaiting($event)"
-          @canplay="onPlayerCanPlay()"/>
+        <div v-if="showError" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
+          <span>{{ errorText }}</span>
+        </div>
+        <div v-else>
+          <video
+            v-show ="showVideo && !playBack"
+            id="beseyeVideo"
+            :controls="showControls"
+            height="100%"
+            width="90%"
+            prload
+            autoplay
+            style="margin: auto"
+            @waiting="onPlayerWaiting($event)"
+            @playing="onPlayerPlaying($event)"
+            @loadstart="onPlayerWaiting($event)"
+            @error="onPlayerWaiting($event)"
+            @canplay="onPlayerCanPlay()"/>
+          <video
+            v-show="playBack"
+            id="video1"
+            :controls="showControls"
+            height="83%"
+            width="90%"
+            prload
+            autoplay
+            style="margin: auto"
+            @waiting="onPlayerWaiting($event)"
+            @playing="onPlayerPlaying($event)"
+            @loadstart="onPlayerWaiting($event)"
+            @error="onPlayerWaiting($event)"
+            @canplay="onPlayerCanPlay()"/>
+          <video
+            v-show="playBack"
+            id="video2"
+            :controls="showControls"
+            height="83%"
+            width="90%"
+            prload
+            autoplay
+            style="margin: auto"
+            @waiting="onPlayerWaiting($event)"
+            @playing="onPlayerPlaying($event)"
+            @loadstart="onPlayerWaiting($event)"
+            @error="onPlayerWaiting($event)"
+            @canplay="onPlayerCanPlay()"/>
+        </div>
       </div>
     </div>
     <el-dialog
@@ -260,7 +242,7 @@
 
 <script>
 import i18n from '../lang';
-import { getBeseyeAccessToken, getPlaylistInfo, getStreamInfo, getStreamInfoFromTW } from '../api/beseye';
+import { getBeseyeAccessToken, getPlaylistInfo, getStreamInfo } from '../api/beseye';
 import filterString from '../common/filterString';
 import { mapGetters } from 'vuex';
 
@@ -358,7 +340,6 @@ export default {
       eventDes: '',
       editCount: 0,
       currentStoreId: '',
-      accessToken: '',
       expireTime: 0,
       realTimeSpeed: 0,
       timerPlayReal: null,
@@ -376,7 +357,7 @@ export default {
       // wsURL: '',
       streamInfo: {},
       wsURL: '',
-      vcamerId: '93aed0a82f284c9884c1956121db809f',
+      vcamerId: '',
       accessToken: '',
       dd: '{Web}_{YH-EXTERNAL}_{97557807-1149-4004-8e92-91c344539ded}',
 
@@ -428,15 +409,19 @@ export default {
       curBack: '',
       popperClass: 'select-popClass',
       timeid: null,
-      startTs: 0
+      startTs: 0,
+      ifContinuePlay: false,
+      clipStartTime: 0
     };
   },
+
   methods: {
     showPenList() {
       const self = this;
       self.showPen = !self.showPen;
       self.showCancelContent = false;
     },
+
     checkPen(item, index) {
       const self = this;
       item.showContent = true;
@@ -447,6 +432,7 @@ export default {
       });
       self.penChecked = item.id;
     },
+
     cancelEditCanvas() {
       const self = this;
       self.showCancelContent = false;
@@ -462,6 +448,7 @@ export default {
       ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
       self.imageCanvasList = [];
     },
+
     confirmEditCanvas() {
       const self = this;
       self.showCancelContent = false;
@@ -481,6 +468,7 @@ export default {
         ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length - 1], 0, 0, vcanvas.width, vcanvas.height);
       }
     },
+
     confirmEdit() {
       const self = this;
       const obj = {};
@@ -489,6 +477,7 @@ export default {
       self.$emit('confirmEzvizCanvas', src);
       self.showCutDialog = false;
     },
+
     mouseDownAction(e) {
       const self = this;
       self.isMouseDown = true;
@@ -498,6 +487,7 @@ export default {
       self.showPenBtn = false;
       self.showCancelContent = false;
     },
+
     mouseMoveAction(e) {
       const self = this;
       if (self.isMouseDown) {
@@ -508,24 +498,27 @@ export default {
         self.flag++;
       }
     },
+
     mouseUpHandler(e) {
       const self = this;
       self.isMouseDown = false;
       self.showCutModel = true;
       self.showPenBtn = true;
-      self.showCancelContent = true; // 每次鼠标弹起后显示可以取消的框
-      if (self.flag != 0 && self.canvasEl != '') {
+      self.showCancelContent = true;
+      if (self.flag !== 0 && self.canvasEl !== '') {
         const imgObj = new Image();
         imgObj.src = self.canvasEl.toDataURL('image/jpeg');
         self.imageCanvasList.push(imgObj);
       }
       self.flag = 0;
     },
+
     mouseLeaveAction(e) {
       console.log(e);
       const self = this;
       self.isMouseDown = false;
     },
+
     drawLine(x, y, x1, y1) {
       const self = this;
       var ctx = self.canvasEl.getContext('2d');
@@ -537,22 +530,24 @@ export default {
       ctx.strokeStyle = self.penChecked;
       ctx.lineTo(x1, y1);
       ctx.stroke();
-      if (self.flag != 0) {
+      if (self.flag !== 0) {
         self.X = self.X1;
         self.Y = self.Y1;
       }
     },
+
     showCancel() {
       const self = this;
       self.showCancelContent = true;
       self.showPenBtn = true;
     },
+
     hiddenCancel() {
       const self = this;
       self.showCancelContent = false;
       self.showPenBtn = false;
     },
-    // 抓图问题反馈
+
     confirmAddFeedBack2() {
       const self = this;
       const src = self.canvasEl.toDataURL('image/jpeg');
@@ -562,7 +557,7 @@ export default {
         eventDes: self.eventDes,
         src: src
       };
-      if (self.eventName.trim().length == 0) {
+      if (self.eventName.trim().length === 0) {
         // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
         self.showEventNameInfo = true;
         return false;
@@ -570,10 +565,15 @@ export default {
       self.$emit('ezvizCutPictureFeedback', obj);
       self.showFeedDialog2 = false;
     },
+
     captureSnapshot() {
       const self = this;
       console.log(self.curGroupIndex);
       self.imageCanvasList = [];
+      if (self.playBackState) {
+        const videoArr = document.getElementsByTagName('video')[0].style.display;
+        self.beseyeVideo = videoArr === 'none' ? document.getElementsByTagName('video')[1] : document.getElementsByTagName('video')[0];
+      }
       if (self.fullScreen) {
         self.exitFullscreen();
         self.fullScreen = false;
@@ -612,6 +612,7 @@ export default {
         });
       }
     },
+
     onPlayerWaiting(e) {
       console.log('video is loading');
       this.playState = false;
@@ -622,20 +623,21 @@ export default {
         this.currentTimeValue = 0;
       }
     },
+
     onPlayerPlaying(e) {
-      const self = this;
-      console.log('vi' + 'deo is playing');
+      console.log('video is playing');
       this.playState = true;
       this.editCount++;
       this.showModelContent = true;
       this.isLoading = false;
-      if (this.playBack) {
-        window.clearInterval(self.timeId);
-        self.timeId = window.setInterval(() => {
-          self.getProcess();
-        }, 1000);
-      }
+      // if (this.playBack) {
+      //   window.clearInterval(self.timeId);
+      //   self.timeId = window.setInterval(() => {
+      //     self.getProcess();
+      //   }, 1000);
+      // }
     },
+
     onPlayerCanPlay() {
       const self = this;
       if (!this.playBack) {
@@ -651,6 +653,7 @@ export default {
         // }, 1000);
       }
     },
+
     async getProcess() {
       const self = this;
       const curTime = self.players.mainPlayer.video.currentTime * 1000;
@@ -671,6 +674,7 @@ export default {
         self.timeid = 0;
       }
     },
+
     controlScreen() {
       const self = this;
       if (!self.fullScreen) {
@@ -681,6 +685,7 @@ export default {
         self.fullScreen = false;
       }
     },
+
     eventNameChanged(val) {
       const self = this;
       const content = filterString.standard(val, 50);
@@ -694,6 +699,7 @@ export default {
         this.eventNameRuletip = false;
       }
     },
+
     eventDesChanged(val) {
       const self = this;
       const content = filterString.all(val, 200);
@@ -706,17 +712,17 @@ export default {
         self.eventDesRuletip = false;
       }
     },
+
     notShowInputRuleTips(e) {
-      if (e == 'eventName') {
+      if (e === 'eventName') {
         this.eventNameRuletip = false;
-      } else if (e == 'eventDes') {
+      } else if (e === 'eventDes') {
         this.eventDesRuletip = false;
       }
     },
-    // 进入全屏
+
     fullWindowScreen(...val) {
       console.log(val);
-      const self = this;
       // self.showControls=true;
       var ele = document.getElementById('videoContent');
       ele.style.width = '100%';
@@ -731,7 +737,7 @@ export default {
         ele.msRequestFullscreen();
       }
     },
-    // 退出全屏
+
     exitFullscreen() {
       var de = document;
       var ele = document.getElementById('videoContent');
@@ -745,24 +751,28 @@ export default {
         de.webkitCancelFullScreen();
       }
     },
+
     visibleChange() {
       const self = this;
       if (document.hidden) {
         if (self.playState) {
+          self.ifContinuePlay = true;
           self.stopPlay();
         }
       } else {
         console.log(self.playState);
-        if (self.playState) {
+        if (self.ifContinuePlay) {
           self.startPlay();
         }
       }
     },
+
     startPlay() {
       const self = this;
       self.repeaterRetryCount = 0;
       self.showError = false;
       self.errorText = '';
+      self.isLoading = true;
       if (!self.playBack) {
         self.getBeseyeStreamInfo();
       } else {
@@ -770,10 +780,12 @@ export default {
           // paused
           self.players.mainPlayer.video.play();
         } else {
+          self.isPlaying = false;
           self.initApp();
         }
       }
     },
+
     wsConnect(url) {
       const self = this;
       console.log('socket connection');
@@ -802,6 +814,7 @@ export default {
           }
         };
         self.peerConnection.oniceconnectionstatechange = function() {
+          self.isLoading = false;
           console.log('ice state change: ' + self.peerConnection.iceConnectionState);
         };
 
@@ -816,7 +829,7 @@ export default {
         var msgStatus = Number(msgJSON['status']);
         var msgCommand = msgJSON['command'];
 
-        if (msgStatus == 514) {
+        if (msgStatus === 514) {
           // repeater stream not ready
           self.repeaterRetryCount++;
           if (self.repeaterRetryCount < 10) {
@@ -824,7 +837,7 @@ export default {
           } else {
             self.stopPlay();
           }
-        } else if (msgStatus != 200) {
+        } else if (msgStatus !== 200) {
           self.stopPlay();
         } else {
           var streamInfoResponse = msgJSON['streamInfo'];
@@ -855,7 +868,7 @@ export default {
               var iceCandidate = iceCandidates[index];
               console.log('iceCandidates: ' + JSON.stringify(iceCandidate));
               var candidateInfo = iceCandidate.candidate.split(' ');
-              if (candidateInfo[2] == 'TCP' || candidateInfo[2] == 'UDP' && typeof InstallTrigger !== 'undefined') {
+              if (candidateInfo[2] === 'TCP' || candidateInfo[2] === 'UDP' && typeof InstallTrigger !== 'undefined') {
                 try {
                   self.peerConnection.addIceCandidate(new RTCIceCandidate(iceCandidate));
                 } catch (error) {
@@ -866,7 +879,7 @@ export default {
           }
         }
 
-        if ('sendResponse'.localeCompare(msgCommand) == 0) {
+        if ('sendResponse'.localeCompare(msgCommand) === 0) {
           if (self.wsConnection != null) {
             self.wsConnection.close();
             self.wsConnection = null;
@@ -876,16 +889,19 @@ export default {
 
       self.wsConnection.onclose = function(event) {
         console.log('wsConnection.onclose ' + event.code + event.reason);
-        // self.showError = true
-        // self.errorText = '连接中断'
+        // self.isLoading = false;
+        // self.showError = true;
+        // self.errorText = self.$t('remotePatrol.closeConnection');
       };
 
       self.wsConnection.onerror = function(evt) {
-        // self.showError = true
-        // self.errorText = '连接出错'
+        // self.isLoading = false;
+        // self.showError = true;
+        // self.errorText = self.$t('remotePatrol.errorConnection');
         console.log('wsConnection.onerror: ' + JSON.stringify(evt));
       };
     },
+
     gotDescription(description) {
       console.log('gotDescription' + description.sdp);
       const self = this;
@@ -896,6 +912,7 @@ export default {
         console.error('set description error');
       });
     },
+
     stopPlay() {
       const self = this;
       if (!self.playBack) {
@@ -909,6 +926,7 @@ export default {
         }
         self.beseyeVideo.removeAttribute('src');
         window.clearInterval(self.timerPlayReal);
+        self.timerPlayReal = null;
         self.realTimeSpeed = 0;
         self.playState = false;
         self.showModelContent = false;
@@ -923,28 +941,25 @@ export default {
         }
       }
     },
+
     sendPlayGetOffer() {
       const self = this;
       console.log('sendPlayGetOffer: ' + JSON.stringify(self.streamInfo));
-      self.wsConnection.send('{"direction":"play", "command":"getOffer", "streamInfo":' + JSON.stringify(self.streamInfo) + ', "userData":' + JSON.stringify(self.userData) + '}');
+      self.wsConnection.send('{"direction":"play", "command":"getOffer", "streamInfo":' +
+        JSON.stringify(self.streamInfo) + ', "userData":' + JSON.stringify(self.userData) + '}');
     },
+
     enhanceSDP(sdpStr) {
-      var sdpLines = sdpStr.split(/\r\n/);
-      var sdpSection = 'header';
-      var hitMID = false;
-      var sdpStrRet = '';
+      const sdpLines = sdpStr.split(/\r\n/);
+      const sdpSection = 'header';
+      const hitMID = false;
+      let sdpStrRet = '';
 
       for (var sdpIndex in sdpLines) {
-        var sdpLine = sdpLines[sdpIndex];
-
-        if (sdpLine.length == 0) { continue; }
-
+        let sdpLine = sdpLines[sdpIndex];
+        if (sdpLine.length === 0) { continue; }
         if (sdpLine.includes('profile-level-id')) {
           console.log('found profile-id');
-          // This profile seems to be correct for the stream publishing,
-          // however will not allow Safari to play it back, so we swap
-          // it for a baseline constrained one, which is declared when
-          // Safari publishes in the SDP.
           if (sdpLine.includes('640029')) {
             sdpLine = sdpLine.replace('640029', '42E01F');
           }
@@ -957,6 +972,7 @@ export default {
       console.log('Resulting SDP: ' + sdpStrRet);
       return sdpStrRet;
     },
+
     notify(msg, type, time) {
       this.$message({
         message: msg,
@@ -970,7 +986,7 @@ export default {
       const params = {};
       params.ivsId = channelId;
       return new Promise((resolve, reject) => {
-        if (self.currentStoreId == channelId && (Date.parse(new Date()) < self.expireTime)) {
+        if (self.currentStoreId === channelId && (Date.parse(new Date()) < self.expireTime)) {
           resolve(self.accessToken);
         } else {
           getBeseyeAccessToken(params)
@@ -987,25 +1003,7 @@ export default {
         }
       });
     },
-    getStreamInfofromTW() {
-      const self = this;
-      const params = {
-        'vci': self.channelInfo.ivsId,
-        'dd': self.dd
-      };
-      getStreamInfoFromTW(params).then(response => {
-        console.log(response);
-        if (response) {
-          // let result = response.data
-          self.streamInfo = response.data.streamInfo;
-          self.wsURL = response.data.wsUrl;
-          console.log(self.wsURL);
-          self.wsConnect(self.wsURL);
-        }
-      }).catch(err => {
-        console.log(err);
-      });
-    },
+
     getBeseyeStreamInfo() {
       const self = this;
       if (!self.channelInfo) {
@@ -1026,11 +1024,16 @@ export default {
           self.wsConnect(self.wsURL);
         }
       }).catch(err => {
+        self.isLoading = false;
+        self.showError = true;
+        self.errorText = this.$t('remotePatrol.getBeseyeStreamError');
         console.log(err);
       });
     },
+
     async initApp() {
       const self = this;
+      self.isLoading = true;
       // Install built-in polyfills to patch browser incompatibilities.
       shaka.polyfill.installAll();
       // Check to see if the browser supports the basic APIs Shaka needs.
@@ -1046,37 +1049,31 @@ export default {
       self.times = 0;
       self.showError = false;
       self.errorText = '';
-      const duration = 5 * 60 * 1000;
-      const d = new Date();
-      const start_time = self.startTs;
+      const params = self.setPlayListParams();
+      const result = await self.getBeseyePlaylistInfo(params);
+      console.log(result);
+      self.isLoading = false;
+      if (result.errCode === 0 && result.data.length > 0) {
+        self.updatePlaylist(result.data);
+      } else {
+        self.showError = true;
+        self.errorText = self.$t('remotePatrol.noVideoSource');
+        self.video2.style.display = 'none';
+      }
+    },
 
-      var url = `http://104.199.172.143/api/beseye/playlist?vci=${self.vcamerId}&dd=${self.dd}&start_time=${start_time}&duration=${duration}`;
-      var result = await self.doAjax(url);
+    setPlayListParams() {
+      const duration = 5 * 60 * 1000;
+      const start_time = this.clipStartTime;
       const params = {
-        'cameraId': self.channelInfo.ivsId,
+        'ivsId': this.channelInfo.ivsId,
         'platform': 1, // 0 App, 1 Web
         'startTime': start_time,
         'duration': duration
       };
+      return params;
+    },
 
-      // let result = await self.getBeseyePlaylistInfo(params);
-      console.log(result);
-      if (result.playList) {
-        self.updatePlaylist(result.playList);
-      } else {
-        // self.updatePlaylist([media1, media2, media3, media4])
-      }
-    },
-    async doAjax(url) {
-      var result = await $.ajax({
-        url: url,
-        type: 'GET',
-        headers: { Accept: 'application/json' }
-      });
-      console.log(result);
-      //	return result;
-      return JSON.parse(`${result}`);
-    },
     async getBeseyePlaylistInfo(params) {
       return new Promise((resolve, reject) => {
         getPlaylistInfo(params).then(response => {
@@ -1086,10 +1083,14 @@ export default {
           }
         }).catch(err => {
           console.log(err);
-          reject();
+          this.isLoading = false;
+          this.showError = true;
+          this.errorText = err.message;
+          reject(err);
         });
       });
     },
+
     initPlayer() {
       const self = this;
       // Create a Player instance.
@@ -1110,14 +1111,12 @@ export default {
 
     setupPlayerEventListeners() {
       const self = this;
-      // shaka player events: [error]
       self.player1.addEventListener('error', self.onPlayerError);
       self.player2.addEventListener('error', self.onPlayerError);
     },
 
     setupVideoEventListeners() {
       const self = this;
-      // video events: [play,canplay,emptied,ended,error...]
       console.log(self.player1);
       self.player1.video.addEventListener('play', self.onVideoPlay.bind(self.player1, self.player1));
       self.player1.video.addEventListener('ended', self.onVideoEnded.bind(self.player1, self.player1));
@@ -1126,9 +1125,7 @@ export default {
       self.player2.video.addEventListener('ended', self.onVideoEnded.bind(self.player2, self.player2));
       self.player2.video.addEventListener('timeupdate', self.onVideoTimeUpdate.bind(self.player2, self.player2));
     },
-    //  --------------------------------------------
-    //  Shaka player event
-    //  --------------------------------------------
+
     onPlayerError(event) {
       // Extract the shaka.util.Error object from the event.
       this.onError(event.detail);
@@ -1136,7 +1133,7 @@ export default {
 
     onError(error) {
       this.isLoading = false;
-      console.error('Error code', error.code, 'object', error,);
+      console.error('Error code', error.code, 'object', error);
     },
 
     onPlayerLoaded(player) {
@@ -1145,9 +1142,6 @@ export default {
       player.video.play();
     },
 
-    //  --------------------------------------------
-    //  Video event
-    //  --------------------------------------------
     onVideoPlay(player) {
       console.log('onVideoPlay', player.video);
       player.firstPlay = true;
@@ -1168,15 +1162,17 @@ export default {
       } else {
         preloadPlayer.video.style.display = 'none';
       }
+      self.isLoading = true;
       // preload player load new streaming
       setTimeout(self.preparePreloadStreaming, 1000);
     },
+
     onVideoTimeUpdate(player) {
       const self = this;
       if (!player.loaded) {
         return;
       }
-      if (player == self.players.preloadPlayer) {
+      if (player === self.players.preloadPlayer) {
         console.log('onVideoTimeUpdate');
         player.video.pause();
         player.ready = true;
@@ -1184,6 +1180,13 @@ export default {
         if (player.firstPlay) {
           player.firstPlay = false;
           console.log('onVideoTimeUpdate main player firstPlay', player.video);
+          self.isLoading = false;
+          if (this.playBack) {
+            window.clearInterval(self.timeId);
+            self.timeId = window.setInterval(() => {
+              self.getProcess();
+            }, 1000);
+          }
           self.showHideVideo();
           // [custom] onPlay callback should be called to change UI
         }
@@ -1192,23 +1195,13 @@ export default {
         }
       }
     },
-    //  --------------------------------------------
-    //   main action
-    //  --------------------------------------------
+
     updatePlaylist(newPlaylist) {
       const self = this;
-      var mainPlayer = self.players.mainPlayer;
-      var preloadPlayer = self.players.preloadPlayer;
-      if (newPlaylist.length == 0) {
-        console.error('Got empty playlist');
-        self.showError = true;
-        self.errorText = self.$t('storeMonitor.noVideoSource');
-        self.video2.style.display = 'none';
-        self.isLoading = false;
-        return;
-      }
+      const mainPlayer = self.players.mainPlayer;
+      const preloadPlayer = self.players.preloadPlayer;
       if (self.isPlaying) {
-        if (self.playlist == 0 && self.checkUndefined(preloadPlayer.media)) {
+        if (self.playlist === 0 && self.checkUndefined(preloadPlayer.media)) {
           preloadPlayer.media = newPlaylist[0];
           self.preloadStreaming(preloadPlayer, newPlaylist[0].manifestUri);
           newPlaylist.shift();
@@ -1243,7 +1236,7 @@ export default {
 
     preparePreloadStreaming() {
       const self = this;
-      if (self.playlist.length == 0) {
+      if (self.playlist.length === 0) {
         // to-da request new playlist
         console.warn('Out of playlist');
         window.clearInterval(self.timeId);
@@ -1269,6 +1262,9 @@ export default {
       const self = this;
       console.log('loadStreaming', '\nplayer', player.video, '\nmedia:', player.media, '\nUri:', assetUri, '\nplaylist:', self.playlist);
       if (assetUri !== '') {
+        self.clipStartTime = player.media.startTime;
+        console.log(self.clipStartTime);
+        self.playBackState = true;
         player.loaded = false;
         player.load(assetUri, startTime, mimeType).then(self.onPlayerLoaded.bind(player, player)).catch(self.onError);
       } else {
@@ -1309,59 +1305,47 @@ export default {
       console.log(lastDuration + ' ----- lastDuration');
       return lastDuration;
     },
+
     checkUndefined(x) {
       return typeof x === 'undefined';
     },
+
     async adjustProcess(val, label) {
       console.log(val);
       const self = this;
       self.curBack = label;
-      const video = document.getElementById('previewVideo');
-      const curTime = video.player.currentTime();
-      console.log(curTime);
       const time = parseInt(self.currentTimeValue);
       console.log(self.realTimeStartTs);
       console.log(time);
       // self.startTs=self.startTs+ time;
       switch (val) {
         case 0: {
-          self.realTimeStartTs = self.realTimeStartTs - 10;
-          if (curTime > 10) {
-            video.player.currentTime(curTime - 10);
-          } else {
-            console.log(self.realTimeStartTs);
-            self.stopAndAdjustProcessHistoryVideo();
-          }
+          self.clipStartTime = self.clipStartTime - 10;
           break;
         }
         case 1: {
-          self.realTimeStartTs = self.realTimeStartTs - 30;
-          if (curTime > 30) {
-            video.player.currentTime(curTime - 30);
-          } else {
-            console.log(self.realTimeStartTs);
-            self.stopAndAdjustProcessHistoryVideo();
-          }
+          self.clipStartTime = self.clipStartTime - 30;
           break;
         }
         case 2: {
-          self.realTimeStartTs = self.realTimeStartTs - 60;
-          if (curTime > 60) {
-            video.player.currentTime(curTime - 60);
-          } else {
-            console.log(self.realTimeStartTs);
-            self.stopAndAdjustProcessHistoryVideo();
-          }
-        }
+          self.clipStartTime = self.clipStartTime - 60;
           break;
+        }
+        default: {
+          break;
+        }
       }
-      // self.stopAndAdjustProcessHistoryVideo();
+      console.log(self.clipStartTime);
+      self.isPlaying = false;
+      self.initApp();
     },
+
     changeHistoryTime(newValue) {
       console.log('curTime');
       const self = this;
       self.showError = false;
       self.currentTimeValue = 0;
+      self.isPlaying = false;
       if (!self.channelInfo.id || !self.channelInfo.ivsId) {
         self.showError = true;
         self.errorText = self.$t('storeMonitor.lackParams');
@@ -1371,7 +1355,8 @@ export default {
       console.log('new:', newValue);
       console.log(self.curTime);
       self.startTs = newValue;
-      if (newValue == 0) {
+      self.clipStartTime = self.startTs;
+      if (newValue === 0) {
         if (self.playState) {
           self.stopPlay();
         }
@@ -1388,6 +1373,7 @@ export default {
       }
     }
   },
+
   computed: {
     graphBtnWidth: function() {
       return this.varyWindowHeight * 0.185;
@@ -1440,22 +1426,20 @@ export default {
       const self = this;
       self.showError = false;
       if (!self.isStoreMonitor) {
-        if (self.playState) { // 切换前处于播放状态
+        if (self.playState) {
           self.stopPlay();
           self.startPlay();
         } else {
           self.$nextTick(() => {
-            self.startPlay(); // 播放当前通道对应的视频(ivsId,channelId)
+            self.startPlay();
           });
         }
       }
     },
-    // 监听播放时间
     realTimeSpeed(val, oldVal) {
       const self = this;
       console.log(val);
       if (val >= 300) {
-        // 五分钟停止视频
         self.stopPlay();
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = null;
@@ -1465,6 +1449,7 @@ export default {
       }
     }
   },
+
   beforeDestroy() {
     const self = this;
     console.log(self.playState);
@@ -1476,6 +1461,7 @@ export default {
     window.removeEventListener('visibilitychange', self.visibleChange);
     self.visibleChange = null;
   },
+
   mounted() {
     const self = this;
     self.beseyeVideo = document.getElementById('beseyeVideo');
@@ -1513,14 +1499,13 @@ export default {
   }
 
   .errorVideo-model {
-    @include point(margin, 20);
     margin-bottom: 0;
     height: auto;
     position: relative;
     min-height: 420px;
     background-color: #232730;
     color: $red;
-    z-index: 100;
+    z-index: 10;
     span {
       position: absolute;
       top: 50%;
@@ -1644,7 +1629,7 @@ export default {
     #channelName {
       position: absolute;
       color: #fff;
-      z-index: 10;
+      z-index: 100;
       display: block;
       width: -webkit-calc(100% - 30px);
       width: -moz-calc(100% - 30px);
@@ -1667,7 +1652,7 @@ export default {
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
-      z-index: 10;
+      z-index: 100;
       background-color: rgba($color: #24293d, $alpha: 0.6);
       .iconlside {
         float: left;
@@ -1684,16 +1669,6 @@ export default {
           float: left;
         }
       }
-      // @media screen and(min-width:1366px){
-      //   .iconrside{
-      //     width: 40%;
-      //   }
-      // }
-      // @media screen and(min-width:1366px){
-      //   .iconrside{
-      //     width: 40%;
-      //   }
-      // }
       .footer-right {
         float: right;
       }
