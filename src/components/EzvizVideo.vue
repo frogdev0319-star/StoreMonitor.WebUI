@@ -1,25 +1,112 @@
 <template>
-  <div >
-    <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
-      <span>{{ errorMsg }}</span>
+  <div>
+    <div
+      v-loading="isLoading"
+      v-if="!fullWindow"
+      id="videoContent"
+      ref="videoContent"
+      :style="isEvent ? {}: {'margin-bottom': 0}"
+      class="video-content"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
+      @mouseleave="hiddenModel"
+      @mouseenter="showModel"
+      @mousemove="showModel">
+      <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.name }}</span>
+      <div v-if="showInfoContent || playBackState" class="icon-footer">
+        <div class="iconlside">
+          <i v-if="playState" class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
+          <i v-else class="iconfont icon-bofang1 iconplay" @click="realTime"/>
+        </div>
+        <div class="iconlside">
+          <i v-if="ifOpenSound" class="iconfont icon-auido icon-shengyin1" @click="closeSound"/>
+          <i v-else class="iconfont icon-auido icon-jingyin " @click="openSound"/>
+        </div>
+        <div class="footer-right">
+          <div v-if="playBackState" class="iconrside">
+            <div class="speed-content">
+              <span>{{ $t('remotePatrol.back') }}</span>
+              <el-select
+                :value="curBack"
+                :popper-class="popperClass"
+                :popper-append-to-body="false"
+                class="el-test"
+                size="mini"
+                placeholder="">
+                <el-option
+                  v-for="(item) in backList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                  @click.native="adjustProcess(item.value, item.label)"
+                />
+              </el-select>
+            </div>
+          </div>
+          <div class="iconrside">
+            <div class="speed-content">
+              <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+              <el-select
+                :value="proportion"
+                :popper-class="popperClass"
+                :popper-append-to-body="false"
+                class="el-test"
+                size="mini"
+                placeholder="">
+                <el-option
+                  v-for="(item,index) in proportionList"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.label"
+                  @click.native="checkPro(item.label)"
+                />
+              </el-select>
+            </div>
+          </div>
+          <div class="screen-content">
+            <i
+              :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
+              class="iconfont iconscreen"
+              @click="controlScreen"/>
+            <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
+          </div>
+        </div>
+      </div>
+      <div v-if="playBackState" class="progress-content">
+        <b-progress
+          id="bprogress"
+          :value="currentTimeValue"
+          :max="durationTimeValue"
+          class="mb-3 prog"
+          height="0.2rem"/>
+      </div>
+      <transition name="fade">
+        <div v-if="showModelContent && !isEvent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
+          <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+          <span>{{ $t('remotePatrol.snapshot') }}</span>
+        </div>
+      </transition>
+      <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
+        <span>{{ errorMsg }}</span>
+      </div>
+      <div v-else id="myPlayer" ref="myPlayer"/>
     </div>
-    <div v-else>
-      <div
-        v-loading="isLoading"
-        v-if="!fullWindow"
-        id="videoContent"
-        ref="videoContent"
-        :style="isEvent ? {}: {'margin-bottom': 0}"
-        class="video-content"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
-        @mouseleave="hiddenModel"
-        @mouseenter="showModel"
-        @mousemove="showModel">
-        <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.channelName }}</span>
-        <div v-if="showInfoContent || playBackState" class="icon-footer">
+    <!-- full screen -->
+    <div
+      v-loading="isLoading"
+      v-else
+      id="videoContent"
+      ref="videoContent"
+      class="video-content"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
+      @mouseleave="hiddenModel"
+      @mouseenter="showModel"
+      @mousemove="showModel">
+      <div class="video-model">
+        <span v-if="showInfoContent" id="channelName">{{ channelInfo.name }}</span>
+        <div v-if="showInfoContent" class="icon-footer">
           <div class="iconlside">
-            <i v-if="playState" class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
-            <i v-else class="iconfont icon-bofang1 iconplay" @click="realTime"/>
+            <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
+            <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
           </div>
           <div class="iconlside">
             <i v-if="ifOpenSound" class="iconfont icon-auido icon-shengyin1" @click="closeSound"/>
@@ -71,7 +158,6 @@
                 :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
                 class="iconfont iconscreen"
                 @click="controlScreen"/>
-              <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
             </div>
           </div>
         </div>
@@ -81,108 +167,22 @@
             :value="currentTimeValue"
             :max="durationTimeValue"
             class="mb-3 prog"
-            height="0.2rem"/>
+            height="0.2rem"
+            style="margin-bottom:0px !important;"/>
         </div>
-        <transition name="fade">
-          <div v-if="showModelContent && !isEvent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
-            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-            <span>{{ $t('remotePatrol.snapshot') }}</span>
-          </div>
-        </transition>
-        <div id="myPlayer" ref="myPlayer"/>
       </div>
-      <!-- full screen -->
-      <div
-        v-loading="isLoading"
-        v-else
-        id="videoContent"
-        ref="videoContent"
-        class="video-content"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
-        @mouseleave="hiddenModel"
-        @mouseenter="showModel"
-        @mousemove="showModel">
-        <div class="video-model">
-          <span v-if="showInfoContent" id="channelName">{{ channelInfo.channelName }}</span>
-          <div v-if="showInfoContent" class="icon-footer">
-            <div class="iconlside">
-              <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
-              <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
-            </div>
-            <div class="iconlside">
-              <i v-if="ifOpenSound" class="iconfont icon-auido icon-shengyin1" @click="closeSound"/>
-              <i v-else class="iconfont icon-auido icon-jingyin " @click="openSound"/>
-            </div>
-            <div class="footer-right">
-              <div v-if="playBackState" class="iconrside">
-                <div class="speed-content">
-                  <span>{{ $t('remotePatrol.back') }}</span>
-                  <el-select
-                    :value="curBack"
-                    :popper-class="popperClass"
-                    :popper-append-to-body="false"
-                    class="el-test"
-                    size="mini"
-                    placeholder="">
-                    <el-option
-                      v-for="(item) in backList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                      @click.native="adjustProcess(item.value, item.label)"
-                    />
-                  </el-select>
-                </div>
-              </div>
-              <div class="iconrside">
-                <div class="speed-content">
-                  <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
-                  <el-select
-                    :value="proportion"
-                    :popper-class="popperClass"
-                    :popper-append-to-body="false"
-                    class="el-test"
-                    size="mini"
-                    placeholder="">
-                    <el-option
-                      v-for="(item,index) in proportionList"
-                      :key="index"
-                      :label="item.label"
-                      :value="item.label"
-                      @click.native="checkPro(item.label)"
-                    />
-                  </el-select>
-                </div>
-              </div>
-              <div class="screen-content">
-                <i
-                  :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
-                  class="iconfont iconscreen"
-                  @click="controlScreen"/>
-              </div>
-            </div>
-          </div>
-          <div v-if="playBackState" class="progress-content">
-            <b-progress
-              id="bprogress"
-              :value="currentTimeValue"
-              :max="durationTimeValue"
-              class="mb-3 prog"
-              height="0.2rem"
-              style="margin-bottom:0px !important;"/>
-          </div>
-        </div>
 
-        <transition name="fade">
-          <div v-if="showModelContent && !isEvent" :class="lang === 'en' ? 'en-iconright' : 'iconright'" @click="cutPicture">
-            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-            <span>{{ $t('remotePatrol.snapshot') }}</span>
-          </div>
-        </transition>
-        <div id="fullPlayer" ref="myPlayer"/>
+      <transition name="fade">
+        <div v-if="showModelContent && !isEvent" :class="lang === 'en' ? 'en-iconright' : 'iconright'" @click="cutPicture">
+          <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+          <span>{{ $t('remotePatrol.snapshot') }}</span>
+        </div>
+      </transition>
+      <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
+        <span>{{ errorMsg }}</span>
       </div>
+      <div v-else id="fullPlayer" ref="myPlayer"/>
     </div>
-
     <el-dialog
       v-if="showCutDialog"
       :title="$t('remotePatrol.edit')"
@@ -1044,8 +1044,8 @@ export default {
       const self = this;
       self.fullWindow = true;
       var ele = document.getElementById('videoContent');
-      ele.style.width = '100%';
-      ele.style.height = '100%';
+      // ele.style.width = '100%';
+      // ele.style.height = '100%';
       const width = self.varyWindowWidth;
       const height = self.varyWindowHeight;
 
@@ -1067,8 +1067,14 @@ export default {
       self.fullWindow = false;
       var ele = document.getElementById('videoContent');
       var playerEle = self.$refs.myPlayer;
-      playerEle.style.width = self.initPlayerWidth + 'px';
-      playerEle.style.height = self.initPlayerHeight + 'px';
+      if (!self.showError) {
+        playerEle.style.width = self.initPlayerWidth + 'px';
+        playerEle.style.height = self.initPlayerHeight + 'px';
+      }else{
+        const errEle = self.$refs.errorModel;
+        errEle.style.width = '100%';
+        errEle.style.height = '100%';
+      }
       self.$nextTick(() => {
         ele.style.width = self.initPlayerWidth + 'px';
         ele.style.height = self.initPlayerHeight + 'px';
@@ -1215,17 +1221,22 @@ export default {
     async realTime() {
       const self = this;
       self.times = 0;
-      if (self.isStoreMonitor && !self.isLoaded) {
-        self.accessToken.length === 0 && await self.getEzvizAccessToken(self.channelInfo.ivsId);
-        self.checkIfEncry();
-        self.isLoaded = true;
-      } else {
-        if (self.fullWindow) {
-          self.initFullWindowVideo();
-        } else {
-          self.initVideo();
-        }
-      }
+      self.showError = false;
+      self.accessToken.length === 0 && await self.getEzvizAccessToken(self.channelInfo.ivsId);
+      self.checkIfEncry();
+      // if (self.isStoreMonitor && !self.isLoaded) {
+      //   self.accessToken.length === 0 && await self.getEzvizAccessToken(self.channelInfo.ivsId);
+      //   self.checkIfEncry();
+      //   self.isLoaded = true;
+      // } else {
+      //   if (self.fullWindow) {
+      //     self.$nextTick(() => {
+      //       self.initFullWindowVideo();
+      //     })
+      //   } else {
+      //     self.initVideo();
+      //   }
+      // }
     },
 
     initFullWindowVideo() {
@@ -1851,14 +1862,14 @@ export default {
     #{$poi}:checkRem($val);
   }
   .errorVideo-model{
-    margin: calc(25/1920*100vw);
     margin-bottom: 0;
-    height: auto;
+    height: 100%;
+    width: 100%;
     position: relative;
     min-height: 420px;
     background-color: #232730;
     color: $red;
-    z-index: 100;
+    z-index: 9;
     span{
       position: absolute;
       top: 50%;
