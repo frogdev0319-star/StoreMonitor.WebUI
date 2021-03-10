@@ -36,6 +36,7 @@
     "moment": "^2.24.0",
     "multirangeslider": "^0.6.0",
     "popper.js": "^1.14.7",
+    "pouchdb": "^7.2.2",
     "pubsub-js": "^1.7.0",
     "save": "^2.4.0",
     "video.js": "^7.3.0",
