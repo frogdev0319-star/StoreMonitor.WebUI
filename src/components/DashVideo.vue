@@ -109,7 +109,6 @@
         </div>
       </transition>
       <video
-        v-if="showVideo"
         id="dashVideo"
         :controls="showControls"
         :paused="paused"
@@ -580,7 +579,8 @@ export default {
       realType: true,
       lastTime: null,
       currentTime: null,
-      onEndflag: false
+      onEndflag: false,
+      editCount: 0
     };
   },
 
@@ -775,6 +775,7 @@ export default {
       } catch (e) {
         if (e.message !== 'Network request failed') {
           this.currentState = 'blank';
+          this.showError = true;
           this.errorText = e.message;
         }
       }
@@ -926,8 +927,10 @@ export default {
         if (DashHttp.getResult() != null) {
           error += DashHttp.getResult().ErrorCode;
         }
+        this.isLoading = false;
+        this.showError = true;
         this.currentState = 'blank';
-        this.paused = false;
+        this.paused = true;
         this.errorText = error;
         this.destroyVideo();
         return false;
@@ -1458,12 +1461,12 @@ export default {
   .errorVideo-model{
     margin: calc(25/1920*100vw);
     margin-bottom: 0;
-    height: auto;
+    height: 100%;
     position: relative;
     min-height: 420px;
     background-color: #232730;
     color: $red;
-    z-index: 100;
+    z-index: 9;
     span{
       position: absolute;
       top: 50%;
@@ -1471,6 +1474,10 @@ export default {
       font-size: 12px;
       transform: translate(-50%, -50%);
     }
+  }
+  .dash-video{
+    height: 100%;
+    width: 100%;
   }
   .event-error{
     @include point(margin-bottom,20);
