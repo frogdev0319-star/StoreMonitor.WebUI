@@ -196,7 +196,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.6.3 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.6.2 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
 
@@ -1559,9 +1559,6 @@ export default {
   .submenu-item{
     border-bottom: 1px solid #393b4c;
   }
-  /*.submenu-item:nth-child(n+4){*/
-    /*display: none;*/
-  /*}*/
   .el-menu .submenu-item:last-child{
     border-bottom: none;
   }

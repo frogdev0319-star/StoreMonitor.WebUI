@@ -12,15 +12,15 @@ Vue.use(Router);
  * all roles can be accessed
  */
 export const constantRoutes = [
-  {
-    path: '/login',
-    name: 'Login',
-    hidden: true,
-    component: LoginForm,
-    meta: {
-      requireAuth: false
-    }
-  },
+  // {
+  //   path: '/login',
+  //   name: 'Login',
+  //   hidden: true,
+  //   component: LoginForm,
+  //   meta: {
+  //     requireAuth: false
+  //   }
+  // },
   {
     path: '/',
     name: 'AuthRedirect',
@@ -31,7 +31,7 @@ export const constantRoutes = [
 
 const createRouter = () => new Router({
   mode: 'history', // require service support
-  // base: '/storemonitor_ui/',
+  base: '/storemonitor_ui/',
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 });
