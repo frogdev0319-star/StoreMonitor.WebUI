@@ -222,7 +222,7 @@
         </el-dialog>
       </el-col>
       <el-col :span="18" class="el-route-tabs">
-        <div class="loading_area"
+        <div class="loading_area self-loading"
              :element-loading-text="$t('insSettingView.loadingbindstore')"
              v-loading="isLoading">
         </div>

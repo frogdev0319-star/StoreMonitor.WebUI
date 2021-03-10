@@ -133,7 +133,7 @@
         v-loading="isLoading"
         v-if="reportList.length !== 0"
         :element-loading-text="$t('insSettingView.loadingbindstore')"
-        class="card-content">
+        class="card-content self-loading">
         <el-col v-if="reportList.length !== 0" :span="24" class="card-header">
           <el-radio
             v-for="(item,index) in sortTypeList"
@@ -261,7 +261,7 @@
         v-loading="isLoading"
         v-else
         :element-loading-text="$t('insSettingView.loadingbindstore')"
-        class="card-content">
+        class="card-content self-loading">
         <div class="empty-content">{{ noData }}</div>
       </el-row>
     </el-col>
