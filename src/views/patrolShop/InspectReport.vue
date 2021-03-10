@@ -2,36 +2,38 @@
   <div ref="printPDF" class="report-container">
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
-      <img :src="report.inspectSrc" class="title-icon">
-      <span class="report-title">{{ report.storeName+' '+report.tagName+' ('+report.inspectType+')' }}</span>
-      <div :style="isexportPDF ? 'margin-right : 40px;':''" class="info-content">
-        <span class="info-label">{{ $t('remotePatrol.submitter') }}</span>
-        <span class="info-value">{{ report.submitterName }}</span>
-        <span class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
-        <span class="info-value">{{ report.dateStr }}</span>
-        <div style="display:inline-block;">
-          <div class="no-print">
-            <div class="exportbtn" @click="handleDown">
-              <i class="iconfont icon-pdf export"/>
-              <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+      <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
+      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">{{ accountName + ' | ' + report.storeName+' '+report.tagName }}<span v-if="!isexportPDF">{{' ('+report.inspectType+')'}}</span></p>
+      <div class="info-content">
+        <div class="pdf_font_24">
+          <span class="info-label" v-if="!isexportPDF">{{ $t('remotePatrol.submitter') }}</span>
+          <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.submitterName }}</span>
+          <span class="info-label" v-if="!isexportPDF">{{ $t('remotePatrol.generateTime') }}</span>
+          <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
+          <div style="display:inline-block;">
+            <div class="no-print">
+              <div class="exportbtn" @click="handleDown">
+                <i class="iconfont icon-pdf export"/>
+                <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
     <div class="el-acticle">
-      <div v-if="suggest!=null&&suggest.length!=0" class="suggest">
+      <div v-if="suggest!=null&&suggest.length!=0" class="suggest" :style="isexportPDF ? 'max-height:300px;' : ''">
         <div class="suggest-content">
-          <span>{{ $t('remotePatrol.advice') }}</span>
-          <span v-html="turnSuggest(suggest)"/>
+            <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
+            <span v-html="turnSuggest(suggest)" class="pdf_font_20"/>
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="24" class="radior-content">
+        <el-col :span="24" class="radior-content" :style="isexportPDF ? 'height:600px;' : ''">
           <div class="header-score">
-            <span class="span-1">{{ $t('remotePatrol.getscore') }}：</span>
-            <span class="span-2">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span>
-            <span class="span-4">{{ $t('remotePatrol.scoreU') }}</span>
+            <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
+            <span class="span-2"><span class="pdf_font_26">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span></span>
+            <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
           </div>
           <v-chart ref="chartRadar" :options="options" :auto-resize="true" class="chart-content"/>
         </el-col>
@@ -39,30 +41,30 @@
       <el-row class="row-table">
         <el-col>
           <table v-for="(s_item,s_index) in tableData" :key="s_index" class="table table-bordered">
-            <thead>
+            <thead class="pdf_font_20">
               <tr v-if="s_item[0].type==0">
                 <th
                   v-for="(t_item ,t_index) in theaderPassFail"
                   :key="t_index"
-                  :style="t_item.width"
+                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
                   scope="col">{{ t_item.name }}</th>
               </tr>
               <tr v-if="s_item[0].type==1">
                 <th
                   v-for="(t_item ,t_index) in theaderScore"
                   :key="t_index"
-                  :style="t_item.width"
+                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
                   scope="col">{{ t_item.name }}</th>
               </tr>
               <tr v-if="s_item[0].type==2">
                 <th
                   v-for="(t_item ,t_index) in theaderOther"
                   :key="t_index"
-                  :style="t_item.width"
+                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
                   scope="col">{{ t_item.name }}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="pdf_font_20">
               <tr style="vertical-align:middle;">
                 <td :rowspan="s_item.length+1" style="vertical-align:middle;">
                   <span v-if="s_item[0].type==0">{{ $t('insSettingView.sheetpassfail') }}</span>
@@ -72,7 +74,7 @@
               </tr>
               <tr v-for="(item,index) in s_item" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
                 <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span>
-                  <span class="count-blag">{{ item.numOfTotalItems }}</span>
+                  <span class="count-blag"><span class="pdf_font_16">{{ item.numOfTotalItems }}</span></span>
                 </td>
                 <td v-if="item.type==0||item.type==2"><span>{{ item.numOfQualifiedItems }}</span></td>
                 <td v-if="item.type==0||item.type==2"><span>{{ item.numOfUnqualifiedItems }}</span></td>
@@ -92,34 +94,36 @@
           class="details-content">
           <div v-if="index < 3" class="details">
             <div class="item-header">
-              <i :class="item.iconSrc" class="iconfont icontemp"/>
-              <span class="title-lable">{{ item.itemTitleName }}</span>
+              <i :class="item.iconSrc" class="iconfont icontemp" :style="isexportPDF ? 'font-size:26px;' : ''"/>
+              <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
               <div class="count-content">
-                <span class="count">{{ item.itemCount }}</span>
-                <span class="blag">{{ $t('remotePatrol.unit') }}</span>
+                <span class="count"><span class="pdf_font_36">{{ item.itemCount }}</span></span>
+                <span class="blag"><span class="pdf_font_18">{{ $t('remotePatrol.unit') }}</span></span>
               </div>
             </div>
             <div class="item-content">
               <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                 <div v-for="_item in item.itemList" :key="_item.id" class="item-details">
-                  <div class="item-blag"/>
-                  <span class="item-name">{{ index !== 2 ?_item.name : _item.subject }}</span>
-                  <span class="item-des"/>
+                    <div class="item-blag"/>
+                    <span class="item-name"><span class="pdf_font_20">{{ index !== 2 ?_item.name : _item.subject }}</span></span>
+                    <span class="item-des"><span class="pdf_font_18"></span></span>
                 </div>
               </el-scrollbar>
               <span v-if="item.itemCount > 6 && isexportPDF" class="moreInfotip">
-                {{ $t('remotePatrol.more') }}
+                <span class="pdf_font_18">{{ $t('remotePatrol.more') }}</span>
               </span>
             </div>
           </div>
           <div v-else class="details">
             <div class="item-header">
-              <i :class="item.iconSrc" class="iconfont icontemp"/>
-              <span class="title-lable">{{ item.itemTitleName }}</span>
+              <i :class="item.iconSrc" class="iconfont icontemp" :style="isexportPDF ? 'font-size:26px;' : ''"/>
+              <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
             </div>
             <div class="item-content item-img">
               <div class="item-details" style="height:100%;">
-                <img :src="item.itemList">
+                <div class="pdf_font_20">
+                  <img :src="item.itemList">
+                </div>
               </div>
             </div>
           </div>
@@ -128,173 +132,175 @@
       <el-row class="row-detail">
         <el-col>
           <div class="item-header" @click=" isup ? isup = false : isup = true">
-            <i v-if="isup" class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"/>
-            <i v-if="!isup" class="iconfont icon-zhankai1 icontemp" style="color:#7d8cad;"/>
-            <span class="title-lable">{{ $t('remotePatrol.detailInfo') }}</span>
+            <i v-if="isup" class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"  :style="isexportPDF ? 'font-size:22px;' : ''"/>
+            <i v-if="!isup" class="iconfont icon-zhankai1 icontemp" style="color:#7d8cad;"  :style="isexportPDF ? 'font-size:22px;' : ''"/>
+            <span class="title-lable"><span class="pdf_font_20">{{ $t('remotePatrol.detailInfo') }}</span></span>
           </div>
           <div v-show="isup" class="item-content">
-            <div v-for="(item,index) in groups" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
-              <div class="content-title">{{ item.groupName }}</div>
-              <div v-for="(_item,_index) in item.items" :key="_index" class="content-detail">
-                <div class="content-detail-title">
-                  <div class="detail-title">
-                    <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
-                    <p class="title2">{{ _item.description }}</p>
-                  </div>
-                  <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                  <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn">
-                    {{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}
-                  </div>
-                  <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn">
-                    {{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}
-                  </div>
-                  <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" class="title-btn">
-                    {{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}
-                  </div>
-                </div>
-                <div
-                  v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
-                  class="content-detail-main"
-                  style="padding-bottom: 20px;">
-                  <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                  <div v-if="_item.showAudio" class="cdm-voice">
-                    <div class="speech-info" @click="startSpeechItem(_item,_index)">
-                      <i class="iconfont icon-yuyin icon-speech"/>
+            <div class="pdf_font_20">
+              <div v-for="(item,index) in groups" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
+                <div class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
+                <div v-for="(_item,_index) in item.items" :key="_index" class="content-detail">
+                  <div class="content-detail-title">
+                    <div class="detail-title">
+                      <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
+                      <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
                     </div>
-                    <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-                      <source :src="_item.audio.audioSrc" type="audio/mpeg" >
-                    </audio>
-                    <span class="often-text">{{ _item.audio.audioOftenText }}</span>
+                    <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn" :style="isexportPDF ? 'width:110px;' : 'width:50px;'"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
+                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn-failed" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                      <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}</span>
+                    </div>
+                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn-pass" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                      <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}</span>
+                    </div>
+                    <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                      <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
+                    </div>
                   </div>
-                  <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
-                    <span>{{ _item.comment }}</span>
-                  </div>
-                  <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
-                    <div
-                      v-for="(sourceitem,sourceindex) in _item.sourceList"
-                      :key="sourceindex"
-                      :height="imgHeight+'px'"
-                      class="source-details">
-                      <div v-if="sourceitem.mediaType === 2" class="img-content">
-                        <img
-                          :title="imgTitle"
-                          :style="isexportPDF ? 'width:130px;' : 'width: calc(130/1920*100vw);'"
-                          :src="sourceitem.url"
-                          :height="imgHeight+'px'"
-                          :onerror="deafultImg"
-                          class="imgLittle imgInner"
-                          @click="openOuter(sourceitem,$event)">
+                  <div
+                    v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
+                    class="content-detail-main"
+                    style="padding-bottom: 20px;">
+                    <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
+                    <div v-if="_item.showAudio" class="cdm-voice">
+                      <div class="speech-info" @click="startSpeechItem(_item,_index)">
+                        <i class="iconfont icon-yuyin icon-speech"/>
                       </div>
+                      <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
+                        <source :src="_item.audio.audioSrc" type="audio/mpeg" >
+                      </audio>
+                      <span class="often-text">{{ _item.audio.audioOftenText }}</span>
+                    </div>
+                    <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
+                      <span class="pdf_font_24">{{ _item.comment }}</span>
+                    </div>
+                    <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
                       <div
-                        v-if="sourceitem.mediaType==1"
-                        class="img-content "
-                        @click="playCommentVideo(sourceitem,sourceindex)">
-                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                        <img
-                          :style="isexportPDF ? 'width:130px;':'width: calc(130/1920*100vw);'"
-                          :src="videoImgSrc"
-                          :height="imgHeight+'px'"
-                          class="imgLittle">
+                        v-for="(sourceitem,sourceindex) in _item.sourceList"
+                        :key="sourceindex"
+                        :height="imgHeight+'px'"
+                        class="source-details">
+                        <div v-if="sourceitem.mediaType === 2" class="img-content">
+                          <img
+                            :title="imgTitle"
+                            :style="isexportPDF ? 'width:150px;height:100px;' : 'width: calc(130/1920*100vw);'"
+                            :src="sourceitem.url"
+                            :height="imgHeight+'px'"
+                            :onerror="deafultImg"
+                            class="imgLittle imgInner"
+                            @click="openOuter(sourceitem,$event)">
+                        </div>
+                        <div
+                          v-if="sourceitem.mediaType==1"
+                          class="img-content "
+                          @click="playCommentVideo(sourceitem,sourceindex)">
+                          <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                          <img
+                            :style="isexportPDF ? 'width:150px;height:100px;':'width: calc(130/1920*100vw);'"
+                            :src="videoImgSrc"
+                            :height="imgHeight+'px'"
+                            class="imgLittle">
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div v-if="showFeedBacks" style="margin-bottom:20px;">
-              <div class="content-title">{{ $t('remotePatrol.feedbacks') }}</div>
-              <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
-                <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
-                  <div class="detail-title">
-                    <p class="title1">{{ index+1 }}.{{ item.subject }}</p>
-                  </div>
-                </div>
-                <div
-                  v-if="item.showAttachment || item.description != null&&item.description !== ''"
-                  class="content-detail-main">
-                  <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
-                  <div v-if="item.showAudio" class="cdm-voice">
-                    <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
-                      <i class="iconfont icon-yuyin icon-speech"/>
+              <div v-if="showFeedBacks" style="margin-bottom:20px;">
+                <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.feedbacks') }}</span></div>
+                <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
+                  <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
+                    <div class="detail-title">
+                      <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }}</span></p>
                     </div>
-                    <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                      <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                    </audio>
-                    <span class="often-text">{{ item.audio.audioOftenText }}</span>
                   </div>
-                  <div v-if="item.description !=null && item.description !=''" class="cdm-word">
-                    <span>{{ item.description }}</span>
-                  </div>
-                  <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
-                    <div
-                      v-for="(sourceitem,index) in item.sourceList"
-                      :key="index"
-                      :height="imgHeight+'px'"
-                      class="source-details">
-                      <div v-if="sourceitem.mediaType === 2" class="img-content">
-                        <img
-                          :title="imgTitle"
-                          :style="isexportPDF ? 'width:130px;' : 'width: calc(130/1920*100vw);'"
-                          :src="sourceitem.url"
-                          :height="imgHeight+'px'"
-                          :onerror="deafultImg"
-                          class="imgLittle imgInner"
-                          @click="openOuter(sourceitem,$event)">
+                  <div
+                    v-if="item.showAttachment || item.description != null&&item.description !== ''"
+                    class="content-detail-main">
+                    <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
+                    <div v-if="item.showAudio" class="cdm-voice">
+                      <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
+                        <i class="iconfont icon-yuyin icon-speech"/>
                       </div>
+                      <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
+                        <source :src="item.audio.audioSrc" type="audio/mpeg" >
+                      </audio>
+                      <span class="often-text">{{ item.audio.audioOftenText }}</span>
+                    </div>
+                    <div v-if="item.description !=null && item.description !=''" class="cdm-word">
+                      <span class="pdf_font_24">{{ item.description }}</span>
+                    </div>
+                    <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
                       <div
-                        v-if="sourceitem.mediaType === 1"
-                        class="img-content "
-                        @click="playCommentVideo(sourceitem,index)">
-                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                        <img
-                          :style="isexportPDF?'width:130px;':'width: calc(130/1920*100vw);'"
-                          :src="videoImgSrc"
-                          :height="imgHeight+'px'"
-                          class="imgLittle">
+                        v-for="(sourceitem,index) in item.sourceList"
+                        :key="index"
+                        :height="imgHeight+'px'"
+                        class="source-details">
+                        <div v-if="sourceitem.mediaType === 2" class="img-content">
+                          <img
+                            :title="imgTitle"
+                            :style="isexportPDF ? 'width:150px;height:100px;' : 'width: calc(130/1920*100vw);'"
+                            :src="sourceitem.url"
+                            :height="imgHeight+'px'"
+                            :onerror="deafultImg"
+                            class="imgLittle imgInner"
+                            @click="openOuter(sourceitem,$event)">
+                        </div>
+                        <div
+                          v-if="sourceitem.mediaType === 1"
+                          class="img-content "
+                          @click="playCommentVideo(sourceitem,index)">
+                          <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                          <img
+                            :style="isexportPDF?'width:150px;height:100px;':'width: calc(130/1920*100vw);'"
+                            :src="videoImgSrc"
+                            :height="imgHeight+'px'"
+                            class="imgLittle">
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <el-dialog
-              v-if="dialogCommentVideo"
-              :title="$t('eventView.view')"
-              :visible.sync="dialogCommentVideo"
-              :close-on-click-modal="false"
-              width="850px"
-              top="12%"
-              class="rate-video-dialog"
-              @close="stopCommentVideo">
-              <div class="video-dialog-content" style="overflow:hidden;">
-                <hr class="dialog-hr">
-                <div class="video-content" >
-                  <video
-                    id="previewVideo"
-                    height="83%"
-                    width="90%"
-                    prload
-                    controls
-                    class="video-js vjs-fill"/>
-                </div>
-              </div>
-            </el-dialog>
-            <transition name="fade">
               <el-dialog
-                v-if="showOuter"
+                v-if="dialogCommentVideo"
                 :title="$t('eventView.view')"
-                :visible.sync="showOuter"
+                :visible.sync="dialogCommentVideo"
                 :close-on-click-modal="false"
                 width="850px"
-                top="12%">
-                <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
+                top="12%"
+                class="rate-video-dialog"
+                @close="stopCommentVideo">
+                <div class="video-dialog-content" style="overflow:hidden;">
                   <hr class="dialog-hr">
-                  <div class="dialog-source-content">
-                    <img v-if="showImg" :src="checkImgSrc">
+                  <div class="video-content" >
+                    <video
+                      id="previewVideo"
+                      height="83%"
+                      width="90%"
+                      prload
+                      controls
+                      class="video-js vjs-fill"/>
                   </div>
                 </div>
               </el-dialog>
-            </transition>
+              <transition name="fade">
+                <el-dialog
+                  v-if="showOuter"
+                  :title="$t('eventView.view')"
+                  :visible.sync="showOuter"
+                  :close-on-click-modal="false"
+                  width="850px"
+                  top="12%">
+                  <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
+                    <hr class="dialog-hr">
+                    <div class="dialog-source-content">
+                      <img v-if="showImg" :src="checkImgSrc">
+                    </div>
+                  </div>
+                </el-dialog>
+              </transition>
+            </div>
           </div>
         </el-col>
       </el-row>
@@ -327,6 +333,7 @@ export default {
 
   data() {
     return {
+      accountName:'',
       reportId: 0,
       downloadProgress: false,
       hasAttachment: 0,
@@ -384,26 +391,26 @@ export default {
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
       theaderPassFail: [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;' }
+        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;'},
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:20%;',pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:20%;',pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;',pdfWidth: 'width:15%;' }
       ],
       theaderScore: [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;',pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;',pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;',pdfWidth: 'width:15%;' }
       ],
       theaderOther: [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;' }
+        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;',pdfWidth: 'width:11.5%;' }
       ]
     };
   },
@@ -430,12 +437,13 @@ export default {
   },
 
   mounted() {
+    this.accountName = sessionStorage.getItem('accountName');
     this.getReportInfo();
     this.getReportDetail();
   },
 
   beforeDestroy() {
-    self.$refs.chartRadar && self.$refs.chartRadar.dispose();
+    this.$refs.chartRadar && this.$refs.chartRadar.dispose();
   },
 
   methods: {
@@ -458,6 +466,7 @@ export default {
               }
             }, timer * 10);
             console.log('timer', timer);
+            document.getElementById('isNeedRemove').remove();
             self.isexportPDF = false;
           });
           window.clearInterval(timer);
@@ -557,6 +566,7 @@ export default {
         const temp = [];
         const feedtemp = [];
         // let gradetotal = []
+        data.groups.sort((a, b) => {return a.groupType - b.groupType; });
         data.groups.forEach((groupitem, groupindex) => {
           const obj = {
             items: []
@@ -570,6 +580,7 @@ export default {
             details.comment = item.comment;
             details.description = item.description;
             details.grade = item.grade;
+            details.qualifiedScore = item.qualifiedScore;
             if (item.attachment.length !== 0) {
               const _temp = [];
               const audioObj = {};
@@ -829,8 +840,8 @@ export default {
         obj.name = item.groupName;
         obj.max = Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems) === 0
           ? 1 : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
-        tempIndicator.push(obj);
-        seriesValue.push(item.numOfQualifiedItems);
+        tempIndicator.unshift(obj);
+        seriesValue.unshift(item.numOfQualifiedItems);
       });
       const temp = [];
       const obj = { value: seriesValue };
@@ -870,15 +881,6 @@ export default {
                 borderRadius: 3,
                 padding: [3, 5]
               },
-              formatter: (params) => {
-                let str = '';
-                if (params.length > 10) {
-                  str = params.substr(0, 10) + '...';
-                } else {
-                  str = params;
-                }
-                return str;
-              }
             },
             splitArea: {
               show: false
@@ -923,7 +925,12 @@ export default {
             trigger: 'item'
           }
         }
-        ]
+        ],
+        tooltip: {
+          position: function (point, params, dom, rect, size) {
+              return [point[0], '10%'];
+          }
+        }
       };
       return radarChartOption;
     },
@@ -958,8 +965,13 @@ export default {
   .cdm-voice{ page-break-inside:avoid;}
   .cdm-word{ page-break-inside:avoid;}
   .cdm-pic{ page-break-inside:avoid;}
-  .thPrintfont{font-size: 10px;}
-  .tdPrintfont{font-size: 8px;}
+  .pdf_font_16{font-size: 20px;}
+  .pdf_font_18{font-size: 26px;}
+  .pdf_font_20{font-size: 28px;}
+  .pdf_font_24{font-size: 26px;}
+  .pdf_font_26{font-size: 30px;}
+  .pdf_font_36{font-size: 40px;}
+  .title2_pdf{color:#182752;line-height:45px;}
   }
   $red: #f31d65;
   $black: #182752;
@@ -1008,9 +1020,32 @@ export default {
       line-height: 80px;
       padding-left: calc(30 / 1920 * 100vw);
       position: relative;
+      .pdf-title-icon{
+        width:46px;
+        height:54px;
+        vertical-align: middle;
+      }
+      .title-icon{
+        width:26px;
+        height:34px;
+      }
+      .pdf-report-title{
+        font-size: 30px;
+        font-weight: bold;
+        margin:0;
+        vertical-align: middle;
+        display: inline-block;
+        margin-left: 20px;
+        width:900px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .report-title {
         font-size: calc(20 / 1920 * 100vw);
         font-weight: bold;
+        margin:0;
+        display: inline-block;
         margin-left: calc(20 / 1920 * 100vw);
       }
       .info-content {
@@ -1018,12 +1053,12 @@ export default {
         right: calc(110 / 1920 * 100vw);
         top: 0;
         font-size: calc(12 / 1920 * 100vw);
+        color: $tab;
         .info-label {
           margin-left: calc(40 / 1920 * 100vw);
-          color: $tab;
         }
-        .info-value {
-          color: $tab;
+        .pdf-info-value{
+          margin-right: 40px;
         }
         .exportbtn{
           display: inline-block;
@@ -1055,8 +1090,6 @@ export default {
         margin-top: 20px;
         font-size: calc(14 / 1920 * 100vw);
         font-weight: bold;
-        height: calc(20 / 1920 * 100vw);
-        line-height: 20px;
         background-color: $suggestBack;
         color: $qualified;
         padding-left: calc(30 / 1920 * 100vw);
@@ -1068,8 +1101,7 @@ export default {
           display: flex;
         }
         span:first-child {
-          width:100px;
-          padding-right: calc(20 / 1920 * 100vw);
+          padding-right: 20px;
         }
         span:last-child{
           flex:1;
@@ -1104,7 +1136,8 @@ export default {
               }
           }
           .chart-content {
-            width: 100%;
+            width: 1000px;
+            margin:0 auto;
             height: 100%;
           }
           /*@media screen and (min-width: 1280px) and(max-width: 1440px) {*/
@@ -1171,8 +1204,8 @@ export default {
       }
       .row-table{
         margin-top: calc(10 / 1920 * 100vw);
+        font-size: calc(14/1920*100vw);
         .table-bordered{
-                font-size: calc(14/1920*100vw);
                 margin-top: 20px;
                 th{
                     color: $tab;
@@ -1208,7 +1241,7 @@ export default {
                     padding:3px 6px;
                     text-align: center;
                     color: #fff;
-                    font-size: calc(12/1920*100vw);
+                    font-size: 12px;
                     font-weight: normal;
                 }
             }
@@ -1363,10 +1396,19 @@ export default {
                 border-radius: 5px;
                 margin-right: calc(25 / 1920 * 100vw);
               }
-              .title-btn{
-                width:100px;
+              .title-btn-failed{
                 height:25px;
                 background-color: #fcba3f;
+                font-size:12px;
+                color:#ffffff;
+                font-weight: bold;
+                line-height: 25px;
+                text-align: center;
+                border-radius: 20px;
+              }
+              .title-btn-pass{
+                height:25px;
+                background-color: #2AC25D;
                 font-size:12px;
                 color:#ffffff;
                 font-weight: bold;

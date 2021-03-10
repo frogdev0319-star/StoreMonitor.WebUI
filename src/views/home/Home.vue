@@ -196,7 +196,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.7.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.6.3 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
 
@@ -706,6 +706,8 @@ export default {
             self.accountId = item.accountId;
             const accountId = item.accountId.toLowerCase();
             localStorage.setItem('oss_bucket', accountId);
+            const idIndex = self.brandList.map(item => item.accountId).indexOf(self.accountId);
+            idIndex !== '-1' ? sessionStorage.setItem('accountName', self.brandList[idIndex].name) : null;
             self.roleId = item.roleId;
           }
         });
@@ -962,13 +964,13 @@ export default {
       bottom:0px;
       background-color: #f4f5f9;
       .drawer-bg{
-        background: #000;
-        opacity: .3;
+        background: #fff;
+        opacity: 0;
         width: 100%;
         top: 0;
         height: 100%;
         position: fixed;
-        z-index: 999;
+        z-index: 1;
       }
       .aside-menu{
         height: calc(100vh - 80px);
@@ -978,6 +980,7 @@ export default {
         text-align: left;
         padding: 30px 40px 30px calc(50/1920*100vw);
         border-bottom: 1px solid $border;
+        border-top: 1px solid #393b4c;
         .brand-label{
           display: block;
           color: #a0a4ad;

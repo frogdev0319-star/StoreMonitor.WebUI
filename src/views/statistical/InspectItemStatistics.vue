@@ -2,7 +2,10 @@
   <div>
     <div class="item-container">
       <el-col :span="24">
-        <search-component :is-inspect-item = "true" @emitSearch = "emitSearch"/>
+        <search-component :is-inspect-item = "true" @emitSearch = "emitSearch"
+                          ref="inspectItemSearch"
+                          path="inspectItemStatistics" :defaultSort="defaultSort"
+                          @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
       <el-col :span="24" class="items-content content">
         <el-col :span="24" class="contents-container">
@@ -48,7 +51,7 @@
 
             </el-col>
             <el-col :span="12" class="evalution-pct">
-              <div class="radar-title">
+              <div class="title radar-title">
                 {{ curType === 0? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite') }}
               </div>
               <div class="inspect-catergy">
@@ -88,7 +91,7 @@
               :highlight-current-row= "true"
               :pagesize="sizeNum"
               :current-page="page"
-              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+              :default-sort = "defaultSort"
               @handleChange="handlePageAndSizeChange"
               @sortChange="handleSortChange"/>
           </el-col>
@@ -159,7 +162,7 @@
               </div>
             </el-col>
             <el-col :span="12" class="evalution-pct">
-              <div class="radar-title">
+              <div class="title radar-title">
                 {{ curType === 0 ? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite') }}
               </div>
               <div class="inspect-catergy">
@@ -329,7 +332,9 @@ export default {
       order: {
         direction: 'asc',
         property: 'qualifiedRate'
-      }
+      },
+      defaultSort: {prop: 'qualifiedRateStr', order: 'ascending'},
+      ifSaveParams: false
     };
   },
 
@@ -791,15 +796,25 @@ export default {
       this.storePatrolLists = storePatrolLists;
       this.storeNameStr = storeNameStr;
       this.storeTagStr = storeTagStr;
+      const searchParamsObj = {
+        path: 'inspectItemStatistics',
+        params: this.params
+      };
+      this.ifSaveParams && this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
       this.searchData();
     },
 
     handlePageAndSizeChange(pageObj) {
-      console.log(pageObj);
       const self = this;
       self.page = pageObj.page;
-      self.sizeNum = pageObj.size
+      self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      const searchParamsObj = {
+        path: 'inspectItemStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
       self.getInspectItemsTable();
     },
 
@@ -809,8 +824,21 @@ export default {
         page: this.page - 1,
         size: this.sizeNum
       };
+      const searchParamsObj = {
+        path: 'inspectItemStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
       this.getInspectItemsTable();
-    }
+    },
+
+    setDefaultSortAndPage(paramsObj){
+      console.log(paramsObj)
+      this.defaultSort = paramsObj.defaultSort;
+      this.order = this.params.order = paramsObj.order;
+      this.sizeNum = paramsObj.filter.size;
+      this.page = paramsObj.filter.page + 1;
+    },
   }
 };
 </script>
@@ -1018,14 +1046,9 @@ export default {
             line-height: 222px;
           }
           .radar-title {
-            text-align: left;
-            font-size: calc(14 / 1920 * 100vw);
-            color: $tab;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-top: 20px;
-            margin-left: calc(30/1920*100vw);
           }
           .inspect-catergy {
             border-left: 1px solid $border;
@@ -1139,37 +1162,6 @@ export default {
                   color: $tab;
                   font-size: calc(14 / 1920 * 100vw);
                 }
-              }
-            }
-            .item-radar {
-              height: 100%;
-              padding-left: calc(15 / 1920 * 100vw);
-              padding-top: calc(15 / 1920 * 100vw);
-              position: relative;
-
-              .rader-panel {
-                width: 100%;
-                height: 100%;
-                .radar-title {
-                  text-align: left;
-                  font-size: calc(14 / 1920 * 100vw);
-                  color: $tab;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                }
-                .radar-content {
-                  width: 100%;
-                  height: calc(100% - 25 / 1920 * 100vw);
-                }
-              }
-              .radar-empty {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: calc(14 / 1920 * 100vw);
-                color: $tab;
               }
             }
 

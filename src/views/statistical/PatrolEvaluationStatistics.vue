@@ -2,7 +2,10 @@
   <div>
     <el-row class="statistics-container">
       <el-col :span="24">
-        <search-component :is-patrol = "true" @emitSearch = "emitSearch" @exportPdf = "exportPdf"/>
+        <search-component :is-patrol = "true" @emitSearch = "emitSearch"
+                          @exportPdf = "exportPdf" ref="inspectEvalutionSearch"
+                          path="inspectEvalutionStatistics" :defaultSort="defaultSort"
+                          @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
       <div class="statistics-content content">
         <el-col :span="24" class="region-chart">
@@ -82,7 +85,7 @@
               :highlight-current-row= "true"
               :pagesize="sizeNumRegion"
               :current-page="pageRegion"
-              :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
+              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
               @handleChange="handleRegionPageAndSizeChange"
               @sortChange="handleRegionSortChange"/>
           </div>
@@ -118,7 +121,7 @@
                 :highlight-current-row= "true"
                 :pagesize="sizeNumStore"
                 :current-page="pageStore"
-                :default-sort = "{prop: 'qualifiedRatePer', order: 'ascending'}"
+                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
                 @handleChange="handleStorePageAndSizeChange"
                 @sortChange="handleStoreSortChange"/>
             </div>
@@ -151,6 +154,10 @@
         <p>
           <span>{{ $t('remotePatrol.selectStoreTag') }}：</span>
           <span class="content-header">{{ storeTagStr }}</span>
+        </p>
+        <p>
+          <span>{{ $t('overview.patrolLists') }}：</span>
+          <span class="content-header">{{ storePatrolLists }}</span>
         </p>
         <p>
           <span>{{ $t('remotePatrol.time') }}：</span>
@@ -243,6 +250,7 @@
             <div class="el-table-panel">
               <table-pagination
                 ref="elTP"
+                :isexportPDF="isexportPDF"
                 :column-data="storeInfoData"
                 :table-data="storePDFData"
                 :highlight-current-row= "true"
@@ -288,6 +296,7 @@ export default {
       isexportPDF: false,
       storeNameStr: '',
       storeTagStr: '',
+      storePatrolLists: '',
       curRegion: [],
       timeMode: 1,
       regionsList: [],
@@ -375,7 +384,7 @@ export default {
           'maxWidth': '160'
         },
         {
-          'prop': 'qualifiedRatePer',
+          'prop': 'qualifiedRateStr',
           'label': this.$t('overview.passRate'),
           'sortable': 'custom',
           'pdfwidth': '16%',
@@ -400,20 +409,42 @@ export default {
       sizeNumRegion: 10,
       storeInfoData: [
         {
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'pdfwidth': '15%',
+          'width': '150',
+          'maxWidth': '150'
+        },
+        {
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'pdfwidth': '15%',
+          'width': '150',
+          'maxWidth': '150'
+        },
+        {
           'prop': 'region',
           'label': this.$t('overview.storeName'),
           'sortable': false,
-          'pdfwidth': '22%',
-          'pdfmaxWidth': '22%',
-          'width': '284',
-          'maxWidth': '284'
+          'pdfwidth': '15%',
+          'width': '150',
+          'maxWidth': '150'
+        },
+        {
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
+          'sortable': false,
+          'pdfwidth': '15%',
+          'width': '120',
+          'maxWidth': '120'
         },
         {
           'prop': 'cycleOfInspect',
           'label': this.$t('overview.advPatrolCycle'),
           'sortable': 'custom',
-          'pdfwidth': '12%',
-          'pdfmaxWidth': '14%',
+          'pdfwidth': '16%',
           'width': '160',
           'maxWidth': '190'
         },
@@ -421,55 +452,49 @@ export default {
           'prop': 'numOfReport',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
-          'pdfwidth': '12%',
-          'pdfmaxWidth': '12%',
-          'width': '160',
-          'maxWidth': '160'
+          'pdfwidth': '14%',
+          'width': '150',
+          'maxWidth': '150'
         },
         {
           'prop': 'numOfQualified',
           'label': this.$t('overview.echartGood'),
           'sortable': 'custom',
           'pdfwidth': '12%',
-          'pdfmaxWidth': '12%',
-          'width': '160',
-          'maxWidth': '160'
+          'width': '100',
+          'maxWidth': '100'
         },
         {
           'prop': 'numOfImproved',
           'label': this.$t('overview.improve'),
           'sortable': 'custom',
           'pdfwidth': '12%',
-          'pdfmaxWidth': '12%',
-          'width': '160',
-          'maxWidth': '160'
+          'width': '110',
+          'maxWidth': '110'
         },
         {
           'prop': 'numOfDangerous',
           'label': this.$t('overview.danger'),
           'sortable': 'custom',
           'pdfwidth': '12%',
-          'pdfmaxWidth': '12%',
-          'width': '160',
-          'maxWidth': '160'
+          'width': '130',
+          'maxWidth': '130'
         },
         {
-          'prop': 'qualifiedRatePer',
+          'prop': 'qualifiedRateStr',
           'label': this.$t('overview.passRate'),
           'sortable': 'custom',
-          'pdfwidth': '16%',
-          'pdfmaxWidth': '14%',
-          'width': '219',
-          'maxWidth': '180'
+          'pdfwidth': '12%',
+          'width': '140',
+          'maxWidth': '140'
         },
         {
           'prop': 'averageScore',
           'label': this.$t('overview.averageScore'),
           'sortable': 'custom',
-          'pdfwidth': '16%',
-          'pdfmaxWidth': '14%',
-          'width': '217',
-          'maxWidth': '180'
+          'pdfwidth': '12%',
+          'width': '110',
+          'maxWidth': '110'
         }
       ],
       storeTableData: [],
@@ -480,7 +505,10 @@ export default {
       curRegionArray: [],
       exportDataHeader:
       [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
+        this.$t('remotePatrol.code'),
         this.$t('overview.advPatrolCycle'),
         this.$t('overview.numOfEvaluations'),
         this.$t('overview.echartGood'),
@@ -516,7 +544,9 @@ export default {
       storeOrder: { 'direction': 'asc', 'property': 'qualifiedRate' },
       fontFamily: 'Roboto, Microsoft YaHei',
       ispdf: false,
-      regionMode: 2
+      regionMode: 2,
+      ifSaveParams: false,
+      defaultSort: {prop: 'qualifiedRateStr', order: 'ascending'}
     };
   },
 
@@ -555,12 +585,13 @@ export default {
           params.order = self.regionOrder;
           params.regionMode = self.regionMode;
           params.storeIds = self.params.storeIds;
+          params.inspectTagId = self.params.inspectId;
           const regionResult = await self.getInspectStatsOverviewWithRegion(params);
           if (regionResult.errCode === 0) {
             const result = regionResult.data;
             if (result) {
               result.content.forEach(item => {
-                item.qualifiedRatePer = item.qualifiedRate + '%';
+                item.qualifiedRateStr = item.qualifiedRate + '%';
               });
               self.regionPDFData = result.content;
             }
@@ -573,6 +604,7 @@ export default {
           storeparams.endTs = self.params.endTs;
           storeparams.regionMode = 3;
           storeparams.storeIds = self.params.storeIds;
+          storeparams.inspectTagId = self.params.inspectId;
           storeparams.filter = {
             'page': 0,
             'size': storesize
@@ -584,7 +616,7 @@ export default {
             const result = storeResult.data;
             if (result) {
               result.content.forEach(item => {
-                item.qualifiedRatePer = item.qualifiedRate + '%';
+                item.qualifiedRateStr = item.qualifiedRate + '%';
               });
               self.storePDFData = result.content;
             }
@@ -634,7 +666,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportRegionHeader;
         const filterVal = ['region', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
-          'numOfDangerous', 'qualifiedRatePer', 'averageScore'];
+          'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
         const self = this;
         const size = self.totalRegion;
         const params = {};
@@ -643,14 +675,15 @@ export default {
         params.filter = { 'page': 0, 'size': size };
         params.order = self.regionOrder;
         params.storeIds = self.params.storeIds;
-        params.regionMode = 3;
+        params.regionMode = self.regionMode;
+        params.inspectTagId = self.params.inspectId;
         const regionResult = await that.getInspectStatsOverviewWithRegion(params);
         let curData = [];
         if (regionResult.errCode === 0) {
           const result = regionResult.data;
           if (result) {
             result.content.forEach(item => {
-              item.qualifiedRatePer = item.qualifiedRate + '%';
+              item.qualifiedRateStr = item.qualifiedRate + '%';
             });
             curData = result.content;
           }
@@ -674,8 +707,8 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportDataHeader;
-        const filterVal = ['region', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
-          'numOfDangerous', 'qualifiedRatePer', 'averageScore'];
+        const filterVal = ['province', 'city', 'region', 'code', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
+          'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
         const self = this;
         const size = self.totalStore;
         const params = {};
@@ -683,6 +716,7 @@ export default {
         params.endTs = self.params.endTs;
         params.regionMode = 3;
         params.storeIds = self.params.storeIds;
+        params.inspectTagId = self.params.inspectId;
         params.filter = {
           'page': 0,
           'size': size
@@ -695,13 +729,14 @@ export default {
           const result = storeResult.data;
           if (result) {
             result.content.forEach(item => {
-              item.qualifiedRatePer = item.qualifiedRate + '%';
+              item.qualifiedRateStr = item.qualifiedRate + '%';
             });
             curData = result.content;
           }
         }
         const data = that.formatJson(filterVal, curData);
-        const fileName = 'Store' + '-' + util.getCurDateStr();
+        const name = self.params.inspectId==='' ? 'Store' : self.storePatrolLists;
+        const fileName = name + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -739,13 +774,15 @@ export default {
       params.endTs = self.params.endTs;
       params.region = this.regionMode;
       params.timeMode = self.timeMode;
+      params.inspectId = self.params.inspectId;
       try {
         const regionResult = await self.getInspectResultOverRegion(params);
         const option = self.getInspectLineOption();
         if (regionResult.errCode === 0) {
           const result = regionResult.data;
           let sortedProviceOrCity = [];
-          sortedProviceOrCity = this.regionMode === 1 ? JSON.parse(JSON.stringify(self.curRegionI)) : JSON.parse(JSON.stringify(self.curRegionII));
+          sortedProviceOrCity = this.regionMode === 1 ? JSON.parse(JSON.stringify(self.curRegionI))
+            : JSON.parse(JSON.stringify(self.curRegionII));
           const filterResult = self.jsonArrayHasSpecifiedValue(sortedProviceOrCity, result);
           self.regionDataList = filterResult;
           const regionArray = [];
@@ -764,7 +801,7 @@ export default {
 
           const regionData1 = [];
           const regionData2 = [];
-          filterTwoResult.forEach((item, index) => {
+          filterTwoResult.forEach((item) => {
             const filterRegions = item.regions;
             filterRegions.forEach((_item, _index) => {
               let sumOfReports = 0;
@@ -773,7 +810,7 @@ export default {
               let percentRegion = 0;
               sunOfExcellent += _item.numOfExcellent;
               sumOfQualified += _item.numOfQualified;
-              sumOfReports += +_item.numOfQualified + _item.numOfDangerous;
+              sumOfReports += _item.numOfExcellent + _item.numOfQualified + _item.numOfImproved + _item.numOfDangerous;
               if (sumOfReports === 0) {
                 percentRegion = 0;
               } else {
@@ -982,13 +1019,14 @@ export default {
       params.endTs = self.params.endTs;
       params.regionMode = self.regionMode;
       params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
         if (result) {
           self.totalRegion = result.totalElements;
           result.content.forEach(item => {
-            item.qualifiedRatePer = item.qualifiedRate + '%';
+            item.qualifiedRateStr = item.qualifiedRate + '%';
           });
           self.regionTableData = result.content;
         }
@@ -1009,12 +1047,13 @@ export default {
       params.order = self.regionOrder;
       params.regionMode = self.regionMode;
       params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
         if (result) {
           result.content.forEach(item => {
-            item.qualifiedRatePer = item.qualifiedRate + '%';
+            item.qualifiedRateStr = item.qualifiedRate + '%';
           });
           self.regionTableData = result.content;
         }
@@ -1034,13 +1073,14 @@ export default {
       params.storeIds = self.params.storeIds;
       params.filter = self.storeFilter;
       params.order = self.storeOrder;
+      params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
         if (result) {
           self.totalStore = result.totalElements;
           result.content.forEach(item => {
-            item.qualifiedRatePer = item.qualifiedRate + '%';
+            item.qualifiedRateStr = item.qualifiedRate + '%';
           });
           self.storeTableData = result.content;
         }
@@ -1064,6 +1104,7 @@ export default {
       params.regionMode = self.regionMode;
 
       params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: self.totalRegion };
         const storeResult = await self.getInspectStatsOverviewWithRegion(params);
@@ -1173,7 +1214,7 @@ export default {
           let percentRegion = 0;
           sunOfExcellent += _item.numOfExcellent;
           sumOfQualified += _item.numOfQualified;
-          sumOfReports += _item.numOfQualified + _item.numOfDangerous;
+          sumOfReports += _item.numOfExcellent + _item.numOfQualified + _item.numOfImproved + _item.numOfDangerous;
           if (sumOfReports === 0) {
             percentRegion = 0;
           } else {
@@ -1203,31 +1244,41 @@ export default {
       this.$refs.storeChart && this.$refs.storeChart.resize();
     },
 
-    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode) {
-      console.log(searchParams);
-      console.log(dateRangeList);
+    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
       this.params = searchParams;
-      console.log(this.params);
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
       this.regionMode = regionMode;
+      this.timeMode = timeMode;
+      this.storePatrolLists = storePatrolLists;
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.ifSaveParams && this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
       this.searchData();
     },
 
     exportPdf(storeNameStr, storeTagStr) {
+      this.isexportPDF = true;
       this.storeNameStr = storeNameStr;
       this.storeTagStr = storeTagStr;
       this.handleExportReport();
     },
 
     handleRegionPageAndSizeChange(pageObj) {
-      console.log(pageObj);
       const self = this;
       self.pageRegion = pageObj.page;
       self.sizeNumRegion = pageObj.size;
       self.regionFilter = { page: self.pageRegion - 1, size: self.sizeNumRegion };
       self.getInspectStatsOverviewOfRegionTable();
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleRegionSortChange(order) {
@@ -1237,6 +1288,11 @@ export default {
         size: this.sizeNumRegion
       };
       this.getInspectStatsOverviewOfRegionTable();
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStorePageAndSizeChange(pageObj) {
@@ -1244,6 +1300,11 @@ export default {
       this.pageStore = pageObj.page;
       this.storeFilter = { page: this.pageStore - 1, size: this.sizeNumStore };
       this.getInspectStatsOverviewOfStore();
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStoreSortChange(order) {
@@ -1253,7 +1314,20 @@ export default {
         size: this.sizeNumStore
       };
       this.getInspectStatsOverviewOfStore();
-    }
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+    },
+
+    setDefaultSortAndPage(paramsObj){
+      console.log(paramsObj)
+      this.defaultSort = paramsObj.defaultSort;
+      this.order = this.params.order = paramsObj.order;
+      this.sizeNum = paramsObj.filter.size;
+      this.page = paramsObj.filter.page + 1;
+    },
   }
 };
 </script>

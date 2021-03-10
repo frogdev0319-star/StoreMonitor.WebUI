@@ -303,30 +303,38 @@
             </el-col>
             <el-col :span="24">
               <div class="el-bind-content">
-                <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-                  <div v-if="storeList.length !== 0" class="el-all-checkbox">
-                    <el-checkbox v-model="allData" :disabled="allDisabled" @change="choiceAll"/>
-                    <span class="all-device-title">{{ $t('scheduleView.bindAllStore') }}</span>
+                <div v-if="storeList.length === 0">
+                  <div v-if="Havestore === 0|| resultHavestore && Havestore !== 0" class="bind-empty">
+                    <img :src="loadingGif">
+                    <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
                   </div>
-                  <div v-for="(item,index) in storeList" :key="index" class="device-group">
-                    <div class="device-all-checkbox">
-                      <div style="display: block">
-                        <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"/>
-                        <span class="group-name">{{ item.cityName }}</span>
+                </div>
+                <div v-if="storeList.length !== 0">
+                  <el-scrollbar id="el-menuscrollbar" style="height:100%;">
+                    <div class="el-all-checkbox">
+                      <el-checkbox v-model="allData" :disabled="allDisabled" @change="choiceAll"/>
+                      <span class="all-device-title">{{ $t('scheduleView.bindAllStore') }}</span>
+                    </div>
+                    <div v-for="(item,index) in storeList" :key="index" class="device-group">
+                      <div class="device-all-checkbox">
+                        <div style="display: block">
+                          <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="choiceAllGroup(item)"/>
+                          <span class="group-name">{{ item.cityName }}</span>
+                        </div>
+                      </div>
+                      <div class="device-content" >
+                        <div v-for="(_item,_index) in item.itemData" :key="_index" class="device-detail">
+                          <el-checkbox
+                            v-model="_item.checked"
+                            :disabled="_item.disabled"
+                            style="margin-right: 20px"
+                            @change="choiceAllDevice(index,item,_index,_item)"/>
+                          <span :style="{'color': _item.disabled ? '#7d8cad':''}" class="device-name">{{ _item.name }}</span>
+                        </div>
                       </div>
                     </div>
-                    <div class="device-content" >
-                      <div v-for="(_item,_index) in item.itemData" :key="_index" class="device-detail">
-                        <el-checkbox
-                          v-model="_item.checked"
-                          :disabled="_item.disabled"
-                          style="margin-right: 20px"
-                          @change="choiceAllDevice(index,item,_index,_item)"/>
-                        <span :style="{'color': _item.disabled ? '#7d8cad':''}" class="device-name">{{ _item.name }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </el-scrollbar>
+                  </el-scrollbar>
+                </div>
               </div>
               <div class="enable-content">
                 <span>{{ $t('scheduleView.enable') }}</span>
@@ -422,6 +430,9 @@ export default {
   },
   data() {
     return {
+      Havestore: 0,
+      resultHavestore: false,
+      loadingGif: require('../../../../static/img/loading.gif'),
       varyWindowHeight: window.innerHeight,
       varyWindowWidth: window.innerWidth,
       isActive: '',
@@ -1237,6 +1248,7 @@ export default {
       let self = this;
       let scheId = self.paneList[Number(self.activeName)].schId;
       self.showBindDialog = false;
+      self.$emit('paneList', self.paneList.length);
       let isAdd = false;
       if (scheId === 0) {
         isAdd = true;
@@ -1353,6 +1365,7 @@ export default {
 
     async searchStore() {
       let self = this;
+      self.storeList = [];
       let mode = self.paneList[Number(self.activeName)].mode;
       if (mode === 2) {
         self.monthList = self.bigMonthList.slice(0, 28);
@@ -1370,6 +1383,13 @@ export default {
       };
       let resData = await self.getStoreData(params);
       let data = resData.content;
+      if (data.length > 0) {
+        self.resultHavestore = true;
+        self.Havestore++;
+      } else {
+        self.resultHavestore = false;
+        self.Havestore++;
+      }
       self.getStoreByCity(data);
 
       let count = 0;
@@ -1525,6 +1545,7 @@ export default {
               paneArr.push(item);
             }
           });
+          self.$emit('paneList', paneArr.length);
           if (paneArr.length !== 0) {
             paneArr.forEach(_item => {
               let tempScheduleData = {};
@@ -1668,13 +1689,15 @@ export default {
           return new Promise((resolve, reject) => {
             getScheduleBindList(params).then(res => {
               let errMsg = res.errMsg;
-              let data = res.data;
-              data.forEach(_item => {
-                if (self.hasBoundStoreIds.indexOf(_item) === -1) {
-                  self.hasBoundStoreIds.push(_item);
-                }
-              });
-              resolve(data);
+              if(res.errCode===0){
+                let data = res.data;
+                data.forEach(_item => {
+                  if (self.hasBoundStoreIds.indexOf(_item) === -1) {
+                    self.hasBoundStoreIds.push(_item);
+                  }
+                });
+                resolve(data);
+              }
             }).catch(err => {
               console.log("PatrolSchedule-getHasBoundStroeIds: " + err);
               reject(err)
@@ -1813,14 +1836,18 @@ export default {
     initData() {
       let self = this;
       self.paneList.splice(Number(self.activeName), 1);
-      self.activeName = '0';
-      self.scheduleId = self.paneList[0].schId;
-      self.curType = (self.paneList[0].mode).toString();
-      self.scheduleId = self.paneList[0].schId;
-      self.enable = self.paneList[0].enable;
-      self.notifyTime = self.paneList[0].notifyTime;
-      self.getHasBoundStroeIds();
-      self.searchStore();
+      if(self.paneList.length!==0){
+        self.activeName = '0';
+        self.scheduleId = self.paneList[0].schId;
+        self.curType = (self.paneList[0].mode).toString();
+        self.enable = self.paneList[0].enable;
+        self.notifyTime = self.paneList[0].notifyTime;
+        self.getHasBoundStroeIds();
+        self.searchStore();
+      }else{
+        self.$emit('paneList', self.paneList.length);
+        self.getScheduleList(self.isActivePatrol,self.isActive);
+      }
     },
 
     formatMonthDay(array) {
@@ -2103,6 +2130,15 @@ export default {
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;
         color: $black;
+        .bind-empty{
+          height: calc(415/1920*100vw);
+          line-height: calc(415/1920*100vw);
+            text-align: center;
+            .empty-text{
+                font-size: calc(14/1920*100vw);
+                color:#7d8cad;
+            }
+        }
         .el-all-checkbox {
           margin: 20px auto 20px calc(25/1920*100vw);
           float: left;

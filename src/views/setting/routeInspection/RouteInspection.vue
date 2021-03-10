@@ -222,13 +222,24 @@
         </el-dialog>
       </el-col>
       <el-col :span="18" class="el-route-tabs">
-        <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick">
-          <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label" :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false" >
-            <el-tabs v-if="item.data.length !== 0" id="patrltabs-content" v-model="patrolActive" :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
+        <div class="loading_area self-loading"
+             :element-loading-text="$t('insSettingView.loadingbindstore')"
+             v-loading="isLoading">
+        </div>
+        <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick" :style="{'min-height':varyWindowWidth - 250 +'px'}">
+          <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label"
+                       :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false"
+                       v-loading="isLoading"
+                       :element-loading-text="$t('insSettingView.loadingbindstore')">
+            <el-tabs v-if="item.data.length !== 0 && !isLoading" id="patrltabs-content" v-model="patrolActive"
+                     :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
                 <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{ _item.name }}</span>
                 <div v-if="_item.routeData&&!loading">
-                  <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name" :down-src="downLoadSrc" :all-routedata="_item.allRoutedata" :sheet-name="_item.sheetName" :tab-name="_item.name" @refreshList="getTagList" @change-routeData="changerouteData"/>
+                  <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name"
+                                :down-src="downLoadSrc" :all-routedata="_item.allRoutedata"
+                                :sheet-name="_item.sheetName" :tab-name="_item.name" @refreshList="getTagList"
+                                @change-routeData="changerouteData"/>
                 </div>
                 <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
                   <img :src="loadingGif">
@@ -236,7 +247,7 @@
                 </div>
               </el-tab-pane>
             </el-tabs>
-            <div v-else :style="{'min-height':varyWindowWidth*0.52+'px'}" class="data-empty">
+            <div v-if="item.data.length === 0 && !isLoading" :style="{'min-height':varyWindowWidth*0.52+'px'}" class="data-empty">
               <i class="iconfont icon-wenjian" style="font-size:100px;color:#E0E5F4"/>
               <p class="empty-title">
                 {{ $t('insSettingView.please') }}
@@ -245,7 +256,8 @@
                 <span @click="showNameImport = true">{{ $t('insSettingView.thenImport') }}</span>
                 {{ $t('insSettingView.waveline') }}
               </p>
-              <input id="uploadFile" ref="loadFile" type="file" style="display: none" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
+              <input id="uploadFile" ref="loadFile" type="file" style="display: none"
+                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
             </div>
           </el-tab-pane>
         </el-tabs>
@@ -272,7 +284,7 @@ export default {
   },
   data() {
     return {
-      elTableData: [{ label: '远程巡检', data: [] }, { label: '现场巡检', data: [] }],
+      elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
       loadingGif: require('../../../../static/img/loading.gif'),
       radioList: [
         {
@@ -351,10 +363,10 @@ export default {
       allData: [],
       tagList: ['远程巡检', '现场巡检'],
       curData: [],
-      loading: null,
       fileName: this.$t('insSettingView.patrolExample'),
       lang: this.$i18n.locale,
-      taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')]
+      taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')],
+      isLoading: true
     };
   },
 
@@ -369,6 +381,7 @@ export default {
       if (val !== 0) {
         sessionStorage.removeItem('TabPatrolIndex0');
         sessionStorage.removeItem('TabPatrolIndex1');
+        self.activeName = '0';
         self.getTagList('accountChanged');
       }
     }
@@ -397,6 +410,7 @@ export default {
       self.$store.dispatch('setInspectHistory', null);
       sessionStorage.removeItem('TabPatrolIndex0');
       sessionStorage.removeItem('TabPatrolIndex1');
+      sessionStorage.removeItem('TabIndex');
       next();
     }
   },
@@ -407,6 +421,16 @@ export default {
     if (InspectHistory != null) {
       self.activeName = InspectHistory.activeName;
       self.patrolActive = InspectHistory.patrolActive;
+    }else{
+      const tabIndex = sessionStorage.getItem('TabIndex');
+      if(tabIndex !== null){
+        self.activeName = tabIndex;
+        if(self.activeName === '0'){
+          self.patrolActive = sessionStorage.getItem('TabPatrolIndex0');
+        }else if(self.activeName === '1'){
+          self.patrolActive = sessionStorage.getItem('TabPatrolIndex1');
+        }
+      }
     }
     self.getTagList();
     self.initData();
@@ -431,9 +455,9 @@ export default {
 
     getLang(index) {
       if (index === 0) {
-        return this.$t('insSettingView.remotePatrol');
-      } else if (index === 1) {
         return this.$t('insSettingView.onsitePatrol');
+      } else if (index === 1) {
+        return this.$t('insSettingView.remotePatrol');
       } else {
         return '';
       }
@@ -442,8 +466,8 @@ export default {
     initData() {
       const self = this;
       switch (Number(self.activeName)) {
-        case 0: self.checkValue = '远程巡检'; break;
-        case 1: self.checkValue = '现场巡检'; break;
+        case 0: self.checkValue = '现场巡检'; break;
+        case 1: self.checkValue = '远程巡检'; break;
         default:self.checkValue = '新增巡检表'; break;
       }
     },
@@ -484,7 +508,7 @@ export default {
     getTagAll() {
       const self = this;
       const params = {
-        mode: parseInt(self.activeName)
+        mode: parseInt(self.activeName) === 0 ? 1 : 0
       };
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectTagList(params).then(res => {
@@ -546,6 +570,11 @@ export default {
           tagIndex = TagData.length - 1;
         } else {
           tagIndex = Number(self.patrolActive);
+        }
+        if (self.activeName === '0') {
+          sessionStorage.setItem('TabPatrolIndex0', tagIndex);
+        } else if (self.activeName === '1') {
+          sessionStorage.setItem('TabPatrolIndex1', tagIndex);
         }
         const params = {
           inspectId: TagData[tagIndex].id
@@ -656,9 +685,9 @@ export default {
           const tagObj = {};
           let label = '';
           if (tag_item.mode == 0) {
-            label = '远程巡检';
-          } else if (tag_item.mode == 1) {
             label = '现场巡检';
+          } else if (tag_item.mode == 1) {
+            label = '远程巡检';
           }
           tagObj.label = label;
           tagObj.name = tag_item.name;
@@ -689,9 +718,10 @@ export default {
           // self.notify(self.$t('insSettingView.importSuss'), 'success', 3000);
           self.showImportSucceed = true;
         }
-      } else {
+      }
+      else {
         self.getDownLoadURL();
-        self.elTableData = [{ label: '远程巡检', data: [] }, { label: '现场巡检', data: [] }];
+        self.elTableData = [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }];
       }
       self.getBindStoreList();
     },
@@ -758,7 +788,7 @@ export default {
 
     async addAllData(dataArry) {
       const self = this;
-      let mode = self.activeName == '0' ? mode = 0 : mode = 1; // remote mode 0,onsite  mode 1
+      let mode = self.activeName == '0' ? mode = 1 : mode = 0; // remote mode 0,onsite  mode 1
       const arr = Object.entries(dataArry);
       const tempGroups = [];
       const tempItems = [];
@@ -944,12 +974,13 @@ export default {
 
     handleClick(tabObj) {
       const self = this;
+      self.isLoading = true;
       sessionStorage.setItem('TabIndex', tabObj.index);
       switch (tabObj.index) {
         case '0':
-          self.checkValue = '远程巡检'; break;
-        case '1':
           self.checkValue = '现场巡检'; break;
+        case '1':
+          self.checkValue = '远程巡检'; break;
         default:
           self.checkValue = '新增巡检表'; break;
       }
@@ -1006,7 +1037,7 @@ export default {
     toSetRules() {
       const self = this;
       const activeInpect = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)];
-      const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name,mode: Number(self.activeName)};
+      const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name,mode: Number(self.activeName) === 0 ? 1 : 0};
       sessionStorage.setItem('ruleData', JSON.stringify(params));
       self.$router.push({ name: 'setRule', params: params });
     },
@@ -1094,10 +1125,10 @@ export default {
       const isGlobalWebsite = Environment.isGlobalWebsite;
       if (isGlobalWebsite) {
         const Datalength = self.elTableData[Number(self.activeName)].data.length;
-        if (Number(self.activeName) === 0 && Datalength >= 10) {
+        if (Number(self.activeName) === 1 && Datalength >= 10) {
           self.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
           return false;
-        } else if (Number(self.activeName) === 1 && Datalength >= 10) {
+        } else if (Number(self.activeName) === 0 && Datalength >= 10) {
           self.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
           return false;
         } else {
@@ -1132,9 +1163,11 @@ export default {
             self.btnList[1].enabled = false;
             self.btnList[3].enabled = false;
           }
+          self.isLoading = false;
         });
       } else {
         self.storeNum = 0;
+        self.isLoading = false;
       }
     },
 
@@ -1201,10 +1234,10 @@ export default {
             sheet1 = XLSX.utils.sheet_to_json(wb.Sheets['Pass&Fail']);
             sheet1.forEach((_item, _index) => {
               const obj = {};
-              obj.a = _item.__EMPTY!==undefined ? _item.__EMPTY.trim() : _item.__EMPTY;
-              obj.b = _item.__EMPTY_1!==undefined ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
+              obj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
+              obj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
               obj.c = _item.__EMPTY_2;
-              obj.d = _item.__EMPTY_3!==undefined ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
+              obj.d = _item.__EMPTY_3!==undefined && typeof _item.__EMPTY_3 !== 'number' ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
               temp_sheet1.push(obj);
             });
             outdata.PassFail = temp_sheet1;
@@ -1214,12 +1247,12 @@ export default {
             sheet2 = XLSX.utils.sheet_to_json(wb.Sheets['Score']);
             sheet2.forEach((_item, _index) => {
               const obj = {};
-              obj.a = _item.__EMPTY!==undefined ? _item.__EMPTY.trim() : _item.__EMPTY;
-              obj.b = _item.__EMPTY_1!==undefined ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
+              obj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
+              obj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
               obj.c = _item.__EMPTY_2;
               obj.d = _item.__EMPTY_3;
-              obj.e = _item.__EMPTY_4!==undefined ? _item.__EMPTY_4.trim() : _item.__EMPTY_4;
-              obj.f = _item.__EMPTY_5!==undefined ? _item.__EMPTY_5.trim() : _item.__EMPTY_5;
+              obj.e = _item.__EMPTY_4!==undefined && typeof _item.__EMPTY_4!=='number' ? _item.__EMPTY_4.trim() : _item.__EMPTY_4;
+              obj.f = _item.__EMPTY_5!==undefined && typeof _item.__EMPTY_5 !== 'number' ? _item.__EMPTY_5.trim() : _item.__EMPTY_5;
               temp_sheet2.push(obj);
             });
             outdata.Score = temp_sheet2;
@@ -1229,10 +1262,10 @@ export default {
             sheet3 = XLSX.utils.sheet_to_json(wb.Sheets['Others']);
             sheet3.forEach((_item, _index) => {
               const obj = {};
-              obj.a = _item.__EMPTY!==undefined ? _item.__EMPTY.trim() : _item.__EMPTY;
-              obj.b = _item.__EMPTY_1!==undefined ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
+              obj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
+              obj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
               obj.c = _item.__EMPTY_2;
-              obj.d = _item.__EMPTY_3!==undefined ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
+              obj.d = _item.__EMPTY_3!==undefined && typeof _item.__EMPTY_3 !== 'number' ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
               temp_sheet3.push(obj);
             });
             outdata.Others = temp_sheet3;
@@ -1583,11 +1616,11 @@ export default {
         let label = '';
         switch (Number(that.activeName)) {
           case 0: {
-            label = `[${that.$t('insSettingView.remotePatrol')}]`;
+            label = `[${that.$t('insSettingView.onsitePatrol')}]`;
             break;
           }
           case 1: {
-            label = `[${that.$t('insSettingView.onsitePatrol')}]`;
+            label = `[${that.$t('insSettingView.remotePatrol')}]`;
             break;
           }
           default: {
@@ -1734,7 +1767,6 @@ export default {
             .el-route-tabs{
                 width: 98%;
                 margin-left: calc(15/1920*100vw);
-
                 .bind-empty{
                     text-align: center;
                     img{
@@ -1913,6 +1945,13 @@ export default {
 
     .nameinput /deep/ .el-input__inner{
         border:0;
+    }
+    .loading_area /deep/ .el-loading-spinner{
+      height: calc(100vh - 180px);
+    }
+    .loading_area /deep/ .el-loading-text{
+      height: calc(100vh - 180px);
+      line-height:calc(100vh - 180px);
     }
     #en-patrltabs-content /deep/ .el-tabs__nav-scroll {
       height: 40px;

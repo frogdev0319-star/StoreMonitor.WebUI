@@ -129,7 +129,7 @@
             </span>
           </div>
           <div class="right-select">
-            <el-select v-model="ModelPost" size="mini" class="el-province" @change="initData">
+            <el-select v-model="ModelPost" size="mini" class="el-province" @change="changeRole">
               <el-option
                 v-for="item in titleList"
                 :key="item.value"
@@ -274,10 +274,11 @@ import {
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
 import { mapGetters } from 'vuex';
+import SearchConditionUtil from '../../common/SearchConditionUtil.js';
 import resize from '@/components/mixins/echartResize';
 
 export default {
-  name: 'ExceptEvent',
+  name: 'PatrolOverview',
 
   components: {
     'v-chart': ECharts
@@ -402,23 +403,16 @@ export default {
         self.timeMode = 1;
         self.isEnSpan = false;
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-        self.params.beginTs = start;
-        self.params.endTs = end;
         self.currentIndex = 0;
+        self.getSearchParams();
         self.initData();
       }
     }
   },
 
   created() {
-    const self = this;
-    const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-    const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-    self.params.beginTs = start;
-    self.params.endTs = end;
-    self.initData();
+    this.getSearchParams();
+    this.initData();
   },
 
   beforeDestroy() {
@@ -429,6 +423,16 @@ export default {
   },
 
   methods: {
+    changeRole(){
+      this.params.roleId = this.ModelPost;
+      this.saveSearchParams();
+      this.getStoreNumAndCycle();
+      this.getBestAndWorstStores();
+      this.getInspectItems();
+      this.getInspectTaskRanking();
+      this.getPassRateAndCycle();
+      this.getRegionInspectResult();
+    },
     changBestAndWorst() {
       const self = this;
       self.isWorstArea = !self.isWorstArea;
@@ -751,6 +755,7 @@ export default {
       self.params.beginTs = start;
       self.params.endTs = end;
       self.params.roleId = self.ModelPost;
+      self.saveSearchParams();
       self.initData();
     },
 
@@ -1716,6 +1721,30 @@ export default {
       this.$refs.itemsPie && this.$refs.itemsPie.resize();
       this.$refs.itemsRadar && this.$refs.itemsRadar.resize();
       this.$refs.cycleChart && this.$refs.cycleChart.resize();
+    },
+
+    saveSearchParams(){
+      const searchConditon = {
+        path: 'patrolOverview',
+        params: this.params
+      }
+      SearchConditionUtil.saveSearchCondition(searchConditon)
+    },
+
+    getSearchParams(){
+      const searchParams = SearchConditionUtil.getSearchCondition('patrolOverview');
+      if(Object.keys(searchParams).length > 0){
+        this.dateValue[0] = new Date(searchParams.beginTs);
+        this.dateValue[1] = new Date(searchParams.endTs);
+        this.params.beginTs = searchParams.beginTs;
+        this.params.endTs = searchParams.endTs;
+        this.params.roleId = this.ModelPost = searchParams.roleId;
+      }else{
+        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
+        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+        this.params.beginTs = start;
+        this.params.endTs = end;
+      }
     }
 
   }

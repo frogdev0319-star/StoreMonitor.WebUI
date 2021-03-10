@@ -2413,6 +2413,6 @@ export default {
     height: 100%;
   }
   #videoContent .el-loading-mask{
-    z-index: 900
+    z-index: 900;
   }
 </style>

@@ -161,6 +161,7 @@ import { isLoginIn } from '@/api/login';
 import PubSub from 'pubsub-js';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 
 export default {
   name: 'StoreManage',
@@ -230,14 +231,17 @@ export default {
       showPopoVer: true,
       lang: this.$i18n.locale,
       noData: '',
-      storeStr: ''
+      storeStr: '',
+      ifGetParamsFromCash: false,
+      ifSaveParams: false
     };
   },
 
   watch: {
     accountChanged(val) {
       const self = this;
-      if (val !==0) {
+      if (val !== 0) {
+        this.ifSaveParams = false;
         self.getInitData();
       }
     }
@@ -265,6 +269,7 @@ export default {
       this.tableHeight = 770 + 'px';
       this.sizeNum = 20;
     }
+    self.getSearchParams();
     self.getCountryStore();
     self.getTagListData();
   },
@@ -290,14 +295,12 @@ export default {
 
     changeStoreTag(val) {
       const self = this;
-      const temp = [];
       self.curStoreTag = val;
       self.changeStore(self.curStore);
     },
 
     changeCountry(val) {
       const self = this;
-      const temp = [];
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
@@ -532,7 +535,7 @@ export default {
           self.CountryList[0].label = self.$t('remotePatrol.country');
           self.CountryList[0].countryList = countryList;
           self.CountryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-          self.curCountry = countryList[0].value;
+          self.curCountry = this.ifGetParamsFromCash ? self.curCountry : countryList[0].value;
           self.selectAllProAndCity(self.curCountry);
         }
       }
@@ -585,20 +588,22 @@ export default {
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
-      self.curProvince = provinceArr;
+      self.curProvince = self.ifGetParamsFromCash ? self.curProvince : provinceArr;
 
       let cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
-      self.curCity = cityArr;
+      self.curCity = self.ifGetParamsFromCash ? self.curCity : cityArr;
       self.storeDataList = tempStore;
       let storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      self.curStore = storeArr;
-      self.changeStore(self.curStore);
+      setTimeout(()=>{
+        self.curStore = self.ifGetParamsFromCash ? self.curStore : storeArr;
+        self.changeStore(self.curStore);
+      },100)
     },
 
     clearPage() {
@@ -614,6 +619,7 @@ export default {
     getInitData() {
       let self = this;
       self.clearPage();
+      self.getSearchParams();
       self.getCountryStore();
       self.getTagListData();
       self.params.filter = {
@@ -625,8 +631,10 @@ export default {
 
     async getStoreList(params) {
       let self = this;
+      this.ifSaveParams && this.saveSearchParams(params);
       try {
         await self.getTableData(params);
+        this.ifSaveParams = true;
         let paramsGetBind = {
           'storeIds': self.tableData.map(x => x.storeId)
         };
@@ -648,7 +656,7 @@ export default {
           })
         }
       }
-      catch (e) {
+      catch (err) {
         console.log("StoreManagement-getStoreList: " + err);
       }
     },
@@ -794,6 +802,41 @@ export default {
         type: type,
         duration: time
       });
+    },
+
+    saveSearchParams(params) {
+      const tempsearchParamsObj = {};
+      tempsearchParamsObj.searchCondition = params;
+      tempsearchParamsObj.curCountry = this.curCountry;
+      tempsearchParamsObj.curProvince = this.curProvince;
+      tempsearchParamsObj.curCity = this.curCity;
+      tempsearchParamsObj.curStore = this.curStore;
+      tempsearchParamsObj.curStoreTag = this.curStoreTag;
+      tempsearchParamsObj.timeMode = this.timeMode;
+      const searchParamsObj = {
+        path: 'storeMgmt',
+        params: tempsearchParamsObj
+      };
+      SearchConditionUtil.saveSearchCondition(searchParamsObj);
+    },
+
+    getSearchParams() {
+      const searchParams = SearchConditionUtil.getSearchCondition('storeMgmt');
+      if (Object.keys(searchParams).length > 0) {
+        this.curStore = searchParams.storeIds;
+        this.timeMode = searchParams.timeMode;
+        this.curCountry = searchParams.curCountry;
+        this.curProvince = searchParams.curProvince;
+        this.curCity = searchParams.curCity;
+        this.curStore = searchParams.curStore;
+        this.curStoreTag = searchParams.curStoreTag;
+        // this.setDefaultSort();
+        this.ifGetParamsFromCash = true;
+      } else {
+        const storeIds = this.filterStoreIds;
+        this.params.clause = { storeId: storeIds };
+        this.ifGetParamsFromCash = false;
+      }
     }
   },
 

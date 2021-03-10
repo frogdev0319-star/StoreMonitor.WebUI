@@ -13,7 +13,7 @@ const _Environments = {
   },
   Stable: {
     CHINA_WEBSITE: 'http://mgmt.storevue.com.cn:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://mgmt.storevue.com/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://mgmt.storevue.com/storemonitor/api/',
     VERSION: version
   },
   QA: {
@@ -23,7 +23,7 @@ const _Environments = {
   }
 };
 
-  const environJSON = _Environments.QA;
+const environJSON = _Environments.QA;
 const isGlobalWebsite = false;
 
 let Environment;

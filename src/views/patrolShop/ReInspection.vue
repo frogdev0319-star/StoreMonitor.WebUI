@@ -492,6 +492,9 @@ export default {
       showPen: false,
       showStoreUp: false,
       showAddTextFeedbackDialog: false,
+      showFeedDialog1: false,
+      showFeedDialog2: false,
+      showFeedDialog3: false,
       arrows1Src: require('../../../static/img/arrows_left.png'),
       arrows2Src: require('../../../static/img/arrows_right.png'),
       plusSrc: require('../../../static/img/add_icon.png'),
@@ -736,6 +739,7 @@ export default {
         console.log('confirm');
         if (to.name !== 'confirmSum') {
           //   from.meta.keepAlive=false;
+          self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
         } else {
@@ -1861,9 +1865,9 @@ export default {
     leaveDialog() {
       const self = this;
       self.leaveObj.dialogCosed = false;
-      if (self.videoPlatform === 0) {
+      if (self.vendor === 0) {
         self.editCount = 0;
-      } else if(self.videoPlatform === 1) {
+      } else if(self.vendor === 1) {
         self.$refs.ezvizVideo.editCount = 0;
       } else{
         self.$refs.beseyeVideo.editCount = 0;
@@ -2390,7 +2394,7 @@ export default {
       // }
       if ((self.vendor === 0 && self.editCount != 0) ||
         (self.vendor === 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0) ||
-        (self.videoPlatform === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !== 0) ||
+        (self.vendor === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !== 0) ||
         (self.$store.getters.PatrolHistory != null)) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
@@ -2410,7 +2414,7 @@ export default {
         }
       }else{
         !self.showGuide ? self.$refs.beseyeVideo.editCount = 0 : '';
-        if(self.videoPlatform === 2 &&self.$refs.beseyeVideo != undefined){
+        if(self.vendor === 2 &&self.$refs.beseyeVideo != undefined){
           self.$refs.beseyeVideo.playState ? self.$refs.beseyeVideo.stopPlay() : '';
         }
       }
@@ -3316,7 +3320,7 @@ export default {
                 }
             }
             .video-content{
-                height: auto;
+                height: 420px;
                 position: relative;
                 margin: calc(25/1920*100vw);
                 //@include point(min-width,500);

@@ -733,7 +733,7 @@ export default {
       }
       let mode = 0;
       const tabIndex = sessionStorage.getItem('TabIndex');
-      mode = tabIndex === '0' ? 0 : (tabIndex === '1' ? 1 : 0);
+      mode = tabIndex === '0' ? 1 : (tabIndex === '1' ? 0 : 1);
       const obj = {
         name: self.groupNameInput,
         mode: mode,
@@ -996,7 +996,8 @@ export default {
       // type 0 : Nonnegative number , type 1 : negative
         val = type===0 ? val.replace(/[^\d\.]/g,"") : val.replace(/[^-?\d\.]/g,"");  
         val = val.replace(/\.{2,}/g,"."); 
-        val = val.replace(".","$#$").replace(/\./g,"").replace("$#$","."); 
+        val = val.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+        val = val.replace("-","$#$").replace(/\-/g,"").replace("$#$","-"); 
         val = val.replace(/^(\-)*(\d+)\.(\d).*$/,'$1$2.$3');
         if(val!=="-0" && !isNaN(val)&&val.indexOf(".")< 0 && val !=""){
             val= parseFloat(val); 
@@ -1042,7 +1043,8 @@ export default {
           }
           if(self.ItemScoreOption !== ''){
             let unavailable = 0;
-            self.ItemScoreOptions.forEach(item=>{
+            const ItemScoreOptions = self.ItemScoreOption.split('/');
+            ItemScoreOptions.forEach(item=>{
               if(!isNaN(parseFloat(item)) && parseFloat(item)>=-50 && parseFloat(item)<=parseFloat(self.ItemTotalScore)){
                 selectAvailable.push(parseFloat(self.getFloat(item)));
               }else{
@@ -1080,7 +1082,7 @@ export default {
       const temp = [];
       const objItem = {
           subject: self.ItemName.trim(),
-          description: self.ItemDescription.trim(),
+          description: self.ItemDescription===null ? '' : self.ItemDescription.trim(),
           itemScore: itemScore,
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable
@@ -1140,7 +1142,7 @@ export default {
       const obj = {
           id: self.updateType.id,
           subject: self.ItemName.trim(),
-          description: self.ItemDescription.trim(),
+          description: self.ItemDescription===null ? '' : self.ItemDescription.trim(),
           itemScore: itemScore,
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable

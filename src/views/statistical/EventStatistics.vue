@@ -2,7 +2,8 @@
   <div>
     <div class="el-overview-content">
       <el-col :span="24">
-        <search-component @emitSearch = "emitSearch" @exportPdf = "exportPdf"/>
+        <search-component @emitSearch = "emitSearch" @exportPdf = "exportPdf" ref="eventSearch"
+                          path="eventStatistics" :defaultSort="defaultSort" @changeDefaultSort="setDefaultSortAndPage"/>
       </el-col>
       <el-col :span="24" class="el-overview">
         <el-row class="first-row">
@@ -19,7 +20,7 @@
           </el-col>
           <el-col :span="14" class="store-events">
             <div class="region-result">
-              <div class="charts-content">
+              <div class="charts-content" v-loading="isLoading">
                 <v-chart
                   ref="storeEventRef"
                   :options="storeEventsOptions"
@@ -81,7 +82,8 @@
               :is-event = "true"
               :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
               @handleChange="handlePageAndSizeChange"
-              @sortChange="handleSortChange"/>
+              @sortChange="handleSortChange"
+            />
           </el-col>
         </el-row>
       </el-col>
@@ -203,30 +205,30 @@
                   <el-table-column
                     :label="$t('overview.remotePatrol')"
                     :min-width="lang !== 'en' ? '8% ': '9%'"
-                    prop="remotePer">
+                    prop="RemoteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper remote">
-                        <el-tag size="small" color="#f31d651a">{{ scope.row.remotePer }}</el-tag>
+                        <el-tag size="small" color="#f31d651a">{{ scope.row.RemoteStr }}</el-tag>
                       </div>
                     </template>
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.onsitePatrol')"
                     :min-width="lang !== 'en' ? '8%' : '9%'"
-                    prop="onsitePer">
+                    prop="OnsiteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper onsite">
-                        <el-tag size="small" color="#fb804f1a">{{ scope.row.onsitePer }}</el-tag>
+                        <el-tag size="small" color="#fb804f1a">{{ scope.row.OnsiteStr }}</el-tag>
                       </div>
                     </template>
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.storeMonitor')"
                     :min-width="lang !== 'en' ? '8%' : '9%'"
-                    prop="videoPer">
+                    prop="VideoStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper video">
-                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.videoPer }}</el-tag>
+                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.VideoStr }}</el-tag>
                       </div>
                     </template>
                   </el-table-column>
@@ -363,16 +365,32 @@ export default {
       eventPDFData: [],
       eventInfoData: [
         {
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%'
+        },
+        {
           'prop': 'storeName',
           'label': this.$t('overview.storeName'),
           'sortable': false,
-          'width': '290',
-          'maxWidth': '290',
-          'pdfwidth': '16%'
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%'
         },
         {
-          'prop': 'regionName',
-          'label': this.$t('overview.area'),
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
           'sortable': false,
           'width': '140',
           'maxWidth': '140',
@@ -431,8 +449,10 @@ export default {
       cellClass: 'cell-class',
       rowClass: 'row-class',
       exportEventHeader: [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
-        this.$t('overview.area'),
+        this.$t('remotePatrol.code'),
         this.$t('overview.sumEvents'),
         this.$t('overview.numUnprocessEvents'),
         this.$t('overview.numProcessEvents'),
@@ -443,7 +463,10 @@ export default {
         this.$t('overview.storeMonitor')
       ],
       hasNoData: false,
-      fontFamily: 'Roboto, Microsoft YaHei'
+      fontFamily: 'Roboto, Microsoft YaHei',
+      ifSaveParams: false,
+      defaultSort: {prop: 'numOfTotal', order: 'ascending'},
+      isLoading: true
     };
   },
 
@@ -454,12 +477,13 @@ export default {
   watch: {
     async accountChanged(val) {
       if (val !== 0) {
+        this.ifSaveParams = false;
         this.initData();
       }
     }
   },
 
-  async created() {
+  created() {
     this.initData();
   },
 
@@ -525,6 +549,7 @@ export default {
         });
         option.dataset.source = soureceList;
       }
+      self.isLoading = false;
       self.storeEventsOptions = option;
     },
 
@@ -669,8 +694,8 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportEventHeader;
-        const filterVal = ['storeName', 'regionName', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
-          'numOfProcessed', 'numOfRejected', 'remotePer', 'onsitePer', 'videoPer'];
+        const filterVal = ['province', 'city','storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
+          'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
         let curData = [];
         curData = that.allEventData;
         const data = that.formatJson(filterVal, curData);
@@ -686,7 +711,6 @@ export default {
     async searchData() {
       const self = this;
       self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      console.log(self.params.storeIds);
       if (self.params.storeIds.length === 0) {
         self.eventTableData = [];
         self.total = 0;
@@ -741,6 +765,13 @@ export default {
 
     async getEventTableData() {
       const self = this;
+      self.params.timeMode = self.timeMode;
+      const searchParamsObj = {
+        path: 'eventStatistics',
+        params: this.params
+      };
+      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
       const eventResult = await self.getEventTableDataInfo(self.params);
       const ignorePer = 0;
       const errCode = eventResult.errCode;
@@ -752,13 +783,13 @@ export default {
           content.forEach(item => {
             const numOfTotal = item.numOfTotal;
             if (numOfTotal === 0) {
-              item.remotePer = 0 + '%';
-              item.onsitePer = 0 + '%';
-              item.videoPer = 0 + '%';
+              item.RemoteStr = 0 + '%';
+              item.OnsiteStr = 0 + '%';
+              item.VideoStr = 0 + '%';
             } else {
-              item.remotePer = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-              item.onsitePer = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-              item.videoPer = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+              item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+              item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+              item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
             }
           });
           self.eventTableData = content;
@@ -796,13 +827,13 @@ export default {
               content.forEach(item => {
                 const numOfTotal = item.numOfTotal;
                 if (numOfTotal === 0) {
-                  item.remotePer = 0 + '%';
-                  item.onsitePer = 0 + '%';
-                  item.videoPer = 0 + '%';
+                  item.RemoteStr = 0 + '%';
+                  item.OnsiteStr = 0 + '%';
+                  item.VideoStr = 0 + '%';
                 } else {
-                  item.remotePer = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-                  item.onsitePer = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-                  item.videoPer = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+                  item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+                  item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+                  item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
                 }
               });
               self.allEventData = content;
@@ -947,62 +978,63 @@ export default {
       });
     },
 
-    sortChange(col) {
-      const self = this;
-      const order = col.order;
-      self.order = order;
-      let prop = '';
-      let tempOrder = '';
-      if (order === 'ascending') {
-        let property = '';
-        if (col.column.property === 'remotePer') {
-          property = 'numOfRemote';
-        } else if (col.column.property === 'onsitePer') {
-          property = 'numOfOnsite';
-        } else if (col.column.property === 'videoPer') {
-          property = 'numOfVideo';
-        } else {
-          property = col.column.property;
-        }
-        self.order = self.params.order = {
-          'direction': 'asc',
-          'property': property
-        };
-        prop = col.column.property;
-        tempOrder = 'asc';
-      } else if (order === 'descending') {
-        let property = '';
-        if (col.column.property === 'remotePer') {
-          property = 'numOfRemote';
-        } else if (col.column.property === 'onsitePer') {
-          property = 'numOfOnsite';
-        } else if (col.column.property === 'videoPer') {
-          property = 'numOfVideo';
-        } else {
-          property = col.column.property;
-        }
-        self.order = self.params.order = {
-          'direction': 'desc',
-          'property': property
-        };
-        prop = col.column.property;
-        tempOrder = 'desc';
-      } else {
-        self.order = self.params.order = { 'direction': 'asc', 'property': 'numOfTotal' };
-      }
-      self.params.filter = {
-        page: self.page - 1,
-        size: self.sizeNum
-      };
-      self.getEventTableData();
-    },
+    // sortChange(col) {
+    //   const self = this;
+    //   const order = col.order;
+    //   self.order = order;
+    //   let prop = '';
+    //   let tempOrder = '';
+    //   if (order === 'ascending') {
+    //     let property = '';
+    //     if (col.column.property === 'RemoteStr') {
+    //       property = 'numOfRemote';
+    //     } else if (col.column.property === 'OnsiteStr') {
+    //       property = 'numOfOnsite';
+    //     } else if (col.column.property === 'VideoStr') {
+    //       property = 'numOfVideo';
+    //     } else {
+    //       property = col.column.property;
+    //     }
+    //     self.order = self.params.order = {
+    //       'direction': 'asc',
+    //       'property': property
+    //     };
+    //     prop = col.column.property;
+    //     tempOrder = 'asc';
+    //   } else if (order === 'descending') {
+    //     let property = '';
+    //     if (col.column.property === 'RemoteStr') {
+    //       property = 'numOfRemote';
+    //     } else if (col.column.property === 'OnsiteStr') {
+    //       property = 'numOfOnsite';
+    //     } else if (col.column.property === 'VideoStr') {
+    //       property = 'numOfVideo';
+    //     } else {
+    //       property = col.column.property;
+    //     }
+    //     self.order = self.params.order = {
+    //       'direction': 'desc',
+    //       'property': property
+    //     };
+    //     prop = col.column.property;
+    //     tempOrder = 'desc';
+    //   } else {
+    //     self.order = self.params.order = { 'direction': 'asc', 'property': 'numOfTotal' };
+    //   }
+    //   self.params.filter = {
+    //     page: self.page - 1,
+    //     size: self.sizeNum
+    //   };
+    //   self.getEventTableData();
+    // },
 
-    emitSearch(searchParams, dateRangeList) {
+    emitSearch(searchParams, dateRangeList, curRegionI, curRegionII,
+      regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
       this.params = searchParams;
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
-
       this.daysRangeList = dateRangeList;
+      this.timeMode = timeMode;
       this.searchData();
     },
 
@@ -1010,7 +1042,29 @@ export default {
       this.storeNameStr = storeNameStr;
       this.storeTagStr = storeTagStr;
       this.handleDown();
-    }
+    },
+
+    handlePageAndSizeChange(pageObj) {
+      const self = this;
+      self.page = pageObj.page;
+      self.sizeNum = pageObj.size
+      self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      self.getEventTableData();
+    },
+
+    handleSortChange(order) {
+      this.order = this.params.order = order;
+      this.params.filter = {
+        page: this.page - 1,
+        size: this.sizeNum
+      };
+      this.getEventTableData();
+    },
+
+    setDefaultSortAndPage(paramsObj){
+      this.defaultSort = paramsObj.defaultSort;
+      this.order = this.params.order = paramsObj.order;
+    },
 
   }
 };
