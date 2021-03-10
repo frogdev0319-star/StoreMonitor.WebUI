@@ -381,6 +381,7 @@ export default {
       if (val !== 0) {
         sessionStorage.removeItem('TabPatrolIndex0');
         sessionStorage.removeItem('TabPatrolIndex1');
+        self.activeName = '0';
         self.getTagList('accountChanged');
       }
     }
@@ -409,6 +410,7 @@ export default {
       self.$store.dispatch('setInspectHistory', null);
       sessionStorage.removeItem('TabPatrolIndex0');
       sessionStorage.removeItem('TabPatrolIndex1');
+      sessionStorage.removeItem('TabIndex');
       next();
     }
   },
@@ -419,6 +421,16 @@ export default {
     if (InspectHistory != null) {
       self.activeName = InspectHistory.activeName;
       self.patrolActive = InspectHistory.patrolActive;
+    }else{
+      const tabIndex = sessionStorage.getItem('TabIndex');
+      if(tabIndex !== null){
+        self.activeName = tabIndex;
+        if(self.activeName === '0'){
+          self.patrolActive = sessionStorage.getItem('TabPatrolIndex0');
+        }else if(self.activeName === '1'){
+          self.patrolActive = sessionStorage.getItem('TabPatrolIndex1');
+        }
+      }
     }
     self.getTagList();
     self.initData();
@@ -558,6 +570,11 @@ export default {
           tagIndex = TagData.length - 1;
         } else {
           tagIndex = Number(self.patrolActive);
+        }
+        if (self.activeName === '0') {
+          sessionStorage.setItem('TabPatrolIndex0', tagIndex);
+        } else if (self.activeName === '1') {
+          sessionStorage.setItem('TabPatrolIndex1', tagIndex);
         }
         const params = {
           inspectId: TagData[tagIndex].id

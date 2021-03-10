@@ -764,7 +764,7 @@ export default {
       params.curStore = this.curStore;
       params.curStoreTag = this.curStoreTag;
       params.timeMode = this.timeMode;
-      params.inspectId = this.inspectList;
+      params.inspectId = this.inspectList==='-1' ? '' : this.inspectList
       console.log(params)
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
