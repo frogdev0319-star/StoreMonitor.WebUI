@@ -413,7 +413,9 @@ export default {
     'signature': 'Signature',
     'excellent': 'Excellent',
     'getBeseyeStreamError': 'Failed to get beseye stream info!',
-    'loading': 'Loading...'
+    'loading': 'Loading...',
+    'closeConnection': 'Connection close',
+    'errorConnection': 'Connection error'
   },
 
   // event Management page language

@@ -419,7 +419,9 @@ export default {
     'signature': '簽名',
     'excellent': '優秀',
     'getBeseyeStreamError': '獲取Beseye視頻流信息失敗！',
-    'loading': '加載中...'
+    'loading': '加載中...',
+    'closeConnection': '連接關閉',
+    'errorConnection': '連接錯誤'
   },
 
   // event Management page language
