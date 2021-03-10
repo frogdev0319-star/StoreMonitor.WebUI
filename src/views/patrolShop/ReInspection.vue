@@ -1778,7 +1778,7 @@ export default {
             })
           } else if (self.vendor === 1) {
             self.$nextTick( () => {
-              if(self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState){
+              if(!self.showGuide && self.$refs.ezvizVideo.playState){
                 self.$refs.ezvizVideo.stopRealTime();
                 self.$nextTick(()=>{
                   self.$refs.ezvizVideo.realTime();
@@ -1790,7 +1790,18 @@ export default {
               }
             })
           } else {
-            // beseye
+            self.$nextTick( () => {
+              if(!self.showGuide && self.$refs.beseyeVideo.playState){
+                self.$refs.beseyeVideo.stopPlay();
+                self.$nextTick(() => {
+                  self.$refs.beseyeVideo.startPlay();
+                })
+              } else {
+                self.$nextTick(() => {
+                  self.$refs.beseyeVideo.startPlay();
+                })
+              }
+            })
           }
           self.curDeviceId = item.deviceId[0];
           item.checked = true;
