@@ -493,7 +493,6 @@ export default {
     },
 
     getDeviceList() {
-      const self = this;
       return new Promise((resolve, reject) => {
         getDeviceList().then(res => {
           const errMsg = res.errMsg;
@@ -661,29 +660,7 @@ export default {
       if (index != undefined) {
         self.curChannel = item;
       }
-      if (self.vendor === 0) {
-        self.$nextTick(() => {
-          self.$refs.dashVideo.onPlay();
-        })
-      } else if (self.vendor === 1) {
-        self.$nextTick(async() => {
-          await self.$refs.ezvizVideo.getEzvizAccessToken(self.channelInfo.ivsId);
-          if (self.$refs.ezvizVideo.playState) {
-            self.$refs.ezvizVideo.stopRealTime();
-            self.$nextTick(() => {
-              self.$refs.ezvizVideo.realTime();
-            });
-          } else {
-            self.$nextTick(() => {
-              self.$refs.ezvizVideo.realTime();
-            });
-          }
-        })
-      } else {
-        self.$nextTick(() => {
-          self.$refs.beseyeVideo.startPlay();
-        })
-      }
+      self.playVendorVideo();
     },
 
     getCommentList(e) {
@@ -905,9 +882,33 @@ export default {
       self.channelRadio = '';
       self.channelInfo = {};
       self.channelInfo = self.curChannel;
-      if (!self.isEzviz) {
+      self.vendor = self.curChannel.vendor;
+      self.playVendorVideo();
+    },
+
+    playVendorVideo() {
+      const self = this;
+      if (self.vendor === 0) {
         self.$nextTick(() => {
           self.$refs.dashVideo.startVideo(self.channelInfo.ivsId, self.channelInfo.channelId, null);
+        })
+      } else if (self.vendor === 1) {
+        self.$nextTick(async() => {
+          await self.$refs.ezvizVideo.getEzvizAccessToken(self.channelInfo.ivsId);
+          if (self.$refs.ezvizVideo.playState) {
+            self.$refs.ezvizVideo.stopRealTime();
+            self.$nextTick(() => {
+              self.$refs.ezvizVideo.realTime();
+            });
+          } else {
+            self.$nextTick(() => {
+              self.$refs.ezvizVideo.realTime();
+            });
+          }
+        })
+      } else {
+        self.$nextTick(() => {
+          self.$refs.beseyeVideo.startPlay();
         })
       }
     }
