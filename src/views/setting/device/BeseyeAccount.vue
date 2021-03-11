@@ -69,7 +69,6 @@ import util from '@/common/util.js';
 import { mapGetters } from 'vuex';
 import BeseyeAuthorizeConfig from '@/common/BeseyeAuthorizeConfig';
 import { getBeseyeUserList, deleteBeseyeUser, beseyeAccountAuthorize } from '@/api/beseye';
-import Environment from '@/common/environment';
 
 export default {
   name: 'BeseyeUser',
@@ -225,9 +224,7 @@ export default {
     },
 
     setAuthorizeState() {
-      const redirectSite = Environment.REDIRECT_SITE;
-      const isGlobal = Environment.isGlobalWebsite;
-      const stateStr = `${redirectSite}-${isGlobal}-${this.beseyeAccount}`;
+      const stateStr = `Beseye-${this.beseyeAccount}`;
       const base64StateStr = this.strToBase64(stateStr);
       BeseyeAuthorizeConfig.state = base64StateStr;
       console.log(BeseyeAuthorizeConfig.state);

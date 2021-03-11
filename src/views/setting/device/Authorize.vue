@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import enviroment, { _Environments } from '@/common/environment';
+
 export default {
   name: 'Authorize',
 
@@ -41,24 +41,6 @@ export default {
     getSiteFromState() {
       const stateStr = this.base64ToStr(this.state);
       return stateStr.split('-');
-    },
-
-    setRedirectUrl(stateArray) {
-      let redirectUrl = '';
-      if (stateArray[0] === 'Debug_XA') {
-        const splitLength = _Environments.Debug_XA.CHINA_WEBSITE.indexOf('storemonitor');
-        const site = _Environments.Debug_XA.CHINA_WEBSITE.substr(0, splitLength);
-        redirectUrl = `${site}beseye/authorize?code=${this.code}&state=${this.state}`;
-      } else if (stateArray[0] === 'QA') {
-        const splitLength = _Environments.QA.CHINA_WEBSITE.indexOf('storemonitor');
-        const site = _Environments.QA.CHINA_WEBSITE.substr(0, splitLength);
-        redirectUrl = `${site}beseye/authorize?code=${this.code}&state=${this.state}`;
-      } else if (stateArray[0] === 'Preview') {
-        const splitLength = _Environments.Preview.CHINA_WEBSITE.indexOf('storemonitor');
-        const site = _Environments.Preview.CHINA_WEBSITE.substr(0, splitLength);
-        redirectUrl = `${site}beseye/authorize?code=${this.code}&state=${this.state}`;
-      }
-      return redirectUrl;
     }
   }
 };
