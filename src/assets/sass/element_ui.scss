@@ -211,7 +211,7 @@ body .el-table th.gutter {
     display: none;
   }
   .el-loading-spinner {
-    background: url('/static/img/loading.gif') no-repeat center;
+    background: url('~@/../static/img/loading.gif') no-repeat center;
     height: 32px;
   }
 
