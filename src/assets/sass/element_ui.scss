@@ -211,19 +211,17 @@ body .el-table th.gutter {
     display: none;
   }
   .el-loading-spinner {
-    background: url("../../../static/img/loading.gif") no-repeat;
-    background-position: center;
+    background: url('/static/img/loading.gif') no-repeat center;
     height: 32px;
   }
 
   .el-loading-text {
     color: #7d8cad;
-    margin: 3px 0;
     font-size: calc(14 / 1920 * 100vw);
     display: inline-block;
     height: 32px;
     line-height: 32px;
-    margin-left: 90px;
+    margin: 3px 0 3px 90px;
   }
 }
 

@@ -156,7 +156,7 @@ import { getBriefStoreList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
 import resize from '@/components/mixins/echartResize';
-import SearchConditionUtil from "../../common/SearchConditionUtil";
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 
 export default {
   name: 'EventOverview',
@@ -338,7 +338,7 @@ export default {
   },
 
   created() {
-    this.getBriefStoreData()
+    this.getBriefStoreData();
   },
 
   beforeDestroy() {
@@ -399,7 +399,7 @@ export default {
             };
             tempStore.push(obj);
           });
-          if(tempStore.length > 0){
+          if (tempStore.length > 0) {
             tempStore.unshift(
               {
                 storeId: '-1',
@@ -418,7 +418,7 @@ export default {
     changeStore(val) {
       const self = this;
       self.storeIds = [];
-      if (val === "-1") {
+      if (val === '-1') {
         self.storeIds = [];
       } else {
         self.storeIds.push(self.curStore);
@@ -1023,35 +1023,35 @@ export default {
       this.$refs.eventStatusRef && this.$refs.eventStatusRef.resize();
     },
 
-    saveSearchParams(){
-      let params = {
+    saveSearchParams() {
+      const params = {
         beginTs: this.params.beginTs,
         endTs: this.params.endTs,
         storeId: this.curStore,
         rankType: this.rankType
-      }
+      };
       const searchConditon = {
         path: 'eventOverview',
         params: params
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventOverview');
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
         this.params.endTs = searchParams.endTs;
         this.rankType = searchParams.rankType;
         this.curStore = searchParams.storeId;
-        if (this.curStore === "-1") {
+        if (this.curStore === '-1') {
           this.storeIds = [];
         } else {
           this.storeIds.push(this.curStore);
         }
-      }else{
+      } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;

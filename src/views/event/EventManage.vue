@@ -163,7 +163,7 @@
               <el-table-column
                 :label="$t('eventView.operation')"
                 prop="option"
-                min-width="80"
+                min-width="100"
                 align="left">
                 <template slot-scope="scope">
                   <i class="iconfont icon-gengduo" @click="toEventDetail(scope.row)"/>
