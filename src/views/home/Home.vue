@@ -196,7 +196,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.7.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.8.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
 
@@ -290,34 +290,14 @@ export default {
     },
 
     showBorder() {
-      if ((this.$route.path !== '/reinspection' && this.$route.path !== '/storemonitor' &&
-          this.$route.path !== '/rate' && this.$route.path !== '/reinspect/confirmrein')) {
-        return true;
-      }
+      const showBorderPathArr = ['/reinspection', '/storemonitor', '/rate', '/reinspect/confirmrein'];
+      return !showBorderPathArr.includes(this.$route.path);
     },
 
     showHeader() {
-      let flag = false;
-      switch (this.$route.path) {
-        case '/report':
-        case '/patrolOverview':
-        case '/eventOverview':
-        case '/patrolEvaluation':
-        case '/patrolItem':
-        case '/supervisorStat':
-        case '/eventStat':
-        case '/storedetail':
-        case '/storemanage':
-        case '/bindroute':
-        {
-          flag = true;
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      return flag;
+      const showBorderPathArr = ['/report', '/patrolOverview', '/eventOverview', '/patrolEvaluation',
+        '/patrolItem', '/supervisorStat', '/eventStat', '/storedetail', '/storemanage', '/bindroute'];
+      return showBorderPathArr.includes(this.$route.path);
     },
 
     curPath() {
@@ -325,56 +305,21 @@ export default {
     },
 
     activePath() {
-      console.log(this.$route.path);
       let path = this.$route.path;
-      switch (path) {
-        case '/reinspect/confirmrein':
-        case '/reinspect/submit': {
-          path = '/reinspection';
-          break;
-        }
-        case '/storemonitor/submit': {
-          path = '/storemonitor';
-          break;
-        }
-        case '/reportdetails': {
-          path = '/report';
-          break;
-        }
-        case '/rate': {
-          path = '/event';
-          break;
-        }
-        case '/bindroute' :
-        case '/addroute':
-        case '/setroute':
-        {
-          path = '/routeinspection';
-          break;
-        }
-        case '/storedetail': {
-          path = '/storemanage';
-          break;
-        }
-        case '/ezvizeDeviceSetting': {
-          path = '/ezvizDevice';
-          break;
-        }
-        case '/beseyeDeviceSetting': {
-          path = '/beseyeAccount';
-          break;
-        }
-        case '/ezvizDevice1': {
-          path = '/ezvizDevice';
-          break;
-        }
-        case '/titleSetting': {
-          path = '/title';
-          break;
-        }
-        default: {
-          break;
-        }
+      const pathMapArr = [
+        { curPath: ['/reinspect/confirmrein', '/reinspect/submit'], activePath: '/reinspection' },
+        { curPath: ['/storemonitor/submit'], activePath: '/storemonitor' },
+        { curPath: ['/reportdetails'], activePath: '/report' },
+        { curPath: ['/bindroute', '/addroute', '/setroute'], activePath: '/routeinspection' },
+        { curPath: ['/storedetail'], activePath: '/storemanage' },
+        { curPath: ['/ezvizeDeviceSetting'], activePath: '/ezvizDevice' },
+        { curPath: ['/beseyeDeviceSetting'], activePath: '/beseyeAccount' },
+        { curPath: ['/beseyeDeviceSetting'], activePath: '/beseyeAccount' },
+        { curPath: ['/titleSetting'], activePath: '/title' }
+      ];
+      const pathMAP = pathMapArr.find(item => item.curPath.includes(path));
+      if (pathMAP) {
+        path = pathMAP.activePath;
       }
       return path;
     },
@@ -397,7 +342,6 @@ export default {
         }
         case 3: {
           const path = this.$route.matched[2].path;
-          console.log(this.$route.matched[2]);
           disabled = this.setThreeChildrenCanChangeBrand(path);
           break;
         }
@@ -443,8 +387,8 @@ export default {
   },
 
   mounted() {
-    if (this.$refs.fieldSelect != undefined) {
-      this.$nextTick(function() {
+    if (this.$refs.fieldSelect !== undefined) {
+      this.$nextTick(() => {
         this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
           'scroll-opacity'
         );
@@ -455,19 +399,8 @@ export default {
   methods: {
     setThreeChildrenCanChangeBrand(path) {
       let disabled = true;
-      switch (path) {
-        case '/patrolSechedule':
-        case '/dashDevice':
-        case '/ezvizDevice':
-        case '/beseyeAccount':
-        {
-          disabled = false;
-          break;
-        }
-        default: {
-          break;
-        }
-      }
+      const canChangeBrandPathArr = ['/patrolSechedule', '/dashDevice', '/ezvizDevice', '/beseyeAccount'];
+      disabled = !canChangeBrandPathArr.includes(path);
       return disabled;
     },
 
@@ -499,7 +432,6 @@ export default {
     },
 
     handleselect(key, keyPath) {
-      console.log(key);
       if (this.isMobile) {
         this.collapsed = true;
       }
@@ -515,30 +447,20 @@ export default {
       matched.length > 2 && (matched[1].name === 'deviceManage' || matched[1].name === 'ezvizDeviceMgt' ||
         matched[1].name === 'beseyeDeviceMgt') &&
       this.setDeviceBread(matched, currentRoute);
-      console.log(matched);
       this.breadList = matched;
     },
 
     setScheduleBread(matched, currentRoute) {
-      // patrol setting
-      switch (currentRoute) {
-        case '/pointCheck': {
-          matched[2].name = 'checkSchedule';
-          break;
-        }
-        case '/patrolSechedule': {
-          matched[2].name = 'patrolSecheduleManage';
-          break;
-        }
-        default: {
-          break;
-        }
-      }
+      const routeNameAndPathMaps = [
+        { path: ['/pointCheck'], name: 'checkSchedule' },
+        { path: ['/patrolSechedule'], name: 'patrolSecheduleManage' }
+      ];
+      const pathAndNameMap = routeNameAndPathMaps.find(item => item.path.includes(currentRoute));
+      pathAndNameMap && (matched[2].name = pathAndNameMap.name);
       matched.splice(1, 1);
     },
 
     setDeviceBread(matched, currentRoute) {
-      // device setting
       switch (currentRoute) {
         case '/dashDevice': {
           matched[2].name = 'dashDeviceMgt';
@@ -572,66 +494,17 @@ export default {
     },
 
     setSecondLevelNavbarBread(matched, currentRoute) {
-      console.log(matched);
-      let parentBread = {};
-      switch (currentRoute) {
-        case '/storedetail': {
-          parentBread = {
-            path: '/storemanage',
-            name: 'storeManage'
-          };
-          break;
-        }
-        case '/titleSetting': {
-          parentBread = {
-            path: '/title',
-            name: 'titleManage'
-          };
-          break;
-        }
-        case '/addroute':
-        case '/setroute':
-        case '/bindroute': {
-          parentBread = {
-            path: '/routeinspection',
-            name: 'inspectSetting'
-          };
-          break;
-        }
-        case '/rate': {
-          parentBread = {
-            path: '/event',
-            name: 'eventManage'
-          };
-          break;
-        }
-        case '/reportdetails': {
-          parentBread = {
-            path: '/report',
-            name: 'reports'
-          };
-          break;
-        }
-        case '/storemonitor/submit': {
-          parentBread = {
-            path: '/storemonitor',
-            name: 'storeMonitor'
-          };
-          break;
-        }
-        case '/reinspect/confirmrein':
-        case '/reinspect/submit' : {
-          parentBread = {
-            path: '/reinspection',
-            name: 'remotePatrol'
-          };
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      Object.keys(parentBread).length > 0 && matched.splice(1, 0, parentBread);
+      const pathAndBreadMaps = [
+        { paths: ['/storedetail'], parentBread: { path: '/storemanage', name: 'storeManage' }},
+        { paths: ['/titleSetting'], parentBread: { path: '/title', name: 'titleManage' }},
+        { paths: ['/addroute', '/setroute', '/bindroute'], parentBread: { path: '/routeinspection', name: 'inspectSetting' }},
+        { paths: ['/rate'], parentBread: { path: '/event', name: 'eventManage' }},
+        { paths: ['/reportdetails'], parentBread: { path: '/report', name: 'reports' }},
+        { paths: ['/storemonitor/submit'], parentBread: { path: '/storemonitor', name: 'storeMonitor' }},
+        { paths: ['/reinspect/confirmrein', '/reinspect/submit'], parentBread: { path: '/reinspection', name: 'remotePatrol' }}
+      ];
+      const pathAndBreadMap = pathAndBreadMaps.find(map => map.paths.includes(currentRoute));
+      pathAndBreadMap && matched.splice(1, 0, pathAndBreadMap.parentBread);
     },
 
     getWindowSize() {
@@ -780,14 +653,6 @@ export default {
     font-size: calc(32/1920*100vw);
     color:#fff;
     margin-right: calc(36/1920*100vw);
-    /*<!--@media screen  and(min-width:1366px){-->*/
-    /*<!--@include point(margin-left,25);-->*/
-    /*<!--@include point(width,45);-->*/
-    /*<!--}-->*/
-    /*<!--@media screen  and(max-width:1366px){-->*/
-    /*<!--@include point(margin-left,0);-->*/
-    /*<!--@include point(width,35);-->*/
-    /*<!--}-->*/
   }
   .container{
     position: absolute;
