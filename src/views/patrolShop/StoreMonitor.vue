@@ -391,7 +391,7 @@ import {
   addFavoriteStore,
   deleteFavoriteStore,
   getFavoriteList,
-  getBriefStoreList
+  getStoreList
 } from '@/api/store';
 import {
   addComment,
@@ -399,7 +399,6 @@ import {
   getEventList,
   getStorageInfo
 } from '@/api/event';
-import { getDeviceList } from '@/api/device';
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
@@ -743,7 +742,7 @@ export default {
         }
       };
       return new Promise((resolve, reject) => {
-        getBriefStoreList(params).then((res) => {
+        getStoreList(params).then((res) => {
           resolve(res);
         });
       });
@@ -896,7 +895,7 @@ export default {
       try {
         const res = await self.getAllStoreList();
         if (res.errCode === 0) {
-          const storeData = res.data;
+          const storeData = res.data.content;
           self.allInitStoreList = storeData;
           if (storeData.length === 0) {
             self.tabList[2].storeList = [];
@@ -1636,52 +1635,32 @@ export default {
           self.$refs.beseyeVideo.stopPlay();
         }
       }
-      self.getDeviceList(storeItem.storeId).then(res => {
-        console.log(res);
-        res.forEach((item, index) => {
-          const obj = {};
-          obj.id = item.id;
-          obj.name = item.name;
-          obj.ivsId = item.ivsId;
-          obj.channelId = item.channelId;
-          obj.isonline = true;
-          obj.vendor = item.vendor;
-          if (index === 0) {
-            obj.isClick = true;
-            self.channel = {
-              id: item.id,
-              ivsId: item.ivsId,
-              channelId: item.channelId,
-              channelName: item.name,
-              vendor: item.vendor
-            };
-            self.vendor = item.vendor;
-          } else {
-            obj.isClick = false;
-          }
-          temp.push(obj);
-        });
-        self.channelBtns = temp;
-        self.allChannelBtns = temp;
-        self.getshowBtns(temp);
-      }).catch(err => {
-        console.log('StoreMonitor-getChannelByStore: ' + err);
+      storeItem.device.forEach((item, index) => {
+        const obj = {};
+        obj.id = item.id;
+        obj.name = item.name;
+        obj.ivsId = item.ivsId;
+        obj.channelId = item.channelId;
+        obj.isonline = true;
+        if (index === 0) {
+          obj.isClick = true;
+          self.channel = {
+            id: item.id,
+            ivsId: item.ivsId,
+            channelId: item.channelId,
+            channelName: item.name
+          };
+        } else {
+          obj.isClick = false;
+        }
+        item.status === 1 && temp.push(obj);
       });
+
+      self.channelBtns = temp;
+      self.allChannelBtns = temp;
+      self.getshowBtns(temp);
     },
 
-    getDeviceList(storeId) {
-      const params = {};
-      params.storeId = storeId;
-      return new Promise((resolve, reject) => {
-        getDeviceList(params).then((res) => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          console.log('StoreMonitor-getDeviceList: ' + err);
-          reject(err);
-        });
-      });
-    },
     getshowBtns(list) {
       const self = this;
       const width = document.getElementsByClassName('btn-content')[0]
