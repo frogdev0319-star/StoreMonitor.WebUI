@@ -10,16 +10,15 @@
         :popper-class="poperClass"
         :picker-options="dateOpt"
         :default-time="['00:00:00', '23:59:59']"
+        :start-placeholder="$t('overview.startDate')"
+        :end-placeholder="$t('overview.endDate')"
         type="daterange"
         range-separator="-"
         size="mini"
         format="yyyy/MM/dd"
         class="date-range"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
         unlink-panels
-        @change="dateChange"
-      />
+        @change="dateChange"/>
       <el-tooltip
         class="item"
         effect="dark"
@@ -328,10 +327,6 @@ export default {
         self.getBriefStoreData();
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.getSearchParams();
-        // const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        // const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-        // self.params.beginTs = start;
-        // self.params.endTs = end;
         self.initData();
       }
     }
@@ -1042,6 +1037,7 @@ export default {
       if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
+        this.dateChange(this.dateValue);
         this.params.beginTs = searchParams.beginTs;
         this.params.endTs = searchParams.endTs;
         this.rankType = searchParams.rankType;

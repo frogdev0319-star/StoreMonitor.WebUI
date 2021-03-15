@@ -10,16 +10,15 @@
         :popper-class="poperClass"
         :picker-options="dateOpt"
         :default-time="['00:00:00', '23:59:59']"
+        :start-placeholder="$t('overview.startDate')"
+        :end-placeholder="$t('overview.endDate')"
         type="daterange"
         range-separator="-"
         size="mini"
         format="yyyy/MM/dd"
         class="date-range"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
         unlink-panels
-        @change="dateChange"
-      />
+        @change="dateChange"/>
       <el-tooltip
         :popper-class="tooltipClass"
         class="item"
@@ -423,7 +422,7 @@ export default {
   },
 
   methods: {
-    changeRole(){
+    changeRole() {
       this.params.roleId = this.ModelPost;
       this.saveSearchParams();
       this.getStoreNumAndCycle();
@@ -1500,7 +1499,7 @@ export default {
           const tempRegions = util.groupArrayOnSize(regions, self.showRegionNum);
           self.regionGroups = tempRegions;
           const regionList = [];
-          tempRegions[0].forEach((item) => {
+          tempRegions.length > 0 && tempRegions[0].forEach((item) => {
             regionList.push(item.region);
           });
           self.regionList = regionList;
@@ -1723,23 +1722,23 @@ export default {
       this.$refs.cycleChart && this.$refs.cycleChart.resize();
     },
 
-    saveSearchParams(){
+    saveSearchParams() {
       const searchConditon = {
         path: 'patrolOverview',
         params: this.params
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('patrolOverview');
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
         this.params.endTs = searchParams.endTs;
         this.params.roleId = this.ModelPost = searchParams.roleId;
-      }else{
+      } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
