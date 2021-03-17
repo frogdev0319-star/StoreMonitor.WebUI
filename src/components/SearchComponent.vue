@@ -1,7 +1,8 @@
 <template>
   <el-col :span="24" class="statistics-header">
     <el-col :span="24" class="header-details">
-      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeSelect') }}</span>
+      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">
+        {{ $t('remotePatrol.storeSelect') }}</span>
       <el-select
         v-model="curCountry"
         :placeholder="$t('remotePatrol.country')"
@@ -42,7 +43,8 @@
         :options="storeDataList"
         style="display: inline"
         @changeInput="handleStoreChange"/>
-      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.selectStoreTag') }}</span>
+      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">
+        {{ $t('remotePatrol.selectStoreTag') }}</span>
       <multi-select
         ref="TagMultiSelect"
         :selected="curStoreTag"
@@ -53,7 +55,8 @@
         style="display: inline;margin-left: calc(20/1920*100vw);"
         @changeInput="handleStoreTagChange"/>
       <span v-if="isInspectItem || isPatrol">
-        <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
+        <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">
+          {{ $t('overview.patrolLists') }}</span>
         <el-select
           v-model="inspectList"
           :placeholder="$t('insSettingView.selectPost')"
@@ -80,13 +83,13 @@
         :popper-class="poperClass"
         :picker-options="dateOpt"
         :default-time="['00:00:00', '23:59:59']"
+        :start-placeholder="$t('overview.startDate')"
+        :end-placeholder="$t('overview.endDate')"
         type="daterange"
         range-separator="-"
         size="mini"
         format="yyyy/MM/dd"
         class="date-range"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
         unlink-panels
         @change="dateChange"
       />
@@ -132,7 +135,7 @@ import { mapGetters } from 'vuex';
 import { getBriefStoreList, GetTagList } from '@/api/store';
 import util from '../common/util.js';
 import { inpectRESTful } from '@/api/index';
-import SearchConditionUtil from "../common/SearchConditionUtil";
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 
 export default {
   name: 'SearchComponent',
@@ -154,8 +157,8 @@ export default {
       type: String,
       default: ''
     },
-    defaultSort:{
-      type:Object
+    defaultSort: {
+      type: Object
     }
   },
 
@@ -197,9 +200,9 @@ export default {
       storePatrolLists: [],
       ifGetParamsFromCash: false,
       storeListLength: -1,
-      order: {direction: '', property: ''},
-      filter: {page: 0, size: 10},
-      inspectCatch:''
+      order: { direction: '', property: '' },
+      filter: { page: 0, size: 10 },
+      inspectCatch: ''
     };
   },
 
@@ -301,7 +304,7 @@ export default {
       self.inspectTypeList = inspectList;
       self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
       if (inspectList.length !== 0) {
-        self.inspectList = self.ifGetParamsFromCash ? (self.inspectTypeList.map(x=>x.id).indexOf(self.inspectCatch) !==-1 ? self.inspectCatch : '') : self.inspectTypeList[0].id;
+        self.inspectList = self.ifGetParamsFromCash ? (self.inspectTypeList.map(x => x.id).indexOf(self.inspectCatch) !== -1 ? self.inspectCatch : '') : self.inspectTypeList[0].id;
       } else {
         self.inspectList = '';
       }
@@ -509,7 +512,7 @@ export default {
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      self.selectAllProAndCity(val,false);
+      self.selectAllProAndCity(val, false);
     },
 
     changeCity(val) {
@@ -566,7 +569,7 @@ export default {
       self.$refs.citySelect.input = '';
     },
 
-    async selectAllProAndCity(val,isFirst) {
+    async selectAllProAndCity(val, isFirst) {
       const self = this;
       const storeList = self.storeList;
       const temp = [];
@@ -581,9 +584,9 @@ export default {
             temp.push(obj);
           }
           let storeObj = {};
-          if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-            if(self.curCity.length > 0 && self.curCity !== "-1"){
-              if(self.curProvince.includes(item.province) && self.curCity.includes(item.city)){
+          if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
+            if (self.curCity.length > 0 && self.curCity !== '-1') {
+              if (self.curProvince.includes(item.province) && self.curCity.includes(item.city)) {
                 storeObj = {
                   storeId: item.storeId,
                   label: item.name,
@@ -593,8 +596,7 @@ export default {
                 };
               }
             }
-          }
-          else{
+          } else {
             storeObj = {
               storeId: item.storeId,
               label: item.name,
@@ -612,9 +614,9 @@ export default {
         storeList.forEach(item => {
           if (item.province === _item.value) {
             let citObj = {};
-            if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-              if(self.curCity.length > 0 && self.curCity !== "-1"){
-                if(self.curProvince.includes(item.province)){
+            if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
+              if (self.curCity.length > 0 && self.curCity !== '-1') {
+                if (self.curProvince.includes(item.province)) {
                   if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
                     citObj = {
                       label: item.city,
@@ -623,8 +625,7 @@ export default {
                   }
                 }
               }
-            }
-            else{
+            } else {
               if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
                 citObj = {
                   label: item.city,
@@ -653,12 +654,12 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      setTimeout(async()=>{
+      setTimeout(async() => {
         self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
         self.ifGetParamsFromCash = false;
         self.changeStoreNew(self.curStore);
         isFirst ? await self.searchData() : null;
-      },100)
+      }, 100);
     },
 
     async searchData() {
@@ -683,7 +684,7 @@ export default {
           this.params.inspectId = id;
           this.storePatrolLists = name;
         } else {
-          this.params.inspectId = this.inspectList==='-1' ? '' : this.inspectList;
+          this.params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
         }
       }
     },
@@ -756,7 +757,7 @@ export default {
       });
     },
 
-    saveSearchParams(saveParamsObj){
+    saveSearchParams(saveParamsObj) {
       const params = saveParamsObj.params;
       params.curCountry = this.curCountry;
       params.curProvince = this.curProvince;
@@ -764,14 +765,13 @@ export default {
       params.curStore = this.curStore;
       params.curStoreTag = this.curStoreTag;
       params.timeMode = this.timeMode;
-      params.inspectId = this.inspectList==='-1' ? '' : this.inspectList
-      console.log(params)
+      params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition(this.path);
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
@@ -786,10 +786,10 @@ export default {
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.inspectCatch = searchParams.inspectId;
-        //this.setDefaultSort();
+        // this.setDefaultSort();
         this.ifGetParamsFromCash = true;
         console.log(this.params);
-      }else{
+      } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
@@ -797,7 +797,7 @@ export default {
       }
     },
 
-    setDefaultSort(){
+    setDefaultSort() {
       // this.defaultSort.order = this.order.direction === 'asc' ? 'ascending' : 'descending';
       // this.defaultSort.prop = this.order.property === 'completionRate' ? 'completionRateStr': this.order.property;
       const paramsObj = {};
