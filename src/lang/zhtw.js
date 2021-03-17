@@ -407,7 +407,9 @@ export default {
     'advice': '巡檢建議：',
     'good': '優秀',
     'signature': '簽名',
-    'excellent': '優秀'
+    'excellent': '優秀',
+    'signatureAndPic': '簽名與照片'
+
   },
 
   // event Management page language

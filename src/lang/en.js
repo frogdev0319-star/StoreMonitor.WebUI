@@ -401,7 +401,8 @@ export default {
     'advice': 'Advice:',
     'good': 'Good',
     'signature': 'Signature',
-    'excellent': 'Excellent'
+    'excellent': 'Excellent',
+    'signatureAndPic': 'Signature & Picture'
   },
 
   // event Management page language

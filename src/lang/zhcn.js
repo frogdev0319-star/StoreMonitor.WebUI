@@ -407,7 +407,8 @@ export default {
     'advice': '巡检建议：',
     'good': '优秀',
     'signature': '签名',
-    'excellent': '优秀'
+    'excellent': '优秀',
+    'signatureAndPic': '签名与照片'
   },
 
   // event Management page language

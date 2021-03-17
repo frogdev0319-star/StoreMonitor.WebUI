@@ -3,12 +3,12 @@
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
       <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
-      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">{{ accountName + ' | ' + report.storeName+' '+report.tagName }}<span v-if="!isexportPDF">{{' ('+report.inspectType+')'}}</span></p>
+      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">{{ accountName + ' | ' + report.storeName+' '+report.tagName }}<span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span></p>
       <div class="info-content">
         <div class="pdf_font_24">
-          <span class="info-label" v-if="!isexportPDF">{{ $t('remotePatrol.submitter') }}</span>
+          <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.submitterName }}</span>
-          <span class="info-label" v-if="!isexportPDF">{{ $t('remotePatrol.generateTime') }}</span>
+          <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
           <div style="display:inline-block;">
             <div class="no-print">
@@ -22,14 +22,14 @@
       </div>
     </div>
     <div class="el-acticle">
-      <div v-if="suggest!=null&&suggest.length!=0" class="suggest" :style="isexportPDF ? 'max-height:300px;' : ''">
+      <div v-if="suggest!=null&&suggest.length!=0" :style="isexportPDF ? 'max-height:300px;' : ''" class="suggest">
         <div class="suggest-content">
-            <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
-            <span v-html="turnSuggest(suggest)" class="pdf_font_20"/>
+          <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
+          <span class="pdf_font_20" v-html="turnSuggest(suggest)"/>
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="24" class="radior-content" :style="isexportPDF ? 'height:600px;' : ''">
+        <el-col :span="24" :style="isexportPDF ? 'height:600px;' : ''" class="radior-content">
           <div class="header-score">
             <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
             <span class="span-2"><span class="pdf_font_26">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span></span>
@@ -94,7 +94,7 @@
           class="details-content">
           <div v-if="index < 3" class="details">
             <div class="item-header">
-              <i :class="item.iconSrc" class="iconfont icontemp" :style="isexportPDF ? 'font-size:26px;' : ''"/>
+              <i :class="item.iconSrc" :style="isexportPDF ? 'font-size:26px;' : ''" class="iconfont icontemp"/>
               <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
               <div class="count-content">
                 <span class="count"><span class="pdf_font_36">{{ item.itemCount }}</span></span>
@@ -104,9 +104,9 @@
             <div class="item-content">
               <el-scrollbar style="height:100%;" class="el-menuscrollbar">
                 <div v-for="_item in item.itemList" :key="_item.id" class="item-details">
-                    <div class="item-blag"/>
-                    <span class="item-name"><span class="pdf_font_20">{{ index !== 2 ?_item.name : _item.subject }}</span></span>
-                    <span class="item-des"><span class="pdf_font_18"></span></span>
+                  <div class="item-blag"/>
+                  <span class="item-name"><span class="pdf_font_20">{{ index !== 2 ?_item.name : _item.subject }}</span></span>
+                  <span class="item-des"><span class="pdf_font_18"/></span>
                 </div>
               </el-scrollbar>
               <span v-if="item.itemCount > 6 && isexportPDF" class="moreInfotip">
@@ -116,13 +116,17 @@
           </div>
           <div v-else class="details">
             <div class="item-header">
-              <i :class="item.iconSrc" class="iconfont icontemp" :style="isexportPDF ? 'font-size:26px;' : ''"/>
+              <i :class="item.iconSrc" :style="isexportPDF ? 'font-size:26px;' : ''" class="iconfont icontemp"/>
               <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
             </div>
             <div class="item-content item-img">
-              <div class="item-details" style="height:100%;">
-                <div class="pdf_font_20">
-                  <img :src="item.itemList">
+              <div class="item-details signature-details" style="height:100%;">
+                <div
+                  v-for="(signatureItem) in item.itemList"
+                  :class="item.itemList.length > 2 && 'signature-items'"
+                  class="pdf_font_20 signature-item" @click="displayEnlargeSignature(signatureItem.content)">
+                  <span v-if="signatureItem.type === 1">{{ $t('remotePatrol.signature') }}</span>
+                  <img :src="signatureItem.content" class="signature-content" >
                 </div>
               </div>
             </div>
@@ -132,8 +136,8 @@
       <el-row class="row-detail">
         <el-col>
           <div class="item-header" @click=" isup ? isup = false : isup = true">
-            <i v-if="isup" class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"  :style="isexportPDF ? 'font-size:22px;' : ''"/>
-            <i v-if="!isup" class="iconfont icon-zhankai1 icontemp" style="color:#7d8cad;"  :style="isexportPDF ? 'font-size:22px;' : ''"/>
+            <i v-if="isup" :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"/>
+            <i v-if="!isup" :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icon-zhankai1 icontemp" style="color:#7d8cad;"/>
             <span class="title-lable"><span class="pdf_font_20">{{ $t('remotePatrol.detailInfo') }}</span></span>
           </div>
           <div v-show="isup" class="item-content">
@@ -146,11 +150,11 @@
                       <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
                       <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
                     </div>
-                    <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn" :style="isexportPDF ? 'width:110px;' : 'width:50px;'"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
-                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn-failed" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                    <div v-if="_item.grade === Math.pow(-2,31)" :style="isexportPDF ? 'width:110px;' : 'width:50px;'" class="ignore-btn"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
+                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" :style="isexportPDF ? 'width:170px;' : 'width:100px;'" class="title-btn-failed">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}</span>
                     </div>
-                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn-pass" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" :style="isexportPDF ? 'width:170px;' : 'width:100px;'" class="title-btn-pass">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}</span>
                     </div>
                     <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
@@ -312,6 +316,20 @@
         </el-dialog>
       </div>
     </div>
+    <el-dialog
+      v-if="showSignatureFlag"
+      :title="$t('eventView.view')"
+      :visible.sync="showSignatureFlag"
+      :close-on-click-modal="false"
+      width="850px"
+      top="12%">
+      <div class="video-dialog-content" style="overflow:hidden;">
+        <hr class="dialog-hr">
+        <div class="dialog-source-content">
+          <img :src="signatureSrc">
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -333,7 +351,7 @@ export default {
 
   data() {
     return {
-      accountName:'',
+      accountName: '',
       reportId: 0,
       downloadProgress: false,
       hasAttachment: 0,
@@ -391,27 +409,29 @@ export default {
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
       theaderPassFail: [
-        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;'},
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;',pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;',pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;',pdfWidth: 'width:15%;' }
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;', pdfWidth: 'width:15%;' }
       ],
       theaderScore: [
-        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;',pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;',pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;',pdfWidth: 'width:15%;' }
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
       ],
       theaderOther: [
-        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;',pdfWidth: 'width:11.5%;' }
-      ]
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;', pdfWidth: 'width:11.5%;' }
+      ],
+      showSignatureFlag: false,
+      signatureSrc: ''
     };
   },
 
@@ -566,7 +586,7 @@ export default {
         const temp = [];
         const feedtemp = [];
         // let gradetotal = []
-        data.groups.sort((a, b) => {return a.groupType - b.groupType; });
+        data.groups.sort((a, b) => { return a.groupType - b.groupType; });
         data.groups.forEach((groupitem, groupindex) => {
           const obj = {
             items: []
@@ -788,10 +808,10 @@ export default {
       };
       if (this.isInsiteInspect && data.signature) {
         tempArray[3] = {
-          itemTitleName: this.$t('remotePatrol.signature'),
+          itemTitleName: this.$t('remotePatrol.signatureAndPic'),
           iconSrc: 'icon-fankui',
           itemCount: '',
-          itemList: data.signature.content
+          itemList: data.signature
         };
       }
       this.tempList = tempArray;
@@ -880,7 +900,7 @@ export default {
                 color: '#7d8cad',
                 borderRadius: 3,
                 padding: [3, 5]
-              },
+              }
             },
             splitArea: {
               show: false
@@ -927,8 +947,8 @@ export default {
         }
         ],
         tooltip: {
-          position: function (point, params, dom, rect, size) {
-              return [point[0], '10%'];
+          position: function(point, params, dom, rect, size) {
+            return [point[0], '10%'];
           }
         }
       };
@@ -941,6 +961,11 @@ export default {
 
     adjustChart() {
       this.$refs.chartRadar && this.$refs.chartRadar.resize();
+    },
+
+    displayEnlargeSignature(src) {
+      this.showSignatureFlag = true;
+      this.signatureSrc = src;
     }
   }
 };
@@ -1322,9 +1347,37 @@ export default {
                 margin-left: calc(35 / 1920 * 100vw);
                 color: $tab;
               }
-              img {
+
+            }
+            .signature-details{
+              margin-bottom: 0;
+              padding: 0;
+              display: flex;
+              flex-wrap: wrap;
+              .signature-item{
+                width: 50%;
                 height: 100%;
-                width: 100%;
+                flex-grow: 1;
+                position: relative;
+                border: 1px solid $border;
+                border-left: none;
+                cursor: pointer;
+                &:nth-child(n+3){
+                  border-top: none;
+                }
+                span{
+                  position: absolute;
+                  padding-left: calc(20 / 1920 * 100vw);
+                  padding-top: 10px;
+                  color: $tab;
+                }
+                .signature-content{
+                  height: 100%;
+                  width: 100%;
+                }
+              }
+              .signature-items{
+                height: 50%;
               }
             }
             .moreInfotip{
@@ -1336,7 +1389,7 @@ export default {
             }
           }
           .item-img {
-            padding-bottom: calc(20 / 1920 * 100vw);
+            padding: 0;
           }
         }
       }
@@ -1762,6 +1815,15 @@ export default {
             @include point(min-width,450);
             @include point(min-height,360);
         }
+    }
+    .dialog-source-content{
+      @include point(height,320);
+      @include point(padding,20);
+
+      img{
+        height: 100%;
+        user-select: none;
+      }
     }
   }
 </style>
