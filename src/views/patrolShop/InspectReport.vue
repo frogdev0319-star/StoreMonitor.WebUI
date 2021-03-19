@@ -92,8 +92,8 @@
           :span="tempList.length === 4 ? 6 : 8"
           :key="index"
           class="details-content">
-          <div v-if="index < 3" class="details">
-            <div class="item-header">
+          <div v-if="index < 3" class="details" :style="isexportPDF ? 'height:430px;' : ''">
+            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''">
               <i :class="item.iconSrc" :style="isexportPDF ? 'font-size:26px;' : ''" class="iconfont icontemp"/>
               <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
               <div class="count-content">
@@ -101,30 +101,31 @@
                 <span class="blag"><span class="pdf_font_18">{{ $t('remotePatrol.unit') }}</span></span>
               </div>
             </div>
-            <div class="item-content">
-              <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+            <div class="item-content" :style="isexportPDF ? 'height:380px;' : ''">
+              <el-scrollbar :style="isexportPDF ? 'height:75%;' : 'height:98%;'" class="el-menuscrollbar">
                 <div v-for="_item in item.itemList" :key="_item.id" class="item-details">
-                  <div class="item-blag"/>
+                  <div :class="isexportPDF ? 'pdf_item_blag' : 'item-blag'"/>
                   <span class="item-name"><span class="pdf_font_20">{{ index !== 2 ?_item.name : _item.subject }}</span></span>
                   <span class="item-des"><span class="pdf_font_18"/></span>
                 </div>
               </el-scrollbar>
-              <span v-if="item.itemCount > 6 && isexportPDF" class="moreInfotip">
+              <span v-if="item.itemCount > 3 && isexportPDF" class="moreInfotip">
                 <span class="pdf_font_18">{{ $t('remotePatrol.more') }}</span>
               </span>
             </div>
           </div>
-          <div v-else class="details">
-            <div class="item-header">
+          <div v-else class="details" :style="isexportPDF ? 'height:430px;' : ''">
+            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''">
               <i :class="item.iconSrc" :style="isexportPDF ? 'font-size:26px;' : ''" class="iconfont icontemp"/>
               <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
             </div>
-            <div class="item-content item-img">
+            <div class="item-content item-img" :style="isexportPDF ? 'height:380px;' : ''">
               <div class="item-details signature-details" style="height:100%;">
                 <div
-                  v-for="(signatureItem) in item.itemList"
+                  v-for="(signatureItem,signatureIndex) in item.itemList"
+                  :key="signatureIndex"
                   :class="item.itemList.length > 2 && 'signature-items'"
-                  class="pdf_font_20 signature-item"
+                  class="signature-item"
                   @click="displayEnlargeSignature(signatureItem.content)">
                   <span v-if="signatureItem.type === 1">{{ $t('remotePatrol.signature') }}</span>
                   <img :src="signatureItem.content" :class="signatureItem.type === 1 ? 'signature': ''" class="signature-content">
@@ -136,7 +137,7 @@
       </el-row>
       <el-row class="row-detail">
         <el-col>
-          <div class="item-header" @click=" isup ? isup = false : isup = true">
+          <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''" @click=" isup ? isup = false : isup = true">
             <i v-if="isup" :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"/>
             <i v-if="!isup" :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icon-zhankai1 icontemp" style="color:#7d8cad;"/>
             <span class="title-lable"><span class="pdf_font_20">{{ $t('remotePatrol.detailInfo') }}</span></span>
@@ -151,14 +152,14 @@
                       <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
                       <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
                     </div>
-                    <div v-if="_item.grade === Math.pow(-2,31)" :style="isexportPDF ? 'width:110px;' : 'width:50px;'" class="ignore-btn"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
-                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" :style="isexportPDF ? 'width:170px;' : 'width:100px;'" class="title-btn-failed">
+                    <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn" :style="isexportPDF ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
+                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn-failed" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}</span>
                     </div>
-                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" :style="isexportPDF ? 'width:170px;' : 'width:100px;'" class="title-btn-pass">
+                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn-pass" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}</span>
                     </div>
-                    <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                    <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
                     </div>
                   </div>
@@ -168,7 +169,7 @@
                     style="padding-bottom: 20px;">
                     <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
                     <div v-if="_item.showAudio" class="cdm-voice">
-                      <div class="speech-info" @click="startSpeechItem(_item,_index)">
+                      <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
                         <i class="iconfont icon-yuyin icon-speech"/>
                       </div>
                       <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
@@ -185,10 +186,10 @@
                         :key="sourceindex"
                         :height="imgHeight+'px'"
                         class="source-details">
-                        <div v-if="sourceitem.mediaType === 2" class="img-content">
+                        <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''">
                           <img
                             :title="imgTitle"
-                            :style="isexportPDF ? 'width:150px;height:100px;' : 'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
                             :src="sourceitem.url"
                             :height="imgHeight+'px'"
                             :onerror="deafultImg"
@@ -201,7 +202,7 @@
                           @click="playCommentVideo(sourceitem,sourceindex)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                           <img
-                            :style="isexportPDF ? 'width:150px;height:100px;':'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
                             :src="videoImgSrc"
                             :height="imgHeight+'px'"
                             class="imgLittle">
@@ -224,7 +225,7 @@
                     class="content-detail-main">
                     <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
                     <div v-if="item.showAudio" class="cdm-voice">
-                      <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
+                      <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
                         <i class="iconfont icon-yuyin icon-speech"/>
                       </div>
                       <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
@@ -244,7 +245,7 @@
                         <div v-if="sourceitem.mediaType === 2" class="img-content">
                           <img
                             :title="imgTitle"
-                            :style="isexportPDF ? 'width:150px;height:100px;' : 'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
                             :src="sourceitem.url"
                             :height="imgHeight+'px'"
                             :onerror="deafultImg"
@@ -257,7 +258,7 @@
                           @click="playCommentVideo(sourceitem,index)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                           <img
-                            :style="isexportPDF?'width:150px;height:100px;':'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
                             :src="videoImgSrc"
                             :height="imgHeight+'px'"
                             class="imgLittle">
@@ -986,6 +987,7 @@ export default {
     #{$poi}:checkRem($val);
   }
   @media print {
+  .details{page-break-inside:avoid;}
   .content-detail-title{ page-break-inside:avoid;}
   .cdm-title{ page-break-inside:avoid;}
   .cdm-voice{ page-break-inside:avoid;}
@@ -1289,7 +1291,6 @@ export default {
           border: 1px solid $border;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
           .item-header {
-
             position: relative;
             background-color: $background;
             height: 40px;
@@ -1320,7 +1321,6 @@ export default {
           .item-content {
             padding-top: calc(20 / 1920 * 100vw);
             height: 280px;
-            position: relative;
             .item-details {
               height: auto;
               font-size: calc(14 / 1920 * 100vw);
@@ -1337,6 +1337,15 @@ export default {
                 display: inline-block;
                 margin-right: calc(16 / 1920 * 100vw);
                 margin-top: 3px;
+              }
+              .pdf_item_blag{
+                width:18px;
+                height:18px;
+                border-radius: 50%;
+                background-color: $tab;
+                display: inline-block;
+                margin-right: 16px;
+                margin-top: 8px;
               }
               .item-name{
                 flex: 1;
@@ -1392,6 +1401,7 @@ export default {
               right:10px;
               font-size: 12px;
               color:$tab;
+              margin:0;
             }
           }
           .item-img {
@@ -1516,6 +1526,20 @@ export default {
                         @include point(line-height,26);
                         @include point(margin-left,5);
                     }
+                }
+                .pdf_speech_info{
+                  width:160px;
+                  height:52px;
+                  background-color: #FFEDED;
+                  color: $red;
+                  border: 1px solid #FEC0C7;
+                  border-radius:30px;
+                  display: inline-block;
+                  .icon-speech{
+                      font-size:26px;
+                      line-height:52px;
+                      margin-left:10px;
+                  }
                 }
                 .often-text{
                     @include point(margin-left,20);

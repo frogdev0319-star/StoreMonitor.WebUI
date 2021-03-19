@@ -388,7 +388,7 @@ export default {
     'passItem': 'Qualified Items',
     'failedItem': 'Failed Items',
     'generateTime': 'Generated Time:',
-    'more': 'More details',
+    'more': 'More',
     'InspectionDetail': 'Export report',
     'improved': 'To Be Improved',
     'notableItem': 'Notable Items',
