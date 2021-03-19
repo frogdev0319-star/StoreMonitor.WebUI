@@ -1175,12 +1175,7 @@ export default {
       self.ItemTotalScore = item.Score_1;
       self.ItemMinScore = item.Score_2;
       self.ItemSheetScore = item.Score_3;
-      let ItemScoreOption = '';
-      item.Score_4.forEach((_item,_index)=>{
-        let isuu = _index === item.Score_4.length - 1 ? '' : '/';
-        ItemScoreOption += _item + isuu;
-      })
-      self.ItemScoreOption = ItemScoreOption;
+      self.ItemScoreOption = item.availableScoreStr;
       self.ItemDescription = item.napeDep;
     },
 
