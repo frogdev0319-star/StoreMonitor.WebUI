@@ -546,8 +546,6 @@ export default {
     },
 
     async storeId(newValue, oldValue) {
-      console.log(newValue);
-      console.log(oldValue);
       const self = this;
       if (newValue.length > 0) {
         await self.getEzvizAccessToken(newValue);
@@ -557,10 +555,11 @@ export default {
 
   async mounted() {
     const self = this;
-    console.log(self.storeId);
-    console.log(self.accessToken);
+    const o = self.$refs.myPlayer;
+    self.initPlayerWidth = o.offsetWidth;
+    self.initPlayerHeight = 420;
     if (!self.isStoreMonitor) {
-      const result = await self.getEzvizAccessToken(self.storeId);
+      await self.getEzvizAccessToken(self.storeId);
       self.checkIfEncry();
     }
     window.addEventListener('resize', self.resizeFun, false);
@@ -1780,7 +1779,7 @@ export default {
         } else {
           if (isGlobalWebsite) {
             self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' +
-              self.channelInfo.channelId + '.live';
+              self.channelInfo.channelId + '.hd.live';
           } else {
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' +
               self.channelInfo.channelId + '.live';
