@@ -2130,7 +2130,7 @@ export default {
       const self = this;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-      if (e == 0) {
+      if (e === 0) {
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
       }else{

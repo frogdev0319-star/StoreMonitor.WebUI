@@ -1779,7 +1779,7 @@ export default {
         } else {
           if (isGlobalWebsite) {
             self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' +
-              self.channelInfo.channelId + '.hd.live';
+              self.channelInfo.channelId + '.live';
           } else {
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' +
               self.channelInfo.channelId + '.live';
