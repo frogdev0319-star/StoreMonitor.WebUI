@@ -180,7 +180,7 @@ export const getInspectReportList = data => {
 
 export const getInspectReportInfo = data => {
   return request({
-    url: `v3.0/inspect/report/info`,
+    url: `v4.0/inspect/report/info`,
     method: 'post',
     data
   });
@@ -196,7 +196,7 @@ export const submitInspectItem1 = data => {
 
 export const getInspectReportDetail = params => {
   return request({
-    url: `${version}/inspect/report/detail`,
+    url: `v2.0/inspect/report/detail`,
     method: 'post',
     params
   });

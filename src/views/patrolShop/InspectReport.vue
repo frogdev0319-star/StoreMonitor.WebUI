@@ -124,9 +124,10 @@
                 <div
                   v-for="(signatureItem) in item.itemList"
                   :class="item.itemList.length > 2 && 'signature-items'"
-                  class="pdf_font_20 signature-item" @click="displayEnlargeSignature(signatureItem.content)">
+                  class="pdf_font_20 signature-item"
+                  @click="displayEnlargeSignature(signatureItem.content)">
                   <span v-if="signatureItem.type === 1">{{ $t('remotePatrol.signature') }}</span>
-                  <img :src="signatureItem.content" class="signature-content" >
+                  <img :src="signatureItem.content" :class="signatureItem.type === 1 ? 'signature': ''" class="signature-content">
                 </div>
               </div>
             </div>
@@ -334,7 +335,7 @@
 </template>
 <script>
 import ECharts from 'vue-echarts';
-import { getInspectReportInfo, getInspectReportDetail } from '../../api/inspect';
+import { getInspectReportInfo, getInspectReportDetail } from '@/api/inspect';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -787,7 +788,7 @@ export default {
 
     getReportItemsListInfo(data) {
       let tempArray = [];
-      this.isInsiteInspect && data.signature ? tempArray = new Array(4) : tempArray = new Array(3);
+      this.isInsiteInspect && data.signatures ? tempArray = new Array(4) : tempArray = new Array(3);
       tempArray[0] = {
         itemTitleName: this.$t('remotePatrol.notableItem'),
         iconSrc: 'icon-zhongxindingwei',
@@ -806,12 +807,12 @@ export default {
         itemCount: data.feedback.length,
         itemList: data.feedback
       };
-      if (this.isInsiteInspect && data.signature) {
+      if (this.isInsiteInspect && data.signatures) {
         tempArray[3] = {
           itemTitleName: this.$t('remotePatrol.signatureAndPic'),
           iconSrc: 'icon-fankui',
           itemCount: '',
-          itemList: data.signature
+          itemList: data.signatures
         };
       }
       this.tempList = tempArray;
@@ -1368,12 +1369,17 @@ export default {
                 span{
                   position: absolute;
                   padding-left: calc(20 / 1920 * 100vw);
-                  padding-top: 10px;
+                  padding-top: 5px;
                   color: $tab;
+                  font-size: 12px;
                 }
                 .signature-content{
                   height: 100%;
                   width: 100%;
+                  object-fit: contain;
+                }
+                .signature{
+                  padding-top: 20px;
                 }
               }
               .signature-items{
@@ -1552,269 +1558,122 @@ export default {
           }
         }
       }
-      .video-dialog-content{
-            width:100%;
-            height:100%;
-            margin: auto;
-            .dialog-hr{
-                border: 0.5px solid ;
-                border-color: #dfe2e9;
-                margin-bottom:10px;
-                bottom: 5px;
-                margin-top: 0;
+    }
+    .video-dialog-content{
+      width:100%;
+      height:100%;
+      margin: auto;
+      .dialog-hr{
+        border: 0.5px solid ;
+        border-color: #dfe2e9;
+        margin-bottom:10px;
+        bottom: 5px;
+        margin-top: 0;
+      }
+      .video-content{
+        @include point(margin,20);
+        padding-top: 0;
+        position: relative;
+        #channelName{
+          width: 100%;
+          color: #fff;
+          background-color: rgba($color: #24293d, $alpha: 0.6);
+          height: 40px;
+          line-height: 40px;
+          position: absolute;
+          z-index: 10;
+          text-align: left;
+          span{
+            margin-left: 30px;
+          }
+        }
+        .icon-footer{
+          width: 100%;
+          position: absolute;
+          bottom: 0px;
+          color: #fff;
+          overflow: hidden;
+          user-select:none;
+          background-color: rgba($color: #24293d, $alpha: 0.6);
+          height: 40px;
+          line-height: 40px;
+          z-index: 10;
+          .iconlside{
+            float: left;
+            text-align: left;
+            .iconplay{
+              font-size: 18px;
+              cursor: pointer;
+              float: left;
+              margin-left: 30px;
             }
-            .video-content{
-                @include point(margin,20);
-                padding-top: 0;
+
+          }
+          .iconrside{
+            max-width: 500px;
+            float: right;
+            position: relative;
+            span{
+              font-size: 13px;
+              margin-right:6px;
+              margin-left: 20px;
+            }
+            .speed-content{
+              display: inline-block;
+              span{
                 position: relative;
-                #channelName{
-                    width: 100%;
-                    color: #fff;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    position: absolute;
-                    z-index: 10;
-                    text-align: left;
-                    span{
-                        margin-left: 30px;
-                    }
-                }
-                .icon-footer{
-                    width: 100%;
-                    position: absolute;
-                    bottom: 0px;
-                    color: #fff;
-                    overflow: hidden;
-                    user-select:none;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    z-index: 10;
-                    .iconlside{
-                        float: left;
-                        text-align: left;
-                        .iconplay{
-                            font-size: 18px;
-                            cursor: pointer;
-                            float: left;
-                            margin-left: 30px;
-                        }
-
-                    }
-                    .iconrside{
-                        max-width: 500px;
-                        float: right;
-                        position: relative;
-                        span{
-                            font-size: 13px;
-                            margin-right:6px;
-                            margin-left: 20px;
-                        }
-                        .speed-content{
-                            display: inline-block;
-                            span{
-                                position: relative;
-                                bottom:3px;
-                            }
-                        }
-                        .screen-content{
-                            display: inline;
-                            margin-left: 30px;
-                            position: absolute;
-                            right: 20px;
-                            .iconscreen{
-                                font-size: 18px;
-                                position: relative;
-                                cursor: pointer;
-                                margin-right: 20px;
-                                bottom: 3px;
-                            }
-                        }
-                    }
-                }
-            }
-            .channel-content{
-              margin: 20px 30px;
-              padding-top: 0;
-              position: relative;
-              .radio-group{
-                display: grid;
-                grid-template-columns: 240px 240px;
-                grid-template-rows: 30px;
-              }
-              .radio-class{
-                display: flex;
-                align-items: center;
-                /deep/ .el-radio__label{
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                }
-                .radio-img{
-                  height: 26px;
-                  width: 26px;
-                  margin-right: 10px;
-                }
-                .radio-span{
-                  display: inline-block;
-                  max-width: 150px;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  font-size: 14px;
-                  color: #94a4b4;
-                }
+                bottom:3px;
               }
             }
-        }
-        .dialog-source-content{
-            @include point(height,320);
-            @include point(padding,20);
-
-            img{
-                height: 100%;
-                user-select: none;
-            }
-        }
-        .video-dialog-content{
-            width:100%;
-            height:100%;
-            margin: auto;
-            .dialog-hr{
-                border: 0.5px solid ;
-                border-color: #dfe2e9;
-                margin-bottom:10px;
-                bottom: 5px;
-                margin-top: 0;
-            }
-            .video-content{
-                @include point(margin,20);
-                padding-top: 0;
+            .screen-content{
+              display: inline;
+              margin-left: 30px;
+              position: absolute;
+              right: 20px;
+              .iconscreen{
+                font-size: 18px;
                 position: relative;
-                #channelName{
-                    width: 100%;
-                    color: #fff;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    position: absolute;
-                    z-index: 10;
-                    text-align: left;
-                    span{
-                        margin-left: 30px;
-                    }
-                }
-                .icon-footer{
-                    width: 100%;
-                    position: absolute;
-                    bottom: 0px;
-                    color: #fff;
-                    overflow: hidden;
-                    user-select:none;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    z-index: 10;
-                    .iconlside{
-                        float: left;
-                        text-align: left;
-                        .iconplay{
-                            font-size: 18px;
-                            cursor: pointer;
-                            float: left;
-                            margin-left: 30px;
-                        }
-
-                    }
-                    .iconrside{
-                        max-width: 500px;
-                        float: right;
-                        position: relative;
-                        span{
-                            font-size: 13px;
-                            margin-right:6px;
-                            margin-left: 20px;
-                        }
-                        .speed-content{
-                            display: inline-block;
-                            span{
-                                position: relative;
-                                bottom:3px;
-                            }
-                        }
-                        .screen-content{
-                            display: inline;
-                            margin-left: 30px;
-                            position: absolute;
-                            right: 20px;
-                            .iconscreen{
-                                font-size: 18px;
-                                position: relative;
-                                cursor: pointer;
-                                margin-right: 20px;
-                                bottom: 3px;
-                            }
-                        }
-                    }
-                }
-            }
-            .channel-content{
-              margin: 20px 30px;
-              padding-top: 0;
-              position: relative;
-              .radio-group{
-                display: grid;
-                grid-template-columns: 240px 240px;
-                grid-template-rows: 30px;
-              }
-              .radio-class{
-                display: flex;
-                align-items: center;
-                /deep/ .el-radio__label{
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                }
-                .radio-img{
-                  height: 26px;
-                  width: 26px;
-                  margin-right: 10px;
-                }
-                .radio-span{
-                  display: inline-block;
-                  max-width: 150px;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  font-size: 14px;
-                  color: #94a4b4;
-                }
+                cursor: pointer;
+                margin-right: 20px;
+                bottom: 3px;
               }
             }
-        }
-      /deep/ .el-dialog__footer{
-        line-height: 24px;
-        padding: 30px;
-        padding-top: 20px;
-        #cancelBtn{
-          @include point(width,76);
-          @include point(margin-right,20);
-          background-color: #EAEDF2 !important;
-          color: #708090 !important;
-          font-size: 12px;
-          line-height: 12px;
-        }
-        #confirmBtn{
-          @include point(width,76);
-          font-size: 12px;
-          line-height: 12px;
+          }
         }
       }
-        #previewVideo{
-            @include point(min-width,450);
-            @include point(min-height,360);
+      .channel-content{
+        margin: 20px 30px;
+        padding-top: 0;
+        position: relative;
+        .radio-group{
+          display: grid;
+          grid-template-columns: 240px 240px;
+          grid-template-rows: 30px;
         }
+        .radio-class{
+          display: flex;
+          align-items: center;
+          /deep/ .el-radio__label{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .radio-img{
+            height: 26px;
+            width: 26px;
+            margin-right: 10px;
+          }
+          .radio-span{
+            display: inline-block;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 14px;
+            color: #94a4b4;
+          }
+        }
+      }
     }
     .dialog-source-content{
       @include point(height,320);
@@ -1825,9 +1684,32 @@ export default {
         user-select: none;
       }
     }
+    /deep/ .el-dialog__footer{
+      line-height: 24px;
+      padding: 30px;
+      padding-top: 20px;
+      #cancelBtn{
+        @include point(width,76);
+        @include point(margin-right,20);
+        background-color: #EAEDF2 !important;
+        color: #708090 !important;
+        font-size: 12px;
+        line-height: 12px;
+      }
+      #confirmBtn{
+        @include point(width,76);
+        font-size: 12px;
+        line-height: 12px;
+      }
+    }
+    #previewVideo{
+      @include point(min-width,450);
+      @include point(min-height,360);
+    }
   }
 </style>
 <style>
+  @import '../../assets/css/importfile.css';
   .echarts {
     width: 100%;
     height: 100%;
