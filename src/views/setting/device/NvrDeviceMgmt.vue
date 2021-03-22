@@ -10,7 +10,7 @@
           {{ $t('deviceView.submit') }}
         </el-button>
       </div>
-      <div v-else style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;">
+      <div v-else class="device-btns">
         <el-input
           v-if="false"
           v-model="serachVale"
@@ -264,11 +264,9 @@
                 label-position="top"
                 size="mini">
                 <el-form-item label="IVS ID" prop="ivsId">
-                  <el-input
-                    v-model="addNvrData.ivsId"
-                    @input="(val)=>ivsIdChange(val)"
-                    @blur="notShowInputRuleTips('ivsId')"/>
-                  <span v-if="ivsIdRuletip" class="rules">{{ $t('scheduleView.scheduleNameRuletip') }}</span>
+                  <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)"
+                            @blur="notShowInputRuleTips('ivsId')"/>
+                  <span v-if="ivsIdRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
@@ -361,20 +359,7 @@
                       @input="(val)=>channelNameChange(val,item)"/>
                   </div>
                   <div class="nape-dep-data">
-                    <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
-                    <el-select
-                      v-if="item.id === 0"
-                      v-model="item.channelId"
-                      size="mini"
-                      class="nvr-select"
-                      style="margin-left: 10%">
-                      <el-option
-                        v-for="numList in newChannelNumList"
-                        :key="numList.value"
-                        :label="numList.label"
-                        :value="numList.value"
-                        :disabled="numList.disabled"/>
-                    </el-select>
+                    <span class="nape-dep">{{ item.channelId }}</span>
                   </div>
                   <div class="nape-picture-data">
                     <span v-if="item.tempUrl">
@@ -487,10 +472,8 @@
                     </el-col>
                     <el-col :span="10" :offset="2">
                       <el-form-item :label="$t('deviceView.channelOrder')" prop="channelId">
-                        <el-select
-                          v-model="addChannelData.channelId"
-                          :placeholder="$t('deviceView.selectNvrChannel')"
-                          size="mini">
+                        <el-select v-model="addChannelData.channelId"
+                                   :placeholder="$t('deviceView.selectNvrChannel')" size="mini" filterable>
                           <el-option
                             v-for="numList in newChannelNumList"
                             :key="numList.value"
@@ -618,64 +601,32 @@ export default {
           label: '1 ' + this.$t('deviceView.unit')
         },
         {
-          value: 2,
-          label: '2 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 3,
-          label: '3 ' + this.$t('deviceView.unit')
-        },
-        {
           value: 4,
           label: '4 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 5,
-          label: '5 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 6,
-          label: '6 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 7,
-          label: '7 ' + this.$t('deviceView.unit')
         },
         {
           value: 8,
           label: '8 ' + this.$t('deviceView.unit')
         },
         {
-          value: 9,
-          label: '9 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 10,
-          label: '10 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 11,
-          label: '11 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 12,
-          label: '12 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 13,
-          label: '13 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 14,
-          label: '14 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 15,
-          label: '15 ' + this.$t('deviceView.unit')
-        },
-        {
           value: 16,
           label: '16 ' + this.$t('deviceView.unit')
+        },
+        {
+          value: 32,
+          label: '32 ' + this.$t('deviceView.unit')
+        },
+        {
+          value: 64,
+          label: '64 ' + this.$t('deviceView.unit')
+        },
+        {
+          value: 128,
+          label: '128 ' + this.$t('deviceView.unit')
+        },
+        {
+          value: 256,
+          label: '256 ' + this.$t('deviceView.unit')
         }
       ],
       storeDataList: [],
@@ -1467,7 +1418,8 @@ export default {
         const sortArr = self.channelList.sort(self.getSortFun('channelId'));
         const lastChannel = sortArr[sortArr.length - 1];
         const maxChannleId = lastChannel.channelId;
-        const spliceArray = self.channelNumList.filter(x => x.value >= maxChannleId);
+        const maxChannel = Math.pow(2, Math.ceil(Math.log2(maxChannleId)));
+        const spliceArray = self.channelNumList.filter(x => x.value >= maxChannel);
         self.editNvrChannelNumList = spliceArray;
       }
     },
@@ -1799,23 +1751,23 @@ export default {
 
     addNewChannel() {
       const self = this;
-      const channelNum = self.curNVRItem.channelCount;
-      self.channelNumList.forEach(item => {
-        item.disabled = false;
-      });
-      const spliceArray = self.channelNumList.filter(x => x.value <= channelNum);
+      const channelNum = this.curNVRItem.channelCount;
+      const spliceArray = [];
+      for (let item = 1; item <= channelNum; item++) {
+        const channelJson = {};
+        channelJson.value = item;
+        channelJson.label = item;
+        channelJson.disabled = false;
+        spliceArray.push(channelJson);
+      }
       spliceArray.forEach(item => {
-        self.channelList.forEach(_item => {
+        this.channelList.forEach(_item => {
           if (item.value === _item.channelId) {
             item.disabled = true;
           }
         });
       });
-      const deepArray = JSON.parse(JSON.stringify(spliceArray));
-      deepArray.forEach(item => {
-        item.label = item.label.split(' ')[0];
-      });
-      self.newChannelNumList = deepArray;
+      self.newChannelNumList = spliceArray;
       self.showAddChannelDialog = true;
       self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
     },
@@ -1868,11 +1820,11 @@ export default {
     },
 
     ivsIdChange(val) {
-      const self = this;
-      const comment = filterString.all(val, 30);
+      let self = this;
+      let comment = filterString.all(val, 20);
       self.addNvrData.ivsId = comment;
-      const length = filterString.getContentLength(val);
-      if (length > 30) {
+      let length = filterString.getContentLength(val);
+      if (length > 20) {
         this.ivsIdRuletip = true;
       } else {
         this.ivsIdRuletip = false;
@@ -2019,6 +1971,14 @@ export default {
         padding: 0;
         top: 23px;
       }
+    }
+    .device-btns{
+      position:absolute;
+      z-index: 979;
+      right: 30px;
+      top: 23px;
+      float: right;
+      display: none;
     }
     .el-tabPanels{
       padding: 25px calc(25/1920*100vw) 0 calc(25/1920*100vw);

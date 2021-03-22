@@ -3,12 +3,12 @@
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
       <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
-      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">{{ accountName + ' | ' + report.storeName+' '+report.tagName }}<span v-if="!isexportPDF">{{' ('+report.inspectType+')'}}</span></p>
+      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">{{ accountName + ' | ' + report.storeName+' '+report.tagName }}<span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span></p>
       <div class="info-content">
         <div class="pdf_font_24">
-          <span class="info-label" v-if="!isexportPDF">{{ $t('remotePatrol.submitter') }}</span>
+          <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.submitterName }}</span>
-          <span class="info-label" v-if="!isexportPDF">{{ $t('remotePatrol.generateTime') }}</span>
+          <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
           <div style="display:inline-block;">
             <div class="no-print">
@@ -22,14 +22,14 @@
       </div>
     </div>
     <div class="el-acticle">
-      <div v-if="suggest!=null&&suggest.length!=0" class="suggest" :style="isexportPDF ? 'max-height:300px;' : ''">
+      <div v-if="suggest!=null&&suggest.length!=0" :style="isexportPDF ? 'max-height:300px;' : ''" class="suggest">
         <div class="suggest-content">
-            <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
-            <span v-html="turnSuggest(suggest)" class="pdf_font_20"/>
+          <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
+          <span class="pdf_font_20" v-html="turnSuggest(suggest)"/>
         </div>
       </div>
       <el-row class="report-content">
-        <el-col :span="24" class="radior-content" :style="isexportPDF ? 'height:600px;' : ''">
+        <el-col :span="24" :style="isexportPDF ? 'height:600px;' : ''" class="radior-content">
           <div class="header-score">
             <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
             <span class="span-2"><span class="pdf_font_26">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span></span>
@@ -92,37 +92,43 @@
           :span="tempList.length === 4 ? 6 : 8"
           :key="index"
           class="details-content">
-          <div v-if="index < 3" class="details">
-            <div class="item-header">
-              <i :class="item.iconSrc" class="iconfont icontemp" :style="isexportPDF ? 'font-size:26px;' : ''"/>
+          <div v-if="index < 3" class="details" :style="isexportPDF ? 'height:430px;' : ''">
+            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''">
+              <i :class="item.iconSrc" :style="isexportPDF ? 'font-size:26px;' : ''" class="iconfont icontemp"/>
               <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
               <div class="count-content">
                 <span class="count"><span class="pdf_font_36">{{ item.itemCount }}</span></span>
                 <span class="blag"><span class="pdf_font_18">{{ $t('remotePatrol.unit') }}</span></span>
               </div>
             </div>
-            <div class="item-content">
-              <el-scrollbar style="height:100%;" class="el-menuscrollbar">
+            <div class="item-content" :style="isexportPDF ? 'height:380px;' : ''">
+              <el-scrollbar :style="isexportPDF ? 'height:75%;' : 'height:98%;'" class="el-menuscrollbar">
                 <div v-for="_item in item.itemList" :key="_item.id" class="item-details">
-                    <div class="item-blag"/>
-                    <span class="item-name"><span class="pdf_font_20">{{ index !== 2 ?_item.name : _item.subject }}</span></span>
-                    <span class="item-des"><span class="pdf_font_18"></span></span>
+                  <div :class="isexportPDF ? 'pdf_item_blag' : 'item-blag'"/>
+                  <span class="item-name"><span class="pdf_font_20">{{ index !== 2 ?_item.name : _item.subject }}</span></span>
+                  <span class="item-des"><span class="pdf_font_18"/></span>
                 </div>
               </el-scrollbar>
-              <span v-if="item.itemCount > 6 && isexportPDF" class="moreInfotip">
+              <span v-if="item.itemCount > 3 && isexportPDF" class="moreInfotip">
                 <span class="pdf_font_18">{{ $t('remotePatrol.more') }}</span>
               </span>
             </div>
           </div>
-          <div v-else class="details">
-            <div class="item-header">
-              <i :class="item.iconSrc" class="iconfont icontemp" :style="isexportPDF ? 'font-size:26px;' : ''"/>
+          <div v-else class="details" :style="isexportPDF ? 'height:430px;' : ''">
+            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''">
+              <i :class="item.iconSrc" :style="isexportPDF ? 'font-size:26px;' : ''" class="iconfont icontemp"/>
               <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
             </div>
-            <div class="item-content item-img">
-              <div class="item-details" style="height:100%;">
-                <div class="pdf_font_20">
-                  <img :src="item.itemList">
+            <div class="item-content item-img" :style="isexportPDF ? 'height:380px;' : ''">
+              <div class="item-details signature-details" style="height:100%;">
+                <div
+                  v-for="(signatureItem,signatureIndex) in item.itemList"
+                  :key="signatureIndex"
+                  :class="item.itemList.length > 2 && 'signature-items'"
+                  class="signature-item"
+                  @click="displayEnlargeSignature(signatureItem.content)">
+                  <span v-if="signatureItem.type === 1">{{ $t('remotePatrol.signature') }}</span>
+                  <img :src="signatureItem.content" :class="signatureItem.type === 1 ? 'signature': ''" class="signature-content">
                 </div>
               </div>
             </div>
@@ -131,9 +137,9 @@
       </el-row>
       <el-row class="row-detail">
         <el-col>
-          <div class="item-header" @click=" isup ? isup = false : isup = true">
-            <i v-if="isup" class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"  :style="isexportPDF ? 'font-size:22px;' : ''"/>
-            <i v-if="!isup" class="iconfont icon-zhankai1 icontemp" style="color:#7d8cad;"  :style="isexportPDF ? 'font-size:22px;' : ''"/>
+          <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''" @click=" isup ? isup = false : isup = true">
+            <i v-if="isup" :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"/>
+            <i v-if="!isup" :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icon-zhankai1 icontemp" style="color:#7d8cad;"/>
             <span class="title-lable"><span class="pdf_font_20">{{ $t('remotePatrol.detailInfo') }}</span></span>
           </div>
           <div v-show="isup" class="item-content">
@@ -146,14 +152,14 @@
                       <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
                       <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
                     </div>
-                    <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn" :style="isexportPDF ? 'width:110px;' : 'width:50px;'"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
-                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn-failed" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                    <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn" :style="isexportPDF ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
+                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn-failed" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}</span>
                     </div>
-                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn-pass" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn-pass" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}</span>
                     </div>
-                    <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:170px;' : 'width:100px;'">
+                    <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                       <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
                     </div>
                   </div>
@@ -163,7 +169,7 @@
                     style="padding-bottom: 20px;">
                     <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
                     <div v-if="_item.showAudio" class="cdm-voice">
-                      <div class="speech-info" @click="startSpeechItem(_item,_index)">
+                      <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
                         <i class="iconfont icon-yuyin icon-speech"/>
                       </div>
                       <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
@@ -180,10 +186,10 @@
                         :key="sourceindex"
                         :height="imgHeight+'px'"
                         class="source-details">
-                        <div v-if="sourceitem.mediaType === 2" class="img-content">
+                        <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''">
                           <img
                             :title="imgTitle"
-                            :style="isexportPDF ? 'width:150px;height:100px;' : 'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
                             :src="sourceitem.url"
                             :height="imgHeight+'px'"
                             :onerror="deafultImg"
@@ -196,7 +202,7 @@
                           @click="playCommentVideo(sourceitem,sourceindex)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                           <img
-                            :style="isexportPDF ? 'width:150px;height:100px;':'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
                             :src="videoImgSrc"
                             :height="imgHeight+'px'"
                             class="imgLittle">
@@ -219,7 +225,7 @@
                     class="content-detail-main">
                     <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
                     <div v-if="item.showAudio" class="cdm-voice">
-                      <div class="speech-info" @click="startSpeechFeedBacks(item,index)">
+                      <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
                         <i class="iconfont icon-yuyin icon-speech"/>
                       </div>
                       <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
@@ -239,7 +245,7 @@
                         <div v-if="sourceitem.mediaType === 2" class="img-content">
                           <img
                             :title="imgTitle"
-                            :style="isexportPDF ? 'width:150px;height:100px;' : 'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
                             :src="sourceitem.url"
                             :height="imgHeight+'px'"
                             :onerror="deafultImg"
@@ -252,7 +258,7 @@
                           @click="playCommentVideo(sourceitem,index)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                           <img
-                            :style="isexportPDF?'width:150px;height:100px;':'width: calc(130/1920*100vw);'"
+                            :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
                             :src="videoImgSrc"
                             :height="imgHeight+'px'"
                             class="imgLittle">
@@ -312,11 +318,25 @@
         </el-dialog>
       </div>
     </div>
+    <el-dialog
+      v-if="showSignatureFlag"
+      :title="$t('eventView.view')"
+      :visible.sync="showSignatureFlag"
+      :close-on-click-modal="false"
+      width="850px"
+      top="12%">
+      <div class="video-dialog-content" style="overflow:hidden;">
+        <hr class="dialog-hr">
+        <div class="dialog-source-content">
+          <img :src="signatureSrc">
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
 import ECharts from 'vue-echarts';
-import { getInspectReportInfo, getInspectReportDetail } from '../../api/inspect';
+import { getInspectReportInfo, getInspectReportDetail } from '@/api/inspect';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -333,7 +353,7 @@ export default {
 
   data() {
     return {
-      accountName:'',
+      accountName: '',
       reportId: 0,
       downloadProgress: false,
       hasAttachment: 0,
@@ -391,27 +411,29 @@ export default {
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
       theaderPassFail: [
-        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;'},
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;',pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;',pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;',pdfWidth: 'width:15%;' }
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;', pdfWidth: 'width:15%;' }
       ],
       theaderScore: [
-        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;',pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;',pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;',pdfWidth: 'width:15%;' }
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
       ],
       theaderOther: [
-        { name: '', width: 'width:11%;',pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;',pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;',pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;',pdfWidth: 'width:11.5%;' }
-      ]
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;', pdfWidth: 'width:11.5%;' }
+      ],
+      showSignatureFlag: false,
+      signatureSrc: ''
     };
   },
 
@@ -566,7 +588,7 @@ export default {
         const temp = [];
         const feedtemp = [];
         // let gradetotal = []
-        data.groups.sort((a, b) => {return a.groupType - b.groupType; });
+        data.groups.sort((a, b) => { return a.groupType - b.groupType; });
         data.groups.forEach((groupitem, groupindex) => {
           const obj = {
             items: []
@@ -767,7 +789,7 @@ export default {
 
     getReportItemsListInfo(data) {
       let tempArray = [];
-      this.isInsiteInspect && data.signature ? tempArray = new Array(4) : tempArray = new Array(3);
+      this.isInsiteInspect && data.signatures ? tempArray = new Array(4) : tempArray = new Array(3);
       tempArray[0] = {
         itemTitleName: this.$t('remotePatrol.notableItem'),
         iconSrc: 'icon-zhongxindingwei',
@@ -786,12 +808,12 @@ export default {
         itemCount: data.feedback.length,
         itemList: data.feedback
       };
-      if (this.isInsiteInspect && data.signature) {
+      if (this.isInsiteInspect && data.signatures) {
         tempArray[3] = {
-          itemTitleName: this.$t('remotePatrol.signature'),
+          itemTitleName: this.$t('remotePatrol.signatureAndPic'),
           iconSrc: 'icon-fankui',
           itemCount: '',
-          itemList: data.signature.content
+          itemList: data.signatures
         };
       }
       this.tempList = tempArray;
@@ -880,7 +902,7 @@ export default {
                 color: '#7d8cad',
                 borderRadius: 3,
                 padding: [3, 5]
-              },
+              }
             },
             splitArea: {
               show: false
@@ -927,8 +949,8 @@ export default {
         }
         ],
         tooltip: {
-          position: function (point, params, dom, rect, size) {
-              return [point[0], '10%'];
+          position: function(point, params, dom, rect, size) {
+            return [point[0], '10%'];
           }
         }
       };
@@ -941,6 +963,11 @@ export default {
 
     adjustChart() {
       this.$refs.chartRadar && this.$refs.chartRadar.resize();
+    },
+
+    displayEnlargeSignature(src) {
+      this.showSignatureFlag = true;
+      this.signatureSrc = src;
     }
   }
 };
@@ -960,6 +987,7 @@ export default {
     #{$poi}:checkRem($val);
   }
   @media print {
+  .details{page-break-inside:avoid;}
   .content-detail-title{ page-break-inside:avoid;}
   .cdm-title{ page-break-inside:avoid;}
   .cdm-voice{ page-break-inside:avoid;}
@@ -1263,7 +1291,6 @@ export default {
           border: 1px solid $border;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
           .item-header {
-
             position: relative;
             background-color: $background;
             height: 40px;
@@ -1294,7 +1321,6 @@ export default {
           .item-content {
             padding-top: calc(20 / 1920 * 100vw);
             height: 280px;
-            position: relative;
             .item-details {
               height: auto;
               font-size: calc(14 / 1920 * 100vw);
@@ -1312,6 +1338,15 @@ export default {
                 margin-right: calc(16 / 1920 * 100vw);
                 margin-top: 3px;
               }
+              .pdf_item_blag{
+                width:18px;
+                height:18px;
+                border-radius: 50%;
+                background-color: $tab;
+                display: inline-block;
+                margin-right: 16px;
+                margin-top: 8px;
+              }
               .item-name{
                 flex: 1;
               }
@@ -1322,9 +1357,42 @@ export default {
                 margin-left: calc(35 / 1920 * 100vw);
                 color: $tab;
               }
-              img {
+
+            }
+            .signature-details{
+              margin-bottom: 0;
+              padding: 0;
+              display: flex;
+              flex-wrap: wrap;
+              .signature-item{
+                width: 50%;
                 height: 100%;
-                width: 100%;
+                flex-grow: 1;
+                position: relative;
+                border: 1px solid $border;
+                border-left: none;
+                cursor: pointer;
+                &:nth-child(n+3){
+                  border-top: none;
+                }
+                span{
+                  position: absolute;
+                  padding-left: calc(20 / 1920 * 100vw);
+                  padding-top: 5px;
+                  color: $tab;
+                  font-size: 12px;
+                }
+                .signature-content{
+                  height: 100%;
+                  width: 100%;
+                  object-fit: contain;
+                }
+                .signature{
+                  padding-top: 20px;
+                }
+              }
+              .signature-items{
+                height: 50%;
               }
             }
             .moreInfotip{
@@ -1333,10 +1401,11 @@ export default {
               right:10px;
               font-size: 12px;
               color:$tab;
+              margin:0;
             }
           }
           .item-img {
-            padding-bottom: calc(20 / 1920 * 100vw);
+            padding: 0;
           }
         }
       }
@@ -1458,6 +1527,20 @@ export default {
                         @include point(margin-left,5);
                     }
                 }
+                .pdf_speech_info{
+                  width:160px;
+                  height:52px;
+                  background-color: #FFEDED;
+                  color: $red;
+                  border: 1px solid #FEC0C7;
+                  border-radius:30px;
+                  display: inline-block;
+                  .icon-speech{
+                      font-size:26px;
+                      line-height:52px;
+                      margin-left:10px;
+                  }
+                }
                 .often-text{
                     @include point(margin-left,20);
                 }
@@ -1499,273 +1582,158 @@ export default {
           }
         }
       }
-      .video-dialog-content{
-            width:100%;
-            height:100%;
-            margin: auto;
-            .dialog-hr{
-                border: 0.5px solid ;
-                border-color: #dfe2e9;
-                margin-bottom:10px;
-                bottom: 5px;
-                margin-top: 0;
+    }
+    .video-dialog-content{
+      width:100%;
+      height:100%;
+      margin: auto;
+      .dialog-hr{
+        border: 0.5px solid ;
+        border-color: #dfe2e9;
+        margin-bottom:10px;
+        bottom: 5px;
+        margin-top: 0;
+      }
+      .video-content{
+        @include point(margin,20);
+        padding-top: 0;
+        position: relative;
+        #channelName{
+          width: 100%;
+          color: #fff;
+          background-color: rgba($color: #24293d, $alpha: 0.6);
+          height: 40px;
+          line-height: 40px;
+          position: absolute;
+          z-index: 10;
+          text-align: left;
+          span{
+            margin-left: 30px;
+          }
+        }
+        .icon-footer{
+          width: 100%;
+          position: absolute;
+          bottom: 0px;
+          color: #fff;
+          overflow: hidden;
+          user-select:none;
+          background-color: rgba($color: #24293d, $alpha: 0.6);
+          height: 40px;
+          line-height: 40px;
+          z-index: 10;
+          .iconlside{
+            float: left;
+            text-align: left;
+            .iconplay{
+              font-size: 18px;
+              cursor: pointer;
+              float: left;
+              margin-left: 30px;
             }
-            .video-content{
-                @include point(margin,20);
-                padding-top: 0;
+
+          }
+          .iconrside{
+            max-width: 500px;
+            float: right;
+            position: relative;
+            span{
+              font-size: 13px;
+              margin-right:6px;
+              margin-left: 20px;
+            }
+            .speed-content{
+              display: inline-block;
+              span{
                 position: relative;
-                #channelName{
-                    width: 100%;
-                    color: #fff;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    position: absolute;
-                    z-index: 10;
-                    text-align: left;
-                    span{
-                        margin-left: 30px;
-                    }
-                }
-                .icon-footer{
-                    width: 100%;
-                    position: absolute;
-                    bottom: 0px;
-                    color: #fff;
-                    overflow: hidden;
-                    user-select:none;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    z-index: 10;
-                    .iconlside{
-                        float: left;
-                        text-align: left;
-                        .iconplay{
-                            font-size: 18px;
-                            cursor: pointer;
-                            float: left;
-                            margin-left: 30px;
-                        }
-
-                    }
-                    .iconrside{
-                        max-width: 500px;
-                        float: right;
-                        position: relative;
-                        span{
-                            font-size: 13px;
-                            margin-right:6px;
-                            margin-left: 20px;
-                        }
-                        .speed-content{
-                            display: inline-block;
-                            span{
-                                position: relative;
-                                bottom:3px;
-                            }
-                        }
-                        .screen-content{
-                            display: inline;
-                            margin-left: 30px;
-                            position: absolute;
-                            right: 20px;
-                            .iconscreen{
-                                font-size: 18px;
-                                position: relative;
-                                cursor: pointer;
-                                margin-right: 20px;
-                                bottom: 3px;
-                            }
-                        }
-                    }
-                }
-            }
-            .channel-content{
-              margin: 20px 30px;
-              padding-top: 0;
-              position: relative;
-              .radio-group{
-                display: grid;
-                grid-template-columns: 240px 240px;
-                grid-template-rows: 30px;
-              }
-              .radio-class{
-                display: flex;
-                align-items: center;
-                /deep/ .el-radio__label{
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                }
-                .radio-img{
-                  height: 26px;
-                  width: 26px;
-                  margin-right: 10px;
-                }
-                .radio-span{
-                  display: inline-block;
-                  max-width: 150px;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  font-size: 14px;
-                  color: #94a4b4;
-                }
+                bottom:3px;
               }
             }
-        }
-        .dialog-source-content{
-            @include point(height,320);
-            @include point(padding,20);
-
-            img{
-                height: 100%;
-                user-select: none;
-            }
-        }
-        .video-dialog-content{
-            width:100%;
-            height:100%;
-            margin: auto;
-            .dialog-hr{
-                border: 0.5px solid ;
-                border-color: #dfe2e9;
-                margin-bottom:10px;
-                bottom: 5px;
-                margin-top: 0;
-            }
-            .video-content{
-                @include point(margin,20);
-                padding-top: 0;
+            .screen-content{
+              display: inline;
+              margin-left: 30px;
+              position: absolute;
+              right: 20px;
+              .iconscreen{
+                font-size: 18px;
                 position: relative;
-                #channelName{
-                    width: 100%;
-                    color: #fff;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    position: absolute;
-                    z-index: 10;
-                    text-align: left;
-                    span{
-                        margin-left: 30px;
-                    }
-                }
-                .icon-footer{
-                    width: 100%;
-                    position: absolute;
-                    bottom: 0px;
-                    color: #fff;
-                    overflow: hidden;
-                    user-select:none;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    z-index: 10;
-                    .iconlside{
-                        float: left;
-                        text-align: left;
-                        .iconplay{
-                            font-size: 18px;
-                            cursor: pointer;
-                            float: left;
-                            margin-left: 30px;
-                        }
-
-                    }
-                    .iconrside{
-                        max-width: 500px;
-                        float: right;
-                        position: relative;
-                        span{
-                            font-size: 13px;
-                            margin-right:6px;
-                            margin-left: 20px;
-                        }
-                        .speed-content{
-                            display: inline-block;
-                            span{
-                                position: relative;
-                                bottom:3px;
-                            }
-                        }
-                        .screen-content{
-                            display: inline;
-                            margin-left: 30px;
-                            position: absolute;
-                            right: 20px;
-                            .iconscreen{
-                                font-size: 18px;
-                                position: relative;
-                                cursor: pointer;
-                                margin-right: 20px;
-                                bottom: 3px;
-                            }
-                        }
-                    }
-                }
-            }
-            .channel-content{
-              margin: 20px 30px;
-              padding-top: 0;
-              position: relative;
-              .radio-group{
-                display: grid;
-                grid-template-columns: 240px 240px;
-                grid-template-rows: 30px;
-              }
-              .radio-class{
-                display: flex;
-                align-items: center;
-                /deep/ .el-radio__label{
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                }
-                .radio-img{
-                  height: 26px;
-                  width: 26px;
-                  margin-right: 10px;
-                }
-                .radio-span{
-                  display: inline-block;
-                  max-width: 150px;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  font-size: 14px;
-                  color: #94a4b4;
-                }
+                cursor: pointer;
+                margin-right: 20px;
+                bottom: 3px;
               }
             }
-        }
-      /deep/ .el-dialog__footer{
-        line-height: 24px;
-        padding: 30px;
-        padding-top: 20px;
-        #cancelBtn{
-          @include point(width,76);
-          @include point(margin-right,20);
-          background-color: #EAEDF2 !important;
-          color: #708090 !important;
-          font-size: 12px;
-          line-height: 12px;
-        }
-        #confirmBtn{
-          @include point(width,76);
-          font-size: 12px;
-          line-height: 12px;
+          }
         }
       }
-        #previewVideo{
-            @include point(min-width,450);
-            @include point(min-height,360);
+      .channel-content{
+        margin: 20px 30px;
+        padding-top: 0;
+        position: relative;
+        .radio-group{
+          display: grid;
+          grid-template-columns: 240px 240px;
+          grid-template-rows: 30px;
         }
+        .radio-class{
+          display: flex;
+          align-items: center;
+          /deep/ .el-radio__label{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .radio-img{
+            height: 26px;
+            width: 26px;
+            margin-right: 10px;
+          }
+          .radio-span{
+            display: inline-block;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 14px;
+            color: #94a4b4;
+          }
+        }
+      }
+    }
+    .dialog-source-content{
+      @include point(height,320);
+      @include point(padding,20);
+
+      img{
+        height: 100%;
+        user-select: none;
+      }
+    }
+    /deep/ .el-dialog__footer{
+      line-height: 24px;
+      padding: 30px;
+      padding-top: 20px;
+      #cancelBtn{
+        @include point(width,76);
+        @include point(margin-right,20);
+        background-color: #EAEDF2 !important;
+        color: #708090 !important;
+        font-size: 12px;
+        line-height: 12px;
+      }
+      #confirmBtn{
+        @include point(width,76);
+        font-size: 12px;
+        line-height: 12px;
+      }
+    }
+    #previewVideo{
+      @include point(min-width,450);
+      @include point(min-height,360);
     }
   }
 </style>
 <style>
+  @import '../../assets/css/importfile.css';
   .echarts {
     width: 100%;
     height: 100%;

@@ -424,7 +424,8 @@ export default {
     'getBeseyeStreamError': '獲取Beseye視頻流信息失敗！',
     'loading': '加載中...',
     'closeConnection': '連接關閉',
-    'errorConnection': '連接錯誤'
+    'errorConnection': '連接錯誤',
+    'signatureAndPic': '簽名與照片'
   },
 
   // event Management page language

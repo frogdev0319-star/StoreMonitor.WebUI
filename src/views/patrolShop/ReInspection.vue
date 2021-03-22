@@ -1593,7 +1593,7 @@ export default {
       const self = this;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-      if (e == 0) {
+      if (e === 0) {
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
       } else {
@@ -2776,8 +2776,7 @@ export default {
       });
     },
     itemDescriptionChanged(val, item) {
-      const self = this;
-      const content = filterString.comment(val, 200);
+      const content = filterString.all(val, 200);
       console.log(content);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
@@ -2789,7 +2788,7 @@ export default {
     },
     eventNameChanged(val) {
       const self = this;
-      const content = filterString.comment(val, 50);
+      const content = filterString.all(val, 50);
       console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
@@ -2802,7 +2801,7 @@ export default {
     },
     eventDesChanged(val) {
       const self = this;
-      const content = filterString.comment(val, 200);
+      const content = filterString.all(val, 200);
       console.log(content);
       self.eventDes = content;
       const length = filterString.getContentLength(val);

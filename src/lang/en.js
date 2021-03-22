@@ -401,7 +401,7 @@ export default {
     'passItem': 'Qualified Items',
     'failedItem': 'Failed Items',
     'generateTime': 'Generated Time:',
-    'more': 'More details',
+    'more': 'More',
     'InspectionDetail': 'Export report',
     'improved': 'To Be Improved',
     'notableItem': 'Notable Items',
@@ -418,7 +418,8 @@ export default {
     'getBeseyeStreamError': 'Failed to get beseye stream info!',
     'loading': 'Loading...',
     'closeConnection': 'Connection close',
-    'errorConnection': 'Connection error'
+    'errorConnection': 'Connection error',
+    'signatureAndPic': 'Signature & Picture'
   },
 
   // event Management page language

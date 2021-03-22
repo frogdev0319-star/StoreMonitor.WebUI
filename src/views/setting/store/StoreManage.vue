@@ -112,7 +112,7 @@
                 :key="_index">
                 {{ _item }}
               </span>
-=              <span slot="reference" class="napeTable-prp">{{ scope.row.napeTable }}</span>
+              <span slot="reference" class="napeTable-prp">{{ scope.row.napeTable }}</span>
             </el-popover>
             <span v-else>
               {{ scope.row.napeTable }}

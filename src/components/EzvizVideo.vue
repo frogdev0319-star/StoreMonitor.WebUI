@@ -566,8 +566,6 @@ export default {
     },
 
     async ivsId(newValue, oldValue) {
-      console.log(newValue);
-      console.log(oldValue);
       const self = this;
       if (newValue.length > 0) {
         await self.getEzvizAccessToken(newValue);

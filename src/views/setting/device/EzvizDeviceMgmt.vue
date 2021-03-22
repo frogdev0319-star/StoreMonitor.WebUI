@@ -544,64 +544,32 @@ export default {
           label: '1 ' + this.$t('deviceView.unit')
         },
         {
-          value: 2,
-          label: '2 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 3,
-          label: '3 ' + this.$t('deviceView.unit')
-        },
-        {
           value: 4,
           label: '4 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 5,
-          label: '5 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 6,
-          label: '6 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 7,
-          label: '7 ' + this.$t('deviceView.unit')
         },
         {
           value: 8,
           label: '8 ' + this.$t('deviceView.unit')
         },
         {
-          value: 9,
-          label: '9' + this.$t('deviceView.unit')
-        },
-        {
-          value: 10,
-          label: '10 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 11,
-          label: '11 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 12,
-          label: '12 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 13,
-          label: '13 ' + this.$t('deviceView.unit')
-        },
-        {
-          value: 14,
-          label: '14' + this.$t('deviceView.unit')
-        },
-        {
-          value: 15,
-          label: '15 ' + this.$t('deviceView.unit')
-        },
-        {
           value: 16,
           label: '16 ' + this.$t('deviceView.unit')
+        },
+        {
+          value: 32,
+          label: '32 ' + this.$t('deviceView.unit')
+        },
+        {
+          value: 64,
+          label: '64 ' + this.$t('deviceView.unit')
+        },
+        {
+          value: 128,
+          label: '128 ' + this.$t('deviceView.unit')
+        },
+        {
+          value: 256,
+          label: '256 ' + this.$t('deviceView.unit')
         }
       ],
       storeDataList: [],
@@ -1153,7 +1121,8 @@ export default {
         const sortArr = self.channelList.sort(self.getSortFun('channelId'));
         const lastChannel = sortArr[sortArr.length - 1];
         const maxChannleId = lastChannel.channelId;
-        const spliceArray = self.channelNumList.filter(x => x.value >= maxChannleId);
+        const maxChannel = Math.pow(2, Math.ceil(Math.log2(maxChannleId)));
+        const spliceArray = self.channelNumList.filter(x => x.value >= maxChannel);
         self.editChannelNumList = spliceArray;
       }
     },
@@ -1424,23 +1393,23 @@ export default {
     // add new channel
     addNewChannel() {
       const self = this;
-      const channelNum = self.curEzvizItem.channelCount;
-      self.channelNumList.forEach(item => {
-        item.disabled = false;
-      });
-      const spliceArray = self.channelNumList.filter(x => x.value <= channelNum);
+      const channelNum = this.curEzvizItem.channelCount;
+      const spliceArray = [];
+      for (let item = 1; item <= channelNum; item++) {
+        const channelJson = {};
+        channelJson.value = item;
+        channelJson.label = item;
+        channelJson.disabled = false;
+        spliceArray.push(channelJson);
+      }
       spliceArray.forEach(item => {
-        self.channelList.forEach(_item => {
+        this.channelList.forEach(_item => {
           if (item.value === _item.channelId) {
             item.disabled = true;
           }
         });
       });
-      const deepArray = JSON.parse(JSON.stringify(spliceArray));
-      deepArray.forEach(item => {
-        item.label = item.label.split(' ')[0];
-      });
-      self.newChannelNumList = deepArray;
+      self.newChannelNumList = spliceArray;
       self.showAddChannelDialog = true;
       self.initAddChannelFormData();
     },
