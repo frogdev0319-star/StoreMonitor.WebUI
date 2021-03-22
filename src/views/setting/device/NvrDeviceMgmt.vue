@@ -7,7 +7,7 @@
           {{ $t('deviceView.submit') }}
         </el-button>
       </div>
-      <div v-else style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;">
+      <div v-else class="device-btns">
         <el-input
           v-if="false"
           v-model="serachVale"
@@ -245,7 +245,7 @@
                 <el-form-item label="IVS ID" prop="ivsId">
                   <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)"
                             @blur="notShowInputRuleTips('ivsId')"/>
-                  <span v-if="ivsIdRuletip" class="rules">{{ $t('scheduleView.scheduleNameRuletip') }}</span>
+                  <span v-if="ivsIdRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
                 </el-form-item>
                 <el-form-item style="height: 57px;">
                   <el-col :span="13">
@@ -1829,10 +1829,10 @@ export default {
 
     ivsIdChange(val) {
       let self = this;
-      let comment = filterString.all(val, 30);
+      let comment = filterString.all(val, 20);
       self.addNvrData.ivsId = comment;
       let length = filterString.getContentLength(val);
-      if (length > 30) {
+      if (length > 20) {
         this.ivsIdRuletip = true;
       } else {
         this.ivsIdRuletip = false;
@@ -1979,6 +1979,14 @@ export default {
         padding: 0;
         top: 23px;
       }
+    }
+    .device-btns{
+      position:absolute;
+      z-index: 979;
+      right: 30px;
+      top: 23px;
+      float: right;
+      display: none;
     }
     .el-tabPanels{
       padding: 25px calc(25/1920*100vw) 0 calc(25/1920*100vw);
