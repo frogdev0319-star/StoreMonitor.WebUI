@@ -1,7 +1,7 @@
 <template>
   <el-row :style="{'height':varyWindowHeight-170+'px'}" class="el-device">
     <el-col :span="24" class="el-btns">
-      <div v-if="activeName === 'device'" style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;">
+      <div v-if="activeName === 'device'" class="device-btns">
         <el-input
           v-if="false"
           v-model="serachVale"
@@ -2205,6 +2205,14 @@ export default {
         @include point(right,25);
         z-index: 979;
         @include point(width,90);
+      }
+      .device-btns{
+        display: none;
+        position:absolute;
+        z-index: 979;
+        right: 30px;
+        top: 23px;
+        float: right;
       }
     }
     .addNvr .ezviz-form{
