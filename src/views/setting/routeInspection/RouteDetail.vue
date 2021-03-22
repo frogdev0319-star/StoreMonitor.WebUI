@@ -3,8 +3,6 @@
     <el-row>
       <el-col :span="24" class="detail-title">
         <div class="table-right-post" @click="setItem">
-          <!-- <span class="title-title " v-if="routeData.length!=0">{{routeName}} {{$t('insSettingView.contains')}}{{typeNum}} {{$t('insSettingView.group')}},
-                        {{itemNum}} {{$t('insSettingView.item')}}</span> -->
           <i class="iconfont icon-quxiaolianjie"/>
           <span class="post-label">{{ $t('insSettingView.relationDuty') }}:</span>
           <span class="post-concent">{{ routeData[0].ModelPost }}</span>
