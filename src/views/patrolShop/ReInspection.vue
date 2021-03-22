@@ -3593,8 +3593,7 @@ export default {
       });
     },
     itemDescriptionChanged(val, item) {
-      const self = this;
-      const content = filterString.comment(val, 200);
+      const content = filterString.all(val, 200);
       console.log(content);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
@@ -3606,7 +3605,7 @@ export default {
     },
     eventNameChanged(val) {
       const self = this;
-      const content = filterString.comment(val, 50);
+      const content = filterString.all(val, 50);
       console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
@@ -3619,7 +3618,7 @@ export default {
     },
     eventDesChanged(val) {
       const self = this;
-      const content = filterString.comment(val, 200);
+      const content = filterString.all(val, 200);
       console.log(content);
       self.eventDes = content;
       const length = filterString.getContentLength(val);
