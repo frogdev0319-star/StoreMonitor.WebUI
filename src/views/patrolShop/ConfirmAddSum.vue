@@ -582,7 +582,7 @@ export default {
       });
       self.uploadProgress = false;
     },
-    
+
     getRouteData() {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
@@ -888,7 +888,7 @@ $h1:#292e36;
 @mixin point($poi,$val){
     #{$poi}:checkRem($val);
 }
-.AddSumupLoad /deep/ .el-dialog__body{
+.AddSumupLoad >>> .el-dialog__body{
     padding:30px 40px !important;
     text-align: left;
     .body-content{
@@ -999,49 +999,8 @@ $h1:#292e36;
                 grid-template-columns: 240px 240px;
                 grid-template-rows: 30px;
               }
-              .radio-class{
-                display: flex;
-                align-items: center;
-                /deep/ .el-radio__label{
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                }
-                .radio-img{
-                  height: 26px;
-                  width: 26px;
-                  margin-right: 10px;
-                }
-                .radio-span{
-                  display: inline-block;
-                  max-width: 150px;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  font-size: 14px;
-                  color: #94a4b4;
-                }
-              }
             }
         }
-      /deep/ .el-dialog__footer{
-        line-height: 24px;
-        padding: 30px;
-        padding-top: 20px;
-        #cancelBtn{
-          @include point(width,76);
-          @include point(margin-right,20);
-          background-color: #EAEDF2 !important;
-          color: #708090 !important;
-          font-size: 12px;
-          line-height: 12px;
-        }
-        #confirmBtn{
-          @include point(width,76);
-          font-size: 12px;
-          line-height: 12px;
-        }
-      }
         #previewVideo{
             @include point(min-width,450);
             @include point(min-height,360);

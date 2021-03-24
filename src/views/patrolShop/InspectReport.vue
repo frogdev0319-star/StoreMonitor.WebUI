@@ -1016,7 +1016,7 @@ export default {
   .fade-enter, .fade-leave-active {
     opacity: 0
   }
-  .AddSumupLoad /deep/ .el-dialog__body{
+  .AddSumupLoad >>> .el-dialog__body{
     padding:30px 40px !important;
     text-align: left;
     .body-content{
@@ -1677,7 +1677,7 @@ export default {
         .radio-class{
           display: flex;
           align-items: center;
-          /deep/ .el-radio__label{
+          >>> .el-radio__label{
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1708,7 +1708,7 @@ export default {
         user-select: none;
       }
     }
-    /deep/ .el-dialog__footer{
+    >>> .el-dialog__footer{
       line-height: 24px;
       padding: 30px;
       padding-top: 20px;

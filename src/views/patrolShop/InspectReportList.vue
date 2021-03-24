@@ -1432,76 +1432,13 @@ $suggestBack:#F1F6FE;
                   margin-right: 10px;
                 };
             }
-          /deep/ .content .el-select.el-select--medium{
+          >>> .content .el-select.el-select--medium{
             @media screen and (min-width: 1280px) and (max-width: 1360px){
               width: 85px;
             };
             @media screen and (max-width: 1022px){
               margin-right: 10px;
             };
-          }
-          .stores-panel{
-            position: relative;
-            display: inline-block;
-            .month-content{
-              width: calc(200/1920*100vw);
-              display: inline-block;
-              position: relative;
-              cursor: pointer;
-              #elMonth{
-                width: 200px;
-                border-radius: 0px;
-                background-color: #f0f5f8;
-              }
-              .el-input{
-                width: calc(160/1920*100vw);
-                /deep/ .el-input__inner{
-                  padding-right: 20px;
-                  height: calc(36/1920*100vw);
-                  line-height: calc(36/1920*100vw);
-                  background-color: #f4f5f9;
-                  color: $tab;
-                }
-              }
-              .input-arrow-panel{
-                width: calc(160/1920*100vw);
-                height: calc(36/1920*100vw);
-                position: absolute;
-                background-color: transparent;
-                cursor: pointer;
-                z-index: 100;
-              }
-              .icon-input{
-                position: relative;
-                right: 25px;
-                top: 1px;
-                font-size: 12px;
-                color: #C0C4CC;
-              }
-            }
-            .month-panel{
-              position: absolute;
-              margin-top: 3px;
-              white-space:nowrap;
-              box-sizing: border-box;
-              height: 150px;
-              z-index: 980;
-              background-color: #fff;
-              border: 1px solid #ddd;
-              padding: 5px;
-              overflow: auto;
-              .month-details{
-                padding: 2px 0px;
-                span{
-                  margin-left: 10px;
-                  font-size: 14px;
-                  color: #606266;
-                }
-                .el-checkbox{
-                  margin-right: 0;
-                }
-              }
-            }
           }
             .search-input{
                 width: calc(160/1920*100vw);
@@ -1661,10 +1598,10 @@ $suggestBack:#F1F6FE;
       padding-left: calc(20/1920*100vw);
       margin-bottom: 20px;
     }
-    .list-table /deep/ .report-cell-class .cell{
+    .list-table >>> .report-cell-class .cell{
       padding-left: calc(20/1920*100vw) !important;
     }
-    .list-table /deep/ .report-header-class .cell{
+    .list-table >>> .report-header-class .cell{
       padding-left: calc(20/1920*100vw) !important;
     }
     .report-card{
