@@ -567,7 +567,7 @@ export default {
                   @include point(width,140);
                  // @include point(margin-right,25);
                   border: none;
-                  /deep/ .el-input.is-disabled .el-input__inner{
+                   >>> .el-input.is-disabled .el-input__inner{
                     border: none;
                     background-color: #f0f5f8 !important;
                   }
@@ -649,13 +649,13 @@ export default {
                 line-height: 60px;
                 height: 60px;
             }
-            #patrltabs-content /deep/ .el-tabs__nav-wrap{
+            #patrltabs-content >>> .el-tabs__nav-wrap{
                 padding-left: 35px;
             }
-            #patrltabs-content /deep/ .el-tabs__active-bar{
+            #patrltabs-content >>> .el-tabs__active-bar{
                 height: 5px;
             }
-            #patrltabs-content /deep/ .el-tabs__item {
+            #patrltabs-content >>> .el-tabs__item {
                 font-weight: bold;
                 color: #94A4B4;
                 font-size: calc(14/1920*100vw);
@@ -663,7 +663,7 @@ export default {
                 // overflow: hidden;
                 // text-overflow: ellipsis;
             }
-            #patrltabs-content /deep/ .el-tabs__item.is-active{
+            #patrltabs-content >>> .el-tabs__item.is-active{
                 color: #f31d65;
                 font-size: calc(16/1920*100vw);
             }
@@ -712,10 +712,10 @@ export default {
                     .nape-value{
                         margin-left: 2%;
                         width: calc(400/1920*100vw);
-                        /deep/  .el-province{
+                        >>>  .el-province{
                           width: calc(400/1920*100vw);
                         }
-                      /deep/ .input-class{
+                      >>> .input-class{
                         width: calc(370/1920*100vw);
                       }
                     }

@@ -1157,7 +1157,7 @@ $h1:#292e36;
               .radio-class{
                 display: flex;
                 align-items: center;
-                /deep/ .el-radio__label{
+                >>> .el-radio__label{
                   display: flex;
                   align-items: center;
                   justify-content: center;
@@ -1179,7 +1179,7 @@ $h1:#292e36;
               }
             }
         }
-      /deep/ .el-dialog__footer{
+      >>> .el-dialog__footer{
         line-height: 24px;
         padding: 30px;
         padding-top: 20px;

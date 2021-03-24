@@ -351,7 +351,6 @@ export default {
         const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
-        self.initDaysRange();
         await self.initData();
         self.curStoreTag = [];
       }

@@ -225,15 +225,15 @@ export default {
     top: 0;
     left: 0;
   }
-  /deep/ .el-select__tags{
+  >>> .el-select__tags{
     opacity: 0;
   }
-  .el-province /deep/ .el-input--mini .el-input__inner{
+  .el-province >>> .el-input--mini .el-input__inner{
     height: 28px;
     line-height: 27px;
     border-radius: 0 !important;
   }
-  /deep/ .input-class.el-input--medium .el-input__inner{
+  >>> .input-class.el-input--medium .el-input__inner{
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     border: 1px solid #E4E7ED;
@@ -245,7 +245,7 @@ export default {
     min-height: 28px;
     min-width: 55px;
   }
-  /deep/ .input-class.el-input--mini .el-input__inner{
+  >>> .input-class.el-input--mini .el-input__inner{
     height: 26px;
     line-height: 26px;
     border: none;
@@ -254,7 +254,7 @@ export default {
     padding: 0 10px;
     font-size: 12px;
   }
-  /deep/ .el-select.el-select--medium .el-input .el-input__inner{
+  >>> .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
     z-index: 1;
     background: transparent !important;
@@ -266,7 +266,7 @@ export default {
     min-height: 28px;
     min-width: 85px;
   }
-  /deep/ .el-select.el-select--mini .el-input .el-input__inner{
+  >>> .el-select.el-select--mini .el-input .el-input__inner{
     position: relative;
     z-index: 1;
     background: transparent !important;
@@ -275,15 +275,15 @@ export default {
     height: 28px;
     line-height: 28px;
   }
-  /deep/ .el-select.el-select--mini .el-input .el-input__suffix-inner{
+  >>> .el-select.el-select--mini .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
-  /deep/ .el-input--medium .el-input__icon {
+  >>> .el-input--medium .el-input__icon {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
   }
-  .el-province /deep/ .el-input--mini .el-input__icon {
+  .el-province >>> .el-input--mini .el-input__icon {
     line-height: 28px;
     height: 28px;
   }

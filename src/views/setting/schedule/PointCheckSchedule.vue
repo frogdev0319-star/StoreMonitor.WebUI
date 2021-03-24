@@ -2041,8 +2041,6 @@ export default {
     height: 30px;
     line-height: 30px;
   }
-  /* 浏览器滚动条样式 */
-
   /* width */
   ::-webkit-scrollbar {
     width: 4px;

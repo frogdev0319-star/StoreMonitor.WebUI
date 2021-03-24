@@ -1115,10 +1115,6 @@ export default {
       padding-bottom: 30px;
       color: $black;
       text-align: left;
-      .header-mul-select /deep/ .el-input__inner{
-        height: calc(35 / 1920 * 100vw);
-        min-height: 28px;
-      }
       .header-mul-select{
         display: inline-block;
         .mul-label{

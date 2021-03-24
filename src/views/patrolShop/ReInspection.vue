@@ -3569,24 +3569,21 @@ export default {
                 margin-left: calc(25/1920*100vw);
                 margin-right: calc(25/1920*100vw);
                 position: relative;
-                .inspect-title /deep/ .el-alert__title{
+                .inspect-title >>> .el-alert__title{
                     font-weight: bold;
                     color:#f59f23;
                     font-size: 14px;
                 }
-                // .inspect-title /deep/ .el-alert--warning{
-                //     height:40px;
-                //     line-height: 40px;
-                // }
-                .inspect-title /deep/ .el-alert__icon{
+
+                .inspect-title >>> .el-alert__icon{
                     font-size: 16px;
                     margin-right: calc(10/1920*100vw);
                 }
-                .inspect-title /deep/ .el-alert__description{
+                .inspect-title >>> .el-alert__description{
                     font-size: 14px;
                     margin:0;
                 }
-                .inspect-title /deep/ .el-alert__content{
+                .inspect-title >>> .el-alert__content{
                     padding:0;
                 }
                 .inspect-title{
@@ -3597,7 +3594,7 @@ export default {
                         padding-right: calc(26/1920*100vw);
                         vertical-align: middle;
                     }
-                    .info-alert /deep/ .el-alert__content{
+                    .info-alert >>> .el-alert__content{
                         width:100%;
                     }
                     .info-alert{
@@ -4135,7 +4132,7 @@ export default {
                     }
                 }
             }
-            .patrol-select /deep/ .el-icon--right{
+            .patrol-select >>> .el-icon--right{
                 float:right;
             }
             .patrol-select{
@@ -4231,7 +4228,7 @@ export default {
             background-color: $background !important;
         }
     }
-    .patrol-content /deep/ .el-select .el-input--medium .el-input__inner{
+    .patrol-content >>> .el-select .el-input--medium .el-input__inner{
         color:#333;
     }
 </style>

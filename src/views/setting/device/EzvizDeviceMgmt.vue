@@ -1729,21 +1729,7 @@ export default {
             font-size: calc(16/1920*100vw);
             margin-right: calc(8/1920*100vw);
           }
-        }
-        .delete-btn{
-          position: absolute;
-          right: calc(25/1920*100vw);
-          font-size: calc(14/1920*100vw);
-          height: calc(36/1920*100vw);
-          padding: 0 0;
-          width: calc(130/1920*100vw);
-          top: 0;
-          bottom: 0;
-          margin: auto;
-          .el-icon-plus{
-            font-size: calc(16/1920*100vw);
-            margin-right: calc(8/1920*100vw);
-          }
+
         }
       }
       .lisde{
@@ -1881,10 +1867,10 @@ export default {
               font-size: 12px;
               width: calc(100/1920*100vw);
               min-width: 85px;
-              /deep/ .el-upload{
+              >>> .el-upload{
                 width: 100%;
               }
-              /deep/ .el-button{
+              >>> .el-button{
                 width: 100%;
                 height: 28px;
                 opacity: 0.5;
@@ -1892,7 +1878,7 @@ export default {
                 bottom: 10px;
                 left: 0;
               }
-              /deep/ .el-button--mini{
+              >>> .el-button--mini{
                 padding: 7px;
               }
             }
@@ -1979,6 +1965,7 @@ export default {
     display: block;
 }
   .el-dialog__body .dialog-content .deviceForm /deep/ label{
+  .el-dialog__body .dialog-content .nvrForm label{
     padding: 0;
   }
   .available-span{

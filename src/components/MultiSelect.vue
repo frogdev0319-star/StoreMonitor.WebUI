@@ -224,10 +224,10 @@ export default {
     position: absolute;
     left: 0;
   }
-  /deep/ .el-select__tags{
+  >>> .el-select__tags{
     opacity: 0;
   }
-  /deep/ .input-class.el-input--medium .el-input__inner{
+  >>> .input-class.el-input--medium .el-input__inner{
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     border: 1px solid #E4E7ED;
@@ -239,7 +239,7 @@ export default {
     min-width: 55px;
     min-height: 28px;
   }
-  /deep/ .el-select.el-select--medium .el-input .el-input__inner{
+  >>> .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
     z-index: 1;
     background: transparent !important;
@@ -251,16 +251,11 @@ export default {
     min-height: 28px;
     min-width: 85px;
   }
-  /*@media screen and (max-width: 1560px) and (min-width: 1280px){*/
-    /*/deep/ .el-select.el-select--medium .el-input .el-input__inner{*/
-      /*width: 85px;*/
-    /*}*/
-  /*}*/
-  /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
+  >>> .el-select.el-select--medium .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
-  /deep/ .el-input--medium .el-input__icon {
+  >>> .el-input--medium .el-input__icon {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
     min-height: 28px;
@@ -276,11 +271,6 @@ export default {
     min-height: 28px;
     min-width: 85px;
   }
-  /*@media screen and (max-width: 1560px) and (min-width: 1280px){*/
-    /*.el-select.el-select--medium{*/
-      /*width: 85px;*/
-    /*}*/
-  /*}*/
 
 </style>
 <style>

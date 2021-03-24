@@ -793,10 +793,10 @@ export default {
           content: ' ';
           margin-right: 4px;
         }
-        /deep/ .el-form-item__label{
+        >>> .el-form-item__label{
           font-size: calc(14/1920*100vw);
         }
-        /deep/ .el-radio__label{
+        >>> .el-radio__label{
           font-size: calc(14/1920*100vw);
         }
       }
@@ -879,7 +879,7 @@ export default {
   .role-group .el-checkbox{
     margin-right: 0;
   }
-  .role-group /deep/ .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
+  .role-group .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
     background-color:#f31d65 ;
     border-color: #f31d65;
   }

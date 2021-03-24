@@ -2,36 +2,6 @@
   <el-row :style="{'min-height':varyWindowHeight - 200+'px'}" class="el-schedule-container">
     <div class="el-schedule-header">
       <el-dialog
-        v-if="showAddDialog"
-        :title="$t('scheduleView.addSchedule')"
-        :visible.sync="showAddDialog"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        width="28%"
-        top="35vh"
-        left="40vh">
-        <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #dfe2e9;">
-          <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;display: inline-block;  vertical-align: middle">
-            <span style="display: inline-block;  vertical-align: middle">{{ $t('scheduleView.scheduleName') }}</span>
-            <el-input
-              ref="scheduleName"
-              v-model="scheduleName"
-              :placeholder="$t('scheduleView.inputPlaceholder')"
-              size="mini"
-              class="el-schedule-name"/>
-          </p>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" size="mini" @click="showAddDialog = false">
-            {{ $t('scheduleView.cancel') }}
-          </el-button>
-          <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSchedule">
-            {{ $t('scheduleView.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
         v-if="showDeleteDialog"
         :title="$t('scheduleView.delete')"
         :visible.sync="showDeleteDialog"
@@ -872,11 +842,6 @@ export default {
 
     cancelNoSelfMonth(val) {
       this.selectSelfMonthObj.dialogCosed = false;
-    },
-
-    addScheduleButton() {
-      this.scheduleName = '';
-      this.showAddDialog = true;
     },
 
     deleteScheduleButton() {
@@ -1973,14 +1938,6 @@ export default {
       font-size: 14px;
       margin-right: 20px;
     }
-    .el-schedule-name{
-      width: 200px;
-      @include point(margin-right,20);
-      right: 0px;
-      /deep/ .el-input__inner{
-        border-radius: 30px;
-      }
-    }
   }
   .el-schedule-container{
     height: calc(180 / 1920 * 100vw);
@@ -2012,23 +1969,23 @@ export default {
           }
           .el-type{
             width: 200px;
-            /deep/ .el-input__inner{
+            >>> .el-input__inner{
               height: 30px !important;
             }
           }
-          /deep/ .el-input__inner{
+          >>> .el-input__inner{
             height: 30px !important;
             width: 200px;
             border-radius: 3px !important;;
           }
-          /deep/ .el-select.el-select--mini{
+          >>> .el-select.el-select--mini{
             height: 30px !important;
             width: 200px;
           }
           .content{
             width: 199px;
           }
-          /deep/ .content .input-class{
+          >>> .content .input-class{
             width: 170px;
             overflow: hidden;
           }
@@ -2259,7 +2216,7 @@ export default {
         width: calc(200/1920*100vw);
         margin-left: calc(30/1920*100vw);
       }
-      .el-search-input /deep/ .el-input__inner{
+      .el-search-input >>> .el-input__inner{
         border-radius: 30px;
         text-overflow: ellipsis;
       }
@@ -2290,39 +2247,17 @@ export default {
       }
     }
   }
-  // #patrltabs-content /deep/ .el-tabs__nav-next, #patrltabs-content /deep/ .el-tabs__nav-prev {
-  //   line-height: 30px;
-  // }
-  // #patrltabs-content /deep/ .el-tabs__item {
-  //   padding: 0 0;
-  //   margin: 0 12px;
-  //   font-size: 12px;
-  //   font-family: Roboto,"Microsoft YaHei";
-  //   width: 100px;
-  //   overflow: hidden;
-  //   text-overflow: ellipsis;
-  //   height: 30px;
-  //   line-height: 30px;
-  // }
-  // #patrltabs-content /deep/ el-tabs__nav-wrap.is-scrollable.is-top{
-  //   height: 30px;
-  // }
-  // #patrltabs-content /deep/ .el-tabs__nav-wrap::after{
-  //   position: static;
-  // }
-  #patrltabs-content /deep/ .is-active {
+  #patrltabs-content >>> .is-active {
     color: #f31d65;
     font-weight: 600;
   }
-  #patrltabs-content /deep/ .el-tabs__active-bar{
+  #patrltabs-content >>>.el-tabs__active-bar{
       height: 4px;
   }
-  /deep/ .el-input--mini .el-input__inner{
+  >>>.el-input--mini .el-input__inner{
     height: 30px;
     line-height: 30px;
   }
-  /* 浏览器滚动条样式 */
-
   /* width */
   ::-webkit-scrollbar {
     width: 4px;
@@ -2346,13 +2281,13 @@ export default {
     background: rgb(162, 162, 163);
   }
 
-  /deep/ .el-checkbox__label{
+  .el-checkbox__label{
     font-size: calc(14/1920*100vw);
   }
-  .header-person /deep/ .el-checkbox-group{
+  .header-person .el-checkbox-group{
     display: inline-block;
   }
-  .header-person /deep/ .el-checkbox{
+  .header-person .el-checkbox{
     margin-right:45px;
   }
 </style>

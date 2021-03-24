@@ -859,7 +859,7 @@ export default {
           margin-left: calc(2/1920*100vw);
           min-width: 180px;
         }
-        /deep/ .el-input--suffix .el-input__inner{
+        >>> .el-input--suffix .el-input__inner{
           padding-left: 0;
         }
       }
@@ -1035,7 +1035,7 @@ export default {
             font-size: 12px;
           }
         }
-        .three-child /deep/ .el-submenu__title {
+        .three-child >>> .el-submenu__title {
           padding-left: calc(60/1920*100vw) !important;
           text-align: left;
           position: relative;
@@ -1047,14 +1047,14 @@ export default {
           background-color: rgba(243,29,101,0.1) !important;
           color:#fff !important;
         }
-        .three-child /deep/ .el-menu{
+        .three-child >>> .el-menu{
           text-align: left !important;
         }
         .zh-third-title{
           font-size: 14px !important;
           color: #a0a4ad;
         }
-        .zh-three-child /deep/ .el-submenu__title {
+        .zh-three-child >>> .el-submenu__title {
           padding-left: calc(60/1920*100vw) !important;
           text-align: left;
           position: relative;
@@ -1068,7 +1068,7 @@ export default {
           /*padding-left: 25px !important;*/
           /*}*/
         }
-        .zh-three-child /deep/ .el-menu{
+        .zh-three-child >>> .el-menu{
           text-align: left !important;
         }
         #childSubItem.submenu-item{
@@ -1269,10 +1269,10 @@ export default {
   .aside-collapse-width #el-menuscrollbar{
     height: calc(100% - 40px);
   }
-  /deep/ #el-menuscrollbar .el-scrollbar__wrap{
+  >>> #el-menuscrollbar .el-scrollbar__wrap{
     overflow-x: hidden;
   }
-  /deep/ #el-menuscrollbar .el-scrollbar__wrap .el-scrollbar__bar.is-horizontal{
+  >>> #el-menuscrollbar .el-scrollbar__wrap .el-scrollbar__bar.is-horizontal{
     display: none !important;
   }
 </style>
@@ -1677,7 +1677,7 @@ export default {
   /**
   add style to schedule setting
    */
-  li[class*="three-child"]  /deep/ .el-menu.el-menu--inline::before{
+  li[class*="three-child"] .el-menu.el-menu--inline::before{
     display: table;
     content: "";
     position: absolute;
@@ -1687,7 +1687,7 @@ export default {
     border-left: 1px solid #9a9ea7;
     z-index: 1;
   }
-  li[class*="three-child"] .el-menu--inline /deep/ li::before{
+  li[class*="three-child"] .el-menu--inline li::before{
     content: '';
     position: absolute;
     width: calc(40/1920*100vw);
@@ -1695,7 +1695,7 @@ export default {
     left: calc(90/1920*100vw);
     top: 50%;
   }
-  li[class*="three-child"].is-active .el-menu--inline /deep/ li.is-active::before{
+  li[class*="three-child"].is-active .el-menu--inline li.is-active::before{
     border-bottom: 1px solid #f31d65;
   }
   li[class*="three-child"] .el-menu--inline .el-menu-item:hover::before{

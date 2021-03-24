@@ -322,17 +322,15 @@ $itemHeight:50px;
             }
             .radio{
                 margin-right: 10px;
-                /deep/ .el-radio__label{
+                >>> .el-radio__label{
                     margin-left: calc(30/1920*100vw);
                     padding:0;
                     color:#424151;
                 }
             }
-            /deep/ .el-checkbox__label{
-                padding-left: calc(30/1920*100vw);
-            }
-            /deep/ .el-checkbox__label{
-                color:#424151;
+            >>> .el-checkbox__label{
+              padding-left: calc(30/1920*100vw);
+              color:#424151;
             }
         }
     }
