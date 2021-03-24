@@ -2080,7 +2080,7 @@ export default {
             position: relative;
             bottom: 2px;
             left:20px;
-            /deep/ .el-input--suffix .el-input__inner{
+            >>> .el-input--suffix .el-input__inner{
               padding: 10px;
             }
           }
@@ -2300,10 +2300,10 @@ export default {
               bottom: 0;
               width: calc(100/1920*100vw);
               min-width: 85px;
-              /deep/ .el-upload{
+               .el-upload{
                 width: 100%;
               }
-              /deep/ .el-button{
+              >>> .el-button{
                 width: calc(100/1920*100vw);
                 height: 28px;
                 opacity: 0.5;
@@ -2311,7 +2311,7 @@ export default {
                 bottom: 10px;
                 left: 0;
               }
-              /deep/ .el-button--mini{
+              >>> .el-button--mini{
                 padding: 2px;
               }
               /*@media screen and (max-width: 1280px){*/
@@ -2378,7 +2378,7 @@ export default {
     margin-top: 3px;
     display: block;
 }
-  .el-dialog__body .dialog-content .nvrForm /deep/ label{
+  .el-dialog__body .dialog-content .nvrForm .el-form-item__label{
     padding: 0;
   }
   .avatar-uploader .picture-tips{

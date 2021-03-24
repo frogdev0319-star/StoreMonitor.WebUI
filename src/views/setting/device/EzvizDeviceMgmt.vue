@@ -2430,20 +2430,6 @@ export default {
             top: 15%;
             background-color: $mainColor;
           }
-          .nvr-input{
-            @include point(width,80);
-            /*margin-left: 13%;*/
-            position: relative;
-            bottom: 2px;
-          }
-          .nvr-select{
-            @include point(width,60);
-            position: relative;
-            bottom: 2px;
-            /deep/ .el-input--suffix .el-input__inner{
-              padding: 10px;
-            }
-          }
           .comment-data{
             width: 4%;
             height: 100%;
@@ -2534,7 +2520,7 @@ export default {
                 border-color: #ddd;
                 line-height: 60px;
                 height: 60px;
-                /deep/ el-button .add-btn{
+                >>> el-button .add-btn{
                   font-size: 12px;
                 }
               }
@@ -2691,10 +2677,10 @@ export default {
               font-size: 12px;
               width: calc(100/1920*100vw);
               min-width: 85px;
-              /deep/ .el-upload{
+              >>> .el-upload{
                 width: 100%;
               }
-              /deep/ .el-button{
+              >>> .el-button{
                 width: 100%;
                 height: 28px;
                 opacity: 0.5;
@@ -2702,7 +2688,7 @@ export default {
                 bottom: 10px;
                 left: 0;
               }
-              /deep/ .el-button--mini{
+              >>> .el-button--mini{
                 padding: 7px;
               }
             }
@@ -2779,7 +2765,7 @@ export default {
     margin-top: 3px;
     display: block;
 }
-  .el-dialog__body .dialog-content .nvrForm /deep/ label{
+  .el-dialog__body .dialog-content .nvrForm label{
     padding: 0;
   }
   .avatar-uploader .picture-tips{

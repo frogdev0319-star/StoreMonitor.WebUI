@@ -221,7 +221,7 @@
           </div>
         </el-dialog>
       </el-col>
-      <el-col :span="18" class="el-route-tabs">
+      <el-col :span="18" class="el-route-tabs" :style="{'min-height':varyWindowWidth - 250 +'px'}">
         <div class="loading_area self-loading"
              :element-loading-text="$t('insSettingView.loadingbindstore')"
              v-loading="isLoading">
@@ -1942,30 +1942,29 @@ export default {
         }
     }
 
-    .nameinput /deep/ .el-input__inner{
+    .nameinput >>> .el-input__inner{
         border:0;
     }
-    .loading_area /deep/ .el-loading-spinner{
+    .loading_area >>> .el-loading-spinner{
       height: calc(100vh - 180px);
     }
-    .loading_area /deep/ .el-loading-text{
+    .loading_area >>> .el-loading-text{
       height: calc(100vh - 180px);
       line-height:calc(100vh - 180px);
     }
-    #en-patrltabs-content /deep/ .el-tabs__nav-scroll {
+    #en-patrltabs-content >>> .el-tabs__nav-scroll {
       height: 40px;
     }
-    #en-patrltabs-content /deep/ .el-tabs__item {
+    #en-patrltabs-content >>> .el-tabs__item {
       padding: 0 0;
       font-size: 14px;
       width: calc(160/1920*100vw);
       display: inline-block;
-      /*overflow: hidden;*/
       white-space: nowrap;
       text-overflow: ellipsis;
     }
 
-    #en-patrltabs-content /deep/ .el-tabs__active-bar{
+    #en-patrltabs-content >>> .el-tabs__active-bar{
       height: 4px;
     }
     .el-dropbtn{
@@ -1993,10 +1992,10 @@ export default {
       right: 0px;
       top: 3px;
     }
-    #patrltabs-content /deep/ .el-tabs__nav-next, #patrltabs-content /deep/ .el-tabs__nav-prev {
-    line-height: 30px;
-  }
-  #patrltabs-content /deep/ .el-tabs__item {
+    #patrltabs-content >>> .el-tabs__nav-next, #patrltabs-content >>> .el-tabs__nav-prev {
+      line-height: 30px;
+    }
+  #patrltabs-content >>> .el-tabs__item {
     padding: 0 0;
     margin: 0 12px;
     font-size: 12px;
@@ -2007,20 +2006,20 @@ export default {
     height: 30px;
     line-height: 30px;
   }
-  #patrltabs-content /deep/ el-tabs__nav-wrap.is-scrollable.is-top{
+  #patrltabs-content >>> el-tabs__nav-wrap.is-scrollable.is-top{
     height: 30px;
   }
-  #patrltabs-content /deep/ .el-tabs__nav-wrap::after{
+  #patrltabs-content >>> .el-tabs__nav-wrap::after{
     position: static;
   }
-  #patrltabs-content /deep/ .is-active {
+  #patrltabs-content >>> .is-active {
     margin-bottom: 2px;
     background: #f31d65 ;
     color: #fff;
     border-radius: 3px;
   }
 
-  #patrltabs-content /deep/ .el-tabs__active-bar{
+  #patrltabs-content >>> .el-tabs__active-bar{
     height: 0 !important;
   }
 

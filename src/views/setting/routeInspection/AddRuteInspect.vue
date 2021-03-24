@@ -992,16 +992,16 @@ export default {
       return str;
     },
 
-    getUtilScore(val,type){ 
+    getUtilScore(val,type){
       // type 0 : Nonnegative number , type 1 : negative
-        val = type===0 ? val.replace(/[^\d\.]/g,"") : val.replace(/[^-?\d\.]/g,"");  
-        val = val.replace(/\.{2,}/g,"."); 
+        val = type===0 ? val.replace(/[^\d\.]/g,"") : val.replace(/[^-?\d\.]/g,"");
+        val = val.replace(/\.{2,}/g,".");
         val = val.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
-        val = val.replace("-","$#$").replace(/\-/g,"").replace("$#$","-"); 
+        val = val.replace("-","$#$").replace(/\-/g,"").replace("$#$","-");
         val = val.replace(/^(\-)*(\d+)\.(\d).*$/,'$1$2.$3');
         if(val!=="-0" && !isNaN(val)&&val.indexOf(".")< 0 && val !=""){
-            val= parseFloat(val); 
-        } 
+            val= parseFloat(val);
+        }
         return val;
     },
 
@@ -1071,7 +1071,7 @@ export default {
       }
       if(self.updateType.type===0){
         self.addItem(itemScore,qualifiedScore,selectAvailable);
-        
+
       }else if(self.updateType.type===1){
         self.editItem(itemScore,qualifiedScore,selectAvailable);
       }
@@ -1540,15 +1540,15 @@ export default {
         float: left;
         @include point(margin-left,10);
     }
-    #el-menuscrollbar /deep/ .el-scrollbar__thumb{
+    #el-menuscrollbar >>> .el-scrollbar__thumb{
         width:0 !important;
     }
     .addNape{
-      .el-form-item /deep/ .el-dialog__footer{
+      .el-form-item >>> .el-dialog__footer{
         margin-top: 20px;
         line-height: 24px;
       }
-      .el-form-item /deep/ .el-form-item__label{
+      .el-form-item >>> .el-form-item__label{
         padding:0;
         font-size: 14px;
         color:#424151;
@@ -1790,13 +1790,13 @@ export default {
                     font-size: 14px;
                     color: $tab;
                     .group-name-title{
-                        #group-content /deep/ .el-tabs__nav-wrap{
+                        #group-content >>> .el-tabs__nav-wrap{
                             margin-left: 6px;
                         }
-                        #group-content /deep/ .el-tabs__active-bar{
+                        #group-content >>> .el-tabs__active-bar{
                             height: 4px;
                         }
-                        #group-content /deep/ .el-tabs__item {
+                        #group-content >>> .el-tabs__item {
                             font-weight: bold;
                             color: #94A4B4;
                             font-size: calc(14/1920*100vw);
@@ -1804,7 +1804,7 @@ export default {
                             min-width:92px;
                             padding:0;
                         }
-                        #group-content /deep/ .el-tabs__item.is-active{
+                        #group-content >>> .el-tabs__item.is-active{
                             color: #f31d65;
                         }
                     }
@@ -2065,11 +2065,11 @@ export default {
                         float: left;
                         text-align: left;
                     }
-                    .FullScore-input /deep/ .el-input{
+                    .FullScore-input >>> .el-input{
                         width:65px;
                         margin: 0 auto;
                     }
-                    .critical-input /deep/ .el-input{
+                    .critical-input >>> .el-input{
                         width:65px;
                         margin: 0 auto;
                     }
@@ -2088,13 +2088,13 @@ export default {
                       color: #7d8cad;
                     }
                 }
-                .nape-scores-handle /deep/ .el-select.el-select--mini{
+                .nape-scores-handle >>> .el-select.el-select--mini{
                     width:110px !important;
                     height:45px !important;
                     background-color: #fee4e7 !important;
                     color:#424151 !important;
                 }
-                .nape-scores-handle /deep/ .el-province .el-input--mini .el-input__icon{
+                .nape-scores-handle >>> .el-province .el-input--mini .el-input__icon{
                     line-height: 0;
                 }
                 .iconcontent{

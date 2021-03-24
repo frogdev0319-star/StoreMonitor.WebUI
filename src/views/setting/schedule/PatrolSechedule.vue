@@ -326,9 +326,6 @@ export default {
     align-items: center;
     justify-content: center;
   }
-  /*.en-el-delete-btn.btn-class, en-el-add-btn.btn-class{*/
-    /*width: 100px;*/
-  /*}*/
   .schedule-container{
     padding: 20px calc(15/1920*100vw) 25px 15px;
     /*height: calc(180 / 1920 * 100vw);*/
@@ -371,44 +368,8 @@ export default {
         }
       }
     }
-    #patrol-content /deep/ .el-tabs__nav-scroll{
-      height: 40px;
-    }
-    #patrol-content /deep/ .el-tabs__item {
-      padding: 0 0;
-      font-size: 14px;
-      width: 120px;
-      text-overflow: ellipsis;
-    }
-
-    #patrol-content /deep/ .el-tabs__active-bar{
-      height: 4px;
-    }
   }
-  /* 浏览器滚动条样式 */
-  /* width */
-  ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: rgb(255, 255, 255);
-    border-radius: 8px;
-  }
-
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: rgb(201, 201, 202);
-    border-radius: 8px;
-  }
-
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgb(162, 162, 163);
-  }
-  .el-schedule-btns /deep/ .el-input__inner{
+  .el-schedule-btns >>> .el-input__inner{
     color:#7d8cad;
     background-color: #f4f5f9;
     font-size: 14px;
