@@ -1346,11 +1346,11 @@ $h1:#292e36;
                 @include point(width,160);
             }
         }
-        .el-date /deep/ .el-select-dropdown__item{
+        .el-date >>> .el-select-dropdown__item{
             padding: 0 20px 0 50px !important;
             /*color: #7d8cad;*/
         }
-        .el-date /deep/ .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
+        .el-date >>> .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
             font-family: "iconfont" !important;
             content: '\e6a2';
             left: 20px;
@@ -1359,7 +1359,7 @@ $h1:#292e36;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        .el-date /deep/ .el-select-dropdown.is-multiple .el-select-dropdown__item::after{
+        .el-date >>> .el-select-dropdown.is-multiple .el-select-dropdown__item::after{
             font-family: "iconfont" !important;
             position: absolute;
             left: 20px;
@@ -1497,15 +1497,15 @@ $h1:#292e36;
           }
         }
     }
-    #tabs-content /deep/ .el-tabs__item {
+    #tabs-content  .el-tabs__item {
       padding: 0 0;
       font-size: 14px;
       width: 160px;
     }
-    #tabs-content /deep/  .el-tabs__nav-scroll{
+    #tabs-content  .el-tabs__nav-scroll{
       margin-left:40px;
     }
-    #tabs-content  /deep/ .el-tabs__active-bar{
+    #tabs-content .el-tabs__active-bar{
       height: 4px;
     }
   .el-table-panel{
@@ -1546,9 +1546,6 @@ $h1:#292e36;
 <style>
  @import '../../assets/css/pagination.css';
  @import '../../assets/css/tabsItem.css';
-    .layui-laydate .layui-this{
-        background-color:#f31d65 !important;
-    }
     .el-table::before{
         height: 0px !important;
     }
@@ -1567,7 +1564,7 @@ $h1:#292e36;
      .select-poper .el-select-dropdown__item.hover{
         background-color:#FEE4E7;
     }
-   .self-class-name  /deep/ .cell{
+   .self-class-name .cell{
      display: flex ;
      align-items: center;
    }
