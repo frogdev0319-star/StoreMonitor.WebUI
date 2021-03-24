@@ -43,10 +43,10 @@
   height: calc(35 / 1920 * 100vw);
   line-height: calc(35 / 1920 * 100vw);
 }
-.LoadDialog /deep/ .el-dialog__header{
+.LoadDialog .el-dialog__header{
   padding-bottom:0;
 }
-.LoadDialog /deep/ .el-dialog__body{
+.LoadDialog .el-dialog__body{
   padding:0px 20px 30px 20px !important;
 }
 .el-table__body-wrapper::-webkit-scrollbar{

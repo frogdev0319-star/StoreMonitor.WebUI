@@ -1,41 +1,41 @@
-#en-storetab-content /deep/ .el-tabs__item {
+#en-storetab-content .el-tabs__item {
   padding: 0 0;
   font-size: calc(14/1920*100vw);
 }
 
-#en-storetab-content /deep/ .el-tabs__active-bar{
+#en-storetab-content .el-tabs__active-bar{
     height: 4px;
 }
-#storetab-content /deep/ .el-tabs__item {
+#storetab-content .el-tabs__item {
   padding: 0 0;
   font-size: 14px;
 }
-#storetab-content /deep/ .el-tabs__active-bar{
+#storetab-content .el-tabs__active-bar{
   height: 4px;
 }
 
-#en-devicetabs-content /deep/ .el-tabs__item {
+#en-devicetabs-content .el-tabs__item {
   padding: 0 0;
   font-size: 14px;
   width: 180px;
 }
 
-#en-devicetabs-content /deep/ .el-tabs__active-bar{
+#en-devicetabs-content .el-tabs__active-bar{
   height: 4px;
 }
 
-#en-tabs-content  /deep/ .el-tabs__nav-scroll{
+#en-tabs-content  .el-tabs__nav-scroll{
   margin-left:20px !important;
 }
 #en-tabs-content .el-tabs__nav.is-top{
   margin-left: 0;
 }
-#en-tabs-content /deep/ .el-tabs__item {
+#en-tabs-content .el-tabs__item {
   padding: 0 0;
   font-size: 14px;
   width:160px;
 }
 
-#en-tabs-content /deep/ .el-tabs__active-bar{
+#en-tabs-content .el-tabs__active-bar{
   height: 4px;
 }

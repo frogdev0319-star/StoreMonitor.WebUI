@@ -902,63 +902,6 @@ $ignored: #cad1db;
               font-size: calc(14 / 1920 * 100vw);
               margin-right: calc(20 / 1920 * 100vw);
             }
-            .stores-panel{
-              position: relative;
-              display: inline-block;
-              .month-content{
-                display: inline-block;
-                position: relative;
-                cursor: pointer;
-                #elMonth{
-                  width: 200px;
-                  border-radius: 0px;
-                  background-color: #f0f5f8;
-                }
-                .el-input{
-                  width: 200px;
-                  /deep/ .el-input__inner{
-                    padding-right: 20px;
-                    color: #7d8cad;
-                  }
-                }
-                .input-arrow-panel{
-                  width: 200px;
-                  height: 28px;
-                  position: absolute;
-                  background-color: transparent;
-                  cursor: pointer;
-                  z-index: 100;
-                  top: 18px;
-                }
-                .icon-input{
-                  position: relative;
-                  right: 25px;
-                  top: 1px;
-                }
-              }
-              .month-panel{
-                position: absolute;
-                margin-top: 3px;
-                width: 200px;
-                height: 150px;
-                z-index: 980;
-                background-color: #fff;
-                border: 1px solid #ddd;
-                padding: 5px;
-                overflow: auto;
-                .month-details{
-                  padding: 2px 10px;
-                  @include point(height,24);
-                  span{
-                    margin-left: 10px;
-                    font-size: 14px;
-                  }
-                  .el-checkbox{
-                    margin-right: 0;
-                  }
-                }
-              }
-            }
 
           }
           .charts-content{
@@ -1131,7 +1074,7 @@ $ignored: #cad1db;
     }
   }
 
-  .el-progress /deep/ path:first-child {
+  .el-progress >>> path:first-child {
     stroke: $background;
   }
 }
