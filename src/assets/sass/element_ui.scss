@@ -144,7 +144,9 @@ body .el-table th.gutter {
   .el-loading-spinner {
     background: url("../../../static/img/loading.gif") no-repeat;
     background-position: center;
-    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .el-loading-text {
