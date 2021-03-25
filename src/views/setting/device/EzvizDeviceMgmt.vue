@@ -1964,8 +1964,7 @@ export default {
     margin-top: 3px;
     display: block;
 }
-  .el-dialog__body .dialog-content .deviceForm /deep/ label{
-  .el-dialog__body .dialog-content .nvrForm label{
+  .el-dialog__body .dialog-content .deviceForm label{
     padding: 0;
   }
   .available-span{
