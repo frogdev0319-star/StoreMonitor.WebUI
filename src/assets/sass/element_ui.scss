@@ -211,8 +211,11 @@ body .el-table th.gutter {
     display: none;
   }
   .el-loading-spinner {
-    background: url('~@/../static/img/loading.gif') no-repeat center;
-    height: 32px;
+    background: url("~@/../static/img/loading.gif") no-repeat;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .el-loading-text {
