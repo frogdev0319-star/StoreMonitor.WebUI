@@ -210,12 +210,12 @@ export default {
               roleName: this.$t('route.storeChecking'),
               checked: false,
               disabled: true
-            },
-            {
-              roleName: this.$t('route.customers'),
-              checked: false,
-              disabled: false
             }
+            // {
+            //   roleName: this.$t('route.customers'),
+            //   checked: false,
+            //   disabled: false
+            // }
           ]
         },
         {
@@ -471,7 +471,7 @@ export default {
       self.roleNameList[1].children[4].disabled = !PermissionHelper.enableStoreMonitor();
       self.roleNameList[1].children[5].disabled = !PermissionHelper.enableTransactionPatrol();
       self.roleNameList[1].children[6].disabled = !PermissionHelper.enableStorePointCheck();
-      self.roleNameList[1].children[7].disabled = !PermissionHelper.enableCustomers();
+      // self.roleNameList[1].children[7].disabled = !PermissionHelper.enableCustomers();
 
       self.roleNameList[2].children[0].disabled = !PermissionHelper.enableEventHandle();
       self.roleNameList[2].children[1].disabled = !PermissionHelper.enableEventClose();
@@ -594,8 +594,8 @@ export default {
           self.roleNameList[1].children[0].disabled = false;
           self.roleNameList[1].children[1].checked = false;
           self.roleNameList[1].children[1].disabled = false;
-          self.roleNameList[1].children[7].checked = false;
-          self.roleNameList[1].children[7].disabled = false;
+          // self.roleNameList[1].children[7].checked = false;
+          // self.roleNameList[1].children[7].disabled = false;
         }
       } else {
         // check has selected roles
@@ -611,7 +611,7 @@ export default {
         self.roleNameList[1].children[4].checked = !!PermissionHelper.enableStoreMonitor();
         self.roleNameList[1].children[5].checked = !!PermissionHelper.enableTransactionPatrol();
         self.roleNameList[1].children[6].checked = !!PermissionHelper.enableStorePointCheck();
-        self.roleNameList[1].children[7].checked = !!PermissionHelper.enableCustomers();
+        // self.roleNameList[1].children[7].checked = !!PermissionHelper.enableCustomers();
 
         self.roleNameList[2].children[0].checked = !!PermissionHelper.enableEventHandle();
         self.roleNameList[2].children[1].checked = !!PermissionHelper.enableEventClose();
