@@ -39,10 +39,14 @@
       </div>
       <div class="details">
         <span :class="lang === 'en' ? 'en-event-label' : 'event-label'">{{ $t('remotePatrol.description') }}:</span>
-        <div v-for="(item,index) in commentList" v-show="item.eventDes.length > 0" :key="index"
-             class="comment-details">
-          <div :style="item.showContent ? {'background-color':'#FBC7CC'} : {'background-color':'#FAFAFA'}"
-               class="circle-content">
+        <div
+          v-for="(item,index) in commentList"
+          v-if="item.eventDes.length > 0"
+          :key="index"
+          class="comment-details">
+          <div
+            :style="item.showContent ? {'background-color':'#FBC7CC'} : {'background-color':'#FAFAFA'}"
+            class="circle-content">
             <div class="circle"/>
           </div>
           <div class="lside"/>
@@ -51,7 +55,7 @@
               <span>{{ item.eventDes }}</span>
             </div>
             <div class="source-content">
-              <div v-for="(_item,_index) in sourceList" :key="_index" class="source-details">
+              <div v-for="(_item, _index) in sourceList" :key="_index" class="source-details">
                 <div v-if="_item.mediaType === 2" class="img-content">
                   <img :src="_item.url" height="100" width="140">
                 </div>
@@ -65,11 +69,6 @@
           </div>
         </div>
       </div>
-      <div v-if="showLeader" class="details">
-        <span v-if="lang ==='en'" class="en-event-label" style="margin-right: 70px;">{{ $t('remotePatrol.copy') }}:</span>
-        <span v-else class="event-label" style="margin-right:38px;">{{ $t('remotePatrol.copy') }}：</span>
-        <span>{{ leader }}</span>
-      </div>
     </div>
     <div v-else class="page-err-btn">
       <el-button size="mini" type="primary" class="retry-btn" @click="reTry">
@@ -79,7 +78,6 @@
   </div>
 </template>
 <script>
-import { addEvent, addComment } from '@/api/event';
 import PubSub from 'pubsub-js';
 
 export default {
@@ -92,10 +90,8 @@ export default {
       sucInfo: this.$t('remotePatrol.submitSucc'),
       errInfo: this.$t('remotePatrol.submitFail'),
       curSecond: 10,
-      storeName: '西安6店',
-      eventName: '水吧问题2',
-      leader: '小明',
-      showLeader: true,
+      storeName: '',
+      eventName: '',
       commentList: [],
       sourceList: [],
       routeData: null,
@@ -139,7 +135,7 @@ export default {
       const self = this;
       let routeData = self.$route.params.data;
       console.log(routeData);
-      if (self.$route.params.data == undefined) {
+      if (self.$route.params.data === undefined) {
         routeData = JSON.parse(sessionStorage.getItem('store_submit'));
       }
       self.routeData = routeData;
@@ -151,12 +147,6 @@ export default {
       self.storeName = routeData.store.storeName;
       self.eventName = routeData.event.eventName;
       self.sourceList = routeData.event.fileList;
-      if (routeData.flag.addEventType === 'add') {
-        self.showLeader = true;
-        self.leader = routeData.user.length != 0 ? routeData.user[0].userName : '';
-      } else {
-        self.showLeader = false;
-      }
       if (self.isSuccess) {
         self.$route.matched[2].name = 'successSubmit';
       } else {
@@ -194,14 +184,6 @@ export default {
     reTry() {
       const self = this;
       self.$router.push({ name: 'storeMonitor', params: { flag: self.isSuccess }});
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     }
   },
 
