@@ -279,7 +279,7 @@ export const navbarRoute = {
     PermissionHelper.enablePatrolSetting() && inspectionRoute.children.push(
       {
         path: '/routeinspection',
-        name: 'inspectSetting',
+        name: 'inspectListSetting',
         component: resolve => require(['@/views/setting/routeInspection/RouteInspection'], resolve),
         hidden: false
       },
