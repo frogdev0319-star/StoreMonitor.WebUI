@@ -3,8 +3,12 @@
     <div class="el-event-header">
       <div class="el-area">
         <span class="select-title">{{ $t('remotePatrol.storeSelect') }}</span>
-        <el-select v-model="curCountry" :placeholder="$t('remotePatrol.country')" size="mini"
-                   class="el-province" @change="changeCountry">
+        <el-select
+          v-model="curCountry"
+          :placeholder="$t('remotePatrol.country')"
+          size="mini"
+          class="el-province"
+          @change="changeCountry">
           <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
             <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"/>
           </el-option-group>
@@ -101,7 +105,7 @@
           <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
         </div>
       </el-button>
-      <el-tabs v-model="activeName" id='en-tabs-content' @tab-click="handleTabClick">
+      <el-tabs id="en-tabs-content" v-model="activeName" @tab-click="handleTabClick">
         <el-tab-pane
           v-for="(item,index) in tableDataList"
           :key="index"
@@ -207,7 +211,7 @@ import { getBriefStoreList, GetTagList } from '@/api/store';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import LimitSelect from '@/components/LimitSelect';
-import SearchConditionUtil from "../../common/SearchConditionUtil";
+import SearchConditionUtil from '../../common/SearchConditionUtil';
 
 export default {
   name: 'EventManage',
@@ -309,7 +313,7 @@ export default {
         this.$t('remotePatrol.regionI'),
         this.$t('remotePatrol.regionII'),
         this.$t('eventView.stores'),
-        this.$t('remotePatrol.code'),],
+        this.$t('remotePatrol.code')],
       windowHeight: window.innerHeight,
       userId: '',
       poperClass: 'date-picker-poper',
@@ -351,7 +355,7 @@ export default {
 
   watch: {
     accountChanged(val) {
-      let self = this;
+      const self = this;
       if (val !== 0) {
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
@@ -363,7 +367,7 @@ export default {
     },
 
     numberOfElements(val) {
-      let self = this;
+      const self = this;
       if (val === 0 && self.totalElements > 0) {
         self.params.filter.page -= 1;
         self.getEventList();
@@ -376,17 +380,17 @@ export default {
   },
 
   async mounted() {
-    let self = this;
+    const self = this;
     self.userId = getCookie('UserId');
     self.getDeafultTime();
-    let windowHeight = window.innerHeight;
+    const windowHeight = window.innerHeight;
     if (windowHeight > 800) {
       self.tableHeight = 770 + 'px';
     }
   },
 
   activated() {
-    let self = this;
+    const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
       self.initData();
@@ -410,13 +414,13 @@ export default {
     },
 
     getTagListData() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         GetTagList().then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             res.data.forEach(item => {
-              let obj = {};
+              const obj = {};
               obj.value = item.tagId;
               obj.label = item.tagName;
               obj.disabled = false;
@@ -431,12 +435,12 @@ export default {
     },
 
     getBriefStoreData() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         getBriefStoreList().then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            let data = res.data;
+            const data = res.data;
             resolve(res);
           }
         }).catch(err => {
@@ -446,16 +450,16 @@ export default {
     },
 
     async getCountryStore() {
-      let self = this;
-      let data = await self.getBriefStoreData();
-      let temp = [];
+      const self = this;
+      const data = await self.getBriefStoreData();
+      const temp = [];
       if (data.errCode === 0 && data.errMsg === 'Success') {
         self.tempStoreData = data.data;
         if (self.tempStoreData.length !== 0) {
           self.tempStoreData.forEach(item => {
-            let country = item.country;
+            const country = item.country;
             if (temp.map(x => x.label).indexOf(country) === -1) {
-              let obj = {
+              const obj = {
                 value: country,
                 label: country
               };
@@ -463,7 +467,7 @@ export default {
             }
           });
         }
-        let countryList = temp;
+        const countryList = temp;
         self.CountryList[0] = {};
         self.CountryList[0].label = self.$t('remotePatrol.country');
         self.CountryList[0].countryList = countryList;
@@ -474,23 +478,23 @@ export default {
     },
 
     selectAllProAndCity(val) {
-      let self = this;
-      let storeList = self.tempStoreData;
-      let temp = [];
-      let tempStore = [];
+      const self = this;
+      const storeList = self.tempStoreData;
+      const temp = [];
+      const tempStore = [];
       storeList.forEach(item => {
         if (item.country === val || val === '-1') {
           if (temp.map(x => x.value).indexOf(item.province) === -1) {
-            let obj = {
+            const obj = {
               label: item.province,
               value: item.province
             };
             temp.push(obj);
           }
           let storeObj = {};
-          if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-            if(self.curCity.length > 0 && self.curCity !== "-1"){
-              if(self.curProvince.includes(item.province) && self.curCity.includes(item.city)){
+          if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
+            if (self.curCity.length > 0 && self.curCity !== '-1') {
+              if (self.curProvince.includes(item.province) && self.curCity.includes(item.city)) {
                 storeObj = {
                   storeId: item.storeId,
                   label: item.name,
@@ -500,8 +504,7 @@ export default {
                 };
               }
             }
-          }
-          else{
+          } else {
             storeObj = {
               storeId: item.storeId,
               label: item.name,
@@ -514,14 +517,14 @@ export default {
         }
       });
       self.provinceList = temp;
-      let cityTemp = [];
+      const cityTemp = [];
       self.provinceList.forEach(_item => {
         storeList.forEach(item => {
           if (item.province === _item.value) {
             let citObj = {};
-            if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-              if(self.curCity.length > 0 && self.curCity !== "-1"){
-                if(self.curProvince.includes(item.province)){
+            if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
+              if (self.curCity.length > 0 && self.curCity !== '-1') {
+                if (self.curProvince.includes(item.province)) {
                   if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
                     citObj = {
                       label: item.city,
@@ -530,8 +533,7 @@ export default {
                   }
                 }
               }
-            }
-            else{
+            } else {
               if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
                 citObj = {
                   label: item.city,
@@ -544,39 +546,38 @@ export default {
         });
       });
       self.cityList = cityTemp;
-      let provinceArr = [];
+      const provinceArr = [];
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
       self.curProvince = (!self.ifGetParamsFromCash) ? provinceArr : self.curProvince;
 
-      let cityArr = [];
+      const cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
       self.curCity = (!self.ifGetParamsFromCash) ? cityArr : self.curCity;
       self.storeDataList = tempStore;
-      let storeArr = [];
+      const storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      setTimeout(()=>{
-        self.curStore = (!self.ifGetParamsFromCash) ? storeArr : (self.curStore.length===1 && self.curStore[0]==='-1' ? [] : self.curStore);
-        self.curState = (!self.ifGetParamsFromCash) ? [0]: self.curState;
+      setTimeout(() => {
+        self.curStore = (!self.ifGetParamsFromCash) ? storeArr : (self.curStore.length === 1 && self.curStore[0] === '-1' ? [] : self.curStore);
+        self.curState = (!self.ifGetParamsFromCash) ? [0] : self.curState;
         self.ifGetParamsFromCash = false;
         self.changeStore(self.curStore);
-      },100)
-
+      }, 100);
     },
 
     changeStoreTag(val) {
-      let self = this;
+      const self = this;
       self.curStoreTag = val;
       self.changeStore(self.curStore);
     },
 
     changeCountry(val) {
-      let self = this;
+      const self = this;
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
@@ -584,17 +585,17 @@ export default {
     },
 
     changePro(val) {
-      let self = this;
+      const self = this;
       self.curCity = [];
       self.clearCityInfo();
       self.clearStoreInfo();
-      let storeList = self.tempStoreData;
-      let temp = [];
-      let tempStore = [];
+      const storeList = self.tempStoreData;
+      const temp = [];
+      const tempStore = [];
       if (val === '') {
         storeList.forEach(item => {
           if (item.country === self.curCountry) {
-            let obj = {
+            const obj = {
               storeId: item.storeId,
               label: item.name,
               value: item.name,
@@ -609,13 +610,13 @@ export default {
           storeList.forEach(item => {
             if (item.province === _item) {
               if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                let obj = {
+                const obj = {
                   label: item.city,
                   value: item.city
                 };
                 temp.push(obj);
               }
-              let obj = {
+              const obj = {
                 storeId: item.storeId,
                 label: item.name,
                 value: item.name,
@@ -627,7 +628,7 @@ export default {
           });
         });
         self.cityList = temp;
-        let cityArr = [];
+        const cityArr = [];
         if (self.cityList.length !== 0) {
           self.cityList.forEach(item => {
             cityArr.push(item.value);
@@ -648,16 +649,16 @@ export default {
     },
 
     changeCity(val) {
-      let self = this;
+      const self = this;
       self.clearStoreInfo();
-      let storeList = self.tempStoreData;
-      let temp = [];
+      const storeList = self.tempStoreData;
+      const temp = [];
       if (val.length !== 0) {
         val.forEach(_item => {
           storeList.forEach(item => {
             if (item.city === _item) {
               if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                let obj = {
+                const obj = {
                   storeId: item.storeId,
                   label: item.name,
                   value: item.name,
@@ -681,31 +682,31 @@ export default {
     },
 
     handleStateChange(val) {
-      let self = this;
+      const self = this;
       self.curState = val;
       self.searchData();
     },
 
     handleStoreChange(arr) {
-      let self = this;
+      const self = this;
       self.curStore = arr;
       self.changeStore(arr);
     },
 
     handleProChange(arr) {
-      let self = this;
+      const self = this;
       self.curProvince = arr;
       self.changePro(arr);
     },
 
     handleCityChange(arr) {
-      let self = this;
+      const self = this;
       self.curCity = arr;
       self.changeCity(arr);
     },
 
     clearStoreInfo() {
-      let self = this;
+      const self = this;
       self.curStore = [];
       self.storeStr = '';
       self.$refs.multiSelect.selectedArray = [];
@@ -713,21 +714,21 @@ export default {
     },
 
     clearProviceInfo() {
-      let self = this;
+      const self = this;
       self.curProvince = [];
       self.$refs.proviceSelect.selectedArray = [];
       self.$refs.proviceSelect.input = '';
     },
 
     clearCityInfo() {
-      let self = this;
+      const self = this;
       self.curCity = [];
       self.$refs.citySelect.selectedArray = [];
       self.$refs.citySelect.input = '';
     },
 
     changeStore(val) {
-      let self = this;
+      const self = this;
       let str = '';
       self.tempStoreData.forEach((item) => {
         val.forEach(_item => {
@@ -747,8 +748,8 @@ export default {
       self.searchEventList();
     },
 
-    getSelectedStoreString(selectedItem, storeItem){
-      let self = this;
+    getSelectedStoreString(selectedItem, storeItem) {
+      const self = this;
       let str = '';
       if (storeItem.storeId === selectedItem) {
         self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
@@ -764,35 +765,34 @@ export default {
       self.searchEventList();
     },
 
-    dateChange(val){
-        let self=this;
-        let tabIndex=Number(self.activeName);
-        let start=typeof(val[0])==='object'?val[0].getTime():val[0];
-        let end=typeof(val[1])==='object'?val[1].getTime():val[1];
-        let threeMonthAgo = util.getThreeMonths(end)
-        if(end - start > end - threeMonthAgo){
-            self.$message({
-                message: this.$t('eventView.changeTimeRange'),
-                type:'warning',
-                duration:3*1000
-            })
-            self.dateValue=[new Date().setTime(threeMonthAgo),new Date().setTime(end)];
-        }
-        else{
-          self.dateValue = [new Date().setTime(start),new Date().setTime(end)]
-        }
-        self.inputSearchValue=''
-        self.tableDataList[tabIndex].page = 1;
-        self.getEventList(0);
-        self.getEventCount();
+    dateChange(val) {
+      const self = this;
+      const tabIndex = Number(self.activeName);
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      const threeMonthAgo = util.getThreeMonths(end);
+      if (end - start > end - threeMonthAgo) {
+        self.$message({
+          message: this.$t('eventView.changeTimeRange'),
+          type: 'warning',
+          duration: 3 * 1000
+        });
+        self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
+      } else {
+        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+      }
+      self.inputSearchValue = '';
+      self.tableDataList[tabIndex].page = 1;
+      self.getEventList(0);
+      self.getEventCount();
     },
 
     handleTabClick(val) {
-      let self = this;
+      const self = this;
       if (Number(val.index) < 4) {
         self.curState = [Number(val.index)];
       } else {
-        let stateArr = [];
+        const stateArr = [];
         self.eventStatesList.forEach(item => {
           stateArr.push(item.value);
         });
@@ -803,7 +803,7 @@ export default {
     },
 
     searchEventList() {
-      let self = this;
+      const self = this;
       self.inputSearchValue = '';
       self.tableDataList[Number(self.activeName)].page = 1;
       self.getEventList();
@@ -811,14 +811,14 @@ export default {
     },
 
     searchData() {
-      let self = this;
+      const self = this;
       self.tableDataList[Number(self.activeName)].page = self.page;
       self.getEventList();
       self.getEventCount();
     },
 
     rowClickItem(row) {
-      let self = this;
+      const self = this;
       this.event = row;
       sessionStorage.setItem('event', JSON.stringify(this.event));
       sessionStorage.setItem('queryparams', JSON.stringify(self.params));
@@ -826,7 +826,7 @@ export default {
     },
 
     toEventDetail(row) {
-      let self = this;
+      const self = this;
       this.event = row;
       sessionStorage.setItem('event', JSON.stringify(this.event));
       sessionStorage.setItem('queryparams', JSON.stringify(self.params));
@@ -834,10 +834,10 @@ export default {
     },
 
     sortChange(col) {
-      let self = this;
-      let tabIndex = Number(self.activeName);
+      const self = this;
+      const tabIndex = Number(self.activeName);
       self.tableDataList[tabIndex].page = 1;
-      let order = col.order;
+      const order = col.order;
       self.order = order;
       let prop = '';
       let tempOrder = '';
@@ -864,24 +864,24 @@ export default {
     },
 
     async getEventList(val) {
-      let self = this;
-      let tabIndex = Number(this.activeName);
+      const self = this;
+      const tabIndex = Number(this.activeName);
 
-      if(self.storeStr !== ''){
+      if (self.storeStr !== '') {
         self.getEventListRequestParams(val);
         this.ifSaveParams && self.saveSearchParams();
         this.ifSaveParams = true;
         eventRESTful.getEventList(self.params).then((res) => {
-          let data = res.data.content;
-          let temp = [];
+          const data = res.data.content;
+          const temp = [];
           data.forEach(item => {
-            let attachment = [];
+            const attachment = [];
             if (item.initialComment.attachment.length !== 0) {
               item.initialComment.attachment.some(x => x.mediaType === 0) ? attachment.push({ url: self.attachmentAudio }) : '';
               item.initialComment.attachment.some(x => x.mediaType === 1) ? attachment.push({ url: self.attachmentVideo }) : '';
               item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
             }
-            let obj = {
+            const obj = {
               id: item.id,
               ts: util.getDateTime(item.ts),
               assignee: item.assignee,
@@ -900,7 +900,7 @@ export default {
               relatedDeviceIds: item.relatedDeviceIds,
               province: item.province,
               city: item.city,
-              code: item.code,
+              code: item.code
             };
             temp.push(obj);
           });
@@ -912,7 +912,7 @@ export default {
         }).catch(err => {
           console.log('EventManagement-getEventList:' + err);
         });
-      }else{
+      } else {
         self.ifSaveParams && self.saveSearchParams();
         self.ifSaveParams = true;
         self.tableDataList[tabIndex].tableData = [];
@@ -923,21 +923,21 @@ export default {
       }
     },
 
-    getEventListRequestParams(val){
-      let tabIndex = Number(this.activeName);
+    getEventListRequestParams(val) {
+      const tabIndex = Number(this.activeName);
       let like = {};
       if (this.inputSearchValue.trim().length !== 0) {
         like = { subject: this.inputSearchValue.trim(), assignerName: this.inputSearchValue.trim(), storeName: this.inputSearchValue.trim() };
       } else {
         like = {};
       }
-      let storeId = this.storeStr.split('，');
+      const storeId = this.storeStr.split('，');
       let status = [];
       if (this.curState.length !== 0) {
         if (this.curState.length === 1) {
           status = this.curState[0];
         } else {
-          let allStatus = this.curState.some(item => item === '-1');
+          const allStatus = this.curState.some(item => item === '-1');
           if (allStatus) {
             status = [0, 1, 2, 3];
           } else {
@@ -960,7 +960,7 @@ export default {
         end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
       } else {
         start = this.dateValue[0];
-        let endTime = this.dateValue[1];
+        const endTime = this.dateValue[1];
         end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
       }
       this.params = {
@@ -976,9 +976,9 @@ export default {
         },
         like: like
       };
-      let curTabSortColumn = this.sortColumnOfTab[tabIndex];
-      let order = curTabSortColumn.sortType.order;
-      let prop = curTabSortColumn.sortType.prop;
+      const curTabSortColumn = this.sortColumnOfTab[tabIndex];
+      const order = curTabSortColumn.sortType.order;
+      const prop = curTabSortColumn.sortType.prop;
       if (order.length > 0 && prop.length > 0) {
         this.params.order = {
           direction: order,
@@ -994,37 +994,37 @@ export default {
     },
 
     sizeChange(val) {
-      let self = this;
+      const self = this;
       self.tableDataList[Number(self.activeName)].sizeNum = val;
       self.tableDataList[Number(self.activeName)].page = 1;
       self.getEventList();
     },
 
     currentChange(val) {
-      let self = this;
+      const self = this;
       self.tableDataList[Number(self.activeName)].page = val;
       self.getEventList('currentChange');
 
-      let dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
-      let offestTop = dom.offsetTop;
+      const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
+      const offestTop = dom.offsetTop;
       if (dom != undefined) {
         document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop = 0;
       }
     },
 
     getEventCount() {
-      let self = this;
-      let start = self.dateValue[0];
-      let endTime = self.dateValue[1];
-      let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
-      let storeId = self.storeStr.split('，');
+      const self = this;
+      const start = self.dateValue[0];
+      const endTime = self.dateValue[1];
+      const end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+      const storeId = self.storeStr.split('，');
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         like = { subject: self.inputSearchValue.trim(), assignerName: self.inputSearchValue.trim(), storeName: self.inputSearchValue.trim() };
       } else {
         like = {};
       }
-      let params = {
+      const params = {
         beginTs: start,
         endTs: end,
         clause: {
@@ -1033,7 +1033,7 @@ export default {
         like: like
       };
       eventRESTful.GetEventCountByStatus(params).then(res => {
-        let data = res.data;
+        const data = res.data;
         let numOfEventTotal = 0;
         for (let i = 0; i < 4; i++) {
           self.tableDataList[i].eventCount = data[i].numOfEvent;
@@ -1046,32 +1046,32 @@ export default {
     },
 
     getExportDataSize() {
-      let self = this;
-      let params = self.params;
+      const self = this;
+      const params = self.params;
       params.filter = {};
       return new Promise((resolve, reject) => {
         eventRESTful.getEventList(params).then((res) => {
-          let size = res.data.totalElements;
+          const size = res.data.totalElements;
           resolve(size);
         }).catch((error) => {
-            reject(error);
+          reject(error);
         });
       });
     },
 
     async getExportData() {
-      let self = this;
-      let size = await self.getExportDataSize();
+      const self = this;
+      const size = await self.getExportDataSize();
       self.params.filter = {
         'page': 0,
         'size': size
       };
       return new Promise((resolve, reject) => {
         eventRESTful.getEventList(self.params).then((res) => {
-          let data = res.data.content;
-          let temp = [];
+          const data = res.data.content;
+          const temp = [];
           data.forEach(item => {
-            let obj = {};
+            const obj = {};
             obj.subject = item.subject;
             obj.storeName = item.storeName;
             obj.inspectTagName = item.inspectTagName;
@@ -1090,8 +1090,8 @@ export default {
     },
 
     getExportFileName() {
-      let self = this;
-      let tabIndex = Number(self.activeName);
+      const self = this;
+      const tabIndex = Number(self.activeName);
       let label = '';
       switch (tabIndex) {
         case 0: label = this.$t('eventView.pendingEve'); break;
@@ -1101,16 +1101,16 @@ export default {
         case 4: label = this.$t('eventView.allEvents'); break;
         default: console.error('error tab pages！'); break;
       }
-      let fileName = label + '-' + util.getCurDateStr();
+      const fileName = label + '-' + util.getCurDateStr();
       return fileName;
     },
 
     async export2Excel() {
-      let that = this;
+      const that = this;
       try {
-        let ret = await that.isLoginIn();
+        const ret = await that.isLoginIn();
         if (ret.data != undefined && ret.data.isLogin) {
-          let tabIndex = Number(that.activeName);
+          const tabIndex = Number(that.activeName);
           if (that.tableDataList[tabIndex].tableData.length === 0) {
             that.$message({
               message: this.$t('eventView.noEvents'),
@@ -1120,18 +1120,18 @@ export default {
             return false;
           }
           require.ensure([], async() => {
-            let { export_json_to_excel } = require('@/excel/Export2Excel');
-            let tHeader = that.exportDataHeader;
-            let filterVal = ['subject', 'inspectTagName', 'assignerName', 'ts','province','city','storeName','code'];
-            let curData = await that.getExportData();
-            let data = that.formatJson(filterVal, curData);
+            const { export_json_to_excel } = require('@/excel/Export2Excel');
+            const tHeader = that.exportDataHeader;
+            const filterVal = ['subject', 'inspectTagName', 'assignerName', 'ts', 'province', 'city', 'storeName', 'code'];
+            const curData = await that.getExportData();
+            const data = that.formatJson(filterVal, curData);
             export_json_to_excel(tHeader, data, that.getExportFileName());
           });
         } else {
           window.location.href = 'https://portals.storeviu.com';
         }
-      }catch (err) {
-        console.log("EventManagement-export2Excel" + err);
+      } catch (err) {
+        console.log('EventManagement-export2Excel' + err);
       }
     },
 
@@ -1140,20 +1140,20 @@ export default {
     },
 
     getDeafultTime() {
-      let self = this;
-      let date = new Date();
-      let hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-      let minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-      let second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-      let dateStr = hour + ':' + minutes + ':' + second;
-      let timeTemp = [];
+      const self = this;
+      const date = new Date();
+      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+      const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+      const dateStr = hour + ':' + minutes + ':' + second;
+      const timeTemp = [];
       timeTemp[0] = '00:00:00';
       timeTemp[1] = dateStr;
       self.defaultTime = timeTemp;
     },
 
     isLoginIn() {
-      let self = this;
+      const self = this;
       return new Promise((resolve, reject) => {
         isLoginIn().then(res => {
           resolve(res);
@@ -1165,9 +1165,9 @@ export default {
 
     initData() {
       console.log('initData');
-      let self = this;
+      const self = this;
       self.activeName = '0';
-      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime()-3600 * 1000 * 24,new Date()];
+      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, new Date()];
       self.inputSearchValue = '';
       self.total = 0;
       // self.page = 1;
@@ -1175,20 +1175,19 @@ export default {
       // self.params = {};
       self.getSearchParams();
       self.getDeafultTime();
-      let windowHeight = window.innerHeight;
+      const windowHeight = window.innerHeight;
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
       }
       try {
         self.getCountryStore();
         self.getTagListData();
-      }
-      catch (err) {
-        console.log("EventMangement-initData: " + err)
+      } catch (err) {
+        console.log('EventMangement-initData: ' + err);
       }
     },
 
-    saveSearchParams(){
+    saveSearchParams() {
       const params = {
         curCountry: this.curCountry,
         curProvince: this.curProvince,
@@ -1204,17 +1203,17 @@ export default {
         order: this.order,
         storeStr: this.params.clause.storeId,
         searchParams: this.params
-      }
+      };
       const searchConditon = {
         path: 'eventManage',
         params: params
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = searchParams.dateValue[0];
         this.dateValue[1] = searchParams.dateValue[1].constructor === Date ? new Date(searchParams.dateValue[1]).getTime() : searchParams.dateValue[1];
         this.curCountry = searchParams.curCountry;
@@ -1229,12 +1228,12 @@ export default {
         this.sizeNum = searchParams.sizeNum;
         this.page = searchParams.page;
         this.order = searchParams.order;
-        this.storeStr = searchParams.storeStr.join(',')
+        this.storeStr = searchParams.storeStr.join(',');
         this.tableDataList[Number(this.activeName)].page = searchParams.page;
         this.params = searchParams.searchParams;
-        console.log(this.params)
+        console.log(this.params);
         this.ifGetParamsFromCash = true;
-      }else{
+      } else {
         this.getDeafultTime();
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
