@@ -54,17 +54,6 @@
 </template>
 
 <script>
-
-import {
-  getScheduleBindList,
-  addNewSchedule,
-  getScheduleListService,
-  bindScheduleAndStore,
-  unbindScheduleAndStore,
-  updateSchedule,
-  deleteScheduleService
-} from '@/api/schedule';
-import { getStoreList } from '@/api/store';
 import { inpectRESTful } from '@/api/index';
 import RemoteDetail from '@/views/setting/schedule/RemoteDetail';
 import { mapGetters } from 'vuex';
