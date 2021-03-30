@@ -31,10 +31,16 @@
             </span>
             <img :src="headUrl" alt="" class="headImg">
             <el-dropdown-menu slot="dropdown" class="dropdown">
-              <el-dropdown-item :disabeled="true" class="dropdown-item" style="width:120px;
+              <el-dropdown-item
+                :disabeled="true"
+                class="dropdown-item"
+                style="width:120px;
               padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
-              <el-dropdown-item class="dropdown-item" @click.native="fedlogout" style=" width:120px;
-              padding-left:20px;">{{ $t('route.logOut') }}</el-dropdown-item>
+              <el-dropdown-item
+                class="dropdown-item"
+                style=" width:120px;
+              padding-left:20px;"
+                @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -42,15 +48,21 @@
       <el-col
         :span="24"
         :style="($route.path === '/device' || $route.path === '/storemanage' || $route.path === '/event'
-              || $route.path === '/reinspection' || $route.path === '/storemonitor/submit' || $route.path === '/datacenter')?
+          || $route.path === '/reinspection' || $route.path === '/storemonitor/submit' || $route.path === '/datacenter')?
         {'height':(varyWindowHeight-68)+'px'}:{'height':'auto'}"
         class="main">
         <div v-if="isMobile && !collapsed" class="drawer-bg" @click="handleClickOutside" />
         <aside :class="classObj" class="aside-menu">
           <div v-if="!collapsed" class="brand-panel">
             <span class="brand-label">{{ $t('route.brand') }}</span>
-            <el-select ref="fieldSelect" v-model="accountId" :disabled="brandDisabled"
-                       placeholder="" popper-class="brandSelect" class="brand-list" @change="changeAccount">
+            <el-select
+              ref="fieldSelect"
+              v-model="accountId"
+              :disabled="brandDisabled"
+              placeholder=""
+              popper-class="brandSelect"
+              class="brand-list"
+              @change="changeAccount">
               <el-option
                 v-for="(item,index) in brandList"
                 :key="index"
@@ -85,8 +97,11 @@
                     :disabled="item.isReadOnly"
                     class="submenu-item"
                     style="text-align:left;">
-                    <i v-if="lang === 'en'" :class="item.iconCls" :style="collapsed ? {'margin-left':'0'}:{}"
-                       class="en-navIcon"/>
+                    <i
+                      v-if="lang === 'en'"
+                      :class="item.iconCls"
+                      :style="collapsed ? {'margin-left':'0'}:{}"
+                      class="en-navIcon"/>
                     <i v-else :class="item.iconCls" :style="collapsed ? {'margin-left' : '0'}:{}" class="navIcon"/>
                     <span>{{ collapsed ? '': $t(`route.${item.children[0].name}`) }}</span>
                   </el-menu-item>
@@ -99,8 +114,11 @@
                     class="el-submenu-content"
                     style="text-align:left;">
                     <template slot="title">
-                      <i v-if="lang === 'en'" :class="item.iconCls" :style="collapsed ? {'margin-left':'0'} : {}"
-                         class="en-navIcon"/>
+                      <i
+                        v-if="lang === 'en'"
+                        :class="item.iconCls"
+                        :style="collapsed ? {'margin-left':'0'} : {}"
+                        class="en-navIcon"/>
                       <i v-else :class="item.iconCls" :style="collapsed ? {'margin-left':'0'} : {}" class="navIcon"/>
                       <span :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'">{{ $t(`route.${item.name}`) }}</span>
                     </template>
@@ -132,12 +150,15 @@
                       style="padding-left: 0px">
                       <template slot="title">
                         <i class="iconfont icon-yuandian icon-content"/>
-                        <span :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'"
-                              :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'" class="third-title">
+                        <span
+                          :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'"
+                          :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'"
+                          class="third-title">
                           {{ $t(`route.${child.name}`) }}</span>
                       </template>
                       <el-menu-item
                         v-for="grandChild in child.children"
+                        v-show="!grandChild.hidden"
                         :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                         :index="grandChild.path"
                         :disabled="grandChild.isReadOnly"
@@ -217,8 +238,8 @@ export default {
 
   computed: {
     getFullYear() {
-      let date = new Date();
-      let y = date.getFullYear();
+      const date = new Date();
+      const y = date.getFullYear();
       return y;
     },
 
@@ -247,7 +268,6 @@ export default {
     },
 
     routerList() {
-      console.log(this.$store.state.user.routes);
       return this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
     },
 
@@ -267,34 +287,14 @@ export default {
     },
 
     showBorder() {
-      if ( (this.$route.path !== '/reinspection' && this.$route.path !== '/storemonitor'
-          && this.$route.path !== '/rate' && this.$route.path !== '/reinspect/confirmrein') ) {
-        return true;
-      }
+      const showBorderPathArr = ['/reinspection', '/storemonitor', '/rate', '/reinspect/confirmrein'];
+      return !showBorderPathArr.includes(this.$route.path);
     },
 
     showHeader() {
-      let flag = false;
-      switch (this.$route.path) {
-        case '/report':
-        case '/patrolOverview':
-        case '/eventOverview':
-        case '/patrolEvaluation':
-        case '/patrolItem':
-        case '/supervisorStat':
-        case '/eventStat':
-        case '/storedetail':
-        case '/storemanage':
-        case '/bindroute':
-        {
-          flag = true;
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      return flag;
+      const showBorderPathArr = ['/report', '/patrolOverview', '/eventOverview', '/patrolEvaluation',
+        '/patrolItem', '/supervisorStat', '/eventStat', '/storedetail', '/storemanage', '/bindroute'];
+      return showBorderPathArr.includes(this.$route.path);
     },
 
     curPath() {
@@ -302,44 +302,21 @@ export default {
     },
 
     activePath() {
-      console.log(this.$route.path);
       let path = this.$route.path;
-      switch (path) {
-        case '/reinspect/confirmrein':
-        case '/reinspect/submit': {
-          path = '/reinspection';
-          break;
-        }
-        case '/storemonitor/submit': {
-          path = '/storemonitor';
-          break;
-        }
-        case '/reportdetails': {
-          path = '/report';
-          break;
-        }
-        case '/rate': {
-          path = '/event';
-          break;
-        }
-        case '/bindroute' :
-        case '/addroute':
-        case '/setroute':
-        {
-          path = '/routeinspection';
-          break;
-        }
-        case '/storedetail': {
-          path = '/storemanage';
-          break;
-        }
-        case '/titleSetting': {
-          path = '/title';
-          break;
-        }
-        default: {
-          break;
-        }
+      const pathMapArr = [
+        { curPath: ['/reinspect/confirmrein', '/reinspect/submit'], activePath: '/reinspection' },
+        { curPath: ['/storemonitor/submit'], activePath: '/storemonitor' },
+        { curPath: ['/reportdetails'], activePath: '/report' },
+        { curPath: ['/bindroute', '/addroute', '/setroute'], activePath: '/routeinspection' },
+        { curPath: ['/storedetail'], activePath: '/storemanage' },
+        { curPath: ['/ezvizeDeviceSetting'], activePath: '/ezvizDevice' },
+        { curPath: ['/beseyeDeviceSetting'], activePath: '/beseyeAccount' },
+        { curPath: ['/beseyeDeviceSetting'], activePath: '/beseyeAccount' },
+        { curPath: ['/titleSetting'], activePath: '/title' }
+      ];
+      const pathMAP = pathMapArr.find(item => item.curPath.includes(path));
+      if (pathMAP) {
+        path = pathMAP.activePath;
       }
       return path;
     },
@@ -354,18 +331,20 @@ export default {
     ]),
 
     brandDisabled() {
-      console.log(this.$route.matched);
       let disabled = true;
-      if (this.$route.matched.length === 2) {
-        disabled = false;
-      } else if (this.$route.matched.length === 3) {
-        if (this.$route.matched[1].path === '/schedule') {
+      switch (this.$route.matched.length) {
+        case 2: {
           disabled = false;
+          break;
+        }
+        case 3: {
+          const path = this.$route.matched[2].path;
+          disabled = this.setThreeChildrenCanChangeBrand(path);
+          break;
         }
       }
       return disabled;
     }
-
   },
 
   watch: {
@@ -387,12 +366,9 @@ export default {
     }
   },
   created() {
-    let self = this;
+    const self = this;
     this.headUrl = './static/img/admin.png';
-    console.log(this.$route.matched);
     this.getBread();
-    console.log(this.$route.query);
-    let params = self.$route.query;
     PubSub.subscribe('change-color', (event, data) => {
       self.showTag = data.showTag;
     });
@@ -403,14 +379,13 @@ export default {
     });
     window.addEventListener('resize', this.$_isMobile);
     self.isMobile = self.$_isMobile();
+    this.getAccountList();
+    this.updateTitle();
   },
 
   mounted() {
-    this.getAccountList();
-    this.updateTitle();
-    console.log(this.$router.options.routes);
-    if (this.$refs.fieldSelect != undefined) {
-      this.$nextTick(function() {
+    if (this.$refs.fieldSelect !== undefined) {
+      this.$nextTick(() => {
         this.$refs.fieldSelect.$refs.scrollbar.$el.classList.add(
           'scroll-opacity'
         );
@@ -419,6 +394,14 @@ export default {
   },
 
   methods: {
+    setThreeChildrenCanChangeBrand(path) {
+      let disabled = true;
+      const canChangeBrandPathArr = ['/routeinspection', '/storemanage', '/patrolSchedule',
+        '/dashDevice', '/ezvizDevice', '/beseyeAccount'];
+      disabled = !canChangeBrandPathArr.includes(path);
+      return disabled;
+    },
+
     handleClickOutside() {
       this.collapsed = true;
     },
@@ -441,13 +424,11 @@ export default {
     },
 
     routerHome() {
-      let self = this;
-      let url = sessionStorage.getItem('LoginURL');
+      const url = sessionStorage.getItem('LoginURL');
       window.location.href = url + '/homepage';
     },
 
     handleselect(key, keyPath) {
-      console.log(key);
       if (this.isMobile) {
         this.collapsed = true;
       }
@@ -455,26 +436,121 @@ export default {
 
     getBread() {
       this.breadList = [];
-      let currentRoute = this.$route.fullPath;
-      let matched = this.$route.matched.filter(x => x.name);
-      if (matched.length > 2 && matched[1].name === 'scheduleManage') {
-        // patrol setting
-        switch (currentRoute) {
-          case "/pointCheck":{
-            matched[2].name = 'checkSchedule';
-            break;
-          }
-          case "/patrolSechedule":{
-            matched[2].name = 'patrolSecheduleManage';
-            break;
-          }
-          default:{
-            break;
-          }
-        }
-        matched.splice(1, 1);
-      }
+      const currentRoute = this.$route.fullPath;
+      let matched = [];
+      matched = this.$route.matched.filter(x => x.name);
+      matched.length === 2 && this.setSecondLevelNavbarBread(matched, currentRoute);
+      matched.length > 2 && this.setSystemNavbarBread(matched, currentRoute);
+      matched.length > 2 && matched[1].name === 'scheduleManage' && this.setScheduleBread(matched, currentRoute);
+      matched.length > 2 && (matched[1].name === 'deviceManage' || matched[1].name === 'ezvizDeviceMgt' ||
+          matched[1].name === 'beseyeDeviceMgt') &&
+        this.setDeviceBread(matched, currentRoute);
       this.breadList = matched;
+    },
+
+    setScheduleBread(matched, currentRoute) {
+      const routeNameAndPathMaps = [
+        { path: ['/pointCheck'], name: 'checkSchedule' },
+        { path: ['/patrolSechedule'], name: 'patrolSecheduleManage' }
+      ];
+      const pathAndNameMap = routeNameAndPathMaps.find(item => item.path.includes(currentRoute));
+      pathAndNameMap && (matched[2].name = pathAndNameMap.name);
+      matched.splice(1, 1);
+    },
+
+    setSystemNavbarBread(matched, currentRoute) {
+      const matchedParentName = matched[1].name;
+      const inspectSettingNameArr = ['inspectSetting', 'inspectingSettingOfInspectList',
+        'inspectingSettingOfDevice', 'inspectingSettingOfSchedule'];
+      const deviceSettingNameArr = ['deviceManage', 'ezvizDeviceMgt', 'beseyeDeviceMgt'];
+      if (inspectSettingNameArr.includes(matchedParentName)) {
+        this.setInspectionSettingBread(matched, currentRoute);
+      } else if (deviceSettingNameArr.includes(matchedParentName)) {
+        this.setDeviceBread(matched, currentRoute);
+      }
+    },
+
+    setFirstBread(matched, str) {
+      matched[2].name = str;
+      matched.splice(1, 1);
+    },
+
+    setSecondBread(matched, str, path) {
+      matched[1].name = str;
+      matched[1].path = path;
+    },
+
+    setInspectionSettingBread(matched, currentRoute) {
+      switch (currentRoute) {
+        case '/routeinspection': {
+          this.setFirstBread(matched, 'inspectingSettingOfInspectList');
+          break;
+        }
+        case '/storemanage': {
+          this.setFirstBread(matched, 'inspectingSettingOfDevice');
+          break;
+        }
+        case '/patrolSchedule': {
+          this.setFirstBread(matched, 'inspectingSettingOfSchedule');
+          break;
+        }
+        case '/bindroute':
+        case '/addroute':
+        case '/setroute': {
+          this.setSecondBread(matched, 'inspectingSettingOfInspectList', '/routeinspection');
+          break;
+        }
+        case '/storedetail': {
+          this.setSecondBread(matched, 'inspectingSettingOfDevice', '/storemanage');
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+    setDeviceBread(matched, currentRoute) {
+      switch (currentRoute) {
+        case '/dashDevice': {
+          this.setFirstBread(matched, 'dashDeviceMgt');
+          break;
+        }
+        case '/ezvizDevice': {
+          this.setFirstBread(matched, 'ezvizDeviceMgt');
+          break;
+        }
+        case '/beseyeAccount': {
+          this.setFirstBread(matched, 'beseyeDeviceMgt');
+
+          break;
+        }
+        case '/ezvizeDeviceSetting': {
+          this.setSecondBread(matched, 'ezvizDeviceMgt', '/ezvizDevice');
+          break;
+        }
+        case '/beseyeDeviceSetting': {
+          this.setSecondBread(matched, 'beseyeDeviceMgt', '/beseyeAccount');
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+    setSecondLevelNavbarBread(matched, currentRoute) {
+      const pathAndBreadMaps = [
+        { paths: ['/storedetail'], parentBread: { path: '/storemanage', name: 'storeManage' }},
+        { paths: ['/titleSetting'], parentBread: { path: '/title', name: 'titleManage' }},
+        { paths: ['/addroute', '/setroute', '/bindroute'], parentBread: { path: '/routeinspection', name: 'inspectSetting' }},
+        { paths: ['/rate'], parentBread: { path: '/event', name: 'eventManage' }},
+        { paths: ['/reportdetails'], parentBread: { path: '/report', name: 'reports' }},
+        { paths: ['/storemonitor/submit'], parentBread: { path: '/storemonitor', name: 'storeMonitor' }},
+        { paths: ['/reinspect/confirmrein', '/reinspect/submit'], parentBread: { path: '/reinspection', name: 'remotePatrol' }}
+      ];
+      const pathAndBreadMap = pathAndBreadMaps.find(map => map.paths.includes(currentRoute));
+      pathAndBreadMap && matched.splice(1, 0, pathAndBreadMap.parentBread);
     },
 
     getWindowSize() {
@@ -492,21 +568,21 @@ export default {
     },
 
     fedlogout() {
-      let self = this;
-      let url = sessionStorage.getItem('LoginURL');
+      const self = this;
+      const url = sessionStorage.getItem('LoginURL');
       window.location.href = url;
     },
 
     logOut() {
-      let self = this;
+      const self = this;
       self.$store.dispatch('logout').then(() => {
       });
     },
 
     getAccountList() {
-      let self = this;
+      const self = this;
       getAccountList().then(res => {
-        let data = res.data;
+        const data = res.data;
         if (res.errCode === 0) {
           self.brandList = data;
           self.getUserName();
@@ -515,8 +591,8 @@ export default {
     },
 
     changeAccount(accountId) {
-      let self = this;
-      let params = {
+      const self = this;
+      const params = {
         accountId: accountId
       };
       self.$store.dispatch('changeAccount', params).then((res) => {
@@ -530,7 +606,7 @@ export default {
     },
 
     changeRoutes() {
-      let self = this;
+      const self = this;
       self.$store.dispatch('GetUserAuthorities').then((result) => {
         if (result.errCode === 0) {
           self.$store.dispatch('generateRoutes');
@@ -539,16 +615,15 @@ export default {
     },
 
     getUserName() {
-      let self = this;
-      let userId = getCookie('UserId');
+      const self = this;
+      const userId = getCookie('UserId');
       getUserInfo().then(res => {
-        console.log(res);
         self.personList = res.data;
         res.data.forEach(item => {
           if (item.userId === userId) {
             self.userName = item.userName.length > 10 ? item.userName.substr(0, 10) + '...' : item.userName;
             self.accountId = item.accountId;
-            let accountId = item.accountId.toLowerCase();
+            const accountId = item.accountId.toLowerCase();
             localStorage.setItem('oss_bucket', accountId);
             const idIndex = self.brandList.map(item => item.accountId).indexOf(self.accountId);
             idIndex !== '-1' ? sessionStorage.setItem('accountName', self.brandList[idIndex].name) : null;
@@ -563,9 +638,8 @@ export default {
     },
 
     $_isMobile() {
-      let { body } = document;
-      let rect = body.getBoundingClientRect();
-      console.log(rect.width - 1 < 1280);
+      const { body } = document;
+      const rect = body.getBoundingClientRect();
       if (rect.width - 1 < 1280) {
         this.collapsed = true;
       }
@@ -625,14 +699,6 @@ export default {
     font-size: calc(32/1920*100vw);
     color:#fff;
     margin-right: calc(36/1920*100vw);
-    /*<!--@media screen  and(min-width:1366px){-->*/
-    /*<!--@include point(margin-left,25);-->*/
-    /*<!--@include point(width,45);-->*/
-    /*<!--}-->*/
-    /*<!--@media screen  and(max-width:1366px){-->*/
-    /*<!--@include point(margin-left,0);-->*/
-    /*<!--@include point(width,35);-->*/
-    /*<!--}-->*/
   }
   .container{
     position: absolute;
