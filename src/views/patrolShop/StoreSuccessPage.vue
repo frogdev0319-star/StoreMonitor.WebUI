@@ -148,9 +148,9 @@ export default {
       self.eventName = routeData.event.eventName;
       self.sourceList = routeData.event.fileList;
       if (self.isSuccess) {
-        self.$route.matched[2].name = 'successSubmit';
+        self.$route.matched[self.$route.matched.length - 1].name = 'successSubmit';
       } else {
-        self.$route.matched[2].name = 'failSubmit';
+        self.$route.matched[self.$route.matched.length - 1].name = 'failSubmit';
       }
     },
 

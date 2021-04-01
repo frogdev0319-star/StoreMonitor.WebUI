@@ -56,9 +56,9 @@ export default {
         self.isSuccess = routeData.isSuccess;
       }
       if (self.isSuccess) {
-        self.$route.matched[2].name = 'successSubmit';
+        self.$route.matched[self.$route.matched.length - 1].name = 'successSubmit';
       } else {
-        self.$route.matched[2].name = 'failSubmit';
+        self.$route.matched[self.$route.matched.length - 1].name = 'failSubmit';
         if (!self.isSuccess) {
           PubSub.publish('success-page', { changeStyle: true });
         }
