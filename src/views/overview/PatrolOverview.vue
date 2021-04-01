@@ -128,15 +128,6 @@
               <img v-else :src="ascending" class="img-class">
             </span>
           </div>
-          <div class="right-select">
-            <el-select v-model="ModelPost" size="mini" class="el-province" @change="changeRole">
-              <el-option
-                v-for="item in titleList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"/>
-            </el-select>
-          </div>
         </div>
         <div class="task-dashboard">
           <div v-if="taskList.length > 0" :class="taskList.length < 5 ? 'space-task': ''" class="task-board">
@@ -294,17 +285,6 @@ export default {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         }
       },
-      titleList: [
-        {
-          label: this.$t('insSettingView.storesupervisor'),
-          value: 3
-        },
-        {
-          label: this.$t('insSettingView.storesuperManage'),
-          value: 4
-        }
-      ],
-      ModelPost: 3,
       toolTipClass: 'page-login-toolTipClass',
       tooltipClass: 'tooltip-class',
       taskList: [],
@@ -423,16 +403,6 @@ export default {
   },
 
   methods: {
-    changeRole(){
-      this.params.roleId = this.ModelPost;
-      this.saveSearchParams();
-      this.getStoreNumAndCycle();
-      this.getBestAndWorstStores();
-      this.getInspectItems();
-      this.getInspectTaskRanking();
-      this.getPassRateAndCycle();
-      this.getRegionInspectResult();
-    },
     changBestAndWorst() {
       const self = this;
       self.isWorstArea = !self.isWorstArea;
@@ -754,7 +724,6 @@ export default {
       daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
       self.params.beginTs = start;
       self.params.endTs = end;
-      self.params.roleId = self.ModelPost;
       self.saveSearchParams();
       self.initData();
     },
@@ -1127,7 +1096,6 @@ export default {
       params = JSON.parse(JSON.stringify(self.params));
       params.lowestFirst = self.isWorstWork;
       params.numOfPerson = 5;
-      params.roleId = self.ModelPost;
       try {
         const result = await self.getInspectStatsOverPerson(params);
         const tempTaskList = [];
@@ -1738,7 +1706,6 @@ export default {
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
         this.params.endTs = searchParams.endTs;
-        this.params.roleId = this.ModelPost = searchParams.roleId;
       }else{
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
