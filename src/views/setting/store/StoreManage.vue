@@ -181,18 +181,6 @@ export default {
           'width': 130
         },
         {
-          'prop': 'supervisorName',
-          'label': this.$t('storeView.supervisor'),
-          'sortable': 'custom',
-          'width': 120
-        },
-        {
-          'prop': 'userName',
-          'label': this.$t('storeView.solver'),
-          'sortable': false,
-          'width': 100
-        },
-        {
           'prop': 'phone',
           'label': this.$t('storeView.contact'),
           'sortable': false,
