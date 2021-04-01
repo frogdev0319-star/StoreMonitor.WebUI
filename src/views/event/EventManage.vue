@@ -826,10 +826,9 @@ export default {
     },
 
     toEventDetail(row) {
-      const self = this;
       this.event = row;
       sessionStorage.setItem('event', JSON.stringify(this.event));
-      sessionStorage.setItem('queryparams', JSON.stringify(self.params));
+      sessionStorage.setItem('queryparams', JSON.stringify(this.params));
       this.$router.push({ name: 'eventDetails', params: { event: this.event }});
     },
 

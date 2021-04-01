@@ -125,13 +125,6 @@
               <span class="details-info">{{ event.createor }}</span>
             </el-tooltip>
           </div>
-          <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
-            <dd><span :class="lang==='en'? 'en-w3': 'w3'">{{ $t('eventView.solver') }}：</span></dd>
-            <el-tooltip :popper-class="tooltipClass" :content="event.assigneeName"
-                        effect="dark" placement="bottom-start">
-              <span class="details-info">{{ event.assigneeName }}</span>
-            </el-tooltip>
-          </div>
         </div>
         <div class="storeInfo-details">
           <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
@@ -177,7 +170,7 @@
                 </div>
               </div>
             </div>
-            <div v-for="(item,index) in imgsourceList" :key="index" class="source-content">
+            <div v-for="(item,index) in imgsourceList" :key="'img-' + index" class="source-content">
               <div v-if="item.mediaType===2" class="img-content">
                 <!--image-->
                 <img
@@ -295,7 +288,7 @@ import PermissionHelper from '../../../api/PermissionHelper';
 import filterString from '@/common/filterString';
 
 export default {
-  name: 'RateManage',
+  name: 'EventDetail',
   components: {
     AudioVue,
     EzvizVideo
@@ -653,7 +646,6 @@ export default {
         eventTitle: event.subject,
         storeName: event.storeName,
         createor: event.assignerName,
-        assigneeName: event.assigneeName,
         createDate: util.getDateTime(event.ts),
         deviceId: event.deviceId,
         status: event.status,
