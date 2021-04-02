@@ -307,6 +307,7 @@ export default {
         { curPath: ['/reinspect/confirmrein', '/reinspect/submit'], activePath: '/reinspection' },
         { curPath: ['/storemonitor/submit'], activePath: '/storemonitor' },
         { curPath: ['/reportdetails'], activePath: '/report' },
+        { curPath: ['/rate'], activePath: '/event' },
         { curPath: ['/bindroute', '/addroute', '/setroute'], activePath: '/routeinspection' },
         { curPath: ['/storedetail'], activePath: '/storemanage' },
         { curPath: ['/ezvizeDeviceSetting'], activePath: '/ezvizDevice' },
@@ -440,11 +441,7 @@ export default {
       let matched = [];
       matched = this.$route.matched.filter(x => x.name);
       matched.length === 2 && this.setSecondLevelNavbarBread(matched, currentRoute);
-      matched.length > 2 && this.setSystemNavbarBread(matched, currentRoute);
-      matched.length > 2 && matched[1].name === 'scheduleManage' && this.setScheduleBread(matched, currentRoute);
-      matched.length > 2 && (matched[1].name === 'deviceManage' || matched[1].name === 'ezvizDeviceMgt' ||
-          matched[1].name === 'beseyeDeviceMgt') &&
-        this.setDeviceBread(matched, currentRoute);
+      matched.length > 2 && matched[0].name === 'systemSetting' && this.setSystemNavbarBread(matched, currentRoute);
       this.breadList = matched;
     },
 
@@ -651,9 +648,6 @@ export default {
 </script>
 <style lang="scss" scoped>
   $border: #393b4c;
-  *{
-    font-family: Roboto, 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
-  }
   $collapseWidth:5.5%;
   //rem(val)
   @function rem($val){
@@ -684,9 +678,6 @@ export default {
   }
   *{
     margin: 0px;
-    padding:0px;
-    border: 0;
-    font-family: Roboto, Arial, Microsoft YaHei;
   }
   .navIcon{
     display:inline-block;
