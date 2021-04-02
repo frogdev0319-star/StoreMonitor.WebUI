@@ -1001,6 +1001,7 @@ export default {
         isActive: false
       });
       self.subBtnList = tempBtnList;
+      self.showWinpBtn = tempBtnList.length !== 0;
     },
 
     showRelatedChannel() {
