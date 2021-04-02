@@ -1,6 +1,7 @@
 <template>
   <div class="table">
     <el-table
+      ref="tablePagination"
       :data="tableData"
       v-bind="$attrs"
       :highlight-current-row="true"
@@ -8,22 +9,69 @@
       :header-cell-class-name="headerClass"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
+      :cell-style="ifSetCellStyle ? setCellStyle : {}"
+      :border="showBorder"
+      :stripe="isStripe"
+      :height="tableHeight"
       :empty-text="$t('deviceView.noData')"
       align="left"
-      stripe
-      border
       style="width: 100%"
       size="mini"
       v-on="$listeners"
       @sort-change="handleSortChange"
+      @row-click="handleRowClick"
     >
+      <el-table-column
+        v-if="showSelectionColumn"
+        type="selection"
+        align="center"
+        min-width="90"
+      />
       <el-table-column
         v-for="(_item,_index) in columnData"
         :key="_index"
         :prop="_item.prop"
         :label="_item.label"
         :sortable="canSortable ? _item.sortable : false"
-        :min-width="isexportPDF ? _item.pdfwidth : (lang !== 'en' ? _item.width : _item.maxWidth)"/>
+        :min-width="isexportPDF ? _item.pdfwidth : (lang !== 'en' ? _item.width : _item.maxWidth)"
+        :formatter="_item.formatter">
+        <template slot-scope="{row}">
+          <template v-if="_item.canEdit && row.isEditing">
+            <el-input v-model="row.tempDeviceName" class="edit-input" size="small" />
+          </template>
+          <span v-else-if="_item.formatter" v-html="_item.formatter(row[_item.prop])"/>
+          <span v-else>{{ row[_item.prop] }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        v-if="tableOperation.label"
+        :min-width="tableOperation.minWidth"
+        :label="tableOperation.label"
+        align="left"
+        class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <div v-if="scope.row.isEditing">
+            <div class="iconlised" @click="confirmEdit(scope.row)">
+              <i class="el-icon-check"/>
+            </div>
+            <div class="iconrised" @click="cancelEdit(scope.row)">
+              <i class="el-icon-close"/>
+            </div>
+          </div>
+          <div v-else>
+            <i
+              v-for="(item,index) in tableOperation.operation"
+              :key="index"
+              :type="item.type"
+              :class="item.icon"
+              class="iconfont"
+              size="mini"
+              @click="handleOperationButton(item.methods, scope.row, scope.$index)">
+              {{ item.label }}
+            </i>
+          </div>
+        </template>
+      </el-table-column>
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
@@ -62,6 +110,16 @@
           </template>
         </el-table-column>
       </template>
+      <div slot="empty">
+        <div v-if="!isLoadingData">
+          <i class="iconfont icon-zhengque empty-data-icon"/>
+          <span class="empty-text">{{ $t('deviceView.noData') }}</span>
+        </div>
+        <div v-else class="empty-content">
+          <img :src="loadingGif">
+          <span class="empty-text">{{ $t('remotePatrol.loading') }}</span>
+        </div>
+      </div>
     </el-table>
     <div v-if="showPagination" class="toolbar pagination clearfix">
       <el-pagination
@@ -69,9 +127,9 @@
         :page-sizes="[10, 20, 50, 100]"
         :page-size="pagesize"
         :total="total"
+        :layout="layout"
         background
         small
-        layout="jumper,total, prev,pager, next,sizes"
         class="pagination"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -81,6 +139,8 @@
 </template>
 
 <script>
+import util from '@/common/util';
+
 export default {
   props: {
     total: {
@@ -109,7 +169,8 @@ export default {
     },
     defaultSort: {
       type: Object,
-      required: true
+      required: false,
+      default: () => {}
     },
     layout: {
       type: String,
@@ -131,6 +192,51 @@ export default {
       type: Boolean,
       default: false
     },
+    tableOperation: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
+    headerClass: {
+      type: String,
+      default: 'header-class'
+    },
+    cellClass: {
+      type: String,
+      default: 'cell-class'
+    },
+    rowClass: {
+      type: String,
+      default: 'row-class'
+    },
+    ifSetCellStyle: {
+      type: Boolean,
+      default: false
+    },
+    showBorder: {
+      type: Boolean,
+      default: true
+    },
+    showSelectionColumn: {
+      type: Boolean,
+      default: false
+    },
+    isStripe: {
+      type: Boolean,
+      default: true
+    },
+    isDevice: {
+      type: Boolean,
+      default: false
+    },
+    tableHeight: {
+      type: Number
+    },
+    isLoadingData: {
+      type: Boolean,
+      default: false
+    },
     isexportPDF: {
       type: Boolean,
       default: false
@@ -139,17 +245,33 @@ export default {
   data() {
     return {
       currentRow: {},
-      headerClass: 'header-class',
-      cellClass: 'cell-class',
-      rowClass: 'row-class',
       lang: this.$i18n.locale,
-      order: { direction: '', property: '' }
+      order: { direction: '', property: '' },
+      noData: this.$t('deviceView.noData'),
+      loadingGif: require('../../static/img/loading.gif')
     };
+  },
+  computed: {
+    tableSelection() {
+      return this.$refs.tablePagination.selection;
+    }
   },
 
   methods: {
-    rowClick(row) {
+    setCellStyle({ row, column, rowIndex, columnIndex }) {
+      let obj = {};
+      if (columnIndex === 0) {
+        obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
+      } else {
+        obj = { 'border-right': '1px solid #e3e9f4' };
+      }
+      return obj;
+    },
+
+    handleRowClick(row) {
       this.currentRow = row;
+      console.log(row);
+      this.$emit('emitRowClick', row);
     },
 
     handleCurrentChange(currentPage) {
@@ -207,6 +329,28 @@ export default {
       const val1 = obj1[column].substr(0, obj1[column].length - 1);
       const val2 = obj2[column].substr(0, obj2[column].length - 1);
       return val1 - val2;
+      console.log(this.order);
+    },
+
+    handleOperationButton(methods, row, index) {
+      this.tableData.map(item => { item.isEditing = false; });
+      row.isEditing = this.isDevice && methods === 'edit';
+      this.$emit('handleOperation', { method: methods, row: row, index: index });
+    },
+
+    confirmEdit(row) {
+      row.isEditing = false;
+      if (row.tempDeviceName.trim().length === 0) {
+        util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
+        return;
+      }
+      row.name = row.tempDeviceName;
+      this.$emit('handleEdit', row);
+    },
+
+    cancelEdit(row) {
+      row.isEditing = false;
+      row.tempDeviceName = row.name;
     }
 
   }
@@ -227,6 +371,59 @@ export default {
     margin: 30px calc(30/1920*100vw);
     margin-right: 0;
     height:13%;
+  }
+  .iconfont{
+    cursor: pointer;
+    margin-right: 20px;
+    font-size: calc(24/1920*100vw);
+    color: #7d8cad;
+    &:last-child{
+      margin-right: 0px;
+    }
+  }
+  .el-table--mini{
+    font-size: calc(14/1920*100vw);
+  }
+
+  .iconfont{
+    font-size: calc(24/1920*100vw);
+    color: #7d8cad;
+  }
+  .iconlised{
+    float: left;
+    position: relative;
+    background-color: #f31d65;
+    padding: 1px 6px;
+    color: #fff;
+    border-width: 1px 1px 1px 1px;
+    border-style: solid;
+    border-color: #ddd;
+    line-height: 25px;
+    height: 25px;
+    /deep/ el-button .add-btn{
+      font-size: 12px;
+    }
+  }
+  .iconrised{
+    float: left;
+    position: relative;
+    padding: 1px 6px;
+    border-width: 1px 1px 1px 0px;
+    border-style: solid;
+    border-color: #ddd;
+    background-color: rgba(255, 255, 255, 0);
+    line-height: 25px;
+    height: 25px;
+  }
+  .empty-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .empty-text{
+    margin-left: 20px;
+    font-size: calc(16/1920*100vw);
+    color: #7d8cad;
   }
 </style>
 
