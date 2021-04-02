@@ -29,13 +29,13 @@
           </el-tooltip>
         </div>
         <div class="header-mul-select">
-          <span class="mul-label">{{ $t('scheduleView.InspectPerson') }}</span>
-          <el-select v-model="ModelPost" size="mini" class="el-province" @change="searchData">
+          <span class="mul-label">{{ $t('overview.patrolLists') }}</span>
+          <el-select v-model="inspectId" size="mini" class="el-province" @change="searchData">
             <el-option
-              v-for="item in titleList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"/>
+              v-for="(item, index) in inspectList"
+              :key="index"
+              :label="item.name"
+              :value="item.id"/>
           </el-select>
         </div>
       </el-col>
@@ -43,22 +43,29 @@
         <el-col :span="24" class="contents-container">
           <el-col :span="24" class="items-title">
             <span class="title">{{ $t('overview.patrolList') }}</span>
-            <div class="exprotBtn">
-              <el-button :class="lang=='en' ? 'en-export-btn':'export-btn'" type="primary" size="mini" style="vertical-align: middle;"
-                         @click="export2Excel">
-                <div class="btn-area">
-                  <!-- <i class="iconfont icon-excel"></i> -->
+            <div class="operation-btns">
+              <delay-button
+                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                type="primary"
+                size="mini"
+                @click="export2Excel"
+              >
+                <div class="button-area">
                   <img :src="exportPng" class="icon-excel">
-                  <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+                  <span>{{ $t('eventView.exportReport') }}</span>
                 </div>
-              </el-button>
-              <el-button :class="lang === 'en'? 'en-export-btn':'export-btn' " type="primary" size="mini" style="vertical-align: middle;"
-                         @click="handleDown()">
-                <div class="btn-area">
+              </delay-button>
+              <delay-button
+                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                type="primary"
+                size="mini"
+                @click="handleDown"
+              >
+                <div class="button-area">
                   <i class="iconfont icon-pdf"/>
-                  <span class="spanClass">{{ $t('remotePatrol.InspectionDetail') }}</span>
+                  <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
                 </div>
-              </el-button>
+              </delay-button>
             </div>
           </el-col>
           <el-col :span="24" class="items-table">
@@ -183,21 +190,6 @@
           </el-col>
         </el-col>
       </el-col>
-      <el-dialog
-        v-if="ispdf"
-        :title="$t('insSettingView.export')"
-        :visible.sync="ispdf"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        class="LoadDialog"
-        width="510px"
-        top="35vh"
-        left="40vh">
-        <div style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #dfe2e9;">
-          <p style="margin-top:40px;color:#000;">{{ $t('insSettingView.isExportPDF') }}......</p>
-        </div>
-      </el-dialog>
     </div>
     <div v-if="ispdf" class="item-container">
       <el-col id="pdfDom" ref="printPDF" :span="24" class="items-content" style="padding:40px 0px;width:1130px;">
@@ -332,26 +324,39 @@
         </el-col>
       </el-col>
     </div>
+    <dialog-pop
+      :title="$t('insSettingView.export')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="ispdf"
+      :show-button="false"
+      class="LoadDialog"
+    >
+      <p>{{ $t('insSettingView.isExportPDF') }}......</p>
+    </dialog-pop>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import { getStoreList, getBriefStoreList } from '@/api/store';
-import util from '../../common/util.js';
-import RegionMultiSelect from '@/components/RegionMultiSelect';
+import { getBriefStoreList } from '@/api/store';
+import util from '@/common/util.js';
 import { GetScheduleTaskList } from '@/api/schedule';
 import {
   getInspectStatsOverPersonV2,
   getInspectScheduleOverview
 } from '@/api/inspectOverview';
-import SearchConditionUtil from "../../common/SearchConditionUtil";
+import SearchConditionUtil from '@/common/SearchConditionUtil';
+import DelayButton from '@/components/DelayButton';
+import DialogPop from '@/components/DialogPop';
+import { inpectRESTful } from '@/api/index';
 
 export default {
   name: 'SupervisorStatistics',
 
   components: {
-    RegionMultiSelect
+    DialogPop,
+    DelayButton
   },
 
   data() {
@@ -478,12 +483,6 @@ export default {
           'width': '13%',
           'className': 'col1'
         },
-        // {
-        //   'prop': 'appliedStores',
-        //   'label': this.$t('overview.patrolStore'),
-        //   'width': '27%',
-        //   'className': 'col2'
-        // },
         {
           'prop': 'schedule',
           'label': this.$t('overview.planDes'),
@@ -516,14 +515,6 @@ export default {
           'prop': 'inspectTagName',
           'label': this.$t('overview.patrolLists')
         },
-        // {
-        //   'prop': 'completedStoresStr',
-        //   'label': this.$t('overview.inspectedStores')
-        // },
-        // {
-        //   'prop': 'incompletedStoresStr',
-        //   'label': this.$t('overview.uninspectedStores')
-        // },
         {
           'prop': 'percentSchedule',
           'label': this.$t('overview.taskPerformance')
@@ -536,7 +527,9 @@ export default {
       insideRowClass: 'inside-row-class',
       elPDFtableData: [],
       htmlTitle: this.$t('overview.htmltopdfC'),
-      defaultSort: {prop: 'completionRateStr', order: 'ascending'}
+      defaultSort: { prop: 'completionRateStr', order: 'ascending' },
+      inspectId: null,
+      inspectList: []
     };
   },
 
@@ -546,20 +539,13 @@ export default {
 
   watch: {
     async accountChanged(val) {
-      if (val !==  0) {
+      if (val !== 0) {
         this.dateValue = [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()];
-        this.defaultSort = {prop: 'completionRateStr', order: 'ascending'};
+        this.defaultSort = { prop: 'completionRateStr', order: 'ascending' };
         this.params = {};
         this.getSearchParams();
         this.initDaysRange();
         this.initData();
-      }
-    },
-    numberOfElements(val) {
-      let self = this;
-      if (val === 0 && self.totalElements > 0) {
-        self.params.filter.page -= 1;
-        self.getEventList(self.params);
       }
     }
   },
@@ -574,9 +560,8 @@ export default {
     getInspectorPlan(params) {
       return new Promise((resolve, reject) => {
         GetScheduleTaskList(params).then(res => {
-          let data = res;
-          resolve(data);
-        }).catch(err =>{
+          resolve(res);
+        }).catch(err => {
           reject(err);
         });
       });
@@ -716,19 +701,6 @@ export default {
       });
     },
 
-    getStoreData(params) {
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          let errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            resolve(res);
-          }
-        }).catch(res => {
-          reject(res);
-        });
-      });
-    },
-
     dateChange(val) {
       let self = this;
       self.currentIndex = 0;
@@ -792,40 +764,8 @@ export default {
       let self = this;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
       self.params.order = { direction: self.direction, property: self.property };
-      self.params.roleId = parseInt(self.ModelPost);
+      self.params.inspectId = parseInt(self.inspectId);
       await self.getInspectPersonTable();
-    },
-
-    async getInspectPersonTable() {
-      let self = this;
-      self.saveSearchParams();
-      let inspectItems = await self.getInspectStatsPersonInfo(self.params);
-      let errCode = inspectItems.errCode;
-
-      if (errCode === 0) {
-        let resultData = inspectItems.data;
-        try {
-          let content = resultData.content;
-          content.forEach(item => {
-            item.completionRateStr = item.completionRate + '%';
-          });
-          self.supervisorTableData = resultData.content;
-          self.total = resultData.totalElements;
-        } catch (e) {
-          console.log("SupervisorStatistics-getInspectPersonTable:" + e);
-          self.supervisorTableData = [];
-        }
-      }
-    },
-
-    getInspectStatsPersonInfo(params) {
-      return new Promise((resolve, reject) => {
-        getInspectStatsOverPersonV2(params).then(res => {
-          resolve(res);
-        }).catch(err => {
-          reject(err)
-        });
-      });
     },
 
     getInspectScheduleImplemention(params) {
@@ -836,10 +776,6 @@ export default {
           reject(err)
         });
       })
-    },
-
-    initData() {
-      this.getInspectPersonTable();
     },
 
     export2Excel() {
@@ -1038,23 +974,9 @@ export default {
       }
     },
 
-    saveSearchParams(){
-      let params = {
-        beginTs: this.params.beginTs,
-        endTs: this.params.endTs,
-        storeId: this.curStore,
-        rankType: this.rankType
-      }
-      const searchConditon = {
-        path: 'supervisorStatistics',
-        params: this.params
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
-    },
-
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('supervisorStatistics');
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
@@ -1064,11 +986,12 @@ export default {
         this.direction = searchParams.order.direction;
         this.property = searchParams.order.property;
         this.params.filter = searchParams.filter;
-        this.params.order =  searchParams.order;
+        this.params.order = searchParams.order;
         this.params.roleId = searchParams.roleId;
         this.ModelPost = searchParams.roleId;
+        this.inspectId = searchParams.inspectId;
         this.setDefaultSort();
-      }else{
+      } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
@@ -1077,15 +1000,68 @@ export default {
         this.params.order = { direction: this.direction, property: this.property };
         this.params.roleId = parseInt(this.ModelPost);
         this.ModelPost = 3;
-        this.defaultSort = {prop: 'completionRateStr', order: 'ascending'};
+        this.inspectId = null;
+        this.defaultSort = { prop: 'completionRateStr', order: 'ascending' };
       }
     },
 
-    setDefaultSort(){
+    setDefaultSort() {
       this.defaultSort.order = this.direction === 'asc' ? 'ascending' : 'descending';
       this.defaultSort.prop = this.property === 'completionRate' ? 'completionRateStr': this.property;
-    }
+    },
 
+    initData() {
+      this.getInspctList();
+      this.getInspectPersonTable();
+    },
+
+    getInspctList() {
+      inpectRESTful.GetInspectTagList().then(res => {
+        if (res.errCode === 0) {
+          this.inspectList = res.data;
+          this.inspectId = this.inspectList.length > 0 ? this.inspectList[0].id : null;
+        }
+      }).catch(err => {
+        console.log('SupervisorStatistics-getInspctList:' + err);
+      })
+    },
+
+    async getInspectPersonTable() {
+      this.saveSearchParams();
+      this.getInspectStatsPersonInfo(this.params).then(res => {
+        const errCode = res.errCode;
+        if (errCode === 0) {
+          const resultData = res.data;
+          const content = resultData.content;
+          content.forEach(item => {
+            item.completionRateStr = item.completionRate + '%';
+          });
+          this.supervisorTableData = resultData.content;
+          this.total = resultData.totalElements;
+        }
+      }).catch(e => {
+        console.log('SupervisorStatistics-getInspectPersonTable:' + e);
+        self.supervisorTableData = [];
+      })
+    },
+
+    saveSearchParams() {
+      const searchConditon = {
+        path: 'supervisorStatistics',
+        params: this.params
+      }
+      SearchConditionUtil.saveSearchCondition(searchConditon)
+    },
+
+    getInspectStatsPersonInfo(params) {
+      return new Promise((resolve, reject) => {
+        getInspectStatsOverPersonV2(params).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err)
+        });
+      });
+    }
   }
 };
 </script>
@@ -1101,10 +1077,7 @@ export default {
   $pass: #72a1f3;
   $failed: #ffd035;
   $ignored: #cad1db;
-  *{
-    box-sizing: border-box;
-    font-family: Roboto, Arial, 'Microsoft YaHei';
-  }
+
   .item-container{
     padding-bottom: 20px;
     .statistics-header{
@@ -1230,81 +1203,6 @@ export default {
             text-align: left;
             color: $black;
             display: inline-block;
-          }
-          .exprotBtn{
-            padding-right: calc(30 / 1920 * 100vw);
-            padding-top: 25px;
-            float: right;
-            .export-btn{
-              border-color: $red;
-              z-index: 990;
-              height: calc(36/1920*100vw);
-              width: calc(130/1920*100vw);
-              margin: 0;
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              line-height: calc(36/1920*100vw);
-              color: #ffffff;
-              border-width: 0;
-              border-radius: 4px;
-              top: calc(24/1920*100vw);
-              min-height: 28px;
-              min-width: 120px;
-              .btn-area{
-                padding: 0 calc(6/1920*100vw);
-                height: calc(36/1920*100vw);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                .icon-excel{
-                  margin-right: calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
-                }
-                .icon-pdf{
-                  margin-right: calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
-                }
-                .spanClass{
-                  font-size: calc(14/1920*100vw);
-                  display: inline-block;
-                }
-              }
-            }
-            .en-export-btn{
-              border-color: $red;
-              z-index: 990;
-              height: calc(36/1920*100vw);
-              width: calc(160/1920*100vw);
-              min-width: 120px;
-              margin: 0;
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              line-height: calc(36/1920*100vw);
-              color: #ffffff;
-              border-width: 0;
-              border-radius: 4px;
-              .btn-area{
-                position: relative;
-                padding: 0 calc(6/1920*100vw);
-                height: calc(36/1920*100vw);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                .icon-excel{
-                  margin-right: calc(18/1920*100vw);
-                  width:calc(24/1920*100vw);
-                  height:calc(24/1920*100vw);
-                }
-                .icon-pdf{
-                  margin-right: calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
-                }
-                .spanClass{
-                  font-size: calc(14/1920*100vw);
-                  display: inline-block;
-                }
-              }
-            }
           }
         }
       .items-table{
