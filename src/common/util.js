@@ -1,7 +1,6 @@
-import { format } from 'url';
 import ConvertPinyin from '@/common/getpinyin';
 import i18n from '@/lang/index';
-import moment from 'moment';
+import { message } from '@/common/singleton-message';
 
 export default {
   getOneHourTime(para) {
@@ -840,7 +839,16 @@ export default {
     }
     console.log(result);
     return result;
+  },
+
+  notify(msg, type, time) {
+    message({
+      message: msg,
+      type: type,
+      duration: time
+    });
   }
+
 };
 class indexedDB {
   init() {
