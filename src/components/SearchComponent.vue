@@ -97,29 +97,28 @@
         <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
         <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"/>
       </el-tooltip>
-      <div class="exprotBtn" style="float:right;">
-        <el-button
-          :class="lang==='en'? 'en-search-btn':'search-btn' "
+      <div class="search-btns">
+        <delay-button
           :disabled="storeListLength === 0"
-          size="mini"
-          style="vertical-align: middle;"
-          type="primary"
-          @click="searchData">{{ $t('remotePatrol.search') }}</el-button>
-        <el-button
-          v-if="!isInspectItem"
-          :class="lang === 'en'? 'en-search-btn':'search-btn' "
+          :class="lang === 'en' ? 'en-export-btn':'export-btn'"
           type="primary"
           size="mini"
-          style="vertical-align: middle;"
-          @click="handleExportPdf"
+          @click="searchData"
         >
-          <div class="btn-area">
-            <i class="iconfont icon-pdf" style="font-size: calc(24/1920*100vw);vertical-align: middle;"/>
-            <span style="font-size: calc(14/1920*100vw);margin:0 0 0 10px;vertical-align: middle;">
-              {{ $t('remotePatrol.InspectionDetail') }}
-            </span>
+          <span>{{ $t('remotePatrol.search') }}</span>
+        </delay-button>
+        <delay-button
+          v-if="!isInspectItem"
+          :class="lang === 'en'? 'en-export-btn':'export-btn' "
+          type="primary"
+          size="mini"
+          style="vertical-align: middle;"
+          @click="handleExportPdf">
+          <div class="button-area">
+            <i class="iconfont icon-pdf"/>
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
           </div>
-        </el-button>
+        </delay-button>
       </div>
     </el-col>
   </el-col>
@@ -130,13 +129,15 @@ import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import { getBriefStoreList, GetTagList } from '@/api/store';
-import util from '../common/util.js';
+import util from '@/common/util.js';
 import { inpectRESTful } from '@/api/index';
-import SearchConditionUtil from "../common/SearchConditionUtil";
+import SearchConditionUtil from '@/common/SearchConditionUtil';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'SearchComponent',
   components: {
+    DelayButton,
     MultiSelect,
     RegionMultiSelect
   },
@@ -154,8 +155,8 @@ export default {
       type: String,
       default: ''
     },
-    defaultSort:{
-      type:Object
+    defaultSort: {
+      type: Object
     }
   },
 
@@ -756,7 +757,7 @@ export default {
       });
     },
 
-    saveSearchParams(saveParamsObj){
+    saveSearchParams(saveParamsObj) {
       const params = saveParamsObj.params;
       params.curCountry = this.curCountry;
       params.curProvince = this.curProvince;
@@ -764,14 +765,14 @@ export default {
       params.curStore = this.curStore;
       params.curStoreTag = this.curStoreTag;
       params.timeMode = this.timeMode;
-      params.inspectId = this.inspectList==='-1' ? '' : this.inspectList
+      params.inspectId = this.inspectList === '-1' ? '' : this.inspectList
       console.log(params)
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition(this.path);
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
@@ -786,10 +787,10 @@ export default {
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.inspectCatch = searchParams.inspectId;
-        //this.setDefaultSort();
+        // this.setDefaultSort();
         this.ifGetParamsFromCash = true;
         console.log(this.params);
-      }else{
+      } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
@@ -797,7 +798,7 @@ export default {
       }
     },
 
-    setDefaultSort(){
+    setDefaultSort() {
       // this.defaultSort.order = this.order.direction === 'asc' ? 'ascending' : 'descending';
       // this.defaultSort.prop = this.order.property === 'completionRate' ? 'completionRateStr': this.order.property;
       const paramsObj = {};
@@ -849,23 +850,6 @@ export default {
         margin-right: calc(15/1920*100vw);
         min-width: 85px;
         min-height: 28px;
-      }
-      .search-btn{
-        width: calc(130/1920*100vw);
-        height: calc(36/1920*100vw);
-        padding: 0 0;
-        font-size: calc(14/1920*100vw);
-        margin-left: calc(20/1920*100vw);
-        // float: right;
-      }
-      .en-search-btn{
-        width: calc(130/1920*100vw);
-        min-width:115px;
-        margin-left: calc(20/1920*100vw);
-        height: calc(36/1920*100vw);
-        padding: 0 0;
-        font-size: calc(14/1920*100vw);
-        margin-left: calc(20/1920*100vw);
       }
       .normal-span{
         font-size: calc(14/1920*100vw);
