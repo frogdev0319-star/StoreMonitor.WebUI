@@ -1,0 +1,179 @@
+$border: #e3e9f4;
+$color: #606266;
+$background: #fff;
+$borderStyle: 1px solid $border;
+$tab:#7d8cad;
+$dialogBorder: 1px solid #dfe2e9;
+$dialogTitle: #424151;
+$warning: #ff9803;
+$cancelBtnBackground: #eaedf2;
+$cancelBtnFont: #adb1c0;
+$mainColor: #f31d65;
+
+@import url('../css/pagination.css');
+.clear-float::after{
+  content: '';
+  display: block;
+  clear: both;
+}
+.header-title{
+  height: 70px;
+  border-bottom: $borderStyle;
+  padding-left: calc(40/1920*100vw);
+  padding-right: calc(25/1920*100vw);
+  margin-bottom: 25px;
+  font-size: calc(20/1920*100vw);
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: $color;
+}
+
+.page-container{
+  background-color: $background;
+  border: $borderStyle;
+}
+
+.table-iconfont{
+  font-size: calc(24/1920*100vw);
+  color: $tab;
+  cursor: pointer;
+  margin-right: 20px;
+  vertical-align: middle;
+  &:last-child{
+    margin-right: 0px;
+  }
+}
+
+.dialog-body{
+  border-top: $dialogBorder;
+  overflow: hidden;
+  width: 100%;
+}
+.dialog-slot{
+  margin: 40px 30px 40px 40px;
+  display: flex;
+  align-items: center;
+}
+
+.dialog-icon{
+  font-size: 40px;
+  margin-right: 20px;
+  color: $warning;
+}
+
+.storevue-dialog .el-dialog{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0 !important;
+}
+
+.storevue-dialog .el-dialog__header{
+  padding: 20px 20px 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.storevue-dialog .el-dialog__title{
+  font-size: 16px;
+  color: $dialogTitle;
+}
+.dialog-content{
+  color: $dialogTitle;
+}
+.storevue-dialog .el-dialog__footer{
+  padding: 0 20px 20px 30px;
+}
+
+.confirm-btn{
+  width: calc(100/1920*100vw);
+  font-size: calc(14/1920*100vw);
+  height:calc(32/1920*100vw) !important;
+  border-radius: 4px;
+  padding: 0;
+}
+
+.cancel-btn{
+  @extend .confirm-btn;
+  background-color: $cancelBtnBackground;
+  color: $cancelBtnFont;
+  margin-right: calc(20/1920*100vw);
+  min-height: 28px;
+  min-width: 85px;
+}
+
+.table-header{
+  border: none;
+  font-size: calc(14/1920*100vw);
+  color: #7d8cad;
+  height: 47px;
+}
+
+.required-name{
+  color: $mainColor;
+}
+
+.storevue-button{
+  width: calc(130/1920*100vw);
+  font-size: calc(14/1920*100vw);
+  height: calc(36/1920*100vw);
+  padding: 0;
+  min-height: 28px;
+  min-width: 85px;
+}
+.storevue-button .iconfont{
+  margin-right: calc(8/1920*100vw);
+}
+.schedule-btn{
+  @extend .storevue-button;
+  @media screen and (max-width: 1680px){
+    width: 110px !important;
+  }
+}
+.operation-btns{
+  padding-top: 25px;
+  padding-right: calc(30 / 1920 * 100vw);
+  float: right;
+  display: flex;
+}
+.export-btn{
+  @extend .storevue-button;
+}
+.export-btn.el-button--primary.el-button--mini{
+  min-height: 28px;
+  min-width: 120px;
+}
+.export-btn .iconfont{
+  font-size: calc(24/1920*100vw);
+  margin-right: calc(18/1920*100vw);
+}
+.export-btn .icon-excel{
+  height: calc(24/1920*100vw);
+  width: calc(24/1920*100vw);
+  margin-right: calc(18/1920*100vw);
+}
+.en-export-btn{
+  @extend .export-btn;
+  width: calc(160/1920*100vw);
+}
+.button-area{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-search-input{
+  width: calc(200/1920*100vw);
+  margin-left: calc(30/1920*100vw);
+  .el-input__inner{
+    border-radius: 30px;
+    text-overflow: ellipsis;
+  }
+}
+
+.search-btns{
+  float: right;
+}
