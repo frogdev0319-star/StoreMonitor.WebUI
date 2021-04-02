@@ -211,7 +211,7 @@ export default {
   // Patrol page language
   'remotePatrol': {
     'code': '分店代码',
-    'downloading':'正在下载中......',
+    'downloading': '正在下载中......',
     'uploading': '正在上传中',
     'upload0': '共',
     'upload1': '个附件，已上传',
@@ -413,7 +413,8 @@ export default {
     'good': '优秀',
     'signature': '签名',
     'excellent': '优秀',
-    'signatureAndPic': '签名与照片'
+    'signatureAndPic': '签名与照片',
+    'loading': '加载中...'
   },
 
   // event Management page language
@@ -876,7 +877,7 @@ export default {
     'dueDays': '执行时效',
     'today': '当天',
     'days': '天',
-    'InspectPerson': '巡检人',
+    'InspectPerson': '任务执行者',
     'remotePatrol': '远程巡检',
     'onsitePatrol': '现场巡检',
     'deleteSuss': '删除成功！',
@@ -891,7 +892,8 @@ export default {
     'emptyMonth': '月份不能为空',
     'emptyTime': '执行时间不能为空',
     'newSchedule': '新增排程',
-    'select': '请选择'
+    'select': '请选择',
+    'onTitle': '（按职务）'
   },
 
   'titleView': {
@@ -899,14 +901,15 @@ export default {
     'deleteTitle': '删除',
     'titleName': '职务名称',
     'titleCate': '职务类别',
+    'createTime': '创建时间',
     'description': '备注',
     'operation': '操作',
     'save': '保存',
     'titleSetting': '职务设置',
-    'roleId1Title': '企业高层/IT运维',
-    'roleId2Title': '企业中层',
-    'roleId3Title': '企业基层',
-    'roleId4Title': '门店运营',
+    'roleId1Title': '管理员',
+    'roleId2Title': '督导主管',
+    'roleId3Title': '督导（稽核经理）',
+    'roleId4Title': '店长（运营经理）',
     'comment': '备注说明',
     'commentRuletip': '最多可输入200个字符',
     'roleSetting': '菜单权限配置',
@@ -921,6 +924,12 @@ export default {
     'titleValidateInfo': '职务名称为1~20个字母或汉字',
     'saveSuss': '保存成功',
     'titleExist': '职务名称已存在',
-    'saveFail': '保存失败'
+    'saveFail': '保存失败',
+    'canAccessVideo': '允许访问视频',
+    'canReceiveMessage': '允许接收消息通知',
+    'yes': '允许',
+    'no': '不允许',
+    'useTemplate': '模板套用',
+    'useAndSave': '保存并套用'
   }
 };

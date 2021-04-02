@@ -211,7 +211,7 @@ export default {
   // Patrol page language
   'remotePatrol': {
     'code': '分店代碼',
-    'downloading':'正在下載中......',
+    'downloading': '正在下載中......',
     'uploading': '正在上傳中',
     'upload0': '共',
     'upload1': '個附件，已上傳',
@@ -413,8 +413,8 @@ export default {
     'good': '優秀',
     'signature': '簽名',
     'excellent': '優秀',
-    'signatureAndPic': '簽名與照片'
-
+    'signatureAndPic': '簽名與照片',
+    'loading': '加載中...'
   },
 
   // event Management page language
@@ -890,7 +890,8 @@ export default {
     'emptyMonth': '月份不能為空',
     'emptyTime': '執行時間不能為空',
     'newSchedule': '新增排程',
-    'select': '請選擇'
+    'select': '請選擇',
+    'onTitle': '（按職務）'
   },
 
   'titleView': {
@@ -898,14 +899,15 @@ export default {
     'deleteTitle': '刪除',
     'titleName': '職務名稱',
     'titleCate': '職務類別',
+    'createTime': '創建時間',
     'description': '備註',
     'operation': '操作',
     'save': '保存',
     'titleSetting': '職務設置',
-    'roleId1Title': '企業高層/IT運維',
-    'roleId2Title': '企業中層',
-    'roleId3Title': '企業基層',
-    'roleId4Title': '門店運營',
+    'roleId1Title': '管理員',
+    'roleId2Title': '督導主管',
+    'roleId3Title': '督導（稽核經理）',
+    'roleId4Title': '店長（運營經理）',
     'comment': ' 備註說明',
     'commentRuletip': '最多可輸入200個字元',
     'roleSetting': '菜單權限配置',
@@ -920,6 +922,12 @@ export default {
     'titleValidateInfo': '職務名稱為1~20個字母或漢字',
     'saveSuss': '保存成功',
     'titleExist': '職務名稱已存在',
-    'saveFail': '保存失敗'
+    'saveFail': '保存失敗',
+    'canAccessVideo': '允許訪問視頻',
+    'canReceiveMessage': '允許接收消息通知',
+    'yes': '允許',
+    'no': '不允許',
+    'useTemplate': '模板套用',
+    'useAndSave': '保存並套用'
   }
 };

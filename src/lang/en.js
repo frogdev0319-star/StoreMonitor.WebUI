@@ -208,7 +208,7 @@ export default {
   // Patrol page language
   'remotePatrol': {
     'code': 'Store Code',
-    'downloading':'Downloading...',
+    'downloading': 'Downloading...',
     'uploading': 'Uploading...',
     'storeTag': 'Tag',
     'patrolWay': 'Inspection Type',
@@ -351,7 +351,7 @@ export default {
     'eventTitle': 'Title',
     'eventStatus': 'Status',
     'untreated': 'pending',
-    'getAccessTokenError': 'Failed to get AccessToken',
+    'getAccessTokenError': 'Failed to get Access Token',
     'partolError': 'Invalid device, please contact administrator',
     'accessTokenError': 'Busy device, please try again later',
     'noHistoryVideo': 'No video during playback time',
@@ -407,7 +407,8 @@ export default {
     'good': 'Good',
     'signature': 'Signature',
     'excellent': 'Excellent',
-    'signatureAndPic': 'Signature & Picture'
+    'signatureAndPic': 'Signature & Picture',
+    'loading': 'Loading...'
   },
 
   // event Management page language
@@ -704,7 +705,7 @@ export default {
     'ezvizAccountSetting': 'Streaming Service Account',
     'addEzvizAccount': 'Add Account',
     'ezvizAccount': 'Account',
-    'accountName': 'Username',
+    'accountName': 'User Name',
     'appliedStores': 'Number of Applied Stores',
     'description': 'Description',
     'noData': 'No data',
@@ -862,10 +863,10 @@ export default {
     'execOnce': 'Execute only once',
     'notifyTime': 'Notification Time',
     'notifyInfo': 'Pushing at the same time every day during the validity period of the task',
-    'dueDays': 'Execution time',
+    'dueDays': 'Execution Time',
     'today': 'Today',
     'days': ' Days',
-    'InspectPerson': 'Inspector',
+    'InspectPerson': 'Executor',
     'remotePatrol': 'Remote Inspection',
     'onsitePatrol': 'Onsite Inspection',
     'deleteSuss': 'Successfully deleted!',
@@ -880,7 +881,8 @@ export default {
     'emptyMonth': 'Month cannot be empty',
     'emptyTime': 'Execution time cannot be empty',
     'newSchedule': 'New Schedule',
-    'select': 'Please Select'
+    'select': 'Please Select',
+    'onTitle': '(On Title)'
   },
 
   'titleView': {
@@ -888,14 +890,15 @@ export default {
     'deleteTitle': 'Delete',
     'titleName': 'Job Title',
     'titleCate': 'Job Category',
+    'createTime': 'Create Time',
     'description': 'Note',
     'operation': 'Operation',
     'save': 'Save',
     'titleSetting': 'Job Settings',
-    'roleId1Title': 'Corporate Executives/ IT operations',
-    'roleId2Title': 'Corporate Middle-level',
-    'roleId3Title': 'Corporate Basic-level',
-    'roleId4Title': 'Store Operation',
+    'roleId1Title': 'Manager',
+    'roleId2Title': 'Supervisor Manager',
+    'roleId3Title': 'Supervisor(Audit Manager)',
+    'roleId4Title': 'Store Manager（Operation Manager）',
     'comment': 'Note',
     'commentRuletip': 'Enter up to 200 characters',
     'roleSetting': 'Menu Permission Settings',
@@ -910,6 +913,12 @@ export default {
     'titleValidateInfo': 'Job title consists of 1~20 Chinese characters or letters',
     'saveSuss': 'Successfully saved',
     'titleExist': 'The job title already exists',
-    'saveFail': 'Failed to save'
+    'saveFail': 'Failed to save',
+    'canAccessVideo': 'Allow video access',
+    'canReceiveMessage': 'Allow receive message',
+    'yes': 'Yes',
+    'no': 'No',
+    'useTemplate': 'Use Template',
+    'useAndSave': 'Use & Save'
   }
 };
