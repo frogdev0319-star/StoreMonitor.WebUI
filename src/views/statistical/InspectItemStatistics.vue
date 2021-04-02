@@ -12,18 +12,18 @@
           <el-col :span="24" class="items-row">
             <el-col :span="24" class="items-title">
               <span class="title">{{ $t('overview.itemChartReport') }}</span>
-              <div class="exprotBtn">
-                <el-button
-                  :class="lang === 'en'? 'en-export-btn':'export-btn' "
+              <div class="operation-btns">
+                <delay-button
+                  :class="lang === 'en' ? 'en-export-btn':'export-btn'"
                   type="primary"
                   size="mini"
-                  style="margin-top:-15px;"
-                  @click="handleDown()">
-                  <div class="btn-area">
+                  @click="handleDown"
+                >
+                  <div class="button-area">
                     <i class="iconfont icon-pdf"/>
-                    <span class="spanClass">{{ $t('remotePatrol.InspectionDetail') }}</span>
+                    <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
                   </div>
-                </el-button>
+                </delay-button>
               </div>
             </el-col>
             <el-col :span="12" class="evalution-pct">
@@ -71,17 +71,18 @@
             </el-col>
           </el-col>
           <el-col :span="24" class="items-table">
-            <div class="exprotBtn">
-              <el-button
-                :class="lang=='en' ? 'en-export-btn':'export-btn'"
+            <div class="operation-btns">
+              <delay-button
+                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
-                @click="export2Excel" >
-                <div class="btn-area">
+                @click="export2Excel"
+              >
+                <div class="button-area">
                   <img :src="exportPng" class="icon-excel">
-                  <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+                  <span>{{ $t('eventView.exportReport') }}</span>
                 </div>
-              </el-button>
+              </delay-button>
             </div>
             <table-pagination
               ref="elTP"
@@ -209,11 +210,13 @@ import {
   getInspectStatsItemOverviewV2
 } from '@/api/inspectOverview';
 import TablePagination from '../../components/TablePagination';
+import DelayButton from '../../components/DelayButton';
 
 export default {
   name: 'InspectItemStatistics',
 
   components: {
+    DelayButton,
     TablePagination,
     'v-chart': ECharts,
     SearchComponent
@@ -893,74 +896,6 @@ export default {
             display: inline-block;
             padding-top: 30px;
           }
-          .exprotBtn{
-            padding-right: calc(30 / 1920 * 100vw);
-            float: right;
-            padding-top: 25px;
-            .export-btn{
-              border-color: $red;
-              z-index: 990;
-              height: calc(36/1920*100vw);
-              width: calc(130/1920*100vw);
-              margin: 0;
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              line-height: calc(36/1920*100vw);
-              color: #ffffff;
-              border-width: 0;
-              border-radius: 4px;
-              top: calc(24/1920*100vw);
-              min-height: 28px;
-              min-width: 120px;
-              .btn-area{
-                position: relative;
-                padding: 0 calc(6/1920*100vw);
-                height: calc(36/1920*100vw);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                .icon-pdf{
-                  margin-right: calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
-                }
-                .spanClass{
-                  font-size: calc(14/1920*100vw);
-                  display: inline-block;
-                }
-              }
-            }
-            .en-export-btn{
-              border-color: $red;
-              z-index: 990;
-              height: calc(36/1920*100vw);
-              width: calc(160/1920*100vw);
-              margin: 0;
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              line-height: calc(36/1920*100vw);
-              color: #ffffff;
-              border-width: 0;
-              border-radius: 4px;
-              min-height: 28px;
-              min-width: 120px;
-              .btn-area{
-                position: relative;
-                padding: 0 calc(6/1920*100vw);
-                height: calc(36/1920*100vw);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                .icon-pdf{
-                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-                  font-size: 24px;
-                }
-                .spanClass{
-                  font-size: calc(14/1920*100vw);
-                  display: inline-block;
-                }
-              }
-            }
-          }
         }
         .evalution-pct {
           background-color: #fff;
@@ -1171,73 +1106,8 @@ export default {
         .table{
           margin: 0 calc(30/1920*100vw);
         }
-        .exprotBtn{
+        .operation-btns{
             margin-bottom: 10px;
-            padding-right: calc(30 / 1920 * 100vw);
-            float: right;
-            .export-btn{
-              border-color: $red;
-              z-index: 990;
-              height: calc(36/1920*100vw);
-              width: calc(130/1920*100vw);
-              margin: 0;
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              line-height: calc(36/1920*100vw);
-              color: #ffffff;
-              border-width: 0;
-              border-radius: 4px;
-              top: calc(24/1920*100vw);
-              min-height: 28px;
-              min-width: 120px;
-              .btn-area{
-                position: relative;
-                padding: 0 calc(6/1920*100vw);
-                height: calc(36/1920*100vw);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                .icon-excel{
-                  margin-right: calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
-                }
-                .spanClass{
-                  font-size: calc(14/1920*100vw);
-                  display: inline-block;
-                }
-              }
-            }
-            .en-export-btn{
-              border-color: $red;
-              z-index: 990;
-              height: calc(36/1920*100vw);
-              width: calc(160/1920*100vw);
-              margin: 0;
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              line-height: calc(36/1920*100vw);
-              color: #ffffff;
-              border-width: 0;
-              border-radius: 4px;
-              min-height: 28px;
-              min-width: 120px;
-              .btn-area{
-                position: relative;
-                padding: 0 calc(6/1920*100vw);
-                height: calc(36/1920*100vw);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                .icon-excel{
-                  margin: calc(6/1920*100vw) calc(18/1920*100vw) calc(6/1920*100vw) 0;
-                  font-size: 24px;
-                }
-                .spanClass{
-                  font-size: calc(14/1920*100vw);
-                  display: inline-block;
-                }
-              }
-            }
           }
         .clearfix{
           content: "";

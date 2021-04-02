@@ -2,8 +2,13 @@
   <div>
     <div class="el-overview-content">
       <el-col :span="24">
-        <search-component @emitSearch = "emitSearch" @exportPdf = "exportPdf" ref="eventSearch"
-                          path="eventStatistics" :defaultSort="defaultSort" @changeDefaultSort="setDefaultSortAndPage"/>
+        <search-component
+          ref="eventSearch"
+          :default-sort="defaultSort"
+          path="eventStatistics"
+          @emitSearch = "emitSearch"
+          @exportPdf = "exportPdf"
+          @changeDefaultSort="setDefaultSortAndPage"/>
       </el-col>
       <el-col :span="24" class="el-overview">
         <el-row class="first-row">
@@ -20,7 +25,10 @@
           </el-col>
           <el-col :span="14" class="store-events">
             <div class="region-result">
-              <div class="charts-content" v-loading="isLoading">
+              <div
+                v-loading="isLoading"
+                :element-loading-text="$t('insSettingView.loadingbindstore')"
+                class="charts-content self-loading">
                 <v-chart
                   ref="storeEventRef"
                   :options="storeEventsOptions"
@@ -57,17 +65,18 @@
         <el-row class="second-row">
           <el-col :span="24" class="items-title">
             <span class="title">{{ $t('overview.eventList') }}</span>
-            <div class="exprotBtn">
-              <el-button
-                :class="lang=='en' ? 'en-export-btn':'export-btn'"
+            <div class="operation-btns">
+              <delay-button
+                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
-                @click="export2Excel" >
-                <div class="btn-area">
+                @click="export2Excel"
+              >
+                <div class="button-area">
                   <img :src="exportPng" class="icon-excel">
-                  <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+                  <span>{{ $t('eventView.exportReport') }}</span>
                 </div>
-              </el-button>
+              </delay-button>
             </div>
           </el-col>
           <el-col :span="24" class="event-table">
@@ -87,21 +96,6 @@
           </el-col>
         </el-row>
       </el-col>
-      <el-dialog
-        v-if="ispdf"
-        :title="$t('insSettingView.export')"
-        :visible.sync="ispdf"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        class="LoadDialog"
-        width="510px"
-        top="35vh"
-        left="40vh">
-        <div style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #dfe2e9;">
-          <p style="margin-top:40px;color:#000;">{{ $t('insSettingView.isExportPDF') }}......</p>
-        </div>
-      </el-dialog>
     </div>
     <div v-if="ispdf" class="el-overview-content">
       <el-col id="pdfDom" ref="printPDF" :span="24" class="el-overview" style="padding:40px 20px;width:1150px;">
@@ -194,7 +188,6 @@
                   border
                   style="width: 100%"
                   size="mini"
-                  @sort-change="sortChange"
                 >
                   <el-table-column
                     v-for="(_item,_index) in eventInfoData"
@@ -247,23 +240,37 @@
         </el-row>
       </el-col>
     </div>
+    <dialog-pop
+      :title="$t('insSettingView.export')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="ispdf"
+      :show-button="false"
+      class="LoadDialog"
+    >
+      <p>{{ $t('insSettingView.isExportPDF') }}......</p>
+    </dialog-pop>
   </div>
 </template>
 
 <script>
 import ECharts from 'vue-echarts';
 import { mapGetters } from 'vuex';
-import util from '../../common/util.js';
+import util from '@/common/util.js';
 import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOverview';
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/resize';
 import TablePagination from '@/components/TablePagination';
+import DelayButton from '@/components/DelayButton';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'EventStatistics',
   components: {
+    DialogPop,
+    DelayButton,
     'v-chart': ECharts,
     SearchComponent,
     TablePagination
@@ -452,7 +459,7 @@ export default {
       hasNoData: false,
       fontFamily: 'Roboto, Microsoft YaHei',
       ifSaveParams: false,
-      defaultSort: {prop: 'numOfTotal', order: 'ascending'},
+      defaultSort: { prop: 'numOfTotal', order: 'ascending' },
       isLoading: true
     };
   },
@@ -681,7 +688,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportEventHeader;
-        const filterVal = ['province', 'city','storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
+        const filterVal = ['province', 'city', 'storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
           'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
         let curData = [];
         curData = that.allEventData;
@@ -965,56 +972,6 @@ export default {
       });
     },
 
-    // sortChange(col) {
-    //   const self = this;
-    //   const order = col.order;
-    //   self.order = order;
-    //   let prop = '';
-    //   let tempOrder = '';
-    //   if (order === 'ascending') {
-    //     let property = '';
-    //     if (col.column.property === 'RemoteStr') {
-    //       property = 'numOfRemote';
-    //     } else if (col.column.property === 'OnsiteStr') {
-    //       property = 'numOfOnsite';
-    //     } else if (col.column.property === 'VideoStr') {
-    //       property = 'numOfVideo';
-    //     } else {
-    //       property = col.column.property;
-    //     }
-    //     self.order = self.params.order = {
-    //       'direction': 'asc',
-    //       'property': property
-    //     };
-    //     prop = col.column.property;
-    //     tempOrder = 'asc';
-    //   } else if (order === 'descending') {
-    //     let property = '';
-    //     if (col.column.property === 'RemoteStr') {
-    //       property = 'numOfRemote';
-    //     } else if (col.column.property === 'OnsiteStr') {
-    //       property = 'numOfOnsite';
-    //     } else if (col.column.property === 'VideoStr') {
-    //       property = 'numOfVideo';
-    //     } else {
-    //       property = col.column.property;
-    //     }
-    //     self.order = self.params.order = {
-    //       'direction': 'desc',
-    //       'property': property
-    //     };
-    //     prop = col.column.property;
-    //     tempOrder = 'desc';
-    //   } else {
-    //     self.order = self.params.order = { 'direction': 'asc', 'property': 'numOfTotal' };
-    //   }
-    //   self.params.filter = {
-    //     page: self.page - 1,
-    //     size: self.sizeNum
-    //   };
-    //   self.getEventTableData();
-    // },
-
     emitSearch(searchParams, dateRangeList, curRegionI, curRegionII,
       regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
       this.params = searchParams;
@@ -1034,7 +991,7 @@ export default {
     handlePageAndSizeChange(pageObj) {
       const self = this;
       self.page = pageObj.page;
-      self.sizeNum = pageObj.size
+      self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
       self.getEventTableData();
     },
@@ -1048,10 +1005,10 @@ export default {
       this.getEventTableData();
     },
 
-    setDefaultSortAndPage(paramsObj){
+    setDefaultSortAndPage(paramsObj) {
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
-    },
+    }
 
   }
 };
@@ -1273,73 +1230,10 @@ export default {
             color: $black;
             display: inline-block;
           }
-          .exprotBtn{
+          .operation-btns{
             padding-top: 25px;
             padding-right: calc(30 / 1920 * 100vw);
             float: right;
-            .export-btn{
-              border-color: $red;
-              z-index: 990;
-              height: calc(36/1920*100vw);
-              width: calc(130/1920*100vw);
-              margin: 0;
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              line-height: calc(36/1920*100vw);
-              color: #ffffff;
-              border-width: 0;
-              border-radius: 4px;
-              .btn-area{
-                position: relative;
-                padding: 0 calc(6/1920*100vw);
-                height: calc(36/1920*100vw);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                .icon-excel{
-                  margin-right:calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
-                  height: calc(24/1920*100vw);
-                  width: calc(24/1920*100vw);
-                }
-                .spanClass{
-                  font-size: calc(14/1920*100vw);
-                  display: inline-block;
-                }
-              }
-            }
-            .en-export-btn{
-              border-color: $red;
-              z-index: 990;
-              height: calc(36/1920*100vw);
-              width: calc(160/1920*100vw);
-              margin: 0;
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              line-height: calc(36/1920*100vw);
-              color: #ffffff;
-              border-width: 0;
-              border-radius: 4px;
-              min-width: 120px;
-              .btn-area{
-                position: relative;
-                padding: 0 calc(6/1920*100vw);
-                height: calc(36/1920*100vw);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                .icon-excel{
-                  margin-right: calc(18/1920*100vw);
-                  font-size: calc(24/1920*100vw);
-                  height: calc(24/1920*100vw);
-                  width: calc(24/1920*100vw);
-                }
-                .spanClass{
-                  font-size: calc(14/1920*100vw);
-                  display: inline-block;
-                }
-              }
-            }
           }
         }
         .event-table {

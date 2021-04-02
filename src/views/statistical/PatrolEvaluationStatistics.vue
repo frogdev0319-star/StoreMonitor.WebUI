@@ -2,10 +2,14 @@
   <div>
     <el-row class="statistics-container">
       <el-col :span="24">
-        <search-component :is-patrol = "true" @emitSearch = "emitSearch"
-                          @exportPdf = "exportPdf" ref="inspectEvalutionSearch"
-                          path="inspectEvalutionStatistics" :defaultSort="defaultSort"
-                          @setDefaultSortAndPage="setDefaultSortAndPage"/>
+        <search-component
+          ref="inspectEvalutionSearch"
+          :is-patrol = "true"
+          :default-sort="defaultSort"
+          path="inspectEvalutionStatistics"
+          @emitSearch = "emitSearch"
+          @exportPdf = "exportPdf"
+          @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
       <div class="statistics-content content">
         <el-col :span="24" class="region-chart">
@@ -66,13 +70,18 @@
               <span class="title">
                 {{ $t('overview.regionalList') }}
               </span>
-              <div class="exprotBtn">
-                <el-button :class="lang=='en' ? 'en-export-btn':'export-btn'" type="primary" size="mini" @click="export2Excel" >
-                  <div class="btn-area">
+              <div class="operation-btns">
+                <delay-button
+                  :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                  type="primary"
+                  size="mini"
+                  @click="export2Excel"
+                >
+                  <div class="button-area">
                     <img :src="exportPng" class="icon-excel">
-                    <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+                    <span>{{ $t('eventView.exportReport') }}</span>
                   </div>
-                </el-button>
+                </delay-button>
               </div>
             </div>
           </el-col>
@@ -97,17 +106,18 @@
               <span class="title">
                 {{ $t('overview.storeList') }}
               </span>
-              <div class="exprotBtn">
-                <el-button
-                  :class="lang === 'en' ? 'en-export-btn' : 'export-btn'"
+              <div class="operation-btns">
+                <delay-button
+                  :class="lang === 'en' ? 'en-export-btn':'export-btn'"
                   type="primary"
                   size="mini"
-                  @click="exportStore2Excel" >
-                  <div class="btn-area">
+                  @click="exportStore2Excel"
+                >
+                  <div class="button-area">
                     <img :src="exportPng" class="icon-excel">
-                    <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+                    <span>{{ $t('eventView.exportReport') }}</span>
                   </div>
-                </el-button>
+                </delay-button>
               </div>
             </div>
           </el-col>
@@ -127,21 +137,6 @@
             </div>
           </el-col>
         </el-col>
-        <el-dialog
-          v-if="ispdf"
-          :title="$t('insSettingView.export')"
-          :visible.sync="ispdf"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          class="LoadDialog"
-          width="510px"
-          top="35vh"
-          left="40vh">
-          <div style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-top:40px;color:#000;">{{ $t('insSettingView.isExportPDF') }}......</p>
-          </div>
-        </el-dialog>
       </div>
     </el-row>
 
@@ -265,25 +260,39 @@
         </el-col>
       </div>
     </el-row>
+    <dialog-pop
+      :title="$t('insSettingView.export')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="ispdf"
+      :show-button="false"
+      class="LoadDialog"
+    >
+      <p>{{ $t('insSettingView.isExportPDF') }}......</p>
+    </dialog-pop>
   </div>
 </template>
 <script>
 import { mapGetters } from 'vuex';
 import LimitSelect from '@/components/LimitSelect';
 import ECharts from 'vue-echarts';
-import util from '../../common/util.js';
+import util from '@/common/util.js';
 import {
   getInspectStatsOverRegion,
   getInspectStatsOverviewWithRegionV2
 } from '@/api/inspectOverview';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/resize';
-import TablePagination from '../../components/TablePagination';
+import TablePagination from '@/components/TablePagination';
+import DialogPop from '@/components/DialogPop';
+import DelayButton from '../../components/DelayButton';
 
 export default {
   name: 'PatrolEvaluationSta',
 
   components: {
+    DelayButton,
+    DialogPop,
     'v-chart': ECharts,
     LimitSelect,
     SearchComponent,
@@ -635,14 +644,6 @@ export default {
           }
         }
       }, 1000);
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     },
 
     async searchData() {
@@ -1031,7 +1032,7 @@ export default {
           self.regionTableData = result.content;
         }
       } else {
-        self.notify(self.$t('overview.queryFail'), 'warning', 3000);
+        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
         self.totalRegion = 0;
         self.regionTableData = [];
       }
@@ -1058,7 +1059,7 @@ export default {
           self.regionTableData = result.content;
         }
       } else {
-        self.notify(self.$t('overview.queryFail'), 'warning', 3000);
+        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
         self.totalRegion = 0;
         self.regionTableData = [];
       }
@@ -1085,7 +1086,7 @@ export default {
           self.storeTableData = result.content;
         }
       } else {
-        self.notify(self.$t('overview.queryFail'), 'warning', 3000);
+        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
         self.totalStore = 0;
       }
     },
@@ -1128,7 +1129,7 @@ export default {
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
           jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
         } else {
-          self.notify(self.$t('overview.queryFail'), 'warning', 3000);
+          util.notify(self.$t('overview.queryFail'), 'warning', 3000);
           const totalArray = [0, 0, 0, 0];
           jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
