@@ -147,16 +147,36 @@ body .el-table th.gutter {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 32px;
   }
 
   .el-loading-text {
     color: #7d8cad;
-    margin: 3px 0;
     font-size: calc(14 / 1920 * 100vw);
     display: inline-block;
     height: 32px;
     line-height: 32px;
-    margin-left: 90px;
+    margin: 3px 0 3px 90px;
   }
 }
 
+.el-dialog__body{
+  padding: 0;
+}
+
+.el-table-column--selection{
+  border-right: none !important;
+}
+
+.el-textarea__inner{
+  font-family: Roboto, Microsoft YaHei,'Microsoft JhengHei', Arial, sans-serif;
+}
+
+.el-radio__label{
+  font-size: calc(14/1920*100vw);
+}
+
+.el-tabs__nav-wrap::after{
+  height: 1px;
+  background-color: #e3e9f4;
+}
