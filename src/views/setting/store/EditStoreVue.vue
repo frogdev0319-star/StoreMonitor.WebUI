@@ -3,13 +3,15 @@
     <el-col :span="24" class="storeEdit-header">
       <div class="store-title ">
         <span>{{ store.name }}</span>
-        <el-button
-          :size="varyWindowWidth > 1680 ? 'small' : 'mini'"
-          :disabled="scheduleData.length === 0? true : false"
-          class="sub-btn"
+        <delay-button
+          :disabled="scheduleData.length === 0"
+          size="mini"
           type="primary"
-          @click="submitData">{{ $t('storeView.mySubmit') }}
-        </el-button>
+          class="sub-btn"
+          @click="submitData"
+        >
+          <span>{{ $t('storeView.mySubmit') }}</span>
+        </delay-button>
       </div>
       <div class="store-info">
         <strong style="margin-right:20px;">{{ $t('storeView.contact') }}</strong>
@@ -75,10 +77,12 @@ import { bindInspectItemV2,
 } from '@/api/inspect';
 import LimitSelect from '@/components/LimitSelect';
 import util from '@/common/util'
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'EditStoreVue',
   components: {
+    DelayButton,
     LimitSelect
   },
   data() {
