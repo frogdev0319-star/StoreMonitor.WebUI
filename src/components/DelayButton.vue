@@ -2,6 +2,8 @@
   <el-button
     v-bind="$attrs"
     :loading="loadingStatus"
+    size="mini"
+    type="primary"
     class="storevue-button"
     @click="handleClick"
   >
