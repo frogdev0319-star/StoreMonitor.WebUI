@@ -1,35 +1,7 @@
 <template>
   <el-row :style="{'min-height':varyWindowHeight - 200+'px'}" class="el-schedule-container">
     <div class="el-schedule-header">
-      <el-dialog
-        v-if="showDeleteDialog"
-        :title="$t('scheduleView.delete')"
-        :visible.sync="showDeleteDialog"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        width="28%"
-        top="35vh"
-        left="40vh">
-        <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #dfe2e9;">
-          <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-            <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;  vertical-align: middle"/>
-            <span style="display: inline-block;  vertical-align: middle">{{ $t('scheduleView.saveInfo') }}</span>
-          </p>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteDialog = false">
-            {{ $t('scheduleView.cancel') }}
-          </el-button>
-          <el-button
-            class="file-confirm-btn"
-            size="mini"
-            type="primary"
-            @click="deleteSchedule">{{ $t('scheduleView.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-      <el-col :span="18" class="el-schedule-tabs">
+      <el-col class="el-schedule-tabs">
         <el-tabs id="patrltabs-content" v-model="activeName" @tab-click="handleClick">
           <el-tab-pane
             v-for="(item,index) in paneList"
@@ -55,7 +27,6 @@
                   v-if="activePatrol === '0'"
                   v-model="item.mode"
                   :disabled="item.modeDisabled"
-                  placeholder="选择类型"
                   size="mini"
                   class="el-type"
                   @change="searchStore">
@@ -322,45 +293,36 @@
             </el-col>
           </el-tab-pane>
         </el-tabs>
-        <el-dialog
-          v-if="showBindDialog"
-          :title="$t('scheduleView.prompt')"
-          :visible.sync="showBindDialog"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;  vertical-align: middle"/>
-              <span style="display: inline-block;  vertical-align: middle">{{ $t('scheduleView.confirmBind') }}</span>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showBindDialog = false">
-              {{ $t('scheduleView.cancel') }}
-            </el-button>
-            <el-button
-              class="file-confirm-btn"
-              size="mini"
-              type="primary"
-              @click="bindSchedule">{{ $t('scheduleView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
       </el-col>
-      <dialog-vue :dialog-title="selectWeekObj.title" :show-info="selectWeekObj.showInfo"
-                  :is-warning="selectWeekObj.isWarning" :dialog-closed="selectWeekObj.dialogCosed"
-                  @confirmed="noWeekDialog" @canceled="cancelNoWeek"/>
-      <dialog-vue :dialog-title="selectTimeObj.title" :show-info="selectTimeObj.showInfo"
-                  :is-warning="selectTimeObj.isWarning" :dialog-closed="selectTimeObj.dialogCosed"
-                  @confirmed="noTimeDialog" @canceled="cancelNoTime"/>
-      <dialog-vue :dialog-title="selectSelfMonthObj.title" :show-info="selectSelfMonthObj.showInfo"
-                  :is-warning="selectSelfMonthObj.isWarning" :dialog-closed="selectSelfMonthObj.dialogCosed"
-                  @confirmed="noSelfMonthDialog" @canceled="cancelNoSelfMonth"/>
     </div>
+    <dialog-pop
+      :title="$t('scheduleView.delete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showDeleteDialog"
+      @visibleChangeHandler="updateDialogFlag"
+      @cancelHandler="hideDeleteDialog"
+      @confirmHandler="deleteSchedule"
+    >
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <div class="dialog-content">{{ $t('scheduleView.saveInfo') }}</div>
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :title="$t('scheduleView.prompt')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showBindDialog"
+      @visibleChangeHandler="updateBindDialogFlag"
+      @cancelHandler="hideBindDialog"
+      @confirmHandler="bindSchedule"
+    >
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <div class="dialog-content">{{ $t('scheduleView.confirmBind') }}</div>
+      </div>
+    </dialog-pop>
   </el-row>
 </template>
 
@@ -375,19 +337,19 @@ import {
   updateSchedule,
   deleteScheduleService } from '@/api/schedule';
 import { getStoreList } from '@/api/store';
-import DialogVue from '@/components/DialogVue.vue';
 import util from '@/common/util';
 import filterString from '@/common/filterString';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
-import LimitSelect from '../../../components/LimitSelect';
+import LimitSelect from '@/components/LimitSelect';
 import { getInspectBindList } from '@/api/inspect';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'RemoteDetail',
   components: {
+    DialogPop,
     LimitSelect,
-    RegionMultiSelect,
-    DialogVue
+    RegionMultiSelect
   },
   props: {
     activePatrol: {
@@ -782,25 +744,7 @@ export default {
           name: `7${this.$t('scheduleView.days')}`
         }
       ],
-      hasBoundStoreIds: [], // 已经绑定过周、月模式的门店id
-      selectWeekObj: {
-        title: '提示',
-        showInfo: '请选择执行日期！',
-        isWarning: false,
-        dialogCosed: false
-      },
-      selectTimeObj: {
-        title: '提示',
-        showInfo: '请选择提醒时间！',
-        isWarning: false,
-        dialogCosed: false
-      },
-      selectSelfMonthObj: {
-        title: '提示',
-        showInfo: '请选择自定义模式下的月份和日期！',
-        isWarning: false,
-        dialogCosed: false
-      },
+      hasBoundStoreIds: [],
       isAdd: false
     };
   },
@@ -818,30 +762,6 @@ export default {
           reject(err)
         });
       });
-    },
-
-    noWeekDialog(val) {
-      this.selectWeekObj.dialogCosed = false;
-    },
-
-    cancelNoWeek(val) {
-      this.selectWeekObj.dialogCosed = false;
-    },
-
-    noTimeDialog() {
-      this.selectTimeObj.dialogCosed = false;
-    },
-
-    cancelNoTime(val) {
-      this.selectTimeObj.dialogCosed = false;
-    },
-
-    noSelfMonthDialog() {
-      this.selectSelfMonthObj.dialogCosed = false;
-    },
-
-    cancelNoSelfMonth(val) {
-      this.selectSelfMonthObj.dialogCosed = false;
     },
 
     deleteScheduleButton() {
@@ -862,22 +782,22 @@ export default {
       let schedule = self.paneList[tabIndex].schedule;
       let assignedTo = self.paneList[tabIndex].assignedTo;
       if (name === '') {
-        self.notify(self.$t('scheduleView.emptyName'), 'warning', 3000);
+        util.notify(self.$t('scheduleView.emptyName'), 'warning', 3000);
         self.$refs.scheduleName[tabIndex].focus();
         return false;
       }
       if (notifyTime === '') {
-        self.notify(self.$t('scheduleView.emptyNotifyTime'), 'warning', 3000);
+        util.notify(self.$t('scheduleView.emptyNotifyTime'), 'warning', 3000);
         return false;
       }
       if (assignedTo.length === 0) {
-        self.notify(self.$t('scheduleView.emptyAssignedTo'), 'warning', 3000);
+        util.notify(self.$t('scheduleView.emptyAssignedTo'), 'warning', 3000);
         return false;
       }
       if (mode === 1 || mode === 2) {
         // weekly or monthly mode
         if (dayArray.length === 0) {
-          self.notify(self.$t('scheduleView.emptyDate'), 'warning', 3000);
+          util.notify(self.$t('scheduleView.emptyDate'), 'warning', 3000);
           return false;
         }
       }
@@ -893,15 +813,15 @@ export default {
           }
         });
         if (lackMonth) {
-          self.notify(self.$t('scheduleView.emptyMonth'), 'warning', 3000);
+          util.notify(self.$t('scheduleView.emptyMonth'), 'warning', 3000);
           return false;
         } else if (lackDay) {
-          self.notify(self.$t('scheduleView.emptyDate'), 'warning', 3000);
+          util.notify(self.$t('scheduleView.emptyDate'), 'warning', 3000);
           return false;
         }
       }
       if (self.isActivePatrol === 'noInspect') {
-        self.notify(self.$t('scheduleView.noscheduleInspect'), 'warning', 3000);
+        util.notify(self.$t('scheduleView.noscheduleInspect'), 'warning', 3000);
         return false;
       } else {
         self.showBindDialog = true;
@@ -1209,6 +1129,13 @@ export default {
       });
     },
 
+    updateBindDialogFlag(val) {
+      this.showBindDialog = val;
+    },
+    hideBindDialog() {
+      this.showBindDialog = false;
+    },
+
     async bindSchedule() {
       let self = this;
       let scheId = self.paneList[Number(self.activeName)].schId;
@@ -1291,11 +1218,11 @@ export default {
       if (flag) {
         let bindIdList = await self.getBindStoreList();
         self.storeCount = bindIdList.length;
-        self.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length}
+        util.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length}
                     ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
         return true;
       } else {
-        self.notify(this.$t('insSettingView.bindFail'), 'warning', 3000);
+        util.notify(this.$t('insSettingView.bindFail'), 'warning', 3000);
         return false;
       }
     },
@@ -1684,14 +1611,6 @@ export default {
       return changedSec;
     },
 
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
-    },
-
     updateScheduleInfo() {
       let params = this.getUpdateScheduleParams();
       return new Promise((resolve, reject) => {
@@ -1766,6 +1685,14 @@ export default {
         assignedTo: self.paneList[tabIndex].assignedTo
       };
       return params;
+    },
+
+    updateDialogFlag(val) {
+      this.showDeleteDialog = val;
+    },
+
+    hideDeleteDialog() {
+      this.showDeleteDialog = false;
     },
 
     deleteSchedule() {
@@ -1916,10 +1843,7 @@ export default {
   $tab:#7d8cad;
   $h1:#292e36;
   $mainColor:#f31d65;
-  *{
-    margin: 0;
-    font-family: Roboto,Arial, Microsoft YaHei;
-  }
+
   @function rem($val){
     @return $val/16+rem;
   }
@@ -2082,7 +2006,7 @@ export default {
       }
 
       .el-bind-content {
-        height: calc(415/1920*100vw);
+        height: calc(380/1920*100vw);
         overflow: auto;
         background-color: #F6F7FB;
         border: 0.5px solid #e3e9f4;
