@@ -1744,6 +1744,7 @@ export default {
   }
   li[class*="three-child"] .el-menu-item:first-child{
     margin-top: 0px;
+    border-top: 0;
   }
 </style>
 <style  lang="scss">
