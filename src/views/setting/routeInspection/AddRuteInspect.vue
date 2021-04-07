@@ -27,9 +27,11 @@
           @changeInput="changeSelect(arguments)"/>
       </div>
       <div class="post-right">
-        <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" type="primary" class="btn-class" @click="submitBindTitle">
+        <delay-button
+          class="inspction-btn"
+          @click="submitBindTitle">
           {{ $t('remotePatrol.submit') }}
-        </el-button>
+        </delay-button>
       </div>
     </el-col>
     <el-col :span="7" class="el-rute-group">
@@ -37,12 +39,13 @@
         <div class="title-content">
           <span class="level2"><i class="iconfont icon-wenjian icontitle"/><span class="level2-name">{{ groupTitle }}</span></span>
           <div class="btn-content">
-            <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" size="mini" type="primary" class="btn-class" @click="addGroup">
-              <div class="btn-area">
-                <i class="el-icon-plus"/>
-                <span>{{ $t('insSettingView.addCategory') }}</span>
-              </div>
-            </el-button>
+            <delay-button
+              class="inspction-btn"
+              @click="addGroup"
+            >
+              <i class="el-icon-plus"/>
+              <span>{{ $t('insSettingView.addCategory') }}</span>
+            </delay-button>
           </div>
         </div>
         <el-scrollbar id="el-menuscrollbar" style="height:100%;">
@@ -112,18 +115,22 @@
             <i class="iconfont icon-icon-test icontitle"/>
           <span class="level2-name">{{ napeTitle }}</span></span>
           <div class="btn-content">
-            <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" :disabled="groupList.length==0" size="mini" type="primary" class="btn-class" @click="addNape">
-              <div class="btn-area">
-                <i class="el-icon-plus"/>
-                <span>{{ $t('insSettingView.addInsItem') }}</span>
-              </div>
-            </el-button>
-            <el-button :class="lang=='en' ? 'en-rute-btn': 'rute-btn'" :disabled="groupList.length==0" size="mini" type="primary" class="btn-class" @click="deleteNape">
-              <div class="btn-area">
-                <i class="iconfont icon-shanchu"/>
-                <span>{{ $t('insSettingView.deleteInsItem') }}</span>
-              </div>
-            </el-button>
+            <delay-button
+              :disabled="groupList.length === 0"
+              class="inspction-btn"
+              @click="addNape"
+            >
+              <i class="el-icon-plus"/>
+              <span>{{ $t('insSettingView.addInsItem') }}</span>
+            </delay-button>
+            <delay-button
+              :disabled="groupList.length === 0"
+              class="inspction-btn"
+              @click="deleteNape"
+            >
+              <i class="iconfont icon-shanchu"/>
+              <span>{{ $t('insSettingView.deleteInsItem') }}</span>
+            </delay-button>
           </div>
         </div>
         <el-scrollbar id="el-menuscrollbar" style="height:100%;">
@@ -184,153 +191,140 @@
                 <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(index, item)"/>
               </div>
             </div>
-            <el-dialog
-              v-if="showAddNape"
-              :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
-              :visible.sync="showAddNape"
-              :append-to-body="true"
-              :close-on-click-modal="false"
-              width="510px"
-              top="35vh"
-              left="40vh"
-              custom-class="addNape">
-              <div class="dialog-content" style="overflow:hidden;">
-                <hr style="border: 0.5px solid #dfe2e9;;">
-                <el-form class="NapeForm" label-position="top" size="mini">
-                  <el-form-item>
-                    <p class="score_item">
-                      <span class="sign">*</span>
-                      <span class="item_label">{{$t('insSettingView.inspectName')}}</span>
-                    </p>
-                    <el-input v-model="ItemName"
-                              :placeholder="$t('insSettingView.enterItemName')"
-                              @input="napeNameChange"></el-input>
-                    <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
-                    <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.titleEmpty') }}</span>
-                  </el-form-item>
-                  <el-form-item v-if="activeSheetName==='1'" style="height: 57px;">
-                    <el-col :span="10">
-                      <el-form-item style="margin-bottom:0;">
-                        <p class="score_item">
-                          <span class="sign">*</span>
-                          <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
-                        </p>
-                        <el-input v-model.number="ItemTotalScore"
-                                  :placeholder="$t('insSettingView.enterScore')"
-                                  @input="napeTotalScoreChange"/>
-                        <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }}</span>
-                        <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}</span>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="12" :offset="2">
-                      <el-form-item :label="$t('insSettingView.sheetscore1')">
-                        <el-input v-model.number="ItemMinScore"
-                                  :placeholder="$t('insSettingView.enterScore')"
-                                  @input="napeMinScoreChange"/>
-                        <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }}</span>
-                      </el-form-item>
-                    </el-col>
-                  </el-form-item>
-                  <el-form-item v-if="activeSheetName==='1'">
-                    <p class="score_item">
-                      <span class="sign">*</span>
-                      <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
-                      <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
-                    </p>
-                    <el-input v-model="ItemScoreOption"
-                              :placeholder="$t('insSettingView.enterScore')"
-                              @input="napeScoreOptionsChange"></el-input>
-                    <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
-                    <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
-                  </el-form-item>
-                  <el-form-item v-if="activeSheetName!=='1'">
-                    <p class="score_item">
-                      <span v-if="activeSheetName==='2'" class="sign">*</span>
-                      <span class="item_label">{{$t('insSettingView.score')}}</span>
-                    </p>
-                    <el-input v-model.number="ItemSheetScore"
-                              :placeholder="$t('insSettingView.enterScore')"
-                              @input="napeSheetScoreChange"/>
-                    <span v-if="PFScoreTip" class="rules">{{ $t('insSettingView.setPassFileRange') }}</span>
-                    <span v-if="OtherScoreTip" class="rules">{{ $t('insSettingView.setOtherRange') }}</span>
-                    <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
-                  </el-form-item>
-                  <el-form-item :label="$t('insSettingView.inspectionDescp')">
-                    <el-input type="textarea" v-model="ItemDescription"
-                              :placeholder="$t('insSettingView.description')"
-                              @input="napeDepChange"></el-input>
-                    <span v-if="descriptionRuletip" class="rules">{{ $t('insSettingView.descriptionRuletip') }}</span>
-                  </el-form-item>
-                </el-form>
-              </div>
-              <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showAddNape = false">{{ $t('insSettingView.cancel') }}</el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
-              </div>
-            </el-dialog>
-            <el-dialog
-              v-if="showDeleteItem"
-              :title="$t('insSettingView.confirmDelete')"
-              :visible.sync="showDeleteItem"
-              :append-to-body="true"
-              :close-on-click-modal="false"
-              width="28%"
-              top="35vh"
-              left="40vh">
-              <div style="overflow:hidden;">
-                <hr style="border: 0.5px solid #dfe2e9;;">
-
-                <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
-                  <span style="display: inline-block; vertical-align: middle;">{{ $t('insSettingView.confirmCurDel') }}</span>
-                </p>
-              </div>
-              <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteItem = false">{{ $t('insSettingView.cancel') }}</el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteItem">{{ $t('insSettingView.confirm') }}</el-button>
-              </div>
-            </el-dialog>
-
-            <el-dialog
-              v-if="showDeleteGroup"
-              :title="$t('insSettingView.confirmDelete')"
-              :visible.sync="showDeleteGroup"
-              :append-to-body="true"
-              :close-on-click-modal="false"
-              width="28%"
-              top="35vh"
-              left="40vh">
-              <div style="overflow:hidden;">
-                <hr style="border: 0.5px solid #dfe2e9;">
-
-                <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803; display: inline-block; vertical-align: middle;"/>
-                  <span style="display: inline-block; vertical-align: middle;">{{ $t('insSettingView.deleteGroup') }}</span>
-                </p>
-              </div>
-              <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteGroup = false">{{ $t('insSettingView.cancel') }}</el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteGroup">{{ $t('insSettingView.confirm') }}</el-button>
-              </div>
-            </el-dialog>
           </div>
         </el-scrollbar>
       </div>
     </el-col>
+    <el-dialog
+      v-if="showAddNape"
+      :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
+      :visible.sync="showAddNape"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      width="510px"
+      top="35vh"
+      left="40vh"
+      custom-class="addNape">
+      <div class="dialog-content" style="overflow:hidden;">
+        <hr style="border: 0.5px solid #dfe2e9;;">
+        <el-form class="NapeForm" label-position="top" size="mini">
+          <el-form-item>
+            <p class="score_item">
+              <span class="sign">*</span>
+              <span class="item_label">{{$t('insSettingView.inspectName')}}</span>
+            </p>
+            <el-input v-model="ItemName"
+                      :placeholder="$t('insSettingView.enterItemName')"
+                      @input="napeNameChange"></el-input>
+            <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
+            <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.titleEmpty') }}</span>
+          </el-form-item>
+          <el-form-item v-if="activeSheetName==='1'" style="height: 57px;">
+            <el-col :span="10">
+              <el-form-item style="margin-bottom:0;">
+                <p class="score_item">
+                  <span class="sign">*</span>
+                  <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
+                </p>
+                <el-input v-model.number="ItemTotalScore"
+                          :placeholder="$t('insSettingView.enterScore')"
+                          @input="napeTotalScoreChange"/>
+                <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }}</span>
+                <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12" :offset="2">
+              <el-form-item :label="$t('insSettingView.sheetscore1')">
+                <el-input v-model.number="ItemMinScore"
+                          :placeholder="$t('insSettingView.enterScore')"
+                          @input="napeMinScoreChange"/>
+                <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }}</span>
+              </el-form-item>
+            </el-col>
+          </el-form-item>
+          <el-form-item v-if="activeSheetName==='1'">
+            <p class="score_item">
+              <span class="sign">*</span>
+              <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
+              <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
+            </p>
+            <el-input v-model="ItemScoreOption"
+                      :placeholder="$t('insSettingView.enterScore')"
+                      @input="napeScoreOptionsChange"></el-input>
+            <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
+            <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
+          </el-form-item>
+          <el-form-item v-if="activeSheetName!=='1'">
+            <p class="score_item">
+              <span v-if="activeSheetName==='2'" class="sign">*</span>
+              <span class="item_label">{{$t('insSettingView.score')}}</span>
+            </p>
+            <el-input v-model.number="ItemSheetScore"
+                      :placeholder="$t('insSettingView.enterScore')"
+                      @input="napeSheetScoreChange"/>
+            <span v-if="PFScoreTip" class="rules">{{ $t('insSettingView.setPassFileRange') }}</span>
+            <span v-if="OtherScoreTip" class="rules">{{ $t('insSettingView.setOtherRange') }}</span>
+            <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('insSettingView.inspectionDescp')">
+            <el-input type="textarea" v-model="ItemDescription"
+                      :placeholder="$t('insSettingView.description')"
+                      @input="napeDepChange"></el-input>
+            <span v-if="descriptionRuletip" class="rules">{{ $t('insSettingView.descriptionRuletip') }}</span>
+          </el-form-item>
+        </el-form>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button class="file-cancel-btn" size="mini" style="" @click="showAddNape = false">{{ $t('insSettingView.cancel') }}</el-button>
+        <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
+      </div>
+    </el-dialog>
+    <dialog-pop
+      :title="$t('insSettingView.confirmDelete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showDeleteItem"
+      @visibleChangeHandler="updateDeleteItemDialogFlag"
+      @cancelHandler="hideDeleteItemDialog"
+      @confirmHandler="confirmDeleteItem"
+    >
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }}</div>
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :title="$t('insSettingView.confirmDelete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showDeleteGroup"
+      @visibleChangeHandler="updateDeleteGroupDialogFlag"
+      @cancelHandler="hideDeleteGroupDialog"
+      @confirmHandler="confirmDeleteGroup"
+    >
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <div class="dialog-content">{{ $t('insSettingView.deleteGroup') }}</div>
+      </div>
+    </dialog-pop>
   </el-row>
 </template>
 
 <script>
 import util from '@/common/util';
-import { validateInput } from '@/common/validate';
 import { inpectRESTful, titleRESTful } from '@/api/index';
 import PubSub from 'pubsub-js';
 import filterString from '@/common/filterString';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { getScheduleListService } from '@/api/schedule';
+import DelayButton from '@/components/DelayButton';
+import DialogPop from '@/components/DialogPop';
+
 export default {
   name: 'AddRuteInspect',
   components: {
+    DialogPop,
+    DelayButton,
     RegionMultiSelect
   },
   data() {
@@ -481,7 +475,7 @@ export default {
     confirmEditTab() {
       const self = this;
       if (self.editRouteName === '') {
-        self.notify(self.$t('insSettingView.enterListName'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.enterListName'), 'warning', 3000);
         return false;
       }
       const params = {
@@ -493,10 +487,10 @@ export default {
           self.showEditTab = false;
           self.routeName = self.editRouteName;
           self.showLengthNameWarning = false;
-          self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
         } else {
-          self.notify(self.$t('remotePatrol.Patroltips2'), 'warning', 3000);
+          util.notify(self.$t('remotePatrol.Patroltips2'), 'warning', 3000);
           return false;
         }
       }).catch(err => {
@@ -619,7 +613,7 @@ export default {
         if (resUnbindGroup.errMsg === 'Success' && bindtitleIds.length !== 0) {
           resBindGroup = await self.bindGroup(paramsBind);
         } else if (resUnbindGroup.errMsg === 'Success' && titleIds.length === 0) {
-          self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           self.refreshData(self.groupIndex);
           return false;
         }
@@ -627,15 +621,15 @@ export default {
         if (bindtitleIds.length !== 0) {
           resBindGroup = await self.bindGroup(paramsBind);
         } else if (bindtitleIds.length === 0) {
-          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           return false;
         }
       }
       if (resBindGroup.errMsg === 'Success') {
-        self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+        util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
         self.refreshData(self.groupIndex);
       } else {
-        self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+        util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
         return false;
       }
     },
@@ -644,13 +638,9 @@ export default {
       const self = this;
       const temp = [];
       if (item.groupName == null || item.groupName.length === 0) {
-        self.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
-      // if(validateInput(item.groupName)){
-      //     self.notify(self.$t('insSettingView.illegalStr'),'warning',3000);
-      //     return false;
-      // }
       const obj = {
         id: item.id,
         name: item.groupName,
@@ -663,11 +653,11 @@ export default {
       let resUpdateGroup = null;
       resUpdateGroup = await self.updateGroup(params);
       if (resUpdateGroup.errMsg === 'Success') {
-        self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+        util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
         item.isEdit = false;
         self.refreshData(self.groupIndex);
       } else {
-        self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+        util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
         return false;
       }
     },
@@ -728,7 +718,7 @@ export default {
       const self = this;
       const temp = [];
       if (self.groupNameInput.trim().length == 0) {
-        self.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
       let mode = 0;
@@ -775,9 +765,9 @@ export default {
           self.groupNameInput = '';
           self.showAddGroup = false;
           self.refreshData(self.groupList.length - 1);
-          self.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
+          util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
         } else {
-          self.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
+          util.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
           return false;
         }
       }).catch(err => {
@@ -849,7 +839,7 @@ export default {
             }
           });
           if (arrtemp.indexOf(self.routeData[0].inspectId) !== -1) {
-            self.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
             return false;
           }
         }
@@ -879,7 +869,7 @@ export default {
       if (idItemArr.length === 0) {
         const errMsg = await self.deleteGroupData(idGroupArr);
         if (errMsg != undefined && errMsg === 'Success') {
-          self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+          util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
           if (self.groupList.length === 1) {
             self.groupList = [];
             self.napeList = [];
@@ -893,7 +883,7 @@ export default {
         if (errMsgItem != undefined && errMsgItem === 'Success') {
           const errMsgGroup = await self.deleteGroupData(idGroupArr);
           if (errMsgGroup != undefined && errMsgGroup === 'Success') {
-            self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+            util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
             if (self.groupList.length === 1) {
               self.groupList = [];
               self.napeList = [];
@@ -902,17 +892,25 @@ export default {
               self.refreshData(self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1);
             }
           } else {
-            self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
             return false;
           }
         } else {
-          self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+          util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
           return false;
         }
       }
       if (self.typeTemp.length === 1 && self.groupList.length === 0) {
         self.$router.push({ name: 'inspectSetting', params: { val: 'del' }});
       }
+    },
+
+    updateDeleteGroupDialogFlag(val) {
+      this.showDeleteGroup = val;
+    },
+
+    hideDeleteGroupDialog() {
+      this.showDeleteGroup = false;
     },
 
     addNape() {
@@ -932,7 +930,7 @@ export default {
         }
       });
       if (count === 0) {
-        self.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
         return false;
       }
       self.showDeleteItem = true;
@@ -954,17 +952,25 @@ export default {
       }
       const errMsg = await self.deleteItemData(idArr);
       if (errMsg != undefined && errMsg === 'Success') {
-        self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+        util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
         self.showDeleteItem = false;
         self.refreshData(self.groupIndex);
         self.groupList[self.groupIndex].groupNum -= idArr.length;
       } else {
-        self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
         return false;
       }
     },
 
-    setDialogContent(){
+    updateDeleteItemDialogFlag(val) {
+      this.showDeleteItem = val;
+    },
+
+    hideDeleteItemDialog() {
+      this.showDeleteItem = false;
+    },
+
+    setDialogContent() {
       const self = this;
       self.ItemName = '';
       self.ItemTotalScore = 50;
@@ -1121,14 +1127,14 @@ export default {
                 const res = resApply;
               });
             }
-            self.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
+            util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
             setTimeout(function() {
               if (self.tabName == '远程巡检') {
                 PubSub.publish('change-color', { showTag: true });
               }
             }, 1000);
           } else {
-            self.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
             return false;
           }
         }).catch(err => {
@@ -1154,11 +1160,11 @@ export default {
         inpectRESTful.updateInspectItem(params).then(res => {
           const codeMsg = res.errMsg;
           if (codeMsg != undefined && codeMsg == 'Success') {
-            self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+            util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
             self.showAddNape = false;
             self.refreshData(self.groupIndex);
           } else {
-            self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+            util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
             return false;
           }
         }).catch(err => {
@@ -1377,14 +1383,6 @@ export default {
       self.routeData = itemSettingData.routeData;
       self.refreshData(0);
       self.getBindStoreList();
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     },
 
     groupNameChange(val, item) {
@@ -1681,28 +1679,6 @@ export default {
                 top:22px;
                 left:calc(30/1920*100vw);
             }
-        }
-        .rute-btn{
-            //background-color: $red;
-            border-color: $red;
-            color: #fff;
-            font-size: 12px;
-        }
-        .en-rute-btn{
-          //background-color: $red;
-          border-color: $red;
-          color: #fff;
-          font-size: calc(14/1920*100vw);
-          height: calc(36/1920*100vw);
-          line-height: calc(36/1920*100vw);
-          padding: 0 0;
-          width: calc(130/1920*100vw);
-          .el-icon-plus{
-            font-size:calc(24/1920*100vw);
-          }
-          .icon-shanchu{
-            font-size:calc(24/1920*100vw);
-          }
         }
         .iconcontent{
             @include point(margin-left,20);
