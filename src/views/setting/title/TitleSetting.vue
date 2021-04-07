@@ -59,7 +59,7 @@
           <el-radio-group v-model="roleId">
             <el-radio v-for="(item, index) in roleList" :label="item.value" :key="index">{{ item.label }}</el-radio>
           </el-radio-group>
-          <storevue-button size="mini" type="primary" @click="saveBasicInfo">{{ $t('titleView.useAndSave') }}</storevue-button>
+          <delay-button size="mini" type="primary" @click="saveBasicInfo">{{ $t('titleView.useAndSave') }}</delay-button>
         </div>
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group">
