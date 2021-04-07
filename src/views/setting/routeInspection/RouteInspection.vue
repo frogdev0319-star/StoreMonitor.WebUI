@@ -1,25 +1,21 @@
 <template>
   <el-row class="el-route-container">
     <el-col :span="24" class="el-route-header">
-      <div v-if="itemhoverName !== ''" :style="{'left':120*itemIndex+4*itemIndex+'px'}" class="item_name">
+      <div v-if="itemhoverName.length > 0" :style="{'left':120*itemIndex+4*itemIndex+'px'}" class="item_name">
         {{ itemhoverName }}<div class="triangle"/>
       </div>
       <el-col :span="7" class="el-route-btns">
         <span :class="lang === 'en'? 'en-bind-title': 'bind-title'">
           {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
         </span>
-        <el-button
-          :class="lang === 'en' ? 'en-el-bind-btn' : 'el-bind-btn' "
+        <delay-button
+          :class="lang === 'en' ? 'en-bind-btn' : 'bind-btn' "
           :disabled="elTableData[Number(activeName)].data.length === 0"
-          size="mini"
-          class="btn-class"
-          type="primary"
-          @click="bindStore">
-          <div class="btn-area">
-            <i class="iconfont icon-quxiaolianjie"/>
-            <span>{{ $t('insSettingView.bindList') }}</span>
-          </div>
-        </el-button>
+          @click="bindStore"
+        >
+          <i class="iconfont icon-quxiaolianjie"/>
+          <span>{{ $t('insSettingView.bindList') }}</span>
+        </delay-button>
         <input
           id="loadFileEx"
           ref="loadFileEx"
@@ -39,211 +35,24 @@
             <span>{{ item.btnTitle }}</span>
           </div>
         </el-button>
-
-        <el-dialog
-          v-if="showImportContent"
-          :title= "$t('insSettingView.import')"
-          :visible.sync="showImportContent"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:0px;">{{ $t('insSettingView.selectImprtLoc') }}</p>
-            <div style="margin-left:20px;">
-              <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
-                <el-radio-button
-                  v-for="(item,key) in radioList"
-                  :key="key"
-                  :label="item.label"
-                  style="margin-left:10px;"
-                  class="radio-btn"/>
-              </el-radio-group>
-            </div>
-            <div class="tabName-input-content">
-              <input
-                v-if="checkValue === this.addPatrol"
-                v-model="tabNameInput"
-                :placeholder="$t('insSettingView.enterListName')"
-                type="text"
-                class="tabName-input">
-            </div>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showImportContent = false">
-              {{ $t('insSettingView.cancel') }}</el-button>
-
-            <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{ $t('insSettingView.select') }}
-              <input
-                id="upload"
-                ref="loadFile"
-                type="file"
-                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                @change="importfxx(this)" >
-            </a>
-          </div>
-        </el-dialog>
-        <el-dialog
-          v-if="showNameImport"
-          :title="$t('insSettingView.import')"
-          :visible.sync="showNameImport"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="510px"
-          top="35vh"
-          left="40vh"
-          @close="cancelImportName">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <div class="nameinput" style="padding:30px 40px 10px 40px;height:60px;">
-              <el-input
-                v-model="ImportName"
-                :placeholder="$t('insSettingView.enterListName')"
-                style="border-bottom:1px solid #ddd;"
-                @input="watchName"/>
-              <p v-if="isShowWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{ warningContent }}</p>
-            </div>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="cancelImportName">
-              {{ $t('insSettingView.cancel') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmImportName">
-              {{ $t('insSettingView.select') }}
-            </el-button>
-          </div>
-        </el-dialog>
-        <el-dialog
-          v-if="showFailInfo"
-          :title="$t('insSettingView.importFailTitle')"
-          :visible.sync="showFailInfo"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="510px"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:40px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.FailTitle') }}</span>
-              <ul class="ul_style">
-                <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
-                  <div class="list_style"/>
-                  {{ item }}
-                </li>
-              </ul>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">
-              {{ $t('insSettingView.cancel') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">
-              {{ $t('insSettingView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
-        <el-dialog
-          v-if="showSingleDeleteContent"
-          :title="$t('insSettingView.confirmDelete')"
-          :visible.sync="showSingleDeleteContent"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmDelData') }}</span>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showSingleDeleteContent = false">
-              {{ $t('insSettingView.cancel') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDelete">
-              {{ $t('insSettingView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
-        <el-dialog
-          v-if="showNoPostDialog"
-          :title="$t('remotePatrol.prompt')"
-          :visible.sync="showNoPostDialog"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmToBindData') }}</span>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showNoPostDialog = false">
-              {{ $t('insSettingView.cancel') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmToBind">
-              {{ $t('insSettingView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
-        <el-dialog
-          v-if="showImportSucceed"
-          :title="$t('remotePatrol.prompt')"
-          :visible.sync="showImportSucceed"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmToSetRule') }}</span>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showImportSucceed = false">
-              {{ $t('insSettingView.cancel') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="toSetRules">
-              {{ $t('insSettingView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
       </el-col>
       <el-col :span="18" class="el-route-tabs" :style="{'min-height':varyWindowWidth - 250 +'px'}">
-        <div class="loading_area self-loading"
-             :element-loading-text="$t('insSettingView.loadingbindstore')"
-             v-loading="isLoading">
-        </div>
-        <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick" :style="{'min-height':varyWindowWidth - 250 +'px'}">
+        <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick"
+                 :style="{'min-height':varyWindowWidth - 250 +'px'}">
           <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label"
                        :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false"
-                       v-loading="isLoading"
-                       :element-loading-text="$t('insSettingView.loadingbindstore')">
+                       class="self-loading"
+                       :element-loading-text="$t('insSettingView.loadingbindstore')"
+                       v-loading="isLoading">
             <el-tabs v-if="item.data.length !== 0 && !isLoading" id="patrltabs-content" v-model="patrolActive"
-                     :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol">
+                     :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol" >
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
                 <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{ _item.name }}</span>
-                <div v-if="_item.routeData&&!loading">
+                <div v-if="_item.routeData">
                   <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name"
                                 :down-src="downLoadSrc" :all-routedata="_item.allRoutedata"
                                 :sheet-name="_item.sheetName" :tab-name="_item.name" @refreshList="getTagList"
                                 @change-routeData="changerouteData"/>
-                </div>
-                <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
-                  <img :src="loadingGif">
-                  <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -257,12 +66,99 @@
                 {{ $t('insSettingView.waveline') }}
               </p>
               <input id="uploadFile" ref="loadFile" type="file" style="display: none"
-                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" @change="importfxx(this)" >
+                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                     application/vnd.ms-excel" @change="importfxx(this)" >
             </div>
           </el-tab-pane>
         </el-tabs>
       </el-col>
     </el-col>
+    <dialog-pop
+      :title="$t('insSettingView.import')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showNameImport"
+      :confirm-text="$t('insSettingView.select')"
+      class="dialog-content"
+      @visibleChangeHandler="cancelImportName"
+      @cancelHandler="cancelImportName"
+      @confirmHandler="confirmImportName"
+    >
+      <div class="import-file-slot">
+        <el-input
+          v-model="ImportName"
+          :placeholder="$t('insSettingView.enterListName')"
+          class="inspection-name"
+          @input="watchName"/>
+        <p v-if="isShowWarning" style="font-size:12px;color:red;margin:5px 0 0 0;">{{ warningContent }}</p>
+      </div>
+    </dialog-pop>
+
+    <dialog-pop
+      :title="$t('insSettingView.importFailTitle')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showFailInfo"
+      class="dialog-content"
+      @visibleChangeHandler="updateShowInfoDialog"
+      @cancelHandler="hideShowInfoDialog"
+      @confirmHandler="hideShowInfoDialog"
+    >
+      <div class="import-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <span>{{ $t('insSettingView.FailTitle') }}</span>
+      </div>
+      <ul class="ul_style">
+        <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
+          <div class="list_style"/>
+          {{ item }}
+        </li>
+      </ul>
+    </dialog-pop>
+
+    <dialog-pop
+      :title="$t('insSettingView.confirmDelete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showSingleDeleteContent"
+      @visibleChangeHandler="updateDeleteContentDialogFlag"
+      @cancelHandler="hideDeleteContentDialog"
+      @confirmHandler="confirmDelete"
+    >
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <div class="dialog-content">{{ $t('insSettingView.confirmDelData') }}</div>
+      </div>
+    </dialog-pop>
+
+    <dialog-pop
+      :title="$t('remotePatrol.prompt')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showNoPostDialog"
+      @visibleChangeHandler="updateTitleDialogFlag"
+      @cancelHandler="hideNoTitleDialog"
+      @confirmHandler="confirmToBind"
+    >
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <span>{{ $t('insSettingView.confirmToBindData') }}</span>
+      </div>
+    </dialog-pop>
+
+    <dialog-pop
+      :title="$t('remotePatrol.prompt')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showImportSucceed"
+      @visibleChangeHandler="updateImportSuccDialogFlag"
+      @cancelHandler="hideImportSuccDialog"
+      @confirmHandler="toSetRules"
+    >
+      <div class="dialog-slot">
+        <span>{{ $t('insSettingView.confirmToSetRule') }}</span>
+      </div>
+    </dialog-pop>
   </el-row>
 </template>
 <script>
@@ -272,15 +168,18 @@ import { validateInput } from '@/common/validate';
 import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
 import filterString from '@/common/filterString';
-import DialogVue from '@/components/DialogVue.vue';
 import { getScheduleListService } from '@/api/schedule';
-import Environment from '../../../common/environment';
+import Environment from '@/common/environment';
+import DelayButton from '@/components/DelayButton';
+import util from '@/common/util'
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'RouteInspection',
   components: {
-    RouteDetail,
-    DialogVue
+    DialogPop,
+    DelayButton,
+    RouteDetail
   },
   data() {
     return {
@@ -449,7 +348,6 @@ export default {
     },
 
     emptyImport() {
-      const self = this;
       document.getElementById('uploadFile').click();
     },
 
@@ -866,10 +764,10 @@ export default {
         if (codeItem != null && codeItem == 'Success') {
           self.getTagList('add');
         } else {
-          self.notify(self.$t('insSettingView.importFail'), 'warning', 3000);
+          util.notify(self.$t('insSettingView.importFail'), 'warning', 3000);
         }
       } else {
-        self.notify(self.$t('insSettingView.importFail'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.importFail'), 'warning', 3000);
       }
       // self.showImportContent=false;
     },
@@ -881,7 +779,7 @@ export default {
     bindStore() {
       const self = this;
       const routeData = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData;
-      self.showNoPostDialog = routeData[0].ModelPost == null;
+      self.showNoPostDialog = routeData[0].ModelPost === null;
       if (!self.showNoPostDialog) {
         self.confirmToBind();
       }
@@ -890,7 +788,7 @@ export default {
     confirmToBind() {
       const self = this;
       if (self.elTableData[Number(self.activeName)].data.length === 0) {
-        self.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
         return false;
       }
       const arr = [];
@@ -900,7 +798,7 @@ export default {
         });
       });
       if (arr.length === 0) {
-        self.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
         return false;
       }
       sessionStorage.setItem('TabName', self.activeName);
@@ -910,6 +808,14 @@ export default {
       };
       sessionStorage.setItem('bindStoreData', JSON.stringify(params));
       self.$router.push({ name: 'bindStore', params: params });
+    },
+
+    updateTitleDialogFlag(val) {
+      this.showNoPostDialog = val;
+    },
+
+    hideNoTitleDialog(){
+      this.showNoPostDialog = false;
     },
 
     changeValue(obj) {
@@ -1034,10 +940,19 @@ export default {
       self.getTagList();
     },
 
+    updateImportSuccDialogFlag(val) {
+      this.showImportSucceed = val;
+    },
+
+    hideImportSuccDialog() {
+      this.showImportSucceed = false;
+    },
+
     toSetRules() {
       const self = this;
       const activeInpect = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)];
-      const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name,mode: Number(self.activeName) === 0 ? 1 : 0};
+      const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name,
+        mode: Number(self.activeName) === 0 ? 1 : 0 };
       sessionStorage.setItem('ruleData', JSON.stringify(params));
       self.$router.push({ name: 'setRule', params: params });
     },
@@ -1046,7 +961,7 @@ export default {
       const self = this;
       const datalength = self.elTableData[Number(self.activeName)].data.length;
       if (datalength === 0) {
-        self.notify(self.$t('insSettingView.deletePatrolList'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.deletePatrolList'), 'warning', 3000);
         return false;
       } else {
         const params = {};
@@ -1059,7 +974,7 @@ export default {
           }
         });
         if (arrtemp.indexOf(self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId) !== -1) {
-          self.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
+          util.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
           return false;
         }
       }
@@ -1096,7 +1011,7 @@ export default {
               self.afterDeleteList();
             }
           } else {
-            self.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
             return false;
           }
         });
@@ -1105,16 +1020,32 @@ export default {
           if (resGroup.errMsg === 'Success') {
             self.afterDeleteList();
           } else {
-            self.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
             return false;
           }
         });
       }
     },
 
+    updateDeleteContentDialogFlag(val) {
+      this.showSingleDeleteContent = val;
+    },
+
+    hideDeleteContentDialog() {
+      this.showSingleDeleteContent = false;
+    },
+
+    updateShowInfoDialog(val) {
+      this.showFailInfo = val;
+    },
+
+    hideShowInfoDialog() {
+      this.showFailInfo = false;
+    },
+
     afterDeleteList() {
       const self = this;
-      self.notify(self.$t('insSettingView.deleteInspectSuss'), 'success', 3000);
+      util.notify(self.$t('insSettingView.deleteInspectSuss'), 'success', 3000);
       self.showSingleDeleteContent = false;
       self.getTagList('del');
     },
@@ -1126,10 +1057,10 @@ export default {
       if (isGlobalWebsite) {
         const Datalength = self.elTableData[Number(self.activeName)].data.length;
         if (Number(self.activeName) === 1 && Datalength >= 10) {
-          self.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
+          util.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
           return false;
         } else if (Number(self.activeName) === 0 && Datalength >= 10) {
-          self.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
+          util.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
           return false;
         } else {
           self.showNameImport = true;
@@ -1144,7 +1075,7 @@ export default {
       const self = this;
       if (self.checkValue === '新增巡检表' && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
         self.hideUpload = true;
-        self.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
         return false;
       } else {
         self.hideUpload = false;
@@ -1719,6 +1650,7 @@ export default {
             border-radius:2px;
             min-height:150px;
             padding:20px 0 0 20px;
+            margin: 20px calc(20/1920*100vw);
             .li_style{
                 color:#7d8cad;
                 margin-bottom:10px;
@@ -1815,47 +1747,6 @@ export default {
                   color:$tab;
                   font-size: 12px;
                 }
-                .el-bind-btn{
-                    color: #fff;
-                    border-color: $mainColor;
-                    border-radius: 3px;
-                    margin-right:calc(20/1920*100vw);
-                    font-size: 12px;
-                    &:disabled{
-                        opacity: 0.5;
-                    }
-                  @media screen and (max-width: 1440px) {
-                    width: 100px !important;
-                  }
-                }
-                .en-el-bind-btn{
-                  color: #fff;
-                  border-color: $mainColor;
-                  border-radius: 3px;
-                  margin-right: calc(20/1920*100vw);
-                  .icon-quxiaolianjie{
-                    font-size: calc(16/1920*100vw);
-                  }
-                  &:disabled{
-                    opacity: 0.5;
-                  }
-
-                }
-                .btn-class{
-                  height: calc(36/1920*100vw);
-                  padding: 0;
-                  font-size: calc(14/1920*100vw);
-                  width: calc(130/1920*100vw);
-                  .iconfont{
-                    font-size: calc(16/1920*100vw);
-                    margin-right: calc(10/1920*100vw)
-                  }
-                  .btn-area{
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                  }
-                }
                 .downLoad-btn{
                     margin-left: 0px !important;
                     border-color: $mainColor !important;
@@ -1892,15 +1783,16 @@ export default {
                     font-size: calc(14/1920*100vw);
                     min-width: 85px;
                     min-height: 28px;
+
                     &:last-child{
-                        border-right: 1px solid;
+                      border-right: 1px solid $mainColor !important;
                     }
 
                     &:hover{
-                        background-color: #FEE4E7;
+                      background-color: #FEE4E7;
                     }
                     &:focus{
-                        background-color: #FEE4E7;
+                      background-color: #FEE4E7;
                     }
                   .btn-area{
                     display: flex;
@@ -1909,34 +1801,8 @@ export default {
                   }
                 }
               .en-el-handle-btn{
-                margin-left: 0px !important;
-                border-color: $mainColor !important;
-                color: $mainColor !important;
-                border-radius: 0px;
-                border-right: 0;
-                height: calc(36/1920*100vw);
-                /*line-height: calc(36/1920*100vw);*/
-                padding: 0 0;
-                font-size: calc(14/1920*100vw);
+                @extend .el-handle-btn;
                 width: calc(130/1920*100vw);
-                min-width: 85px;
-                min-height: 28px;
-                .btn-area{
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                }
-
-                &:last-child{
-                  border-right: 1px solid;
-                }
-
-                &:hover{
-                  background-color: #FEE4E7;
-                }
-                &:focus{
-                  background-color: #FEE4E7;
-                }
               }
             }
         }
