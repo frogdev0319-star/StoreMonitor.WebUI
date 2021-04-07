@@ -898,7 +898,7 @@ export default {
     'roleId1Title': 'Manager',
     'roleId2Title': 'Supervisor Manager',
     'roleId3Title': 'Supervisor(Audit Manager)',
-    'roleId4Title': 'Store Manager（Operation Manager）',
+    'roleId4Title': 'Store Manager(Operation Manager)',
     'comment': 'Note',
     'commentRuletip': 'Enter up to 200 characters',
     'roleSetting': 'Menu Permission Settings',
