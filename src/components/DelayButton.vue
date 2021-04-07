@@ -3,7 +3,7 @@
     v-bind="$attrs"
     :loading="loadingStatus"
     size="mini"
-    type="primary"
+    :type="buttonType"
     class="storevue-button"
     @click="handleClick"
   >
@@ -18,6 +18,10 @@ export default {
     autoLoading: {
       type: Boolean,
       default: false
+    },
+    buttonType: {
+      type: String,
+      default: 'primary'
     }
   },
   data() {
