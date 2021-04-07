@@ -56,7 +56,20 @@ $mainColor: #f31d65;
   display: flex;
   align-items: center;
 }
-
+.import-slot{
+  @extend .dialog-slot;
+  margin: 20px calc(20/1920*100vw) 0px;
+}
+.import-file-slot{
+  @extend .dialog-slot;
+  flex-wrap: wrap;
+}
+.inspection-name{
+  border-bottom:1px solid #ddd;
+  & .el-input__inner{
+    border:none;
+  }
+}
 .dialog-icon{
   font-size: 40px;
   margin-right: 20px;
@@ -98,8 +111,8 @@ $mainColor: #f31d65;
 
 .cancel-btn{
   @extend .confirm-btn;
-  background-color: $cancelBtnBackground;
-  color: $cancelBtnFont;
+  background-color: $cancelBtnBackground !important;
+  color: $cancelBtnFont !important;
   margin-right: calc(20/1920*100vw);
   min-height: 28px;
   min-width: 85px;
@@ -177,3 +190,34 @@ $mainColor: #f31d65;
 .search-btns{
   float: right;
 }
+
+.en-bind-btn{
+  margin-right: calc(20/1920*100vw);
+  .iconfont{
+    font-size: calc(16/1920*100vw);
+  }
+
+}
+.bind-btn{
+  @extend .storevue-button;
+  @extend .en-bind-btn;
+  @media screen and (max-width: 1440px){
+    width: 100px;
+  }
+}
+
+.inspction-btn{
+  @extend .storevue-button;
+  .iconfont{
+    font-size: calc(16/1920*100vw);
+  }
+  @media screen and (max-width: 1440px){
+    width: 100px;
+  }
+}
+
+.inspction-btn.el-button--default{
+  border-color: $mainColor;
+  color: $mainColor;
+}
+
