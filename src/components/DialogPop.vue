@@ -14,7 +14,7 @@
         {{ $t('remotePatrol.cancel') }}
       </el-button>
       <el-button class="confirm-btn" size="mini" type="primary" @click="confirmHandler">
-        {{ $t('remotePatrol.confirm') }}
+        {{ confirmText }}
       </el-button>
     </div>
   </el-dialog>
@@ -39,6 +39,12 @@ export default {
     showButton: {
       type: Boolean,
       default: true
+    },
+    confirmText: {
+      type: String,
+      default() {
+        return this.$t('insSettingView.confirm')
+      }
     }
   },
 
