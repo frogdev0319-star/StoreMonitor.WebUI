@@ -8,85 +8,31 @@
           <span class="post-concent">{{ routeData[0].ModelPost }}</span>
         </div>
         <div class="route-btns">
-          <el-button
-            :class=" lang=='en' ? 'en-el-delete-btn':'el-delete-btn'"
-            :disabled="routeData.length==0"
-            class="btn-class"
-            size="mini"
-            @click="deleteNapes">
+          <delay-button
+            :disabled="routeData.length === 0"
+            class="inspction-btn"
+            button-type="default"
+            @click="deleteNapes"
+          >
             <i class="iconfont icon-shanchu"/>
             <span>{{ $t('insSettingView.deleteItem') }}</span>
-          </el-button>
-          <el-button
-            :class="lang=='en'? 'en-el-set-btn':'el-set-btn'"
-            :disabled="routeData.length==0"
-            class="btn-class"
-            type="primary"
-            size="mini"
+          </delay-button>
+          <delay-button
+            :disabled="routeData.length === 0"
+            class="inspction-btn"
             @click="setRule">
             <i class="iconfont icon-guize1"/>
             <span>{{ $t('insSettingView.ruleInspect') }}</span>
-          </el-button>
-          <el-button
-            :class="lang=='en'? 'en-el-set-btn':'el-set-btn'"
-            :disabled="routeData.length==0"
-            class="btn-class"
-            type="primary"
-            size="mini"
-            @click="setItem">
+          </delay-button>
+          <delay-button
+            :disabled="routeData.length === 0"
+            class="inspction-btn"
+            @click="setItem"
+          >
             <i class="iconfont icon-button"/>
             <span>{{ $t('insSettingView.setItem') }}</span>
-          </el-button>
+          </delay-button>
         </div>
-        <el-dialog
-          v-if="showDeleteContent"
-          :title="$t('insSettingView.confirmDelete')"
-          :visible.sync="showDeleteContent"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;">{{ $t('insSettingView.confirmSelecDel') }}</span>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" @click="showDeleteContent = false">{{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDelete">{{ $t('insSettingView.confirm') }}</el-button>
-          </div>
-        </el-dialog>
-
-        <el-dialog
-          v-if="showSingleDeleteContent"
-          :title="$t('insSettingView.confirmDelete')"
-          :visible.sync="showSingleDeleteContent"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i
-                class="el-icon-warning"
-                style="font-size:26px;margin-right:20px;color:#FF9803;
-              display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;" >{{ $t('insSettingView.confirmCurDel') }}</span>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showSingleDeleteContent = false">
-              {{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteSingle">
-              {{ $t('insSettingView.confirm') }}</el-button>
-          </div>
-        </el-dialog>
-
       </el-col>
       <el-col :span="24">
         <div class="data-box">
@@ -97,18 +43,21 @@
         <el-scrollbar id="el-menuscrollbar">
           <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
             <div v-for="(item,index) in routeData" :key="index" class="data-content">
-              <div v-if="index==0" class="header-content tabTitle">
+              <div v-if="index === 0" class="header-content tabTitle">
                 <el-checkbox v-model="allchecked" class="allcheckBox" @change="changeAllData"/>
                 <span class="name-title">{{ $t('insSettingView.inspectName') }}</span>
-                <span :style="sheetName.some(x=>x.id==1&&x.isClick)?'width: calc((100% - 405px) * 11/29)':'width: calc((100% - 405px) * 15.3/29)'" class="description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
-                <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" :style="'width: calc((100% - 405px) * 2.5/29);'" class="score-title">{{ $t('insSettingView.sheetscore0') }}</span>
-                <!-- <span class="score-title" :style="showSheet1?'width: calc((100% - 405px) * 2.5/29);':''" v-if="showSheet0||showSheet1">{{$t('insSettingView.sheetscore0')}}</span> -->
-                <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" class="score-title" style="width: calc((100% - 405px) * 4/29);">{{ $t('insSettingView.sheetscore3') }}</span>
-                <span v-if="sheetName.some(x=>x.id==1&&x.isClick)" class="score-title" style="width: calc((100% - 405px) * 6/29);">{{ $t('insSettingView.sheetscore1') }}</span>
-                <span v-if="sheetName.some(x=>x.id!==1&&x.isClick)" class="score-title">{{ $t('insSettingView.score') }}</span>
-                <span :class="lang=='en' ? 'en-handle-title':'handle-title'">{{ $t('insSettingView.operation') }}</span>
+                <span v-if="sheetName.some(x=>x.id === 1 && x.isClick)">
+                  <span class="score-item-description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
+                  <span class="total-score">{{ $t('insSettingView.sheetscore0') }}</span>
+                  <span class="options-title">{{ $t('insSettingView.sheetscore3') }}</span>
+                  <span class="limitation-title" >{{ $t('insSettingView.sheetscore1') }}</span>
+                </span>
+                <span v-else>
+                  <span class="description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
+                  <span class="score-title">{{ $t('insSettingView.score') }}</span>
+                </span>
+                <span :class="lang === 'en' ? 'en-handle-title' : 'handle-title'">{{ $t('insSettingView.operation') }}</span>
               </div>
-
               <div class="table-header-title">
                 <el-checkbox v-model="item.checked" class="all-checkBox" @change="change(item)"/>
                 <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
@@ -152,91 +101,47 @@
             </div>
           </div>
         </el-scrollbar>
-        <el-dialog
-          v-if="showImportContent"
-          :title="$t('insSettingView.import')"
-          :visible.sync="showImportContent"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:0px;">{{ $t('insSettingView.selectImprtLoc') }}</p>
-            <div style="margin-left:20px;">
-              <el-radio-group v-model="checkValue" size="mini" style="margin-top:8px;" @change="changeValue">
-                <el-radio-button
-                  v-for="(item,key) in radioList"
-                  :key="key"
-                  :label="item.label"
-                  style="margin-left:10px;"
-                  class="elradio"/>
-              </el-radio-group>
-            </div>
-            <div class="tabName-input-content">
-              <input
-                v-if="checkValue == addPatrol"
-                v-model="tabNameInput"
-                :placeholder="$t('insSettingView.enterListName')"
-                type="text"
-                class="tabName-input">
-            </div>
-
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showImportContent = false">
-              {{ $t('insSettingView.cancel') }}</el-button>
-
-            <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{ $t('insSettingView.select') }}
-              <input
-                id="upload"
-                type="file"
-                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                @change="importfxx(this)" >
-            </a>
-          </div>
-        </el-dialog>
-        <el-dialog
-          v-if="showFailInfo"
-          :title="$t('insSettingView.importFailTitle')"
-          :visible.sync="showFailInfo"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="28%"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i class="el-icon-warning" style="font-size:40px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle;"/>
-              <span style="display: inline-block; vertical-align: middle;font-size:14px;color:#182752;">{{ $t('insSettingView.FailTitle') }}</span>
-              <ul class="ul_style">
-                <li v-for="(item,index) in FileInfo" :key="index" class="li_style">
-                  <div class="list_style"/>
-                  {{ item }}
-                </li>
-              </ul>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showFailInfo = false">
-              {{ $t('insSettingView.cancel') }}</el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="showFailInfo = false">
-              {{ $t('insSettingView.confirm') }}</el-button>
-          </div>
-        </el-dialog>
       </el-col>
     </el-row>
+    <dialog-pop
+      :title="$t('insSettingView.confirmDelete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showDeleteContent"
+      @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showDeleteContent')"
+      @cancelHandler="hideDeleteContentDialog('showDeleteContent')"
+      @confirmHandler="confirmDelete">
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <div class="dialog-content">{{ $t('insSettingView.confirmSelecDel') }}</div>
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :title="$t('insSettingView.confirmDelete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showSingleDeleteContent"
+      @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showSingleDeleteContent')"
+      @cancelHandler="hideDeleteContentDialog('showSingleDeleteContent')"
+      @confirmHandler="confirmDeleteSingle"
+    >
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <div class="dialog-content">{{ $t('insSettingView.confirmDelData') }}</div>
+      </div>
+    </dialog-pop>
   </div>
 </template>
 <script>
 import { inpectRESTful } from '@/api/index';
 import { getScheduleListService } from '@/api/schedule';
+import DelayButton from '@/components/DelayButton';
+import util from '@/common/util';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'RouteDetail',
-
+  components: { DialogPop, DelayButton },
   props: {
     routeData: Array,
     tabName: String,
@@ -255,8 +160,6 @@ export default {
       showDeleteContent: false,
       showSingleDeleteContent: false,
       multeSection: [],
-      showImportContent: false,
-      showFailInfo: false,
       FileInfo: [],
       radioList: [
         {
@@ -268,7 +171,6 @@ export default {
           'label': '现场巡检'
         }
       ],
-      checkValue: '',
       addPatrol: '自定义巡检表',
       tabNameLang: '',
       tabNameInput: '',
@@ -434,7 +336,7 @@ export default {
         });
       });
       if (arr.length === 0 && countGroup.length === 0) {
-        self.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
         return false;
       }
       const typeTemp = [];
@@ -460,7 +362,7 @@ export default {
             }
           });
           if (arrtemp.indexOf(self.routeData[0].inspectId) !== -1) {
-            self.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
             return false;
           }
         }
@@ -481,7 +383,7 @@ export default {
 
     afterDeleteNape() {
       const self = this;
-      self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+      util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
       self.showDeleteContent = false;
       const val = 'del';
       self.$emit('refreshList', val, self.curSheet);
@@ -521,7 +423,7 @@ export default {
               self.afterDeleteNape();
             }
           } else {
-            self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
             return false;
           }
           self.allchecked = false;
@@ -531,7 +433,7 @@ export default {
           if (resGroup.errMsg === 'Success') {
             self.afterDeleteNape();
           } else {
-            self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
             return false;
           }
           self.allchecked = false;
@@ -578,7 +480,7 @@ export default {
             }
           });
           if (arrtemp.indexOf(self.routeData[0].inspectId) !== -1) {
-            self.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
+            util.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
             return false;
           }
         }
@@ -607,7 +509,7 @@ export default {
                     'groupIds': [self.curDelGroupId]
                   };
                   inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-                    self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+                    util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
                     self.showSingleDeleteContent = false;
                     const val = 'del';
                     self.$emit('refreshList', val, self.curSheet);
@@ -615,20 +517,28 @@ export default {
                 }
               });
             } else {
-              self.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+              util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
               self.showSingleDeleteContent = false;
               const val = 'del';
               self.$emit('refreshList', val, self.curSheet);
             }
           });
         } else {
-          self.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+          util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
           return false;
         }
         self.allchecked = false;
       }).catch(err => {
         console.log('RouteDetail-confirmDeleteSingle: ' + err);
       });
+    },
+
+    updateDeleteContentDialogFlag(val, key) {
+      this[key] = val;
+    },
+
+    hideDeleteContentDialog(key) {
+      this[key] = false;
     },
 
     setItem() {
@@ -657,24 +567,15 @@ export default {
     },
 
     emptyImport() {
-      const self = this;
       document.getElementById('uploadFile').click();
     },
 
     checkBeforeImport() {
       const self = this;
       if (self.checkValue === self.addPatrol && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
-        self.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
         return false;
       }
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     }
 
   }
@@ -698,13 +599,7 @@ export default {
     @mixin point($poi,$val){
         #{$poi}:checkRem($val);
     }
-    *{
-      font-family:Roboto, Arial,  'Microsoft YaHei';
-      box-sizing: content-box;
-    }
-    .iconfont{
-      font-size: calc(24/1920*100vw);
-    }
+
     .ul_style{
         background-color:#f7f8fb;
         border:1px solid #dfe2e9;
@@ -760,82 +655,10 @@ export default {
             }
         }
         .route-btns{
-            float: right;
-            margin-right:calc(20/1920*100vw);
-            display: flex;
-            align-items: center;
-            .noAllow{
-                cursor:not-allowed;
-                opacity: 0.6;
-            }
-            .el-delete-btn{
-                border-color:  $mainColor;
-                color: $mainColor;
-                border-radius: 0px;
-                font-size: 12px;
-                &:disabled{
-                    opacity: 0.5;
-                }
-            }
-            .en-el-delete-btn{
-              border-color:  $mainColor;
-              color: $mainColor;
-              border-radius: 0px;
-              font-size: calc(14/1920*100vw);
-              padding: 0 0;
-              width: calc(130/1920*100vw);
-              .icon-shanchu{
-                font-size: calc(24/1920*100vw);
-              }
-              &:disabled{
-                opacity: 0.5;
-              }
-            }
-            .el-set-btn{
-                border-color:  $mainColor;
-                color: #fff;
-                border-radius: 0px;
-                font-size: 12px;
-                &:disabled{
-                    opacity: .5;
-                }
-            }
-            .en-el-set-btn{
-              border-color:  $mainColor;
-              color: #fff;
-              border-radius: 0px;
-              font-size: calc(14/1920*100vw);
-              height: calc(36/1920*100vw);
-              padding: 0;
-              width: calc(130/1920*100vw);
-              &:disabled{
-                opacity: .5;
-              }
-              @media screen and (min-width: 1440px) {
-                  width: calc(130/1920*100vw);
-              }
-              @media screen and (max-width: 1440px) {
-                  width: 125px;
-              }
-            }
-            .btn-class{
-              height: calc(36/1920*100vw);
-              padding: 0;
-              font-size: calc(14/1920*100vw);
-              width: calc(130/1920*100vw);
-              border-radius: 3px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              min-height: 28px;
-              .iconfont{
-                font-size: calc(16/1920*100vw);
-                margin-right: calc(8/1920*100vw);
-              }
-              @media screen and (max-width: 1440px) {
-                width: 100px;
-              }
-          }
+          float: right;
+          margin-right:calc(20/1920*100vw);
+          display: flex;
+          align-items: center;
         }
     }
     #el-menuscrollbar{
@@ -901,11 +724,27 @@ export default {
                 float: left;
                 width: calc((100% - 405px) * 15.3/29);
             }
+            .score-item-description-title{
+              float: left;
+              width: calc((100% - 405px) * 11/29);
+            }
             .score-title{
                 float: left;
                 width: calc((100% - 405px) * 9/29);
                 padding: 0 10px;
                 text-align: center;
+            }
+            .total-score{
+               @extend .score-title;
+               width: calc((100% - 405px) * 2.5/29);
+             }
+            .options-title{
+              @extend .score-title;
+              width: calc((100% - 405px) * 4/29);
+            }
+            .limitation-title{
+              @extend .score-title;
+              width: calc((100% - 405px) * 6/29);
             }
             .handle-title{
                 float: left;
