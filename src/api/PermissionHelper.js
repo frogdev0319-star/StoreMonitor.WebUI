@@ -7,15 +7,17 @@ export default class PermissionHelper {
    * index(2) => ID(4): Event
    * index(3) => ID(8): Statistics
    * index(4) => ID(16): Settings
+   * index(5) => ID(16): Video/Message
    */
   static data = [];
 
   static setData(data) {
+    console.log(data);
     (data.length > 0) && (this.data = data);
   }
 
   static enableAuthorities(index, bigEndian, littleEndian) {
-    if (this.data.length == 0) {
+    if (this.data.length === 0) {
       return true;
     }
 
@@ -123,6 +125,15 @@ export default class PermissionHelper {
     return this.enableAuthorities(4, 0x0, 0x10);
   }
 
+  // index(5) => ID(32): Video/Message
+  static enableVideo() {
+    console.log('enableVideo' + this.enableAuthorities(5, 0x0, 0x1))
+    return this.enableAuthorities(5, 0x0, 0x1);
+  }
+  static enableMessage() {
+    console.log('enableVideo' + this.enableAuthorities(5, 0x0, 0x2))
+    return this.enableAuthorities(5, 0x0, 0x2);
+  }
   static getInterget() {
     const big = new Uint64BE(0x1, 0x1);
   }
