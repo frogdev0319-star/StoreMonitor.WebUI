@@ -37,22 +37,27 @@
         </el-button>
       </el-col>
       <el-col :span="18" class="el-route-tabs" :style="{'min-height':varyWindowWidth - 250 +'px'}">
+        <div class="loading_area self-loading"
+             :element-loading-text="$t('insSettingView.loadingbindstore')"
+             v-loading="isLoading">
+        </div>
         <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick"
                  :style="{'min-height':varyWindowWidth - 250 +'px'}">
           <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label"
-                       :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false"
-                       class="self-loading"
-                       :element-loading-text="$t('insSettingView.loadingbindstore')"
-                       v-loading="isLoading">
+                       :name="index.toString()" :closable ="index !== 0 && index !== 1 ? true : false">
             <el-tabs v-if="item.data.length !== 0 && !isLoading" id="patrltabs-content" v-model="patrolActive"
                      :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol" >
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
                 <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{ _item.name }}</span>
-                <div v-if="_item.routeData">
+                <div v-if="_item.routeData && !loading">
                   <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name"
                                 :down-src="downLoadSrc" :all-routedata="_item.allRoutedata"
                                 :sheet-name="_item.sheetName" :tab-name="_item.name" @refreshList="getTagList"
                                 @change-routeData="changerouteData"/>
+                </div>
+                <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
+                  <img :src="loadingGif">
+                  <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
                 </div>
               </el-tab-pane>
             </el-tabs>
