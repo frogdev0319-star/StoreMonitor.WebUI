@@ -408,7 +408,8 @@ export default {
     'signature': 'Signature',
     'excellent': 'Excellent',
     'signatureAndPic': 'Signature & Picture',
-    'loading': 'Loading...'
+    'loading': 'Loading...',
+    'noVideoAccess': 'No video access, please contact system administrator'
   },
 
   // event Management page language
@@ -458,10 +459,10 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
-    'addTitleItem':'Add Inspection Items',
-    'editTitleItem':'Edit Inspection Items',
-    'enterScore':'Please enter the score',
-    'sheetscore3_des':'(Separate numbers with "/")',
+    'addTitleItem': 'Add Inspection Items',
+    'editTitleItem': 'Edit Inspection Items',
+    'enterScore': 'Please enter the score',
+    'sheetscore3_des': '(Separate numbers with "/")',
     'rangeScoreTips': 'The lowest value of the total score shall not be higher than the highest value',
     'ruleInspect': 'Rule Settings',
     'PatrolScoreCalculation': 'Inspection score calculation',
@@ -474,8 +475,8 @@ export default {
     'setMinScore': 'lowest',
     'setMaxScore': 'highest',
     'isCheckSuggest': 'Recommended value for inspection',
-    'isCheckAnnex':'Inspection attachments',
-    'AllowPhotos':'Supporting live photos only (picture / video)',
+    'isCheckAnnex': 'Inspection attachments',
+    'AllowPhotos': 'Supporting live photos only (picture / video)',
     'PSCrule1': 'When combined with other tabs, the ',
     'PSCrule2': ' project score will participate in the evaluation of the total score calculation',
     'PSCrule3': 'Calculate the score of ignored items in',
@@ -505,7 +506,7 @@ export default {
     'item': 'items',
     'relationDuty': 'Related Jobs',
     'isExportPDF': 'Exporting pdf',
-    'Inspector': 'Please select inspector',
+    'Inspector': 'Please select task executor',
     'inspectName': 'Name',
     'inspectionDescp': 'Descriptions',
     'sheetscore0': 'Total score',
@@ -548,11 +549,11 @@ export default {
     'excelIllegalCategory': "llegal characters '@#￥%^&*'!",
     'excelEmpty': "The inspection category and item name can't empty",
     'passfailexcelEmpty': "The inspection item can't empty",
-    'excelPassFailScoreType': 'Score:Optional,  0.5~50points',
+    'excelPassFailScoreType': 'Score:Optional, 0.5~50points',
     'excelFullScoreType': 'Total Score: Required, 0~50points',
     'excelMinScoreType': 'Anomaly Events-Score Threshold: Optional, -50 point~Total Score',
     'excelScoreItemType': 'Score Options: Required, -50~full marks',
-    'excelOtherScoreType': 'Score:Required,  -100~100points',
+    'excelOtherScoreType': 'Score:Required, -100~100points',
     'excelScoreItemEmpty': 'The score options cannot be empty!',
     'setScoreItemRange': 'The value range is -50~full marks!',
     'setFullScoreRange': 'The value range is 0~50!',
@@ -794,7 +795,7 @@ export default {
   // Schedule Management page language
   'scheduleView': {
     'noscheduleInspect': 'Please select the inspection list associated with the schedule',
-    'emptyAssignedTo': 'Please select inspector',
+    'emptyAssignedTo': 'Please select executor',
     'schedule': 'Schedule',
     'scheduleName': 'Schedule Name',
     'scheduleNameRuletip': 'Enter up to 30 characters',

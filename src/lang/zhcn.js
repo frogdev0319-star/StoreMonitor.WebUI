@@ -357,7 +357,7 @@ export default {
     'eventTitle': '问题名称',
     'eventStatus': '问题状态',
     'untreated': '未处理',
-    'getAccessTokenError': '获取AccessToken失败',
+    'getAccessTokenError': '获取Access Token失败',
     'partolError': '无效的设备，请联系管理员',
     'accessTokenError': '设备繁忙，请稍后重试',
     'noHistoryVideo': '回放时间段无录像',
@@ -414,7 +414,8 @@ export default {
     'signature': '签名',
     'excellent': '优秀',
     'signatureAndPic': '签名与照片',
-    'loading': '加载中...'
+    'loading': '加载中...',
+    'noVideoAccess': '无视频查看权限，请联系系统管理员'
   },
 
   // event Management page language
@@ -513,7 +514,7 @@ export default {
     'item': '个巡检项目',
     'relationDuty': '关联职务',
     'isExportPDF': '正在导出PDF',
-    'Inspector': '请选择巡检人',
+    'Inspector': '请选择任务执行者',
     'inspectName': '巡检项名称',
     'inspectionDescp': '巡检项目详细说明',
     'sheetscore0': '项目总分值',

@@ -414,7 +414,8 @@ export default {
     'signature': '簽名',
     'excellent': '優秀',
     'signatureAndPic': '簽名與照片',
-    'loading': '加載中...'
+    'loading': '加載中...',
+    'noVideoAccess': '無視頻查看權限，請聯系系統管理員'
   },
 
   // event Management page language
