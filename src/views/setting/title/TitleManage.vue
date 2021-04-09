@@ -16,20 +16,6 @@
         row-class=""
         @handleOperation="handleEmitOperation"/>
     </div>
-    <dialog-pop
-      :title="$t('titleView.confirmInfo')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :visible="showDeleteDialog"
-      @visibleChangeHandler="updateDialogFlag"
-      @cancelHandler="hideDeleteDialog"
-      @confirmHandler="deleteTitle"
-    >
-      <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
-        <div class="dialog-content">{{ deleteInfo }}</div>
-      </div>
-    </dialog-pop>
   </div>
 </template>
 
@@ -37,18 +23,14 @@
 import { titleRESTful } from '@/api/index';
 import { mapGetters } from 'vuex';
 import util from '@/common/util';
-import DialogPop from '@/components/DialogPop';
 import TablePagination from '@/components/TablePagination';
 
 export default {
   name: 'TitleManage',
-  components: { TablePagination, DialogPop },
+  components: { TablePagination },
   data() {
     return {
       tableData: [],
-      showDeleteDialog: false,
-      deleteIds: [],
-      deleteInfo: this.$t('titleView.confirmDeleteTitle'),
       noData: this.$t('deviceView.noData'),
       isLoadingData: true,
       columnData: [
@@ -59,13 +41,10 @@ export default {
           'maxWidth': 130
         },
         {
-          'prop': 'roleId',
+          'prop': 'createTime',
           'label': this.$t('titleView.createTime'),
           'width': 130,
-          'maxWidth': 130,
-          formatter: (cellValue) => {
-            return cellValue.length > 0 ? cellValue : '--';
-          }
+          'maxWidth': 130
         },
         {
           'prop': 'comment',
@@ -73,7 +52,7 @@ export default {
           'width': 130,
           'maxWidth': 130,
           formatter: (cellValue) => {
-            return cellValue.length > 0 ? cellValue : '--';
+            return cellValue || '--';
           }
         }
       ],
@@ -86,11 +65,6 @@ export default {
             lable: '',
             icon: 'icon-gengduo',
             methods: 'set'
-          },
-          {
-            lable: '',
-            icon: 'icon-shanchu',
-            methods: 'delete'
           }
         ]
       },
@@ -125,49 +99,11 @@ export default {
         });
     },
 
-    updateDialogFlag(val) {
-      this.showDeleteDialog = val;
-    },
-
-    hideDeleteDialog() {
-      this.showDeleteDialog = false;
-    },
-
-    deleteTitle() {
-      this.deleteUserTitle().then(res => {
-        if (res.errCode === 0) {
-          util.notify(this.$t('titleView.deleteSuss'), 'success', 3000);
-        } else {
-          util.notify(res.errMsg, 'warning', 3000);
-        }
-        this.getTitleList();
-        this.showDeleteDialog = false;
-      }).catch(error => {
-        console.log('TitleManagement-deleteTitle: ' + error);
-      });
-    },
-
-    deleteUserTitle() {
-      const params = {};
-      params.titleIds = this.deleteIds;
-      return new Promise((resolve, reject) => {
-        titleRESTful.deleteTitle(params).then(res => {
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
     handleEmitOperation(methodsAndRowObj) {
       const method = methodsAndRowObj.method;
       switch (method) {
         case 'set': {
           this.updateTitle(methodsAndRowObj.row);
-          break;
-        }
-        case 'delete': {
-          this.showDeleteDialogMethod(methodsAndRowObj.row);
           break;
         }
         default: {
@@ -179,13 +115,6 @@ export default {
     updateTitle(row) {
       this.$router.push({ name: 'titleSetting' });
       sessionStorage.setItem('titleInfo', JSON.stringify(row));
-    },
-
-    showDeleteDialogMethod(row) {
-      this.deleteIds = [];
-      this.deleteIds.push(row.id);
-      this.deleteInfo = this.$t('titleView.confirmDeleteTitle');
-      this.showDeleteDialog = true;
     }
 
   }
