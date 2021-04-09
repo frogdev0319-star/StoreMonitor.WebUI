@@ -711,8 +711,9 @@ export default {
         self.allEventData = [];
         self.getEventsNum();
         self.storeEventList = [];
-        self.storeEventsOptions.dataset.source = [];
+        self.storeEventsOptions && (self.storeEventsOptions.dataset.source = []);
         self.getEventBySourcePie();
+        self.isLoading = false;
       } else {
         self.params.filter = { page: self.page - 1, size: self.sizeNum };
         self.params.order = this.order;
