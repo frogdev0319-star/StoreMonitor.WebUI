@@ -30,7 +30,7 @@
         </div>
         <div class="header-mul-select">
           <span class="mul-label">{{ $t('overview.patrolLists') }}</span>
-          <el-select v-model="inspectId" size="mini" class="el-province" @change="searchData">
+          <el-select v-model="inspectTagId" size="mini" class="el-province" @change="searchData">
             <el-option
               v-for="(item, index) in inspectList"
               :key="index"
@@ -528,7 +528,7 @@ export default {
       elPDFtableData: [],
       htmlTitle: this.$t('overview.htmltopdfC'),
       defaultSort: { prop: 'completionRateStr', order: 'ascending' },
-      inspectId: null,
+      inspectTagId: null,
       inspectList: []
     };
   },
@@ -545,15 +545,14 @@ export default {
         this.params = {};
         this.getSearchParams();
         this.initDaysRange();
-        this.initData();
       }
     }
   },
 
-  created() {
+  async created() {
+    this.getInspctList();
     this.getSearchParams();
     this.initDaysRange();
-    this.initData();
   },
 
   methods: {
@@ -761,11 +760,11 @@ export default {
     },
 
     async searchData() {
-      let self = this;
-      self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.params.order = { direction: self.direction, property: self.property };
-      self.params.inspectId = parseInt(self.inspectId);
-      await self.getInspectPersonTable();
+      this.params.filter = { page: this.page - 1, size: this.sizeNum };
+      this.params.order = { direction: this.direction, property: this.property };
+      this.params.inspectTagId = parseInt(this.inspectTagId);
+      this.saveSearchParams();
+      await this.getInspectPersonTable();
     },
 
     getInspectScheduleImplemention(params) {
@@ -987,9 +986,12 @@ export default {
         this.property = searchParams.order.property;
         this.params.filter = searchParams.filter;
         this.params.order = searchParams.order;
-        this.params.roleId = searchParams.roleId;
-        this.ModelPost = searchParams.roleId;
-        this.inspectId = searchParams.inspectId;
+        if (!searchParams.inspectTagId) {
+          this.params.inspectTagId = this.inspectTagId;
+        } else {
+          this.params.inspectTagId = searchParams.inspectTagId;
+          this.inspectTagId = searchParams.inspectTagId;
+        }
         this.setDefaultSort();
       } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
@@ -998,36 +1000,33 @@ export default {
         this.params.endTs = end;
         this.params.filter = { page: this.page - 1, size: this.sizeNum };
         this.params.order = { direction: this.direction, property: this.property };
-        this.params.roleId = parseInt(this.ModelPost);
-        this.ModelPost = 3;
-        this.inspectId = null;
+        this.params.inspectTagId = this.inspectTagId;
         this.defaultSort = { prop: 'completionRateStr', order: 'ascending' };
       }
     },
 
     setDefaultSort() {
       this.defaultSort.order = this.direction === 'asc' ? 'ascending' : 'descending';
-      this.defaultSort.prop = this.property === 'completionRate' ? 'completionRateStr': this.property;
-    },
-
-    initData() {
-      this.getInspctList();
-      this.getInspectPersonTable();
+      this.defaultSort.prop = this.property === 'completionRate' ? 'completionRateStr' : this.property;
     },
 
     getInspctList() {
-      inpectRESTful.GetInspectTagList().then(res => {
-        if (res.errCode === 0) {
-          this.inspectList = res.data;
-          this.inspectId = this.inspectList.length > 0 ? this.inspectList[0].id : null;
-        }
-      }).catch(err => {
-        console.log('SupervisorStatistics-getInspctList:' + err);
+      return new Promise((resolve, reject) => {
+        inpectRESTful.GetInspectTagList().then(res => {
+          if (res.errCode === 0) {
+            this.inspectList = res.data;
+            this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : null;
+            this.getInspectPersonTable();
+            resolve(res);
+          }
+        }).catch(err => {
+          console.log('SupervisorStatistics-getInspctList:' + err);
+        })
       })
     },
 
     async getInspectPersonTable() {
-      this.saveSearchParams();
+      this.params.inspectTagId = this.inspectTagId;
       this.getInspectStatsPersonInfo(this.params).then(res => {
         const errCode = res.errCode;
         if (errCode === 0) {
