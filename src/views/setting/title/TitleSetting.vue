@@ -14,14 +14,14 @@
           <div class="access-video">
             <span class="required-name">*</span>
             <div class="title-description">{{ $t('titleView.canAccessVideo') }}</div>
-            <el-radio-group v-model="infoForm.roleId">
+            <el-radio-group v-model="ifAccessVideo">
               <el-radio v-for="(item, index) in accessVideoList" :label="item.value" :key="index">{{ item.label }}</el-radio>
             </el-radio-group>
           </div>
           <div class="access-video">
             <span class="required-name">*</span>
             <div class="title-description">{{ $t('titleView.canReceiveMessage') }}</div>
-            <el-radio-group v-model="infoForm.roleId">
+            <el-radio-group v-model="ifReceiveMes">
               <el-radio v-for="(item, index) in accessVideoList" :label="item.value" :key="index">{{ item.label }}</el-radio>
             </el-radio-group>
           </div>
@@ -56,10 +56,10 @@
       </div>
       <div class="role-list">
         <div v-if="showRolesList" class="template-info">
-          <el-radio-group v-model="roleId">
+          <el-radio-group v-model="templateRoleId">
             <el-radio v-for="(item, index) in roleList" :label="item.value" :key="index">{{ item.label }}</el-radio>
           </el-radio-group>
-          <delay-button size="mini" type="primary" @click="saveBasicInfo">{{ $t('titleView.useAndSave') }}</delay-button>
+          <delay-button size="mini" type="primary" @click="saveTemplateTitle">{{ $t('titleView.useAndSave') }}</delay-button>
         </div>
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group">
@@ -183,11 +183,6 @@ export default {
               roleName: this.$t('route.transactionMonitor'),
               checked: false,
               disabled: false
-            },
-            {
-              roleName: this.$t('route.storeChecking'),
-              checked: false,
-              disabled: true
             }
           ]
         },
@@ -251,12 +246,12 @@ export default {
           disabled: false,
           children: [
             {
-              roleName: this.$t('route.inspectListSetting'),
+              roleName: this.$t('route.deviceManage'),
               checked: false,
               disabled: false
             },
             {
-              roleName: this.$t('route.deviceManage'),
+              roleName: this.$t('route.inspectListSetting'),
               checked: false,
               disabled: false
             },
@@ -276,23 +271,24 @@ export default {
       tempRoleNameList: [],
       authorityInfoLists: [],
       lang: this.$i18n.locale,
-      roleId: 0
+      roleId: 0,
+      templateRoleId: 0,
+      ifAccessVideo: 0,
+      ifReceiveMes: 0
     };
   },
 
   watch: {
-    roleId(newValue, oldValue) {
-      if (oldValue !== 0) {
-        this.roleNameList = this.tempRoleNameList;
-        this.roleNameList.forEach(item => {
-          item.checked = false;
-          item.children.forEach(_item => {
-            _item.checked = false;
-            _item.disabled = false;
-          });
+    templateRoleId(newValue, oldValue) {
+      this.roleNameList = this.tempRoleNameList;
+      this.roleNameList.forEach(item => {
+        item.checked = false;
+        item.children.forEach(_item => {
+          _item.checked = false;
+          _item.disabled = false;
         });
-        this.getAvailableAuthority(this.authorityInfoLists[newValue - 1].availableAuth);
-      }
+      });
+      this.getAvailableAuthority(this.authorityInfoLists[newValue - 1].availableAuth);
     }
   },
 
@@ -311,8 +307,8 @@ export default {
       const data = sessionStorage.getItem('titleInfo');
       this.infoForm = JSON.parse(data);
       this.roleId = this.infoForm.roleId;
-      const comment = filterString.all(this.infoForm.comment, 200);
-      const commentLength = filterString.getContentLength(comment);
+      const comment = this.infoForm.comment && filterString.all(this.infoForm.comment, 200);
+      const commentLength = this.infoForm.comment && filterString.getContentLength(comment);
       this.curLength = commentLength;
     },
 
@@ -324,7 +320,7 @@ export default {
         });
       }).then(res => {
         self.authorityInfoLists = res.data;
-        self.getAvailableAuthority(this.infoForm.authorities);
+        this.infoForm.authorities.length > 0 ? self.getAvailableAuthority(this.infoForm.authorities) : this.getRequiredAuthority();
       }).catch(err => {
         console.log('TitleSetting-getAuthorityInfoList: ' + err);
       });
@@ -341,7 +337,6 @@ export default {
       this.roleNameList[1].children[3].checked = !!PermissionHelper.enablePatrolTask();
       this.roleNameList[1].children[4].checked = !!PermissionHelper.enableStoreMonitor();
       this.roleNameList[1].children[5].checked = !!PermissionHelper.enableTransactionPatrol();
-      this.roleNameList[1].children[6].checked = !!PermissionHelper.enableStorePointCheck();
 
       this.roleNameList[2].children[0].checked = !!PermissionHelper.enableEventHandle();
       this.roleNameList[2].children[1].checked = !!PermissionHelper.enableEventClose();
@@ -352,17 +347,23 @@ export default {
       this.roleNameList[3].children[1].checked = !!PermissionHelper.enableInspectStatistics();
       this.roleNameList[3].children[2].checked = !!PermissionHelper.enableEventStatistics();
       this.roleNameList[3].children[3].checked = !!PermissionHelper.enableSupervisionEffStatistics();
-
-      this.roleNameList[4].children[0].checked = !!PermissionHelper.enablePatrolSetting();
-      this.roleNameList[4].children[1].checked = !!PermissionHelper.enableDeviceSetting();
+      
+      this.roleNameList[4].children[0].checked = !!PermissionHelper.enableDeviceSetting();
+      this.roleNameList[4].children[1].checked = !!PermissionHelper.enablePatrolSetting();
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableStoreSetting();
       this.roleNameList[4].children[3].checked = !!PermissionHelper.enableScheduleSetting();
 
+      if (authorities.length === 6) {
+        this.ifAccessVideo = PermissionHelper.enableVideo() ? 1 : 0;
+        this.ifReceiveMes = PermissionHelper.enableMessage() ? 1 : 0;
+      }
       this.getRequiredAuthority();
     },
 
     getRequiredAuthority() {
+      this.roleNameList[1].children[2].checked = true;
       this.roleNameList[1].children[2].disabled = true;
+      this.roleNameList[1].children[4].checked = true;
       this.roleNameList[1].children[4].disabled = true;
       this.setParentIfChecked();
     },
@@ -408,6 +409,7 @@ export default {
 
     getTemplateAuthorities() {
       this.showRolesList = true;
+      this.templateRoleId = 1;
       this.getAvailableAuthority(this.authorityInfoLists[this.roleId - 1].availableAuth);
     },
 
@@ -445,6 +447,10 @@ export default {
         });
         this.infoForm.authorities.push(tempAuthorityNum);
       });
+      let videoAndMessNum = Math.pow(2, 5) * decAuthorityNum;
+      this.ifAccessVideo && (videoAndMessNum += Math.pow(2, 0));
+      this.ifReceiveMes && (videoAndMessNum += Math.pow(2, 1));
+      this.infoForm.authorities.push(videoAndMessNum);
     },
 
     updateBasicInformation() {
