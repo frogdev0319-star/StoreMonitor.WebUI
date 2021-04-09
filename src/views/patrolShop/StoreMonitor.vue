@@ -301,6 +301,7 @@
         :is-store-monitor="true"
         :play-back="playBackState"
         :cur-time="playBackTime"
+        :video-authority="videoAuthority"
         @confirmEzvizCanvas="editEzvizCanvas"
       />
       <div class="el-event">
@@ -589,7 +590,7 @@ import filterString from '@/common/filterString.js';
 import { getCookie } from '@/common/auth';
 import { setTimeout } from 'timers';
 import EzvizVideo from '@/components/EzvizVideo.vue';
-import DashHttp from "../../common/DashHttp";
+import DashHttp from '@/common/DashHttp';
 import { getDashServerInfo } from '@/api/device.js';
 
 export default {
@@ -679,7 +680,6 @@ export default {
           label: '60s'
         }
       ],
-      fullScreen: false,
       curBack: '',
       showControls: false,
       showSpread: false,
@@ -750,7 +750,6 @@ export default {
 
       startTs: 0,
       protocal: 'DASH',
-      sessionId: '',
       channel: {},
       isPlayingFlag: -1,
       evBtns: [
@@ -837,7 +836,7 @@ export default {
       fullScreen: false,
       paused: true,
       muted: false,
-      currentState: 'blank', // 'blank','loading','play','inline'
+      currentState: 'blank',
       error: '',
       streamProtocol: 'DASH',
       sessionId: null,
@@ -870,7 +869,8 @@ export default {
     },
 
     ...mapGetters({
-      accountChanged: 'accountChanged'
+      accountChanged: 'accountChanged',
+      videoAuthority: 'videoAuthority'
     }),
 
     corEvent: function() {
@@ -949,7 +949,7 @@ export default {
     self.getUpLoadBucketInfo();
     self.getInitStoreData();
     self.getFaStoreData();
-    self.getDashUrlInfo();
+    this.videoAuthority && self.getDashUrlInfo();
     window.onresize = function() {
       if (!self.checkFull()) {
         self.fullScreen = false;
@@ -2639,11 +2639,16 @@ export default {
 
     async startVideo(IVSID, channelId, startTs) {
       try {
+        if (this.videoAuthority === false) {
+          this.showModelContent = false;
+          this.errorText = this.$t('remotePatrol.videoLicense');
+          return;
+        }
         if (IVSID === null || channelId === null) {
-          let error = this.$t('remotePatrol.dashServerError') + '5';
+          const error = this.$t('remotePatrol.dashServerError') + '5';
           this.currentState = 'blank';
           this.errorText = error;
-          this.showError = true;
+          this.showModelContent = true;
         } else {
           this.isLoading = true;
           if (!await this.stopVideoPlay()) {
@@ -2893,9 +2898,8 @@ export default {
           this.isLoading = false;
         }
       });
-    },
-
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

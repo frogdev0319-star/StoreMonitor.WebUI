@@ -5,8 +5,12 @@
         <img :src="sourceSrc" :height="varyWindowWidth>1366?'40px':'32px'" class="title-img" >
         <span class="event-title">{{ event.eventTitle }}</span>
         <span v-if="event.score!==Math.pow(-2,31)" class="event-score">{{ $t('eventView.scores') }} {{ event.score }}</span>
-        <el-button v-if="showWinpBtn" :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="el-submit"
-                   type="primary" @click="submit">{{ $t('eventView.submit') }}</el-button>
+        <el-button
+          v-if="showWinpBtn"
+          :size="varyWindowWidth > 1680 ? 'small' : 'mini'"
+          class="el-submit"
+          type="primary"
+          @click="submit">{{ $t('eventView.submit') }}</el-button>
       </div>
       <el-dialog
         v-if="dialogFormVisible"
@@ -17,8 +21,11 @@
         top="12%"
         class="rate-video-dialog"
         @close="closeRealTime">
-        <div class="video-dialog-content" style="overflow:hidden;" @mousemove="showControlInfo=true"
-             @mouseleave="showControlInfo = false">
+        <div
+          class="video-dialog-content"
+          style="overflow:hidden;"
+          @mousemove="showControlInfo=true"
+          @mouseleave="showControlInfo = false">
           <hr class="dialog-hr">
           <div v-if="!isEzviz" id="videoContent" class="video-content">
             <div v-if="showControlInfo" id="channelName"><span>{{ curChannel.name }}</span></div>
@@ -44,7 +51,14 @@
               prload
               class="video-js vjs-fill"/>
           </div>
-          <ezviz-video v-else ref="ezvizVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
+          <ezviz-video
+            v-else
+            ref="ezvizVideo"
+            :channel-info="channelInfo"
+            :is-event="isEvent"
+            :store-id="event.storeId"
+            :video-authority="videoAuthority"
+          />
         </div>
       </el-dialog>
       <el-dialog
@@ -120,8 +134,11 @@
         <div class="storeInfo-details">
           <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
             <dd><span :class="lang==='en'? 'en-w3': 'w3'">{{ $t('eventView.submitter') }}：</span></dd>
-            <el-tooltip :popper-class="tooltipClass" :content="event.createor" effect="dark"
-                        placement="bottom-start">
+            <el-tooltip
+              :popper-class="tooltipClass"
+              :content="event.createor"
+              effect="dark"
+              placement="bottom-start">
               <span class="details-info">{{ event.createor }}</span>
             </el-tooltip>
           </div>
@@ -225,8 +242,9 @@
         <el-scrollbar style="height:100%;" class="el-menuscrollbar">
           <div v-if="commentList.length !== 0" id="rightLine"/>
           <div v-for="(item,index) in commentList" :key="index" class="deal-details">
-            <div :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}"
-                 class="circle-content">
+            <div
+              :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}"
+              class="circle-content">
               <div class="circle"/>
             </div>
             <div class="deal-lside">
@@ -247,8 +265,11 @@
               </div>
               <pre v-if="item.description != null" class="description">{{ item.description }}</pre>
               <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="source-content">
-                <div v-for="(_item,_index) in item.sourceList" :key="_index" :height="imgHeight+'px'"
-                     class="source-details">
+                <div
+                  v-for="(_item,_index) in item.sourceList"
+                  :key="_index"
+                  :height="imgHeight+'px'"
+                  class="source-details">
                   <div v-if="_item.mediaType === 2" class="img-content">
                     <img
                       :title="imgTitle"
@@ -275,17 +296,17 @@
   </el-row>
 </template>
 <script>
-import util from '../../../common/util';
+import util from '@/common/util';
 import dashAPI from '@/api/dash';
 import videojs from '../../../../static/video.js';
 import 'videojs-contrib-hls';
 import { eventRESTful } from '@/api/index';
 import AudioVue from '@/components/AudioVue.vue';
-import $ from 'jquery';
-import { getDeviceList } from '@/api/device';
+import { getDetailedStoreInfo } from '@/api/store';
 import EzvizVideo from '@/components/EzvizVideo.vue';
-import PermissionHelper from '../../../api/PermissionHelper';
+import PermissionHelper from '@/api/PermissionHelper';
 import filterString from '@/common/filterString';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'EventDetail',
@@ -353,7 +374,8 @@ export default {
       ivsIdRuletip: false,
       videosourceList: [],
       imgsourceList: [],
-      Changestatus: ''
+      Changestatus: '',
+      videoAuthority: false
     };
   },
   computed: {
@@ -401,7 +423,10 @@ export default {
     isEzviz() {
       const self = this;
       return self.$store.state.user.isEzviz;
-    }
+    },
+    ...mapGetters({
+      videoAuthority: 'videoAuthority'
+    })
   },
   watch: {
     realTimeSpeed(val) {
@@ -499,14 +524,16 @@ export default {
 
     showOuterPhoto(target) {
       const self = this;
-      var winWidth = $(window).width();
-      var winHeight = $(window).height();
       var src = target.src;
       self.bigImgSrc = src;
     },
 
     async realTime() {
       const self = this;
+      if (this.videoAuthority === false) {
+        this.showControlInfo = false;
+        return;
+      }
       self.realTimeSpeed = 0;
       const sessionId = await dashAPI.Online();
       self.sessionId = sessionId;
@@ -626,13 +653,14 @@ export default {
     },
 
     getDeviceList() {
-      const self = this;
+      const params = {};
+      params.storeId = this.event.storeId;
+      params.deviceOnlyoptional = 1;
       return new Promise((resolve, reject) => {
-        getDeviceList().then(res => {
+        getDetailedStoreInfo(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            const data = res.data;
-            resolve(res.data);
+            resolve(res.data.device);
           }
         });
       });
@@ -910,7 +938,7 @@ export default {
           self.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
           return false;
         }
-      }).catch( err => {
+      }).catch(err => {
         console.log('EventDetail-addComment:' + err);
       });
     },

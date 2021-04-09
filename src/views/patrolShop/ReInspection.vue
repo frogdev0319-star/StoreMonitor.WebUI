@@ -329,6 +329,7 @@
           :show-feed-back="showFeedBack"
           :show-feed-dialog2="showFeedDialog2"
           :store-id="store.storeId"
+          :video-authority="videoAuthority"
           @confirmEzvizCanvas="editEzvizCanvas"
           @ezvizCutPictureFeedback="ezvizPictureFeedback"
           @confirmEzvizVideoFeedback="ezvizVideoFeedback"
@@ -657,18 +658,15 @@
   </el-row>
 </template>
 <script>
-import { checkOutInspectItem, submitInspectItem, checkOutInspectItemV3 } from '@/api/inspect';
+import { checkOutInspectItemV3 } from '@/api/inspect';
 import util from '@/common/util';
-import { getStoreList, getFavoriteList, addFavoriteStore, deleteFavoriteStore, getVideoAuthority } from '@/api/store';
+import { getStoreList, getFavoriteList, addFavoriteStore, deleteFavoriteStore, getDetailedStoreInfo } from '@/api/store';
 import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
-import { getStorageInfo } from '@/api/event';
-import { getDeviceList } from '@/api/device';
 import videojs from '../../../static/video.js';
 import DialogVue from '@/components/DialogVue.vue';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import { getCookie } from '@/common/auth';
-import { validateInput } from '@/common/validate';
 import EzvizVideo from '@/components/EzvizVideo.vue';
 import filterString from '@/common/filterString.js';
 import { getDashServerInfo } from '@/api/device.js';
@@ -932,7 +930,6 @@ export default {
       initEzviz: false,
       sourceListLength: 0,
       realTimeSpeed: 0,
-      videoAuthority: false,
       isLoading: false,
       showEventNameInfo: false,
       fromName: '',
@@ -975,7 +972,8 @@ export default {
       return this.varyWindowHeight / 758;
     },
     ...mapGetters({
-      accountChanged: 'accountChanged'
+      accountChanged: 'accountChanged',
+      videoAuthority: 'videoAuthority'
     }),
     ...mapGetters(
       ['isEzviz']
@@ -1054,6 +1052,7 @@ export default {
       next();
     }
   },
+
   async mounted() {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
@@ -1106,13 +1105,13 @@ export default {
       }
     } else {
       self.getFaStoreData();
-      self.getDashUrlInfo();
+      this.videoAuthority && self.getDashUrlInfo();
     }
     document.onmouseup = self.mouseUpAction;
     self.isREC = false;
     self.getUpLoadBucketInfo();
     self.getOssInfo();
-    self.getDeviceList();
+    self.curStoreItem && self.getDeviceList();
     window.onresize = function() {
       if (!self.checkFull()) {
         self.fullScreen = false;
@@ -1196,7 +1195,7 @@ export default {
       self.showError = false;
       self.errorText = '';
       self.getFaStoreData();
-      self.getDeviceList();
+      self.curStoreItem && self.getDeviceList();
     },
     anchorLinkTo() {
       const self = this;
@@ -1226,15 +1225,8 @@ export default {
     },
     async getOssInfo() {
       const self = this;
-      const accountId = await self.getAccountId();
-      console.log(accountId);
+      await self.getAccountId();
       self.accountId = localStorage.getItem('oss_bucket');
-      // getStorageInfo().then(res=>{
-      //     console.log(res);
-      //     if(res.errCode==0){
-      //         self.oss=res.data;
-      //     }
-      // })
     },
     getUpLoadBucketInfo() {
       const self = this;
@@ -1398,11 +1390,15 @@ export default {
           });
       });
     },
+
     getDeviceList() {
       const self = this;
-      getDeviceList().then(res => {
-        if (res.errCode == 0) {
-          const data = res.data;
+      const params = {};
+      params.storeId = this.curStoreItem.storeId
+      params.deviceOnly = 1;
+      getDetailedStoreInfo(params).then(res => {
+        if (res.errCode === 0) {
+          const data = res.data.device;
           self.deviceList = data;
         }
       });
@@ -2165,13 +2161,9 @@ export default {
       const self = this;
       self.noBindDeviceObj.dialogCosed = false;
     },
+
     clickBtn(item, index) {
       const self = this;
-      console.log(item);
-      // if ((self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
       const obj = {
         id: item.id,
         channelId: item.channelId,
@@ -2187,7 +2179,7 @@ export default {
         });
       }
       self.showChannelBtns.forEach((_item, _index) => {
-        if (_index != index) {
+        if (_index !== index) {
           _item.isClick = false;
         }
       });
@@ -2209,15 +2201,10 @@ export default {
       }
     },
     clickItem(item, index) {
-      console.log(item);
       const self = this;
       if (item.isIgnore) {
         return false;
       }
-      // if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       const obj = {};
@@ -2232,7 +2219,7 @@ export default {
           self.channelBtns = [];
           device.forEach(item => {
             self.allChannelBtns.forEach(_item => {
-              if (item.id == _item.id) {
+              if (item.id === _item.id) {
                 self.channelBtns.push(_item);
               }
             });
@@ -2274,13 +2261,6 @@ export default {
           item.disabled = false;
           self.showError = false;
           self.showGuide = false;
-
-          // else{
-          //   if(!self.videoAuthority){
-          //     self.showError = true;
-          //     self.errorText = self.$t('remotePatrol.videoLicense');
-          //   }
-          // }
         }
       } else if (item.deviceId.length == 0) {
         self.noBindDeviceObj.dialogCosed = true;
@@ -2314,13 +2294,7 @@ export default {
         });
       });
     },
-    getInspectByStore(storeId) {
-      const self = this;
-      // self.inspectItemList=[];
-      //   checkOutInspectItemV3(params).then(res=>{
-      //
-      //     })
-    },
+
     leaveDialog() {
       const self = this;
       self.leaveObj.dialogCosed = false;
@@ -2611,6 +2585,11 @@ export default {
 
     async startVideo(IVSID, channelId, startTs) {
       try {
+        if (this.videoAuthority === false) {
+          this.showError = true;
+          this.errorText = this.$t('remotePatrol.videoLicense');
+          return;
+        }
         if (IVSID === null || channelId === null) {
           const error = this.$t('remotePatrol.dashServerError') + '5';
           this.currentState = 'blank';
@@ -3578,20 +3557,7 @@ export default {
         self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
       }
     },
-    getVideoAuthority() {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        getVideoAuthority().then(res => {
-          console.log(res);
-          resolve(res);
-        }).then(result => {
-          self.videoAuthority = result.data.authorized;
-        })
-          .catch(error => {
-            console.log(error);
-          });
-      });
-    },
+
     itemDescriptionChanged(val, item) {
       const content = filterString.all(val, 200);
       console.log(content);
