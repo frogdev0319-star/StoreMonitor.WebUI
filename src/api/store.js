@@ -64,3 +64,11 @@ export const getVideoAuthority = () => {
     method: 'get'
   });
 };
+
+export const getDetailedStoreInfo = params => {
+  return request({
+    url: `${version}/store/info`,
+    method: 'get',
+    params
+  });
+}
