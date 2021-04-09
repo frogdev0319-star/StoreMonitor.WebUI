@@ -71,6 +71,7 @@
 
 <script>
 import { getDeviceList } from '@/api/device';
+import { getDetailedStoreInfo } from '@/api/store';
 import { bindInspectItemV2,
   unbindInspectItemV2,
   checkOutInspectItemV3
@@ -164,9 +165,9 @@ export default {
 
     getChannelByStore(storeId) {
       const self = this;
-      const params = { storeId: storeId };
-      getDeviceList(params).then(res => {
-        const data = res.data;
+      const params = { storeId: storeId, deviceOnly: 1 };
+      getDetailedStoreInfo(params).then(res => {
+        const data = res.data.device;
         const temp = [];
         if (data.length !== 0) {
           data.forEach(item => {
