@@ -389,6 +389,10 @@ export default {
     storeId: {
       type: String,
       default: ''
+    },
+    videoAuthority: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -630,8 +634,12 @@ export default {
     },
 
     async changeHistoryTime(newValue) {
-      console.log('curTime');
       const self = this;
+      if (this.videoAuthority === false) {
+        this.showError = true;
+        this.errorMsg = this.$t('remotePatrol.videoLicense');
+        return;
+      }
       if (!self.channelInfo.id || !self.channelInfo.ivsId) {
         self.showError = true;
         self.errorMsg = self.$t('remotePatrol.lackParams');
@@ -684,6 +692,11 @@ export default {
 
     getEzvizAccessToken(storeId) {
       const self = this;
+      if (this.videoAuthority === false) {
+        this.showError = true;
+        this.errorMsg = this.$t('remotePatrol.videoLicense');
+        return;
+      }
       const params = {};
       params.storeId = storeId;
       return new Promise((resolve, reject) => {
@@ -1195,6 +1208,11 @@ export default {
     async realTime() {
       const self = this;
       self.times = 0;
+      if (this.videoAuthority === false) {
+        this.showError = true;
+        this.errorMsg = this.$t('remotePatrol.videoLicense');
+        return;
+      }
       if (self.isStoreMonitor && !self.isLoaded) {
         self.checkIfEncry();
         self.isLoaded = true;
@@ -1832,7 +1850,7 @@ export default {
     #{$poi}:checkRem($val);
   }
   .errorVideo-model{
-    @include point(margin,20);
+    margin: calc(25/1920*100vw);
     margin-bottom: 0;
     height: auto;
     position: relative;
