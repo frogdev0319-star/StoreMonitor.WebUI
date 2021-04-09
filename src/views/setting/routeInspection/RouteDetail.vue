@@ -46,7 +46,7 @@
               <div v-if="index === 0" class="header-content tabTitle">
                 <el-checkbox v-model="allchecked" class="allcheckBox" @change="changeAllData"/>
                 <span class="name-title">{{ $t('insSettingView.inspectName') }}</span>
-                <span v-if="sheetName.some(x=>x.id === 1 && x.isClick)">
+                <span v-if="isScoreItemActive">
                   <span class="score-item-description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
                   <span class="total-score">{{ $t('insSettingView.sheetscore0') }}</span>
                   <span class="options-title">{{ $t('insSettingView.sheetscore3') }}</span>
@@ -62,7 +62,7 @@
                 <el-checkbox v-model="item.checked" class="all-checkBox" @change="change(item)"/>
                 <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
               </div>
-              <div v-if="item.itemData.length!=0" class="table-class">
+              <div v-if="item.itemData.length !== 0" class="table-class">
                 <el-table
                   :data="item.itemData"
                   :ref="item.refId"
@@ -71,24 +71,27 @@
                   <el-table-column prop="checked" width="70px" align="center">
                     <template slot-scope="scope">
                       <span v-if="scope.row.isNew" class="showNewContent">new</span>
-                      <el-checkbox v-model="scope.row.checked" style="position:relative;bottom:1px;" @change="selectRow(index,item,scope.$index,scope.row)"/>
+                      <el-checkbox
+                        v-model="scope.row.checked"
+                        style="position:relative;bottom:1px;"
+                        @change="selectRow(index,item,scope.$index,scope.row)"/>
                     </template>
                   </el-table-column>
                   <el-table-column prop="name" width="300px"/>
-                  <el-table-column :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'18%':'23%'" prop="description"/>
-                  <el-table-column :min-width="sheetName.some(x=>x.id==1&&x.isClick)?'4%':'15%'" prop="score" align="center">
+                  <el-table-column :min-width="isScoreItemActive?'18%':'23%'" prop="description"/>
+                  <el-table-column :min-width="isScoreItemActive?'4%':'15%'" prop="score" align="center">
                     <template slot-scope="scope">
                       <span>{{ scope.row.score }}<span v-if="lang!='en'">{{ $t('insSettingView.scores') }}</span></span>
                     </template>
                   </el-table-column>
-                  <el-table-column v-if="sheetName.some(x=>x.id==1&&x.isClick)" :min-width="'8%'" prop="score" show-overflow-tooltip align="center">
+                  <el-table-column v-if="isScoreItemActive" :min-width="'8%'" prop="score" show-overflow-tooltip align="center">
                     <template slot-scope="scope">
                       <span>{{ scope.row.availableScores }}</span>
                     </template>
                   </el-table-column>
-                  <el-table-column v-if="sheetName.some(x=>x.id==1&&x.isClick)" prop="qualifiedScore" align="center" min-width="11%">
+                  <el-table-column v-if="isScoreItemActive" prop="qualifiedScore" align="center" min-width="11%">
                     <template slot-scope="scope">
-                      <span>{{ scope.row.qualifiedScore }}<span v-if="lang!='en'">{{ $t('insSettingView.scores') }}</span></span>
+                      <span>{{ scope.row.qualifiedScore }}<span v-if="lang !== 'en'">{{ $t('insSettingView.scores') }}</span></span>
                     </template>
                   </el-table-column>
                   <el-table-column prop="handle" min-width="6%">
@@ -190,6 +193,11 @@ export default {
     };
   },
 
+  computed: {
+    isScoreItemActive() {
+      return this.sheetName.some(item => item.id === 1 && item.isClick);
+    }
+  },
   mounted() {
     this.getNum();
   },
