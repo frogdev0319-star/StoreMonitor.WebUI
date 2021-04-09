@@ -380,6 +380,7 @@ export default {
     });
     window.addEventListener('resize', this.$_isMobile);
     self.isMobile = self.$_isMobile();
+    this.changeRoutes();
     this.getAccountList();
     this.updateTitle();
   },
@@ -602,13 +603,12 @@ export default {
       });
     },
 
-    changeRoutes() {
+    async changeRoutes() {
       const self = this;
-      self.$store.dispatch('GetUserAuthorities').then((result) => {
-        if (result.errCode === 0) {
-          self.$store.dispatch('generateRoutes');
-        }
-      });
+      const result = await self.$store.dispatch('GetUserAuthorities');
+      if (result.errCode === 0) {
+        self.$store.dispatch('generateRoutes');
+      }
     },
 
     getUserName() {
