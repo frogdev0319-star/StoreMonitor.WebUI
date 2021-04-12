@@ -355,7 +355,6 @@
 
 <script>
 import { inpectRESTful, titleRESTful } from '@/api/index';
-import RemoteDetail from '@/views/setting/schedule/RemoteDetail';
 import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
@@ -379,7 +378,6 @@ export default {
 
   components: {
     DelayButton,
-    RemoteDetail,
     DialogPop,
     LimitSelect,
     RegionMultiSelect
@@ -820,31 +818,14 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectTagList(params).then(async res => {
           let data = res.data;
-          let InspectList = [];
           const result = await titleRESTful.getUserTitleList();
           const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
           const filterInspect = [];
-          data.forEach(inspectItem => {
+          data.map(inspectItem => {
             inspectItem.appliedTo.forEach(appliedInspctor => {
               appliedInspctor.id === roleId && filterInspect.push(inspectItem);
             })
           })
-          // this.inspectList = filterInspect;
-          // data.forEach(item => {
-          //   if (item.appliedTo.length !== 0) {
-          //     let isrole = [];
-          //     item.appliedTo.forEach(app_item => {
-          //       isrole.push(app_item);
-          //     });
-          //     if (isrole.length !== 0) {
-          //       let obj = {};
-          //       obj.id = item.id;
-          //       obj.name = item.name;
-          //       obj.roleId = item.appliedTo;
-          //       InspectList.push(obj);
-          //     }
-          //   }
-          // });
           this.InspectList = filterInspect;
           if (this.InspectList.length !== 0) {
             this.inspectId = this.InspectList[0].id;
