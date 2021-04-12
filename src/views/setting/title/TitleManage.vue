@@ -22,7 +22,6 @@
 <script>
 import { titleRESTful } from '@/api/index';
 import { mapGetters } from 'vuex';
-import util from '@/common/util';
 import TablePagination from '@/components/TablePagination';
 
 export default {

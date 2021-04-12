@@ -246,12 +246,12 @@ export default {
           disabled: false,
           children: [
             {
-              roleName: this.$t('route.deviceManage'),
+              roleName: this.$t('route.inspectListSetting'),
               checked: false,
               disabled: false
             },
             {
-              roleName: this.$t('route.inspectListSetting'),
+              roleName: this.$t('route.deviceManage'),
               checked: false,
               disabled: false
             },
@@ -347,9 +347,9 @@ export default {
       this.roleNameList[3].children[1].checked = !!PermissionHelper.enableInspectStatistics();
       this.roleNameList[3].children[2].checked = !!PermissionHelper.enableEventStatistics();
       this.roleNameList[3].children[3].checked = !!PermissionHelper.enableSupervisionEffStatistics();
-      
-      this.roleNameList[4].children[0].checked = !!PermissionHelper.enableDeviceSetting();
-      this.roleNameList[4].children[1].checked = !!PermissionHelper.enablePatrolSetting();
+
+      this.roleNameList[4].children[0].checked = !!PermissionHelper.enablePatrolSetting();
+      this.roleNameList[4].children[1].checked = !!PermissionHelper.enableDeviceSetting();
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableStoreSetting();
       this.roleNameList[4].children[3].checked = !!PermissionHelper.enableScheduleSetting();
 
