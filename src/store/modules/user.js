@@ -1,8 +1,9 @@
 import { loginByUsername, logout, changeAccount, getUserAuthorities } from '@/api/login';
 import { getDashServerInfo } from '@/api/device';
 import { getToken, setToken, removeToken, getCookie, setCookie } from '@/common/auth';
-import PermissionHelper from '../../api/PermissionHelper';
+import PermissionHelper from '@/api/PermissionHelper';
 import router, { resetRouter, constantRoutes, navbarRoute } from '@/router';
+import { getUserTitleList } from '@/api/title';
 
 const user = {
   state: {
@@ -28,7 +29,8 @@ const user = {
     addRoutes: [],
     PatrolHistory: null,
     InspectHistory: null,
-    PatrolComment: ''
+    PatrolComment: '',
+    videoAuthority: false
   },
 
   mutations: {
@@ -102,6 +104,10 @@ const user = {
 
     SET_PatrolComment: (state, PatrolComment) => {
       state.PatrolComment = PatrolComment;
+    },
+
+    SET_Video_Authority: (state, videoAccess) => {
+      state.videoAuthority = videoAccess;
     }
 
   },
@@ -143,7 +149,7 @@ const user = {
     changeAccount({ commit }, params) {
       return new Promise((resolve, reject) => {
         changeAccount(params).then(res => {
-          if (res.errCode == 0) {
+          if (res.errCode === 0) {
             commit('Account_Changed', ++user.state.accountChanged);
             // commit('SET_ACCOUNTID',params.)
             const accountId = params.accountId.toLowerCase();
@@ -210,10 +216,13 @@ const user = {
     },
 
     GetUserAuthorities({ commit }) {
-      return new Promise((resolve,reject) => {
+      return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
           commit('SET_AUTHORITY', res.data.authorities);
-          commit('SET_ROLES', [res.data.roleId]);
+          // getUserTitleList().then(res => {
+          //   console.log(res);
+          // });
+          commit('SET_ROLES', [res.data.title]);
           resolve(res);
         }).catch(error => {
           reject(error);
@@ -267,6 +276,12 @@ const user = {
           'hidden': true
         });
         commit('SET_ROUTES', accessedRoutes);
+        if (user.state.authorities.length === 6) {
+          const videoAccess = !!PermissionHelper.enableVideo();
+          console.log(videoAccess);
+          commit('SET_Video_Authority', videoAccess)
+        }
+        router.addRoutes(accessedRoutes);
         resolve(accessedRoutes);
       });
     },
@@ -278,9 +293,13 @@ const user = {
         // generate accessible routes map based on roles
         const accessRoutes = await dispatch('generateRoutes');
         // dynamically add accessible routes
-        router.addRoutes(accessRoutes);
+        //router.addRoutes(accessRoutes);
         resolve();
       });
+    },
+
+    setVideoAuthority({ commit, dispatch }){
+
     }
   }
 };
