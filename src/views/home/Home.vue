@@ -158,14 +158,15 @@
                       </template>
                       <el-menu-item
                         v-for="grandChild in child.children"
-                        v-show="!grandChild.hidden"
+                        v-if="!grandChild.hidden"
                         :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                         :index="grandChild.path"
                         :disabled="grandChild.isReadOnly"
                         :key="grandChild.path"
                         class="submenu-item" >
                         <template>
-                          <span :class="lang === 'en' ? 'third-child-span' : 'zh-third-child-span'">
+                          <span
+                            :class="lang === 'en' ? 'third-child-span' : 'zh-third-child-span'">
                             {{ $t(`route.${grandChild.name}`) }}</span>
                         </template>
                       </el-menu-item>
@@ -195,7 +196,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.7.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.6.5 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
 
@@ -1745,6 +1746,11 @@ export default {
   li[class*="three-child"] .el-menu-item:first-child{
     margin-top: 0px;
     border-top: 0;
+  }
+  li[class*="three-child"] .el-menu--inline li:last-child:first-child::before,
+  li[class*="three-child"].is-active .el-menu--inline li:last-child:first-child.is-active::before,
+  li[class*="three-child"] .el-menu--inline .el-menu-item:last-child:first-child:hover::before{
+    border-bottom: none;
   }
 </style>
 <style  lang="scss">
