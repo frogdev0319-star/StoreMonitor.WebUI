@@ -349,7 +349,7 @@ import {
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
-import { inpectRESTful } from '@/api/index';
+import { inpectRESTful, titleRESTful } from '@/api/index';
 
 export default {
   name: 'SupervisorStatistics',
@@ -534,7 +534,10 @@ export default {
   },
 
   computed: {
-    ...mapGetters({ accountChanged: 'accountChanged' })
+    ...mapGetters({
+      accountChanged: 'accountChanged',
+      roles: 'roles'
+    })
   },
 
   watch: {
@@ -1012,9 +1015,17 @@ export default {
 
     getInspctList() {
       return new Promise((resolve, reject) => {
-        inpectRESTful.GetInspectTagList().then(res => {
+        inpectRESTful.GetInspectTagList().then(async res => {
           if (res.errCode === 0) {
-            this.inspectList = res.data;
+            const result = await titleRESTful.getUserTitleList();
+            const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
+            const filterInspect = [];
+            res.data.forEach(inspectItem => {
+              inspectItem.appliedTo.forEach(appliedInspctor => {
+                appliedInspctor.id === roleId && filterInspect.push(inspectItem);
+              })
+            })
+            this.inspectList = filterInspect;
             this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : null;
             this.getInspectPersonTable();
             resolve(res);
@@ -1023,6 +1034,17 @@ export default {
           console.log('SupervisorStatistics-getInspctList:' + err);
         })
       })
+    },
+
+    getTitleList() {
+      titleRESTful.getUserTitleList().then(res => {
+        this.isLoadingData = false;
+        this.tableData = res.data;
+      })
+        .catch(err => {
+          this.isLoadingData = false;
+          console.log('TitleManagement-getTitleList: ' + err);
+        });
     },
 
     async getInspectPersonTable() {

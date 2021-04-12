@@ -229,6 +229,7 @@
                       :disabled="false"
                       :input-size="`mini`"
                       :all="$t('storeView.all')"
+                      @changeInput="changeSelectInspector(arguments,item)"
                     />
                     <!--<el-checkbox-group v-model="item.assignedTo">-->
                       <!--<el-checkbox v-for="list_item in inspectorList" :disabled="list_item.disabled"-->
@@ -353,7 +354,7 @@
 </template>
 
 <script>
-import { inpectRESTful } from '@/api/index';
+import { inpectRESTful, titleRESTful } from '@/api/index';
 import RemoteDetail from '@/views/setting/schedule/RemoteDetail';
 import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
@@ -817,27 +818,34 @@ export default {
         mode: val
       };
       return new Promise((resolve, reject) => {
-        inpectRESTful.GetInspectTagList(params).then(res => {
+        inpectRESTful.GetInspectTagList(params).then(async res => {
           let data = res.data;
           let InspectList = [];
-          data.forEach(item => {
-            if (item.appliedTo.length !== 0) {
-              let isrole = [];
-              item.appliedTo.forEach(app_item => {
-                if (app_item.roleId  === 3 || app_item.roleId  === 4) {
-                  isrole.push(app_item);
-                }
-              });
-              if (isrole.length !== 0) {
-                let obj = {};
-                obj.id = item.id;
-                obj.name = item.name;
-                obj.roleId = item.appliedTo;
-                InspectList.push(obj);
-              }
-            }
-          });
-          this.InspectList = InspectList;
+          const result = await titleRESTful.getUserTitleList();
+          const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
+          const filterInspect = [];
+          data.forEach(inspectItem => {
+            inspectItem.appliedTo.forEach(appliedInspctor => {
+              appliedInspctor.id === roleId && filterInspect.push(inspectItem);
+            })
+          })
+          // this.inspectList = filterInspect;
+          // data.forEach(item => {
+          //   if (item.appliedTo.length !== 0) {
+          //     let isrole = [];
+          //     item.appliedTo.forEach(app_item => {
+          //       isrole.push(app_item);
+          //     });
+          //     if (isrole.length !== 0) {
+          //       let obj = {};
+          //       obj.id = item.id;
+          //       obj.name = item.name;
+          //       obj.roleId = item.appliedTo;
+          //       InspectList.push(obj);
+          //     }
+          //   }
+          // });
+          this.InspectList = filterInspect;
           if (this.InspectList.length !== 0) {
             this.inspectId = this.InspectList[0].id;
             this.changePatrolList(this.inspectId, this.isActive);
@@ -982,6 +990,10 @@ export default {
       });
     },
 
+    changeSelectInspector(val, item) {
+      item.assignedTo = Array.from(val)[0];
+    },
+
     addScheduleService() {
       let self = this;
       let params = self.getUpdateScheduleParams();
@@ -992,7 +1004,7 @@ export default {
         }).catch(err => {
           console.log("PatrolSchedule-addScheduleService: " + err);
           reject(err);
-        });;
+        });
       });
     },
 
@@ -1286,7 +1298,7 @@ export default {
       }
       self.bindOrUnbindStore(scheId).then(res => {
         self.getHasBoundStroeIds();
-      }).catch( err =>{
+      }).catch(err => {
         console.log("PatrolSchedule-bindSchedule: " + err);
       });
     },
@@ -1540,7 +1552,7 @@ export default {
         if (val === item.id) {
           item.appliedTo.forEach(_item => {
             const inspectorObj = {};
-            inspectorObj.value = _item.roleId;
+            inspectorObj.value = _item.id;
             inspectorObj.label = _item.name;
             this.inspectorList.push(inspectorObj);
           })
@@ -1804,7 +1816,7 @@ export default {
       params.schedule = tempSchedule;
       params.extra = {
         inspectId: self.inspectId,
-        assignedTo: self.paneList[tabIndex].assignedTo
+        assignedTo: self.paneList[tabIndex].assignedTo.filter(item => item !== '-1')
       };
       return params;
     },
@@ -1907,12 +1919,10 @@ export default {
     },
 
     changeSelectWeek(val, item) {
-      let self = this;
       item.schedule[0].day = Array.from(val)[0];
     },
 
     changeSelectMonth(val, item) {
-      let self = this;
       item.schedule[0].day = Array.from(val)[0];
     },
 
@@ -1953,7 +1963,8 @@ export default {
 
   computed: {
     ...mapGetters({
-      accountChanged: 'accountChanged'
+      accountChanged: 'accountChanged',
+      roles: 'roles'
     })
   }
 };
