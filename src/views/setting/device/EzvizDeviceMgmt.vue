@@ -1,31 +1,7 @@
 <template>
   <el-row :style="{'height':varyWindowHeight-170+'px'}" class="el-device">
     <el-col :span="24" class="el-btns">
-      <div v-if="activeName === 'device'" class="device-btns">
-        <el-input
-          v-if="false"
-          v-model="serachVale"
-          :placeholder="$t('deviceView.searchInfo')"
-          size="small"
-          class="el-search-input"
-          @keyup.enter.native="searchNVRList">
-          <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:7px;left:6px;" @click="searchNVRList"/>
-        </el-input>
-        <el-button
-          v-for="(item,index) in btnList"
-          :key="index"
-          :class="lang === 'en' ? 'en-el-handle-btn' : 'el-handle-btn'"
-          :disabled="index === 2"
-          size="mini"
-          @click="handleNVR(index,item)">
-          <div class="btn-area">
-            <i :class="item.iconClass" style="font-size:24px;"/>
-            <span>{{ item.btnTitle }}</span>
-          </div>
-
-        </el-button>
-      </div>
-      <div v-else style="display: inline-block;position:absolute;z-index: 979;right: 30px;top: 23px;float: right;">
+      <div v-if="activeName === 'ezvizAccount'" class="device-btns">
         <el-button
           :class=" lang === 'en' ? 'en-el-delete-btn' : 'el-delete-btn'"
           size="mini"
@@ -151,11 +127,12 @@
                 <div
                   v-for="(item,index) in nvrData"
                   :key="index"
-                  :class="`${!item.isClick ? 'noraml-color' : 'active-color'}  ${item.comment.length > 0 ? 'tooltip-color' : ''}`"
+                  :class="`${!item.isClick ? 'noraml-color' : 'active-color'}
+                  ${item.comment && item.comment.length > 0 ? 'tooltip-color' : ''}`"
                   class="nvr-data group-title"
                   @click="clickNVR(index,item)" >
                   <div v-if="item.isClick" class="proper-flag"/>
-                  <div :style="{visibility: (item.comment!= '') ? 'visible': 'hidden' }" class="comment-data titles">
+                  <div :style="{visibility: (!item.comment) ? 'visible': 'hidden' }" class="comment-data titles">
                     <el-tooltip
                       :content="item.comment"
                       :popper-class="elTooltipClass"
@@ -2168,7 +2145,6 @@ export default {
         @include point(width,90);
       }
       .device-btns{
-        display: none;
         position:absolute;
         z-index: 979;
         right: 30px;

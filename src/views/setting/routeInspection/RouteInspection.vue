@@ -539,7 +539,7 @@ export default {
                 } else {
                   ti_item.userTitles.forEach(u_item => {
                     usertext.push(u_item.titleName);
-                    te_item['ModelPost'] = usertext.toString();// 关联职务
+                    te_item['ModelPost'] = usertext.toString();
                   });
                 }
               } else {
