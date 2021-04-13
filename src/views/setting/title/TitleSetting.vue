@@ -246,12 +246,12 @@ export default {
           disabled: false,
           children: [
             {
-              roleName: this.$t('route.inspectListSetting'),
+              roleName: this.$t('route.deviceManage'),
               checked: false,
               disabled: false
             },
             {
-              roleName: this.$t('route.deviceManage'),
+              roleName: this.$t('route.inspectListSetting'),
               checked: false,
               disabled: false
             },
@@ -348,8 +348,8 @@ export default {
       this.roleNameList[3].children[2].checked = !!PermissionHelper.enableEventStatistics();
       this.roleNameList[3].children[3].checked = !!PermissionHelper.enableSupervisionEffStatistics();
 
-      this.roleNameList[4].children[0].checked = !!PermissionHelper.enablePatrolSetting();
-      this.roleNameList[4].children[1].checked = !!PermissionHelper.enableDeviceSetting();
+      this.roleNameList[4].children[0].checked = !!PermissionHelper.enableDeviceSetting();
+      this.roleNameList[4].children[1].checked = !!PermissionHelper.enablePatrolSetting();
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableStoreSetting();
       this.roleNameList[4].children[3].checked = !!PermissionHelper.enableScheduleSetting();
 
@@ -441,8 +441,14 @@ export default {
       this.roleNameList.forEach((item, index) => {
         let tempAuthorityNum = Math.pow(2, index) * decAuthorityNum;
         item.children.forEach((_item, _index) => {
-          if (_item.checked) {
-            tempAuthorityNum += Math.pow(2, _index);
+          if(_item.checked){
+            if(index === 4 && _index === 0){
+              tempAuthorityNum += Math.pow(2, 1);
+            }else if(index === 4 && _index === 1){
+              tempAuthorityNum += Math.pow(2, 0);
+            }else {
+              tempAuthorityNum += Math.pow(2, _index);
+            }
           }
         });
         this.infoForm.authorities.push(tempAuthorityNum);
