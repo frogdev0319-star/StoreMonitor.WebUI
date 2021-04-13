@@ -219,9 +219,6 @@ const user = {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
           commit('SET_AUTHORITY', res.data.authorities);
-          // getUserTitleList().then(res => {
-          //   console.log(res);
-          // });
           commit('SET_ROLES', [res.data.title]);
           resolve(res);
         }).catch(error => {
@@ -230,7 +227,6 @@ const user = {
       });
     },
 
-    // remove token
     resetToken({ commit }) {
       return new Promise(resolve => {
         commit('SET_TOKEN', '');
@@ -269,37 +265,26 @@ const user = {
           'redirect': '/',
           'hidden': true
         });
-
-        accessedRoutes.push({
-          'path': '*',
-          'redirect': '/',
-          'hidden': true
-        });
         commit('SET_ROUTES', accessedRoutes);
         if (user.state.authorities.length === 6) {
           const videoAccess = !!PermissionHelper.enableVideo();
           console.log(videoAccess);
           commit('SET_Video_Authority', videoAccess)
         }
-        router.addRoutes(accessedRoutes);
         resolve(accessedRoutes);
       });
     },
 
     changeRoutes({ commit, dispatch }) {
       return new Promise(async resolve => {
-        const result = await dispatch('GetUserAuthorities');
+        await dispatch('GetUserAuthorities');
         resetRouter();
         // generate accessible routes map based on roles
         const accessRoutes = await dispatch('generateRoutes');
         // dynamically add accessible routes
-        //router.addRoutes(accessRoutes);
+        router.addRoutes(accessRoutes);
         resolve();
       });
-    },
-
-    setVideoAuthority({ commit, dispatch }){
-
     }
   }
 };
