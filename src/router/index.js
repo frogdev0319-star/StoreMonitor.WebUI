@@ -30,7 +30,8 @@ export const constantRoutes = [
 ];
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
+  mode: 'history', // require service support
+  base: process.env.NODE_ENV === 'development' ? '' : '/storemonitor_ui/',
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 });
