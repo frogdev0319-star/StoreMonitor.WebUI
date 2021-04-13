@@ -43,7 +43,7 @@ export default{
         }
       }
       //self.$router.push('home');
-      window.location.href = window.location.origin + window.location.pathname + '#/home';
+      window.location.href = window.location.origin + window.location.pathname + 'home';
     },
 
     queryURL(hashValue) {
