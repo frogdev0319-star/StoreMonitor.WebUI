@@ -1,232 +1,199 @@
 <template>
   <div :style="{'height':varyWindowHeight-350+'px'}" class="detail-container">
-    <el-row>
-      <el-col :span="24" class="detail-title">
-        <el-dialog
-          v-if="showAddAccount"
-          :title="accountTitle"
-          :visible.sync="showAddAccount"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="30%"
-          top="25vh"
-          left="40vh"
-          class="add-dialog"
+    <el-col :span="24" >
+      <div class="el-table-content">
+        <el-table
+          :data="tableData"
+          :highlight-current-row="true"
+          :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+          :cell-style="cellStyle"
+          align="left"
+          stripe
+          style="width:100%;text-algin:center;border: 0px solid #ebebeb;"
         >
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <el-form
-              ref="accountForm"
-              :model="ezvizAccountInfo"
-              :rules="rules"
-              class="nvrForm"
-              label-position="top"
-              size="mini">
-              <el-form-item
-                v-if="isAdd"
-                :label="$t('deviceView.selectAccountType')"
-                required
-                class="radio-item">
-                <el-radio-group v-model="ezvizAccountInfo.scope">
-                  <el-radio
-                    v-for="item in ezvizScopes"
-                    :key="item.value"
-                    :label="item.value">{{ item.label }}</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <div v-if="ezvizAccountInfo.scope === 0">
-                <el-col :span="24">
-                  <el-form-item :label="`${this.$t('deviceView.mobilePhone')}${this.$t('deviceView.charterSize')}`" :error="errorAccount" prop="ezvizAccount">
-                    <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" @input="ezvizAccountChanged" />
-                  </el-form-item>
-                </el-col>
-                <el-col :span="24">
-                  <el-form-item :label="$t('deviceView.accessKey')" :error="errorAccessKey" prop="accessKey">
-                    <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;" type="password"/>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="24">
-                  <el-form-item
-                    :label="$t('deviceView.authorizedDevices')"
-                    :error="errorAuthDeviceNum"
-                    prop="authorizedDevices">
-                    <el-input
-                      v-model="ezvizAccountInfo.authorizedDevices"
-                      style="width: 100%;"
-                      @input="(val)=>{ezvizAccountInfo.authorizedDevices = val.replace(/[^\d:]/g, '')}" />
-                  </el-form-item>
-                </el-col>
-              </div>
-              <div v-else>
-                <el-row>
-                  <el-col :span="12">
-                    <el-form-item :label="`${this.$t('deviceView.mobilePhone')}${this.$t('deviceView.charterSize')}`" :error="errorAccount" prop="ezvizAccount">
-                      <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span="11" :offset="1">
-                    <el-form-item :label="$t('deviceView.accountName')" prop="accountName">
-                      <el-input v-model="ezvizAccountInfo.accountName" />
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-form-item :label="$t('deviceView.developerService')" required>
-                  <div class="account-list">
-                    <el-form
-                      ref="appForm"
-                      :label-width="varyWindowHeight < 1600 ? '90px' : '120px'"
-                      :model="ezvizAccountInfo"
-                      :rules="rules.appRules"
-                      label-position="left"
-                      class="ezviz-account"
-                      size="mini">
-                      <el-form-item label="AppKey" prop="appKey">
-                        <el-input v-model="ezvizAccountInfo.appKey" :type="isAdd ? '': 'password'" />
-                      </el-form-item>
-                      <el-form-item label="AppSecret" prop="appSecret">
-                        <el-input v-model="ezvizAccountInfo.appSecret" :type="isAdd ? '': 'password'"/>
-                      </el-form-item>
-                      <el-form-item
-                        :error="errorMsg"
-                        prop="accessToken"
-                        label="AccessToken"
-                        class="access-token" >
-                        <el-input
-                          ref="tokenInput"
-                          v-model="ezvizAccountInfo.accessToken"
-                          :type="isAdd ? '': 'password'"
-                          readonly/>
-                        <el-button class="get-button" @click.prevent="getAccessToken()">
-                          {{ $t('deviceView.obtain') }}
-                        </el-button>
-                      </el-form-item>
-                    </el-form>
-                  </div>
-                </el-form-item>
-              </div>
-              <el-col :span="24">
-                <el-form-item :label="$t('deviceView.comment')" prop="comment" class="comment-item">
-                  <el-input
-                    v-model="ezvizAccountInfo.comment"
-                    style="width: 100%;"
-                    type="textarea"
-                    @input="commentChange"
-                    @blur="notShowInputRuleTips"/>
-                </el-form-item>
-                <span class="text" style="float: right;color: #909399;">{{ curLength }}/100</span>
-                <span v-if="commentRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
-              </el-col>
-            </el-form>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showAddAccount = false">
-              {{ $t('deviceView.cancle') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="addAccount">
-              {{ isAdd ? $t('deviceView.confirmAdd') : $t('deviceView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
-      </el-col>
-      <el-col :span="24" >
-        <div class="el-table-content">
-          <el-table
-            :data="tableData"
-            :highlight-current-row="true"
-            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
-            :cell-style="cellStyle"
-            align="left"
-            stripe
-            style="width:100%;text-algin:center;border: 0px solid #ebebeb;"
-          >
-            <el-table-column
-              v-for="(item,index) in tableInfoData"
-              :key="index"
-              :prop="item.prop"
-              :label="item.label"
-              :min-width="item.width"/>
-            <el-table-column
-              :label="$t('deviceView.operation')"
-              prop="option"
-              min-width="90"
-              align="left">
-              <template slot-scope="scope">
-                <i class="iconfont icon-bianji" style="cursor: pointer; margin-right: 20px" @click="updateAccount(scope.row)"/>
-                <i class="iconfont icon-shanchu" style="cursor: pointer;" @click="showDeleteAccountDialog(scope.row)"/>
-              </template>
-            </el-table-column>
-            <div slot="empty">
-              <div>
-                <i class="iconfont icon-zhengque empty-data-icon"/>
-                <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262'}">{{ noData }}</span>
-              </div>
+          <el-table-column
+            v-for="(item,index) in tableInfoData"
+            :key="index"
+            :prop="item.prop"
+            :label="item.label"
+            :min-width="item.width"/>
+          <el-table-column
+            :label="$t('deviceView.operation')"
+            prop="option"
+            min-width="90"
+            align="left">
+            <template slot-scope="scope">
+              <i class="iconfont icon-bianji" style="cursor: pointer; margin-right: 20px" @click="updateAccount(scope.row)"/>
+              <i class="iconfont icon-shanchu" style="cursor: pointer;" @click="showDeleteAccountDialog(scope.row)"/>
+            </template>
+          </el-table-column>
+          <div slot="empty">
+            <div>
+              <i class="iconfont icon-zhengque empty-data-icon"/>
+              <span :style="{'margin-left':'20px','font-size':'16px','color':'#4b5262'}">{{ noData }}</span>
             </div>
-          </el-table>
-        </div>
-      </el-col>
-      <el-dialog
-        v-if="showDeleteAccount"
-        :title="$t('deviceView.deleteAccount')"
-        :visible.sync="showDeleteAccount"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        width="28%"
-        top="35vh"
-        left="40vh">
-        <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #dfe2e9;">
-          <p style="margin: 20px 20px 20px 26px;">
-            <i
-              class="el-icon-warning"
-              style="font-size:26px;margin-right:20px;color:#FF9803;
-            display: inline-block; vertical-align: middle"/>
-            <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.confirmDelete') }}</span>
-          </p>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteAccount = false">
-            {{ $t('deviceView.cancle') }}
-          </el-button>
-          <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteAccount()">
-            {{ $t('deviceView.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showDeleteStoreVueAccount"
-        :title="$t('deviceView.deleteAccount')"
-        :visible.sync="showDeleteStoreVueAccount"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        width="28%"
-        top="35vh"
-        left="40vh">
-        <div class="dialog-content" style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #dfe2e9;">
-          <el-form
-            ref="accountForm"
-            :model="ezvizAccountInfo"
-            :rules="rules"
-            class="nvrForm"
-            label-position="top"
-            size="mini">
+          </div>
+        </el-table>
+      </div>
+    </el-col>
+    <dialog-pop
+      :title="$t('deviceView.deleteAccount')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showDeleteAccount"
+      @visibleChangeHandler="updateDeleteAccountDialogFlag($event, 1)"
+      @cancelHandler="hideDeleteAccountDialog(1)"
+      @confirmHandler="deleteAccount"
+    >
+      <div class="dialog-slot">
+        <i class="el-icon-warning dialog-icon"/>
+        <div class="dialog-content">{{ $t('deviceView.confirmDelete') }}</div>
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :is-form="true"
+      :title="$t('deviceView.deleteAccount')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showDeleteStoreVueAccount"
+      @visibleChangeHandler="updateDeleteAccountDialogFlag($event, 0)"
+      @cancelHandler="hideDeleteAccountDialog(0)"
+      @confirmHandler="deleteAccount">
+      <div class="form-slot">
+        <el-form
+          ref="accountForm"
+          :model="ezvizAccountInfo"
+          :rules="rules"
+          class="nvrForm"
+          label-position="top"
+          size="mini">
+          <el-col :span="24">
+            <el-form-item :label="$t('deviceView.accessKey')" :error="errorAccessKey" prop="accessKey">
+              <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;" type="password"/>
+            </el-form-item>
+          </el-col>
+        </el-form>
+      </div>
+    </dialog-pop>
+
+    <dialog-pop
+      :is-form="true"
+      :title="accountTitle"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showAddAccount"
+      :confirm-context="isAdd ? $t('deviceView.confirmAdd') : $t('deviceView.confirm')"
+      dialog-width="510px"
+      @visibleChangeHandler="updateAddAccountDialogFlag"
+      @cancelHandler="hideAddAccountDialog"
+      @confirmHandler="addAccount">
+      <div class="form-slot">
+        <el-form
+          ref="accountForm"
+          :model="ezvizAccountInfo"
+          :rules="rules"
+          class="nvrForm"
+          label-position="top"
+          size="mini">
+          <el-form-item
+            v-if="isAdd"
+            :label="$t('deviceView.selectAccountType')"
+            required
+            class="radio-item">
+            <el-radio-group v-model="ezvizAccountInfo.scope">
+              <el-radio
+                v-for="item in ezvizScopes"
+                :key="item.value"
+                :label="item.value">{{ item.label }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <div v-if="ezvizAccountInfo.scope === 0">
+            <el-col :span="24">
+              <el-form-item :label="`${this.$t('deviceView.mobilePhone')}${this.$t('deviceView.charterSize')}`"
+                            :error="errorAccount" prop="ezvizAccount">
+                <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" @input="ezvizAccountChanged" />
+              </el-form-item>
+            </el-col>
             <el-col :span="24">
               <el-form-item :label="$t('deviceView.accessKey')" :error="errorAccessKey" prop="accessKey">
                 <el-input v-model="ezvizAccountInfo.accessKey" style="width: 100%;" type="password"/>
               </el-form-item>
             </el-col>
-          </el-form>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteStoreVueAccount = false">
-            {{ $t('deviceView.cancle') }}
-          </el-button>
-          <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteAccount()">
-            {{ $t('deviceView.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-    </el-row>
+            <el-col :span="24">
+              <el-form-item
+                :label="$t('deviceView.authorizedDevices')"
+                :error="errorAuthDeviceNum"
+                prop="authorizedDevices">
+                <el-input
+                  v-model="ezvizAccountInfo.authorizedDevices"
+                  style="width: 100%;"
+                  @input="(val)=>{ezvizAccountInfo.authorizedDevices = val.replace(/[^\d:]/g, '')}" />
+              </el-form-item>
+            </el-col>
+          </div>
+          <div v-else>
+            <el-row>
+              <el-col :span="12">
+                <el-form-item :label="`${this.$t('deviceView.mobilePhone')}${this.$t('deviceView.charterSize')}`"
+                              :error="errorAccount" prop="ezvizAccount">
+                  <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="11" :offset="1">
+                <el-form-item :label="$t('deviceView.accountName')" prop="accountName">
+                  <el-input v-model="ezvizAccountInfo.accountName" />
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-form-item :label="$t('deviceView.developerService')" required>
+              <div class="account-list">
+                <el-form
+                  ref="appForm"
+                  :label-width="varyWindowHeight < 1600 ? '90px' : '120px'"
+                  :model="ezvizAccountInfo"
+                  :rules="rules.appRules"
+                  label-position="left"
+                  class="ezviz-account"
+                  size="mini">
+                  <el-form-item label="AppKey" prop="appKey">
+                    <el-input v-model="ezvizAccountInfo.appKey" :type="isAdd ? '': 'password'" />
+                  </el-form-item>
+                  <el-form-item label="AppSecret" prop="appSecret">
+                    <el-input v-model="ezvizAccountInfo.appSecret" :type="isAdd ? '': 'password'"/>
+                  </el-form-item>
+                  <el-form-item
+                    :error="errorMsg"
+                    prop="accessToken"
+                    label="AccessToken"
+                    class="access-token" >
+                    <el-input
+                      ref="tokenInput"
+                      v-model="ezvizAccountInfo.accessToken"
+                      :type="isAdd ? '': 'password'"
+                      readonly/>
+                    <el-button class="get-button" @click.prevent="getAccessToken()">
+                      {{ $t('deviceView.obtain') }}
+                    </el-button>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-form-item>
+          </div>
+          <el-col :span="24">
+            <el-form-item :label="$t('deviceView.comment')" prop="comment" class="comment-item">
+              <el-input
+                v-model="ezvizAccountInfo.comment"
+                style="width: 100%;"
+                type="textarea"
+                @input="commentChange"
+                @blur="notShowInputRuleTips"/>
+            </el-form-item>
+            <span class="text" style="float: right;color: #909399;">{{ curLength }}/100</span>
+            <span v-if="commentRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
+          </el-col>
+        </el-form>
+      </div>
+    </dialog-pop>
   </div>
 </template>
 
@@ -234,10 +201,12 @@
 import { ezvizRESTful } from '@/api/index';
 import qs from 'qs';
 import filterString from '@/common/filterString.js';
+import DialogPop from '@/components/DialogPop';
+import util from '@/common/util';
 
 export default {
   name: 'EzvizAccount',
-
+  components: { DialogPop },
   data() {
     const validateEzvizAccount = (rule, value, callback) => {
       const self = this;
@@ -610,14 +579,14 @@ export default {
       try {
         const res = await ezvizRESTful.addEzvizAccount(accountParams);
         if (res.errCode === 0) {
-          self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
+          util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
           self.showAddAccount = false;
         } else {
           const msg = res.errMsg;
           if (self.ezvizAccountInfo.scope === 0) {
             self.setErrorMsg(msg);
           } else {
-            self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+            util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
             self.showAddAccount = false;
           }
         }
@@ -643,14 +612,14 @@ export default {
       try {
         const res = await ezvizRESTful.updateEzvizAccount(accountParams);
         if (res.errCode === 0) {
-          self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           self.showAddAccount = false;
         } else {
           const msg = self.ezvizAccountInfo.scope === 0 ? res.errMsg : self.$t('deviceView.editFail');
           if (self.ezvizAccountInfo.scope === 0) {
             self.setErrorMsg(msg);
           } else {
-            self.notify(msg, 'warning', 3000);
+            util.notify(msg, 'warning', 3000);
             self.showAddAccount = false;
           }
         }
@@ -701,7 +670,7 @@ export default {
       self.errorAccessKey = '';
       const appliedScored = row.appliedStores;
       if (appliedScored > 0) {
-        self.notify(self.$t('deviceView.canotDeleteInfo'), 'warning', 3000);
+        util.notify(self.$t('deviceView.canotDeleteInfo'), 'warning', 3000);
         return;
       } else {
         self.deleteId = row.id;
@@ -723,6 +692,7 @@ export default {
         self.deleteAccountService();
       }
     },
+
     async deleteAccountService() {
       const self = this;
       const accountParams = {};
@@ -733,7 +703,7 @@ export default {
       try {
         const res = await ezvizRESTful.deleteEzvizAccount(accountParams);
         if (res.errCode === 0) {
-          self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+          util.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
           self.showDeleteAccount = false;
           self.showDeleteStoreVueAccount = false;
           self.getAccountList();
@@ -741,13 +711,29 @@ export default {
           if (self.ezvizAccountInfo.scope === 0) {
             self.errorAccessKey = res.errMsg;
           } else {
-            self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+            util.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
             self.showDeleteAccount = false;
           }
         }
       } catch (err) {
         console.log('EzvizAccount-deleteAccount: ' + err);
       }
+    },
+
+    updateDeleteAccountDialogFlag(val, accountType){
+      accountType === 0 ? this.showDeleteStoreVueAccount = val : this.showDeleteAccount = val;
+    },
+
+    hideDeleteAccountDialog(accountType){
+      accountType === 0 ? this.showDeleteStoreVueAccount = false : this.showDeleteAccount = false;
+    },
+
+    updateAddAccountDialogFlag(val){
+      this.showAddAccount = val;
+    },
+
+    hideAddAccountDialog(){
+      this.showAddAccount = false;
     },
 
     commentChange(val) {
@@ -767,14 +753,6 @@ export default {
 
     notShowInputRuleTips() {
       this.commentRuletip = false;
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     },
 
     setErrorMsg(msg) {
@@ -848,53 +826,7 @@ export default {
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
   }
-  *{
-    font-family: Roboto, Arial, "Microsoft YaHei";
-  }
-  .detail-title{
-    overflow: hidden;
-    .title-title{
-      display: block;
-      @include point(margin-top,10);
-      margin-left: 0px;
-      @include point(margin-bottom,15);
-      float: left;
-      font-size: 18px;
-      font-weight: bold;
-      color: #424151;
-    }
-    .route-btns{
-      float: right;
-      @include point(margin-right,15);
-      .noAllow{
-        cursor:not-allowed;
-        opacity: 0.6;
-      }
-      .el-delete-btn{
-        background-color: $mainColor;
-        border-color:  $mainColor;
-        color: #fff;
-        @include point(margin-right,8);
-        font-size: 12px;
-        &:disabled{
-          opacity: 0.6;
-        }
-      }
-      .en-el-delete-btn{
-        background-color: $mainColor;
-        border-color:  $mainColor;
-        color: #fff;
-        font-size: 12px;
-        text-align: center;
-        &:disabled{
-          opacity: 0.6;
-        }
-        span{
-          position: relative;
-        }
-      }
-    }
-  }
+
   .el-table-content{
     border-bottom: none;
     .iconfont{
@@ -942,9 +874,6 @@ export default {
   .current-row > td {
     background: #FEE7E4 !important;
   }
-  .el-dialog__body{
-    padding: 0px;
-  }
 
   @media screen  and (max-width: 1280px){
     .add-dialog .el-dialog{
@@ -972,6 +901,7 @@ export default {
   .access-button .el-form-item__content{
     width: 100%;
   }
+
   .nvrForm .el-form-item__error{
       color:#F56C6C !important;
   }
