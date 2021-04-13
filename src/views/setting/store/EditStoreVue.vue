@@ -433,10 +433,6 @@ export default {
                   margin-right:10px;
                 }
               }
-                .el-schedule{
-                    @include point(width,140);
-                    @include point(margin-right,25);
-                }
                 .input{
                   @include point(width,140);
                  // @include point(margin-right,25);
@@ -600,15 +596,4 @@ export default {
             }
         }
     }
-</style>
-<style>
-.el-dialog__body{
-    padding: 0px !important;
-}
-.el-schedule .el-input__inner{
-    background: #f0f5f8 !important;
-    border-radius: 0px !important;
-    border: 0px !important;
-}
-
 </style>

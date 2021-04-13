@@ -324,18 +324,9 @@
                   accept="image/png,image/jpg,image/jpeg"
                   list-type="picture">
                   <el-button size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
-                    <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/><span>{{ $t('deviceView.selectPicture') }}</span>
+                    <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/>
+                    <span>{{ $t('deviceView.selectPicture') }}</span>
                   </el-button>
-                  <delay-button
-                    size="mini"
-                    type="primary"
-                    class="add-btn inspction-btn"
-                    @click="">
-                    <div class="button-area">
-                      <i class="iconfont el-icon-plus"/>
-                      <span>{{ $t('deviceView.selectPicture') }}</span>
-                    </div>
-                  </delay-button>
                   <el-image :src="addChannelData.pictureUrl" class="image-class">
                     <div slot="error" class="image-slot">
                       <span class="image-span">{{ $t('deviceView.preview') }}</span>
@@ -395,7 +386,8 @@
           <el-form-item style="height: 57px;">
             <el-col :span="13">
               <el-form-item :label="$t('deviceView.deviceName')" prop="name" style="margin-bottom:0;">
-                <el-input v-model="addDeviceData.name" style="width: 100%;" @input="deviceNameChange" @blur="notShowInputRuleTips('deviceName')"/>
+                <el-input v-model="addDeviceData.name" style="width: 100%;"
+                          @input="deviceNameChange" @blur="notShowInputRuleTips('deviceName')"/>
                 <span v-if="deviceRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
               </el-form-item>
             </el-col>
@@ -1915,17 +1907,6 @@ export default {
   }
 };
 </script>
-<style>
-  .rowStyle{
-    height: 50px;
-    background-color: #FAFAFA !important;
-  }
-  .headerStyle{
-    height: 40px;
-    background-color: #FAFAFA !important;
-  }
-
-</style>
 <style lang="scss" scoped>
   @import '../../../assets/css/importfile.css';
   @import '../../../assets/css/textstyle.css';
@@ -1949,12 +1930,6 @@ export default {
     line-height: 60px;
     text-align: left;
     border-bottom: 1px solid #ddd;
-  }
-  //@mixin 超出显示省略号
-  @mixin txtEllipsis {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
 
   .noraml-color{
@@ -2497,29 +2472,8 @@ export default {
       }
     }
   }
-  .btn-class{
-    height: calc(36/1920*100vw);
-    padding: 0;
-    font-size: calc(14/1920*100vw);
-    width: calc(130/1920*100vw);
-    .el-icon-plus{
-      font-size: calc(16/1920*100vw);
-      margin-right: calc(8/1920*100vw);
-    }
-    @media screen and (max-width: 1440px) {
-      width: 100px !important;
-    }
-    .btn-area{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
 </style>
 <style>
-  @import '../../../assets/css/pagination.css';
-  @import '../../../assets/css/tabsItem.css';
-
   #el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
   }
@@ -2586,12 +2540,5 @@ export default {
   }
   .el-icon-picture-outline{
     font-size: 16px;
-  }
-</style>
-<style scoped>
-  .el-input--small >>>.el-input__inner{
-    background: #f0f5f8 !important;
-    border-radius: 15px !important;
-    line-height: 50% !important;
   }
 </style>

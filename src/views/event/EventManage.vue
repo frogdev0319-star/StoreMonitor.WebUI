@@ -99,12 +99,18 @@
       </div>
     </div>
     <div class="el-table-content">
-      <el-button :class="lang==='en' ? 'en-export-btn':'export-btn'" type="primary" size="mini" @click="export2Excel" >
-        <div class="btn-area">
+      <delay-button
+        :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+        class="absolute-btn"
+        type="primary"
+        size="mini"
+        @click="export2Excel"
+      >
+        <div class="button-area">
           <img :src="exportPng" class="icon-excel">
-          <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+          <span>{{ $t('eventView.exportReport') }}</span>
         </div>
-      </el-button>
+      </delay-button>
       <el-tabs id="en-tabs-content" v-model="activeName" @tab-click="handleTabClick">
         <el-tab-pane
           v-for="(item,index) in tableDataList"
@@ -176,7 +182,7 @@
               <div slot="empty">
                 <div>
                   <i class="iconfont icon-zhengque empty-data-icon"/>
-                  <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{ $t('eventView.noEvents') }}</span>
+                  <span class="empty-text">{{ $t('eventView.noEvents') }}</span>
                 </div>
               </div>
             </el-table>
@@ -202,7 +208,7 @@
 
 <script>
 
-import util from '../../common/util.js';
+import util from '@/common/util.js';
 import { eventRESTful } from '@/api/index';
 import { getCookie } from '@/common/auth';
 import { isLoginIn } from '@/api/login';
@@ -211,11 +217,13 @@ import { getBriefStoreList, GetTagList } from '@/api/store';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import LimitSelect from '@/components/LimitSelect';
-import SearchConditionUtil from '../../common/SearchConditionUtil';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'EventManage',
   components: {
+    DelayButton,
     LimitSelect,
     MultiSelect,
     RegionMultiSelect
@@ -1413,77 +1421,13 @@ $h1:#292e36;
         }
     }
     .el-table-content{
-        width: 100%;
-        background-color: #fff;
-        position: relative;
-        padding-top: calc(30/1920*100vw);
-        .export-btn{
-            position: absolute;
-            @include point(right,20);
-            //background-color: $red;
-            border-color: $red;
-            z-index: 990;
-            height: calc(36/1920*100vw);
-            width: calc(130/1920*100vw);
-            margin: 0;
-            padding: 0;
-            font-size: calc(14/1920*100vw);
-            line-height: calc(36/1920*100vw);
-            color: #ffffff;
-            border-width: 0;
-            border-radius: 4px;
-            top: calc(24/1920*100vw);
-            .btn-area{
-              padding: 0 calc(6/1920*100vw);
-              height: calc(36/1920*100vw);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              .icon-excel{
-                margin-right: calc(18/1920*100vw);
-                font-size: calc(24/1920*100vw);
-                height: calc(24/1920*100vw);
-                width: calc(24/1920*100vw);
-              }
-              .spanClass{
-                font-size: calc(14/1920*100vw);
-                display: inline-block;
-              }
-            }
-        }
-      .en-export-btn{
+      width: 100%;
+      background-color: #fff;
+      position: relative;
+      padding-top: calc(30/1920*100vw);
+      .absolute-btn{
         position: absolute;
-        @include point(right,20);
-        //background-color: $red;
-        border-color: $red;
-        z-index: 990;
-        height: calc(36/1920*100vw);
-        margin: 0;
-        padding: 0;
-        font-size: calc(14/1920*100vw);
-        line-height: calc(36/1920*100vw);
-        color: #ffffff;
-        border-width: 0;
-        border-radius: 4px;
-        width: calc(160/1920*100vw);
-        min-width: 120px;
-        .btn-area{
-          position: relative;
-          padding: 0 calc(6/1920*100vw);
-          height: calc(36/1920*100vw);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          .icon-excel{
-            margin-right: calc(18/1920*100vw);
-            width: calc(24/1920*100vw);
-            height: calc(24/1920*100vw);
-          }
-          .spanClass{
-            font-size: calc(14/1920*100vw);
-            display: inline-block;
-          }
-        }
+        right: calc(25/1920*100vw);
       }
       .table-content{
             width:100%;
@@ -1517,9 +1461,6 @@ $h1:#292e36;
     clear:both;
     overflow: auto;
   }
-}
-.el-select-content{
-    //@include point(width,120);
 }
 .empty-data-icon{
     @include point(font-size,22);

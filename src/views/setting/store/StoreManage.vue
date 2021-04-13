@@ -162,6 +162,7 @@ import PubSub from 'pubsub-js';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import util from '@/common/util';
 
 export default {
   name: 'StoreManage',
@@ -456,7 +457,7 @@ export default {
     choiceCity() {
       const self = this;
       if (self.curProvince.length === 0) {
-        self.notify(this.$t('storeView.selectProviceInfo'), 'warning', 3000);
+        util.notify(this.$t('storeView.selectProviceInfo'), 'warning', 3000);
         self.showPopoVer = true;
         return false;
       } else {
@@ -729,7 +730,7 @@ export default {
         sessionStorage.setItem('STORE_ROW', JSON.stringify(row));
         self.$router.push({ name: 'storeDetail', params: row });
       } else {
-        self.notify(self.$t('insSettingView.storeNoInspect'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.storeNoInspect'), 'warning', 3000);
         return false;
       }
     },
@@ -781,14 +782,6 @@ export default {
           console.log("StoreManagement-getTagListData: " + err);
           reject(err);
         });
-      });
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
       });
     },
 
