@@ -60,6 +60,10 @@ $mainColor: #f31d65;
   @extend .dialog-slot;
   margin: 20px calc(20/1920*100vw) 0px;
 }
+.form-slot{
+  @extend .dialog-slot;
+  margin: 20px calc(20/1920*100vw);
+}
 .import-file-slot{
   @extend .dialog-slot;
   flex-wrap: wrap;
@@ -90,6 +94,7 @@ $mainColor: #f31d65;
   align-items: center;
   justify-content: space-between;
 }
+
 .storevue-dialog .el-dialog__title{
   font-size: 16px;
   color: $dialogTitle;
@@ -99,6 +104,17 @@ $mainColor: #f31d65;
 }
 .storevue-dialog .el-dialog__footer{
   padding: 0 20px 20px 30px;
+}
+
+.storevue-form-dialog {
+  @extend .storevue-dialog;
+}
+
+.storevue-form-dialog .el-dialog__header{
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .confirm-btn{
@@ -221,3 +237,11 @@ $mainColor: #f31d65;
   color: $mainColor;
 }
 
+.picture-tips{
+  display: inline;
+  font-size: 12px;
+  color: $warning;
+  position: relative;
+  top: 30px;
+  left: 30px;
+}

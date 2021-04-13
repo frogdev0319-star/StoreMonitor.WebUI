@@ -180,3 +180,17 @@ body .el-table th.gutter {
   height: 1px;
   background-color: #e3e9f4;
 }
+
+.el-dialog__body .el-form-item__label{
+  padding:0;
+  font-size: calc(14/1920*100vw);
+  color: #424151;
+}
+
+.el-form{
+  width: 100%;
+}
+
+.el-form-item__error{
+  color:#F56C6C !important;
+}

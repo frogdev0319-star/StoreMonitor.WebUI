@@ -4,7 +4,7 @@
     :visible.sync="dialogVisible"
     :width="dialogWidth"
     :height="dialogHeight"
-    class="storevue-dialog"
+    :class="isForm ? 'storevue-form-dialog' : 'storevue-dialog'"
   >
     <div class="dialog-body">
       <slot/>
@@ -45,6 +45,10 @@ export default {
       default() {
         return this.$t('insSettingView.confirm')
       }
+    },
+    isForm: {
+      type: Boolean,
+      default: false
     }
   },
 
