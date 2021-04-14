@@ -1,7 +1,3 @@
-@import "./mixin.scss";
-@import '../../assets/css/textstyle.css';
-@import '../../assets/css/importfile.css';
-
 $red: #f31d65;
 $black: #182752;
 $border: #e3e9f4;
@@ -21,54 +17,6 @@ $ignored: #cad1db;
 *{
   box-sizing: border-box;
 }
-.el-date {
-  height: 80px;
-  line-height: 80px;
-  text-align: left;
-  margin-bottom: 30px;
-  border-bottom: 1px solid $border;
-  position: relative;
-  background: #fff;
-
-  .date-title {
-    @include point(margin-left, 30);
-    @include point(margin-right, 20);
-    margin-left: calc(60 / 1920 * 100vw);
-    margin-right: calc(40 / 1920 * 100vw);
-    font-size: 14px;
-    color: $black;
-  }
-
-  .iconbangzhu {
-    font-size: calc(20 / 1920 * 100vw);
-    position: relative;
-    top: 2px;
-    color: $tab;
-  }
-
-  .date-range {
-    border: 1px solid #ccc;
-    width: 200px;
-    height: calc(36 / 1920 * 100vw);
-    line-height: calc(36 / 1920 * 100vw);
-  }
-
-  .item {
-    color: $tab;
-    margin-left: calc(20 / 1920 * 100vw);;
-    margin-right: calc(8 / 1920 * 100vw);
-  }
-
-  .content {
-    display: inline-block;
-  }
-
-  .el-store {
-    position: absolute;
-    right: 0px;
-    @include point(margin-right, 30);
-  }
-}
 
 .title{
   height: 70px;
@@ -84,64 +32,6 @@ $ignored: #cad1db;
   position: relative;
   font-size: calc(14 / 1920 * 100vw);
   height: auto;
-  .sourceType-icon {
-    margin-right: calc(15 / 1920 * 100vw);
-    position: relative;
-    float: left;
-    @include point(bottom, 3);
-  }
-
-  .icon-span {
-    display: inline-block;
-    width: calc(60 / 1920 * 100vw);
-    height: calc(22 / 1920 * 100vw);
-    color: white;
-    font-size: calc(12 / 1920 * 100vw);
-  }
-
-  .el-date {
-    height: 80px;
-    line-height: 80px;
-    text-align: left;
-    margin-bottom: 30px;
-    border-bottom: 1px solid $border;
-    position: relative;
-    background: #fff;
-    .date-title {
-      @include point(margin-left, 30);
-      @include point(margin-right, 20);
-      margin-left: calc(60/1920*100vw);
-      margin-right: calc(40/1920*100vw);
-      font-size: 14px;
-      color: $black;
-    }
-    .iconbangzhu {
-      font-size: calc(20 / 1920 * 100vw);
-      position: relative;
-      top: 2px;
-      color: $tab;
-    }
-    .date-range {
-      border: 1px solid #ccc;
-      width: 200px;
-      height: calc(36 / 1920 * 100vw);
-      line-height: calc(36 / 1920 * 100vw);
-    }
-    .item {
-      color: $tab;
-      margin-left: calc(20/1920*100vw);
-      margin-right: calc(8/1920*100vw);
-    }
-    .content {
-      display: inline-block;
-      font-size: 12px;
-    }
-    .el-store {
-      position: absolute;
-      right: 0px;
-      @include point(margin-right, 30);
-    }
-  }
 
   .el-overview {
     position: relative;
