@@ -205,7 +205,9 @@ export default {
     'none': '无',
     'allZoneI': '全部区域一',
     'allZoneII': '全部区域二',
-    'dataZoomInfo': '坐标系内滚动鼠标实现数据区域缩放，查看数据细节'
+    'dataZoomInfo': '坐标系内滚动鼠标实现数据区域缩放，查看数据细节',
+    'startDate': '开始日期',
+    'endDate': '结束日期'
   },
 
   // Patrol page language

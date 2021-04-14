@@ -202,7 +202,9 @@ export default {
     'none': 'None',
     'allZoneI': 'All Region I',
     'allZoneII': 'All Region II',
-    'dataZoomInfo': 'Scroll the mouse in the coordinate system to zoom the data area and see the data details'
+    'dataZoomInfo': 'Scroll the mouse in the coordinate system to zoom the data area and see the data details',
+    'startDate': 'Start Date',
+    'endDate': 'End Date'
   },
 
   // Patrol page language

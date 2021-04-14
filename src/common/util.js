@@ -1,6 +1,7 @@
 import ConvertPinyin from '@/common/getpinyin';
 import i18n from '@/lang/index';
 import { message } from '@/common/singleton-message';
+import moment from 'moment';
 
 export default {
   getOneHourTime(para) {
@@ -847,6 +848,31 @@ export default {
       type: type,
       duration: time
     });
+  },
+
+  getDaysRangeList(startTime, endTime, timeMode){
+    console.log(timeMode)
+    const startDay = moment(startTime).format('YYYY-MM-DD');
+    const endDay = moment(endTime).format('YYYY-MM-DD');
+    const startDayWithoutYear = moment(startTime).format('MM/DD');
+    const endDayWithoutYear = moment(endTime).format('MM/DD');
+    let daysRangeList = [];
+    if (timeMode === 1) {
+      const beginDay = new Date(this.judgeStart(startDay));
+      const weekList = this.getWeek(beginDay, endDay);
+      const arrLength = weekList.length;
+      const firstEndTime = weekList[0].split('-')[1];
+      const firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
+      const lastStartTime = weekList[arrLength - 1].split('-')[0];
+      const lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
+      weekList.splice(0, 1, firstWeekStr);
+      weekList.splice(arrLength - 1, 1, lastWeekStr);
+      daysRangeList = weekList;
+    } else if (timeMode === 2) {
+      const monthArray = this.getMonthBetween(startDay, endDay);
+      daysRangeList = monthArray;
+    }
+    return daysRangeList;
   }
 
 };
