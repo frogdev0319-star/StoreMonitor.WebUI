@@ -1425,10 +1425,6 @@ $h1:#292e36;
       background-color: #fff;
       position: relative;
       padding-top: calc(30/1920*100vw);
-      .absolute-btn{
-        position: absolute;
-        right: calc(25/1920*100vw);
-      }
       .table-content{
             width:100%;
             text-align: center;

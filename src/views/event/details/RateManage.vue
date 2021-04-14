@@ -5,12 +5,15 @@
         <img :src="sourceSrc" :height="varyWindowWidth>1366?'40px':'32px'" class="title-img" >
         <span class="event-title">{{ event.eventTitle }}</span>
         <span v-if="event.score!==Math.pow(-2,31)" class="event-score">{{ $t('eventView.scores') }} {{ event.score }}</span>
-        <el-button
+        <delay-button
           v-if="showWinpBtn"
-          :size="varyWindowWidth > 1680 ? 'small' : 'mini'"
-          class="el-submit"
           type="primary"
-          @click="submit">{{ $t('eventView.submit') }}</el-button>
+          size="mini"
+          class="absolute-btn"
+          @click="submit"
+        >
+          {{ $t('eventView.submit') }}
+        </delay-button>
       </div>
       <el-dialog
         v-if="dialogFormVisible"
@@ -307,10 +310,12 @@ import EzvizVideo from '@/components/EzvizVideo.vue';
 import PermissionHelper from '@/api/PermissionHelper';
 import filterString from '@/common/filterString';
 import { mapGetters } from 'vuex';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'EventDetail',
   components: {
+    DelayButton,
     AudioVue,
     EzvizVideo
   },
@@ -374,8 +379,7 @@ export default {
       ivsIdRuletip: false,
       videosourceList: [],
       imgsourceList: [],
-      Changestatus: '',
-      videoAuthority: false
+      Changestatus: ''
     };
   },
   computed: {
@@ -1113,9 +1117,6 @@ $h1:#292e36;
 .el-rate-container{
     background-color: #f7f8fa;
     @media screen and(min-width: 1366px){
-        /*.el-submit{*/
-            /*top: 30%;*/
-        /*}*/
         .storeInfo-details{
             height: 50px;
             line-height: 50px;
@@ -1132,9 +1133,6 @@ $h1:#292e36;
         }
     }
     @media screen and(max-width: 1366px){
-        /*.el-submit{*/
-            /*top: 20%;*/
-        /*}*/
         .storeInfo-details{
             height: 40px;
             line-height: 40px;
