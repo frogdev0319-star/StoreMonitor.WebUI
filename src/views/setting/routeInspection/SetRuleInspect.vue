@@ -65,6 +65,7 @@
 
 <script>
 import { inpectRESTful } from '@/api/index';
+import util from '@/common/util';
 
 export default {
   name: 'SetRuleInspect',
@@ -108,10 +109,10 @@ export default {
         };
         const res = await self.updateInspectRule(params);
         if (res.errCode === 0) {
-          self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           return false;
         } else {
-          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           return false;
         }
       }
@@ -200,14 +201,6 @@ export default {
             val= parseFloat(val);
         }
         return val;
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     }
   },
   destroyed(){

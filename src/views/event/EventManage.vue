@@ -780,11 +780,7 @@ export default {
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       const threeMonthAgo = util.getThreeMonths(end);
       if (end - start > end - threeMonthAgo) {
-        self.$message({
-          message: this.$t('eventView.changeTimeRange'),
-          type: 'warning',
-          duration: 3 * 1000
-        });
+        util.notify(this.$t('eventView.changeTimeRange'), 'warning', 3 * 1000);
         self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
       } else {
         self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
@@ -1119,11 +1115,7 @@ export default {
         if (ret.data != undefined && ret.data.isLogin) {
           const tabIndex = Number(that.activeName);
           if (that.tableDataList[tabIndex].tableData.length === 0) {
-            that.$message({
-              message: this.$t('eventView.noEvents'),
-              type: 'warning',
-              duration: 3 * 1000
-            });
+            util.notify(this.$t('eventView.noEvents'), 'warning', 3 * 1000);
             return false;
           }
           require.ensure([], async() => {

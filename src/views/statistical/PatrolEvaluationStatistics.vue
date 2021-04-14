@@ -657,10 +657,7 @@ export default {
     async export2Excel() {
       const that = this;
       if (that.regionTableData.length === 0) {
-        that.$message({
-          message: that.$t('overview.emptyRegionList'),
-          type: 'warning'
-        });
+        util.notify(that.$t('overview.emptyRegionList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {
@@ -699,10 +696,7 @@ export default {
     async exportStore2Excel() {
       const that = this;
       if (that.storeTableData.length === 0) {
-        that.$message({
-          message: that.$t('overview.emptyStoreList'),
-          type: 'warning'
-        });
+        util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {

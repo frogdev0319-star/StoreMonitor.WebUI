@@ -749,11 +749,12 @@ export default {
         self.storeCount = bindIdList.data.length;
         if (bindIdList.errMsg === 'Success') {
           self.loading = false;
-          self.notify(`${self.$t('insSettingView.editSuss')} ${bindIdList.data.length} ${self.$t('insSettingView.storesBound')}`, 'success', 3000);
+          util.notify(`${self.$t('insSettingView.editSuss')} ${bindIdList.data.length}
+          ${self.$t('insSettingView.storesBound')}`, 'success', 3000);
         }
       } else {
         self.loading = false;
-        self.notify(self.$t('insSettingView.bindFail'), 'warning', 3000);
+        util.notify(self.$t('insSettingView.bindFail'), 'warning', 3000);
         return false;
       }
     },
@@ -791,14 +792,6 @@ export default {
         }
       }
       self.tabName = nameLang;
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     }
 
   }

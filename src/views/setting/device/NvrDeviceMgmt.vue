@@ -506,6 +506,7 @@ import { isLoginIn } from '@/api/login';
 import { mapMutations, mapGetters } from 'vuex';
 import { getStoreList, getBriefStoreList } from '@/api/store';
 import filterString from '@/common/filterString';
+import util from '@/common/util';
 
 export default {
   name: 'NvrDeviceMgmt',
@@ -790,7 +791,7 @@ export default {
       const data = await self.getDashServerInfo();
       const msg = self.checkDashInfo();
       if (msg.length !== 0) {
-        self.notify(msg, 'warning', 3000);
+        util.notify(msg, 'warning', 3000);
         setTimeout(function() {
           if (data.errCode != null && data.errMsg === 'Success') {
             self.dash = data.data;
@@ -808,12 +809,12 @@ export default {
         deviceRESTful.addDashServer(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            self.notify(this.$t('deviceView.connectSuss'), 'success', 3000);
+            util.notify(this.$t('deviceView.connectSuss'), 'success', 3000);
             const url = self.getDashURL();
             sessionStorage.setItem('DASH_URL', url);
             self.$store.commit('SET_DASHURL', url);
           } else {
-            self.notify(this.$t('deviceView.connectFail'), 'warning', 3000);
+            util.notify(this.$t('deviceView.connectFail'), 'warning', 3000);
             return false;
           }
         });
@@ -821,12 +822,12 @@ export default {
         deviceRESTful.upateDashServer(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            self.notify(this.$t('deviceView.connectSuss'), 'success', 3000);
+            util.notify(this.$t('deviceView.connectSuss'), 'success', 3000);
             const url = self.getDashURL();
             sessionStorage.setItem('DASH_URL', url);
             self.$store.commit('SET_DASHURL', url);
           } else {
-            self.notify(this.$t('deviceView.connectFail'), 'warning', 3000);
+            util.notify(this.$t('deviceView.connectFail'), 'warning', 3000);
             setTimeout(function() {
               self.dash = data.data;
             }, 1000);
@@ -1054,10 +1055,10 @@ export default {
       const res1 = await self.addNVR(paramsNVR);
       const res2 = await self.addDevice(paramsDevice);
       if (res1.errMsg === 'Success' && res2.errMsg === 'Success') {
-        self.notify(self.$t('deviceView.importSuss'), 'success', 3000);
+        util.notify(self.$t('deviceView.importSuss'), 'success', 3000);
         self.showImportContent = false;
       } else {
-        self.notify(self.$t('deviceView.importFail'), 'warning', 3000);
+        util.notify(self.$t('deviceView.importFail'), 'warning', 3000);
         self.showImportContent = false;
       }
       self.page = 1;
@@ -1110,7 +1111,7 @@ export default {
           }
           outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
           if (!outdata[0].hasOwnProperty('StoreID')) {
-            _this.notify(this.$t('deviceView.templateError'), 'warning', 3000);
+            util.notify(this.$t('deviceView.templateError'), 'warning', 3000);
             return false;
           }
           const arr = outdata;
@@ -1237,7 +1238,7 @@ export default {
       channelObj.id = self.curChannelItem.id;
       channelObj.name = self.curChannelItem.tempName;
       if (channelObj.name.trim().length === 0) {
-        self.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
+        util.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
         return false;
       }
       const params = channelObj;
@@ -1252,12 +1253,12 @@ export default {
             attachRes = await self.attachImageToDevice(fm);
           }
           if (attachRes.errMsg === 'Success') {
-            self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+            util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           }
           self.curChannelItem.isClick = false;
           self.file = '';
         } else {
-          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
         }
       })
       .then(async() => {
@@ -1283,10 +1284,10 @@ export default {
       deviceRESTful.addDevice(params).then(res => {
         let errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
-          self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
+          util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
           self.curChannelItem.isClick = false;
         } else {
-          self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+          util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
         }
       })
         .then(async() => {
@@ -1491,10 +1492,10 @@ export default {
           let res1 = await self.addNVR(nvrParams);
 
           if (res1.errMsg === 'Success') {
-            self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
+            util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             self.showAddNvrDialog = false;
           } else {
-            self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+            util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
             self.showAddNvrDialog = false;
           }
           self.addNvrData = { ivsId: '', name: '', channelCount: 1, storeId: self.storeDataList[0].storeId };
@@ -1545,11 +1546,11 @@ export default {
             fm.append('picture', self.file);
             let attachRes = await self.attachImageToDevice(fm);
             if (attachRes.errMsg === 'Success') {
-              self.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
+              util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             }
             self.showAddChannelDialog = false;
           } else {
-            self.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+            util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
             self.showAddChannelDialog = false;
           }
           self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
@@ -1606,9 +1607,9 @@ export default {
       deviceRESTful.deleteDevice(params).then(res => {
         let errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
-          self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+          util.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
         } else {
-          self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+          util.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
         }
       })
         .then(async() => {
@@ -1644,7 +1645,7 @@ export default {
       obj.storeId = item.storeId;
       obj.channelCount = item.tempChannelCount;
       if (obj.name.trim().length === 0) {
-        self.notify(self.$t('deviceView.nvrNameEmpty'), 'warning', 3000);
+        util.notify(self.$t('deviceView.nvrNameEmpty'), 'warning', 3000);
         return false;
       }
       let arr = [];
@@ -1654,10 +1655,10 @@ export default {
       deviceRESTful.updateNVR(params).then(res => {
         let errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
-          self.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           item.isEditing = false;
         } else {
-          self.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           item.isEditing = false;
         }
       })
@@ -1688,16 +1689,16 @@ export default {
           let res1 = await self.deleteChannel(channelList);
           let res2 = await self.deleteNVR(nvrList);
           if (res1.errMsg === 'Success' && res2.errMsg === 'Success') {
-            self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+            util.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
           } else {
-            self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+            util.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
           }
         } else {
           let res2 = await self.deleteNVR(nvrList);
           if (res2.errMsg === 'Success') {
-            self.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+            util.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
           } else {
-            self.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+            util.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
           }
         }
         let params = {
@@ -1746,13 +1747,6 @@ export default {
       return sortFun;
     },
 
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
-    },
     ...mapMutations(['SET_DASHURL']),
 
     nvrNameChange(val, item) {

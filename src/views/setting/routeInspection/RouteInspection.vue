@@ -618,7 +618,6 @@ export default {
         self.elTableData = self.elTableData.concat(tempAllData);
         if (val == 'add') {
           self.patrolActive = (TagData.length - 1).toString();
-          // self.notify(self.$t('insSettingView.importSuss'), 'success', 3000);
           self.showImportSucceed = true;
         }
       }
@@ -1392,7 +1391,7 @@ export default {
           if(arrsheet2.length===0&&arrsheet1.length===0&&arrsheet3.length===0){
             _this.$refs.loadFile.value = '';
             _this.$refs.loadFileEx.value = '';
-            _this.notify(_this.$t('insSettingView.templateEmpty'), 'warning', 3000);
+            util.notify(_this.$t('insSettingView.templateEmpty'), 'warning', 3000);
             return false;
           }
           const dataArry = {
@@ -1453,7 +1452,7 @@ export default {
         let name = '';
         var wb = XLSX.utils.book_new();
         if (that.elTableData[Number(that.activeName)].data.length === 0) {
-          that.notify(that.$t('insSettingView.haveNothingToExport'), 'warning', 3000);
+          util.notify(that.$t('insSettingView.haveNothingToExport'), 'warning', 3000);
           return false;
         } else {
           let sheet1data = [], sheet2data = [], sheet3data = [];
@@ -1603,14 +1602,6 @@ export default {
 
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     }
 
   }

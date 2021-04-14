@@ -930,7 +930,7 @@ export default {
       eventRESTful.addComment(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg === 'Success') {
-          self.notify(this.$t('storeView.successSubmit'), 'success', 3000);
+          util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
           self.getCommentList(1);
           self.eventDes = '';
           setTimeout(() => {
@@ -939,7 +939,7 @@ export default {
             });
           }, 3000);
         } else {
-          self.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
+          util.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
           return false;
         }
       }).catch(err => {
@@ -952,7 +952,7 @@ export default {
       let status = 0;
       const description = self.eventDes;
       if (description.trim().length === 0) {
-        self.notify(this.$t('eventView.emptyInfo'), 'warning', 3000);
+        util.notify(this.$t('eventView.emptyInfo'), 'warning', 3000);
         return false;
       }
       if (self.subBtnList[0].isActive) {
@@ -993,14 +993,6 @@ export default {
         isFull = false;
       }
       return isFull;
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     },
 
     getBtnList() {

@@ -535,10 +535,7 @@ export default {
     async export2Excel() {
       const that = this;
       if (that.reportList.length === 0) {
-        that.$message({
-          message: that.$t('remotePatrol.emptyReportList'),
-          type: 'warning'
-        });
+        util.notify(that.$t('remotePatrol.emptyReportList'), 'warning', 3000);
         return false;
       }
       const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
@@ -1092,11 +1089,7 @@ export default {
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       const threeMonthAgo = util.getThreeMonths(end);
       if (end - start > end - threeMonthAgo) {
-        self.$message({
-          message: this.$t('eventView.changeTimeRange'),
-          type: 'warning',
-          duration: 3 * 1000
-        });
+        util.notify(that.$t('eventView.changeTimeRange'), 'warning', 3000);
         self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
       }
     },
@@ -1278,14 +1271,6 @@ export default {
         this.params.clause = { storeId: storeIds };
         this.ifGetParamsFromCash = false;
       }
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     }
   },
 

@@ -679,10 +679,7 @@ export default {
     export2Excel() {
       const that = this;
       if (that.allEventData.length === 0) {
-        that.$message({
-          message: that.$t('overview.emptyEventList'),
-          type: 'warning'
-        });
+        util.notify(that.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {

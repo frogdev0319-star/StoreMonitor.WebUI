@@ -230,7 +230,7 @@
 
 <script>
 import ECharts from 'vue-echarts';
-import util from '../../common/util.js';
+import util from '@/common/util.js';
 import {
   getInspectStatsOverview,
   getInspectStatsOverStore,
@@ -242,8 +242,8 @@ import {
 } from '@/api/inspectOverview';
 import { mapGetters } from 'vuex';
 import resize from '@/components/mixins/resize';
-import SearchConditionUtil from '../../common/SearchConditionUtil.js';
-import DateTimePicker from '../../components/DateTimePicker';
+import SearchConditionUtil from '@/common/SearchConditionUtil.js';
+import DateTimePicker from '@/components/DateTimePicker';
 
 export default {
   name: 'PatrolOverview',
@@ -842,14 +842,6 @@ export default {
       util.isDot(tempPoint) ? str = tempPoint.toFixed(2) : str = tempPoint;
       str += '%';
       return str;
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     },
 
     async getBestAndWorstStores() {

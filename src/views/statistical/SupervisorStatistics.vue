@@ -593,7 +593,7 @@ export default {
               }
             } else {
               self.ispdf = false;
-              self.notify(self.$t('insSettingView.exportFailTitle'), 'warning', 3000);
+              util.notify(self.$t('insSettingView.exportFailTitle'), 'warning', 3000);
               return false;
             }
           });
@@ -716,10 +716,7 @@ export default {
     export2Excel() {
       let that = this;
       if (that.supervisorTableData.length === 0) {
-        that.$message({
-          message: that.$t('overview.emptyPatrolList'),
-          type: 'warning'
-        });
+        util.notify(that.$t('overview.emptyPatrolList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {

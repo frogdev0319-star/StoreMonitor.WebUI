@@ -451,11 +451,11 @@ export default {
         }
       });
       if (!flag) {
-        self.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
+        util.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
         return false;
       }
       if (self.suggest.length == 0) {
-        self.notify(self.$t('remotePatrol.suggestEmpty'), 'warning', 3000);
+        util.notify(self.$t('remotePatrol.suggestEmpty'), 'warning', 3000);
         return false;
       }
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
@@ -502,7 +502,7 @@ export default {
                 });
                 if (upload !== 0) {
                   self.uploadProgress = false;
-                  self.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                  util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
                   return false;
                 }
 
@@ -540,7 +540,7 @@ export default {
           });
           if (upload !== 0) {
             self.uploadProgress = false;
-            self.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
             return false;
           }
 
@@ -577,7 +577,7 @@ export default {
         }
         self.$router.push({ name: 'submitEvent', params: { data: routeData }});
       }).catch(err => {
-        self.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+        util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
         return false;
       });
       self.uploadProgress = false;
@@ -837,13 +837,7 @@ export default {
       self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
       self.bucketImage = 'image' + '/' + util.getCurDate2Str();
     },
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
-    },
+
     notShowInputRuleTips() {
       this.adviceInfoRuletip = false;
     },

@@ -351,10 +351,11 @@ import EZUIKit_Global from '../../static/ezuikit/ezuikit_Global/ezuikit.js';
 import { getEzvizAccessToken, getIsEncrypt, updateDevicePassword, getDeviceCapacity } from '@/api/ezviz';
 import { mapGetters } from 'vuex';
 import qs from 'qs';
-import { getCookie } from '../common/auth';
-import filterString from '../common/filterString';
-import Environment from '../common/environment';
+import { getCookie } from '@/common/auth';
+import filterString from '@/common/filterString';
+import Environment from '@/common/environment';
 import html2canvas from 'html2canvas';
+import util from '@/common/util';
 
 export default {
   name: 'EzvizVideo',
@@ -823,7 +824,7 @@ export default {
         self.initPlayerHeight = height;
         self.getVideoUrl();
         if (self.accessToken === '') {
-          self.notify(self.$t('remotePatrol.getAccessTokenError'), 'warning', 3000);
+          util.notify(self.$t('remotePatrol.getAccessTokenError'), 'warning', 3000);
           return;
         }
         const isGlobalWebsite = Environment.isGlobalWebsite;
@@ -1369,7 +1370,7 @@ export default {
         self.showCancelContent = false;
         if (self.sourceListLength >= 10) {
           const msg = self.isStoreMonitor ? self.$t('remotePatrol.storeMaxAttach') : self.$t('remotePatrol.maximumAttach');
-          self.notify(msg, 'warning', 3000);
+          util.notify(msg, 'warning', 3000);
           return false;
         }
         self.showCutDialog = true;
@@ -1551,14 +1552,6 @@ export default {
         isFull = false;
       }
       return isFull;
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     },
 
     stopAndRealTime() {

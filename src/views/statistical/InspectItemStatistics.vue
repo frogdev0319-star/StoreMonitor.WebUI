@@ -202,7 +202,7 @@
 <script>
 import ECharts from 'vue-echarts';
 import { mapGetters } from 'vuex';
-import util from '../../common/util.js';
+import util from '@/common/util.js';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/resize';
 
@@ -751,10 +751,7 @@ export default {
     export2Excel() {
       const that = this;
       if (that.itemsTableData.length === 0) {
-        that.$message({
-          message: that.$t('overview.emptyItemList'),
-          type: 'warning'
-        });
+        util.notify(that.$t('overview.emptyItemList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {

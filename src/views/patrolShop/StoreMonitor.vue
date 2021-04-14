@@ -1663,7 +1663,7 @@ export default {
       let self = this;
       self.showCancelContent = false;
       if (self.sourceList.length >= 10) {
-        self.notify(self.$t('remotePatrol.storeMaxAttach'), 'warning', 3000);
+        util.notify(self.$t('remotePatrol.storeMaxAttach'), 'warning', 3000);
         return false;
       }
       if (self.fullScreen) {
@@ -2505,14 +2505,6 @@ export default {
         isFull = false;
       }
       return isFull;
-    },
-
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
     },
 
     editEzvizCanvas(src) {
