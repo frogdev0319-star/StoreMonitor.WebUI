@@ -1,32 +1,8 @@
 <template>
   <div class="el-overview-content">
-    <div class="el-date">
+    <div class="overview-date">
       <span class="date-title">{{ $t('overview.date') }}</span>
-      <el-date-picker
-        ref="datePicker"
-        v-model="dateValue"
-        :clearable="false"
-        :editable="false"
-        :popper-class="poperClass"
-        :picker-options="dateOpt"
-        :default-time="['00:00:00', '23:59:59']"
-        type="daterange"
-        range-separator="-"
-        size="mini"
-        format="yyyy/MM/dd"
-        class="date-range"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        unlink-panels
-        @change="dateChange"
-      />
-      <el-tooltip
-        :popper-class="tooltipClass"
-        class="item"
-        placement="right">
-        <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
-        <i class="iconfont icon-bangzhu iconbangzhu"/>
-      </el-tooltip>
+      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
       <span class="el-store">
         {{ $t('overview.totalStore') }}{{ totalStoreNum }}{{ $t('overview.totalUnit') }}
       </span>
@@ -267,11 +243,13 @@ import {
 import { mapGetters } from 'vuex';
 import resize from '@/components/mixins/resize';
 import SearchConditionUtil from '../../common/SearchConditionUtil.js';
+import DateTimePicker from '../../components/DateTimePicker';
 
 export default {
   name: 'PatrolOverview',
 
   components: {
+    DateTimePicker,
     'v-chart': ECharts
   },
 
@@ -280,13 +258,6 @@ export default {
   data() {
     return {
       dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
-      dateOpt: {
-        disabledDate: (time) => {
-          return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
-        }
-      },
-      toolTipClass: 'page-login-toolTipClass',
-      tooltipClass: 'tooltip-class',
       taskList: [],
       isWorstArea: true,
       isWorstWork: true,
@@ -342,7 +313,6 @@ export default {
       cycleOption: null,
       dataMap: {},
       poperClass: 'date-picker-poper',
-      selectpoperClass: 'select-poper',
       elTooltipClass: 'el-tooltip-class',
       lang: this.$i18n.locale,
       timeMode: 1, // weekly mode
@@ -694,69 +664,26 @@ export default {
     },
 
     dateChange(val) {
-      const self = this;
-      self.currentIndex = 0;
-      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      this.dateValue = val;
+      this.currentIndex = 0;
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      let daysDiff = self.$moment(end).diff(start, 'days');
-      if (daysDiff < 6) {
-        self.$message({
-          message: self.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-
-        start = end - 3600 * 24 * 6 * 1000;
-        start = self.$moment(start).startOf('d').toDate().valueOf();
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
-      if (daysDiff > 364) {
-        self.$message({
-          message: self.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-        start = end - 3600 * 24 * 364 * 1000;
-        start = self.$moment(start).startOf('d').toDate().valueOf();
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      } else {
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
-      daysDiff = self.$moment(end).diff(start, 'days');
-      daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      self.params.beginTs = start;
-      self.params.endTs = end;
-      self.saveSearchParams();
-      self.initData();
+      const daysDiff = this.$moment(end).diff(start, 'days');
+      this.timeMode = daysDiff <= 30 ? 1 : 2;
+      this.params.beginTs = start;
+      this.params.endTs = end;
+      this.saveSearchParams();
+      this.initData();
     },
 
     initData() {
-      const self = this;
-      const start = self.params.beginTs;
-      const end = self.params.endTs;
-      const startDay = self.$moment(start).format('YYYY-MM-DD');
-      const endDay = self.$moment(end).format('YYYY-MM-DD');
-      const startDayWithoutYear = self.$moment(start).format('MM/DD');
-      const endDayWithoutYear = self.$moment(end).format('MM/DD');
-      if (self.timeMode === 1) {
-        const beginDay = new Date(util.judgeStart(startDay));
-        const weekList = util.getWeek(beginDay, endDay);
-        const arrLength = weekList.length;
-        const firstEndTime = weekList[0].split('-')[1];
-        const firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
-        const lastStartTime = weekList[arrLength - 1].split('-')[0];
-        const lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
-        weekList.splice(0, 1, firstWeekStr);
-        weekList.splice(arrLength - 1, 1, lastWeekStr);
-        self.daysRangeList = weekList;
-      } else if (self.timeMode === 2) {
-        const monthArray = util.getMonthBetween(startDay, endDay);
-        self.daysRangeList = monthArray;
-      }
-      self.getStoreNumAndCycle();
-      self.getBestAndWorstStores();
-      self.getInspectItems();
-      self.getInspectTaskRanking();
-      self.getPassRateAndCycle();
-      self.getRegionInspectResult();
+      this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
+      this.getStoreNumAndCycle();
+      this.getBestAndWorstStores();
+      this.getInspectItems();
+      this.getInspectTaskRanking();
+      this.getPassRateAndCycle();
+      this.getRegionInspectResult();
     },
 
     compareDanger(a, b) {
@@ -1712,6 +1639,8 @@ export default {
         this.params.beginTs = start;
         this.params.endTs = end;
       }
+      const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
+      this.timeMode = daysDiff <= 30 ? 1 : 2;
     }
 
   }
@@ -1720,8 +1649,4 @@ export default {
 
 <style lang="scss" scoped>
   @import '../../assets/sass/overview.scss';
-</style>
-
-<style>
-  @import '../../assets/css/pagination.css';
 </style>

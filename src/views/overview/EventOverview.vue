@@ -1,32 +1,8 @@
 <template>
   <div class="el-overview-content">
-    <div class="el-date">
+    <div class="overview-date">
       <span class="date-title">{{ $t('overview.date') }}</span>
-      <el-date-picker
-        ref="datePicker"
-        v-model="dateValue"
-        :clearable="false"
-        :editable="false"
-        :popper-class="poperClass"
-        :picker-options="dateOpt"
-        :default-time="['00:00:00', '23:59:59']"
-        type="daterange"
-        range-separator="-"
-        size="mini"
-        format="yyyy/MM/dd"
-        class="date-range"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        unlink-panels
-        @change="dateChange"
-      />
-      <el-tooltip
-        class="item"
-        effect="dark"
-        placement="right">
-        <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
-        <i class="iconfont icon-bangzhu iconbangzhu"/>
-      </el-tooltip>
+      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
       <span class="el-store">
         {{ $t('overview.totalStore') }}{{ numOfStores }}{{ $t('overview.totalUnit') }}
       </span>
@@ -151,17 +127,19 @@
 
 <script>
 import ECharts from 'vue-echarts';
-import util from '../../common/util.js';
+import util from '@/common/util.js';
 import { getBriefStoreList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
 import resize from '@/components/mixins/resize';
-import SearchConditionUtil from "../../common/SearchConditionUtil";
+import SearchConditionUtil from '@/common/SearchConditionUtil';
+import DateTimePicker from '@/components/DateTimePicker';
 
 export default {
   name: 'EventOverview',
 
   components: {
+    DateTimePicker,
     'v-chart': ECharts
   },
 
@@ -175,7 +153,6 @@ export default {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         }
       },
-      toolTipClass: 'page-login-toolTipClass',
       numOfStores: 0,
       varWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
@@ -328,17 +305,15 @@ export default {
         self.getBriefStoreData();
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.getSearchParams();
-        // const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        // const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-        // self.params.beginTs = start;
-        // self.params.endTs = end;
         self.initData();
       }
     }
   },
 
   created() {
-    this.getBriefStoreData()
+    this.getBriefStoreData();
+    this.getSearchParams();
+    this.initData();
   },
 
   beforeDestroy() {
@@ -350,36 +325,15 @@ export default {
 
   methods: {
     dateChange(val) {
-      const self = this;
-      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      this.dateValue = val;
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      let daysDiff = self.$moment(end).diff(start, 'days');
-      if (daysDiff < 6) {
-        self.$message({
-          message: self.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-        start = end - 3600 * 24 * 6 * 1000;
-        start = self.$moment(start).startOf('d').toDate().valueOf();
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
-      if (daysDiff > 364) {
-        self.$message({
-          message: self.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-        start = end - 3600 * 24 * 364 * 1000;
-        start = self.$moment(start).startOf('d').toDate().valueOf();
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      } else {
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
-      daysDiff = self.$moment(end).diff(start, 'days');
-      daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      self.params.beginTs = start;
-      self.params.endTs = end;
-      self.saveSearchParams();
-      self.initData();
+      const daysDiff = this.$moment(end).diff(start, 'days');
+      this.timeMode = daysDiff <= 30 ? 1 : 2;
+      this.params.beginTs = start;
+      this.params.endTs = end;
+      this.saveSearchParams();
+      this.initData();
     },
 
     getBriefStoreData() {
@@ -409,8 +363,6 @@ export default {
             );
           }
           self.storeDataList = tempStore;
-          this.getSearchParams();
-          this.initData();
         }
       });
     },
@@ -428,31 +380,10 @@ export default {
     },
 
     initData() {
-      const self = this;
-      const start = self.params.beginTs;
-      const end = self.params.endTs;
-      const startDay = self.$moment(start).format('YYYY-MM-DD');
-      const endDay = self.$moment(end).format('YYYY-MM-DD');
-      const startDayWithoutYear = self.$moment(start).format('MM/DD');
-      const endDayWithoutYear = self.$moment(end).format('MM/DD');
-      if (self.timeMode === 1) {
-        const beginDay = new Date(util.judgeStart(startDay));
-        const weekList = util.getWeek(beginDay, endDay);
-        const arrLength = weekList.length;
-        const firstEndTime = weekList[0].split('-')[1];
-        const firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
-        const lastStartTime = weekList[arrLength - 1].split('-')[0];
-        const lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
-        weekList.splice(0, 1, firstWeekStr);
-        weekList.splice(arrLength - 1, 1, lastWeekStr);
-        self.daysRangeList = weekList;
-      } else if (self.timeMode === 2) {
-        const monthArray = util.getMonthBetween(startDay, endDay);
-        self.daysRangeList = monthArray;
-      }
-      self.getEventStatsStatics();
-      self.getEventRankingInfo();
-      self.getStoreEventStatics();
+      this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
+      this.getEventStatsStatics();
+      this.getEventRankingInfo();
+      this.getStoreEventStatics();
     },
 
     async getEventStatsStatics() {
@@ -1046,7 +977,7 @@ export default {
         this.params.endTs = searchParams.endTs;
         this.rankType = searchParams.rankType;
         this.curStore = searchParams.storeId;
-        if (this.curStore === "-1") {
+        if (this.curStore === "-1" || this.curStore.length === 0) {
           this.storeIds = [];
         } else {
           this.storeIds.push(this.curStore);
@@ -1057,6 +988,8 @@ export default {
         this.params.beginTs = start;
         this.params.endTs = end;
       }
+      const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
+      this.timeMode = daysDiff <= 30 ? 1 : 2;
     }
   }
 };
@@ -1065,8 +998,4 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../assets/sass/overview.scss";
-</style>
-
-<style>
-  @import '../../assets/css/pagination.css';
 </style>

@@ -72,31 +72,7 @@
     <el-col :span="24" class="header-details">
       <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'" >
         {{ $t('remotePatrol.time') }}</span>
-      <el-date-picker
-        ref="datePicker"
-        v-model="dateValue"
-        :clearable="false"
-        :editable="false"
-        :popper-class="poperClass"
-        :picker-options="dateOpt"
-        :default-time="['00:00:00', '23:59:59']"
-        type="daterange"
-        range-separator="-"
-        size="mini"
-        format="yyyy/MM/dd"
-        class="date-range"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-        unlink-panels
-        @change="dateChange"
-      />
-      <el-tooltip
-        class="item"
-        effect="dark"
-        placement="right">
-        <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
-        <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"/>
-      </el-tooltip>
+      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
       <div class="search-btns">
         <delay-button
           :disabled="storeListLength === 0"
@@ -133,10 +109,12 @@ import util from '@/common/util.js';
 import { inpectRESTful } from '@/api/index';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
+import DateTimePicker from './DateTimePicker';
 
 export default {
   name: 'SearchComponent',
   components: {
+    DateTimePicker,
     DelayButton,
     MultiSelect,
     RegionMultiSelect
@@ -257,35 +235,14 @@ export default {
 
   methods: {
     dateChange(val) {
-      const self = this;
+      this.dateValue = val;
       let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      let daysDiff = self.$moment(end).diff(start, 'days');
-      if (daysDiff < 6) {
-        self.$message({
-          message: self.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-        start = end - 3600 * 24 * 6 * 1000;
-        start = self.$moment(start).startOf('d').toDate().valueOf();
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
-      if (daysDiff > 364) {
-        self.$message({
-          message: self.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-        start = end - 3600 * 24 * 364 * 1000;
-        start = self.$moment(start).startOf('d').toDate().valueOf();
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      } else {
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
-      daysDiff = self.$moment(end).diff(start, 'days');
-      daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      self.params.beginTs = start;
-      self.params.endTs = end;
-      self.initDaysRange();
+      const daysDiff = this.$moment(end).diff(start, 'days');
+      this.timeMode = daysDiff <= 30 ? 1 : 2;
+      this.params.beginTs = start;
+      this.params.endTs = end;
+      this.daysRangeList = util.getDaysRangeList(start, end, this.timeMode);
     },
 
     async getInspectList() {
@@ -796,6 +753,8 @@ export default {
         this.params.beginTs = start;
         this.params.endTs = end;
       }
+      const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
+      this.timeMode = daysDiff <= 30 ? 1 : 2;
     },
 
     setDefaultSort() {

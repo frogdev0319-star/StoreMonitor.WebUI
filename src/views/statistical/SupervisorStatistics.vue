@@ -4,29 +4,7 @@
       <el-col :span="24" class="statistics-header">
         <div class="header-details">
           <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
-          <el-date-picker
-            ref="datePicker"
-            v-model="dateValue"
-            :clearable="false"
-            :editable="false"
-            :popper-class="poperClass"
-            :picker-options="dateOpt"
-            :default-time="['00:00:00', '23:59:59']"
-            type="daterange"
-            range-separator="-"
-            size="mini"
-            format="yyyy/MM/dd"
-            class="date-range"
-            unlink-panels
-            @change="dateChange"
-          />
-          <el-tooltip
-            class="item"
-            effect="dark"
-            placement="right">
-            <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
-            <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"/>
-          </el-tooltip>
+          <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
         </div>
         <div class="header-mul-select">
           <span class="mul-label">{{ $t('overview.patrolLists') }}</span>
@@ -350,11 +328,13 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import { inpectRESTful, titleRESTful } from '@/api/index';
+import DateTimePicker from '@/components/DateTimePicker';
 
 export default {
   name: 'SupervisorStatistics',
 
   components: {
+    DateTimePicker,
     DialogPop,
     DelayButton
   },
@@ -704,62 +684,15 @@ export default {
     },
 
     dateChange(val) {
-      let self = this;
-      self.currentIndex = 0;
+      this.currentIndex = 0;
+      this.dateValue = val;
       let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      let daysDiff = self.$moment(end).diff(start, 'days');
-      if (daysDiff < 6) {
-        self.$message({
-          message: self.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-        start = end - 3600 * 24 * 6 * 1000;
-        start = self.$moment(start).startOf('d').toDate().valueOf();
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
-      if (daysDiff > 364) {
-        self.$message({
-          message: self.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-        start = end - 3600 * 24 * 364 * 1000;
-        start = self.$moment(start).startOf('d').toDate().valueOf();
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      } else {
-        self.dateValue = [self.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
-      daysDiff = self.$moment(end).diff(start, 'days');
-      daysDiff <= 30 ? self.timeMode = 1 : self.timeMode = 2;
-      self.params.beginTs = start;
-      self.params.endTs = end;
-      self.initDaysRange();
-      self.searchData();
-    },
-
-    initDaysRange() {
-      let self = this;
-      let start = self.params.beginTs;
-      let end = self.params.endTs;
-      let startDay = self.$moment(start).format('YYYY-MM-DD');
-      let endDay = self.$moment(end).format('YYYY-MM-DD');
-      let startDayWithoutYear = self.$moment(start).format('MM/DD');
-      let endDayWithoutYear = self.$moment(end).format('MM/DD');
-      if (self.timeMode === 1) {
-        let beginDay = new Date(util.judgeStart(startDay));
-        let weekList = util.getWeek(beginDay, endDay);
-        let arrLength = weekList.length;
-        let firstEndTime = weekList[0].split('-')[1];
-        let firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
-        let lastStartTime = weekList[arrLength - 1].split('-')[0];
-        let lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
-        weekList.splice(0, 1, firstWeekStr);
-        weekList.splice(arrLength - 1, 1, lastWeekStr);
-        self.daysRangeList = weekList;
-      } else if (self.timeMode === 2) {
-        let monthArray = util.getMonthBetween(startDay, endDay);
-        self.daysRangeList = monthArray;
-      }
+      const daysDiff = this.$moment(end).diff(start, 'days');
+      this.timeMode = daysDiff <= 30 ? 1 : 2;
+      this.params.beginTs = start;
+      this.params.endTs = end;
+      this.searchData();
     },
 
     async searchData() {
