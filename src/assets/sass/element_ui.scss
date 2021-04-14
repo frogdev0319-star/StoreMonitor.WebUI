@@ -194,3 +194,7 @@ body .el-table th.gutter {
 .el-form-item__error{
   color:#F56C6C !important;
 }
+
+.el-date-editor .el-range__close-icon{
+  display: none;
+}
