@@ -45,10 +45,8 @@
         </div>
       </el-col>
       <el-col
-        v-loading="isLoadingSchedule"
         :span="24"
-        :element-loading-text="$t('insSettingView.loadingbindstore')"
-        class="el-schedule-tabs self-loading"
+        class="el-schedule-tabs"
       >
         <el-row :style="{'min-height':varyWindowHeight - 200+'px'}" class="el-schedule-container">
           <div class="el-schedule-header">
@@ -268,12 +266,12 @@
                   </el-col>
                   <el-col :span="24">
                     <div class="el-bind-content">
-                      <!--<div v-if="storeList.length === 0">-->
-                        <!--<div v-if="Havestore === 0|| resultHavestore && Havestore !== 0" class="bind-empty">-->
-                          <!--<img :src="loadingGif">-->
-                          <!--<span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>-->
-                        <!--</div>-->
-                      <!--</div>-->
+                      <div v-if="storeList.length === 0">
+                        <div v-if="Havestore === 0|| resultHavestore && Havestore !== 0" class="bind-empty">
+                          <img :src="loadingGif">
+                          <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
+                        </div>
+                      </div>
                       <div v-if="storeList.length !== 0">
                         <el-scrollbar id="el-menuscrollbar" style="height:100%;">
                           <div class="el-all-checkbox">
@@ -1826,9 +1824,9 @@ export default {
             let errMsg = res.errMsg;
             let data = res.errCode;
             if (data === 0) {
-              self.notify(self.$t('scheduleView.deleteSuss'), 'success', 3000);
+              util.notify(self.$t('scheduleView.deleteSuss'), 'success', 3000);
             } else {
-              self.notify(self.$t('scheduleView.deleteFail'), 'warning', 3000);
+              util.notify(self.$t('scheduleView.deleteFail'), 'warning', 3000);
             }
             self.initData();
             resolve(data);
@@ -2205,6 +2203,9 @@ export default {
           height: calc(415/1920*100vw);
           line-height: calc(415/1920*100vw);
           text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           .empty-text{
             font-size: calc(14/1920*100vw);
             color:#7d8cad;
