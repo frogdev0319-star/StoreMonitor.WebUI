@@ -9,6 +9,7 @@ $warning: #ff9803;
 $cancelBtnBackground: #eaedf2;
 $cancelBtnFont: #adb1c0;
 $mainColor: #f31d65;
+$black: #182752;
 
 @import url('../css/pagination.css');
 .clear-float::after{
@@ -137,7 +138,7 @@ $mainColor: #f31d65;
 .table-header{
   border: none;
   font-size: calc(14/1920*100vw);
-  color: #7d8cad;
+  color: $tab;
   height: 47px;
 }
 
@@ -244,4 +245,93 @@ $mainColor: #f31d65;
   position: relative;
   top: 30px;
   left: 30px;
+}
+
+.empty-text{
+  margin-left: 20px;
+  font-size: calc(16/1920*100vw);
+  color: $tab;
+}
+
+.radio-group{
+  display: grid;
+  grid-template-columns: 240px 240px;
+  grid-template-rows: 30px;
+}
+.radio-class{
+  display: flex;
+  align-items: center;
+  .el-radio__label{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .radio-img{
+    height: 26px;
+    width: 26px;
+    margin-right: 10px;
+  }
+  .radio-span{
+    display: inline-block;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    color: #94a4b4;
+  }
+}
+
+.absolute-btn{
+  position: absolute;
+  right: calc(25/1920*100vw);
+}
+
+.date-range{
+  display: inline-block;
+}
+
+.date-range.el-date-editor--daterange.el-range-editor--mini {
+  border: 1px solid #ccc;
+  width: 200px;
+  height: calc(36 / 1920 * 100vw);
+  line-height: calc(36 / 1920 * 100vw);
+  min-height: 28px;
+}
+
+.overview-date {
+  height: 80px;
+  line-height: 80px;
+  text-align: left;
+  margin-bottom: 30px;
+  border-bottom: 1px solid $border;
+  position: relative;
+  background: #fff;
+
+  .date-title {
+    margin-left: calc(60 / 1920 * 100vw);
+    margin-right: calc(40 / 1920 * 100vw);
+    font-size: 14px;
+    color: $black;
+  }
+  .content {
+    display: inline-block;
+  }
+  .el-store {
+    position: absolute;
+    right: 0px;
+    margin-right: calc(30/1920*100vw);
+  }
+}
+.iconbangzhu {
+  font-size: calc(20 / 1920 * 100vw);
+  position: relative;
+  top: 2px;
+  color: $tab;
+}
+
+.date-time-tooltip{
+  color: $tab;
+  margin-left: calc(20 / 1920 * 100vw);;
+  margin-right: calc(8 / 1920 * 100vw);
 }
