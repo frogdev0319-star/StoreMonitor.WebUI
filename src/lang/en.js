@@ -760,7 +760,8 @@ export default {
     'getAccessTokenError': 'Cannot get streaming service access token',
     'duplicateSeriNum': 'Duplicate device serial number',
     'storeNotExist': 'Store does not exist',
-    'noAuthorityForStore': 'No authority for the specified store'
+    'noAuthorityForStore': 'No authority for the specified store',
+    'otherError': 'Other Errors'
   },
 
   // Store Management page language

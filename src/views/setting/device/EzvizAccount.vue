@@ -759,42 +759,29 @@ export default {
       const self = this;
       self.errorAccessKey = '';
       self.errorAuthDeviceNum = '';
+      self.errorAccount = '';
       if (msg.indexOf('access key') !== -1) {
-        self.errorAccessKey = String(Math.random());
-        self.$nextTick(() => {
-          self.errorAccessKey = self.$t('deviceView.errorAccessKey');
-        });
+        this.returnMsg('errorAccessKey', self.$t('deviceView.errorAccessKey'));
       } else if (msg.indexOf('authorized devices is invalid') !== -1) {
-        self.errorAuthDeviceNum = String(Math.random());
-        self.$nextTick(() => {
-          self.errorAuthDeviceNum = self.$t('deviceView.errorDeviceNum');
-        });
+        this.returnMsg('errorAuthDeviceNum', self.$t('deviceView.errorDeviceNum'));
       } else if (msg.indexOf('authorized devices is less than') !== -1) {
-        self.errorAuthDeviceNum = String(Math.random());
-        self.$nextTick(() => {
-          self.errorAuthDeviceNum = self.$t('deviceView.lessThanAuthorizedDevices');
-        });
+        this.returnMsg('errorAuthDeviceNum', self.$t('deviceView.lessThanAuthorizedDevices'));
       } else if (msg.indexOf('Account does not exist') !== -1) {
-        self.errorAccount = String(Math.random());
-        self.$nextTick(() => {
-          self.errorAccount = self.$t('deviceView.accountNotExist');
-        });
+        this.returnMsg('errorAccount', self.$t('deviceView.accountNotExist'));
       } else if (msg.indexOf('Account not authorized') !== -1) {
-        self.errorAccount = String(Math.random());
-        self.$nextTick(() => {
-          self.errorAccount = self.$t('deviceView.accountNotAuthorized');
-        });
+        this.returnMsg('errorAccount', self.$t('deviceView.accountNotAuthorized'));
       } else if (msg.indexOf('Account already exists') !== -1) {
-        self.errorAccount = String(Math.random());
-        self.$nextTick(() => {
-          self.errorAccount = self.$t('deviceView.accountExist');
-        });
+        this.returnMsg('errorAccount', self.$t('deviceView.accountExist'));
       } else {
-        self.errorAccessKey = String(Math.random());
-        self.$nextTick(() => {
-          self.errorAccessKey = msg;
-        });
+        this.returnMsg('errorAuthDeviceNum', self.$t('deviceView.otherError'));
       }
+    },
+
+    returnMsg(msgKey, msgValue) {
+      this[msgKey] = String(Math.random());
+      this.$nextTick(() => {
+        this[msgKey] = msgValue;
+      })
     },
 
     ezvizAccountChanged(val) {

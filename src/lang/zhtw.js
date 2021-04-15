@@ -770,7 +770,8 @@ export default {
     'getAccessTokenError': '獲取Access Token失敗',
     'duplicateSeriNum': '重復的設備序列號',
     'storeNotExist': '門店不存在',
-    'noAuthorityForStore': '對門店無操作權限'
+    'noAuthorityForStore': '對門店無操作權限',
+    'otherError': '其他錯誤'
   },
 
   // Store Management page language
