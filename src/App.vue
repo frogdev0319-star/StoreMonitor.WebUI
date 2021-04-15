@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  import util from '@/common/util';
 export default {
   name: 'App',
   data() {
@@ -18,7 +19,7 @@ export default {
         if (val != oldval) {
           sessionStorage.setItem('onLine', this.onLine);
           if (!this.onLine) {
-            this.$message({ message: this.$t('route.networkError'), type: 'error', duration: 5 * 1000 });
+            util.notify(this.$t('route.networkError'), 'error', 5 * 1000 );
           }
         }
       },
