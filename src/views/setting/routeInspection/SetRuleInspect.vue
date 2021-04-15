@@ -4,9 +4,13 @@
     <el-col :span="24" class="el-rute-title">
       <span class="tab-name">【{{ routeName }}】{{ $t('insSettingView.ruleInspect') }}</span>
       <div style="float:right;">
-        <el-button size="mini" type="primary" class="btn-class" @click="submitRule">
+        <delay-button
+          size="mini"
+          type="primary"
+          class="bind-btn"
+          @click="submitRule">
           {{ $t('titleView.save') }}
-        </el-button>
+        </delay-button>
       </div>
     </el-col>
     <el-col :span="24" class="el-rute-content">
@@ -66,9 +70,11 @@
 <script>
 import { inpectRESTful } from '@/api/index';
 import util from '@/common/util';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'SetRuleInspect',
+  components: { DelayButton },
   data() {
     return {
       hundredMarkType: '',
@@ -251,21 +257,6 @@ $itemHeight:50px;
             margin-left:calc(15/1920*100vw);
             font-weight: bold;
             font-size: calc(20/1920*100vw);
-        }
-        .btn-class{
-            border-color: $red;
-            height: calc(36/1920*100vw);
-            padding: 0;
-            font-size: calc(14/1920*100vw);
-            width: calc(130/1920*100vw);
-            @media screen and (max-width: 1440px) {
-                width: 100px;
-            }
-            .btn-area{
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
         }
     }
     .el-rute-content{
