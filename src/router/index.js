@@ -325,7 +325,7 @@ export const navbarRoute = {
       component: resolve => require(['@/views/setting/schedule/PatrolSechedule'], resolve),
       hidden: false,
       meta: {
-        keepAlive: true, // the component is't to be cache.
+        keepAlive: false, // the component is't to be cache.
         requireAuth: true
       }
     });
