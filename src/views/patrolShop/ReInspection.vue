@@ -1,249 +1,25 @@
 <template>
-  <el-row :class="isREC?'noeventClass':''" class="el-container">
-    <el-col :span="16" :class="{liseAnmiClass:showSpread}" class="lside">
+  <el-row class="el-container">
+    <el-col :span="16" class="lside">
       <div class="el-header-title">
-        <span v-if="showStoreUp" class="lside-title">
-          {{ store.storeTitle }}
-        </span>
-        <div v-if="showStoreUp" :class="store.storeUp?'coll':'nocoll'" class="storeUp-content" @click="addStoreUp">
-          <i :class="store.storeUp?'coll-icon':'nocoll-icon'" class="iconfont icon-iconfontstart" style="vertical-align: middle;"/>
-          <span :class="store.storeUp?'coll-font':'nocoll-font'">{{ store.storeUpTitle }}</span>
+        <div v-if="showStoreUp" class="lside-title">
+          <span class="store-title"> {{ store.storeTitle }} </span>
+          <div :class="store.storeUp ? 'start-btn' : 'unstart-btn'" class="storeUp-content" @click="addStoreUp">
+            <i class="iconfont icon-iconfontstart"/>
+            <span class="star-font">{{ store.storeUpTitle }}</span>
+          </div>
         </div>
-        <el-button v-if="sheetName.length!=0" :disabled="isDisabled?false:true" :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
+        <delay-button
+          v-if="sheetName.length !== 0"
+          :disabled="!isDisabled"
+          size="mini"
+          type="primary"
+          class="storevue-button"
+          @click="confirmSummary"
+        >
           {{ $t('remotePatrol.confirmSum') }}
-        </el-button>
+        </delay-button>
       </div>
-      <el-dialog
-        v-if="showCutDialog"
-        :title="$t('remotePatrol.edit')"
-        :visible.sync="showCutDialog"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-          <hr class="dialog-hr">
-          <div v-if="showPenBtn" id="iconR" class="icon-right">
-            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-            <transition name="fadepen">
-              <div v-if="showPen" class="pen-content">
-                <div v-for="(item,index) in penList" :key="index" class="content">
-                  <div :class="{colorActive:item.showContent}"/>
-                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-                </div>
-              </div>
-            </transition>
-          </div>
-          <canvas
-            id="icanvas"
-            :width="767*percentHeight"
-            :height="431*percentHeight"
-            @mousedown="mouseDownAction($event)"
-            @mousemove="mouseMoveAction($event)"/>
-          <div
-            v-if="showCancelContent"
-            :style="{'width':767*percentHeight+'px',
-                     'margin-left':47*percentHeight+'px'}"
-            class="cancel-content">
-            <div class="content" @click="cancelEditCanvas">
-              <img :src="clearIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.clear') }}</span>
-            </div>
-            <div class="content" @click="confirmEditCanvas">
-              <img :src="removeIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.cancel') }}</span>
-            </div>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showCutDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="dialogCommentVideo"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="dialogCommentVideo"
-        :close-on-click-modal="false"
-        :width="680*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content">
-          <hr class="dialog-hr">
-          <video
-            id="previewCutVideo"
-            :width="580*percentHeight"
-            :height="420*percentHeight"
-            :src="curVideoSrc"
-            prload
-            controls
-            autoplay/>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showOuter"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="showOuter"
-        :close-on-click-modal="false"
-        :width="680*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="dialog-img-content">
-            <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight">
-          </div>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showFeedDialog1"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog1"
-        :close-on-click-modal="false"
-        :width="480*percentHeight+'px'"
-        top="12%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="dialog-event-content">
-            <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
-            <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
-            <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 2, maxRows: 7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              @input="eventDesChanged"
-              @blur="notShowInputRuleTips('eventDes')"/>
-            <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog1 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack1">
-            {{ $t('remotePatrol.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showFeedDialog2"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog2"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-            <div v-if="showPenBtn" id="iconR" class="icon-right">
-              <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-              <transition name="fadepen">
-                <div v-if="showPen" class="pen-content">
-                  <div v-for="(item,index) in penList" :key="index" class="content">
-                    <div :class="{colorActive:item.showContent}"/>
-                    <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-                  </div>
-                </div>
-              </transition>
-            </div>
-            <canvas
-              id="icanvas"
-              :width="520*percentHeight"
-              :height="340*percentHeight"
-              @mousedown="mouseDownAction($event)"
-              @mousemove="mouseMoveAction($event)"/>
-            <div
-              v-if="showCancelContent"
-              :style="{'width':520*percentHeight+'px',
-                       'margin-left':47*percentHeight+'px'}"
-              class="cancel-content">
-              <div class="content" @click="cancelEditCanvas">
-                <img :src="clearIconSrc" class="icon-clear" height="22px">
-                <span>{{ $t('remotePatrol.clear') }}</span>
-              </div>
-              <div class="content" @click="confirmEditCanvas">
-                <img :src="removeIconSrc" class="icon-clear" height="22px">
-                <span>{{ $t('remotePatrol.cancel') }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="event-content">
-            <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
-            <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
-            <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 4, maxRows: 7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              @input="eventDesChanged"
-              @blur="notShowInputRuleTips('eventDes')"/>
-            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog2 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack2">
-            {{ $t('remotePatrol.confirm') }}</el-button>
-        </div>
-      </el-dialog>
-
-      <el-dialog
-        v-if="showFeedDialog3"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog3"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="feed-canvas-content" style="text-align:center">
-            <video id="previewCutVideo" :width="520*percentHeight" :height="340*percentHeight" :src="feedBackVideoFileObj.src" prload controls autoplay/>
-          </div>
-          <div class="event-content">
-            <span class="event-title">{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" maxlength="10"/>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 4, maxRows:7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              maxlength="300"/>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog3 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack3">
-            {{ $t('remotePatrol.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-
-      <dialog-vue :dialog-title="changeBrandObj.title" :show-info="changeBrandObj.showInfo" :is-warning="changeBrandObj.isWarning" :dialog-closed="changeBrandObj.dialogCosed" @confirmed="changeBrandDialog" @canceled="canceldChangeBrand"/>
-      <dialog-vue :dialog-title="changeStoreObj.title" :show-info="changeStoreObj.showInfo" :is-warning="changeStoreObj.isWarning" :dialog-closed="changeStoreObj.dialogCosed" @confirmed="changeStoreDialog" @canceled="canceldChangeStore"/>
-      <dialog-vue :dialog-title="changeInspectObj.title" :show-info="changeInspectObj.showInfo" :is-warning="changeInspectObj.isWarning" :dialog-closed="changeInspectObj.dialogCosed" @confirmed="changeInspectDialog" @canceled="canceldChangeInspect"/>
-      <dialog-vue :dialog-title="noBindDeviceObj.title" :show-info="noBindDeviceObj.showInfo" :is-warning="noBindDeviceObj.isWarning" :dialog-closed="noBindDeviceObj.dialogCosed" @confirmed="noBindDeviceDialog" @canceled="canceldNoBind"/>
-      <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
-      <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
-      <dialog-vue :dialog-title="noStoreUser.title" :show-info="noStoreUser.showInfo" :is-warning="noStoreUser.isWarning" :dialog-closed="noStoreUser.dialogCosed" @confirmed="noStoreUserDialog" @canceled="cancelNoUser"/>
-      <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
-      <dialog-vue :dialog-title="videoLoadingObj.title" :show-info="videoLoadingObj.showInfo" :is-warning="videoLoadingObj.isWarning" :dialog-closed="videoLoadingObj.dialogCosed" @confirmed="videoLoadingDialog" @canceled="cancelVideoLoading">></dialog-vue>
       <div v-if="showGuide && inspectList.length > 0" class="guide-content">
         <div class="guide-rside">
           <div class="num-content">
@@ -254,14 +30,9 @@
           </div>
           <img :src="arrows2Src" alt="arrow2">
           <div class="iconright-content">
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
-              <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+            <div :class="lang === 'en'? 'en-iconright' : 'iconright'">
+              <i class="iconfont icon-xiangji iconpaizhao"/>
               <span>{{ $t('remotePatrol.snapshot') }}</span>
-            </div>
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'" style="display: none">
-              <i v-if="lang =='en' " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
-              <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
-              <span>{{ $t('remotePatrol.record') }}</span>
             </div>
           </div>
         </div>
@@ -301,7 +72,7 @@
             </div>
             <transition name="fade">
               <div v-if="showModelContent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
-                <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+                <i class="iconfont icon-xiangji iconpaizhao"/>
                 <span>{{ $t('remotePatrol.snapshot') }}</span>
               </div>
             </transition>
@@ -345,7 +116,7 @@
           </div>
           <img :src="arrows1Src" alt="arrow1">
         </div>
-        <el-row v-if="sheetName.length!=0" class="inspect-title">
+        <el-row v-if="sheetName.length > 0" class="inspect-title">
           <el-col v-if="!notShowAlert" :span="24">
             <el-alert v-if="!isShowWarn&&!showIgnoreItem" :title="$t('remotePatrol.allIgnored')" :closable="false" type="warning"/>
             <el-alert v-if="isShowWarn" :closable="false" type="warning" show-icon><span style="cursor: pointer;font-weight:bold;" @click="hasIgnoreItem">{{ $t('remotePatrol.clickToContent') }}</span></el-alert>
@@ -355,13 +126,14 @@
             </el-alert>
           </el-col>
         </el-row>
-        <el-row v-if="sheetName.length!=0&&!showIgnoreItem" class="inspect-content">
+        <el-row v-if="sheetName.length > 0&&!showIgnoreItem" class="inspect-content">
           <el-col :span="8">
             <el-scrollbar style="height:100%;" class="el-menuscrollbar">
               <div style="background-color:#f4f5f9;height:316.06px;">
                 <div v-for="(_item,_index) in sheetName" :key="_index" class="Group-content">
-                  <div :class="_item.isClick?'noraml-color':'noraml-groupColor'" class="Group-content-title" @click="changeSheet(_item,_index)">
-                    <!-- <span v-if="_item.label==$t('insSettingView.sheetpassfail')" style="color:red;">*</span> -->
+                  <div :class="_item.isClick ? 'noraml-color' : 'noraml-groupColor'"
+                       class="Group-content-title"
+                       @click="changeSheet(_item,_index)">
                     <span>{{ _item.label }}</span>
                     <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span>
                     <i v-if="_item.groupId==undefined&&!_item.isClick" class="el-icon-arrow-right icon"/>
@@ -550,19 +322,15 @@
         </el-row>
       </div>
     </el-col>
-    <el-col v-if="!showSpread" :span="8" class="rside">
+    <el-col :span="8" class="rside">
       <div class="el-header-title">
-        <span>{{ $t('remotePatrol.selectStrore') }}</span>
+        <span class="store-title">{{ $t('remotePatrol.selectStrore') }}</span>
       </div>
-      <el-tabs v-model="activeIndex" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%" @tab-click="handleClick">
+      <el-tabs v-model="activeIndex" :id="lang === 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%" @tab-click="handleClick">
         <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
           <el-scrollbar style="height:100%;" class="el-menuscrollbar">
             <div v-if="index!=2" class="storeList-content">
-              <span v-if="item.storeList.length!=0" class="icon-info">* {{ $t('remotePatrol.cannotSwitch') }}</span>
-              <!-- <span v-for="(_item,_index) in item.storeList" :key="_index" class="storename"
-                            :class="_item.isActive?'activeClass':''" @click="clickStore(item,index,_item,_index)">
-                                {{_item.name}}
-                            </span> -->
+              <span v-if="item.storeList.length !== 0" class="icon-info">* {{ $t('remotePatrol.cannotSwitch') }}</span>
               <div
                 v-for="(_item,_index) in item.storeList"
                 :key="_index"
@@ -655,6 +423,238 @@
         </div>
       </div>
     </el-col>
+
+    <el-dialog
+      v-if="showCutDialog"
+      :title="$t('remotePatrol.edit')"
+      :visible.sync="showCutDialog"
+      :close-on-click-modal="false"
+      :width="860*percentHeight+'px'"
+      height="300px"
+      top="5%">
+      <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+        <hr class="dialog-hr">
+        <div v-if="showPenBtn" id="iconR" class="icon-right">
+          <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
+          <transition name="fadepen">
+            <div v-if="showPen" class="pen-content">
+              <div v-for="(item,index) in penList" :key="index" class="content">
+                <div :class="{colorActive:item.showContent}"/>
+                <div :id="item.id" class="color" @click="checkPen(item,index)"/>
+              </div>
+            </div>
+          </transition>
+        </div>
+        <canvas
+          id="icanvas"
+          :width="767*percentHeight"
+          :height="431*percentHeight"
+          @mousedown="mouseDownAction($event)"
+          @mousemove="mouseMoveAction($event)"/>
+        <div
+          v-if="showCancelContent"
+          :style="{'width':767*percentHeight+'px',
+                     'margin-left':47*percentHeight+'px'}"
+          class="cancel-content">
+          <div class="content" @click="cancelEditCanvas">
+            <img :src="clearIconSrc" class="icon-clear" height="22px">
+            <span>{{ $t('remotePatrol.clear') }}</span>
+          </div>
+          <div class="content" @click="confirmEditCanvas">
+            <img :src="removeIconSrc" class="icon-clear" height="22px">
+            <span>{{ $t('remotePatrol.cancel') }}</span>
+          </div>
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button id="cancelBtn" size="mini" @click="showCutDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
+        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog
+      v-if="dialogCommentVideo"
+      :title="$t('remotePatrol.view')"
+      :visible.sync="dialogCommentVideo"
+      :close-on-click-modal="false"
+      :width="680*percentHeight+'px'"
+      height="300px"
+      top="5%">
+      <div class="canvas-content">
+        <hr class="dialog-hr">
+        <video
+          id="previewCutVideo"
+          :width="580*percentHeight"
+          :height="420*percentHeight"
+          :src="curVideoSrc"
+          prload
+          controls
+          autoplay/>
+      </div>
+    </el-dialog>
+    <el-dialog
+      v-if="showOuter"
+      :title="$t('remotePatrol.view')"
+      :visible.sync="showOuter"
+      :close-on-click-modal="false"
+      :width="680*percentHeight+'px'"
+      height="300px"
+      top="5%">
+      <div class="canvas-content" style="overflow:hidden;">
+        <hr class="dialog-hr">
+        <div class="dialog-img-content">
+          <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight">
+        </div>
+      </div>
+    </el-dialog>
+    <el-dialog
+      v-if="showFeedDialog1"
+      :title="$t('remotePatrol.feedbacks')"
+      :visible.sync="showFeedDialog1"
+      :close-on-click-modal="false"
+      :width="480*percentHeight+'px'"
+      top="12%">
+      <div class="canvas-content" style="overflow:hidden;">
+        <hr class="dialog-hr">
+        <div class="dialog-event-content">
+          <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
+          <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
+          <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
+          <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
+          <span class="event-title">{{ $t('remotePatrol.description') }}</span>
+          <el-input
+            :autosize="{ minRows: 2, maxRows: 7}"
+            v-model="eventDes"
+            :placeholder="$t('remotePatrol.descPlaceholder')"
+            size="mini"
+            class="des-input"
+            type="textarea"
+            resize="none"
+            @input="eventDesChanged"
+            @blur="notShowInputRuleTips('eventDes')"/>
+          <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button id="cancelBtn" size="mini" @click="showFeedDialog1 = false">{{ $t('remotePatrol.cancel') }}</el-button>
+        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack1">
+          {{ $t('remotePatrol.confirm') }}
+        </el-button>
+      </div>
+    </el-dialog>
+    <el-dialog
+      v-if="showFeedDialog2"
+      :title="$t('remotePatrol.feedbacks')"
+      :visible.sync="showFeedDialog2"
+      :close-on-click-modal="false"
+      :width="860*percentHeight+'px'"
+      height="300px"
+      top="5%">
+      <div class="canvas-content" style="overflow:hidden;">
+        <hr class="dialog-hr">
+        <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+          <div v-if="showPenBtn" id="iconR" class="icon-right">
+            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
+            <transition name="fadepen">
+              <div v-if="showPen" class="pen-content">
+                <div v-for="(item,index) in penList" :key="index" class="content">
+                  <div :class="{colorActive:item.showContent}"/>
+                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
+                </div>
+              </div>
+            </transition>
+          </div>
+          <canvas
+            id="icanvas"
+            :width="520*percentHeight"
+            :height="340*percentHeight"
+            @mousedown="mouseDownAction($event)"
+            @mousemove="mouseMoveAction($event)"/>
+          <div
+            v-if="showCancelContent"
+            :style="{'width':520*percentHeight+'px',
+                       'margin-left':47*percentHeight+'px'}"
+            class="cancel-content">
+            <div class="content" @click="cancelEditCanvas">
+              <img :src="clearIconSrc" class="icon-clear" height="22px">
+              <span>{{ $t('remotePatrol.clear') }}</span>
+            </div>
+            <div class="content" @click="confirmEditCanvas">
+              <img :src="removeIconSrc" class="icon-clear" height="22px">
+              <span>{{ $t('remotePatrol.cancel') }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="event-content">
+          <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
+          <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
+          <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
+          <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
+          <span class="event-title">{{ $t('remotePatrol.description') }}</span>
+          <el-input
+            :autosize="{ minRows: 4, maxRows: 7}"
+            v-model="eventDes"
+            :placeholder="$t('remotePatrol.descPlaceholder')"
+            size="mini"
+            class="des-input"
+            type="textarea"
+            resize="none"
+            @input="eventDesChanged"
+            @blur="notShowInputRuleTips('eventDes')"/>
+          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button id="cancelBtn" size="mini" @click="showFeedDialog2 = false">{{ $t('remotePatrol.cancel') }}</el-button>
+        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack2">
+          {{ $t('remotePatrol.confirm') }}</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog
+      v-if="showFeedDialog3"
+      :title="$t('remotePatrol.feedbacks')"
+      :visible.sync="showFeedDialog3"
+      :close-on-click-modal="false"
+      :width="860*percentHeight+'px'"
+      height="300px"
+      top="5%">
+      <div class="canvas-content" style="overflow:hidden;">
+        <hr class="dialog-hr">
+        <div class="feed-canvas-content" style="text-align:center">
+          <video id="previewCutVideo" :width="520*percentHeight" :height="340*percentHeight" :src="feedBackVideoFileObj.src" prload controls autoplay/>
+        </div>
+        <div class="event-content">
+          <span class="event-title">{{ $t('remotePatrol.name') }}</span>
+          <el-input v-model="eventName" size="mini" class="name-input" maxlength="10"/>
+          <span class="event-title">{{ $t('remotePatrol.description') }}</span>
+          <el-input
+            :autosize="{ minRows: 4, maxRows:7}"
+            v-model="eventDes"
+            :placeholder="$t('remotePatrol.descPlaceholder')"
+            size="mini"
+            class="des-input"
+            type="textarea"
+            resize="none"
+            maxlength="300"/>
+        </div>
+      </div>
+      <div slot="footer">
+        <el-button id="cancelBtn" size="mini" @click="showFeedDialog3 = false">{{ $t('remotePatrol.cancel') }}</el-button>
+        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack3">
+          {{ $t('remotePatrol.confirm') }}
+        </el-button>
+      </div>
+    </el-dialog>
+
+    <dialog-vue :dialog-title="changeBrandObj.title" :show-info="changeBrandObj.showInfo" :is-warning="changeBrandObj.isWarning" :dialog-closed="changeBrandObj.dialogCosed" @confirmed="changeBrandDialog" @canceled="canceldChangeBrand"/>
+    <dialog-vue :dialog-title="changeStoreObj.title" :show-info="changeStoreObj.showInfo" :is-warning="changeStoreObj.isWarning" :dialog-closed="changeStoreObj.dialogCosed" @confirmed="changeStoreDialog" @canceled="canceldChangeStore"/>
+    <dialog-vue :dialog-title="changeInspectObj.title" :show-info="changeInspectObj.showInfo" :is-warning="changeInspectObj.isWarning" :dialog-closed="changeInspectObj.dialogCosed" @confirmed="changeInspectDialog" @canceled="canceldChangeInspect"/>
+    <dialog-vue :dialog-title="noBindDeviceObj.title" :show-info="noBindDeviceObj.showInfo" :is-warning="noBindDeviceObj.isWarning" :dialog-closed="noBindDeviceObj.dialogCosed" @confirmed="noBindDeviceDialog" @canceled="canceldNoBind"/>
+    <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
+    <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
+    <dialog-vue :dialog-title="noStoreUser.title" :show-info="noStoreUser.showInfo" :is-warning="noStoreUser.isWarning" :dialog-closed="noStoreUser.dialogCosed" @confirmed="noStoreUserDialog" @canceled="cancelNoUser"/>
+    <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
+    <dialog-vue :dialog-title="videoLoadingObj.title" :show-info="videoLoadingObj.showInfo" :is-warning="videoLoadingObj.isWarning" :dialog-closed="videoLoadingObj.dialogCosed" @confirmed="videoLoadingDialog" @canceled="cancelVideoLoading">></dialog-vue>
   </el-row>
 </template>
 <script>
@@ -671,10 +671,12 @@ import EzvizVideo from '@/components/EzvizVideo.vue';
 import filterString from '@/common/filterString.js';
 import { getDashServerInfo } from '@/api/device.js';
 import DashHttp from '@/common/DashHttp.js';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'ReInspection',
   components: {
+    DelayButton,
     DialogVue,
     ChannelIconBtn,
     EzvizVideo
@@ -773,7 +775,6 @@ export default {
         }
       ],
       testBack: '10s',
-      showSpread: false,
       tabList: [
         {
           label: this.$t('remotePatrol.star'),
@@ -910,7 +911,6 @@ export default {
       timeVideo: 0,
       startTimeCutVideo: 0,
       endTImeCutVideo: 0,
-      isREC: false,
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
 
@@ -1108,7 +1108,6 @@ export default {
       this.videoAuthority && self.getDashUrlInfo();
     }
     document.onmouseup = self.mouseUpAction;
-    self.isREC = false;
     self.getUpLoadBucketInfo();
     self.getOssInfo();
     self.curStoreItem && self.getDeviceList();
@@ -1268,7 +1267,7 @@ export default {
         sourceObj: srcObj
       };
       if (self.eventName.trim().length == 0) {
-        self.notify(self.$t('remotePatrol.emptyTitle'), 'warning', 3000);
+        util.notify(self.$t('remotePatrol.emptyTitle'), 'warning', 3000);
         return false;
       }
       self.eventList.push(obj);
@@ -1295,7 +1294,6 @@ export default {
         sourceObj: srcObj
       };
       if (self.eventName.trim().length == 0) {
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
         self.showEventNameInfo = true;
         return false;
       }
@@ -1312,7 +1310,6 @@ export default {
       };
       if (self.eventName.trim().length == 0) {
         self.showEventNameInfo = true;
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
         return false;
       }
       self.eventList.push(obj);
@@ -1441,7 +1438,7 @@ export default {
       } else {
         self.showCancelContent = false;
         if (self.sourceListLength >= 10) {
-          self.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+          util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
           return false;
         }
         self.showCutDialog = true;
@@ -2511,14 +2508,7 @@ export default {
       const params = { data: obj, rule: inspectSettings };
       self.$router.push({ name: 'confirmSum', params: params });
     },
-    spreadContent() {
-      const self = this;
-      self.showSpread = true;
-    },
-    closeContent() {
-      const self = this;
-      self.showSpread = false;
-    },
+
     async playVideo(url) {
       const self = this;
       console.log('playvideo enter!');
@@ -3445,13 +3435,6 @@ export default {
       }
       return isFull;
     },
-    notify(msg, type, time) {
-      this.$message({
-        message: msg,
-        type: type,
-        duration: time
-      });
-    },
     /**
        * handle ezviz video snapshot
        */
@@ -3665,27 +3648,6 @@ export default {
         background-color: $background;
         .spreadLsideClass{
             width: 98%;
-        }
-        .liseAnmiClass{
-            animation:lisdeAn 0.5s;
-            -webkit-animation: lisdeAn 0.5s;
-            animation-fill-mode:forwards;
-        }
-        @keyframes lisdeAn{
-            from{
-                width: 66.67%;
-            }
-            to{
-                width: 100%;
-            }
-        }
-        @-webkit-keyframes lisdeAn{
-            from{
-                width: 66.67%;
-            }
-            to{
-                width: 100%;
-            }
         }
         #cancelBtn{
             @include point(width,76);
@@ -3913,104 +3875,56 @@ export default {
             background-color: #fff;
             .el-header-title{
                 text-align: left;
-                position: relative;
                 height: 80px;
-                line-height: 80px;
                 border-bottom: 1px solid $border;
                 padding-left: calc(25/1920*100vw);
                 padding-right: calc(25/1920*100vw);
-                .lside-title{
-                    font-weight: bold;
-                    color:$h1;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .store-title{
+                  font-size: 18px;
+                  font-weight: bold;
+                  color:$h1;
                 }
-                @media screen and(min-width: 1366px){
-                    .lside-title{
-                        font-size: 18px;
-                    }
-                    .storeUp-content{
-                        height:22px;
-                        width: 105px;
-                        text-align: center;
-                    }
-                }
-                @media screen and(max-width: 1366px){
-                    .lside-title{
-                        @include point(font-size,18);
-                    }
-                    .storeUp-content{
-                        height:auto;
-                        text-align: center;
-                        width: 100px;
-                    }
-                }
-                .nocoll{
+                .unstart-btn{
                     border:1px solid #FF9803;
+                  .icon-iconfontstart{
+                    color: #FF9803;
+                    font-size: 14px;
+                  }
+
+                  .star-font{
+                    color: #FF9803;
+                  }
                 }
-                .coll{
+                .start-btn{
                     border:1px solid #FF9803;
                     background-color: #FF9803;
-                }
-                .nocoll-icon{
-                    color: #FF9803;
-                    font-size: 14px;
-                }
-                .coll-icon{
+                  .icon-iconfontstart{
                     color: #fff;
                     font-size: 14px;
-                }
-                .coll-font{
+                  }
+                  .star-font{
                     color: #fff;
-                }
-                .nocoll-font{
-                    color: #FF9803;
+                  }
                 }
 
                 .storeUp-content{
-                    display: inline-block;
-                    margin-left: 20px;
-                    padding: 1px 6px;
-                    line-height: 18px;
-                    cursor: pointer;
-                    position: relative;
-                    bottom: 2px;
-                    span{
-                        font-size: 12px;
-                        /*vertical-align: middle;*/
-                        margin-left: 4px;
-                    }
-                }
-                .el-submit{
-                    position: absolute;
-                    @include point(right,20);
-                    //@include point(width,90);
-                    color: #fff;
-                    width:calc(130/1920*100vw);
-                    height: calc(36/1920*100vw);
-                    padding: 0 0;
-                    font-size: calc(14/1920*100vw);
-                }
-                .en-el-submit{
-                    position: absolute;
-                    right: calc(30/1920*100vw);
-                    width:calc(130/1920*100vw);
-                    color: #fff;
-                    height: calc(36/1920*100vw);
-                    padding: 0 0;
-                    font-size: calc(14/1920*100vw);
-                    min-height: 28px;
-                    top: 50%;
-                    transform: translate(0, -50%);
-                    min-width: 85px;
-                }
-                @media screen and(min-width: 1366px){
-                    .el-submit{
-                        top: 30%;
-                    }
-                }
-                @media screen and(max-width: 1366px){
-                    .el-submit{
-                        top: 20%;
-                    }
+                  display: inline-flex;
+                  margin-left: 20px;
+                  padding: 1px 6px;
+                  line-height: 18px;
+                  cursor: pointer;
+                  position: relative;
+                  bottom: 2px;
+                  width: 100px;
+                  justify-content: center;
+                  align-items: center;
+                  .star-font{
+                      font-size: 12px;
+                      margin-left: 4px;
+                  }
                 }
             }
             .errorVideo-model{
@@ -4055,7 +3969,6 @@ export default {
                         width: auto;
                         height: auto;
                         position: absolute;
-                        //top: 30%;
                         top: 60%;
                         right: 0;
                         .iconright{
@@ -4070,6 +3983,7 @@ export default {
                             .iconpaizhao{
                                 color: #fff;
                                 vertical-align:middle;
+                              font-size:18px;
                             }
                             span{
                                 color: #fff;
@@ -4079,24 +3993,8 @@ export default {
                             }
                         }
                         .en-iconright{
+                          @extend .iconright;
                           width: 100px;
-                          text-align: center;
-                          margin-top: 30px;
-                          height: 32px;
-                          line-height: 30px;
-                          border-radius: 4px;
-                          padding: 0 6px;
-                          background-color: rgba($color: #24293d, $alpha: 0.6);
-                          .iconpaizhao{
-                            color: #fff;
-                            vertical-align:middle;
-                          }
-                          span{
-                            color: #fff;
-                            font-size: 12px;
-                            margin-left: 12px;
-                            vertical-align:middle;
-                          }
                         }
                     }
                 }
@@ -4345,9 +4243,8 @@ export default {
               }
             }
             .el-inspect{
-                border-left: 1px solid $border;
-                border-right: 1px solid $border;
-                border-bottom: 1px solid $border;
+              border: 1px solid $border;
+              border-top: none;
                 margin: 0;
                 margin-left: calc(25/1920*100vw);
                 margin-right: calc(25/1920*100vw);
