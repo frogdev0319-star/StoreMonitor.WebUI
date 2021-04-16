@@ -70,7 +70,6 @@
             <div class="role-content">
               <div
                 v-for="(_item,_index) in item.children"
-                v-show="!_item.disabled|| (_item.disabled && _item.checked)"
                 :class="lang === 'en'? 'en-role-detail': 'role-detail'"
                 :key="_index">
                 <el-checkbox
@@ -268,7 +267,6 @@ export default {
           ]
         }
       ],
-      tempRoleNameList: [],
       authorityInfoLists: [],
       lang: this.$i18n.locale,
       roleId: 0,
@@ -279,21 +277,22 @@ export default {
   },
 
   watch: {
-    templateRoleId(newValue, oldValue) {
-      this.roleNameList = this.tempRoleNameList;
-      this.roleNameList.forEach(item => {
-        item.checked = false;
-        item.children.forEach(_item => {
-          _item.checked = false;
-          _item.disabled = false;
+    templateRoleId(newValue) {
+      if(newValue !== 0){
+        this.roleNameList.forEach(item => {
+          item.checked = false;
+          item.disabled = true;
+          item.children.forEach(_item => {
+            _item.checked = false;
+            _item.disabled = true;
+          });
         });
-      });
-      this.getAvailableAuthority(this.authorityInfoLists[newValue - 1].availableAuth);
+        this.getAvailableAuthority(this.authorityInfoLists[newValue - 1].availableAuth);
+      }
     }
   },
 
   mounted() {
-    this.tempRoleNameList = JSON.parse(JSON.stringify(this.roleNameList));
     this.getTitleInfo();
     this.getAuthorityInfoList();
   },
@@ -370,22 +369,7 @@ export default {
 
     setParentIfChecked() {
       this.roleNameList.forEach(item => {
-        let childrenMustNum = 0;
-        let childrenCheckedNum = 0;
-        let childrenUncheckedNum = 0;
-        let childrenNoAuthorityNum = 0;
-        item.children.forEach(_item => {
-          if (_item.disabled) {
-            _item.checked ? childrenMustNum++ : childrenNoAuthorityNum++;
-          } else {
-            _item.checked ? childrenCheckedNum++ : childrenUncheckedNum++;
-          }
-        });
-        if (childrenMustNum + childrenNoAuthorityNum + childrenCheckedNum === item.children.length) {
-          item.checked = true;
-        } else {
-          item.checked = false;
-        }
+        item.checked = !item.children.find(_item => _item.checked === false);
       });
     },
 
@@ -415,11 +399,27 @@ export default {
 
     getRoleAuthority() {
       this.showRolesList = false;
+      this.templateRoleId = 0;
+      this.setDefaultValueOfRoleNameList();
       this.getAvailableAuthority(this.infoForm.authorities);
     },
 
     saveTemplateTitle() {
+      this.setDefaultValueOfRoleNameList();
       this.showRolesList = false;
+      this.getAvailableAuthority(this.authorityInfoLists[this.templateRoleId - 1].availableAuth);
+      this.templateRoleId = 0;
+    },
+
+    setDefaultValueOfRoleNameList(){
+      this.roleNameList.forEach(item => {
+        item.checked = false;
+        item.disabled = false;
+        item.children.forEach(_item => {
+          _item.checked = false;
+          _item.disabled = false;
+        });
+      });
     },
 
     saveBasicInfo() {

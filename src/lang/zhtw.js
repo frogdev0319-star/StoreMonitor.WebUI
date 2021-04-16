@@ -923,7 +923,7 @@ export default {
     'canReceiveMessage': '允許接收消息通知',
     'yes': '允許',
     'no': '不允許',
-    'useTemplate': '職務配置模板',
+    'useTemplate': '模板',
     'useAndSave': '選擇並套用'
   }
 };

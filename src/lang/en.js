@@ -915,7 +915,7 @@ export default {
     'canReceiveMessage': 'Allow message reception',
     'yes': 'Yes',
     'no': 'No',
-    'useTemplate': 'Permission template',
+    'useTemplate': 'Template',
     'useAndSave': 'Choose & Save'
   }
 };

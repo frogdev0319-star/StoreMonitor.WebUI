@@ -926,7 +926,7 @@ export default {
     'canReceiveMessage': '允许接收消息通知',
     'yes': '允许',
     'no': '不允许',
-    'useTemplate': '职务配置模板',
+    'useTemplate': '模板',
     'useAndSave': '选择并套用'
   }
 };
