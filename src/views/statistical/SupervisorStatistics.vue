@@ -527,7 +527,6 @@ export default {
         this.defaultSort = { prop: 'completionRateStr', order: 'ascending' };
         this.params = {};
         this.getSearchParams();
-        this.initDaysRange();
       }
     }
   },
@@ -535,7 +534,6 @@ export default {
   async created() {
     this.getInspctList();
     this.getSearchParams();
-    this.initDaysRange();
   },
 
   methods: {
@@ -948,16 +946,21 @@ export default {
         inpectRESTful.GetInspectTagList().then(async res => {
           if (res.errCode === 0) {
             const result = await titleRESTful.getUserTitleList();
-            const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
             const filterInspect = [];
-            res.data.forEach(inspectItem => {
-              inspectItem.appliedTo.forEach(appliedInspctor => {
-                appliedInspctor.id === roleId && filterInspect.push(inspectItem);
+            if(result.errCode === 0 && result.data.length > 0){
+              const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
+              res.data.forEach(inspectItem => {
+                inspectItem.appliedTo.forEach(appliedInspctor => {
+                  appliedInspctor.id === roleId && filterInspect.push(inspectItem);
+                })
               })
-            })
-            this.inspectList = filterInspect;
-            this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : null;
-            this.getInspectPersonTable();
+              this.inspectList = filterInspect;
+              this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : '';
+              this.getInspectPersonTable();
+            } else{
+              this.inspectList = [];
+              this.inspectTagId = '';
+            }
             resolve(res);
           }
         }).catch(err => {
