@@ -581,9 +581,14 @@ export default {
     getAccountList() {
       const self = this;
       getAccountList().then(res => {
-        const data = res.data;
         if (res.errCode === 0) {
-          self.brandList = data;
+          const data = res.data;
+          const accountArr = [];
+          data.forEach(accountItem => {
+            accountItem.srp.forEach(item => {
+              item.type === 'Custom_Inspection' && item.enable && item.visible && accountArr.push(accountItem)
+            })
+          });
           self.getUserName();
         }
       });
