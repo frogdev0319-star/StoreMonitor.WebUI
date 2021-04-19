@@ -817,13 +817,15 @@ export default {
         inpectRESTful.GetInspectTagList(params).then(async res => {
           let data = res.data;
           const result = await titleRESTful.getUserTitleList();
-          const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
           const filterInspect = [];
-          data.map(inspectItem => {
-            inspectItem.appliedTo.forEach(appliedInspctor => {
-              appliedInspctor.id === roleId && filterInspect.push(inspectItem);
+          if(result.code === 0 && result.data.length > 0){
+            const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
+            data.map(inspectItem => {
+              inspectItem.appliedTo.forEach(appliedInspctor => {
+                appliedInspctor.id === roleId && filterInspect.push(inspectItem);
+              })
             })
-          })
+          }
           this.InspectList = filterInspect;
           if (this.InspectList.length !== 0) {
             this.inspectId = this.InspectList[0].id;
