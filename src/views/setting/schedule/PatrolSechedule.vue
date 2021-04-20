@@ -818,7 +818,7 @@ export default {
           let data = res.data;
           const result = await titleRESTful.getUserTitleList();
           const filterInspect = [];
-          if(result.code === 0 && result.data.length > 0){
+          if(result.errCode === 0 && result.data.length > 0){
             const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
             data.map(inspectItem => {
               inspectItem.appliedTo.forEach(appliedInspctor => {
