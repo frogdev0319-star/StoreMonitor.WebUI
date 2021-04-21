@@ -352,7 +352,7 @@
 </template>
 
 <script>
-import { inpectRESTful, titleRESTful } from '@/api/index';
+import { inpectRESTful } from '@/api/index';
 import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
@@ -811,31 +811,28 @@ export default {
 
     getTagList(val) {
       const params = {
-        mode: val
+        mode: val,
+        appliedOnly: 1
       };
       return new Promise((resolve, reject) => {
-        inpectRESTful.GetInspectTagList(params).then(async res => {
-          const data = res.data;
-          const result = await titleRESTful.getUserTitleList();
-          const filterInspect = [];
-          if (result.errCode === 0 && result.data.length > 0) {
-            const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
-            data.map(inspectItem => {
-              inspectItem.appliedTo.forEach(appliedInspctor => {
-                appliedInspctor.id === roleId && filterInspect.push(inspectItem);
-              })
-            })
-          }
-          this.InspectList = filterInspect;
-          if (this.InspectList.length !== 0) {
-            this.inspectId = this.InspectList[0].id;
-            this.changePatrolList(this.inspectId, this.isActive);
+        inpectRESTful.GetInspectTagList(params).then(res => {
+          if (res.errCode === 0) {
+            const data = res.data;
+            this.InspectList = data;
+            if (this.InspectList.length !== 0) {
+              this.inspectId = this.InspectList[0].id;
+              this.changePatrolList(this.inspectId, this.isActive);
+            } else {
+              this.changePatrolList('noInspect', this.isActive);
+            }
+            resolve(data);
           } else {
-            this.changePatrolList('noInspect', this.isActive);
+            this.InspectList = [];
+            this.inspectId = '';
+            resolve(res);
           }
-          resolve(data);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     },
@@ -1944,8 +1941,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      accountChanged: 'accountChanged',
-      roles: 'roles'
+      accountChanged: 'accountChanged'
     })
   }
 };
