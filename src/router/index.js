@@ -157,8 +157,6 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() ||
-      PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) &&
     eventRoute.children.push(
       {
         path: '/event',
