@@ -36,11 +36,10 @@
           </div>
         </el-button>
       </el-col>
-      <el-col :span="18" class="el-route-tabs" :style="{'min-height':varyWindowWidth - 250 +'px'}">
-        <div class="loading_area self-loading"
-             :element-loading-text="$t('insSettingView.loadingbindstore')"
-             v-loading="isLoading">
-        </div>
+      <el-col :span="18" class="el-route-tabs loading_area self-loading"
+              :style="{'min-height':varyWindowWidth - 250 +'px'}"
+              :element-loading-text="$t('insSettingView.loadingbindstore')"
+              v-loading="isLoading">
         <el-tabs id="en-patrltabs-content" v-model="activeName" @tab-click="handleClick"
                  :style="{'min-height':varyWindowWidth - 250 +'px'}">
           <el-tab-pane v-for="(item,index) in elTableData" :key="index" :label="index < 2 ? getLang(index) : item.label"
@@ -1807,13 +1806,6 @@ export default {
     .nameinput >>> .el-input__inner{
         border:0;
     }
-    .loading_area >>> .el-loading-spinner{
-      height: calc(100vh - 180px);
-    }
-    .loading_area >>> .el-loading-text{
-      height: calc(100vh - 180px);
-      line-height:calc(100vh - 180px);
-    }
     #en-patrltabs-content >>> .el-tabs__nav-scroll {
       height: 40px;
     }
@@ -1885,4 +1877,7 @@ export default {
     height: 0 !important;
   }
 
+    .self-loading.loading_area >>> .el-loading-mask{
+      background-color: transparent;
+    }
 </style>
