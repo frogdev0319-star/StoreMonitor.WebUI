@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="template-titles">
-      <div class="names">
+      <div class="names" v-if="templateList.length > 1">
         <div v-for="(item,index) in templateList"
              class="template-name no-print"
              :class="{'click-btn' : curTemplateIndex === index}"
@@ -361,6 +361,7 @@ import 'videojs-contrib-hls';
 import resize from '@/components/mixins/resize';
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
+import SearchConditionUtil from '../../common/SearchConditionUtil';
 
 export default {
   name: 'InspectReport',
@@ -460,7 +461,8 @@ export default {
       staticalConfig: null,
       pageData: null,
       signaturesList: null,
-      reportData: null
+      reportData: null,
+      cachedTemplateId: -1
     };
   },
 
@@ -482,6 +484,7 @@ export default {
   },
 
   created() {
+    this.getStoredTemplateId();
     this.getInspectTemplateList();
     this.getRouterData();
     this.getReportInfo();
@@ -500,10 +503,18 @@ export default {
       ReportSetting.getInspectReportTemplateList().then(res => {
         if(res.errCode === 0 && res.data.length > 0) {
           this.templateList = res.data;
-          this.curTemplateIndex = 0;
-          this.templateConfig = this.templateList[0].config.switches.filter(item => item.enable === true);
-          const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
-          this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
+          const savedTemplateIndex = this.templateList.findIndex(item => {return item.id === this.cachedTemplateId});
+          if(savedTemplateIndex !== -1){
+            this.curTemplateIndex = savedTemplateIndex;
+            this.templateConfig = this.templateList[savedTemplateIndex].config.switches.filter(item => item.enable === true);
+            const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
+            this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
+          } else {
+            this.curTemplateIndex = 0;
+            this.templateConfig = this.templateList[0].config.switches.filter(item => item.enable === true);
+            const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
+            this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
+          }
         }
         else{
             this.templateList = [];
@@ -522,6 +533,7 @@ export default {
       const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
       this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
       this.getPageDataBasedOnTemplate(this.reportData);
+      this.saveTemplateId();
     },
 
     handleDown() {
@@ -1174,6 +1186,24 @@ export default {
         pageIndex === index && (item.ifExpand = !item.ifExpand)
       })
     },
+
+    saveTemplateId(){
+      let params = {
+        templateId: this.templateList[this.curTemplateIndex].id,
+      }
+      const searchConditon = {
+        path: 'reportDetail',
+        params: params
+      }
+      SearchConditionUtil.saveSearchCondition(searchConditon)
+    },
+
+    getStoredTemplateId(){
+      const templateJson = SearchConditionUtil.getSearchCondition('reportDetail');
+      if(Object.keys(templateJson).length > 0){
+        this.cachedTemplateId = templateJson.templateId;
+      }
+    }
   }
 };
 </script>
@@ -1400,6 +1430,7 @@ export default {
       .radar-content {
         height: 300px;
         position: relative;
+        margin-top: 20px;
         .span-4{
           position: absolute;
           font-weight: 400;
