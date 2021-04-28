@@ -75,8 +75,8 @@
               <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfQualified }}</span></td>
               <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfUnqualified }}</span></td>
               <td v-if="s_item.type==1"><span>{{ item.itemScore }}</span></td>
-              <td><span>{{ item.numIgnore }}</span></td>
-              <td v-if="s_item.type==1||s_item.type==2"><span>{{ item.itemgetScore }}</span></td>
+              <!--<td><span>{{ item.numIgnore }}</span></td>-->
+              <td><span>{{ item.itemgetScore }}</span></td>
             </tr>
           </tbody>
         </table>
@@ -97,15 +97,20 @@
                     <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
                     <p class="title2">{{ _item.description }}</p>
                   </div>
-                  <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                  <div v-if="(_item.type === 0 ||_item.type === 2)&&item.detailType !== 1" class="title-btn">
-                    {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
-                  </div>
-                  <div v-if="_item.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
-                    <span>
-                      <span>{{ _item.itemgetScore }}</span>
-                      <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
-                    </span>
+                  <div>
+                    <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
+                    <div v-if="(_item.type === 0 ||_item.type === 2)&&item.detailType !== 1" class="title-btn">
+                      {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                    </div>
+                    <div v-if="_item.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
+                      <span>
+                        <span>{{ _item.itemgetScore }}</span>
+                        <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
+                      </span>
+                    </div>
+                    <div class="total-score">
+                      {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}
+                    </div>
                   </div>
                 </div>
                 <div v-if="index === 2" class="content-detail-title" style="background-color:#fff;min-height:30px;">
@@ -271,22 +276,20 @@ export default {
         { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
         { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
         { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;' }
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
       ],
       theaderScore: [
         { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:26%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:34%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
       ],
       theaderOther: [
         { name: '', width: 'width:11%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;' }
+        { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
       ],
       suggest: '',
       store: {},
@@ -627,7 +630,7 @@ export default {
               } else if (p_item.type === 1 && (s_item.itemgetScore < s_item.qualifiedScore)) {
                 UnqualifiedTemp.push(s_item);
               }
-              if ((p_item.type === 1 || p_item.type === 2) && s_item.itemgetScore !== '--') {
+              if ((p_item.type === 0 || p_item.type === 1 || p_item.type === 2) && s_item.itemgetScore !== '--') {
                 totalGetscore += s_item.itemgetScore;
               }
             }
@@ -664,7 +667,11 @@ export default {
           }else{
             item['itemScore'] = notAddIgnoretotalScore;
           }
-          item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
+          if(p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1){
+            item['itemgetScore'] = '--';
+          } else{
+            item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
+          }
           if (p_item.type === 0) {
             PassFileTotalScoreSystem = PassFileTS;
             PassFileXS = PassFileX;
@@ -1409,6 +1416,12 @@ $h1:#292e36;
             }
         }
     }
+}
+.total-score{
+  text-align: center;
+  font-size: 12px;
+  color: $black;
+  margin-top: 4px;
 }
 
 </style>
