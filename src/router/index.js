@@ -139,6 +139,9 @@ export const navbarRoute = {
         path: '/reportdetails',
         name: 'reportDetails',
         hidden: true,
+        meta: {
+          keepAlive: false
+        },
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
     );
@@ -328,7 +331,7 @@ export const navbarRoute = {
       }
     });
 
-    //PermissionHelper.enableReportSetting() &&
+    PermissionHelper.enableReportSetting() &&
     inspectionRoute.children.push({
       path: '/insepctionReportSetting',
       name: 'insepctionReportSetting',
