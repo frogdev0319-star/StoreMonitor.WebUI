@@ -157,8 +157,6 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() ||
-      PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) &&
     eventRoute.children.push(
       {
         path: '/event',
@@ -326,6 +324,19 @@ export const navbarRoute = {
       hidden: false,
       meta: {
         keepAlive: false, // the component is't to be cache.
+        requireAuth: true
+      }
+    });
+
+    //PermissionHelper.enableReportSetting() &&
+    inspectionRoute.children.push({
+      path: '/insepctionReportSetting',
+      name: 'insepctionReportSetting',
+      isReadOnly: false,
+      component: resolve => require(['@/views/setting/report/ReportSetting'], resolve),
+      hidden: false,
+      meta: {
+        keepAlive: false,
         requireAuth: true
       }
     });

@@ -400,7 +400,7 @@ export default {
     setThreeChildrenCanChangeBrand(path) {
       let disabled = true;
       const canChangeBrandPathArr = ['/routeinspection', '/storemanage', '/patrolSchedule',
-        '/dashDevice', '/ezvizDevice', '/beseyeAccount'];
+        '/dashDevice', '/ezvizDevice', '/beseyeAccount', '/insepctionReportSetting'];
       disabled = !canChangeBrandPathArr.includes(path);
       return disabled;
     },
@@ -460,7 +460,7 @@ export default {
     setSystemNavbarBread(matched, currentRoute) {
       const matchedParentName = matched[1].name;
       const inspectSettingNameArr = ['inspectSetting', 'inspectingSettingOfInspectList',
-        'inspectingSettingOfDevice', 'inspectingSettingOfSchedule'];
+        'inspectingSettingOfDevice', 'inspectingSettingOfSchedule', 'insepctionReportSetting'];
       const deviceSettingNameArr = ['deviceManage', 'ezvizDeviceMgt', 'beseyeDeviceMgt'];
       if (inspectSettingNameArr.includes(matchedParentName)) {
         this.setInspectionSettingBread(matched, currentRoute);
@@ -491,6 +491,10 @@ export default {
         }
         case '/patrolSchedule': {
           this.setFirstBread(matched, 'inspectingSettingOfSchedule');
+          break;
+        }
+        case '/insepctionReportSetting': {
+          this.setFirstBread(matched, 'inspectingSettingOfReport');
           break;
         }
         case '/bindroute':

@@ -63,7 +63,9 @@ export default {
     'networkError': 'Network error, please check network connection status!',
     'serverException': 'Server exception, please refresh and try again!',
     'noAuthority': 'No authority!',
-    'loginAbnormal': 'The login information is abnormal, please sign in again!'
+    'loginAbnormal': 'The login information is abnormal, please sign in again!',
+    'insepctionReportSetting': 'Inspection Report Settings',
+    'inspectingSettingOfReport': 'Inspection Settings(Inspection Report Settings)'
   },
 
   'overview': {
@@ -411,7 +413,10 @@ export default {
     'excellent': 'Excellent',
     'signatureAndPic': 'Signature & Picture',
     'loading': 'Loading...',
-    'noVideoAccess': 'No video access, please contact system administrator'
+    'noVideoAccess': 'No video access, please contact system administrator',
+    'highDefinition': 'HD',
+    'fluency': 'Fluency',
+    'totalScoreUnit': 'Total Score:'
   },
 
   // event Management page language
@@ -902,7 +907,7 @@ export default {
     'roleId2Title': 'Manager',
     'roleId3Title': 'Supervisor',
     'roleId4Title': 'Store Manager',
-    'comment': 'Note',
+    'remarksContent': 'Note',
     'commentRuletip': 'Enter up to 200 characters',
     'roleSetting': 'Menu Permission Settings',
     'confirmInfo': 'Confirm Delete',
@@ -916,6 +921,32 @@ export default {
     'yes': 'Yes',
     'no': 'No',
     'useTemplate': 'Template',
-    'useAndSave': 'Choose & Save'
+    'useAndSave': 'Choose & Save',
+    'add': 'Add',
+    'delete': 'Delete',
+    'templateName': 'Template Name',
+    'componentName': 'Component Name',
+    'componentStatus': 'Component Status',
+    'comment': 'Inspection Advice',
+    'statistics': 'Inspection Statistics',
+    'summaryTable': 'Inspection Table Preview',
+    'focalItem': 'Notable Items',
+    'feedbackItem': 'Feedback Items',
+    'qualifiedItem': 'Qualified Items',
+    'ignoredItem': 'Ignored Items',
+    'atLeastOneTemplate': 'Keep at least one report template',
+    'noEnableTemplate': 'There is no enabled template after deletion, please adjust and delete',
+    'templateOutOfLimit': 'Configuration template out of limit',
+    'enableTemplate': 'Please enable report template',
+    'enableConfig': 'Please open the configuration item',
+    'templateNameExist': 'Template name already exists',
+    'enterTemplateName': 'Please enter the template name',
+    'inspectionStaticSetting': 'Inspection result statistics setting',
+    'statisIndex': 'Statistic Index',
+    'qualified': 'Qualified',
+    'unqualified': 'Unqualified',
+    'displayofStatisticalResults': 'Statistical Results Display',
+    'radar':'Radar Chart',
+    'pie':'Pie Chart'
   }
 };
