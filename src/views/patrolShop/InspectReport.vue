@@ -1088,34 +1088,13 @@ export default {
         obj.value = this.staticalConfig.qualified ? item.numOfUnqualifiedItems : item.numOfQualifiedItems;
         obj.value > 0 && seriesData.push(obj);
       });
-      pieOptions.series[1].data = seriesData;
+      pieOptions.series[0].data = seriesData;
       return pieOptions;
     },
 
     getPieChartsOption(){
       const pieOption = {
         series: [
-          {
-            type: 'pie',
-            radius: ['43%', '70%'],
-            itemStyle: {
-              normal:{
-                color: function(params){
-                  let colorList = ['#f4f5f9'];
-                  return colorList[params.dataIndex];
-                },
-              }
-            },
-            label:{
-              show: false
-            },
-            tooltip: {
-              show: false,
-              trigger: 'none',
-            },
-            silent: true,
-            data: [{value: 1, name:''}]
-          },
           {
             type: 'pie',
             radius: ['50%', '60%'],
@@ -1392,6 +1371,17 @@ export default {
       .pie-content {
         height: 300px;
         position: relative;
+        .pie-panel{
+          width: 210px;
+          height: 210px;
+          margin: 0 auto;
+          border-radius: 50%;
+          background: -webkit-radial-gradient(circle closest-side, #fff 60%, #f4f5f9 40%);
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          position: absolute;
+        }
         .span-4{
           position: absolute;
           font-weight: 400;
@@ -1932,10 +1922,10 @@ export default {
   .signature-details{
     display: flex;
     flex-wrap: nowrap;
-    height: 280px;
+    height: 150px;
     justify-content: flex-start;
     .signature-item{
-      width: calc(200/1920*100vw);
+      width: 200px;
       height: 100%;
       position: relative;
       cursor: pointer;
