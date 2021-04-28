@@ -356,6 +356,7 @@ export default {
       this.roleNameList[4].children[1].checked = !!PermissionHelper.enablePatrolSetting();
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableStoreSetting();
       this.roleNameList[4].children[3].checked = !!PermissionHelper.enableScheduleSetting();
+      this.roleNameList[4].children[4].checked = !!PermissionHelper.enableReportSetting();
 
       if (authorities.length === 6) {
         this.ifAccessVideo = PermissionHelper.enableVideo() ? 1 : 0;
