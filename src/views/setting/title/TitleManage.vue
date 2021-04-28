@@ -23,6 +23,7 @@
 import { titleRESTful } from '@/api/index';
 import { mapGetters } from 'vuex';
 import TablePagination from '@/components/TablePagination';
+import util from '@/common/util';
 
 export default {
   name: 'TitleManage',
@@ -90,6 +91,9 @@ export default {
       this.tableData = [];
       titleRESTful.getUserTitleList().then(res => {
         this.isLoadingData = false;
+        res.data.map(item => {
+          item.createTime = util.getDateStr1(item.createTime);
+        });
         this.tableData = res.data;
       })
         .catch(err => {
