@@ -284,6 +284,7 @@ $black: #182752;
 
 .absolute-btn{
   position: absolute;
+  z-index: 2;
   right: calc(25/1920*100vw);
 }
 

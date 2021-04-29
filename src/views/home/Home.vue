@@ -196,7 +196,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.6.5 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.6.7 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
 
@@ -233,7 +233,8 @@ export default {
       roleId: 0,
       lang: this.$i18n.locale,
       title: '',
-      isMobile: false
+      isMobile: false,
+      brandDisabled: false
     };
   },
 
@@ -319,6 +320,9 @@ export default {
       const pathMAP = pathMapArr.find(item => item.curPath.includes(path));
       if (pathMAP) {
         path = pathMAP.activePath;
+        this.setBrandListDisabled(true);
+      } else {
+        this.setBrandListDisabled(false);
       }
       return path;
     },
@@ -330,23 +334,7 @@ export default {
     ...mapGetters([
       'token',
       'name'
-    ]),
-
-    brandDisabled() {
-      let disabled = true;
-      switch (this.$route.matched.length) {
-        case 2: {
-          disabled = false;
-          break;
-        }
-        case 3: {
-          const path = this.$route.matched[2].path;
-          disabled = this.setThreeChildrenCanChangeBrand(path);
-          break;
-        }
-      }
-      return disabled;
-    }
+    ])
   },
 
   watch: {
@@ -397,12 +385,8 @@ export default {
   },
 
   methods: {
-    setThreeChildrenCanChangeBrand(path) {
-      let disabled = true;
-      const canChangeBrandPathArr = ['/routeinspection', '/storemanage', '/patrolSchedule',
-        '/dashDevice', '/ezvizDevice', '/beseyeAccount', '/insepctionReportSetting'];
-      disabled = !canChangeBrandPathArr.includes(path);
-      return disabled;
+    setBrandListDisabled(booleanFlag) {
+      this.brandDisabled = booleanFlag;
     },
 
     handleClickOutside() {
@@ -585,12 +569,25 @@ export default {
     getAccountList() {
       const self = this;
       getAccountList().then(res => {
-        const data = res.data;
         if (res.errCode === 0) {
-          self.brandList = data;
+          const data = res.data;
+          this.getBrandList(data);
           self.getUserName();
         }
       });
+    },
+
+    getBrandList(brandList) {
+      const tempAccount = [];
+      brandList.forEach((accountItem) => {
+        const res = accountItem['srp'].filter((srpItem) =>
+          srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
+        if (res && res.length) {
+          accountItem['srp'] = res;
+          tempAccount.push(accountItem)
+        }
+      })
+      this.brandList = tempAccount;
     },
 
     changeAccount(accountId) {

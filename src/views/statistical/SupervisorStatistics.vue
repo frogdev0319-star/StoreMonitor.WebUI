@@ -327,7 +327,7 @@ import {
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
-import { inpectRESTful, titleRESTful } from '@/api/index';
+import { inpectRESTful } from '@/api/index';
 import DateTimePicker from '@/components/DateTimePicker';
 
 export default {
@@ -515,8 +515,7 @@ export default {
 
   computed: {
     ...mapGetters({
-      accountChanged: 'accountChanged',
-      roles: 'roles'
+      accountChanged: 'accountChanged'
     })
   },
 
@@ -941,42 +940,24 @@ export default {
     },
 
     getInspctList() {
+      const params = {};
+      params.appliedOnly = 1;
       return new Promise((resolve, reject) => {
-        inpectRESTful.GetInspectTagList().then(async res => {
+        inpectRESTful.GetInspectTagList(params).then(res => {
           if (res.errCode === 0) {
-            const result = await titleRESTful.getUserTitleList();
-            const filterInspect = [];
-            if(result.errCode === 0 && result.data.length > 0){
-              const roleId = result.data.filter(item => item.titleId === this.roles[0])[0].id;
-              res.data.forEach(inspectItem => {
-                inspectItem.appliedTo.forEach(appliedInspctor => {
-                  appliedInspctor.id === roleId && filterInspect.push(inspectItem);
-                })
-              })
-              this.inspectList = filterInspect;
-              this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : '';
-              this.getInspectPersonTable();
-            } else{
-              this.inspectList = [];
-              this.inspectTagId = '';
-            }
+            this.inspectList = res.data;
+            this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : '';
+            this.getInspectPersonTable();
+            resolve(res);
+          } else {
+            this.inspectList = [];
+            this.inspectTagId = '';
             resolve(res);
           }
         }).catch(err => {
           console.log('SupervisorStatistics-getInspctList:' + err);
         })
       })
-    },
-
-    getTitleList() {
-      titleRESTful.getUserTitleList().then(res => {
-        this.isLoadingData = false;
-        this.tableData = res.data;
-      })
-        .catch(err => {
-          this.isLoadingData = false;
-          console.log('TitleManagement-getTitleList: ' + err);
-        });
     },
 
     async getInspectPersonTable() {

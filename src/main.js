@@ -57,42 +57,15 @@ async function setURL() {
 setURL();
 
 router.beforeEach(async(to, from, next) => {
-  console.log(to.name);
-  // determine whether the user has logged in
   if (!to.name) {
     // generate accessible routes map based on roles
     const { roles } = await store.dispatch('GetUserAuthorities');
-    console.log(roles);
-    // generate accessible routes map based on roles
     const accessRoutes = await store.dispatch('generateRoutes');
-    // dynamically add accessible routes
     router.addRoutes(accessRoutes);
-    // hack method to ensure that addRoutes is complete
-    // set the replace: true, so the navigation will not leave a history record
     next({ ...to, replace: true });
   } else {
-    // if (to.matched.some(r => r.meta.requireAuth)) {
-    //   if (getToken()) {
-    //     next();
-    //   } else {
-    //     // const url = sessionStorage.getItem('LoginURL');
-    //     // window.location.href = url;
-    //   }
-    // } else {
-    //   next();
-    // }
     next();
   }
-  // if (to.matched.some(r => r.meta.requireAuth)) {
-  //   if (getToken()) {
-  //     next();
-  //   } else {
-  //     const url = sessionStorage.getItem('LoginURL');
-  //     window.location.href = url;
-  //   }
-  // } else {
-  //   next();
-  // }
 });
 
 new Vue({
