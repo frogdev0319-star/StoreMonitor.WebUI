@@ -282,7 +282,6 @@ export default {
     'confirmIgnore': '确认是否忽略当前巡检项？',
     'notBindCamera': '当前门店的巡检项未绑定设备！',
     'incompleteInfo': '巡检项尚未完成评估，是否继续?',
-    'notSolver': '当前门店未绑定负责人，是否继续？',
     'emptyTitle': '问题反馈名称不能为空！',
     'recording': '正在录制',
     'recordSucc': '录制成功',

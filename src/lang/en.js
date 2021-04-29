@@ -277,7 +277,6 @@ export default {
     'confirmIgnore': 'Confirm ignore items?',
     'notBindCamera': "Items hasn't bind with devices!",
     'incompleteInfo': 'Incomplete items, whether to continue？',
-    'notSolver': "Solver hasn't been assigned yet, continue?",
     'emptyTitle': 'Title may not empty!',
     'recording': 'Recording',
     'recordSucc': 'Successfully Recorded',

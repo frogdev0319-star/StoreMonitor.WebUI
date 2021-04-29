@@ -241,7 +241,6 @@
       <dialog-vue :dialog-title="noBindDeviceObj.title" :show-info="noBindDeviceObj.showInfo" :is-warning="noBindDeviceObj.isWarning" :dialog-closed="noBindDeviceObj.dialogCosed" @confirmed="noBindDeviceDialog" @canceled="canceldNoBind"/>
       <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
       <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
-      <dialog-vue :dialog-title="noStoreUser.title" :show-info="noStoreUser.showInfo" :is-warning="noStoreUser.isWarning" :dialog-closed="noStoreUser.dialogCosed" @confirmed="noStoreUserDialog" @canceled="cancelNoUser"/>
       <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
       <dialog-vue :dialog-title="videoLoadingObj.title" :show-info="videoLoadingObj.showInfo" :is-warning="videoLoadingObj.isWarning" :dialog-closed="videoLoadingObj.dialogCosed" @confirmed="videoLoadingDialog" @canceled="cancelVideoLoading">></dialog-vue>
       <div v-if="showGuide && inspectList.length > 0" class="guide-content">
@@ -868,12 +867,6 @@ export default {
       noAllInspectObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.incompleteInfo'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      noStoreUser: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notSolver'),
         isWarning: true,
         dialogCosed: false
       },
@@ -3027,12 +3020,7 @@ export default {
     changeStoreDialog(val) {
       const self = this;
       self.changeStoreObj.dialogCosed = false;
-      // self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
-      if (self.curStoreItem.userId == null) {
-        self.noStoreUser.dialogCosed = true;
-      } else {
-        self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
-      }
+      self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
     },
     changeInspectDialog() {
       const self = this;
@@ -3136,15 +3124,6 @@ export default {
       });
       self.channelBtns = temp;
       self.allChannelBtns = temp;
-    },
-    cancelNoUser() {
-      const self = this;
-      self.noStoreUser.dialogCosed = false;
-    },
-    noStoreUserDialog() {
-      const self = this;
-      self.noStoreUser.dialogCosed = false;
-      self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
     },
     changeInspect(val) {
       const self = this;
@@ -3428,11 +3407,7 @@ export default {
         (self.$store.getters.PatrolHistory != null)) {
         self.changeStoreObj.dialogCosed = true;
       } else {
-        if (_item.userId == null) {
-          self.noStoreUser.dialogCosed = true;
-        } else {
-          self.changeStore(item, index, _item, _index);
-        }
+        self.changeStore(item, index, _item, _index);
       }
     },
     checkFull() {
