@@ -48,22 +48,34 @@
             </div>
             <div class="iconrside">
               <div class="speed-content">
-                <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
-                <el-select
-                  :value="proportion"
-                  :popper-class="popperClass"
-                  :popper-append-to-body="false"
-                  class="el-test"
-                  size="mini"
-                  placeholder="">
-                  <el-option
-                    v-for="(item,index) in proportionList"
-                    :key="index"
-                    :label="item.label"
-                    :value="item.label"
-                    @click.native="checkPro(item.label)"
-                  />
-                </el-select>
+                <div class="video-quality" v-if="!playBackState">
+                  <el-popover
+                    placement="top"
+                    v-model="qualityVisible" popper-class="quality-tooltip"
+                  >
+                    <div v-for="(item, index) in videoQualityList" :key="index" @click="onClickQualityLabel(index)"
+                         class="quaility-label" :class="{'checked-label': index === curQualityIndex}">
+                      {{item.label}}
+                    </div>
+                    <el-button class="quality-button" slot="reference">{{videoQualityList[curQualityIndex].label}}</el-button>
+                  </el-popover>
+              </div>
+              <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+              <el-select
+                :value="proportion"
+                :popper-class="popperClass"
+                :popper-append-to-body="false"
+                class="el-test"
+                size="mini"
+                placeholder="">
+                <el-option
+                  v-for="(item,index) in proportionList"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.label"
+                  @click.native="checkPro(item.label)"
+                />
+              </el-select>
               </div>
             </div>
             <div class="screen-content">
@@ -136,6 +148,20 @@
               </div>
               <div class="iconrside">
                 <div class="speed-content">
+                  <div class="video-quality" v-if="!playBackState">
+                    <el-popover
+                      placement="top"
+                      v-model="qualityVisible"
+                      popper-class="quality-tooltip"
+                      :append-to-body="false"
+                    >
+                      <div v-for="(item, index) in videoQualityList" :key="index" @click="onClickQualityLabel(index)"
+                           class="quaility-label" :class="{'checked-label': index === curQualityIndex}">
+                        {{item.label}}
+                      </div>
+                      <el-button class="quality-button" slot="reference">{{videoQualityList[curQualityIndex].label}}</el-button>
+                    </el-popover>
+                  </div>
                   <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
                   <el-select
                     :value="proportion"
@@ -356,6 +382,7 @@ import filterString from '@/common/filterString';
 import Environment from '@/common/environment';
 import html2canvas from 'html2canvas';
 import util from '@/common/util';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 
 export default {
   name: 'EzvizVideo',
@@ -496,7 +523,19 @@ export default {
       showEventNameInfo: false,
       changeId: false,
       eventNameRuletip: false,
-      eventDesRuletip: false
+      eventDesRuletip: false,
+      qualityVisible: false,
+      curQualityIndex: 1,
+      videoQualityList: [
+        {
+          label: '高清',
+          value: 0
+        },
+        {
+          label: '流畅',
+          value: 1
+        }
+      ]
     };
   },
 
@@ -553,6 +592,7 @@ export default {
     async storeId(newValue, oldValue) {
       const self = this;
       if (newValue.length > 0) {
+        self.getVideoQualityIndex();
         await self.getEzvizAccessToken(newValue);
       }
     }
@@ -610,6 +650,53 @@ export default {
   },
 
   methods: {
+    onClickQualityLabel(index){
+      this.curQualityIndex = index;
+      this.qualityVisible = false;
+      this.saveVideoQuality();
+      this.stopPlayingVideoAndPlay();
+    },
+
+    saveVideoQuality(){
+      let params = {
+        videoQualityIndex: this.curQualityIndex
+      }
+      const searchConditon = {
+        path: this.storeId,
+        params: params
+      }
+      SearchConditionUtil.saveSearchCondition(searchConditon)
+    },
+
+    getVideoQualityIndex(){
+      const templateJson = SearchConditionUtil.getSearchCondition(this.storeId);
+      if(Object.keys(templateJson).length > 0){
+        this.curQualityIndex = templateJson.videoQualityIndex;
+      }
+    },
+
+    stopPlayingVideoAndPlay(){
+      if (this.fullWindow) {
+        if (this.playState) {
+          if (this.ifOpenSound) {
+            this.fullDecoder.closeSound();
+          }
+          this.fullDecoder.stop();
+          this.fullDecoder = null;
+        }
+        this.resetVideoSize();
+      } else {
+        if (this.playState) {
+          if (this.ifOpenSound) {
+            this.decoder.closeSound();
+          }
+          this.decoder.stop();
+          this.decoder = null;
+        }
+        this.initVideo();
+      }
+    },
+
     checkPro(item) {
       const self = this;
       self.proportion = item;
@@ -1784,18 +1871,20 @@ export default {
           }
         }
       } else {
+        const videoStream = this.curQualityIndex === 0 ? '.hd.live' : '.live';
         if (self.videoPassword.length > 0) {
           self.videoUrl = 'ezopen://' + self.videoPassword + '@open.ys7.com/' + self.channelInfo.ivsId +
-            '/' + self.channelInfo.channelId + '.live';
+            '/' + self.channelInfo.channelId + videoStream;
         } else {
           if (isGlobalWebsite) {
             self.videoUrl = 'ezopen://open.ezviz.com/' + self.channelInfo.ivsId + '/' +
-              self.channelInfo.channelId + '.live';
+              self.channelInfo.channelId + videoStream;
           } else {
             self.videoUrl = 'ezopen://open.ys7.com/' + self.channelInfo.ivsId + '/' +
-              self.channelInfo.channelId + '.live';
+              self.channelInfo.channelId + videoStream;
           }
         }
+        console.log(self.videoUrl)
       }
     },
 
@@ -2015,8 +2104,19 @@ export default {
       }
       .iconrside{
         // max-width: 230px;
-        display: inline-block;
+        display: inline-flex;
         margin-right: 20px;
+        font-size: 13px;
+        .quality-content{
+          width: 48px;
+          height: 44px;
+          margin-right: calc(30/1920*100vw);
+        }
+        .quality-label{
+          width: 100%;
+          height: 30px;
+          border: 1px solid #fff;
+        }
         span{
           font-size: 13px;
           margin-right:6px;
@@ -2030,11 +2130,28 @@ export default {
           .el-test{
             width: 85px;
           }
+          .video-quality{
+            display: inline-block;
+            margin-right: 30px;
+          }
+          .quality-button{
+            width: 45px;
+            height: 30px;
+            padding: 0;
+            color: #C8C9CA;
+            background-color: transparent;
+            border: 1px solid #fff;
+          }
+          .quality-button.el-button:hover, .quality-button.el-button:focus{
+            border: 1px solid #5E5F61;
+            color: #5E5F61 !important;
+          }
         }
       }
     }
     .screen-content{
       display: inline-block;
+      height: 46px;
       .iconscreen{
         margin-right: 20px;
         font-size: 18px;
@@ -2395,5 +2512,31 @@ export default {
   }
   #videoContent .el-loading-mask{
     z-index: 900;
+  }
+
+  .el-popover.quality-tooltip{
+    min-width: 48px;
+    height: 60px;
+    padding: 0;
+    text-align: center;
+    background-color: black;
+    border: 1px solid #5E5F61;
+    border-radius: 0;
+    margin-bottom: 2px;
+  }
+  .quality-tooltip .popper__arrow{
+    display: none;
+  }
+  .quaility-label{
+    height: 30px;
+    line-height: 30px;
+    cursor: pointer;
+    color: #C8C9CA;
+  }
+  .quaility-label:first-child{
+    border-bottom:1px solid  #5E5F61;
+  }
+  .checked-label{
+    color: #f31d65;
   }
 </style>
