@@ -177,8 +177,8 @@
             <span class="content-header">{{ storeDateValue }}</span>
           </p>
           <p>
-            <span>{{ $t('scheduleView.InspectPerson') }}：</span>
-            <span class="content-header">{{ ModelPostpdf }}</span>
+            <span>{{ $t('scheduleView.inspectName') }}：</span>
+            <span class="content-header">{{ inspectName }}</span>
           </p>
         </div>
         <el-col :span="24" class="contents-container" style="border-top:1px solid #e3e9f4;">
@@ -352,7 +352,7 @@ export default {
       timeMode: 1,
       ispdf: false,
       storeDateValue: '',
-      ModelPostpdf: '',
+      inspectName: '',
       params: {},
       poperClass: 'date-picker-poper',
       exportPng: require('../../../static/img/excel.png'),
@@ -550,9 +550,9 @@ export default {
     async handleDown() {
       let self = this;
       self.ispdf = true;
-      self.titleList.forEach(item => {
-        if (item.value === self.ModelPost) {
-          self.ModelPostpdf = item.label;
+      self.inspectList.forEach(item => {
+        if (item.id === self.inspectTagId) {
+          self.inspectName = item.name;
         }
       });
       self.storeDateValue = self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
@@ -774,14 +774,13 @@ export default {
           let scheduleStr = '';
           let store = '';
           storeList.forEach(store_item => {
-            item.appliedStores.forEach((app_item, app_index) => {
+            item.appliedStores.forEach((app_item) => {
               if (store_item.storeId === app_item) {
-                let isuu = app_index === item.appliedStores.length - 1 ? '' : ',';
-                store += store_item.name + isuu;
+                store += store_item.name + ',';
               }
             });
           });
-          item.appliedStores = store;
+          item.appliedStores = store.substring(0, store.length - 1);
           switch (item.mode) {
             case 1:
               item.mode = self.$t('overview.superTaskmode1');
