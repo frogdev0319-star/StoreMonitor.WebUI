@@ -901,7 +901,8 @@ export default {
     'emptyTime': '执行时间不能为空',
     'newSchedule': '新增排程',
     'select': '请选择',
-    'onTitle': '（按职务）'
+    'onTitle': '（按职务）',
+    'inspectName': '巡检表名称'
   },
 
   'titleView': {

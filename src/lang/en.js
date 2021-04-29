@@ -890,7 +890,8 @@ export default {
     'emptyTime': 'Execution time cannot be empty',
     'newSchedule': 'New Schedule',
     'select': 'Please Select',
-    'onTitle': '(by position)'
+    'onTitle': '(by position)',
+    'inspectName': 'Inspection List'
   },
 
   'titleView': {

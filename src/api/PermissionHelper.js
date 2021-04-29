@@ -131,11 +131,9 @@ export default class PermissionHelper {
 
   // index(5) => ID(32): Video/Message
   static enableVideo() {
-    console.log('enableVideo' + this.enableAuthorities(5, 0x0, 0x1))
     return this.enableAuthorities(5, 0x0, 0x1);
   }
   static enableMessage() {
-    console.log('enableVideo' + this.enableAuthorities(5, 0x0, 0x2))
     return this.enableAuthorities(5, 0x0, 0x2);
   }
   static getInterget() {

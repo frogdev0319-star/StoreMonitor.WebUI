@@ -899,7 +899,8 @@ export default {
     'emptyTime': '執行時間不能為空',
     'newSchedule': '新增排程',
     'select': '請選擇',
-    'onTitle': '（按職務）'
+    'onTitle': '（按職務）',
+    'inspectName': '巡检表名称'
   },
 
   'titleView': {
