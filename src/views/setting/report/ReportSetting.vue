@@ -177,10 +177,9 @@
         } else {
           this.showTemplateTip = false;
         }
-        let nameList = this.templateList.filter(item => item.id !== -1).map(item => item.originalName);
-        if (this.templateList[this.curTemplateIndex].id !== -1) {
-          nameList = nameList.filter(item => this.templateList[this.curTemplateIndex].name !== item);
-        }
+        let nameList = this.templateList.filter(item => item.id !== -1
+          && item.id !== this.templateList[this.curTemplateIndex].id)
+          .map(item => item.originalName);
         if(nameList.includes(tempName)){
           this.showTemplateTip = true;
           this.templateNameTip = this.$t('titleView.templateNameExist');
@@ -307,6 +306,14 @@
         if(this.curTemplate.name.trim().length === 0) {
           this.showTemplateTip = true;
           this.templateNameTip = this.$t('scheduleView.enterTemplateName');
+          return false;
+        }
+        let nameList = this.templateList.filter
+        (item => item.id !== -1 && item.id !== this.templateList[this.curTemplateIndex].id)
+          .map(item => item.originalName);
+        if(nameList.includes(this.curTemplate.name.trim())) {
+          this.showTemplateTip = true;
+          this.templateNameTip = this.$t('titleView.templateNameExist');
           return false;
         }
         return true;
