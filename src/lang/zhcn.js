@@ -957,6 +957,7 @@ export default {
     'unqualified': '不合格',
     'displayofStatisticalResults': '统计结果展示',
     'radar': '雷达图',
-    'pie': '饼状图'
+    'pie': '饼状图',
+    'others': '其他'
   }
 }

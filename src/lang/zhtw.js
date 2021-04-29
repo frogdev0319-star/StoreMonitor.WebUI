@@ -954,6 +954,7 @@ export default {
     'unqualified': '不合格',
     'displayofStatisticalResults': '統計結果展示',
     'radar': '雷達圖',
-    'pie': '餅狀圖'
+    'pie': '餅狀圖',
+    'others': '其他'
   }
 };

@@ -946,6 +946,7 @@ export default {
     'unqualified': 'Unqualified',
     'displayofStatisticalResults': 'Statistical Results Display',
     'radar':'Radar Chart',
-    'pie':'Pie Chart'
+    'pie':'Pie Chart',
+    'others': 'Others'
   }
 };

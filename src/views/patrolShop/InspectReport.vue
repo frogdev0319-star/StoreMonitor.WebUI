@@ -87,7 +87,7 @@
                              :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
                         </div>
-                        <div class="total-score"><span class="pdf_font_18">
+                        <div class="total-score" v-if="_item.itemScore !== Number.MAX_VALUE"><span class="pdf_font_18">
                           {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}</span></div>
                       </div>
 
@@ -287,7 +287,6 @@
         <el-col v-if="pageItem.class === 'radior-content' && staticalConfig.chart" class="pie-content"
                 :style="isexportPDF ? 'height:400px;' : ''">
           <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
-          <div class="pie-panel"></div>
           <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
                    class="pie-chart-content"/>
         </el-col>
@@ -361,7 +360,7 @@ import 'videojs-contrib-hls';
 import resize from '@/components/mixins/resize';
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
-import SearchConditionUtil from '../../common/SearchConditionUtil';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 
 export default {
   name: 'InspectReport',
@@ -500,7 +499,9 @@ export default {
 
   methods: {
     getInspectTemplateList(){
-      ReportSetting.getInspectReportTemplateList().then(res => {
+      const params = {};
+      params.enable = true;
+      ReportSetting.getInspectReportTemplateList(params).then(res => {
         if(res.errCode === 0 && res.data.length > 0) {
           this.templateList = res.data;
           const savedTemplateIndex = this.templateList.findIndex(item => {return item.id === this.cachedTemplateId});
@@ -1090,7 +1091,8 @@ export default {
         }
       }
       if(otherUnqualified !== 0 || otherQualified !== 0){
-        const otherItems = {numOfUnqualifiedItems: otherUnqualified, numOfQualifiedItems: otherQualified, groupName: '其他'};
+        const otherItems = {numOfUnqualifiedItems: otherUnqualified,
+                            numOfQualifiedItems: otherQualified, groupName: this.$t('titleView.others')};
         summaryTempArr.push(otherItems);
       }
       const seriesData = [];
@@ -1100,13 +1102,28 @@ export default {
         obj.value = this.staticalConfig.qualified ? item.numOfUnqualifiedItems : item.numOfQualifiedItems;
         obj.value > 0 && seriesData.push(obj);
       });
-      pieOptions.series[0].data = seriesData;
+      pieOptions.series[1].data = seriesData;
       return pieOptions;
     },
 
     getPieChartsOption(){
       const pieOption = {
         series: [
+          {
+            type: 'pie',
+            radius: ['43%', '70%'],
+            itemStyle: {
+              normal:{
+                color: function(params){
+                  let colorList = ['#f4f5f9'];
+                  return colorList[params.dataIndex];
+                },
+              }
+            },
+            silent: true,
+            z: 0,
+            data: [{value: 1, name: ''}],
+          },
           {
             type: 'pie',
             radius: ['50%', '60%'],
@@ -1141,6 +1158,7 @@ export default {
               trigger: 'item',
               formatter: '{b}-{d}%'
             },
+            z: 1,
             data: []
           }
         ]
@@ -1195,7 +1213,7 @@ export default {
         path: 'reportDetail',
         params: params
       }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
     getStoredTemplateId(){
@@ -1401,17 +1419,6 @@ export default {
       .pie-content {
         height: 300px;
         position: relative;
-        .pie-panel{
-          width: 210px;
-          height: 210px;
-          margin: 0 auto;
-          border-radius: 50%;
-          background: -webkit-radial-gradient(circle closest-side, #fff 60%, #f4f5f9 40%);
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          position: absolute;
-        }
         .span-4{
           position: absolute;
           font-weight: 400;
