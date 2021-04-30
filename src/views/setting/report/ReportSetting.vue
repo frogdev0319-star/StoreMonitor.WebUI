@@ -168,6 +168,7 @@
 
       onTemplateNameChange(val){
         const tempName = filterString.all(val, 30);
+        this.curTemplate.name = tempName;
         this.templateList[this.curTemplateIndex].name = tempName;
         const length = filterString.getContentLength(val);
         if (length > 30) {
