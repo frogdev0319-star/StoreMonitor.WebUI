@@ -70,7 +70,7 @@
                         <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
                         <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
                       </div>
-                      <div>
+                      <div class="score-title">
                         <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn"
                              :style="isexportPDF ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
@@ -82,13 +82,16 @@
                              class="title-btn-pass" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }} </span>
                         </div>
-                        <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)"
+                        <div v-if="item.groupType==1 &&_item.grade!=Math.pow(-2,31)"
                              :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
                              :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
                         </div>
-                        <div class="total-score" v-if="_item.itemScore !== Number.MAX_VALUE"><span class="pdf_font_18">
-                          {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}</span></div>
+                        <div class="total-score"
+                             v-if="_item.itemScore !== Number.MAX_VALUE">
+                          <span class="pdf_font_18">
+                          {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}</span>
+                        </div>
                       </div>
 
                     </div>
@@ -811,6 +814,7 @@ export default {
           details.grade = item.grade;
           details.qualifiedScore = item.qualifiedScore;
           details.itemScore = item.itemScore;
+          details.showTotalScore =
           details.passOfFailFlag = this.getItemsPassOrFailed(groupitem.groupType, item.grade, item.qualifiedScore);
           if (item.attachment.length !== 0) {
             const _temp = [];
@@ -1515,7 +1519,7 @@ export default {
         }
       }
       .row-table{
-        margin-top: calc(10 / 1920 * 100vw);
+        margin-top: 10px;
         font-size: calc(14/1920*100vw);
         .table-bordered{
           border-collapse: collapse;
@@ -1641,7 +1645,6 @@ export default {
                 line-height: 25px;
                 text-align: center;
                 border-radius: 5px;
-                margin-right: calc(25 / 1920 * 100vw);
               }
               .title-btn-failed{
                 height:25px;
@@ -1676,6 +1679,12 @@ export default {
                   color:#7d8cad;
                   margin: 15px 0 0 10px;
                 }
+              }
+              .score-title{
+                display: inline-flex;
+                flex-direction: column;
+                width: 100px;
+                align-items: center;
               }
               .total-score{
                 text-align: center;
@@ -1900,12 +1909,14 @@ export default {
     justify-content: flex-start;
   }
   .template-name{
-    cursor: pointer;
-    width: 160px;
     font-size: 14px;
+    cursor: pointer;
+    width: 120px;
     color: #7d8cad;
-    text-align: center;
-    padding-bottom: 10px;
+    padding: 15px calc(20/1920*100vw) 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .click-btn{
     color: $red;
@@ -1975,6 +1986,9 @@ export default {
         object-fit: contain;
       }
     }
+  }
+  .radior-content{
+    padding-top: 30px;
   }
 </style>
 <style>
