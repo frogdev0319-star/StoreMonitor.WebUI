@@ -192,6 +192,10 @@
                     <i
                       :class="item.mode === 0 ? 'icon-yuanchengxunjian' : 'icon-xianchangxunjian'"
                       class="iconfont inspectIcon"/>
+                    <div class="item-score">
+                      <span class="score-num">{{ item.totalScore }}</span>
+                      <span class="score-unit" v-if="lang !== 'en'">{{ $t('insSettingView.scores')}}</span>
+                    </div>
                   </div>
                   <div class="item-content">
                     <span class="assigner">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</span>
@@ -1645,12 +1649,25 @@ $suggestBack:#F1F6FE;
             }
         }
         .item-icon{
-            text-align: left;
-            padding-left: calc(20/1920*100vw);
+          text-align: left;
+          padding-left: calc(20/1920*100vw);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-right: calc(20/1920*100vw);
         }
         .inspectIcon{
-            font-size: calc(60/1920*100vw);
-            color: $border;
+          font-size: calc(60/1920*100vw);
+          color: $border;
+        }
+        .item-score{
+          color: $tab;
+        }
+        .score-num{
+          font-size: calc(40/1920*100vw);
+        }
+        .score-unit{
+          font-size: 12px;
         }
         .item-content{
             text-align: left;
