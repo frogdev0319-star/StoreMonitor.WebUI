@@ -323,7 +323,6 @@ export default {
     'videoLicense': '无视频访问权限',
     'suggestEmpty': '请输入本次巡检建议！',
     'changPageInfo': '当前巡检尚未完成，确认是否离开页面？',
-    'videoLoading': '视频加载中...',
     'dashServerError': 'Dash视频服务器请求异常，请刷新后重试！',
     'detailInfo': '巡检详情',
 
@@ -416,8 +415,7 @@ export default {
     'signature': '签名',
     'excellent': '优秀',
     'signatureAndPic': '签名与照片',
-    'loading': '加载中...',
-    'noVideoAccess': '无视频查看权限，请联系系统管理员'
+    'loading': '加载中...'
   },
 
   // event Management page language

@@ -317,7 +317,6 @@ export default {
     'videoLicense': 'No video access',
     'suggestEmpty': 'Please enter suggestions for this inspection !',
     'changPageInfo': 'Not finish yet, confirm leaving the page? ',
-    'videoLoading': 'Video loading...',
     'dashServerError': 'Dash video server request exception, please refresh and try again!',
     'detailInfo': 'Inspection details',
 
@@ -410,8 +409,7 @@ export default {
     'signature': 'Signature',
     'excellent': 'Excellent',
     'signatureAndPic': 'Signature & Picture',
-    'loading': 'Loading...',
-    'noVideoAccess': 'No video access, please contact system administrator'
+    'loading': 'Loading...'
   },
 
   // event Management page language
