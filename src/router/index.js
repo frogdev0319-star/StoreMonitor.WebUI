@@ -139,6 +139,9 @@ export const navbarRoute = {
         path: '/reportdetails',
         name: 'reportDetails',
         hidden: true,
+        meta: {
+          keepAlive: false
+        },
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
     );
