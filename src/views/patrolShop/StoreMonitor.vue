@@ -150,14 +150,6 @@
         @canceled="canceldNoBind"
       />
       <dialog-vue
-        :dialog-title="noStoreUser.title"
-        :show-info="noStoreUser.showInfo"
-        :is-warning="noStoreUser.isWarning"
-        :dialog-closed="noStoreUser.dialogCosed"
-        @confirmed="noStoreUserDialog"
-        @canceled="cancelNoUser"
-      />
-      <dialog-vue
         :dialog-title="videoLoadingObj.title"
         :show-info="videoLoadingObj.showInfo"
         :is-warning="videoLoadingObj.isWarning"
@@ -792,12 +784,6 @@ export default {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.notBindCamera'),
         isWarning: false,
-        dialogCosed: false
-      },
-      noStoreUser: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notSolver'),
-        isWarning: true,
         dialogCosed: false
       },
       dialogCommentVideo: false,
@@ -2203,37 +2189,17 @@ export default {
     changeStoreDialog() {
       let self = this;
       self.changeStoreObj.dialogCosed = false;
-      if (self.curStoreItem.userId == null) {
-        self.noStoreUser.dialogCosed = true;
-      } else {
-        self.changeStore(
-          self.curTabItem,
-          self.curTabIndex,
-          self.curStoreItem,
-          self.curStoreIndex
-        );
-      }
-    },
-
-    canceldChangeStore() {
-      let self = this;
-      self.changeStoreObj.dialogCosed = false;
-    },
-
-    cancelNoUser() {
-      let self = this;
-      self.noStoreUser.dialogCosed = false;
-    },
-
-    noStoreUserDialog() {
-      let self = this;
-      self.noStoreUser.dialogCosed = false;
       self.changeStore(
         self.curTabItem,
         self.curTabIndex,
         self.curStoreItem,
         self.curStoreIndex
       );
+    },
+
+    canceldChangeStore() {
+      let self = this;
+      self.changeStoreObj.dialogCosed = false;
     },
 
     clickStore(item, index, _item, _index) {
@@ -2255,12 +2221,7 @@ export default {
       ) {
         self.changeStoreObj.dialogCosed = true;
       } else {
-        // self.changeStore(item,index,_item,_index);
-        if (_item.userId == null) {
-          self.noStoreUser.dialogCosed = true;
-        } else {
-          self.changeStore(item, index, _item, _index);
-        }
+        self.changeStore(item, index, _item, _index);
       }
     },
 
