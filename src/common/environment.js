@@ -34,11 +34,16 @@ const _Environments = {
     USHOP_URL: 'http://172.21.73.207/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version
+  },
+  Beta: {
+    CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://rc-inspection.storevue.com/storemonitor/api/',
+    VERSION: version
   }
 };
 
-const environJSON = _Environments.Stable;
-const isGlobalWebsite = true;
+const environJSON = _Environments.Beta;
+const isGlobalWebsite = false;
 
 let Environment;
 export default Environment = {
