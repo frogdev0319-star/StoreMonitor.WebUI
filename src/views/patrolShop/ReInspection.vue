@@ -1051,7 +1051,6 @@ export default {
     self.isREC = false;
     self.getUpLoadBucketInfo();
     self.getOssInfo();
-    self.curStoreItem && self.getDeviceList();
     window.onresize = function() {
       if (!self.checkFull()) {
         self.fullScreen = false;
@@ -1135,7 +1134,6 @@ export default {
       self.showError = false;
       self.errorText = '';
       self.getFaStoreData();
-      self.curStoreItem && self.getDeviceList();
     },
     anchorLinkTo() {
       const self = this;
@@ -1327,10 +1325,10 @@ export default {
       });
     },
 
-    getDeviceList() {
+    getDeviceList(storeId) {
       const self = this;
       const params = {};
-      params.storeId = this.curStoreItem.storeId;
+      params.storeId = storeId;
       params.deviceOnly = 1;
       getDetailedStoreInfo(params).then(res => {
         if (res.errCode === 0) {
@@ -1787,6 +1785,7 @@ export default {
               }
             });
             self.saveStoreObj(storeObj);
+            self.getDeviceList(self.tabList[0].storeList[0].storeId);
             self.getChannelByStore(self.tabList[0].storeList[0]);
           } else {
             self.showStoreUp = false;
