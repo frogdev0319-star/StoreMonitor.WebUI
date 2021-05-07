@@ -140,7 +140,7 @@
         top="5%">
         <div class="canvas-content" style="overflow:hidden;">
           <hr class="dialog-hr">
-          <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+          <div class="feed-canvas-content" v-if="feedbackIndex === -1" @mouseenter="showCancel" @mouseleave="hiddenCancel">
             <div v-if="showPenBtn" id="iconR" class="icon-right">
               <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
               <transition name="fadepen">
@@ -172,6 +172,13 @@
                 <span>{{ $t('remotePatrol.cancel') }}</span>
               </div>
             </div>
+          </div>
+          <div class="feed-canvas-content" v-else>
+            <img
+              :width="520*percentHeight"
+              :height="340*percentHeight"
+              class="canvas-img"
+              :src="eventList[feedbackIndex].sourceObj.src">
           </div>
           <div class="event-content">
             <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
@@ -293,9 +300,7 @@
           :store-id="store.storeId"
           :video-authority="videoAuthority"
           @confirmEzvizCanvas="editEzvizCanvas"
-          @ezvizCutPictureFeedback="ezvizPictureFeedback"
-          @confirmEzvizVideoFeedback="ezvizVideoFeedback"
-          @emitEzvizVideo="confirmEzvizVideo" />
+          @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
       </div>
       <div class="el-inspect">
         <div v-if="showGuide && sheetName.length > 0" class="guide-lside">
@@ -921,7 +926,6 @@ export default {
   },
   watch: {
     accountChanged(val, oldVal) {
-      console.log(val);
       const self = this;
       if (val != 0) {
         self.changeBrand();
@@ -949,7 +953,6 @@ export default {
         cancelButtonClass: 'cancelBtn',
         confirmButtonClass: 'confirmBtn'
       }).then(() => {
-        console.log('confirm');
         if (to.name != 'confirmSum') {
           //   from.meta.keepAlive=false;
           self.playState && self.previewplayer && self.previewplayer.dispose();
@@ -969,7 +972,6 @@ export default {
         }
         next();
       }).catch(() => {
-        console.log('cancel');
         next(false);
       });
     } else {
@@ -1076,7 +1078,6 @@ export default {
         this.userName = result.data.loginId;
         this.password = result.data.password;
         const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
-        console.log(url);
         DashHttp.setDashHost(url);
       }).catch(error => {
         if (error.message !== 'Network request failed') {
@@ -1089,13 +1090,11 @@ export default {
 
     visibilityChange() {
       const self = this;
-      console.log(self.isEzviz);
       if (!self.isEzviz) {
         if (document.hidden) {
           self.stopVideoPlay();
           self.stopTimer();
         } else {
-          console.log(self.isPlayingFlag);
           if (this.currentState === 'loading') {
             self.startVideo(self.channel.ivsId, self.channel.channelId, null);
           }
@@ -1149,8 +1148,7 @@ export default {
       self.userId = userId;
       return new Promise((resolve, reject) => {
         getUserInfo().then(res => {
-          console.log(res);
-          res.data.forEach(item => {
+           res.data.forEach(item => {
             if (item.userId == userId) {
               const accountId = item.accountId.toLowerCase();
               self.accountId = accountId;
@@ -1184,8 +1182,6 @@ export default {
     },
     deleteEvent(item, index) {
       const self = this;
-      console.log(item);
-      console.log(index);
       self.eventList.splice(index, 1);
       self.showFeedBackInfo = self.eventList.length == 0;
     },
@@ -1200,33 +1196,32 @@ export default {
 
     confirmAddFeedBack2() {
       const self = this;
-      let srcObj = null;
-      const src = self.canvasEl.toDataURL('image/jpeg');
-      srcObj = {
-        mediaType: 2,
-        src: src,
-        height: '100px',
-        width: '140px',
-        fileName: self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg',
-        file: util.base64ToBlob(src),
-        deviceId: self.channel.id
-      };
-
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: srcObj
-      };
       if (self.eventName.trim().length === 0) {
         self.showEventNameInfo = true;
         return false;
       }
       if(this.feedbackIndex === -1){
+        let srcObj = null;
+        const src = self.canvasEl.toDataURL('image/jpeg');
+        srcObj = {
+          mediaType: 2,
+          src: src,
+          height: '100px',
+          width: '140px',
+          fileName: `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`,
+          file: util.base64ToBlob(src),
+          deviceId: self.channel.id
+        };
+
+        const obj = {
+          eventName: self.eventName,
+          eventDes: self.eventDes,
+          sourceObj: srcObj
+        };
         self.eventList.push(obj);
       } else {
         self.eventList[this.feedbackIndex].eventName = self.eventName;
         self.eventList[this.feedbackIndex].eventDes = self.eventDes;
-        self.eventList[this.feedbackIndex].srcObj = srcObj;
       }
       self.showFeedDialog2 = false;
       self.showFeedBackInfo = false;
@@ -1296,9 +1291,6 @@ export default {
       const self = this;
       self.percentage = 0;
       const OSS = require('ali-oss');
-      // let bucketName = 'viumo-'+self.accountId
-      // let bucketName='viumo-aaoompqqpjy4';
-      // let bucketName = self.oss.ossBucketName;
       const bucketName = 'viumo-n3azju2aknpw';
       const client = new OSS({
         region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
@@ -1316,7 +1308,6 @@ export default {
         })
           .then((results) => {
             const url = self.getFileUrl(results.name);
-            console.log(url);
             resolve(url);
           })
           .catch((err) => {
@@ -1448,14 +1439,12 @@ export default {
       obj.src = self.canvasEl.toDataURL('image/jpeg');
       obj.height = '100px';
       obj.width = '140px';
-      obj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg';
+      obj.fileName = `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`;
       obj.file = util.base64ToBlob(obj.src);
       obj.deviceId = self.channel.id;
       self.sourceList.push(obj);
       self.showCutDialog = false;
-      console.log(self.curItemId);
       const tempId = self.getIndexById(self.curItemId);
-      console.log(tempId);
       if (tempId != null) {
         if (!self.showIgnoreItem) {
           self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
@@ -1470,13 +1459,6 @@ export default {
       } else {
         self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
       }
-      // if(tempId!=null){
-      //   self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-      // }
-      // else{
-      //     self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList=self.sourceList;
-      // }
-      // self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
     },
     mouseDownAction(e) {
       const self = this;
@@ -1527,19 +1509,16 @@ export default {
       }
     },
     showCancel() {
-      const self = this;
-      self.showCancelContent = true;
-      self.showPenBtn = true;
+      this.showCancelContent = true;
+      this.showPenBtn = true;
     },
     hiddenCancel() {
-      const self = this;
-      self.showCancelContent = false;
-      self.showPenBtn = false;
+      this.showCancelContent = false;
+      this.showPenBtn = false;
     },
     getFaStoreList() {
       return new Promise((resolve, reject) => {
         getFavoriteList().then(res => {
-          console.log(res);
           resolve(res);
         });
       });
@@ -1571,7 +1550,6 @@ export default {
     },
     checkScore(item, itemDS, e) {
       const self = this;
-      console.log(item, itemDS);
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
       });
@@ -1628,7 +1606,6 @@ export default {
       };
       return new Promise((resolve, reject) => {
         getStoreList(params).then(res => {
-          console.log(res);
           resolve(res);
         });
       });
@@ -1661,7 +1638,6 @@ export default {
       temp.forEach((item, index) => {
         indexArray.push(self.allInitStoreList.map(x => x.storeId).indexOf(item.storeId));
       });
-      console.log(indexArray);
       indexArray = indexArray.filter(function(x) {
         return x != -1;
       });
@@ -1672,8 +1648,6 @@ export default {
     },
     async getStoreList() {
       const self = this;
-      console.log(self.activeIndex);
-      console.log(self.store);
       const getStoreTemp = data => {
         const temp = [];
         data.forEach((item, index) => {
@@ -1702,7 +1676,6 @@ export default {
       let data;
       switch (Number(self.activeIndex)) {
         case 0: data = await self.getFaStoreList();
-          console.log(data);
           if (data.errCode == 0) {
             const storeData = data.data;
             self.tabList[0].storeList = getStoreTemp(storeData);
@@ -1713,7 +1686,6 @@ export default {
           break;
         case 1:
           data = self.getStoreObj();
-          console.log(data);
           self.tabList[1].storeList = getStoreTemp(data);
           break;
         case 2:
@@ -1852,7 +1824,6 @@ export default {
       }
     },
     async handleClick(tab) {
-      console.log(tab);
       const self = this;
       const allStoreData = await self.getAllStoreList();
       self.getInitStoreData(allStoreData);
@@ -1867,7 +1838,6 @@ export default {
       };
       if (!self.store.storeUp) {
         addFavoriteStore(params).then(res => {
-          console.log(res);
           if (res.errCode == 0) {
             self.store.storeUp = true;
             self.store.storeUpTitle = this.$t('remotePatrol.stared');
@@ -1929,7 +1899,6 @@ export default {
       item.isHover = false;
     },
     getItemByGroup(item, index) {
-      console.log(item);
       const self = this;
 
       // else{
@@ -1957,9 +1926,6 @@ export default {
       const self = this;
       const device = [];
       self.deviceList.forEach(item => {
-        // if(deviceId==item.id){
-        //     device=item;
-        // }
         deviceId.forEach(_item => {
           if (_item == item.id) {
             device.push(item);
@@ -1970,7 +1936,6 @@ export default {
     },
     openOuter(item) {
       const self = this;
-      console.log(item);
       if (item != null) {
         self.showOuter = true;
         self.checkImgSrc = item.src;
@@ -2449,18 +2414,12 @@ export default {
     },
     async playVideo(url) {
       const self = this;
-      console.log('playvideo enter!');
       self.showModelContent = true;
-      // self.showInfoContent=true;
       self.playState = true;
       var video = document.getElementById('previewVideo');
       this.previewplayer = videojs(video);
       this.previewplayer.src({ src: url, type: this.protocal == 'HLS' ? 'application/x-mpegURL' : 'application/dash+xml' });
       this.previewplayer.play();
-      // setTimeout(() => {
-      //     self.showModelContent=true;
-      //     //self.showInfoContent=false;
-      // }, 3000);
     },
     destroyVideo() {
       const self = this;
@@ -2555,7 +2514,6 @@ export default {
       this.realTimeSpeed = 0;
       this.isLoading = false;
       this.timerPlayReal = window.setInterval(() => {
-        console.log(this.realTimeSpeed);
         this.realTimeSpeed = this.realTimeSpeed + 1;
       }, 1000);
     },
@@ -2634,7 +2592,6 @@ export default {
     },
 
     async connectVideo() {
-      console.log('Connect Video--');
       const data = {};
       const request = {};
       request.method = 'connection';
@@ -2649,7 +2606,6 @@ export default {
       if (await DashHttp.putDash('LiveStream', data)) {
         const url = DashHttp.getResult().mpd;
         this.uri = url;
-        console.log(this.uri);
         this.playVideo(url);
         this.currentState = 'play';
         this.paused = false;
@@ -2743,7 +2699,6 @@ export default {
 
     stopVideo() {
       const self = this;
-      console.log('stop video');
       self.showModelContent = false;
       self.playState = false;
       var video = document.getElementById('previewVideo');
@@ -2764,9 +2719,6 @@ export default {
     },
 
     fullWindowScreen(...val) {
-      console.log(val);
-      const self = this;
-      // self.showControls=true;
       var ele = document.getElementById('videoContent');
       ele.style.width = '100%';
       ele.style.height = '100%';
@@ -2805,8 +2757,6 @@ export default {
     },
     searchStore() {
       const self = this;
-      console.log(self.tabList);
-      console.log(self.serachVale.trim());
       const tempStoreList = self.tempStoreList;
       const getStore2Temp = data => {
         const cityList = [];
@@ -2863,7 +2813,6 @@ export default {
           tempStore.push(itemDs);
         });
       });
-      console.log(temp);
       for (var i = 0; i < temp.length; i++) {
         if (temp[i][0].indexOf(self.serachVale.trim()) != -1 ||
                     temp[i][1].indexOf(self.serachVale.trim()) != -1) {
@@ -3295,7 +3244,6 @@ export default {
           self.showFeedBack = true;
           self.showFeedBackInfo = self.eventList.length == 0;
           self.showGuide = false;
-          console.log(self.channel);
           self.channelBtns = self.allChannelBtns.concat();
           self.channelBtns.forEach((_item, _index) => {
             if (self.channel != null) {
@@ -3359,7 +3307,6 @@ export default {
        * handle ezviz video snapshot
        */
     editEzvizCanvas(src) {
-      console.log(src);
       const self = this;
       self.sourceList = [];
       const obj = {};
@@ -3367,13 +3314,11 @@ export default {
       obj.src = src;
       obj.height = '100px';
       obj.width = '140px';
-      obj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg';
+      obj.fileName = `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`;
       obj.file = util.base64ToBlob(obj.src);
       obj.deviceId = self.channel.id;
       self.sourceList.push(obj);
-      console.log(self.curItemId);
       const tempId = self.getIndexById(self.curItemId);
-      console.log(tempId);
       if (tempId != null) {
         if (!self.showIgnoreItem) {
           self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
@@ -3389,12 +3334,8 @@ export default {
         self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
       }
     },
-    /**
-       * handle ezviz video picture feedback
-       * @param obj
-       */
+
     ezvizPictureFeedback(obj) {
-      console.log(obj);
       const self = this;
       let srcObj = null;
       const src = obj.src;
@@ -3403,7 +3344,7 @@ export default {
         src: src,
         height: '100px',
         width: '140px',
-        fileName: self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg',
+        fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`,
         file: util.base64ToBlob(src),
         deviceId: self.channel.id
       };
@@ -3416,54 +3357,9 @@ export default {
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
     },
-    /**
-       * handle ezviz video feedback
-       * @param obj
-       */
-    ezvizVideoFeedback(ezvizObj) {
-      console.log(ezvizObj);
-      const self = this;
-      const srcObj = {};
-      const tempSrcObj = ezvizObj.sourceObj;
-      srcObj.src = tempSrcObj.src;
-      srcObj.file = tempSrcObj.blob;
-      srcObj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.channel.channelId + '.webm';
-      srcObj.mediaType = 1;
-      const videoObj = {
-        eventName: ezvizObj.eventName,
-        eventDes: ezvizObj.eventDes,
-        sourceObj: srcObj
-      };
-      self.eventList.push(videoObj);
-      self.showFeedBackInfo = false;
-    },
-    /**
-       * handle ezviz record video
-       */
-    confirmEzvizVideo(blob) {
-      const self = this;
-      const url = URL.createObjectURL(blob);
-      self.sourceList = [];
-      const obj = {};
-      obj.fileName = self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.channel.channelId + '.webm';
-      obj.file = blob;
-      obj.mediaType = 1;
-      obj.src = url;
-      obj.height = '100px';
-      self.sourceList.push(obj);
-      console.log(self.curItemId);
-      const tempId = self.getIndexById(self.curItemId);
-      console.log(tempId);
-      if (tempId != null) {
-        self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-      } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
-      }
-    },
 
     itemDescriptionChanged(val, item) {
       const content = filterString.all(val, 200);
-      console.log(content);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
       if (length > 200) {
@@ -3475,7 +3371,6 @@ export default {
     eventNameChanged(val) {
       const self = this;
       const content = filterString.all(val, 50);
-      console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
       const length = filterString.getContentLength(val);
@@ -3488,7 +3383,6 @@ export default {
     eventDesChanged(val) {
       const self = this;
       const content = filterString.all(val, 200);
-      console.log(content);
       self.eventDes = content;
       const length = filterString.getContentLength(val);
       if (length > 200) {
@@ -3506,9 +3400,11 @@ export default {
         this.eventDesRuletip = false;
       }
     },
+
     onPlayerWaiting(e) {
       this.showModelContent = false;
     },
+
     onPlayerPlaying(e) {
       this.showModelContent = true;
     },
@@ -3671,8 +3567,9 @@ export default {
                 position: relative;
                 text-align: left;
                 margin-left: 1%;
-                #icanvas{
-                    margin-left: 20px;
+                .canvas-img{
+                  margin-left: 20px;
+                  margin-top: 15px;
                 }
                 .cancel-content{
                     margin-left: 20px !important;
