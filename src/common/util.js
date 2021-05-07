@@ -323,7 +323,7 @@ export default {
         } else if (lang == 'en') {
           msg = 'Video request DASH server network error';
         } else if (lang == 'zhtw') {
-          msg = '視頻請求 DASH 服務器網絡出錯';
+          msg = '視頻請求 DASH 伺服器網絡出錯';
         } else {
           msg = '视频请求 DASH 服务器网络出错';
         }
@@ -479,7 +479,7 @@ export default {
         } else if (lang == 'en') {
           msg = 'Internal web server is not working properly';
         } else if (lang == 'zhtw') {
-          msg = '內部web服務器不能正常工作';
+          msg = '內部web伺服器不能正常工作';
         } else {
           msg = '内部web服务器不能正常工作';
         }
