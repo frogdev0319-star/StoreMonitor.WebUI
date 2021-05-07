@@ -199,51 +199,13 @@
         </div>
       </el-dialog>
 
-      <el-dialog
-        v-if="showFeedDialog3"
-        :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog3"
-        :close-on-click-modal="false"
-        :width="860*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="feed-canvas-content" style="text-align:center">
-            <video id="previewCutVideo" :width="520*percentHeight" :height="340*percentHeight" :src="feedBackVideoFileObj.src" prload controls autoplay/>
-          </div>
-          <div class="event-content">
-            <span class="event-title">{{ $t('remotePatrol.name') }}</span>
-            <el-input v-model="eventName" size="mini" class="name-input" maxlength="10"/>
-            <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-            <el-input
-              :autosize="{ minRows: 4, maxRows:7}"
-              v-model="eventDes"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              maxlength="300"/>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog3 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack3">
-            {{ $t('remotePatrol.confirm') }}
-          </el-button>
-        </div>
-      </el-dialog>
-
       <dialog-vue :dialog-title="changeBrandObj.title" :show-info="changeBrandObj.showInfo" :is-warning="changeBrandObj.isWarning" :dialog-closed="changeBrandObj.dialogCosed" @confirmed="changeBrandDialog" @canceled="canceldChangeBrand"/>
       <dialog-vue :dialog-title="changeStoreObj.title" :show-info="changeStoreObj.showInfo" :is-warning="changeStoreObj.isWarning" :dialog-closed="changeStoreObj.dialogCosed" @confirmed="changeStoreDialog" @canceled="canceldChangeStore"/>
       <dialog-vue :dialog-title="changeInspectObj.title" :show-info="changeInspectObj.showInfo" :is-warning="changeInspectObj.isWarning" :dialog-closed="changeInspectObj.dialogCosed" @confirmed="changeInspectDialog" @canceled="canceldChangeInspect"/>
       <dialog-vue :dialog-title="noBindDeviceObj.title" :show-info="noBindDeviceObj.showInfo" :is-warning="noBindDeviceObj.isWarning" :dialog-closed="noBindDeviceObj.dialogCosed" @confirmed="noBindDeviceDialog" @canceled="canceldNoBind"/>
       <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
       <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
-      <dialog-vue :dialog-title="noStoreUser.title" :show-info="noStoreUser.showInfo" :is-warning="noStoreUser.isWarning" :dialog-closed="noStoreUser.dialogCosed" @confirmed="noStoreUserDialog" @canceled="cancelNoUser"/>
       <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
-      <dialog-vue :dialog-title="videoLoadingObj.title" :show-info="videoLoadingObj.showInfo" :is-warning="videoLoadingObj.isWarning" :dialog-closed="videoLoadingObj.dialogCosed" @confirmed="videoLoadingDialog" @canceled="cancelVideoLoading">></dialog-vue>
       <div v-if="showGuide && inspectList.length > 0" class="guide-content">
         <div class="guide-rside">
           <div class="num-content">
@@ -448,8 +410,10 @@
                   <div class="feedbacks-content">
                     <div v-for="(item,index) in eventList" :key="index" class="feedbacks-details">
                       <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" />
-                      <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
-                      <span class="feedback-eventdes">{{ item.eventDes }}</span>
+                      <div @click="editFeedback(item, index)" class="title-description">
+                        <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
+                        <span class="feedback-eventdes">{{ item.eventDes }}</span>
+                      </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
                         <img
                           :src="item.sourceObj.src"
@@ -696,7 +660,6 @@ export default {
       showStoreUp: false,
       showFeedDialog1: false,
       showFeedDialog2: false,
-      showFeedDialog3: false,
       arrows1Src: require('../../../static/img/arrows_left.png'),
       arrows2Src: require('../../../static/img/arrows_right.png'),
       plusSrc: require('../../../static/img/add_icon.png'),
@@ -847,18 +810,6 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
-      // ignoreInspectObj:{
-      //     title: this.$t('remotePatrol.confirm'),
-      //     showInfo: this.$t('remotePatrol.confirmIgnore'),
-      //     isWarning:true,
-      //     dialogCosed:false
-      // },
-      // CancleIgnoreInspectObj:{
-      //     title: this.$t('remotePatrol.confirm'),
-      //     showInfo: this.$t('remotePatrol.cancleIgnore'),
-      //     isWarning:true,
-      //     dialogCosed:false
-      // },
       noBindDeviceObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.notBindCamera'),
@@ -868,12 +819,6 @@ export default {
       noAllInspectObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.incompleteInfo'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      noStoreUser: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notSolver'),
         isWarning: true,
         dialogCosed: false
       },
@@ -887,12 +832,6 @@ export default {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.changPageInfo'),
         isWarning: true,
-        dialogCosed: false
-      },
-      videoLoadingObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.videoLoading'),
-        isWarning: false,
         dialogCosed: false
       },
       recorder: null,
@@ -958,7 +897,8 @@ export default {
       lastTime: null,
       currentTime: null,
       onEndflag: false,
-      previewplayer: null
+      previewplayer: null,
+      feedbackIndex: -1
     };
   },
   computed: {
@@ -1251,30 +1191,15 @@ export default {
       self.eventList.splice(index, 1);
       self.showFeedBackInfo = self.eventList.length == 0;
     },
+
     addFeedBack() {
-      const self = this;
-      self.showFeedDialog1 = true;
-      self.eventName = '';
-      self.eventDes = '';
-      self.showEventNameInfo = false;
+      this.feedbackIndex = -1;
+      this.showFeedDialog1 = true;
+      this.eventName = '';
+      this.eventDes = '';
+      this.showEventNameInfo = false;
     },
-    confirmAddFeedBack3() {
-      const self = this;
-      let srcObj = null;
-      srcObj = self.feedBackVideoFileObj;
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: srcObj
-      };
-      if (self.eventName.trim().length == 0) {
-        self.notify(self.$t('remotePatrol.emptyTitle'), 'warning', 3000);
-        return false;
-      }
-      self.eventList.push(obj);
-      self.showFeedDialog3 = false;
-      self.showFeedBackInfo = false;
-    },
+
     confirmAddFeedBack2() {
       const self = this;
       let srcObj = null;
@@ -1294,31 +1219,42 @@ export default {
         eventDes: self.eventDes,
         sourceObj: srcObj
       };
-      if (self.eventName.trim().length == 0) {
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+      if (self.eventName.trim().length === 0) {
         self.showEventNameInfo = true;
         return false;
       }
-      self.eventList.push(obj);
+      if(this.feedbackIndex === -1){
+        self.eventList.push(obj);
+      } else {
+        self.eventList[this.feedbackIndex].eventName = self.eventName;
+        self.eventList[this.feedbackIndex].eventDes = self.eventDes;
+        self.eventList[this.feedbackIndex].srcObj = srcObj;
+      }
       self.showFeedDialog2 = false;
       self.showFeedBackInfo = false;
     },
+
     confirmAddFeedBack1() {
       const self = this;
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: null
-      };
-      if (self.eventName.trim().length == 0) {
-        self.showEventNameInfo = true;
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
-        return false;
+      if(this.feedbackIndex == -1){
+        const obj = {
+          eventName: self.eventName,
+          eventDes: self.eventDes,
+          sourceObj: null
+        };
+        if (self.eventName.trim().length == 0) {
+          self.showEventNameInfo = true;
+          return false;
+        }
+        self.eventList.push(obj);
+      } else {
+        self.eventList[this.feedbackIndex].eventName = self.eventName;
+        self.eventList[this.feedbackIndex].eventDes = self.eventDes;
       }
-      self.eventList.push(obj);
       self.showFeedDialog1 = false;
       self.showFeedBackInfo = false;
     },
+
     getIndexById(id) {
       const self = this;
       let tempId = null;
@@ -1416,7 +1352,6 @@ export default {
 
     cutPicture() {
       const self = this;
-      console.log(self.curGroupIndex);
       self.videoEl = document.getElementById('previewVideo').children[0];
       self.imageCanvasList = [];
       if (self.fullScreen) {
@@ -1424,6 +1359,7 @@ export default {
         self.fullScreen = false;
       }
       if (self.showFeedBack) {
+        self.feedbackIndex = -1;
         self.showFeedDialog2 = true;
         self.eventName = '';
         self.eventDes = '';
@@ -2405,14 +2341,7 @@ export default {
       const self = this;
       self.allIgnoreObj.dialogCosed = false;
     },
-    videoLoadingDialog() {
-      const self = this;
-      self.videoLoadingObj.dialogCosed = false;
-    },
-    cancelVideoLoading() {
-      const self = this;
-      self.videoLoadingObj.dialogCosed = false;
-    },
+
     async confirmSummary() {
       const self = this;
       const temp = [];
@@ -3027,12 +2956,7 @@ export default {
     changeStoreDialog(val) {
       const self = this;
       self.changeStoreObj.dialogCosed = false;
-      // self.changeStore(self.curTabItem,self.curTabIndex,self.curStoreItem,self.curStoreIndex);
-      if (self.curStoreItem.userId == null) {
-        self.noStoreUser.dialogCosed = true;
-      } else {
-        self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
-      }
+      self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
     },
     changeInspectDialog() {
       const self = this;
@@ -3137,21 +3061,8 @@ export default {
       self.channelBtns = temp;
       self.allChannelBtns = temp;
     },
-    cancelNoUser() {
-      const self = this;
-      self.noStoreUser.dialogCosed = false;
-    },
-    noStoreUserDialog() {
-      const self = this;
-      self.noStoreUser.dialogCosed = false;
-      self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
-    },
     changeInspect(val) {
       const self = this;
-      // if ((self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.isLoading)) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
       if(val!==undefined){
         if ((!self.isEzviz && self.editCount != 0) ||
           (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
@@ -3428,11 +3339,7 @@ export default {
         (self.$store.getters.PatrolHistory != null)) {
         self.changeStoreObj.dialogCosed = true;
       } else {
-        if (_item.userId == null) {
-          self.noStoreUser.dialogCosed = true;
-        } else {
-          self.changeStore(item, index, _item, _index);
-        }
+        self.changeStore(item, index, _item, _index);
       }
     },
     checkFull() {
@@ -3601,12 +3508,18 @@ export default {
       }
     },
     onPlayerWaiting(e) {
-      console.log('video is loading');
       this.showModelContent = false;
     },
     onPlayerPlaying(e) {
-      console.log('video is playing');
       this.showModelContent = true;
+    },
+
+    editFeedback(feedbackObj, index){
+      this.feedbackIndex = index;
+      !feedbackObj.sourceObj ? this.showFeedDialog1 = true : this.showFeedDialog2 = true;
+      this.eventName = feedbackObj.eventName;
+      this.eventDes = feedbackObj.eventDes;
+      this.showEventNameInfo = false;
     }
   }
 };
@@ -4535,6 +4448,9 @@ export default {
                                     border: 0.5px solid $border;
                                 }
                             }
+                          .title-description{
+                            cursor: pointer;
+                          }
                         }
                     }
                     #feedback-content{
