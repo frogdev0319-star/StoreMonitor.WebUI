@@ -57,8 +57,8 @@
                   :name="index.toString()"
                   :key="index"
                   :label="`${item.name}`">
-                  <el-row :span="24" class="header-details">
-                    <el-col :span="varyWindowWidth <= 1440 ? 24 : 7">
+                  <div class="header-details">
+                    <div>
                       <span :id="lang === 'en'? 'en-span' : 'span'">{{ $t('scheduleView.scheduleName') }}</span>
                       <div class="NameInput" style="margin-right:calc(25/1920*100vw);">
                         <el-input
@@ -71,64 +71,62 @@
                           @blur="notShowInputRuleTips(item)"/>
                         <span v-if="item.Ruletip" class="rules">{{ $t('scheduleView.scheduleNameRuletip') }}</span>
                       </div>
-                    </el-col>
-                    <el-col :span="varyWindowWidth <= 1440 ? 24 : 16">
-                      <div>
-                        <span :id="lang === 'en'? 'en-span': 'span'">{{ $t('scheduleView.scheduleType') }}</span>
-                        <el-select
-                          v-if="activePatrol === '0'"
-                          v-model="item.mode"
-                          :disabled="item.modeDisabled"
-                          size="mini"
-                          class="el-type"
-                          @change="searchStore">
-                          <el-option
-                            v-for="itemType in typeList"
-                            :key="itemType.value"
-                            :label="itemType.label"
-                            :value="itemType.value"/>
-                        </el-select>
-                        <el-select
-                          v-else
-                          v-model="item.mode"
-                          :disabled="item.modeDisabled"
-                          size="mini"
-                          class="el-type"
-                          @change="searchStore">
-                          <el-option
-                            v-for="itemType in typeList.slice(1)"
-                            :key="itemType.value"
-                            :label="itemType.label"
-                            :value="itemType.value"/>
-                        </el-select>
-                        <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">
-                          {{ $t('scheduleView.execOnce') }}
-                        </el-checkbox>
-                        <div v-if="item.mode === 1" class="day-detail">
-                          <region-multi-select
-                            :options="weekList"
-                            :selected="item.schedule[0].day"
-                            :placeholder="$t('scheduleView.select')"
-                            :disabled="false"
-                            :input-size="`mini`"
-                            :all="$t('scheduleView.everyDay')"
-                            @changeInput="changeSelectWeek(arguments,item)"/>
-                        </div>
-                        <div v-if="item.mode === 2" class="day-detail">
-                          <span :id="lang=='en'? 'en-span': 'span'">{{ $t('scheduleView.execDays') }}</span>
-                          <region-multi-select
-                            :options="bigMonthList.slice(0, 28)"
-                            :selected="item.schedule[0].day"
-                            :placeholder="$t('scheduleView.select')"
-                            :disabled="false"
-                            :input-size="`mini`"
-                            :all="$t('scheduleView.everyDay')"
-                            @changeInput="changeSelectMonth(arguments,item)"/>
-                        </div>
+                    </div>
+                    <div>
+                      <span :id="lang === 'en'? 'en-span': 'span'">{{ $t('scheduleView.scheduleType') }}</span>
+                      <el-select
+                        v-if="activePatrol === '0'"
+                        v-model="item.mode"
+                        :disabled="item.modeDisabled"
+                        size="mini"
+                        class="el-type"
+                        @change="searchStore">
+                        <el-option
+                          v-for="itemType in typeList"
+                          :key="itemType.value"
+                          :label="itemType.label"
+                          :value="itemType.value"/>
+                      </el-select>
+                      <el-select
+                        v-else
+                        v-model="item.mode"
+                        :disabled="item.modeDisabled"
+                        size="mini"
+                        class="el-type"
+                        @change="searchStore">
+                        <el-option
+                          v-for="itemType in typeList.slice(1)"
+                          :key="itemType.value"
+                          :label="itemType.label"
+                          :value="itemType.value"/>
+                      </el-select>
+                      <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">
+                        {{ $t('scheduleView.execOnce') }}
+                      </el-checkbox>
+                      <div v-if="item.mode === 1" class="day-detail">
+                        <region-multi-select
+                          :options="weekList"
+                          :selected="item.schedule[0].day"
+                          :placeholder="$t('scheduleView.select')"
+                          :disabled="false"
+                          :input-size="`mini`"
+                          :all="$t('scheduleView.everyDay')"
+                          @changeInput="changeSelectWeek(arguments,item)"/>
                       </div>
-                    </el-col>
-                  </el-row>
-                  <el-col v-for="(_item, _index) in item.schedule" v-if="item.mode === 3" :span="24"
+                      <div v-if="item.mode === 2" class="day-detail">
+                        <span :id="lang=='en'? 'en-span': 'span'">{{ $t('scheduleView.execDays') }}</span>
+                        <region-multi-select
+                          :options="bigMonthList.slice(0, 28)"
+                          :selected="item.schedule[0].day"
+                          :placeholder="$t('scheduleView.select')"
+                          :disabled="false"
+                          :input-size="`mini`"
+                          :all="$t('scheduleView.everyDay')"
+                          @changeInput="changeSelectMonth(arguments,item)"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-for="(_item, _index) in item.schedule" v-if="item.mode === 3"
                           :key="'mode3'+_index" class="header-details">
                     <div class="self-detail">
                       <span :id="lang === 'en'? 'en-span' : 'span'">{{ $t('scheduleView.selectMonth') }}</span>
@@ -166,9 +164,8 @@
                       size="mini"
                       type="primary"
                       @click="addMonth()"><i class="el-icon-plus"/></el-button>
-                  </el-col>
-                  <el-col
-                    :span="24"
+                  </div>
+                  <div
                     :key="index"
                     class="header-details">
                     <span :id="lang === 'en' ? 'en-span' : 'span'">{{ $t('scheduleView.notifyTime') }}</span>
@@ -192,9 +189,9 @@
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
                     <el-checkbox v-model="item.ifNotifyOneDay">{{ $t('scheduleView.notifyOneDayBefore') }}</el-checkbox>
-                  </el-col>
-                  <el-col :span="24" class="header-details header-person">
-                    <el-col :span="7">
+                  </div>
+                  <div class="header-details header-person">
+                    <div :span="7">
                       <span :id="lang === 'en' ? 'en-span' : 'span'">{{ $t('scheduleView.dueDays') }}</span>
                       <el-select
                         v-model="item.dueDays"
@@ -207,7 +204,7 @@
                           :label="item.name"
                           :value="item.value"/>
                       </el-select>
-                    </el-col>
+                    </div>
                     <div
                       :id="lang === 'en' ? 'en-span' : 'span'"
                       :style="lang === 'en' ? '' : 'padding-right:14px;'"
@@ -229,11 +226,7 @@
                       :all="$t('storeView.all')"
                       @changeInput="changeSelectInspector(arguments,item)"
                     />
-                    <!--<el-checkbox-group v-model="item.assignedTo">-->
-                      <!--<el-checkbox v-for="list_item in inspectorList" :disabled="list_item.disabled"-->
-                                   <!--:label="list_item.id" :key="list_item.id">{{ list_item.label }}</el-checkbox>-->
-                    <!--</el-checkbox-group>-->
-                  </el-col>
+                  </div>
                   <el-col :span="24" class="el-header-hr"/>
                   <el-col :span="24" class="el-bind-header">
                     <div style="display: flex">
@@ -2012,7 +2005,7 @@ export default {
             font-size: 16px;
             color:#182752;
             font-weight: 600;
-            @media screen and (max-width: 1366px){
+            @media screen and (max-width: 1440px){
               width: 310px !important;
               text-overflow: ellipsis;
               overflow: hidden;
@@ -2055,6 +2048,9 @@ export default {
           height: 50px;
           line-height: 50px;
           position: relative;
+          display: flex;
+          align-items: center;
+          font-size: 0;
           #span {
             font-size: calc(14 / 1920 * 100vw);
             margin-right: calc(40 / 1920 * 100vw);
@@ -2078,37 +2074,42 @@ export default {
             display: inline-block;
           }
           .el-type{
-            width: 200px;
+            width: calc(200/1920*100vw);
+            min-width: 85px;
             >>> .el-input__inner{
               height: 30px !important;
             }
           }
           >>> .el-input__inner{
             height: 30px !important;
-            width: 200px;
+            width: calc(200/1920*100vw);
+            min-width: 85px;
             border-radius: 3px !important;;
           }
           >>> .el-select.el-select--mini{
             height: 30px !important;
-            width: 200px;
+            width: calc(200/1920*100vw);
+            min-width: 85px;
+            line-height: 30px;
           }
           .content{
-            width: 199px;
+            width: calc(199/1920*100vw);
+            height: 30px;
+            line-height: 30px;
           }
           >>> .content .input-class{
-            width: 170px;
+            width: calc(170/1920*100vw);
             overflow: hidden;
           }
           .time-select{
-            width: 200px;
-          }
-          .date-range{
-            width:200px;
+            width: calc(200/1920*100vw);
+            min-width: 85px;
           }
           .day-detail{
             display: inline-block;
             padding-left: 50px;
             height: 50px;
+            line-height: 45px;
             font-size: 14px;
             position: relative;
           }
@@ -2394,14 +2395,21 @@ export default {
     background: rgb(162, 162, 163);
   }
 
-  .el-checkbox__label{
+  >>> .el-checkbox__label{
     font-size: calc(14/1920*100vw);
+    padding-left: 10px;
   }
   .header-person .el-checkbox-group{
     display: inline-block;
   }
   .header-person .el-checkbox{
     margin-right:45px;
+  }
+  .content >>> .el-province .el-input--mini .el-input__icon{
+    line-height: 30px;
+  }
+  .iconbangzhu{
+    margin: 0 10px;
   }
 </style>
 <style>
