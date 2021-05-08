@@ -1074,11 +1074,15 @@ export default {
   methods: {
     getDashUrlInfo() {
       getDashServerInfo().then(result => {
-        const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
-        this.userName = result.data.loginId;
-        this.password = result.data.password;
-        const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
-        DashHttp.setDashHost(url);
+        if(result.errCode === 0){
+          const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
+          this.userName = result.data.loginId;
+          this.password = result.data.password;
+          const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
+          DashHttp.setDashHost(url);
+        } else {
+          console.log(result.errMsg);
+        }
       }).catch(error => {
         if (error.message !== 'Network request failed') {
           this.currentState = 'blank';
@@ -1171,12 +1175,8 @@ export default {
     },
     getFileUrl(fileName) {
       const self = this;
-      // let bucketName='viumo-'+self.accountId;
-      // let bucketName='viumo-aaoompqqpjy4';
-      // let bucketName = self.oss.ossBucketName;
       const bucketName = 'viumo-n3azju2aknpw';
       const endpoint = self.oss.ossEndPoint;
-      const key = fileName;
       const url = `http://${bucketName}.${endpoint}/${fileName}`;
       return url;
     },
