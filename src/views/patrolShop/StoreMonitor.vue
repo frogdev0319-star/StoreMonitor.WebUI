@@ -149,15 +149,6 @@
         @confirmed="noBindDeviceDialog"
         @canceled="canceldNoBind"
       />
-      <dialog-vue
-        :dialog-title="videoLoadingObj.title"
-        :show-info="videoLoadingObj.showInfo"
-        :is-warning="videoLoadingObj.isWarning"
-        :dialog-closed="videoLoadingObj.dialogCosed"
-        @confirmed="videoLoadingDialog"
-        @canceled="cancelVideoLoading"
-      >>
-      </dialog-vue>
 
       <div v-if="!isEzviz">
         <div id="videoContent" class="video-content" v-loading="isLoading"
@@ -797,12 +788,6 @@ export default {
       playBackTime: 0,
       realTimeStartTs: 0,
       isFirstLoad: false,
-      videoLoadingObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.videoLoading'),
-        isWarning: false,
-        dialogCosed: false
-      },
       isLoading: false,
       showEventNameInfo: false,
       showEventDescInfo: false,
@@ -2204,10 +2189,6 @@ export default {
 
     clickStore(item, index, _item, _index) {
       let self = this;
-      // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading) ) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
       self.showStoreUp = true;
 
       self.curTabIndex = index;
@@ -2414,10 +2395,6 @@ export default {
 
     clickBtn(item, index) {
       let self = this;
-      // if ( (self.isEzviz && self.$refs.ezvizVideo.isLoading)) {
-      //   self.videoLoadingObj.dialogCosed = true;
-      //   return false;
-      // }
       self.curChannelItem = item;
       self.curChannelIndex = index;
       if (self.eventName.trim().length !== 0) {
@@ -2479,16 +2456,6 @@ export default {
                       self.store.storeId + '_' + self.channel.channelId + '.jpg';
       obj.file = util.base64ToBlob(obj.src);
       self.sourceList.push(obj);
-    },
-
-    videoLoadingDialog() {
-      let self = this;
-      self.videoLoadingObj.dialogCosed = false;
-    },
-
-    cancelVideoLoading() {
-      let self = this;
-      self.videoLoadingObj.dialogCosed = false;
     },
 
     eventNameChanged(val) {
