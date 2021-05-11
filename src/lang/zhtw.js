@@ -491,9 +491,6 @@ export default {
     'Addscoreitems': '附加評分項目',
     'selecttitle': '請選擇關聯職務',
     'storeNoInspect': '此門店尚未綁定遠程巡檢表',
-    'confirmSubmitThis': '是否确认绑定当前巡检表',
-    'storesupervisor': '門店督導',
-    'storesuperManage': '門店負責人',
     'tHeaderA': '巡檢類別（選填，30字符）',
     'tHeaderA2': '巡檢類別（必填，30字符）',
     'tHeaderB': '巡檢項名稱（必填，100字符）',
@@ -893,7 +890,7 @@ export default {
     'emptyTime': '執行時間不能為空',
     'newSchedule': '新增排程',
     'select': '請選擇',
-    'onTitle': '（按職務）'
+    'onTitle': '（按職務）',
   },
 
   'titleView': {

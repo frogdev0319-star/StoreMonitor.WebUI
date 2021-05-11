@@ -227,7 +227,7 @@ export default {
     'listStyle': '列表模式',
     'cancleIgnore': '确认是否取消忽略当前巡检项',
     'emptyReportList': '巡检报告列表为空，请重新筛选数据',
-    'reportExcelList': '巡检报告明细单', // Sprint10
+    'reportExcelList': '巡检报告明细单',
     'TableTotal': '项目总分值',
     'TableIgnore': '不适用',
     'TableGet': '得分',
@@ -491,9 +491,6 @@ export default {
     'Addscoreitems': '附加评分项目',
     'selecttitle': '请选择关联职务',
     'storeNoInspect': '此门店尚未绑定远程巡检表',
-    'confirmSubmitThis': '是否确认绑定当前巡检表',
-    'storesupervisor': '门店督导',
-    'storesuperManage': '门店负责人',
     'tHeaderA': '巡检类别（选填，30字符）',
     'tHeaderA2': '巡检类别（必填，30字符）',
     'tHeaderB': '巡检项名称（必填，100字符）',
@@ -624,8 +621,6 @@ export default {
     'searchPlaceholder': '请输入关键词搜索门店',
     'addSuss': '添加成功',
     'addFail': '添加失败',
-    'stared': '已关注',
-    'clickToStar': '点击关注',
     'needBind': '表，需要绑定的门店',
     'itemsOfCate': '类别巡检项'
   },
