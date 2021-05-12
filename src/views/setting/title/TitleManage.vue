@@ -12,9 +12,11 @@
         :show-border="false"
         :is-loading-data="isLoadingData"
         :show-selection-column="true"
+        :default-sort = "{prop: 'createTime', order: 'descending'}"
         cell-class=""
         row-class=""
-        @handleOperation="handleEmitOperation"/>
+        @handleOperation="handleEmitOperation"
+      />
     </div>
   </div>
 </template>
@@ -43,8 +45,9 @@ export default {
         {
           'prop': 'createTime',
           'label': this.$t('titleView.createTime'),
+          'sortable': true,
           'width': 130,
-          'maxWidth': 130
+          'maxWidth': 130,
         },
         {
           'prop': 'comment',
