@@ -1129,6 +1129,7 @@ export default {
     async importfxx(obj) {
       const _this = this;
       const inputDOM = this.$refs.inputer;
+      const ITEMSLENGTH = 250;
       _this.FileInfo = [];
       this.file = event.currentTarget.files[0];
       var rABS = false;
@@ -1220,7 +1221,7 @@ export default {
                   indexArryPassFail.push(index);
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthPassFail = true; }
                 }
-                if (item.b == undefined || item.b.length == 0) { flagItemNamePassFail = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthPassFail = true; }
+                if (item.b == undefined || item.b.length == 0) { flagItemNamePassFail = true; } else if (filterString.getContentLength(item.b.toString().trim()) > ITEMSLENGTH) { flagItemLengthPassFail = true; }
                 if (item.c != undefined) {
                   if(isNaN(item.c) || parseFloat(item.c) < 0.5 || parseFloat(item.c) > 50){flagPassFailScoreType = true;};
                 } else {
@@ -1234,7 +1235,7 @@ export default {
                   indexArryScore.push(index);
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
                 }
-                if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthScore = true; }
+                if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > ITEMSLENGTH) { flagItemLengthScore = true; }
                 if (item.c == undefined || item.c.length == 0 || isNaN(item.c) || parseFloat(item.c) < 0 || parseFloat(item.c) > 50) {
                   flagFullScoreType = true;
                 }
@@ -1275,7 +1276,7 @@ export default {
                   indexArryOthers.push(index);
                   if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthOthers = true; }
                 }
-                if (item.b == undefined || item.b.length == 0) { flagItemNameOthers = true; } else if (filterString.getContentLength(item.b.toString().trim()) > 100) { flagItemLengthOthers = true; }
+                if (item.b == undefined || item.b.length == 0) { flagItemNameOthers = true; } else if (filterString.getContentLength(item.b.toString().trim()) > ITEMSLENGTH) { flagItemLengthOthers = true; }
                 if (item.c == undefined || item.c.length == 0 || isNaN(item.c) || parseFloat(item.c) < -100 || parseFloat(item.c) > 100) { // 项目分值必填，字符类型为-100~+100
                   flagOtherScoreType = true;
                 }

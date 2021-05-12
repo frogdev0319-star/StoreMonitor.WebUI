@@ -1465,13 +1465,14 @@ export default {
 
     napeNameChange(val) {
       const self = this;
-      const comment = filterString.all(val, 100);
+      const ITEMSLENGTH = 250;
+      const comment = filterString.all(val, ITEMSLENGTH);
       const length = filterString.getContentLength(val);
       self.ItemName = comment;
-      if (length > 100) {
+      if (length > ITEMSLENGTH) {
         self.enterListNameRuletip = true;
       } else {
-        if(length===0){
+        if(length === 0){
           self.enterItemNameTip = true;
         }else{
           self.enterListNameRuletip = false;
