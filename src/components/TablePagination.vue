@@ -33,6 +33,7 @@
         :prop="_item.prop"
         :label="_item.label"
         :sortable="canSortable ? _item.sortable : false"
+        :sort-orders="['ascending', 'descending']"
         :min-width="isexportPDF ? _item.pdfwidth : (lang !== 'en' ? _item.width : _item.maxWidth)"
         :formatter="_item.formatter">
         <template slot-scope="{row}">

@@ -73,6 +73,7 @@
                     :prop="_item.prop"
                     :label="_item.label"
                     :sortable="_item.sortable"
+                    :sort-orders="['ascending', 'descending']"
                     :min-width="lang!=='en'? _item.width : _item.maxWidth"/>
                   <el-table-column :label="$t('overview.detail')" :width="lang!=='en'? 100: 130" type="expand">
                     <template slot-scope="props">
