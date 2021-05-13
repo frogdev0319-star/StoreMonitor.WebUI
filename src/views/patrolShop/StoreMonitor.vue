@@ -2536,7 +2536,7 @@ export default {
           this.currentState = 'inline';
           this.paused = true;
         } else {
-          if (this.channel === null) {
+          if (this.channel === null || Object.keys(this.channel).length === 0) {
             this.paused = true;
           }
           else{

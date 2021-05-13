@@ -366,7 +366,7 @@ export default {
     'initialCode': 'Look for initial code on the device label',
     'videoEncrypted': 'Video is encrypted',
     'deviceOffline': 'Device offline',
-    'lackParams': 'Lack of necessary parameters',
+    'lackParams': 'Please select channel',
     'noVideoSource': 'No video source device',
     'enterDesc': 'Enter description',
     'videoCannotPlay': 'Video playback is not supported on encrypted devices',

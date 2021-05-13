@@ -105,31 +105,17 @@ export async function getDeviceCapacity(data) {
 
 export async function getIsEncrypt(data) {
   let ret = null;
-  console.log(data);
   await instance({
     method: 'post',
     url: '/lapp/device/info',
     data: data
   }).then(res => {
-    console.log(res);
     const data = res.data;
-    if (data.code !== '200') {
-      const msg = getMsg();
-      Message({
-        message: msg,
-        type: 'error',
-        duration: 5 * 1000
-      });
-    } else {
+    if (data.code === '200') {
       ret = data.data.isEncrypt;
     }
   }).catch((err) => {
-    const msg = getMsg();
-    Message({
-      message: msg,
-      type: 'error',
-      duration: 5 * 1000
-    });
+    console.log(err);
   });
   return ret;
 };

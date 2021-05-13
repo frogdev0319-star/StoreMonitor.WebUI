@@ -694,8 +694,6 @@ export default {
     getEzvizAccessToken(storeId) {
       const self = this;
       if (this.videoAuthority === false) {
-        this.showError = true;
-        this.errorMsg = this.$t('remotePatrol.videoLicense');
         return;
       }
       const params = {};
@@ -728,6 +726,12 @@ export default {
       if (self.channelInfo == null) {
         return;
       }
+      if(self.videoAuthority === false){
+        this.showError = true;
+        this.errorMsg = this.$t('remotePatrol.videoLicense');
+        return;
+      }
+
       obj.deviceSerial = self.channelInfo.ivsId;
       try {
         const result = await self.getDeviceIsEncrypt(qs.stringify(obj));
@@ -1209,6 +1213,11 @@ export default {
     async realTime() {
       const self = this;
       self.times = 0;
+      if (this.channelInfo === null || Object.keys(this.channelInfo).length === 0) {
+        this.showError = true;
+        this.errorMsg = this.$t('remotePatrol.lackParams');
+        return;
+      }
       if (this.videoAuthority === false) {
         this.showError = true;
         this.errorMsg = this.$t('remotePatrol.videoLicense');

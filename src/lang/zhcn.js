@@ -372,7 +372,7 @@ export default {
     'initialCode': '初始密码为机身标签上的验证码（密码区分大小写）',
     'videoEncrypted': '视频已加密',
     'deviceOffline': '设备离线，播放失败',
-    'lackParams': '缺少必要参数',
+    'lackParams': '请选择门店通道',
     'noVideoSource': '设备无视频源',
     'enterDesc': '请输入信息',
     'videoCannotPlay': '加密设备不支持播放',

@@ -2432,7 +2432,7 @@ export default {
           await this.offline();
           this.paused = true;
         } else {
-          if (this.channel === null) {
+          if (this.channel === null || Object.keys(this.channel).length === 0) {
             this.paused = true;
           } else {
             await this.startVideo(this.channel.ivsId, this.channel.channelId, null);
