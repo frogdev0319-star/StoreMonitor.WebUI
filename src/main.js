@@ -68,6 +68,15 @@ router.beforeEach(async(to, from, next) => {
   }
 });
 
+router.onError((error) => {
+  const pattern = /Loading chunk (\d)+ failed/g;
+  const isChunkLoadFailed = error.message.match(pattern);
+  if(isChunkLoadFailed){
+    const url = sessionStorage.getItem('LoginURL');
+    window.location.href = url;
+  }
+})
+
 new Vue({
   el: '#app',
   router,
