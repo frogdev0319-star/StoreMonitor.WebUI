@@ -100,7 +100,7 @@
                           :label="itemType.label"
                           :value="itemType.value"/>
                       </el-select>
-                      <el-checkbox v-if="item.mode === 3" v-model="item.execOnce">
+                      <el-checkbox v-if="item.mode === 3" v-model="item.execOnce" class="exection-box">
                         {{ $t('scheduleView.execOnce') }}
                       </el-checkbox>
                       <div v-if="item.mode === 1" class="day-detail">
@@ -357,12 +357,12 @@ import {
   unbindScheduleAndStore,
   updateSchedule,
   deleteScheduleService } from '@/api/schedule';
-import { getStoreList } from '@/api/store';
 import filterString from '@/common/filterString';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import LimitSelect from '@/components/LimitSelect';
 import { getInspectBindList } from '@/api/inspect';
 import DialogPop from '@/components/DialogPop';
+import { getBriefStoreList } from '@/api/store';
 
 export default {
   name: 'PatrolSchedule',
@@ -1087,7 +1087,7 @@ export default {
     getStoreData(params) {
       this.isLoadingSchedule = true;
       return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
+        getBriefStoreList(params).then(res => {
           const data = res.data;
           this.isLoadingSchedule = false;
           resolve(data);
@@ -1123,7 +1123,7 @@ export default {
             obj.province = _item.province;
             _obj.storeName = _item.name;
             _obj.storeId = _item.storeId;
-            _temp.push(_obj);
+            bindStore.data.includes(_item.storeId) && _temp.push(_obj);
           }
         });
         obj.store = _temp;
@@ -1148,6 +1148,30 @@ export default {
             _obj.checked = true;
             _tempCount++;
           }
+          if(mode === 3){
+            if (bindStoreId.indexOf(_item.storeId) == -1) {
+              _obj.checked = false;
+              _obj.disabled = false;
+            }
+          }
+          else{
+            if (bindStoreId.indexOf(_item.storeId) != -1) {
+              _obj.checked = true;
+              _obj.disabled = false;
+            }
+            else {
+              if(self.hasBoundStoreIds.indexOf(_item.storeId) == -1) {
+                _obj.checked = false;
+                _obj.disabled = false;
+              }
+              else{
+                _obj.checked = false;
+                _obj.disabled = true;
+                _tempDisCount++;
+              }
+            }
+          }
+
           _obj.storeId = _item.storeId;
           _obj.name = _item.storeName;
           _obj.city = item.city;
@@ -1388,7 +1412,7 @@ export default {
         }
       };
       let resData = await self.getStoreData(params);
-      let data = resData.content;
+      let data = resData;
       if (data.length > 0) {
         self.resultHavestore = true;
         self.Havestore++;
@@ -2395,6 +2419,9 @@ export default {
     background: rgb(162, 162, 163);
   }
 
+  .exection-box{
+    margin-left: 10px;
+  }
   >>> .el-checkbox__label{
     font-size: calc(14/1920*100vw);
     padding-left: 10px;
