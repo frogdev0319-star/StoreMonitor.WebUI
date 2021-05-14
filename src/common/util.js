@@ -873,7 +873,12 @@ export default {
       daysRangeList = monthArray;
     }
     return daysRangeList;
-  }
+  },
+
+  getDiffBetweenArrays(arr1, arr2){
+    let result = arr2.filter(number => !arr1.includes(number))
+    return result;
+}
 
 };
 class indexedDB {
