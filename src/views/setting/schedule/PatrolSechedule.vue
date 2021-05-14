@@ -240,7 +240,7 @@
                     <div class="select-info">
                       <span class="choice-device">
                         <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
-                        {{ $t('scheduleView.hasBind') }}{{ storeCount }}{{ $t('scheduleView.stores') }}
+                        {{ $t('scheduleView.hasBind') }}{{ hasBindScheduleStoreList.length }}{{ $t('scheduleView.stores') }}
                       </span>
                       <el-input
                         :clearable="true"
@@ -665,7 +665,7 @@ export default {
       showDeleteDialog: false,
       isActivePatrol: '',
       scheduleName: '',
-      storeCount: 0,
+      hasBindScheduleStoreList: [],
       serachVale: '',
       scheduleId: -1,
       selectTab: '',
@@ -1105,7 +1105,7 @@ export default {
         bindStore = await self.getBindStore();
       }
       let bindStoreId = await self.getBindStoreList();
-      self.storeCount = bindStoreId.length;
+      self.hasBindScheduleStoreList = bindStoreId;
       let cityList = [];
       data.forEach(item => {
         if (cityList.indexOf(item.city) === -1) {
@@ -1299,63 +1299,19 @@ export default {
     },
 
     async bindOrUnbindStore(scheId){
-      let self = this;
       let storeIdChecked = [];
-      let storeIdUnchecked = [];
-      let count = 0;
-      self.storeList.forEach(item => {
-        count += item.itemData.length;
+      this.storeList.forEach(item => {
         item.itemData.forEach(_item => {
-          if (_item.checked) {
-            storeIdChecked.push(_item.storeId);
-          } else {
-            storeIdUnchecked.push(_item.storeId);
-          }
+          _item.checked && storeIdChecked.push(_item.storeId);
         });
       });
-
-      let tempchecked = [];
-      let obj = {
-        scheduleId: scheId,
-        storeIds: storeIdChecked
-      };
-      tempchecked.push(obj);
-      let paramsBind = {
-        items: tempchecked
-      };
-      let tempUnchecked = [];
-      let unbindobj = {
-        scheduleId: scheId,
-        storeIds: storeIdUnchecked
-      };
-      tempUnchecked.push(unbindobj);
-
-      let paramsUnBind = {
-        items: tempUnchecked
-      };
-      let flag = false;
-      if (storeIdChecked.length === count) {
-        const resBind = await self.bindScheduleToStore(paramsBind);
-        console.log(resBind);
-        if (resBind.errMsg === 'Success' && resBind.errCode === 0) {
-          flag = true;
-        }
-      } else if (storeIdUnchecked.length === count) {
-        const resUnBind = await self.unbindScheToStore(paramsUnBind);
-        console.log(resUnBind);
-        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === 0) {
-          flag = true;
-        }
-      } else {
-        let resBind = await self.bindScheduleToStore(paramsBind);
-        let resUnBind = await self.unbindScheToStore(paramsUnBind);
-        if (resBind.errMsg === 'Success' && resUnBind.errMsg === 'Success') {
-          flag = true;
-        }
-      }
-      if (flag) {
-        let bindIdList = await self.getBindStoreList();
-        self.storeCount = bindIdList.length;
+      const storesNeedUnbind = util.getDiffBetweenArrays(storeIdChecked, this.hasBindScheduleStoreList);
+      const storesNeedBind = util.getDiffBetweenArrays(this.hasBindScheduleStoreList, storeIdChecked);
+      const bindFlag = await this.bindStoreWithSchedule(scheId, storesNeedBind);
+      const unbindFlag = await this.unbindStoreWithSchedule(scheId, storesNeedUnbind);
+      if (bindFlag && unbindFlag) {
+        let bindIdList = await this.getBindStoreList();
+        this.hasBindScheduleStoreList = bindIdList;
         util.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length}
                     ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
         return true;
@@ -1363,6 +1319,36 @@ export default {
         util.notify(this.$t('insSettingView.bindFail'), 'warning', 3000);
         return false;
       }
+    },
+
+    async bindStoreWithSchedule(scheId, storeIds){
+      if(storeIds.length > 0){
+        const bindParams = this.getBindOrUnbindParams(scheId, storeIds);
+        const resBind = await this.bindScheduleToStore(bindParams);
+        return resBind.errCode === 0;
+      }else {
+        return true;
+      }
+    },
+
+    async unbindStoreWithSchedule(scheId, storeIds){
+      if(storeIds.length > 0){
+        const unbindParams = this.getBindOrUnbindParams(scheId, storeIds);
+        const resUnbind = await this.unbindScheToStore(unbindParams);
+        return resUnbind.errCode === 0;
+      }else {
+        return true;
+      }
+    },
+
+    getBindOrUnbindParams(scheId, storeIds){
+      let params = {
+        items: [{
+          scheduleId: scheId,
+          storeIds: storeIds
+        }]
+      };
+      return params;
     },
 
     deleteMonthAndDays(index) {
