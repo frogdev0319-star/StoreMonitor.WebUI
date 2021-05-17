@@ -1,6 +1,5 @@
 <template>
   <div class="page-container">
-    <div class="header-title"/>
     <div class="title-table">
       <table-pagination
         :column-data="columnData"
@@ -133,7 +132,9 @@ export default {
   }
   .title-table{
     min-height: calc(100% - 75px);
-    margin: 20px calc(20/1920*100vw);
+    padding: 20px calc(20/1920*100vw);
+    border-top: 1px solid #e3e9f4;
+    margin-top: 70px;
   }
 </style>
 <style>

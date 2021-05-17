@@ -1695,8 +1695,7 @@ export default {
           params.scheduleId = sheduleId;
           return new Promise((resolve, reject) => {
             getScheduleBindList(params).then(res => {
-              let errMsg = res.errMsg;
-              if(res.errCode===0){
+              if(res.errCode === 0){
                 let data = res.data;
                 data.forEach(_item => {
                   if (self.hasBoundStoreIds.indexOf(_item) === -1) {
