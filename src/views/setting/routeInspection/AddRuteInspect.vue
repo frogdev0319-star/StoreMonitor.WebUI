@@ -215,7 +215,7 @@
             </p>
             <el-input v-model="ItemName"
                       :placeholder="$t('insSettingView.enterItemName')"
-                      @input="napeNameChange"></el-input>
+                      @input="napeNameChange" @blur="enterListNameRuletip = false"></el-input>
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.titleEmpty') }}</span>
           </el-form-item>
@@ -269,7 +269,7 @@
           <el-form-item :label="$t('insSettingView.inspectionDescp')">
             <el-input type="textarea" v-model="ItemDescription"
                       :placeholder="$t('insSettingView.description')"
-                      @input="napeDepChange"></el-input>
+                      @input="napeDepChange" @blur="descriptionRuletip = false"></el-input>
             <span v-if="descriptionRuletip" class="rules">{{ $t('insSettingView.descriptionRuletip') }}</span>
           </el-form-item>
         </el-form>
