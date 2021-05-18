@@ -878,7 +878,11 @@ export default {
   getDiffBetweenArrays(arr1, arr2){
     let result = arr2.filter(number => !arr1.includes(number))
     return result;
-}
+  },
+
+  sortArrayByKeyAsc(sortedArray, key){
+    sortedArray.sort((a, b) => { return a[key] - b[key]; })
+  },
 
 };
 class indexedDB {
