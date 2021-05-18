@@ -28,7 +28,7 @@
         </div>
         <div class="clear-float">
           <div class="comment-class">
-            <div class="title-description">{{ $t('titleView.comment') }}</div>
+            <div class="title-description">{{ $t('titleView.remarksContent') }}</div>
             <el-input
               v-model="infoForm.comment"
               :autosize="{minRows: 2, maxRows: 4}"
@@ -263,6 +263,11 @@ export default {
               roleName: this.$t('route.scheduleManage'),
               checked: false,
               disabled: false
+            },
+            {
+              roleName: this.$t('route.insepctionReportSetting'),
+              checked: false,
+              disabled: false
             }
           ]
         }
@@ -351,6 +356,7 @@ export default {
       this.roleNameList[4].children[1].checked = !!PermissionHelper.enablePatrolSetting();
       this.roleNameList[4].children[2].checked = !!PermissionHelper.enableStoreSetting();
       this.roleNameList[4].children[3].checked = !!PermissionHelper.enableScheduleSetting();
+      this.roleNameList[4].children[4].checked = !!PermissionHelper.enableReportSetting();
 
       if (authorities.length === 6) {
         this.ifAccessVideo = PermissionHelper.enableVideo() ? 1 : 0;
@@ -446,7 +452,9 @@ export default {
               tempAuthorityNum += Math.pow(2, 1);
             }else if(index === 4 && _index === 1){
               tempAuthorityNum += Math.pow(2, 0);
-            }else {
+            } else if(index === 4 && _index === 4){
+              tempAuthorityNum += Math.pow(2, 5);
+            } else {
               tempAuthorityNum += Math.pow(2, _index);
             }
           }

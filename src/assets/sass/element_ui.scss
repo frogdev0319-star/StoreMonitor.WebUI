@@ -198,3 +198,8 @@ body .el-table th.gutter {
 .el-date-editor .el-range__close-icon{
   display: none;
 }
+
+.el-switch.is-checked .el-switch__core {
+  border-color: #00FF00;
+  background-color: #00FF00;
+}

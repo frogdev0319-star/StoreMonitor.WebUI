@@ -75,8 +75,8 @@
               <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfQualified }}</span></td>
               <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfUnqualified }}</span></td>
               <td v-if="s_item.type==1"><span>{{ item.itemScore }}</span></td>
-              <td><span>{{ item.numIgnore }}</span></td>
-              <td v-if="s_item.type==1||s_item.type==2"><span>{{ item.itemgetScore }}</span></td>
+              <!--<td><span>{{ item.numIgnore }}</span></td>-->
+              <td><span>{{ item.itemgetScore }}</span></td>
             </tr>
           </tbody>
         </table>
@@ -97,15 +97,20 @@
                     <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
                     <p class="title2">{{ _item.description }}</p>
                   </div>
-                  <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                  <div v-if="(_item.type === 0 ||_item.type === 2)&&item.detailType !== 1" class="title-btn">
-                    {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
-                  </div>
-                  <div v-if="_item.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
-                    <span>
-                      <span>{{ _item.itemgetScore }}</span>
-                      <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
-                    </span>
+                  <div class="score-title">
+                    <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
+                    <div v-if="(_item.type === 0 ||_item.type === 2)&&item.detailType !== 1" class="title-btn">
+                      {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                    </div>
+                    <div v-if="_item.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
+                      <span>
+                        <span>{{ _item.itemgetScore }}</span>
+                        <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
+                      </span>
+                    </div>
+                    <div class="total-score" v-if="_item.showTotalScore">
+                      {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}
+                    </div>
                   </div>
                 </div>
                 <div v-if="index === 2" class="content-detail-title" style="background-color:#fff;min-height:30px;">
@@ -271,22 +276,20 @@ export default {
         { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
         { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
         { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;' }
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
       ],
       theaderScore: [
         { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:26%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:34%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
       ],
       theaderOther: [
         { name: '', width: 'width:11%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;' }
+        { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
       ],
       suggest: '',
       store: {},
@@ -597,6 +600,7 @@ export default {
       self.store = store;
       self.inspectList = routeData.inspect;
       self.eventList = routeData.event;
+      const allTypeArr = new Set();
       let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
       let PassFileXN = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0;
       let ScoreX = 0,ScoreN = 0,ScoreXN = 0,ScoreTotalScoreX = 0, allScoreB = 0,ScoreTotalScoreSystem = 0;
@@ -605,6 +609,7 @@ export default {
         if (p_item.dealCount !== 0) {
           dealType.push(p_item.type);
         }
+        allTypeArr.add(p_item.type);
       });
       let Tab0Status = false;
       let inspectPic = 0;
@@ -614,6 +619,10 @@ export default {
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
           let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
+          let tab1GetScoreNoContainedIngored = 0;
+          let tab1GetScoreContainedIgnored = 0;
+          let tab2NotIgnoredItemsGetScore = 0;
+          let tab2IgnoredItemsGetScore = 0;
           item.items.forEach(s_item => {
             if (s_item.isIgnore) {
               IgnoredArr.push(s_item);
@@ -627,7 +636,7 @@ export default {
               } else if (p_item.type === 1 && (s_item.itemgetScore < s_item.qualifiedScore)) {
                 UnqualifiedTemp.push(s_item);
               }
-              if ((p_item.type === 1 || p_item.type === 2) && s_item.itemgetScore !== '--') {
+              if (s_item.itemgetScore !== '--') {
                 totalGetscore += s_item.itemgetScore;
               }
             }
@@ -638,8 +647,31 @@ export default {
               if (!s_item.isIgnore&&!s_item.manualIgnore) {
                 PassFileX += s_item.itemgetScore;
                 PassFile_totalScoreX += s_item.itemScore;
+                tab1GetScoreNoContainedIngored += s_item.itemgetScore;
               }else{
                 PassFileN += s_item.itemScore;
+                tab1GetScoreContainedIgnored += s_item.itemScore;
+              }
+              if(inspect.length > 1){
+                if(!inspectSettings.includedInTotalScoreWithType1){
+                  s_item.showTotalScore = false;
+                } else if(s_item.isIgnore || s_item.manualIgnore){
+                  if(inspectSettings.qualifiedForIgnoredWithType1){
+                    s_item.showTotalScore = true;
+                  }
+                  else{
+                    s_item.showTotalScore = false;
+                  }
+                } else{
+                  s_item.showTotalScore = true;
+                }
+              } else {
+                if(s_item.isIgnore || s_item.manualIgnore){
+                  s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType1;
+                }
+                else{
+                  s_item.showTotalScore = true;
+                }
               }
             } else if (p_item.type === 1) {
               totalScore += s_item.itemScore;
@@ -648,11 +680,19 @@ export default {
                 ScoreX += s_item.itemgetScore;
                 Score_totalScoreX += s_item.itemScore;
                 notAddIgnoretotalScore += s_item.itemScore;
+                tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
               }else{
                 ScoreN += s_item.itemScore;
+                tab2IgnoredItemsGetScore += s_item.itemScore;
+              }
+              if(s_item.isIgnore || s_item.manualIgnore){
+                s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType2;
+              } else{
+                s_item.showTotalScore = true;
               }
             } else if (p_item.type === 2 && !s_item.isIgnore) {
               OtherTS += s_item.itemgetScore;
+              s_item.showTotalScore = true;
             }
             inspectPic += s_item.sourceList.length;
           });
@@ -664,7 +704,28 @@ export default {
           }else{
             item['itemScore'] = notAddIgnoretotalScore;
           }
-          item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
+          if(p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1){
+            item['itemgetScore'] = '--';
+          } else{
+            item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
+          }
+          if (inspect.length === 1 && inspect[0].type === 0) {
+            if (inspectSettings.qualifiedForIgnoredWithType1) {
+              item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;;
+            } else {
+              item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+            }
+          } else {
+            if (inspectSettings.includedInTotalScoreWithType1) {
+              if (inspectSettings.qualifiedForIgnoredWithType1) {
+                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+              } else {
+                item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+              }
+            } else {
+              item['itemgetScore'] = '--';
+            }
+          }
           if (p_item.type === 0) {
             PassFileTotalScoreSystem = PassFileTS;
             PassFileXS = PassFileX;
@@ -678,6 +739,9 @@ export default {
             ScoreTotalScoreSystem = ScoreTS;
             ScoreXN = ScoreX + ScoreN;
             ScoreTotalScoreX = Score_totalScoreX;
+            item['itemgetScore'] =
+              inspectSettings.qualifiedForIgnoredWithType2 ?
+                (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
           }
           if (p_item.type === 2) {
             CurOtherTotalScore += totalGetscore;
@@ -709,9 +773,9 @@ export default {
           }
         } else {
           if (inspectSettings.qualifiedForIgnoredWithType1) {
-            s_count = PassFileTotalScore===0 ? 0 : PassFileXN / PassFileTotalScore * 100;
+            s_count = PassFileTotalScore === 0 ? 0 : PassFileXN / PassFileTotalScore * 100;
           } else {
-            s_count = PassFileTotalScoreX===0 ? 0 : PassFileXS / PassFileTotalScoreX * 100;
+            s_count = PassFileTotalScoreX === 0 ? 0 : PassFileXS / PassFileTotalScoreX * 100;
           }
         }
       } else {
@@ -1236,7 +1300,6 @@ $h1:#292e36;
                     line-height: 25px;
                     text-align: center;
                     border-radius: 5px;
-                    margin-right: calc(25 / 1920 * 100vw);
                 }
                 .title-btn{
                     width:100px;
@@ -1250,19 +1313,25 @@ $h1:#292e36;
                     border-radius: 20px;
                 }
                 .detail-title{
-                    flex: 1;
-                    .title1{
-                    font-size: calc(14 / 1920 * 100vw);
-                    color:#182752;
-                    font-weight: bold;
-                    margin:0 0 5px 0;
-                    }
-                    .title2{
-                    font-size: calc(12 / 1920 * 100vw);
-                    color:#7d8cad;
-                    margin: 15px 0 0 10px;
-                    }
+                  flex: 1;
+                  .title1{
+                  font-size: calc(14 / 1920 * 100vw);
+                  color:#182752;
+                  font-weight: bold;
+                  margin:0 0 5px 0;
+                  }
+                  .title2{
+                  font-size: calc(12 / 1920 * 100vw);
+                  color:#7d8cad;
+                  margin: 15px 0 0 10px;
+                  }
                 }
+                  .score-title{
+                    display: inline-flex;
+                    flex-direction: column;
+                    width: 100px;
+                    align-items: center;
+                  }
                 }
                 .content-detail-main{
                 padding-top: 10px;
@@ -1409,6 +1478,12 @@ $h1:#292e36;
             }
         }
     }
+}
+.total-score{
+  text-align: center;
+  font-size: 12px;
+  color: $black;
+  margin-top: 4px;
 }
 
 </style>

@@ -125,6 +125,10 @@ export default class PermissionHelper {
     return this.enableAuthorities(4, 0x0, 0x10);
   }
 
+  static enableReportSetting() {
+    return this.enableAuthorities(4, 0x0, 0x20);
+  }
+
   // index(5) => ID(32): Video/Message
   static enableVideo() {
     return this.enableAuthorities(5, 0x0, 0x1);

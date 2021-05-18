@@ -196,7 +196,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.6.6 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.6.7 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
 
@@ -444,7 +444,7 @@ export default {
     setSystemNavbarBread(matched, currentRoute) {
       const matchedParentName = matched[1].name;
       const inspectSettingNameArr = ['inspectSetting', 'inspectingSettingOfInspectList',
-        'inspectingSettingOfDevice', 'inspectingSettingOfSchedule'];
+        'inspectingSettingOfDevice', 'inspectingSettingOfSchedule', 'insepctionReportSetting'];
       const deviceSettingNameArr = ['deviceManage', 'ezvizDeviceMgt', 'beseyeDeviceMgt'];
       if (inspectSettingNameArr.includes(matchedParentName)) {
         this.setInspectionSettingBread(matched, currentRoute);
@@ -475,6 +475,10 @@ export default {
         }
         case '/patrolSchedule': {
           this.setFirstBread(matched, 'inspectingSettingOfSchedule');
+          break;
+        }
+        case '/insepctionReportSetting': {
+          this.setFirstBread(matched, 'inspectingSettingOfReport');
           break;
         }
         case '/bindroute':

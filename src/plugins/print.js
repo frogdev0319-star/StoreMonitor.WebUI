@@ -2,18 +2,18 @@
 /* eslint-disable */
 const Print = function (dom, options) {
   if (!(this instanceof Print)) return new Print(dom, options);
- 
+
   this.options = this.extend({
     'noPrint': '.no-print'
   }, options);
- 
+
   if ((typeof dom) === "string") {
     this.dom = document.querySelector(dom);
   } else {
     this.isDOM(dom)
     this.dom = this.isDOM(dom) ? dom : dom.$el;
   }
- 
+
   this.init();
 };
 Print.prototype = {
@@ -27,7 +27,7 @@ Print.prototype = {
     }
     return obj;
   },
- 
+
   getStyle: function () {
     var str = "",
       styles = document.querySelectorAll('style,link');
@@ -35,17 +35,17 @@ Print.prototype = {
       str += styles[i].outerHTML;
     }
     str += "<style>" + (this.options.noPrint ? this.options.noPrint : '.no-print') + "{display:none;}</style>";
- 
+
     return str;
   },
- 
+
   getHtml: function () {
     var inputs = document.querySelectorAll('input');
     var textareas = document.querySelectorAll('textarea');
     var selects = document.querySelectorAll('select');
     var canvass = document.querySelectorAll('canvas');
 
- 
+
     for (var k = 0; k < inputs.length; k++) {
       if (inputs[k].type == "checkbox" || inputs[k].type == "radio") {
         if (inputs[k].checked == true) {
@@ -59,13 +59,13 @@ Print.prototype = {
         inputs[k].setAttribute('value', inputs[k].value)
       }
     }
- 
+
     for (var k2 = 0; k2 < textareas.length; k2++) {
       if (textareas[k2].type == 'textarea') {
         textareas[k2].innerHTML = textareas[k2].value
       }
     }
- 
+
     for (var k3 = 0; k3 < selects.length; k3++) {
       if (selects[k3].type == 'select-one') {
         var child = selects[k3].children;
@@ -91,7 +91,7 @@ Print.prototype = {
         if(imgs.length==0){
           var img = document.createElement("img");
           img.src = imageURL;
-          img.setAttribute('style', 'height:600px;margin:0 auto;margin-left:-475px;');
+          img.setAttribute('style', 'height:400px;margin:0 auto;margin-left:-100px;');
           img.id = 'isNeedRemove';
           canvass[k4].parentNode.insertBefore(img,canvass[k4].nextElementSibling);
         }
@@ -104,7 +104,7 @@ Print.prototype = {
     // }
     return this.dom.outerHTML;
   },
- 
+
   writeIframe: function (content) {
     var w, doc, iframe = document.createElement('iframe'),
       f = document.body.appendChild(iframe);
@@ -130,7 +130,7 @@ Print.prototype = {
       }, 100)
     }
   },
- 
+
   toPrint: function (frameWindow) {
     try {
       setTimeout(function () {

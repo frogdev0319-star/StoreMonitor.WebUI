@@ -64,7 +64,9 @@ export default {
     'networkError': '网络异常，请检查网络连接状况！',
     'serverException': '服务器异常，请刷新后重试！',
     'noAuthority': '无操作权限！',
-    'loginAbnormal': '登录信息异常，请重新登录！'
+    'loginAbnormal': '登录信息异常，请重新登录！',
+    'insepctionReportSetting': '巡检报告配置',
+    'inspectingSettingOfReport': '巡检配置（巡检报告配置）'
   },
 
   'overview': {
@@ -280,7 +282,6 @@ export default {
     'confirmIgnore': '确认是否忽略当前巡检项？',
     'notBindCamera': '当前门店的巡检项未绑定设备！',
     'incompleteInfo': '巡检项尚未完成评估，是否继续?',
-    'notSolver': '当前门店未绑定负责人，是否继续？',
     'emptyTitle': '问题反馈名称不能为空！',
     'recording': '正在录制',
     'recordSucc': '录制成功',
@@ -415,7 +416,10 @@ export default {
     'signature': '签名',
     'excellent': '优秀',
     'signatureAndPic': '签名与照片',
-    'loading': '加载中...'
+    'loading': '加载中...',
+    'highDefinition': '高清',
+    'fluency': '流畅',
+    'totalScoreUnit': '总分：'
   },
 
   // event Management page language
@@ -890,7 +894,8 @@ export default {
     'emptyTime': '执行时间不能为空',
     'newSchedule': '新增排程',
     'select': '请选择',
-    'onTitle': '（按职务）'
+    'onTitle': '（按职务）',
+    'inspectName': '巡检表名称'
   },
 
   'titleView': {
@@ -906,7 +911,7 @@ export default {
     'roleId2Title': '督导主管',
     'roleId3Title': '督导',
     'roleId4Title': '店长',
-    'comment': '备注说明',
+    'remarksContent': '备注说明',
     'commentRuletip': '最多可输入200个字符',
     'roleSetting': '菜单权限配置',
     'confirmInfo': '确认删除',
@@ -920,6 +925,33 @@ export default {
     'yes': '允许',
     'no': '不允许',
     'useTemplate': '模板',
-    'useAndSave': '选择并套用'
+    'useAndSave': '选择并套用',
+    'add': '新增',
+    'delete': '删除',
+    'templateName': '报告模板名称',
+    'componentName': '组件名称',
+    'componentStatus': '组件状态',
+    'comment': '巡检建议',
+    'statistics': '巡检结果统计',
+    'summaryTable': '巡检表格概览',
+    'focalItem': '重点关注项',
+    'feedbackItem': '问题反馈项',
+    'qualifiedItem': '合格项',
+    'ignoredItem': '不适用项',
+    'atLeastOneTemplate': '至少保留一份报告模板',
+    'noEnableTemplate': '删除后无启用状态模板，请调整再删除',
+    'templateOutOfLimit': '配置模板超限',
+    'enableTemplate': '请启用报告模板',
+    'enableConfig': '请开启配置项',
+    'templateNameExist': '模板名称已存在',
+    'enterTemplateName': '请输入模板名称',
+    'inspectionStaticSetting': '巡检结果统计设置',
+    'statisIndex': '统计指标',
+    'qualified': '合格',
+    'unqualified': '不合格',
+    'displayofStatisticalResults': '统计结果展示',
+    'radar': '雷达图',
+    'pie': '饼状图',
+    'others': '其他'
   }
-};
+}

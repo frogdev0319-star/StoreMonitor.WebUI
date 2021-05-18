@@ -331,6 +331,19 @@ export const navbarRoute = {
       }
     });
 
+    PermissionHelper.enableReportSetting() &&
+    inspectionRoute.children.push({
+      path: '/insepctionReportSetting',
+      name: 'insepctionReportSetting',
+      isReadOnly: false,
+      component: resolve => require(['@/views/setting/report/ReportSetting'], resolve),
+      hidden: false,
+      meta: {
+        keepAlive: false,
+        requireAuth: true
+      }
+    });
+
     inspectionRoute.children.length > 0 && systemSettingRoute.children.push(inspectionRoute);
     PermissionHelper.enableTitleSetting() && systemSettingRoute.children.push(
       {

@@ -64,7 +64,9 @@ export default {
     'networkError': '網絡異常，請檢查網絡連接狀況！',
     'serverException': '伺服器異常，請刷新後重試！',
     'noAuthority': '無操作權限！',
-    'loginAbnormal': '登錄信息異常，請重新登錄！'
+    'loginAbnormal': '登錄信息異常，請重新登錄！',
+    'insepctionReportSetting': '巡檢報告設置',
+    'inspectingSettingOfReport': '巡檢配置（巡檢報告設置）'
   },
 
   'overview': {
@@ -280,7 +282,6 @@ export default {
     'confirmIgnore': '確認是否忽略當前巡檢項？',
     'notBindCamera': '當前門店的巡檢項未綁定設備！',
     'incompleteInfo': '巡檢項尚未完成評估，是否繼續？',
-    'notSolver': '當前門店未綁定負責人，是否繼續？',
     'emptyTitle': '問題回饋名稱不能為空！',
     'recording': '正在錄製',
     'recordSucc': '錄製成功',
@@ -415,7 +416,10 @@ export default {
     'signature': '簽名',
     'excellent': '優秀',
     'signatureAndPic': '簽名與照片',
-    'loading': '加載中...'
+    'loading': '加載中...',
+    'highDefinition': '高清',
+    'fluency': '流畅',
+    'totalScoreUnit': '总分：'
   },
 
   // event Management page language
@@ -891,6 +895,7 @@ export default {
     'newSchedule': '新增排程',
     'select': '請選擇',
     'onTitle': '（按職務）',
+    'inspectName': '巡檢表名称'
   },
 
   'titleView': {
@@ -905,7 +910,7 @@ export default {
     'roleId2Title': '督導主管',
     'roleId3Title': '督導',
     'roleId4Title': '店長',
-    'comment': ' 備註說明',
+    'remarksContent': ' 備註說明',
     'commentRuletip': '最多可輸入200個字元',
     'roleSetting': '菜單權限配置',
     'confirmInfo': '確認刪除',
@@ -919,6 +924,33 @@ export default {
     'yes': '允許',
     'no': '不允許',
     'useTemplate': '樣板',
-    'useAndSave': '選擇並套用'
+    'useAndSave': '選擇並套用',
+    'add': '新增',
+    'delete': '删除',
+    'templateName': '報告模板名稱',
+    'componentName': '組件名稱',
+    'componentStatus': '組件狀態',
+    'comment': '巡檢建議',
+    'statistics': '巡檢結果統計',
+    'summaryTable': '巡檢表格概覽',
+    'focalItem': '重點關註項',
+    'feedbackItem': '問題反饋項',
+    'qualifiedItem': '合格項',
+    'ignoredItem': '不適用項',
+    'atLeastOneTemplate': '至少保留一份報告模板',
+    'noEnableTemplate': '刪除後無啟用狀態模板，請調整再刪除',
+    'templateOutOfLimit': '配置模板超限',
+    'enableTemplate': '請啟用報告模板',
+    'enableConfig': '請開啟配置項',
+    'templateNameExist': '模板名稱已存在',
+    'enterTemplateName': '請輸入報告模板名稱',
+    'inspectionStaticSetting': '巡檢結果統計設置',
+    'statisIndex': '統計指標',
+    'qualified': '合格',
+    'unqualified': '不合格',
+    'displayofStatisticalResults': '統計結果展示',
+    'radar': '雷達圖',
+    'pie': '餅狀圖',
+    'others': '其他'
   }
 };

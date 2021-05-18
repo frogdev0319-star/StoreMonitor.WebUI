@@ -3,7 +3,10 @@
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
       <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
-      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">{{ accountName + ' | ' + report.storeName+' '+report.tagName }}<span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span></p>
+      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">
+        {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
+        <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
+      </p>
       <div class="info-content">
         <div class="pdf_font_24">
           <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
@@ -21,291 +24,308 @@
         </div>
       </div>
     </div>
-    <div class="el-acticle">
-      <div v-if="suggest!=null&&suggest.length!=0" :style="isexportPDF ? 'max-height:300px;' : ''" class="suggest">
-        <div class="suggest-content">
-          <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
-          <span class="pdf_font_20" v-html="turnSuggest(suggest)"/>
+    <div class="template-titles">
+      <div class="names" v-if="templateList.length > 1">
+        <div v-for="(item,index) in templateList"
+             class="template-name no-print"
+             :class="{'click-btn' : curTemplateIndex === index}"
+             :key="index"
+             @click="getTemplateConfig(index)">
+          {{ item.name }}
         </div>
       </div>
+    </div>
+    <div class="el-acticle">
       <el-row class="report-content">
-        <el-col :span="24" :style="isexportPDF ? 'height:600px;' : ''" class="radior-content">
+        <el-col :span="24" class="">
           <div class="header-score">
             <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
             <span class="span-2"><span class="pdf_font_26">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span></span>
-            <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
           </div>
-          <v-chart ref="chartRadar" :options="options" :auto-resize="true" class="chart-content"/>
         </el-col>
       </el-row>
-      <el-row class="row-table">
+      <el-row v-for="(pageItem, pageIndex) in pageData" :class="pageItem.class" :key="pageIndex">
         <el-col>
-          <table v-for="(s_item,s_index) in tableData" :key="s_index" class="table table-bordered">
-            <thead class="pdf_font_20">
-              <tr v-if="s_item[0].type==0">
-                <th
-                  v-for="(t_item ,t_index) in theaderPassFail"
-                  :key="t_index"
-                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }}</th>
-              </tr>
-              <tr v-if="s_item[0].type==1">
-                <th
-                  v-for="(t_item ,t_index) in theaderScore"
-                  :key="t_index"
-                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }}</th>
-              </tr>
-              <tr v-if="s_item[0].type==2">
-                <th
-                  v-for="(t_item ,t_index) in theaderOther"
-                  :key="t_index"
-                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name }}</th>
-              </tr>
-            </thead>
-            <tbody class="pdf_font_20">
-              <tr style="vertical-align:middle;">
-                <td :rowspan="s_item.length+1" style="vertical-align:middle;">
-                  <span v-if="s_item[0].type==0">{{ $t('insSettingView.sheetpassfail') }}</span>
-                  <span v-if="s_item[0].type==1">{{ $t('insSettingView.sheetscore') }}</span>
-                  <span v-if="s_item[0].type==2">{{ $t('insSettingView.sheetother') }}</span>
-                </td>
-              </tr>
-              <tr v-for="(item,index) in s_item" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-                <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span>
-                  <span class="count-blag"><span class="pdf_font_16">{{ item.numOfTotalItems }}</span></span>
-                </td>
-                <td v-if="item.type==0||item.type==2"><span>{{ item.numOfQualifiedItems }}</span></td>
-                <td v-if="item.type==0||item.type==2"><span>{{ item.numOfUnqualifiedItems }}</span></td>
-                <td v-if="item.type==1"><span>{{ item.totalScore }}</span></td>
-                <td><span>{{ item.numOfIgnored }}</span></td>
-                <td v-if="item.type==1||item.type==2"><span>{{ item.actualScore }}</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </el-col>
-      </el-row>
-      <el-row class="row-footer">
-        <el-col
-          v-for="(item,index) in tempList"
-          :span="tempList.length === 4 ? 6 : 8"
-          :key="index"
-          class="details-content">
-          <div v-if="index < 3" class="details" :style="isexportPDF ? 'height:430px;' : ''">
-            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''">
-              <i :class="item.iconSrc" :style="isexportPDF ? 'font-size:26px;' : ''" class="iconfont icontemp"/>
-              <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
-              <div class="count-content">
-                <span class="count"><span class="pdf_font_36">{{ item.itemCount }}</span></span>
+          <div v-if="pageItem.class === 'row-detail'">
+            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
+                 @click="hideOrShowDetail(pageItem, pageIndex)">
+              <div class="icon-header">
+                <i :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icontemp"
+                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'">
+                </i>
+                <span class="title-lable"><span class="pdf_font_20">{{ $t(`titleView.${pageItem.name}`) }}</span></span>
+              </div>
+              <div class="count-header">
+                <span class="count"><span class="pdf_font_36">{{ pageItem.itemCount }}</span></span>
                 <span class="blag"><span class="pdf_font_18">{{ $t('remotePatrol.unit') }}</span></span>
               </div>
             </div>
-            <div class="item-content" :style="isexportPDF ? 'height:380px;' : ''">
-              <el-scrollbar :style="isexportPDF ? 'height:75%;' : 'height:98%;'" class="el-menuscrollbar">
-                <div v-for="_item in item.itemList" :key="_item.id" class="item-details">
-                  <div :class="isexportPDF ? 'pdf_item_blag' : 'item-blag'"/>
-                  <span class="item-name"><span class="pdf_font_20">{{ index !== 2 ?_item.name : _item.subject }}</span></span>
-                  <span class="item-des"><span class="pdf_font_18"/></span>
+            <div class="item-content" v-if="pageItem.ifExpand">
+              <div class="pdf_font_20">
+                <div v-for="(item,index) in pageItem.data" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
+                  <div class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
+                  <div v-for="(_item,_index) in item.cateryItems" :key="_index" class="content-detail">
+                    <div class="content-detail-title">
+                      <div class="detail-title">
+                        <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
+                        <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
+                      </div>
+                      <div class="score-title">
+                        <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn"
+                             :style="isexportPDF ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'">
+                          <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
+                        <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0"
+                             class="title-btn-failed" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
+                          <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }} </span>
+                        </div>
+                        <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1"
+                             class="title-btn-pass" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
+                          <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }} </span>
+                        </div>
+                        <div v-if="item.groupType==1 &&_item.grade!=Math.pow(-2,31)"
+                             :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
+                             :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
+                          <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
+                        </div>
+                        <div class="total-score"
+                             v-if="_item.itemScore !== Number.MAX_VALUE">
+                          <span class="pdf_font_18">
+                          {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}</span>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div
+                      v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
+                      class="content-detail-main"
+                      style="padding-bottom: 20px;">
+                      <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
+                      <div v-if="_item.showAudio" class="cdm-voice">
+                        <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
+                          <i class="iconfont icon-yuyin icon-speech"/>
+                        </div>
+                        <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
+                          <source :src="_item.audio.audioSrc" type="audio/mpeg" >
+                        </audio>
+                        <span class="often-text">{{ _item.audio.audioOftenText }}</span>
+                      </div>
+                      <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
+                        <span class="pdf_font_24">{{ _item.comment }}</span>
+                      </div>
+                      <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
+                        <div
+                          v-for="(sourceitem,sourceindex) in _item.sourceList"
+                          :key="sourceindex"
+                          :height="imgHeight+'px'"
+                          class="source-details">
+                          <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''">
+                            <img
+                              :title="imgTitle"
+                              :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                              :src="sourceitem.url"
+                              :height="imgHeight+'px'"
+                              :onerror="deafultImg"
+                              class="imgLittle imgInner"
+                              @click="openOuter(sourceitem,$event)">
+                          </div>
+                          <div
+                            v-if="sourceitem.mediaType==1"
+                            class="img-content "
+                            @click="playCommentVideo(sourceitem,sourceindex)">
+                            <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                            <img
+                              :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                              :src="videoImgSrc"
+                              :height="imgHeight+'px'"
+                              class="imgLittle">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </el-scrollbar>
-              <span v-if="item.itemCount > 3 && isexportPDF" class="moreInfotip">
-                <span class="pdf_font_18">{{ $t('remotePatrol.more') }}</span>
-              </span>
-            </div>
-          </div>
-          <div v-else class="details" :style="isexportPDF ? 'height:430px;' : ''">
-            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''">
-              <i :class="item.iconSrc" :style="isexportPDF ? 'font-size:26px;' : ''" class="iconfont icontemp"/>
-              <span class="title-lable"><span class="pdf_font_20">{{ item.itemTitleName }}</span></span>
-            </div>
-            <div class="item-content item-img" :style="isexportPDF ? 'height:380px;' : ''">
-              <div class="item-details signature-details" style="height:100%;">
-                <div
-                  v-for="(signatureItem,signatureIndex) in item.itemList"
-                  :key="signatureIndex"
-                  :class="item.itemList.length > 2 && 'signature-items'"
-                  class="signature-item"
-                  @click="displayEnlargeSignature(signatureItem.content)">
-                  <span v-if="signatureItem.type === 1">{{ $t('remotePatrol.signature') }}</span>
-                  <img :src="signatureItem.content" :class="signatureItem.type === 1 ? 'signature': ''" class="signature-content">
+                <div v-if="showFeedBacks" style="margin-bottom:20px;">
+                  <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.feedbacks') }}</span></div>
+                  <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
+                    <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
+                      <div class="detail-title">
+                        <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }}</span></p>
+                      </div>
+                    </div>
+                    <div
+                      v-if="item.showAttachment || item.description != null&&item.description !== ''"
+                      class="content-detail-main">
+                      <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
+                      <div v-if="item.showAudio" class="cdm-voice">
+                        <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
+                          <i class="iconfont icon-yuyin icon-speech"/>
+                        </div>
+                        <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
+                          <source :src="item.audio.audioSrc" type="audio/mpeg" >
+                        </audio>
+                        <span class="often-text">{{ item.audio.audioOftenText }}</span>
+                      </div>
+                      <div v-if="item.description !=null && item.description !=''" class="cdm-word">
+                        <span class="pdf_font_24">{{ item.description }}</span>
+                      </div>
+                      <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
+                        <div
+                          v-for="(sourceitem,index) in item.sourceList"
+                          :key="index"
+                          :height="imgHeight+'px'"
+                          class="source-details">
+                          <div v-if="sourceitem.mediaType === 2" class="img-content">
+                            <img
+                              :title="imgTitle"
+                              :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                              :src="sourceitem.url"
+                              :height="imgHeight+'px'"
+                              :onerror="deafultImg"
+                              class="imgLittle imgInner"
+                              @click="openOuter(sourceitem,$event)">
+                          </div>
+                          <div
+                            v-if="sourceitem.mediaType === 1"
+                            class="img-content "
+                            @click="playCommentVideo(sourceitem,index)">
+                            <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                            <img
+                              :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                              :src="videoImgSrc"
+                              :height="imgHeight+'px'"
+                              class="imgLittle">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                <el-dialog
+                  v-if="dialogCommentVideo"
+                  :title="$t('eventView.view')"
+                  :visible.sync="dialogCommentVideo"
+                  :close-on-click-modal="false"
+                  width="850px"
+                  top="12%"
+                  class="rate-video-dialog"
+                  @close="stopCommentVideo">
+                  <div class="video-dialog-content" style="overflow:hidden;">
+                    <hr class="dialog-hr">
+                    <div class="video-content" >
+                      <video
+                        id="previewVideo"
+                        height="83%"
+                        width="90%"
+                        prload
+                        controls
+                        class="video-js vjs-fill"/>
+                    </div>
+                  </div>
+                </el-dialog>
+                <transition name="fade">
+                  <el-dialog
+                    v-if="showOuter"
+                    :title="$t('eventView.view')"
+                    :visible.sync="showOuter"
+                    :close-on-click-modal="false"
+                    width="850px"
+                    top="12%">
+                    <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
+                      <hr class="dialog-hr">
+                      <div class="dialog-source-content">
+                        <img v-if="showImg" :src="checkImgSrc">
+                      </div>
+                    </div>
+                  </el-dialog>
+                </transition>
               </div>
             </div>
           </div>
         </el-col>
-      </el-row>
-      <el-row class="row-detail">
-        <el-col>
-          <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''" @click=" isup ? isup = false : isup = true">
-            <i v-if="isup" :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icon-zhedie1 icontemp" style="color: #eb1d63;"/>
-            <i v-if="!isup" :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icon-zhankai1 icontemp" style="color:#7d8cad;"/>
-            <span class="title-lable"><span class="pdf_font_20">{{ $t('remotePatrol.detailInfo') }}</span></span>
+        <el-col v-if="pageItem.class === 'row-table'">
+          <table v-for="(s_item,s_index) in pageItem.data" :key="s_index" class="table table-bordered">
+            <thead class="pdf_font_20">
+            <tr v-if="s_item[0].type === 0">
+              <th
+                v-for="(t_item ,t_index) in theaderPassFail"
+                :key="t_index"
+                :style="isexportPDF ? t_item.pdfWidth: t_item.width"
+                scope="col">{{ t_item.name }}</th>
+            </tr>
+            <tr v-if="s_item[0].type === 1">
+              <th
+                v-for="(t_item ,t_index) in theaderScore"
+                :key="t_index"
+                :style="isexportPDF ? t_item.pdfWidth: t_item.width"
+                scope="col">{{ t_item.name }}</th>
+            </tr>
+            <tr v-if="s_item[0].type === 2">
+              <th
+                v-for="(t_item ,t_index) in theaderOther"
+                :key="t_index"
+                :style="isexportPDF ? t_item.pdfWidth: t_item.width"
+                scope="col">{{ t_item.name }}</th>
+            </tr>
+            </thead>
+            <tbody class="pdf_font_20">
+            <tr style="vertical-align:middle;">
+              <td :rowspan="s_item.length+1" style="vertical-align:middle;">
+                <span v-if="s_item[0].type === 0">{{ $t('insSettingView.sheetpassfail') }}</span>
+                <span v-if="s_item[0].type === 1">{{ $t('insSettingView.sheetscore') }}</span>
+                <span v-if="s_item[0].type === 2">{{ $t('insSettingView.sheetother') }}</span>
+              </td>
+            </tr>
+            <tr v-for="(item,index) in s_item" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
+              <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span>
+                <span class="count-blag"><span class="pdf_font_16">{{ item.numOfTotalItems }}</span></span>
+              </td>
+              <td v-if="item.type === 0||item.type === 2"><span>{{ item.numOfQualifiedItems }}</span></td>
+              <td v-if="item.type === 0||item.type === 2"><span>{{ item.numOfUnqualifiedItems }}</span></td>
+              <td v-if="item.type === 1"><span>{{ item.totalScore }}</span></td>
+              <td><span>{{ item.actualScore | filterScore}}</span></td>
+            </tr>
+            </tbody>
+          </table>
+        </el-col>
+        <el-col v-if="pageItem.class === 'radior-content' && staticalConfig.chart" class="pie-content"
+                :style="isexportPDF ? 'height:400px;' : ''">
+          <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
+          <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
+                   class="pie-chart-content"/>
+        </el-col>
+        <el-col v-if="pageItem.class === 'radior-content' && !staticalConfig.chart" class="radar-content"
+                :style="isexportPDF ? 'height:400px;' : ''">
+          <span class="span-4">{{ $t('remotePatrol.scoreU') }}</span>
+          <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
+                   class="radar-chart-content"/>
+        </el-col>
+        <el-col v-if="pageItem.class === 'suggest'">
+          <div class="suggest-content" v-if="pageItem.data !== null && pageItem.data.length !== 0">
+            <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
+            <span class="pdf_font_20" v-html="turnSuggest(pageItem.data)"/>
           </div>
-          <div v-show="isup" class="item-content">
-            <div class="pdf_font_20">
-              <div v-for="(item,index) in groups" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
-                <div class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
-                <div v-for="(_item,_index) in item.items" :key="_index" class="content-detail">
-                  <div class="content-detail-title">
-                    <div class="detail-title">
-                      <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
-                      <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
-                    </div>
-                    <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn" :style="isexportPDF ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'"><span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
-                    <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0" class="title-btn-failed" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-                      <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }}</span>
-                    </div>
-                    <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1" class="title-btn-pass" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-                      <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }}</span>
-                    </div>
-                    <div v-if="item.groupType==1&&_item.grade!=Math.pow(-2,31)" :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-                      <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
-                    </div>
-                  </div>
-                  <div
-                    v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
-                    class="content-detail-main"
-                    style="padding-bottom: 20px;">
-                    <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
-                    <div v-if="_item.showAudio" class="cdm-voice">
-                      <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
-                        <i class="iconfont icon-yuyin icon-speech"/>
-                      </div>
-                      <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-                        <source :src="_item.audio.audioSrc" type="audio/mpeg" >
-                      </audio>
-                      <span class="often-text">{{ _item.audio.audioOftenText }}</span>
-                    </div>
-                    <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
-                      <span class="pdf_font_24">{{ _item.comment }}</span>
-                    </div>
-                    <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
-                      <div
-                        v-for="(sourceitem,sourceindex) in _item.sourceList"
-                        :key="sourceindex"
-                        :height="imgHeight+'px'"
-                        class="source-details">
-                        <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''">
-                          <img
-                            :title="imgTitle"
-                            :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
-                            :src="sourceitem.url"
-                            :height="imgHeight+'px'"
-                            :onerror="deafultImg"
-                            class="imgLittle imgInner"
-                            @click="openOuter(sourceitem,$event)">
-                        </div>
-                        <div
-                          v-if="sourceitem.mediaType==1"
-                          class="img-content "
-                          @click="playCommentVideo(sourceitem,sourceindex)">
-                          <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                          <img
-                            :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
-                            :src="videoImgSrc"
-                            :height="imgHeight+'px'"
-                            class="imgLittle">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+        </el-col>
+        <el-col>
+          <div v-if="pageItem.class === 'signature-detail'">
+            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
+                 @click="hideOrShowDetail(pageItem, pageIndex)">
+              <div class="icon-header">
+                <i :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icontemp"
+                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'">
+                </i>
+                <span class="title-lable"><span class="pdf_font_20">{{ $t(`remotePatrol.${pageItem.name}`) }}</span></span>
+              </div>
+            </div>
+            <div class="item-content" v-if="pageItem.ifExpand">
+              <div class="signature-details">
+                <div
+                  v-for="(signatureItem, signatureIndex) in pageItem.data"
+                  :key="signatureIndex"
+                  class="signature-item"
+                  @click="displayEnlargeSignature(signatureItem.content)">
+                  <img :src="signatureItem.content" class="signature-content">
                 </div>
               </div>
-              <div v-if="showFeedBacks" style="margin-bottom:20px;">
-                <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.feedbacks') }}</span></div>
-                <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
-                  <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
-                    <div class="detail-title">
-                      <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }}</span></p>
-                    </div>
-                  </div>
-                  <div
-                    v-if="item.showAttachment || item.description != null&&item.description !== ''"
-                    class="content-detail-main">
-                    <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
-                    <div v-if="item.showAudio" class="cdm-voice">
-                      <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
-                        <i class="iconfont icon-yuyin icon-speech"/>
-                      </div>
-                      <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                        <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                      </audio>
-                      <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                    </div>
-                    <div v-if="item.description !=null && item.description !=''" class="cdm-word">
-                      <span class="pdf_font_24">{{ item.description }}</span>
-                    </div>
-                    <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
-                      <div
-                        v-for="(sourceitem,index) in item.sourceList"
-                        :key="index"
-                        :height="imgHeight+'px'"
-                        class="source-details">
-                        <div v-if="sourceitem.mediaType === 2" class="img-content">
-                          <img
-                            :title="imgTitle"
-                            :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
-                            :src="sourceitem.url"
-                            :height="imgHeight+'px'"
-                            :onerror="deafultImg"
-                            class="imgLittle imgInner"
-                            @click="openOuter(sourceitem,$event)">
-                        </div>
-                        <div
-                          v-if="sourceitem.mediaType === 1"
-                          class="img-content "
-                          @click="playCommentVideo(sourceitem,index)">
-                          <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                          <img
-                            :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
-                            :src="videoImgSrc"
-                            :height="imgHeight+'px'"
-                            class="imgLittle">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <el-dialog
-                v-if="dialogCommentVideo"
-                :title="$t('eventView.view')"
-                :visible.sync="dialogCommentVideo"
-                :close-on-click-modal="false"
-                width="850px"
-                top="12%"
-                class="rate-video-dialog"
-                @close="stopCommentVideo">
-                <div class="video-dialog-content" style="overflow:hidden;">
-                  <hr class="dialog-hr">
-                  <div class="video-content" >
-                    <video
-                      id="previewVideo"
-                      height="83%"
-                      width="90%"
-                      prload
-                      controls
-                      class="video-js vjs-fill"/>
-                  </div>
-                </div>
-              </el-dialog>
-              <transition name="fade">
-                <el-dialog
-                  v-if="showOuter"
-                  :title="$t('eventView.view')"
-                  :visible.sync="showOuter"
-                  :close-on-click-modal="false"
-                  width="850px"
-                  top="12%">
-                  <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-                    <hr class="dialog-hr">
-                    <div class="dialog-source-content">
-                      <img v-if="showImg" :src="checkImgSrc">
-                    </div>
-                  </div>
-                </el-dialog>
-              </transition>
             </div>
           </div>
         </el-col>
@@ -341,18 +361,30 @@ import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
 import resize from '@/components/mixins/resize';
+import DelayButton from '@/components/DelayButton';
+import ReportSetting from '@/api/reportSetting';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 
 export default {
   name: 'InspectReport',
-
   components: {
+    DelayButton,
     'v-chart': ECharts
   },
 
   mixins: [resize],
 
+  filters: {
+    filterScore(value) {
+      return value === Number.MAX_VALUE ? '--': value;
+    }
+  },
+
   data() {
     return {
+      templateList: [],
+      templateConfig: [],
+      curTemplateIndex: 0,
       accountName: '',
       reportId: 0,
       downloadProgress: false,
@@ -375,11 +407,7 @@ export default {
       inspectSrc10: require('../../../static/img/excellent_tw.png'),
       report: null,
       suggest: '',
-      summary: [],
       totalScore: '',
-      tableData: [],
-      tempList: [],
-      options: null,
       theaderList: [
         {
           name: this.$t('remotePatrol.items')
@@ -415,25 +443,28 @@ export default {
         { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
         { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
         { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;', pdfWidth: 'width:15%;' }
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
       ],
       theaderScore: [
         { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:30%;', pdfWidth: 'width:25%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
       ],
       theaderOther: [
         { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.TableIgnore'), width: 'width:15%;', pdfWidth: 'width:11.5%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:15%;', pdfWidth: 'width:11.5%;' }
+        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
       ],
       showSignatureFlag: false,
-      signatureSrc: ''
+      signatureSrc: '',
+      staticalConfig: null,
+      pageData: null,
+      signaturesList: null,
+      reportData: null,
+      cachedTemplateId: -1
     };
   },
 
@@ -455,13 +486,14 @@ export default {
   },
 
   created() {
+    this.getStoredTemplateId();
+    this.getInspectTemplateList();
     this.getRouterData();
+    this.getReportInfo();
   },
 
   mounted() {
     this.accountName = sessionStorage.getItem('accountName');
-    this.getReportInfo();
-    this.getReportDetail();
   },
 
   beforeDestroy() {
@@ -469,6 +501,45 @@ export default {
   },
 
   methods: {
+    getInspectTemplateList(){
+      const params = {};
+      params.enable = true;
+      ReportSetting.getInspectReportTemplateList(params).then(res => {
+        if(res.errCode === 0 && res.data.length > 0) {
+          this.templateList = res.data;
+          const savedTemplateIndex = this.templateList.findIndex(item => {return item.id === this.cachedTemplateId});
+          if(savedTemplateIndex !== -1){
+            this.curTemplateIndex = savedTemplateIndex;
+            this.templateConfig = this.templateList[savedTemplateIndex].config.switches.filter(item => item.enable === true);
+            const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
+            this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
+          } else {
+            this.curTemplateIndex = 0;
+            this.templateConfig = this.templateList[0].config.switches.filter(item => item.enable === true);
+            const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
+            this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
+          }
+        }
+        else{
+            this.templateList = [];
+            this.curTemplate = [];
+            this.templateConfig = [];
+          }
+        }).catch(err => {
+          console.log('ReportSetting:' + err);
+        })
+    },
+
+
+    getTemplateConfig(index){
+      this.curTemplateIndex = index;
+      this.templateConfig = this.templateList[index].config.switches.filter(item => item.enable === true);
+      const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
+      this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
+      this.getPageDataBasedOnTemplate(this.reportData);
+      this.saveTemplateId();
+    },
+
     handleDown() {
       const self = this;
       if (self.hasAttachment !== 0) {
@@ -478,6 +549,9 @@ export default {
         if (document.readyState === 'complete') {
           new Promise(async function(resolve) {
             self.isup = true;
+            self.pageData.forEach(item => {
+              item.ifExpand = true;
+            })
             self.isexportPDF = true;
             resolve(true);
           }).then(function() {
@@ -578,93 +652,22 @@ export default {
       self.report = obj;
     },
 
-    async getReportDetail() {
-      const self = this;
-      const params = {
-        reportId: self.report.reportId
-      };
-      getInspectReportDetail(params).then(res => {
-        const data = res.data;
-        const temp = [];
-        const feedtemp = [];
-        // let gradetotal = []
-        data.groups.sort((a, b) => { return a.groupType - b.groupType; });
-        data.groups.forEach((groupitem, groupindex) => {
-          const obj = {
-            items: []
-          };
-          obj.groupId = groupitem.groupId;
-          obj.groupName = groupitem.groupName;
-          obj.groupType = groupitem.groupType;
-          groupitem.items.forEach((item, index) => {
-            const details = {};
-            details.subject = item.subject;
-            details.comment = item.comment;
-            details.description = item.description;
-            details.grade = item.grade;
-            details.qualifiedScore = item.qualifiedScore;
-            if (item.attachment.length !== 0) {
-              const _temp = [];
-              const audioObj = {};
-              self.hasAttachment++;
-              details.showAttachment = true;
-              item.attachment.forEach((_item, _index) => {
-                if (_item.mediaType === 0) {
-                  audioObj.audioSrc = _item.url;
-                  audioObj.audioRef = 'audioRef' + groupindex + index + _index;
-                  audioObj.isPlaying = false;
-                  audioObj.audioOftenText = '';
-                  details.showAudio = true;
-                } else {
-                  _temp.push(_item);
-                }
-              });
-              details.audio = audioObj;
-              details.sourceList = _temp;
-            } else {
-              details.showAttachment = false;
-            }
-            obj.items.push(details);
-          });
-          temp.push(obj);
-        });
-        self.groups = temp;
-        if (data.feedbacks.length === 0) {
-          this.showFeedBacks = false;
+    getItemsPassOrFailed(groupType, grade, qualifiedScore){
+      if(grade === -1<<31){
+        return 0; //ignored
+      } else if(groupType === 0 || groupType === 2){
+        if(grade === 0){
+          return 1; // unqualified
         } else {
-          this.showFeedBacks = true;
-          data.feedbacks.forEach((item, index) => {
-            const obj = {};
-            obj.subject = item.subject;
-            obj.description = item.description;
-            if (item.attachment.length !== 0) {
-              const _temp = [];
-              const audioObj = {};
-              self.hasAttachment++;
-              obj.showAttachment = true;
-              item.attachment.forEach((_item, _index) => {
-                if (_item.mediaType === 0) {
-                  audioObj.audioSrc = _item.url;
-                  audioObj.audioRef = 'audioRef' + index;
-                  audioObj.isPlaying = false;
-                  audioObj.audioOftenText = '';
-                  obj.showAudio = true;
-                } else {
-                  _temp.push(_item);
-                }
-              });
-              obj.audio = audioObj;
-              obj.sourceList = _temp;
-            } else {
-              obj.showAttachment = false;
-            }
-            feedtemp.push(obj);
-          });
-          self.feedbacks = feedtemp;
+          return 2; // qualified
         }
-      }).catch(err => {
-        console.log('InspectReportDetail-getReportDetail: ' + err);
-      });
+      } else if(groupType === 1 && grade !== -1<<31){
+        if(grade < qualifiedScore){
+          return 1; // unqualified
+        } else {
+          return 2; // qualified
+        }
+      }
     },
 
     stopCommentVideo() {
@@ -736,7 +739,7 @@ export default {
         self.$refs[item.audio.audioRef][0].pause();
         item.audio.isPlaying = false;
       }
-      self.groups.forEach((groupitem, groupindex) => {
+      self.groups.forEach((groupitem) => {
         groupitem.items.forEach((_item, _index) => {
           if (_item.audio !== undefined) {
             if (_index !== index) {
@@ -771,54 +774,6 @@ export default {
       });
     },
 
-    getSummaryInfo(summary) {
-      const summaryTemp = [];
-      summary.forEach(item => {
-        const obj = {};
-        obj.groupId = item.groupId;
-        obj.groupName = item.groupName;
-        obj.count = item.numOfTotalItems;
-        obj.isQua = item.result === 1;
-        obj.numOfExcellentItems = item.numOfExcellentItems;
-        obj.numOfQualifiedItems = item.numOfQualifiedItems;
-        obj.numOfUnqualifiedItems = item.numOfUnqualifiedItems;
-        summaryTemp.push(obj);
-      });
-      this.summary = summaryTemp;
-    },
-
-    getReportItemsListInfo(data) {
-      let tempArray = [];
-      this.isInsiteInspect && data.signatures ? tempArray = new Array(4) : tempArray = new Array(3);
-      tempArray[0] = {
-        itemTitleName: this.$t('remotePatrol.notableItem'),
-        iconSrc: 'icon-zhongxindingwei',
-        itemCount: data.focalItems.length,
-        itemList: data.focalItems
-      };
-      tempArray[1] = {
-        itemTitleName: this.$t('remotePatrol.inapplicableItem'),
-        iconSrc: 'icon-hulve',
-        itemCount: data.ignoredItems.length,
-        itemList: data.ignoredItems
-      };
-      tempArray[2] = {
-        itemTitleName: this.$t('remotePatrol.feedbacks'),
-        iconSrc: 'icon-fankui',
-        itemCount: data.feedback.length,
-        itemList: data.feedback
-      };
-      if (this.isInsiteInspect && data.signatures) {
-        tempArray[3] = {
-          itemTitleName: this.$t('remotePatrol.signatureAndPic'),
-          iconSrc: 'icon-fankui',
-          itemCount: '',
-          itemList: data.signatures
-        };
-      }
-      this.tempList = tempArray;
-    },
-
     async getReportInfo() {
       const self = this;
       const reportId = self.report.reportId;
@@ -827,43 +782,210 @@ export default {
       const params = {
         reportIds: temp
       };
-      getInspectReportInfo(params).then(res => {
+      getInspectReportInfo(params).then(async res => {
         if (res.errCode === 0 && res.data.length > 0) {
           const data = res.data[0].info;
-          self.suggest = data.comment;
-          const summary = data.summary;
-          const te_temp = [];
-          for (let i = 0; i < 3; i++) {
-            const typeIndex = summary.filter(x => x.type === i);
-            if (typeIndex.length !== 0) {
-              typeIndex[0].type === 0 ? te_temp.push(typeIndex) : '';
-              typeIndex[0].type === 1 ? te_temp.push(typeIndex) : '';
-              typeIndex[0].type === 2 ? te_temp.push(typeIndex) : '';
-            }
-          }
-          self.tableData = te_temp;
           self.totalScore = data.totalScore;
-          self.getSummaryInfo(summary);
-          self.getReportItemsListInfo(data);
-          self.getRadarOption();
+          this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
+          self.getGroupsData(data.groups);
+          self.reportData = data;
+          self.getPageDataBasedOnTemplate(self.reportData);
         }
       }).catch(err => {
         console.log('InspectReportDetail-getReportInfo: ' + err);
       });
     },
 
-    getRadarOption() {
+    getGroupsData(groups){
+      const temp = [];
+      groups.sort((a, b) => { return a.groupType - b.groupType; });
+      groups.forEach((groupitem, groupindex) => {
+        const obj = {
+          items: []
+        };
+        obj.groupId = groupitem.groupId;
+        obj.groupName = groupitem.groupName;
+        obj.groupType = groupitem.groupType;
+        groupitem.items.forEach((item, index) => {
+          const details = {};
+          details.subject = item.subject;
+          details.comment = item.comment;
+          details.description = item.description;
+          details.grade = item.grade;
+          details.qualifiedScore = item.qualifiedScore;
+          details.itemScore = item.itemScore;
+          details.showTotalScore =
+          details.passOfFailFlag = this.getItemsPassOrFailed(groupitem.groupType, item.grade, item.qualifiedScore);
+          if (item.attachment.length !== 0) {
+            const _temp = [];
+            const audioObj = {};
+            this.hasAttachment++;
+            details.showAttachment = true;
+            item.attachment.forEach((_item, _index) => {
+              if (_item.mediaType === 0) {
+                audioObj.audioSrc = _item.url;
+                audioObj.audioRef = 'audioRef' + groupindex + index + _index;
+                audioObj.isPlaying = false;
+                audioObj.audioOftenText = '';
+                details.showAudio = true;
+              } else {
+                _temp.push(_item);
+              }
+            });
+            details.audio = audioObj;
+            details.sourceList = _temp;
+          } else {
+            details.showAttachment = false;
+          }
+          obj.items.push(details);
+        });
+        temp.push(obj);
+      });
+      this.groups = temp;
+    },
+
+    getPageDataBasedOnTemplate(data){
+      const map = new Map([
+        ['comment', 'getComment'],
+        ['statistics', 'getOptions'],
+        ['summaryTable', 'getTableData'],
+        ['feedbackItem', 'getFeedbacks'],
+        ['focalItem', 'getFocalItems'],
+        ['qualifiedItem', 'getQualifiedItems'],
+        ['ignoredItem', 'getIgnoreItems']
+      ]);
+      this.sortArrayByKey(this.templateConfig, 'position');
+      const pageData = [];
+      this.templateConfig.forEach(config => {
+        if(map.has(config.name)){
+          console.log(map.get(config.name))
+          const fnName = map.get(config.name);
+          const returnDataJson = this[fnName](data);
+          returnDataJson.name = config.name;
+          pageData.push(returnDataJson);
+        }
+      });
+        if(this.isInsiteInspect && this.signaturesList.length > 0){
+          const signatureObj = {name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList};
+          pageData.push(signatureObj);
+        }
+      console.log(pageData);
+      this.pageData = pageData;
+    },
+
+    sortArrayByKey(sortedArray, key){
+      sortedArray.sort((a, b) => { return a[key] - b[key]; })
+    },
+
+    sortArrayByKeyDesc(key){
+      return function(a,b){
+        if (a[key] > b[key]){
+          return -1;
+        } else if(a[key] < b[key]){
+          return 1;
+        }
+        return 0;
+      }
+    },
+    getComment(data){
+      const suggest = data.comment;
+      return {class: 'suggest', data: suggest};
+    },
+
+    getTableData(data){
+      const summary = data.summary;
+      const te_temp = [];
+      for (let i = 0; i < 3; i++) {
+        const typeIndex = summary.filter(x => x.type === i);
+        if (typeIndex.length !== 0) {
+          typeIndex[0].type === 0 ? te_temp.push(typeIndex) : '';
+          typeIndex[0].type === 1 ? te_temp.push(typeIndex) : '';
+          typeIndex[0].type === 2 ? te_temp.push(typeIndex) : '';
+        }
+      }
+      return {class: 'row-table', data: te_temp};
+    },
+
+    getOptions(data){
+      const options = this.getStaticOptions(data.summary);
+      return {class: 'radior-content', data: options};
+    },
+
+    getStaticOptions(summary){
+      return this.staticalConfig.chart === 0 ? this.getRadarChart(summary) : this.getPieChart(summary);
+    },
+
+    getFeedbacks(data){
+      const feedbackTemp = [];
+      if (data.feedback.length === 0) {
+        this.showFeedBacks = false;
+      } else {
+        this.showFeedBacks = true;
+        data.feedback.forEach((item, index) => {
+          const obj = {};
+          obj.subject = item.subject;
+          obj.description = item.description;
+          if (item.attachment.length !== 0) {
+            const _temp = [];
+            const audioObj = {};
+            this.hasAttachment++;
+            obj.showAttachment = true;
+            item.attachment.forEach((_item, _index) => {
+              if (_item.mediaType === 0) {
+                audioObj.audioSrc = _item.url;
+                audioObj.audioRef = 'audioRef' + index;
+                audioObj.isPlaying = false;
+                audioObj.audioOftenText = '';
+                obj.showAudio = true;
+              } else {
+                _temp.push(_item);
+              }
+            });
+            obj.audio = audioObj;
+            obj.sourceList = _temp;
+          } else {
+            obj.showAttachment = false;
+          }
+          feedbackTemp.push(obj);
+        });
+        this.feedbacks = feedbackTemp;
+      }
+      return {class: 'row-detail', ifExpand: false, itemCount: this.feedbacks.length, data: this.feedbacks};
+    },
+
+    getFocalItems(){
+      const focalItems = this.getGroupsItems(1);
+      let focalCount = 0;
+        focalItems.forEach(item =>{focalCount += item.cateryItems.length});
+      return {class: 'row-detail', ifExpand: false, itemCount: focalCount, data: focalItems};
+    },
+
+    getQualifiedItems(){
+      const qualifiedItems = this.getGroupsItems(2);
+      let qualifiedCount = 0;
+      qualifiedItems.forEach(item =>{qualifiedCount += item.cateryItems.length});
+      return {class: 'row-detail', ifExpand: false, itemCount: qualifiedCount, data: qualifiedItems};
+    },
+
+    getIgnoreItems(){
+      const ignoreItems = this.getGroupsItems(0);
+      let ignoreCount = 0;
+      ignoreItems.forEach(item =>{ignoreCount += item.cateryItems.length});
+      return {class: 'row-detail', ifExpand: false, itemCount: ignoreCount, data: ignoreItems};
+    },
+
+    getRadarChart(summary) {
       const self = this;
       const options = self.getRadarChartOption();
       const tempIndicator = [];
       const seriesValue = [];
-      self.summary.forEach(item => {
+      summary.forEach(item => {
         const obj = {};
         obj.name = item.groupName;
         obj.max = Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems) === 0
           ? 1 : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
         tempIndicator.unshift(obj);
-        seriesValue.unshift(item.numOfQualifiedItems);
+        this.staticalConfig.qualified ? seriesValue.unshift(item.numOfUnqualifiedItems) : seriesValue.unshift(item.numOfQualifiedItems);
       });
       const temp = [];
       const obj = { value: seriesValue };
@@ -877,7 +999,7 @@ export default {
       } else {
         options.radar.splitNumber = 5;
       }
-      self.options = options;
+      return options;
     },
 
     getRadarChartOption() {
@@ -949,12 +1071,123 @@ export default {
         }
         ],
         tooltip: {
-          position: function(point, params, dom, rect, size) {
+          position: function(point) {
             return [point[0], '10%'];
           }
         }
       };
       return radarChartOption;
+    },
+
+    getPieChart(summary){
+      const pieOptions = this.getPieChartsOption();
+      let otherUnqualified = 0;
+      let otherQualified = 0;
+      this.staticalConfig.qualified ? summary.sort(this.sortArrayByKeyDesc('numOfUnqualifiedItems'))
+        : summary.sort(this.sortArrayByKeyDesc('numOfQualifiedItems'));
+      const summaryTempArr = [];
+      for(let summaryIndex = 0; summaryIndex < summary.length; summaryIndex++){
+        if(summaryIndex < 10){
+          summaryTempArr.push(summary[summaryIndex]);
+        }else{
+          otherUnqualified += summary[summaryIndex].numOfUnqualifiedItems;
+          otherQualified += summary[summaryIndex].numOfQualifiedItems;
+        }
+      }
+      if(otherUnqualified !== 0 || otherQualified !== 0){
+        const otherItems = {numOfUnqualifiedItems: otherUnqualified,
+                            numOfQualifiedItems: otherQualified, groupName: this.$t('titleView.others')};
+        summaryTempArr.push(otherItems);
+      }
+      const seriesData = [];
+      summaryTempArr.forEach(item => {
+        let obj = {};
+        obj.name = item.groupName;
+        obj.value = this.staticalConfig.qualified ? item.numOfUnqualifiedItems : item.numOfQualifiedItems;
+        obj.value > 0 && seriesData.push(obj);
+      });
+      pieOptions.series[1].data = seriesData;
+      return pieOptions;
+    },
+
+    getPieChartsOption(){
+      const pieOption = {
+        series: [
+          {
+            type: 'pie',
+            radius: ['43%', '70%'],
+            itemStyle: {
+              normal:{
+                color: function(params){
+                  let colorList = ['#f4f5f9'];
+                  return colorList[params.dataIndex];
+                },
+              }
+            },
+            silent: true,
+            z: 0,
+            data: [{value: 1, name: ''}],
+          },
+          {
+            type: 'pie',
+            radius: ['50%', '60%'],
+            emphasis: {
+              label: {
+                show: true
+              }
+            },
+            itemStyle: {
+              normal:{
+                color: function(params){
+                  console.log(params)
+                  let colorList = ['#68BE7B', '#FCCC3F', '#FB804F', '#F31D65', '#7E838D',
+                    '#844379', '#585AA5', '#4B81DF', '#7FA9F1', '#76D3E6'];
+                  return colorList[params.dataIndex];
+                },
+              }
+            },
+            label: {
+              fontSize:14,
+              color: '#9A9A9C',
+              formatter: '{b}-{d}%',
+            },
+            labelLine: {
+              length: 10,
+              length2: 50,
+              lineStyle: {
+                color: "#9A9A9C",
+              }
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: '{b}-{d}%'
+            },
+            z: 1,
+            data: []
+          }
+        ]
+      };
+      return pieOption;
+    },
+
+    getGroupsItems(status){
+      const group = [];
+      this.groups.forEach(groupItem => {
+        const tempGroupItem = {};
+        tempGroupItem.groupId = groupItem.groupId;
+        tempGroupItem.groupName = groupItem.groupName;
+        tempGroupItem.groupType = groupItem.groupType;
+        tempGroupItem.cateryItems = [];
+        groupItem.items.forEach(inspectItem => {
+          if(inspectItem.passOfFailFlag === status){
+            tempGroupItem.cateryItems.push(inspectItem);
+          };
+        })
+        if (tempGroupItem.cateryItems.length > 0) {
+          group.push(tempGroupItem);
+        }
+      });
+      return group;
     },
 
     turnSuggest(data) {
@@ -968,13 +1201,35 @@ export default {
     displayEnlargeSignature(src) {
       this.showSignatureFlag = true;
       this.signatureSrc = src;
+    },
+
+    hideOrShowDetail(pageItem, pageIndex){
+      this.pageData.forEach((item, index) => {
+        pageIndex === index && (item.ifExpand = !item.ifExpand)
+      })
+    },
+
+    saveTemplateId(){
+      let params = {
+        templateId: this.templateList[this.curTemplateIndex].id,
+      }
+      const searchConditon = {
+        path: 'reportDetail',
+        params: params
+      }
+      SearchConditionUtil.saveSearchCondition(searchConditon);
+    },
+
+    getStoredTemplateId(){
+      const templateJson = SearchConditionUtil.getSearchCondition('reportDetail');
+      if(Object.keys(templateJson).length > 0){
+        this.cachedTemplateId = templateJson.templateId;
+      }
     }
   }
 };
 </script>
 <style lang="scss" scoped>
-  @import 'node_modules/bootstrap/scss/bootstrap';
-  @import 'node_modules/bootstrap-vue/src/index.scss';
   @function rem($val){
     @return $val/16+rem;
   }
@@ -999,6 +1254,12 @@ export default {
   .pdf_font_24{font-size: 26px;}
   .pdf_font_26{font-size: 30px;}
   .pdf_font_36{font-size: 40px;}
+    .pdf_font_16{font-size: 14px;}
+    .pdf_font_18{font-size: 18px;}
+    .pdf_font_20{font-size: 20px;}
+    .pdf_font_24{font-size: 18px;}
+    .pdf_font_26{font-size: 24px;}
+    .pdf_font_36{font-size: 34px;}
   .title2_pdf{color:#182752;line-height:45px;}
   }
   $red: #f31d65;
@@ -1044,10 +1305,11 @@ export default {
       width: 100%;
       height: 80px;
       text-align: left;
-      border-bottom: 1px solid $border;
       line-height: 80px;
       padding-left: calc(30 / 1920 * 100vw);
       position: relative;
+      display: flex;
+      align-items: center;
       .pdf-title-icon{
         width:46px;
         height:54px;
@@ -1114,6 +1376,11 @@ export default {
       text-align: left;
       padding-left: calc(40 / 1920 * 100vw);
       padding-right: calc(40 / 1920 * 100vw);
+      .template-list{
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
       .suggest {
         margin-top: 20px;
         font-size: calc(14 / 1920 * 100vw);
@@ -1137,41 +1404,62 @@ export default {
           word-wrap: break-word;
         }
       }
+      .header-score{
+        margin-bottom: 10px;
+        font-weight: bold;
+        .span-1{
+          font-size: calc(14/1920*100vw);
+          color: $black;
+        }
+        .span-2{
+          color: $red;
+          font-size: calc(20/1920*100vw);
+        }
+        .span-3{
+          color: $tab;
+          font-size: calc(12/1920*100vw);
+        }
+      }
+      .pie-content {
+        height: 300px;
+        position: relative;
+        .span-4{
+          position: absolute;
+          font-weight: 400;
+          color: $tab;
+          font-size: calc(12/1920*100vw);
+          top: 0;
+          right: 0;
+          z-index: 2;
+        }
+        .pie-chart-content {
+          width: 1000px;
+          margin:0 auto;
+          height: 100%;
+        }
+      }
+      .radar-content {
+        height: 300px;
+        position: relative;
+        margin-top: 20px;
+        .span-4{
+          position: absolute;
+          font-weight: 400;
+          color: $tab;
+          font-size: calc(12/1920*100vw);
+          top: 0;
+          right: 0;
+          z-index: 2;
+        }
+        .radar-chart-content {
+          width: 1000px;
+          margin:0 auto;
+          height: 100%;
+        }
+      }
       .report-content {
         margin-top: 15px;
-        .radior-content {
-          height: 300px;
-          .header-score{
-            margin-bottom: 10px;
-            font-weight: bold;
-              .span-1{
-                  font-size: calc(14/1920*100vw);
-                  color: $black;
-              }
-              .span-2{
-                  color: $red;
-                  font-size: calc(20/1920*100vw);
-              }
-              .span-3{
-                  color: $tab;
-                  font-size: calc(12/1920*100vw);
-              }
-              .span-4{
-                float: right;
-                font-weight: 400;
-                color: $tab;
-                font-size: calc(12/1920*100vw);
-              }
-          }
-          .chart-content {
-            width: 1000px;
-            margin:0 auto;
-            height: 100%;
-          }
-          /*@media screen and (min-width: 1280px) and(max-width: 1440px) {*/
-            /*height: calc(360 / 1920 * 100vw);*/
-          /*}*/
-        }
+
         .report-table {
           font-size: calc(14 / 1920 * 100vw);
           padding-left: calc(40/1920*100vw);
@@ -1231,186 +1519,71 @@ export default {
         }
       }
       .row-table{
-        margin-top: calc(10 / 1920 * 100vw);
+        margin-top: 10px;
         font-size: calc(14/1920*100vw);
         .table-bordered{
-                margin-top: 20px;
-                th{
-                    color: $tab;
-                    text-align: left;
-                    background-color: $background;
-                    border-bottom-width: 1px;
-                    padding: 0.5rem;
-                    // width: 10%;
-                    padding-left: 1rem;
-                }
-                td{
-                    color: $black;
-                    padding-top:0.5rem;
-                    padding-bottom: 0.5rem;
-                    padding-left: 1.2rem;
-                    text-align: left;
-                    font-weight: bold;
-                }
-                .count-blag{
-                    padding: 2px 12px;
-                    width: auto;
-                    height: auto;
-                    border-radius: 10px;
-                    background-color: #D4DBE5;
-                    color: $tab;
-                    font-size: 12px;
-                    margin-right: calc(20/1920*100vw);
-                    float:right;
-                }
-                .icon-blag{
-                    display: inline-block;
-                    width: 80px;;
-                    padding:3px 6px;
-                    text-align: center;
-                    color: #fff;
-                    font-size: 12px;
-                    font-weight: normal;
-                }
-            }
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 20px;
+          th{
+              color: $tab;
+              text-align: left;
+              background-color: $background;
+              border-bottom-width: 1px;
+              padding: 0.5rem;
+              // width: 10%;
+              padding-left: 1rem;
+            border: 1px solid #dee2e6;
+          }
+          td{
+              color: $black;
+              padding-top:0.5rem;
+              padding-bottom: 0.5rem;
+              padding-left: 1.2rem;
+              text-align: left;
+              font-weight: bold;
+            border: 1px solid #dee2e6;
+          }
+          .count-blag{
+              padding: 2px 12px;
+              width: auto;
+              height: auto;
+              border-radius: 10px;
+              background-color: #D4DBE5;
+              color: $tab;
+              font-size: 12px;
+              margin-right: calc(20/1920*100vw);
+              float:right;
+          }
+          .icon-blag{
+              display: inline-block;
+              width: 80px;;
+              padding:3px 6px;
+              text-align: center;
+              color: #fff;
+              font-size: 12px;
+              font-weight: normal;
+          }
+      }
       }
       .row-footer {
         padding-top: calc(30 / 1920 * 100vw);
-        border-top: 1px solid $border;
         padding-bottom: calc(30 / 1920 * 100vw);
         margin-top: calc(10 / 1920 * 100vw);
         .details-content {
           padding-right: calc(20 / 1920 * 100vw);
+          &:first-child{
+            border-top: 1px solid $border;
+          }
           &:last-child {
             padding-right: 0;
           }
         }
-        .details {
-          position: relative;
-          height: 320px;
-          border: 1px solid $border;
-          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-          .item-header {
-            position: relative;
-            background-color: $background;
-            height: 40px;
-            line-height: 40px;
-            border-bottom: 1px solid $border;
-            padding-left: calc(20 / 1920 * 100vw);
-            .icontemp {
-              font-size: calc(18 / 1920 * 100vw);
-              margin-right: calc(15 / 1920 * 100vw);
-              color: $tab;
-            }
-            .title-lable {
-              font-size: calc(14 / 1920 * 100vw);
-              font-weight: bold;
-            }
-            .count-content {
-              position: absolute;
-              right: calc(20 / 1920 * 100vw);
-              top: 0;
-              .count {
-                font-size: calc(30 / 1920 * 100vw);
-              }
-              .blag {
-                font-size: calc(12 / 1920 * 100vw);
-              }
-            }
-          }
-          .item-content {
-            padding-top: calc(20 / 1920 * 100vw);
-            height: 280px;
-            .item-details {
-              height: auto;
-              font-size: calc(14 / 1920 * 100vw);
-              padding-left: calc(30 / 1920 * 100vw);
-              padding-right: calc(20 / 1920 * 100vw);
-              margin-bottom: 30px;
-              color: #4b5262;
-              display: flex;
-              .item-blag {
-                width: calc(12 / 1920 * 100vw);
-                height: calc(12 / 1920 * 100vw);
-                border-radius: 50%;
-                background-color: $tab;
-                display: inline-block;
-                margin-right: calc(16 / 1920 * 100vw);
-                margin-top: 3px;
-              }
-              .pdf_item_blag{
-                width:18px;
-                height:18px;
-                border-radius: 50%;
-                background-color: $tab;
-                display: inline-block;
-                margin-right: 16px;
-                margin-top: 8px;
-              }
-              .item-name{
-                flex: 1;
-              }
-              .item-des {
-                display: block;
-                font-size: calc(12 / 1920 * 100vw);
-                margin-top: calc(10 / 1920 * 100vw);
-                margin-left: calc(35 / 1920 * 100vw);
-                color: $tab;
-              }
 
-            }
-            .signature-details{
-              margin-bottom: 0;
-              padding: 0;
-              display: flex;
-              flex-wrap: wrap;
-              .signature-item{
-                width: 50%;
-                height: 100%;
-                flex-grow: 1;
-                position: relative;
-                border: 1px solid $border;
-                border-left: none;
-                cursor: pointer;
-                &:nth-child(n+3){
-                  border-top: none;
-                }
-                span{
-                  position: absolute;
-                  padding-left: calc(20 / 1920 * 100vw);
-                  padding-top: 5px;
-                  color: $tab;
-                  font-size: 12px;
-                }
-                .signature-content{
-                  height: 100%;
-                  width: 100%;
-                  object-fit: contain;
-                }
-                .signature{
-                  padding-top: 20px;
-                }
-              }
-              .signature-items{
-                height: 50%;
-              }
-            }
-            .moreInfotip{
-              position: absolute;
-              bottom:10px;
-              right:10px;
-              font-size: 12px;
-              color:$tab;
-              margin:0;
-            }
-          }
-          .item-img {
-            padding: 0;
-          }
-        }
       }
       .row-detail{
-        margin-bottom: 50px !important;
+        margin-bottom: 20px !important;
+        margin-top: 20px;
         .item-header{
             position: relative;
             background-color: $background;
@@ -1419,6 +1592,9 @@ export default {
             border: 1px solid $border;
             padding-left: calc(20 / 1920 * 100vw);
             cursor: pointer;
+          display: flex;
+          padding-right: calc(20 / 1920 * 100vw);
+          justify-content: space-between;
           .icontemp {
               font-size: calc(14 / 1920 * 100vw);
               margin-right: calc(15 / 1920 * 100vw);
@@ -1426,6 +1602,12 @@ export default {
           .title-lable {
             font-size: calc(14 / 1920 * 100vw);
             font-weight: bold;
+          }
+          .count {
+            font-size: calc(30 / 1920 * 100vw);
+          }
+          .blag {
+            font-size: calc(12 / 1920 * 100vw);
           }
         }
         .item-content{
@@ -1463,7 +1645,6 @@ export default {
                 line-height: 25px;
                 text-align: center;
                 border-radius: 5px;
-                margin-right: calc(25 / 1920 * 100vw);
               }
               .title-btn-failed{
                 height:25px;
@@ -1498,6 +1679,18 @@ export default {
                   color:#7d8cad;
                   margin: 15px 0 0 10px;
                 }
+              }
+              .score-title{
+                display: inline-flex;
+                flex-direction: column;
+                width: 100px;
+                align-items: center;
+              }
+              .total-score{
+                text-align: center;
+                font-size: 12px;
+                color: $black;
+                margin-top: 4px;
               }
             }
             .content-detail-main{
@@ -1581,6 +1774,12 @@ export default {
             }
           }
         }
+        &:first-child{
+          margin-top: 20px;
+        }
+      }
+      .signature-detail{
+        @extend .row-detail;
       }
     }
     .video-dialog-content{
@@ -1665,39 +1864,6 @@ export default {
           }
         }
       }
-      .channel-content{
-        margin: 20px 30px;
-        padding-top: 0;
-        position: relative;
-        .radio-group{
-          display: grid;
-          grid-template-columns: 240px 240px;
-          grid-template-rows: 30px;
-        }
-        .radio-class{
-          display: flex;
-          align-items: center;
-          >>> .el-radio__label{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .radio-img{
-            height: 26px;
-            width: 26px;
-            margin-right: 10px;
-          }
-          .radio-span{
-            display: inline-block;
-            max-width: 150px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 14px;
-            color: #94a4b4;
-          }
-        }
-      }
     }
     .dialog-source-content{
       @include point(height,320);
@@ -1731,9 +1897,101 @@ export default {
       @include point(min-height,360);
     }
   }
+  .template-titles{
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid $border;
+    padding-left: calc(40 / 1920 * 100vw);
+    padding-right: calc(40 / 1920 * 100vw);
+  }
+  .names{
+    display: flex;
+    justify-content: flex-start;
+  }
+  .template-name{
+    font-size: 14px;
+    cursor: pointer;
+    width: 120px;
+    color: #7d8cad;
+    padding: 15px calc(20/1920*100vw) 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .click-btn{
+    color: $red;
+    border-bottom: 4px solid $red;
+  }
+  .icon-zhedie1{
+    color: $red;
+  }
+  .icon-zhankai1{
+    color: $tab;
+  }
+  .details {
+    position: relative;
+    height: 320px;
+    border: 1px solid $border;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    .item-header {
+      position: relative;
+      background-color: $background;
+      height: 40px;
+      line-height: 40px;
+      border-bottom: 1px solid $border;
+      padding-left: calc(20 / 1920 * 100vw);
+      display: flex;
+      align-items: center;
+      .icontemp {
+        font-size: calc(18 / 1920 * 100vw);
+        margin-right: calc(15 / 1920 * 100vw);
+        color: $tab;
+      }
+      .title-lable {
+        font-size: calc(14 / 1920 * 100vw);
+        font-weight: bold;
+      }
+      .count-content {
+        position: absolute;
+        right: calc(20 / 1920 * 100vw);
+        top: 0;
+        .count {
+          font-size: calc(30 / 1920 * 100vw);
+        }
+        .blag {
+          font-size: calc(12 / 1920 * 100vw);
+        }
+      }
+    }
+
+  }
+  .signature-detail .item-content{
+    padding-bottom: calc(20/1920*100vw);
+  }
+  .signature-details{
+    display: flex;
+    flex-wrap: nowrap;
+    height: 150px;
+    justify-content: flex-start;
+    .signature-item{
+      width: 200px;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+      border: 1px solid $border;
+      margin-right: calc(30/1920*100vw);
+      .signature-content{
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+      }
+    }
+  }
+  .radior-content{
+    padding-top: 30px;
+  }
 </style>
 <style>
-  @import '../../assets/css/importfile.css';
   .echarts {
     width: 100%;
     height: 100%;
