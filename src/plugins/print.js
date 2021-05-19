@@ -91,7 +91,7 @@ Print.prototype = {
         if(imgs.length==0){
           var img = document.createElement("img");
           img.src = imageURL;
-          img.setAttribute('style', 'height:400px;margin:0 auto;margin-left:-100px;');
+          img.setAttribute('style', 'height:500px;margin:0 auto;margin-left:-355px;');
           img.id = 'isNeedRemove';
           canvass[k4].parentNode.insertBefore(img,canvass[k4].nextElementSibling);
         }

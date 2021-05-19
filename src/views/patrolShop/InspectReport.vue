@@ -55,7 +55,7 @@
                 </i>
                 <span class="title-lable"><span class="pdf_font_20">{{ $t(`titleView.${pageItem.name}`) }}</span></span>
               </div>
-              <div class="count-header">
+              <div class="count-header" v-if="pageItem.itemCount > -1">
                 <span class="count"><span class="pdf_font_36">{{ pageItem.itemCount }}</span></span>
                 <span class="blag"><span class="pdf_font_18">{{ $t('remotePatrol.unit') }}</span></span>
               </div>
@@ -288,14 +288,14 @@
           </table>
         </el-col>
         <el-col v-if="pageItem.class === 'radior-content' && staticalConfig.chart" class="pie-content"
-                :style="isexportPDF ? 'height:400px;' : ''">
+                :style="isexportPDF ? 'height:450px;' : ''">
           <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
           <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
                    class="pie-chart-content"/>
         </el-col>
         <el-col v-if="pageItem.class === 'radior-content' && !staticalConfig.chart" class="radar-content"
-                :style="isexportPDF ? 'height:400px;' : ''">
-          <span class="span-4">{{ $t('remotePatrol.scoreU') }}</span>
+                :style="isexportPDF ? 'height:450px;' : ''">
+          <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
           <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
                    class="radar-chart-content"/>
         </el-col>
@@ -360,7 +360,7 @@ import { getInspectReportInfo, getInspectReportDetail } from '@/api/inspect';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/resize.js'
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
@@ -371,8 +371,6 @@ export default {
     DelayButton,
     'v-chart': ECharts
   },
-
-  mixins: [resize],
 
   filters: {
     filterScore(value) {
@@ -464,7 +462,8 @@ export default {
       pageData: null,
       signaturesList: null,
       reportData: null,
-      cachedTemplateId: -1
+      cachedTemplateId: -1,
+      showAllDetailsEnable: true
     };
   },
 
@@ -496,10 +495,6 @@ export default {
     this.accountName = sessionStorage.getItem('accountName');
   },
 
-  beforeDestroy() {
-    this.$refs.chartRadar && this.$refs.chartRadar.dispose();
-  },
-
   methods: {
     getInspectTemplateList(){
       const params = {};
@@ -510,19 +505,13 @@ export default {
           const savedTemplateIndex = this.templateList.findIndex(item => {return item.id === this.cachedTemplateId});
           if(savedTemplateIndex !== -1){
             this.curTemplateIndex = savedTemplateIndex;
-            this.templateConfig = this.templateList[savedTemplateIndex].config.switches.filter(item => item.enable === true);
-            const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
-            this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
           } else {
             this.curTemplateIndex = 0;
-            this.templateConfig = this.templateList[0].config.switches.filter(item => item.enable === true);
-            const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
-            this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
           }
+          this.setTemplateAndStaticalConfig();
         }
         else{
             this.templateList = [];
-            this.curTemplate = [];
             this.templateConfig = [];
           }
         }).catch(err => {
@@ -530,12 +519,17 @@ export default {
         })
     },
 
+    setTemplateAndStaticalConfig(){
+      this.templateConfig = this.templateList[this.curTemplateIndex].config.switches.filter(item => item.enable === true);
+      util.sortArrayByKeyAsc(this.templateConfig, 'position');
+      const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
+      this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
+      this.showAllDetailsEnable = this.templateConfig.some(item => item.name === 'defaultAll');
+    },
 
     getTemplateConfig(index){
       this.curTemplateIndex = index;
-      this.templateConfig = this.templateList[index].config.switches.filter(item => item.enable === true);
-      const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
-      this.staticalConfig = chartOption && chartOption.length > 0 ? chartOption[0] : {};
+      this.setTemplateAndStaticalConfig();
       this.getPageDataBasedOnTemplate(this.reportData);
       this.saveTemplateId();
     },
@@ -845,32 +839,46 @@ export default {
     },
 
     getPageDataBasedOnTemplate(data){
-      const map = new Map([
-        ['comment', 'getComment'],
-        ['statistics', 'getOptions'],
-        ['summaryTable', 'getTableData'],
-        ['feedbackItem', 'getFeedbacks'],
-        ['focalItem', 'getFocalItems'],
-        ['qualifiedItem', 'getQualifiedItems'],
-        ['ignoredItem', 'getIgnoreItems']
-      ]);
+      const map = this.getDetailNameAndHandlerMap();
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
       this.templateConfig.forEach(config => {
         if(map.has(config.name)){
-          console.log(map.get(config.name))
           const fnName = map.get(config.name);
           const returnDataJson = this[fnName](data);
           returnDataJson.name = config.name;
           pageData.push(returnDataJson);
         }
       });
-        if(this.isInsiteInspect && this.signaturesList.length > 0){
-          const signatureObj = {name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList};
-          pageData.push(signatureObj);
-        }
-      console.log(pageData);
+      this.showAllDetailsEnable && pageData.push(pageData.shift(pageData.length - 1));
+      if(this.isInsiteInspect && this.signaturesList.length > 0){
+        const signatureObj = {name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList};
+        pageData.push(signatureObj);
+      }
       this.pageData = pageData;
+    },
+
+    getDetailNameAndHandlerMap(){
+      let map = null;
+      if(this.showAllDetailsEnable){
+        map = new Map([
+          ['comment', 'getComment'],
+          ['statistics', 'getOptions'],
+          ['summaryTable', 'getTableData'],
+          ['defaultAll', 'getReportDetail']
+        ]);
+      } else {
+        map = new Map([
+          ['comment', 'getComment'],
+          ['statistics', 'getOptions'],
+          ['summaryTable', 'getTableData'],
+          ['feedbackItem', 'getFeedbacks'],
+          ['focalItem', 'getFocalItems'],
+          ['qualifiedItem', 'getQualifiedItems'],
+          ['ignoredItem', 'getIgnoreItems']
+        ]);
+      }
+      return map;
     },
 
     sortArrayByKey(sortedArray, key){
@@ -904,6 +912,12 @@ export default {
         }
       }
       return {class: 'row-table', data: te_temp};
+    },
+
+    getReportDetail(){
+      const allReportDetails = this.getGroupsItems();
+      console.log(allReportDetails);
+      return {class: 'row-detail', ifExpand: false, itemCount: -1, data: allReportDetails};
     },
 
     getOptions(data){
@@ -1179,9 +1193,13 @@ export default {
         tempGroupItem.groupType = groupItem.groupType;
         tempGroupItem.cateryItems = [];
         groupItem.items.forEach(inspectItem => {
-          if(inspectItem.passOfFailFlag === status){
+          if(status){
+            if(inspectItem.passOfFailFlag === status){
+              tempGroupItem.cateryItems.push(inspectItem);
+            };
+          } else {
             tempGroupItem.cateryItems.push(inspectItem);
-          };
+          }
         })
         if (tempGroupItem.cateryItems.length > 0) {
           group.push(tempGroupItem);
@@ -1192,10 +1210,6 @@ export default {
 
     turnSuggest(data) {
       return data.replace(/(\r\n|\n|\r)/gm, '<br/>');
-    },
-
-    adjustChart() {
-      this.$refs.chartRadar && this.$refs.chartRadar.resize();
     },
 
     displayEnlargeSignature(src) {
@@ -1242,25 +1256,19 @@ export default {
     #{$poi}:checkRem($val);
   }
   @media print {
-  .details{page-break-inside:avoid;}
-  .content-detail-title{ page-break-inside:avoid;}
-  .cdm-title{ page-break-inside:avoid;}
-  .cdm-voice{ page-break-inside:avoid;}
-  .cdm-word{ page-break-inside:avoid;}
-  .cdm-pic{ page-break-inside:avoid;}
-  .pdf_font_16{font-size: 20px;}
-  .pdf_font_18{font-size: 26px;}
-  .pdf_font_20{font-size: 28px;}
-  .pdf_font_24{font-size: 26px;}
-  .pdf_font_26{font-size: 30px;}
-  .pdf_font_36{font-size: 40px;}
-    .pdf_font_16{font-size: 14px;}
-    .pdf_font_18{font-size: 18px;}
+    .details{page-break-inside:avoid;}
+    .content-detail-title{ page-break-inside:avoid;}
+    .cdm-title{ page-break-inside:avoid;}
+    .cdm-voice{ page-break-inside:avoid;}
+    .cdm-word{ page-break-inside:avoid;}
+    .cdm-pic{ page-break-inside:avoid;}
+    .pdf_font_16{font-size: 16px;}
+    .pdf_font_18{font-size: 20px;}
     .pdf_font_20{font-size: 20px;}
-    .pdf_font_24{font-size: 18px;}
-    .pdf_font_26{font-size: 24px;}
-    .pdf_font_36{font-size: 34px;}
-  .title2_pdf{color:#182752;line-height:45px;}
+    .pdf_font_24{font-size: 20px;}
+    .pdf_font_26{font-size: 26px;}
+    .pdf_font_36{font-size: 36px;}
+    .title2_pdf{color:#182752;line-height:45px;}
   }
   $red: #f31d65;
   $black: #182752;
