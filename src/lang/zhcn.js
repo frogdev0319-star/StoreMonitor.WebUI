@@ -901,7 +901,6 @@ export default {
   'titleView': {
     'deleteTitle': '删除',
     'titleName': '职务名称',
-    'titleCate': '职务类别',
     'createTime': '创建时间',
     'description': '备注',
     'operation': '操作',
@@ -952,6 +951,12 @@ export default {
     'displayofStatisticalResults': '统计结果展示',
     'radar': '雷达图',
     'pie': '饼状图',
-    'others': '其他'
+    'others': '其他',
+    'reportTemplate': '巡检报告模板',
+    'showAllDetails': '巡检详情全部展示',
+    'showPartsDetails': '巡检详情部分展示',
+    'basicInfo': '基本信息',
+    'notJoinItem': '基础信息（不参与评估项）',
+    'defaultAll': '巡检详情'
   }
 }

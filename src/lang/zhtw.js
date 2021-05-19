@@ -418,7 +418,7 @@ export default {
     'signatureAndPic': '簽名與照片',
     'loading': '加載中...',
     'highDefinition': '高清',
-    'fluency': '流畅',
+    'fluency': '流暢',
     'totalScoreUnit': '总分：'
   },
 
@@ -927,7 +927,7 @@ export default {
     'useAndSave': '選擇並套用',
     'add': '新增',
     'delete': '删除',
-    'templateName': '報告模板名稱',
+    'templateName': '報告樣板名稱',
     'componentName': '組件名稱',
     'componentStatus': '組件狀態',
     'comment': '巡檢建議',
@@ -937,13 +937,13 @@ export default {
     'feedbackItem': '問題反饋項',
     'qualifiedItem': '合格項',
     'ignoredItem': '不適用項',
-    'atLeastOneTemplate': '至少保留一份報告模板',
-    'noEnableTemplate': '刪除後無啟用狀態模板，請調整再刪除',
-    'templateOutOfLimit': '配置模板超限',
-    'enableTemplate': '請啟用報告模板',
+    'atLeastOneTemplate': '至少保留一份報告樣板',
+    'noEnableTemplate': '刪除後無啟用狀態樣板，請調整再刪除',
+    'templateOutOfLimit': '配置樣板超限',
+    'enableTemplate': '請啟用報告樣板',
     'enableConfig': '請開啟配置項',
-    'templateNameExist': '模板名稱已存在',
-    'enterTemplateName': '請輸入報告模板名稱',
+    'templateNameExist': '樣板名稱已存在',
+    'enterTemplateName': '請輸入報告樣板名稱',
     'inspectionStaticSetting': '巡檢結果統計設置',
     'statisIndex': '統計指標',
     'qualified': '合格',
@@ -951,6 +951,12 @@ export default {
     'displayofStatisticalResults': '統計結果展示',
     'radar': '雷達圖',
     'pie': '餅狀圖',
-    'others': '其他'
+    'others': '其他',
+    'reportTemplate': '巡檢報告樣板',
+    'showAllDetails': '巡檢詳情全部展示',
+    'showPartsDetails': '巡檢詳情部分展示',
+    'basicInfo': '基本信息',
+    'notJoinItem': '基礎信息（不參與評估項）',
+    'defaultAll': '巡檢詳情'
   }
 };

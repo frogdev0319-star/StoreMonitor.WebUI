@@ -413,7 +413,7 @@ export default {
     'loading': 'Loading...',
     'noVideoAccess': 'No video access, please contact system administrator',
     'highDefinition': 'HD',
-    'fluency': 'Fluency',
+    'fluency': 'Smooth',
     'totalScoreUnit': 'Total Score:'
   },
 
@@ -892,7 +892,6 @@ export default {
   },
 
   'titleView': {
-    'addTitle': 'Add',
     'deleteTitle': 'Delete',
     'titleName': 'Position',
     'createTime': 'Create Time',
@@ -945,6 +944,12 @@ export default {
     'displayofStatisticalResults': 'Statistical Results Display',
     'radar':'Radar Chart',
     'pie':'Pie Chart',
-    'others': 'Others'
+    'others': 'Others',
+    'reportTemplate': 'Report Template',
+    'showAllDetails': 'Show All Details',
+    'showPartsDetails': 'Show Part of Details',
+    'basicInfo': 'Basic Info.',
+    'notJoinItem': 'Basic Info.(Not calculate score items)',
+    'defaultAll': 'Inspection Details'
   }
 };
