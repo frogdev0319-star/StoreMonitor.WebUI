@@ -186,9 +186,8 @@
               template.originalName = template.name;
               template.originalEnable = template.enable;
             });
-            this.curTemplate = JSON.parse(JSON.stringify(this.templateList[0]));
+            this.curTemplate = JSON.parse(JSON.stringify(this.templateList[this.curTemplateIndex]));
             this.setBasicAndDetailList();
-            this.curTemplateIndex = 0;
           }
           else{
             this.templateList = [];
@@ -328,9 +327,9 @@
           return false;
         }
         this.curTemplate.id === -1 ? this.templateList.splice(this.curTemplateIndex, 1) : this.deleteReportTemplateFromDB();
-        this.curTemplate = JSON.parse(JSON.stringify(this.templateList[0]));
+        this.curTemplateIndex--;
+        this.curTemplate = JSON.parse(JSON.stringify(this.templateList[this.curTemplateIndex]));
         this.setBasicAndDetailList();
-        this.curTemplateIndex = 0;
       },
 
       deleteReportTemplateFromDB(){
