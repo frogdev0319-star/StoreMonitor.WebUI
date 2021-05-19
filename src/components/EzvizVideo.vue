@@ -528,11 +528,11 @@ export default {
       curQualityIndex: 1,
       videoQualityList: [
         {
-          label: '高清',
+          label: this.$t('remotePatrol.highDefinition'),
           value: 0
         },
         {
-          label: '流畅',
+          label: this.$t('remotePatrol.fluency'),
           value: 1
         }
       ]

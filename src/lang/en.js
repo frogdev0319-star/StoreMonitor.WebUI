@@ -413,7 +413,7 @@ export default {
     'loading': 'Loading...',
     'noVideoAccess': 'No video access, please contact system administrator',
     'highDefinition': 'HD',
-    'fluency': 'Smooth',
+    'fluency': 'LD',
     'totalScoreUnit': 'Total Score:'
   },
 
