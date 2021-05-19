@@ -177,6 +177,8 @@ import Environment from '@/common/environment';
 import DelayButton from '@/components/DelayButton';
 import util from '@/common/util'
 import DialogPop from '@/components/DialogPop';
+const XLSX = require('xlsx');
+
 
 export default {
   name: 'RouteInspection',
@@ -1148,7 +1150,6 @@ export default {
           for (var i = 0; i < length; i++) {
             binary += String.fromCharCode(bytes[i]);
           }
-          var XLSX = require('xlsx');
           if (rABS) {
             wb = XLSX.read(btoa(fixdata(binary)), {
               type: 'base64'
@@ -1158,52 +1159,15 @@ export default {
               type: 'binary'
             });
           }
-          var sheet1, sheet2, sheet3;
+
           const PassFail = wb.Sheets['Pass&Fail'];
           const Score = wb.Sheets['Score'];
           const Others = wb.Sheets['Others'];
-          let temp_sheet1 = [], temp_sheet2 = [], temp_sheet3 = [];
-          if (PassFail != undefined) {
-            delete PassFail.A1; delete PassFail.B1; delete PassFail.C1; delete PassFail.D1;
-            sheet1 = XLSX.utils.sheet_to_json(wb.Sheets['Pass&Fail']);
-            sheet1.forEach((_item, _index) => {
-              const obj = {};
-              obj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
-              obj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
-              obj.c = _item.__EMPTY_2;
-              obj.d = _item.__EMPTY_3!==undefined && typeof _item.__EMPTY_3 !== 'number' ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
-              temp_sheet1.push(obj);
-            });
-            outdata.PassFail = temp_sheet1;
-          }
-          if (Score != undefined) {
-            delete Score.A1; delete Score.B1; delete Score.C1; delete Score.D1; delete Score.E1; delete Score.F1;
-            sheet2 = XLSX.utils.sheet_to_json(wb.Sheets['Score']);
-            sheet2.forEach((_item, _index) => {
-              const obj = {};
-              obj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
-              obj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
-              obj.c = _item.__EMPTY_2;
-              obj.d = _item.__EMPTY_3;
-              obj.e = _item.__EMPTY_4!==undefined && typeof _item.__EMPTY_4!=='number' ? _item.__EMPTY_4.trim() : _item.__EMPTY_4;
-              obj.f = _item.__EMPTY_5!==undefined && typeof _item.__EMPTY_5 !== 'number' ? _item.__EMPTY_5.trim() : _item.__EMPTY_5;
-              temp_sheet2.push(obj);
-            });
-            outdata.Score = temp_sheet2;
-          }
-          if (Others != undefined) {
-            delete Others.A1; delete Others.B1; delete Others.C1; delete Others.D1;
-            sheet3 = XLSX.utils.sheet_to_json(wb.Sheets['Others']);
-            sheet3.forEach((_item, _index) => {
-              const obj = {};
-              obj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
-              obj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
-              obj.c = _item.__EMPTY_2;
-              obj.d = _item.__EMPTY_3!==undefined && typeof _item.__EMPTY_3 !== 'number' ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
-              temp_sheet3.push(obj);
-            });
-            outdata.Others = temp_sheet3;
-          }
+          const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
+
+          outdata.PassFail = _this.getPassAndFailSheetData(wb, PassFail);
+          outdata.Score = _this.getScoreSheetData(wb, Score);
+          outdata.Others = _this.getPassAndFailSheetData(wb, Others);
           let indexArryPassFail = [], indexArryScore = [], indexArryOthers = [];
           let flaggroupLengthPassFail = false, flaggroupLengthScore = false, flaggroupLengthOthers = false;
           let flagItemNamePassFail = false, flagItemNameScore = false, flagItemNameOthers = false;
@@ -1399,6 +1363,7 @@ export default {
             Score: arrsheet2,
             Others: arrsheet3
           };
+          console.log(dataArry);
           _this.addAllData(dataArry);
           _this.$refs.loadFile.value = '';
           _this.$refs.loadFileEx.value = '';
@@ -1411,6 +1376,56 @@ export default {
         reader.readAsBinaryString(f);
       }
     },
+
+    getTableVersonBasedOnB1(sheet1, sheet2, sheet3){
+      const subCatergyLength = 30;
+      const containSubColumn = ( sheet1 && sheet1.B1.h.includes(subCatergyLength) )
+                            || ( sheet2 && sheet2.B1.h.includes(subCatergyLength) )
+                            || ( sheet3 && sheet3.B1.h.includes(subCatergyLength) );
+      let tableVersion = containSubColumn ? 2 : 1;
+      return tableVersion;
+    },
+
+    getPassAndFailSheetData(workbook, sheet){
+      if(sheet){
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
+        const sheetArray = XLSX.utils.sheet_to_json(sheet);
+        console.log(sheetArray);
+        let rowDataArray = [];
+        sheetArray.forEach((_item) => {
+          const rowDataObj = {};
+          rowDataObj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
+          rowDataObj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
+          rowDataObj.c = _item.__EMPTY_2;
+          rowDataObj.d = _item.__EMPTY_3!==undefined && typeof _item.__EMPTY_3 !== 'number' ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
+          rowDataArray.push(rowDataObj);
+        });
+        console.log(rowDataArray);
+        return rowDataArray;
+      }
+      return [];
+    },
+
+    getScoreSheetData(workbook, sheet){
+      if(sheet){
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1;
+        const sheetArray = XLSX.utils.sheet_to_json(sheet);
+        let rowDataArray = [];
+        sheetArray.forEach((_item) => {
+          const rowDataObj = {};
+          rowDataObj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
+          rowDataObj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
+          rowDataObj.c = _item.__EMPTY_2;
+          rowDataObj.d = _item.__EMPTY_3;
+          rowDataObj.e = _item.__EMPTY_4!==undefined && typeof _item.__EMPTY_4!=='number' ? _item.__EMPTY_4.trim() : _item.__EMPTY_4;
+          rowDataObj.f = _item.__EMPTY_5!==undefined && typeof _item.__EMPTY_5 !== 'number' ? _item.__EMPTY_5.trim() : _item.__EMPTY_5;
+          rowDataArray.push(rowDataObj);
+        });
+        console.log(rowDataArray);
+        return rowDataArray;
+      }
+    },
+
 
     getFloat (value) {
       let str = value.toString();
