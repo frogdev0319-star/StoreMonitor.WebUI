@@ -1,79 +1,110 @@
 <template>
-    <div class="page-container report-setting">
-      <div class="template-titles">
-        <div class="names">
-          <div v-for="(item,index) in templateList"
-               class="template-name"
-               :class="{'click-btn' : curTemplateIndex === index}"
-               :key="index"
-            @click="displayTemplateInfo(index)">
+  <div class="page-container report-setting">
+      <div class="setting-titles">
+        <div class="setting-tabs">
+          <div v-for="(item,index) in settingTitleList"
+               class="setting-name"
+               :class="{'click-setting-btn' : curSettingIndex === index}"
+               :key="index">
             {{ item.name }}
           </div>
         </div>
-        <div class="buttons">
-          <delay-button
-            class="schedule-btn"
-            @click="addReportTemplate">
-            <div class="button-area">
-              <i class="iconfont el-icon-plus"/>
-              <span>{{ $t('titleView.add') }}</span>
-            </div>
-          </delay-button>
-          <delay-button
-            :disabled="templateList.length === 0"
-            class="schedule-btn"
-            @click="deleteReportTemplate">
-            <div class="button-area">
-              <i class="iconfont icon-shanchu"/>
-              <span>{{ $t('titleView.delete') }}</span>
-            </div>
-          </delay-button>
-        </div>
-
       </div>
-      <div class="template-info">
-        <div class="title-info" >
-          <div class="left-item">
-            <span class="required-name">*</span>
-            <span class="name-font">{{$t('titleView.templateName')}}</span>
-            <div class="name-tips">
-              <el-input v-model="curTemplate.name" class="input-name" :placeholder="$t('titleView.enterTemplateName')"
-                        @input="onTemplateNameChange" @blur="showTemplateTip = false"></el-input>
-              <span v-if="showTemplateTip" class="error-text"><span>
+      <div class="setting-details">
+        <div class="content-titles">
+          <button-list :name-list="templateList" :cur-template-index="curTemplateIndex" @click="displayTemplateInfo"></button-list>
+          <div class="buttons">
+            <delay-button
+              class="schedule-btn"
+              @click="addReportTemplate">
+              <div class="button-area">
+                <i class="iconfont el-icon-plus"/>
+                <span>{{ $t('titleView.add') }}</span>
+              </div>
+            </delay-button>
+            <delay-button
+              :disabled="templateList.length === 0"
+              class="schedule-btn"
+              @click="deleteReportTemplate">
+              <div class="button-area">
+                <i class="iconfont icon-shanchu"/>
+                <span>{{ $t('titleView.delete') }}</span>
+              </div>
+            </delay-button>
+          </div>
+        </div>
+        <div class="template-info">
+          <div class="title-info" >
+            <div class="left-item">
+              <span class="required-name">*</span>
+              <span class="name-font">{{$t('titleView.templateName')}}</span>
+              <div class="name-tips">
+                <el-input v-model="curTemplate.name" class="input-name" :placeholder="$t('titleView.enterTemplateName')"
+                          @input="onTemplateNameChange" @blur="showTemplateTip = false"></el-input>
+                <span v-if="showTemplateTip" class="error-text"><span>
                 {{templateNameTip}}
               </span></span>
+              </div>
+            </div>
+            <div class="right-item">
+              <span class="enable-font">{{$t('scheduleView.enable')}}</span>
+              <el-switch v-model="curTemplate.enable" @change="changTemplateEnableStatus">{{curTemplate.enable}}</el-switch>
             </div>
           </div>
-          <div class="right-item">
-            <span class="enable-font">{{$t('scheduleView.enable')}}</span>
-            <el-switch v-model="curTemplate.enable" @change="changTemplateEnableStatus">{{curTemplate.enable}}</el-switch>
-          </div>
-        </div>
-        <div class="titles-header">
-          <div class="title-name">{{$t('titleView.componentName')}}</div>
-          <div class="title-status">{{$t('titleView.componentStatus')}}</div>
-          <div class="title-operation">{{$t('titleView.operation')}}</div>
-        </div>
-        <draggable v-model="list">
-          <div class="setting-config" v-for="item in list" :key="item.position">
-            <div class="title-name">{{$t(`titleView.${item.name}`)}}</div>
-            <div class="title-status"><el-switch v-model="item.enable"></el-switch></div>
-            <div class="title-operation">
-              <span class="iconfont icon-gengduo" v-if="item.name === 'statistics'" @click="setStatusDetail(item)"></span>
+          <div class="inspect-basic">
+            <div class="titles-header">
+              {{$t('titleView.basicInfo')}}
+            </div>
+            <div class="table-header basic-header">
+              <div class="title-name">{{$t('titleView.componentName')}}</div>
+              <div class="title-status">{{$t('titleView.componentStatus')}}</div>
+              <div class="title-operation">{{$t('titleView.operation')}}</div>
+            </div>
+            <div class="setting-config basic-config" v-for="item in basicList" :key="item.position">
+              <div class="title-name">{{$t(`titleView.${item.name}`)}}</div>
+              <div class="title-status"><el-switch v-model="item.enable"></el-switch></div>
+              <div class="title-operation">
+                <span class="iconfont icon-gengduo" v-if="item.name === 'statistics'" @click="setStatusDetail(item)"></span>
+              </div>
             </div>
           </div>
-        </draggable>
-      </div>
-
-
-      <div class="save-btn">
-        <delay-button
-          class="schedule-btn"
-          @click="saveTemplateInfo">
-          <div class="button-area">
-            <span>{{ $t('titleView.save') }}</span>
+          <div class="inspect-detail">
+            <div class="titles-header">
+              {{$t('remotePatrol.detailInfo')}}
+            </div>
+            <div class="detail-setting">
+              <div>
+                <el-radio-group v-model="ifShowAllDetails" class="radio-setting" textColor="#7d8cad">
+                  <el-radio :label="1">{{$t('titleView.showAllDetails')}}</el-radio>
+                  <el-radio :label="0">{{$t('titleView.showPartsDetails')}}</el-radio>
+                </el-radio-group>
+              </div>
+              <template v-if="ifShowAllDetails === 0">
+                <div class="table-header">
+                  <div class="title-name">{{$t('titleView.componentName')}}</div>
+                  <div class="title-status">{{$t('titleView.componentStatus')}}</div>
+                </div>
+                <draggable v-model="list">
+                  <div class="setting-config" v-for="item in list" :key="item.position">
+                    <template v-if="item.position !== 8">
+                      <div class="title-name">{{$t(`titleView.${item.name}`)}}</div>
+                      <div class="title-status"><el-switch v-model="item.enable"></el-switch></div>
+                    </template>
+                  </div>
+                </draggable>
+              </template>
+            </div>
           </div>
-        </delay-button>
+        </div>
+        <div class="save-btn">
+          <delay-button
+            class="schedule-btn"
+            @click="saveTemplateInfo">
+            <div class="button-area">
+              <span>{{ $t('titleView.save') }}</span>
+            </div>
+          </delay-button>
+        </div>
       </div>
       <dialog-pop
         v-if="showStaticDetailSetting"
@@ -117,13 +148,13 @@
   import util from '@/common/util';
   import filterString from '@/common/filterString';
   import ReportSetting from  '@/api/reportSetting'
-  import TablePagination from '../../../components/TablePagination';
   import draggable from 'vuedraggable';
-  import DialogPop from '../../../components/DialogPop';
+  import DialogPop from '@/components/DialogPop';
+  import ButtonList from '@/components/ButtonList';
 
   export default {
     name: 'reportSetting',
-    components: { DialogPop, TablePagination, DelayButton, draggable },
+    components: { ButtonList, DialogPop, DelayButton, draggable },
     data(){
       return {
         curTemplate: 0,
@@ -135,6 +166,10 @@
         templateNameTip: '',
         showStaticDetailSetting: false,
         statisticSettingDetail: {chart: 0, qualified: 0},
+        settingTitleList: [{ name: this.$t('titleView.reportTemplate') }],
+        curSettingIndex: 0,
+        basicList: [],
+        ifShowAllDetails: 1
       }
     },
 
@@ -152,18 +187,27 @@
               template.originalEnable = template.enable;
             });
             this.curTemplate = JSON.parse(JSON.stringify(this.templateList[0]));
-            this.list = this.curTemplate.config.switches;
+            this.setBasicAndDetailList();
             this.curTemplateIndex = 0;
           }
           else{
             this.templateList = [];
             this.curTemplate = [];
             this.list = [];
+            this.basicList = [];
             this.curTemplateIndex = 0;
           }
         }).catch(err => {
           console.log('ReportSetting:' + err);
         })
+      },
+
+      setBasicAndDetailList(){
+        const switches = this.curTemplate.config.switches;
+        util.sortArrayByKeyAsc(switches, 'position');
+        this.basicList = switches.slice(1, 4);
+        this.list = switches.slice(4);
+        this.ifShowAllDetails = switches[0].enable ? 1 : 0;
       },
 
       onTemplateNameChange(val){
@@ -209,7 +253,7 @@
         this.templateList.forEach(item => {item.originalEnable = item.enable});
         this.pushTemplateToList();
         this.curTemplate = this.templateList[this.templateList.length - 1];
-        this.list = this.curTemplate.config.switches;
+        this.setBasicAndDetailList();
         this.curTemplateIndex = this.templateList.length - 1;
       },
 
@@ -220,6 +264,11 @@
           "enable": true,
           "config": {
             "switches": [
+              {
+                "enable": true,
+                "name": "defaultAll",
+                "position": -1
+              },
               {
                 "enable": true,
                 "name": "comment",
@@ -253,9 +302,14 @@
                 "position": 6
               },
               {
-                "enable": false,
+                "enable": true,
                 "name": "ignoredItem",
                 "position": 7
+              },
+              {
+                "enable": false,
+                "name": "notJoinItem",
+                "position": 8
               }
             ]
           }
@@ -269,13 +323,13 @@
           return false;
         }
         const enableTemplateList = this.templateList.filter(item => item.originalEnable === true);
-        if(this.curTemplate.id !== -1 && enableTemplateList[0].id === this.curTemplate.id){
+        if(this.curTemplate.id !== -1 && enableTemplateList.length === 1 && enableTemplateList[0].id === this.curTemplate.id){
           util.notify(this.$t('titleView.noEnableTemplate'), 'warning', 3000);
           return false;
         }
         this.curTemplate.id === -1 ? this.templateList.splice(this.curTemplateIndex, 1) : this.deleteReportTemplateFromDB();
         this.curTemplate = JSON.parse(JSON.stringify(this.templateList[0]));
-        this.list = this.curTemplate.config.switches;
+        this.setBasicAndDetailList();
         this.curTemplateIndex = 0;
       },
 
@@ -290,10 +344,9 @@
       },
 
       displayTemplateInfo(index){
-        console.log(index);
         this.curTemplate = this.templateList[index];
         this.curTemplateIndex = index;
-        this.list = this.curTemplate.config.switches;
+        this.setBasicAndDetailList();
       },
 
       saveTemplateInfo(){
@@ -321,7 +374,13 @@
       },
 
       validateConfig(){
-        const allConfigEnable = this.list.some(switchs => switchs.enable === true);
+        let configList = [];
+        if (this.ifShowAllDetails === 1) {
+          configList = [...this.basicList];
+        } else {
+          configList = [...this.basicList,...this.list];
+        }
+        const allConfigEnable = configList.some(switchs => switchs.enable === true);
         if(allConfigEnable === false){
           util.notify(this.$t('titleView.enableConfig'), 'success', 3000);
           return false;
@@ -331,13 +390,21 @@
 
       getUpdateParams(){
         this.list.map((switchs, index) => {
-          switchs.position = index + 1;
+          switchs.position = index + this.basicList.length + 1;
         });
+        const list = [...this.basicList, ...this.list];
+        list.push(
+          {
+            "enable": !!this.ifShowAllDetails,
+            "name": "defaultAll",
+            "position": -1
+          }
+        );
         const updateTemplParmas = {};
         this.curTemplate.id !== -1 && (updateTemplParmas.id = this.curTemplate.id);
         updateTemplParmas.name = this.curTemplate.name;
         updateTemplParmas.enable = this.curTemplate.enable;
-        updateTemplParmas.switches = this.list;
+        updateTemplParmas.switches = list;
         return updateTemplParmas;
       },
 
@@ -367,7 +434,7 @@
         }
         else{
           if(res.errCode === 0){
-            util.notify(this.$t('titleView.deleteSuccess'), 'success', 3000);
+            util.notify(this.$t('titleView.deleteSuss'), 'success', 3000);
           } else {
             util.notify(this.$t('titleView.deleteFail'), 'warning', 3000);
           }
@@ -390,7 +457,7 @@
       },
 
       confirmStaticSetting(){
-        this.list.forEach(item => {
+        this.basicList.forEach(item => {
           if(item.name === 'statistics'){
             item.chart = this.statisticSettingDetail.chart;
             item.qualified = this.statisticSettingDetail.qualified;
@@ -405,23 +472,24 @@
 
 <style scoped>
   .report-setting{
-    padding: 20px calc(25/ 1920*100vw);
+    padding: 20px 0;
     height: 100%;
     position: relative;
     font-size: calc(14/1920*100vw);
+    box-sizing: border-box;
   }
-  .template-titles{
+  .setting-titles{
     display: flex;
     justify-content: space-between;
-    margin-right: 20px;
     border-bottom: 1px solid #e3e9f4;
     height: 47px;
+    padding: 0 30px;
   }
-  .names{
+  .setting-tabs{
     display: flex;
     justify-content: flex-start;
   }
-  .template-name{
+  .setting-name{
     cursor: pointer;
     width: 120px;
     color: #7d8cad;
@@ -431,7 +499,7 @@
     white-space: nowrap;
   }
 
-  .click-btn{
+  .click-setting-btn{
     color: #f31d65;
     border-bottom: 4px solid #f31d65;
   }
@@ -446,7 +514,6 @@
     padding-bottom: calc(20/1920*100vw);
     display: flex;
     align-items: flex-start;
-    margin-left: calc(20/1920*100vw);
     margin-top: 30px;
   }
   .left-item, .right-item{
@@ -490,29 +557,57 @@
   .error-text span{
     position: absolute;
   }
-  .titles-header, .setting-config{
+  .titles-header, .setting-config, .table-header{
     display: flex;
     justify-content: flex-start;
     align-items: center;
     height: 50px;
-    border: 1px solid #e3e9f4;
-    border-bottom: none;
   }
+  .table-header{
+    color: #424151;
+    border: 1px solid #e3e9f4;
+    font-weight: bold;
+  }
+
   .titles-header{
     color: #2C3E50;
+    font-weight: bolder;
     background-color: #e3e9f4;
+    padding-left: 10px;
+    border: 1px solid #e3e9f4;
+  }
+  .inspect-detail{
+    border: 1px solid #e3e9f4;
+  }
+  .detail-setting{
+    padding: 0 calc(30/1920*100vw) 30px;
+  }
+  .radio-setting{
+    display: flex;
+    flex-direction: column;
+    height: 60px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .radio-setting .el-radio{
+    height: 30px;
   }
   .setting-config{
     height: 60px;
+    border: 1px solid #e3e9f4;
+    border-top: none;
   }
   .setting-config:nth-child(2n){
     background-color: #f4f5f9;
   }
-  .setting-config:last-child{
-    border-bottom: 1px solid #e3e9f4;
-  }
   .setting-config:hover{
     cursor: pointer;
+  }
+  .basic-config, .basic-header{
+    padding-left: calc(30/1920*100vw);
+  }
+  .basic-config:hover{
+    cursor: default;
   }
   .title-name{
     width: 20%;
@@ -540,5 +635,26 @@
   }
   .el-radio{
     width: 100px;
+  }
+
+  .setting-details{
+    margin: 0 30px;
+  }
+  .content-titles{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    font-size: 12px;
+  }
+  .inspect-basic{
+    margin-bottom: 30px;
+  }
+
+  .el-radio{
+    color: #424151;
+  }
+  >>> .el-radio__input.is-checked + .el-radio__label{
+    color: #424151;
   }
 </style>
