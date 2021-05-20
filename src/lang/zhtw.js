@@ -487,6 +487,8 @@ export default {
     'isCheckSuggest': '巡檢建議值',
     'isCheckAnnex': '巡檢附件上傳',
     'AllowPhotos': '僅允許現場拍照（圖片/影像）',
+    'inspectionSignature': '巡檢簽名',
+    'needSignatrue': '須進行現場簽名',
     'patrolSuggest': '中存在不合格項時，巡檢結果為：立即督導',
     'PSCrule1': '與其他tab組合時，',
     'PSCrule2': '項目分值參與考評總分運算',

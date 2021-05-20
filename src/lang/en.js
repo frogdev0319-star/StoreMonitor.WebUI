@@ -319,7 +319,7 @@ export default {
     'suggestEmpty': 'Please enter suggestions for this inspection !',
     'changPageInfo': 'Not finish yet, confirm leaving the page? ',
     'dashServerError': 'Dash video server request exception, please refresh and try again!',
-    'detailInfo': 'Inspection details',
+    'detailInfo': 'Inspection Details',
 
     'ezuikitwidth': 'Video size',
     'createMothod': 'Method of Creation',
@@ -482,6 +482,8 @@ export default {
     'isCheckSuggest': 'Recommended value for inspection',
     'isCheckAnnex': 'Inspection attachments',
     'AllowPhotos': 'Supporting live photos only (picture / video)',
+    'inspectionSignature': 'Inspection signature',
+    'needSignatrue': 'Onsite signature required',
     'PSCrule1': 'When combined with other tabs, the ',
     'PSCrule2': ' project score will participate in the evaluation of the total score calculation',
     'PSCrule3': 'Calculate the score of ignored items in',

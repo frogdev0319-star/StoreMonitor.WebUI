@@ -487,6 +487,8 @@ export default {
     'isCheckSuggest': '巡检建议值',
     'isCheckAnnex': '巡检附件上传',
     'AllowPhotos': '仅允许现场拍照（图片/视频）',
+    'inspectionSignature': '巡检签名',
+    'needSignatrue': '须进行现场签名',
     'patrolSuggest': '中存在不合格项时，巡检结果为：立即督导',
     'PSCrule1': '与其他tab组合时，',
     'PSCrule2': '项目分值参与考评总分运算',
