@@ -86,7 +86,7 @@ export default {
       qualifiedForIgnoredWithType2: false,
       dangerousOnFailedItem: false,
       onSitePhotoOnly: false,
-      onSiteSignature: false,
+      onSiteSignature: true,
       lang: this.$i18n.locale,
       ScoreMsg: false,
       inspectId: 0,
