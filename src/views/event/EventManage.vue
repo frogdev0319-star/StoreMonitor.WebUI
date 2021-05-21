@@ -101,7 +101,7 @@
           <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
         </div>
       </el-button>
-      <el-tabs v-model="activeName" :id="lang === 'en' ? 'en-tabs-content' : 'tabs-content'" @tab-click="handleTabClick">
+      <el-tabs id="en-tabs-content" v-model="activeName" @tab-click="handleTabClick">
         <el-tab-pane
           v-for="(item,index) in tableDataList"
           :key="index"
