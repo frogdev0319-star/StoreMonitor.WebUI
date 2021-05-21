@@ -17,7 +17,7 @@
               @click="clickSum(item,index)">{{ item.name }}</span>
           </span>
         </div>
-        <span class="sug-label"><span>*</span>{{ $t('remotePatrol.inspectionAdvice') }}</span>
+        <span class="sug-label">{{ $t('remotePatrol.inspectionAdvice') }}</span>
         <el-input
           :autosize="{ minRows: 2, maxRows: 7}"
           v-model="suggest"
@@ -452,10 +452,6 @@ export default {
       });
       if (!flag) {
         self.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
-        return false;
-      }
-      if (self.suggest.length == 0) {
-        self.notify(self.$t('remotePatrol.suggestEmpty'), 'warning', 3000);
         return false;
       }
       self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
@@ -1065,9 +1061,6 @@ $h1:#292e36;
                 font-size: calc(12/1920*100vw);
                 display: block;
                 margin-bottom: 10px;
-                span{
-                    color: $red;
-                }
             }
             .rules{
                 font-size: 10px;
