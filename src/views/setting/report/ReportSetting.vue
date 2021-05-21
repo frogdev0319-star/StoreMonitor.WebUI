@@ -328,7 +328,7 @@
           return false;
         }
         this.curTemplate.id === -1 ? this.templateList.splice(this.curTemplateIndex, 1) : this.deleteReportTemplateFromDB();
-        this.curTemplateIndex = this.curTemplateIndex > 0 ? this.curTemplateIndex-- : this.curTemplateIndex++;
+        this.curTemplateIndex > 0 ? this.curTemplateIndex-- : 0;
         this.curTemplate = JSON.parse(JSON.stringify(this.templateList[this.curTemplateIndex]));
         this.setBasicAndDetailList();
       },
