@@ -1154,8 +1154,8 @@ export default {
               normal:{
                 color: function(params){
                   console.log(params)
-                  let colorList = ['#68BE7B', '#FCCC3F', '#FB804F', '#F31D65', '#7E838D',
-                    '#844379', '#585AA5', '#4B81DF', '#7FA9F1', '#76D3E6'];
+                  let colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
+                    '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
                   return colorList[params.dataIndex];
                 },
               }
