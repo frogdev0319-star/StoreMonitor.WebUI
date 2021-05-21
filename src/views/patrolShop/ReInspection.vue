@@ -140,7 +140,7 @@
         top="5%">
         <div class="canvas-content" style="overflow:hidden;">
           <hr class="dialog-hr">
-          <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+          <div class="feed-canvas-content" v-if="feedbackIndex === -1" @mouseenter="showCancel" @mouseleave="hiddenCancel">
             <div v-if="showPenBtn" id="iconR" class="icon-right">
               <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
               <transition name="fadepen">
@@ -172,6 +172,13 @@
                 <span>{{ $t('remotePatrol.cancel') }}</span>
               </div>
             </div>
+          </div>
+          <div class="feed-canvas-content" v-else>
+            <img
+              :width="520*percentHeight"
+              :height="340*percentHeight"
+              class="canvas-img"
+              :src="eventList[feedbackIndex].sourceObj.src">
           </div>
           <div class="event-content">
             <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
@@ -447,8 +454,10 @@
                   <div class="feedbacks-content">
                     <div v-for="(item,index) in eventList" :key="index" class="feedbacks-details">
                       <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" />
-                      <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
-                      <span class="feedback-eventdes">{{ item.eventDes }}</span>
+                      <div @click="editFeedback(item, index)" class="title-description">
+                        <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
+                        <span class="feedback-eventdes">{{ item.eventDes }}</span>
+                      </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
                         <img
                           :src="item.sourceObj.src"
@@ -961,7 +970,8 @@ export default {
       lastTime: null,
       currentTime: null,
       onEndflag: false,
-      previewplayer: null
+      previewplayer: null,
+      feedbackIndex: -1
     };
   },
   computed: {
@@ -1134,12 +1144,15 @@ export default {
   methods: {
     getDashUrlInfo() {
       getDashServerInfo().then(result => {
-        const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
-        this.userName = result.data.loginId;
-        this.password = result.data.password;
-        const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
-        console.log(url);
-        DashHttp.setDashHost(url);
+        if(result.errCode === 0){
+          const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
+          this.userName = result.data.loginId;
+          this.password = result.data.password;
+          const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
+          DashHttp.setDashHost(url);
+        } else {
+          console.log(result.errMsg);
+        }
       }).catch(error => {
         if (error.message !== 'Network request failed') {
           this.currentState = 'blank';
@@ -1260,73 +1273,67 @@ export default {
       self.showFeedBackInfo = self.eventList.length == 0;
     },
     addFeedBack() {
-      const self = this;
-      self.showFeedDialog1 = true;
-      self.eventName = '';
-      self.eventDes = '';
-      self.showEventNameInfo = false;
+      this.feedbackIndex = -1;
+      this.showFeedDialog1 = true;
+      this.eventName = '';
+      this.eventDes = '';
+      this.showEventNameInfo = false;
     },
-    confirmAddFeedBack3() {
-      const self = this;
-      let srcObj = null;
-      srcObj = self.feedBackVideoFileObj;
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: srcObj
-      };
-      if (self.eventName.trim().length == 0) {
-        self.notify(self.$t('remotePatrol.emptyTitle'), 'warning', 3000);
-        return false;
-      }
-      self.eventList.push(obj);
-      self.showFeedDialog3 = false;
-      self.showFeedBackInfo = false;
-    },
+
     confirmAddFeedBack2() {
       const self = this;
-      let srcObj = null;
-      const src = self.canvasEl.toDataURL('image/jpeg');
-      srcObj = {
-        mediaType: 2,
-        src: src,
-        height: '100px',
-        width: '140px',
-        fileName: self.bucketImage + '/' + 'inspect' + '_' + util.getCurTimeStr() + '_' + self.store.storeId + '_' + self.curItemId + '.jpg',
-        file: util.base64ToBlob(src),
-        deviceId: self.channel.id
-      };
-
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: srcObj
-      };
-      if (self.eventName.trim().length == 0) {
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
+      if (self.eventName.trim().length === 0) {
         self.showEventNameInfo = true;
         return false;
       }
-      self.eventList.push(obj);
+      if(this.feedbackIndex === -1){
+        let srcObj = null;
+        const src = self.canvasEl.toDataURL('image/jpeg');
+        srcObj = {
+          mediaType: 2,
+          src: src,
+          height: '100px',
+          width: '140px',
+          fileName: `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`,
+          file: util.base64ToBlob(src),
+          deviceId: self.channel.id
+        };
+
+        const obj = {
+          eventName: self.eventName,
+          eventDes: self.eventDes,
+          sourceObj: srcObj
+        };
+        self.eventList.push(obj);
+      } else {
+        self.eventList[this.feedbackIndex].eventName = self.eventName;
+        self.eventList[this.feedbackIndex].eventDes = self.eventDes;
+      }
       self.showFeedDialog2 = false;
       self.showFeedBackInfo = false;
     },
+
     confirmAddFeedBack1() {
       const self = this;
-      const obj = {
-        eventName: self.eventName,
-        eventDes: self.eventDes,
-        sourceObj: null
-      };
-      if (self.eventName.trim().length == 0) {
-        self.showEventNameInfo = true;
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
-        return false;
+      if(this.feedbackIndex == -1){
+        const obj = {
+          eventName: self.eventName,
+          eventDes: self.eventDes,
+          sourceObj: null
+        };
+        if (self.eventName.trim().length == 0) {
+          self.showEventNameInfo = true;
+          return false;
+        }
+        self.eventList.push(obj);
+      } else {
+        self.eventList[this.feedbackIndex].eventName = self.eventName;
+        self.eventList[this.feedbackIndex].eventDes = self.eventDes;
       }
-      self.eventList.push(obj);
       self.showFeedDialog1 = false;
       self.showFeedBackInfo = false;
     },
+
     getIndexById(id) {
       const self = this;
       let tempId = null;
@@ -1428,6 +1435,7 @@ export default {
         self.fullScreen = false;
       }
       if (self.showFeedBack) {
+        self.feedbackIndex = -1;
         self.showFeedDialog2 = true;
         self.eventName = '';
         self.eventDes = '';
@@ -3644,6 +3652,14 @@ export default {
     onPlayerPlaying(e) {
       console.log('video is playing');
       this.showModelContent = true;
+    },
+
+    editFeedback(feedbackObj, index) {
+      this.feedbackIndex = index;
+      !feedbackObj.sourceObj ? this.showFeedDialog1 = true : this.showFeedDialog2 = true;
+      this.eventName = feedbackObj.eventName;
+      this.eventDes = feedbackObj.eventDes;
+      this.showEventNameInfo = false;
     }
   }
 };
@@ -4571,6 +4587,9 @@ export default {
                                 .feedbacks-hr{
                                     border: 0.5px solid $border;
                                 }
+                            }
+                            .title-description{
+                              cursor: pointer;
                             }
                         }
                     }
