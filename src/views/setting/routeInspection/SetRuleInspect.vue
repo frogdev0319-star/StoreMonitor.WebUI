@@ -52,11 +52,19 @@
         </el-checkbox>
       </p>
     </el-col>
-    <el-col :span="24" class="el-rute-content" style="margin-bottom:40px;" v-if="mode===1">
+    <el-col :span="24" class="el-rute-content" v-if="mode===1">
       <p class="rule-title">{{ $t('insSettingView.isCheckAnnex') }}</p>
       <p class="rule-item">
         <el-checkbox v-model="onSitePhotoOnly">
           <span>{{ $t('insSettingView.AllowPhotos') }}</span>
+        </el-checkbox>
+      </p>
+    </el-col>
+    <el-col :span="24" class="el-rute-content" style="margin-bottom:40px;" v-if="mode===1">
+      <p class="rule-title">{{ $t('insSettingView.inspectionSignature') }}</p>
+      <p class="rule-item">
+        <el-checkbox v-model="onSiteSignature">
+          <span>{{ $t('insSettingView.needSignatrue') }}</span>
         </el-checkbox>
       </p>
     </el-col>
@@ -78,6 +86,7 @@ export default {
       qualifiedForIgnoredWithType2: false,
       dangerousOnFailedItem: false,
       onSitePhotoOnly: false,
+      onSiteSignature: false,
       lang: this.$i18n.locale,
       ScoreMsg: false,
       inspectId: 0,
@@ -104,6 +113,7 @@ export default {
             { name: 'maxScore', value: parseFloat(self.maxScore) },
             { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
             { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
+            { name: 'onSiteSignature', value: self.onSiteSignature },
           ]
         };
         const res = await self.updateInspectRule(params);
@@ -152,6 +162,8 @@ export default {
               case 'onSitePhotoOnly':
                 self.onSitePhotoOnly = item.value;
                 break;
+              case 'onSiteSignature':
+                self.onSiteSignature = item.value;
               default:
                 break;
             }
