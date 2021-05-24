@@ -10,7 +10,7 @@
           </div>
         </div>
       </div>
-      <div class="setting-details">
+      <div class="setting-details self-loading" v-loading="isLoadingData">
         <div class="content-titles">
           <button-list :name-list="templateList" :cur-template-index="curTemplateIndex" @click="displayTemplateInfo"></button-list>
           <div class="buttons">
@@ -161,7 +161,7 @@
         curTemplate: 0,
         templateList: [],
         showTemplateTip: false,
-        isLoadingData: false,
+        isLoadingData: true,
         list: [],
         curTemplateIndex: 0,
         templateNameTip: '',
@@ -197,6 +197,7 @@
             this.basicList = [];
             this.curTemplateIndex = 0;
           }
+          this.isLoadingData = false;
         }).catch(err => {
           console.log('ReportSetting:' + err);
         })
