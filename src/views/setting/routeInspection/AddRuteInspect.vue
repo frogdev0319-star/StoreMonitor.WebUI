@@ -1,4 +1,3 @@
-/* eslint-disable arrow-spacing */
 <template>
   <el-row class="el-addrute">
     <el-col :span="24" class="el-rute-title">
@@ -57,53 +56,48 @@
                 </el-tabs>
               </div>
             </div>
-            <div v-for="(item,index) in groupList" :key="index" :class="item.isClick?'noraml-color':'noraml-groupColor'" class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)">
-              <div v-if="item.isClick" class="proper-flag"/>
-              <div>
-                <div class="group-left">
-                  <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{ item.groupName }}（{{ item.groupNum }}）</span>
-                  <el-input v-if="item.isEdit" v-model="item.groupName" size="mini" class="group-input" @input="(val)=>groupNameChange(val,item)"/>
-                </div>
-                <div class="group-right">
-                  <div v-if="item.showEdit" class="show-edit">
-                    <div v-if="!item.isEdit" class="nape-items-handle">
-                      <i
-                        class="iconfont icon-bianji"
-                        style="cursor:pointer;"
-                        @click="editGroup(index,item)"/>
-                      <i
-                        class="iconfont icon-shanchu"
-                        style="cursor:pointer;"
-                        @click="deleteGroup(index, item)"/>
+            <draggable v-model="groupList">
+              <div v-for="(item,index) in groupList" :key="index" :class="item.isClick?'noraml-color':'noraml-groupColor'"
+                   class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)">
+                <div v-if="item.isClick" class="proper-flag"/>
+                <div>
+                  <div class="group-left">
+                    <div v-if="!item.isSubCatergy" @click="showSubCatergy = true">
+                      <span :style="item.isClick?{'color':'#f31d65'}:{}">
+                        {{ item.groupName }}（{{ item.groupNum }}）
+                      </span>
+                    </div>
+                    <div v-else class="subcatergy-item">
+                      <span :style="item.isClick?{'color':'#f31d65'}:{}">
+                        {{ item.groupName }}
+                      </span>
                     </div>
                   </div>
-                  <div v-if="item.isEdit" class="iconcontent">
-                    <div class="iconlised" @click="confirmEditGroup(index,item)">
-                      <i class="el-icon-check"/>
+                  <div class="group-right">
+                    <div v-if="item.showEdit" class="show-edit">
+                      <div v-if="!item.isEdit" class="nape-items-handle">
+                        <i
+                          class="iconfont icon-bianji"
+                          style="cursor:pointer;"
+                          @click="editGroup(index,item)"/>
+                        <i
+                          class="iconfont icon-shanchu"
+                          style="cursor:pointer;"
+                          @click="deleteGroup(index, item)"/>
+                      </div>
                     </div>
-                    <div class="iconrised" @click="cancelEditGroup(index,item)">
-                      <i class="el-icon-close"/>
+                    <div v-if="item.isEdit" class="iconcontent">
+                      <div class="iconlised" @click="confirmEditGroup(index,item)">
+                        <i class="el-icon-check"/>
+                      </div>
+                      <div class="iconrised" @click="cancelEditGroup(index,item)">
+                        <i class="el-icon-close"/>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div v-if="showAddGroup" class="group-add">
-              <div class="group-name-left">
-                <el-input :placeholder="$t('insSettingView.enterName')" v-model="groupNameInput" size="mini" class="groupName-input" @input="(val)=>groupNameChange(val,{})" @blur="notShowInputRuleTips('enterName')"/>
-                <span v-if="enterNameRuletip" class="rules">{{ $t('insSettingView.enterNameRuletip') }}</span>
-              </div>
-              <div class="group-name-right">
-                <div class="iconcontent">
-                  <div class="iconlised" @click="confirmAddGroup">
-                    <i class="el-icon-check"/>
-                  </div>
-                  <div class="iconrised" @click="cancelAddGroup">
-                    <i class="el-icon-close"/>
                   </div>
                 </div>
               </div>
-            </div>
+            </draggable>
           </div>
         </el-scrollbar>
       </div>
@@ -111,7 +105,7 @@
     <el-col :span="17" class="el-rute-nape">
       <div class="nape-content">
         <div class="title-content">
-          <span :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2">
+          <span :class="lang == 'en' ? 'en-item-title': 'item-title'" class="level2">
             <i class="iconfont icon-icon-test icontitle"/>
           <span class="level2-name">{{ napeTitle }}</span></span>
           <div class="btn-content">
@@ -135,62 +129,12 @@
         </div>
         <el-scrollbar id="el-menuscrollbar" style="height:100%;">
           <div :style="{'max-height':varyDivHeight+'px'}" class="nape-items">
-            <div v-if="napeList.length!=0" class="nape-items-title">
-              <div :style="activeSheetName=='1'?'flex:2.05;':'flex:3'" class="nape-name-title">
-                <span>{{ $t('insSettingView.inspectName') }}</span>
-              </div>
-              <div :style="activeSheetName=='1'?'flex:2.2;':'flex:4;'" class="nape-dep-title">
-                <span :style="activeSheetName=='1'?'left:5%;':'left:-4%;'">{{ $t('insSettingView.inspectionDescp') }}</span>
-              </div>
-              <div v-if="activeSheetName=='1'" class="nape-score0-title" style="flex:1;">
-                <span style="position:relative;left:8%;">{{ $t('insSettingView.sheetscore0') }}</span>
-              </div>
-              <div v-if="activeSheetName=='1'" class="nape-score0-title" style="flex:1;">
-                <span>{{ $t('insSettingView.sheetscore3') }}</span>
-              </div>
-              <div v-if="activeSheetName=='1'" class="nape-score0-title" style="flex:1;line-height:20px;padding-top:10px;padding-right:20px;">
-                <span>{{ $t('insSettingView.sheetscore1') }}</span>
-              </div>
-              <div v-if="activeSheetName!='1'" class="nape-score1-title" style="flex:1;">
-                <span>{{ $t('insSettingView.score') }}</span>
-              </div>
-              <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'" style="flex:1;">
-                <span>{{ $t('insSettingView.operation') }}</span>
-              </div>
-            </div>
-            <div
-              v-for="(item,index) in napeList"
-              :key="index"
-              :class="!item.isClick?'noraml-color':'active-color'"
-              class="nape-items-data"
-              @click="clickItem(index,item)">
-              <div :style="activeSheetName=='1'?'flex:2;':'flex:2.8;'" class="nape-name-data">
-                <el-checkbox v-model="item.checked" class="item-checkbox"/>
-                <span>{{ item.napeNameShow }}</span>
-              </div>
-              <div :style="activeSheetName=='1'?'flex:2;':'flex:4.2;'" class="nape-dep-data">
-                <span>{{ item.napeDep }}</span>
-              </div>
-              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
-                <span style="position:relative;left:15%;">{{ item.Score_1 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
-              </div>
-              <div v-if="activeSheetName=='1'" :style="item.isClick?'':'flex:1;'" class="nape-scores-handle">
-                <el-tooltip class="item" effect="dark" placement="top">
-                  <div slot="content" style="max-width:120px;">{{ item.availableScoreStr }}</div>
-                  <span style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.availableScoreStr }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
-                </el-tooltip>
-              </div>
-              <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
-                <span>{{ item.Score_2 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
-              </div>
-              <div v-if="activeSheetName!='1'" class="nape-scores-handle" style="flex:1;">
-                <span>{{ item.Score_3 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
-              </div>
-              <div class="nape-items-handle" style="flex:1;">
-                <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;" @click="handleEdit(index,item)"/>
-                <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(index, item)"/>
-              </div>
-            </div>
+            <draggable-table
+              :is-score-sheet= "activeSheetName === '1'"
+              :table-header="activeSheetName === '1' ? scoreTableHeader:passFailTableHeader"
+              :table-data="napeList"
+              @handleEditItem="handleEdit"
+              @handleDeleteItem="handleDelete"/>
           </div>
         </el-scrollbar>
       </div>
@@ -219,6 +163,18 @@
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.titleEmpty') }}</span>
           </el-form-item>
+          <el-form-item v-if="activeSheetName==='1'">
+            <p class="score_item">
+              <span class="sign">*</span>
+              <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
+              <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
+            </p>
+            <el-input v-model="ItemScoreOption"
+                      :placeholder="$t('insSettingView.enterScore')"
+                      @input="napeScoreOptionsChange"></el-input>
+            <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
+            <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
+          </el-form-item>
           <el-form-item v-if="activeSheetName==='1'" style="height: 57px;">
             <el-col :span="10">
               <el-form-item style="margin-bottom:0;">
@@ -226,7 +182,7 @@
                   <span class="sign">*</span>
                   <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
                 </p>
-                <el-input v-model.number="ItemTotalScore"
+                <el-input v-model.number="ItemTotalScore" disabled
                           :placeholder="$t('insSettingView.enterScore')"
                           @input="napeTotalScoreChange"/>
                 <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }}</span>
@@ -241,18 +197,6 @@
                 <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }}</span>
               </el-form-item>
             </el-col>
-          </el-form-item>
-          <el-form-item v-if="activeSheetName==='1'">
-            <p class="score_item">
-              <span class="sign">*</span>
-              <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
-              <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
-            </p>
-            <el-input v-model="ItemScoreOption"
-                      :placeholder="$t('insSettingView.enterScore')"
-                      @input="napeScoreOptionsChange"></el-input>
-            <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
-            <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
           </el-form-item>
           <el-form-item v-if="activeSheetName!=='1'">
             <p class="score_item">
@@ -279,6 +223,43 @@
         <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
       </div>
     </el-dialog>
+    <!--<dialog-pop-->
+      <!--v-if="showAddNape"-->
+      <!--:title="updateType.type === 0 ? $t('insSettingView.addTitleItem') : $t('insSettingView.editTitleItem')"-->
+      <!--:append-to-body="true"-->
+      <!--:close-on-click-modal="false"-->
+      <!--:visible="showAddNape"-->
+      <!--@visibleChangeHandler="hideHandleItemDialog"-->
+      <!--@cancelHandler="hideHandleItemDialog"-->
+      <!--@confirmHandler="confirmUpdateNape">-->
+      <!--<div class="dialog-slot input-form-slot">-->
+        <!--<validate-input-->
+          <!--:placeholder="$t('insSettingView.enterName')"-->
+          <!--:input-limit-length="30"-->
+          <!--:out-limit-prompt-msg="$t('insSettingView.enterNameRuletip')"-->
+          <!--:empty-prompt-msg="$t('insSettingView.enterName')"-->
+          <!--:input-name="groupNameTemp"-->
+          <!--@getInputValue="getInputCatergyName"-->
+        <!--&gt;-->
+          <!--<div slot class="dialog-form-item-name">-->
+            <!--<span class="required-name">*</span>-->
+            <!--<span>{{$t('insSettingView.catergyName')}}</span>-->
+          <!--</div>-->
+        <!--</validate-input>-->
+        <!--<div class="dialog-form-item">-->
+          <!--<div class="dialog-form-item-name">-->
+            <!--<span>{{$t('insSettingView.parentCatergyName')}}</span>-->
+            <!--<icon-tooltip placement="right" :is-catergy-setting="true">-->
+              <!--<i class="iconfont icon-bangzhu iconbangzhu"/>-->
+            <!--</icon-tooltip>-->
+          <!--</div>-->
+          <!--<el-select v-model="ruleForm.region" style="width:100%" size="mini">-->
+            <!--<el-option label="区域一" value="shanghai"></el-option>-->
+            <!--<el-option label="区域二" value="beijing"></el-option>-->
+          <!--</el-select>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</dialog-pop>-->
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -307,6 +288,42 @@
         <div class="dialog-content">{{ $t('insSettingView.deleteGroup') }}</div>
       </div>
     </dialog-pop>
+    <dialog-pop
+      :title="$t('insSettingView.addCategory')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="showAddGroup"
+      @visibleChangeHandler="hideAddGroupDialog"
+      @cancelHandler="hideAddGroupDialog"
+      @confirmHandler="confirmAddGroup">
+      <div class="dialog-slot input-form-slot">
+        <validate-input
+          :placeholder="$t('insSettingView.enterName')"
+          :input-limit-length="30"
+          :out-limit-prompt-msg="$t('insSettingView.enterNameRuletip')"
+          :empty-prompt-msg="$t('insSettingView.enterName')"
+          :input-name="groupNameTemp"
+          @getInputValue="getInputCatergyName"
+        >
+          <div slot class="dialog-form-item-name">
+            <span class="required-name">*</span>
+            <span>{{$t('insSettingView.catergyName')}}</span>
+          </div>
+        </validate-input>
+        <div class="dialog-form-item">
+          <div class="dialog-form-item-name">
+            <span>{{$t('insSettingView.parentCatergyName')}}</span>
+            <icon-tooltip placement="right" :is-catergy-setting="true">
+              <i class="iconfont icon-bangzhu iconbangzhu"/>
+            </icon-tooltip>
+          </div>
+          <el-select v-model="ruleForm.region" style="width:100%" size="mini">
+            <el-option label="区域一" value="shanghai"></el-option>
+            <el-option label="区域二" value="beijing"></el-option>
+          </el-select>
+        </div>
+      </div>
+    </dialog-pop>
   </el-row>
 </template>
 
@@ -319,13 +336,22 @@ import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { getScheduleListService } from '@/api/schedule';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
+import ValidateInput from "@/components/ValidateInput";
+import IconTooltip from "../../../components/IconTooltip";
+import DraggableTable from "../../../components/DraggableTable";
+import draggable from 'vuedraggable';
+
 
 export default {
   name: 'AddRuteInspect',
   components: {
+    DraggableTable,
+    IconTooltip,
+    ValidateInput,
     DialogPop,
     DelayButton,
-    RegionMultiSelect
+    RegionMultiSelect,
+    draggable
   },
   data() {
     return {
@@ -393,7 +419,78 @@ export default {
         { id: '2', label: this.$t('insSettingView.sheetother') }
       ],
       allRoutedata: [],
-      typeTemp: []
+      typeTemp: [],
+      passFailTableHeader: [
+        {
+          name: this.$t('insSettingView.inspectName'),
+          headerStyle:{
+            width: '30%',
+            textAlign: 'left',
+            marginLeft: 'calc(30/1920*100vw)'
+          },
+        },
+        {
+          name: this.$t('insSettingView.inspectionDescp'),
+          headerStyle:{
+            width: '45%',
+            textAlign: 'left'
+          },
+        },
+        {
+          name: this.$t('insSettingView.score'),
+          headerStyle:{
+            width: '12.5%'
+          },
+        },
+        {
+          name: this.$t('insSettingView.operation'),
+          headerStyle:{
+            width: '12.5%'
+          },
+        },
+      ],
+      scoreTableHeader: [
+        {
+          name: this.$t('insSettingView.inspectName'),
+          headerStyle:{
+            width: '25%',
+            marginLeft: 'calc(30/1920*100vw)',
+            textAlign: 'left'
+          },
+        },
+        {
+          name: this.$t('insSettingView.inspectionDescp'),
+          headerStyle:{
+            width: '25%',
+            textAlign: 'left'
+          },
+        },
+        {
+          name: this.$t('insSettingView.sheetscore0'),
+          headerStyle:{
+            width: '12.5%'
+          },
+        },
+        {
+          name: this.$t('insSettingView.sheetscore3'),
+          headerStyle:{
+            width: '12.5%'
+          },
+        },
+        {
+          name: this.$t('insSettingView.sheetscore1'),
+          headerStyle:{
+            width: '12.5%'
+          },
+        },
+        {
+          name: this.$t('insSettingView.operation'),
+          headerStyle:{
+            width: '12.5%'
+          },
+        },
+      ],
+      showSubCatergy: false
     };
   },
   computed: {
@@ -531,18 +628,6 @@ export default {
 
     clickItem(index, item) {
       const self = this;
-    },
-
-    getTagAll(params) {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        inpectRESTful.GetInspectTagList(params).then(res => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
     },
 
     getInspectGroupBindAll(params) {
@@ -744,7 +829,7 @@ export default {
             isClick: false,
             showEdit: false,
             isEdit: false,
-            itemData: []
+            itemData: [],
           };
           self.groupList.push(obj);
           let titleIds = [];
@@ -792,6 +877,7 @@ export default {
     },
 
     editGroup(index, item) {
+      this.showAddGroup = true;
       const self = this;
       item.isEdit = true;
       item.showEdit = false;
@@ -1173,16 +1259,15 @@ export default {
     },
 
     handleEdit(index, item) {
-      const self = this;
-      self.showAddNape = true;
-      self.updateType = {type:1,id:item.id};
-      self.setDialogContent();
-      self.ItemName = item.napeName;
-      self.ItemTotalScore = item.Score_1;
-      self.ItemMinScore = item.Score_2;
-      self.ItemSheetScore = item.Score_3;
-      self.ItemScoreOption = item.availableScoreStr;
-      self.ItemDescription = item.napeDep;
+      this.showAddNape = true;
+      this.updateType = {type:1,id:item.id};
+      this.setDialogContent();
+      this.ItemName = item.napeName;
+      this.ItemTotalScore = item.score;
+      this.ItemMinScore = item.qualifiedScore;
+      this.ItemSheetScore = item.Score_3;
+      this.ItemScoreOption = item.availableScoreStr;
+      this.ItemDescription = item.napeDep;
     },
 
     handleDelete(index, item) {
@@ -1243,7 +1328,7 @@ export default {
       const data = util.getRouteByTag(curTag, allData);
       const temp = [];
       const groupIds = [];
-      data.forEach(item => {
+      data.forEach((item, index) => {
         const obj = {};
         obj.id = item.id;
         obj.groupName = item.name;
@@ -1366,6 +1451,11 @@ export default {
           Score_3: _item.itemScore,
           Score_4: _item.availableScores,
           availableScoreStr: availableScoreStr,
+          name: `${index + 1}，${_item.subject}`,
+          description: _item.description,
+          score: _item.itemScore,
+          qualifiedScore: _item.qualifiedScore,
+          availableScores: availableScoreStr,
           isClick: false,
           checked: false
         };
@@ -1375,30 +1465,12 @@ export default {
     },
 
     initData() {
-      const self = this;
-      const arr = [];
-      self.tabName = sessionStorage.getItem('GroupName');
+      this.tabName = sessionStorage.getItem('GroupName');
       const itemSettingData = JSON.parse(sessionStorage.getItem('itemSettingData'));
-      self.routeName = itemSettingData.routeName;
-      self.routeData = itemSettingData.routeData;
-      self.refreshData(0);
-      self.getBindStoreList();
-    },
-
-    groupNameChange(val, item) {
-      const self = this;
-      const comment = filterString.all(val, 30);
-      const length = filterString.getContentLength(val);
-      if (Object.keys(item).length === 0) {
-        self.groupNameInput = comment;
-      } else {
-        item.groupName = comment;
-      }
-      if (length > 30) {
-        this.enterNameRuletip = true;
-      } else {
-        this.enterNameRuletip = false;
-      }
+      this.routeName = itemSettingData.routeName;
+      this.routeData = itemSettingData.routeData;
+      this.refreshData(0);
+      this.getBindStoreList();
     },
 
     napeTotalScoreChange(val){
@@ -1449,12 +1521,14 @@ export default {
       const self = this;
       self.ItemScoreOption = val.replace(/[^-?\d\.\/]/g,"");
       self.ItemScoreOptions = self.ItemScoreOption.split('/');
+      self.ItemScoreOptions.sort((a,b) => {return a-b});
+      console.log(self.ItemScoreOptions);
       self.ScoreOptionsTips0 = false;
       if(val===''){
         self.ScoreOptionsTips1 = false;
       }else{
         self.ItemScoreOptions.forEach(item=>{
-          if(!isNaN(parseFloat(item)) && parseFloat(item)>=-50 && parseFloat(item)<=parseFloat(self.ItemTotalScore)){
+          if(!isNaN(parseFloat(item)) && parseFloat(item) >= -50 && parseFloat(item) <= parseFloat(self.ItemTotalScore)){
             self.ScoreOptionsTips1 = false;
           }else{
             self.ScoreOptionsTips1 = true;
@@ -1501,8 +1575,23 @@ export default {
       } else if (e === 'description') {
         this.descriptionRuletip = false;
       }
-    }
+    },
 
+    hideAddGroupDialog(){
+      this.showAddGroup = false;
+    },
+
+    confirmAddSubGroup(){
+      this.showAddGroup = false;
+    },
+
+    getInputCatergyName(val){
+      this.groupNameInput = val;
+    },
+
+    hideHandleItemDialog(){
+      this.showAddNape = false;
+    }
   },
 
   beforeRouteLeave(to, from, next) {
@@ -1815,6 +1904,10 @@ export default {
                             overflow: hidden;
                             white-space: nowrap;
                         }
+                      .subcatergy-item{
+                        margin-left: calc(20/1920*100vw);
+                        font-size: calc(13/1920*100vw);
+                      }
                     }
                     .group-right{
                         display: inline-block;
@@ -1942,6 +2035,9 @@ export default {
                   left: 0%;
                 }
             }
+          .nape-items{
+            width: 99%;
+          }
             .nape-items-title{
                 height: 60px;
                 line-height: 60px;
