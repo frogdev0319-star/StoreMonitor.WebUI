@@ -693,6 +693,7 @@ export default {
       const self = this;
       let mode = self.activeName == '0' ? mode = 1 : mode = 0; // remote mode 0,onsite  mode 1
       const arr = Object.entries(dataArry);
+      console.log(arr);
       const tempGroups = [];
       const tempItems = [];
       let type = null;
@@ -707,7 +708,7 @@ export default {
         if (arr[i][1].length != 0) {
           arr[i][1].forEach((item, index) => {
             const obj = {};
-            obj.name = item[0].a;
+            obj.name = item[0].catergyName;
             obj.mode = mode;
             obj.tag = self.ImportName;
             obj.type = type;
@@ -732,22 +733,22 @@ export default {
                 const _obj = {};
                 let itemScore = 0, qualifiedScore = 0, description = '', availableScores = [];
                 if (arr[i][0] == 'PassFail') {
-                  itemScore = _item.c;
+                  itemScore = _item.score;
                   qualifiedScore = null;
-                  description = _item.d;
+                  description = _item.description;
                   availableScores = null;
                 } else if (arr[i][0] == 'Score') {
-                  itemScore = _item.c;
-                  qualifiedScore = _item.d;
-                  description = _item.f;
-                  availableScores = _item.e;
+                  itemScore = _item.totalScore;
+                  qualifiedScore = _item.scoreThreshold;
+                  description = _item.description;
+                  availableScores = _item.score;
                 } else if (arr[i][0] == 'Others') {
-                  itemScore = _item.c;
+                  itemScore = _item.score;
                   qualifiedScore = null;
-                  description = _item.d;
+                  description = _item.description;
                   availableScores = null;
                 }
-                _obj.subject = _item.b;
+                _obj.subject = _item.itemName;
                 _obj.description = description;
                 _obj.itemScore = parseFloat(self.getFloat(itemScore));
                 _obj.qualifiedScore = qualifiedScore===null ? null : parseFloat(self.getFloat(qualifiedScore));
@@ -1165,203 +1166,46 @@ export default {
           const Others = wb.Sheets['Others'];
           const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
 
-          outdata.PassFail = _this.getPassAndFailSheetData(wb, PassFail);
-          outdata.Score = _this.getScoreSheetData(wb, Score);
-          outdata.Others = _this.getPassAndFailSheetData(wb, Others);
-          let indexArryPassFail = [], indexArryScore = [], indexArryOthers = [];
-          let flaggroupLengthPassFail = false, flaggroupLengthScore = false, flaggroupLengthOthers = false;
-          let flagItemNamePassFail = false, flagItemNameScore = false, flagItemNameOthers = false;
-          let flagItemLengthPassFail = false, flagItemLengthScore = false, flagItemLengthOthers = false;
-          let flagDesLengthPassFail = false, flagDesLengthScore = false, flagDesLengthOthers = false;
-          let flagFullScoreType = false, flagMinScoreType = false, flagOtherScoreType = false, flagPassFailScoreType = false,flagScoreItemType = false;
-          let flagTempError = false,flagScoreItemEmpty = false;
-          // The sheet has been parsed : outdata
-          outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined ? flagTempError = true : flagTempError = false;
-          const arr = Object.entries(outdata);
-          for (let i = 0; i < arr.length; i++) {
-            arr[i][1].forEach((item, index) => {
-              if (arr[i][0] == 'PassFail') {
-                if (item.a != undefined && item.a.length != 0) {
-                  indexArryPassFail.push(index);
-                  if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthPassFail = true; }
-                }
-                if (item.b == undefined || item.b.length == 0) { flagItemNamePassFail = true; } else if (filterString.getContentLength(item.b.toString().trim()) > ITEMSLENGTH) { flagItemLengthPassFail = true; }
-                if (item.c != undefined) {
-                  if(isNaN(item.c) || parseFloat(item.c) < 0.5 || parseFloat(item.c) > 50){flagPassFailScoreType = true;};
-                } else {
-                  item.c = 10;
-                }
-                if (item.d != undefined) {
-                  if (filterString.getContentLength(item.d.toString().trim()) > 1200) { flagDesLengthPassFail = true; }
-                }
-              } else if (arr[i][0] == 'Score') {
-                if (item.a != undefined && item.a.length != 0) {
-                  indexArryScore.push(index);
-                  if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthScore = true; }
-                }
-                if (item.b == undefined || item.b.length == 0) { flagItemNameScore = true; } else if (filterString.getContentLength(item.b.toString().trim()) > ITEMSLENGTH) { flagItemLengthScore = true; }
-                if (item.c == undefined || item.c.length == 0 || isNaN(item.c) || parseFloat(item.c) < 0 || parseFloat(item.c) > 50) {
-                  flagFullScoreType = true;
-                }
-                if (item.d != undefined) {
-                  if (isNaN(item.d) || parseFloat(item.d) < -50 || parseFloat(item.d) > parseFloat(item.c)) {
-                    flagMinScoreType = true;
-                  }
-                } else {
-                  item.d = parseFloat(item.c);
-                }
-                if (item.e != undefined) {
-                  if (typeof item.e!=='number'&&item.e.indexOf('/') !== -1) {
-                    const f_Score = item.e.split('/');
-                    const scoreArr = [];
-                    f_Score.forEach(f_item => {
-                      if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= parseFloat(item.c)) {
-                          scoreArr.push(parseFloat(_this.getFloat(f_item)));
-                      }
-                    });
-                    scoreArr.length===0 ? flagScoreItemType = true : item.e = scoreArr;
-                  } else {
-                    if (!isNaN(Number(item.e)) && parseFloat(item.e) >= -50 && parseFloat(item.e) <= parseFloat(item.c)) {
-                      let a = [];
-                      a.push(parseFloat(_this.getFloat(item.e)));
-                      item.e = a;
-                    } else {
-                      flagScoreItemType = true
-                    }
-                  }
-                } else {
-                  flagScoreItemEmpty = true
-                }
-                if (item.f != undefined) {
-                  if (filterString.getContentLength(item.f.toString().trim()) > 1200) { flagDesLengthScore = true; }
-                }
-              } else if (arr[i][0] == 'Others') {
-                if (item.a != undefined && item.a.length != 0) {
-                  indexArryOthers.push(index);
-                  if (filterString.getContentLength(item.a.toString().trim()) > 30) { flaggroupLengthOthers = true; }
-                }
-                if (item.b == undefined || item.b.length == 0) { flagItemNameOthers = true; } else if (filterString.getContentLength(item.b.toString().trim()) > ITEMSLENGTH) { flagItemLengthOthers = true; }
-                if (item.c == undefined || item.c.length == 0 || isNaN(item.c) || parseFloat(item.c) < -100 || parseFloat(item.c) > 100) { // 项目分值必填，字符类型为-100~+100
-                  flagOtherScoreType = true;
-                }
-                if (item.d != undefined) {
-                  if (filterString.getContentLength(item.d.toString().trim()) > 1200) { flagDesLengthOthers = true; }
-                }
-              }
-            });
-          }
-          const showWarningIfo = flaggroupLengthPassFail || flagItemNamePassFail || flagItemLengthPassFail || flagDesLengthPassFail ||
-                                         flaggroupLengthScore || flagItemNameScore || flagItemLengthScore || flagDesLengthScore ||
-                                         flaggroupLengthOthers || flagItemNameOthers || flagItemLengthOthers || flagDesLengthOthers ||
-                                         flagFullScoreType || flagMinScoreType || flagOtherScoreType || flagPassFailScoreType || flagTempError || flagScoreItemType || flagScoreItemEmpty;
-          if (showWarningIfo) {
+          outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
+          outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
+          outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
+
+          const passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
+          console.log(passFailSheetFlagObj);
+
+          const scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
+          console.log(scoreSheetFlagObj);
+
+          const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
+          console.log(otherSheetFlagObj);
+          let flagTempError = outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined ? true : false;
+
+          _this.FileInfo = _this.getWarningInfo(passFailSheetFlagObj.flags, scoreSheetFlagObj.flags,
+                                                otherSheetFlagObj.flags, flagTempError);
+          console.log(_this.FileInfo);
+
+          if (_this.FileInfo.length > 0) {
             _this.showFailInfo = true;
             _this.$refs.loadFile.value = '';
             _this.$refs.loadFileEx.value = '';
-            if (flagTempError) {
-              _this.FileInfo.push(_this.$t('insSettingView.templateError'));
-            }
-            if (flaggroupLengthPassFail || flaggroupLengthScore || flaggroupLengthOthers) {
-              const flagArr = [];
-              if (flaggroupLengthPassFail) { flagArr.push('PassFail'); }
-              if (flaggroupLengthScore) { flagArr.push('Score'); }
-              if (flaggroupLengthOthers) { flagArr.push('Others'); }
-              const flag = flagArr.toString() + ' ' + _this.$t('insSettingView.excelLongCategory');
-              _this.FileInfo.push(flag);
-            }
-            if (flagItemNamePassFail || flagItemNameScore || flagItemNameOthers) {
-              const flagArr = [];
-              if (flagItemNameScore) {
-                const flag = 'Score' + ' ' + _this.$t('insSettingView.excelEmpty');
-                _this.FileInfo.push(flag);
-              }
-              if (flagItemNamePassFail || flagItemNameOthers) {
-                if (flagItemNamePassFail) { flagArr.push('PassFail'); }
-                if (flagItemNameOthers) { flagArr.push('Others'); }
-                const flag = flagArr.toString() + ' ' + _this.$t('insSettingView.passfailexcelEmpty');
-                _this.FileInfo.push(flag);
-              }
-            }
-            if (flagItemLengthPassFail || flagItemLengthScore || flagItemLengthOthers) {
-              const flagArr = [];
-              if (flagItemLengthPassFail) { flagArr.push('PassFail'); }
-              if (flagItemLengthScore) { flagArr.push('Score'); }
-              if (flagItemLengthOthers) { flagArr.push('Others'); }
-              const flag = flagArr.toString() + ' ' + _this.$t('insSettingView.excelLongItem');
-              _this.FileInfo.push(flag);
-            }
-            if (flagDesLengthPassFail || flagDesLengthScore || flagDesLengthOthers) {
-              const flagArr = [];
-              if (flagDesLengthPassFail) { flagArr.push('PassFail'); }
-              if (flagDesLengthScore) { flagArr.push('Score'); }
-              if (flagDesLengthOthers) { flagArr.push('Others'); }
-              const flag = flagArr.toString() + ' ' + _this.$t('insSettingView.excelIllegalDes');
-              _this.FileInfo.push(flag);
-            }
-            if (flagPassFailScoreType) {
-              _this.FileInfo.push('PassFail' + ' ' + _this.$t('insSettingView.excelPassFailScoreType'));
-            }
-            if (flagFullScoreType) {
-              _this.FileInfo.push('Score' + ' ' + _this.$t('insSettingView.excelFullScoreType'));
-            }
-            if (flagMinScoreType) {
-              _this.FileInfo.push('Score' + ' ' + _this.$t('insSettingView.excelMinScoreType'));
-            }
-            if (flagOtherScoreType) {
-              _this.FileInfo.push('Others' + ' ' + _this.$t('insSettingView.excelOtherScoreType'));
-            }
-            if(flagScoreItemType){
-              _this.FileInfo.push('Score' + ' ' + _this.$t('insSettingView.excelScoreItemType'));
-            }
-            if(flagScoreItemEmpty){
-              _this.FileInfo.push('Score' + ' ' + _this.$t('insSettingView.excelScoreItemEmpty'));
-            }
             return false;
           }
-          const arrsheet1 = [];
-          if (outdata.PassFail != undefined) {
-            if (indexArryPassFail.length != 0) {
-              for (var i = 0; i < indexArryPassFail.length; i++) {
-                arrsheet1[i] = outdata.PassFail.slice(indexArryPassFail[i], indexArryPassFail[i + 1]);
-              }
-            } else {
-              if (outdata.PassFail.length != 0) {
-                arrsheet1.push(outdata.PassFail);
-                arrsheet1[0][0].a = _this.$t('insSettingView.Ratingitems');
-              }
-            }
-          }
-          const arrsheet2 = [];
-          if (outdata.Score != undefined) {
-            if (indexArryScore.length != 0) {
-              for (var i = 0; i < indexArryScore.length; i++) {
-                arrsheet2[i] = outdata.Score.slice(indexArryScore[i], indexArryScore[i + 1]);
-              }
-            }
-          }
-          const arrsheet3 = [];
-          if (outdata.Others != undefined) {
-            if (indexArryOthers.length != 0) {
-              for (var i = 0; i < indexArryOthers.length; i++) {
-                arrsheet3[i] = outdata.Others.slice(indexArryOthers[i], indexArryOthers[i + 1]);
-              }
-            } else {
-              if (outdata.Others.length != 0) {
-                arrsheet3.push(outdata.Others);
-                arrsheet3[0][0].a = _this.$t('insSettingView.Addscoreitems');
-              }
-            }
-          }
-          if(arrsheet2.length===0&&arrsheet1.length===0&&arrsheet3.length===0){
+
+          const arrSheet1 = _this.getPassAndFailArrData(outdata.PassFail, passFailSheetFlagObj.indexArrPassFail, passFailSheetFlagObj.indexSubCatergyPassFail);
+          const arrSheet2 = _this.getScoreArrData(outdata.Score, scoreSheetFlagObj.indexArrScore);
+          const arrSheet3 = _this.getOtherArrData(outdata.Others, otherSheetFlagObj.indexArrOthers);
+
+          if(arrSheet1.length === 0 && arrSheet2.length === 0 && arrSheet3.length === 0){
             _this.$refs.loadFile.value = '';
             _this.$refs.loadFileEx.value = '';
             util.notify(_this.$t('insSettingView.templateEmpty'), 'warning', 3000);
             return false;
           }
+
           const dataArry = {
-            PassFail: arrsheet1,
-            Score: arrsheet2,
-            Others: arrsheet3
+            PassFail: arrSheet1,
+            Score: arrSheet2,
+            Others: arrSheet3
           };
           console.log(dataArry);
           _this.addAllData(dataArry);
@@ -1386,7 +1230,7 @@ export default {
       return tableVersion;
     },
 
-    getPassAndFailSheetData(workbook, sheet){
+    getPassAndFailSheetJsonData(workbook, sheet, tableVersion){
       if(sheet){
         delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
@@ -1394,10 +1238,19 @@ export default {
         let rowDataArray = [];
         sheetArray.forEach((_item) => {
           const rowDataObj = {};
-          rowDataObj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
-          rowDataObj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
-          rowDataObj.c = _item.__EMPTY_2;
-          rowDataObj.d = _item.__EMPTY_3!==undefined && typeof _item.__EMPTY_3 !== 'number' ? _item.__EMPTY_3.trim() : _item.__EMPTY_3;
+          rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
+          if(tableVersion === 1){
+            rowDataObj.subCatergyName = '';
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.score = _item.__EMPTY_2;
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_3);
+          } else {
+            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+            rowDataObj.score = _item.__EMPTY_3;
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_4);
+          }
+
           rowDataArray.push(rowDataObj);
         });
         console.log(rowDataArray);
@@ -1406,19 +1259,30 @@ export default {
       return [];
     },
 
-    getScoreSheetData(workbook, sheet){
+    getScoreSheetJsonData(workbook, sheet, tableVersion){
       if(sheet){
         delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         let rowDataArray = [];
         sheetArray.forEach((_item) => {
           const rowDataObj = {};
-          rowDataObj.a = _item.__EMPTY!==undefined && typeof _item.__EMPTY !== 'number' ? _item.__EMPTY.trim() : _item.__EMPTY;
-          rowDataObj.b = _item.__EMPTY_1!==undefined && typeof _item.__EMPTY_1 !== 'number' ? _item.__EMPTY_1.trim() : _item.__EMPTY_1;
-          rowDataObj.c = _item.__EMPTY_2;
-          rowDataObj.d = _item.__EMPTY_3;
-          rowDataObj.e = _item.__EMPTY_4!==undefined && typeof _item.__EMPTY_4!=='number' ? _item.__EMPTY_4.trim() : _item.__EMPTY_4;
-          rowDataObj.f = _item.__EMPTY_5!==undefined && typeof _item.__EMPTY_5 !== 'number' ? _item.__EMPTY_5.trim() : _item.__EMPTY_5;
+          rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
+          if(tableVersion === 1){
+            rowDataObj.subCatergyName = '';
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.totalScore = _item.__EMPTY_2;
+            rowDataObj.scoreThreshold = _item.__EMPTY_3;
+            rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_5);
+          } else{
+            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+            rowDataObj.score = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.scoreThreshold = _item.__EMPTY_4;
+            rowDataObj.totalScore = Infinity;
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
+          }
+
           rowDataArray.push(rowDataObj);
         });
         console.log(rowDataArray);
@@ -1426,6 +1290,377 @@ export default {
       }
     },
 
+    getTableCellData(itemData){
+      const resultData = itemData !== undefined && typeof itemData !== 'number' ? itemData.trim() : itemData;
+      return resultData;
+    },
+
+    validatePassFailData(passFailArr) {
+      const ITEMSLENGTH = 250;
+      let passFailFlagObj = {
+        indexArrPassFail: [],
+        indexSubCatergyPassFail: [],
+        flags: {
+          flagGroupLengthPassFail: false,
+          flagSubGroupLengthPassFail: false,
+          flagItemNamePassFail: false,
+          flagItemLengthPassFail: false,
+          flagPassFailScoreType: false,
+          flagDesLengthPassFail: false
+        }
+      };
+      passFailArr.forEach((item, index) => {
+        if (item.catergyName != undefined && item.catergyName.length > 0) {
+          passFailFlagObj.indexArrPassFail.push(index);
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+            passFailFlagObj.flags.flagGroupLengthPassFail = true;
+          }
+        }
+        if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
+          passFailFlagObj.indexSubCatergyPassFail.push(index);
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+            passFailFlagObj.flags.flagSubGroupLengthPassFail = true;
+          }
+        }
+        if (item.itemName == undefined || item.itemName.length == 0) {
+          passFailFlagObj.flags.flagItemNamePassFail = true;
+        }
+        else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
+          passFailFlagObj.flags.flagItemLengthPassFail = true;
+        }
+        if (item.score != undefined) {
+          if(isNaN(item.score) || parseFloat(item.score) < 0.5 || parseFloat(item.score) > 50) {
+            passFailFlagObj.flags.flagPassFailScoreType = true;
+          }
+        } else {
+          item.score = 10;
+        }
+        if (item.description != undefined) {
+          if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
+            passFailFlagObj.flags.flagDesLengthPassFail = true;
+          }
+        }
+      })
+      return passFailFlagObj;
+    },
+
+    validateScoreData(scoreArr , tableVersion) {
+      const ITEMSLENGTH = 250;
+      const _this = this;
+      let scoreFlagObj = {
+        indexArrScore: [],
+        indexSubCatergyScore: [],
+        flags: {
+          flagGroupLengthScore: false,
+          flagSubGroupLengthScore: false,
+          flagItemNameScore: false,
+          flagItemLengthScore: false,
+          flagFullScoreType: false,
+          flagMinScoreType: false,
+          flagDesLengthPassFail: false,
+          flagScoreItemType: false,
+          flagDesLengthScore: false,
+          flagScoreItemEmpty: false,
+        }
+      };
+      scoreArr.forEach((item, index) => {
+        if (item.catergyName != undefined && item.catergyName.length != 0) {
+          scoreFlagObj.indexArrScore.push(index);
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+            scoreFlagObj.flags.flagGroupLengthScore = true;
+          }
+        }
+        if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
+          scoreFlagObj.indexSubCatergyScore.push(index);
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+            scoreFlagObj.flags.flagSubGroupLengthScore = true;
+          }
+        }
+        if (item.itemName == undefined || item.itemName.length === 0) {
+          scoreFlagObj.flags.flagItemNameScore = true;
+        } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
+          scoreFlagObj.flags.flagItemLengthScore = true;
+        }
+        if(tableVersion === 1){
+          if (item.totalScore == undefined || item.totalScore.length == 0 || isNaN(item.totalScore)
+            || parseFloat(item.totalScore) < 0 || parseFloat(item.totalScore) > 50) {
+            scoreFlagObj.flags.flagFullScoreType = true;
+          }
+          if (item.scoreThreshold != undefined) {
+            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50
+              || parseFloat(item.scoreThreshold) > parseFloat(item.totalScore)) {
+              scoreFlagObj.flags.flagMinScoreType = true;
+            }
+          } else {
+            item.scoreThreshold = parseFloat(item.totalScore);
+          }
+          if (item.score != undefined) {
+            if (typeof item.score!=='number'&&item.score.indexOf('/') !== -1) {
+              const f_Score = item.score.split('/');
+              const scoreArr = [];
+              f_Score.forEach(f_item => {
+                if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= parseFloat(item.totalScore)) {
+                  scoreArr.push(parseFloat(_this.getFloat(f_item)));
+                }
+              });
+              scoreArr.length === 0 ? scoreFlagObj.flags.flagScoreItemType = true : item.score = scoreArr;
+            } else {
+              if (!isNaN(Number(item.score)) && parseFloat(item.score) >= -50 && parseFloat(item.score) <= parseFloat(item.totalScore)) {
+                let a = [];
+                a.push(parseFloat(_this.getFloat(item.score)));
+                item.score = a;
+              } else {
+                scoreFlagObj.flags.flagScoreItemType = true
+              }
+            }
+          } else {
+            scoreFlagObj.flags.flagScoreItemEmpty = true;
+          }
+        } else {
+          if (item.score != undefined) {
+            if (typeof item.score!=='number'&&item.score.indexOf('/') !== -1) {
+              const f_Score = item.score.split('/');
+              const scoreArr = [];
+              f_Score.forEach(f_item => {
+                if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50) {
+                  scoreArr.push(parseFloat(_this.getFloat(f_item)));
+                }
+              });
+              if(scoreArr.length === 0){
+                scoreFlagObj.flags.flagScoreItemType = true;
+              } else {
+                scoreArr.sort((a, b) => {return a - b});
+                item.score = scoreArr;
+              }
+            } else {
+              if (!isNaN(Number(item.score)) && parseFloat(item.score) >= -50) {
+                let a = [];
+                a.push(parseFloat(_this.getFloat(item.score)));
+                item.score = a;
+              } else {
+                scoreFlagObj.flags.flagScoreItemType = true;
+              }
+            }
+          } else {
+            scoreFlagObj.flags.flagScoreItemEmpty = true;
+          }
+          let maxScore = Infinity;
+          if(!scoreFlagObj.flags.flagScoreItemType && !scoreFlagObj.flags.flagScoreItemType){
+            maxScore = item.score[item.score.length - 1];
+          }
+          item.totalScore = maxScore;
+
+          if (item.scoreThreshold != undefined) {
+            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50
+              || parseFloat(item.scoreThreshold) > parseFloat(item.maxScore)) {
+              scoreFlagObj.flags.flagMinScoreType = true;
+            }
+          } else {
+            item.scoreThreshold = parseFloat(item.totalScore);
+          }
+        }
+        if (item.description != undefined) {
+          if (filterString.getContentLength(item.f.toString().trim()) > 1200) {
+            scoreFlagObj.flags.flagDesLengthScore = true;
+          }
+        }
+      })
+      return scoreFlagObj;
+    },
+
+    validateOtherData(scoreArr) {
+      const ITEMSLENGTH = 250;
+      let otherFlagObj = {
+        indexArrOthers: [],
+        indexSubCatergyOthers: [],
+        flags: {
+          flagGroupLengthOthers: false,
+          flagSubGroupLengthOthers: false,
+          flagItemNameOthers: false,
+          flagItemLengthOthers: false,
+          flagOtherScoreType: false,
+          flagDesLengthOthers: false
+        }
+      };
+      scoreArr.forEach((item, index) => {
+        if (item.catergyName != undefined && item.catergyName.length != 0) {
+          otherFlagObj.indexArrOthers.push(index);
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+            otherFlagObj.flags.flagGroupLengthOthers = true;
+          }
+        }
+        if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
+          otherFlagObj.indexSubCatergyOthers.push(index);
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+            otherFlagObj.flags.flagSubGroupLengthOthers = true;
+          }
+        }
+        if (item.itemName == undefined || item.itemName.length == 0) {
+          otherFlagObj.flags.flagItemNameOthers = true;
+        } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
+          otherFlagObj.flags.flagItemLengthOthers = true;
+        }
+        if (item.score == undefined || item.score.length == 0 || isNaN(item.score)
+          || parseFloat(item.score) < -100 || parseFloat(item.score) > 100) {
+          // 项目分值必填，字符类型为-100~+100
+          otherFlagObj.flags.flagOtherScoreType = true;
+        }
+        if (item.description != undefined) {
+          if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
+            otherFlagObj.flags.flagDesLengthOthers = true;
+          }
+        }
+      });
+      return otherFlagObj;
+    },
+
+
+    getWarningInfo(passFailFlag, scoreFlag, othersFlag, flagTempError){
+      const showWarningIfo = this.isObjContainValue(passFailFlag, true)
+                          || this.isObjContainValue(scoreFlag, true)
+                          || this.isObjContainValue(othersFlag, true)
+                          || flagTempError;
+      let warningInfo = [];
+      if (showWarningIfo) {
+        if (flagTempError) {
+          warningInfo.push(this.$t('insSettingView.templateError'));
+        }
+        if (passFailFlag.flagGroupLengthPassFail || scoreFlag.flagGroupLengthScore || othersFlag.flagGroupLengthOthers) {
+          const flagArr = [];
+          if (passFailFlag.flagGroupLengthPassFail) {
+            flagArr.push('PassFail');
+          }
+          if (scoreFlag.flagGroupLengthScore) {
+            flagArr.push('Score');
+          }
+          if (othersFlag.flagGroupLengthOthers) {
+            flagArr.push('Others');
+          }
+          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
+          warningInfo.push(flag);
+        }
+        if (passFailFlag.flagSubGroupLengthPassFail || scoreFlag.flagSubGroupLengthScore || othersFlag.flagSubGroupLengthOthers) {
+          const flagArr = [];
+          if (passFailFlag.flagSubGroupLengthPassFail) {
+            flagArr.push('PassFail');
+          }
+          if (scoreFlag.flagSubGroupLengthScore) {
+            flagArr.push('Score');
+          }
+          if (othersFlag.flagSubGroupLengthOthers) {
+            flagArr.push('Others');
+          }
+          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
+          warningInfo.push(flag);
+        }
+        if (passFailFlag.flagItemNamePassFail || scoreFlag.flagItemNameScore || othersFlag.flagItemNameOthers) {
+          const flagArr = [];
+          if (scoreFlag.flagItemNameScore) {
+            const flag = 'Score' + ' ' + this.$t('insSettingView.excelEmpty');
+            warningInfo.push(flag);
+          }
+          if (passFailFlag.flagItemNamePassFail ||  othersFlag.flagItemNameOthers) {
+            if (passFailFlag.flagItemNamePassFail) {
+              flagArr.push('PassFail');
+            }
+            if (othersFlag.flagItemNameOthers) {
+              flagArr.push('Others');
+            }
+            const flag = flagArr.toString() + ' ' + this.$t('insSettingView.passfailexcelEmpty');
+            warningInfo.push(flag);
+          }
+        }
+        if (passFailFlag.flagItemLengthPassFail || scoreFlag.flagItemLengthScore || othersFlag.flagItemLengthOthers) {
+          const flagArr = [];
+          if (passFailFlag.flagItemLengthPassFail) { flagArr.push('PassFail'); }
+          if (scoreFlag.flagItemLengthScore) { flagArr.push('Score'); }
+          if (othersFlag.flagItemLengthOthers) { flagArr.push('Others'); }
+          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongItem');
+          warningInfo.push(flag);
+        }
+        if (passFailFlag.flagDesLengthPassFail || scoreFlag.flagDesLengthScore || othersFlag.flagDesLengthOthers) {
+          const flagArr = [];
+          if (passFailFlag.flagDesLengthPassFail) { flagArr.push('PassFail'); }
+          if (scoreFlag.flagDesLengthScore) { flagArr.push('Score'); }
+          if (othersFlag.flagDesLengthOthers) { flagArr.push('Others'); }
+          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelIllegalDes');
+          warningInfo.push(flag);
+        }
+        if (passFailFlag.flagPassFailScoreType) {
+          warningInfo.push('PassFail' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));
+        }
+        if (scoreFlag.flagFullScoreType) {
+          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelFullScoreType'));
+        }
+        if (scoreFlag.flagMinScoreType) {
+          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelMinScoreType'));
+        }
+        if (othersFlag.flagOtherScoreType) {
+          warningInfo.push('Others' + ' ' + this.$t('insSettingView.excelOtherScoreType'));
+        }
+        if(scoreFlag.flagScoreItemType){
+          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemType'));
+        }
+        if(scoreFlag.flagScoreItemEmpty){
+          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemEmpty'));
+        }
+      }
+      return warningInfo;
+    },
+
+    getPassAndFailArrData(sheetData, indexArray, subCatergyIndexArr){
+      let passFailSheet = [];
+      if (sheetData != undefined) {
+        if (indexArray.length !== 0) {
+          for (let i = 0; i < indexArray.length; i++) {
+            const subCatergyArr = [];
+            for(let subIndex = 0; subIndex < subCatergyIndexArr.length; subIndex++){
+              subCatergyArr[subIndex] = sheetData.slice(indexArray[subIndex], indexArray[subIndex + 1]);
+            }
+            passFailSheet[i] = sheetData.slice(indexArray[i], indexArray[i + 1]);
+          }
+        } else {
+          if (sheetData.length !== 0) {
+            passFailSheet.push(sheetData);
+            passFailSheet[0][0].a = this.$t('insSettingView.Ratingitems');
+          }
+        }
+      }
+      return passFailSheet;
+    },
+
+    getScoreArrData(sheetData, indexArray){
+      let scoreSheetArr = [];
+      if (sheetData != undefined) {
+        if (indexArray.length !== 0) {
+          for (let i = 0; i < indexArray.length; i++) {
+            scoreSheetArr[i] = sheetData.slice(indexArray[i], indexArray[i + 1]);
+          }
+        }
+      }
+      return scoreSheetArr;
+    },
+
+    getOtherArrData(sheetData, indexArray){
+      let otherSheetArr = [];
+      if (sheetData != undefined) {
+        if (indexArray.length !== 0) {
+          for (let i = 0; i < indexArray.length; i++) {
+            otherSheetArr[i] = sheetData.slice(indexArray[i], indexArray[i + 1]);
+          }
+        } else {
+          if (sheetData.length != 0) {
+            otherSheetArr.push(sheetData);
+            otherSheetArr[0][0].a = this.$t('insSettingView.Addscoreitems');
+          }
+        }
+      }
+      return otherSheetArr;
+    },
+
+    isObjContainValue(object, value){
+      return Object.values(object).includes(value);
+    },
 
     getFloat (value) {
       let str = value.toString();
