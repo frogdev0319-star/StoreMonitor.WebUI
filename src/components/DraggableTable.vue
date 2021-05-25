@@ -1,6 +1,6 @@
 <template>
-    <div class="dragable-table-content">
-      <div class="dragable-table-header">
+    <div :class="showTableHeader ? 'dragable-table-content' : 'dragable-noheader-table-content'">
+      <div class="dragable-table-header" v-if="showTableHeader">
         <div class="table-header-item" v-for="(headerItem, headerIndex) in tableHeader" :key="headerIndex"
              :style="headerItem.headerStyle">
           {{ headerItem.name }}
@@ -22,16 +22,22 @@
             <div class="table-score">
               {{ contentItem.score}}
             </div>
-            <template v-if="tableHeader.length > 4">
+            <template v-if="isScoreSheet">
               <div class="table-available-score">
-                {{ contentItem.availableScores}}
+                <template v-if="!showTableHeader">
+                  <icon-tooltip :content="contentItem.availableScores" placement="top">
+                    <div>{{ contentItem.availableScores}}</div>
+                  </icon-tooltip>
+                </template>
+                <template v-else>{{ contentItem.availableScores}}</template>
               </div>
               <div class="table-available-score">
                 {{ contentItem.qualifiedScore}}
               </div>
             </template>
-            <div class="nape-items-handle">
-              <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;" @click="handleEdit(contentIndex,contentItem)"/>
+            <div class="table-operation">
+              <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;"
+                 @click="handleEdit(contentIndex,contentItem)" v-if="showEditBtn"/>
               <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(contentIndex, contentItem)"/>
             </div>
           </div>
@@ -42,6 +48,7 @@
 
 <script>
   import draggable from 'vuedraggable';
+  import IconTooltip from "./IconTooltip";
 
   export default {
     name: "DragableTable",
@@ -57,9 +64,17 @@
       isScoreSheet: {
         type: Boolean,
         default: false
+      },
+      showEditBtn:{
+        type: Boolean,
+        default: true
+      },
+      showTableHeader: {
+        type: Boolean,
+        default: true
       }
     },
-    components: { draggable },
+    components: {IconTooltip, draggable },
     data(){
       return {
         sortableTableData: this.tableData
@@ -90,6 +105,35 @@
     margin-left: 4%;
     box-sizing: border-box;
   }
+  .dragable-noheader-table-content{
+    box-sizing: border-box;
+    .table-content-item{
+      padding-left: calc(27/1920*100vw);
+      border-bottom: 1px solid #e3e9f4;
+    }
+    .table-checkbox-name{
+      width: 27%;
+      .table-name{
+        margin-left: 0;
+        padding-left: calc(38/1920*100vw);
+      }
+    }
+    .table-description{
+      width: 45%;
+    }
+    .table-score{
+      width: 16%;
+    }
+    .table-operation{
+      width: 18%;
+    }
+    .table-available-score{
+      width: 18%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
   .dragable-table-header, .table-content-item{
     display: flex;
     justify-content: space-between;
@@ -118,7 +162,7 @@
       height: 14px;
     }
   }
-  .table-score, .nape-items-handle, .table-available-score{
+  .table-score, .table-operation, .table-available-score{
     width: 12.5%;
   }
 
@@ -135,7 +179,7 @@
     text-align: left;
   }
 
-  .nape-items-handle{
+  .table-operation{
     display: inline-block;
     .iconfont{
       font-size: calc(24/1920*100vw);
@@ -146,7 +190,7 @@
   .sortable-ghost{
     color: #424151 !important;
     background: rgba(243, 19, 101, 0.1) !important;
-    border: 1px solid #f31d65;
+    border: 1px solid #f31d65 !important;
   }
 
 </style>
