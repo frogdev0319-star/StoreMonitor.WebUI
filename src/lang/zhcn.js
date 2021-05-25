@@ -555,6 +555,7 @@ export default {
     'templateError': '巡检表模板错误！',
     'templateEmpty': '巡检表不能为空！',
     'excelLongCategory': '巡检类别长度不可超过30个字符！',
+    'subCategoryLength': '巡检子类别长度不可超过30个字符！',
     'excelIllegalCategory': '存在“@#￥%^&*”非法字符！',
     'excelEmpty': '巡检类别与巡检项名称不能为空',
     'passfailexcelEmpty': '巡检项名称不能为空！',
@@ -588,7 +589,7 @@ export default {
     'thenImport': '导入',
     'waveline': '按钮～',
     'selectItems': '请勾选要删除的巡检项类别或巡检项目！',
-    'deleteGroup': '确认删除当前巡检类别及其巡检项？',
+    'deleteGroup': '确认删除当前巡检类别及其子类别或巡检项？',
     'deleteSuss': '巡检项删除成功！',
     'deleteFail': '巡检项删除失败！',
     'deleteInspectSuss': '巡检表删除成功！',
@@ -626,7 +627,11 @@ export default {
     'addSuss': '添加成功',
     'addFail': '添加失败',
     'needBind': '表，需要绑定的门店',
-    'itemsOfCate': '类别巡检项'
+    'itemsOfCate': '类别巡检项',
+    'catergyName': '巡检类别名称',
+    'parentCatergyName': '上级巡检类别',
+    'parentCatergyNameTooltip1': '1. 一级类别若存在直属巡检项目，系统不允许创建子类别',
+    'parentCatergyNameTooltip2': '2. 一级类别中若存在子类别，系统不允许调整为二级类别'
   },
 
   // Device Management page language

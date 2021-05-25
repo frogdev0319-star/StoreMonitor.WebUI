@@ -549,6 +549,7 @@ export default {
     'templateError': 'The template of inspection tableis wrong!!',
     'templateEmpty': 'The inspection table cannot be empty!',
     'excelLongCategory': 'The length of category supports up to 30 characters',
+    'subCategoryLength': 'The length of sub-category supports up to 30 characters',
     'excelIllegalCategory': "llegal characters '@#￥%^&*'!",
     'excelEmpty': "The inspection category and item name can't empty",
     'passfailexcelEmpty': "The inspection item can't empty",
@@ -582,7 +583,7 @@ export default {
     'thenImport': 'import',
     'waveline': '～',
     'selectItems': 'Please select items to delete!',
-    'deleteGroup': 'Confirm delete inspection category and items?',
+    'deleteGroup': 'Confirm delete inspection category and subcatergies and items?',
     'deleteSuss': 'Successfully deleted!',
     'deleteFail': 'Failed to delete',
     'deleteInspectSuss': 'Successfully deleted！',
@@ -618,7 +619,11 @@ export default {
     'searchPlaceholder': 'Enter keywords to search stores',
     'addSuss': 'Successfully added',
     'addFail': 'Failed to add',
-    'itemsOfCate': 'Inspection items of '
+    'itemsOfCate': 'Inspection items of ',
+    'catergyName': 'Category Name',
+    'parentCatergyName': 'Superior inspection category',
+    'parentCatergyNameTooltip1': '1. If there is a direct inspection item in the first category, the system does not allow subcategories',
+    'parentCatergyNameTooltip2': '2. If there are sub-categories in the first-level category, the system does not allow adjustment to \n                                 the second-level category',
   },
 
   // Device Management page language

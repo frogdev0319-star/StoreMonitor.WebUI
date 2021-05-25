@@ -555,6 +555,7 @@ export default {
     'templateError': '巡檢表樣板錯誤！',
     'templateEmpty': '巡檢表不能為空！',
     'excelLongCategory': '巡檢類別長度不可超過30個字元！',
+    'subCategoryLength': '巡檢子類別長度不可超過30個字元！',
     'excelIllegalCategory': '存在“@#￥%^&*”非法字符！',
     'excelEmpty': '巡檢類別與巡檢項名稱不能為空',
     'passfailexcelEmpty': '巡检项不能為空！',
@@ -588,7 +589,7 @@ export default {
     'thenImport': '導入',
     'waveline': '按鈕～',
     'selectItems': '請勾選要刪除的巡檢項類別或巡檢專案！',
-    'deleteGroup': '確認刪除當前巡檢類別及其巡檢項？',
+    'deleteGroup': '確認刪除當前巡檢類別及其子類別或巡檢項？',
     'deleteSuss': '巡檢項刪除成功！',
     'deleteFail': '巡檢項刪除失敗！',
     'deleteInspectSuss': '巡檢表刪除成功！',
@@ -626,7 +627,11 @@ export default {
     'addSuss': '添加成功',
     'addFail': '添加失敗',
     'needBind': '表，需要綁定的門店',
-    'itemsOfCate': '類別巡檢項'
+    'itemsOfCate': '類別巡檢項',
+    'catergyName': '巡檢類別名稱',
+    'parentCatergyName': '上級巡檢類別',
+    'parentCatergyNameTooltip1': '1. 一級類別若存在直屬巡檢項目，系統不允許創建子類別',
+    'parentCatergyNameTooltip2': '2. 一級類別中若存在子類別，系統不允許調整為二級類別'
   },
 
   // Device Management page language
