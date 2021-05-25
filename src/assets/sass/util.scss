@@ -341,3 +341,28 @@ $black: #182752;
   color: #7d8cad;
   font-size: calc(24/1920*100vw);
 }
+
+.input-form-slot{
+  flex-direction: column;
+}
+
+.error-text{
+  font-size: 12px;
+  color: red;
+  position: relative;
+}
+.error-text span{
+  position: absolute;
+}
+
+.dialog-form-item-name{
+  height: 28px;
+  line-height: 28px;
+  display: inline-flex;
+}
+
+.dialog-form-item{
+  width: 100%;
+  height: 56px;
+  margin-bottom: 18px;
+}
