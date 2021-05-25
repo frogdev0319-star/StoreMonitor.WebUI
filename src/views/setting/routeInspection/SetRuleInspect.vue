@@ -14,55 +14,114 @@
       </div>
     </el-col>
     <el-col :span="24" class="el-rute-content">
-      <p class="rule-title">{{ $t('insSettingView.PatrolScoreCalculation') }}</p>
-      <p class="rule-item"><el-checkbox v-model="includedInTotalScoreWithType1">{{ $t('insSettingView.PSCrule1') }}Tab1
-      （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}</el-checkbox></p>
-      <p class="rule-item"><el-checkbox v-model="qualifiedForIgnoredWithType1"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab1（{{ $t('insSettingView.sheetpassfail') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span></el-checkbox></p>
-      <p class="rule-item"><el-checkbox v-model="qualifiedForIgnoredWithType2"><span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}</span> Tab2（{{ $t('insSettingView.sheetscore') }}）<span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span> </el-checkbox></p>
-      <p class="rule-score">{{ $t('insSettingView.CalculationMethod') }}：</p>
-      <p class="rule-item">
-        <el-radio v-model="hundredMarkType" label="0" class="radio">{{ $t('insSettingView.Proportional') }}</el-radio>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          placement="bottom-end">
-          <div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>
-          <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
-        </el-tooltip>
-        <el-radio v-model="hundredMarkType" label="-1" class="radio" style="margin-left: calc(40/1920*100vw);">{{ $t('insSettingView.totalScore') }}</el-radio>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          placement="bottom-end">
-          <div slot="content">{{ $t('insSettingView.totalScoreDes') }}</div>
-          <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
-        </el-tooltip>
-      </p>
-      <p class="rule-item">
-        <span class="rangeScore">{{ $t('insSettingView.totalScorRange') }}：</span>
-        <el-input :placeholder="$t('insSettingView.setMinScore')" v-model="minScore" class="input" @input="inputChangeMin"/>
-        <span class="input-text">{{ $t('remotePatrol.scorecount') }}~</span>
-        <el-input :placeholder="$t('insSettingView.setMaxScore')" v-model="maxScore" class="input" @input="inputChangeMax"/>
-        <span class="input-text">{{ $t('remotePatrol.scorecount') }}</span>
-        <span v-if="ScoreMsg" class="score_msg">*{{ $t('insSettingView.rangeScoreTips') }}</span>
-      </p>
+      <setting-table :table-name="$t('insSettingView.PatrolScoreCalculation')">
+        <div slot="tableDetail">
+          <p class="rule-item">
+            <el-checkbox v-model="includedInTotalScoreWithType1">
+              {{ $t('insSettingView.PSCrule1') }}Tab1
+            （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}
+            </el-checkbox>
+          </p>
+          <p class="rule-item">
+            <el-checkbox v-model="qualifiedForIgnoredWithType1">
+              <span v-if="lang==='en'">
+                {{ $t('insSettingView.PSCrule3') }}
+              </span> Tab1（{{ $t('insSettingView.sheetpassfail') }}）
+              <span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span>
+            </el-checkbox>
+          </p>
+          <p class="rule-item">
+            <el-checkbox v-model="qualifiedForIgnoredWithType2">
+              <span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}
+              </span>
+              Tab2（{{ $t('insSettingView.sheetscore') }}）
+              <span v-if="lang!=='en'">
+                {{ $t('insSettingView.PSCrule3') }}
+              </span>
+            </el-checkbox>
+          </p>
+          <p class="rule-score">
+            {{ $t('insSettingView.CalculationMethod') }}：
+          </p>
+          <p class="rule-item">
+            <el-radio v-model="hundredMarkType" label="0" class="radio">
+              {{ $t('insSettingView.Proportional') }}
+            </el-radio>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              placement="bottom-end">
+              <div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>
+              <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
+            </el-tooltip>
+            <el-radio v-model="hundredMarkType" label="-1" class="radio" style="margin-left: calc(40/1920*100vw);">
+              {{ $t('insSettingView.totalScore') }}
+            </el-radio>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              placement="bottom-end">
+              <div slot="content">{{ $t('insSettingView.totalScoreDes') }}</div>
+              <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
+            </el-tooltip>
+          </p>
+          <p class="rule-item">
+            <span class="rangeScore">
+              {{ $t('insSettingView.totalScorRange') }}：
+            </span>
+            <el-input :placeholder="$t('insSettingView.setMinScore')" v-model="minScore" class="input" @input="inputChangeMin"/>
+            <span class="input-text">
+              {{ $t('remotePatrol.scorecount') }}~
+            </span>
+            <el-input :placeholder="$t('insSettingView.setMaxScore')" v-model="maxScore" class="input" @input="inputChangeMax"/>
+            <span class="input-text">
+              {{ $t('remotePatrol.scorecount') }}
+            </span>
+            <span v-if="ScoreMsg" class="score_msg">*{{ $t('insSettingView.rangeScoreTips') }}</span>
+          </p>
+        </div>
+      </setting-table>
     </el-col>
     <el-col :span="24" class="el-rute-content">
-      <p class="rule-title">{{ $t('insSettingView.isCheckSuggest') }}</p>
-      <p class="rule-item">
-        <el-checkbox v-model="dangerousOnFailedItem">
-          <span v-if="lang!=='en'">Tab1（{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.patrolSuggest') }}</span>
-          <span v-else>When there are unqualified items in Tab1 ({{ $t('insSettingView.sheetpassfail') }}), the inspection result is: Dangerous.</span>
-        </el-checkbox>
-      </p>
+      <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
+        <div slot="tableDetail">
+          <p class="rule-item">
+            <el-checkbox v-model="dangerousOnFailedItem">
+              <span v-if="lang!=='en'">
+                Tab1（{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.patrolSuggest') }}
+              </span>
+              <span v-else>
+                When there are unqualified items in Tab1 ({{ $t('insSettingView.sheetpassfail') }}),
+                the inspection result is: Dangerous.
+              </span>
+            </el-checkbox>
+          </p>
+        </div>
+      </setting-table>
     </el-col>
-    <el-col :span="24" class="el-rute-content" style="margin-bottom:40px;" v-if="mode===1">
-      <p class="rule-title">{{ $t('insSettingView.isCheckAnnex') }}</p>
-      <p class="rule-item">
-        <el-checkbox v-model="onSitePhotoOnly">
-          <span>{{ $t('insSettingView.AllowPhotos') }}</span>
-        </el-checkbox>
-      </p>
+    <el-col :span="24" class="el-rute-content" v-if="mode === 1">
+      <setting-table :table-name="$t('insSettingView.isCheckAnnex')">
+        <div slot="tableDetail">
+          <p class="rule-item">
+            <el-checkbox v-model="onSitePhotoOnly">
+              <span>
+                {{ $t('insSettingView.AllowPhotos') }}
+              </span>
+            </el-checkbox>
+          </p>
+        </div>
+      </setting-table>
+    </el-col>
+    <el-col :span="24" class="el-rute-content" style="margin-bottom:20px;" v-if="mode === 1">
+      <setting-table :table-name="$t('insSettingView.inspectionSignature')">
+        <div class="setting-config rule-item" slot="tableDetail">
+          <el-checkbox v-model="onSiteSignature">
+            <span>
+              {{ $t('insSettingView.needSignatrue') }}
+            </span>
+          </el-checkbox>
+        </div>
+      </setting-table>
     </el-col>
   </el-row>
 </template>
@@ -71,10 +130,11 @@
 import { inpectRESTful } from '@/api/index';
 import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
+import SettingTable from '@/components/SettingTable';
 
 export default {
   name: 'SetRuleInspect',
-  components: { DelayButton },
+  components: { SettingTable, DelayButton },
   data() {
     return {
       hundredMarkType: '',
@@ -89,7 +149,8 @@ export default {
       ScoreMsg: false,
       inspectId: 0,
       routeName: '',
-      mode:0
+      mode:0,
+      onSiteSignature: true
     }
   },
   mounted() {
@@ -111,6 +172,7 @@ export default {
             { name: 'maxScore', value: parseFloat(self.maxScore) },
             { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
             { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
+            { name: 'onSiteSignature', value: self.onSiteSignature },
           ]
         };
         const res = await self.updateInspectRule(params);
@@ -158,6 +220,9 @@ export default {
                 break;
               case 'onSitePhotoOnly':
                 self.onSitePhotoOnly = item.value;
+                break;
+              case 'onSiteSignature':
+                self.onSiteSignature = item.value;
                 break;
               default:
                 break;
@@ -262,7 +327,6 @@ $itemHeight:50px;
     .el-rute-content{
         margin-top: 20px;
         padding-bottom: 20px;
-        border: 1px solid #e3e9f4;
         .rule-title{
             height:40px;
             margin:0;

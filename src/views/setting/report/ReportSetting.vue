@@ -10,7 +10,7 @@
           </div>
         </div>
       </div>
-      <div class="setting-details">
+      <div class="setting-details self-loading" v-loading="isLoadingData">
         <div class="content-titles">
           <button-list :name-list="templateList" :cur-template-index="curTemplateIndex" @click="displayTemplateInfo"></button-list>
           <div class="buttons">
@@ -52,49 +52,49 @@
             </div>
           </div>
           <div class="inspect-basic">
-            <div class="titles-header">
-              {{$t('titleView.basicInfo')}}
-            </div>
-            <div class="table-header basic-header">
-              <div class="title-name">{{$t('titleView.componentName')}}</div>
-              <div class="title-status">{{$t('titleView.componentStatus')}}</div>
-              <div class="title-operation">{{$t('titleView.operation')}}</div>
-            </div>
-            <div class="setting-config basic-config" v-for="item in basicList" :key="item.position">
-              <div class="title-name">{{$t(`titleView.${item.name}`)}}</div>
-              <div class="title-status"><el-switch v-model="item.enable"></el-switch></div>
-              <div class="title-operation">
-                <span class="iconfont icon-gengduo" v-if="item.name === 'statistics'" @click="setStatusDetail(item)"></span>
-              </div>
-            </div>
-          </div>
-          <div class="inspect-detail">
-            <div class="titles-header">
-              {{$t('remotePatrol.detailInfo')}}
-            </div>
-            <div class="detail-setting">
-              <div>
-                <el-radio-group v-model="ifShowAllDetails" class="radio-setting" textColor="#7d8cad">
-                  <el-radio :label="1">{{$t('titleView.showAllDetails')}}</el-radio>
-                  <el-radio :label="0">{{$t('titleView.showPartsDetails')}}</el-radio>
-                </el-radio-group>
-              </div>
-              <template v-if="ifShowAllDetails === 0">
-                <div class="table-header">
+            <setting-table :table-name="$t('titleView.basicInfo')">
+              <template slot="tableDetail">
+                <div class="table-header basic-header">
                   <div class="title-name">{{$t('titleView.componentName')}}</div>
                   <div class="title-status">{{$t('titleView.componentStatus')}}</div>
+                  <div class="title-operation">{{$t('titleView.operation')}}</div>
                 </div>
-                <draggable v-model="list">
-                  <div class="setting-config" v-for="item in list" :key="item.position">
-                    <template v-if="item.position !== 8">
-                      <div class="title-name">{{$t(`titleView.${item.name}`)}}</div>
-                      <div class="title-status"><el-switch v-model="item.enable"></el-switch></div>
-                    </template>
+                <div class="setting-config basic-config" v-for="item in basicList" :key="item.position">
+                  <div class="title-name">{{$t(`titleView.${item.name}`)}}</div>
+                  <div class="title-status"><el-switch v-model="item.enable"></el-switch></div>
+                  <div class="title-operation">
+                    <span class="iconfont icon-gengduo" v-if="item.name === 'statistics'" @click="setStatusDetail(item)"></span>
                   </div>
-                </draggable>
+                </div>
               </template>
-            </div>
+            </setting-table>
           </div>
+          <setting-table :table-name="$t('remotePatrol.detailInfo')">
+            <template slot="tableDetail">
+              <div class="detail-setting">
+                <div>
+                  <el-radio-group v-model="ifShowAllDetails" class="radio-setting" textColor="#7d8cad">
+                    <el-radio :label="1">{{$t('titleView.showAllDetails')}}</el-radio>
+                    <el-radio :label="0">{{$t('titleView.showPartsDetails')}}</el-radio>
+                  </el-radio-group>
+                </div>
+                <template v-if="ifShowAllDetails === 0">
+                  <div class="table-header">
+                    <div class="title-name">{{$t('titleView.componentName')}}</div>
+                    <div class="title-status">{{$t('titleView.componentStatus')}}</div>
+                  </div>
+                  <draggable v-model="list" class="detail-table">
+                    <div class="setting-config" v-for="item in list" :key="item.position">
+                      <template v-if="item.position !== 8">
+                        <div class="title-name">{{$t(`titleView.${item.name}`)}}</div>
+                        <div class="title-status"><el-switch v-model="item.enable"></el-switch></div>
+                      </template>
+                    </div>
+                  </draggable>
+                </template>
+              </div>
+            </template>
+          </setting-table>
         </div>
         <div class="save-btn">
           <delay-button
@@ -151,16 +151,17 @@
   import draggable from 'vuedraggable';
   import DialogPop from '@/components/DialogPop';
   import ButtonList from '@/components/ButtonList';
+  import SettingTable from '../../../components/SettingTable';
 
   export default {
     name: 'reportSetting',
-    components: { ButtonList, DialogPop, DelayButton, draggable },
+    components: { SettingTable, ButtonList, DialogPop, DelayButton, draggable },
     data(){
       return {
         curTemplate: 0,
         templateList: [],
         showTemplateTip: false,
-        isLoadingData: false,
+        isLoadingData: true,
         list: [],
         curTemplateIndex: 0,
         templateNameTip: '',
@@ -196,6 +197,7 @@
             this.basicList = [];
             this.curTemplateIndex = 0;
           }
+          this.isLoadingData = false;
         }).catch(err => {
           console.log('ReportSetting:' + err);
         })
@@ -327,7 +329,7 @@
           return false;
         }
         this.curTemplate.id === -1 ? this.templateList.splice(this.curTemplateIndex, 1) : this.deleteReportTemplateFromDB();
-        this.curTemplateIndex--;
+        this.curTemplateIndex > 0 ? this.curTemplateIndex-- : 0;
         this.curTemplate = JSON.parse(JSON.stringify(this.templateList[this.curTemplateIndex]));
         this.setBasicAndDetailList();
       },
@@ -512,8 +514,8 @@
     text-align: left;
     padding-bottom: calc(20/1920*100vw);
     display: flex;
-    align-items: flex-start;
-    margin-top: 30px;
+    align-items: center;
+    margin-top: 20px;
   }
   .left-item, .right-item{
     display: inline-flex;
@@ -556,30 +558,22 @@
   .error-text span{
     position: absolute;
   }
-  .titles-header, .setting-config, .table-header{
+  .setting-config, .table-header{
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    height: 50px;
+    height: 60px;
   }
   .table-header{
     color: #424151;
     border: 1px solid #e3e9f4;
+    border-bottom: none;
     font-weight: bold;
+    background-color: #fff;
   }
 
-  .titles-header{
-    color: #2C3E50;
-    font-weight: bolder;
-    background-color: #e3e9f4;
-    padding-left: 10px;
-    border: 1px solid #e3e9f4;
-  }
-  .inspect-detail{
-    border: 1px solid #e3e9f4;
-  }
   .detail-setting{
-    padding: 0 calc(30/1920*100vw) 30px;
+    padding: 0 calc(30/1920*100vw);
   }
   .radio-setting{
     display: flex;
@@ -592,17 +586,15 @@
     height: 30px;
   }
   .setting-config{
-    height: 60px;
-    border: 1px solid #e3e9f4;
-    border-top: none;
+    border-bottom: 1px solid #e3e9f4;
   }
-  .setting-config:nth-child(2n){
-    background-color: #f4f5f9;
-  }
+
   .setting-config:hover{
     cursor: pointer;
   }
   .basic-config, .basic-header{
+    border: none;
+    border-bottom: 1px solid #e3e9f4;
     padding-left: calc(30/1920*100vw);
   }
   .basic-config:hover{
@@ -611,7 +603,7 @@
   .title-name{
     width: 20%;
     text-align: left;
-    margin-left: 20px;
+    margin-left: calc(20/1920*100vw);
   }
   .title-status{
     width: 20%;
@@ -655,5 +647,12 @@
   }
   >>> .el-radio__input.is-checked + .el-radio__label{
     color: #424151;
+  }
+  .detail-table{
+    border: 1px solid #e3e9f4;
+    padding-bottom: 20px;
+  }
+  .detail-table .setting-config{
+    padding-left: 0;
   }
 </style>

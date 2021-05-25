@@ -735,8 +735,6 @@ export default {
       }
       self.showError = false;
       self.times = 0;
-      console.log('new:', newValue);
-      console.log(self.curTime);
       self.startTs = newValue;
       if (newValue === 0) {
         self.playBack = false;
@@ -1310,7 +1308,7 @@ export default {
         this.errorMsg = this.$t('remotePatrol.videoLicense');
         return;
       }
-      if (self.isStoreMonitor && !self.isLoaded) {
+      if (self.isStoreMonitor) {
         self.checkIfEncry();
         self.isLoaded = true;
       } else {

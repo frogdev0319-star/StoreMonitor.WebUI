@@ -342,6 +342,15 @@ $black: #182752;
   font-size: calc(24/1920*100vw);
 }
 
+.setting-config{
+  border-bottom: 1px solid #e3e9f4;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 60px;
+  padding-left: calc(30/1920*100vw);
+}
+
 .input-form-slot{
   flex-direction: column;
 }

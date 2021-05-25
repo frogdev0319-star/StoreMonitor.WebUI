@@ -1058,14 +1058,13 @@ export default {
 
     importItem() {
       const self = this;
-      const ret = self.isLoginIn();
       const isGlobalWebsite = Environment.isGlobalWebsite;
       if (isGlobalWebsite) {
         const Datalength = self.elTableData[Number(self.activeName)].data.length;
-        if (Number(self.activeName) === 1 && Datalength >= 10) {
+        if (Number(self.activeName) === 1 && Datalength >= 20) {
           util.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
           return false;
-        } else if (Number(self.activeName) === 0 && Datalength >= 10) {
+        } else if (Number(self.activeName) === 0 && Datalength >= 20) {
           util.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
           return false;
         } else {
