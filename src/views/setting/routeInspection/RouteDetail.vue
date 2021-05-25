@@ -43,63 +43,29 @@
         <el-scrollbar id="el-menuscrollbar">
           <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
             <div v-for="(item,index) in routeData" :key="index" class="data-content">
-              <div v-if="index === 0" class="header-content tabTitle">
-                <el-checkbox v-model="allchecked" class="allcheckBox" @change="changeAllData"/>
-                <span class="name-title">{{ $t('insSettingView.inspectName') }}</span>
-                <span v-if="isScoreItemActive">
-                  <span class="score-item-description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
-                  <span class="total-score">{{ $t('insSettingView.sheetscore0') }}</span>
-                  <span class="options-title">{{ $t('insSettingView.sheetscore3') }}</span>
-                  <span class="limitation-title" >{{ $t('insSettingView.sheetscore1') }}</span>
-                </span>
-                <span v-else>
-                  <span class="description-title">{{ $t('insSettingView.inspectionDescp') }}</span>
-                  <span class="score-title">{{ $t('insSettingView.score') }}</span>
-                </span>
-                <span :class="lang === 'en' ? 'en-handle-title' : 'handle-title'">{{ $t('insSettingView.operation') }}</span>
+              <div class="dragable-table-header" v-if="index === 0">
+                <div class="table-header-item" v-for="(headerItem, headerIndex) in tableHeader" :key="headerIndex"
+                     :style="headerItem.headerStyle">
+                  <el-checkbox v-model="allchecked" class="allcheckBox" @change="checkAllItems" v-if="headerIndex === 0"/>
+                  {{ headerItem.name }}
+                </div>
               </div>
-              <div class="table-header-title">
-                <el-checkbox v-model="item.checked" class="all-checkBox" @change="change(item)"/>
+              <div class="catergy-title">
+                <el-checkbox v-model="item.checked" class="all-checkBox" @change="checkItemsOfCatergy(item)"/>
                 <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
               </div>
+              <div class="catergy-title subcatergy-title">
+                <el-checkbox v-model="item.checked" class="all-checkBox" @change="checkItemsOfSubCatergy(item)"/>
+                <span class="table-title">{{ item.groupName }}</span>
+              </div>
               <div v-if="item.itemData.length !== 0" class="table-class">
-                <el-table
-                  :data="item.itemData"
-                  :ref="item.refId"
-                  :show-header="false"
-                  size="medium">
-                  <el-table-column prop="checked" width="70px" align="center">
-                    <template slot-scope="scope">
-                      <span v-if="scope.row.isNew" class="showNewContent">new</span>
-                      <el-checkbox
-                        v-model="scope.row.checked"
-                        style="position:relative;bottom:1px;"
-                        @change="selectRow(index,item,scope.$index,scope.row)"/>
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="name" width="300px"/>
-                  <el-table-column :min-width="isScoreItemActive?'18%':'23%'" prop="description"/>
-                  <el-table-column :min-width="isScoreItemActive?'4%':'15%'" prop="score" align="center">
-                    <template slot-scope="scope">
-                      <span>{{ scope.row.score }}<span v-if="lang!='en'">{{ $t('insSettingView.scores') }}</span></span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column v-if="isScoreItemActive" :min-width="'8%'" prop="score" show-overflow-tooltip align="center">
-                    <template slot-scope="scope">
-                      <span>{{ scope.row.availableScores }}</span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column v-if="isScoreItemActive" prop="qualifiedScore" align="center" min-width="11%">
-                    <template slot-scope="scope">
-                      <span>{{ scope.row.qualifiedScore }}<span v-if="lang !== 'en'">{{ $t('insSettingView.scores') }}</span></span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="handle" min-width="6%">
-                    <template slot-scope="scope">
-                      <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(scope.$index, scope.row)"/>
-                    </template>
-                  </el-table-column>
-                </el-table>
+                <draggable-table
+                  :is-score-sheet= "isScoreItemActive"
+                  :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
+                  :table-data="item.itemData"
+                  :show-edit-btn="false"
+                  :show-table-header="false"
+                  @handleDeleteItem="handleDelete"/>
               </div>
             </div>
           </div>
@@ -141,10 +107,12 @@ import { getScheduleListService } from '@/api/schedule';
 import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
 import DialogPop from '@/components/DialogPop';
+import draggable from 'vuedraggable';
+import DraggableTable from "@/components/DraggableTable";
 
 export default {
   name: 'RouteDetail',
-  components: { DialogPop, DelayButton },
+  components: {DraggableTable, DialogPop, DelayButton , draggable},
   props: {
     routeData: Array,
     tabName: String,
@@ -189,14 +157,85 @@ export default {
       showSheet0: true,
       showSheet1: false,
       showSheet2: false,
-      curSheet: -1
+      curSheet: -1,
+      passFailTableHeader: [
+        {
+          name: this.$t('insSettingView.inspectName'),
+          headerStyle:{
+            width: '27%',
+            textAlign: 'left',
+          },
+        },
+        {
+          name: this.$t('insSettingView.inspectionDescp'),
+          headerStyle:{
+            width: '45%',
+            textAlign: 'left'
+          },
+        },
+        {
+          name: this.$t('insSettingView.score'),
+          headerStyle:{
+            width: '16%'
+          },
+        },
+        {
+          name: this.$t('insSettingView.operation'),
+          headerStyle:{
+            width: '18%'
+          },
+        },
+      ],
+      scoreTableHeader: [
+        {
+          name: this.$t('insSettingView.inspectName'),
+          headerStyle:{
+            width: '27%',
+            textAlign: 'left'
+          },
+        },
+        {
+          name: this.$t('insSettingView.inspectionDescp'),
+          headerStyle:{
+            width: '25%',
+            textAlign: 'left'
+          },
+        },
+        {
+          name: this.$t('insSettingView.sheetscore0'),
+          headerStyle:{
+            width: '16%'
+          },
+        },
+        {
+          name: this.$t('insSettingView.sheetscore3'),
+          headerStyle:{
+            width: '18%'
+          },
+        },
+        {
+          name: this.$t('insSettingView.sheetscore1'),
+          headerStyle:{
+            width: '18%'
+          },
+        },
+        {
+          name: this.$t('insSettingView.operation'),
+          headerStyle:{
+            width: '18%'
+          },
+        },
+      ],
     };
   },
 
   computed: {
     isScoreItemActive() {
       return this.sheetName.some(item => item.id === 1 && item.isClick);
-    }
+    },
+    tableHeader(){
+      return this.isScoreItemActive ? this.scoreTableHeader : this.passFailTableHeader;
+    },
   },
   mounted() {
     this.getNum();
@@ -213,7 +252,7 @@ export default {
       self.itemNum = allcount;
     },
 
-    changeAllData(val) {
+    checkAllItems(val) {
       console.log(val);
       const self = this;
       self.routeData.forEach(item => {
@@ -244,7 +283,7 @@ export default {
       });
     },
 
-    change(item) {
+    checkItemsOfCatergy(item) {
       const self = this;
       const arr = [];
       console.log(item);
@@ -584,7 +623,10 @@ export default {
         util.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
         return false;
       }
-    }
+    },
+
+    checkItemsOfSubCatergy(item){
+    },
 
   }
 };
@@ -627,9 +669,6 @@ export default {
                 margin-right:10px;
             }
         }
-    }
-    #el-menuscrollbar >>> .el-scrollbar__view{
-        margin-top:65px;
     }
     .detail-title{
         overflow: hidden;
@@ -702,79 +741,22 @@ export default {
         }
     }
     .data-content{
-        margin: 20px calc(20/1920*100vw);
-        margin-left: 0px;
-        overflow: hidden;
-        .header-content{
-            width: 100%;
-            margin:0px;
-            float: left;
-            overflow: hidden;
-            text-align: left;
-            padding: 15px 0 15px 27px;
-            border-bottom:1px solid #e3e9f4;
-            font-size: calc(14/1920*100vw);
-            position: absolute;
-            top:0;
-            background-color: #fff;
-            z-index: 100;
-            .allcheckBox{
-                float: left;
-                margin-right: 0;
-            }
-            .name-title{
-                float: left;
-                width: 300px;
-                margin-left: 40px;
-            }
-
-            .description-title{
-                float: left;
-                width: calc((100% - 405px) * 15.3/29);
-            }
-            .score-item-description-title{
-              float: left;
-              width: calc((100% - 405px) * 11/29);
-            }
-            .score-title{
-                float: left;
-                width: calc((100% - 405px) * 9/29);
-                padding: 0 10px;
-                text-align: center;
-            }
-            .total-score{
-               @extend .score-title;
-               width: calc((100% - 405px) * 2.5/29);
-             }
-            .options-title{
-              @extend .score-title;
-              width: calc((100% - 405px) * 4/29);
-            }
-            .limitation-title{
-              @extend .score-title;
-              width: calc((100% - 405px) * 6/29);
-            }
-            .handle-title{
-                float: left;
-                width: calc((100% - 405px) * 3/29);
-                padding-left:calc(20/1920*100vw);
-            }
-            .en-handle-title{
-              float: left;
-              width: calc((100% - 405px) * 5/29);
-            }
+      overflow: hidden;
+      width: calc(100% - 4px);
+      .catergy-title{
+        font-size: 0;
+        width:80%;
+        text-align: left;
+        margin: 15px 0 15px calc(27/1920*100vw);
+        .all-checkBox{
+          margin-right: 0;
         }
-        .table-header-title{
-            float:left;
-            width:80%;
-            text-align: left;
-            margin-bottom:calc(15/1920*100vw);
-            margin-left: 27px;
-            margin-right: 0;
-            .all-checkBox{
-                margin-right: 0;
-            }
+      }
+      .subcatergy-title{
+        .table-title{
+          font-size: 13px;
         }
+      }
       .table-class{
         .iconfont{
           font-size: calc(24/1920*100vw);
@@ -784,59 +766,25 @@ export default {
           font-size: calc(14/1920*100vw);
         }
       }
-        .table-title{
-            @include point(margin-left,38);
-            margin-left: 38px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #424151;
-        }
+      .table-title{
+        padding-left: calc(38/1920*100vw);
+        font-size: 14px;
+        font-weight: bold;
+        color: #424151;
+      }
     }
-    .el-dropbtn1{
-        position: relative;
-        bottom: 2px;
-        @include point(margin-left,10);
-    }
-    .showNewContent{
-        position: absolute;
-        display: inline-block;
-        background-color: orange;
-        top: 0px;
-        left: 5px;
-        color: #fff;
-        padding-left: 8px;
-        padding-right: 8px;
-        font-size: 12px;
-        height: 12px;
-        padding-top: 0px;
-        line-height: 10px;
-    }
-    .elradio{
-        &:last-child{
-            border-left: 1px solid #dcdfe6;
-        }
-    }
-    .data-empty{
-        margin: 0 auto;
-        margin-top: 14%;
-        position: relative;
-        .empty-title{
-            font-weight: bold;
-            span{
-                color: $mainColor;
-                cursor: pointer;
-            }
-            .downLoad-btn{
-                color:  $mainColor;
-                text-decoration: none;
-                cursor: pointer;
-            }
-        }
-    }
-    .tabName-input-content{
-        background: #fff;
-        @include point(height,73);
-        width: 100%;
+    .dragable-table-header{
+      display: flex;
+      justify-content: space-between;
+      height: 50px;
+      align-items: center;
+      padding-left: calc(27/1920*100vw);
+      border-bottom: 1px solid #e3e9f4;
+      position: relative;
+      font-size: 14px;
+      color: #909399;
+      font-weight: bold;
+      text-align: center;
     }
 </style>
 <style>
@@ -848,10 +796,6 @@ export default {
 }
 .el-dialog__body{
     padding: 0px;
-}
-.elradio .el-radio-button__inner{
-    width: 86px;
-    border-radius: 5px !important;
 }
 </style>
 
