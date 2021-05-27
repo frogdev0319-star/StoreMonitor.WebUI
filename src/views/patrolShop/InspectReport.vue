@@ -75,16 +75,16 @@
                              :style="isexportPDF ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
                         <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0"
-                             class="title-btn-failed" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
+                             class="title-btn-failed" :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }} </span>
                         </div>
                         <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1"
-                             class="title-btn-pass" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
+                             class="title-btn-pass" :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }} </span>
                         </div>
                         <div v-if="item.groupType==1 &&_item.grade!=Math.pow(-2,31)"
                              :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
-                             :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
+                             :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
                         </div>
                         <div class="total-score"
@@ -556,7 +556,7 @@ export default {
               }
             }, timer * 10);
             console.log('timer', timer);
-            document.getElementById('isNeedRemove').remove();
+            document.getElementById('isNeedRemove') && document.getElementById('isNeedRemove').remove();
             self.isexportPDF = false;
           });
           window.clearInterval(timer);
