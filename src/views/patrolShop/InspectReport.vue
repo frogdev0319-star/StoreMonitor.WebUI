@@ -371,8 +371,8 @@
           <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
                    class="radar-chart-content"/>
         </el-col>
-        <el-col v-if="pageItem.class === 'suggest'">
-          <div class="suggest-content" v-if="pageItem.data !== null && pageItem.data.length !== 0">
+        <el-col v-if="pageItem.class === 'suggest' && pageItem.data !== null && pageItem.data.length !== 0">
+          <div class="suggest-content">
             <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
             <span class="pdf_font_20" v-html="turnSuggest(pageItem.data)"/>
           </div>
@@ -1477,13 +1477,13 @@ export default {
         font-weight: bold;
         background-color: $suggestBack;
         color: $qualified;
-        padding-left: calc(30 / 1920 * 100vw);
-        border: 1px solid #a0c1f8;
         max-height: 100px;
         height: auto;
         overflow-y: auto;
         .suggest-content {
           display: flex;
+          padding-left: calc(30 / 1920 * 100vw);
+          border: 1px solid #a0c1f8;
         }
         span:first-child {
           padding-right: 20px;

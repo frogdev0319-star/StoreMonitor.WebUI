@@ -1145,7 +1145,7 @@ export default {
       const pieOption = {
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)',
+          formatter: '{b} : {c} ({d}%)',
           textStyle: {
             align: 'left'
           },
