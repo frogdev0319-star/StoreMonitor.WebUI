@@ -92,86 +92,92 @@
           <div class="item-content">
             <div style="margin-bottom:20px;">
               <div v-for="(_item,_index) in item.itemList" :key="_index" class="content-detail">
-                <div v-if="index !== 2" class="content-detail-title">
-                  <div class="detail-title">
-                    <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
-                    <p class="title2">{{ _item.description }}</p>
-                  </div>
-                  <div class="score-title">
-                    <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                    <div v-if="(_item.type === 0 ||_item.type === 2)&&item.detailType !== 1" class="title-btn">
-                      {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
-                    </div>
-                    <div v-if="_item.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
-                      <span>
-                        <span>{{ _item.itemgetScore }}</span>
+                <template v-if="index !== 2" >
+                  <div class="content-title">{{ _item.name }}</div>
+                  <div v-for="(inspectItem, inspectIndex) in _item.data" :key="inspectIndex">
+                    <div class="content-detail-title">
+                      <div class="detail-title">
+                        <p class="title1">{{ inspectIndex+1 }}.{{ inspectItem.subject }}</p>
+                        <p class="title2">{{ inspectItem.description }}</p>
+                      </div>
+                      <div class="score-title">
+                        <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
+                        <div v-if="(inspectItem.type === 0 ||inspectItem.type === 2)&&item.detailType !== 1" class="title-btn">
+                          {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                        </div>
+                        <div v-if="inspectItem.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
+                          <span>
+                        <span>{{ inspectItem.itemgetScore }}</span>
                         <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
                       </span>
-                    </div>
-                    <div class="total-score" v-if="_item.showTotalScore">
-                      {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}
-                    </div>
-                  </div>
-                </div>
-                <div v-if="index === 2" class="content-detail-title" style="background-color:#fff;min-height:30px;">
-                  <div class="detail-title">
-                    <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
-                  </div>
-                </div>
-                <div
-                  v-if="index !== 2 && _item.sourceList!= null && _item.sourceList.length !== 0
-                  || _item.inspectInput != null&&_item.inspectInput !== ''"
-                  class="content-detail-main"
-                  style="padding-bottom: 20px;">
-                  <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                  <div v-if="_item.inspectInput!=null&&_item.inspectInput!=''" class="cdm-word">
-                    <span>{{ _item.inspectInput }}</span>
-                  </div>
-                  <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
-                    <div
-                      v-for="(sourceitem,sourceindex) in _item.sourceList"
-                      :key="sourceindex"
-                      :height="imgHeight+'px'"
-                      class="source-details">
-                      <div v-if="sourceitem.mediaType==2" class="img-content">
-                        <img
-                          :title="imgTitle"
-                          :src="sourceitem.src"
-                          :height="imgHeight+'px'"
-                          :onerror="deafultImg"
-                          class="imgLittle imgInner"
-                          @click="openOuter(sourceitem,$event)">
-                      </div>
-                      <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
-                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                        <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                        </div>
+                        <div class="total-score" v-if="inspectItem.showTotalScore">
+                          {{$t('remotePatrol.totalScoreUnit')}}{{inspectItem.itemScore}}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div v-if="index==2&&_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
-                  <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
-                  <div v-if="_item.description!=null&&_item.description!=''" class="cdm-word">
-                    <span>{{ _item.description }}</span>
-                  </div>
-                  <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
-                    <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
-                      <div v-if="sourceitem.mediaType==2" class="img-content">
-                        <img
-                          :title="imgTitle"
-                          :src="sourceitem.src"
-                          :height="imgHeight+'px'"
-                          :onerror="deafultImg"
-                          class="imgLittle imgInner"
-                          @click="openOuter(sourceitem,$event)">
+                    <div v-if="inspectItem.sourceList!= null && inspectItem.sourceList.length !== 0
+                      || inspectItem.inspectInput != null&&inspectItem.inspectInput !== ''"
+                           class="content-detail-main"
+                           style="padding-bottom: 20px;">
+                        <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
+                        <div v-if="inspectItem.inspectInput!=null&&inspectItem.inspectInput!=''" class="cdm-word">
+                          <span>{{ inspectItem.inspectInput }}</span>
+                        </div>
+                        <div v-if="inspectItem.sourceList!=null&&inspectItem.sourceList.length!=0" class="cdm-pic">
+                          <div
+                            v-for="(sourceitem,sourceindex) in inspectItem.sourceList"
+                            :key="sourceindex"
+                            :height="imgHeight+'px'"
+                            class="source-details">
+                            <div v-if="sourceitem.mediaType==2" class="img-content">
+                              <img
+                                :title="imgTitle"
+                                :src="sourceitem.src"
+                                :height="imgHeight+'px'"
+                                :onerror="deafultImg"
+                                class="imgLittle imgInner"
+                                @click="openOuter(sourceitem,$event)">
+                            </div>
+                            <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                              <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                              <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
-                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                        <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                    </div>
+                </template>
+                <template v-else>
+                  <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
+                    <div class="detail-title">
+                      <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
+                    </div>
+                  </div>
+                  <div v-if="_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
+                    <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
+                    <div v-if="_item.description!=null&&_item.description!=''" class="cdm-word">
+                      <span>{{ _item.description }}</span>
+                    </div>
+                    <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
+                      <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
+                        <div v-if="sourceitem.mediaType==2" class="img-content">
+                          <img
+                            :title="imgTitle"
+                            :src="sourceitem.src"
+                            :height="imgHeight+'px'"
+                            :onerror="deafultImg"
+                            class="imgLittle imgInner"
+                            @click="openOuter(sourceitem,$event)">
+                        </div>
+                        <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
+                          <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                          <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </template>
               </div>
             </div>
             <el-dialog
@@ -622,14 +628,17 @@ export default {
           item.items.forEach(s_item => {
             if (s_item.isIgnore) {
               IgnoredArr.push(s_item);
+              s_item.groupName = item.groupName;
               ignoreTemp.push(s_item);
             } else {
               if ((p_item.type === 0 || p_item.type === 2) && !s_item.isQualified) {
                 UnqualifiedArr.push(s_item);
+                s_item.groupName = item.groupName;
                 UnqualifiedTemp.push(s_item);
               } else if ((p_item.type === 0 || p_item.type === 2) && s_item.isQualified) {
                 QualifiedArr.push(s_item);
               } else if (p_item.type === 1 && (s_item.itemgetScore < s_item.qualifiedScore)) {
+                s_item.groupName = item.groupName;
                 UnqualifiedTemp.push(s_item);
               }
               if (s_item.itemgetScore !== '--') {
@@ -844,14 +853,14 @@ export default {
         itemTitleName: self.$t('remotePatrol.notableItem'),
         iconSrc: 'icon-zhongxindingwei',
         itemCount: UnqualifiedTemp.length,
-        itemList: UnqualifiedTemp,
+        itemList: this.groupbyName(UnqualifiedTemp, 'groupName'),
         detailType: 0
       };
       tempList[1] = {
         itemTitleName: self.$t('remotePatrol.ignoreds'),
         iconSrc: 'icon-hulve',
         itemCount: ignoreTemp.length,
-        itemList: ignoreTemp,
+        itemList: this.groupbyName(ignoreTemp, 'groupName'),
         detailType: 1
       };
       tempList[2] = {
@@ -863,6 +872,31 @@ export default {
       };
       self.tempList = tempList;
     },
+
+    groupbyName(data, Name) {
+      var map = {},
+        dest = [];
+      for (var i = 0; i < data.length; i++) {
+        var ai = data[i];
+        if (!map[ai[Name]]) {
+          dest.push({
+            name: ai[Name],
+            data: [ai]
+          });
+          map[ai[Name]] = ai;
+        } else {
+          for (var j = 0; j < dest.length; j++) {
+            var dj = dest[j];
+            if (dj.name == ai[Name]) {
+              dj.data.push(ai);
+              break;
+            }
+          }
+        }
+      }
+      return dest;
+    },
+
     getAccountId() {
       const self = this;
       const userId = getCookie('UserId');
@@ -1276,7 +1310,8 @@ $h1:#292e36;
             .content-detail{
                 margin-top: 10px;
                 .content-detail-title{
-                min-height:70px;
+                  margin-top: 10px;
+                  min-height:70px;
                 background-color:$background;
                 padding-left:calc(20 / 1920 * 100vw);
                 padding-right: calc(20 / 1920 * 100vw);
