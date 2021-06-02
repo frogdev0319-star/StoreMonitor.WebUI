@@ -31,28 +31,35 @@
           @mouseleave="showControlInfo = false">
           <hr class="dialog-hr">
           <div v-if="!isEzviz" id="videoContent" class="video-content">
-            <div v-if="showControlInfo" id="channelName"><span>{{ curChannel.name }}</span></div>
-            <div v-if="showControlInfo" class="icon-footer">
-              <div class="iconlside">
-                <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
-                <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
-              </div>
-              <div class="iconrside">
-                <div class="screen-content">
-                  <i
-                    :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
-                    class="iconfont iconscreen"
-                    @click="controlScreen"/>
+            <template v-if="false">
+              <div v-if="showControlInfo" id="channelName"><span>{{ curChannel.name }}</span></div>
+              <div v-if="showControlInfo" class="icon-footer">
+                <div class="iconlside">
+                  <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
+                  <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
+                </div>
+                <div class="iconrside">
+                  <div class="screen-content">
+                    <i
+                      :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
+                      class="iconfont iconscreen"
+                      @click="controlScreen"/>
+                  </div>
                 </div>
               </div>
+              <video
+                id="previewVideo"
+                :controls="false"
+                height="83%"
+                width="90%"
+                prload
+                class="video-js vjs-fill"/>
+            </template>
+            <div v-else class="errorVideo-model">
+              <span>
+                {{ $t('remotePatrol.videoLicense') }}
+              </span>
             </div>
-            <video
-              id="previewVideo"
-              :controls="false"
-              height="83%"
-              width="90%"
-              prload
-              class="video-js vjs-fill"/>
           </div>
           <ezviz-video
             v-else
@@ -1331,6 +1338,22 @@ $h1:#292e36;
           @include point(width,76);
           font-size: 12px;
           line-height: 12px;
+        }
+      }
+      .errorVideo-model{
+        margin-bottom: 0;
+        height: auto;
+        position: relative;
+        min-height: 420px;
+        background-color: #232730;
+        color: $red;
+        z-index: 100;
+        span{
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 12px;
         }
       }
         #previewVideo{
