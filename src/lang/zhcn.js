@@ -959,6 +959,7 @@ export default {
     'showPartsDetails': '巡检详情部分展示',
     'basicInfo': '基本信息',
     'notJoinItem': '基础信息（不参与评估项）',
-    'defaultAll': '巡检详情'
+    'defaultAll': '巡检详情',
+    'draggableInfo': '拖动项目，调整显示顺序'
   }
 }

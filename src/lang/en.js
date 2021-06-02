@@ -952,6 +952,7 @@ export default {
     'showPartsDetails': 'Show Part of Details',
     'basicInfo': 'Basic Info.',
     'notJoinItem': 'Basic Info.(Not calculate score items)',
-    'defaultAll': 'Inspection Details'
+    'defaultAll': 'Inspection Details',
+    'draggableInfo': 'Drag items and adjust display sequence'
   }
 };
