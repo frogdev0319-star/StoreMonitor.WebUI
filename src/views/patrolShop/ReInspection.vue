@@ -1650,8 +1650,14 @@ export default {
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
           if (item.authorizedInspect.length != 0) {
-            obj.authorizedInspect = item.authorizedInspect;
-            obj.hasInspect = true;
+            const remoteInspectList = item.authorizedInspect.filter(inspcetItem => inspcetItem.mode === 0);
+            if(remoteInspectList.length > 0){
+              obj.authorizedInspect = item.authorizedInspect;
+              obj.hasInspect = true;
+            } else {
+              obj.hasInspect = false;
+            }
+
           } else {
             obj.hasInspect = false;
           }
