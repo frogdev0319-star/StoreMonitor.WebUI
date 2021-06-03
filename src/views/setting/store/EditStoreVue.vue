@@ -26,7 +26,7 @@
         </span>
       </p>
       <div class="tab-main">
-        <el-tabs id="patrltabs-content" v-model="activeName" :before-leave="beforeleave">
+        <el-tabs id="patrltabs-content" v-model="activeName" :before-leave="beforeChangeInspectList">
           <el-tab-pane v-for="(item,index) in appliedInspect" :key="index" :label="item.name" />
         </el-tabs>
         <div class="data-box">
@@ -39,30 +39,59 @@
           <span class="schedule-title">{{ $t('storeView.bindChanel') }}</span>
         </div>
         <div v-for="(item,index) in scheduleData" :key="index" class="el-table-data" >
-          <span class="grouptitle">
+          <div class="grouptitle">
             {{ item.napeName }}（{{ item.napeNum }}）
-          </span>
-          <div class="schedule-data">
-            <div
-              v-for="(_item,_index) in item.itemData"
-              :key="_index"
-              :class="!_item.isClick?'noraml-color':'active-color'"
-              class="schedule-detials"
-              style="overflow:hidden;"
-              @click="clickItem(_item,_index)">
+          </div>
+          <template v-if="!item.children">
+            <div class="schedule-data">
+              <div
+                v-for="(_item,_index) in item.itemData"
+                :key="_index"
+                :class="!_item.isClick?'noraml-color':'active-color'"
+                class="schedule-detials"
+                style="overflow:hidden;"
+                @click="clickItem(_item,_index)">
               <span class="nape-title">
                 {{ `${_index+1}. ${_item.subject}` }}
               </span>
-              <limit-select
-                :selected="_item.channelvalue"
-                :options="alleList"
-                :input-size="`mini`"
-                :select-limit="5"
-                class="nape-value"
-                @changeInput="changeDeviceId($event, _item)"
-                @changeIfSelect="changeSelect($event, _item,_index)"/>
+                <limit-select
+                  :selected="_item.channelvalue"
+                  :options="alleList"
+                  :input-size="`mini`"
+                  :select-limit="5"
+                  class="nape-value"
+                  @changeInput="changeDeviceId($event, _item)"
+                  @changeIfSelect="changeSelect($event, _item,_index)"/>
+              </div>
             </div>
-          </div>
+          </template>
+          <template v-else v-for="(child, childIndex) in item.children">
+            <div class="subcatergy-title">
+              {{ child.groupName }}
+            </div>
+            <div class="schedule-data" :key="`child-${childIndex}`">
+              <div
+                v-for="(_item,_index) in child.itemData"
+                :key="_index"
+                :class="!_item.isClick?'noraml-color':'active-color'"
+                class="schedule-detials"
+                style="overflow:hidden;"
+                @click="clickItem(_item,_index)">
+              <span class="nape-title">
+                {{ `${_index+1}. ${_item.subject}` }}
+              </span>
+                <limit-select
+                  :selected="_item.channelvalue"
+                  :options="alleList"
+                  :input-size="`mini`"
+                  :select-limit="5"
+                  class="nape-value"
+                  @changeInput="changeDeviceId($event, _item)"
+                  @changeIfSelect="changeSelect($event, _item,_index)"/>
+              </div>
+            </div>
+          </template>
+
         </div>
       </div>
     </el-col>
@@ -79,10 +108,12 @@ import { bindInspectItemV2,
 import LimitSelect from '@/components/LimitSelect';
 import util from '@/common/util'
 import DelayButton from '@/components/DelayButton';
+import ItemsChannels from "../../../components/Setting/ItemsChannels";
 
 export default {
   name: 'EditStoreVue',
   components: {
+    ItemsChannels,
     DelayButton,
     LimitSelect
   },
@@ -120,20 +151,19 @@ export default {
   },
 
   methods: {
-    beforeleave(e) {
+    beforeChangeInspectList(e) {
       const self = this;
-      let isshowdialog = false;
-      self.allRoutedata.forEach(item => {
-        item.forEach(a_item => {
-          a_item.itemData.forEach(_item => {
-            if (_item.oldChannelvalue.toString() !== _item.channelvalue.toString()) {
-              isshowdialog = true;
-            }
-          });
-        });
-      });
-      !isshowdialog ? self.getNapeByStore(self.store.storeId, Number(e)) : null;
-      return isshowdialog ? new Promise((resolve, reject) => {
+      let ifShowDialog = false;
+      const inspectItemsList = this.getAllInspectItem();
+      for (let itemIndex = 0; itemIndex < inspectItemsList.length; itemIndex++){
+        let inspectItem = inspectItemsList[itemIndex];
+        if (inspectItem.oldChannelvalue.sort().toString() !== inspectItem.channelvalue.sort().toString()){
+          ifShowDialog = true;
+          break;
+        }
+      }
+      !ifShowDialog ? self.getNapeByStore(self.store.storeId, Number(e)) : null;
+      return ifShowDialog ? new Promise((resolve, reject) => {
         self.$confirm(self.$t('remotePatrol.confirmChangeBind'), self.$t('remotePatrol.confirm'), {
           confirmButtonText: self.$t('remotePatrol.confirm'),
           cancelButtonText: self.$t('remotePatrol.cancel'),
@@ -145,6 +175,22 @@ export default {
           reject(err);
         });
       }) : true;
+    },
+
+    getSubcategoryItemsIfChanged(catergoryItemArr){
+     let ifShowDialog = false;
+     for (let catergoryIndex = 0; catergoryIndex < catergoryItemArr.length; catergoryIndex++) {
+       let children = catergoryItemArr[catergoryIndex];
+       let inspectItemLength = children.itemData.length;
+       for (let itemIndex = 0; itemIndex < inspectItemLength; itemIndex++){
+         let inspectItem = children.itemData[itemIndex];
+         if (inspectItem.oldChannelvalue.toString() !== inspectItem.channelvalue.toString()) {
+           ifShowDialog = true;
+           break;
+         }
+       }
+     }
+      return ifShowDialog;
     },
 
     changeSheet(e) {
@@ -263,62 +309,123 @@ export default {
 
     getItemsGroupAndInfo(data) {
       const infoArr = [];
-      data.forEach(item => {
+      const treeData = util.handleInspctionCatergyTree(data, 'groupId');
+      treeData.forEach(item => {
         const groupObj = {};
         groupObj.id = item.groupId;
         groupObj.napeName = item.groupName;
         groupObj.type = item.type;
-        groupObj.napeNum = item.items.length;
-        const tempItemArr = [];
-        for (const _item of item.items) {
-          const itemObj = {};
-          itemObj.id = _item.id;
-          itemObj.subject = _item.subject;
-          itemObj.channelvalue = [];
-          itemObj.oldChannelvalue = [];
-          _item.deviceIds.forEach(id => {
-            if (id !== -1) {
-              itemObj.channelvalue.push(id);
+        groupObj.napeNum = item.children ? util.getSubCategoryItemsLength(item.children) : item.items.length;
+        if(item.children){
+          for(const child of item.children){
+            const tempItemArr = [];
+            for (const _item of child.items) {
+              const itemObj = {};
+              itemObj.id = _item.id;
+              itemObj.subject = _item.subject;
+              itemObj.channelvalue = [];
+              itemObj.oldChannelvalue = [];
+              _item.deviceIds.forEach(id => {
+                if (id !== -1) {
+                  itemObj.channelvalue.push(id);
+                }
+                itemObj.oldChannelvalue.push(id);
+              });
+              itemObj.isClick = false;
+              tempItemArr.push(itemObj);
             }
-            itemObj.oldChannelvalue.push(id);
-          });
-          itemObj.isClick = false;
-          tempItemArr.push(itemObj);
+            child.itemData = tempItemArr;
+          }
+          groupObj.children = item.children;
+        } else {
+          let tempItemArr = [];
+          for (const _item of item.items) {
+            const itemObj = {};
+            itemObj.id = _item.id;
+            itemObj.subject = _item.subject;
+            itemObj.channelvalue = [];
+            itemObj.oldChannelvalue = [];
+            _item.deviceIds.forEach(id => {
+              if (id !== -1) {
+                itemObj.channelvalue.push(id);
+              }
+              itemObj.oldChannelvalue.push(id);
+            });
+            itemObj.isClick = false;
+            tempItemArr.push(itemObj);
+          }
+          groupObj.itemData = tempItemArr;
         }
-        groupObj.itemData = tempItemArr;
         infoArr.push(groupObj);
       });
       return infoArr;
     },
 
+    getAllInspectItem(){
+      let inspectItemsArr = [];
+      this.allRoutedata.forEach(tabItem => {
+        tabItem.forEach(catergoryItems => {
+          if(!catergoryItems.children){
+            inspectItemsArr.push(...catergoryItems.itemData);
+          } else {
+            catergoryItems.children.forEach(child => {
+              inspectItemsArr.push(...child.itemData);
+            })
+          }
+        })
+      });
+      return inspectItemsArr;
+    },
+
+    getOneSheetInspectItems(catergoryItems){
+      let temp = [];
+      let unbindTemp = [];
+      catergoryItems.forEach(_item => {
+        const obj = {};
+        const unbindObj = {};
+        if (_item.channelvalue.length !== 0) {
+          countChannel++;
+          obj.inspectItemId = _item.id;
+          obj.storeId = this.store.storeId;
+          obj.deviceIds = _item.channelvalue;
+          if (_item.oldChannelvalue.length > 0 &&
+            JSON.stringify(_item.oldChannelvalue.sort()) !== JSON.stringify(_item.channelvalue.sort())) {
+            unbindObj.inspectItemId = _item.id;
+            unbindObj.storeId = this.store.storeId;
+            unbindObj.deviceIds = _item.oldChannelvalue;
+            unbindTemp.push(unbindObj);
+          }
+          temp.push(obj);
+        }
+      });
+      return temp;
+    },
+
     async submitData() {
       const self = this;
-      let count = 0;
       let countChannel = 0;
       const temp = [];
       const unbindTemp = [];
-      self.allRoutedata.forEach(all_item => {
-        all_item.forEach(item => {
-          count += item.itemData.length;
-          item.itemData.forEach(_item => {
-            const obj = {};
-            const unbindObj = {};
-            if (_item.channelvalue.length !== 0) {
-              countChannel++;
-              obj.inspectItemId = _item.id;
-              obj.storeId = self.store.storeId;
-              obj.deviceIds = _item.channelvalue;
-              if (_item.oldChannelvalue.length > 0 && JSON.stringify(_item.oldChannelvalue.sort()) !== JSON.stringify(_item.channelvalue.sort())) {
-                unbindObj.inspectItemId = _item.id;
-                unbindObj.storeId = self.store.storeId;
-                unbindObj.deviceIds = _item.oldChannelvalue;
-                unbindTemp.push(unbindObj);
-              }
-              temp.push(obj);
-            }
-          });
-        });
-      });
+      const allInspectItemsList = this.getAllInspectItem();
+      let count = allInspectItemsList.length;
+      allInspectItemsList.forEach(inspectItem => {
+        const obj = {};
+        const unbindObj = {};
+        if (inspectItem.channelvalue.length !== 0) {
+          countChannel++;
+          obj.inspectItemId = inspectItem.id;
+          obj.storeId = self.store.storeId;
+          obj.deviceIds = inspectItem.channelvalue;
+          if (inspectItem.oldChannelvalue.length > 0 &&
+            JSON.stringify(inspectItem.oldChannelvalue.sort()) !== JSON.stringify(inspectItem.channelvalue.sort())) {
+            unbindObj.inspectItemId = inspectItem.id;
+            unbindObj.storeId = self.store.storeId;
+            unbindObj.deviceIds = inspectItem.oldChannelvalue;
+            unbindTemp.push(unbindObj);
+          }
+          temp.push(obj);
+        }
+      })
       if (self.scheduleData.length > 0) {
         if ((count !== 0 && (count !== countChannel)) || countChannel === 0) {
           util.notify(this.$t('storeView.selectAllChanels'), 'warning', 3000);
@@ -559,11 +666,15 @@ export default {
                 text-align: left;
                 .grouptitle{
                     margin-left: 2%;
-                    display: inline-block;
+                    display: block;
                     margin-top: 15px;
                     font-size: 15px;
                     font-weight: bold;
                     color: #424151;
+                }
+                .subcatergy-title{
+                  @extend .grouptitle;
+                  font-size: 14px;
                 }
                 .schedule-data{
                     margin-top: 5px;
