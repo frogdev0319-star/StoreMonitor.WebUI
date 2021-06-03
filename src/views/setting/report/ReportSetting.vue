@@ -85,7 +85,7 @@
                   </div>
                   <draggable v-model="list" class="detail-table">
                     <div class="setting-config" v-for="item in list" :key="item.position">
-                      <template v-if="item.position !== 8">
+                      <template>
                         <div class="title-name">{{$t(`titleView.${item.name}`)}}</div>
                         <div class="title-status"><el-switch v-model="item.enable"></el-switch></div>
                       </template>
