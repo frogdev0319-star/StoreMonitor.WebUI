@@ -327,25 +327,34 @@
             <el-scrollbar style="height:100%;" class="el-menuscrollbar">
               <div style="background-color:#f4f5f9;height:316.06px;">
                 <div v-for="(_item,_index) in sheetName" :key="_index" class="Group-content">
-                  <div :class="_item.isClick?'noraml-color':'noraml-groupColor'" class="Group-content-title" @click="changeSheet(_item,_index)">
-                    <!-- <span v-if="_item.label==$t('insSettingView.sheetpassfail')" style="color:red;">*</span> -->
-                    <span>{{ _item.label }}</span>
-                    <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span>
-                    <i v-if="_item.groupId==undefined&&!_item.isClick" class="el-icon-arrow-right icon"/>
-                    <i v-if="_item.groupId==undefined&&_item.isClick" class="el-icon-arrow-down icon"/>
-                  </div>
-                  <div v-if="_item.isClick&&_item.groupId==undefined" class="Group-content-details">
-                    <div
-                      v-for="(item,index) in inspectList"
-                      :key="index"
-                      :style="item.isHover||item.isClick?'color:#f31b65;background-color:#fddde8;':''"
-                      class="inspect-details"
-                      @click="getItemByGroup(item,index)"
-                      @mouseover="mouseoverGroup(item,index)"
-                      @mouseout="mouseoutGroup(item,index)">
-                      <span>{{ item.groupName }}</span>
+                  <template v-if="_item.isCategory">
+                    <div :class="_item.isClick?'noraml-color':'noraml-groupColor'" class="Group-content-title"
+                         @click="changeSheet(_item,_index)">
+                      <span>{{ _item.label }}</span>
+                      <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span>
+                      <i v-if="_item.groupId==undefined&&!_item.isClick" class="el-icon-arrow-right icon"/>
+                      <i v-if="_item.groupId==undefined&&_item.isClick" class="el-icon-arrow-down icon"/>
                     </div>
-                  </div>
+                    <div v-if="_item.isClick&&_item.groupId==undefined" class="Group-content-details">
+                      <div
+                        v-for="(item,index) in inspectList"
+                        :key="index"
+                        :style="item.isHover||item.isClick?'color:#f31b65;background-color:#fddde8;':''"
+                        class="inspect-details"
+                        @click="getItemByGroup(item,index)"
+                        @mouseover="mouseoverGroup(item,index)"
+                        @mouseout="mouseoutGroup(item,index)">
+                        <span>{{ item.groupName }}</span>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div :class="_item.isClick?'noraml-color':'noraml-groupColor'" class="Group-content-title"
+                         @click="getItemOfCategory(_item, _index)" >
+                      <span>{{ _item.label }}</span>
+                      <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span>
+                    </div>
+                  </template>
                 </div>
               </div>
             </el-scrollbar>
@@ -361,10 +370,14 @@
                     class="titles"
                     @click="clickItem(item,index)">{{ `${index+1}. ${item.subject}` }}</span>
                   <div v-if="item.disabled" class="dropdown-model"/>
-                  <div v-if="inspectList[0].type!=1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
-                    <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs" :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">{{ itemDS.scoreTitle }}</p>
+                  <div v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
+                    <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                       :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
+                      {{ itemDS.scoreTitle }}
+                    </p>
                   </div>
-                  <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'" trigger="click" class="item-score" size="small">
+                  <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                               trigger="click" class="item-score" size="small">
                     <span class="el-dropdown-link">
                       {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                       <i class="el-icon-arrow-down el-icon--right"/>
@@ -378,7 +391,8 @@
                     </el-dropdown-menu>
                   </el-dropdown>
                   <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,0)"/>
-                  <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
+                  <img v-if="item.manualIgnore" class="iconfont iconhulve"
+                       src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
                   <div v-if="item.checked" class="icon-clicked"/>
                   <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
                     <span>{{ item.description }}</span>
@@ -903,7 +917,12 @@ export default {
       currentTime: null,
       onEndflag: false,
       previewplayer: null,
-      feedbackIndex: -1
+      feedbackIndex: -1,
+      groupType: -1,
+      isCategory: false,
+      itemOptionsForType1: [],
+      itemOptionsForType3: [],
+
     };
   },
   computed: {
@@ -1542,7 +1561,7 @@ export default {
       });
       self.isEzviz ? self.$refs.ezvizVideo.editCount++ : self.editCount++;
       if (e === 0) {
-        if (item.type === 2) {
+        if (item.groupType === 2) {
           if (item.itemScore < 0) {
             item.itemgetScore = itemDS.val === -1 ? item.itemScore : 0;
           } else {
@@ -1893,6 +1912,8 @@ export default {
       self.hideNext = false;
       self.hideLast = false;
       self.channelBtns = [];
+      this.groupType = item.type;
+      this.isCategory = true;
       item.isClick = true;
       this.$nextTick(() => {
         self.anchorLinkTo();
@@ -1903,6 +1924,31 @@ export default {
         }
       });
     },
+
+    getItemOfCategory(item, index){
+      this.inspectItemList = [];
+      this.curGroupIndex = 0;
+      this.curSheetIndex = index;
+      this.curGroup = item;
+      this.curItemIndex = 0;
+      this.groupType = item.type;
+      this.inspectItemList = item.inspectList[0].items;
+      this.showFeedBack = false;
+      this.hideNext = false;
+      this.hideLast = false;
+      this.channelBtns = [];
+      this.isCategory = false;
+      item.isClick = true;
+      this.$nextTick(() => {
+        this.anchorLinkTo();
+      });
+      this.sheetName.forEach((_item, _index) => {
+        if ((!_item.isCategory && index !== _index) || _item.isCategory) {
+          _item.isClick = false;
+        }
+      });
+    },
+
     getDeviceById(deviceId) {
       const self = this;
       const device = [];
@@ -3065,6 +3111,17 @@ export default {
               case 'dangerousOnFailedItem':
                 inspectSettings.dangerousOnFailedItem = item.value;
                 break;
+              case 'baseScore':
+                inspectSettings.baseScore = item.value;
+                break;
+              case 'itemOptionsForType1':
+                inspectSettings.itemOptionsForType1 = item.value;
+                this.itemOptionsForType1 = item.value;
+                break;
+              case 'itemOptionsForType3':
+                inspectSettings.itemOptionsForType3 = item.value;
+                this.itemOptionsForType3 = item.value;
+                break;
               default:
                 break;
             }
@@ -3080,11 +3137,13 @@ export default {
             obj.dealCount = 0;
             obj.Effective = 0;
             obj.isHover = false;
+            obj.parentId = item.parentId;
             if (index == 0) {
               obj.isClick = true;
             } else {
               obj.isClick = false;
             }
+            const btnNameArr = this.getTab1AndTab3BtnName(obj.type);
             const tempItems = [];
             item.items.forEach((_item, _index) => {
               const itemObj = {};
@@ -3101,7 +3160,9 @@ export default {
                   itemScoreLength.push(i);
                 }
               }
-              itemScoreLength.sort((a, b) => { return a - b; });
+              itemScoreLength.sort((a, b) => {
+                return a - b;
+              });
               itemObj.itemScoreLength = itemScoreLength.reverse();
               itemObj.itemgetScore = '--';
               itemObj.isQualified = false;
@@ -3118,44 +3179,70 @@ export default {
               itemObj.Ruletip = false;
               itemObj.manualIgnore = false;
               itemObj.sourceList = [];
-              itemObj.scoreList = [{ val: _item.itemScore, scoreTitle: this.$t('remotePatrol.pass'), isClick: false },
-                { val: -1, scoreTitle: this.$t('remotePatrol.failed'), isClick: false }];
+              itemObj.groupType = item.type;
+              itemObj.scoreList = [
+                {val: _item.itemScore, scoreTitle: btnNameArr[0], isClick: false},
+                {val: -1, scoreTitle: btnNameArr[1], isClick: false}
+                ];
               tempItems.push(itemObj);
             });
             obj.items = tempItems;
             temp.push(obj);
           });
           const te_temp = [];
-          for (let i = 0; i < 3; i++) {
-            const Typeindex = temp.filter(x => x.type == i);
-            if (Typeindex.length != 0) {
-              let count = 0, label = '';
-              Typeindex.forEach(item => {
-                count += item.items.length;
+
+          const treeData = temp.filter(item => item.parentId === -1);
+          let handleData = [];
+          treeData.forEach(item => {
+            let obj = {};
+            obj.cateray = item;
+            obj.subcatergy = [];
+            temp.forEach(totalData => {
+              if(item.groupId === totalData.parentId){
+                obj.subcatergy.push(totalData);
+              }
+            })
+            handleData.push(obj);
+          })
+          for (let i = 0; i < handleData.length; i++) {
+            let count = 0, label = '';
+            if (handleData[i].subcatergy.length === 0){
+              count = handleData[i].cateray.items.length;
+              te_temp.push({
+                inspectList: [handleData[i].cateray], dealCount: 0, Effective: 0, count: count, isClick: false,
+                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: false
               });
-              if (Typeindex[0].type == 0) {
-                label = self.$t('insSettingView.sheetpassfail');
-              }
-              if (Typeindex[0].type == 1) {
-                label = self.$t('insSettingView.sheetscore');
-              }
-              if (Typeindex[0].type == 2) {
-                label = self.$t('insSettingView.sheetother');
-              }
-              te_temp.push({ inspectList: Typeindex, dealCount: 0, Effective: 0, count: count, isClick: false, label: label, type: Typeindex[0].type });
+            } else {
+              handleData[i].subcatergy.forEach(item => count += item.items.length);
+              console.log(count)
+              te_temp.push({
+                inspectList: handleData[i].subcatergy, dealCount: 0, Effective: 0, count: count, isClick: false,
+                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: true
+              });
             }
           }
-          self.sheetName = te_temp;
+
+          self.sheetName = te_temp.sort((a, b) => {return a.type - b.type});
           self.sheetName[0].isClick = true;
-          self.inspectList = self.sheetName[0].inspectList;
-          const feedobj = { groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false };
+          const isCategory = self.sheetName[0].isCategory;
+          self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
+          const feedobj = {groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false, isCategory: true};
           if (self.sheetName.length != 0) {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
           }
         }
-      });
+      })
     },
+
+    getTab1AndTab3BtnName(type){
+      let nameBtnArr = [this.$t('remotePatrol.pass'), this.$t('remotePatrol.failed')];
+      nameBtnArr = type === 0 ?
+        [this.itemOptionsForType1[0].name , this.itemOptionsForType1[1].name] :
+        [this.itemOptionsForType3[0].name , this.itemOptionsForType3[1].name];
+      return nameBtnArr;
+    },
+
     hasIgnoreItem() {
       const self = this;
       self.showIgnoreItem = true;
@@ -3174,6 +3261,7 @@ export default {
             }
           });
         });
+
       });
       self.hasIgnoretemp = hasIgnoretemp;
     },
