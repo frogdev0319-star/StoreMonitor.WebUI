@@ -3,7 +3,7 @@
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
       <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
-      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">
+      <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
         {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
         <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
       </p>
@@ -316,7 +316,7 @@
         </el-col>
         <el-col v-if="pageItem.class === 'row-table'">
           <table v-for="(s_item,s_index) in pageItem.data" :key="s_index" class="table table-bordered">
-            <thead class="pdf_font_20">
+            <thead :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
             <tr v-if="s_item[0].type === 0">
               <th
                 v-for="(t_item ,t_index) in theaderPassFail"
@@ -339,7 +339,7 @@
                 scope="col">{{ t_item.name }}</th>
             </tr>
             </thead>
-            <tbody class="pdf_font_20">
+            <tbody :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
             <tr style="vertical-align:middle;">
               <td :rowspan="s_item.length+1" style="vertical-align:middle;">
                 <span v-if="s_item[0].type === 0">{{ $t('insSettingView.sheetpassfail') }}</span>
@@ -403,8 +403,8 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-col class="pie-content" v-if="!hasChart">
-          <v-chart ref="chartRadar" class="pie-chart-content"></v-chart>
+        <el-col class="pie-content" v-if="!hasChart" :style="isexportPDF ? 'height:450px;' : 'height:0px;'">
+          <v-chart ref="chartRadar" class="pie-chart-content" :auto-resize="true"></v-chart>
         </el-col>
       </el-row>
       <div class="no-print">
@@ -887,7 +887,6 @@ export default {
           details.grade = item.grade;
           details.qualifiedScore = item.qualifiedScore;
           details.itemScore = item.itemScore;
-          details.showTotalScore =
           details.passOfFailFlag = this.getItemsPassOrFailed(groupitem.groupType, item.grade, item.qualifiedScore);
           if (item.attachment.length !== 0) {
             const _temp = [];
@@ -1427,6 +1426,9 @@ export default {
         margin:0;
         display: inline-block;
         margin-left: calc(20 / 1920 * 100vw);
+      }
+      .nochart-report-title{
+        font-size: 20px;
       }
       .info-content {
         position: absolute;
