@@ -12,7 +12,7 @@
           <div class="table-content-item" v-for="(contentItem, contentIndex) in sortableTableData" :key="contentIndex">
             <div class="table-checkbox-name">
               <div class="table-checkbox">
-                <el-checkbox v-model="contentItem.checked" class="item-checkbox"/>
+                <el-checkbox v-model="contentItem.checked" class="item-checkbox" @change="onCheckItem(contentItem, contentIndex, sortableTableData)"/>
               </div>
               <div class="table-name">{{ contentItem.name }}</div>
             </div>
@@ -24,12 +24,11 @@
             </div>
             <template v-if="isScoreSheet">
               <div class="table-available-score">
-                <template v-if="!showTableHeader">
+                <template>
                   <icon-tooltip :content="contentItem.availableScores" placement="top">
                     <div>{{ contentItem.availableScores}}</div>
                   </icon-tooltip>
                 </template>
-                <template v-else>{{ contentItem.availableScores}}</template>
               </div>
               <div class="table-available-score">
                 {{ contentItem.qualifiedScore}}
@@ -82,11 +81,11 @@
     },
     watch:{
       tableData:{
-        handler(newValue,oldValue){
+        handler(newValue){
           this.sortableTableData = newValue;
         },
         deep:true
-      },
+      }
     },
     methods:{
       handleEdit(contentIndex, contentItem){
@@ -95,6 +94,9 @@
       handleDelete(contentIndex, contentItem){
         this.$emit('handleDeleteItem', contentIndex, contentItem);
       },
+      onCheckItem(contentItem, contentIndex, tableData){
+        this.$emit('handleCheckItem', contentItem, contentIndex, tableData);
+      }
     }
   }
 </script>
@@ -129,9 +131,6 @@
     }
     .table-available-score{
       width: 18%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
   }
   .dragable-table-header, .table-content-item{
@@ -164,6 +163,9 @@
   }
   .table-score, .table-operation, .table-available-score{
     width: 12.5%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .table-checkbox-name{
