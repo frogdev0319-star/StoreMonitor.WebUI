@@ -37,6 +37,11 @@
           default: ''
         }
       },
+      watch:{
+        inputName(newValue){
+          this.inputValue = newValue;
+        }
+      },
       data(){
         return {
           inputValue: this.inputName,
