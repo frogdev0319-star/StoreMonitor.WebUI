@@ -1023,7 +1023,7 @@ export default {
       self.curSheetIndex = PatrolHistory.curSheetIndex;
       self.curGroupIndex = PatrolHistory.curGroupIndex;
       self.curItemIndex = PatrolHistory.curItemIndex;
-
+      self.deviceList = PatrolHistory.deviceList;
       self.isDisabled = true;
       const isClick = self.sheetName[self.sheetName.length - 1].isClick;
       if (isClick) {
@@ -2274,7 +2274,8 @@ export default {
         allChannelBtns: self.allChannelBtns,
         curSheetIndex: self.curSheetIndex,
         curGroupIndex: self.curGroupIndex,
-        curItemIndex: self.curItemIndex
+        curItemIndex: self.curItemIndex,
+        deviceList: self.deviceList
       };
       self.hasIgnoretemp = [];
       const params = { data: obj, rule: inspectSettings };
