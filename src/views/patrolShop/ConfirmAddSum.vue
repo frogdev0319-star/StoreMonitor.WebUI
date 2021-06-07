@@ -56,33 +56,35 @@
         </div>
         <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered">
           <thead>
-            <tr>
-              <th v-for="(t_item ,t_index) in s_item.tHeader" :key="t_index" :style="t_item.width" scope="col">
-                {{ t_item.name }}
-              </th>
-            </tr>
+          <tr>
+            <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
+              {{ t_item.name }}
+            </th>
+          </tr>
           </thead>
-          <tbody>
-            <tr style="vertical-align:middle;">
-              <td :rowspan="s_item.inspectList.length+1" style="vertical-align:middle;">
-                <span class="sheet_title">{{ s_item.label }}</span>
-              </td>
-            </tr>
-            <tr v-for="(item,index) in s_item.inspectList" :key="index" :style=" index%2 != 0?{'background-color':'#F7F8FC'}:{}">
-              <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span><span class="count-blag">
-                {{ item.items.length }}</span>
-              </td>
-              <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfQualified }}</span></td>
-              <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfUnqualified }}</span></td>
-              <td v-if="s_item.type==1"><span>{{ item.itemScore }}</span></td>
-              <!--<td><span>{{ item.numIgnore }}</span></td>-->
-              <td><span>{{ item.itemgetScore }}</span></td>
-            </tr>
-          </tbody>
+          <template v-for="(inspectItem, inspectIndex) in s_item.data">
+            <tbody :key="inspectIndex">
+              <tr style="vertical-align:middle;">
+                <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
+                  <span class="sheet_title">{{ inspectItem.label }}</span>
+                </td>
+              </tr>
+              <tr v-for="(item,index) in inspectItem.inspectList" :key="index"
+                  :style=" index%2 != 0?{'background-color':'#F7F8FC'}:{}">
+                <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span><span class="count-blag">
+                  {{ item.items.length }}</span>
+                </td>
+                <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
+                <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
+                <td v-if="inspectItem.type === 1"><span>{{ item.itemScore }}</span></td>
+                <td><span>{{ item.itemgetScore }}</span></td>
+              </tr>
+            </tbody>
+          </template>
         </table>
       </div>
       <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
-        <el-col v-if="item.itemList.length!=0">
+        <el-col v-if="item.data.length!=0">
           <div class="item-header">
             <i :class="item.iconSrc" class="iconfont icontemp"/>
             <span class="title-lable">{{ item.itemTitleName }}</span>
@@ -91,87 +93,207 @@
           </div>
           <div class="item-content">
             <div style="margin-bottom:20px;">
-              <div v-for="(_item,_index) in item.itemList" :key="_index" class="content-detail">
-                <div v-if="index !== 2" class="content-detail-title">
-                  <div class="detail-title">
-                    <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
-                    <p class="title2">{{ _item.description }}</p>
-                  </div>
-                  <div class="score-title">
-                    <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                    <div v-if="(_item.type === 0 ||_item.type === 2)&&item.detailType !== 1" class="title-btn">
-                      {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
-                    </div>
-                    <div v-if="_item.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
-                      <span>
-                        <span>{{ _item.itemgetScore }}</span>
-                        <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
-                      </span>
-                    </div>
-                    <div class="total-score" v-if="_item.showTotalScore">
-                      {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}
-                    </div>
-                  </div>
-                </div>
-                <div v-if="index === 2" class="content-detail-title" style="background-color:#fff;min-height:30px;">
-                  <div class="detail-title">
-                    <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
-                  </div>
-                </div>
-                <div
-                  v-if="index !== 2 && _item.sourceList!= null && _item.sourceList.length !== 0
-                  || _item.inspectInput != null&&_item.inspectInput !== ''"
-                  class="content-detail-main"
-                  style="padding-bottom: 20px;">
-                  <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                  <div v-if="_item.inspectInput!=null&&_item.inspectInput!=''" class="cdm-word">
-                    <span>{{ _item.inspectInput }}</span>
-                  </div>
-                  <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
-                    <div
-                      v-for="(sourceitem,sourceindex) in _item.sourceList"
-                      :key="sourceindex"
-                      :height="imgHeight+'px'"
-                      class="source-details">
-                      <div v-if="sourceitem.mediaType==2" class="img-content">
-                        <img
-                          :title="imgTitle"
-                          :src="sourceitem.src"
-                          :height="imgHeight+'px'"
-                          :onerror="deafultImg"
-                          class="imgLittle imgInner"
-                          @click="openOuter(sourceitem,$event)">
+              <div v-for="(_item,_index) in item.data" :key="_index" class="content-detail">
+                <template v-if="index !== 2" >
+                  <div class="content-title">{{ _item.groupName }}</div>
+                  <template v-if="!_item.children">
+                    <div v-for="(categoryItem,categoryIndex) in _item.cateryItems" :key="categoryIndex" class="content-detail">
+                      <div class="content-detail-title">
+                        <div class="detail-title">
+                          <p class="title1">{{ categoryIndex+1 }}.{{ categoryItem.subject }}</p>
+                          <p class="title2">{{ categoryItem.description }}</p>
+                        </div>
+                        <div class="score-title">
+                          <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
+                          <div v-if="(categoryItem.type === 0 ||categoryItem.type === 2)&&item.detailType !== 1"
+                               class="title-btn">
+                            {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                          </div>
+                          <div v-if="categoryItem.type==1&&item.detailType!=1" class="title-btn">
+                            {{ $t('remotePatrol.scoreUnit') }}
+                            <span>
+                              <span>{{ categoryItem.itemgetScore }}</span>
+                              <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
+                            </span>
+                          </div>
+                          <div class="total-score" v-if="categoryItem.showTotalScore">
+                            {{$t('remotePatrol.totalScoreUnit')}}{{categoryItem.itemScore}}
+                          </div>
+                        </div>
                       </div>
-                      <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
-                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                        <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div v-if="index==2&&_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
-                  <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
-                  <div v-if="_item.description!=null&&_item.description!=''" class="cdm-word">
-                    <span>{{ _item.description }}</span>
-                  </div>
-                  <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
-                    <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
-                      <div v-if="sourceitem.mediaType==2" class="img-content">
-                        <img
-                          :title="imgTitle"
-                          :src="sourceitem.src"
-                          :height="imgHeight+'px'"
-                          :onerror="deafultImg"
-                          class="imgLittle imgInner"
-                          @click="openOuter(sourceitem,$event)">
-                      </div>
-                      <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
-                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                        <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                      <div v-if="categoryItem.sourceList!= null && categoryItem.sourceList.length !== 0
+                      || categoryItem.inspectInput != null&&categoryItem.inspectInput !== ''"
+                           class="content-detail-main"
+                           style="padding-bottom: 20px;">
+                        <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
+                        <div v-if="categoryItem.inspectInput!=null&&categoryItem.inspectInput!=''" class="cdm-word">
+                          <span>{{ categoryItem.inspectInput }}</span>
+                        </div>
+                        <div v-if="categoryItem.sourceList!=null&&categoryItem.sourceList.length!=0" class="cdm-pic">
+                          <div
+                            v-for="(sourceitem,sourceindex) in categoryItem.sourceList"
+                            :key="sourceindex"
+                            :height="imgHeight+'px'"
+                            class="source-details">
+                            <div v-if="sourceitem.mediaType==2" class="img-content">
+                              <img
+                                :title="imgTitle"
+                                :src="sourceitem.src"
+                                :height="imgHeight+'px'"
+                                :onerror="deafultImg"
+                                class="imgLittle imgInner"
+                                @click="openOuter(sourceitem,$event)">
+                            </div>
+                            <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                              <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                              <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
+                  </template>
+                  <template v-else>
+                    <div v-for="(child, childIndex) in _item.children" :key="childIndex">
+                      <div class="subcatergy-title">
+                        {{ child.groupName}}
+                      </div>
+                      <div v-for="(childItem, childIndex) in child.cateryItems" :key="childIndex" class="content-detail">
+                        <div class="content-detail-title">
+                          <div class="detail-title">
+                            <p class="title1">{{ childIndex+1 }}.{{ childItem.subject }}</p>
+                            <p class="title2">{{ childItem.description }}</p>
+                          </div>
+                          <div class="score-title">
+                            <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
+                            <div v-if="(childItem.type === 0 ||childItem.type === 2)&&item.detailType !== 1"
+                                 class="title-btn">
+                              {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                            </div>
+                            <div v-if="childItem.type==1&&item.detailType!=1" class="title-btn">
+                              {{ $t('remotePatrol.scoreUnit') }}
+                              <span>
+                                <span>{{ childItem.itemgetScore }}</span>
+                                <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}
+                              </span>
+                            </span>
+                            </div>
+                            <div class="total-score" v-if="childItem.showTotalScore">
+                              {{$t('remotePatrol.totalScoreUnit')}}{{childItem.itemScore}}
+                            </div>
+                          </div>
+                        </div>
+                        <div v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
+                      || childItem.inspectInput != null&&childItem.inspectInput !== ''"
+                             class="content-detail-main"
+                             style="padding-bottom: 20px;">
+                          <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
+                          <div v-if="childItem.inspectInput!=null&&childItem.inspectInput!=''" class="cdm-word">
+                            <span>{{ childItem.inspectInput }}</span>
+                          </div>
+                          <div v-if="childItem.sourceList!=null&&childItem.sourceList.length!=0" class="cdm-pic">
+                            <div
+                              v-for="(sourceitem,sourceindex) in childItem.sourceList"
+                              :key="sourceindex"
+                              :height="imgHeight+'px'"
+                              class="source-details">
+                              <div v-if="sourceitem.mediaType==2" class="img-content">
+                                <img
+                                  :title="imgTitle"
+                                  :src="sourceitem.src"
+                                  :height="imgHeight+'px'"
+                                  :onerror="deafultImg"
+                                  class="imgLittle imgInner"
+                                  @click="openOuter(sourceitem,$event)">
+                              </div>
+                              <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                                <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                                <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
+                          class="content-detail-main"
+                          style="padding-bottom: 20px;">
+                          <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
+                          <div v-if="_item.showAudio" class="cdm-voice">
+                            <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
+                              <i class="iconfont icon-yuyin icon-speech"/>
+                            </div>
+                            <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
+                              <source :src="_item.audio.audioSrc" type="audio/mpeg" >
+                            </audio>
+                            <span class="often-text">{{ _item.audio.audioOftenText }}</span>
+                          </div>
+                          <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
+                            <span class="pdf_font_24">{{ _item.comment }}</span>
+                          </div>
+                          <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
+                            <div
+                              v-for="(sourceitem,sourceindex) in _item.sourceList"
+                              :key="sourceindex"
+                              :height="imgHeight+'px'"
+                              class="source-details">
+                              <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''">
+                                <img
+                                  :title="imgTitle"
+                                  :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                                  :src="sourceitem.url"
+                                  :height="imgHeight+'px'"
+                                  :onerror="deafultImg"
+                                  class="imgLittle imgInner"
+                                  @click="openOuter(sourceitem,$event)">
+                              </div>
+                              <div
+                                v-if="sourceitem.mediaType==1"
+                                class="img-content "
+                                @click="playCommentVideo(sourceitem,sourceindex)">
+                                <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                                <img
+                                  :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                                  :src="videoImgSrc"
+                                  :height="imgHeight+'px'"
+                                  class="imgLittle">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </template>
+                <template v-else>
+                  <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
+                    <div class="detail-title">
+                      <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
+                    </div>
                   </div>
-                </div>
+                  <div v-if="_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
+                    <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
+                    <div v-if="_item.description!=null&&_item.description!=''" class="cdm-word">
+                      <span>{{ _item.description }}</span>
+                    </div>
+                    <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
+                      <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
+                        <div v-if="sourceitem.mediaType==2" class="img-content">
+                          <img
+                            :title="imgTitle"
+                            :src="sourceitem.src"
+                            :height="imgHeight+'px'"
+                            :onerror="deafultImg"
+                            class="imgLittle imgInner"
+                            @click="openOuter(sourceitem,$event)">
+                        </div>
+                        <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
+                          <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                          <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
               </div>
             </div>
             <el-dialog
@@ -227,1267 +349,1356 @@
   </el-row>
 </template>
 <script>
-import { getStorageInfo } from '@/api/event';
-import { submitInspectItem1 } from '@/api/inspect';
-import util from '@/common/util';
-import { getCookie } from '@/common/auth';
-import { getUserInfo } from '@/api/login';
-import filterString from '@/common/filterString.js';
+  import { getStorageInfo } from '@/api/event';
+  import { submitInspectItem1 } from '@/api/inspect';
+  import util from '@/common/util';
+  import { getCookie } from '@/common/auth';
+  import { getUserInfo } from '@/api/login';
+  import filterString from '@/common/filterString.js';
 
-export default {
-  name: 'ConfirmAddSum',
-  data() {
-    return {
-      dialogCommentVideo: false,
-      uploadProgress: false,
-      totalnumOfPic: 0,
-      uploadingnumOfPic: 0,
-      showOuter: false,
-      showImg: false,
-      checkImgSrc: '',
-      scorecount: 0,
-      radioList: [],
-      imgTitle: '',
-      resultList: [
-        {
-          'label': 2,
-          'name': this.$t('overview.echartGood'),
-          'isActive': false,
-          'isShow': true
-        },
-        {
-          'label': 1,
-          'name': this.$t('remotePatrol.improve'),
-          'isActive': false,
-          'isShow': true
-        },
-        {
-          'label': 0,
-          'name': this.$t('remotePatrol.dangerous'),
-          'isActive': false,
-          'isShow': true
-        }
-      ],
-      startIcon: require('../../../static/img/play_icon.png'),
-      videoImgSrc: require('../../../static/img/video_thumbnail.png'),
-      deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
-      theaderPassFail: [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
-      ],
-      theaderScore: [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:26%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:34%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
-      ],
-      theaderOther: [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
-      ],
-      suggest: '',
-      store: {},
-      channel: {},
-      summary: [],
-      tempList: [],
-      inspectList: [],
-      eventList: [],
-      oss: null,
-      bucketVideo: '',
-      bucketImage: '',
-      percentage: 0,
-      accountId: '',
-      curSumIndex: 0,
-      varyWindowWidth: window.innerWidth,
-      pass: this.$t('remotePatrol.pass'),
-      fail: this.$t('remotePatrol.failed'),
-      lang: this.$i18n.locale,
-      adviceInfoRuletip: false
-    };
-  },
-  computed: {
-    imgHeight() {
-      let height = 0;
-      if (this.varyWindowWidth > 1800) {
-        height = this.varyWindowWidth * 0.039;
-      } else if (this.varyWindowWidth > 1400) {
-        height = this.varyWindowWidth * 0.035;
-      } else {
-        height = 75;
-      }
-      return height;
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    const self = this;
-    if (to.name !== 'remotePatrol') {
-      self.$store.dispatch('setPatrolHistory', null);
-      self.$store.dispatch('setPatrolComment', null);
-      next();
-    } else {
-      self.$store.dispatch('setPatrolComment', self.suggest);
-      next();
-    }
-  },
-  mounted() {
-    const self = this;
-    self.getRouteData();
-    self.getUpLoadBucketInfo();
-    self.getOssInfo();
-  },
-  methods: {
-    stopCommentVideo() {
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      this.previewplayer.pause();
+  export default {
+    name: 'ConfirmAddSum',
+    data() {
+      return {
+        dialogCommentVideo: false,
+        uploadProgress: false,
+        totalnumOfPic: 0,
+        uploadingnumOfPic: 0,
+        showOuter: false,
+        showImg: false,
+        checkImgSrc: '',
+        scorecount: 0,
+        radioList: [],
+        imgTitle: '',
+        resultList: [
+          {
+            'label': 2,
+            'name': this.$t('overview.echartGood'),
+            'isActive': false,
+            'isShow': true
+          },
+          {
+            'label': 1,
+            'name': this.$t('remotePatrol.improve'),
+            'isActive': false,
+            'isShow': true
+          },
+          {
+            'label': 0,
+            'name': this.$t('remotePatrol.dangerous'),
+            'isActive': false,
+            'isShow': true
+          }
+        ],
+        startIcon: require('../../../static/img/play_icon.png'),
+        videoImgSrc: require('../../../static/img/video_thumbnail.png'),
+        deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
+        theaderPassFail: [],
+        theaderScore: [],
+        theaderOther: [],
+        suggest: '',
+        store: {},
+        channel: {},
+        summary: [],
+        tempList: [],
+        inspectList: [],
+        eventList: [],
+        oss: null,
+        bucketVideo: '',
+        bucketImage: '',
+        percentage: 0,
+        accountId: '',
+        curSumIndex: 0,
+        varyWindowWidth: window.innerWidth,
+        pass: this.$t('remotePatrol.pass'),
+        fail: this.$t('remotePatrol.failed'),
+        lang: this.$i18n.locale,
+        adviceInfoRuletip: false,
+        tab1BtnArr: [],
+        tab3BtnArr: []
+      };
     },
-    playCommentVideo(item, index) {
+    computed: {
+      imgHeight() {
+        let height = 0;
+        if (this.varyWindowWidth > 1800) {
+          height = this.varyWindowWidth * 0.039;
+        } else if (this.varyWindowWidth > 1400) {
+          height = this.varyWindowWidth * 0.035;
+        } else {
+          height = 75;
+        }
+        return height;
+      }
+    },
+    beforeRouteLeave(to, from, next) {
       const self = this;
-      self.dialogCommentVideo = true;
-      self.$nextTick(function() {
+      if (to.name !== 'remotePatrol') {
+        self.$store.dispatch('setPatrolHistory', null);
+        self.$store.dispatch('setPatrolComment', null);
+        next();
+      } else {
+        self.$store.dispatch('setPatrolComment', self.suggest);
+        next();
+      }
+    },
+    mounted() {
+      this.getRouteData();
+      this.getUpLoadBucketInfo();
+      this.getOssInfo();
+    },
+    methods: {
+      stopCommentVideo() {
         var video = document.getElementById('previewVideo');
         this.previewplayer = videojs(video);
-        this.previewplayer.src({ src: item.url });
-        this.previewplayer.play();
-      });
-    },
-    openOuter(item, $ev) {
-      const self = this;
-      console.log(item);
-      console.log($ev.target.onerror);
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.src;
-        self.showImg = true;
-      }
-    },
-    getFileUrl(fileName) {
-      const self = this;
-      const bucketName = self.oss.ossBucketName;
-      const endpoint = self.oss.ossEndPoint;
-      const key = fileName;
-      if (self.oss.ossVendor === 2) {
-        return `https://${endpoint}/${bucketName}/${fileName}`;
-      } else {
-        return `http://${bucketName}.${endpoint}/${fileName}`;
-      }
-    },
-    upLoadFile(fileItem) {
-      const self = this;
-      self.percentage = 0;
-      if (self.oss.ossVendor === null) {
-        self.oss.ossVendor = 1; // 1 -aliyun  2-azure
-      }
-      if (self.oss.ossVendor === 1) {
-        const OSS = require('ali-oss');
-        const client = new OSS({
-          region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-          accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
-          accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
-          // bucket: 'viumo-'+self.accountId,
-          bucket: self.oss.ossBucketName
+        this.previewplayer.pause();
+      },
+      playCommentVideo(item, index) {
+        const self = this;
+        self.dialogCommentVideo = true;
+        self.$nextTick(function() {
+          var video = document.getElementById('previewVideo');
+          this.previewplayer = videojs(video);
+          this.previewplayer.src({ src: item.url });
+          this.previewplayer.play();
         });
-        const name = fileItem.fileName;
-        return new Promise((resolve, reject) => {
-          client.put(name, fileItem.file, {
-            progress: function * (percentage, cpt) {
-              self.percentage = percentage;
-            }
-          })
-            .then((results) => {
-              // 上传完成
-              const url = self.getFileUrl(results.name);
-              console.log(url);
-              resolve(url);
-            })
-            .catch((err) => {
-              reject(err);
-              console.log(err);
-            });
-        });
-      } else {
-        const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
-        const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
-        const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
-        return new Promise((resolve, reject) => {
-          azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
-            .then((results) => {
-              // 上传完成
-              const url = self.getFileUrl(fileItem.fileName);
-              console.log(url);
-              resolve(url);
-            })
-            .catch((error) => {
-              reject(error);
-              console.log(error);
-            });
-        });
-      }
-    },
-    clickSum(item, index) {
-      const self = this;
-      item.isActive = true;
-      self.resultList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isActive = false;
+      },
+      openOuter(item, $ev) {
+        const self = this;
+        console.log(item);
+        console.log($ev.target.onerror);
+        if (item != null) {
+          self.showOuter = true;
+          self.checkImgSrc = item.src;
+          self.showImg = true;
         }
-      });
-      self.curSumIndex = item.label;
-    },
-    async submit() {
-      const self = this;
-      let upload = 0;
-      const inspect = self.inspectList;
-      const eventList = self.eventList;
-      let status = 0;
-      let flag = false;
-      self.uploadingnumOfPic = 0;
-      self.resultList.forEach(item => {
-        if (item.isActive) {
-          flag = true;
-        }
-      });
-      if (!flag) {
-        util.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
-        return false;
-      }
-      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
-      const storageParams = {};
-      storageParams.storeId = self.store.storeId;
-      await getStorageInfo(storageParams).then(res => {
-        if (res.errCode === 0) {
-          self.oss = res.data;
-          console.log(self.oss);
-        }
-      });
-      const temp = [];
-      for (const i in inspect) {
-        for (const g in inspect[i].inspectList) {
-          for (const j in inspect[i].inspectList[g].items) {
-            const objItem = {};
-            objItem.ts = new Date().getTime();
-            objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
-            if (inspect[i].type === 0 || inspect[i].type === 2) {
-              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
-            } else {
-              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
-            }
-
-            objItem.storeId = self.store.storeId;
-            objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
-            const tempFileUrl = [];
-            if (!inspect[i].inspectList[g].items[j].isIgnore) {
-              for (const k in inspect[i].inspectList[g].items[j].sourceList) {
-                const obj = {};
-                await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
-                  self.uploadingnumOfPic++;
-                  if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
-                    obj.mediaType = 2;
-                    obj.url = url;
-                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                  } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
-                    obj.mediaType = 1;
-                    obj.url = url;
-                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                  }
-                }).catch((err) => {
-                  upload++;
-                });
-                if (upload !== 0) {
-                  self.uploadProgress = false;
-                  util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-                  return false;
-                }
-
-                tempFileUrl.push(obj);
-              }
-            }
-            objItem.attachment = tempFileUrl;
-            temp.push(objItem);
-          }
-        }
-      }
-      const feedEventList = [];
-      console.log(self.eventList);
-
-      for (const i in self.eventList) {
-        const obj = {};
-        obj.ts = new Date().getTime();
-        obj.storeId = self.store.storeId;
-
-        obj.subject = self.eventList[i].eventName;
-        obj.description = self.eventList[i].eventDes;
-
-        const commentTemp = [];
-        if (self.eventList[i].sourceObj != null) { // 通过通道创建的反馈问题
-          await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
-            self.uploadingnumOfPic++;
-            const commentObj = {
-              mediaType: self.eventList[i].sourceObj.mediaType,
-              url: url,
-              deviceId: self.eventList[i].sourceObj.deviceId
-            };
-            commentTemp.push(commentObj);
-          }).catch((err) => {
-            upload++;
-          });
-          if (upload !== 0) {
-            self.uploadProgress = false;
-            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-            return false;
-          }
-
-          obj.deviceId = self.eventList[i].sourceObj.deviceId;
-        } else { // 通过加号创建的问题反馈
-          // obj.diviceId=-1;
-        }
-        obj.attachment = commentTemp;
-        feedEventList.push(obj);
-      }
-      let curSumIndex = [];
-      curSumIndex = self.resultList.filter(x => x.isActive);
-      status = curSumIndex[0].label;
-      const params = {
-        status: status,
-        comment: self.suggest.trim(),
-        items: temp,
-        feedback: feedEventList
-      };
-      let routeData = null;
-      upload === 0 && submitInspectItem1(params).then(res => {
-        if (res.errCode === 0) {
-          const data = res.data;
-          self.editFlag = true;
-          routeData = {
-            isSuccess: true,
-            user: data.notifiedTo
-          };
+      },
+      getFileUrl(fileName) {
+        const self = this;
+        const bucketName = self.oss.ossBucketName;
+        const endpoint = self.oss.ossEndPoint;
+        const key = fileName;
+        if (self.oss.ossVendor === 2) {
+          return `https://${endpoint}/${bucketName}/${fileName}`;
         } else {
-          routeData = {
-            isSuccess: false,
-            reLoadData: self.$route.params
-          };
+          return `http://${bucketName}.${endpoint}/${fileName}`;
         }
-        self.$router.push({ name: 'submitEvent', params: { data: routeData }});
-      }).catch(err => {
-        util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-        return false;
-      });
-      self.uploadProgress = false;
-    },
+      },
+      upLoadFile(fileItem) {
+        const self = this;
+        self.percentage = 0;
+        if (self.oss.ossVendor === null) {
+          self.oss.ossVendor = 1; // 1 -aliyun  2-azure
+        }
+        if (self.oss.ossVendor === 1) {
+          const OSS = require('ali-oss');
+          const client = new OSS({
+            region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
+            accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
+            accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
+            // bucket: 'viumo-'+self.accountId,
+            bucket: self.oss.ossBucketName
+          });
+          const name = fileItem.fileName;
+          return new Promise((resolve, reject) => {
+            client.put(name, fileItem.file, {
+              progress: function * (percentage, cpt) {
+                self.percentage = percentage;
+              }
+            })
+              .then((results) => {
+                // 上传完成
+                const url = self.getFileUrl(results.name);
+                console.log(url);
+                resolve(url);
+              })
+              .catch((err) => {
+                reject(err);
+                console.log(err);
+              });
+          });
+        } else {
+          const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+          const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
+          const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+          return new Promise((resolve, reject) => {
+            azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+              .then((results) => {
+                // 上传完成
+                const url = self.getFileUrl(fileItem.fileName);
+                console.log(url);
+                resolve(url);
+              })
+              .catch((error) => {
+                reject(error);
+                console.log(error);
+              });
+          });
+        }
+      },
+      clickSum(item, index) {
+        const self = this;
+        item.isActive = true;
+        self.resultList.forEach((_item, _index) => {
+          if (index !== _index) {
+            _item.isActive = false;
+          }
+        });
+        self.curSumIndex = item.label;
+      },
+      async submit() {
+        const self = this;
+        let upload = 0;
+        const inspect = self.inspectList;
+        const eventList = self.eventList;
+        let status = 0;
+        let flag = false;
+        self.uploadingnumOfPic = 0;
+        self.resultList.forEach(item => {
+          if (item.isActive) {
+            flag = true;
+          }
+        });
+        if (!flag) {
+          util.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
+          return false;
+        }
+        self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
+        const storageParams = {};
+        storageParams.storeId = self.store.storeId;
+        await getStorageInfo(storageParams).then(res => {
+          if (res.errCode === 0) {
+            self.oss = res.data;
+            console.log(self.oss);
+          }
+        });
+        const temp = [];
+        for (const i in inspect) {
+          for (const g in inspect[i].inspectList) {
+            for (const j in inspect[i].inspectList[g].items) {
+              const objItem = {};
+              objItem.ts = new Date().getTime();
+              objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
+              if (inspect[i].type === 0 || inspect[i].type === 2) {
+                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
+              } else {
+                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
+              }
 
-    getRouteData() {
-      const self = this;
-      const PatrolComment = self.$store.getters.PatrolComment;
-      if (PatrolComment != null) {
-        self.suggest = PatrolComment;
-      }
-      const routeData = self.$route.params.data;
-      const inspectSettings = self.$route.params.rule;
-      const inspect = routeData.inspect;
-      const eventList = routeData.event;
-      const store = routeData.store;
-      self.store = store;
-      self.inspectList = routeData.inspect;
-      self.eventList = routeData.event;
-      const allTypeArr = new Set();
-      let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
-      let PassFileXN = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0;
-      let ScoreX = 0,ScoreN = 0,ScoreXN = 0,ScoreTotalScoreX = 0, allScoreB = 0,ScoreTotalScoreSystem = 0;
-      let otherGetscoreTotal = 0, OtherTotalScoreSystem = 0;
-      inspect.forEach(p_item => {
-        if (p_item.dealCount !== 0) {
-          dealType.push(p_item.type);
-        }
-        allTypeArr.add(p_item.type);
-      });
-      let Tab0Status = false;
-      let inspectPic = 0;
-      inspect.forEach(p_item => {
-        let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
-        let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
-        p_item.inspectList.forEach(item => {
-          let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
-          let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
-          let tab1GetScoreNoContainedIngored = 0;
-          let tab1GetScoreContainedIgnored = 0;
-          let tab2NotIgnoredItemsGetScore = 0;
-          let tab2IgnoredItemsGetScore = 0;
-          item.items.forEach(s_item => {
-            if (s_item.isIgnore) {
-              IgnoredArr.push(s_item);
-              ignoreTemp.push(s_item);
-            } else {
-              if ((p_item.type === 0 || p_item.type === 2) && !s_item.isQualified) {
-                UnqualifiedArr.push(s_item);
-                UnqualifiedTemp.push(s_item);
-              } else if ((p_item.type === 0 || p_item.type === 2) && s_item.isQualified) {
-                QualifiedArr.push(s_item);
-              } else if (p_item.type === 1 && (s_item.itemgetScore < s_item.qualifiedScore)) {
-                UnqualifiedTemp.push(s_item);
+              objItem.storeId = self.store.storeId;
+              objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
+              const tempFileUrl = [];
+              if (!inspect[i].inspectList[g].items[j].isIgnore) {
+                for (const k in inspect[i].inspectList[g].items[j].sourceList) {
+                  const obj = {};
+                  await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
+                    self.uploadingnumOfPic++;
+                    if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
+                      obj.mediaType = 2;
+                      obj.url = url;
+                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                    } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
+                      obj.mediaType = 1;
+                      obj.url = url;
+                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                    }
+                  }).catch((err) => {
+                    upload++;
+                  });
+                  if (upload !== 0) {
+                    self.uploadProgress = false;
+                    util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                    return false;
+                  }
+
+                  tempFileUrl.push(obj);
+                }
               }
-              if (s_item.itemgetScore !== '--') {
-                totalGetscore += s_item.itemgetScore;
-              }
+              objItem.attachment = tempFileUrl;
+              temp.push(objItem);
             }
-            s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
-            if (p_item.type === 0) {
-              PassFileTS += s_item.itemgetScore;
-              totalScore0 += s_item.itemScore;
-              if (!s_item.isIgnore&&!s_item.manualIgnore) {
-                PassFileX += s_item.itemgetScore;
-                PassFile_totalScoreX += s_item.itemScore;
-                tab1GetScoreNoContainedIngored += s_item.itemgetScore;
-              }else{
-                PassFileN += s_item.itemScore;
-                tab1GetScoreContainedIgnored += s_item.itemScore;
+          }
+        }
+        const feedEventList = [];
+        console.log(self.eventList);
+
+        for (const i in self.eventList) {
+          const obj = {};
+          obj.ts = new Date().getTime();
+          obj.storeId = self.store.storeId;
+
+          obj.subject = self.eventList[i].eventName;
+          obj.description = self.eventList[i].eventDes;
+
+          const commentTemp = [];
+          if (self.eventList[i].sourceObj != null) { // 通过通道创建的反馈问题
+            await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
+              self.uploadingnumOfPic++;
+              const commentObj = {
+                mediaType: self.eventList[i].sourceObj.mediaType,
+                url: url,
+                deviceId: self.eventList[i].sourceObj.deviceId
+              };
+              commentTemp.push(commentObj);
+            }).catch((err) => {
+              upload++;
+            });
+            if (upload !== 0) {
+              self.uploadProgress = false;
+              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+              return false;
+            }
+
+            obj.deviceId = self.eventList[i].sourceObj.deviceId;
+          } else { // 通过加号创建的问题反馈
+            // obj.diviceId=-1;
+          }
+          obj.attachment = commentTemp;
+          feedEventList.push(obj);
+        }
+        let curSumIndex = [];
+        curSumIndex = self.resultList.filter(x => x.isActive);
+        status = curSumIndex[0].label;
+        const params = {
+          status: status,
+          comment: self.suggest.trim(),
+          items: temp,
+          feedback: feedEventList
+        };
+        let routeData = null;
+        upload === 0 && submitInspectItem1(params).then(res => {
+          if (res.errCode === 0) {
+            const data = res.data;
+            self.editFlag = true;
+            routeData = {
+              isSuccess: true,
+              user: data.notifiedTo
+            };
+          } else {
+            routeData = {
+              isSuccess: false,
+              reLoadData: self.$route.params
+            };
+          }
+          self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+        }).catch(err => {
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        });
+        self.uploadProgress = false;
+      },
+
+      getRouteData() {
+        const self = this;
+        const PatrolComment = self.$store.getters.PatrolComment;
+        if (PatrolComment != null) {
+          self.suggest = PatrolComment;
+        }
+        const routeData = self.$route.params.data;
+        const inspectSettings = self.$route.params.rule;
+        const inspect = routeData.inspect;
+        const eventList = routeData.event;
+        const store = routeData.store;
+        self.store = store;
+        self.inspectList = routeData.inspect;
+        self.eventList = routeData.event;
+        this.getTab1AndTab3BtnName(inspectSettings);
+        const allTypeArr = new Set();
+        let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
+        let PassFileXN = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0;
+        let ScoreX = 0,ScoreN = 0,ScoreXN = 0,ScoreTotalScoreX = 0, allScoreB = 0,ScoreTotalScoreSystem = 0;
+        let otherGetscoreTotal = 0, OtherTotalScoreSystem = 0;
+        inspect.forEach(p_item => {
+          if (p_item.dealCount !== 0) {
+            dealType.push(p_item.type);
+          }
+          allTypeArr.add(p_item.type);
+        });
+        let Tab0Status = false;
+        let inspectPic = 0;
+        inspect.forEach(p_item => {
+          let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
+          let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
+          p_item.inspectList.forEach(item => {
+            let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
+            let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
+            let tab1GetScoreNoContainedIngored = 0;
+            let tab1GetScoreContainedIgnored = 0;
+            let tab2NotIgnoredItemsGetScore = 0;
+            let tab2IgnoredItemsGetScore = 0;
+            item.ignoreItems = [];
+            item.unqualifiedItems = [];
+            item.items.forEach(s_item => {
+              if (s_item.isIgnore) {
+                IgnoredArr.push(s_item);
+                s_item.groupName = item.groupName;
+                ignoreTemp.push(s_item);
+                item.ignoreItems.push(s_item);
+              } else {
+                if ((p_item.type === 0 || p_item.type === 2) && !s_item.isQualified) {
+                  UnqualifiedArr.push(s_item);
+                  s_item.groupName = item.groupName;
+                  UnqualifiedTemp.push(s_item);
+                  item.unqualifiedItems.push(s_item);
+                } else if ((p_item.type === 0 || p_item.type === 2) && s_item.isQualified) {
+                  QualifiedArr.push(s_item);
+                } else if (p_item.type === 1 && (s_item.itemgetScore < s_item.qualifiedScore)) {
+                  s_item.groupName = item.groupName;
+                  UnqualifiedTemp.push(s_item);
+                  item.unqualifiedItems.push(s_item);
+                }
+                if (s_item.itemgetScore !== '--') {
+                  totalGetscore += s_item.itemgetScore;
+                }
               }
-              if(inspect.length > 1){
-                if(!inspectSettings.includedInTotalScoreWithType1){
-                  s_item.showTotalScore = false;
-                } else if(s_item.isIgnore || s_item.manualIgnore){
-                  if(inspectSettings.qualifiedForIgnoredWithType1){
+              s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
+              if (p_item.type === 0) {
+                PassFileTS += s_item.itemgetScore;
+                totalScore0 += s_item.itemScore;
+                if (!s_item.isIgnore&&!s_item.manualIgnore) {
+                  PassFileX += s_item.itemgetScore;
+                  PassFile_totalScoreX += s_item.itemScore;
+                  tab1GetScoreNoContainedIngored += s_item.itemgetScore;
+                }else{
+                  PassFileN += s_item.itemScore;
+                  tab1GetScoreContainedIgnored += s_item.itemScore;
+                }
+                if(inspect.length > 1){
+                  if(!inspectSettings.includedInTotalScoreWithType1){
+                    s_item.showTotalScore = false;
+                  } else if(s_item.isIgnore || s_item.manualIgnore){
+                    if(inspectSettings.qualifiedForIgnoredWithType1){
+                      s_item.showTotalScore = true;
+                    }
+                    else{
+                      s_item.showTotalScore = false;
+                    }
+                  } else{
                     s_item.showTotalScore = true;
                   }
-                  else{
-                    s_item.showTotalScore = false;
+                } else {
+                  if(s_item.isIgnore || s_item.manualIgnore){
+                    s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType1;
                   }
+                  else{
+                    s_item.showTotalScore = true;
+                  }
+                }
+              } else if (p_item.type === 1) {
+                totalScore += s_item.itemScore;
+                ScoreTS += s_item.itemgetScore;
+                if (!s_item.isIgnore&&!s_item.manualIgnore) {
+                  ScoreX += s_item.itemgetScore;
+                  Score_totalScoreX += s_item.itemScore;
+                  notAddIgnoretotalScore += s_item.itemScore;
+                  tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
+                }else{
+                  ScoreN += s_item.itemScore;
+                  tab2IgnoredItemsGetScore += s_item.itemScore;
+                }
+                if(s_item.isIgnore || s_item.manualIgnore){
+                  s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType2;
                 } else{
                   s_item.showTotalScore = true;
                 }
-              } else {
-                if(s_item.isIgnore || s_item.manualIgnore){
-                  s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType1;
-                }
-                else{
-                  s_item.showTotalScore = true;
-                }
-              }
-            } else if (p_item.type === 1) {
-              totalScore += s_item.itemScore;
-              ScoreTS += s_item.itemgetScore;
-              if (!s_item.isIgnore&&!s_item.manualIgnore) {
-                ScoreX += s_item.itemgetScore;
-                Score_totalScoreX += s_item.itemScore;
-                notAddIgnoretotalScore += s_item.itemScore;
-                tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
-              }else{
-                ScoreN += s_item.itemScore;
-                tab2IgnoredItemsGetScore += s_item.itemScore;
-              }
-              if(s_item.isIgnore || s_item.manualIgnore){
-                s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType2;
-              } else{
+              } else if (p_item.type === 2 && !s_item.isIgnore) {
+                OtherTS += s_item.itemgetScore;
                 s_item.showTotalScore = true;
               }
-            } else if (p_item.type === 2 && !s_item.isIgnore) {
-              OtherTS += s_item.itemgetScore;
-              s_item.showTotalScore = true;
+              inspectPic += s_item.sourceList.length;
+            });
+            item['numOfQualified'] = QualifiedArr.length;
+            item['numOfUnqualified'] = UnqualifiedArr.length;
+            item['numIgnore'] = IgnoredArr.length;
+            if(inspectSettings.qualifiedForIgnoredWithType2){
+              item['itemScore'] = totalScore;
+            }else{
+              item['itemScore'] = notAddIgnoretotalScore;
             }
-            inspectPic += s_item.sourceList.length;
-          });
-          item['numOfQualified'] = QualifiedArr.length;
-          item['numOfUnqualified'] = UnqualifiedArr.length;
-          item['numIgnore'] = IgnoredArr.length;
-          if(inspectSettings.qualifiedForIgnoredWithType2){
-            item['itemScore'] = totalScore;
-          }else{
-            item['itemScore'] = notAddIgnoretotalScore;
-          }
-          if(p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1){
-            item['itemgetScore'] = '--';
-          } else{
-            item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
-          }
-          if (inspect.length === 1 && inspect[0].type === 0) {
-            if (inspectSettings.qualifiedForIgnoredWithType1) {
-              item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;;
-            } else {
-              item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+            if(p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1){
+              item['itemgetScore'] = '--';
+            } else{
+              item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
             }
-          } else {
-            if (inspectSettings.includedInTotalScoreWithType1) {
+            if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;;
               } else {
                 item['itemgetScore'] = tab1GetScoreNoContainedIngored;
               }
             } else {
-              item['itemgetScore'] = '--';
+              if (inspectSettings.includedInTotalScoreWithType1) {
+                if (inspectSettings.qualifiedForIgnoredWithType1) {
+                  item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                } else {
+                  item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                }
+              } else {
+                item['itemgetScore'] = '--';
+              }
             }
-          }
-          if (p_item.type === 0) {
-            PassFileTotalScoreSystem = PassFileTS;
-            PassFileXS = PassFileX;
-            PassFileXN = PassFileN + PassFileX;
-            PassFileTotalScore = totalScore0;
-            PassFileTotalScoreX = PassFile_totalScoreX;
-          }
-          if (p_item.type === 1) {
-            CurAddScoreB += totalScore;
-            allScoreB = CurAddScoreB;
-            ScoreTotalScoreSystem = ScoreTS;
-            ScoreXN = ScoreX + ScoreN;
-            ScoreTotalScoreX = Score_totalScoreX;
-            item['itemgetScore'] =
-              inspectSettings.qualifiedForIgnoredWithType2 ?
-                (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
-          }
-          if (p_item.type === 2) {
-            CurOtherTotalScore += totalGetscore;
-            otherGetscoreTotal = CurOtherTotalScore;
-            OtherTotalScoreSystem = OtherTS;
-          }
-        });
-        if (p_item.type === 0) {
-          p_item['tHeader'] = self.theaderPassFail;
-          if (p_item.inspectList.some(x => x.numOfUnqualified !== 0) && dealType.some(x => x === 0) && inspectSettings.dangerousOnFailedItem) {
-            self.resultList[0].isShow = false;
-            self.resultList[1].isShow = false;
-            self.resultList[2].isActive = true;
-            Tab0Status = true;
-          }
-        } else if (p_item.type === 1) {
-          p_item['tHeader'] = self.theaderScore;
-        } else if (p_item.type === 2) {
-          p_item['tHeader'] = self.theaderOther;
-        }
-      });
-      let s_count = 0;
-      if (inspect.length === 1 && inspect[0].type === 0) {
-        if (inspectSettings.hundredMarkType === '-1') {
-          if(inspectSettings.qualifiedForIgnoredWithType1){
-            s_count = PassFileXN;
-          }else{
-            s_count = PassFileTotalScoreSystem;
-          }
-        } else {
-          if (inspectSettings.qualifiedForIgnoredWithType1) {
-            s_count = PassFileTotalScore === 0 ? 0 : PassFileXN / PassFileTotalScore * 100;
-          } else {
-            s_count = PassFileTotalScoreX === 0 ? 0 : PassFileXS / PassFileTotalScoreX * 100;
-          }
-        }
-      } else {
-        if (inspectSettings.includedInTotalScoreWithType1) {
-          if (inspectSettings.hundredMarkType === '-1') {
-            if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
-              s_count = PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem;
-            } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
-              s_count = PassFileTotalScoreSystem + ScoreXN + OtherTotalScoreSystem;
-            } else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
-              s_count = PassFileXN + ScoreXN + OtherTotalScoreSystem;
-            } else {
-              s_count = PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem;
+            if (p_item.type === 0) {
+              PassFileTotalScoreSystem = PassFileTS;
+              PassFileXS = PassFileX;
+              PassFileXN = PassFileN + PassFileX;
+              PassFileTotalScore = totalScore0;
+              PassFileTotalScoreX = PassFile_totalScoreX;
             }
-          } else {
-            let total_a = 0,total_b = 0,total_c = 0;
-            if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
-              total_a = PassFileXN + ScoreTotalScoreSystem;
-              total_b = PassFileTotalScore + ScoreTotalScoreX;
-            } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
-              total_a = PassFileXS + ScoreXN;
-              total_b = PassFileTotalScoreX + allScoreB;
-            } else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
-              total_a = PassFileXN + ScoreXN;
-              total_b = PassFileTotalScore + allScoreB;
-            } else {
-              total_a = PassFileXS + ScoreTotalScoreSystem;
-              total_b = PassFileTotalScoreX + ScoreTotalScoreX;
+            if (p_item.type === 1) {
+              CurAddScoreB += totalScore;
+              allScoreB = CurAddScoreB;
+              ScoreTotalScoreSystem = ScoreTS;
+              ScoreXN = ScoreX + ScoreN;
+              ScoreTotalScoreX = Score_totalScoreX;
+              item['itemgetScore'] =
+                inspectSettings.qualifiedForIgnoredWithType2 ?
+                  (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
             }
-            total_c = total_a===0 || total_b===0 ? 0 : (total_a / total_b * 100);
-            s_count = total_c + otherGetscoreTotal;
-          }
-        } else {
-          if (inspectSettings.hundredMarkType === '-1') {
-            if (inspectSettings.qualifiedForIgnoredWithType2) {
-              s_count = ScoreXN + OtherTotalScoreSystem;
-            } else {
-              s_count = ScoreTotalScoreSystem + OtherTotalScoreSystem;
-            }
-          } else {
-            let total_a = 0;
-            if (inspectSettings.qualifiedForIgnoredWithType2) {
-              total_a = allScoreB===0 || ScoreXN===0 ? 0 : (ScoreXN / allScoreB * 100);
-            } else {
-              total_a = ScoreTotalScoreX===0 || ScoreTotalScoreSystem===0 ? 0 : (ScoreTotalScoreSystem / ScoreTotalScoreX * 100);
-            }
-            s_count = total_a + otherGetscoreTotal;
-          }
-        }
-      }
-      if (!Tab0Status && dealType.length !== 1 && inspect[0].type === 0 || inspect[0].type !== 0) {
-        self.resultList.forEach(item => {
-          item.isShow = true;
-          item.isActive = false;
-        });
-      }
-      self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
-      self.summary = inspect;
-      eventList.forEach((item, index) => {
-        const objFeedBack = {};
-        objFeedBack.subject = item.eventName;
-        objFeedBack.description = item.eventDes;
-        objFeedBack.sourceList = [];
-        item.sourceObj != null ? objFeedBack.sourceList.push(item.sourceObj) : '';
-        feedBackTemp.push(objFeedBack);
-      });
-      const eventpic = eventList.filter(x => x.sourceObj != null);
-      self.totalnumOfPic = Number(inspectPic) + Number(eventpic.length);
-      tempList[0] = {
-        itemTitleName: self.$t('remotePatrol.notableItem'),
-        iconSrc: 'icon-zhongxindingwei',
-        itemCount: UnqualifiedTemp.length,
-        itemList: UnqualifiedTemp,
-        detailType: 0
-      };
-      tempList[1] = {
-        itemTitleName: self.$t('remotePatrol.ignoreds'),
-        iconSrc: 'icon-hulve',
-        itemCount: ignoreTemp.length,
-        itemList: ignoreTemp,
-        detailType: 1
-      };
-      tempList[2] = {
-        itemTitleName: self.$t('remotePatrol.feedbacks'),
-        iconSrc: 'icon-fankui',
-        itemCount: feedBackTemp.length,
-        itemList: feedBackTemp,
-        detailType: 2
-      };
-      self.tempList = tempList;
-    },
-    getAccountId() {
-      const self = this;
-      const userId = getCookie('UserId');
-      return new Promise((resolve, reject) => {
-        getUserInfo().then(res => {
-          console.log(res);
-          res.data.forEach(item => {
-            if (item.userId === userId) {
-              const accountId = item.accountId.toLowerCase();
-              self.accountId = accountId;
-              localStorage.setItem('oss_bucket', accountId);
-              resolve(accountId);
+            if (p_item.type === 2) {
+              CurOtherTotalScore += totalGetscore;
+              otherGetscoreTotal = CurOtherTotalScore;
+              OtherTotalScoreSystem = OtherTS;
             }
           });
+          if (p_item.type === 0) {
+            p_item['tHeader'] = self.theaderPassFail;
+            if (p_item.inspectList.some(x => x.numOfUnqualified !== 0) && dealType.some(x => x === 0) && inspectSettings.dangerousOnFailedItem) {
+              self.resultList[0].isShow = false;
+              self.resultList[1].isShow = false;
+              self.resultList[2].isActive = true;
+              Tab0Status = true;
+            }
+          } else if (p_item.type === 1) {
+            p_item['tHeader'] = self.theaderScore;
+          } else if (p_item.type === 2) {
+            p_item['tHeader'] = self.theaderOther;
+          }
         });
-      });
-    },
-    async getOssInfo() {
-      const self = this;
-      const accountId = await self.getAccountId();
-      console.log(accountId);
-      self.accountId = localStorage.getItem('oss_bucket');
-      // getStorageInfo().then(res=>{
-      //     console.log(res);
-      //     if(res.errCode==0){
-      //         self.oss=res.data;
-      //     }
-      // })
-    },
-    getUpLoadBucketInfo() {
-      const self = this;
-      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
-      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
-    },
+        let s_count = 0;
+        if (inspect.length === 1 && inspect[0].type === 0) {
+          if (inspectSettings.hundredMarkType === '-1') {
+            if(inspectSettings.qualifiedForIgnoredWithType1){
+              s_count = PassFileXN;
+            }else{
+              s_count = PassFileTotalScoreSystem;
+            }
+          } else {
+            if (inspectSettings.qualifiedForIgnoredWithType1) {
+              s_count = PassFileTotalScore === 0 ? 0 : PassFileXN / PassFileTotalScore * 100;
+            } else {
+              s_count = PassFileTotalScoreX === 0 ? 0 : PassFileXS / PassFileTotalScoreX * 100;
+            }
+          }
+        } else {
+          if (inspectSettings.includedInTotalScoreWithType1) {
+            if (inspectSettings.hundredMarkType === '-1') {
+              if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
+                s_count = PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem;
+              } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
+                s_count = PassFileTotalScoreSystem + ScoreXN + OtherTotalScoreSystem;
+              } else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
+                s_count = PassFileXN + ScoreXN + OtherTotalScoreSystem;
+              } else {
+                s_count = PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem;
+              }
+            } else {
+              let total_a = 0,total_b = 0,total_c = 0;
+              if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
+                total_a = PassFileXN + ScoreTotalScoreSystem;
+                total_b = PassFileTotalScore + ScoreTotalScoreX;
+              } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
+                total_a = PassFileXS + ScoreXN;
+                total_b = PassFileTotalScoreX + allScoreB;
+              } else if (inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
+                total_a = PassFileXN + ScoreXN;
+                total_b = PassFileTotalScore + allScoreB;
+              } else {
+                total_a = PassFileXS + ScoreTotalScoreSystem;
+                total_b = PassFileTotalScoreX + ScoreTotalScoreX;
+              }
+              total_c = total_a===0 || total_b===0 ? 0 : (total_a / total_b * 100);
+              s_count = total_c + otherGetscoreTotal;
+            }
+          } else {
+            if (inspectSettings.hundredMarkType === '-1') {
+              if (inspectSettings.qualifiedForIgnoredWithType2) {
+                s_count = ScoreXN + OtherTotalScoreSystem;
+              } else {
+                s_count = ScoreTotalScoreSystem + OtherTotalScoreSystem;
+              }
+            } else {
+              let total_a = 0;
+              if (inspectSettings.qualifiedForIgnoredWithType2) {
+                total_a = allScoreB===0 || ScoreXN===0 ? 0 : (ScoreXN / allScoreB * 100);
+              } else {
+                total_a = ScoreTotalScoreX===0 || ScoreTotalScoreSystem===0 ? 0 : (ScoreTotalScoreSystem / ScoreTotalScoreX * 100);
+              }
+              s_count = total_a + otherGetscoreTotal;
+            }
+          }
+        }
+        if (!Tab0Status && dealType.length !== 1 && inspect[0].type === 0 || inspect[0].type !== 0) {
+          self.resultList.forEach(item => {
+            item.isShow = true;
+            item.isActive = false;
+          });
+        }
+        self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
+        self.summary = this.groupbyKey(inspect, 'type');
+        eventList.forEach((item, index) => {
+          const objFeedBack = {};
+          objFeedBack.subject = item.eventName;
+          objFeedBack.description = item.eventDes;
+          objFeedBack.sourceList = [];
+          item.sourceObj != null ? objFeedBack.sourceList.push(item.sourceObj) : '';
+          feedBackTemp.push(objFeedBack);
+        });
+        const eventpic = eventList.filter(x => x.sourceObj != null);
+        self.totalnumOfPic = Number(inspectPic) + Number(eventpic.length);
+        this.getNoteableData();
+        this.getIgnoreData();
+        tempList[0] = {
+          itemTitleName: self.$t('remotePatrol.notableItem'),
+          iconSrc: 'icon-zhongxindingwei',
+          itemCount: UnqualifiedTemp.length,
+          data: this.getGroupsItems('unqualifiedItems'),
+          detailType: 0
+        };
+        tempList[1] = {
+          itemTitleName: self.$t('remotePatrol.ignoreds'),
+          iconSrc: 'icon-hulve',
+          itemCount: ignoreTemp.length,
+          data: this.getGroupsItems('ignoreItems'),
+          detailType: 1
+        };
+        tempList[2] = {
+          itemTitleName: self.$t('remotePatrol.feedbacks'),
+          iconSrc: 'icon-fankui',
+          itemCount: feedBackTemp.length,
+          data: feedBackTemp,
+          detailType: 2
+        };
+        self.tempList = tempList;
+      },
 
-    notShowInputRuleTips() {
-      this.adviceInfoRuletip = false;
-    },
-    adviceChanged(val) {
-      const self = this;
-      const content = filterString.all(val, 600);
-      const length = filterString.getContentLength(val);
-      console.log(content);
-      self.suggest = content;
-      if (length > 600) {
-        this.adviceInfoRuletip = true;
-      } else {
+      getGroupsItems(key){
+        const group = [];
+        console.log(this.inspectList);
+        this.inspectList.forEach(catergy => {
+          const tempGroupItem = {};
+          tempGroupItem.groupName = catergy.label;
+          tempGroupItem.type = catergy.type;
+          if(!catergy.isCategory){
+            if (catergy.inspectList[0][key].length > 0) {
+              tempGroupItem.cateryItems = catergy.inspectList[0][key];
+              group.push(tempGroupItem);
+            }
+          } else {
+            tempGroupItem.children = [];
+            catergy.inspectList.forEach(child => {
+              const tempChildItem = {};
+              tempChildItem.groupId = child.groupId;
+              tempChildItem.groupName = child.groupName;
+              tempChildItem.type = child.type;
+              tempChildItem.cateryItems = [];
+              if (child[key].length > 0) {
+                tempChildItem.cateryItems = child[key];
+              }
+              if (tempChildItem.cateryItems.length > 0) {
+                tempGroupItem.children.push(tempChildItem);
+              }
+            });
+
+            if(tempGroupItem.children.length > 0){
+              group.push(tempGroupItem);
+            }
+          }
+        });
+        console.log(group)
+        return group;
+      },
+
+      getNoteableData(){
+      },
+
+      getIgnoreData(){},
+
+      groupbyKey(data, key) {
+        var map = {},
+          dest = [];
+        for (var i = 0; i < data.length; i++) {
+          var ai = data[i];
+          if (!map[ai[key]]) {
+            dest.push({
+              name: ai[key],
+              data: [ai]
+            });
+            map[ai[key]] = ai;
+          } else {
+            for (var j = 0; j < dest.length; j++) {
+              var dj = dest[j];
+              if (dj.name == ai[key]) {
+                dj.data.push(ai);
+                break;
+              }
+            }
+          }
+        }
+        return dest;
+      },
+
+      getAccountId() {
+        const self = this;
+        const userId = getCookie('UserId');
+        return new Promise((resolve, reject) => {
+          getUserInfo().then(res => {
+            console.log(res);
+            res.data.forEach(item => {
+              if (item.userId === userId) {
+                const accountId = item.accountId.toLowerCase();
+                self.accountId = accountId;
+                localStorage.setItem('oss_bucket', accountId);
+                resolve(accountId);
+              }
+            });
+          });
+        });
+      },
+      async getOssInfo() {
+        const self = this;
+        const accountId = await self.getAccountId();
+        console.log(accountId);
+        self.accountId = localStorage.getItem('oss_bucket');
+      },
+      getUpLoadBucketInfo() {
+        const self = this;
+        self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
+        self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+      },
+
+      notShowInputRuleTips() {
         this.adviceInfoRuletip = false;
-      }
-    }
+      },
+
+      adviceChanged(val) {
+        const self = this;
+        const content = filterString.all(val, 600);
+        const length = filterString.getContentLength(val);
+        console.log(content);
+        self.suggest = content;
+        if (length > 600) {
+          this.adviceInfoRuletip = true;
+        } else {
+          this.adviceInfoRuletip = false;
+        }
+      },
+
+      getTab1AndTab3BtnName(setting){
+        let tab1BtnArr = [setting.itemOptionsForType1[0].name , setting.itemOptionsForType1[1].name];
+        let tab3BtnArr = [setting.itemOptionsForType3[0].name , setting.itemOptionsForType3[1].name];
+        this.theaderPassFail = [
+          { name: '', width: 'width:11%;' },
+          { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
+          { name: tab1BtnArr[0], width: 'width:20%;' },
+          { name: tab1BtnArr[1], width: 'width:20%;' },
+          { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        ];
+        this.theaderOther = [
+          { name: '', width: 'width:11%;' },
+          { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
+          { name: tab3BtnArr[0], width: 'width:20%;' },
+          { name: tab3BtnArr[1], width: 'width:20%;' },
+          { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        ];
+        this.theaderScore = [
+          { name: '', width: 'width:11%;' },
+          { name: this.$t('remotePatrol.item'), width: 'width:26%;' },
+          { name: this.$t('remotePatrol.TableTotal'), width: 'width:34%;' },
+          { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        ];
+        this.tab1BtnArr = tab1BtnArr;
+        this.tab3BtnArr = tab3BtnArr;
+      },
+
   }
-};
+  };
 </script>
 <style lang="scss" scoped>
-@import 'node_modules/bootstrap/scss/bootstrap';
-@import 'node_modules/bootstrap-vue/src/index.scss';
-$red:#f31d65;
-$black:#182752;
-$border:#e3e9f4;
-$background:#f4f5f9;
-$tab:#7d8cad;
-$h1:#292e36;
-@function rem($val){
+  $red:#f31d65;
+  $black:#182752;
+  $border:#e3e9f4;
+  $background:#f4f5f9;
+  $tab:#7d8cad;
+  $h1:#292e36;
+  @function rem($val){
     @return $val/16+rem;
-}
-@function checkRem($val){
+  }
+  @function checkRem($val){
     @if($val==0){
-        @return 0;
+      @return 0;
     }
     @else if($val==auto){
-        @return auto;
+      @return auto;
     }
     @else{
-        @return rem($val);
+      @return rem($val);
     }
-}
-@mixin point($poi,$val){
+  }
+  @mixin point($poi,$val){
     #{$poi}:checkRem($val);
-}
-.AddSumupLoad >>> .el-dialog__body{
+  }
+  .AddSumupLoad >>> .el-dialog__body{
     padding:30px 40px !important;
     text-align: left;
     .body-content{
-        p{
-            margin-bottom:0;
-            color:#182752;
-            font-size: calc(14/1920*100vw);
-        }
+      p{
+        margin-bottom:0;
+        color:#182752;
+        font-size: calc(14/1920*100vw);
+      }
     }
-}
-.dialog-source-content{
-            @include point(height,320);
-            @include point(padding,20);
+  }
+  .dialog-source-content{
+    @include point(height,320);
+    @include point(padding,20);
 
-            img{
-                height: 100%;
-                user-select: none;
-            }
+    img{
+      height: 100%;
+      user-select: none;
+    }
+  }
+  .video-dialog-content{
+    width:100%;
+    height:100%;
+    margin: auto;
+    .dialog-hr{
+      border: 0.5px solid ;
+      border-color: #dfe2e9;
+      margin-bottom:10px;
+      bottom: 5px;
+      margin-top: 0;
+    }
+    .video-content{
+      @include point(margin,20);
+      padding-top: 0;
+      position: relative;
+      #channelName{
+        width: 100%;
+        color: #fff;
+        background-color: rgba($color: #24293d, $alpha: 0.6);
+        height: 40px;
+        line-height: 40px;
+        position: absolute;
+        z-index: 10;
+        text-align: left;
+        span{
+          margin-left: 30px;
         }
-        .video-dialog-content{
-            width:100%;
-            height:100%;
-            margin: auto;
-            .dialog-hr{
-                border: 0.5px solid ;
-                border-color: #dfe2e9;
-                margin-bottom:10px;
-                bottom: 5px;
-                margin-top: 0;
-            }
-            .video-content{
-                @include point(margin,20);
-                padding-top: 0;
-                position: relative;
-                #channelName{
-                    width: 100%;
-                    color: #fff;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    position: absolute;
-                    z-index: 10;
-                    text-align: left;
-                    span{
-                        margin-left: 30px;
-                    }
-                }
-                .icon-footer{
-                    width: 100%;
-                    position: absolute;
-                    bottom: 0px;
-                    color: #fff;
-                    overflow: hidden;
-                    user-select:none;
-                    background-color: rgba($color: #24293d, $alpha: 0.6);
-                    height: 40px;
-                    line-height: 40px;
-                    z-index: 10;
-                    .iconlside{
-                        float: left;
-                        text-align: left;
-                        .iconplay{
-                            font-size: 18px;
-                            cursor: pointer;
-                            float: left;
-                            margin-left: 30px;
-                        }
+      }
+      .icon-footer{
+        width: 100%;
+        position: absolute;
+        bottom: 0px;
+        color: #fff;
+        overflow: hidden;
+        user-select:none;
+        background-color: rgba($color: #24293d, $alpha: 0.6);
+        height: 40px;
+        line-height: 40px;
+        z-index: 10;
+        .iconlside{
+          float: left;
+          text-align: left;
+          .iconplay{
+            font-size: 18px;
+            cursor: pointer;
+            float: left;
+            margin-left: 30px;
+          }
 
-                    }
-                    .iconrside{
-                        max-width: 500px;
-                        float: right;
-                        position: relative;
-                        span{
-                            font-size: 13px;
-                            margin-right:6px;
-                            margin-left: 20px;
-                        }
-                        .speed-content{
-                            display: inline-block;
-                            span{
-                                position: relative;
-                                bottom:3px;
-                            }
-                        }
-                        .screen-content{
-                            display: inline;
-                            margin-left: 30px;
-                            position: absolute;
-                            right: 20px;
-                            .iconscreen{
-                                font-size: 18px;
-                                position: relative;
-                                cursor: pointer;
-                                margin-right: 20px;
-                                bottom: 3px;
-                            }
-                        }
-                    }
-                }
-            }
-            .channel-content{
-              margin: 20px 30px;
-              padding-top: 0;
+        }
+        .iconrside{
+          max-width: 500px;
+          float: right;
+          position: relative;
+          span{
+            font-size: 13px;
+            margin-right:6px;
+            margin-left: 20px;
+          }
+          .speed-content{
+            display: inline-block;
+            span{
               position: relative;
-              .radio-group{
-                display: grid;
-                grid-template-columns: 240px 240px;
-                grid-template-rows: 30px;
-              }
+              bottom:3px;
             }
+          }
+          .screen-content{
+            display: inline;
+            margin-left: 30px;
+            position: absolute;
+            right: 20px;
+            .iconscreen{
+              font-size: 18px;
+              position: relative;
+              cursor: pointer;
+              margin-right: 20px;
+              bottom: 3px;
+            }
+          }
         }
-        #previewVideo{
-            @include point(min-width,450);
-            @include point(min-height,360);
-        }
-.activeClass{
+      }
+    }
+    .channel-content{
+      margin: 20px 30px;
+      padding-top: 0;
+      position: relative;
+      .radio-group{
+        display: grid;
+        grid-template-columns: 240px 240px;
+        grid-template-rows: 30px;
+      }
+    }
+  }
+  #previewVideo{
+    @include point(min-width,450);
+    @include point(min-height,360);
+  }
+  .activeClass{
     background-color: #FDE8EF !important;
     color: $red;
     border-color: $red !important;
-}
-.sum-content{
+  }
+  .sum-content{
     color: $black;
     .sum-submit{
-        margin-bottom: 30px;
+      margin-bottom: 30px;
+      text-align: left;
+      padding-left: calc(30/1920*100vw);
+      padding-right: calc(40/1920*100vw);
+      border: 1px solid $border;
+      padding-bottom: 30px;
+      background-color: #fff;
+      .submit-header{
         text-align: left;
-        padding-left: calc(30/1920*100vw);
-        padding-right: calc(40/1920*100vw);
-        border: 1px solid $border;
-        padding-bottom: 30px;
-        background-color: #fff;
-        .submit-header{
-            text-align: left;
-            height: 60px;
-            line-height: 60px;
-            overflow: hidden;
-            span{
-                font-size: calc(20/1920*100vw);
-                font-weight: bold;
-                float: left;
-            }
-            .sum-btn{
-                float: right;
-                margin-top: 18px;
-                height: calc(36/1920*100vw);
-                width: calc(130/1920*100vw);
-                line-height: calc(36/1920*100vw);
-                font-size: calc(14/1920*100vw);
-                padding: 0 0;
-                outline: none;
-                border-radius: 4px;
-            }
+        height: 60px;
+        line-height: 60px;
+        overflow: hidden;
+        span{
+          font-size: calc(20/1920*100vw);
+          font-weight: bold;
+          float: left;
         }
-        .submit-content{
-            padding-left: calc(10/1920*100vw);
-            .submit-radio{
-                text-align: left;
-                margin-bottom: calc(20/1920*100vw);
-                .el-radio-details{
-                    display: inline-block;
-                    border: 1px solid #ddd;
-                    padding:6px;
-                    font-size: 12px;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    @include point(width,90);
-                    @include point(padding,6);
-                    text-align: center;
-                    margin-right: calc(20/1920*100vw);
-                }
+        .sum-btn{
+          float: right;
+          margin-top: 18px;
+          height: calc(36/1920*100vw);
+          width: calc(130/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          font-size: calc(14/1920*100vw);
+          padding: 0 0;
+          outline: none;
+          border-radius: 4px;
+        }
+      }
+      .submit-content{
+        padding-left: calc(10/1920*100vw);
+        .submit-radio{
+          text-align: left;
+          margin-bottom: calc(20/1920*100vw);
+          .el-radio-details{
+            display: inline-block;
+            border: 1px solid #ddd;
+            padding:6px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            @include point(width,90);
+            @include point(padding,6);
+            text-align: center;
+            margin-right: calc(20/1920*100vw);
+          }
 
-            }
-            .sug-label{
-                font-size: calc(12/1920*100vw);
-                display: block;
-                margin-bottom: 10px;
-            }
-            .rules{
-                font-size: 10px;
-                color:#ff2400;
-                font-weight: 400;
-                line-height: 12px;
-            }
-            .sug-input{
-              width: 99.5%;
-            }
         }
+        .sug-label{
+          font-size: calc(12/1920*100vw);
+          display: block;
+          margin-bottom: 10px;
+        }
+        .rules{
+          font-size: 10px;
+          color:#ff2400;
+          font-weight: 400;
+          line-height: 12px;
+        }
+        .sug-input{
+          width: 99.5%;
+        }
+      }
 
     }
     .sum-data{
-        padding: calc(40/1920*100vw);
-        border: 1px solid $border;
-        padding-top: 20px;
-        padding-bottom: 20px;
-        background-color: #fff;
-        min-height: calc(500/1920*100vw);
-        .divider-content{
-            height: 40px;
-            line-height: 40px;
-            display: flex;
-            align-items: center;
-            .divider-hr{
-                border: 0.5px solid $border;
-            }
-            span{
-                font-size: calc(18/1920*100vw);
-                font-weight: bold;
-                color: $tab;
-            }
+      padding: calc(40/1920*100vw);
+      border: 1px solid $border;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      background-color: #fff;
+      min-height: calc(500/1920*100vw);
+      .divider-content{
+        height: 40px;
+        line-height: 40px;
+        display: flex;
+        align-items: center;
+        .divider-hr{
+          border: 0.5px solid $border;
         }
-        .table-content{
-            .table-header{
-                padding-bottom: 20px;
-                font-weight: bold;
-                .header-store-name{
-                    float: left;
-                    font-size: calc(16/1920*100vw);
-                    color: $tab;
-                    .store-name{
-                        color: $black;
-                    }
-                    .en-store-name{
-                        margin-right: 20px;
-                        color: $black;
-                    }
-                }
-                .header-score{
-                    float: right;
-                    .span-1{
-                        font-size: calc(16/1920*100vw);
-                        color: $black;
-                    }
-                    .span-2{
-                        color: $red;
-                        font-size: calc(20/1920*100vw);
-                    }
-                    .span-3{
-                        color: $tab;
-                        font-size: calc(12/1920*100vw);
-                    }
-                }
-            }
-            .table-bordered{
-                font-size: calc(14/1920*100vw);
-                margin-top: 20px;
-                th{
-                    color: $tab;
-                    text-align: left;
-                    background-color: $background;
-                    border-bottom-width: 1px;
-                    padding: 0.5rem;
-                    // width: 10%;
-                    padding-left: 1rem;
-                }
-                td{
-                    color: $black;
-                    padding-top:0.5rem;
-                    padding-bottom: 0.5rem;
-                    padding-left: 1.2rem;
-                    text-align: left;
-                    font-weight: bold;
-                }
-                .count-blag{
-                    padding: 2px 12px;
-                    width: auto;
-                    height: auto;
-                    border-radius: 10px;
-                    background-color: #D4DBE5;
-                    color: $tab;
-                    font-size: 12px;
-                    margin-right: calc(20/1920*100vw);
-                    float:right;
-                }
-                .icon-blag{
-                    display: inline-block;
-                    width: 80px;;
-                    padding:3px 6px;
-                    text-align: center;
-                    color: #fff;
-                    font-size: calc(12/1920*100vw);
-                    font-weight: normal;
-                }
-            }
+        span{
+          font-size: calc(18/1920*100vw);
+          font-weight: bold;
+          color: $tab;
         }
-        .row-detail{
-            margin-top: 20px;
+      }
+      .table-content{
+        .table-header{
+          padding-bottom: 20px;
+          font-weight: bold;
+          .header-store-name{
+            float: left;
+            font-size: calc(16/1920*100vw);
+            color: $tab;
+            .store-name{
+              color: $black;
+            }
+            .en-store-name{
+              margin-right: 20px;
+              color: $black;
+            }
+          }
+          .header-score{
+            float: right;
+            .span-1{
+              font-size: calc(16/1920*100vw);
+              color: $black;
+            }
+            .span-2{
+              color: $red;
+              font-size: calc(20/1920*100vw);
+            }
+            .span-3{
+              color: $tab;
+              font-size: calc(12/1920*100vw);
+            }
+          }
+        }
+        .table-bordered{
+          font-size: calc(14/1920*100vw);
+          margin-top: 20px;
+          width: 100%;
+          border-collapse: collapse;
+          th, td{
+            border: 1px solid #dee2e6;
+          }
+          th{
+            color: $tab;
             text-align: left;
-            .item-header{
-                position: relative;
-                background-color: $background;
-                height: 40px;
-                line-height: 40px;
-                border: 1px solid $border;
-                padding:0 calc(20 / 1920 * 100vw);
-                cursor: pointer;
-                    .icontemp {
-                        font-size: calc(14 / 1920 * 100vw);
-                        margin-right: calc(15 / 1920 * 100vw);
-                        }
-                    .title-lable {
-                        font-size: calc(14 / 1920 * 100vw);
-                        font-weight: bold;
-                    }
-                    .count-content{
-                        position:absolute;
-                        right: calc(20/1920*100vw);
-                        top: 0;
-                        .count{
-                            font-size: calc(30/1920*100vw);
-                        }
-                        .blag{
-                            font-size: calc(12/1920*100vw);
-                        }
-                    }
-            }
-            .item-content{
-            padding-top: calc(20 / 1920 * 100vw);
+            background-color: $background;
+            border-bottom-width: 1px;
+            padding: 0.5rem;
+            // width: 10%;
+            padding-left: 1rem;
+          }
+          td{
+            color: $black;
+            padding-top:0.5rem;
+            padding-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            text-align: left;
+            font-weight: bold;
+          }
+          .count-blag{
+            padding: 2px 12px;
+            width: auto;
+            height: auto;
+            border-radius: 10px;
+            background-color: #D4DBE5;
+            color: $tab;
+            font-size: 12px;
+            margin-right: calc(20/1920*100vw);
+            float:right;
+          }
+          .icon-blag{
+            display: inline-block;
+            width: 80px;;
+            padding:3px 6px;
+            text-align: center;
+            color: #fff;
+            font-size: calc(12/1920*100vw);
+            font-weight: normal;
+          }
+        }
+      }
+      .row-detail{
+        margin-top: 20px;
+        text-align: left;
+        .item-header{
+          position: relative;
+          background-color: $background;
+          height: 40px;
+          line-height: 40px;
+          border: 1px solid $border;
+          padding:0 calc(20 / 1920 * 100vw);
+          cursor: pointer;
+          .icontemp {
             font-size: calc(14 / 1920 * 100vw);
-            padding-left: calc(30 / 1920 * 100vw);
-            padding-right: calc(30 / 1920 * 100vw);
-            color: #4b5262;
-            border: 1px solid $border;
-            border-top:0;
-            .content-title{
-                border-left:4px solid #eb1d63;
-                font-size: calc(14 / 1920 * 100vw);
-                color:#7d8cad;
-                padding-left:calc(20 / 1920 * 100vw);
-                font-weight: bold;
+            margin-right: calc(15 / 1920 * 100vw);
+          }
+          .title-lable {
+            font-size: calc(14 / 1920 * 100vw);
+            font-weight: bold;
+          }
+          .count-content{
+            position:absolute;
+            right: calc(20/1920*100vw);
+            top: 0;
+            .count{
+              font-size: calc(30/1920*100vw);
             }
-            .content-detail{
-                margin-top: 10px;
-                .content-detail-title{
-                min-height:70px;
-                background-color:$background;
-                padding-left:calc(20 / 1920 * 100vw);
-                padding-right: calc(20 / 1920 * 100vw);
-                padding-top:10px;
-                padding-bottom: 10px;
-                display: flex;
-                .ignore-btn{
-                    width:50px;
-                    height:24px;
-                    background-color: #434c5e;
-                    font-size: 12px;
-                    color:#ffffff;
-                    font-weight: bold;
-                    line-height: 25px;
-                    text-align: center;
-                    border-radius: 5px;
-                }
-                .title-btn{
-                    width:100px;
-                    height:25px;
-                    background-color: #fcba3f;
-                    font-size:12px;
-                    color:#ffffff;
-                    font-weight: bold;
-                    line-height: 25px;
-                    text-align: center;
-                    border-radius: 20px;
-                }
-                .detail-title{
-                  flex: 1;
-                  .title1{
+            .blag{
+              font-size: calc(12/1920*100vw);
+            }
+          }
+        }
+        .item-content{
+          padding-top: calc(20 / 1920 * 100vw);
+          font-size: calc(14 / 1920 * 100vw);
+          padding-left: calc(30 / 1920 * 100vw);
+          padding-right: calc(30 / 1920 * 100vw);
+          color: #4b5262;
+          border: 1px solid $border;
+          border-top:0;
+          .content-title{
+            border-left:4px solid #eb1d63;
+            font-size: calc(14 / 1920 * 100vw);
+            color:#7d8cad;
+            padding-left:calc(20 / 1920 * 100vw);
+            font-weight: bold;
+          }
+          .content-detail{
+            margin-top: 10px;
+            .content-detail-title{
+              margin-top: 10px;
+              min-height:70px;
+              background-color:$background;
+              padding-left:calc(20 / 1920 * 100vw);
+              padding-right: calc(20 / 1920 * 100vw);
+              padding-top:10px;
+              padding-bottom: 10px;
+              display: flex;
+              .ignore-btn{
+                width:50px;
+                height:24px;
+                background-color: #434c5e;
+                font-size: 12px;
+                color:#ffffff;
+                font-weight: bold;
+                line-height: 25px;
+                text-align: center;
+                border-radius: 5px;
+              }
+              .title-btn{
+                width:100px;
+                height:25px;
+                background-color: #fcba3f;
+                font-size:12px;
+                color:#ffffff;
+                font-weight: bold;
+                line-height: 25px;
+                text-align: center;
+                border-radius: 20px;
+              }
+              .detail-title{
+                flex: 1;
+                .title1{
                   font-size: calc(14 / 1920 * 100vw);
                   color:#182752;
                   font-weight: bold;
                   margin:0 0 5px 0;
-                  }
-                  .title2{
+                }
+                .title2{
                   font-size: calc(12 / 1920 * 100vw);
                   color:#7d8cad;
                   margin: 15px 0 0 10px;
+                }
+              }
+              .score-title{
+                display: inline-flex;
+                flex-direction: column;
+                width: 100px;
+                align-items: center;
+              }
+            }
+            .content-detail-main{
+              padding-top: 10px;
+              padding-left:calc(20 / 1920 * 100vw);
+              padding-right: calc(20 / 1920 * 100vw);
+              .cdm-title{
+                font-size:calc(12 / 1920 * 100vw);
+                color:#94a4b4;
+                font-weight: bold;
+                margin: 0;
+              }
+              .cdm-voice{
+                margin-top: 10px;
+                .speech-info{
+                  @include point(width,80);
+                  @include point(height,26);
+                  background-color: #FFEDED;
+                  color: $red;
+                  border: 1px solid #FEC0C7;
+                  @include point(border-radius,15);
+                  display: inline-block;
+                  cursor: pointer;
+                  .icon-speech{
+                    @include point(font-size,18);
+                    @include point(line-height,26);
+                    @include point(margin-left,5);
                   }
                 }
-                  .score-title{
-                    display: inline-flex;
-                    flex-direction: column;
-                    width: 100px;
-                    align-items: center;
-                  }
+                .often-text{
+                  @include point(margin-left,20);
                 }
-                .content-detail-main{
-                padding-top: 10px;
-                padding-left:calc(20 / 1920 * 100vw);
-                padding-right: calc(20 / 1920 * 100vw);
-                .cdm-title{
-                    font-size:calc(12 / 1920 * 100vw);
-                    color:#94a4b4;
-                    font-weight: bold;
-                    margin: 0;
-                }
-                .cdm-voice{
-                    margin-top: 10px;
-                    .speech-info{
-                        @include point(width,80);
-                        @include point(height,26);
-                        background-color: #FFEDED;
-                        color: $red;
-                        border: 1px solid #FEC0C7;
-                        @include point(border-radius,15);
-                        display: inline-block;
-                        cursor: pointer;
-                        .icon-speech{
-                            @include point(font-size,18);
-                            @include point(line-height,26);
-                            @include point(margin-left,5);
-                        }
-                    }
-                    .often-text{
-                        @include point(margin-left,20);
-                    }
-                }
-                .cdm-pic{
-                    margin-top: 20px;
-                    overflow: hidden;
-                    .source-details{
-                        display: inline-block;
-                        .img-content{
-                        margin-right: calc(10/1920*100vw);
-                            position: relative;
-                            cursor: pointer;
-                            .start-icon{
-                                position: absolute;
-                                left: 50%;
-                                top: 50%;
-                                transform: translate(-50%,-50%);
-                            }
-                        .imgLittle{
-                            min-width: 70px;
-                            width: calc(130/1920*100vw);
-                        }
-                        }
-                    @media screen and (min-width: 1280px) and(max-width: 1366px){
-                        width: 90px;
-                        .img-content .imgLittle{
-                            width: 85px;
-                            width: calc(130/1920*100vw);
-                        }
-                    }
-                    }
-                }
-                .cdm-word{
-                    margin-top: 10px;
-                    font-size: calc(14 / 1920 * 100vw);
-                    color:#4b5262;
-                    word-wrap:break-word;
-                }
-                }
-            }
-            }
-        }
-        .row-footer{
-            padding-top: 20px;
-            padding-bottom: 10px;
-            margin-top: 10px;
-            .details-content{
-                padding-right: calc(30/1920*100vw);
-                &:last-child{
-                    padding-right:0;
-                }
-            }
-            .details{
-                position: relative;
-                height: 320px;
-                border:1px solid $border;
-                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-                .item-header{
+              }
+              .cdm-pic{
+                margin-top: 20px;
+                overflow: hidden;
+                .source-details{
+                  display: inline-block;
+                  .img-content{
+                    margin-right: calc(10/1920*100vw);
                     position: relative;
-                    background-color: $background;
-                    height: 40px;
-                    line-height: 40px;
-                    border-bottom: 1px solid $border;
-                    padding-left: calc(20/1920*100vw);
-                    text-align: left;
-                    .icontemp{
-                        font-size: calc(18/1920*100vw);
-                        margin-right: calc(15/1920*100vw);
-                        color: $tab;
+                    cursor: pointer;
+                    .start-icon{
+                      position: absolute;
+                      left: 50%;
+                      top: 50%;
+                      transform: translate(-50%,-50%);
                     }
-                    .title-lable{
-                        font-size: calc(14/1920*100vw);
-                        font-weight: bold;
+                    .imgLittle{
+                      min-width: 70px;
+                      width: calc(130/1920*100vw);
                     }
-                    .count-content{
-                        position:absolute;
-                        right: calc(20/1920*100vw);
-                        top: 0;
-                        .count{
-                            font-size: calc(30/1920*100vw);
-                        }
-                        .blag{
-                            font-size: calc(12/1920*100vw);
-                        }
+                  }
+                  @media screen and (min-width: 1280px) and(max-width: 1366px){
+                    width: 90px;
+                    .img-content .imgLittle{
+                      width: 85px;
+                      width: calc(130/1920*100vw);
                     }
+                  }
                 }
-                .item-content{
-                    padding-top: 20px;
-                    height:  280px;
-                    .item-details{
-                        height: auto;
-                        font-size: calc(14/1920*100vw);
-                        padding-left: calc(30/1920*100vw);
-                        padding-right: calc(20/1920*100vw);
-                        margin-bottom: 30px;
-                        color: #4b5262;
-                        text-align: left;
-                        .item-blag{
-                            width: calc(12/1920*100vw);
-                            height: calc(12/1920*100vw);
-                            border-radius: 50%;
-                            background-color: $tab;
-                            display: inline-block;
-                            margin-right: calc(16/1920*100vw);
-                        }
-                        .item-des{
-                            display: block;
-                            font-size: calc(12/1920*100vw);
-                            margin-top: calc(10/1920*100vw);
-                            margin-left: calc(35/1920*100vw);
-                            color: $tab;
-                        }
-                    }
-                }
+              }
+              .cdm-word{
+                margin-top: 10px;
+                font-size: calc(14 / 1920 * 100vw);
+                color:#4b5262;
+                word-wrap:break-word;
+              }
             }
+          }
         }
+      }
+      .row-footer{
+        padding-top: 20px;
+        padding-bottom: 10px;
+        margin-top: 10px;
+        .details-content{
+          padding-right: calc(30/1920*100vw);
+          &:last-child{
+            padding-right:0;
+          }
+        }
+        .details{
+          position: relative;
+          height: 320px;
+          border:1px solid $border;
+          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+          .item-header{
+            position: relative;
+            background-color: $background;
+            height: 40px;
+            line-height: 40px;
+            border-bottom: 1px solid $border;
+            padding-left: calc(20/1920*100vw);
+            text-align: left;
+            .icontemp{
+              font-size: calc(18/1920*100vw);
+              margin-right: calc(15/1920*100vw);
+              color: $tab;
+            }
+            .title-lable{
+              font-size: calc(14/1920*100vw);
+              font-weight: bold;
+            }
+            .count-content{
+              position:absolute;
+              right: calc(20/1920*100vw);
+              top: 0;
+              .count{
+                font-size: calc(30/1920*100vw);
+              }
+              .blag{
+                font-size: calc(12/1920*100vw);
+              }
+            }
+          }
+          .item-content{
+            padding-top: 20px;
+            height:  280px;
+            .item-details{
+              height: auto;
+              font-size: calc(14/1920*100vw);
+              padding-left: calc(30/1920*100vw);
+              padding-right: calc(20/1920*100vw);
+              margin-bottom: 30px;
+              color: #4b5262;
+              text-align: left;
+              .item-blag{
+                width: calc(12/1920*100vw);
+                height: calc(12/1920*100vw);
+                border-radius: 50%;
+                background-color: $tab;
+                display: inline-block;
+                margin-right: calc(16/1920*100vw);
+              }
+              .item-des{
+                display: block;
+                font-size: calc(12/1920*100vw);
+                margin-top: calc(10/1920*100vw);
+                margin-left: calc(35/1920*100vw);
+                color: $tab;
+              }
+            }
+          }
+        }
+      }
     }
-}
-.total-score{
-  text-align: center;
-  font-size: 12px;
-  color: $black;
-  margin-top: 4px;
-}
+  }
+  .total-score{
+    text-align: center;
+    font-size: 12px;
+    color: $black;
+    margin-top: 4px;
+  }
 
 </style>
 <style>
-.AddSumupLoad .el-dialog__header{
-        display: none !important;
-    }
+  .AddSumupLoad .el-dialog__header{
+    display: none !important;
+  }
   .el-menuscrollbar .el-scrollbar__wrap {
-        overflow-x: hidden;
-    }
-    .el-textarea__inner{
-        font-family: Roboto,Arial, 'Microsoft YaHei';
-    }
+    overflow-x: hidden;
+  }
+  .el-textarea__inner{
+    font-family: Roboto,Arial, 'Microsoft YaHei';
+  }
 </style>
