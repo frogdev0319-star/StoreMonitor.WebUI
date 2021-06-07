@@ -362,6 +362,7 @@ $black: #182752;
 }
 .error-text span{
   position: absolute;
+  left: 0;
 }
 
 .dialog-form-item-name{
@@ -374,4 +375,17 @@ $black: #182752;
   width: 100%;
   height: 56px;
   margin-bottom: 18px;
+}
+
+.el-radio__input.is-checked + .el-radio__label{
+  color: #424151;
+}
+
+.subcatergy-title{
+  font-size: calc(14 / 1920 * 100vw);
+  color: #7d8cad;
+  padding-left: calc(20 / 1920 * 100vw);
+  margin: 5px 0;
+  font-weight: bold;
+  border-left: 4px solid #fff;
 }
