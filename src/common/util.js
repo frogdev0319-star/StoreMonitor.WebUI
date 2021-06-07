@@ -884,6 +884,24 @@ export default {
     sortedArray.sort((a, b) => { return a[key] - b[key]; })
   },
 
+
+  handleInspctionCatergyTree(arr, key='id') {
+    let cloneData = JSON.parse(JSON.stringify(arr));
+    return cloneData.filter(father => {
+      let branchArr = cloneData.filter(child => father[key] === child.parentId);
+      branchArr.length > 0 ? (father.children = branchArr) : '';
+      return father.parentId == -1;
+    })
+  },
+
+  getSubCategoryItemsLength(childrenItemList){
+    let itemsLength = 0;
+    childrenItemList.forEach(item => {
+      itemsLength += item.items.length;
+    })
+    return itemsLength;
+  },
+
 };
 class indexedDB {
   init() {
