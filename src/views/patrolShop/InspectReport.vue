@@ -64,85 +64,21 @@
               <div class="pdf_font_20">
                 <div v-for="(item,index) in pageItem.data" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
                   <div class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
-                  <div v-for="(_item,_index) in item.cateryItems" :key="_index" class="content-detail">
-                    <div class="content-detail-title">
-                      <div class="detail-title">
-                        <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
-                        <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
+                  <template v-if="!item.children">
+                    <report-detail :report-detail-data="item.cateryItems" :is-exportPdf="isexportPDF" :groups="groups"
+                                   :group-type="item.groupType" :tab1-btn-arr="tab1BtnArr" :tab3-btn-arr="tab3BtnArr">
+                    </report-detail>
+                  </template>
+                  <template v-else>
+                    <div v-for="(child, childIndex) in item.children" :key="childIndex">
+                      <div class="subcatergy-title">
+                          {{ child.groupName}}
                       </div>
-                      <div class="score-title">
-                        <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn"
-                             :style="isexportPDF ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'">
-                          <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
-                        <div v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0"
-                             class="title-btn-failed" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-                          <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }} </span>
-                        </div>
-                        <div v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1"
-                             class="title-btn-pass" :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-                          <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }} </span>
-                        </div>
-                        <div v-if="item.groupType==1 &&_item.grade!=Math.pow(-2,31)"
-                             :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
-                             :style="isexportPDF ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-                          <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
-                        </div>
-                        <div class="total-score"
-                             v-if="_item.itemScore !== Number.MAX_VALUE">
-                          <span class="pdf_font_18">
-                          {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}</span>
-                        </div>
-                      </div>
-
+                      <report-detail :report-detail-data="child.cateryItems" :is-exportPdf="isexportPDF" :groups="groups"
+                                     :group-type="item.groupType" :tab1-btn-arr="tab1BtnArr" :tab3-btn-arr="tab3BtnArr">
+                      </report-detail>
                     </div>
-                    <div
-                      v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
-                      class="content-detail-main"
-                      style="padding-bottom: 20px;">
-                      <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
-                      <div v-if="_item.showAudio" class="cdm-voice">
-                        <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
-                          <i class="iconfont icon-yuyin icon-speech"/>
-                        </div>
-                        <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-                          <source :src="_item.audio.audioSrc" type="audio/mpeg" >
-                        </audio>
-                        <span class="often-text">{{ _item.audio.audioOftenText }}</span>
-                      </div>
-                      <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
-                        <span class="pdf_font_24">{{ _item.comment }}</span>
-                      </div>
-                      <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
-                        <div
-                          v-for="(sourceitem,sourceindex) in _item.sourceList"
-                          :key="sourceindex"
-                          :height="imgHeight+'px'"
-                          class="source-details">
-                          <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''">
-                            <img
-                              :title="imgTitle"
-                              :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
-                              :src="sourceitem.url"
-                              :height="imgHeight+'px'"
-                              :onerror="deafultImg"
-                              class="imgLittle imgInner"
-                              @click="openOuter(sourceitem,$event)">
-                          </div>
-                          <div
-                            v-if="sourceitem.mediaType==1"
-                            class="img-content "
-                            @click="playCommentVideo(sourceitem,sourceindex)">
-                            <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                            <img
-                              :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
-                              :src="videoImgSrc"
-                              :height="imgHeight+'px'"
-                              class="imgLittle">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  </template>
                 </div>
                 <div v-if="showFeedBacks" style="margin-bottom:20px;">
                   <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.feedbacks') }}</span></div>
@@ -243,48 +179,49 @@
           </div>
         </el-col>
         <el-col v-if="pageItem.class === 'row-table'">
-          <table v-for="(s_item,s_index) in pageItem.data" :key="s_index" class="table table-bordered">
+          <table v-for="(tableItem, tableIndex) in pageItem.data" :key="tableIndex" class="table table-bordered">
             <thead class="pdf_font_20">
-            <tr v-if="s_item[0].type === 0">
-              <th
-                v-for="(t_item ,t_index) in theaderPassFail"
-                :key="t_index"
-                :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                scope="col">{{ t_item.name }}</th>
-            </tr>
-            <tr v-if="s_item[0].type === 1">
-              <th
-                v-for="(t_item ,t_index) in theaderScore"
-                :key="t_index"
-                :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                scope="col">{{ t_item.name }}</th>
-            </tr>
-            <tr v-if="s_item[0].type === 2">
-              <th
-                v-for="(t_item ,t_index) in theaderOther"
-                :key="t_index"
-                :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                scope="col">{{ t_item.name }}</th>
-            </tr>
+              <tr v-if="tableItem[0].type === 0">
+                <th
+                  v-for="(t_item ,t_index) in theaderPassFail"
+                  :key="t_index"
+                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
+                  scope="col">{{ t_item.name }}</th>
+              </tr>
+              <tr v-if="tableItem[0].type === 1">
+                <th
+                  v-for="(t_item ,t_index) in theaderScore"
+                  :key="t_index"
+                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
+                  scope="col">{{ t_item.name}} </th>
+              </tr>
+              <tr v-if="tableItem[0].type === 2">
+                <th
+                  v-for="(t_item ,t_index) in theaderOther"
+                  :key="t_index"
+                  :style="isexportPDF ? t_item.pdfWidth: t_item.width"
+                  scope="col">{{ t_item.name }}</th>
+              </tr>
             </thead>
-            <tbody class="pdf_font_20">
-            <tr style="vertical-align:middle;">
-              <td :rowspan="s_item.length+1" style="vertical-align:middle;">
-                <span v-if="s_item[0].type === 0">{{ $t('insSettingView.sheetpassfail') }}</span>
-                <span v-if="s_item[0].type === 1">{{ $t('insSettingView.sheetscore') }}</span>
-                <span v-if="s_item[0].type === 2">{{ $t('insSettingView.sheetother') }}</span>
-              </td>
-            </tr>
-            <tr v-for="(item,index) in s_item" :key="index" :style="index%2!=0?{'background-color':'#F7F8FC'}:{}">
-              <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span>
-                <span class="count-blag"><span class="pdf_font_16">{{ item.numOfTotalItems }}</span></span>
-              </td>
-              <td v-if="item.type === 0||item.type === 2"><span>{{ item.numOfQualifiedItems }}</span></td>
-              <td v-if="item.type === 0||item.type === 2"><span>{{ item.numOfUnqualifiedItems }}</span></td>
-              <td v-if="item.type === 1"><span>{{ item.totalScore }}</span></td>
-              <td><span>{{ item.actualScore | filterScore}}</span></td>
-            </tr>
-            </tbody>
+            <template v-for="(categoryItem, categoryIndex) in tableItem">
+              <tbody class="pdf_font_20" :key="categoryIndex">
+                <tr style="vertical-align:middle;">
+                  <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
+                    <span>{{ categoryItem.groupName }}</span>
+                  </td>
+                </tr>
+                <tr v-for="(subcategory,subcategoryIndex) in categoryItem.children" :key="subcategoryIndex"
+                    :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
+                  <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ subcategory.groupName }}</span>
+                    <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
+                  </td>
+                  <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
+                  <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
+                  <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
+                  <td><span>{{ subcategory.actualScore | filterScore}}</span></td>
+                </tr>
+              </tbody>
+            </template>
           </table>
         </el-col>
         <el-col v-if="pageItem.class === 'radior-content' && staticalConfig.chart" class="pie-content"
@@ -364,10 +301,12 @@ import resize from '@/components/mixins/resize.js'
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import ReportDetail from "@/components/ReportDetail";
 
 export default {
   name: 'InspectReport',
   components: {
+    ReportDetail,
     DelayButton,
     'v-chart': ECharts
   },
@@ -436,26 +375,9 @@ export default {
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
-      theaderPassFail: [
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
-      ],
-      theaderScore: [
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:30%;', pdfWidth: 'width:25%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
-      ],
-      theaderOther: [
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
-      ],
+      theaderPassFail: [],
+      theaderScore: [],
+      theaderOther: [],
       showSignatureFlag: false,
       signatureSrc: '',
       staticalConfig: null,
@@ -463,7 +385,9 @@ export default {
       signaturesList: null,
       reportData: null,
       cachedTemplateId: -1,
-      showAllDetailsEnable: true
+      showAllDetailsEnable: true,
+      tab1BtnArr: [],
+      tab3BtnArr: []
     };
   },
 
@@ -724,29 +648,6 @@ export default {
       }
     },
 
-    startSpeechItem(item, index) {
-      const self = this;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
-      }
-      self.groups.forEach((groupitem) => {
-        groupitem.items.forEach((_item, _index) => {
-          if (_item.audio !== undefined) {
-            if (_index !== index) {
-              if (self.$refs[_item.audio.audioRef] !== undefined) {
-                self.$refs[_item.audio.audioRef][0].pause();
-                _item.audio.isPlaying = false;
-              }
-            }
-          }
-        });
-      });
-    },
-
     startSpeechFeedBacks(item, index) {
       const self = this;
       if (!item.audio.isPlaying) {
@@ -783,6 +684,7 @@ export default {
           this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
           self.getGroupsData(data.groups);
           self.reportData = data;
+          self.getTab1AndTab3BtnName(res.data[0].inspectSettings);
           self.getPageDataBasedOnTemplate(self.reportData);
         }
       }).catch(err => {
@@ -800,6 +702,8 @@ export default {
         obj.groupId = groupitem.groupId;
         obj.groupName = groupitem.groupName;
         obj.groupType = groupitem.groupType;
+        obj.parentId = groupitem.parentId;
+        obj.parentName = '';
         groupitem.items.forEach((item, index) => {
           const details = {};
           details.subject = item.subject;
@@ -808,7 +712,6 @@ export default {
           details.grade = item.grade;
           details.qualifiedScore = item.qualifiedScore;
           details.itemScore = item.itemScore;
-          details.showTotalScore =
           details.passOfFailFlag = this.getItemsPassOrFailed(groupitem.groupType, item.grade, item.qualifiedScore);
           if (item.attachment.length !== 0) {
             const _temp = [];
@@ -901,10 +804,19 @@ export default {
     },
 
     getTableData(data){
+      this.getTableHeader();
       const summary = data.summary;
+      util.sortArrayByKeyAsc(summary, 'type');
+      const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
+      summaryTree.forEach(item => {
+        if(!item.children){
+          item.children = [];
+          item.children.push(item);
+        }
+      })
       const te_temp = [];
       for (let i = 0; i < 3; i++) {
-        const typeIndex = summary.filter(x => x.type === i);
+        const typeIndex = summaryTree.filter(x => x.type === i);
         if (typeIndex.length !== 0) {
           typeIndex[0].type === 0 ? te_temp.push(typeIndex) : '';
           typeIndex[0].type === 1 ? te_temp.push(typeIndex) : '';
@@ -914,9 +826,31 @@ export default {
       return {class: 'row-table', data: te_temp};
     },
 
+    getTableHeader(){
+      this.theaderPassFail = [
+        { name: '', width: 'width:11%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
+        { name: this.tab1BtnArr[0], width: 'width:20%;' },
+        { name: this.tab1BtnArr[1], width: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+      ];
+      this.theaderOther = [
+        { name: '', width: 'width:11%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
+        { name: this.tab3BtnArr[0], width: 'width:20%;' },
+        { name: this.tab3BtnArr[1], width: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+      ];
+      this.theaderScore = [
+        { name: '', width: 'width:11%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:26%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:34%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+      ];
+    },
+
     getReportDetail(){
-      const allReportDetails = this.getGroupsItems();
-      console.log(allReportDetails);
+      const allReportDetails = this.getGroupsItems(-1);
       return {class: 'row-detail', ifExpand: false, itemCount: -1, data: allReportDetails};
     },
 
@@ -926,7 +860,46 @@ export default {
     },
 
     getStaticOptions(summary){
-      return this.staticalConfig.chart === 0 ? this.getRadarChart(summary) : this.getPieChart(summary);
+      const summaryTree = this.getCategorySummary(summary);
+      return this.staticalConfig.chart === 0 ? this.getRadarChart(summaryTree) : this.getPieChart(summaryTree);
+    },
+
+    getCategorySummary(summary){
+      util.sortArrayByKeyAsc(summary, 'type');
+      const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
+      summaryTree.forEach(summaryItem => {
+        if(summaryItem.children){
+          summaryItem.numOfIgnored = this.addChildrenDataToParent(summaryItem.children, 'numOfIgnored');
+          summaryItem.numOfQualifiedItems = this.addChildrenDataToParent(summaryItem.children, 'numOfQualifiedItems');
+          summaryItem.numOfUnqualifiedItems = this.addChildrenDataToParent(summaryItem.children, 'numOfUnqualifiedItems');
+          summaryItem.numOfTotalItems = this.addChildrenDataToParent(summaryItem.children, 'numOfTotalItems');
+          summaryItem.totalScore = this.addChildrenDataToParent(summaryItem.children, 'totalScore');
+          summaryItem.actualScore = this.addChildrenDataToParent(summaryItem.children, 'actualScore');
+        }
+      });
+      return summaryTree;
+    },
+
+    addChildrenDataToParent(jsonArr, key){
+      let arr = Array.isArray(jsonArr) ? jsonArr : [jsonArr];
+      let sum = 0;
+      if(arr.length > 1){
+        sum = arr.reduce((prev, cur) => {
+          return prev[key] + cur[key];
+        })
+      } else {
+        sum = arr[0][key];
+      }
+      return sum;
+    },
+
+    getTab1AndTab3BtnName(inspectSettings){
+      let itemOptionsForType1 = inspectSettings.filter(settingItem => settingItem.name === 'itemOptionsForType1');
+      let itemOptionsForType3 = inspectSettings.filter(settingItem => settingItem.name === 'itemOptionsForType3');
+      let tab1BtnArr = [itemOptionsForType1[0].value[0].name ,itemOptionsForType1[0].value[1].name];
+      let tab3BtnArr = [itemOptionsForType3[0].value[0].name ,itemOptionsForType3[0].value[1].name];
+      this.tab1BtnArr = tab1BtnArr;
+      this.tab3BtnArr = tab3BtnArr;
     },
 
     getFeedbacks(data){
@@ -969,23 +942,34 @@ export default {
 
     getFocalItems(){
       const focalItems = this.getGroupsItems(1);
-      let focalCount = 0;
-        focalItems.forEach(item =>{focalCount += item.cateryItems.length});
+      let focalCount = this.getItemsLength(focalItems);
       return {class: 'row-detail', ifExpand: false, itemCount: focalCount, data: focalItems};
     },
 
     getQualifiedItems(){
       const qualifiedItems = this.getGroupsItems(2);
-      let qualifiedCount = 0;
-      qualifiedItems.forEach(item =>{qualifiedCount += item.cateryItems.length});
+      let qualifiedCount = this.getItemsLength(qualifiedItems);
       return {class: 'row-detail', ifExpand: false, itemCount: qualifiedCount, data: qualifiedItems};
     },
 
     getIgnoreItems(){
       const ignoreItems = this.getGroupsItems(0);
-      let ignoreCount = 0;
-      ignoreItems.forEach(item =>{ignoreCount += item.cateryItems.length});
+      let ignoreCount = this.getItemsLength(ignoreItems);
       return {class: 'row-detail', ifExpand: false, itemCount: ignoreCount, data: ignoreItems};
+    },
+
+    getItemsLength(itemsArr){
+      let sum = 0;
+      itemsArr.forEach(item => {
+        if(!item.children){
+          sum += item.cateryItems.length;
+        } else {
+          item.children.forEach(child => {
+            sum += child.cateryItems.length;
+          })
+        }
+      });
+      return sum;
     },
 
     getRadarChart(summary) {
@@ -1153,7 +1137,6 @@ export default {
             itemStyle: {
               normal:{
                 color: function(params){
-                  console.log(params)
                   let colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
                     '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
                   return colorList[params.dataIndex];
@@ -1185,26 +1168,53 @@ export default {
     },
 
     getGroupsItems(status){
+      const treeData = util.handleInspctionCatergyTree(this.groups, 'groupId');
       const group = [];
-      this.groups.forEach(groupItem => {
+      treeData.forEach(catergy => {
         const tempGroupItem = {};
-        tempGroupItem.groupId = groupItem.groupId;
-        tempGroupItem.groupName = groupItem.groupName;
-        tempGroupItem.groupType = groupItem.groupType;
-        tempGroupItem.cateryItems = [];
-        groupItem.items.forEach(inspectItem => {
-          if(status){
-            if(inspectItem.passOfFailFlag === status){
+        tempGroupItem.groupId = catergy.groupId;
+        tempGroupItem.groupName = catergy.groupName;
+        tempGroupItem.groupType = catergy.groupType;
+        if(!catergy.children){
+          tempGroupItem.cateryItems = [];
+          catergy.items.forEach(inspectItem => {
+            if(status >= 0){
+              if(inspectItem.passOfFailFlag === status){
+                tempGroupItem.cateryItems.push(inspectItem);
+              }
+            } else {
               tempGroupItem.cateryItems.push(inspectItem);
-            };
-          } else {
-            tempGroupItem.cateryItems.push(inspectItem);
+            }
+          })
+          if (tempGroupItem.cateryItems.length > 0) {
+            group.push(tempGroupItem);
           }
-        })
-        if (tempGroupItem.cateryItems.length > 0) {
-          group.push(tempGroupItem);
+        } else {
+          tempGroupItem.children = [];
+          catergy.children.forEach(child => {
+            const tempChildItem = {};
+            tempChildItem.groupId = child.groupId;
+            tempChildItem.groupName = child.groupName;
+            tempChildItem.groupType = child.groupType;
+            tempChildItem.cateryItems = [];
+            child.items.forEach(inspectItem => {
+              if(status >= 0){
+                if(inspectItem.passOfFailFlag === status){
+                  tempChildItem.cateryItems.push(inspectItem);
+                }
+              } else {
+                tempChildItem.cateryItems.push(inspectItem);
+              }
+            })
+            if (tempChildItem.cateryItems.length > 0) {
+              tempGroupItem.children.push(tempChildItem);
+            }
+          });
+          if(tempGroupItem.children.length > 0){
+            group.push(tempGroupItem);
+          }
         }
-      });
+      })
       return group;
     },
 
@@ -1876,7 +1886,6 @@ export default {
     .dialog-source-content{
       @include point(height,320);
       @include point(padding,20);
-
       img{
         height: 100%;
         width: 100%;
