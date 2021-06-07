@@ -600,6 +600,7 @@ export default {
     accountChanged(val) {
       const self = this;
       if (val !== 0) {
+        self.$refs.ezvizAccount.accountList = [];
         self.InitData();
         self.getBriefStoreData();
         self.getAccountList();
