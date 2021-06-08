@@ -224,18 +224,21 @@
             </template>
           </table>
         </el-col>
-        <el-col v-if="pageItem.class === 'radior-content' && staticalConfig.chart" class="pie-content"
-                :style="isexportPDF ? 'height:450px;' : ''">
-          <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
-          <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
-                   class="pie-chart-content"/>
-        </el-col>
-        <el-col v-if="pageItem.class === 'radior-content' && !staticalConfig.chart" class="radar-content"
-                :style="isexportPDF ? 'height:450px;' : ''">
-          <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
-          <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
-                   class="radar-chart-content"/>
-        </el-col>
+        <template  v-if="pageItem.class === 'radior-content' && pageItem.data">
+          <el-col v-if="staticalConfig.chart" class="pie-content"
+                  :style="isexportPDF ? 'height:450px;' : ''">
+            <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
+            <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
+                     class="pie-chart-content"/>
+          </el-col>
+          <el-col v-if="!staticalConfig.chart" class="radar-content"
+                  :style="isexportPDF ? 'height:450px;' : ''">
+            <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
+            <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
+                     class="radar-chart-content"/>
+          </el-col>
+        </template>
+
         <el-col v-if="pageItem.class === 'suggest'">
           <div class="suggest-content" v-if="pageItem.data !== null && pageItem.data.length !== 0">
             <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
@@ -712,6 +715,7 @@ export default {
           details.grade = item.grade;
           details.qualifiedScore = item.qualifiedScore;
           details.itemScore = item.itemScore;
+          details.type = item.type;
           details.passOfFailFlag = this.getItemsPassOrFailed(groupitem.groupType, item.grade, item.qualifiedScore);
           if (item.attachment.length !== 0) {
             const _temp = [];
@@ -778,7 +782,8 @@ export default {
           ['feedbackItem', 'getFeedbacks'],
           ['focalItem', 'getFocalItems'],
           ['qualifiedItem', 'getQualifiedItems'],
-          ['ignoredItem', 'getIgnoreItems']
+          ['ignoredItem', 'getIgnoreItems'],
+          ['notJoinItem', 'getCommentItems']
         ]);
       }
       return map;
@@ -860,6 +865,9 @@ export default {
     },
 
     getStaticOptions(summary){
+      if (summary.length === 0) {
+        return null;
+      }
       const summaryTree = this.getCategorySummary(summary);
       return this.staticalConfig.chart === 0 ? this.getRadarChart(summaryTree) : this.getPieChart(summaryTree);
     },
@@ -956,6 +964,12 @@ export default {
       const ignoreItems = this.getGroupsItems(0);
       let ignoreCount = this.getItemsLength(ignoreItems);
       return {class: 'row-detail', ifExpand: false, itemCount: ignoreCount, data: ignoreItems};
+    },
+
+    getCommentItems(){
+      const commentItems = this.getGroupsItems(3);
+      let commentCount = this.getItemsLength(commentItems);
+      return {class: 'row-detail', ifExpand: false, itemCount: commentCount, data: commentItems};
     },
 
     getItemsLength(itemsArr){
@@ -1179,7 +1193,10 @@ export default {
           tempGroupItem.cateryItems = [];
           catergy.items.forEach(inspectItem => {
             if(status >= 0){
-              if(inspectItem.passOfFailFlag === status){
+              if(status === 3 && inspectItem.type === 1){
+                tempGroupItem.cateryItems.push(inspectItem);
+              }
+              else if(inspectItem.passOfFailFlag === status && inspectItem.type === 0){
                 tempGroupItem.cateryItems.push(inspectItem);
               }
             } else {
@@ -1199,7 +1216,13 @@ export default {
             tempChildItem.cateryItems = [];
             child.items.forEach(inspectItem => {
               if(status >= 0){
-                if(inspectItem.passOfFailFlag === status){
+                // if(inspectItem.passOfFailFlag === status){
+                //   tempChildItem.cateryItems.push(inspectItem);
+                // }
+                if(status === 3 && inspectItem.type === 1){
+                  tempChildItem.cateryItems.push(inspectItem);
+                }
+                else if(inspectItem.passOfFailFlag === status && inspectItem.type === 0){
                   tempChildItem.cateryItems.push(inspectItem);
                 }
               } else {
