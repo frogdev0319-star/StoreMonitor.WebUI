@@ -398,7 +398,6 @@ export default {
     },
 
     handleopen(index) {
-      console.log('handleopen');
       switch (Number(index)) {
         case 1:
           document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#f31d65';
@@ -406,7 +405,7 @@ export default {
         case 5:
           document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor = '#f31d65';
           document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#222538'; break;
-        default: console.log('this is not a group'); break;
+        default: break;
       }
     },
 
