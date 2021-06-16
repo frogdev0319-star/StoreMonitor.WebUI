@@ -166,1939 +166,2314 @@
   </el-row>
 </template>
 <script>
-import RouteDetail from '@/views/setting/routeInspection/RouteDetail';
-import { inpectRESTful, titleRESTful } from '@/api/index';
-import { validateInput } from '@/common/validate';
-import { isLoginIn } from '@/api/login';
-import { mapGetters } from 'vuex';
-import filterString from '@/common/filterString';
-import { getScheduleListService } from '@/api/schedule';
-import Environment from '@/common/environment';
-import DelayButton from '@/components/DelayButton';
-import util from '@/common/util'
-import DialogPop from '@/components/DialogPop';
-const XLSX = require('xlsx');
+  import RouteDetail from '@/views/setting/routeInspection/RouteDetail';
+  import { inpectRESTful, titleRESTful } from '@/api/index';
+  import { validateInput } from '@/common/validate';
+  import { isLoginIn } from '@/api/login';
+  import { mapGetters } from 'vuex';
+  import filterString from '@/common/filterString';
+  import { getScheduleListService } from '@/api/schedule';
+  import Environment from '@/common/environment';
+  import DelayButton from '@/components/DelayButton';
+  import util from '@/common/util'
+  import DialogPop from '@/components/DialogPop';
+  import deepClone from 'nanoclone'
+  const XLSX = require('xlsx');
 
 
-export default {
-  name: 'RouteInspection',
-  components: {
-    DialogPop,
-    DelayButton,
-    RouteDetail
-  },
-  data() {
-    return {
-      elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
-      loadingGif: require('../../../../static/img/loading.gif'),
-      radioList: [
-        {
-          'value': '1',
-          'label': '远程巡检'
-        },
-        {
-          'value': '2',
-          'label': '现场巡检'
+  export default {
+    name: 'RouteInspection',
+    components: {
+      DialogPop,
+      DelayButton,
+      RouteDetail
+    },
+    data() {
+      return {
+        elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
+        loadingGif: require('../../../../static/img/loading.gif'),
+        radioList: [
+          {
+            'value': '1',
+            'label': '远程巡检'
+          },
+          {
+            'value': '2',
+            'label': '现场巡检'
+          }
+        ],
+        showNoPostDialog: false,
+        itemhoverName: '',
+        itemIndex: 0,
+        loading: false,
+        varyWindowWidth: window.innerHeight,
+        addPatrol: '新增巡检表',
+        patrolActive: '0',
+        PatrolListOne: '0',
+        PatrolListTwo: '0',
+        warningContent: '',
+        isShowWarning: false,
+        downLoadSrc: '',
+        curIndex: 'id0',
+        showBtnContent: false,
+        showSingleDeleteContent: false,
+        reload: true,
+        storeNum: 0,
+        activeName: '',
+        showImportContent: false,
+        showConfirmImport: false,
+        showNameImport: false,
+        ImportName: '',
+        showFailInfo: false,
+        FileInfo: [],
+        checkValue: '',
+        tabNameInput: '',
+        hideUpload: false,
+        tempdata: [],
+        showImportSucceed: false,
+        btnList: [
+          {
+            id: 0,
+            iconClass: 'iconfont icon-daoru',
+            style: 'font-size:24px;',
+            name: 'import',
+            btnTitle: this.$t('insSettingView.import'),
+            enabled: false
+          },
+          {
+            id: 0,
+            iconClass: 'iconfont icon-daochu',
+            style: 'font-size:24px;',
+            name: 'export',
+            btnTitle: this.$t('insSettingView.export'),
+            enabled: false
+          },
+          {
+            id: 0,
+            iconClass: 'iconfont icon-xiazai',
+            style: 'font-size:24px;',
+            name: 'download',
+            btnTitle: this.$t('insSettingView.download'),
+            enabled: false
+          },
+          {
+            id: 0,
+            iconClass: 'iconfont icon-shanchu',
+            style: 'font-size:17px;',
+            name: 'delete',
+            btnTitle: this.$t('scheduleView.delete'),
+            enabled: false
+          }
+        ],
+
+        tagList: ['远程巡检', '现场巡检'],
+        curData: [],
+        fileName: this.$t('insSettingView.patrolExample'),
+        lang: this.$i18n.locale,
+        taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')],
+        isLoading: true
+      };
+    },
+
+    computed: {
+      ...mapGetters({ accountChanged: 'accountChanged' })
+    },
+
+    watch: {
+      accountChanged(val, oldVal) {
+        console.log(val);
+        const self = this;
+        if (val !== 0) {
+          sessionStorage.removeItem('TabPatrolIndex0');
+          sessionStorage.removeItem('TabPatrolIndex1');
+          self.activeName = '0';
+          self.getTagList('accountChanged');
         }
-      ],
-      showNoPostDialog: false,
-      itemhoverName: '',
-      itemIndex: 0,
-      loading: false,
-      varyWindowWidth: window.innerHeight,
-      addPatrol: '新增巡检表',
-      patrolActive: '0',
-      PatrolListOne: '0',
-      PatrolListTwo: '0',
-      warningContent: '',
-      isShowWarning: false,
-      downLoadSrc: '',
-      curIndex: 'id0',
-      showBtnContent: false,
-      showSingleDeleteContent: false,
-      reload: true,
-      storeNum: 0,
-      activeName: '',
-      showImportContent: false,
-      showConfirmImport: false,
-      showNameImport: false,
-      ImportName: '',
-      showFailInfo: false,
-      FileInfo: [],
-      checkValue: '',
-      tabNameInput: '',
-      hideUpload: false,
-      tempdata: [],
-      showImportSucceed: false,
-      btnList: [
-        {
-          id: 0,
-          iconClass: 'iconfont icon-daoru',
-          style: 'font-size:24px;',
-          name: 'import',
-          btnTitle: this.$t('insSettingView.import'),
-          enabled: false
-        },
-        {
-          id: 0,
-          iconClass: 'iconfont icon-daochu',
-          style: 'font-size:24px;',
-          name: 'export',
-          btnTitle: this.$t('insSettingView.export'),
-          enabled: false
-        },
-        {
-          id: 0,
-          iconClass: 'iconfont icon-xiazai',
-          style: 'font-size:24px;',
-          name: 'download',
-          btnTitle: this.$t('insSettingView.download'),
-          enabled: false
-        },
-        {
-          id: 0,
-          iconClass: 'iconfont icon-shanchu',
-          style: 'font-size:17px;',
-          name: 'delete',
-          btnTitle: this.$t('scheduleView.delete'),
-          enabled: false
+      }
+    },
+
+    beforeRouteEnter(to, from, next) {
+      next(vm => {
+        if (from.name === 'itemSetting') {
+          to.meta.keepAlive = false;
+        } else {
+          to.meta.keepAlive = false;
         }
-      ],
+      });
+    },
 
-      allData: [],
-      tagList: ['远程巡检', '现场巡检'],
-      curData: [],
-      fileName: this.$t('insSettingView.patrolExample'),
-      lang: this.$i18n.locale,
-      taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')],
-      isLoading: true
-    };
-  },
-
-  computed: {
-    ...mapGetters({ accountChanged: 'accountChanged' })
-  },
-
-  watch: {
-    accountChanged(val, oldVal) {
-      console.log(val);
+    beforeRouteLeave(to, from, next) {
       const self = this;
-      if (val !== 0) {
+      if (to.name === 'itemSetting' || to.name === 'bindStore' || to.name === 'setRule') {
+        const historyObj = {
+          activeName: self.activeName,
+          patrolActive: self.patrolActive
+        };
+        self.$store.dispatch('setInspectHistory', historyObj);
+        next();
+      } else {
+        self.$store.dispatch('setInspectHistory', null);
         sessionStorage.removeItem('TabPatrolIndex0');
         sessionStorage.removeItem('TabPatrolIndex1');
-        self.activeName = '0';
-        self.getTagList('accountChanged');
-      }
-    }
-  },
-
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      if (from.name === 'itemSetting') {
-        to.meta.keepAlive = false;
-      } else {
-        to.meta.keepAlive = false;
-      }
-    });
-  },
-
-  beforeRouteLeave(to, from, next) {
-    const self = this;
-    if (to.name === 'itemSetting' || to.name === 'bindStore' || to.name === 'setRule') {
-      const historyObj = {
-        activeName: self.activeName,
-        patrolActive: self.patrolActive
-      };
-      self.$store.dispatch('setInspectHistory', historyObj);
-      next();
-    } else {
-      self.$store.dispatch('setInspectHistory', null);
-      sessionStorage.removeItem('TabPatrolIndex0');
-      sessionStorage.removeItem('TabPatrolIndex1');
-      sessionStorage.removeItem('TabIndex');
-      next();
-    }
-  },
-
-  mounted() {
-    const self = this;
-    const InspectHistory = self.$store.getters.InspectHistory;
-    if (InspectHistory != null) {
-      self.activeName = InspectHistory.activeName;
-      self.patrolActive = InspectHistory.patrolActive;
-    }else{
-      const tabIndex = sessionStorage.getItem('TabIndex');
-      if(tabIndex !== null){
-        self.activeName = tabIndex;
-        if(self.activeName === '0'){
-          self.patrolActive = sessionStorage.getItem('TabPatrolIndex0');
-        }else if(self.activeName === '1'){
-          self.patrolActive = sessionStorage.getItem('TabPatrolIndex1');
-        }
-      }
-    }
-    self.getTagList();
-    self.initData();
-  },
-
-  methods: {
-    getScheduleFromDB(params) {
-      return new Promise((resolve, reject) => {
-        getScheduleListService(params).then(res => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    emptyImport() {
-      document.getElementById('uploadFile').click();
-    },
-
-    getLang(index) {
-      if (index === 0) {
-        return this.$t('insSettingView.onsitePatrol');
-      } else if (index === 1) {
-        return this.$t('insSettingView.remotePatrol');
-      } else {
-        return '';
+        sessionStorage.removeItem('TabIndex');
+        next();
       }
     },
 
-    initData() {
+    mounted() {
       const self = this;
-      switch (Number(self.activeName)) {
-        case 0: self.checkValue = '现场巡检'; break;
-        case 1: self.checkValue = '远程巡检'; break;
-        default:self.checkValue = '新增巡检表'; break;
-      }
-    },
-
-    downItem() {
-      const self = this;
-      inpectRESTful.downLoadTemplate().then(res => {
-        const blob = new Blob([res], {
-          type: 'application/vnd.ms-excel'
-        });
-        const objectUrl = URL.createObjectURL(blob);
-        const url = objectUrl;
-        self.downLoadSrc = url;
-        var link = document.createElement('a');
-        link.href = url;
-        link.download = self.fileName;
-        link.click();
-      }).catch(err => {
-        console.log('RouteInspection-downItem: ' + err);
-      });
-    },
-
-    getDownLoadURL() {
-      const self = this;
-      inpectRESTful.downLoadTemplate().then(res => {
-        const blob = new Blob([res], {
-          type: 'application/vnd.ms-excel'
-        });
-        const objectUrl = URL.createObjectURL(blob);
-        const url = objectUrl;
-        self.downLoadSrc = url;
-        // window.open(self.downLoadSrc,'_self');
-      }).catch(err => {
-        console.log('RouteInspection-getDownLoadURL: ' + err);
-      });
-    },
-
-    getTagAll() {
-      const self = this;
-      const params = {
-        mode: parseInt(self.activeName) === 0 ? 1 : 0
-      };
-      return new Promise((resolve, reject) => {
-        inpectRESTful.GetInspectTagList(params).then(res => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    getNapeList(params) {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        inpectRESTful.getInspectItemList(params).then(res => {
-          const code = res.errMsg;
-          const data = res.data;
-          if (code != null && code === 'Success') {
-            self.allData = data;
-          }
-          resolve(data);
-        }).catch(err => {
-          console.log(err.message);
-        });
-      });
-    },
-
-    getInspectGroupBindAll(params) { // get related role
-      const self = this;
-      return new Promise((resolve, reject) => {
-        inpectRESTful.GetInspectGroupBindList(params).then(res => {
-          const data = res.data;
-          resolve(data);
-        }).catch(err => {
-          console.log(err.message);
-        });
-      });
-    },
-
-    changerouteData(val) {
-      const self = this;
-      self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData = val;
-    },
-
-    async getTagList(val, sheetIndex) {
-      const self = this;
-      const TagData = await self.getTagAll();
-      if (TagData.length != 0) {
-        if (val == 'del' || self.$route.params.val == 'del') {
-          if (Number(self.patrolActive) == TagData.length) {
-            self.patrolActive = (TagData.length - 1).toString();
+      const InspectHistory = self.$store.getters.InspectHistory;
+      if (InspectHistory != null) {
+        self.activeName = InspectHistory.activeName;
+        self.patrolActive = InspectHistory.patrolActive;
+      }else{
+        const tabIndex = sessionStorage.getItem('TabIndex');
+        if(tabIndex !== null){
+          self.activeName = tabIndex;
+          if(self.activeName === '0'){
+            self.patrolActive = sessionStorage.getItem('TabPatrolIndex0');
+          }else if(self.activeName === '1'){
+            self.patrolActive = sessionStorage.getItem('TabPatrolIndex1');
           }
         }
-        if (val == 'accountChanged') {
-          self.patrolActive = '0';
-        }
-        let tagIndex = 0;
-        if (val == 'add') {
-          tagIndex = TagData.length - 1;
+      }
+      self.getTagList();
+      self.initData();
+    },
+
+    methods: {
+      getScheduleFromDB(params) {
+        return new Promise((resolve, reject) => {
+          getScheduleListService(params).then(res => {
+            const data = res.data;
+            resolve(data);
+          }).catch(err => {
+            reject(err);
+          });
+        });
+      },
+
+      emptyImport() {
+        document.getElementById('uploadFile').click();
+      },
+
+      getLang(index) {
+        if (index === 0) {
+          return this.$t('insSettingView.onsitePatrol');
+        } else if (index === 1) {
+          return this.$t('insSettingView.remotePatrol');
         } else {
-          tagIndex = Number(self.patrolActive);
+          return '';
         }
-        if (self.activeName === '0') {
-          sessionStorage.setItem('TabPatrolIndex0', tagIndex);
-        } else if (self.activeName === '1') {
-          sessionStorage.setItem('TabPatrolIndex1', tagIndex);
+      },
+
+      initData() {
+        const self = this;
+        switch (Number(self.activeName)) {
+          case 0: self.checkValue = '现场巡检'; break;
+          case 1: self.checkValue = '远程巡检'; break;
+          default:self.checkValue = '新增巡检表'; break;
         }
+      },
+
+      downItem() {
+        const self = this;
+        inpectRESTful.downLoadTemplate().then(res => {
+          const blob = new Blob([res], {
+            type: 'application/vnd.ms-excel'
+          });
+          const objectUrl = URL.createObjectURL(blob);
+          const url = objectUrl;
+          self.downLoadSrc = url;
+          var link = document.createElement('a');
+          link.href = url;
+          link.download = self.fileName;
+          link.click();
+        }).catch(err => {
+          console.log('RouteInspection-downItem: ' + err);
+        });
+      },
+
+      getDownLoadURL() {
+        const self = this;
+        inpectRESTful.downLoadTemplate().then(res => {
+          const blob = new Blob([res], {
+            type: 'application/vnd.ms-excel'
+          });
+          const objectUrl = URL.createObjectURL(blob);
+          const url = objectUrl;
+          self.downLoadSrc = url;
+          // window.open(self.downLoadSrc,'_self');
+        }).catch(err => {
+          console.log('RouteInspection-getDownLoadURL: ' + err);
+        });
+      },
+
+      getTagAll() {
+        const self = this;
         const params = {
-          inspectId: TagData[tagIndex].id
+          mode: parseInt(self.activeName) === 0 ? 1 : 0
         };
-        const NapeData = await self.getNapeList(params);
-        const tempAllData = [];
-        const obj = {};
-        const temp = [];
-        const groupids = [];
-        NapeData.forEach((_item, _index) => {
-          const _obj = {};
-          _obj.id = _item.id;
-          _obj.groupName = _item.name;
-          _obj.itemCount = _item.items.length;
-          _obj.type = _item.type;
-          _obj.checked = false;
-          const tempChild = [];
-          _item.items.forEach(itemChild => {
-            const objChild = {};
-            objChild.id = itemChild.id;
-            objChild.checked = false;
-            objChild.name = itemChild.subject;
-            objChild.description = (itemChild.description == undefined || itemChild.length == 0) ? '--' : itemChild.description;
-            objChild.score = itemChild.itemScore;
-            objChild.qualifiedScore = itemChild.qualifiedScore;
-            let availableScores = '';
-            if (itemChild.availableScores.length !== 0) {
-              itemChild.availableScores.forEach((x_item, x_index) => {
-                const isuu = x_index === itemChild.availableScores.length - 1 ? '' : '/';
-                availableScores += x_item + isuu;
-              });
-            } else {
-              for (let i = 0; i < itemChild.itemScore + 1; i++) {
-                const isuu = i === itemChild.itemScore ? '' : '/';
-                availableScores += i + isuu;
-              }
-            }
-            objChild.availableScores = availableScores;
-            tempChild.push(objChild);
-          });
-          _obj.itemData = tempChild;
-          _obj.inspectId = TagData[tagIndex].id; // 巡检表
-          _obj.mode = TagData[Number(self.patrolActive)].mode; // 巡检类别
-          groupids.push(_item.id);
-          temp.push(_obj);
-        });
-        const postparams = {
-          groupIds: groupids
-        };
-        const titletemp = await self.getInspectGroupBindAll(postparams);
-        const titleList = await self.getUserTitleList();
-        temp.forEach(te_item => {
-          const usertext = [];
-          titletemp.forEach(ti_item => {
-            if (te_item.id == ti_item.groupId) {
-              if (ti_item.userTitles.length != 0) {
-                if (ti_item.userTitles.length == titleList.data.length) {
-                  te_item['ModelPost'] = self.$t('remotePatrol.all');
-                } else {
-                  ti_item.userTitles.forEach(u_item => {
-                    usertext.push(u_item.titleName);
-                    te_item['ModelPost'] = usertext.toString();
-                  });
-                }
-              } else {
-                te_item['ModelPost'] = null;
-              }
-            }
+        return new Promise((resolve, reject) => {
+          inpectRESTful.GetInspectTagList(params).then(res => {
+            const data = res.data;
+            resolve(data);
+          }).catch(err => {
+            reject(err);
           });
         });
-        const te_temp = [];
-        const sheetName = [];
-        for (let i = 0; i < 3; i++) {
-          const Typeindex = temp.filter(x => x.type == i);
-          let obj = {};
-          if (Typeindex.length != 0) {
-            te_temp.push(Typeindex);
-            if (Typeindex[0].type == 0) {
-              obj = { 'id': 0, 'isClick': false, 'label': self.$t('insSettingView.sheetpassfail') };
-            }
-            if (Typeindex[0].type == 1) {
-              obj = { 'id': 1, 'isClick': false, 'label': self.$t('insSettingView.sheetscore') };
-            }
-            if (Typeindex[0].type == 2) {
-              obj = { 'id': 2, 'isClick': false, 'label': self.$t('insSettingView.sheetother') };
-            }
-            sheetName.push(obj);
-          }
-        }
-        let i = 0;
-        if (sheetIndex != undefined) {
-          if (sheetName.length == 3) {
-            i = sheetIndex == -1 ? 0 : sheetIndex;
-          } else if (sheetName.length == 2) {
-            if (sheetName.some(x => x.id == 2)) {
-              i = sheetIndex == -1 || sheetIndex == 0 ? 0 : sheetIndex - 1;
-            } else {
-              i = sheetIndex == -1 ? 0 : (sheetIndex == 2 ? 1 : sheetIndex);
-            }
-          } else if (sheetName.length == 1) {
-            i = 0;
-          }
-        }
-        sheetName[i].isClick = true;
-        self.tempdata = temp;
-        const tagTemp = [];
-        TagData.forEach((tag_item, tag_index) => {
-          const tagObj = {};
-          let label = '';
-          if (tag_item.mode == 0) {
-            label = '现场巡检';
-          } else if (tag_item.mode == 1) {
-            label = '远程巡检';
-          }
-          tagObj.label = label;
-          tagObj.name = tag_item.name;
-          tagObj.routeData = te_temp[i];
-          tagObj.allRoutedata = te_temp;
-          tagObj.sheetName = sheetName;
-          tagTemp.push(tagObj);
-        });
-        if (self.activeName == 0) {
-          if (temp.length == 0) {
-            self.getDownLoadURL();
-          }
-          self.elTableData[0].data = tagTemp;
-        } else if (self.activeName == 1) {
-          if (temp.length == 0) {
-            self.getDownLoadURL();
-          }
-          self.elTableData[1].data = tagTemp;
-        } else {
-          obj.label = item;
-          obj.data = { name: '', routeData: te_temp[0] };
-          // tempAllData.push(obj);
-        }
-        // })
-        self.elTableData = self.elTableData.concat(tempAllData);
-        if (val == 'add') {
-          self.patrolActive = (TagData.length - 1).toString();
-          self.showImportSucceed = true;
-        }
-      }
-      else {
-        self.getDownLoadURL();
-        self.elTableData = [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }];
-      }
-      self.getBindStoreList();
-    },
+      },
 
-    getUserTitleList() {
-      return new Promise((resolve, reject) => {
-        titleRESTful.getUserTitleList().then(res => {
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    deleteItem(itemIdList) {
-      const params = {
-        itemIds: itemIdList
-      };
-      return new Promise((resolve, reject) => {
-        inpectRESTful.deleteInspectItem(params).then(res => {
-          console.log(res);
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    deleteGroup(groupIdList) {
-      const params = {
-        groupIds: groupIdList
-      };
-      return new Promise((resolve, reject) => {
-        inpectRESTful.deleteInspectGroup(params).then(res => {
-          console.log(res);
-          resolve(res);
-        });
-      }).catch(err => {
-        reject(err);
-      });
-    },
-
-    addGroup(params) {
-      return new Promise((resolve, reject) => {
-        inpectRESTful.addInspectGroup(params).then(res => {
-          console.log(res);
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    addItem(params) {
-      return new Promise((resolve, reject) => {
-        inpectRESTful.addInspectItem(params).then(res => {
-          console.log(res);
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    async addAllData(dataArry) {
-      const self = this;
-      let mode = self.activeName == '0' ? mode = 1 : mode = 0; // remote mode 0,onsite  mode 1
-      const arr = Object.entries(dataArry);
-      console.log(arr);
-      const tempGroups = [];
-      const tempItems = [];
-      let type = null;
-      for (let i = 0; i < arr.length; i++) {
-        if (arr[i][0] == 'PassFail') {
-          type = 0;
-        } else if (arr[i][0] == 'Score') {
-          type = 1;
-        } else if (arr[i][0] == 'Others') {
-          type = 2;
-        }
-        if (arr[i][1].length != 0) {
-          arr[i][1].forEach((item, index) => {
-            const obj = {};
-            obj.name = item[0].catergyName;
-            obj.mode = mode;
-            obj.tag = self.ImportName;
-            obj.type = type;
-            tempGroups.push(obj);
+      getNapeList(params) {
+        const self = this;
+        return new Promise((resolve, reject) => {
+          inpectRESTful.getInspectItemList(params).then(res => {
+            const code = res.errMsg;
+            const data = res.data;
+            resolve(data);
+          }).catch(err => {
+            console.log(err.message);
           });
-        }
-      }
-      const paramsGroup = {
-        'groups': tempGroups
-      };
-      const resGroup = await self.addGroup(paramsGroup);
-      const codeGroup = resGroup.errMsg;
-      const dataGroup = resGroup.data;
-      let groupindex = 0;
-      if (codeGroup != null && codeGroup == 'Success') {
-        for (let i = 0; i < arr.length; i++) {
-          if (arr[i][1].length != 0) {
-            arr[i][1].forEach((item, index) => {
-              const objItem = {};
-              const temp = [];
-              item.forEach((_item, _index) => {
-                const _obj = {};
-                let itemScore = 0, qualifiedScore = 0, description = '', availableScores = [];
-                if (arr[i][0] == 'PassFail') {
-                  itemScore = _item.score;
-                  qualifiedScore = null;
-                  description = _item.description;
-                  availableScores = null;
-                } else if (arr[i][0] == 'Score') {
-                  itemScore = _item.totalScore;
-                  qualifiedScore = _item.scoreThreshold;
-                  description = _item.description;
-                  availableScores = _item.score;
-                } else if (arr[i][0] == 'Others') {
-                  itemScore = _item.score;
-                  qualifiedScore = null;
-                  description = _item.description;
-                  availableScores = null;
-                }
-                _obj.subject = _item.itemName;
-                _obj.description = description;
-                _obj.itemScore = parseFloat(self.getFloat(itemScore));
-                _obj.qualifiedScore = qualifiedScore===null ? null : parseFloat(self.getFloat(qualifiedScore));
-                _obj.availableScores = availableScores;
-                temp.push(_obj);
-              });
-              objItem.groupId = dataGroup[groupindex];
-              objItem.items = temp;
-              tempItems.push(objItem);
-              groupindex = groupindex + 1;
-            });
-          }
-        }
-        const paramsItem = {
-          'request': tempItems
-        };
-        const resItem = await self.addItem(paramsItem);
-        const codeItem = resItem.errMsg;
-        if (codeItem != null && codeItem == 'Success') {
-          self.getTagList('add');
-        } else {
-          util.notify(self.$t('insSettingView.importFail'), 'warning', 3000);
-        }
-      } else {
-        util.notify(self.$t('insSettingView.importFail'), 'warning', 3000);
-      }
-      // self.showImportContent=false;
-    },
-
-    handleItem() {
-      this.showBtnContent = !this.showBtnContent;
-    },
-
-    bindStore() {
-      const self = this;
-      const routeData = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData;
-      self.showNoPostDialog = routeData[0].ModelPost === null;
-      if (!self.showNoPostDialog) {
-        self.confirmToBind();
-      }
-    },
-
-    confirmToBind() {
-      const self = this;
-      if (self.elTableData[Number(self.activeName)].data.length === 0) {
-        util.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
-        return false;
-      }
-      const arr = [];
-      self.tempdata.forEach(item => {
-        item.itemData.forEach(_item => {
-          arr.push(_item.id);
         });
-      });
-      if (arr.length === 0) {
-        util.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
-        return false;
-      }
-      sessionStorage.setItem('TabName', self.activeName);
-      sessionStorage.setItem('NapeId', JSON.stringify(arr));
-      const params = {
-        inspectId: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId
-      };
-      sessionStorage.setItem('bindStoreData', JSON.stringify(params));
-      self.$router.push({ name: 'bindStore', params: params });
-    },
+      },
 
-    updateTitleDialogFlag(val) {
-      this.showNoPostDialog = val;
-    },
+      getInspectGroupBindAll(params) { // get related role
+        const self = this;
+        return new Promise((resolve, reject) => {
+          inpectRESTful.GetInspectGroupBindList(params).then(res => {
+            const data = res.data;
+            resolve(data);
+          }).catch(err => {
+            console.log(err.message);
+          });
+        });
+      },
 
-    hideNoTitleDialog(){
-      this.showNoPostDialog = false;
-    },
+      changerouteData(val) {
+        const self = this;
+        self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData = val;
+      },
 
-    changeValue(obj) {
-      const self = this;
-      self.tabNameInput = '';
-      if (obj !== '新增巡检表') {
-        self.hideUpload = false;
-      } else {
-        if (self.tabNameInput.length === 0) {
-          self.hideUpload = true;
-        } else {
-          self.hideUpload = false;
-        }
-      }
-    },
-
-    cancelImportName() {
-      const self = this;
-      self.isShowWarning = false;
-      self.showNameImport = false;
-    },
-    async confirmImportName() {
-      const self = this;
-      if (self.ImportName !== '') {
+      async getTagList(val, sheetIndex) {
+        const self = this;
         const TagData = await self.getTagAll();
-        let namerepeat = 0;
-        TagData.forEach(item => {
-          if (item.name === self.ImportName) {
-            namerepeat = 1;
+        if (TagData.length != 0) {
+          if (val == 'del' || self.$route.params.val == 'del') {
+            if (Number(self.patrolActive) == TagData.length) {
+              self.patrolActive = (TagData.length - 1).toString();
+            }
           }
+          if (val == 'accountChanged') {
+            self.patrolActive = '0';
+          }
+          let tagIndex = 0;
+          if (val == 'add') {
+            tagIndex = TagData.length - 1;
+          } else {
+            tagIndex = Number(self.patrolActive);
+          }
+          if (self.activeName === '0') {
+            sessionStorage.setItem('TabPatrolIndex0', tagIndex);
+          } else if (self.activeName === '1') {
+            sessionStorage.setItem('TabPatrolIndex1', tagIndex);
+          }
+          const params = {
+            inspectId: TagData[tagIndex].id
+          };
+          const NapeData = await self.getNapeList(params);
+          const tempAllData = [];
+          const obj = {};
+          const temp = [];
+          const groupids = [];
+          NapeData.forEach((_item, _index) => {
+            const _obj = {};
+            _obj.id = _item.id;
+            _obj.groupName = _item.name;
+            _obj.itemCount = _item.items.length;
+            _obj.type = _item.type;
+            _obj.checked = false;
+            _obj.parentId = _item.parentId;
+            const tempChild = [];
+            _item.items.forEach(itemChild => {
+              const objChild = {};
+              objChild.id = itemChild.id;
+              objChild.checked = false;
+              objChild.name = itemChild.subject;
+              objChild.description = (itemChild.description == undefined || itemChild.length == 0) ? '--' : itemChild.description;
+              objChild.score = itemChild.itemScore;
+              objChild.qualifiedScore = itemChild.qualifiedScore;
+              objChild.sequence = itemChild.sequence;
+              objChild.type = itemChild.type;
+              let availableScores = '';
+              if (itemChild.availableScores.length !== 0) {
+                itemChild.availableScores.forEach((x_item, x_index) => {
+                  const isuu = x_index === itemChild.availableScores.length - 1 ? '' : '/';
+                  availableScores += x_item + isuu;
+                });
+              } else {
+                for (let i = 0; i < itemChild.itemScore + 1; i++) {
+                  const isuu = i === itemChild.itemScore ? '' : '/';
+                  availableScores += i + isuu;
+                }
+              }
+              objChild.availableScores = availableScores;
+              tempChild.push(objChild);
+            });
+            _obj.itemData = tempChild;
+            _obj.inspectId = TagData[tagIndex].id; // 巡检表
+            _obj.mode = TagData[Number(self.patrolActive)].mode; // 巡检类别
+            groupids.push(_item.id);
+            temp.push(_obj);
+          });
+          const postparams = {
+            groupIds: groupids
+          };
+          const titletemp = await self.getInspectGroupBindAll(postparams);
+          const titleList = await self.getUserTitleList();
+          temp.forEach(te_item => {
+            const usertext = [];
+            titletemp.forEach(ti_item => {
+              if (te_item.id == ti_item.groupId) {
+                if (ti_item.userTitles.length != 0) {
+                  if (ti_item.userTitles.length == titleList.data.length) {
+                    te_item['ModelPost'] = self.$t('remotePatrol.all');
+                  } else {
+                    ti_item.userTitles.forEach(u_item => {
+                      usertext.push(u_item.titleName);
+                      te_item['ModelPost'] = usertext.toString();
+                    });
+                  }
+                } else {
+                  te_item['ModelPost'] = null;
+                }
+              }
+            });
+          });
+          const te_temp = [];
+          const sheetName = [];
+          for (let i = 0; i < 3; i++) {
+            const Typeindex = temp.filter(x => x.type == i);
+            let obj = {};
+            if (Typeindex.length != 0) {
+              te_temp.push(Typeindex);
+              if (Typeindex[0].type == 0) {
+                obj = { 'id': 0, 'isClick': false, 'label': self.$t('insSettingView.sheetpassfail') };
+              }
+              if (Typeindex[0].type == 1) {
+                obj = { 'id': 1, 'isClick': false, 'label': self.$t('insSettingView.sheetscore') };
+              }
+              if (Typeindex[0].type == 2) {
+                obj = { 'id': 2, 'isClick': false, 'label': self.$t('insSettingView.sheetother') };
+              }
+              sheetName.push(obj);
+            }
+          }
+          let i = 0;
+          if (sheetIndex != undefined) {
+            if (sheetName.length == 3) {
+              i = sheetIndex == -1 ? 0 : sheetIndex;
+            } else if (sheetName.length == 2) {
+              if (sheetName.some(x => x.id == 2)) {
+                i = sheetIndex == -1 || sheetIndex == 0 ? 0 : sheetIndex - 1;
+              } else {
+                i = sheetIndex == -1 ? 0 : (sheetIndex == 2 ? 1 : sheetIndex);
+              }
+            } else if (sheetName.length == 1) {
+              i = 0;
+            }
+          }
+          sheetName[i].isClick = true;
+          self.tempdata = temp;
+          const tagTemp = [];
+          TagData.forEach((tag_item, tag_index) => {
+            const tagObj = {};
+            let label = '';
+            if (tag_item.mode == 0) {
+              label = '现场巡检';
+            } else if (tag_item.mode == 1) {
+              label = '远程巡检';
+            }
+            tagObj.label = label;
+            tagObj.name = tag_item.name;
+            tagObj.routeData = te_temp[i];
+            tagObj.allRoutedata = te_temp;
+            tagObj.sheetName = sheetName;
+            tagTemp.push(tagObj);
+          });
+          if (self.activeName == 0) {
+            if (temp.length == 0) {
+              self.getDownLoadURL();
+            }
+            self.elTableData[0].data = tagTemp;
+          } else if (self.activeName == 1) {
+            if (temp.length == 0) {
+              self.getDownLoadURL();
+            }
+            self.elTableData[1].data = tagTemp;
+          } else {
+            obj.label = item;
+            obj.data = { name: '', routeData: te_temp[0] };
+            // tempAllData.push(obj);
+          }
+          // })
+          self.elTableData = self.elTableData.concat(tempAllData);
+          if (val == 'add') {
+            self.patrolActive = (TagData.length - 1).toString();
+            self.showImportSucceed = true;
+          }
+        }
+        else {
+          self.getDownLoadURL();
+          self.elTableData = [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }];
+        }
+        self.getBindStoreList();
+      },
+
+      getUserTitleList() {
+        return new Promise((resolve, reject) => {
+          titleRESTful.getUserTitleList().then(res => {
+            resolve(res);
+          }).catch(err => {
+            reject(err);
+          });
         });
-        if (namerepeat === 1) {
+      },
+
+      deleteItem(itemIdList) {
+        const params = {
+          itemIds: itemIdList
+        };
+        return new Promise((resolve, reject) => {
+          inpectRESTful.deleteInspectItem(params).then(res => {
+            console.log(res);
+            resolve(res);
+          }).catch(err => {
+            reject(err);
+          });
+        });
+      },
+
+      deleteGroup(groupIdList) {
+        const params = {
+          groupIds: groupIdList
+        };
+        return new Promise((resolve, reject) => {
+          inpectRESTful.deleteInspectGroup(params).then(res => {
+            console.log(res);
+            resolve(res);
+          });
+        }).catch(err => {
+          reject(err);
+        });
+      },
+
+      addGroup(params) {
+        return new Promise((resolve, reject) => {
+          inpectRESTful.addInspectGroup(params).then(res => {
+            console.log(res);
+            resolve(res);
+          }).catch(err => {
+            reject(err);
+          });
+        });
+      },
+
+      addItem(params) {
+        return new Promise((resolve, reject) => {
+          inpectRESTful.addInspectItem(params).then(res => {
+            console.log(res);
+            resolve(res);
+          }).catch(err => {
+            reject(err);
+          });
+        });
+      },
+
+      async addAllDataCopy ({
+                              PassFail,
+                              Score,
+                              Others
+                            }) {
+        try {
+          PassFail && await this.resolveSheetData(PassFail, 'PassFail');
+          Score && await this.resolveSheetData(Score, 'Score');
+          Others && await this.resolveSheetData(Others, 'Others');
+          await this.getTagList('add');
+        } catch (e) {
+          util.notify(this.$t('insSettingView.importFail'), 'warning', 3000);
+          console.log('importFile -' + e);
+        }
+      },
+
+      getPrimaryColumCells ({ sheet, range }) {
+        let primaryColumnCells = []
+        this.traverseSheet({
+          sheet,
+          range: {
+            s: {
+              c: range.s.c,
+              r: range.s.r + 1
+            },
+            e: {
+              c: range.s.c,
+              r: range.e.r
+            }
+          },
+          fn: ({ sheet, cellRef }) => {
+            primaryColumnCells.push(sheet[cellRef])
+          }
+        })
+        return primaryColumnCells
+      },
+
+      traverseSheet ({ sheet, range, fn }) {
+        for(let r = range.s.r; r <= range.e.r; ++r) {
+          for(let c = range.s.c; c <= range.e.c; ++c) {
+            let cellAddress = { c, r }
+            let cellRef = XLSX.utils.encode_cell(cellAddress)
+            fn({ sheet, cellAddress, cellRef  })
+          }
+        }
+      },
+
+      formatSheetCells ({ sheet, range }) {
+        this.traverseSheet({ sheet, range, fn: ({ sheet, cellAddress, cellRef }) => {
+            let headerRef = XLSX.utils.encode_cell({c: cellAddress.c, r: range.s.r})
+            let header = sheet[headerRef];
+            sheet[cellRef] = {
+              ...sheet[cellRef],
+              cellRef,
+              cellAddress,
+              parent: null,
+              header,
+              tag: header && header.v && header.v.replace(/\(.*\)|\（.*\）/g, '')
+            }
+          }})
+      },
+
+      getSheetCells ({ sheet, range }) {
+        let cells = []
+        this.traverseSheet({
+          sheet,
+          range,
+          fn: ({ sheet, cellRef }) => {
+            cells.push(sheet[cellRef])
+          }
+        })
+
+        return cells
+      },
+
+      getSecondaryColumnHeadCell ({ sheet }) {
+        let range = XLSX.utils.decode_range(sheet['!ref']);
+        let secondaryColumnCellAddress = {c: range.s.c + 1, r: range.s.r};
+        let cell = sheet[XLSX.utils.encode_cell(secondaryColumnCellAddress)];
+        const subCategoryArr = ['子类别', '子類別', 'Subcategory'];
+        return cell && subCategoryArr.includes(cell.tag) && cell;
+      },
+      
+      async resolveSheetData (sheet, type) {
+        let range = XLSX.utils.decode_range(sheet['!ref']);
+        sheet.$$type = type;
+        this.formatSheetCells({ sheet, range });
+        let primaryColumnCells = this.getSheetCells({
+          sheet,
+          range: {
+            s: {
+              c: range.s.c,
+              r: range.s.r + 1
+            },
+            e: {
+              c: range.s.c,
+              r: range.e.r
+            }
+          }
+        })
+        let primaryGroupCelss = []
+        let secondaryGroupCells = []
+        let groupItemCells = []
+
+        if (!primaryColumnCells.some(cell => cell.v) && type === 'PassFail') {
+          primaryColumnCells = [{ ...primaryColumnCells[0], v: '巡检评分项'}]
+        }
+        if (!primaryColumnCells.some(cell => cell.v) && type === 'Others') {
+          primaryColumnCells = [{ ...primaryColumnCells[0], v: '附加评分项'}]
+        }
+
+        primaryColumnCells.filter(cell => cell.v).forEach((cell, i) => {
+          primaryGroupCelss.push(cell)
+
+          let next, current = sheet[cell.cellRef]
+
+          if (primaryColumnCells.filter(cell => cell.v)[i + 1]) {
+            next = sheet[primaryColumnCells.filter(cell => cell.v)[i + 1].cellRef]
+            sheet[cell.cellRef].next = sheet[primaryColumnCells.filter(cell => cell.v)[i + 1].cellRef]
+          }
+
+          let secondaryColumnHeadCell = this.getSecondaryColumnHeadCell({ sheet })
+          let secondaryColumnCells = []
+          if (secondaryColumnHeadCell) {
+            if (next && next.v) {
+              secondaryColumnCells = this.getSheetCells({
+                sheet,
+                range: {
+                  s: {
+                    c: current.cellAddress.c + 1,
+                    r: current.cellAddress.r
+                  },
+                  e: {
+                    c: current.cellAddress.c + 1,
+                    r: next.cellAddress.r - 1
+                  }
+                }
+              })
+            } else {
+              secondaryColumnCells = this.getSheetCells({
+                sheet,
+                range: {
+                  s: {
+                    c: current.cellAddress.c + 1,
+                    r: current.cellAddress.r
+                  },
+                  e: {
+                    c: current.cellAddress.c + 1,
+                    r: current.parent && current.parent.next ? current.parent.next.cellAddress.r - 1 : range.e.r
+                  }
+                }
+              })
+            }
+
+            if (secondaryColumnCells.filter(cell => cell.v).length) {
+              if (next && next.v) {
+                this.traverseSheet({
+                  sheet,
+                  range: {
+                    s: {
+                      c: current.cellAddress.c + 1,
+                      r: current.cellAddress.r
+                    },
+                    e: {
+                      c: current.cellAddress.c + 1,
+                      r: next.cellAddress.r - 1
+                    }
+                  },
+                  fn: ({ sheet, cellRef }) => {
+                    sheet[cellRef] = {
+                      ...sheet[cellRef],
+                      parent: sheet[cell.cellRef]
+                    }
+                    if (sheet[cellRef].v) {
+                      secondaryGroupCells.push(sheet[cellRef])
+                    }
+                  }
+                })
+              } else {
+                this.traverseSheet({
+                  sheet,
+                  range: {
+                    s: {
+                      c: current.cellAddress.c + 1,
+                      r: current.cellAddress.r
+                    },
+                    e: {
+                      c: current.cellAddress.c + 1,
+                      r: range.e.r
+                    }
+                  },
+                  fn: ({ sheet, cellRef }) => {
+                    sheet[cellRef] = {
+                      ...sheet[cellRef],
+                      parent: sheet[cell.cellRef]
+                    }
+
+                    if (sheet[cellRef].v) {
+                      secondaryGroupCells.push(sheet[cellRef])
+                    }
+                  }
+                })
+              }
+
+              // 第二列非空遍历
+              secondaryColumnCells.filter(cell => cell.v).forEach((cell, i) => {
+                let next, current = sheet[cell.cellRef]
+                if (secondaryColumnCells.filter(cell => cell.v)[i+1]) {
+                  next = sheet[secondaryColumnCells.filter(cell => cell.v)[i+1].cellRef]
+                }
+
+                if (next && next.v) {
+                  this.traverseSheet({
+                    sheet,
+                    range: {
+                      s: {
+                        c: current.cellAddress.c + 1,
+                        r: current.cellAddress.r
+                      },
+                      e: {
+                        c: range.e.c,
+                        r: next.cellAddress.r - 1
+                      }
+                    },
+                    fn: ({ sheet, cellRef }) => {
+                      sheet[cellRef] = {
+                        ...sheet[cellRef],
+                        parent: sheet[cell.cellRef]
+                      }
+                      groupItemCells.push(sheet[cellRef])
+                    }
+                  })
+                } else {
+                  this.traverseSheet({
+                    sheet,
+                    range: {
+                      s: {
+                        c: current.cellAddress.c + 1,
+                        r: current.cellAddress.r
+                      },
+                      e: {
+                        c: range.e.c,
+                        r: current.parent && current.parent.next ? current.parent.next.cellAddress.r - 1 : range.e.r
+                      }
+                    },
+                    fn: ({ sheet, cellRef }) => {
+                      sheet[cellRef] = {
+                        ...sheet[cellRef],
+                        parent: sheet[cell.cellRef]
+                      }
+                      groupItemCells.push(sheet[cellRef])
+                    }
+                  })
+                }
+              })
+            } else {
+              if (next && next.v) {
+                this.traverseSheet({
+                  sheet,
+                  range: {
+                    s: {
+                      c: current.cellAddress.c + 2,
+                      r: current.cellAddress.r
+                    },
+                    e: {
+                      c: range.e.c,
+                      r: next.cellAddress.r - 1
+                    }
+                  },
+                  fn: ({ sheet, cellRef }) => {
+                    sheet[cellRef] = {
+                      ...sheet[cellRef],
+                      parent: sheet[cell.cellRef]
+                    }
+                    groupItemCells.push(sheet[cellRef])
+                  }
+                })
+              } else {
+                this.traverseSheet({
+                  sheet,
+                  range: {
+                    s: {
+                      c: current.cellAddress.c + 2,
+                      r: current.cellAddress.r
+                    },
+                    e: range.e
+                  },
+                  fn: ({ sheet, cellRef }) => {
+                    sheet[cellRef] = {
+                      ...sheet[cellRef],
+                      parent: sheet[cell.cellRef]
+                    }
+                    groupItemCells.push(sheet[cellRef])
+                  }
+                })
+              }
+            }
+          } else {
+            if (next && next.v) {
+              this.traverseSheet({
+                sheet,
+                range: {
+                  s: {
+                    c: current.cellAddress.c + 1,
+                    r: current.cellAddress.r
+                  },
+                  e: {
+                    c: range.e.c,
+                    r: next.cellAddress.r - 1
+                  }
+                },
+                fn: ({ sheet, cellRef }) => {
+                  sheet[cellRef] = {
+                    ...sheet[cellRef],
+                    parent: sheet[cell.cellRef]
+                  }
+                  groupItemCells.push(sheet[cellRef])
+                }
+              })
+            } else {
+              this.traverseSheet({
+                sheet,
+                range: {
+                  s: {
+                    c: current.cellAddress.c + 1,
+                    r: current.cellAddress.r
+                  },
+                  e: range.e
+                },
+                fn: ({ sheet, cellRef }) => {
+                  sheet[cellRef] = {
+                    ...sheet[cellRef],
+                    parent: sheet[cell.cellRef]
+                  }
+                  groupItemCells.push(sheet[cellRef])
+                }
+              })
+            }
+          }
+        })
+        const groupType = this.getGroupType(type);
+        let addGroupParams = primaryGroupCelss.filter(cell => cell.v).map(cell => {
+          return {
+            name: cell.v,
+            mode: this.activeName == '0' ? 1 : 0,
+            parentId: cell.parent && cell.parent.id ? cell.parent.id : -1,
+            type: groupType,
+            tag: this.ImportName
+          }
+        })
+        let primaryResult = await this.addGroup({ groups: addGroupParams })
+        if (!primaryResult.data && primaryResult.errMsg) {
+          throw new Error(primaryResult.errMsg)
+        }
+        primaryGroupCelss.map((cell, i) => {
+          sheet[cell.cellRef].id = primaryResult.data[i]
+        })
+
+        if (secondaryGroupCells.length) {
+          addGroupParams = secondaryGroupCells.map(cell => {
+            return {
+              name: cell.v,
+              mode: this.activeName == '0' ? 1 : 0,
+              parentId: cell.parent && cell.parent.id ? cell.parent.id : -1,
+              type: groupType,
+              tag: this.ImportName
+            }
+          })
+
+          let secondaryResult = await this.addGroup({ groups: addGroupParams })
+          if (!secondaryResult.data && secondaryResult.errMsg) {
+            throw new Error(secondaryResult.errMsg)
+          }
+          secondaryGroupCells.map((cell, i) => {
+            sheet[cell.cellRef].id = secondaryResult.data[i]
+          })
+        }
+
+        let requestGroups = {}
+        let rowCellsObject = groupItemCells.reduce((current, next) => {
+          let nextCell = sheet[next.cellRef]
+          if (current[next.cellAddress.r]) {
+            current[next.cellAddress.r].push(nextCell)
+          } else {
+            current[next.cellAddress.r] = [nextCell]
+          }
+          current[next.cellAddress.r].parent = nextCell.parent
+          return current
+        }, {})
+
+        Object.values(rowCellsObject).forEach(rowCells => {
+          let mapping = {
+            '巡检项名称': 'subject',
+            '项目分值': 'itemScore',
+            '巡检项目详细说明': 'description',
+            '评分选项': 'availableScore',
+            '低于*分，须门店负责人处理': 'qualifiedScore',
+            '巡檢項名稱': 'subject',
+            '項目分值': 'itemScore',
+            '巡檢項目詳細說明': 'description',
+            '評分選項': 'availableScore',
+            '低於*分，須門店負責人處理': 'qualifiedScore',
+            'Inspection Items': 'subject',
+            'Score': 'itemScore',
+            'Inspection Item Description': 'description',
+            'Score Options': 'availableScore',
+            'Anomaly Events-Score Threshold': 'qualifiedScore'
+          }
+          let item = {}
+          rowCells.forEach(cell => {
+            let key = cell.header && cell.header.tag
+            if (!mapping[key]) return
+            if ('availableScore' === mapping[key]) {
+              item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : []
+            } else if ('itemScore' === mapping[key]) {
+              item[mapping[key]] = cell.v ? Number(cell.v) : 10
+              if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1)
+            } else if ('description' === mapping[key]) {
+              item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : ''
+            } else {
+              item[mapping[key]] = cell.v || ''
+            }
+          })
+
+          if (type === 'Score') {
+            const availableScore = deepClone(item['availableScore']);
+            console.log(availableScore);
+            const maxAvailableScore = availableScore.sort((a, b) => a - b)[availableScore.length - 1];
+            item['itemScore'] = maxAvailableScore;
+          }
+
+          if (item['subject']) {
+            if (requestGroups[rowCells.parent.id]) {
+              requestGroups[rowCells.parent.id].items.push(item)
+            } else {
+              requestGroups[rowCells.parent.id] = {
+                groupId: rowCells.parent.id,
+                items: [item]
+              }
+            }
+          }
+        })
+
+        let addItemParams = {
+          request: Object.values(requestGroups)
+        }
+
+        let res = await this.addItem(addItemParams)
+      },
+
+
+      getGroupType(type){
+        let groupType = type === 'PassFail' ? 0 : type === 'Score' ? 1 : 2;
+        return groupType;
+      },
+
+      handleItem() {
+        this.showBtnContent = !this.showBtnContent;
+      },
+
+      bindStore() {
+        const self = this;
+        const routeData = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData;
+        self.showNoPostDialog = routeData[0].ModelPost === null;
+        if (!self.showNoPostDialog) {
+          self.confirmToBind();
+        }
+      },
+
+      confirmToBind() {
+        const self = this;
+        if (self.elTableData[Number(self.activeName)].data.length === 0) {
+          util.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
+          return false;
+        }
+        const arr = [];
+        self.tempdata.forEach(item => {
+          item.itemData.forEach(_item => {
+            arr.push(_item.id);
+          });
+        });
+        if (arr.length === 0) {
+          util.notify(self.$t('insSettingView.emptyInfo'), 'warning', 3000);
+          return false;
+        }
+        sessionStorage.setItem('TabName', self.activeName);
+        sessionStorage.setItem('NapeId', JSON.stringify(arr));
+        const params = {
+          inspectId: self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId
+        };
+        sessionStorage.setItem('bindStoreData', JSON.stringify(params));
+        self.$router.push({ name: 'bindStore', params: params });
+      },
+
+      updateTitleDialogFlag(val) {
+        this.showNoPostDialog = val;
+      },
+
+      hideNoTitleDialog(){
+        this.showNoPostDialog = false;
+      },
+
+      changeValue(obj) {
+        const self = this;
+        self.tabNameInput = '';
+        if (obj !== '新增巡检表') {
+          self.hideUpload = false;
+        } else {
+          if (self.tabNameInput.length === 0) {
+            self.hideUpload = true;
+          } else {
+            self.hideUpload = false;
+          }
+        }
+      },
+
+      cancelImportName() {
+        const self = this;
+        self.isShowWarning = false;
+        self.showNameImport = false;
+      },
+      async confirmImportName() {
+        const self = this;
+        if (self.ImportName !== '') {
+          const TagData = await self.getTagAll();
+          let namerepeat = 0;
+          TagData.forEach(item => {
+            if (item.name === self.ImportName) {
+              namerepeat = 1;
+            }
+          });
+          if (namerepeat === 1) {
+            self.isShowWarning = true;
+            self.warningContent = self.$t('remotePatrol.Patroltips2');
+          } else if (validateInput(self.ImportName)) {
+            self.isShowWarning = true;
+            self.warningContent = self.$t('insSettingView.excelIllegalCategory');
+          } else {
+            self.isShowWarning = false;
+            document.getElementById('loadFileEx').click();
+            self.showNameImport = false;
+          }
+        } else {
           self.isShowWarning = true;
-          self.warningContent = self.$t('remotePatrol.Patroltips2');
-        } else if (validateInput(self.ImportName)) {
+          self.warningContent = self.$t('insSettingView.enterListName');
+        }
+      },
+
+      watchName(val) {
+        const self = this;
+        const content = filterString.all(val, 30);
+        const length = filterString.getContentLength(val);
+        self.ImportName = val.replace(/[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig, '');
+        self.ImportName = content;
+        if (length > 30) {
           self.isShowWarning = true;
-          self.warningContent = self.$t('insSettingView.excelIllegalCategory');
+          self.warningContent = self.$t('insSettingView.enterNameRuletip');
         } else {
           self.isShowWarning = false;
-          document.getElementById('loadFileEx').click();
-          self.showNameImport = false;
         }
-      } else {
-        self.isShowWarning = true;
-        self.warningContent = self.$t('insSettingView.enterListName');
-      }
-    },
+      },
 
-    watchName(val) {
-      const self = this;
-      const content = filterString.all(val, 30);
-      const length = filterString.getContentLength(val);
-      self.ImportName = val.replace(/[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig, '');
-      self.ImportName = content;
-      if (length > 30) {
-        self.isShowWarning = true;
-        self.warningContent = self.$t('insSettingView.enterNameRuletip');
-      } else {
-        self.isShowWarning = false;
-      }
-    },
-
-    handleClick(tabObj) {
-      const self = this;
-      self.isLoading = true;
-      sessionStorage.setItem('TabIndex', tabObj.index);
-      switch (tabObj.index) {
-        case '0':
-          self.checkValue = '现场巡检'; break;
-        case '1':
-          self.checkValue = '远程巡检'; break;
-        default:
-          self.checkValue = '新增巡检表'; break;
-      }
-      if (tabObj.index === '0') {
-        const idx0 = sessionStorage.getItem('TabPatrolIndex0');
-        if (idx0 != null && idx0 !== '0') {
-          if (Number(idx0) === self.elTableData[Number(self.activeName)].data.length) {
-            self.patrolActive = (Number(idx0) - 1).toString();
-          } else {
-            self.patrolActive = idx0;
-          }
-        } else {
-          self.patrolActive = '0';
+      handleClick(tabObj) {
+        const self = this;
+        self.isLoading = true;
+        sessionStorage.setItem('TabIndex', tabObj.index);
+        switch (tabObj.index) {
+          case '0':
+            self.checkValue = '现场巡检'; break;
+          case '1':
+            self.checkValue = '远程巡检'; break;
+          default:
+            self.checkValue = '新增巡检表'; break;
         }
-      } else if (tabObj.index === '1') {
-        const idx1 = sessionStorage.getItem('TabPatrolIndex1');
-        if (idx1 != null && idx1 !== '0') {
-          if (Number(idx1) === self.elTableData[Number(self.activeName)].data.length) {
-            self.patrolActive = (Number(idx1) - 1).toString();
-          } else {
-            self.patrolActive = idx1;
-          }
-        } else {
-          self.patrolActive = '0';
-        }
-      }
-      self.getTagList();
-    },
-
-    overItem(item, index) {
-      const self = this;
-      self.itemhoverName = item.name;
-      self.itemIndex = index;
-    },
-
-    outItem(item, index) {
-      const self = this;
-      self.itemhoverName = '';
-    },
-
-    handleClickPatrol(val) {
-      const self = this;
-      if (self.activeName === '0') {
-        sessionStorage.setItem('TabPatrolIndex0', val.index);
-      } else if (self.activeName === '1') {
-        sessionStorage.setItem('TabPatrolIndex1', val.index);
-      }
-      self.loading = true;
-      self.btnList[1].enabled = true;
-      self.btnList[3].enabled = true;
-      self.getTagList();
-    },
-
-    updateImportSuccDialogFlag(val) {
-      this.showImportSucceed = val;
-    },
-
-    hideImportSuccDialog() {
-      this.showImportSucceed = false;
-    },
-
-    toSetRules() {
-      const self = this;
-      const activeInpect = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)];
-      const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name,
-        mode: Number(self.activeName) === 0 ? 1 : 0 };
-      sessionStorage.setItem('ruleData', JSON.stringify(params));
-      self.$router.push({ name: 'setRule', params: params });
-    },
-
-    async delAllItem() {
-      const self = this;
-      const datalength = self.elTableData[Number(self.activeName)].data.length;
-      if (datalength === 0) {
-        util.notify(self.$t('insSettingView.deletePatrolList'), 'warning', 3000);
-        return false;
-      } else {
-        const params = {};
-        params.category = parseInt(self.activeName);
-        const bindSchedule = await self.getScheduleFromDB(params);
-        const arrtemp = [];
-        bindSchedule.forEach(item => {
-          if (item.extra != null) {
-            arrtemp.push(item.extra.inspectId);
-          }
-        });
-        if (arrtemp.indexOf(self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId) !== -1) {
-          util.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
-          return false;
-        }
-      }
-      self.showSingleDeleteContent = true;
-    },
-
-    confirmDelete() {
-      const self = this;
-      const arrGroup = [];
-      const arrItem = [];
-      self.tempdata.forEach(item => {
-        arrGroup.push(item.id);
-        item.itemData.forEach(_item => {
-          arrItem.push(_item.id);
-        });
-      });
-      const params = {
-        'itemIds': arrItem
-      };
-      const paramsGroup = {
-        'groupIds': arrGroup
-      };
-      if (arrItem.length !== 0) {
-        inpectRESTful.deleteInspectItem(params).then(res => {
-          const code = res.errMsg;
-          if (code != undefined && code === 'Success') {
-            if (arrGroup.length !== 0) {
-              inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-                if (resGroup.errMsg === 'Success') {
-                  self.afterDeleteList();
-                }
-              });
+        if (tabObj.index === '0') {
+          const idx0 = sessionStorage.getItem('TabPatrolIndex0');
+          if (idx0 != null && idx0 !== '0') {
+            if (Number(idx0) === self.elTableData[Number(self.activeName)].data.length) {
+              self.patrolActive = (Number(idx0) - 1).toString();
             } else {
-              self.afterDeleteList();
+              self.patrolActive = idx0;
             }
           } else {
-            util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
-            return false;
+            self.patrolActive = '0';
           }
-        });
-      } else {
-        inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-          if (resGroup.errMsg === 'Success') {
-            self.afterDeleteList();
+        } else if (tabObj.index === '1') {
+          const idx1 = sessionStorage.getItem('TabPatrolIndex1');
+          if (idx1 != null && idx1 !== '0') {
+            if (Number(idx1) === self.elTableData[Number(self.activeName)].data.length) {
+              self.patrolActive = (Number(idx1) - 1).toString();
+            } else {
+              self.patrolActive = idx1;
+            }
           } else {
-            util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
+            self.patrolActive = '0';
+          }
+        }
+        self.getTagList();
+      },
+
+      overItem(item, index) {
+        const self = this;
+        self.itemhoverName = item.name;
+        self.itemIndex = index;
+      },
+
+      outItem(item, index) {
+        const self = this;
+        self.itemhoverName = '';
+      },
+
+      handleClickPatrol(val) {
+        const self = this;
+        if (self.activeName === '0') {
+          sessionStorage.setItem('TabPatrolIndex0', val.index);
+        } else if (self.activeName === '1') {
+          sessionStorage.setItem('TabPatrolIndex1', val.index);
+        }
+        self.loading = true;
+        self.btnList[1].enabled = true;
+        self.btnList[3].enabled = true;
+        self.getTagList();
+      },
+
+      updateImportSuccDialogFlag(val) {
+        this.showImportSucceed = val;
+      },
+
+      hideImportSuccDialog() {
+        this.showImportSucceed = false;
+      },
+
+      toSetRules() {
+        const self = this;
+        const activeInpect = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)];
+        const params = { inspectId: activeInpect.routeData[0].inspectId, routeName: activeInpect.name,
+          mode: Number(self.activeName) === 0 ? 1 : 0 };
+        sessionStorage.setItem('ruleData', JSON.stringify(params));
+        self.$router.push({ name: 'setRule', params: params });
+      },
+
+      async delAllItem() {
+        const self = this;
+        const datalength = self.elTableData[Number(self.activeName)].data.length;
+        if (datalength === 0) {
+          util.notify(self.$t('insSettingView.deletePatrolList'), 'warning', 3000);
+          return false;
+        } else {
+          const params = {};
+          params.category = parseInt(self.activeName);
+          const bindSchedule = await self.getScheduleFromDB(params);
+          const arrtemp = [];
+          bindSchedule.forEach(item => {
+            if (item.extra != null) {
+              arrtemp.push(item.extra.inspectId);
+            }
+          });
+          if (arrtemp.indexOf(self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId) !== -1) {
+            util.notify(self.$t('insSettingView.deletebindSchedule'), 'warning', 3000);
             return false;
           }
+        }
+        self.showSingleDeleteContent = true;
+      },
+
+      confirmDelete() {
+        const self = this;
+        const arrGroup = [];
+        const arrItem = [];
+        self.tempdata.forEach(item => {
+          arrGroup.push(item.id);
+          item.itemData.forEach(_item => {
+            arrItem.push(_item.id);
+          });
         });
-      }
-    },
+        const params = {
+          'itemIds': arrItem
+        };
+        const paramsGroup = {
+          'groupIds': arrGroup
+        };
+        if (arrItem.length !== 0) {
+          inpectRESTful.deleteInspectItem(params).then(res => {
+            const code = res.errMsg;
+            if (code != undefined && code === 'Success') {
+              if (arrGroup.length !== 0) {
+                inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
+                  if (resGroup.errMsg === 'Success') {
+                    self.afterDeleteList();
+                  }
+                });
+              } else {
+                self.afterDeleteList();
+              }
+            } else {
+              util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
+              return false;
+            }
+          });
+        } else {
+          inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
+            if (resGroup.errMsg === 'Success') {
+              self.afterDeleteList();
+            } else {
+              util.notify(self.$t('insSettingView.deleteInspectFail'), 'warning', 3000);
+              return false;
+            }
+          });
+        }
+      },
 
-    updateDeleteContentDialogFlag(val) {
-      this.showSingleDeleteContent = val;
-    },
+      updateDeleteContentDialogFlag(val) {
+        this.showSingleDeleteContent = val;
+      },
 
-    hideDeleteContentDialog() {
-      this.showSingleDeleteContent = false;
-    },
+      hideDeleteContentDialog() {
+        this.showSingleDeleteContent = false;
+      },
 
-    updateShowInfoDialog(val) {
-      this.showFailInfo = val;
-    },
+      updateShowInfoDialog(val) {
+        this.showFailInfo = val;
+      },
 
-    hideShowInfoDialog() {
-      this.showFailInfo = false;
-    },
+      hideShowInfoDialog() {
+        this.showFailInfo = false;
+      },
 
-    afterDeleteList() {
-      const self = this;
-      util.notify(self.$t('insSettingView.deleteInspectSuss'), 'success', 3000);
-      self.showSingleDeleteContent = false;
-      self.getTagList('del');
-    },
+      afterDeleteList() {
+        const self = this;
+        util.notify(self.$t('insSettingView.deleteInspectSuss'), 'success', 3000);
+        self.showSingleDeleteContent = false;
+        self.getTagList('del');
+      },
 
-    importItem() {
-      const self = this;
-      const isGlobalWebsite = Environment.isGlobalWebsite;
-      if (isGlobalWebsite) {
-        const Datalength = self.elTableData[Number(self.activeName)].data.length;
-        if (Number(self.activeName) === 1 && Datalength >= 20) {
-          util.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
-          return false;
-        } else if (Number(self.activeName) === 0 && Datalength >= 20) {
-          util.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
-          return false;
+      importItem() {
+        const self = this;
+        const isGlobalWebsite = Environment.isGlobalWebsite;
+        if (isGlobalWebsite) {
+          const Datalength = self.elTableData[Number(self.activeName)].data.length;
+          if (Number(self.activeName) === 1 && Datalength >= 20) {
+            util.notify(self.$t('insSettingView.RemoteLength'), 'warning', 3000);
+            return false;
+          } else if (Number(self.activeName) === 0 && Datalength >= 20) {
+            util.notify(self.$t('insSettingView.OnsiteLength'), 'warning', 3000);
+            return false;
+          } else {
+            self.showNameImport = true;
+            self.ImportName = '';
+          }
         } else {
           self.showNameImport = true;
           self.ImportName = '';
         }
-      } else {
-        self.showNameImport = true;
-        self.ImportName = '';
-      }
-    },
-    checkBeforeImport() {
-      const self = this;
-      if (self.checkValue === '新增巡检表' && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
-        self.hideUpload = true;
-        util.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
-        return false;
-      } else {
-        self.hideUpload = false;
-      }
-    },
-    getBindStoreList() {
-      const self = this;
-      if (self.elTableData[Number(self.activeName)].data.length !== 0) {
-        const inspectId = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId;
-        const params = { inspectId: inspectId };
-        inpectRESTful.getInspectBindList(params).then(res => {
-          if (res.errMsg != undefined && res.errMsg === 'Success') {
-            const data = res.data;
-            self.storeNum = data.length;
-            self.loading = false;
-            self.btnList[1].enabled = false;
-            self.btnList[3].enabled = false;
-          }
-          self.isLoading = false;
-        });
-      } else {
-        self.storeNum = 0;
-        self.isLoading = false;
-      }
-    },
-
-    isLoginIn() {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        isLoginIn().then(res => {
-          resolve(res);
-        });
-      }).catch(err => {
-        console.log(err);
-      });
-    },
-
-    async exportItem() {
-      const self = this;
-      const ret = await self.isLoginIn();
-      if (ret.data != undefined && ret.data.isLogin) {
-        self.export2Excel();
-      } else {
-        window.location.href = 'https://portals.storeviu.com';
-      }
-    },
-
-    async importfxx(obj) {
-      const _this = this;
-      const inputDOM = this.$refs.inputer;
-      const ITEMSLENGTH = 250;
-      _this.FileInfo = [];
-      this.file = event.currentTarget.files[0];
-      var rABS = false;
-      var f = this.file;
-      var reader = new FileReader();
-      FileReader.prototype.readAsBinaryString = function(f) {
-        var binary = '';
-        var rABS = false;
-        var pt = this;
-        var wb;
-        var outdata = {};
-        var reader = new FileReader();
-        reader.onload = function(e) {
-          var bytes = new Uint8Array(reader.result);
-          var length = bytes.byteLength;
-          for (var i = 0; i < length; i++) {
-            binary += String.fromCharCode(bytes[i]);
-          }
-          if (rABS) {
-            wb = XLSX.read(btoa(fixdata(binary)), {
-              type: 'base64'
-            });
-          } else {
-            wb = XLSX.read(binary, {
-              type: 'binary'
-            });
-          }
-
-          const PassFail = wb.Sheets['Pass&Fail'];
-          const Score = wb.Sheets['Score'];
-          const Others = wb.Sheets['Others'];
-          const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
-
-          outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
-          outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
-          outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
-
-          const passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
-          console.log(passFailSheetFlagObj);
-
-          const scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
-          console.log(scoreSheetFlagObj);
-
-          const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
-          console.log(otherSheetFlagObj);
-          let flagTempError = outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined ? true : false;
-
-          _this.FileInfo = _this.getWarningInfo(passFailSheetFlagObj.flags, scoreSheetFlagObj.flags,
-                                                otherSheetFlagObj.flags, flagTempError);
-          console.log(_this.FileInfo);
-
-          if (_this.FileInfo.length > 0) {
-            _this.showFailInfo = true;
-            _this.$refs.loadFile.value = '';
-            _this.$refs.loadFileEx.value = '';
-            return false;
-          }
-
-          const arrSheet1 = _this.getPassAndFailArrData(outdata.PassFail, passFailSheetFlagObj.indexArrPassFail, passFailSheetFlagObj.indexSubCatergyPassFail);
-          const arrSheet2 = _this.getScoreArrData(outdata.Score, scoreSheetFlagObj.indexArrScore);
-          const arrSheet3 = _this.getOtherArrData(outdata.Others, otherSheetFlagObj.indexArrOthers);
-
-          if(arrSheet1.length === 0 && arrSheet2.length === 0 && arrSheet3.length === 0){
-            _this.$refs.loadFile.value = '';
-            _this.$refs.loadFileEx.value = '';
-            util.notify(_this.$t('insSettingView.templateEmpty'), 'warning', 3000);
-            return false;
-          }
-
-          const dataArry = {
-            PassFail: arrSheet1,
-            Score: arrSheet2,
-            Others: arrSheet3
-          };
-          console.log(dataArry);
-          _this.addAllData(dataArry);
-          _this.$refs.loadFile.value = '';
-          _this.$refs.loadFileEx.value = '';
-        };
-        reader.readAsArrayBuffer(f);
-      };
-      if (rABS) {
-        reader.readAsArrayBuffer(f);
-      } else {
-        reader.readAsBinaryString(f);
-      }
-    },
-
-    getTableVersonBasedOnB1(sheet1, sheet2, sheet3){
-      const subCatergyLength = 30;
-      const containSubColumn = ( sheet1 && sheet1.B1.h.includes(subCatergyLength) )
-                            || ( sheet2 && sheet2.B1.h.includes(subCatergyLength) )
-                            || ( sheet3 && sheet3.B1.h.includes(subCatergyLength) );
-      let tableVersion = containSubColumn ? 2 : 1;
-      return tableVersion;
-    },
-
-    getPassAndFailSheetJsonData(workbook, sheet, tableVersion){
-      if(sheet){
-        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
-        const sheetArray = XLSX.utils.sheet_to_json(sheet);
-        console.log(sheetArray);
-        let rowDataArray = [];
-        sheetArray.forEach((_item) => {
-          const rowDataObj = {};
-          rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
-          if(tableVersion === 1){
-            rowDataObj.subCatergyName = '';
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
-            rowDataObj.score = _item.__EMPTY_2;
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_3);
-          } else {
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.score = _item.__EMPTY_3;
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_4);
-          }
-
-          rowDataArray.push(rowDataObj);
-        });
-        console.log(rowDataArray);
-        return rowDataArray;
-      }
-      return [];
-    },
-
-    getScoreSheetJsonData(workbook, sheet, tableVersion){
-      if(sheet){
-        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1;
-        const sheetArray = XLSX.utils.sheet_to_json(sheet);
-        let rowDataArray = [];
-        sheetArray.forEach((_item) => {
-          const rowDataObj = {};
-          rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
-          if(tableVersion === 1){
-            rowDataObj.subCatergyName = '';
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
-            rowDataObj.totalScore = _item.__EMPTY_2;
-            rowDataObj.scoreThreshold = _item.__EMPTY_3;
-            rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_5);
-          } else{
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.score = this.getTableCellData(_item.__EMPTY_3);
-            rowDataObj.scoreThreshold = _item.__EMPTY_4;
-            rowDataObj.totalScore = Infinity;
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
-          }
-
-          rowDataArray.push(rowDataObj);
-        });
-        console.log(rowDataArray);
-        return rowDataArray;
-      }
-    },
-
-    getTableCellData(itemData){
-      const resultData = itemData !== undefined && typeof itemData !== 'number' ? itemData.trim() : itemData;
-      return resultData;
-    },
-
-    validatePassFailData(passFailArr) {
-      const ITEMSLENGTH = 250;
-      let passFailFlagObj = {
-        indexArrPassFail: [],
-        indexSubCatergyPassFail: [],
-        flags: {
-          flagGroupLengthPassFail: false,
-          flagSubGroupLengthPassFail: false,
-          flagItemNamePassFail: false,
-          flagItemLengthPassFail: false,
-          flagPassFailScoreType: false,
-          flagDesLengthPassFail: false
-        }
-      };
-      passFailArr.forEach((item, index) => {
-        if (item.catergyName != undefined && item.catergyName.length > 0) {
-          passFailFlagObj.indexArrPassFail.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
-            passFailFlagObj.flags.flagGroupLengthPassFail = true;
-          }
-        }
-        if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
-          passFailFlagObj.indexSubCatergyPassFail.push(index);
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
-            passFailFlagObj.flags.flagSubGroupLengthPassFail = true;
-          }
-        }
-        if (item.itemName == undefined || item.itemName.length == 0) {
-          passFailFlagObj.flags.flagItemNamePassFail = true;
-        }
-        else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
-          passFailFlagObj.flags.flagItemLengthPassFail = true;
-        }
-        if (item.score != undefined) {
-          if(isNaN(item.score) || parseFloat(item.score) < 0.5 || parseFloat(item.score) > 50) {
-            passFailFlagObj.flags.flagPassFailScoreType = true;
-          }
-        } else {
-          item.score = 10;
-        }
-        if (item.description != undefined) {
-          if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
-            passFailFlagObj.flags.flagDesLengthPassFail = true;
-          }
-        }
-      })
-      return passFailFlagObj;
-    },
-
-    validateScoreData(scoreArr , tableVersion) {
-      const ITEMSLENGTH = 250;
-      const _this = this;
-      let scoreFlagObj = {
-        indexArrScore: [],
-        indexSubCatergyScore: [],
-        flags: {
-          flagGroupLengthScore: false,
-          flagSubGroupLengthScore: false,
-          flagItemNameScore: false,
-          flagItemLengthScore: false,
-          flagFullScoreType: false,
-          flagMinScoreType: false,
-          flagDesLengthPassFail: false,
-          flagScoreItemType: false,
-          flagDesLengthScore: false,
-          flagScoreItemEmpty: false,
-        }
-      };
-      scoreArr.forEach((item, index) => {
-        if (item.catergyName != undefined && item.catergyName.length != 0) {
-          scoreFlagObj.indexArrScore.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
-            scoreFlagObj.flags.flagGroupLengthScore = true;
-          }
-        }
-        if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
-          scoreFlagObj.indexSubCatergyScore.push(index);
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
-            scoreFlagObj.flags.flagSubGroupLengthScore = true;
-          }
-        }
-        if (item.itemName == undefined || item.itemName.length === 0) {
-          scoreFlagObj.flags.flagItemNameScore = true;
-        } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
-          scoreFlagObj.flags.flagItemLengthScore = true;
-        }
-        if(tableVersion === 1){
-          if (item.totalScore == undefined || item.totalScore.length == 0 || isNaN(item.totalScore)
-            || parseFloat(item.totalScore) < 0 || parseFloat(item.totalScore) > 50) {
-            scoreFlagObj.flags.flagFullScoreType = true;
-          }
-          if (item.scoreThreshold != undefined) {
-            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50
-              || parseFloat(item.scoreThreshold) > parseFloat(item.totalScore)) {
-              scoreFlagObj.flags.flagMinScoreType = true;
-            }
-          } else {
-            item.scoreThreshold = parseFloat(item.totalScore);
-          }
-          if (item.score != undefined) {
-            if (typeof item.score!=='number'&&item.score.indexOf('/') !== -1) {
-              const f_Score = item.score.split('/');
-              const scoreArr = [];
-              f_Score.forEach(f_item => {
-                if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= parseFloat(item.totalScore)) {
-                  scoreArr.push(parseFloat(_this.getFloat(f_item)));
-                }
-              });
-              scoreArr.length === 0 ? scoreFlagObj.flags.flagScoreItemType = true : item.score = scoreArr;
-            } else {
-              if (!isNaN(Number(item.score)) && parseFloat(item.score) >= -50 && parseFloat(item.score) <= parseFloat(item.totalScore)) {
-                let a = [];
-                a.push(parseFloat(_this.getFloat(item.score)));
-                item.score = a;
-              } else {
-                scoreFlagObj.flags.flagScoreItemType = true
-              }
-            }
-          } else {
-            scoreFlagObj.flags.flagScoreItemEmpty = true;
-          }
-        } else {
-          if (item.score != undefined) {
-            if (typeof item.score!=='number'&&item.score.indexOf('/') !== -1) {
-              const f_Score = item.score.split('/');
-              const scoreArr = [];
-              f_Score.forEach(f_item => {
-                if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50) {
-                  scoreArr.push(parseFloat(_this.getFloat(f_item)));
-                }
-              });
-              if(scoreArr.length === 0){
-                scoreFlagObj.flags.flagScoreItemType = true;
-              } else {
-                scoreArr.sort((a, b) => {return a - b});
-                item.score = scoreArr;
-              }
-            } else {
-              if (!isNaN(Number(item.score)) && parseFloat(item.score) >= -50) {
-                let a = [];
-                a.push(parseFloat(_this.getFloat(item.score)));
-                item.score = a;
-              } else {
-                scoreFlagObj.flags.flagScoreItemType = true;
-              }
-            }
-          } else {
-            scoreFlagObj.flags.flagScoreItemEmpty = true;
-          }
-          let maxScore = Infinity;
-          if(!scoreFlagObj.flags.flagScoreItemType && !scoreFlagObj.flags.flagScoreItemType){
-            maxScore = item.score[item.score.length - 1];
-          }
-          item.totalScore = maxScore;
-
-          if (item.scoreThreshold != undefined) {
-            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50
-              || parseFloat(item.scoreThreshold) > parseFloat(item.maxScore)) {
-              scoreFlagObj.flags.flagMinScoreType = true;
-            }
-          } else {
-            item.scoreThreshold = parseFloat(item.totalScore);
-          }
-        }
-        if (item.description != undefined) {
-          if (filterString.getContentLength(item.f.toString().trim()) > 1200) {
-            scoreFlagObj.flags.flagDesLengthScore = true;
-          }
-        }
-      })
-      return scoreFlagObj;
-    },
-
-    validateOtherData(scoreArr) {
-      const ITEMSLENGTH = 250;
-      let otherFlagObj = {
-        indexArrOthers: [],
-        indexSubCatergyOthers: [],
-        flags: {
-          flagGroupLengthOthers: false,
-          flagSubGroupLengthOthers: false,
-          flagItemNameOthers: false,
-          flagItemLengthOthers: false,
-          flagOtherScoreType: false,
-          flagDesLengthOthers: false
-        }
-      };
-      scoreArr.forEach((item, index) => {
-        if (item.catergyName != undefined && item.catergyName.length != 0) {
-          otherFlagObj.indexArrOthers.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
-            otherFlagObj.flags.flagGroupLengthOthers = true;
-          }
-        }
-        if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
-          otherFlagObj.indexSubCatergyOthers.push(index);
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
-            otherFlagObj.flags.flagSubGroupLengthOthers = true;
-          }
-        }
-        if (item.itemName == undefined || item.itemName.length == 0) {
-          otherFlagObj.flags.flagItemNameOthers = true;
-        } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
-          otherFlagObj.flags.flagItemLengthOthers = true;
-        }
-        if (item.score == undefined || item.score.length == 0 || isNaN(item.score)
-          || parseFloat(item.score) < -100 || parseFloat(item.score) > 100) {
-          // 项目分值必填，字符类型为-100~+100
-          otherFlagObj.flags.flagOtherScoreType = true;
-        }
-        if (item.description != undefined) {
-          if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
-            otherFlagObj.flags.flagDesLengthOthers = true;
-          }
-        }
-      });
-      return otherFlagObj;
-    },
-
-
-    getWarningInfo(passFailFlag, scoreFlag, othersFlag, flagTempError){
-      const showWarningIfo = this.isObjContainValue(passFailFlag, true)
-                          || this.isObjContainValue(scoreFlag, true)
-                          || this.isObjContainValue(othersFlag, true)
-                          || flagTempError;
-      let warningInfo = [];
-      if (showWarningIfo) {
-        if (flagTempError) {
-          warningInfo.push(this.$t('insSettingView.templateError'));
-        }
-        if (passFailFlag.flagGroupLengthPassFail || scoreFlag.flagGroupLengthScore || othersFlag.flagGroupLengthOthers) {
-          const flagArr = [];
-          if (passFailFlag.flagGroupLengthPassFail) {
-            flagArr.push('PassFail');
-          }
-          if (scoreFlag.flagGroupLengthScore) {
-            flagArr.push('Score');
-          }
-          if (othersFlag.flagGroupLengthOthers) {
-            flagArr.push('Others');
-          }
-          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
-          warningInfo.push(flag);
-        }
-        if (passFailFlag.flagSubGroupLengthPassFail || scoreFlag.flagSubGroupLengthScore || othersFlag.flagSubGroupLengthOthers) {
-          const flagArr = [];
-          if (passFailFlag.flagSubGroupLengthPassFail) {
-            flagArr.push('PassFail');
-          }
-          if (scoreFlag.flagSubGroupLengthScore) {
-            flagArr.push('Score');
-          }
-          if (othersFlag.flagSubGroupLengthOthers) {
-            flagArr.push('Others');
-          }
-          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
-          warningInfo.push(flag);
-        }
-        if (passFailFlag.flagItemNamePassFail || scoreFlag.flagItemNameScore || othersFlag.flagItemNameOthers) {
-          const flagArr = [];
-          if (scoreFlag.flagItemNameScore) {
-            const flag = 'Score' + ' ' + this.$t('insSettingView.excelEmpty');
-            warningInfo.push(flag);
-          }
-          if (passFailFlag.flagItemNamePassFail ||  othersFlag.flagItemNameOthers) {
-            if (passFailFlag.flagItemNamePassFail) {
-              flagArr.push('PassFail');
-            }
-            if (othersFlag.flagItemNameOthers) {
-              flagArr.push('Others');
-            }
-            const flag = flagArr.toString() + ' ' + this.$t('insSettingView.passfailexcelEmpty');
-            warningInfo.push(flag);
-          }
-        }
-        if (passFailFlag.flagItemLengthPassFail || scoreFlag.flagItemLengthScore || othersFlag.flagItemLengthOthers) {
-          const flagArr = [];
-          if (passFailFlag.flagItemLengthPassFail) { flagArr.push('PassFail'); }
-          if (scoreFlag.flagItemLengthScore) { flagArr.push('Score'); }
-          if (othersFlag.flagItemLengthOthers) { flagArr.push('Others'); }
-          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongItem');
-          warningInfo.push(flag);
-        }
-        if (passFailFlag.flagDesLengthPassFail || scoreFlag.flagDesLengthScore || othersFlag.flagDesLengthOthers) {
-          const flagArr = [];
-          if (passFailFlag.flagDesLengthPassFail) { flagArr.push('PassFail'); }
-          if (scoreFlag.flagDesLengthScore) { flagArr.push('Score'); }
-          if (othersFlag.flagDesLengthOthers) { flagArr.push('Others'); }
-          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelIllegalDes');
-          warningInfo.push(flag);
-        }
-        if (passFailFlag.flagPassFailScoreType) {
-          warningInfo.push('PassFail' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));
-        }
-        if (scoreFlag.flagFullScoreType) {
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelFullScoreType'));
-        }
-        if (scoreFlag.flagMinScoreType) {
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelMinScoreType'));
-        }
-        if (othersFlag.flagOtherScoreType) {
-          warningInfo.push('Others' + ' ' + this.$t('insSettingView.excelOtherScoreType'));
-        }
-        if(scoreFlag.flagScoreItemType){
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemType'));
-        }
-        if(scoreFlag.flagScoreItemEmpty){
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemEmpty'));
-        }
-      }
-      return warningInfo;
-    },
-
-    getPassAndFailArrData(sheetData, indexArray, subCatergyIndexArr){
-      let passFailSheet = [];
-      if (sheetData != undefined) {
-        if (indexArray.length !== 0) {
-          for (let i = 0; i < indexArray.length; i++) {
-            const subCatergyArr = [];
-            for(let subIndex = 0; subIndex < subCatergyIndexArr.length; subIndex++){
-              subCatergyArr[subIndex] = sheetData.slice(indexArray[subIndex], indexArray[subIndex + 1]);
-            }
-            passFailSheet[i] = sheetData.slice(indexArray[i], indexArray[i + 1]);
-          }
-        } else {
-          if (sheetData.length !== 0) {
-            passFailSheet.push(sheetData);
-            passFailSheet[0][0].a = this.$t('insSettingView.Ratingitems');
-          }
-        }
-      }
-      return passFailSheet;
-    },
-
-    getScoreArrData(sheetData, indexArray){
-      let scoreSheetArr = [];
-      if (sheetData != undefined) {
-        if (indexArray.length !== 0) {
-          for (let i = 0; i < indexArray.length; i++) {
-            scoreSheetArr[i] = sheetData.slice(indexArray[i], indexArray[i + 1]);
-          }
-        }
-      }
-      return scoreSheetArr;
-    },
-
-    getOtherArrData(sheetData, indexArray){
-      let otherSheetArr = [];
-      if (sheetData != undefined) {
-        if (indexArray.length !== 0) {
-          for (let i = 0; i < indexArray.length; i++) {
-            otherSheetArr[i] = sheetData.slice(indexArray[i], indexArray[i + 1]);
-          }
-        } else {
-          if (sheetData.length != 0) {
-            otherSheetArr.push(sheetData);
-            otherSheetArr[0][0].a = this.$t('insSettingView.Addscoreitems');
-          }
-        }
-      }
-      return otherSheetArr;
-    },
-
-    isObjContainValue(object, value){
-      return Object.values(object).includes(value);
-    },
-
-    getFloat (value) {
-      let str = value.toString();
-      let strIndex = str.indexOf('.');
-      if (strIndex === -1){return str};
-      str = str.substring(0, strIndex + 2);
-      return str;
-    },
-
-    addTab(targetName) {
-      const newTabName = ++this.tabIndex + '';
-      this.editableTabs2.push({
-        title: 'New Tab',
-        name: newTabName,
-        content: 'New Tab content'
-      });
-      this.editableTabsValue2 = newTabName;
-    },
-
-    handleNape(index, item) {
-      console.log(item);
-      const self = this;
-      switch (index) {
-        case 0: self.importItem(); break;
-        case 1: self.exportItem(); break;
-        case 2: self.downItem(); break;
-        case 3: self.delAllItem(); break;
-      }
-    },
-
-    export2Excel() {
-      var that = this;
-      require.ensure([], () => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = [that.$t('insSettingView.tHeaderA'), that.$t('insSettingView.tHeaderB'),
-          that.$t('insSettingView.tHeaderC'), that.$t('insSettingView.tHeaderD'),
-          that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2'), that.$t('insSettingView.tHeaderE'), that.$t('insSettingView.tHeaderG'), that.$t('insSettingView.sheetscore2')];
-        const excelData = [];
-        let name = '';
-        var wb = XLSX.utils.book_new();
-        if (that.elTableData[Number(that.activeName)].data.length === 0) {
-          util.notify(that.$t('insSettingView.haveNothingToExport'), 'warning', 3000);
+      },
+      checkBeforeImport() {
+        const self = this;
+        if (self.checkValue === '新增巡检表' && (self.tabNameInput == null || self.tabNameInput.trim().length === 0)) {
+          self.hideUpload = true;
+          util.notify(self.$t('insSettingView.enterSelfListName'), 'warning', 3000);
           return false;
         } else {
-          let sheet1data = [], sheet2data = [], sheet3data = [];
-          const curData = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
-          const passfail = curData.filter(x => x[0].type === 0)[0];
-          const score = curData.filter(x => x[0].type === 1)[0];
-          const other = curData.filter(x => x[0].type === 2)[0];
-          name = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].name;
-          if (passfail != undefined) {
-            passfail.forEach(item => {
-              if (item.itemData.length !== 0) {
-                item.itemData.forEach((_item, _index) => {
-                  const obj = {};
-                  if (_index === 0) {
-                    obj[tHeader[0]] = item.groupName;
-                  } else {
-                    obj[tHeader[0]] = '';
+          self.hideUpload = false;
+        }
+      },
+      getBindStoreList() {
+        const self = this;
+        if (self.elTableData[Number(self.activeName)].data.length !== 0) {
+          const inspectId = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId;
+          const params = { inspectId: inspectId };
+          inpectRESTful.getInspectBindList(params).then(res => {
+            if (res.errMsg != undefined && res.errMsg === 'Success') {
+              const data = res.data;
+              self.storeNum = data.length;
+              self.loading = false;
+              self.btnList[1].enabled = false;
+              self.btnList[3].enabled = false;
+            }
+            self.isLoading = false;
+          });
+        } else {
+          self.storeNum = 0;
+          self.isLoading = false;
+        }
+      },
+
+      isLoginIn() {
+        const self = this;
+        return new Promise((resolve, reject) => {
+          isLoginIn().then(res => {
+            resolve(res);
+          });
+        }).catch(err => {
+          console.log(err);
+        });
+      },
+
+      async exportItem() {
+        const self = this;
+        const ret = await self.isLoginIn();
+        if (ret.data != undefined && ret.data.isLogin) {
+          self.export2Excel();
+        } else {
+          window.location.href = 'https://portals.storeviu.com';
+        }
+      },
+
+      async importfxx(obj) {
+        const _this = this;
+        const inputDOM = this.$refs.inputer;
+        const ITEMSLENGTH = 250;
+        _this.FileInfo = [];
+        this.file = event.currentTarget.files[0];
+        var rABS = false;
+        var f = this.file;
+        var reader = new FileReader();
+        FileReader.prototype.readAsBinaryString = async function(f) {
+          var binary = '';
+          var rABS = false;
+          var pt = this;
+          var wb;
+          var outdata = {};
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var bytes = new Uint8Array(reader.result);
+            var length = bytes.byteLength;
+            for (var i = 0; i < length; i++) {
+              binary += String.fromCharCode(bytes[i]);
+            }
+            if (rABS) {
+              wb = XLSX.read(btoa(fixdata(binary)), {
+                type: 'base64'
+              });
+            } else {
+              wb = XLSX.read(binary, {
+                type: 'binary'
+              });
+            }
+            const PassFail = wb.Sheets['Pass&Fail'];
+            const Score = wb.Sheets['Score'];
+            const Others = wb.Sheets['Others'];
+            // 由于旧逻辑会改动 PassFail Score Others 这些源数据，不利于我后面添加新逻辑，所以复制来一份
+            const PassFailCopy = deepClone(PassFail)
+            const ScoreCopy = deepClone(Score)
+            const OthersCopy = deepClone(Others)
+            const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
+            outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
+            outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
+            outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
+
+            const passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
+            console.log('passFailSheetFlagObj', passFailSheetFlagObj);
+
+            const scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
+            console.log('scoreSheetFlagObj', scoreSheetFlagObj);
+
+            const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
+            console.log('otherSheetFlagObj', otherSheetFlagObj);
+            let flagTempError = outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined ? true : false;
+
+            _this.FileInfo = _this.getWarningInfo(passFailSheetFlagObj.flags, scoreSheetFlagObj.flags,
+              otherSheetFlagObj.flags, flagTempError);
+            console.log(_this.FileInfo);
+
+            if (_this.FileInfo.length > 0) {
+              _this.showFailInfo = true;
+              _this.$refs.loadFile.value = '';
+              _this.$refs.loadFileEx.value = '';
+              return false;
+            }
+
+            const arrSheet1 = _this.getPassAndFailArrData(outdata.PassFail, passFailSheetFlagObj.indexArrPassFail, passFailSheetFlagObj.indexSubCatergyPassFail);
+            const arrSheet2 = _this.getScoreArrData(outdata.Score, scoreSheetFlagObj.indexArrScore);
+            const arrSheet3 = _this.getOtherArrData(outdata.Others, otherSheetFlagObj.indexArrOthers);
+
+            if(arrSheet1.length === 0 && arrSheet2.length === 0 && arrSheet3.length === 0){
+              _this.$refs.loadFile.value = '';
+              _this.$refs.loadFileEx.value = '';
+              util.notify(_this.$t('insSettingView.templateEmpty'), 'warning', 3000);
+              return false;
+            }
+
+            _this.addAllDataCopy({
+              PassFail: PassFailCopy,
+              Score: ScoreCopy,
+              Others: OthersCopy
+            });
+
+            _this.$refs.loadFile.value = '';
+            _this.$refs.loadFileEx.value = '';
+          };
+          reader.readAsArrayBuffer(f);
+        };
+        if (rABS) {
+          reader.readAsArrayBuffer(f);
+        } else {
+          reader.readAsBinaryString(f);
+        }
+      },
+
+      getTableVersonBasedOnB1(sheet1, sheet2, sheet3){
+        const subCategoryArr = ['子类别', '子類別', 'Subcategory'];
+        const containSubColumn = ( sheet1 && subCategoryArr.includes(sheet1.B1.h.replace(/\(.*\)|\（.*\）/g, '')))
+          || ( sheet2 && subCategoryArr.includes(sheet2.B1.h.replace(/\(.*\)|\（.*\）/g, '')))
+          || ( sheet3 && subCategoryArr.includes(sheet3.B1.h.replace(/\(.*\)|\（.*\）/g, '')) );
+        let tableVersion = containSubColumn ? 2 : 1;
+        return tableVersion;
+      },
+
+      getPassAndFailSheetJsonData(workbook, sheet, tableVersion){
+        if(sheet){
+          delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
+          const sheetArray = XLSX.utils.sheet_to_json(sheet);
+          console.log(sheetArray);
+          let rowDataArray = [];
+          sheetArray.forEach((_item) => {
+            const rowDataObj = {};
+            rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
+            if(tableVersion === 1){
+              rowDataObj.subCatergyName = '';
+              rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
+              rowDataObj.score = _item.__EMPTY_2;
+              rowDataObj.description = this.getTableCellData(_item.__EMPTY_3);
+            } else {
+              rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
+              rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+              rowDataObj.score = _item.__EMPTY_3;
+              rowDataObj.description = this.getTableCellData(_item.__EMPTY_4);
+            }
+
+            rowDataArray.push(rowDataObj);
+          });
+          console.log(rowDataArray);
+          return rowDataArray;
+        }
+        return [];
+      },
+
+      getScoreSheetJsonData(workbook, sheet, tableVersion){
+        if(sheet){
+          delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1;
+          const sheetArray = XLSX.utils.sheet_to_json(sheet);
+          let rowDataArray = [];
+          sheetArray.forEach((_item) => {
+            const rowDataObj = {};
+            rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
+            if(tableVersion === 1){
+              rowDataObj.subCatergyName = '';
+              rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
+              rowDataObj.totalScore = _item.__EMPTY_2;
+              rowDataObj.scoreThreshold = _item.__EMPTY_3;
+              rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
+              rowDataObj.description = this.getTableCellData(_item.__EMPTY_5);
+            } else{
+              rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
+              rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+              rowDataObj.score = this.getTableCellData(_item.__EMPTY_3);
+              rowDataObj.scoreThreshold = _item.__EMPTY_4;
+              rowDataObj.totalScore = Infinity;
+              rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
+            }
+
+            rowDataArray.push(rowDataObj);
+          });
+          console.log(rowDataArray);
+          return rowDataArray;
+        }
+      },
+
+      getTableCellData(itemData){
+        const resultData = itemData !== undefined && typeof itemData !== 'number' ? itemData.trim() : itemData;
+        return resultData;
+      },
+
+      validatePassFailData(passFailArr) {
+        const ITEMSLENGTH = 250;
+        let passFailFlagObj = {
+          indexArrPassFail: [],
+          indexSubCatergyPassFail: [],
+          flags: {
+            flagGroupLengthPassFail: false,
+            flagSubGroupLengthPassFail: false,
+            flagItemNamePassFail: false,
+            flagItemLengthPassFail: false,
+            flagPassFailScoreType: false,
+            flagDesLengthPassFail: false
+          }
+        };
+        passFailArr.forEach((item, index) => {
+          if (item.catergyName != undefined && item.catergyName.length > 0) {
+            passFailFlagObj.indexArrPassFail.push(index);
+            if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+              passFailFlagObj.flags.flagGroupLengthPassFail = true;
+            }
+          }
+          if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
+            passFailFlagObj.indexSubCatergyPassFail.push(index);
+            if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+              passFailFlagObj.flags.flagSubGroupLengthPassFail = true;
+            }
+          }
+          if (item.itemName == undefined || item.itemName.length == 0) {
+            passFailFlagObj.flags.flagItemNamePassFail = true;
+          }
+          else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
+            passFailFlagObj.flags.flagItemLengthPassFail = true;
+          }
+          if (item.score != undefined) {
+            if(isNaN(item.score) || parseFloat(item.score) < 0.5 || parseFloat(item.score) > 50) {
+              passFailFlagObj.flags.flagPassFailScoreType = true;
+            }
+          } else {
+            item.score = 10;
+          }
+          if (item.description != undefined) {
+            if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
+              passFailFlagObj.flags.flagDesLengthPassFail = true;
+            }
+          }
+        })
+        return passFailFlagObj;
+      },
+
+      validateScoreData(scoreArr , tableVersion) {
+        const ITEMSLENGTH = 250;
+        const _this = this;
+        let scoreFlagObj = {
+          indexArrScore: [],
+          indexSubCatergyScore: [],
+          flags: {
+            flagGroupLengthScore: false,
+            flagSubGroupLengthScore: false,
+            flagItemNameScore: false,
+            flagItemLengthScore: false,
+            flagFullScoreType: false,
+            flagMinScoreType: false,
+            flagDesLengthPassFail: false,
+            flagScoreItemType: false,
+            flagDesLengthScore: false,
+            flagScoreItemEmpty: false,
+          }
+        };
+        scoreArr.forEach((item, index) => {
+          if (item.catergyName != undefined && item.catergyName.length != 0) {
+            scoreFlagObj.indexArrScore.push(index);
+            if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+              scoreFlagObj.flags.flagGroupLengthScore = true;
+            }
+          }
+          if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
+            scoreFlagObj.indexSubCatergyScore.push(index);
+            if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+              scoreFlagObj.flags.flagSubGroupLengthScore = true;
+            }
+          }
+          if (item.itemName == undefined || item.itemName.length === 0) {
+            scoreFlagObj.flags.flagItemNameScore = true;
+          } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
+            scoreFlagObj.flags.flagItemLengthScore = true;
+          }
+          if(tableVersion === 1){
+            if (item.totalScore == undefined || item.totalScore.length == 0 || isNaN(item.totalScore)
+              || parseFloat(item.totalScore) < 0 || parseFloat(item.totalScore) > 50) {
+              scoreFlagObj.flags.flagFullScoreType = true;
+            }
+            if (item.scoreThreshold != undefined) {
+              if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50
+                || parseFloat(item.scoreThreshold) > parseFloat(item.totalScore)) {
+                scoreFlagObj.flags.flagMinScoreType = true;
+              }
+            } else {
+              item.scoreThreshold = parseFloat(item.totalScore);
+            }
+            if (item.score != undefined) {
+              if (typeof item.score!=='number'&&item.score.indexOf('/') !== -1) {
+                const f_Score = item.score.split('/');
+                const scoreArr = [];
+                f_Score.forEach(f_item => {
+                  if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= parseFloat(item.totalScore)) {
+                    scoreArr.push(parseFloat(_this.getFloat(f_item)));
                   }
-                  obj[tHeader[1]] = _item.name;
-                  obj[tHeader[6]] = _item.score;
-                  obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
+                });
+                scoreArr.length === 0 ? scoreFlagObj.flags.flagScoreItemType = true : item.score = scoreArr;
+              } else {
+                if (!isNaN(Number(item.score)) && parseFloat(item.score) >= -50 && parseFloat(item.score) <= parseFloat(item.totalScore)) {
+                  let a = [];
+                  a.push(parseFloat(_this.getFloat(item.score)));
+                  item.score = a;
+                } else {
+                  scoreFlagObj.flags.flagScoreItemType = true
+                }
+              }
+            } else {
+              scoreFlagObj.flags.flagScoreItemEmpty = true;
+            }
+          } else {
+            if (item.score != undefined) {
+              if (typeof item.score!=='number'&&item.score.indexOf('/') !== -1) {
+                const f_Score = item.score.split('/');
+                const scoreArr = [];
+                f_Score.forEach(f_item => {
+                  if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50) {
+                    scoreArr.push(parseFloat(_this.getFloat(f_item)));
+                  }
+                });
+                if(scoreArr.length === 0){
+                  scoreFlagObj.flags.flagScoreItemType = true;
+                } else {
+                  scoreArr.sort((a, b) => {return a - b});
+                  item.score = scoreArr;
+                }
+              } else {
+                if (!isNaN(Number(item.score)) && parseFloat(item.score) >= -50) {
+                  let a = [];
+                  a.push(parseFloat(_this.getFloat(item.score)));
+                  item.score = a;
+                } else {
+                  scoreFlagObj.flags.flagScoreItemType = true;
+                }
+              }
+            } else {
+              scoreFlagObj.flags.flagScoreItemEmpty = true;
+            }
+            let maxScore = Infinity;
+            if(!scoreFlagObj.flags.flagScoreItemType && !scoreFlagObj.flags.flagScoreItemType){
+              maxScore = item.score[item.score.length - 1];
+            }
+            item.totalScore = maxScore;
+
+            if (item.scoreThreshold != undefined) {
+              if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50
+                || parseFloat(item.scoreThreshold) > parseFloat(item.maxScore)) {
+                scoreFlagObj.flags.flagMinScoreType = true;
+              }
+            } else {
+              item.scoreThreshold = parseFloat(item.totalScore);
+            }
+          }
+          if (item.description != undefined) {
+            if (filterString.getContentLength(item.description && item.description.toString().trim()) > 1200) {
+              scoreFlagObj.flags.flagDesLengthScore = true;
+            }
+          }
+        })
+        return scoreFlagObj;
+      },
+
+      validateOtherData(scoreArr) {
+        const ITEMSLENGTH = 250;
+        let otherFlagObj = {
+          indexArrOthers: [],
+          indexSubCatergyOthers: [],
+          flags: {
+            flagGroupLengthOthers: false,
+            flagSubGroupLengthOthers: false,
+            flagItemNameOthers: false,
+            flagItemLengthOthers: false,
+            flagOtherScoreType: false,
+            flagDesLengthOthers: false
+          }
+        };
+        scoreArr.forEach((item, index) => {
+          if (item.catergyName != undefined && item.catergyName.length != 0) {
+            otherFlagObj.indexArrOthers.push(index);
+            if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+              otherFlagObj.flags.flagGroupLengthOthers = true;
+            }
+          }
+          if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
+            otherFlagObj.indexSubCatergyOthers.push(index);
+            if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+              otherFlagObj.flags.flagSubGroupLengthOthers = true;
+            }
+          }
+          if (item.itemName == undefined || item.itemName.length == 0) {
+            otherFlagObj.flags.flagItemNameOthers = true;
+          } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
+            otherFlagObj.flags.flagItemLengthOthers = true;
+          }
+          if (item.score == undefined || item.score.length == 0 || isNaN(item.score)
+            || parseFloat(item.score) < -100 || parseFloat(item.score) > 100) {
+            // 项目分值必填，字符类型为-100~+100
+            otherFlagObj.flags.flagOtherScoreType = true;
+          }
+          if (item.description != undefined) {
+            if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
+              otherFlagObj.flags.flagDesLengthOthers = true;
+            }
+          }
+        });
+        return otherFlagObj;
+      },
+
+
+      getWarningInfo(passFailFlag, scoreFlag, othersFlag, flagTempError){
+        const showWarningIfo = this.isObjContainValue(passFailFlag, true)
+          || this.isObjContainValue(scoreFlag, true)
+          || this.isObjContainValue(othersFlag, true)
+          || flagTempError;
+        let warningInfo = [];
+        if (showWarningIfo) {
+          if (flagTempError) {
+            warningInfo.push(this.$t('insSettingView.templateError'));
+          }
+          if (passFailFlag.flagGroupLengthPassFail || scoreFlag.flagGroupLengthScore || othersFlag.flagGroupLengthOthers) {
+            const flagArr = [];
+            if (passFailFlag.flagGroupLengthPassFail) {
+              flagArr.push('PassFail');
+            }
+            if (scoreFlag.flagGroupLengthScore) {
+              flagArr.push('Score');
+            }
+            if (othersFlag.flagGroupLengthOthers) {
+              flagArr.push('Others');
+            }
+            const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
+            warningInfo.push(flag);
+          }
+          if (passFailFlag.flagSubGroupLengthPassFail || scoreFlag.flagSubGroupLengthScore || othersFlag.flagSubGroupLengthOthers) {
+            const flagArr = [];
+            if (passFailFlag.flagSubGroupLengthPassFail) {
+              flagArr.push('PassFail');
+            }
+            if (scoreFlag.flagSubGroupLengthScore) {
+              flagArr.push('Score');
+            }
+            if (othersFlag.flagSubGroupLengthOthers) {
+              flagArr.push('Others');
+            }
+            const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
+            warningInfo.push(flag);
+          }
+          if (passFailFlag.flagItemNamePassFail || scoreFlag.flagItemNameScore || othersFlag.flagItemNameOthers) {
+            const flagArr = [];
+            if (scoreFlag.flagItemNameScore) {
+              const flag = 'Score' + ' ' + this.$t('insSettingView.excelEmpty');
+              warningInfo.push(flag);
+            }
+            if (passFailFlag.flagItemNamePassFail ||  othersFlag.flagItemNameOthers) {
+              if (passFailFlag.flagItemNamePassFail) {
+                flagArr.push('PassFail');
+              }
+              if (othersFlag.flagItemNameOthers) {
+                flagArr.push('Others');
+              }
+              const flag = flagArr.toString() + ' ' + this.$t('insSettingView.passfailexcelEmpty');
+              warningInfo.push(flag);
+            }
+          }
+          if (passFailFlag.flagItemLengthPassFail || scoreFlag.flagItemLengthScore || othersFlag.flagItemLengthOthers) {
+            const flagArr = [];
+            if (passFailFlag.flagItemLengthPassFail) { flagArr.push('PassFail'); }
+            if (scoreFlag.flagItemLengthScore) { flagArr.push('Score'); }
+            if (othersFlag.flagItemLengthOthers) { flagArr.push('Others'); }
+            const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongItem');
+            warningInfo.push(flag);
+          }
+          if (passFailFlag.flagDesLengthPassFail || scoreFlag.flagDesLengthScore || othersFlag.flagDesLengthOthers) {
+            const flagArr = [];
+            if (passFailFlag.flagDesLengthPassFail) { flagArr.push('PassFail'); }
+            if (scoreFlag.flagDesLengthScore) { flagArr.push('Score'); }
+            if (othersFlag.flagDesLengthOthers) { flagArr.push('Others'); }
+            const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelIllegalDes');
+            warningInfo.push(flag);
+          }
+          if (passFailFlag.flagPassFailScoreType) {
+            warningInfo.push('PassFail' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));
+          }
+          if (scoreFlag.flagFullScoreType) {
+            warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelFullScoreType'));
+          }
+          if (scoreFlag.flagMinScoreType) {
+            warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelMinScoreType'));
+          }
+          if (othersFlag.flagOtherScoreType) {
+            warningInfo.push('Others' + ' ' + this.$t('insSettingView.excelOtherScoreType'));
+          }
+          if(scoreFlag.flagScoreItemType){
+            warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemType'));
+          }
+          if(scoreFlag.flagScoreItemEmpty){
+            warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemEmpty'));
+          }
+        }
+        return warningInfo;
+      },
+
+      getPassAndFailArrData(sheetData, indexArray, subCatergyIndexArr){
+        let passFailSheet = [];
+        const maxCategoryIndex = indexArray[indexArray.length -1];
+        if (sheetData != undefined) {
+          if (indexArray.length !== 0) {
+            for (let i = 0; i < indexArray.length; i++) {
+              passFailSheet[i] = {};
+              passFailSheet[i].category = sheetData.slice(indexArray[i], indexArray[i + 1]);
+              for (let j = 0; j < subCatergyIndexArr.length; j++) {
+                if(subCatergyIndexArr[j] <= indexArray[indexArray.length -1]){
+                  console.log(subCatergyIndexArr[j]);
+                  console.log(indexArray[indexArray.length - 1]);
+                  passFailSheet[i].subcategory = sheetData.slice(subCatergyIndexArr[j], subCatergyIndexArr[j + 1]);
+                }
+              }
+              console.log(passFailSheet[i])
+            }
+          }
+          else {
+            if (sheetData.length !== 0) {
+              passFailSheet.push(sheetData);
+              passFailSheet[0][0].catergyName = this.$t('insSettingView.Ratingitems');
+            }
+          }
+        }
+        return passFailSheet;
+      },
+
+      getScoreArrData(sheetData, indexArray){
+        let scoreSheetArr = [];
+        if (sheetData != undefined) {
+          if (indexArray.length !== 0) {
+            for (let i = 0; i < indexArray.length; i++) {
+              scoreSheetArr[i] = sheetData.slice(indexArray[i], indexArray[i + 1]);
+            }
+          }
+        }
+        return scoreSheetArr;
+      },
+
+      getOtherArrData(sheetData, indexArray){
+        let otherSheetArr = [];
+        if (sheetData != undefined) {
+          if (indexArray.length !== 0) {
+            for (let i = 0; i < indexArray.length; i++) {
+              otherSheetArr[i] = sheetData.slice(indexArray[i], indexArray[i + 1]);
+            }
+          } else {
+            if (sheetData.length != 0) {
+              otherSheetArr.push(sheetData);
+              otherSheetArr[0][0].a = this.$t('insSettingView.Addscoreitems');
+            }
+          }
+        }
+        return otherSheetArr;
+      },
+
+      isObjContainValue(object, value){
+        return Object.values(object).includes(value);
+      },
+
+      getFloat (value) {
+        let str = value.toString();
+        let strIndex = str.indexOf('.');
+        if (strIndex === -1){return str};
+        str = str.substring(0, strIndex + 2);
+        return str;
+      },
+
+      addTab(targetName) {
+        const newTabName = ++this.tabIndex + '';
+        this.editableTabs2.push({
+          title: 'New Tab',
+          name: newTabName,
+          content: 'New Tab content'
+        });
+        this.editableTabsValue2 = newTabName;
+      },
+
+      handleNape(index, item) {
+        console.log(item);
+        const self = this;
+        switch (index) {
+          case 0: self.importItem(); break;
+          case 1: self.exportItem(); break;
+          case 2: self.downItem(); break;
+          case 3: self.delAllItem(); break;
+        }
+      },
+
+      export2Excel() {
+        var that = this;
+        require.ensure([], () => {
+          const { export_json_to_excel } = require('@/excel/Export2Excel');
+          const tHeader = [that.$t('insSettingView.tHeaderA'), that.$t('insSettingView.tHeaderB'),
+            that.$t('insSettingView.tHeaderC'), that.$t('insSettingView.tHeaderD'),
+            that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2'), that.$t('insSettingView.tHeaderE'), that.$t('insSettingView.tHeaderG'), that.$t('insSettingView.sheetscore2')];
+          const excelData = [];
+          let name = '';
+          var wb = XLSX.utils.book_new();
+          if (that.elTableData[Number(that.activeName)].data.length === 0) {
+            util.notify(that.$t('insSettingView.haveNothingToExport'), 'warning', 3000);
+            return false;
+          } else {
+            let sheet1data = [], sheet2data = [], sheet3data = [];
+            const curData = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
+            const passfail = curData.filter(x => x[0].type === 0)[0];
+            const score = curData.filter(x => x[0].type === 1)[0];
+            const other = curData.filter(x => x[0].type === 2)[0];
+            name = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].name;
+            if (passfail != undefined) {
+              passfail.forEach(item => {
+                if (item.itemData.length !== 0) {
+                  item.itemData.forEach((_item, _index) => {
+                    const obj = {};
+                    if (_index === 0) {
+                      obj[tHeader[0]] = item.groupName;
+                    } else {
+                      obj[tHeader[0]] = '';
+                    }
+                    obj[tHeader[1]] = _item.name;
+                    obj[tHeader[6]] = _item.score;
+                    obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
+                    sheet1data.push(obj);
+                  });
+                } else {
+                  const obj = {};
+                  obj[tHeader[0]] = item.groupName;
+                  obj[tHeader[1]] = '';
+                  obj[tHeader[6]] = '';
+                  obj[tHeader[3]] = '';
                   sheet1data.push(obj);
-                });
-              } else {
-                const obj = {};
-                obj[tHeader[0]] = item.groupName;
-                obj[tHeader[1]] = '';
-                obj[tHeader[6]] = '';
-                obj[tHeader[3]] = '';
-                sheet1data.push(obj);
-              }
-            });
-            const sheet1 = XLSX.utils.json_to_sheet(sheet1data);
-            XLSX.utils.book_append_sheet(wb, sheet1, 'Pass&Fail');
-          }
-          if (score != undefined) {
-            score.forEach(item => {
-              if (item.itemData.length !== 0) {
-                item.itemData.forEach((_item, _index) => {
+                }
+              });
+              const sheet1 = XLSX.utils.json_to_sheet(sheet1data);
+              XLSX.utils.book_append_sheet(wb, sheet1, 'Pass&Fail');
+            }
+            if (score != undefined) {
+              score.forEach(item => {
+                if (item.itemData.length !== 0) {
+                  item.itemData.forEach((_item, _index) => {
+                    const obj = {};
+                    if (_index === 0) {
+                      obj[tHeader[5]] = item.groupName;
+                    } else {
+                      obj[tHeader[5]] = '';
+                    }
+                    obj[tHeader[1]] = _item.name;
+                    obj[tHeader[2]] = _item.score;
+                    obj[tHeader[4]] = _item.qualifiedScore;
+                    obj[tHeader[7]] = _item.availableScores;
+                    obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
+                    sheet2data.push(obj);
+                  });
+                } else {
                   const obj = {};
-                  if (_index === 0) {
-                    obj[tHeader[5]] = item.groupName;
-                  } else {
-                    obj[tHeader[5]] = '';
-                  }
-                  obj[tHeader[1]] = _item.name;
-                  obj[tHeader[2]] = _item.score;
-                  obj[tHeader[4]] = _item.qualifiedScore;
-                  obj[tHeader[7]] = _item.availableScores;
-                  obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
+                  obj[tHeader[5]] = item.groupName;
+                  obj[tHeader[1]] = '';
+                  obj[tHeader[2]] = '';
+                  obj[tHeader[4]] = '';
+                  obj[tHeader[7]] = '';
+                  obj[tHeader[3]] = '';
                   sheet2data.push(obj);
-                });
-              } else {
-                const obj = {};
-                obj[tHeader[5]] = item.groupName;
-                obj[tHeader[1]] = '';
-                obj[tHeader[2]] = '';
-                obj[tHeader[4]] = '';
-                obj[tHeader[7]] = '';
-                obj[tHeader[3]] = '';
-                sheet2data.push(obj);
-              }
-            });
-            var sheet2 = XLSX.utils.json_to_sheet(sheet2data);
-            XLSX.utils.book_append_sheet(wb, sheet2, 'Score');
-          }
-          if (other != undefined) {
-            other.forEach(item => {
-              if (item.itemData.length !== 0) {
-                item.itemData.forEach((_item, _index) => {
+                }
+              });
+              var sheet2 = XLSX.utils.json_to_sheet(sheet2data);
+              XLSX.utils.book_append_sheet(wb, sheet2, 'Score');
+            }
+            if (other != undefined) {
+              other.forEach(item => {
+                if (item.itemData.length !== 0) {
+                  item.itemData.forEach((_item, _index) => {
+                    const obj = {};
+                    if (_index === 0) {
+                      obj[tHeader[0]] = item.groupName;
+                    } else {
+                      obj[tHeader[0]] = '';
+                    }
+                    obj[tHeader[1]] = _item.name;
+                    obj[tHeader[8]] = _item.score;
+                    obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
+                    sheet3data.push(obj);
+                  });
+                } else {
                   const obj = {};
-                  if (_index === 0) {
-                    obj[tHeader[0]] = item.groupName;
-                  } else {
-                    obj[tHeader[0]] = '';
-                  }
-                  obj[tHeader[1]] = _item.name;
-                  obj[tHeader[8]] = _item.score;
-                  obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
+                  obj[tHeader[0]] = item.groupName;
+                  obj[tHeader[1]] = '';
+                  obj[tHeader[8]] = '';
+                  obj[tHeader[3]] = '';
                   sheet3data.push(obj);
-                });
-              } else {
-                const obj = {};
-                obj[tHeader[0]] = item.groupName;
-                obj[tHeader[1]] = '';
-                obj[tHeader[8]] = '';
-                obj[tHeader[3]] = '';
-                sheet3data.push(obj);
-              }
-            });
-            var sheet3 = XLSX.utils.json_to_sheet(sheet3data);
-            XLSX.utils.book_append_sheet(wb, sheet3, 'Others');
+                }
+              });
+              var sheet3 = XLSX.utils.json_to_sheet(sheet3data);
+              XLSX.utils.book_append_sheet(wb, sheet3, 'Others');
+            }
           }
+          let label = '';
+          switch (Number(that.activeName)) {
+            case 0: {
+              label = `[${that.$t('insSettingView.onsitePatrol')}]`;
+              break;
+            }
+            case 1: {
+              label = `[${that.$t('insSettingView.remotePatrol')}]`;
+              break;
+            }
+            default: {
+              label = `[${that.elTableData[Number(that.activeName)].label}]`;
+            }
+          }
+          const fileName = label + ' ' + name + '.xlsx';
+          const workbookBlob = that.workbook2blob(wb);
+          that.openDownloadDialog(workbookBlob, fileName);
+        });
+      },
+
+      workbook2blob(workbook) {
+        const self = this;
+        var wopts = { bookType: 'xlsx', bookSST: false, type: 'binary' };
+        var wbout = XLSX.write(workbook, wopts);
+        var blob = new Blob([self.s2ab(wbout)], {
+          type: 'application/octet-stream'
+        });
+        return blob;
+      },
+
+      s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
+        return buf;
+      },
+
+      openDownloadDialog(blob, fileName) {
+        if (typeof blob === 'object' && blob instanceof Blob) {
+          blob = URL.createObjectURL(blob);
         }
-        let label = '';
-        switch (Number(that.activeName)) {
-          case 0: {
-            label = `[${that.$t('insSettingView.onsitePatrol')}]`;
-            break;
-          }
-          case 1: {
-            label = `[${that.$t('insSettingView.remotePatrol')}]`;
-            break;
-          }
-          default: {
-            label = `[${that.elTableData[Number(that.activeName)].label}]`;
-          }
+        var aLink = document.createElement('a');
+        aLink.href = blob;
+        aLink.download = fileName || '';
+        var event;
+        if (window.MouseEvent) event = new MouseEvent('click');
+        else {
+          event = document.createEvent('MouseEvents');
+          event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
         }
-        const fileName = label + ' ' + name + '.xlsx';
-        const workbookBlob = that.workbook2blob(wb);
-        that.openDownloadDialog(workbookBlob, fileName);
-      });
-    },
+        aLink.dispatchEvent(event);
+      },
 
-    workbook2blob(workbook) {
-      const self = this;
-      var wopts = { bookType: 'xlsx', bookSST: false, type: 'binary' };
-      var wbout = XLSX.write(workbook, wopts);
-      var blob = new Blob([self.s2ab(wbout)], {
-        type: 'application/octet-stream'
-      });
-      return blob;
-    },
-
-    s2ab(s) {
-      var buf = new ArrayBuffer(s.length);
-      var view = new Uint8Array(buf);
-      for (var i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xff;
-      return buf;
-    },
-
-    openDownloadDialog(blob, fileName) {
-      if (typeof blob === 'object' && blob instanceof Blob) {
-        blob = URL.createObjectURL(blob);
+      formatJson(filterVal, jsonData) {
+        return jsonData.map(v => filterVal.map(j => v[j]));
       }
-      var aLink = document.createElement('a');
-      aLink.href = blob;
-      aLink.download = fileName || '';
-      var event;
-      if (window.MouseEvent) event = new MouseEvent('click');
-      else {
-        event = document.createEvent('MouseEvents');
-        event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-      }
-      aLink.dispatchEvent(event);
-    },
 
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => v[j]));
     }
-
-  }
-};
+  };
 </script>
 <style>
-@import '../../../assets/css/importfile.css';
+  @import '../../../assets/css/importfile.css';
 </style>
 <style lang="scss" scoped>
-    $mainColor:#f31d65;
-    $border: #e3e9f4;
-    $tab: #7d8cad;
-    *{
-       font-family: Roboto,Arial, Microsoft YaHei;
-       box-sizing: content-box;
-    }
-    @function rem($val){
-        @return $val/16+rem;
-    }
-    @function checkRem($val){
-        @if($val==auto){@return auto;}
-        @else if($val==0){@return 0;}
-        @else{@return rem($val);}
-    }
-    @mixin point($poi,$val){
-        #{$poi}:checkRem($val);
-    }
-    .dialog-content{
-        width: 100%;
-        span{
-            font-size: 14px;
-        }
-        .radio-btn{
-            margin-left: 20px;
-            &:last-child{
-                border-left: 1px solid #dcdfe6;
-            }
-        }
-        .ul_style{
-            background-color:#f7f8fb;
-            border:1px solid #dfe2e9;
-            border-radius:2px;
-            min-height:150px;
-            padding:20px 0 0 20px;
-            margin: 20px calc(20/1920*100vw);
-            .li_style{
-                color:#7d8cad;
-                margin-bottom:10px;
-                list-style:none;
-                .list_style{
-                    width:10px;
-                    height:10px;
-                    border-radius:50%;
-                    background-color:#dfe2e9;
-                    display:inline-block;
-                    margin-right:10px;
-                }
-            }
-        }
-    }
-
-    .el-route-container{
-        padding: 20px calc(20/1920*100vw) 15px calc(20/1920*100vw);
-        border: 1px solid $border;
-        background-color: #fff;
-        .el-route-header{
-            margin-top: calc(15/1920*100vw);
-            .item_name{
-                    position: absolute;
-                    top:55px;
-                    margin-left:47px;
-                    z-index: 100;
-                    height:18px;
-                    line-height: 18px;
-                    border-radius: 3px;
-                    background-color: rgb(0, 0, 0);
-                    color:#fff;
-                    padding:5px 2px;
-                    min-width: 100px;
-                    text-align: center;
-                    font-size: calc(12/1920*100vw);
-                    .triangle{
-                        width:10px;
-                        height:10px;
-                        margin:0 auto;
-                        transform:rotate(45deg);
-                        background-color: rgb(0, 0, 0);
-                    }
-                }
-            .el-route-tabs{
-                width: 98%;
-                margin-left: calc(15/1920*100vw);
-                .bind-empty{
-                    text-align: center;
-                    img{
-                        width:32px;
-                        height:32px;
-                        vertical-align: middle;
-                    }
-                    .empty-text{
-                        font-size: calc(14/1920*100vw);
-                        color:#7d8cad;
-                        vertical-align: middle;
-                    }
-                }
-                .data-empty{
-                    margin: 0 auto;
-                    margin-top: 14%;
-                    position: relative;
-                    .empty-title{
-                        font-weight: bold;
-                        span{
-                            color: $mainColor;
-                            cursor: pointer;
-                        }
-                        .downLoad-btn{
-                            color:  $mainColor;
-                            text-decoration: none;
-                            cursor: pointer;
-                        }
-                    }
-                }
-            }
-            .el-route-btns{
-                position: absolute;
-                right: calc(40/1920*100vw);
-                z-index: 10;
-                width: auto;
-                top: 25px;
-                display: flex;
-                align-items: center;
-                .bind-title{
-                    margin-right:calc(20/1920*100vw);
-                    color:$tab;
-                    font-size: 12px;
-                }
-                .en-bind-title{
-                  margin-right:calc(20/1920*100vw);
-                  color:$tab;
-                  font-size: 12px;
-                }
-                .downLoad-btn{
-                    margin-left: 0px !important;
-                    border-color: $mainColor !important;
-                    color: $mainColor !important;
-                    border-radius: 0px;
-                    padding: 2px 5px !important;
-                    position: relative;
-                    display: inline-block;
-                    text-decoration: none;
-                    font-size: 12px;
-                    border: 1px solid;
-                    border-left-width: 0px;
-                    @include point(right,5);
-                    cursor: pointer;
-                    &:hover{
-                        background-color: #FEE4E7;
-                    }
-                    &:focus{
-                        background-color: #FEE4E7;
-                    }
-                    span{
-                        position: relative;
-                        bottom: 3px;
-                    }
-                }
-                .el-handle-btn{
-                    margin-left: 0px !important;
-                    border-color: $mainColor !important;
-                    color: $mainColor !important;
-                    border-radius: 0px;
-                    border-right: 0;
-                    height: calc(36/1920*100vw);
-                    padding: 0 0;
-                    font-size: calc(14/1920*100vw);
-                    min-width: 85px;
-                    min-height: 28px;
-
-                    &:last-child{
-                      border-right: 1px solid $mainColor !important;
-                    }
-
-                    &:hover{
-                      background-color: #FEE4E7;
-                    }
-                    &:focus{
-                      background-color: #FEE4E7;
-                    }
-                  .btn-area{
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                  }
-                }
-              .en-el-handle-btn{
-                @extend .el-handle-btn;
-                width: calc(130/1920*100vw);
-              }
-            }
-        }
-    }
-
-    .nameinput >>> .el-input__inner{
-        border:0;
-    }
-    #en-patrltabs-content >>> .el-tabs__nav-scroll {
-      height: 40px;
-    }
-    #en-patrltabs-content >>> .el-tabs__item {
-      padding: 0 0;
+  $mainColor:#f31d65;
+  $border: #e3e9f4;
+  $tab: #7d8cad;
+  *{
+    font-family: Roboto,Arial, Microsoft YaHei;
+    box-sizing: content-box;
+  }
+  @function rem($val){
+    @return $val/16+rem;
+  }
+  @function checkRem($val){
+    @if($val==auto){@return auto;}
+    @else if($val==0){@return 0;}
+    @else{@return rem($val);}
+  }
+  @mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+  }
+  .dialog-content{
+    width: 100%;
+    span{
       font-size: 14px;
-      width: calc(160/1920*100vw);
-      display: inline-block;
-      white-space: nowrap;
-      text-overflow: ellipsis;
     }
+    .radio-btn{
+      margin-left: 20px;
+      &:last-child{
+        border-left: 1px solid #dcdfe6;
+      }
+    }
+    .ul_style{
+      background-color:#f7f8fb;
+      border:1px solid #dfe2e9;
+      border-radius:2px;
+      min-height:150px;
+      padding:20px 0 0 20px;
+      margin: 20px calc(20/1920*100vw);
+      .li_style{
+        color:#7d8cad;
+        margin-bottom:10px;
+        list-style:none;
+        .list_style{
+          width:10px;
+          height:10px;
+          border-radius:50%;
+          background-color:#dfe2e9;
+          display:inline-block;
+          margin-right:10px;
+        }
+      }
+    }
+  }
 
-    #en-patrltabs-content >>> .el-tabs__active-bar{
-      height: 4px;
-    }
-    .el-dropbtn{
-        position: relative;
-        bottom: 2px;
-        border: 1px solid $mainColor;
-    }
-    .file-sliver{
-        @include point(width,76);
-        @include point(height,28);
-        background-color: transparent;
+  .el-route-container{
+    padding: 20px calc(20/1920*100vw) 15px calc(20/1920*100vw);
+    border: 1px solid $border;
+    background-color: #fff;
+    .el-route-header{
+      margin-top: calc(15/1920*100vw);
+      .item_name{
         position: absolute;
-        top: 0px;
-        left: 0px;
+        top:55px;
+        margin-left:47px;
+        z-index: 100;
+        height:18px;
+        line-height: 18px;
+        border-radius: 3px;
+        background-color: rgb(0, 0, 0);
+        color:#fff;
+        padding:5px 2px;
+        min-width: 100px;
+        text-align: center;
+        font-size: calc(12/1920*100vw);
+        .triangle{
+          width:10px;
+          height:10px;
+          margin:0 auto;
+          transform:rotate(45deg);
+          background-color: rgb(0, 0, 0);
+        }
+      }
+      .el-route-tabs{
+        width: 98%;
+        margin-left: calc(15/1920*100vw);
+        .bind-empty{
+          text-align: center;
+          img{
+            width:32px;
+            height:32px;
+            vertical-align: middle;
+          }
+          .empty-text{
+            font-size: calc(14/1920*100vw);
+            color:#7d8cad;
+            vertical-align: middle;
+          }
+        }
+        .data-empty{
+          margin: 0 auto;
+          margin-top: 14%;
+          position: relative;
+          .empty-title{
+            font-weight: bold;
+            span{
+              color: $mainColor;
+              cursor: pointer;
+            }
+            .downLoad-btn{
+              color:  $mainColor;
+              text-decoration: none;
+              cursor: pointer;
+            }
+          }
+        }
+      }
+      .el-route-btns{
+        position: absolute;
+        right: calc(40/1920*100vw);
+        z-index: 10;
+        width: auto;
+        top: 25px;
+        display: flex;
+        align-items: center;
+        .bind-title{
+          margin-right:calc(20/1920*100vw);
+          color:$tab;
+          font-size: 12px;
+        }
+        .en-bind-title{
+          margin-right:calc(20/1920*100vw);
+          color:$tab;
+          font-size: 12px;
+        }
+        .downLoad-btn{
+          margin-left: 0px !important;
+          border-color: $mainColor !important;
+          color: $mainColor !important;
+          border-radius: 0px;
+          padding: 2px 5px !important;
+          position: relative;
+          display: inline-block;
+          text-decoration: none;
+          font-size: 12px;
+          border: 1px solid;
+          border-left-width: 0px;
+          @include point(right,5);
+          cursor: pointer;
+          &:hover{
+            background-color: #FEE4E7;
+          }
+          &:focus{
+            background-color: #FEE4E7;
+          }
+          span{
+            position: relative;
+            bottom: 3px;
+          }
+        }
+        .el-handle-btn{
+          margin-left: 0px !important;
+          border-color: $mainColor !important;
+          color: $mainColor !important;
+          border-radius: 0px;
+          border-right: 0;
+          height: calc(36/1920*100vw);
+          padding: 0 0;
+          font-size: calc(14/1920*100vw);
+          min-width: 85px;
+          min-height: 28px;
+
+          &:last-child{
+            border-right: 1px solid $mainColor !important;
+          }
+
+          &:hover{
+            background-color: #FEE4E7;
+          }
+          &:focus{
+            background-color: #FEE4E7;
+          }
+          .btn-area{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+        .en-el-handle-btn{
+          @extend .el-handle-btn;
+          width: calc(130/1920*100vw);
+        }
+      }
     }
-    .tabName-input-content{
-        background: #fff;
-        @include point(height,73);
-        width: 100%;
-    }
-    .el-search-input{
-      @include point(width,200);
-      @include point(margin-right,20);
-      position:absolute;
-      right: 0px;
-      top: 3px;
-    }
-    #patrltabs-content >>> .el-tabs__nav-next, #patrltabs-content >>> .el-tabs__nav-prev {
-      line-height: 30px;
-    }
+  }
+
+  .nameinput >>> .el-input__inner{
+    border:0;
+  }
+  #en-patrltabs-content >>> .el-tabs__nav-scroll {
+    height: 40px;
+  }
+  #en-patrltabs-content >>> .el-tabs__item {
+    padding: 0 0;
+    font-size: 14px;
+    width: calc(160/1920*100vw);
+    display: inline-block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  #en-patrltabs-content >>> .el-tabs__active-bar{
+    height: 4px;
+  }
+  .el-dropbtn{
+    position: relative;
+    bottom: 2px;
+    border: 1px solid $mainColor;
+  }
+  .file-sliver{
+    @include point(width,76);
+    @include point(height,28);
+    background-color: transparent;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+  }
+  .tabName-input-content{
+    background: #fff;
+    @include point(height,73);
+    width: 100%;
+  }
+  .el-search-input{
+    @include point(width,200);
+    @include point(margin-right,20);
+    position:absolute;
+    right: 0px;
+    top: 3px;
+  }
+  #patrltabs-content >>> .el-tabs__nav-next, #patrltabs-content >>> .el-tabs__nav-prev {
+    line-height: 30px;
+  }
   #patrltabs-content >>> .el-tabs__item {
     padding: 0 0;
     margin: 0 12px;
@@ -2127,7 +2502,7 @@ export default {
     height: 0 !important;
   }
 
-    .self-loading.loading_area >>> .el-loading-mask{
-      background-color: transparent;
-    }
+  .self-loading.loading_area >>> .el-loading-mask{
+    background-color: transparent;
+  }
 </style>
