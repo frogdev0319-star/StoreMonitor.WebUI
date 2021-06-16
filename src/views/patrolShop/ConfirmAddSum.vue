@@ -103,7 +103,7 @@
                           <p class="title1">{{ categoryIndex+1 }}.{{ categoryItem.subject }}</p>
                           <p class="title2">{{ categoryItem.description }}</p>
                         </div>
-                        <div class="score-title">
+                        <div class="score-title" v-if="categoryItem.itemType === 0">
                           <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
                           <div v-if="(categoryItem.type === 0 ||categoryItem.type === 2)&&item.detailType !== 1"
                                class="title-btn">
@@ -164,7 +164,7 @@
                             <p class="title1">{{ childIndex+1 }}.{{ childItem.subject }}</p>
                             <p class="title2">{{ childItem.description }}</p>
                           </div>
-                          <div class="score-title">
+                          <div class="score-title" v-if="childItem.itemType === 0">
                             <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
                             <div v-if="(childItem.type === 0 ||childItem.type === 2)&&item.detailType !== 1"
                                  class="title-btn">
@@ -729,6 +729,9 @@
             item.ignoreItems = [];
             item.unqualifiedItems = [];
             item.items.forEach(s_item => {
+              if (s_item.itemType === 1){
+                return;
+              }
               if (s_item.isIgnore) {
                 IgnoredArr.push(s_item);
                 s_item.groupName = item.groupName;
@@ -876,7 +879,7 @@
         });
         let s_count = 0;
         if (inspect.length === 1 && inspect[0].type === 0) {
-          if (inspectSettings.hundredMarkType === '-1') {
+          if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
             if(inspectSettings.qualifiedForIgnoredWithType1){
               s_count = PassFileXN;
             }else{
@@ -891,7 +894,7 @@
           }
         } else {
           if (inspectSettings.includedInTotalScoreWithType1) {
-            if (inspectSettings.hundredMarkType === '-1') {
+            if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
               if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
                 s_count = PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem;
               } else if (!inspectSettings.qualifiedForIgnoredWithType1 && inspectSettings.qualifiedForIgnoredWithType2) {
@@ -920,7 +923,7 @@
               s_count = total_c + otherGetscoreTotal;
             }
           } else {
-            if (inspectSettings.hundredMarkType === '-1') {
+            if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
               if (inspectSettings.qualifiedForIgnoredWithType2) {
                 s_count = ScoreXN + OtherTotalScoreSystem;
               } else {
@@ -943,7 +946,11 @@
             item.isActive = false;
           });
         }
-        self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
+        if(inspectSettings.hundredMarkType === '1'){
+          s_count = s_count + inspectSettings.baseScore;
+        }
+        self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore :
+          (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
         self.summary = this.groupbyKey(inspect, 'type');
         eventList.forEach((item, index) => {
           const objFeedBack = {};

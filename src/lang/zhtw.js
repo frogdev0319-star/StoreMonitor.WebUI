@@ -419,7 +419,8 @@ export default {
     'loading': '加載中...',
     'highDefinition': '高清',
     'fluency': '流暢',
-    'totalScoreUnit': '总分：'
+    'totalScoreUnit': '总分：',
+    'invalidInspection': '無效的巡檢信息，請填寫內容'
   },
 
   // event Management page language
@@ -479,7 +480,8 @@ export default {
     'CalculationMethod': '考評總分計算方式',
     'Proportional': '總分-比例制',
     'ProportionalDes': '考評總分=【SUM(每項巡檢得分)/SUM（Tab1/Tab2巡檢總分）*100】+附加項得分',
-    'totalScore': '總分-累加制',
+    'totalScore': '總分-累加制（正分）',
+    'accumulateTotalScore': '總分-累加制（扣分）',
     'totalScoreDes': '考評總分= SUM(每項巡檢得分)',
     'totalScorRange': '考評總分範圍設置',
     'setMinScore': '最低',
@@ -563,11 +565,11 @@ export default {
     'passfailexcelEmpty': '巡检项不能為空！',
     'excelPassFailScoreType': '項目分值選填，取值範圍為0.5~50',
     'excelFullScoreType': '項目總分值必填，取值範圍為0~50',
-    'excelMinScoreType': '巡檢項最低分值选填，取值範圍為-50~項目總分值',
-    'excelScoreItemType': '評分選項必填，取值範圍為-50~滿分值',
+    'excelMinScoreType': 'Score 巡檢項最低分值选填，取值範圍為-50~評分選項最高分',
+    'excelScoreItemType': '評分選項必填，取值範圍為-50~50',
     'excelOtherScoreType': '項目分值必填，取值範圍為-100~100',
     'excelScoreItemEmpty': '評分選項不能為空！',
-    'setScoreItemRange': '取值範圍為-50~满分值！',
+    'setScoreItemRange': '取值範圍為-50~50',
     'setFullScoreRange': '取值範圍為0~50！',
     'setFullScoreEmpty': '項目總分值不能為空！',
     'setMinScoreRange': '取值範圍為-50~項目總分值！',
@@ -633,7 +635,22 @@ export default {
     'catergyName': '巡檢類別名稱',
     'parentCatergyName': '上級巡檢類別',
     'parentCatergyNameTooltip1': '1. 一級類別若存在直屬巡檢項目，系統不允許創建子類別',
-    'parentCatergyNameTooltip2': '2. 一級類別中若存在子類別，系統不允許調整為二級類別'
+    'parentCatergyNameTooltip2': '2. 一級類別中若存在子類別，系統不允許調整為二級類別',
+    'btnAttributeValues': '按鈕屬性值（Pass&Fail、Others）',
+    'passFail': '合格/不合格',
+    'yesNo': '是/否',
+    'userDefined': '自定義',
+    'inspectItemType': '巡檢項類型',
+    'evaluationType': '評估類',
+    'remarksType': '備註類（不參與評估）',
+    'no': '無',
+    'updateCategory': '編輯巡檢類別',
+    'btnAttrLength': '最多可輸入8個字符',
+    'enterBtnAttr': '請輸入表格屬性值',
+    'passFailAttr': 'Pass&Fail按鈕顯示',
+    'othersAttr': 'Others按鈕顯示',
+    'subCategoryHeader': '子類別（選填，30字符）',
+    'subCategory': '子類別'
   },
 
   // Device Management page language

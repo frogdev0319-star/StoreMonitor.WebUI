@@ -419,7 +419,8 @@ export default {
     'loading': '加载中...',
     'highDefinition': '高清',
     'fluency': '流畅',
-    'totalScoreUnit': '总分：'
+    'totalScoreUnit': '总分：',
+    'invalidInspection': '无效的巡检信息，请填写内容'
   },
 
   // event Management page language
@@ -479,7 +480,8 @@ export default {
     'CalculationMethod': '考评总分计算方式',
     'Proportional': '总分-百分制',
     'ProportionalDes': '考评总分=【SUM(每项巡检得分)/SUM（Tab1/Tab2巡检总分）*100】+附加项得分',
-    'totalScore': '总分-累加制',
+    'totalScore': '总分-累加制（正分）',
+    'accumulateTotalScore': '总分-累加制（扣分）',
     'totalScoreDes': '考评总分= SUM(每项巡检得分)',
     'totalScorRange': '考评总分范围设置',
     'setMinScore': '最低',
@@ -563,11 +565,11 @@ export default {
     'passfailexcelEmpty': '巡检项名称不能为空！',
     'excelPassFailScoreType': '项目分值选填，取值范围为0.5~50',
     'excelFullScoreType': '项目总分值必填，取值范围为0~50',
-    'excelMinScoreType': '巡检项最低分值选填，取值范围为-50~项目总分值',
-    'excelScoreItemType': '评分选项必填，取值范围为-50~满分值',
+    'excelMinScoreType': 'Score 巡检项最低分值选填，取值范围为-50~评分选项最高分',
+    'excelScoreItemType': '评分选项必填，取值范围为-50~50',
     'excelOtherScoreType': '项目分值必填，取值范围为-100~100',
     'excelScoreItemEmpty': '评分选项不能为空！',
-    'setScoreItemRange': '取值范围为-50~满分值！',
+    'setScoreItemRange': '取值范围为-50~50！',
     'setFullScoreRange': '取值范围为0~50！',
     'setFullScoreEmpty': '项目总分值不能为空！',
     'setMinScoreRange': '取值范围为-50~项目总分值！',
@@ -633,7 +635,22 @@ export default {
     'catergyName': '巡检类别名称',
     'parentCatergyName': '上级巡检类别',
     'parentCatergyNameTooltip1': '1. 一级类别若存在直属巡检项目，系统不允许创建子类别',
-    'parentCatergyNameTooltip2': '2. 一级类别中若存在子类别，系统不允许调整为二级类别'
+    'parentCatergyNameTooltip2': '2. 一级类别中若存在子类别，系统不允许调整为二级类别',
+    'btnAttributeValues': '按钮属性值（Pass&Fail、Others）',
+    'passFail': '合格/不合格',
+    'yesNo': '是/否',
+    'userDefined': '自定义',
+    'inspectItemType': '巡检项类型',
+    'evaluationType': '评估类',
+    'remarksType': '备注类（不参与评估）',
+    'no': '无',
+    'updateCategory': '编辑巡检类别',
+    'btnAttrLength': '最多可输入8个字符',
+    'enterBtnAttr': '请输入表格属性值',
+    'passFailAttr': 'Pass&Fail按钮显示',
+    'othersAttr': 'Others按钮显示',
+    'subCategoryHeader': '子类别（选填，30字符）',
+    'subCategory': '子类别'
   },
 
   // Device Management page language
