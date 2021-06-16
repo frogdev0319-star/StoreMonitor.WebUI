@@ -42,7 +42,7 @@
         </div>
         <el-scrollbar id="el-menuscrollbar">
           <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
-            <div v-for="(item,index) in routeData" :key="index" class="data-content">
+            <div v-for="(item,index) in inspectCategoryList" :key="index" class="data-content">
               <div class="dragable-table-header" v-if="index === 0">
                 <div class="table-header-item" v-for="(headerItem, headerIndex) in tableHeader" :key="headerIndex"
                      :style="headerItem.headerStyle">
@@ -54,19 +54,40 @@
                 <el-checkbox v-model="item.checked" class="all-checkBox" @change="checkItemsOfCatergy(item)"/>
                 <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
               </div>
-              <div class="catergy-title subcatergy-title">
-                <el-checkbox v-model="item.checked" class="all-checkBox" @change="checkItemsOfSubCatergy(item)"/>
-                <span class="table-title">{{ item.groupName }}</span>
-              </div>
-              <div v-if="item.itemData.length !== 0" class="table-class">
-                <draggable-table
-                  :is-score-sheet= "isScoreItemActive"
-                  :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
-                  :table-data="item.itemData"
-                  :show-edit-btn="false"
-                  :show-table-header="false"
-                  @handleDeleteItem="handleDelete"/>
-              </div>
+              <template v-if="!item.children">
+                <div v-if="item.itemData.length !== 0" class="table-class">
+                  <draggable-table
+                    :is-score-sheet= "isScoreItemActive"
+                    :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
+                    :table-data="item.itemData"
+                    :show-edit-btn="false"
+                    :show-table-header="false"
+                    @handleDeleteItem="contentItem => handleDelete(contentItem, index, -1)"
+                    @handleCheckItem="tableData => handleCheckCategoryItem(tableData, index)"
+                    @updateTableData = "sortableTableData => changeTableData(sortableTableData, index)"
+                  />
+                </div>
+              </template>
+              <template v-else>
+                <template v-for="(child,childIndex) in item.children">
+                  <div class="catergy-title subcatergy" :key="childIndex">
+                    <el-checkbox v-model="child.checked" class="all-checkBox" @change="checkSubcatergy(child, item)"/>
+                    <span class="table-title">{{ child.groupName  }}</span>
+                  </div>
+                  <div v-if="child.itemData.length !== 0" class="table-class">
+                    <draggable-table
+                      :is-score-sheet= "isScoreItemActive"
+                      :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
+                      :table-data="child.itemData"
+                      :show-edit-btn="false"
+                      :show-table-header="false"
+                      @handleDeleteItem="contentItem => handleDelete(contentItem, index, childIndex)"
+                      @handleCheckItem="(tableData) => handleCheckSubcategoryItem(tableData, index, childIndex)"
+                      @updateTableData = "sortableTableData => changeTableData(sortableTableData,index, childIndex)"
+                    />
+                  </div>
+                </template>
+              </template>
             </div>
           </div>
         </el-scrollbar>
@@ -85,6 +106,7 @@
         <div class="dialog-content">{{ $t('insSettingView.confirmSelecDel') }}</div>
       </div>
     </dialog-pop>
+
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -96,7 +118,7 @@
     >
       <div class="dialog-slot">
         <i class="el-icon-warning dialog-icon"/>
-        <div class="dialog-content">{{ $t('insSettingView.confirmDelData') }}</div>
+        <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }}</div>
       </div>
     </dialog-pop>
   </div>
@@ -226,6 +248,9 @@ export default {
           },
         },
       ],
+      inspectCategoryList: util.handleInspctionCatergyTree(this.routeData),
+      categoryIndex: -1,
+      subcategoryIndex: -1
     };
   },
 
@@ -235,6 +260,14 @@ export default {
     },
     tableHeader(){
       return this.isScoreItemActive ? this.scoreTableHeader : this.passFailTableHeader;
+    }
+  },
+  watch:{
+    routeData:{
+      handler(newValue){
+        this.inspectCategoryList = util.handleInspctionCatergyTree(newValue);
+      },
+      deep:true
     },
   },
   mounted() {
@@ -253,9 +286,7 @@ export default {
     },
 
     checkAllItems(val) {
-      console.log(val);
-      const self = this;
-      self.routeData.forEach(item => {
+      this.routeData.forEach(item => {
         item.checked = val;
         item.itemData.forEach(_item => {
           _item.checked = val;
@@ -263,7 +294,7 @@ export default {
       });
     },
 
-    changeSheet: function(e) {
+    changeSheet(e) {
       const self = this;
       self.curSheet = e;
       self.allchecked = false;
@@ -286,39 +317,24 @@ export default {
     checkItemsOfCatergy(item) {
       const self = this;
       const arr = [];
-      console.log(item);
-      item.itemData.forEach(_item => {
-        _item.checked = item.checked;
-      });
-      self.routeData.forEach(_item => {
-        if (_item.checked) {
-          arr.push(_item);
-        }
-      });
-      self.allchecked = self.routeData.length === arr.length;
-    },
-
-    selectRow(tableIndex, item) {
-      const arr = [];
-      const self = this;
-      item.itemData.forEach(_item => {
-        if (_item.checked) {
-          arr.push(_item);
-        }
-      });
-      console.log(arr.length);
-      item.checked = item.itemData.length === arr.length;
-      const arrCheckedItem = [];
-      let count = 0;
-      self.routeData.forEach(_item => {
-        count += _item.itemData.length;
-        _item.itemData.forEach(itemS => {
-          if (itemS.checked) {
-            arrCheckedItem.push(itemS);
-          }
+      if(!item.children){
+        item.itemData.forEach(_item => {
+          _item.checked = item.checked;
         });
+      } else {
+        item.children.forEach(child => {
+          child.checked = item.checked;
+          child.itemData.forEach(_item => {
+            _item.checked = item.checked;
+          })
+        })
+      }
+      self.inspectCategoryList.forEach(_item => {
+        if (_item.checked) {
+          arr.push(_item);
+        }
       });
-      self.allchecked = count === arrCheckedItem.length;
+      self.allchecked = self.inspectCategoryList.length === arr.length;
     },
 
     getNapeList() {
@@ -368,21 +384,45 @@ export default {
       }
     },
 
+    getSelectedCategoryIdList(){
+      const categoryIds = [];
+      const subcategoryIds = [];
+      const inspectionItemIds = [];
+      this.inspectCategoryList.forEach(category => {
+        if(category.checked){
+          categoryIds.push(category.id);
+        }
+        if (category.children){
+          category.children.forEach(child => {
+            if (child.checked){
+              subcategoryIds.push(child.id);
+            }
+            child.itemData.map(v => {
+              if (v.checked){
+                inspectionItemIds.push(v.id);
+              }
+            });
+          })
+        } else {
+          category.itemData.map(v => {
+            if (v.checked){
+              inspectionItemIds.push(v.id);
+            }
+          });
+        }
+      });
+      return {
+        categoryIds,
+        subcategoryIds,
+        inspectionItemIds
+      }
+    },
+
     async deleteNapes() {
       const self = this;
-      const arr = [];
-      const countGroup = [];
-      self.routeData.forEach(item => {
-        if (item.checked) {
-          countGroup.push(item.id);
-        }
-        item.itemData.forEach(_item => {
-          if (_item.checked) {
-            arr.push(_item.id);
-          }
-        });
-      });
-      if (arr.length === 0 && countGroup.length === 0) {
+      const selectedIdsJson = this.getSelectedCategoryIdList();
+      const selectIds = [...Object.values(selectedIdsJson).flat()];
+      if (selectIds.length === 0) {
         util.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
         return false;
       }
@@ -394,10 +434,6 @@ export default {
       });
       const delData = self.routeData.filter(x => x.itemData.length !== 0);
       if (delData.length === 1 && delData[0].itemData.length === 1 || self.allchecked) {
-        // if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) || self.allRoutedata.length === 3) && delData[0].type === 1) {
-        //   self.showFaildig = true;
-        //   return false;
-        // } else
         if (self.allRoutedata.length === 1) {
           const params = {};
           params.category = parseInt(self.routeData[0].mode);
@@ -436,55 +472,34 @@ export default {
       self.$emit('refreshList', val, self.curSheet);
     },
 
-    confirmDelete() {
-      const self = this;
-      const arrGroup = [];
-      const arrItem = [];
-      self.routeData.forEach(item => {
-        if (item.checked) {
-          arrGroup.push(item.id);
-        }
-        item.itemData.forEach(_item => {
-          if (_item.checked) {
-            arrItem.push(_item.id);
-          }
-        });
-      });
+    async confirmDelete() {
+      const selectedIdsJson = this.getSelectedCategoryIdList();
       const params = {
-        'itemIds': arrItem
+        'itemIds': selectedIdsJson.inspectionItemIds
+      };
+      const subCategoryGroup = {
+        'groupIds': selectedIdsJson.subcategoryIds
       };
       const paramsGroup = {
-        'groupIds': arrGroup
+        'groupIds': selectedIdsJson.categoryIds
       };
-      if (arrItem.length !== 0) {
-        inpectRESTful.deleteInspectItem(params).then(res => {
-          const code = res.errMsg;
-          if (code != undefined && code === 'Success') {
-            if (arrGroup.length !== 0) {
-              inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-                if (resGroup.errMsg === 'Success') {
-                  self.afterDeleteNape();
-                }
-              });
-            } else {
-              self.afterDeleteNape();
-            }
-          } else {
-            util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
-            return false;
-          }
-          self.allchecked = false;
-        });
-      } else {
-        inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-          if (resGroup.errMsg === 'Success') {
-            self.afterDeleteNape();
-          } else {
-            util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
-            return false;
-          }
-          self.allchecked = false;
-        });
+
+      try {
+        if (selectedIdsJson.inspectionItemIds.length > 0) {
+          await inpectRESTful.deleteInspectItem(params);
+        }
+        if (selectedIdsJson.subcategoryIds.length > 0) {
+          await inpectRESTful.deleteInspectGroup(subCategoryGroup);
+        }
+        if (selectedIdsJson.categoryIds.length > 0){
+          await inpectRESTful.deleteInspectGroup(paramsGroup);
+        }
+        this.afterDeleteNape();
+      } catch (e) {
+        util.notify(this.$t('insSettingView.deleteFail'), 'warning', 3000);
+        return false;
+      } finally{
+        this.allchecked = false;
       }
     },
 
@@ -501,7 +516,7 @@ export default {
       });
     },
 
-    async handleDelete(index, row) {
+    async handleDelete(contentItem, contentIndex, subcategoryIndex) {
       const self = this;
       const typeTemp = [];
       self.allRoutedata.forEach(item => {
@@ -511,11 +526,6 @@ export default {
       });
       const delData = self.routeData.filter(x => x.itemData.length !== 0);
       if (delData.length === 1 && delData[0].itemData.length === 1) {
-        // if ((self.allRoutedata.length === 2 && !typeTemp.some(x => x === 0) ||
-        //   self.allRoutedata.length === 3) && delData[0].type === 1) {
-        //   self.showFaildig = true;
-        //   return false;
-        // } else
         if (self.allRoutedata.length === 1) {
           const params = {};
           params.category = parseInt(self.routeData[0].mode);
@@ -533,51 +543,55 @@ export default {
         }
       }
       self.showSingleDeleteContent = true;
-      const id = row.id;
+      const id = contentItem.id;
       const arr = [];
       arr.push(id);
       self.curDeleteId = arr;
+      this.categoryIndex = contentIndex;
+      this.subcategoryIndex = subcategoryIndex;
     },
 
     async confirmDeleteSingle() {
-      const self = this;
       const params = {
-        'itemIds': self.curDeleteId
+        'itemIds': this.curDeleteId
       };
-      inpectRESTful.deleteInspectItem(params).then(res => {
-        const code = res.errMsg;
-        if (code != undefined && code === 'Success') {
-          self.routeData.forEach((r_item, r_index) => {
-            if (self.routeData[r_index].itemData.length === 1) {
-              r_item.itemData.forEach((d_item, d_index) => {
-                if (self.curDeleteId[0] === d_item.id) {
-                  self.curDelGroupId = r_item.id;
-                  const paramsGroup = {
-                    'groupIds': [self.curDelGroupId]
-                  };
-                  inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
-                    util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
-                    self.showSingleDeleteContent = false;
-                    const val = 'del';
-                    self.$emit('refreshList', val, self.curSheet);
-                  });
-                }
-              });
-            } else {
-              util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
-              self.showSingleDeleteContent = false;
-              const val = 'del';
-              self.$emit('refreshList', val, self.curSheet);
-            }
-          });
+      try {
+        await inpectRESTful.deleteInspectItem(params);
+        const category = this.inspectCategoryList[this.categoryIndex];
+        if (this.subcategoryIndex === -1) {
+          if(category.itemData.length === 1){
+            await this.deleteInspectGroup([category.id])
+          }
         } else {
-          util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
-          return false;
+          const subCategory = category.children[this.subcategoryIndex];
+          if (subCategory.itemData.length === 1 ) {
+            await this.deleteInspectGroup([subCategory.id]);
+            if (category.itemCount === 1){
+              await this.deleteInspectGroup([category.id])
+            }
+          }
         }
-        self.allchecked = false;
-      }).catch(err => {
-        console.log('RouteDetail-confirmDeleteSingle: ' + err);
-      });
+        util.notify(this.$t('insSettingView.deleteSuss'), 'success', 3000);
+        const val = 'del';
+        this.$emit('refreshList', val, this.curSheet);
+      } catch (e){
+        util.notify(this.$t('insSettingView.deleteFail'), 'warning', 3000);
+        return false;
+      } finally {
+        this.showSingleDeleteContent = false;
+        this.allchecked = false;
+      }
+    },
+
+    deleteInspectGroup(groupIds){
+      const paramsGroup = {
+        'groupIds': groupIds
+      };
+      return new Promise((resolve => {
+        inpectRESTful.deleteInspectGroup(paramsGroup).then(resGroup => {
+          resolve(resGroup);
+        });
+      }))
     },
 
     updateDeleteContentDialogFlag(val, key) {
@@ -625,9 +639,65 @@ export default {
       }
     },
 
-    checkItemsOfSubCatergy(item){
+    checkSubcatergy(child, item){
+      let checkedSubCategyNum = [];
+      if (child.itemData.length > 0){
+        child.itemData.forEach(_item => {
+          _item.checked = child.checked;
+          child.checked && checkedSubCategyNum ++;
+        });
+        child.checked = child.itemData.length === checkedSubCategyNum;
+      }
+      item.checked = item.children.length === item.children.filter(childItem => childItem.checked).length;
+      this.changeTableHeaderCheckedFlag();
     },
 
+    handleCheckCategoryItem(tableData, index){
+      this.inspectCategoryList[index].itemData = tableData;
+      const checkedItems = this.inspectCategoryList[index].itemData.filter(item => item.checked);
+      this.inspectCategoryList[index].checked = checkedItems.length === this.inspectCategoryList[index].itemData.length;
+      this.changeTableHeaderCheckedFlag();
+    },
+
+    handleCheckSubcategoryItem(tableData, index, childIndex){
+      const category = this.inspectCategoryList[index];
+      const childItem = category.children[childIndex];
+      childItem.itemData = tableData;
+
+      const checkedItems = childItem.itemData.filter(item => item.checked);
+      childItem.checked = checkedItems.length === childItem.itemData.length;
+
+      const checkSubcategoryItems = category.children.filter(child => child.checked);
+      category.checked = category.children.length === checkSubcategoryItems.length;
+      this.changeTableHeaderCheckedFlag();
+    },
+
+    changeTableHeaderCheckedFlag(){
+      const checkedCategory = this.inspectCategoryList.filter(category => category.checked);
+      this.allchecked = this.inspectCategoryList.length === checkedCategory.length;
+    },
+
+    changeTableData(sortableTableData, index, childIndex){
+      const category = this.inspectCategoryList[index];
+      if(childIndex){
+        const childItem = category.children[childIndex];
+        childItem.itemData = sortableTableData;
+        const itemId = childItem.id;
+        this.routeData.forEach(item => {
+          if (itemId === item.id){
+            item.itemData = sortableTableData;
+          }
+        })
+      } else {
+        category.itemData = sortableTableData;
+        const itemId = category.id;
+        this.routeData.forEach(item => {
+          if (itemId === item.id){
+            item.itemData = sortableTableData;
+          }
+        })
+      }
+    }
   }
 };
 </script>
@@ -785,6 +855,9 @@ export default {
       color: #909399;
       font-weight: bold;
       text-align: center;
+      .allcheckBox{
+        margin-right: calc(38/1920*100vw);
+      }
     }
 </style>
 <style>
