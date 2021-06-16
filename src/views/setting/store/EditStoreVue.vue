@@ -108,12 +108,10 @@ import { bindInspectItemV2,
 import LimitSelect from '@/components/LimitSelect';
 import util from '@/common/util'
 import DelayButton from '@/components/DelayButton';
-import ItemsChannels from "../../../components/Setting/ItemsChannels";
 
 export default {
   name: 'EditStoreVue',
   components: {
-    ItemsChannels,
     DelayButton,
     LimitSelect
   },
