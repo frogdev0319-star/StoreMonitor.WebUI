@@ -6,7 +6,7 @@
             <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
             <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
           </div>
-          <div class="score-title">
+          <div class="score-title" v-if="_item.type === 0">
             <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn"
                  :style="isExportPdf ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'">
               <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
