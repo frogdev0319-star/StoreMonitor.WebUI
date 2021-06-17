@@ -398,7 +398,7 @@ export default {
     'more': 'More',
     'InspectionDetail': 'Export report',
     'improved': 'To Be Improved',
-    'notableIteminsSettingView': 'Notable Items',
+    'notableItem': 'Notable Items',
     'inapplicableItem': 'Ignored Items',
     'timePlaceholder': 'The maximum search time is three month',
     'changeTimeRange': 'The maximum selected time range is three month, which has been adjusted!',
