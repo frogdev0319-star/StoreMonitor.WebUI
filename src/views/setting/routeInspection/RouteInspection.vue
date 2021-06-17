@@ -281,7 +281,6 @@
 
     watch: {
       accountChanged(val, oldVal) {
-        console.log(val);
         const self = this;
         if (val !== 0) {
           sessionStorage.removeItem('TabPatrolIndex0');
@@ -645,7 +644,6 @@
         };
         return new Promise((resolve, reject) => {
           inpectRESTful.deleteInspectItem(params).then(res => {
-            console.log(res);
             resolve(res);
           }).catch(err => {
             reject(err);
@@ -659,7 +657,6 @@
         };
         return new Promise((resolve, reject) => {
           inpectRESTful.deleteInspectGroup(params).then(res => {
-            console.log(res);
             resolve(res);
           });
         }).catch(err => {
@@ -670,7 +667,6 @@
       addGroup(params) {
         return new Promise((resolve, reject) => {
           inpectRESTful.addInspectGroup(params).then(res => {
-            console.log(res);
             resolve(res);
           }).catch(err => {
             reject(err);
@@ -681,7 +677,6 @@
       addItem(params) {
         return new Promise((resolve, reject) => {
           inpectRESTful.addInspectItem(params).then(res => {
-            console.log(res);
             resolve(res);
           }).catch(err => {
             reject(err);
@@ -746,7 +741,7 @@
               cellAddress,
               parent: null,
               header,
-              tag: header && header.v && header.v.replace(/\(.*\)|\（.*\）/g, '')
+              tag: header && header.v && header.v.replace(/(\r)|(\n)|\(.*\)|\（.*\）/g, '')
             }
           }})
       },
@@ -771,7 +766,7 @@
         const subCategoryArr = ['子类别', '子類別', 'Subcategory'];
         return cell && subCategoryArr.includes(cell.tag) && cell;
       },
-      
+
       async resolveSheetData (sheet, type) {
         let range = XLSX.utils.decode_range(sheet['!ref']);
         sheet.$$type = type;
@@ -792,6 +787,10 @@
         let primaryGroupCelss = []
         let secondaryGroupCells = []
         let groupItemCells = []
+
+        console.log(primaryColumnCells);
+        console.log(primaryColumnCells.some(cell => cell.v));
+        console.log(sheet);
 
         if (!primaryColumnCells.some(cell => cell.v) && type === 'PassFail') {
           primaryColumnCells = [{ ...primaryColumnCells[0], v: '巡检评分项'}]
@@ -1099,15 +1098,15 @@
           }
           let item = {}
           rowCells.forEach(cell => {
-            let key = cell.header && cell.header.tag
-            if (!mapping[key]) return
+            let key = cell.header && cell.header.tag;
+            if (!mapping[key]) return;
             if ('availableScore' === mapping[key]) {
-              item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : []
+              item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : [];
             } else if ('itemScore' === mapping[key]) {
-              item[mapping[key]] = cell.v ? Number(cell.v) : 10
+              item[mapping[key]] = cell.v ? Number(cell.v) : 10;
               if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1)
             } else if ('description' === mapping[key]) {
-              item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : ''
+              item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
             } else {
               item[mapping[key]] = cell.v || ''
             }
@@ -1115,8 +1114,7 @@
 
           if (type === 'Score') {
             const availableScore = deepClone(item['availableScore']);
-            console.log(availableScore);
-            const maxAvailableScore = availableScore.sort((a, b) => a - b)[availableScore.length - 1];
+            const maxAvailableScore = availableScore.sort((a, b) =>{ return a - b})[availableScore.length - 1];
             item['itemScore'] = maxAvailableScore;
           }
 
@@ -1136,7 +1134,7 @@
           request: Object.values(requestGroups)
         }
 
-        let res = await this.addItem(addItemParams)
+        let res = addItemParams.request.length > 0 && await this.addItem(addItemParams);
       },
 
 
@@ -1529,28 +1527,31 @@
             const PassFail = wb.Sheets['Pass&Fail'];
             const Score = wb.Sheets['Score'];
             const Others = wb.Sheets['Others'];
-            // 由于旧逻辑会改动 PassFail Score Others 这些源数据，不利于我后面添加新逻辑，所以复制来一份
-            const PassFailCopy = deepClone(PassFail)
-            const ScoreCopy = deepClone(Score)
-            const OthersCopy = deepClone(Others)
+
+            let PassFailCopy = deepClone(PassFail);
+            let ScoreCopy = deepClone(Score);
+            let OthersCopy = deepClone(Others);
+
             const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
+
             outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
             outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
             outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
 
-            const passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
-            console.log('passFailSheetFlagObj', passFailSheetFlagObj);
+            PassFailCopy = outdata.PassFail.length > 0 ? PassFailCopy : undefined;
+            ScoreCopy = outdata.Score.length > 0 ? ScoreCopy : undefined;
+            OthersCopy = outdata.Others.length > 0 ? OthersCopy : undefined;
 
+            const passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
+            console.log(passFailSheetFlagObj);
             const scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
-            console.log('scoreSheetFlagObj', scoreSheetFlagObj);
 
             const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
-            console.log('otherSheetFlagObj', otherSheetFlagObj);
+
             let flagTempError = outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined ? true : false;
 
             _this.FileInfo = _this.getWarningInfo(passFailSheetFlagObj.flags, scoreSheetFlagObj.flags,
               otherSheetFlagObj.flags, flagTempError);
-            console.log(_this.FileInfo);
 
             if (_this.FileInfo.length > 0) {
               _this.showFailInfo = true;
@@ -1590,18 +1591,22 @@
 
       getTableVersonBasedOnB1(sheet1, sheet2, sheet3){
         const subCategoryArr = ['子类别', '子類別', 'Subcategory'];
-        const containSubColumn = ( sheet1 && subCategoryArr.includes(sheet1.B1.h.replace(/\(.*\)|\（.*\）/g, '')))
-          || ( sheet2 && subCategoryArr.includes(sheet2.B1.h.replace(/\(.*\)|\（.*\）/g, '')))
-          || ( sheet3 && subCategoryArr.includes(sheet3.B1.h.replace(/\(.*\)|\（.*\）/g, '')) );
+        const containSubColumn = ( sheet1 && subCategoryArr.includes(this.formatTableHeader(sheet1.B1.h)) )
+          || ( sheet2 && subCategoryArr.includes(this.formatTableHeader(sheet2.B1.h)) )
+          || ( sheet3 && subCategoryArr.includes(this.formatTableHeader(sheet3.B1.h)) );
         let tableVersion = containSubColumn ? 2 : 1;
         return tableVersion;
+      },
+
+      formatTableHeader(headName){
+        let name = headName.replace(/\(.*\)|\（.*\）/g, '');
+        return name.trim();
       },
 
       getPassAndFailSheetJsonData(workbook, sheet, tableVersion){
         if(sheet){
           delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
           const sheetArray = XLSX.utils.sheet_to_json(sheet);
-          console.log(sheetArray);
           let rowDataArray = [];
           sheetArray.forEach((_item) => {
             const rowDataObj = {};
@@ -1620,7 +1625,6 @@
 
             rowDataArray.push(rowDataObj);
           });
-          console.log(rowDataArray);
           return rowDataArray;
         }
         return [];
@@ -1652,8 +1656,9 @@
 
             rowDataArray.push(rowDataObj);
           });
-          console.log(rowDataArray);
           return rowDataArray;
+        } else {
+          return [];
         }
       },
 
@@ -1676,6 +1681,10 @@
             flagDesLengthPassFail: false
           }
         };
+        if (passFailArr.length === 0) {
+          return passFailFlagObj;
+        }
+        console.log(passFailArr);
         passFailArr.forEach((item, index) => {
           if (item.catergyName != undefined && item.catergyName.length > 0) {
             passFailFlagObj.indexArrPassFail.push(index);
@@ -1730,6 +1739,9 @@
             flagScoreItemEmpty: false,
           }
         };
+        if (scoreArr.length === 0){
+          return scoreFlagObj;
+        }
         scoreArr.forEach((item, index) => {
           if (item.catergyName != undefined && item.catergyName.length != 0) {
             scoreFlagObj.indexArrScore.push(index);
@@ -1835,7 +1847,7 @@
         return scoreFlagObj;
       },
 
-      validateOtherData(scoreArr) {
+      validateOtherData(othersArr) {
         const ITEMSLENGTH = 250;
         let otherFlagObj = {
           indexArrOthers: [],
@@ -1849,7 +1861,10 @@
             flagDesLengthOthers: false
           }
         };
-        scoreArr.forEach((item, index) => {
+        if (othersArr.length === 0){
+          return otherFlagObj;
+        }
+        othersArr.forEach((item, index) => {
           if (item.catergyName != undefined && item.catergyName.length != 0) {
             otherFlagObj.indexArrOthers.push(index);
             if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -1985,12 +2000,9 @@
               passFailSheet[i].category = sheetData.slice(indexArray[i], indexArray[i + 1]);
               for (let j = 0; j < subCatergyIndexArr.length; j++) {
                 if(subCatergyIndexArr[j] <= indexArray[indexArray.length -1]){
-                  console.log(subCatergyIndexArr[j]);
-                  console.log(indexArray[indexArray.length - 1]);
                   passFailSheet[i].subcategory = sheetData.slice(subCatergyIndexArr[j], subCatergyIndexArr[j + 1]);
                 }
               }
-              console.log(passFailSheet[i])
             }
           }
           else {
@@ -2054,14 +2066,12 @@
         this.editableTabsValue2 = newTabName;
       },
 
-      handleNape(index, item) {
-        console.log(item);
-        const self = this;
+      handleNape(index) {
         switch (index) {
-          case 0: self.importItem(); break;
-          case 1: self.exportItem(); break;
-          case 2: self.downItem(); break;
-          case 3: self.delAllItem(); break;
+          case 0: this.importItem(); break;
+          case 1: this.exportItem(); break;
+          case 2: this.downItem(); break;
+          case 3: this.delAllItem(); break;
         }
       },
 
@@ -2069,122 +2079,30 @@
         var that = this;
         require.ensure([], () => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const tHeader = [that.$t('insSettingView.tHeaderA'), that.$t('insSettingView.tHeaderB'),
-            that.$t('insSettingView.tHeaderC'), that.$t('insSettingView.tHeaderD'),
-            that.$t('insSettingView.tHeaderF'), that.$t('insSettingView.tHeaderA2'), that.$t('insSettingView.tHeaderE'), that.$t('insSettingView.tHeaderG'), that.$t('insSettingView.sheetscore2')];
-          const excelData = [];
           let name = '';
           var wb = XLSX.utils.book_new();
           if (that.elTableData[Number(that.activeName)].data.length === 0) {
             util.notify(that.$t('insSettingView.haveNothingToExport'), 'warning', 3000);
             return false;
           } else {
-            let sheet1data = [], sheet2data = [], sheet3data = [];
             const curData = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
             const passfail = curData.filter(x => x[0].type === 0)[0];
             const score = curData.filter(x => x[0].type === 1)[0];
             const other = curData.filter(x => x[0].type === 2)[0];
             name = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].name;
-            if (passfail != undefined) {
-              passfail.forEach(item => {
-                if (item.itemData.length !== 0) {
-                  item.itemData.forEach((_item, _index) => {
-                    const obj = {};
-                    if (_index === 0) {
-                      obj[tHeader[0]] = item.groupName;
-                    } else {
-                      obj[tHeader[0]] = '';
-                    }
-                    obj[tHeader[1]] = _item.name;
-                    obj[tHeader[6]] = _item.score;
-                    obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
-                    sheet1data.push(obj);
-                  });
-                } else {
-                  const obj = {};
-                  obj[tHeader[0]] = item.groupName;
-                  obj[tHeader[1]] = '';
-                  obj[tHeader[6]] = '';
-                  obj[tHeader[3]] = '';
-                  sheet1data.push(obj);
-                }
-              });
-              const sheet1 = XLSX.utils.json_to_sheet(sheet1data);
-              XLSX.utils.book_append_sheet(wb, sheet1, 'Pass&Fail');
-            }
-            if (score != undefined) {
-              score.forEach(item => {
-                if (item.itemData.length !== 0) {
-                  item.itemData.forEach((_item, _index) => {
-                    const obj = {};
-                    if (_index === 0) {
-                      obj[tHeader[5]] = item.groupName;
-                    } else {
-                      obj[tHeader[5]] = '';
-                    }
-                    obj[tHeader[1]] = _item.name;
-                    obj[tHeader[2]] = _item.score;
-                    obj[tHeader[4]] = _item.qualifiedScore;
-                    obj[tHeader[7]] = _item.availableScores;
-                    obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
-                    sheet2data.push(obj);
-                  });
-                } else {
-                  const obj = {};
-                  obj[tHeader[5]] = item.groupName;
-                  obj[tHeader[1]] = '';
-                  obj[tHeader[2]] = '';
-                  obj[tHeader[4]] = '';
-                  obj[tHeader[7]] = '';
-                  obj[tHeader[3]] = '';
-                  sheet2data.push(obj);
-                }
-              });
-              var sheet2 = XLSX.utils.json_to_sheet(sheet2data);
-              XLSX.utils.book_append_sheet(wb, sheet2, 'Score');
-            }
-            if (other != undefined) {
-              other.forEach(item => {
-                if (item.itemData.length !== 0) {
-                  item.itemData.forEach((_item, _index) => {
-                    const obj = {};
-                    if (_index === 0) {
-                      obj[tHeader[0]] = item.groupName;
-                    } else {
-                      obj[tHeader[0]] = '';
-                    }
-                    obj[tHeader[1]] = _item.name;
-                    obj[tHeader[8]] = _item.score;
-                    obj[tHeader[3]] = _item.description === '---' ? '' : _item.description;
-                    sheet3data.push(obj);
-                  });
-                } else {
-                  const obj = {};
-                  obj[tHeader[0]] = item.groupName;
-                  obj[tHeader[1]] = '';
-                  obj[tHeader[8]] = '';
-                  obj[tHeader[3]] = '';
-                  sheet3data.push(obj);
-                }
-              });
-              var sheet3 = XLSX.utils.json_to_sheet(sheet3data);
-              XLSX.utils.book_append_sheet(wb, sheet3, 'Others');
-            }
+            const sheet1Data = that.getExcelDataOfSheet(passfail, 0);
+            const sheet1 = XLSX.utils.json_to_sheet(sheet1Data);
+            XLSX.utils.book_append_sheet(wb, sheet1, 'Pass&Fail');
+
+            const sheet2Data = that.getExcelDataOfSheet(score, 1);
+            const sheet2 = XLSX.utils.json_to_sheet(sheet2Data);
+            XLSX.utils.book_append_sheet(wb, sheet2, 'Score');
+
+            const sheet3Data = that.getExcelDataOfSheet(other, 2);
+            const sheet3 = XLSX.utils.json_to_sheet(sheet3Data);
+            XLSX.utils.book_append_sheet(wb, sheet3, 'Others');
           }
-          let label = '';
-          switch (Number(that.activeName)) {
-            case 0: {
-              label = `[${that.$t('insSettingView.onsitePatrol')}]`;
-              break;
-            }
-            case 1: {
-              label = `[${that.$t('insSettingView.remotePatrol')}]`;
-              break;
-            }
-            default: {
-              label = `[${that.elTableData[Number(that.activeName)].label}]`;
-            }
-          }
+          const label = this.getExcelInspectionType();
           const fileName = label + ' ' + name + '.xlsx';
           const workbookBlob = that.workbook2blob(wb);
           that.openDownloadDialog(workbookBlob, fileName);
@@ -2226,6 +2144,142 @@
 
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => v[j]));
+      },
+
+      getExcelDataOfSheet(sheetDataArr, type){
+        const tableHeader = this.getExcelTableHeader(type);
+        let sheetData = [];
+        if (sheetDataArr){
+          const treeData = util.handleInspctionCatergyTree(sheetDataArr);
+          treeData.forEach(item => {
+            if (!item.children) {
+              if (item.itemData.length !== 0) {
+                item.itemData.forEach((_item, _index) => {
+                  const obj = {};
+                  if (_index === 0) {
+                    obj[tableHeader[0]] = item.groupName;
+                  } else {
+                    obj[tableHeader[0]] = '';
+                  }
+                  if (type === 0 || type === 2){
+                    obj[tableHeader[1]] = '';
+                    obj[tableHeader[2]] = _item.name;
+                    obj[tableHeader[3]] = _item.score;
+                    obj[tableHeader[4]] = _item.description === '---' ? '' : _item.description;
+                  } else {
+                    obj[tableHeader[1]] = '';
+                    obj[tableHeader[2]] = _item.name;
+                    obj[tableHeader[3]] = _item.availableScores;
+                    obj[tableHeader[4]] = _item.qualifiedScore;
+                    obj[tableHeader[5]] = _item.description === '---' ? '' : _item.description;
+                  }
+                  sheetData.push(obj);
+                });
+              } else {
+                const obj = {};
+                obj[tableHeader[0]] = item.groupName;
+                obj[tableHeader[1]] = '';
+                obj[tableHeader[2]] = '';
+                obj[tableHeader[3]] = '';
+                obj[tableHeader[4]] = '';
+                if (type === 1){
+                  obj[tableHeader[5]] = '';
+                }
+                sheetData.push(obj);
+              }
+            } else {
+              item.children.forEach((child, childIndex) => {
+                if(child.itemData.length > 0){
+                  child.itemData.forEach((childItem, childItemIndex) => {
+                    const obj = {};
+                    if (childIndex === 0 && childItemIndex === 0) {
+                      obj[tableHeader[0]] = item.groupName;
+                    } else {
+                      obj[tableHeader[0]] = '';
+                    }
+                    if (childItemIndex === 0) {
+                      obj[tableHeader[1]] = child.groupName;
+                    } else {
+                      obj[tableHeader[1]] = '';
+                    }
+                    if (type === 0 || type === 2){
+                      obj[tableHeader[2]] = childItem.name;
+                      obj[tableHeader[3]] = childItem.score;
+                      obj[tableHeader[4]] = childItem.description === '---' ? '' : childItem.description;
+                    } else {
+                      obj[tableHeader[2]] = childItem.name;
+                      obj[tableHeader[3]] = childItem.availableScores;
+                      obj[tableHeader[4]] = childItem.qualifiedScore;
+                      obj[tableHeader[5]] = childItem.description === '---' ? '' : childItem.description;
+                    }
+                    sheetData.push(obj);
+                  })
+                } else {
+                  const obj = {};
+                  if (childIndex === 0) {
+                    obj[tableHeader[0]] = item.groupName;
+                  } else {
+                    obj[tableHeader[0]] = '';
+                  }
+                  obj[tableHeader[1]] = child.groupName;
+                  obj[tableHeader[2]] ='';
+                  obj[tableHeader[3]] ='';
+                  obj[tableHeader[4]] = '';
+                  if (type === 1){
+                    obj[tableHeader[5]] = '';
+                  }
+                  sheetData.push(obj);
+                }
+              })
+            }
+
+          });
+        } else {
+          const obj = {};
+          tableHeader.map(item => obj[item] = '');
+          sheetData.push(obj);
+        }
+        return sheetData;
+      },
+
+      getExcelTableHeader(type){
+        const sheet1TableHeader = [
+          this.$t('insSettingView.tHeaderA'), this.$t('insSettingView.subCategoryHeader'),
+          this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.tHeaderE'),
+          this.$t('insSettingView.tHeaderD')
+        ];
+
+        const sheet2TableHeader = [
+          this.$t('insSettingView.tHeaderA2'), this.$t('insSettingView.subCategoryHeader'),
+          this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.tHeaderG'),
+          this.$t('insSettingView.tHeaderF'), this.$t('insSettingView.tHeaderD')
+        ];
+
+        const sheet3TableHeader = [
+          this.$t('insSettingView.tHeaderA'), this.$t('insSettingView.subCategoryHeader'),
+          this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.sheetscore2'),
+          this.$t('insSettingView.tHeaderD')
+        ];
+        let tableHeader = [];
+        return tableHeader = type === 0 ? sheet1TableHeader : type === 1 ? sheet2TableHeader : sheet3TableHeader;
+      },
+
+      getExcelInspectionType(){
+        let label = '';
+        switch (Number(this.activeName)) {
+          case 0: {
+            label = `[${this.$t('insSettingView.onsitePatrol')}]`;
+            break;
+          }
+          case 1: {
+            label = `[${this.$t('insSettingView.remotePatrol')}]`;
+            break;
+          }
+          default: {
+            label = `[${this.elTableData[Number(this.activeName)].label}]`;
+          }
+        }
+        return label;
       }
 
     }
