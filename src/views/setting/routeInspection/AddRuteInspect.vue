@@ -2,7 +2,9 @@
   <el-row class="el-addrute">
     <el-col :span="24" class="el-rute-title">
       <span v-if="!showEditTab" class="tab-name">{{ routeName }}<i class="iconfont icon-bianji icon-tabname" @click="editTabName"/></span>
-      <el-input v-if="showEditTab" :size="varyWindowWidth>1600?'small':'mini'" :placeholder="$t('insSettingView.enterListName')" v-model="editRouteName" class="tabName-input" @input="RouteNameLength"/>
+      <el-input v-if="showEditTab" :size="varyWindowWidth>1600?'small':'mini'"
+                :placeholder="$t('insSettingView.enterListName')" v-model="editRouteName" class="tabName-input"
+                @input="RouteNameLength"/>
       <div v-if="showEditTab" class="iconcontent" style="margin-top:28px;">
         <div class="iconlised" @click="confirmEditTab">
           <i class="el-icon-check"/>
@@ -40,7 +42,7 @@
           <div class="btn-content">
             <delay-button
               class="inspction-btn"
-              @click="addGroup"
+              @click="addInspectCatergory"
             >
               <i class="el-icon-plus"/>
               <span>{{ $t('insSettingView.addCategory') }}</span>
@@ -56,47 +58,73 @@
                 </el-tabs>
               </div>
             </div>
-            <draggable v-model="groupList">
-              <div v-for="(item,index) in groupList" :key="index" :class="item.isClick?'noraml-color':'noraml-groupColor'"
-                   class="groupItem" @click="clickGroupItem(index,item)" @mouseenter="getEditGroup(index,item)">
-                <div v-if="item.isClick" class="proper-flag"/>
-                <div>
-                  <div class="group-left">
-                    <div v-if="!item.isSubCatergy" @click="showSubCatergy = true">
-                      <span :style="item.isClick?{'color':'#f31d65'}:{}">
-                        {{ item.groupName }}（{{ item.groupNum }}）
-                      </span>
-                    </div>
-                    <div v-else class="subcatergy-item">
-                      <span :style="item.isClick?{'color':'#f31d65'}:{}">
-                        {{ item.groupName }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="group-right">
-                    <div v-if="item.showEdit" class="show-edit">
-                      <div v-if="!item.isEdit" class="nape-items-handle">
-                        <i
-                          class="iconfont icon-bianji"
-                          style="cursor:pointer;"
-                          @click="editGroup(index,item)"/>
-                        <i
-                          class="iconfont icon-shanchu"
-                          style="cursor:pointer;"
-                          @click="deleteGroup(index, item)"/>
+            <draggable v-model="groupList" :group="{name: 'parent', pull: true}" @update="handleUpdateCategorySequence">
+              <template v-for="(item,index) in groupList">
+                <div :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
+                           class="groupItem" @click="clickCategory(index,item)"
+                     @mouseenter="onShowCategoryEditBtn(index,item)">
+                  <div>
+                    <div class="group-left">
+                      <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
+                      <div>
+                        <span :style="activeParentId === item.id?{'color':'#f31d65'}:{}">
+                          {{ item.name }}（{{ item.groupNum }}）
+                        </span>
                       </div>
                     </div>
-                    <div v-if="item.isEdit" class="iconcontent">
-                      <div class="iconlised" @click="confirmEditGroup(index,item)">
-                        <i class="el-icon-check"/>
-                      </div>
-                      <div class="iconrised" @click="cancelEditGroup(index,item)">
-                        <i class="el-icon-close"/>
+                    <div class="group-right">
+                      <div class="show-edit">
+                        <div class="nape-items-handle" v-if="hoverId === item.id">
+                          <i
+                            class="iconfont icon-bianji"
+                            style="cursor:pointer;"
+                            @click="editCategory(index,item)"/>
+                          <i
+                            class="iconfont icon-shanchu"
+                            style="cursor:pointer;"
+                            @click="deleteGroup(index, item)"/>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+                <template v-if="activeParentId === item.id">
+                  <draggable v-model="item.children" :group="{name: 'children', pull: true}"
+                             @start="getSubCategorySequence(item.children)"
+                             @update="handleUpdateSubCategorySequence(item.children)">
+                    <div v-for="(childItem, childIndex) in item.children" :key='`child-${childIndex}`' class="groupItem">
+                      <div :key="index" :class="childItem.isClick ? 'noraml-color':'noraml-groupColor'"
+                           class="groupItem" @click="clickSubCategory(index, item.id, childIndex,childItem)"
+                           @mouseenter="onShowSubcategoryEditBtn(childIndex, childItem)">
+                          <div v-if="activeChildId === childItem.id" class="proper-flag"/>
+                          <div>
+                            <div class="group-left">
+                              <div class="subcatergy-item">
+                              <span :style="activeChildId === childItem.id?{'color':'#f31d65'}:{}">
+                                {{ childItem.name }}
+                              </span>
+                              </div>
+                            </div>
+                            <div class="group-right">
+                              <div class="show-edit">
+                                <div v-if="hoverId === childItem.id" class="nape-items-handle">
+                                  <i
+                                    class="iconfont icon-bianji"
+                                    style="cursor:pointer;"
+                                    @click="editCategory(childIndex,childItem)"/>
+                                  <i
+                                    class="iconfont icon-shanchu"
+                                    style="cursor:pointer;"
+                                    @click="deleteGroup(childIndex, childItem, item)"/>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                    </div>
+                  </draggable>
+                </template>
+              </template>
             </draggable>
           </div>
         </el-scrollbar>
@@ -163,53 +191,66 @@
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.titleEmpty') }}</span>
           </el-form-item>
-          <el-form-item v-if="activeSheetName==='1'">
+          <el-form-item>
             <p class="score_item">
               <span class="sign">*</span>
-              <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
-              <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
+              <span class="item_label">{{$t('insSettingView.inspectItemType')}}</span>
             </p>
-            <el-input v-model="ItemScoreOption"
-                      :placeholder="$t('insSettingView.enterScore')"
-                      @input="napeScoreOptionsChange"></el-input>
-            <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
-            <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
+            <el-radio-group class="attribute-group" v-model="itemType">
+              <div v-for="(typeItem, typeIndex) in itemsTypeList"style="display: inline-flex">
+                <el-radio :label="typeItem.value" :key="typeIndex">{{typeItem.label}}</el-radio>
+              </div>
+            </el-radio-group>
           </el-form-item>
-          <el-form-item v-if="activeSheetName==='1'" style="height: 57px;">
-            <el-col :span="10">
-              <el-form-item style="margin-bottom:0;">
-                <p class="score_item">
-                  <span class="sign">*</span>
-                  <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
-                </p>
-                <el-input v-model.number="ItemTotalScore" disabled
-                          :placeholder="$t('insSettingView.enterScore')"
-                          @input="napeTotalScoreChange"/>
-                <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }}</span>
-                <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}</span>
-              </el-form-item>
-            </el-col>
-            <el-col :span="12" :offset="2">
-              <el-form-item :label="$t('insSettingView.sheetscore1')">
-                <el-input v-model.number="ItemMinScore"
-                          :placeholder="$t('insSettingView.enterScore')"
-                          @input="napeMinScoreChange"/>
-                <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }}</span>
-              </el-form-item>
-            </el-col>
-          </el-form-item>
-          <el-form-item v-if="activeSheetName!=='1'">
-            <p class="score_item">
-              <span v-if="activeSheetName==='2'" class="sign">*</span>
-              <span class="item_label">{{$t('insSettingView.score')}}</span>
-            </p>
-            <el-input v-model.number="ItemSheetScore"
-                      :placeholder="$t('insSettingView.enterScore')"
-                      @input="napeSheetScoreChange"/>
-            <span v-if="PFScoreTip" class="rules">{{ $t('insSettingView.setPassFileRange') }}</span>
-            <span v-if="OtherScoreTip" class="rules">{{ $t('insSettingView.setOtherRange') }}</span>
-            <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
-          </el-form-item>
+          <div v-if="itemType === 0" class="score-content">
+            <el-form-item v-if="activeSheetName==='1'">
+              <p class="score_item">
+                <span class="sign">*</span>
+                <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
+                <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
+              </p>
+              <el-input v-model="ItemScoreOption"
+                        :placeholder="$t('insSettingView.enterScore')"
+                        @input="napeScoreOptionsChange"></el-input>
+              <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
+              <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
+            </el-form-item>
+            <el-form-item v-if="activeSheetName==='1'" style="height: 57px;">
+              <el-col :span="10">
+                <el-form-item style="margin-bottom:0;">
+                  <p class="score_item">
+                    <span class="sign">*</span>
+                    <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
+                  </p>
+                  <el-input v-model.number="ItemTotalScore" disabled
+                            :placeholder="$t('insSettingView.enterScore')"
+                            @input="napeTotalScoreChange"/>
+                  <span v-if="ItemTotalScoreTip0" class="rules">{{ $t('insSettingView.setFullScoreEmpty') }}</span>
+                  <span v-if="ItemTotalScoreTip1" class="rules">{{ $t('insSettingView.setFullScoreRange') }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col :span="12" :offset="2">
+                <el-form-item :label="$t('insSettingView.sheetscore1')">
+                  <el-input v-model.number="ItemMinScore"
+                            :placeholder="$t('insSettingView.enterScore')"
+                            @input="napeMinScoreChange"/>
+                  <span v-if="ItemMinScoreTip" class="rules">{{ $t('insSettingView.setMinScoreRange') }}</span>
+                </el-form-item>
+              </el-col>
+            </el-form-item>
+            <el-form-item v-if="activeSheetName!=='1'">
+              <p class="score_item">
+                <span v-if="activeSheetName==='2'" class="sign">*</span>
+                <span class="item_label">{{$t('insSettingView.score')}}</span>
+              </p>
+              <el-input v-model.number="ItemSheetScore"
+                        :placeholder="$t('insSettingView.enterScore')"
+                        @input="napeSheetScoreChange"/>
+              <span v-if="PFScoreTip" class="rules">{{ $t('insSettingView.setPassFileRange') }}</span>
+              <span v-if="OtherScoreTip" class="rules">{{ $t('insSettingView.setOtherRange') }}</span>
+              <span v-if="OtherScoreTipEmpty" class="rules">{{ $t('insSettingView.setOtherEmpty') }}</span>
+            </el-form-item>
+          </div>
           <el-form-item :label="$t('insSettingView.inspectionDescp')">
             <el-input type="textarea" v-model="ItemDescription"
                       :placeholder="$t('insSettingView.description')"
@@ -223,43 +264,6 @@
         <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
       </div>
     </el-dialog>
-    <!--<dialog-pop-->
-      <!--v-if="showAddNape"-->
-      <!--:title="updateType.type === 0 ? $t('insSettingView.addTitleItem') : $t('insSettingView.editTitleItem')"-->
-      <!--:append-to-body="true"-->
-      <!--:close-on-click-modal="false"-->
-      <!--:visible="showAddNape"-->
-      <!--@visibleChangeHandler="hideHandleItemDialog"-->
-      <!--@cancelHandler="hideHandleItemDialog"-->
-      <!--@confirmHandler="confirmUpdateNape">-->
-      <!--<div class="dialog-slot input-form-slot">-->
-        <!--<validate-input-->
-          <!--:placeholder="$t('insSettingView.enterName')"-->
-          <!--:input-limit-length="30"-->
-          <!--:out-limit-prompt-msg="$t('insSettingView.enterNameRuletip')"-->
-          <!--:empty-prompt-msg="$t('insSettingView.enterName')"-->
-          <!--:input-name="groupNameTemp"-->
-          <!--@getInputValue="getInputCatergyName"-->
-        <!--&gt;-->
-          <!--<div slot class="dialog-form-item-name">-->
-            <!--<span class="required-name">*</span>-->
-            <!--<span>{{$t('insSettingView.catergyName')}}</span>-->
-          <!--</div>-->
-        <!--</validate-input>-->
-        <!--<div class="dialog-form-item">-->
-          <!--<div class="dialog-form-item-name">-->
-            <!--<span>{{$t('insSettingView.parentCatergyName')}}</span>-->
-            <!--<icon-tooltip placement="right" :is-catergy-setting="true">-->
-              <!--<i class="iconfont icon-bangzhu iconbangzhu"/>-->
-            <!--</icon-tooltip>-->
-          <!--</div>-->
-          <!--<el-select v-model="ruleForm.region" style="width:100%" size="mini">-->
-            <!--<el-option label="区域一" value="shanghai"></el-option>-->
-            <!--<el-option label="区域二" value="beijing"></el-option>-->
-          <!--</el-select>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</dialog-pop>-->
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -289,20 +293,20 @@
       </div>
     </dialog-pop>
     <dialog-pop
-      :title="$t('insSettingView.addCategory')"
+      :title="isEditCategory ? $t('insSettingView.updateCategory') : $t('insSettingView.addCategory')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :visible="showAddGroup"
       @visibleChangeHandler="hideAddGroupDialog"
       @cancelHandler="hideAddGroupDialog"
-      @confirmHandler="confirmAddGroup">
+      @confirmHandler="confirmHandleCategory">
       <div class="dialog-slot input-form-slot">
         <validate-input
           :placeholder="$t('insSettingView.enterName')"
           :input-limit-length="30"
           :out-limit-prompt-msg="$t('insSettingView.enterNameRuletip')"
           :empty-prompt-msg="$t('insSettingView.enterName')"
-          :input-name="groupNameTemp"
+          :input-name="groupNameInput"
           @getInputValue="getInputCatergyName"
         >
           <div slot class="dialog-form-item-name">
@@ -317,9 +321,10 @@
               <i class="iconfont icon-bangzhu iconbangzhu"/>
             </icon-tooltip>
           </div>
-          <el-select v-model="ruleForm.region" style="width:100%" size="mini">
-            <el-option label="区域一" value="shanghai"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
+          <el-select v-model="parentId" style="width:100%" size="mini" :disabled="ifCanChangeParentId">
+            <el-option v-for="(catergy, index) in parentCatergoryList"
+                       :key="index"
+                       :label="catergy.label" :value="catergy.value"></el-option>
           </el-select>
         </div>
       </div>
@@ -337,8 +342,8 @@ import { getScheduleListService } from '@/api/schedule';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import ValidateInput from "@/components/ValidateInput";
-import IconTooltip from "../../../components/IconTooltip";
-import DraggableTable from "../../../components/DraggableTable";
+import IconTooltip from "@/components/IconTooltip";
+import DraggableTable from "@/components/DraggableTable";
 import draggable from 'vuedraggable';
 
 
@@ -381,7 +386,6 @@ export default {
       ModelAddPost: [],
       groupList: [],
       activeSheetName: '',
-      groupNameTemp: '',
       groupNameInput: '',
       napeTitle: '',
       showEditTab: false,
@@ -394,7 +398,6 @@ export default {
       showAddNape: false,
       newNapeChecked: false,
       newNapeName: '',
-      newNapeDep: '',
       groupIndex: 0,
       curGroup: '',
       showDeleteItem: false,
@@ -405,13 +408,11 @@ export default {
       varyWindowWidth: window.innerWidth,
       bindStoreList: [],
       lang: this.$i18n.locale,
-      routeName: this.$route.params.routeName,
-      routeData: this.$route.params.routeData,
+      routeName: '',
+      routeData: '',
       showLengthNameWarning: false,
       editRouteName: '',
       titleList: [],
-      tableData: [],
-      noData: '',
       groupIds: [],
       sheetName: [
         { id: '0', label: this.$t('insSettingView.sheetpassfail') },
@@ -490,7 +491,31 @@ export default {
           },
         },
       ],
-      showSubCatergy: false
+      showSubCatergy: false,
+      parentId: -1,
+      parentCatergoryList: [],
+      itemsTypeList: [
+        {
+          label: this.$t('insSettingView.evaluationType'),
+          value: 0
+        },
+        {
+          label: this.$t('insSettingView.remarksType'),
+          value: 1
+        }
+      ],
+      activeParentId: -1,
+      activeChildId: -1,
+      isEditCategory: false,
+      hoverId: '',
+      ifCanChangeParentId: false,
+      ifClickSubCategory: false,
+      itemType: 0,
+      childIndex: -1,
+      oldGroupSequence: [],
+      newGroupSequence: [],
+      oldSubcategorySequence: [],
+      newSubcategorySequence: []
     };
   },
   computed: {
@@ -504,10 +529,10 @@ export default {
       }
     }
   },
+
   mounted() {
-    const self = this;
-    self.initData();
-    self.getTitleList();
+    this.initData();
+    this.getTitleList();
   },
 
   destroyed() {
@@ -516,25 +541,16 @@ export default {
 
   methods: {
     getTitleList() {
-      const self = this;
-      self.tableData = [];
-      self.getUserTitleList().then((res) => {
+      this.getUserTitleList().then(res => {
+        let listArray = [];
         res.data.forEach(item => {
-          const roleId = item.roleId;
-        });
-        self.tableData = res.data;
-        if (self.tableData.length === 0) {
-          self.noData = self.$t('deviceView.noData');
-        }
-        const listArray = [];
-        self.tableData.forEach(item => {
           listArray.push({
             label: item.title,
             value: item.id,
             disabled: false
           });
         });
-        self.titleList = listArray;
+        this.titleList = listArray;
       })
         .catch(err => {
           console.log('AddRuteInspect-getTitleList: ' + err);
@@ -600,34 +616,46 @@ export default {
       self.showEditTab = false;
     },
 
-    handleSheetClick(val) {
-      const self = this;
-      self.showAddGroup = false;
-      self.showAddNape = false;
-      self.getGroupList(0);
+    handleSheetClick() {
+      this.showAddGroup = false;
+      this.showAddNape = false;
+      this.activeChildId = -1;
+      this.activeParentId = -1;
+      this.getGroupList(0);
     },
 
-    clickGroupItem(index, item) {
-      const self = this;
-      item.isClick = true;
-      self.groupIndex = index;
-      self.curGroup = item;
-      if (self.lang == 'en') {
-        self.napeTitle = `${self.$t('insSettingView.itemsOfCate')} ${item.groupName}`;
+    clickCategory(index, item) {
+      this.groupIndex = index;
+      this.activeParentId = item.id;
+      if(!item.children){
+        this.activeChildId = -1;
+        this.setItemTitle(item.name);
+        this.curGroup = item;
+        this.showAddNape = false;
+        this.getItemsList(index, item);
       } else {
-        self.napeTitle = `${item.groupName} ${self.$t('insSettingView.itemsOfCate')}`;
+        item.isClick = !item.isClick;
+        this.activeChildId = item.children[0].id;
+        this.setItemTitle(item.children[0].name);
+        this.getItemsList(index, item.children[0]);
       }
-      self.showAddNape = false;
-      self.groupList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isClick = false;
-        }
-      });
-      self.getNapeList(index, item);
     },
 
-    clickItem(index, item) {
-      const self = this;
+    setItemTitle(name){
+      if (this.lang == 'en') {
+        this.napeTitle = `${this.$t('insSettingView.itemsOfCate')} ${name}`;
+      } else {
+        this.napeTitle = `${name} ${this.$t('insSettingView.itemsOfCate')}`;
+      }
+    },
+
+    clickSubCategory(index, itemId, subCategoryIndex, subCategoryItem){
+      this.ifClickSubCategory = true;
+      this.activeChildId = subCategoryItem.id;
+      this.childIndex = subCategoryIndex;
+      this.curGroup = subCategoryItem;
+      this.setItemTitle(subCategoryItem.name);
+      this.getItemsList(subCategoryIndex, subCategoryItem);
     },
 
     getInspectGroupBindAll(params) {
@@ -722,13 +750,13 @@ export default {
     async confirmEditGroup(index, item) {
       const self = this;
       const temp = [];
-      if (item.groupName == null || item.groupName.length === 0) {
+      if (item.name == null || item.name.length === 0) {
         util.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
       const obj = {
         id: item.id,
-        name: item.groupName,
+        name: item.name,
         tag: self.tabName
       };
       temp.push(obj);
@@ -777,66 +805,91 @@ export default {
       });
     },
 
-    cancelEditGroup(index, item) {
-      const self = this;
-      item.isEdit = false;
-      item.groupName = self.groupNameTemp;
+    addInspectCatergory() {
+      this.showAddGroup = true;
+      this.groupNameInput = '';
+      this.parentId = -1;
+      this.isEditCategory = false;
+      this.ifCanChangeParentId = false;
+      this.getParentCatergoryList();
     },
-    /**
-     * Add group functions
-     */
-    addGroup() {
-      const self = this;
-      self.showAddGroup = true;
-      self.groupNameInput = '';
-      self.groupList.forEach(item => {
-        item.isEdit = false;
+
+    getParentCatergoryList(){
+      this.parentCatergoryList = [];
+      const parentCatergoryList = this.groupList.filter(item => item.children || item.items.length === 0);
+      parentCatergoryList.forEach(item => {
+        const catergoryObj = {};
+        catergoryObj.label = item.name;
+        catergoryObj.value = item.id;
+        this.parentCatergoryList.push(catergoryObj);
+      })
+      this.parentCatergoryList.unshift({
+        label: this.$t('insSettingView.no'),
+        value: -1
       });
     },
 
     changeSelect(val) {
-      const self = this;
-      self.ModelPost = Array.from(val)[0];
+      this.ModelPost = Array.from(val)[0];
     },
 
-    async confirmAddGroup() {
+    async confirmHandleCategory() {
       const self = this;
-      const temp = [];
-      if (self.groupNameInput.trim().length == 0) {
+      if (self.groupNameInput.trim().length === 0) {
         util.notify(self.$t('insSettingView.titleEmpty'), 'warning', 3000);
         return false;
       }
       let mode = 0;
       const tabIndex = sessionStorage.getItem('TabIndex');
       mode = tabIndex === '0' ? 1 : (tabIndex === '1' ? 0 : 1);
+      this.isEditCategory ? this.updateInspectGroup() : this.addInspectGroup(mode);
+    },
+
+    cancelAddGroup() {
+      const self = this;
+      self.showAddGroup = false;
+    },
+
+    async updateInspectGroup(){
+      const params = {
+        'groups': [{
+          id: this.activeParentId,
+          name: this.groupNameInput,
+          tag: this.tabName,
+          parentId: this.parentId
+        }]
+      };
+      let resUpdateGroup = await this.updateGroup(params);
+      this.showAddGroup = false;
+      if (resUpdateGroup.errCode === 0) {
+        util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+        this.refreshData(this.groupIndex);
+      } else {
+        util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
+        return false;
+      }
+    },
+
+    addInspectGroup(mode){
+      const temp = [];
       const obj = {
-        name: self.groupNameInput,
+        name: this.groupNameInput,
         mode: mode,
-        tag: self.tabName,
-        type: Number(self.activeSheetName)
+        tag: this.tabName,
+        type: Number(this.activeSheetName),
+        parentId: this.parentId
       };
       temp.push(obj);
       const params = {
         'groups': temp
       };
       inpectRESTful.addInspectGroup(params).then(res => {
-        const codeMsg = res.errMsg;
-        if (codeMsg != undefined && codeMsg === 'Success') {
-          const obj = {
-            id: res.data[0],
-            groupName: self.groupNameInput,
-            groupNum: 0,
-            isClick: false,
-            showEdit: false,
-            isEdit: false,
-            itemData: [],
-          };
-          self.groupList.push(obj);
+        if (res.errCode === 0) {
           let titleIds = [];
-          if (self.ModelPost[0] === '-1') {
-            titleIds = self.ModelPost.slice(1);
+          if (this.ModelPost[0] === '-1') {
+            titleIds = this.ModelPost.slice(1);
           } else {
-            titleIds = self.ModelPost;
+            titleIds = this.ModelPost;
           }
           if (titleIds.length !== 0) {
             const paramsBind = {
@@ -845,48 +898,47 @@ export default {
                 titleIds: titleIds
               }]
             };
-            self.bindGroup(paramsBind);
+            this.bindGroup(paramsBind);
           }
-          self.groupNameInput = '';
-          self.showAddGroup = false;
-          self.refreshData(self.groupList.length - 1);
-          util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
+          if(this.parentId !== -1) {
+            this.activeParentId = this.parentId;
+            this.activeChildId = res.data[0];
+            this.refreshData(this.groupIndex);
+          } else {
+            this.activeParentId = res.data[0];
+            this.refreshData(this.groupList.length);
+          }
+          this.groupNameInput = '';
+          this.showAddGroup = false;
+          util.notify(this.$t('insSettingView.addSuss'), 'success', 3000);
         } else {
-          util.notify(self.$t('insSettingView.addFail'), 'warning', 3000);
+          util.notify(this.$t('insSettingView.addFail'), 'warning', 3000);
           return false;
         }
       }).catch(err => {
-        reject(err);
+        util.notify(this.$t('insSettingView.addFail'), 'warning', 3000);
+        console.log(err);
       });
     },
 
-    cancelAddGroup() {
-      const self = this;
-      self.showAddGroup = false;
+    onShowCategoryEditBtn(index, item) {
+      this.hoverId = item.id;
     },
 
-    getEditGroup(index, item) {
-      const self = this;
-      item.showEdit = true;
-
-      self.groupList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.showEdit = false;
-        }
-      });
+    onShowSubcategoryEditBtn(index, item) {
+      this.hoverId = item.id;
     },
 
-    editGroup(index, item) {
-      this.showAddGroup = true;
-      const self = this;
+    editCategory(index, item) {
       item.isEdit = true;
       item.showEdit = false;
-      self.groupNameTemp = item.groupName;
-      self.groupList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isEdit = false;
-        }
-      });
+      this.ifCanChangeParentId = item.parentId === -1 ? (!item.children && item.groupNum > 0)
+                              || (item.children && item.children.length > 0) : false;
+      this.groupNameInput = item.name;
+      this.isEditCategory = true;
+      this.parentId = item.parentId;
+      this.showAddGroup = true;
+      this.getParentCatergoryList();
     },
 
     deleteItemData(idArr) {
@@ -907,11 +959,13 @@ export default {
         inpectRESTful.deleteInspectGroup(params).then(res => {
           const errMsg = res.errMsg;
           resolve(errMsg);
+        }).catch(e => {
+          reject(e);
         });
       });
     },
 
-    async deleteGroup(index, item) {
+    async deleteGroup(index, item, parentItem) {
       const self = this;
       if (self.groupList.length === 1) {
         if (self.typeTemp.length === 1) {
@@ -931,7 +985,7 @@ export default {
         }
       }
       self.showDeleteGroup = true;
-      self.curGroup = item;
+      !parentItem && (self.curGroup = item);
     },
 
     getScheduleFromDB(params) {
@@ -946,45 +1000,65 @@ export default {
     async confirmDeleteGroup() {
       const self = this;
       const idGroupArr = [];
+      const subCategoryArr = [];
       const idItemArr = [];
-      idGroupArr.push(self.curGroup.id);
-      self.curGroup.itemData.forEach(item => {
-        idItemArr.push(item.id);
-      });
-      self.showDeleteGroup = false;
-      if (idItemArr.length === 0) {
-        const errMsg = await self.deleteGroupData(idGroupArr);
-        if (errMsg != undefined && errMsg === 'Success') {
-          util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
-          if (self.groupList.length === 1) {
-            self.groupList = [];
-            self.napeList = [];
-            self.napeTitle = '';
-          } else {
-            self.refreshData(self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1);
-          }
+      if (self.curGroup.parentId === -1){
+        if(self.curGroup.children){
+          idGroupArr.push(self.curGroup.id);
+          self.curGroup.children.forEach(subCatergyItem => {
+            subCategoryArr.push(subCatergyItem.id);
+            subCatergyItem.items.forEach(inspectItem => {
+              idItemArr.push(inspectItem.id);
+            })
+          })
+        } else {
+          idGroupArr.push(self.curGroup.id);
+          self.curGroup.items.forEach(item => {
+            idItemArr.push(item.id);
+          });
         }
       } else {
-        const errMsgItem = await self.deleteItemData(idItemArr);
-        if (errMsgItem != undefined && errMsgItem === 'Success') {
-          const errMsgGroup = await self.deleteGroupData(idGroupArr);
-          if (errMsgGroup != undefined && errMsgGroup === 'Success') {
-            util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
-            if (self.groupList.length === 1) {
-              self.groupList = [];
-              self.napeList = [];
-              self.napeTitle = '';
-            } else {
-              self.refreshData(self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1);
-            }
-          } else {
-            util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
-            return false;
-          }
+        idGroupArr.push(self.curGroup.id);
+        self.curGroup.items.forEach(item => {
+          idItemArr.push(item.id);
+        });
+      }
+      self.showDeleteGroup = false;
+      try {
+        idItemArr.length > 0 && await self.deleteItemData(idItemArr);
+        subCategoryArr.length > 0 && await self.deleteGroupData(subCategoryArr);
+        idGroupArr.length > 0 && await self.deleteGroupData(idGroupArr);
+
+        if (self.groupList.length === 1) {
+          self.groupList = [];
+          self.napeList = [];
+          self.napeTitle = '';
         } else {
-          util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
-          return false;
+          let index = 0;
+          index = self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1;
+          if(self.curGroup.parentId === -1){
+            this.activeParentId = -1;
+            this.activeChildId = -1;
+            index = self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1;
+          } else {
+            const category = self.groupList.filter(category => category.id === this.activeParentId);
+            if (category && category[0].children.length  === 1){
+              this.activeParentId = -1;
+              this.activeChildId = -1;
+              index = self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1;
+            } else {
+              this.activeParentId = self.curGroup.parentId;
+              const childIndex = self.childIndex === 0 ? self.childIndex+1 : self.childIndex - 1;
+              this.activeChildId = category[0].children[childIndex].id;
+              index = self.groupIndex;
+            }
+          }
+          self.refreshData(index);
         }
+        util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
+      } catch (e) {
+        util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
+        return false;
       }
       if (self.typeTemp.length === 1 && self.groupList.length === 0) {
         self.$router.push({ name: 'inspectSetting', params: { val: 'del' }});
@@ -1074,6 +1148,7 @@ export default {
       self.ItemTotalScoreTip1 = false;
       self.ScoreOptionsTips0 = false;
       self.ScoreOptionsTips1 = false;
+      this.itemType = 0;
     },
 
     getFloat (value) {
@@ -1116,8 +1191,12 @@ export default {
           }
         }
       } else if (self.activeSheetName === '1') {
-        if(self.ItemScoreOption === ''){
-          self.ScoreOptionsTips0 = true;
+        if(self.itemType === 0 ){
+          if (self.ItemScoreOption === '') {
+            self.ScoreOptionsTips0 = true;
+          }
+        } else {
+          self.ItemScoreOption = '10';
         }
         if(self.ItemTotalScore === ''){
           self.ItemTotalScoreTip0 = true;
@@ -1173,15 +1252,16 @@ export default {
       const self = this;
       const temp = [];
       const objItem = {
-          subject: self.ItemName.trim(),
-          description: self.ItemDescription===null ? '' : self.ItemDescription.trim(),
-          itemScore: itemScore,
-          qualifiedScore: qualifiedScore,
-          availableScores: selectAvailable
-        };
+        subject: self.ItemName.trim(),
+        description: self.ItemDescription===null ? '' : self.ItemDescription.trim(),
+        itemScore: itemScore,
+        qualifiedScore: qualifiedScore,
+        availableScores: selectAvailable,
+        type: this.itemType
+      };
         temp.push(objItem);
         const obj = {
-          groupId: self.curGroup.id,
+          groupId: self.activeChildId === -1 ? self.activeParentId : self.activeChildId,
           items: temp
         };
         const tempParam = [];
@@ -1237,7 +1317,8 @@ export default {
           description: self.ItemDescription===null ? '' : self.ItemDescription.trim(),
           itemScore: itemScore,
           qualifiedScore: qualifiedScore,
-          availableScores: selectAvailable
+          availableScores: selectAvailable,
+          type: this.itemType
         };
         temp.push(obj);
         const params = {
@@ -1268,27 +1349,23 @@ export default {
       this.ItemSheetScore = item.Score_3;
       this.ItemScoreOption = item.availableScoreStr;
       this.ItemDescription = item.napeDep;
+      this.itemType = item.type;
     },
 
-    handleDelete(index, item) {
-      const self = this;
-      self.showDeleteItem = true;
-      self.deleteItemFlag = 'S';
-      self.curItemId = item.id;
+    handleDelete(item) {
+      this.showDeleteItem = true;
+      this.deleteItemFlag = 'S';
+      this.curItemId = item.id;
     },
 
-    getAllData() {
+    getInspectItemList() {
       const self = this;
       return new Promise((resolve, reject) => {
         const params = {
           inspectId: self.routeData[0].inspectId
         };
         inpectRESTful.getInspectItemList(params).then(res => {
-          const code = res.errMsg;
           const data = res.data;
-          if (code != null && code === 'Success') {
-            console.log(res.data);
-          }
           resolve(data);
         }).catch(err => {
           reject(err);
@@ -1322,25 +1399,35 @@ export default {
 
     async refreshData(index) {
       const self = this;
-      const asds = self.routeData;
       const curTag = self.tabName;
-      const allData = await self.getAllData();
-      const data = util.getRouteByTag(curTag, allData);
+      const itemsList = await self.getInspectItemList();
+      const data = util.getRouteByTag(curTag, itemsList);
+      const filterData = util.handleInspctionCatergyTree(data);
       const temp = [];
       const groupIds = [];
-      data.forEach((item, index) => {
+      filterData.forEach(item => {
         const obj = {};
         obj.id = item.id;
-        obj.groupName = item.name;
-        obj.groupNum = item.items.length;
+        obj.name = item.name;
+        obj.groupNum = item.children ? this.getSubCategoryItemsLength(item.children) : item.items.length;
         obj.isClick = false;
         obj.showEdit = false;
         obj.isEdit = false;
-        obj.itemData = item.items;
+        obj.items = item.items;
         obj.type = item.type;
+        obj.parentId = item.parentId;
+        obj.children = item.children;
+        obj.sequence = item.sequence;
         temp.push(obj);
         groupIds.push(item.id);
       });
+
+      this.activeParentId = this.activeParentId === -1 ? filterData[0].id : this.activeParentId;
+      if (filterData[0].children) {
+        this.activeChildId = this.activeChildId === -1 ? filterData[0].children[0].id : this.activeChildId;
+      } else {
+        this.activeChildId = -1;
+      }
       self.groupIds = groupIds;
       const postparams = {
         groupIds: self.groupIds
@@ -1398,37 +1485,45 @@ export default {
       self.getGroupList(index);
     },
 
+    getSubCategoryItemsLength(childrenItemList){
+      let itemsLength = 0;
+      childrenItemList.forEach(item => {
+        itemsLength += item.items.length;
+      })
+      return itemsLength;
+    },
+
     getGroupList(index){
       const self = this;
       self.activeSheetName = self.firstLoad ? self.allRoutedata[0][0].type.toString() : self.activeSheetName;
       self.firstLoad = false;
-      self.groupList = self.activeSheetName === '0' ? self.sheetTemp.passfail : (self.activeSheetName === '1' ? self.sheetTemp.score : self.sheetTemp.other);
+      self.groupList = self.activeSheetName === '0' ? self.sheetTemp.passfail :
+                      (self.activeSheetName === '1' ? self.sheetTemp.score : self.sheetTemp.other);
+      self.oldGroupSequence = self.groupList.map(item => item.sequence);
       if (self.groupList.length !== 0) {
-        self.groupList.forEach((_item,_index) => {
-           _index===index ? _item.isClick = true : _item.isClick = false;
-        })
-        self.curGroup = self.groupList[index];
         self.groupIndex = index;
-        if (self.lang === 'en') {
-          self.napeTitle = `${self.$t('insSettingView.itemsOfCate')} ${self.groupList[index].groupName}`;
+        this.activeParentId = this.activeParentId === -1 ? self.groupList[index].id : this.activeParentId;
+        if (self.groupList[index].children){
+          this.activeChildId = this.activeChildId === -1 ? self.groupList[index].children[0].id : this.activeChildId;
+          const child = self.groupList[index].children.filter(child => child.id === this.activeChildId);
+          self.setItemTitle(child[0].name);
+          self.getItemsList(index, child[0]);
         } else {
-          self.napeTitle = `${self.groupList[index].groupName} ${self.$t('insSettingView.itemsOfCate')}`;
+          self.curGroup = self.groupList[index];
+          this.activeChildId = -1;
+          self.setItemTitle(self.groupList[index].name);
+          self.getItemsList(index, self.groupList[index]);
         }
-        self.getNapeList(index, self.groupList[index]);
       } else {
         self.napeList = [];
-        if (self.lang === 'en') {
-          self.napeTitle = `${self.$t('insSettingView.itemsOfCate')}`;
-        } else {
-          self.napeTitle = `${self.$t('insSettingView.itemsOfCate')}`;
-        }
+        self.setItemTitle('');
       }
     },
 
-    getNapeList(index, item) {
+    getItemsList(index, item) {
       const self = this;
       const temp = [];
-      item.itemData.forEach((_item, index) => {
+      item.items.forEach((_item, index) => {
         let availableScoreStr = '';
         if (_item.availableScores.length !== 0) {
           _item.availableScores.forEach((x_item, x_index) => {
@@ -1457,7 +1552,9 @@ export default {
           qualifiedScore: _item.qualifiedScore,
           availableScores: availableScoreStr,
           isClick: false,
-          checked: false
+          checked: false,
+          type: _item.type,
+          sequence: _item.sequence
         };
         temp.push(obj);
       });
@@ -1528,7 +1625,9 @@ export default {
         self.ScoreOptionsTips1 = false;
       }else{
         self.ItemScoreOptions.forEach(item=>{
-          if(!isNaN(parseFloat(item)) && parseFloat(item) >= -50 && parseFloat(item) <= parseFloat(self.ItemTotalScore)){
+          if(!isNaN(parseFloat(item)) && parseFloat(item) >= -50 && parseFloat(item) <= 50){
+            self.ItemTotalScore = self.ItemScoreOptions[self.ItemScoreOptions.length - 1];
+            self.ItemMinScore = self.ItemTotalScore;
             self.ScoreOptionsTips1 = false;
           }else{
             self.ScoreOptionsTips1 = true;
@@ -1589,9 +1688,55 @@ export default {
       this.groupNameInput = val;
     },
 
-    hideHandleItemDialog(){
-      this.showAddNape = false;
+    getSubCategorySequence(children){
+      this.oldSubcategorySequence = children.map(value => value.sequence);
+    },
+
+    handleUpdateSubCategorySequence(children){
+      this.newSubcategorySequence = children.map(value => {
+        return {
+          id: value.id,
+          name: value.name,
+          parentId: value.parentId,
+          sequence: value.sequence
+        }
+      });
+      this.updateCategorySequence(this.oldSubcategorySequence, this.newSubcategorySequence);
+    },
+
+    handleUpdateCategorySequence(){
+      this.newGroupSequence = this.groupList.map(value => {
+        return {
+          id: value.id,
+          name: value.name,
+          parentId: value.parentId,
+          sequence: value.sequence
+        }
+      });
+      this.updateCategorySequence(this.oldGroupSequence, this.newGroupSequence);
+    },
+
+    updateCategorySequence(oldSequenceList, newSequenceList){
+      const params = {};
+      params.groups = [];
+      newSequenceList.forEach((item, index) => {
+        let itemObj = {};
+        itemObj.id = item.id;
+        itemObj.name = item.name;
+        itemObj.parentId = item.parentId;
+        itemObj.sequence = oldSequenceList[index];
+        params.groups.push(itemObj);
+      })
+
+      if(params.groups.length > 0){
+        inpectRESTful.updateInspectGroup(params).then(res => {
+          console.log(res);
+        }).catch(err => {
+          console.log('updateItemsSequence: ' + err);
+        })
+      }
     }
+
   },
 
   beforeRouteLeave(to, from, next) {
@@ -2219,6 +2364,16 @@ export default {
         }
       }
     }
+
+  .score-content{
+    padding: 20px calc(20/1920*100vw);
+    border: 1px solid #e3e9f4;
+    height: auto;
+    position: relative
+  }
+  .el-radio{
+    margin-right: calc(20/1920*100vw);
+  }
 </style>
 <style>
 .el-rute-post .el-select.el-select--mini{
