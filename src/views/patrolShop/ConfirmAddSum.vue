@@ -105,17 +105,23 @@
                         </div>
                         <div class="score-title" v-if="categoryItem.itemType === 0">
                           <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                          <div v-if="(categoryItem.type === 0 ||categoryItem.type === 2)&&item.detailType !== 1"
-                               class="title-btn">
-                            {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
-                          </div>
-                          <div v-if="categoryItem.type==1&&item.detailType!=1" class="title-btn">
-                            {{ $t('remotePatrol.scoreUnit') }}
-                            <span>
-                              <span>{{ categoryItem.itemgetScore }}</span>
-                              <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
+                          <template v-if="item.detailType !== 1">
+                            <div v-if="categoryItem.type === 0"
+                                 class="title-btn">
+                              {{ $t('remotePatrol.scoreUnit') }}<span>{{ tab1BtnArr[1] }}</span>
+                            </div>
+                            <div v-if="categoryItem.type === 2"
+                                 class="title-btn">
+                              {{ $t('remotePatrol.scoreUnit') }}<span>{{ tab3BtnArr[1] }}</span>
+                            </div>
+                            <div v-if="categoryItem.type === 1" class="title-btn">
+                              {{ $t('remotePatrol.scoreUnit') }}
+                              <span>
+                                <span>{{ categoryItem.itemgetScore }}</span>
+                                <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
                             </span>
-                          </div>
+                            </div>
+                          </template>
                           <div class="total-score" v-if="categoryItem.showTotalScore">
                             {{$t('remotePatrol.totalScoreUnit')}}{{categoryItem.itemScore}}
                           </div>
@@ -579,10 +585,16 @@
               const objItem = {};
               objItem.ts = new Date().getTime();
               objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
-              if (inspect[i].type === 0 || inspect[i].type === 2) {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
+              if (inspect[i].inspectList[g].items[j].itemType === 1) {
+                objItem.grade = Math.pow(-2,31);
               } else {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
+                if (inspect[i].type === 0 || inspect[i].type === 2) {
+                  objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
+                  inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
+                } else {
+                  objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
+                  inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
+                }
               }
 
               objItem.storeId = self.store.storeId;
@@ -716,9 +728,9 @@
         });
         let Tab0Status = false;
         let inspectPic = 0;
+        let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
+        let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
         inspect.forEach(p_item => {
-          let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
-          let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
           p_item.inspectList.forEach(item => {
             let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
             let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
@@ -825,7 +837,7 @@
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;;
+                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
               } else {
                 item['itemgetScore'] = tab1GetScoreNoContainedIngored;
               }
@@ -837,7 +849,7 @@
                   item['itemgetScore'] = tab1GetScoreNoContainedIngored;
                 }
               } else {
-                item['itemgetScore'] = '--';
+                item['itemgetScore'] = p_item.type === 0 ? '--' : item['itemgetScore'];
               }
             }
             if (p_item.type === 0) {
@@ -962,8 +974,6 @@
         });
         const eventpic = eventList.filter(x => x.sourceObj != null);
         self.totalnumOfPic = Number(inspectPic) + Number(eventpic.length);
-        this.getNoteableData();
-        this.getIgnoreData();
         tempList[0] = {
           itemTitleName: self.$t('remotePatrol.notableItem'),
           iconSrc: 'icon-zhongxindingwei',
@@ -1024,11 +1034,6 @@
         console.log(group)
         return group;
       },
-
-      getNoteableData(){
-      },
-
-      getIgnoreData(){},
 
       groupbyKey(data, key) {
         var map = {},
