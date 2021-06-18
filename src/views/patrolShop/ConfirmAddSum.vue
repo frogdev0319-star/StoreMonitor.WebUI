@@ -30,7 +30,7 @@
         <span v-if="adviceInfoRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
       </div>
     </el-col>
-    <el-col :span="24" class="sum-data">
+    <el-col :span="24" class="sum-data" v-if="!allRemarkItemsFlag">
       <el-row class="divider-content">
         <el-col :span="11">
           <hr class="divider-hr">
@@ -421,7 +421,8 @@
         lang: this.$i18n.locale,
         adviceInfoRuletip: false,
         tab1BtnArr: [],
-        tab3BtnArr: []
+        tab3BtnArr: [],
+        allRemarkItemsFlag: true
       };
     },
     computed: {
@@ -714,6 +715,7 @@
         self.store = store;
         self.inspectList = routeData.inspect;
         self.eventList = routeData.event;
+        self.allRemarkItemsFlag = routeData.allRemarkItemsFlag;
         this.getTab1AndTab3BtnName(inspectSettings);
         const allTypeArr = new Set();
         let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
@@ -740,8 +742,12 @@
             let tab2IgnoredItemsGetScore = 0;
             item.ignoreItems = [];
             item.unqualifiedItems = [];
+            item.numOfCommentItem = 0;
+            item.numOfTotalItems = 0;
             item.items.forEach(s_item => {
+              item.numOfTotalItems ++;
               if (s_item.itemType === 1){
+                item.numOfCommentItem ++;
                 return;
               }
               if (s_item.isIgnore) {
@@ -1036,10 +1042,19 @@
       },
 
       groupbyKey(data, key) {
-        var map = {},
-          dest = [];
-        for (var i = 0; i < data.length; i++) {
-          var ai = data[i];
+        const tempData = [];
+        data.forEach((item) => {
+          const res = item.inspectList.filter(inspect => {
+            return inspect.numOfCommentItem !== inspect.numOfTotalItems;
+          });
+          if (res && res.length) {
+            item.inspectList = res;
+            tempData.push(item);
+          }
+        })
+        let map = {}, dest = [];
+        for (var i = 0; i < tempData.length; i++) {
+          var ai = tempData[i];
           if (!map[ai[key]]) {
             dest.push({
               name: ai[key],
