@@ -89,9 +89,12 @@
             <span v-if="ScoreMsg" class="score_msg">*{{ $t('insSettingView.rangeScoreTips') }}</span>
             <template v-if="hundredMarkType === '1'">
               <span class="rangeScore">
-              {{ $t('remotePatrol.totalScoreUnit') }}
+              {{ $t('remotePatrol.startingScore') }}
             </span>
               <el-input :placeholder="$t('insSettingView.setMinScore')" v-model="baseScore" class="input" @input="inputChangeBaseScore"/>
+              <span class="input-text">
+              {{ $t('remotePatrol.scorecount') }}
+            </span>
             </template>
           </p>
         </div>
