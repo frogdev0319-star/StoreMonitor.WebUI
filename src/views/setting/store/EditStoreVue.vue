@@ -672,6 +672,8 @@ export default {
                 }
                 .subcatergy-title{
                   @extend .grouptitle;
+                  border-left-width: 0px;
+                  padding-left: 0px;
                   font-size: 14px;
                 }
                 .schedule-data{
