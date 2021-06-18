@@ -211,7 +211,7 @@
         const switches = this.curTemplate.config.switches;
         util.sortArrayByKeyAsc(switches, 'position');
         this.basicList = switches.slice(1, 4);
-        this.list = switches.slice(4, switches.length -1);
+        this.list = switches.slice(4);
         this.ifShowAllDetails = switches[0].enable ? 1 : 0;
       },
 
@@ -403,11 +403,6 @@
             "enable": !!this.ifShowAllDetails,
             "name": "defaultAll",
             "position": -1
-          },
-          {
-            "enable": false,
-            "name": "notJoinItem",
-            "position": 8
           }
         );
         const updateTemplParmas = {};
