@@ -277,7 +277,8 @@ export default {
       roleId: 0,
       templateRoleId: 0,
       ifAccessVideo: 0,
-      ifReceiveMes: 0
+      ifReceiveMes: 0,
+      hasCheckedAuthoritiesList: []
     };
   },
 
@@ -292,7 +293,7 @@ export default {
             _item.disabled = true;
           });
         });
-        this.getAvailableAuthority(this.authorityInfoLists[newValue - 1].availableAuth);
+        this.getAvailableAuthority(this.authorityInfoLists[newValue - 1].availableAuth, false);
       }
     }
   },
@@ -330,7 +331,7 @@ export default {
       });
     },
 
-    getAvailableAuthority(authorities) {
+    getAvailableAuthority(authorities, resetFlag = true) {
       PermissionHelper.setData(authorities);
       this.roleNameList[0].children[0].checked = !!PermissionHelper.enableRemoteOverview();
       this.roleNameList[0].children[1].checked = !!PermissionHelper.enableEventOverview();
@@ -358,7 +359,7 @@ export default {
       this.roleNameList[4].children[3].checked = !!PermissionHelper.enableScheduleSetting();
       this.roleNameList[4].children[4].checked = !!PermissionHelper.enableReportSetting();
 
-      if (authorities.length === 6) {
+      if (authorities.length === 6 && resetFlag) {
         this.ifAccessVideo = PermissionHelper.enableVideo() ? 1 : 0;
         this.ifReceiveMes = PermissionHelper.enableMessage() ? 1 : 0;
       }
@@ -398,6 +399,8 @@ export default {
     },
 
     getTemplateAuthorities() {
+      this.getSelectedAuthorities();
+      this.hasCheckedAuthoritiesList = JSON.parse(JSON.stringify(this.infoForm.authorities));
       this.showRolesList = true;
       this.templateRoleId = 1;
       this.getAvailableAuthority(this.authorityInfoLists[this.roleId - 1].availableAuth);
@@ -407,7 +410,7 @@ export default {
       this.showRolesList = false;
       this.templateRoleId = 0;
       this.setDefaultValueOfRoleNameList();
-      this.getAvailableAuthority(this.infoForm.authorities);
+      this.getAvailableAuthority(this.hasCheckedAuthoritiesList);
     },
 
     saveTemplateTitle() {

@@ -72,11 +72,15 @@
           <setting-table :table-name="$t('remotePatrol.detailInfo')">
             <template slot="tableDetail">
               <div class="detail-setting">
-                <div>
+                <div style="position: relative">
                   <el-radio-group v-model="ifShowAllDetails" class="radio-setting" textColor="#7d8cad">
                     <el-radio :label="1">{{$t('titleView.showAllDetails')}}</el-radio>
                     <el-radio :label="0">{{$t('titleView.showPartsDetails')}}</el-radio>
                   </el-radio-group>
+                  <div class="promot-info" v-if="ifShowAllDetails === 0">
+                    <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
+                    {{ $t('titleView.draggableInfo') }}
+                  </div>
                 </div>
                 <template v-if="ifShowAllDetails === 0">
                   <div class="table-header">
@@ -207,7 +211,7 @@
         const switches = this.curTemplate.config.switches;
         util.sortArrayByKeyAsc(switches, 'position');
         this.basicList = switches.slice(1, 4);
-        this.list = switches.slice(4);
+        this.list = switches.slice(4, switches.length -1);
         this.ifShowAllDetails = switches[0].enable ? 1 : 0;
       },
 
@@ -399,6 +403,11 @@
             "enable": !!this.ifShowAllDetails,
             "name": "defaultAll",
             "position": -1
+          },
+          {
+            "enable": false,
+            "name": "notJoinItem",
+            "position": 8
           }
         );
         const updateTemplParmas = {};
@@ -654,5 +663,13 @@
   }
   .detail-table .setting-config{
     padding-left: 0;
+  }
+
+  .promot-info{
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+    font-size: 12px;
+    color: #7d8cad;
   }
 </style>

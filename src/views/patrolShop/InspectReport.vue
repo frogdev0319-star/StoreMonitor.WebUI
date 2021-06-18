@@ -3,7 +3,7 @@
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
       <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
-      <p :class="isexportPDF ? 'pdf-report-title' : 'report-title'">
+      <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
         {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
         <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
       </p>
@@ -80,7 +80,7 @@
                     </div>
                   </template>
                 </div>
-                <div v-if="showFeedBacks" style="margin-bottom:20px;">
+                <div v-if="showFeedBacks && showAllDetailsEnable" style="margin-bottom:20px;">
                   <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.feedbacks') }}</span></div>
                   <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
                     <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
@@ -178,9 +178,81 @@
             </div>
           </div>
         </el-col>
+        <el-col>
+          <div v-if="pageItem.class === 'feedback-detail'" class="row-detail">
+            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
+                 @click="hideOrShowDetail(pageItem, pageIndex)">
+              <div class="icon-header">
+                <i :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icontemp"
+                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'">
+                </i>
+                <span class="title-lable"><span class="pdf_font_20">{{ $t(`titleView.${pageItem.name}`) }}</span></span>
+              </div>
+              <div class="count-header" v-if="pageItem.itemCount > -1">
+                <span class="count"><span class="pdf_font_36">{{ pageItem.itemCount }}</span></span>
+                <span class="blag"><span class="pdf_font_18">{{ $t('remotePatrol.unit') }}</span></span>
+              </div>
+            </div>
+            <div class="item-content" v-if="pageItem.ifExpand">
+              <div v-for="(item,index) in feedbacks" :key="index" class="content-detail" style="margin-bottom: 20px">
+                <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
+                  <div class="detail-title">
+                    <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }}</span></p>
+                  </div>
+                </div>
+                <div
+                  v-if="item.showAttachment || item.description != null&&item.description !== ''"
+                  class="content-detail-main">
+                  <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
+                  <div v-if="item.showAudio" class="cdm-voice">
+                    <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
+                      <i class="iconfont icon-yuyin icon-speech"/>
+                    </div>
+                    <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
+                      <source :src="item.audio.audioSrc" type="audio/mpeg" >
+                    </audio>
+                    <span class="often-text">{{ item.audio.audioOftenText }}</span>
+                  </div>
+                  <div v-if="item.description !=null && item.description !=''" class="cdm-word">
+                    <span class="pdf_font_24">{{ item.description }}</span>
+                  </div>
+                  <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
+                    <div
+                      v-for="(sourceitem,index) in item.sourceList"
+                      :key="index"
+                      :height="imgHeight+'px'"
+                      class="source-details">
+                      <div v-if="sourceitem.mediaType === 2" class="img-content">
+                        <img
+                          :title="imgTitle"
+                          :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                          :src="sourceitem.url"
+                          :height="imgHeight+'px'"
+                          :onerror="deafultImg"
+                          class="imgLittle imgInner"
+                          @click="openOuter(sourceitem,$event)">
+                      </div>
+                      <div
+                        v-if="sourceitem.mediaType === 1"
+                        class="img-content "
+                        @click="playCommentVideo(sourceitem,index)">
+                        <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                        <img
+                          :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                          :src="videoImgSrc"
+                          :height="imgHeight+'px'"
+                          class="imgLittle">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-col>
         <el-col v-if="pageItem.class === 'row-table'">
           <table v-for="(tableItem, tableIndex) in pageItem.data" :key="tableIndex" class="table table-bordered">
-            <thead class="pdf_font_20">
+            <thead :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
               <tr v-if="tableItem[0].type === 0">
                 <th
                   v-for="(t_item ,t_index) in theaderPassFail"
@@ -204,7 +276,7 @@
               </tr>
             </thead>
             <template v-for="(categoryItem, categoryIndex) in tableItem">
-              <tbody class="pdf_font_20" :key="categoryIndex">
+              <tbody class="pdf_font_20" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
                     <span>{{ categoryItem.groupName }}</span>
@@ -268,6 +340,11 @@
               </div>
             </div>
           </div>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col class="pie-content" v-if="!hasChart" :style="isexportPDF ? 'height:450px;' : 'height:0px;'">
+          <v-chart ref="chartRadar" class="pie-chart-content" :auto-resize="true"></v-chart>
         </el-col>
       </el-row>
       <div class="no-print">
@@ -390,7 +467,8 @@ export default {
       cachedTemplateId: -1,
       showAllDetailsEnable: true,
       tab1BtnArr: [],
-      tab3BtnArr: []
+      tab3BtnArr: [],
+      hasChart: false
     };
   },
 
@@ -456,6 +534,7 @@ export default {
 
     getTemplateConfig(index){
       this.curTemplateIndex = index;
+      this.hasChart = false;
       this.setTemplateAndStaticalConfig();
       this.getPageDataBasedOnTemplate(this.reportData);
       this.saveTemplateId();
@@ -483,7 +562,7 @@ export default {
               }
             }, timer * 10);
             console.log('timer', timer);
-            document.getElementById('isNeedRemove').remove();
+            document.getElementById('isNeedRemove') && document.getElementById('isNeedRemove').remove();
             self.isexportPDF = false;
           });
           window.clearInterval(timer);
@@ -757,7 +836,10 @@ export default {
           pageData.push(returnDataJson);
         }
       });
-      this.showAllDetailsEnable && pageData.push(pageData.shift(pageData.length - 1));
+      if(this.showAllDetailsEnable){
+        pageData.push(pageData.shift(pageData.length - 1));
+        this.getFeedbacks(data);
+      }
       if(this.isInsiteInspect && this.signaturesList.length > 0){
         const signatureObj = {name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList};
         pageData.push(signatureObj);
@@ -860,6 +942,7 @@ export default {
     },
 
     getOptions(data){
+      this.hasChart = true;
       const options = this.getStaticOptions(data.summary);
       return {class: 'radior-content', data: options};
     },
@@ -945,7 +1028,7 @@ export default {
         });
         this.feedbacks = feedbackTemp;
       }
-      return {class: 'row-detail', ifExpand: false, itemCount: this.feedbacks.length, data: this.feedbacks};
+      return {class: 'feedback-detail', ifExpand: false, itemCount: this.feedbacks.length, data: this.feedbacks};
     },
 
     getFocalItems(){
@@ -1379,6 +1462,9 @@ export default {
         display: inline-block;
         margin-left: calc(20 / 1920 * 100vw);
       }
+      .nochart-report-title{
+        font-size: 20px;
+      }
       .info-content {
         position: absolute;
         right: calc(110 / 1920 * 100vw);
@@ -1428,13 +1514,13 @@ export default {
         font-weight: bold;
         background-color: $suggestBack;
         color: $qualified;
-        padding-left: calc(30 / 1920 * 100vw);
-        border: 1px solid #a0c1f8;
         max-height: 100px;
         height: auto;
         overflow-y: auto;
         .suggest-content {
           display: flex;
+          padding-left: calc(30 / 1920 * 100vw);
+          border: 1px solid #a0c1f8;
         }
         span:first-child {
           padding-right: 20px;

@@ -509,7 +509,7 @@ export default {
       elPDFtableData: [],
       htmlTitle: this.$t('overview.htmltopdfC'),
       defaultSort: { prop: 'completionRateStr', order: 'ascending' },
-      inspectTagId: null,
+      inspectTagId: -1,
       inspectList: []
     };
   },
@@ -527,13 +527,14 @@ export default {
         this.defaultSort = { prop: 'completionRateStr', order: 'ascending' };
         this.params = {};
         this.getSearchParams();
+        this.getInspctList();
       }
     }
   },
 
   async created() {
-    this.getInspctList();
     this.getSearchParams();
+    this.getInspctList();
   },
 
   methods: {
@@ -947,12 +948,14 @@ export default {
         inpectRESTful.GetInspectTagList(params).then(res => {
           if (res.errCode === 0) {
             this.inspectList = res.data;
-            this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : '';
+            if(this.inspectTagId === -1){
+              this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : -1;
+            }
             this.getInspectPersonTable();
             resolve(res);
           } else {
             this.inspectList = [];
-            this.inspectTagId = '';
+            this.inspectTagId = -1;
             resolve(res);
           }
         }).catch(err => {
