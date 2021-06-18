@@ -43,17 +43,17 @@
             {{ $t('insSettingView.CalculationMethod') }}：
           </p>
           <p class="rule-item">
-            <el-radio v-model="hundredMarkType" label="0" class="radio">
-              {{ $t('insSettingView.Proportional') }}
-            </el-radio>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              placement="bottom-end">
-              <div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>
-              <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
-            </el-tooltip>
-            <el-radio v-model="hundredMarkType" label="-1" class="radio" style="margin-left: calc(40/1920*100vw);">
+            <!--<el-radio v-model="hundredMarkType" label="0" class="radio">-->
+              <!--{{ $t('insSettingView.Proportional') }}-->
+            <!--</el-radio>-->
+            <!--<el-tooltip-->
+              <!--class="item"-->
+              <!--effect="dark"-->
+              <!--placement="bottom-end">-->
+              <!--<div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>-->
+              <!--<i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>-->
+            <!--</el-tooltip>-->
+            <el-radio v-model="hundredMarkType" label="-1" class="radio">
               {{ $t('insSettingView.totalScore') }}
             </el-radio>
             <el-tooltip
@@ -70,7 +70,7 @@
               class="item"
               effect="dark"
               placement="bottom-end">
-              <div slot="content">{{ $t('insSettingView.totalScoreDes') }}</div>
+              <div slot="content">{{ $t('insSettingView.totalScoreDes') }} + {{$t('insSettingView.accumulateTotalScore')}}</div>
               <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
             </el-tooltip>
           </p>
