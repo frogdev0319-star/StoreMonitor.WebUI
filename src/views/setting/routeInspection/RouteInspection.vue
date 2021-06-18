@@ -741,7 +741,7 @@
               cellAddress,
               parent: null,
               header,
-              tag: header && header.v && header.v.replace(/(\r)|(\n)|\(.*\)|\（.*\）/g, '')
+              tag: header && header.v && this.formatTableHeader(header.v)
             }
           }})
       },
@@ -787,10 +787,6 @@
         let primaryGroupCelss = []
         let secondaryGroupCells = []
         let groupItemCells = []
-
-        console.log(primaryColumnCells);
-        console.log(primaryColumnCells.some(cell => cell.v));
-        console.log(sheet);
 
         if (!primaryColumnCells.some(cell => cell.v) && type === 'PassFail') {
           primaryColumnCells = [{ ...primaryColumnCells[0], v: '巡检评分项'}]
@@ -1101,13 +1097,14 @@
             let key = cell.header && cell.header.tag;
             if (!mapping[key]) return;
             if ('availableScore' === mapping[key]) {
-              item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : [];
+              item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
             } else if ('itemScore' === mapping[key]) {
-              item[mapping[key]] = cell.v ? Number(cell.v) : 10;
+              item[mapping[key]] = cell.v ? Number(cell.v) : cell.v === 0 ? 0 : 10;
               if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1)
             } else if ('description' === mapping[key]) {
               item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
-            } else {
+            }
+            else {
               item[mapping[key]] = cell.v || ''
             }
           })
@@ -2164,13 +2161,13 @@
                   if (type === 0 || type === 2){
                     obj[tableHeader[1]] = '';
                     obj[tableHeader[2]] = _item.name;
-                    obj[tableHeader[3]] = _item.score;
+                    obj[tableHeader[3]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
                     obj[tableHeader[4]] = _item.description === '---' ? '' : _item.description;
                   } else {
                     obj[tableHeader[1]] = '';
                     obj[tableHeader[2]] = _item.name;
-                    obj[tableHeader[3]] = _item.availableScores;
-                    obj[tableHeader[4]] = _item.qualifiedScore;
+                    obj[tableHeader[3]] = _item.type === 0 ? _item.availableScores : 0;
+                    obj[tableHeader[4]] = _item.type === 0 ?_item.qualifiedScore : 0;
                     obj[tableHeader[5]] = _item.description === '---' ? '' : _item.description;
                   }
                   sheetData.push(obj);
@@ -2204,12 +2201,12 @@
                     }
                     if (type === 0 || type === 2){
                       obj[tableHeader[2]] = childItem.name;
-                      obj[tableHeader[3]] = childItem.score;
+                      obj[tableHeader[3]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
                       obj[tableHeader[4]] = childItem.description === '---' ? '' : childItem.description;
                     } else {
                       obj[tableHeader[2]] = childItem.name;
-                      obj[tableHeader[3]] = childItem.availableScores;
-                      obj[tableHeader[4]] = childItem.qualifiedScore;
+                      obj[tableHeader[3]] = childItem.type === 0 ? childItem.availableScores : 0;
+                      obj[tableHeader[4]] = childItem.type === 0 ? childItem.qualifiedScore : 0;
                       obj[tableHeader[5]] = childItem.description === '---' ? '' : childItem.description;
                     }
                     sheetData.push(obj);
