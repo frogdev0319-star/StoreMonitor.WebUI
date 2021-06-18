@@ -35,6 +35,7 @@
     "laydate": "^1.0.7",
     "moment": "^2.24.0",
     "multirangeslider": "^0.6.0",
+    "nanoclone": "^0.2.1",
     "popper.js": "^1.14.7",
     "pubsub-js": "^1.7.0",
     "save": "^2.4.0",
@@ -46,9 +47,9 @@
     "vue-i18n": "^8.11.2",
     "vue-router": "^3.0.1",
     "vue-video-player": "^5.0.2",
+    "vuedraggable": "2.20.0",
     "vuex": "^3.0.1",
-    "xlsx": "^0.14.1",
-    "vuedraggable": "2.20.0"
+    "xlsx": "^0.14.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
