@@ -899,11 +899,17 @@ export default {
         if(!item.children){
           item.children = [];
           item.children.push(item);
+        } else {
+          item.children.forEach(child => {
+            item.numOfCommentItems += child.numOfCommentItems;
+            item.numOfTotalItems += child.numOfTotalItems;
+          })
         }
-      })
+      });
+      const filterTree = summaryTree.filter(item => item.numOfTotalItems !== item.numOfCommentItems);
       const te_temp = [];
       for (let i = 0; i < 3; i++) {
-        const typeIndex = summaryTree.filter(x => x.type === i);
+        const typeIndex = filterTree.filter(x => x.type === i);
         if (typeIndex.length !== 0) {
           typeIndex[0].type === 0 ? te_temp.push(typeIndex) : '';
           typeIndex[0].type === 1 ? te_temp.push(typeIndex) : '';
@@ -949,6 +955,7 @@ export default {
 
     getStaticOptions(summary){
       if (summary.length === 0) {
+        this.hasChart = false;
         return null;
       }
       const summaryTree = this.getCategorySummary(summary);
@@ -966,9 +973,12 @@ export default {
           summaryItem.numOfTotalItems = this.addChildrenDataToParent(summaryItem.children, 'numOfTotalItems');
           summaryItem.totalScore = this.addChildrenDataToParent(summaryItem.children, 'totalScore');
           summaryItem.actualScore = this.addChildrenDataToParent(summaryItem.children, 'actualScore');
+          summaryItem.numOfTotalItems = this.addChildrenDataToParent(summaryItem.children, 'numOfTotalItems');
+          summaryItem.numOfCommentItems = this.addChildrenDataToParent(summaryItem.children, 'numOfCommentItems');
         }
       });
-      return summaryTree;
+      const filterTree = summaryTree.filter(item => item.numOfTotalItems !== item.numOfCommentItems);
+      return filterTree;
     },
 
     addChildrenDataToParent(jsonArr, key){
