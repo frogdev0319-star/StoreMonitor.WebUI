@@ -9,7 +9,9 @@
           <i :class="store.storeUp?'coll-icon':'nocoll-icon'" class="iconfont icon-iconfontstart" style="vertical-align: middle;"/>
           <span :class="store.storeUp?'coll-font':'nocoll-font'">{{ store.storeUpTitle }}</span>
         </div>
-        <el-button v-if="sheetName.length!=0" :disabled="isDisabled?false:true" :class="lang== 'en' ? 'en-el-submit' :'el-submit'" :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
+        <el-button v-if="sheetName.length!=0" :disabled="!allRemarkItemsFlag && !isDisabled"
+                   :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
+                   :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
           {{ $t('remotePatrol.confirmSum') }}
         </el-button>
       </div>
@@ -369,30 +371,32 @@
                     :title="`${index+1}. ${item.subject}`"
                     class="titles"
                     @click="clickItem(item,index)">{{ `${index+1}. ${item.subject}` }}</span>
-                  <div v-if="item.disabled" class="dropdown-model"/>
-                  <div v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
-                    <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
-                       :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
-                      {{ itemDS.scoreTitle }}
-                    </p>
-                  </div>
-                  <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                               trigger="click" class="item-score" size="small">
+                  <template v-if="item.itemType === 0">
+                    <div v-if="item.disabled" class="dropdown-model"/>
+                    <div v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
+                      <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                         :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
+                        {{ itemDS.scoreTitle }}
+                      </p>
+                    </div>
+                    <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                                 trigger="click" class="item-score" size="small">
                     <span class="el-dropdown-link">
                       {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                       <i class="el-icon-arrow-down el-icon--right"/>
                     </span>
-                    <el-dropdown-menu slot="dropdown" class="score-menu">
-                      <el-dropdown-item
-                        v-for="itemDS in item.itemScoreLength"
-                        :key="itemDS"
-                        style="width:70px;text-align:center;"
-                        @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                  <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,0)"/>
-                  <img v-if="item.manualIgnore" class="iconfont iconhulve"
-                       src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
+                      <el-dropdown-menu slot="dropdown" class="score-menu">
+                        <el-dropdown-item
+                          v-for="itemDS in item.itemScoreLength"
+                          :key="itemDS"
+                          style="width:70px;text-align:center;"
+                          @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,0)"/>
+                    <img v-if="item.manualIgnore" class="iconfont iconhulve"
+                         src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
+                  </template>
                   <div v-if="item.checked" class="icon-clicked"/>
                   <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
                     <span>{{ item.description }}</span>
@@ -474,24 +478,29 @@
                     class="titles"
                     @click="clickItem(item,index)">{{ `${index+1}. ${item.subject}` }}</span>
                   <div v-if="item.disabled" class="dropdown-model"/>
-                  <div v-if="item.type!=1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
-                    <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs" :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkIgnoreScore(item,itemDS,0,index)">{{ itemDS.scoreTitle }}</p>
-                  </div>
-                  <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'" trigger="click" class="item-score" size="small">
+                  <template v-if="item.itemType === 0">
+                    <div v-if="item.type!=1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
+                      <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                         :class="itemDS.isClick?'check_isClick':'check_normal'"
+                         @click="checkIgnoreScore(item,itemDS,0,index)">{{ itemDS.scoreTitle }}</p>
+                    </div>
+                    <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'" trigger="click" class="item-score" size="small">
                     <span class="el-dropdown-link">
                       {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                       <i class="el-icon-arrow-down el-icon--right"/>
                     </span>
-                    <el-dropdown-menu slot="dropdown" class="score-menu">
-                      <el-dropdown-item
-                        v-for="itemDS in item.itemScoreLength"
-                        :key="itemDS"
-                        style="width:70px;text-align:center;"
-                        @click.native="checkIgnoreScore(item,itemDS,1,index)">{{ itemDS }}</el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                  <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,1)"/>
-                  <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
+                      <el-dropdown-menu slot="dropdown" class="score-menu">
+                        <el-dropdown-item
+                          v-for="itemDS in item.itemScoreLength"
+                          :key="itemDS"
+                          style="width:70px;text-align:center;"
+                          @click.native="checkIgnoreScore(item,itemDS,1,index)">{{ itemDS }}</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,1)"/>
+                    <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_cancel.png"
+                         @click="CancleIgnoreItem(item,index)">
+                  </template>
                   <div v-if="item.checked" class="icon-clicked"/>
                   <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
                     <span>{{ item.description }}</span>
@@ -922,7 +931,7 @@ export default {
       isCategory: false,
       itemOptionsForType1: [],
       itemOptionsForType3: [],
-
+      allRemarkItemsFlag: false
     };
   },
   computed: {
@@ -1454,6 +1463,15 @@ export default {
       if (tempId != null) {
         if (!self.showIgnoreItem) {
           self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+          if(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].itemType === 1){
+            if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
+              this.sheetName[this.curSheetIndex].dealCount++;
+              this.sheetName[this.curSheetIndex].Effective++;
+              this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
+              this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].Effective++;
+            }
+            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
+          }
         } else {
           self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
         }
@@ -1529,6 +1547,7 @@ export default {
         });
       });
     },
+
     checkIgnoreScore(item, itemDS, e, index) {
       const self = this;
       item.manualIgnore = false;
@@ -1554,6 +1573,7 @@ export default {
       }
       item.dealCount = item.Effective = item.inputCount = 1;
     },
+
     checkScore(item, itemDS, e) {
       const self = this;
       item.scoreList.forEach(s_item => {
@@ -1972,7 +1992,12 @@ export default {
       const self = this;
       item.sourceList.splice(index, 1);
       self.sourceListLength--;
+      if(self.sourceListLength === 0 && item.itemType === 1 && item.inspectInput.length === 0){
+        self.sheetName[self.curSheetIndex].dealCount != 0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
+        this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount = 0;
+      }
     },
+
     handleIgnore() {
       const self = this;
       self.curItem.manualIgnore = true;
@@ -1992,7 +2017,8 @@ export default {
         }
       } else {
         self.showGuide = false;
-        if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount != 0 && self.sheetName[self.curSheetIndex].Effective != 0) {
+        if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount != 0
+          && self.sheetName[self.curSheetIndex].Effective != 0) {
           self.sheetName[self.curSheetIndex].Effective--;
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
@@ -2031,6 +2057,7 @@ export default {
         self.isDisabled ? self.isShowWarn = true : self.isShowWarn = false;
       }
     },
+
     cancleIgnore() {
       const self = this;
       self.curItem.manualIgnore = false;
@@ -2392,7 +2419,11 @@ export default {
           count = count + s_item.count;
         });
       }
-      if (dealCount < count) {
+      if(this.allRemarkItemsFlag && dealCount === 0){
+        util.notify(this.$t('remotePatrol.invalidInspection'), 'warning', 3000);
+        return false;
+      }
+      if (!this.allRemarkItemsFlag && dealCount < count) {
         self.noAllInspectObj.dialogCosed = true;
         return false;
       }
@@ -3127,6 +3158,7 @@ export default {
             }
           });
           sessionStorage.setItem('inspectSettings', JSON.stringify(inspectSettings));
+          this.checkIfAllItemsAreRemark(data);
           const temp = [];
           data.forEach((item, index) => {
             const obj = {};
@@ -3184,6 +3216,7 @@ export default {
                 {val: _item.itemScore, scoreTitle: btnNameArr[0], isClick: false},
                 {val: -1, scoreTitle: btnNameArr[1], isClick: false}
                 ];
+              itemObj.itemType = _item.type;
               tempItems.push(itemObj);
             });
             obj.items = tempItems;
@@ -3241,6 +3274,23 @@ export default {
         [this.itemOptionsForType1[0].name , this.itemOptionsForType1[1].name] :
         [this.itemOptionsForType3[0].name , this.itemOptionsForType3[1].name];
       return nameBtnArr;
+    },
+
+    checkIfAllItemsAreRemark(groupsArr){
+      let tempArr = [];
+      groupsArr.forEach(group => {
+        tempArr.push(...group.items);
+      })
+      const remarkItemsArr = tempArr.filter(item => item.type === 1);
+      if(remarkItemsArr.length === tempArr.length){
+        this.allRemarkItemsFlag = true;
+        this.notShowAlert = true;
+        this.isDisabled = false;
+      } else {
+        this.allRemarkItemsFlag = false;
+        this.notShowAlert = false;
+        this.isDisabled = false;
+      }
     },
 
     hasIgnoreItem() {
@@ -3391,8 +3441,24 @@ export default {
       if (tempId != null) {
         if (!self.showIgnoreItem) {
           self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
+          if(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].itemType === 1){
+            if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
+              this.sheetName[this.curSheetIndex].dealCount++;
+              this.sheetName[this.curSheetIndex].Effective++;
+              this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
+              this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].Effective++;
+            }
+            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
+          }
         } else {
           self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
+          if (self.hasIgnoretemp[tempId.itemIndex].inputCount === 0) {
+            this.sheetName[this.curSheetIndex].dealCount++;
+            this.sheetName[this.curSheetIndex].Effective++;
+            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
+            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].Effective++;
+          }
+          this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
         }
       } else {
         self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
@@ -3436,6 +3502,27 @@ export default {
       } else {
         item.Ruletip = false;
       }
+      if(!this.showIgnoreItem){
+        if (item.itemType === 1 && length > 0) {
+          if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
+            this.sheetName[this.curSheetIndex].dealCount++;
+            this.sheetName[this.curSheetIndex].Effective++;
+            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
+            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].Effective++;
+          }
+          this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
+        } else if (item.itemType === 1 && length === 0 && this.sourceListLength === 0) {
+          this.sheetName[this.curSheetIndex].dealCount != 0 ? this.sheetName[this.curSheetIndex].dealCount-- : null;
+          this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount = 0;
+        }
+      } else {
+        if(item.itemType === 1 && length > 0){
+          item.inputCount = 1;
+        } else if(item.itemType === 1 && length === 0 && item.sourceList.length === 0){
+          item.inputCount = 0;
+        }
+      }
+
     },
     eventNameChanged(val) {
       const self = this;
