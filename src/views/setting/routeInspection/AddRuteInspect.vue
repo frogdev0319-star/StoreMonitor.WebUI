@@ -1196,7 +1196,7 @@ export default {
             self.ScoreOptionsTips0 = true;
           }
         } else {
-          self.ItemScoreOption = '10';
+          self.ItemScoreOption = '0';
         }
         if(self.ItemTotalScore === ''){
           self.ItemTotalScoreTip0 = true;
@@ -1423,7 +1423,7 @@ export default {
       });
 
       this.activeParentId = this.activeParentId === -1 ? filterData[0].id : this.activeParentId;
-      if (filterData[0].children) {
+      if (filterData[index].children) {
         this.activeChildId = this.activeChildId === -1 ? filterData[0].children[0].id : this.activeChildId;
       } else {
         this.activeChildId = -1;

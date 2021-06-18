@@ -2322,7 +2322,8 @@ export default {
         inspect: sheetName,
         event: self.eventList,
         store: self.store,
-        channel: self.channel
+        channel: self.channel,
+        allRemarkItemsFlag: self.allRemarkItemsFlag
       };
       const hasIgnoretemp = [];
       temp.forEach(item => {
@@ -2447,7 +2448,8 @@ export default {
         inspect: sheetName,
         event: self.eventList,
         store: self.store,
-        channel: self.channel
+        channel: self.channel,
+        allRemarkItemsFlag: self.allRemarkItemsFlag
       };
       self.historyObj = {
         storeList: self.tabList[Number(self.activeIndex)].storeList,
