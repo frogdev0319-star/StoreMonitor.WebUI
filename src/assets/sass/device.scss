@@ -1,0 +1,91 @@
+@import "./mixin.scss";
+@import "./element_ui.scss";
+
+$mainColor:#f31d65;
+$border:#e3e9f4;
+$background:#f4f5f9;
+$tab:#7d8cad;
+
+.device-container{
+  border: 1px solid $border;
+  background-color: #fff;
+  min-height: calc(100vh - 80px - 46px - calc(60/1920*100vw));
+}
+.operation-btns{
+  float: right;
+  @include point(margin-right,15);
+  .el-add-btn{
+    background-color: $mainColor;
+    border-color:  $mainColor;
+    color: #fff;
+    font-size: calc(14/1920*100vw);
+    text-align: center;
+    width: calc(130/1920*100vw);
+    &:disabled{
+      opacity: 0.6;
+    }
+    span{
+      position: relative;
+    }
+  }
+  .btn-class{
+    height: calc(36/1920*100vw);
+    padding: 0;
+    font-size: calc(14/1920*100vw);
+    width: calc(130/1920*100vw);
+    .el-icon-plus, .icon-shanchu, .icon-authorize{
+      font-size: calc(16/1920*100vw);
+      margin-right: calc(8/1920*100vw);
+    }
+    @media screen and (max-width: 1440px) {
+      width: 100px !important;
+    }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+.btn-col{
+  border-bottom:  1px solid $border;
+  overflow: hidden;
+  height: 70px;
+  line-height: 70px;
+}
+
+.table-container{
+  min-height: calc(100% - 75px);
+  margin: 20px calc(20/1920*100vw);
+  .iconfont{
+    font-size: calc(24/1920*100vw);
+    color: $tab;
+  }
+}
+.get-button.el-button{
+  background-color: $mainColor;
+  border-color:  $mainColor;
+  color: #fff;
+  position: absolute;
+  right: calc(10/1920*100vw);
+  height: 24px;
+  font-size: 12px;
+}
+.account-list{
+  padding: 20px calc(20/1920*100vw);
+  border: 1px solid $border ;
+  height: auto;
+  position: relative;
+  .buttom-div{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+}
+.rules{
+  font-size: 10px;
+  line-height: 20px;
+  color: #ff2400;
+  display: block;
+}
+
