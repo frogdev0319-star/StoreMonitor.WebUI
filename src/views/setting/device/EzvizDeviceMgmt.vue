@@ -1,452 +1,486 @@
 <template>
-  <el-row :style="{'height':varyWindowHeight-170+'px'}" class="el-device">
-    <el-col :span="24" class="el-btns">
-      <div v-if="activeName === 'ezvizAccount'" class="device-btns">
-        <delay-button
-          type="primary"
-          size="mini"
-          class="inspction-btn"
-          @click="callChildAdd"
-        >
-          <div class="button-area">
-            <i class="iconfont el-icon-plus"/>
-            <span>{{ $t('deviceView.addEzvizAccount') }}</span>
+  <div class="el-device">
+    <div class="account-title">
+      <span>{{ accountSettingMsg }}—{{ ezvizAccount }}</span>
+    </div>
+    <div class="device-content">
+      <el-col :span="lang === 'en' && varWindowWidth < 1920 ? 11 : 11" class="lisde">
+        <div class="device-info">
+          <span class="info-title">{{ $t('deviceView.deviceInfo') }}</span>
+          <div class="operation-btns">
+            <el-button
+              :class=" lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
+              class="btn-class"
+              size="mini"
+              type="primary"
+              @click="showAddDialog"
+            >
+              <div class="btn-area">
+                <i class="iconfont el-icon-plus"/>
+                <span>{{ $t('deviceView.addDevice') }}</span>
+              </div>
+            </el-button>
+            <el-button
+              :disabled="tableData.length === 0"
+              class="el-delete-btn btn-class"
+              size="mini"
+              type="primary"
+              @click="showDeleteDialogMethod(0)"
+            >
+              <div class="btn-area">
+                <i class="iconfont icon-shanchu"/>
+                <span>{{ $t('deviceView.deleteDevice') }}</span>
+              </div>
+            </el-button>
           </div>
-        </delay-button>
-      </div>
-    </el-col>
-    <el-col :span="24" class="el-tabPanels">
-      <el-tabs id="en-devicetabs-content" v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane :label="$t('deviceView.ezvizAccountSetting')" name="ezvizAccount">
-          <ezviz-account ref="ezvizAccount"/>
-        </el-tab-pane>
-        <el-tab-pane :label="$t('deviceView.deviceManage')" name="device">
-          <el-col :span="lang === 'en' && varWindowWidth < 1920? 11 : 11" class="lisde">
-            <div class="nvr-info">
-              <span class="info-title">{{ $t('deviceView.deviceInfo') }}</span>
-              <delay-button
-                type="primary"
-                size="mini"
-                class="add-btn inspction-btn"
-                @click="showAddDialog">
-                <div class="button-area">
-                  <i class="iconfont el-icon-plus"/>
-                  <span>{{ $t('deviceView.addDevice') }}</span>
-                </div>
-              </delay-button>
-            </div>
-            <div class="nvr-title tabTitle">
-              <div :class="lang === 'en' ? 'en-comment-title' : 'comment-title'" class="titles">
-                <span/>
-              </div>
-              <div :class="lang === 'en' ? 'en-name-title' : 'name-title'" class="titles">
-                <span>{{ $t('deviceView.deviceName') }}</span>
-                <i
-                  :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}"
-                  class="icon-filter"
-                  @click="filterNVR"/>
-              </div>
-              <div :class="lang === 'en' ? 'en-model-title': 'model-title'" class="titles">
-                <span>{{ $t('deviceView.ezvizAccount') }}</span>
-                <i
-                  :class="{'el-icon-arrow-up':modelFilter,'el-icon-arrow-down':!modelFilter}"
-                  class="icon-filter"
-                  @click="filterAccount"/>
-              </div>
-              <div :class="lang === 'en' ? 'en-store-title': 'store-title'" class="titles" >
-                <span>{{ $t('deviceView.store') }}</span>
-                <i
-                  :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}"
-                  class="icon-filter"
-                  @click="filterStore"/>
-              </div>
-              <div :class="lang === 'en' ? 'en-count-title': 'count-title'" class="titles" >
-                <span>{{ $t('deviceView.channelNum') }}</span>
-              </div>
-            </div>
-            <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-              <div :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
-                <div
-                  v-for="(item,index) in nvrData"
-                  :key="index"
-                  :class="`${!item.isClick ? 'noraml-color' : 'active-color'}
-                  ${item.comment.length > 0 ? 'tooltip-color' : ''}`"
-                  class="nvr-data group-title"
-                  @click="clickNVR(index,item)" >
-                  <div v-if="item.isClick" class="proper-flag"/>
-                  <div :style="{visibility: (item.comment.length > 0) ? 'visible': 'hidden' }" class="comment-data titles">
-                    <el-tooltip
-                      :content="item.comment"
-                      :popper-class="elTooltipClass"
-                      effect="dark"
-                      placement="bottom">
-                      <div slot="content">{{ $t('deviceView.failedReason') }}<br>{{ item.comment }}</div>
-                      <span style="margin-left: 10%; color: #fea316;"><i class="iconfont icon-jinggao2"/></span>
-                    </el-tooltip>
-                  </div>
-                  <div class="name-data titles">
-                    <el-tooltip
-                      :content="item.tempNvrName"
-                      :popper-class="elTooltipClass"
-                      class="item"
-                      effect="dark"
-                      placement="bottom">
-                      <span>{{ item.tempNvrName.length > 15? item.tempNvrName.substr(0,15)+'...' : item.tempNvrName }}</span>
-                    </el-tooltip>
-                  </div>
-                  <div class="model-data titles">
-                    <span>{{ item.tempEzvizAccount }}</span>
-                  </div>
-                  <div class="store-data titles">
-                    <el-tooltip
-                      :content="item.store"
-                      :popper-class="elTooltipClass"
-                      class="item"
-                      effect="dark"
-                      placement="bottom">
-                      <span>{{ item.store.length>7?item.store.substr(0,7)+'...':item.store }}</span>
-                    </el-tooltip>
-                    <!--<span>{{item.store}}</span>-->
-                  </div>
-                  <div class="count-data titles">
-                    <span>{{ item.tempChannelCount }}{{ $t('deviceView.unit') }}</span>
-                  </div>
-                  <div class="operation-data titles">
-                    <div v-if="!item.ifCanAdd" class="iconcontent">
-                      <div class="iconlised" style=" border: none; color:#2c3e50;font-weight: normal;background-color: rgba(255,255,255,0)" @click.stop="editSingleNvr(index,item)">
-                        <!--:style="{visibility: (item.ifCanEdit == true) ? 'visible': 'hidden' }"-->
-                        <i class="iconfont icon-bianji"/>
-                      </div>
-                      <div class="iconrised" style="border: none; color:#2c3e50; font-weight: normal;" @click="showConfirmDelete=true">
-                        <i class="iconfont icon-shanchu"/>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </el-scrollbar>
-            <div class="toolbar pagination" style="width:100%; margin-top:10px; margin-bottom:20px;">
-              <el-pagination
-                :page-size="sizeNum"
-                :total="total"
-                :current-page="page"
-                style="text-align:right;margin-right:15px;"
-                background
-                small
-                layout="jumper,total,prev,pager,next"
-                @size-change="sizeChange"
-                @current-change="currentChange"/>
-            </div>
-          </el-col>
-          <el-col :span="lang === 'en' && varWindowWidth < 1920? 13: 13" class="risde">
-            <div class="nvr-info">
-              <span class="info-title">{{ $t('deviceView.channelSetting') }}</span>
-              <delay-button
-                type="primary"
-                size="mini"
-                class="add-btn inspction-btn"
-                :disabled="channelBtnDisabled"
-                @click="addNewChannel">
-                <div class="button-area">
-                  <i class="iconfont el-icon-plus"/>
-                  <span>{{ $t('deviceView.addChannel') }}</span>
-                </div>
-              </delay-button>
-            </div>
-            <div :class="lang === 'en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
-              <div class="nape-name-title titles">
-                <span>{{ $t('deviceView.channelName') }}</span>
-              </div>
-              <div class="nape-dep-title titles">
-                <span>{{ $t('deviceView.devChannelNum') }}</span>
-              </div>
-              <div class="nape-picture-title titles">
-                <span>{{ $t('deviceView.thumbnail') }}</span>
-              </div>
-              <div class="nape-handle-title titles">
-                <span>{{ $t('deviceView.operation') }}</span>
-              </div>
-            </div>
-            <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-              <div :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
-                <div
-                  v-for="(item,index) in channelList"
-                  :style="item.isClick?{'background-color':'#FEE4E7'}:{}"
-                  :key="index"
-                  class="nape-items-data">
-                  <div class="nape-name-data">
-                    <span v-if="!item.isClick" class="nape-name">
-                      {{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}
-                    </span>
-                    <el-input
-                      v-if="item.isClick"
-                      v-model="item.tempName"
-                      :placeholder="$t('deviceView.inputInspectName')"
-                      size="mini"
-                      class="nape-input input-details"
-                      @input="(val)=>channelNameChange(val,item)"/>
-                  </div>
-                  <div class="nape-dep-data">
-                    <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
-                  </div>
-                  <div :class="lang=='en'? 'en-nape-picture-data' : ''" class="nape-picture-data">
-                    <span v-if="item.tempUrl">
-                      <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
-                        <div slot="error" class="image-slot">
-                          <i class="el-icon-picture-outline"/>
-                        </div>
-                      </el-image>
-                      <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
-                        <div slot="error" class="image-slot">
-                          <i class="el-icon-picture-outline"/>
-                        </div>
-                      </el-image>
-                    </span>
-                    <span v-else class="img-class" style="display: inline-block;background: #cccc;">
-                      <span style="color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
-                    </span>
-                    <el-upload
-                      v-if="item.isClick"
-                      :before-upload="beforeAvatarUpload"
-                      :on-change="handleEditChange"
-                      class="upload-demo"
-                      action=""
-                      list-type="picture">
-                      <el-button size="mini" type="primary">
-                        <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
-                      </el-button>
-                    </el-upload >
-                  </div>
-                  <div class="nape-items-handle">
-                    <div v-if="item.isClick" class="iconcontent">
-                      <div class="iconlised" @click="confrimEdit(index,item)">
-                        <i class="el-icon-check"/>
-                      </div>
-                      <div class="iconrised" @click="cancelEdit(index,item)">
-                        <i class="el-icon-close"/>
-                      </div>
-                    </div>
-                    <div v-if="!item.isClick">
-                      <i
-                        class="iconfont icon-bianji"
-                        style="cursor:pointer;margin-right:10px;"
-                        @click="handleEdit(index,item)"/>
-                      <i
-                        class="iconfont icon-shanchu"
-                        style="cursor:pointer;margin-right:10px;"
-                        @click="handleDelete(index, item)"/>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </el-scrollbar>
-          </el-col>
-        </el-tab-pane>
-      </el-tabs>
-    </el-col>
-    <dialog-pop
-      :title="$t('deviceView.prompt')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :visible="showConfirmDelete"
-      @visibleChangeHandler="updateDeleteDeviceDialogFlag()"
-      @cancelHandler="hideDeleteDeviceDialog"
-      @confirmHandler="deleteSingleNVR">
-      <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
-        <span>{{ $t('deviceView.deleteInfo') }}</span>
-      </div>
-    </dialog-pop>
-    <dialog-pop
-      :title="$t('deviceView.prompt')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :visible="showDeleteChannel"
-      @visibleChangeHandler="updateDeleteChannelDialogFlag"
-      @cancelHandler="hideDeleteChannelDialog"
-      @confirmHandler="deleteSingleChannel">
-      <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
-        <span>{{ $t('deviceView.deleteChannel') }}</span>
-      </div>
-    </dialog-pop>
-    <dialog-pop
-      :is-form="true"
-      :title="$t('deviceView.addChannel')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :visible="showAddChannelDialog"
-      dialog-width="510px"
-      @visibleChangeHandler="updateAddChannelDialogFlag"
-      @cancelHandler="hideAddChannelDialog"
-      @confirmHandler="addSingleChannel">
-      <div class="form-slot">
-        <el-form
-          ref="channelForm"
-          :model="addChannelData"
-          :rules="channelRules"
-          label-position="top"
-          size="mini">
-          <el-form-item style="height: 57px;">
-            <el-col :span="12">
-              <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
-                <el-input v-model="addChannelData.name" style="width: 100%;"
-                          @input="(val)=>channelNameChange(val,{})" @blur="notShowInputRuleTips('channelName')"/>
-                <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
-              </el-form-item>
-            </el-col>
-            <el-col :span="10" :offset="2">
-              <el-form-item :label="$t('deviceView.devChannelNum')" prop="channelId">
-                <el-select v-model="addChannelData.channelId" size="mini" filterable>
+        </div>
+        <table-pagination
+          ref="ezvizDeviceTable"
+          :column-data="columnData"
+          :table-data="tableData"
+          :table-operation ="columnOperationData"
+          :if-set-cell-style="false"
+          :header-class="accountHead"
+          :cell-class="accountCell"
+          :row-class="accountRow"
+          :show-border="false"
+          :show-selection-column="true"
+          :is-stripe = "false"
+          :is-device="true"
+          :total="total"
+          :table-height="varyDivHeight"
+          :is-loading-data="isLoadingData"
+          layout="jumper,total, prev,pager, next"
+          class="device-table"
+          @handleOperation="handleEmitOperation"
+          @emitRowClick="handleEmitRowClick"
+          @handleEdit="handleEmitEdit"
+          @handleChange="handlePageAndSizeChange"
+        />
+      </el-col>
+      <el-col :span="lang === 'en' && varWindowWidth < 1920? 13: 13" class="risde">
+        <div class="device-info">
+          <span class="info-title">{{ $t('deviceView.deviceDetail') }}</span>
+          <el-button
+            :disabled="channelBtnDisabled"
+            type="primary"
+            size="mini"
+            class="add-btn btn-class"
+            @click="addNewChannel">
+            <i class="iconfont el-icon-plus"/><span>{{ $t('deviceView.addChannel') }}</span>
+          </el-button>
+        </div>
+        <div :class="lang === 'en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
+          <div class="nape-dep-title titles">
+            <span>{{ $t('deviceView.devChannelNum') }}</span>
+          </div>
+          <div class="nape-name-title titles">
+            <span>{{ $t('deviceView.channelName') }}</span>
+          </div>
+          <div class="nape-picture-title titles">
+            <span>{{ $t('deviceView.thumbnail') }}</span>
+          </div>
+          <div class="nape-enable-title titles">
+            <span>{{ $t('deviceView.enableStatus') }}</span>
+          </div>
+          <div class="nape-handle-title titles">
+            <span/>
+          </div>
+        </div>
+        <el-scrollbar id="el-menuscrollbar">
+          <div class="channel-content">
+            <div
+              v-for="(item,index) in channelList"
+              :style="item.isClick ? {'background-color':'#FEE4E7'} : {}"
+              :key="index"
+              class="nape-items-data">
+              <div class="nape-dep-data">
+                <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
+                <el-select
+                  v-if="item.id === 0"
+                  v-model="item.channelId"
+                  :placeholder="$t('deviceView.selectDeviceChannel')"
+                  size="mini"
+                  class="nvr-select"
+                  style="margin-left: 10%">
                   <el-option
                     v-for="numList in newChannelNumList"
                     :key="numList.value"
                     :label="numList.label"
                     :value="numList.value"
-                    :disabled="numList.disabled"
-                  />
+                    :disabled="numList.disabled"/>
                 </el-select>
-              </el-form-item>
-            </el-col>
-          </el-form-item>
-          <el-from-item>
-            <el-col :span="6">
-              <el-form-item ref="uploadElement" :label="$t('deviceView.thumbnail')" prop="pictureUrl">
-                <el-input v-if="false" v-model="addChannelData.pictureUrl"/>
-                <el-upload
-                  ref="upload"
-                  :show-file-list="false"
-                  :before-upload="beforeAvatarUpload"
-                  :on-change="handleChange"
-                  :data="addChannelData"
-                  class="avatar-uploader"
-                  action=""
-                  accept="image/png,image/jpg,image/jpeg"
-                  list-type="picture">
-                  <el-button size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
-                    <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/>
-                    <span>{{ $t('deviceView.selectPicture') }}</span>
-                  </el-button>
-                  <el-image :src="addChannelData.pictureUrl" class="image-class">
+              </div>
+              <div class="nape-name-data">
+                <span v-if="!item.isClick" class="nape-name">
+                  {{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}
+                </span>
+                <el-input
+                  v-if="item.isClick"
+                  v-model="item.tempName"
+                  :placeholder="$t('deviceView.inputInspectName')"
+                  size="mini"
+                  class="nape-input input-details"
+                  @input="(val)=>channelNameChange(val,item)"/>
+              </div>
+              <div :class="lang === 'en' ? 'en-nape-picture-data' : ''" class="nape-picture-data">
+                <span v-if="item.tempUrl">
+                  <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
                     <div slot="error" class="image-slot">
-                      <span class="image-span">{{ $t('deviceView.preview') }}</span>
+                      <i class="el-icon-picture-outline"/>
                     </div>
                   </el-image>
-                </el-upload>
-              </el-form-item>
-            </el-col>
-            <el-col :span="varWindowWidth<1440? 14: 16" :offset="varWindowWidth<1440? 3: 1">
-              <span class="picture-tips">*{{ $t('deviceView.thumbnailInfo') }}</span>
-            </el-col>
-          </el-from-item>
+                  <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
+                    <div slot="error" class="image-slot">
+                      <i class="el-icon-picture-outline"/>
+                    </div>
+                  </el-image>
+                </span>
+                <span v-else class="img-class" style="display: inline-block;background: #cccc;">
+                  <span style="color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
+                </span>
+                <el-upload
+                  v-if="item.isClick"
+                  :before-upload="beforeAvatarUpload"
+                  :on-change="handleEditChange"
+                  class="upload-demo"
+                  action=""
+                  list-type="picture">
+                  <el-button size="mini" type="primary">
+                    <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
+                  </el-button>
+                </el-upload >
+              </div>
+              <div class="nape-enable-handle">
+                <el-switch
+                  :disabled="!item.isClick"
+                  v-model="item.checkedStatus"
+                />
+              </div>
+              <div class="nape-items-handle">
+                <div v-if="item.isClick" class="iconcontent">
+                  <div class="iconlised" @click="confrimEditEzvizChannle(index,item)">
+                    <i class="el-icon-check"/>
+                  </div>
+                  <div class="iconrised" @click="cancelEditEzvizChannle(index,item)">
+                    <i class="el-icon-close"/>
+                  </div>
+                </div>
+                <div v-if="!item.isClick">
+                  <i
+                    class="iconfont icon-bianji"
+                    style="cursor:pointer;margin-right:10px;"
+                    @click="handleEdit(index,item)"/>
+                  <i
+                    v-if="curEzvizItem.addedMethod === 2"
+                    class="iconfont icon-shanchu"
+                    style="cursor:pointer;margin-right:10px;"
+                    @click="handleDelete(index, item)"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-scrollbar>
+        <el-dialog
+          v-if="showDeleteChannel"
+          :title="$t('deviceView.prompt')"
+          :visible.sync="showDeleteChannel"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="610px"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
 
-        </el-form>
-      </div>
-    </dialog-pop>
-    <dialog-pop
-      :is-form="true"
+            <p style="margin-left:25px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+              <i
+                class="el-icon-warning"
+                style="font-size:26px;margin-right:20px;
+              color:#FF9803;display: inline-block; vertical-align: middle"/>
+              <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteChannel') }}</span>
+            </p>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteChannel = false">
+              {{ $t('deviceView.cancle') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteSingleChannel()">
+              {{ $t('deviceView.confirm') }}
+            </el-button>
+          </div>
+        </el-dialog>
+        <el-dialog
+          v-if="showAddChannelDialog"
+          :title="$t('deviceView.addChannel')"
+          :visible.sync="showAddChannelDialog"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="510px"
+          top="35vh"
+          left="40vh"
+          custom-class="addDevice"
+        >
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <el-form
+              ref="channelForm"
+              :model="addChannelData"
+              :rules="channelRules"
+              class="deviceForm"
+              label-position="top"
+              size="mini">
+              <el-form-item style="height: 57px;">
+                <el-col :span="12">
+                  <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
+                    <el-input
+                      v-model="addChannelData.name"
+                      style="width: 100%;"
+                      @input="(val)=>channelNameChange(val,{})"
+                      @blur="notShowInputRuleTips('channelName')"/>
+                    <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="10" :offset="2">
+                  <el-form-item :label="$t('deviceView.devChannelNum')" prop="channelId">
+                    <el-select v-model="addChannelData.channelId" size="mini">
+                      <el-option
+                        v-for="numList in newChannelNumList"
+                        :key="numList.value"
+                        :label="numList.label"
+                        :value="numList.value"
+                        :disabled="numList.disabled"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-form-item>
+              <el-from-item>
+                <el-col :span="6">
+                  <el-form-item ref="uploadElement" :label="$t('deviceView.thumbnail')" prop="pictureUrl">
+                    <el-input v-if="false" v-model="addChannelData.pictureUrl"/>
+                    <el-upload
+                      ref="upload"
+                      :show-file-list="false"
+                      :before-upload="beforeAvatarUpload"
+                      :on-change="handleChange"
+                      :data="addChannelData"
+                      class="avatar-uploader"
+                      action=""
+                      accept="image/png,image/jpg,image/jpeg"
+                      list-type="picture">
+                      <el-button size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
+                        <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/>
+                        <span>{{ $t('deviceView.selectPicture') }}</span>
+                      </el-button>
+                      <el-image :src="addChannelData.pictureUrl" class="image-class">
+                        <div slot="error" class="image-slot">
+                          <span class="image-span">{{ $t('deviceView.preview') }}</span>
+                        </div>
+                      </el-image>
+                    </el-upload>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="varWindowWidth<1440? 14: 16" :offset="varWindowWidth<1440? 3: 1">
+                  <span class="picture-tips">*{{ $t('deviceView.thumbnailInfo') }}</span>
+                </el-col>
+              </el-from-item>
+
+            </el-form>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showAddChannelDialog = false">
+              {{ $t('deviceView.cancle') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleChannel">
+              {{ $t('deviceView.confirm') }}
+            </el-button>
+          </div>
+        </el-dialog>
+      </el-col>
+    </div>
+    <el-dialog
+      v-if="showAddDeviceDialog"
       :title="isAddAgain ? $t('deviceView.updateDevice') : $t('deviceView.addDevice')"
+      :visible.sync="showAddDeviceDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
-      :visible="showAddNvrDialog"
-      dialog-width="510px"
-      @visibleChangeHandler="updateAddDeviceDialogFlag"
-      @cancelHandler="hideAddDeviceDialog"
-      @confirmHandler="addSingleNvr">
-      <div class="form-slot">
+      width="610px"
+      top="35vh"
+      left="40vh"
+      custom-class="addDevice"
+    >
+      <div class="dialog-content" style="overflow:hidden;width:100%;">
+        <hr style="border: 0.5px solid #dfe2e9;">
         <el-form
-          ref="nvrForm"
+          ref="deviceForm"
           :model="addDeviceData"
           :rules="rules"
+          class="deviceForm"
           label-position="top"
           size="mini">
-          <el-form-item style="height: 57px;">
-            <el-col :span="13">
-              <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
-                <el-input
-                  v-model="addDeviceData.serialNumber"
-                  :disabled="isAddAgain"
-                  style="width: 100%;"
-                  @input="(val)=>serialNumberChange(val)"
-                  @blur="notShowInputRuleTips('serialNum')"/>
-                <span v-if="serialRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
-              </el-form-item>
-            </el-col>
-            <el-col :span="9" :offset="2">
-              <el-form-item :label="$t('deviceView.validationCode')" prop="validationCode" style="margin-bottom:0;">
-                <el-input
-                  v-model="addDeviceData.validationCode"
-                  style="width: 100%;"
-                  @input="validateCodeChange"
-                  @blur="notShowInputRuleTips('validationCode')"/>
-                <span v-if="validateRuletip" class="rules">{{ $t('deviceView.validateRuletip') }}</span>
-              </el-form-item>
-            </el-col>
-          </el-form-item>
-          <el-form-item style="height: 57px;">
-            <el-col :span="13">
-              <el-form-item :label="$t('deviceView.deviceName')" prop="name" style="margin-bottom:0;">
-                <el-input v-model="addDeviceData.name" style="width: 100%;"
-                          @input="deviceNameChange" @blur="notShowInputRuleTips('deviceName')"/>
-                <span v-if="deviceRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
-              </el-form-item>
-            </el-col>
-            <el-col :span="9" :offset="2">
-              <el-form-item :label="$t('deviceView.deviceChannelNum')" prop="channelCount">
-                <el-select v-if="isAddAgain" v-model="addDeviceData.channelCount" size="mini">
-                  <el-option
-                    v-for="numList in editNvrChannelNumList"
-                    :key="numList.value"
-                    :label="numList.label"
-                    :value="numList.value"
-                    :disabled="numList.disabled"
-                  />
-                </el-select>
-                <el-select v-else v-model="addDeviceData.channelCount" size="mini">
-                  <el-option
-                    v-for="numList in channelNumList"
-                    :key="numList.value"
-                    :label="numList.label"
-                    :value="numList.value"/>
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-form-item>
-          <el-form-item :label="$t('deviceView.EzvizAccount')" prop="ezvizAccount">
-            <el-select v-model="addDeviceData.ezvizAccount" style="width: 100%;">
+          <el-form-item v-if="accountScope === 1" label="" prop="deviceType">
+            <el-select v-model="deviceType" placeholder="请选择" style="width: 100%;">
               <el-option
-                v-for="item in ezvizAccountList"
-                :key="item.id"
-                :label="item.accountName"
-                :value="item.ezvizAccount"/>
-            </el-select>
-          </el-form-item>
-          <el-form-item :label="$t('deviceView.store')" prop="storeId">
-            <el-select
-              v-model="addDeviceData.storeId"
-              :disabled="isAddAgain"
-              :filter-method="filterStoreOption"
-              filterable
-              style="width: 100%;">
-              <el-option
-                v-for="item in storeDataList"
-                :key="item.storeId"
+                v-for="item in deviceTypeOption"
+                :key="item.value"
                 :label="item.label"
-                :value="item.storeId"/>
+                :value="item.value"/>
             </el-select>
-            <span class="add-label" style="color: rgb(254, 163, 22); display: block">
-                    <span style="margin-right: 10px;font-size: 10px;">*</span>{{ $t('deviceView.selectStoreInfo') }}
-                  </span>
           </el-form-item>
+          <div v-if="accountScope === 1 && deviceType === 1">
+            <span class="available-span">{{ $t('deviceView.availableDevice') }}</span>
+            <div v-if="deviceType === 1" class="available-device-info">
+              <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
+                <div class="available-checkbox">
+                  <el-checkbox v-model="item.checked"/>
+                </div>
+                <div class="available-sn">
+                  <span>{{ item.serialNumber }}</span>
+                </div>
+                <div class="available-name">
+                  <span>{{ item.name }}</span>
+                </div>
+                <div class="available-store">
+                  <el-select
+                    v-model="item.storeId"
+                    :filter-method="filterStoreOption"
+                    :placeholder="$t('deviceView.selectStore')"
+                    style="width: 100%;"
+                    filterable
+                  >
+                    <el-option
+                      v-for="item in storeDataList"
+                      :key="item.storeId"
+                      :label="item.label"
+                      :value="item.storeId"/>
+                  </el-select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="main-device-info">
+            <el-form-item style="height: 57px;">
+              <el-col :span="13">
+                <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
+                  <el-input
+                    v-model="addDeviceData.serialNumber"
+                    :disabled="isAddAgain"
+                    style="width: 100%;"
+                    @input="(val)=>serialNumberChange(val)"
+                    @blur="notShowInputRuleTips('serialNum')"/>
+                  <span v-if="serialRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="deviceType !== 2" :span="9" :offset="2">
+                <el-form-item :label="$t('deviceView.validationCode')" prop="validationCode">
+                  <el-input
+                    v-model="addDeviceData.validationCode"
+                    style="width: 100%;"
+                    @input="validateCodeChange"
+                    @blur="notShowInputRuleTips('validationCode')"/>
+                  <span v-if="validateRuletip" class="rules">{{ $t('deviceView.validateRuletip') }}</span>
+                </el-form-item>
+              </el-col>
+            </el-form-item>
+            <el-form-item style="height: 57px;">
+              <el-col :span="deviceType === 0 || accountScope === 0 ? 24: 13">
+                <el-form-item :label="$t('deviceView.deviceName')" prop="name" style="margin-bottom:0;">
+                  <el-input
+                    v-model="addDeviceData.name"
+                    style="width: 100%;"
+                    @input="deviceNameChange"
+                    @blur="notShowInputRuleTips('deviceName')"/>
+                  <span v-if="deviceRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+                </el-form-item>
+              </el-col>
+              <el-col v-if="deviceType !== 0 && accountScope !== 0" :span="9" :offset="2">
+                <el-form-item :label="$t('deviceView.deviceChannelNum')" prop="channelCount">
+                  <el-select v-if="isAddAgain" v-model="addDeviceData.channelCount" size="mini">
+                    <el-option
+                      v-for="numList in editChannelNumList"
+                      :key="numList.value"
+                      :label="numList.label"
+                      :value="numList.value"
+                      :disabled="numList.disabled"
+                    />
+                  </el-select>
+                  <el-select v-else v-model="addDeviceData.channelCount" size="mini">
+                    <el-option
+                      v-for="numList in channelNumList"
+                      :key="numList.value"
+                      :label="numList.label"
+                      :value="numList.value"/>
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-form-item>
+            <el-form-item :label="$t('deviceView.store')" prop="storeId">
+              <el-select
+                v-model="addDeviceData.storeId"
+                :disabled="isAddAgain"
+                :filter-method="filterStoreOption"
+                filterable
+                style="width: 100%;">
+                <el-option
+                  v-for="item in storeDataList"
+                  :key="item.storeId"
+                  :label="item.label"
+                  :value="item.storeId"/>
+              </el-select>
+              <span class="add-label" style="color: rgb(254, 163, 22); display: block">
+                <span style="margin-right: 10px;font-size: 12px;">*</span>
+                {{ $t('deviceView.selectStoreInfo') }}
+              </span>
+            </el-form-item>
+          </div>
         </el-form>
       </div>
-    </dialog-pop>
-  </el-row>
+      <div slot="footer" class="dialog-footer">
+        <el-button
+          class="file-cancel-btn"
+          size="mini"
+          style=""
+          @click="showAddDeviceDialog = false">{{ $t('deviceView.cancle') }}</el-button>
+        <el-button
+          class="file-confirm-btn"
+          size="mini"
+          type="primary"
+          @click="confirmAddEzvizDevice">{{ $t('deviceView.confirm') }}</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog
+      v-if="showDeleteDialog"
+      :title="$t('titleView.confirmInfo')"
+      :visible.sync="showDeleteDialog"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      width="28%"
+      top="35vh"
+      left="40vh">
+      <div class="dialog-content" style="overflow:hidden;width:100%;">
+        <hr style="border: 0.5px solid #dfe2e9;">
+        <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+          <i
+            class="el-icon-warning"
+            style="font-size:26px;margin-right:20px;color:#FF9803;
+          display: inline-block;  vertical-align: middle"/>
+          <span style="display: inline-block;  vertical-align: middle">{{ deleteInfo }}</span>
+        </p>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteDialog = false">
+          {{ $t('titleView.cancel') }}
+        </el-button>
+        <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteDevice()">
+          {{ $t('titleView.confirm') }}
+        </el-button>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 <script>
-import { validateInput, validateURL, validatePort } from '@/common/validate';
 import { deviceRESTful, ezvizRESTful } from '@/api/index';
-import { mapGetters } from 'vuex';
 import { getStoreList, getBriefStoreList } from '@/api/store';
 import EzvizAccount from './EzvizAccount';
 import filterString from '@/common/filterString';
@@ -454,61 +488,58 @@ import util from '@/common/util';
 import lodash from 'lodash';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
+import TablePagination from '@/components/TablePagination';
 
 export default {
-  name: 'NvrDeviceMgmt',
-  components: { DialogPop, DelayButton, EzvizAccount },
+  name: 'EzvizDeviceMgmt',
+  components: {
+    EzvizAccount,
+    TablePagination
+  },
   data() {
     return {
-      dash: {},
-      activeName: 'ezvizAccount',
       total: 0,
       page: 1,
       sizeNum: 10,
-      nvrData: [],
-      // the filter flag
-      nvrFilter: true,
-      modelFilter: true,
-      nvrFilterName: '',
-      storeFilter: true,
-      channelFilter: true,
-      channelNumFilter: true,
-      // paperCount:3,
+      columnData: [
+        {
+          'prop': 'serialNumber',
+          'label': this.$t('deviceView.serialNum'),
+          'width': 115,
+          'maxWidth': 115
+        },
+        {
+          'prop': 'name',
+          'label': this.$t('deviceView.deviceName'),
+          'width': 155,
+          'maxWidth': 120,
+          'canEdit': true
+        },
+        {
+          'prop': 'storeName',
+          'label': this.$t('deviceView.store'),
+          'width': 96,
+          'maxWidth': 96
+        },
+        {
+          'prop': 'channelCount',
+          'label': this.$t('deviceView.channelNum'),
+          'width': 65,
+          'maxWidth': 120
+        }
+      ],
+      tableData: [],
       showImportContent: false,
       showConfirmImport: false,
       channelList: [],
       channelData: [],
-      serachVale: '',
       curChannelItem: {},
-      btnList: [
-        {
-          id: 0,
-          iconClass: 'iconfont icon-daoru',
-          name: 'import',
-          btnTitle: this.$t('insSettingView.import'),
-          enabled: true
-        },
-        {
-          id: 0,
-          iconClass: 'iconfont icon-daochu',
-          name: 'export',
-          btnTitle: this.$t('insSettingView.export'),
-          enabled: true
-        },
-        {
-          id: 0,
-          iconClass: 'iconfont icon-xiazai',
-          name: 'download',
-          btnTitle: this.$t('insSettingView.download'),
-          enabled: true
-        }
-      ],
       varWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
-      curNVRItem: null,
+      curEzvizItem: null,
       lang: this.$i18n.locale,
-      showAddNvrDialog: false,
-      addDeviceData: { name: '', validationCode: '', storeId: '', serialNumber: '', channelCount: 1, ezvizAccount: '' },
+      showAddDeviceDialog: false,
+      addDeviceData: { },
       channelNumList: [
         {
           value: 1,
@@ -547,11 +578,14 @@ export default {
       allStoreDataList: [],
       newChannelNumList: [],
       channelBtnDisabled: false,
-      editNvrChannelNumList: [],
+      editChannelNumList: [],
       showConfirmDelete: false,
       rules: {
         serialNumber: [
           { required: true, message: this.$t('deviceView.inputSerialNum'), trigger: 'blur' }
+        ],
+        validationCode: [
+          { required: true, message: this.$t('deviceView.codeInfo'), trigger: 'blur' }
         ],
         name: [
           { required: true, message: this.$t('deviceView.inputDeviceName'), trigger: 'blur' }
@@ -569,7 +603,7 @@ export default {
       showDeleteChannel: false,
       deleteFromEzviz: false,
       isAddAgain: false,
-      addChannelData: { name: '', channelId: '', pictureUrl: '', file: '' },
+      addChannelData: { },
       channelRules: {
         name: [
           { required: true, message: this.$t('deviceView.inputChannelName'), trigger: 'blur' }
@@ -593,59 +627,182 @@ export default {
       channelNameRuletip: false,
       serialRuletip: false,
       validateRuletip: false,
-      deviceRuletip: false
+      deviceRuletip: false,
+      authDeviceNumber: 0,
+      accountHead: 'account-header',
+      accountCell: '',
+      accountRow: '',
+      columnOperationData: {
+        label: ' ',
+        minWidth: '120',
+        align: 'center',
+        operation: [
+          {
+            lable: '',
+            icon: 'icon-bianji',
+            methods: 'edit'
+          },
+          {
+            lable: '',
+            icon: 'icon-shanchu',
+            methods: 'delete'
+          }
+        ]
+      },
+      deleteSerialNums: [],
+      deleteInfo: '',
+      showDeleteDialog: false,
+      allDeviceChecked: false,
+      ezvizAccount: '',
+      accountScope: 0,
+      accountSettingMsg: '',
+      deviceTypeOption: [{
+        value: 0,
+        label: this.$t('deviceView.addMainAccountDevice')
+      },
+      {
+        value: 1,
+        label: this.$t('deviceView.addAvailableDevice')
+      },
+      {
+        value: 2,
+        label: this.$t('deviceView.addSharedDevice')
+      }],
+      deviceType: 0,
+      deviceSource: 0,
+      avilableDeviceList: [],
+      isLoadingData: true
     };
   },
-  watch: {
-    accountChanged(val) {
-      const self = this;
-      if (val !== 0) {
-        self.$refs.ezvizAccount.accountList = [];
-        self.InitData();
-        self.getBriefStoreData();
-        self.getAccountList();
-      }
-    }
-  },
+
   computed: {
-    varyDivHeight: function() {
-      if (this.varyWindowHeight > 800) {
-        return this.varyWindowHeight * 0.50;
-      } else if (this.varyWindowHeight > 700) {
-        return this.varyWindowHeight * 0.60;
-      } else {
-        return this.varyWindowHeight * 0.526;
-      }
-    },
-    ...mapGetters({
-      accountChanged: 'accountChanged'
-    })
+    varyDivHeight() {
+      return this.varyWindowHeight - 80 - 70 - 85 - 92 - 30 - 60;
+    }
   },
 
   mounted() {
-    const self = this;
-    self.getAccountList();
+    this.setBreadcrumbsName();
+    this.setDeviceListParams();
+    this.getBriefStoreData();
   },
 
   methods: {
-    callChildAdd() {
-      const self = this;
-      self.$refs.ezvizAccount.showAddEzvizAccount();
+    initAddDeviceFormData() {
+      this.addDeviceData = {
+        name: '',
+        validationCode: '',
+        storeId: this.storeDataList.length > 0 ? this.storeDataList[0].storeId : '',
+        serialNumber: '',
+        channelCount: 1,
+        ezvizAccount: this.ezvizAccount
+      };
     },
 
-    handleClick(tabs) {
-      const self = this;
-      const index = Number(tabs.index);
-      switch (index) {
-        case 0:
-          self.getAccountList();
-          break;
-        case 1:
-          self.InitData();
-          self.getAccountList();
-          self.getBriefStoreData();
-          break;
+    initAddChannelFormData() {
+      this.addChannelData = {
+        name: '',
+        channelId: '',
+        pictureUrl: '',
+        file: ''
+      };
+    },
+
+    setSNCell(row) {
+      if (row.columnIndex === 1) {
+        return 'sn-class';
       }
+    },
+
+    showDeleteDialogMethod(val) {
+      const self = this;
+      self.deleteSerialNums = [];
+      if (val !== 0) {
+        const deviceObj = {};
+        deviceObj.serialNumber = val.serialNumber;
+        deviceObj.deleteFromEzviz = this.accountScope === 0;
+        self.deleteSerialNums.push(deviceObj);
+      } else {
+        const arr = [];
+        const selectRows = self.$refs.ezvizDeviceTable.tableSelection;
+        selectRows.forEach(item => {
+          const deviceObj = {};
+          deviceObj.serialNumber = item.serialNumber;
+          deviceObj.deleteFromEzviz = this.accountScope === 0;
+          arr.push(deviceObj);
+        });
+        self.deleteSerialNums = arr;
+      }
+      if (self.deleteSerialNums.length === 0) {
+        util.notify(self.$t('deviceView.emptyDeleteDevice'), 'warning', 3000);
+        return false;
+      } else {
+        if (self.deleteSerialNums.length === 1) {
+          self.deleteInfo = self.$t('deviceView.confirmDeleteDevice');
+        } else {
+          self.deleteInfo = self.$t('deviceView.confirmDeleteDevices');
+        }
+        self.showDeleteDialog = true;
+      }
+    },
+
+    confirmUpdateDevice(deviceInfo) {
+      const self = this;
+      const params = {};
+      params.serialNumber = deviceInfo.serialNumber;
+      params.name = deviceInfo.name;
+      params.syncToEzviz = false;
+      ezvizRESTful.updateEzvizDevice(params).then(res => {
+        const errMsg = res.errMsg;
+        if (errMsg && errMsg === 'Success') {
+          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          deviceInfo.isEditing = false;
+        } else {
+          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          deviceInfo.isEditing = false;
+        }
+      })
+        .then(async() => {
+          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
+        }).catch(err => {
+          console.log('EzvizDeviceManagement-confirmUpdateDevice: ' + err);
+        });
+    },
+
+    setBreadcrumbsName() {
+      const rowDataJson = JSON.parse(sessionStorage.getItem('ezvizAccount'));
+      const rowData = rowDataJson.rowData;
+      this.ezvizAccount = rowData.ezvizAccount;
+      this.accountScope = rowData.scope;
+      this.accountSettingMsg = this.accountScope === 0 ? this.$t('deviceView.storeViuAccount') : this.$t('deviceView.userAccount');
+      const breadcrumbsName = this.accountScope === 0 ? 'storeViuAccountDeviceSetting' : 'userAccountDeviceSetting';
+      this.$route.matched[2].name = breadcrumbsName;
+    },
+
+    handleEmitOperation(methodsAndRowObj) {
+      const method = methodsAndRowObj.method;
+      switch (method) {
+        case 'edit': {
+          break;
+        }
+        case 'delete': {
+          this.showDeleteDialogMethod(methodsAndRowObj.row);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+    handleEmitRowClick(row) {
+      this.deviceSource = row.deviceType;
+      this.curEzvizItem = row;
+      this.getChannelListByDevice(row.serialNumber);
+    },
+
+    handleEmitEdit(row) {
+      this.confirmUpdateDevice(row);
     },
 
     getBriefStoreData() {
@@ -734,156 +891,6 @@ export default {
       }
     },
 
-    clickNVR(index, item) {
-      const self = this;
-      item.isClick = true;
-      self.curNVRItem = item;
-      self.curIndex = index;
-      self.channelCountTemp = item.channelCount;
-      self.getChannelListByDevice(item.serialNumber);
-      self.nvrData.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isClick = false;
-        }
-      });
-    },
-
-    checkBeforeImport() {
-      const self = this;
-    },
-
-    importItem() {
-      this.showConfirmImport = true;
-    },
-
-    exportItem() {
-      const self = this;
-      self.export2Excel();
-    },
-
-    sizeChange(val) {
-      const self = this;
-      self.sizeNum = val;
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': 'asc',
-          'property': 'name'
-        }
-      };
-      this.getDeviceList(params);
-    },
-
-    currentChange(val) {
-      const self = this;
-      self.page = val;
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': 'asc',
-          'property': 'name'
-        }
-      };
-      self.getDeviceList(params);
-    },
-
-    // nvr list filter
-    filterNVR() {
-      const self = this;
-      self.nvrFilter = !self.nvrFilter;
-      self.page = 1;
-      self.nvrFilterName = 'name';
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': self.nvrFilter ? 'asc' : 'desc',
-          'property': 'name'
-        }
-      };
-      self.getDeviceList(params);
-    },
-
-    filterModel() {
-      const self = this;
-      self.modelFilter = !self.modelFilter;
-      self.page = 1;
-      self.nvrFilterName = 'storeName';
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': self.modelFilter ? 'asc' : 'desc',
-          'property': 'deviceModel'
-        }
-      };
-      self.getDeviceList(params);
-    },
-
-    filterAccount() {
-      const self = this;
-      self.modelFilter = !self.modelFilter;
-      self.page = 1;
-      self.nvrFilterName = 'ezvizAccount';
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': self.modelFilter ? 'asc' : 'desc',
-          'property': 'ezvizAccount'
-        }
-      };
-      self.getDeviceList(params);
-    },
-
-    filterStore() {
-      const self = this;
-      self.storeFilter = !self.storeFilter;
-      self.page = 1;
-      self.nvrFilterName = 'storeName';
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': self.storeFilter ? 'asc' : 'desc',
-          'property': 'storeName'
-        }
-      };
-      self.getDeviceList(params);
-    },
-
-    filterChannelNum() {
-      const self = this;
-      self.channelNumFilter = !self.channelNumFilter;
-      self.page = 1;
-      self.nvrFilterName = 'channelCount';
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': self.channelNumFilter ? 'asc' : 'desc',
-          'property': 'channelCount'
-        }
-      };
-      self.getNVRList(params);
-    },
-
     deleteChannel(channelList) {
       const params = {
         deviceIds: channelList
@@ -891,29 +898,6 @@ export default {
       return new Promise((resolve, reject) => {
         deviceRESTful.deleteDevice(params).then(res => {
           resolve(res);
-        });
-      });
-    },
-
-    deleteNVR(nvrList) {
-      const params = {
-        ivsIds: nvrList
-      };
-      return new Promise((resolve, reject) => {
-        deviceRESTful.deleteNVR(params).then(res => {
-          resolve(res);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    addNVR(params) {
-      return new Promise((resolve, reject) => {
-        deviceRESTful.addNVR(params).then(res => {
-          resolve(res);
-        }).catch(err => {
-          reject(err);
         });
       });
     },
@@ -938,225 +922,6 @@ export default {
       });
     },
 
-    getAllDeviceData() {
-      const self = this;
-      const params = {
-        'filter': {
-          'page': 0,
-          'size': 1000
-        }
-      };
-      return new Promise((resolve, reject) => {
-        ezvizRESTful.getEzvizList(params).then(res => {
-          const errMsg = res.errMsg;
-          let data = [];
-          if (errMsg != undefined && errMsg === 'Success') {
-            data = res.data.content;
-          }
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    getAllNVRData() {
-      const self = this;
-      const params = {
-        'filter': {
-          'page': 0,
-          'size': 1000
-        }
-      };
-      return new Promise((resolve, reject) => {
-        deviceRESTful.getNVRList(params).then(res => {
-          const errMsg = res.errMsg;
-          let data = [];
-          if (errMsg != undefined && errMsg === 'Success') {
-            data = res.data.content;
-          }
-          resolve(data);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    async addAllData(paramsNVR, paramsDevice) {
-      const self = this;
-      const data = await self.getAllDeviceData();
-      self.channelData = await self.getChannelData();
-      const nvrList = [];
-      const channelList = self.channelData.map(x => x.id);
-      data.forEach(item => {
-        const json = {};
-        json.serialNumber = item.serialNumber;
-        json.deleteFromEzviz = false;
-        nvrList.push(json);
-      });
-      if (channelList.length === 0 && nvrList.length === 0) {
-      } else if (channelList.length === 0 && nvrList.length !== 0) {
-        nvrList.forEach(_item => {
-          self.deleteEzvizDevice(_item);
-        });
-      } else if (channelList.length !== 0 && nvrList.length === 0) {
-        await self.deleteChannel(channelList);
-      } else {
-        await self.deleteChannel(channelList);
-        nvrList.forEach(_item => {
-          self.deleteEzvizDevice(_item);
-        });
-      }
-      const res1 = await self.addEzivzDevice(paramsNVR);
-      const res2 = await self.addDevice(paramsDevice);
-      if (res1.errCode === 0 && res2.errCode === 0) {
-        util.notify(self.$t('deviceView.importSuss'), 'success', 3000);
-        self.showImportContent = false;
-      } else {
-        util.notify(self.$t('deviceView.importFail'), 'warning', 3000);
-        self.showImportContent = false;
-      }
-      self.page = 1;
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': 'asc',
-          'property': 'name'
-        }
-      };
-      self.getDeviceList(params);
-    },
-
-    importfxx(obj) {
-      const _this = this;
-      const inputDOM = this.$refs.inputer;
-      this.file = event.currentTarget.files[0];
-      var rABS = false;
-      var f = this.file;
-      var reader = new FileReader();
-      FileReader.prototype.readAsBinaryString = function(f) {
-        var binary = '';
-        var rABS = false;
-        var pt = this;
-        var wb;
-        var outdata;
-        var reader = new FileReader();
-        reader.onload = async function(e) {
-          var bytes = new Uint8Array(reader.result);
-          var length = bytes.byteLength;
-          for (var i = 0; i < length; i++) {
-            binary += String.fromCharCode(bytes[i]);
-          }
-          var XLSX = require('xlsx');
-          if (rABS) {
-            wb = XLSX.read(btoa(fixdata(binary)), {
-              type: 'base64'
-            });
-          } else {
-            wb = XLSX.read(binary, {
-              type: 'binary'
-            });
-          }
-          outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-          if (!outdata[0].hasOwnProperty('StoreID')) {
-            util.notify(this.$t('deviceView.templateError'), 'warning', 3000);
-            return false;
-          }
-          const arr = outdata;
-          const nvrDataTemp = [];
-          const channelDataTemp = [];
-          arr.forEach((item, index) => {
-            if (nvrDataTemp.map(x => x.ivsId).indexOf(item['序列号']) === -1) {
-              const obj = {
-                serialNumber: item['序列号'],
-                name: item['设备名称'],
-                channelCount: item['通道数'],
-                storeId: item['StoreID'],
-                validationCode: item['设备验证码'],
-                ezvizAccount: item['萤石账号']
-              };
-              nvrDataTemp.push(obj);
-            }
-            const obj = {
-              name: item['通道名称'],
-              storeId: item['StoreID'],
-              ivsId: item['序列号'],
-              channelId: item['通道序号'],
-              vendor: 1
-            };
-            channelDataTemp.push(obj);
-          });
-
-          const params1 = {
-            'device': nvrDataTemp
-          };
-          const params2 = {
-            'device': channelDataTemp
-          };
-          _this.addAllData(params1, params2);
-        };
-        reader.readAsArrayBuffer(f);
-      };
-      if (rABS) {
-        reader.readAsArrayBuffer(f);
-      } else {
-        reader.readAsBinaryString(f);
-      }
-    },
-
-    export2Excel() {
-      var that = this;
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = ['StoreID', '所属门店', '序列号', '设备名称', '设备验证码', '通道数', '通道名称',
-          '通道序号', '萤石账号'];
-        const filterVal = ['storeId', 'storeName', 'serialNumber', 'name', 'validationCode',
-          'channelCount', 'channelName', 'channelNum', 'ezvizAccount'];
-        const deviceData = await that.getAllDeviceData();
-        const channelData = that.channelData;
-        const excelData = [];
-        if (deviceData.length !== 0 && channelData.length !== 0) {
-          deviceData.forEach((item, index) => {
-            channelData.forEach((_item, _index) => {
-              if (item.serialNumber === _item.ivsId) {
-                const obj = {};
-                obj.storeId = item.storeId;
-                obj.storeName = item.storeName;
-                obj.serialNumber = item.serialNumber;
-                obj.name = item.name;
-                obj.validationCode = '';
-                obj.channelCount = item.channelCount;
-                obj.channelName = _item.name;
-                obj.channelNum = _item.channelId;
-                obj.ezvizAccount = item.ezvizAccount;
-                excelData.push(obj);
-              }
-            });
-          });
-        }
-        const list = excelData;
-        const data = that.formatJson(filterVal, list);
-        export_json_to_excel(tHeader, data, '看门店-萤石云设备管理导入示例');
-      });
-    },
-
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => v[j]));
-    },
-
-    handleNVR(index, item) {
-      const self = this;
-      switch (index) {
-        case 0: self.importItem(); break;
-        case 1: self.exportItem(); break;
-        // case 2: self.downItem(); break;
-        default: break;
-      }
-    },
-
     handleEdit(index, item) {
       const self = this;
       item.isClick = true;
@@ -1168,19 +933,20 @@ export default {
       });
     },
 
-    cancelEdit(index, item) {
+    cancelEditEzvizChannle(index, item) {
       const self = this;
       self.isUpdate = false;
       item.isClick = false;
       item.tempUrl = item.pictureUrl;
       item.tempName = item.name;
+      item.checkedStatus = item.status === 1;
       self.file = '';
       if (item.id === 0) {
         self.channelList.splice(index, 1);
       }
     },
 
-    confrimEdit(index, item) {
+    confrimEditEzvizChannle(index, item) {
       const self = this;
       if (item.id !== 0) {
         self.updateEzvizChannel(item);
@@ -1196,6 +962,7 @@ export default {
       self.isUpdate = false;
       obj.id = self.curChannelItem.id;
       obj.name = self.curChannelItem.tempName;
+      obj.status = self.curChannelItem.checkedStatus ? 1 : 0;
       if (obj.name.trim().length === 0) {
         util.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
         return false;
@@ -1217,12 +984,13 @@ export default {
           self.curChannelItem.isClick = false;
           self.file = '';
         } else {
+          item.checkedStatus = item.status === 1;
           util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
         }
       })
         .then(async() => {
           self.channelData = await self.getChannelData();
-          self.getChannelListByDevice(self.curNVRItem.serialNumber);
+          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         }).catch(err => {
           console.log('EzvizDeviceManagement-updateEzvizChannel: ' + err);
         });
@@ -1232,8 +1000,8 @@ export default {
       const self = this;
       const json = {};
       json.name = item.tempName;
-      json.storeId = self.curNVRItem.storeId;
-      json.ivsId = self.curNVRItem.serialNumber;
+      json.storeId = self.curEzvizItem.storeId;
+      json.ivsId = self.curEzvizItem.serialNumber;
       json.channelId = item.channelId;
       json.vendor = 1;
       const deviceArr = [];
@@ -1251,7 +1019,7 @@ export default {
       })
         .then(async() => {
           self.channelData = await self.getChannelData();
-          self.getChannelListByDevice(self.curNVRItem.serialNumber);
+          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         }).catch(err => {
           console.log('EzvizDeviceManagement-addEzvizChannel: ' + err);
         });
@@ -1259,59 +1027,60 @@ export default {
 
     getDeviceList(params) {
       const self = this;
+      this.isLoadingData = true;
       ezvizRESTful.getEzvizList(params).then(res => {
-        const errMsg = res.errMsg;
-        const temp = [];
-        if (errMsg != undefined && errMsg === 'Success') {
-          const data = res.data.content;
-          data.forEach((item, index) => {
-            const obj = {};
-            obj.serialNumber = item.serialNumber;
-            obj.name = item.name;
-            obj.tempNvrName = item.name;
-            obj.store = item.storeName;
-            obj.storeId = item.storeId;
-            obj.deviceModel = item.deviceModel;
-            obj.ezvizAccount = item.ezvizAccount;
-            obj.tempEzvizAccount = item.ezvizAccount;
-            obj.channelCount = item.channelCount;
-            obj.tempChannelCount = item.channelCount;
-            obj.channelNum = item.channelCount + '个';
-            obj.comment = item.comment === null ? "" : item.comment;
-            obj.ifCanEdit = true;
-            obj.ifCanAdd = false;
-            obj.isEditing = false;
+        const resCode = res.errCode;
+        const data = res.data;
+        if (resCode === 0 && Object.keys(data).length > 0) {
+          const tempDeviceArr = [];
+          const deviceArray = res.data.content;
+          deviceArray.forEach((item, index) => {
+            const deviceInfo = {};
+            deviceInfo.serialNumber = item.serialNumber;
+            deviceInfo.name = item.name;
+            deviceInfo.tempDeviceName = item.name;
+            deviceInfo.store = item.storeName;
+            deviceInfo.storeName = item.storeName;
+            deviceInfo.storeId = item.storeId;
+            deviceInfo.deviceModel = item.deviceModel;
+            deviceInfo.ezvizAccount = item.ezvizAccount;
+            deviceInfo.channelCount = item.channelCount;
+            deviceInfo.comment = item.comment;
+            deviceInfo.isEditing = false;
+            deviceInfo.addedMethod = item.addedMethod;
             if (index === 0) {
-              obj.isClick = true;
-            } else {
-              obj.isClick = false;
+              this.$nextTick(function() {
+                this.$refs.ezvizDeviceTable.$refs.tablePagination.setCurrentRow(deviceInfo);
+              });
             }
-            temp.push(obj);
+            tempDeviceArr.push(deviceInfo);
           });
-          self.nvrData = temp;
+          self.tableData = tempDeviceArr;
           self.total = res.data.totalElements;
         }
       })
         .then(async() => {
-          if (self.nvrData.length !== 0) {
-            self.curNVRItem = self.nvrData[0];
+          if (self.tableData.length !== 0) {
+            self.curEzvizItem = self.tableData[0];
             self.channelData = await self.getChannelData();
-            self.getChannelListByDevice(self.nvrData[0].serialNumber);
+            self.getChannelListByDevice(self.tableData[0].serialNumber);
           } else {
+            self.channelBtnDisabled = true;
             self.channelData = [];
             self.channelList = [];
           }
+          this.isLoadingData = false;
+        }).catch(error => {
+          this.isLoadingData = false;
+          console.log('EzvizDeviceMgmt-getDeviceList' + error);
         });
     },
 
-    searchNVRList() {
-      // to do nothing
-    },
-
     getChannelData() {
-      const self = this;
+      const params = {};
+      params.showDisabled = true;
       return new Promise((resolve, reject) => {
-        deviceRESTful.getDeviceList().then(res => {
+        deviceRESTful.getDeviceList(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg && errMsg === 'Success') {
             const data = res.data;
@@ -1336,35 +1105,36 @@ export default {
           obj.pictureUrl = item.thumbnailUrl;
           obj.tempUrl = item.thumbnailUrl;
           obj.isClick = false;
+          obj.status = item.status;
+          obj.checkedStatus = item.status === 1;
           temp.push(obj);
         }
       });
       self.channelList = temp;
-      if (self.channelList.length === self.curNVRItem.channelCount) {
+      if (Object.keys(self.curEzvizItem).length === 0 ||
+        self.channelList.length === self.curEzvizItem.channelCount) {
         self.channelBtnDisabled = true;
       } else {
         self.channelBtnDisabled = false;
       }
       if (self.channelList.length === 0) {
-        self.editNvrChannelNumList = self.channelNumList;
+        self.editChannelNumList = self.channelNumList;
       } else {
         const sortArr = self.channelList.sort(self.getSortFun('channelId'));
         const lastChannel = sortArr[sortArr.length - 1];
         const maxChannleId = lastChannel.channelId;
         const maxChannel = Math.pow(2, Math.ceil(Math.log2(maxChannleId)));
         const spliceArray = self.channelNumList.filter(x => x.value >= maxChannel);
-        self.editNvrChannelNumList = spliceArray;
+        self.editChannelNumList = spliceArray;
       }
     },
 
-    async InitData() {
+    async setDeviceListParams() {
       const self = this;
-      if (self.varyWindowHeight >= 760) {
-        self.sizeNum = 20;
-      } else {
-        self.sizeChange = 10;
-      }
       const params = {
+        'clause': {
+          'ezvizAccount': self.ezvizAccount
+        },
         'filter': {
           'page': self.page - 1,
           'size': self.sizeNum
@@ -1404,12 +1174,10 @@ export default {
     },
 
     getStoreData(params) {
-      const self = this;
       return new Promise((resolve, reject) => {
         getStoreList(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            const data = res.data;
             resolve(res);
           }
         }).catch(res => {
@@ -1428,26 +1196,13 @@ export default {
       });
     },
 
-    addAgain(index, item) {
-      const self = this;
-      self.addDeviceData = item;
-      self.isAddAgain = true;
-      self.showAddNvrDialog = true;
-      self.storeDataList = self.allStoreDataList;
-    },
-
-    addSingleNvr() {
-      if (this.isAddAgain) {
-        this.updateEzvizDeviceInfo();
-      } else {
-        this.addEzvizDeviceBasedForm();
-      }
+    confirmAddEzvizDevice() {
+      this.addEzvizDeviceBasedForm();
     },
 
     updateEzvizDeviceInfo() {
       const self = this;
       const obj = self.addDeviceData;
-      obj.syncToEzviz = false;
       const params = {};
       params.serialNumber = obj.serialNumber;
       params.name = obj.name;
@@ -1459,23 +1214,17 @@ export default {
         const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-          self.showAddNvrDialog = false;
+          self.showAddDeviceDialog = false;
           self.isAddAgain = false;
-          self.nvrData[self.curIndex].tempNvrName = obj.name;
-          self.nvrData[self.curIndex].tempEzvizAccount = obj.ezvizAccount;
-          self.nvrData[self.curIndex].tempChannelCount = obj.channelCount;
         } else {
           self.setErrorMsg(errMsg);
-          self.showAddNvrDialog = false;
+          self.showAddDeviceDialog = false;
           self.isAddAgain = false;
-          self.nvrData[self.curIndex].name = obj.tempNvrName;
-          self.nvrData[self.curIndex].ezvizAccount = obj.tempEzvizAccount;
-          self.nvrData[self.curIndex].channelCount = obj.tempChannelCount;
         }
       })
         .then(async() => {
           self.channelData = await self.getChannelData();
-          self.getChannelListByDevice(self.curNVRItem.serialNumber);
+          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         }).catch(err => {
           console.log('EzvizDeviceManagement-updateEzvizDeviceInfo: ' + err);
         });
@@ -1483,40 +1232,51 @@ export default {
 
     addEzvizDeviceBasedForm() {
       const self = this;
-      self.$refs['nvrForm'].validate(async(valid) => {
+      self.$refs['deviceForm'].validate(async(valid) => {
         if (valid) {
           const nvrParams = {};
-          const nvrArray = [];
-          nvrArray.push(self.addDeviceData);
+          let nvrArray = [];
+          if (self.deviceType !== 1) {
+            self.addDeviceData.addedMethod = self.deviceType;
+            self.addDeviceData.ezvizAccount = self.ezvizAccount;
+            nvrArray.push(self.addDeviceData);
+          } else {
+            const selectDevice = self.avilableDeviceList.filter(item => item.checked === true);
+            if (selectDevice.length === 0) {
+              util.notify(self.$t('deviceView.selectDevice'), 'warning', 3000);
+              return false;
+            } else {
+              const noSelectStore = selectDevice.some(item => !item.storeId || item.storeId.length === 0);
+              if (noSelectStore) {
+                util.notify(this.$t('deviceView.selectBoundStore'), 'warning', 3000);
+                return false;
+              } else {
+                selectDevice.map(item => {
+                  item.beseyeAccount = this.beseyeAccount;
+                });
+              }
+            }
+            selectDevice.forEach(item => {
+              item.addedMethod = 1;
+              item.ezvizAccount = self.ezvizAccount;
+              if (item.storeId === '') {
+                util.notify(self.$t('deviceView.selectBoundStore'), 'warning', 3000);
+                return false;
+              }
+            });
+            nvrArray = selectDevice;
+          }
           nvrParams.device = nvrArray;
           const res1 = await self.addEzivzDevice(nvrParams);
           const errMsg = res1.errMsg;
           if (errMsg === 'Success') {
             util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
-            self.showAddNvrDialog = false;
+            self.showAddDeviceDialog = false;
           } else {
             self.setErrorMsg(errMsg);
           }
-          self.addDeviceData = {
-            name: '',
-            validationCode: '',
-            storeId: self.storeDataList.length > 0 ? self.storeDataList[0].storeId : '',
-            serialNumber: '',
-            channelCount: 1,
-            ezvizAccount: self.ezvizAccountList.length > 0 ? self.ezvizAccountList[0].ezvizAccount : ''
-          };
-          self.page = 1;
-          const params = {
-            'filter': {
-              'page': self.page - 1,
-              'size': self.sizeNum
-            },
-            'order': {
-              'direction': 'asc',
-              'property': 'name'
-            }
-          };
-          self.getDeviceList(params);
+          self.initAddDeviceFormData();
+          self.setDeviceListParams();
         } else {
           return false;
         }
@@ -1529,8 +1289,8 @@ export default {
         if (valid) {
           const json = {};
           json.name = self.addChannelData.name;
-          json.storeId = self.curNVRItem.storeId;
-          json.ivsId = self.curNVRItem.serialNumber;
+          json.storeId = self.curEzvizItem.storeId;
+          json.ivsId = self.curEzvizItem.serialNumber;
           json.channelId = self.addChannelData.channelId;
           json.vendor = 1;
           const deviceArr = [];
@@ -1553,10 +1313,10 @@ export default {
             util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
             self.showAddChannelDialog = false;
           }
-          self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
+          self.initAddChannelFormData();
           self.page = 1;
           self.channelData = await self.getChannelData();
-          self.getChannelListByDevice(self.curNVRItem.serialNumber);
+          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         } else {
           return false;
         }
@@ -1621,139 +1381,45 @@ export default {
       })
         .then(async() => {
           self.channelData = await self.getChannelData(); // modify data
-          self.getChannelListByDevice(self.curNVRItem.serialNumber);
+          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         }).catch(err => {
           console.log('EzvizDeviceManagement-deleteSingleChannel: ' + err);
         });
     },
 
-    editSingleNvr(index, item) {
-      const self = this;
-      item.isEditing = true;
-      item.isClick = true;
-      self.nvrData.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isEditing = false;
-          _item.isClick = false;
-        }
-      });
-      item.name = item.tempNvrName;
-      item.ezvizAccount = item.tempEzvizAccount;
-      item.channelCount = item.tempChannelCount;
-      self.curNVRItem = item;
-      self.channelCountTemp = item.channelCount;
-      self.curIndex = index;
-      self.getChannelListByDevice(item.serialNumber);
-      // show update dialog
-      self.addDeviceData = item;
-      self.isAddAgain = true;
-      self.showAddNvrDialog = true;
-      self.storeDataList = self.allStoreDataList;
-    },
-
     showAddDialog() {
-      const self = this;
-      self.showAddNvrDialog = true;
-      self.storeDataList = self.allStoreDataList;
-      self.isAddAgain = false;
-      self.addDeviceData = {
-        name: '',
-        validationCode: '',
-        storeId: self.storeDataList.length > 0 ? self.storeDataList[0].storeId : '',
-        serialNumber: '',
-        channelCount: 1,
-        ezvizAccount: self.ezvizAccountList.length > 0 ? self.ezvizAccountList[0].ezvizAccount : ''
-      };
+      this.showAddDeviceDialog = true;
+      this.storeDataList = this.allStoreDataList;
+      this.isAddAgain = false;
+      this.deviceType = 0;
+      this.initAddDeviceFormData();
+      this.accountScope === 1 && this.getAvailableEzvizDevice();
     },
 
-    confirmEditNvr(index, item) {
-      const self = this;
-      const obj = {};
-      obj.serialNumber = item.serialNumber;
-      obj.name = item.tempNvrName;
-      obj.channelCount = item.tempChannelCount;
-      if (obj.name.trim().length === 0) {
-        util.notify(self.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
-        return false;
-      }
-      obj.syncToEzviz = false;
-      const params = obj;
-      ezvizRESTful.updateEzvizDevice(params).then(res => {
-        const errMsg = res.errMsg;
-        if (errMsg && errMsg === 'Success') {
-          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-          item.isEditing = false;
-          item.name = item.tempNvrName;
-          item.channelCount = item.tempChannelCount;
-        } else {
-          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-          item.isEditing = false;
-        }
-      })
-        .then(async() => {
-          self.getChannelListByDevice(self.curNVRItem.serialNumber);
-        }).catch(err => {
-          console.log('EzvizDeviceManagement-confirmEditNvr: ' + err);
-        });
-    },
-
-    cancelEditNvr(index, item) {
-      const self = this;
-      item.isEditing = false;
-      item.tempNvrName = item.name;
-      item.tempChannelCount = item.channelCount;
-    },
-
-    updateDeleteDeviceDialogFlag(val){
-      this.showConfirmDelete = val;
-    },
-
-    hideDeleteDeviceDialog(){
-      this.showConfirmDelete = false;
-    },
-
-    async deleteSingleNVR() {
+    async confirmDeleteDevice() {
       const self = this;
       self.showConfirmDelete = false;
-      const serialNumber = self.curNVRItem.serialNumber;
-      const json = {};
-      json.serialNumber = serialNumber;
-      json.deleteFromEzviz = self.deleteFromEzviz;
-      const channelList = self.channelList.map(x => x.id);
-      if (channelList.length > 0) {
-        const res1 = await self.deleteChannel(channelList);
-        const res2 = await self.deleteEzvizDevice(json);
-        if (res1.errMsg === 'Success' && res2.errMsg === 'Success') {
+      const deleteParams = {};
+      deleteParams.device = [];
+      deleteParams.device = self.deleteSerialNums;
+      self.deleteEzvizDevice(deleteParams).then(res => {
+        if (res.errCode === 0) {
           util.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
+          self.showDeleteDialog = false;
+          self.setDeviceListParams();
         } else {
           util.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
+          self.showDeleteDialog = false;
         }
-      } else {
-        const res2 = await self.deleteEzvizDevice(json);
-        if (res2.errMsg === 'Success') {
-          util.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);
-        } else {
-          util.notify(self.$t('deviceView.deleteFail'), 'warning', 3000);
-        }
-      }
-      self.deleteFromEzviz = false;
-      const params = {
-        'filter': {
-          'page': self.page - 1,
-          'size': self.sizeNum
-        },
-        'order': {
-          'direction': 'asc',
-          'property': 'name'
-        }
-      };
-      self.getDeviceList(params);
+      }).catch(err => {
+        console.log('EzvizDeviceMgmt-confirmDeleteDevice' + err);
+      });
     },
 
     // add new channel
     addNewChannel() {
       const self = this;
-      const channelNum = this.curNVRItem.channelCount;
+      const channelNum = this.curEzvizItem.channelCount;
       const spliceArray = [];
       for (let item = 1; item <= channelNum; item++) {
         const channelJson = {};
@@ -1771,7 +1437,7 @@ export default {
       });
       self.newChannelNumList = spliceArray;
       self.showAddChannelDialog = true;
-      self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
+      self.initAddChannelFormData();
     },
 
     getSortFun(sortBy) {
@@ -1786,7 +1452,6 @@ export default {
       const retData = await self.getEzvizAccountList();
       const accountList = retData.data;
       self.ezvizAccountList = accountList;
-      self.$refs.ezvizAccount.tableData = accountList;
     },
 
     getEzvizAccountList() {
@@ -1888,13 +1553,14 @@ export default {
     setErrorMsg(msg) {
       let displayedMsg = '';
       const msgMap = [
-        { return: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
+        { ret: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
         { ret: 'deviceExist', match: ['Device already existed'] },
         { ret: 'multipleAccOnSameStore', match: ['Multiple accounts'] },
         { ret: 'getAccessTokenError', match: ['Ezviz access token'] },
         { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
         { ret: 'storeNotExist', match: ['Store does not exist'] },
-        { ret: 'noAuthorityForStore', match: ['No authority'] }
+        { ret: 'noAuthorityForStore', match: ['No authority'] },
+        { ret: 'illegalSeriNum', match: ['deviceSerial'] }
       ];
       const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
       if (!result) {
@@ -1903,17 +1569,47 @@ export default {
         displayedMsg = this.$t(`deviceView.${result.ret}`);
       }
       util.notify(displayedMsg, 'warning', 3000);
-      this.showAddNvrDialog = false;
+      this.showAddDeviceDialog = false;
+    },
+
+    getAvailableDevice(params) {
+      return new Promise((resolve, reject) => {
+        ezvizRESTful.getAvailableDevices(params).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    getAvailableEzvizDevice() {
+      const params = {};
+      params.ezvizAccount = this.ezvizAccount;
+      this.getAvailableDevice(params).then(res => {
+        this.avilableDeviceList = res.errCode === 0 && res.data.length > 0 ? res.data : [];
+      }).catch(error => {
+        this.avilableDeviceList = [];
+        console.log('EzvizDevice-getAvailableEzvizDevice-' + error);
+      });
+    },
+
+    handlePageAndSizeChange(pageObj) {
+      console.log(pageObj);
+      const self = this;
+      self.page = pageObj.page;
+      self.sizeNum = pageObj.size;
+      self.setDeviceListParams();
     }
   }
 };
 </script>
+
 <style lang="scss" scoped>
   @import '../../../assets/css/importfile.css';
   @import '../../../assets/css/textstyle.css';
   $mainColor:#f31d65;
   $border:#e3e9f4;
-  $background:#f4f5f9;
+  $background:#f5f7fa;
   $tab:#7d8cad;
   @function rem($val){
     @return $val/16+rem;
@@ -1930,62 +1626,121 @@ export default {
     height: 60px;
     line-height: 60px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
   }
-
-  .noraml-color{
-    color: #4b5262 !important;
-    background-color: #f4f5f9;
-    cursor: pointer;
+  *{
+    font-family: Roboto,Arial, Microsoft YaHei;
   }
-
-  .active-color{
-    color: $mainColor !important;
-    background-color: #fff;
+  .operation-btns{
+    float: right;
+    @include point(margin-right,15);
+    .iconfont{
+      font-size: calc(16/1920*100vw);
+      margin-right: calc(8/1920*100vw);
+    }
+    span{
+      font-size: calc(14/1920*100vw);
+    }
+    .noAllow{
+      cursor:not-allowed;
+      opacity: 0.6;
+    }
+    .el-add-btn, .el-delete-btn{
+      color: #fff;
+      position: relative;
+      margin-right: calc(15/1920*100vw);
+      height: calc(36/1920*100vw);
+      width: calc(130/1920*100vw);
+      padding: 0;
+      &:disabled{
+        opacity: 0.5;
+      }
+    }
+    .en-el-add-btn, .en-el-delete-btn{
+      background-color: $mainColor;
+      border-color:  $mainColor;
+      color: #fff;
+      font-size: calc(14/1920*100vw);
+      text-align: center;
+      height: calc(36/1920*100vw);
+      width: calc(130/1920*100vw);
+      &:disabled{
+        opacity: 0.5;
+      }
+    }
   }
   .tooltip-color{
     color: rgba(75,82,98, 0.5) !important;
   }
 
-  .el-device{
-    height: calc(100vh - 126px - calc(60/1920*100vw));
+  .el-device {
+    height: calc(100vh - 170px);
     border: 1px solid $border;
     background-color: #fff;
-    .el-btns{
+    .account-title {
+      text-align: left;
       position: relative;
-      height: calc(40/1920*100vw);
-      .btns{
+      height: 70px;
+      line-height: 70px;
+      padding-right: calc(30 / 1920 * 100vw);
+      padding-left: calc(30 / 1920 * 100vw);
+      font-size: calc(20 / 1920 * 100vw);
+      color: #182752;
+      border-bottom: 1px solid $border;
+      .btns {
         position: absolute;
-        @include point(right,25);
+        @include point(right, 25);
         z-index: 979;
-        @include point(width,90);
+        @include point(width, 90);
       }
-      .device-btns{
-        position:absolute;
+      .device-btns {
+        position: absolute;
         z-index: 979;
         right: 30px;
         top: 23px;
         float: right;
       }
     }
-
-    .el-tabPanels{
-      padding: 25px calc(25/1920*100vw) 0 calc(25/1920*100vw);
-      height: auto;
-      position: relative;
+    .table-container {
+      min-height: calc(100% - 75px);
+      margin: 20px calc(20 / 1920 * 100vw);
+    }
+    .addDevice .ezviz-form {
+      border: 1px solid $border;
+      background: $tab;
+    }
+    .device-content {
+      padding: 25px calc(25 / 1920 * 100vw) 0 0;
+      height: calc(100% - 95px);
       bottom: calc(30/1920*100vw);
       .dialog-content{
         width: 100%;
       }
       .titles{
         display: inline-block;
-        span{
-          position: relative;
-          left: 20%;
+        margin-left: calc(20/1920*100vw);
+      }
+      .titles:first-child{
+        margin-left: calc(25/1920*100vw);
+      }
+      .dash-content{
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+        .details{
+          @include point(height,50);
+          @include point(line-height,50);
+          @include point(padding-left,10);
+          .dash-label{
+            width: 30%;
+            float: left;
+          }
+          .dash-input{
+            width: 50%;
+            margin-left: 5%;
+          }
         }
       }
-
-      .nvr-info{
+      .device-info{
         @include titleStyle;
         position: relative;
         padding-left: calc(25/1920*100vw);
@@ -1997,322 +1752,34 @@ export default {
         .add-btn{
           position: absolute;
           right: calc(25/1920*100vw);
+          font-size: calc(14/1920*100vw);
+          height: calc(36/1920*100vw);
           padding: 0 0;
+          width: calc(130/1920*100vw);
           top: 0;
           bottom: 0;
           margin: auto;
+          .el-icon-plus{
+            font-size: calc(16/1920*100vw);
+            margin-right: calc(8/1920*100vw);
+          }
+
         }
       }
       .lisde{
-        background-color: #FAFAFA;
-        height: auto;
+        background-color: $background;
+        height: calc(100% - 1px);
         position: relative;
         .icon-filter{
           position: relative;
           left: 20%;
           cursor: pointer;
         }
-        .nvr-title{
-          @include titleStyle;
-          @media screen and (min-width: 1366px) {
-            font-size: 14px;
-          }
-          @media screen and (max-width: 1366px) {
-            font-size: 12px;
-          }
-          background-color: #fff;
-          .comment-title{
-            width: 2%;
-          }
-          .name-title{
-            width: 20%;
-          }
-          .model-title{
-            width: 20%;
-          }
-          .store-title{
-            width: 20%;
-          }
-          .count-title{
-            width: 15%;
-          }
-          .operation-title{
-            width: 15%;
-            span{
-              left: 30%;
-            }
-          }
-          .en-comment-title {
-            width: 2%;
-          }
-          .en-name-title {
-            width: 18%;
-          }
-          .en-model-title {
-            width: 22%;
-          }
-          .en-store-title {
-            width: 20%;
-          }
-          .en-count-title {
-            width: 20%;
-            span {
-              left: 0;
-            }
-          }
-          .en-operation-title {
-            width: 15%;
-          }
-          @media screen and (max-width: 1680px) {
-            .model-title{
-              width: 18%;
-            }
-            .store-title{
-              width: 20%;
-            }
-            .count-title{
-              width: 20%;
-            }
-            .operation-title{
-              width: 15%;
-              span{
-                left: 30%;
-              }
-            }
-            .en-comment-title {
-              width: 2%;
-            }
-            .en-name-title {
-              width: 18%;
-            }
-            .en-model-title {
-              width: 23%;
-            }
-            .en-store-title {
-              width: 20%;
-            }
-            .en-count-title {
-              width: 23%;
-              span {
-                left: 0;
-              }
-            }
-            .en-operation-title {
-              width: 15%;
-            }
-          }
-          @media screen and (max-width: 1440px) {
-            .model-title{
-              width: 20%;
-            }
-            .store-title{
-              width: 20%;
-            }
-            .count-title{
-              width: 20%;
-            }
-            .operation-title{
-              width: 15%;
-              span{
-                left: 30%;
-              }
-            }
-            .en-comment-title {
-              width: 2%;
-            }
-            .en-name-title {
-              width: 18%;
-            }
-            .en-model-title {
-              width: 25%;
-            }
-            .en-store-title {
-              width: 20%;
-            }
-            .en-count-title {
-              width: 26%;
-              span {
-                left: 0;
-              }
-            }
-            .en-operation-title {
-              width: 15%;
-
-            }
-          }
-          @media screen and (max-width: 1280px) {
-            .model-title{
-              width: 20%;
-            }
-            .store-title{
-              width: 20%;
-            }
-            .count-title{
-              width: 20%;
-            }
-            .operation-title{
-              width: 15%;
-              span{
-                left: 30%;
-              }
-            }
-            .en-comment-title {
-              width: 2%;
-            }
-            .en-name-title {
-              width: 18%;
-            }
-            .en-model-title {
-              width: 26%;
-            }
-            .en-store-title {
-              width: 20%;
-            }
-            .en-count-title {
-              width: 26%;
-              span {
-                left: 0;
-              }
-            }
-            .en-operation-title {
-              width: 15%;
-
-            }
-          }
-        }
-        .nvr-title .titles{
-          color: $tab;
-        }
-        .nvr-data{
-          @include titleStyle;
-          position: relative;
-          font-size: 14px;
-          .proper-flag{
-            height: 70%;
-            width: 4px;
-            position:absolute;
-            top: 15%;
-            background-color: $mainColor;
-          }
-          .comment-data{
-            width: 4%;
-            height: 100%;
-            span{
-              //display: inline-block;
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-            }
-          }
-          .name-data{
-            width: 20%;
-            height: 100%;
-            position: absolute;
-            span{
-              //display: inline-block;
-              width: 70%;
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              left: 10%;
-            }
-          }
-          .model-data{
-            width: 20%;
-            height: 100%;
-            left: 20%;
-            position: absolute;
-            span{
-              display: inline-block;
-              width: 70%;
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-            }
-          }
-          .store-data{
-            width: 20%;
-            height: 100%;
-            position: absolute;
-            left: 43%;
-            span{
-              //display: inline-block;
-              width: 70%;
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-            }
-          }
-          .count-data{
-            width: 15%;
-            height: 100%;
-            position: absolute;
-            left: 65%;
-            span{
-              display: inline-block;
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-            }
-          }
-          .operation-data:after{
-            content: '';
-            display: block;
-            clear: both;
-          }
-          .operation-data{
-            width: 20%;
-            height: 100%;
-            position: absolute;
-            left: 83%;
-            .iconcontent{
-              position: absolute;
-              cursor: pointer;
-              display: inline-block;
-              .iconfont{
-                font-size: calc(24/1920*100vw);
-                color: #7d8cad;
-              }
-              .iconlised{
-                float: left;
-                position: relative;
-                background-color: $mainColor;
-                padding: 1px 6px;
-                color: #fff;
-                border-width: 1px 1px 1px 1px;
-                border-style: solid;
-                border-color: #ddd;
-                line-height: 60px;
-                height: 60px;
-                >>> el-button .add-btn{
-                  font-size: 12px;
-                }
-              }
-              .iconrised{
-                float: left;
-                position: relative;
-                padding: 1px 6px;
-                border-width: 1px 1px 1px 0px;
-                border-style: solid;
-                border-color: #ddd;
-                background-color: rgba(255, 255, 255, 0);
-                line-height: 60px;
-                height: 60px;
-              }
-            }
-
-          }
-          &:last-child{
-            margin-bottom: 20px;
-          }
-        }
       }
       .risde{
+        background-color: #ffffff;
+        height: 100%;
         .iconcontent{
-          position: absolute;
-          @include point(margin-top,-15);
-          cursor: pointer;
-          display: inline-block;
           .iconlised{
             float: left;
             position: relative;
@@ -2338,45 +1805,38 @@ export default {
           }
         }
         padding:0 15px;
-        .nape-items-title{
+        .tabTitle{
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px solid $border;
           @include titleStyle;
-          font-size: 14px;
-          .nape-name-title{
-            width: 30%;
-          }
-          .nape-dep-title{
-            width: 30%;
-          }
-          .nape-picture-title{
-            width: 20%;
-          }
-          .nape-handle-title{
-            width: 10%;
-          }
         }
-        .en-nape-items-title{
+        .nape-items-title{
+          border-bottom: 1px solid $border;
           @include titleStyle;
-          @media screen and (min-width: 1366px) {
-            font-size: 14px;
-          }
-          @media screen and (max-width: 1366px) {
-            font-size: 12px;
-          }
-          .nape-name-title{
-            width: 30%;
-          }
-          .nape-dep-title{
-            width: 26%;
-          }
-          .nape-picture-title{
-            width: 25%;
-          }
-          .nape-handle-title{
-            width: 15%;
-          }
+          font-size: calc(14/1920*100vw);
+        }
+        .nape-dep-title{
+          width: 23%;
+        }
+        .nape-name-title{
+          width: 28%;
+        }
+        .nape-picture-title{
+          width: 20%;
+        }
+        .nape-enable-title{
+          width: 20%;
+        }
+        .nape-handle-title{
+          width: 9%;
         }
         .nape-items-title .titles, .en-nape-items-title .titles{
           color: $tab;
+          text-align: left;
+        }
+        .channel-content{
+          height: calc(100% - 160px);
         }
         .nape-items-data{
           overflow: hidden;
@@ -2386,21 +1846,21 @@ export default {
           font-size: 14px;
           height: 90px;
           line-height: 90px;
-
+          display: flex;
           text-align: left;
           .nape-input{
             width: calc(160/1920*100vw);
-            margin-left: 13%;
+            margin-left: calc(20/1920*100vw);
             position: relative;
             bottom: 2px;
           }
           .nape-name-data{
-            width: 30%;
+            width: 28%;
             display: inline-block;
             position: relative;
             /*margin-right: 6%;*/
             span{
-              margin-left: 20%;
+              margin-left: calc(20/1920*100vw);
               position: relative;
               @include point(max-width,90);
               overflow: hidden;
@@ -2409,11 +1869,11 @@ export default {
             }
           }
           .nape-dep-data{
-            width: 30%;
+            width: 23%;
             display: inline-block;
             position: relative;
             span{
-              margin-left: 20%;
+              margin-left: calc(25/1920*100vw);
             }
           }
           .nape-picture-data{
@@ -2458,11 +1918,21 @@ export default {
             }
           }
           .en-nape-picture-data{
-            width: 24%;
+            width: 20%;
+          }
+          .nape-enable-handle{
+            width: 20%;
+            margin-left: calc(20/1920*100vw);
           }
           .nape-items-handle{
-            width: 13%;
+            width: 9%;
             display: inline-block;
+            position: relative;
+            .iconcontent{
+              position: absolute;
+              top: 50%;
+              transform: translateY(-50%);
+            }
             .iconfont{
               font-size: calc(24/1920*100vw);
               color: #7d8cad !important;
@@ -2473,12 +1943,116 @@ export default {
       }
     }
   }
+  .btn-class{
+    height: calc(36/1920*100vw);
+    padding: 0;
+    font-size: calc(14/1920*100vw);
+    width: calc(130/1920*100vw);
+    .el-icon-plus{
+      font-size: calc(16/1920*100vw);
+      margin-right: calc(8/1920*100vw);
+    }
+    @media screen and (max-width: 1440px) {
+      width: 100px !important;
+    }
+    .btn-area{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 </style>
 <style>
+  @import '../../../assets/css/pagination.css';
+  @import '../../../assets/css/tabsItem.css';
+  #el-menuscrollbar{
+    height: calc(100% - 120px);
+  }
   #el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
   }
+  .el-dialog__body{
+    padding: 0px;
+  }
+  .el-dialog__body .dialog-content .deviceForm{
+    box-sizing: border-box;
+    padding: 32px calc(40/1920*100vw) 0px calc(40/1920*100vw);
+  }
+  .el-dialog__body .dialog-content .deviceForm .picture-tips{
+    display: inline;
+    font-size: 12px;
+    color: #fea316;
+    position: relative;
+    top: 30px;
+    left: 30px;
+  }
+  .addDevice .el-dialog__footer{
+    margin-top: 20px;
+    line-height: 24px;
+    padding-bottom: 30px;
+  }
+  .addDevice .rules{
+    font-size: 10px;
+    color:#ff2400;
+    font-weight: 400;
+    line-height: 10px;
+    margin-top: 3px;
+    display: block;
+}
+  .el-dialog__body .dialog-content .deviceForm label{
+    padding: 0;
+  }
+  .available-span{
+    font-size: calc(14/1920*100vw);
+    color: #94a4b4;
+  }
+  .el-dialog__body .dialog-content .deviceForm .available-device-info{
+    border-radius: 2px;
+    background-color: #f7f8fb;
+    border: 1px solid #dfe2e9;
+    margin-top: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
 
+  .available-device-info .el-select .el-input--medium .el-input__inner{
+    height: 35px;
+    color: #94a4b4;
+  }
+  .available-devices{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 calc(20/1920*100vw) 10px;
+  }
+  .available-sn{
+    width: 150px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-left: 20px;
+  }
+  .available-name{
+    width: 160px;
+    padding-left: 20px;
+  }
+  .available-store{
+    padding-left: 20px;
+    width: 160px;
+  }
+  .available-device-info .el-select .el-input--medium .el-input__inner{
+    height: 35px;
+    color: #94a4b4;
+  }
+  .el-dialog__body .dialog-content .deviceForm .main-device-info{
+    background-color: #f6fbf9;
+    border: 1px solid  #dfe3e9;
+    padding: 20px calc(20/1920*100vw) 0;
+  }
+  .el-switch.is-checked .el-switch__core{
+    border-color: #00FF00;
+    background-color: #00FF00;
+  }
   .avatar-uploader .picture-tips{
     display: inline;
     font-size: 12px;
@@ -2493,14 +2067,7 @@ export default {
   .avatar-uploader .el-upload:hover {
     border-color: #409EFF;
   }
-  .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
-    text-align: center;
-  }
+
   .image-class{
     height: 70px;
     width: calc(100/1920*100vw);
@@ -2541,5 +2108,70 @@ export default {
   }
   .el-icon-picture-outline{
     font-size: 16px;
+  }
+  .device-table{
+    height: calc(100% - 60px);
+    position: relative;
+  }
+  .device-table .el-table--mini{
+    height: calc(100% - 92px);
+    background: #f5f7fa;
+  }
+  .device-table .el-table__row{
+    height: 60px;
+    font-weight: 700;
+    background: #f5f7fa;
+  }
+  .device-table .el-table__row .iconfont{
+    font-weight: 400;
+  }
+  .device-table .el-table .cell{
+    white-space: nowrap;
+  }
+  .device-table .el-table--enable-row-hover .el-table__body tr:hover > td{
+    background-color: #fff;
+  }
+  .device-table .el-table__body tr.current-row > td{
+    background-color: #fff;
+    color: #f31d65;
+  }
+  .device-table .el-table__body tr.current-row .el-table-column--selection .cell {
+    color: #fff;
+    border-left: 4px solid #f31d65;
+    line-height: 40px;
+  }
+  .device-table .el-table__body tr .el-table-column--selection .cell {
+    color: #fff;
+    border-left: 4px solid  rgba(255,255,255,0);
+    line-height: 40px;
+  }
+  .device-table .account-header{
+    height: 60px;
+  }
+  .device-table .el-table .cell{
+    padding-left: calc(20/1920*100vw);
+    padding-right: 0px;
+  }
+
+  .device-table .el-checkbox__input.is-indeterminate .el-checkbox__inner{
+    background-color: #fff;
+    border-color: #DCDFE6;
+  }
+  .device-table .toolbar.pagination{
+    bottom: 0;
+    right: 0;
+    height: auto;
+    position: absolute;
+    margin-right: calc(15/1920*100vw);
+  }
+  .el-table th.is-leaf:first-child{
+    border-left: 4px solid  rgba(255,255,255,0);
+  }
+</style>
+<style scoped>
+  .el-input--small >>>.el-input__inner{
+    background: #f0f5f8 !important;
+    border-radius: 15px !important;
+    line-height: 50% !important;
   }
 </style>

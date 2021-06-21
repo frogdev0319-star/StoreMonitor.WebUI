@@ -255,14 +255,53 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
+
     PermissionHelper.enableDeviceSetting() && systemSettingRoute.children.push({
-      path: '/device',
-      name: 'deviceManage',
-      component: resolve => require(['@/views/setting/device/DeviceSetMge'], resolve),
-      meta: {
-        requireAuth: true
-      }
-    });
+        path: '/device',
+        name: 'deviceManage',
+        hidden: false,
+        threeChild: true,
+        component: resolve => require(['@/views/setting/device/DevicesMgmt'], resolve),
+        meta: {
+          requireAuth: true
+        },
+        children: [
+          {
+            path: '/dashDevice',
+            name: 'dashDevice',
+            component: resolve => require(['@/views/setting/device/NvrDeviceMgmt'], resolve)
+          },
+          {
+            path: '/ezvizDevice',
+            name: 'ezvizDevice',
+            component: resolve => require(['@/views/setting/device/EzvizAccount'], resolve)
+          },
+          {
+            path: '/beseyeAccount',
+            name: 'beseyeAccount',
+            // hidden: true,
+            component: resolve => require(['@/views/setting/device/BeseyeAccount'], resolve)
+          },
+          {
+            path: '/ezvizeDeviceSetting',
+            name: 'deviceSetting',
+            component: resolve => require(['@/views/setting/device/EzvizDeviceMgmt'], resolve),
+            hidden: true
+          },
+          {
+            path: '/beseyeDeviceSetting',
+            name: 'beseyeDeviceSetting',
+            component: resolve => require(['@/views/setting/device/BeseyeDeviceMgmt'], resolve),
+            hidden: true
+          },
+          {
+            path: '/beseye/authorize',
+            name: 'auth',
+            component: resolve => require(['@/views/setting/device/Authorize'], resolve),
+            hidden: true
+          }
+        ]
+      });
 
     const inspectionRoute = {
       path: '/inspectionSetting',
