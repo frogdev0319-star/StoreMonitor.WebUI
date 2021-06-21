@@ -634,7 +634,6 @@ export default {
                 self.downloadProgress = false;
               }
             }, timer * 10);
-            console.log('timer', timer);
             document.getElementById('isNeedRemove') && document.getElementById('isNeedRemove').remove();
             self.isexportPDF = false;
           });
@@ -1234,7 +1233,6 @@ export default {
             itemStyle: {
               normal:{
                 color: function(params){
-                  console.log(params)
                   let colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
                     '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
                   return colorList[params.dataIndex];
