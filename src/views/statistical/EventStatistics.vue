@@ -236,6 +236,19 @@
                 </el-table>
               </div>
             </div>
+            <table-pagination
+              ref="elTP"
+              :column-data="eventInfoData"
+              :table-data="eventPDFData"
+              :total="total"
+              :highlight-current-row= "true"
+              :pagesize="sizeNum"
+              :current-page="page"
+              :can-sortable="false"
+              :show-pagination="false"
+              :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
+              @handleChange="handlePageAndSizeChange"
+              @sortChange="handleSortChange"/>
           </el-col>
         </el-row>
       </el-col>
@@ -261,7 +274,7 @@ import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOve
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';

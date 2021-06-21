@@ -282,10 +282,10 @@ import {
   getInspectStatsOverviewWithRegionV2
 } from '@/api/inspectOverview';
 import SearchComponent from '@/components/SearchComponent';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination';
 import DialogPop from '@/components/DialogPop';
-import DelayButton from '../../components/DelayButton';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'PatrolEvaluationSta',
