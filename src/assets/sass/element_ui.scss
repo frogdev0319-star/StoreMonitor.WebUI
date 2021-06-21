@@ -133,6 +133,75 @@ body .el-table th.gutter {
   padding: 0;
 }
 
+.current-row > td {
+  background: #FEE7E4;
+}
+.el-dialog__body{
+  padding: 0px;
+}
+
+@media screen  and (max-width: 1280px){
+  .add-dialog .el-dialog{
+    width: 40% !important;
+  }
+}
+.ezviz-account .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before{
+  color: #ccc;
+}
+.ezviz-account .el-form-item__content{
+  display: inline-block;
+  margin-left: 0 !important;
+  width: 70%;
+}
+.access-token .el-form-item__content{
+  width: 70%;
+  display: inline-flex;
+  align-items: center;
+}
+.access-button .el-form-item__content{
+  width: 100%;
+}
+.accountForm .el-form-item__error{
+  color:#F56C6C !important;
+}
+.ezviz-account .el-form-item__error{
+  color:#F56C6C !important;
+}
+.el-dialog__body .dialog-content .accountForm{
+  width: 90%;
+  margin: 0 auto;
+}
+.ezviz-account .el-form-item , .accountForm .el-form-item {
+  margin-bottom: 15px;
+}
+.el-dialog__body .dialog-content .accountForm label {
+  padding: 0
+}
+.accountForm .el-radio__label , .accountForm .el-form-item__label , .accountForm .el-form-item__content{
+  font-size: calc(14/1920*100vw);
+}
+.accountForm .radio-item {
+  margin-bottom: 15px;
+}
+.accountForm .el-input__count{
+  float: right;
+}
+.accountForm .el-radio__input.is-checked + .el-radio__label{
+  color: #606266;
+}
+.accountForm .comment-item{
+  margin-bottom: 0px;
+}
+.accountForm .el-form-item__error{
+  left: 0;
+}
+.account-header{
+  border: none;
+  font-size: calc(14/1920*100vw);
+  color: #7d8cad;
+  height: 47px;
+}
+
 .self-loading .el-loading-mask{
   background-color: rgba(255, 255, 255, 1);
   .el-loading-spinner  .circular {
@@ -142,7 +211,7 @@ body .el-table th.gutter {
     display: none;
   }
   .el-loading-spinner {
-    background: url("../../../static/img/loading.gif") no-repeat;
+    background: url("~@/../static/img/loading.gif") no-repeat;
     background-position: center;
     display: flex;
     justify-content: center;
