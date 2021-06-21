@@ -1121,7 +1121,8 @@ export default {
       if (ret.data != undefined && ret.data.isLogin) {
         self.export2Excel();
       } else {
-        window.location.href = 'https://portals.storeviu.com';
+        const url = sessionStorage.getItem('LoginURL');
+        window.location.href = url;
       }
     },
 

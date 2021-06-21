@@ -437,7 +437,7 @@ import { getInspectReportInfo, getInspectReportDetail } from '@/api/inspect';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
-import resize from '@/components/mixins/resize.js'
+import resize from '@/components/mixins/echartResize.js'
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';

@@ -131,7 +131,7 @@ import util from '@/common/util.js';
 import { getBriefStoreList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimePicker from '@/components/DateTimePicker';
 
@@ -353,7 +353,7 @@ export default {
             };
             tempStore.push(obj);
           });
-          if(tempStore.length > 0){
+          if (tempStore.length > 0) {
             tempStore.unshift(
               {
                 storeId: '-1',
@@ -370,7 +370,7 @@ export default {
     changeStore(val) {
       const self = this;
       self.storeIds = [];
-      if (val === "-1") {
+      if (val === '-1') {
         self.storeIds = [];
       } else {
         self.storeIds.push(self.curStore);
@@ -954,23 +954,23 @@ export default {
       this.$refs.eventStatusRef && this.$refs.eventStatusRef.resize();
     },
 
-    saveSearchParams(){
-      let params = {
+    saveSearchParams() {
+      const params = {
         beginTs: this.params.beginTs,
         endTs: this.params.endTs,
         storeId: this.curStore,
         rankType: this.rankType
-      }
+      };
       const searchConditon = {
         path: 'eventOverview',
         params: params
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventOverview');
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
