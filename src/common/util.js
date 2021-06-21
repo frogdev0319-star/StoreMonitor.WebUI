@@ -826,6 +826,7 @@ export default {
     }
     return seats[idx] / digits;
   },
+
   groupArrayOnSize(array, size) {
     const length = array.length;
     if (!length || !size || size < 1) {
@@ -930,6 +931,5 @@ class indexedDB {
       };
     });
   }
-
 }
 export { indexedDB };

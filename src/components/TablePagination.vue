@@ -271,7 +271,6 @@ export default {
 
     handleRowClick(row) {
       this.currentRow = row;
-      console.log(row);
       this.$emit('emitRowClick', row);
     },
 
@@ -330,7 +329,6 @@ export default {
       const val1 = obj1[column].substr(0, obj1[column].length - 1);
       const val2 = obj2[column].substr(0, obj2[column].length - 1);
       return val1 - val2;
-      console.log(this.order);
     },
 
     handleOperationButton(methods, row, index) {

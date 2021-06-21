@@ -1127,7 +1127,8 @@ export default {
             export_json_to_excel(tHeader, data, that.getExportFileName());
           });
         } else {
-          window.location.href = 'https://portals.storeviu.com';
+          const url = sessionStorage.getItem('LoginURL');
+          window.location.href = url;
         }
       } catch (err) {
         console.log('EventManagement-export2Excel' + err);

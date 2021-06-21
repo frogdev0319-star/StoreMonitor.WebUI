@@ -1,7 +1,8 @@
 <template>
   <el-col :span="24" class="statistics-header">
     <el-col :span="24" class="header-details">
-      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeSelect') }}</span>
+      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">
+        {{ $t('remotePatrol.storeSelect') }}</span>
       <el-select
         v-model="curCountry"
         :placeholder="$t('remotePatrol.country')"
@@ -42,7 +43,8 @@
         :options="storeDataList"
         style="display: inline"
         @changeInput="handleStoreChange"/>
-      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.selectStoreTag') }}</span>
+      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">
+        {{ $t('remotePatrol.selectStoreTag') }}</span>
       <multi-select
         ref="TagMultiSelect"
         :selected="curStoreTag"
@@ -53,7 +55,8 @@
         style="display: inline;margin-left: calc(20/1920*100vw);"
         @changeInput="handleStoreTagChange"/>
       <span v-if="isInspectItem || isPatrol">
-        <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
+        <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">
+          {{ $t('overview.patrolLists') }}</span>
         <el-select
           v-model="inspectList"
           :placeholder="$t('insSettingView.selectPost')"
@@ -176,9 +179,9 @@ export default {
       storePatrolLists: [],
       ifGetParamsFromCash: false,
       storeListLength: -1,
-      order: {direction: '', property: ''},
-      filter: {page: 0, size: 10},
-      inspectCatch:''
+      order: { direction: '', property: '' },
+      filter: { page: 0, size: 10 },
+      inspectCatch: ''
     };
   },
 
@@ -259,7 +262,7 @@ export default {
       self.inspectTypeList = inspectList;
       self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
       if (inspectList.length !== 0) {
-        self.inspectList = self.ifGetParamsFromCash ? (self.inspectTypeList.map(x=>x.id).indexOf(self.inspectCatch) !==-1 ? self.inspectCatch : '') : self.inspectTypeList[0].id;
+        self.inspectList = self.ifGetParamsFromCash ? (self.inspectTypeList.map(x => x.id).indexOf(self.inspectCatch) !== -1 ? self.inspectCatch : '') : self.inspectTypeList[0].id;
       } else {
         self.inspectList = '';
       }
@@ -467,7 +470,7 @@ export default {
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      self.selectAllProAndCity(val,false);
+      self.selectAllProAndCity(val, false);
     },
 
     changeCity(val) {
@@ -524,7 +527,7 @@ export default {
       self.$refs.citySelect.input = '';
     },
 
-    async selectAllProAndCity(val,isFirst) {
+    async selectAllProAndCity(val, isFirst) {
       const self = this;
       const storeList = self.storeList;
       const temp = [];
@@ -539,9 +542,9 @@ export default {
             temp.push(obj);
           }
           let storeObj = {};
-          if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-            if(self.curCity.length > 0 && self.curCity !== "-1"){
-              if(self.curProvince.includes(item.province) && self.curCity.includes(item.city)){
+          if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
+            if (self.curCity.length > 0 && self.curCity !== '-1') {
+              if (self.curProvince.includes(item.province) && self.curCity.includes(item.city)) {
                 storeObj = {
                   storeId: item.storeId,
                   label: item.name,
@@ -551,8 +554,7 @@ export default {
                 };
               }
             }
-          }
-          else{
+          } else {
             storeObj = {
               storeId: item.storeId,
               label: item.name,
@@ -570,9 +572,9 @@ export default {
         storeList.forEach(item => {
           if (item.province === _item.value) {
             let citObj = {};
-            if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-              if(self.curCity.length > 0 && self.curCity !== "-1"){
-                if(self.curProvince.includes(item.province)){
+            if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
+              if (self.curCity.length > 0 && self.curCity !== '-1') {
+                if (self.curProvince.includes(item.province)) {
                   if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
                     citObj = {
                       label: item.city,
@@ -581,8 +583,7 @@ export default {
                   }
                 }
               }
-            }
-            else{
+            } else {
               if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
                 citObj = {
                   label: item.city,
@@ -611,12 +612,12 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      setTimeout(async()=>{
+      setTimeout(async() => {
         self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
         self.ifGetParamsFromCash = false;
         self.changeStoreNew(self.curStore);
         isFirst ? await self.searchData() : null;
-      },100)
+      }, 100);
     },
 
     async searchData() {
@@ -641,7 +642,7 @@ export default {
           this.params.inspectId = id;
           this.storePatrolLists = name;
         } else {
-          this.params.inspectId = this.inspectList==='-1' ? '' : this.inspectList;
+          this.params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
         }
       }
     },
@@ -722,8 +723,7 @@ export default {
       params.curStore = this.curStore;
       params.curStoreTag = this.curStoreTag;
       params.timeMode = this.timeMode;
-      params.inspectId = this.inspectList === '-1' ? '' : this.inspectList
-      console.log(params)
+      params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
 
