@@ -163,13 +163,14 @@
                         :index="grandChild.path"
                         :disabled="grandChild.isReadOnly"
                         :key="grandChild.path"
-                        class="submenu-item" >
+                        class="submenu-item">
                         <template>
                           <span
                             :class="lang === 'en' ? 'third-child-span' : 'zh-third-child-span'">
                             {{ $t(`route.${grandChild.name}`) }}</span>
                         </template>
                       </el-menu-item>
+
                     </el-submenu>
                   </el-submenu>
                 </template>
@@ -210,6 +211,7 @@ import { mapGetters } from 'vuex';
 import { getUserInfo, getAccountList } from '@/api/login';
 import PubSub from 'pubsub-js';
 import { getCookie } from '@/common/auth';
+import Database from '@/common/Database';
 
 export default {
   name: 'Home',
@@ -412,6 +414,7 @@ export default {
 
     routerHome() {
       const url = sessionStorage.getItem('LoginURL');
+      Database.destoryDB();
       window.location.href = url + '/homepage';
     },
 
@@ -555,7 +558,7 @@ export default {
     },
 
     fedlogout() {
-      const self = this;
+      Database.destoryDB();
       const url = sessionStorage.getItem('LoginURL');
       window.location.href = url;
     },
