@@ -66,7 +66,18 @@ export default {
     'noAuthority': '無操作權限！',
     'loginAbnormal': '登錄信息異常，請重新登錄！',
     'insepctionReportSetting': '巡檢報告設置',
-    'inspectingSettingOfReport': '巡檢配置（巡檢報告設置）'
+    'inspectingSettingOfReport': '巡檢配置（巡檢報告設置）',
+    'dashDevice': 'Dash設備',
+    'ezvizDevice': '螢石設備',
+    'beseyeAccount': 'Beseye設備',
+    'dashDeviceMgt': '设备管理（Dash設備）',
+    'ezvizDeviceMgt': '设备管理（萤石設備）',
+    'beseyeDeviceMgt': '设备管理（Beseye設備）',
+    'deviceSetting': '設備配置',
+    'storeViuAccountDeviceSetting': 'StoreVue賬號設備配置',
+    'userAccountDeviceSetting': '客戶螢石賬號設備配置',
+    'auth': '授权',
+    'beseyeDeviceSetting': 'Beseye設備配置'
   },
 
   'overview': {
@@ -419,7 +430,10 @@ export default {
     'loading': '加載中...',
     'highDefinition': '高清',
     'fluency': '流暢',
-    'totalScoreUnit': '总分：'
+    'totalScoreUnit': '总分：',
+    'getBeseyeStreamError': '獲取Beseye視頻流信息失敗！',
+    'closeConnection': '連接關閉',
+    'errorConnection': '連接錯誤'
   },
 
   // event Management page language
@@ -469,10 +483,10 @@ export default {
 
   // Inspection Management page language
   'insSettingView': {
-    'addTitleItem':'添加巡檢項',
-    'editTitleItem':'編輯巡檢項',
-    'enterScore':'請輸入分值',
-    'sheetscore3_des':'（分值間，用“/”隔開）',
+    'addTitleItem': '添加巡檢項',
+    'editTitleItem': '編輯巡檢項',
+    'enterScore': '請輸入分值',
+    'sheetscore3_des': '（分值間，用“/”隔開）',
     'rangeScoreTips': '考評總分最低值不得高於最高值',
     'ruleInspect': '巡檢規則設置',
     'PatrolScoreCalculation': '巡檢得分計算',
@@ -655,7 +669,7 @@ export default {
     'addSuccess': '添加成功',
     'addFailed': '添加失敗',
     'addChannel': '新增通道',
-    'devChannelNum': '設備通道號',
+    'devChannelNum': '通道號',
     'imgTypeInfo': '上傳圖片只能是 JPEG/JPG/PNG 格式！',
     'imgSizeInfo': '上傳圖片大小不能超過 60KB!',
     'inputSerialNum': '請輸入設備序列號',
@@ -772,7 +786,34 @@ export default {
     'duplicateSeriNum': '重復的設備序列號',
     'storeNotExist': '門店不存在',
     'noAuthorityForStore': '對門店無操作權限',
-    'otherError': '其他錯誤'
+    'otherError': '其他錯誤',
+    'accountType': '賬號類型',
+    'hasAddedDevice': '已增加設備數',
+    'deleteDevice': '刪除設備',
+    'emptyDeleteDevice': '請選擇要刪除的設備',
+    'confirmDeleteDevice': '確認刪除該設備？',
+    'confirmDeleteDevices': '確認刪除已勾選設備？',
+    'deviceDetail': '設備詳情',
+    'availableDevice': '賬號中可選擇添加的設備',
+    'deviceSeriNum': '設備SN',
+    'enableStatus': '啟用狀態',
+    'addAvailableDevice': '添加可用設備',
+    'addMainAccountDevice': '添加主賬號設備',
+    'addSharedDevice': '添加他人分享設備',
+    'illegalSeriNum': '序列號不合法',
+    'selectBoundStore': '請選擇所屬門店',
+    'beseyeAuthorize': '授權',
+    'deleteBeseyeUserInfo': '確認刪除該Beseye用戶？',
+    'authorizeRefused': '授權被拒絕',
+    'authorizeSucc': '授權成功',
+    'authorizeFail': '授權失敗',
+    'reauthorizeSucc': '重新授權成功',
+    'reauthorizeFail': '重新授權失敗',
+    'reauthorizeRefused': '重新授權被拒絕',
+    'deleteBeseyeUser': '刪除Beseye用戶',
+    'selectDevice': '請選擇設備',
+    'isAuthorizing': '授權中...'
+
   },
 
   // Store Management page language

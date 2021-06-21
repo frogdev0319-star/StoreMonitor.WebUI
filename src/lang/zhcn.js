@@ -66,7 +66,18 @@ export default {
     'noAuthority': '无操作权限！',
     'loginAbnormal': '登录信息异常，请重新登录！',
     'insepctionReportSetting': '巡检报告配置',
-    'inspectingSettingOfReport': '巡检配置（巡检报告配置）'
+    'inspectingSettingOfReport': '巡检配置（巡检报告配置）',
+    'dashDevice': 'Dash设备',
+    'ezvizDevice': '萤石设备',
+    'beseyeAccount': 'Beseye设备',
+    'dashDeviceMgt': '设备管理（Dash设备）',
+    'ezvizDeviceMgt': '设备管理（萤石设备）',
+    'beseyeDeviceMgt': '设备管理（Beseye）',
+    'deviceSetting': '设备配置',
+    'storeViuAccountDeviceSetting': 'StoreVue账号设备配置',
+    'userAccountDeviceSetting': '客户萤石账号设备配置',
+    'auth': '授权',
+    'beseyeDeviceSetting': 'Beseye设备配置'
   },
 
   'overview': {
@@ -419,7 +430,10 @@ export default {
     'loading': '加载中...',
     'highDefinition': '高清',
     'fluency': '流畅',
-    'totalScoreUnit': '总分：'
+    'totalScoreUnit': '总分：',
+    'getBeseyeStreamError': '获取Beseye视频流信息失败！',
+    'closeConnection': '连接关闭',
+    'errorConnection': '连接错误',
   },
 
   // event Management page language
@@ -655,7 +669,7 @@ export default {
     'addSuccess': '添加成功',
     'addFailed': '添加失败',
     'addChannel': '新增通道',
-    'devChannelNum': '设备通道号',
+    'devChannelNum': '通道号',
     'imgTypeInfo': '上传图片只能是 JPEG/JPG/PNG 格式！',
     'imgSizeInfo': '上传图片大小不能超过 60KB!',
     'inputSerialNum': '请输入设备序列号',
@@ -772,7 +786,33 @@ export default {
     'duplicateSeriNum': '重复的设备序列号',
     'storeNotExist': '门店不存在',
     'noAuthorityForStore': '对门店无操作权限',
-    'otherError': '其他错误'
+    'otherError': '其他错误',
+    'accountType': '账号类型',
+    'hasAddedDevice': '已增加设备数',
+    'deleteDevice': '删除设备',
+    'emptyDeleteDevice': '请选择要删除的设备',
+    'confirmDeleteDevice': '确认删除该设备？',
+    'confirmDeleteDevices': '确认删除已勾选设备？',
+    'deviceDetail': '设备详情',
+    'availableDevice': '账号中可选择添加的设备',
+    'deviceSeriNum': '设备SN',
+    'enableStatus': '启用状态',
+    'addAvailableDevice': '添加可用设备',
+    'addMainAccountDevice': '添加主账号设备',
+    'addSharedDevice': '添加他人分享设备',
+    'illegalSeriNum': '序列号不合法',
+    'selectBoundStore': '请选择所属门店',
+    'beseyeAuthorize': '授权',
+    'deleteBeseyeUserInfo': '确认删除该Beseye用户？',
+    'authorizeRefused': '授权被拒绝',
+    'authorizeSucc': '授权成功',
+    'authorizeFail': '授权失败',
+    'reauthorizeSucc': '重新授权成功',
+    'reauthorizeFail': '重新授权失败',
+    'reauthorizeRefused': '重新授权被拒绝',
+    'deleteBeseyeUser': '删除Beseye用户',
+    'selectDevice': '请选择设备',
+    'isAuthorizing': '授权中...'
   },
 
   // Store Management page language

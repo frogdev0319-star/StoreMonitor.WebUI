@@ -65,7 +65,18 @@ export default {
     'noAuthority': 'No authority!',
     'loginAbnormal': 'The login information is abnormal, please sign in again!',
     'insepctionReportSetting': 'Inspection Report Settings',
-    'inspectingSettingOfReport': 'Inspection Settings(Inspection Report Settings)'
+    'inspectingSettingOfReport': 'Inspection Settings(Inspection Report Settings)',
+    'dashDevice': 'Dash',
+    'ezvizDevice': 'Ezviz',
+    'beseyeAccount': 'Beseye',
+    'dashDeviceMgt': 'Device Management (Dash)',
+    'ezvizDeviceMgt': 'Device Management (Ezviz)',
+    'beseyeDeviceMgt': 'Device Management (Beseye)',
+    'deviceSetting': 'Device Settings',
+    'storeViuAccountDeviceSetting': 'Device Settings of StoreVue Account',
+    'userAccountDeviceSetting': 'Device Settings of User Ezviz Account',
+    'auth': 'Authorize',
+    'beseyeDeviceSetting': 'Device Settings of Beseye'
   },
 
   'overview': {
@@ -414,7 +425,10 @@ export default {
     'noVideoAccess': 'No video access, please contact system administrator',
     'highDefinition': 'HD',
     'fluency': 'SD',
-    'totalScoreUnit': 'Total Score:'
+    'totalScoreUnit': 'Total Score:',
+    'getBeseyeStreamError': 'Failed to get beseye stream info!',
+    'closeConnection': 'Connection close',
+    'errorConnection': 'Connection error'
   },
 
   // event Management page language
@@ -764,7 +778,33 @@ export default {
     'duplicateSeriNum': 'Duplicate device serial number',
     'storeNotExist': 'Store does not exist',
     'noAuthorityForStore': 'No authority for the specified store',
-    'otherError': 'Other Errors'
+    'otherError': 'Other Errors',
+    'accountType': 'Account Type',
+    'hasAddedDevice': 'Added Device',
+    'deleteDevice': 'Delete Device',
+    'emptyDeleteDevice': 'Please select device to delete',
+    'confirmDeleteDevice': 'Confirm to delete the device',
+    'confirmDeleteDevices': 'Confirm to delete devices',
+    'deviceDetail': 'Device Details',
+    'availableDevice': 'Devices That Can Be Added to the Account',
+    'deviceSeriNum': 'Device SN',
+    'enableStatus': 'Enable Status',
+    'addAvailableDevice': 'Add Available Device',
+    'addMainAccountDevice': 'Add Device of Main Account',
+    'addSharedDevice': 'Add Shared Device',
+    'illegalSeriNum': 'Illegal serial number',
+    'selectBoundStore': 'Please Select Store',
+    'beseyeAuthorize': 'Authorize',
+    'deleteBeseyeUserInfo': 'Delete the Beseye User?',
+    'authorizeRefused': 'Authorization refused',
+    'authorizeSucc': 'Successfully authorize',
+    'authorizeFail': 'Failed to authorize',
+    'reauthorizeSucc': 'Successfully reauthorize',
+    'reauthorizeFail': 'Failed to reauthorize',
+    'reauthorizeRefused': 'Reauthorization refused',
+    'deleteBeseyeUser': 'Delete Beseye User',
+    'selectDevice': 'Please select device',
+    'isAuthorizing': 'Authorizing...'
   },
 
   // Store Management page language
