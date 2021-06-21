@@ -959,6 +959,10 @@ export default {
         return null;
       }
       const summaryTree = this.getCategorySummary(summary);
+      if (summaryTree.length === 0) {
+        this.hasChart = false;
+        return null;
+      }
       return this.staticalConfig.chart === 0 ? this.getRadarChart(summaryTree) : this.getPieChart(summaryTree);
     },
 
