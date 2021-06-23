@@ -1,150 +1,158 @@
 <template>
-    <div :class="showTableHeader ? 'dragable-table-content' : 'dragable-noheader-table-content'">
-      <div class="dragable-table-header" v-if="showTableHeader">
-        <div class="table-header-item" v-for="(headerItem, headerIndex) in tableHeader" :key="headerIndex"
-             :style="headerItem.headerStyle">
-          {{ headerItem.name }}
-        </div>
-      </div>
-      <slot></slot>
-      <div class="dragable-table-list">
-        <draggable v-model="sortableTableData" @update="handleUpdate">
-          <div class="table-content-item" v-for="(contentItem, contentIndex) in sortableTableData" :key="contentItem.sequence">
-            <div class="table-checkbox-name">
-              <div class="table-checkbox">
-                <el-checkbox v-model="contentItem.checked" class="item-checkbox"
-                             @change="onCheckItem(sortableTableData)"/>
-              </div>
-              <div class="table-name">{{ contentItem.name }}</div>
-            </div>
-            <div :class="isScoreSheet? 'table-score-description': 'table-description'">
-              {{ contentItem.description}}
-            </div>
-            <div class="table-score">
-              {{ contentItem.type === 0 ? contentItem.score : '--'}}
-            </div>
-            <template v-if="isScoreSheet">
-              <div class="table-available-score">
-                <template>
-                  <icon-tooltip :content="contentItem.availableScores" placement="top">
-                    <div>{{ contentItem.type === 0 ? contentItem.availableScores : '--'}}</div>
-                  </icon-tooltip>
-                </template>
-              </div>
-              <div class="table-available-score">
-                {{ contentItem.type === 0 ? contentItem.qualifiedScore : '--'}}
-              </div>
-            </template>
-            <div class="table-operation">
-              <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;"
-                 @click="handleEdit(contentIndex,contentItem)" v-if="showEditBtn"/>
-              <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(contentItem)"/>
-            </div>
-          </div>
-        </draggable>
+  <div :class="showTableHeader ? 'dragable-table-content' : 'dragable-noheader-table-content'">
+    <div v-if="showTableHeader" class="dragable-table-header">
+      <div
+        v-for="(headerItem, headerIndex) in tableHeader"
+        :key="headerIndex"
+        :style="headerItem.headerStyle"
+        class="table-header-item">
+        {{ headerItem.name }}
       </div>
     </div>
+    <slot/>
+    <div class="dragable-table-list">
+      <draggable v-model="sortableTableData" @update="handleUpdate">
+        <div v-for="(contentItem, contentIndex) in sortableTableData" :key="contentItem.sequence" class="table-content-item">
+          <div class="table-checkbox-name">
+            <div class="table-checkbox">
+              <el-checkbox
+                v-model="contentItem.checked"
+                class="item-checkbox"
+                @change="onCheckItem(sortableTableData)"/>
+            </div>
+            <div class="table-name">{{ contentItem.name }}</div>
+          </div>
+          <div :class="isScoreSheet? 'table-score-description': 'table-description'">
+            {{ contentItem.description }}
+          </div>
+          <div class="table-score">
+            {{ contentItem.type === 0 ? contentItem.score : '--' }}
+          </div>
+          <template v-if="isScoreSheet">
+            <div class="table-available-score">
+              <template>
+                <icon-tooltip :content="contentItem.availableScores" placement="top">
+                  <div>{{ contentItem.type === 0 ? contentItem.availableScores : '--' }}</div>
+                </icon-tooltip>
+              </template>
+            </div>
+            <div class="table-available-score">
+              {{ contentItem.type === 0 ? contentItem.qualifiedScore : '--' }}
+            </div>
+          </template>
+          <div class="table-operation">
+            <i
+              v-if="showEditBtn"
+              class="iconfont icon-bianji"
+              style="cursor:pointer;margin-right:10px;"
+              @click="handleEdit(contentIndex,contentItem)"/>
+            <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(contentItem)"/>
+          </div>
+        </div>
+      </draggable>
+    </div>
+  </div>
 </template>
 
 <script>
-  import draggable from 'vuedraggable';
-  import IconTooltip from "./IconTooltip";
-  import { inpectRESTful } from '@/api/index';
+import draggable from 'vuedraggable';
+import IconTooltip from './IconTooltip';
+import { inpectRESTful } from '@/api/index';
 
-  export default {
-    name: "DragableTable",
-    props: {
-      tableHeader: {
-        type: Array,
-        default: []
-      },
-      tableData: {
-        type: Array,
-        default: []
-      },
-      isScoreSheet: {
-        type: Boolean,
-        default: false
-      },
-      showEditBtn:{
-        type: Boolean,
-        default: true
-      },
-      showTableHeader: {
-        type: Boolean,
-        default: true
-      }
+export default {
+  name: 'DragableTable',
+  components: { IconTooltip, draggable },
+  props: {
+    tableHeader: {
+      type: Array,
+      default: []
     },
-    components: {IconTooltip, draggable },
-
-    data(){
-      return {
-        sortableTableData: this.tableData,
-        oldSequenceList: [],
-        newSequenceList: []
-      }
+    tableData: {
+      type: Array,
+      default: []
     },
-    watch:{
-      tableData:{
-        handler(newValue){
-          this.sortableTableData = newValue;
-          this.getSequenceList();
-        },
-        deep:true
-      }
+    isScoreSheet: {
+      type: Boolean,
+      default: false
+    },
+    showEditBtn: {
+      type: Boolean,
+      default: true
+    },
+    showTableHeader: {
+      type: Boolean,
+      default: true
+    }
+  },
+
+  data() {
+    return {
+      sortableTableData: this.tableData,
+      oldSequenceList: [],
+      newSequenceList: []
+    };
+  },
+  watch: {
+    tableData: {
+      handler(newValue) {
+        this.sortableTableData = newValue;
+        this.getSequenceList();
+      },
+      deep: true
+    }
+  },
+
+  mounted() {
+    this.getSequenceList();
+  },
+
+  methods: {
+    getSequenceList() {
+      this.oldSequenceList = this.sortableTableData.map(value => value.sequence);
     },
 
-    mounted(){
-      this.getSequenceList();
+    handleEdit(contentIndex, contentItem) {
+      this.$emit('handleEditItem', contentIndex, contentItem);
+    },
+    handleDelete(contentItem) {
+      this.$emit('handleDeleteItem', contentItem);
+    },
+    onCheckItem(tableData) {
+      this.$emit('handleCheckItem', tableData);
     },
 
-    methods:{
-      getSequenceList(){
-        this.oldSequenceList = this.sortableTableData.map(value => value.sequence);
-      },
+    handleUpdate(e) {
+      this.newSequenceList = this.sortableTableData.map(value => {
+        return {
+          id: value.id,
+          sequence: value.sequence
+        };
+      });
+      this.updateItemSequence();
+    },
 
-      handleEdit(contentIndex, contentItem){
-        this.$emit('handleEditItem', contentIndex, contentItem);
-      },
-      handleDelete(contentItem){
-        this.$emit('handleDeleteItem', contentItem);
-      },
-      onCheckItem(tableData){
-        this.$emit('handleCheckItem',tableData);
-      },
+    updateItemSequence() {
+      const params = {};
+      params.items = [];
+      this.newSequenceList.forEach((item, index) => {
+        const itemObj = {};
+        itemObj.id = item.id;
+        itemObj.sequence = this.oldSequenceList[index];
+        params.items.push(itemObj);
+      });
 
-      handleUpdate(e){
-        this.newSequenceList = this.sortableTableData.map(value => {
-          return {
-            id: value.id,
-            sequence: value.sequence
+      if (params.items.length > 0) {
+        inpectRESTful.updateInspectItem(params).then(res => {
+          if (res.errCode === 0) {
+            this.$emit('updateTableData', this.sortableTableData);
           }
+        }).catch(err => {
+          console.log('updateItemsSequence: ' + err);
         });
-        this.updateItemSequence();
-      },
-
-      updateItemSequence(){
-        const params = {};
-        params.items = [];
-        this.newSequenceList.forEach((item, index) => {
-          let itemObj = {};
-          itemObj.id = item.id;
-          itemObj.sequence = this.oldSequenceList[index];
-          params.items.push(itemObj);
-        })
-
-        if(params.items.length > 0){
-          inpectRESTful.updateInspectItem(params).then(res => {
-            if(res.errCode === 0){
-              this.$emit('updateTableData', this.sortableTableData);
-            }
-          }).catch(err => {
-            console.log('updateItemsSequence: ' + err);
-          })
-        }
       }
     }
   }
+};
 </script>
 
 <style scoped lang="scss">
@@ -182,7 +190,8 @@
   .dragable-table-header, .table-content-item{
     display: flex;
     justify-content: space-between;
-    height: 60px;
+    min-height: 60px;
+    height: auto;
     align-items: center;
   }
   .dragable-table-header{
