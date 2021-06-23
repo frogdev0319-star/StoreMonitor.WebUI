@@ -1783,14 +1783,14 @@ export default {
 
     nvrNameChange(val, item) {
       const self = this;
-      const comment = filterString.all(val, 20);
+      const comment = filterString.all(val, 30);
       if (Object.keys(item).length === 0) {
         self.addNvrData.name = comment;
       } else {
         item.tempDeviceName = comment;
       }
       const length = filterString.getContentLength(val);
-      if (length > 20) {
+      if (length > 30) {
         this.NvrnameRuletip = true;
       } else {
         this.NvrnameRuletip = false;
@@ -1799,14 +1799,14 @@ export default {
 
     channelNameChange(val, item) {
       const self = this;
-      const comment = filterString.all(val, 20);
+      const comment = filterString.all(val, 30);
       if (Object.keys(item).length === 0) {
         self.addChannelData.name = comment;
       } else {
         item.tempName = comment;
       }
       const length = filterString.getContentLength(val);
-      if (length > 20) {
+      if (length > 30) {
         this.channelNameRuletip = true;
       } else {
         this.channelNameRuletip = false;
@@ -1815,10 +1815,10 @@ export default {
 
     ivsIdChange(val) {
       let self = this;
-      let comment = filterString.all(val, 20);
+      let comment = filterString.all(val, 30);
       self.addNvrData.ivsId = comment;
       let length = filterString.getContentLength(val);
-      if (length > 20) {
+      if (length > 30) {
         this.ivsIdRuletip = true;
       } else {
         this.ivsIdRuletip = false;
