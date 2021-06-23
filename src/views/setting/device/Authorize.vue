@@ -14,14 +14,12 @@ export default {
     };
   },
   mounted: function() {
-    console.log(this.$route.query);
     this.getQueryParams();
   },
 
   methods: {
     getQueryParams() {
       const queryParamsArr = Object.keys(this.$route.query);
-      console.log(queryParamsArr);
       if (queryParamsArr.includes('code')) {
         this.code = this.$route.query.code;
         this.state = this.$route.query.state;

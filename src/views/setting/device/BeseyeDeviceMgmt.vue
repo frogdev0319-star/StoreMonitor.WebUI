@@ -331,8 +331,8 @@ export default {
       });
     },
 
-    addBeseyeDeviceDialog() {
-      this.getAvailableBeseyeDevice();
+    async addBeseyeDeviceDialog() {
+      await this.getAvailableBeseyeDevice();
       this.showAddBeseyeDialog = true;
     },
 
@@ -377,7 +377,6 @@ export default {
     beforeAvatarUpload(file) {
       const fileName = file.name.split('.');
       const fileType = fileName[fileName.length - 1];
-      console.log(fileType);
       const isJPEG = fileType === 'jpeg';
       const isJPG = fileType === 'jpg';
       const isPNG = fileType === 'png';

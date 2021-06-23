@@ -1,4 +1,3 @@
-<!--suppress ALL -->
 <template>
   <div class="device-container">
     <div class="btn-col">
@@ -192,7 +191,7 @@ export default {
     setBeseyeAccountParams() {
       const params = {};
       params.grantCode = this.grantCode;
-      if (this.beseyeAccount.length > 0) {
+      if (this.beseyeAccount && this.beseyeAccount.length > 0) {
         params.beseyeAccount = this.beseyeAccount;
       };
       return params;
