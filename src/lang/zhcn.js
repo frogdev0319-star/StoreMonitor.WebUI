@@ -68,16 +68,18 @@ export default {
     'insepctionReportSetting': '巡检报告配置',
     'inspectingSettingOfReport': '巡检配置（巡检报告配置）',
     'dashDevice': 'Dash设备',
-    'ezvizDevice': '萤石设备',
+    'ezvizDevice': '串流服务设备',
     'beseyeAccount': 'Beseye设备',
-    'dashDeviceMgt': '设备管理（Dash设备）',
-    'ezvizDeviceMgt': '设备管理（萤石设备）',
-    'beseyeDeviceMgt': '设备管理（Beseye）',
+    'dashDeviceMgt': '监控设备管理（Dash设备）',
+    'ezvizDeviceMgt': '监控设备管理（串流服务设备）',
+    'beseyeDeviceMgt': '监控设备管理（Beseye）',
     'deviceSetting': '设备配置',
     'storeViuAccountDeviceSetting': 'StoreVue账号设备配置',
-    'userAccountDeviceSetting': '客户萤石账号设备配置',
+    'userAccountDeviceSetting': '客户串流服务账号设备配置',
     'auth': '授权',
-    'beseyeDeviceSetting': 'Beseye设备配置'
+    'beseyeDeviceSetting': 'Beseye设备配置',
+    'noInspectionAccessRights': '无巡检访问权限',
+    'noRight': ''
   },
 
   'overview': {
@@ -696,7 +698,7 @@ export default {
     'nvrChannelSetting': 'NVR通道号名称设置',
     'selectNvrChannel': '请选择NVR通道号',
     'addNvr': '添加NVR',
-    'NvrnameRuletip': '最多可输入20个字符',
+    'NvrnameRuletip': '最多可输入30个字符',
     'validateRuletip': '最多可输入10个字符',
     'deleteNvrInfo': '此操作将会删除当前NVR及通道，是否继续？',
     'nvr': 'NVR名称',

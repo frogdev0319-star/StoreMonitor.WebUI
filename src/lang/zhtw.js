@@ -68,16 +68,18 @@ export default {
     'insepctionReportSetting': '巡檢報告設置',
     'inspectingSettingOfReport': '巡檢配置（巡檢報告設置）',
     'dashDevice': 'Dash設備',
-    'ezvizDevice': '螢石設備',
+    'ezvizDevice': '串流服務設備',
     'beseyeAccount': 'Beseye設備',
     'dashDeviceMgt': '设备管理（Dash設備）',
-    'ezvizDeviceMgt': '设备管理（萤石設備）',
+    'ezvizDeviceMgt': '设备管理（串流服務設備）',
     'beseyeDeviceMgt': '设备管理（Beseye設備）',
     'deviceSetting': '設備配置',
     'storeViuAccountDeviceSetting': 'StoreVue賬號設備配置',
     'userAccountDeviceSetting': '客戶螢石賬號設備配置',
     'auth': '授权',
-    'beseyeDeviceSetting': 'Beseye設備配置'
+    'beseyeDeviceSetting': 'Beseye設備配置',
+    'noInspectionAccessRights': '無巡檢訪問權限',
+    'noRight': ''
   },
 
   'overview': {
@@ -696,7 +698,7 @@ export default {
     'nvrChannelSetting': 'NVR通道號名稱設置',
     'selectNvrChannel': '請選擇NVR通道號',
     'addNvr': '添加NVR',
-    'NvrnameRuletip': '最多可輸入20個字元',
+    'NvrnameRuletip': '最多可輸入30個字元',
     'validateRuletip': '最多可輸入10個字元',
     'deleteNvrInfo': '此操作將會刪除當前NVR及通道，是否繼續？',
     'nvr': 'NVR名稱',

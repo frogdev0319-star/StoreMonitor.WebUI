@@ -76,7 +76,9 @@ export default {
     'storeViuAccountDeviceSetting': 'Device Settings of StoreVue Account',
     'userAccountDeviceSetting': 'Device Settings of User Ezviz Account',
     'auth': 'Authorize',
-    'beseyeDeviceSetting': 'Device Settings of Beseye'
+    'beseyeDeviceSetting': 'Device Settings of Beseye',
+    'noInspectionAccessRights': 'No Inspection Access Rights',
+    'noRight': ''
   },
 
   'overview': {
@@ -688,7 +690,7 @@ export default {
     'nvrChannelSetting': 'Channel Number and Name setting',
     'selectNvrChannel': 'Please select channel order',
     'addNvr': 'Add NVR',
-    'NvrnameRuletip': 'Enter up to 20 characters',
+    'NvrnameRuletip': 'Enter up to 30 characters',
     'validateRuletip': 'Enter up to 10 characters',
     'deleteNvrInfo': 'This operation will delete the current NVR and channel, continue?',
     'nvr': 'NVR',
