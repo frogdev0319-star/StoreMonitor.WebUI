@@ -72,7 +72,7 @@
     <el-col :span="24" class="header-details">
       <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'" >
         {{ $t('remotePatrol.time') }}</span>
-      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
+      <date-time-picker :date-value="dateValue" @change="dateChange"/>
       <div class="search-btns">
         <delay-button
           :disabled="storeListLength === 0"
