@@ -270,7 +270,13 @@ export default {
     },
 
     routerList() {
-      return this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
+      const routes = this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
+      if (routes.length === 3) {
+        this.$router.push('/noRight');
+      } else {
+        window.location.pathname.indexOf('noRight') > -1 ? window.location.reload() : ''
+      }
+      return routes;
     },
 
     groupHeight() {
