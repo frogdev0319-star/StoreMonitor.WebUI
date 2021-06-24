@@ -38,7 +38,6 @@ process.env.MOCK && require('@/mock');
 function getLoginURL() {
   return new Promise((resolve, reject) => {
     axios.get('serverconfig.json').then(res => {
-      console.log(res.data.loginURL);
       const url = res.data.loginURL;
       resolve(url);
     }).catch(err => {
@@ -57,8 +56,7 @@ setURL();
 
 router.beforeEach(async(to, from, next) => {
   if (!to.name) {
-    // generate accessible routes map based on roles
-    const { roles } = await store.dispatch('GetUserAuthorities');
+    await store.dispatch('GetUserAuthorities');
     const accessRoutes = await store.dispatch('generateRoutes');
     router.addRoutes(accessRoutes);
     next({ ...to, replace: true });
