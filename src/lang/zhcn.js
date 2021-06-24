@@ -66,7 +66,9 @@ export default {
     'noAuthority': '无操作权限！',
     'loginAbnormal': '登录信息异常，请重新登录！',
     'insepctionReportSetting': '巡检报告配置',
-    'inspectingSettingOfReport': '巡检配置（巡检报告配置）'
+    'inspectingSettingOfReport': '巡检配置（巡检报告配置）',
+    'noInspectionAccessRights': '无巡检访问权限',
+    'noRight': ''
   },
 
   'overview': {

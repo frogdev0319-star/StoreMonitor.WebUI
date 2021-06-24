@@ -366,7 +366,7 @@ export const navbarRoute = {
     return systemSettingRoute;
   },
 
-  getErrorRoute(){
+  getErrorRoute() {
     const errorRoute = {
       path: '/home',
       name: 'overview',

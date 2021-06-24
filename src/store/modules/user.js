@@ -264,16 +264,16 @@ const user = {
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
+          accessedRoutes.push({
+            'path': '*',
+            'redirect': '/',
+            'hidden': true
+          });
         } else {
           const errorRoute = navbarRoute.getErrorRoute();
           accessedRoutes.push(errorRoute);
           errorRoute.redirect = errorRoute.children[0].path;
         }
-        accessedRoutes.push({
-          'path': '*',
-          'redirect': '/',
-          'hidden': true
-        });
         commit('SET_ROUTES', accessedRoutes);
         if (user.state.authorities.length === 6) {
           const videoAccess = !!PermissionHelper.enableVideo();

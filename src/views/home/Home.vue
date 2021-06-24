@@ -199,7 +199,6 @@
               <p style="text-align:left;">v1.6.7 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
-
         </section>
       </el-col>
     </el-row>
@@ -271,11 +270,6 @@ export default {
 
     routerList() {
       const routes = this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
-      if (routes.length === 3) {
-        this.$router.push('/noRight');
-      } else {
-        window.location.pathname.indexOf('noRight') > -1 ? window.location.reload() : ''
-      }
       return routes;
     },
 
@@ -590,7 +584,7 @@ export default {
           srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
         if (res && res.length) {
           accountItem['srp'] = res;
-          tempAccount.push(accountItem)
+          tempAccount.push(accountItem);
         }
       })
       this.brandList = tempAccount;
@@ -615,7 +609,13 @@ export default {
       const self = this;
       const result = await self.$store.dispatch('GetUserAuthorities');
       if (result.errCode === 0) {
-        self.$store.dispatch('generateRoutes');
+        await self.$store.dispatch('generateRoutes');
+        const routes = this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
+        if (routes.length === 2) {
+          this.$router.push('/noRight');
+        } else {
+          window.location.pathname.indexOf('noRight') > -1 &&  this.$router.push(routes[1].children[0].path);
+        }
       }
     },
 

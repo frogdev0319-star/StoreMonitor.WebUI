@@ -66,7 +66,9 @@ export default {
     'noAuthority': '無操作權限！',
     'loginAbnormal': '登錄信息異常，請重新登錄！',
     'insepctionReportSetting': '巡檢報告設置',
-    'inspectingSettingOfReport': '巡檢配置（巡檢報告設置）'
+    'inspectingSettingOfReport': '巡檢配置（巡檢報告設置）',
+    'noInspectionAccessRights': '無巡檢訪問權限',
+    'noRight': ''
   },
 
   'overview': {
@@ -419,7 +421,7 @@ export default {
     'loading': '加載中...',
     'highDefinition': '高清',
     'fluency': '流暢',
-    'totalScoreUnit': '总分：'
+    'totalScoreUnit': '總分：'
   },
 
   // event Management page language

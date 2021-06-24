@@ -1,13 +1,13 @@
 <template>
-    <div>
-      {{ $t('route.noInspectionAccessRights')}}
-    </div>
+  <div>
+    {{ $t('route.noInspectionAccessRights') }}
+  </div>
 </template>
 
 <script>
-  export default {
-    name: 'Error'
-  };
+export default {
+  name: 'Error'
+};
 </script>
 
 <style scoped>

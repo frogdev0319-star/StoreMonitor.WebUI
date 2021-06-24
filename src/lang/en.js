@@ -65,7 +65,9 @@ export default {
     'noAuthority': 'No authority!',
     'loginAbnormal': 'The login information is abnormal, please sign in again!',
     'insepctionReportSetting': 'Inspection Report Settings',
-    'inspectingSettingOfReport': 'Inspection Settings(Inspection Report Settings)'
+    'inspectingSettingOfReport': 'Inspection Settings(Inspection Report Settings)',
+    'noInspectionAccessRights': 'No Inspection Access Rights',
+    'noRight': ''
   },
 
   'overview': {
