@@ -127,7 +127,6 @@ const user = {
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
         getDashServerInfo().then(res => {
-          console.log(res);
           if (res.data) {
             const dash = res.data;
             let dataPort = '';
@@ -218,8 +217,13 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-          commit('SET_AUTHORITY', res.data.authorities);
-          commit('SET_ROLES', [res.data.title]);
+          if (res.data && res.data.services.includes("Custom_Inspection")){
+            commit('SET_AUTHORITY', res.data.authorities);
+            commit('SET_ROLES', [res.data.title]);
+          } else {
+            commit('SET_AUTHORITY', []);
+            commit('SET_ROLES', []);
+          }
           resolve(res);
         }).catch(error => {
           reject(error);
@@ -239,27 +243,32 @@ const user = {
     generateRoutes({ commit }) {
       return new Promise(resolve => {
         const accessedRoutes = [];
-        console.log(user.state.authorities);
-        PermissionHelper.setData(user.state.authorities);
+        if (user.state.authorities.length > 0){
+          PermissionHelper.setData(user.state.authorities);
 
-        const overviewRoute = navbarRoute.getOverviewRoute();
-        if (overviewRoute.children.length > 0) {
-          overviewRoute.redirect = overviewRoute.children[0].path;
-          accessedRoutes.push(overviewRoute);
+          const overviewRoute = navbarRoute.getOverviewRoute();
+          if (overviewRoute.children.length > 0) {
+            overviewRoute.redirect = overviewRoute.children[0].path;
+            accessedRoutes.push(overviewRoute);
+          }
+
+          const patrolRoute = navbarRoute.getPatrolRoute();
+          accessedRoutes.length === 0 ? patrolRoute.redirect = patrolRoute.children[0].path : '';
+          accessedRoutes.push(patrolRoute);
+
+          const eventRoute = navbarRoute.getEventRoute();
+          accessedRoutes.push(eventRoute);
+
+          const statisticsRoute = navbarRoute.getStatisticalRoute();
+          statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
+
+          const systemSettingRoute = navbarRoute.getSystemSettingRoute();
+          systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
+        } else {
+          const errorRoute = navbarRoute.getErrorRoute();
+          accessedRoutes.push(errorRoute);
+          errorRoute.redirect = errorRoute.children[0].path;
         }
-
-        const patrolRoute = navbarRoute.getPatrolRoute();
-        accessedRoutes.length === 0 ? patrolRoute.redirect = patrolRoute.children[0].path : '';
-        accessedRoutes.push(patrolRoute);
-
-        const eventRoute = navbarRoute.getEventRoute();
-        accessedRoutes.push(eventRoute);
-
-        const statisticsRoute = navbarRoute.getStatisticalRoute();
-        statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
-
-        const systemSettingRoute = navbarRoute.getSystemSettingRoute();
-        systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
         accessedRoutes.push({
           'path': '*',
           'redirect': '/',
@@ -268,22 +277,9 @@ const user = {
         commit('SET_ROUTES', accessedRoutes);
         if (user.state.authorities.length === 6) {
           const videoAccess = !!PermissionHelper.enableVideo();
-          console.log(videoAccess);
           commit('SET_Video_Authority', videoAccess)
         }
         resolve(accessedRoutes);
-      });
-    },
-
-    changeRoutes({ commit, dispatch }) {
-      return new Promise(async resolve => {
-        await dispatch('GetUserAuthorities');
-        resetRouter();
-        // generate accessible routes map based on roles
-        const accessRoutes = await dispatch('generateRoutes');
-        // dynamically add accessible routes
-        router.addRoutes(accessRoutes);
-        resolve();
       });
     }
   }

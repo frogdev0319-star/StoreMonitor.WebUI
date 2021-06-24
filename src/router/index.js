@@ -38,7 +38,6 @@ const createRouter = () => new Router({
 
 const router = createRouter();
 
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter();
   router.matcher = newRouter.matcher; // reset router
@@ -404,5 +403,25 @@ export const navbarRoute = {
       }
     );
     return systemSettingRoute;
+  },
+
+  getErrorRoute(){
+    const errorRoute = {
+      path: '/home',
+      name: 'overview',
+      component: Home,
+      hidden: true,
+      iconCls: 'iconfont icon-zonglan',
+      styles: 'font-size:22px',
+      leaf: true,
+      isReadOnly: false,
+      children: [{
+        path: '/noRight',
+        name: 'noRight',
+        component: resolve => require(['@/views/overview/NoRight'], resolve)
+      }]
+    };
+
+    return errorRoute;
   }
 };
