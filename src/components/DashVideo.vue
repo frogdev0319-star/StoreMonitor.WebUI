@@ -325,42 +325,21 @@ export default {
     storeId: {
       type: String,
       default: ''
+    },
+    videoAuthority: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
     return {
-      patrolstore: '',
-      PatrolList: [],
-      hideLast: false,
-      hideNext: false,
-      fullscreenLoading: false,
-      channelBtns: [],
-      showChannelBtns: [],
-      allChannelBtns: [],
-      store: {},
-      showStoreUp: false,
-      cityList: [],
       popperClass: 'select-popClass',
-      showControlInfo: true,
       errorText: '',
       showCancelContent: false,
-      showCutContent: false,
       playState: false,
       playBackState: false,
-      activeIndex: '0',
-
-      curTabIndex: 0,
-      curTabItem: null,
-      curStoreIndex: 0,
-      curStoreItem: null,
-      curChannelItem: null,
-      curChannelIndex: 0,
-
-      serachVale: '',
       varyWindowHeight: window.innerHeight,
       varyWindowWidth: window.innerWidth,
-      showDate: true,
-      playDate: new Date(),
 
       currentTimeValue: 0,
       durationTimeValue: 0,
@@ -411,9 +390,7 @@ export default {
       showSnapShotDialog: false,
       videoEl: '',
       canvasEl: '',
-      timeVideo: 0,
-      startTimeCutVideo: 0,
-      endTImeCutVideo: 0,
+      showSnapshotBtn: false,
 
       showCutModel: false,
       penBtnSrc: require('../../static/img/edit_btn.png'),
@@ -447,48 +424,12 @@ export default {
       isMouseDown: false,
       flag: 0,
 
-      tabList: [
-        {
-          label: this.$t('remotePatrol.star'),
-          storeList: []
-        },
-        {
-          label: this.$t('remotePatrol.visited'),
-          storeList: []
-        },
-        {
-          label: this.$t('remotePatrol.allStores'),
-          storeList: []
-        }
-      ],
-      tempStoreList: [],
-      allInitStoreList: [],
-      curDate: '',
-      curYear: new Date().getFullYear(),
-      curMonth: new Date().getMonth() + 1,
-      curDay: new Date().getDate(),
-      weekTitles: this.$t('remotePatrol.week'),
-      weekDays: [],
-
       startTs: 0,
       protocal: 'DASH',
       channel: {},
       isPlayingFlag: -1,
-      evBtns: [
-        {
-          name: this.$t('remotePatrol.createProblem'),
-          isActive: true
-        },
-        { name: this.$t('remotePatrol.relateProblem'), isActive: false }
-      ],
-      eventList: [],
-      curEvent: '',
       eventName: '',
       eventDes: '',
-      sourceList: [],
-      oss: null,
-      bucketVideo: '',
-      bucketImage: '',
       imageCanvas: new Image(),
       imageCanvasList: [],
       timeDrap: false,
@@ -498,70 +439,19 @@ export default {
       percentage: 0,
       accountId: '',
       userId: '',
-      changeStoreObj: {
-        title: this.$t('remotePatrol.confirm'),
-        showInfo: this.$t('remotePatrol.switchInfo'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      changeChannelObj: {
-        title: this.$t('remotePatrol.confirm'),
-        showInfo: this.$t('remotePatrol.switchInfo'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      noBindDeviceObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notBindCamera'),
-        isWarning: false,
-        dialogCosed: false
-      },
-      noStoreUser: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.notSolver'),
-        isWarning: true,
-        dialogCosed: false
-      },
-      dialogCommentVideo: false,
-      curVideoSrc: '',
-      videoSpeed: 0,
-      videoSpeedId: 0,
       timerPlayReal: null,
       realTimeSpeed: 0,
       cutDialogcurTime: 0,
       lang: this.$i18n.locale,
-      playBackTime: 0,
       realTimeStartTs: 0,
-      isFirstLoad: false,
-      videoLoadingObj: {
-        title: this.$t('remotePatrol.prompt'),
-        showInfo: this.$t('remotePatrol.videoLoading'),
-        isWarning: false,
-        dialogCosed: false
-      },
       isLoading: false,
       showEventNameInfo: false,
-      showEventDescInfo: false,
-      serachChannelValue: '',
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now();
-        }
-      },
-      dateValue: new Date(),
-      changeFlag: false,
       eventNameRuletip: false,
       eventDesRuletip: false,
 
       showError: false,
-      showModel: true,
-      showInfoContent: false,
-      showVideo: true,
-      showGetVideo: false,
-      showSnapshotBtn: false,
       previewplayer: null,
       showSnapshotFeedbackDialog: false,
-      clickSnapshot: false,
 
       uri: null,
       play: true,
@@ -586,7 +476,6 @@ export default {
 
   watch: {
     accountChanged(val) {
-      console.log(val);
       const self = this;
       if (val !== 0) {
         self.playBackState = false;
@@ -633,19 +522,17 @@ export default {
   async created() {
     window.addEventListener('resize', this.resizeFun, false);
     window.addEventListener('visibilitychange', this.visibilityChange, false);
-    this.getDashUrlInfo();
+    this.videoAuthority && this.getDashUrlInfo();
   },
 
   beforeDestroy() {
-    const self = this;
-    window.clearInterval(self.timerPlayReal);
-    self.realTimeSpeed = 0;
-    console.log('destory');
-    self.stopVideoPlay();
-    window.removeEventListener('resize', self.resizeFun);
-    window.removeEventListener('visibilitychange', self.visibilityChange);
-    self.resizeFun = null;
-    self.visibilityChange = null;
+    window.clearInterval(this.timerPlayReal);
+    this.realTimeSpeed = 0;
+    this.stopVideoPlay();
+    window.removeEventListener('resize', this.resizeFun);
+    window.removeEventListener('visibilitychange', this.visibilityChange);
+    this.resizeFun = null;
+    this.visibilityChange = null;
   },
 
   computed: {
@@ -674,14 +561,12 @@ export default {
   methods: {
     visibilityChange() {
       const self = this;
-      console.log('hide');
       if (document.hidden) {
         if (self.playState && !self.playBackState) {
           self.stopVideoPlay();
           self.stopTimer();
         }
       } else {
-        console.log('show');
         if (!self.playBackState && this.currentState === 'loading') {
           self.startVideo(self.channelInfo.ivsId, self.channelInfo.channelId, null);
         }
@@ -740,6 +625,11 @@ export default {
 
     async startVideo(IVSID, channelId, startTs) {
       try {
+        if (this.videoAuthority === false) {
+          this.showError = true;
+          this.errorText = this.$t('remotePatrol.videoLicense');
+          return;
+        }
         if (IVSID === null || channelId === null) {
           const error = this.$t('remotePatrol.dashServerError') + '5';
           this.currentState = 'blank';
@@ -973,7 +863,6 @@ export default {
     async playVideo(url) {
       const self = this;
       self.playState = true;
-      self.showCutContent = true;
       const video = document.getElementById('dashVideo');
       this.previewplayer = videojs(video, { playbackRates: [0.5, 1, 1.5, 2] });
       this.previewplayer.src({
@@ -1005,13 +894,11 @@ export default {
     },
 
     onPlayerWaiting(e) {
-      console.log('video is loading');
       this.showSnapshotBtn = false;
       this.isLoading = false;
     },
 
     onPlayerPlaying(e) {
-      console.log('video is playing');
       this.showSnapshotBtn = true;
       this.isLoading = false;
     },

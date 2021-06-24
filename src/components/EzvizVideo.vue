@@ -1,29 +1,126 @@
 <template>
-  <div >
-    <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
-      <span>{{ errorMsg }}</span>
+  <div>
+    <div
+      v-loading="isLoading"
+      v-if="!fullWindow"
+      id="videoContent"
+      ref="videoContent"
+      :style="isEvent ? {}: {'margin-bottom': 0}"
+      class="video-content"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
+      @mouseleave="hiddenModel"
+      @mouseenter="showModel"
+      @mousemove="showModel">
+      <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.channelName }}</span>
+      <div v-if="showInfoContent || playBackState" class="icon-footer">
+        <div class="iconlside">
+          <i v-if="playState" class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
+          <i v-else class="iconfont icon-bofang1 iconplay" @click="realTime"/>
+        </div>
+        <div class="iconlside">
+          <i :class="muted ? 'icon-jingyin' : 'icon-shengyin1'" class= "iconfont icon-auido" @click="onMuted"/>
+        </div>
+        <div class="footer-right">
+          <div v-if="playBackState" class="iconrside">
+            <div class="speed-content">
+              <span>{{ $t('remotePatrol.back') }}</span>
+              <el-select
+                :value="curBack"
+                :popper-class="popperClass"
+                :popper-append-to-body="false"
+                class="el-test"
+                size="mini"
+                placeholder="">
+                <el-option
+                  v-for="(item) in backList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                  @click.native="adjustProcess(item.value, item.label)"
+                />
+              </el-select>
+            </div>
+          </div>
+          <div class="iconrside">
+            <div class="speed-content">
+              <div class="video-quality" v-if="!playBackState">
+                <el-popover
+                  placement="top"
+                  v-model="qualityVisible" popper-class="quality-tooltip"
+                >
+                  <div v-for="(item, index) in videoQualityList" :key="index" @click="onClickQualityLabel(index)"
+                       class="quaility-label" :class="{'checked-label': index === curQualityIndex}">
+                    {{item.label}}
+                  </div>
+                  <el-button class="quality-button" slot="reference">{{videoQualityList[curQualityIndex].label}}</el-button>
+                </el-popover>
+              </div>
+              <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+              <el-select
+                :value="proportion"
+                :popper-class="popperClass"
+                :popper-append-to-body="false"
+                class="el-test"
+                size="mini"
+                placeholder="">
+                <el-option
+                  v-for="(item,index) in proportionList"
+                  :key="index"
+                  :label="item.label"
+                  :value="item.label"
+                  @click.native="checkPro(item.label)"
+                />
+              </el-select>
+            </div>
+          </div>
+          <div class="screen-content">
+            <i
+              :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
+              class="iconfont iconscreen"
+              @click="controlScreen"/>
+            <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
+          </div>
+        </div>
+      </div>
+      <div v-if="playBackState" class="progress-content">
+        <b-progress
+          id="bprogress"
+          :value="currentTimeValue"
+          :max="durationTimeValue"
+          class="mb-3 prog"
+          height="0.2rem"/>
+      </div>
+      <transition name="fade">
+        <div v-if="showModelContent && !isEvent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
+          <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+          <span>{{ $t('remotePatrol.snapshot') }}</span>
+        </div>
+      </transition>
+      <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
+        <span>{{ errorMsg }}</span>
+      </div>
+      <div v-else id="myPlayer" ref="myPlayer"/>
     </div>
-    <div v-else>
-      <div
-        v-loading="isLoading"
-        v-if="!fullWindow"
-        id="videoContent"
-        ref="videoContent"
-        :style="isEvent ? {}: {'margin-bottom': 0}"
-        class="video-content"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
-        @mouseleave="hiddenModel"
-        @mouseenter="showModel"
-        @mousemove="showModel">
-        <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.channelName }}</span>
-        <div v-if="showInfoContent || playBackState" class="icon-footer">
+    <!-- full screen -->
+    <div
+      v-loading="isLoading"
+      v-else
+      id="videoContent"
+      ref="videoContent"
+      class="video-content"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
+      @mouseleave="hiddenModel"
+      @mouseenter="showModel"
+      @mousemove="showModel">
+      <div class="video-model">
+        <span v-if="showInfoContent" id="channelName">{{ channelInfo.name }}</span>
+        <div v-if="showInfoContent" class="icon-footer">
           <div class="iconlside">
-            <i v-if="playState" class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
-            <i v-else class="iconfont icon-bofang1 iconplay" @click="realTime"/>
+            <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
+            <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
           </div>
           <div class="iconlside">
-            <i v-if="ifOpenSound" class="iconfont icon-auido icon-shengyin1" @click="closeSound"/>
-            <i v-else class="iconfont icon-auido icon-jingyin " @click="openSound"/>
+            <i :class="muted ? 'icon-jingyin' : 'icon-shengyin1'" class= "iconfont icon-auido" @click="onMuted"/>
           </div>
           <div class="footer-right">
             <div v-if="playBackState" class="iconrside">
@@ -59,23 +156,23 @@
                     </div>
                     <el-button class="quality-button" slot="reference">{{videoQualityList[curQualityIndex].label}}</el-button>
                   </el-popover>
-              </div>
-              <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
-              <el-select
-                :value="proportion"
-                :popper-class="popperClass"
-                :popper-append-to-body="false"
-                class="el-test"
-                size="mini"
-                placeholder="">
-                <el-option
-                  v-for="(item,index) in proportionList"
-                  :key="index"
-                  :label="item.label"
-                  :value="item.label"
-                  @click.native="checkPro(item.label)"
-                />
-              </el-select>
+                </div>
+                <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+                <el-select
+                  :value="proportion"
+                  :popper-class="popperClass"
+                  :popper-append-to-body="false"
+                  class="el-test"
+                  size="mini"
+                  placeholder="">
+                  <el-option
+                    v-for="(item,index) in proportionList"
+                    :key="index"
+                    :label="item.label"
+                    :value="item.label"
+                    @click.native="checkPro(item.label)"
+                  />
+                </el-select>
               </div>
             </div>
             <div class="screen-content">
@@ -83,7 +180,6 @@
                 :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
                 class="iconfont iconscreen"
                 @click="controlScreen"/>
-              <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
             </div>
           </div>
         </div>
@@ -93,120 +189,21 @@
             :value="currentTimeValue"
             :max="durationTimeValue"
             class="mb-3 prog"
-            height="0.2rem"/>
+            height="0.2rem"
+            style="margin-bottom:0px !important;"/>
         </div>
-        <transition name="fade">
-          <div v-if="showModelContent && !isEvent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
-            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-            <span>{{ $t('remotePatrol.snapshot') }}</span>
-          </div>
-        </transition>
-        <div id="myPlayer" ref="myPlayer"/>
       </div>
-      <!-- full screen -->
-      <div
-        v-loading="isLoading"
-        v-else
-        id="videoContent"
-        ref="videoContent"
-        class="video-content"
-        element-loading-background="rgba(0, 0, 0, 0.8)"
-        @mouseleave="hiddenModel"
-        @mouseenter="showModel"
-        @mousemove="showModel">
-        <div class="video-model">
-          <span v-if="showInfoContent" id="channelName">{{ channelInfo.channelName }}</span>
-          <div v-if="showInfoContent" class="icon-footer">
-            <div class="iconlside">
-              <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
-              <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
-            </div>
-            <div class="iconlside">
-              <i v-if="ifOpenSound" class="iconfont icon-auido icon-shengyin1" @click="closeSound"/>
-              <i v-else class="iconfont icon-auido icon-jingyin " @click="openSound"/>
-            </div>
-            <div class="footer-right">
-              <div v-if="playBackState" class="iconrside">
-                <div class="speed-content">
-                  <span>{{ $t('remotePatrol.back') }}</span>
-                  <el-select
-                    :value="curBack"
-                    :popper-class="popperClass"
-                    :popper-append-to-body="false"
-                    class="el-test"
-                    size="mini"
-                    placeholder="">
-                    <el-option
-                      v-for="(item) in backList"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                      @click.native="adjustProcess(item.value, item.label)"
-                    />
-                  </el-select>
-                </div>
-              </div>
-              <div class="iconrside">
-                <div class="speed-content">
-                  <div class="video-quality" v-if="!playBackState">
-                    <el-popover
-                      placement="top"
-                      v-model="qualityVisible"
-                      popper-class="quality-tooltip"
-                      :append-to-body="false"
-                    >
-                      <div v-for="(item, index) in videoQualityList" :key="index" @click="onClickQualityLabel(index)"
-                           class="quaility-label" :class="{'checked-label': index === curQualityIndex}">
-                        {{item.label}}
-                      </div>
-                      <el-button class="quality-button" slot="reference">{{videoQualityList[curQualityIndex].label}}</el-button>
-                    </el-popover>
-                  </div>
-                  <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
-                  <el-select
-                    :value="proportion"
-                    :popper-class="popperClass"
-                    :popper-append-to-body="false"
-                    class="el-test"
-                    size="mini"
-                    placeholder="">
-                    <el-option
-                      v-for="(item,index) in proportionList"
-                      :key="index"
-                      :label="item.label"
-                      :value="item.label"
-                      @click.native="checkPro(item.label)"
-                    />
-                  </el-select>
-                </div>
-              </div>
-              <div class="screen-content">
-                <i
-                  :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
-                  class="iconfont iconscreen"
-                  @click="controlScreen"/>
-              </div>
-            </div>
-          </div>
-          <div v-if="playBackState" class="progress-content">
-            <b-progress
-              id="bprogress"
-              :value="currentTimeValue"
-              :max="durationTimeValue"
-              class="mb-3 prog"
-              height="0.2rem"
-              style="margin-bottom:0px !important;"/>
-          </div>
-        </div>
 
-        <transition name="fade">
-          <div v-if="showModelContent && !isEvent" :class="lang === 'en' ? 'en-iconright' : 'iconright'" @click="cutPicture">
-            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-            <span>{{ $t('remotePatrol.snapshot') }}</span>
-          </div>
-        </transition>
-        <div id="fullPlayer" ref="myPlayer"/>
+      <transition name="fade">
+        <div v-if="showModelContent && !isEvent" :class="lang === 'en' ? 'en-iconright' : 'iconright'" @click="cutPicture">
+          <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+          <span>{{ $t('remotePatrol.snapshot') }}</span>
+        </div>
+      </transition>
+      <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
+        <span>{{ errorMsg }}</span>
       </div>
+      <div v-else id="fullPlayer" ref="myPlayer"/>
     </div>
 
     <el-dialog
@@ -388,7 +385,8 @@ export default {
   name: 'EzvizVideo',
   props: {
     channelInfo: {
-      type: Object
+      type: Object,
+      default: {}
     },
     curDeviceId: {
       type: Number,
@@ -450,7 +448,7 @@ export default {
       videoSpeed: 0,
       videoSpeedId: 0,
       showgongge: false,
-      ifOpenSound: false,
+      muted: true,
       showCutDialog: false,
       imageCanvas: new Image(),
       imageCanvasList: [],
@@ -473,20 +471,17 @@ export default {
       showPen: false,
       showPenBtn: false,
       imgSrc: '',
-      channel: this.channel,
       canvasEl: '',
       isMouseDown: false,
       flag: 0,
       eventName: '',
       eventDes: '',
       showSnapshotFeedbackDialog: false,
-      feedBackVideoFileObj: {},
       timerPlayReal: null,
       realTimeSpeed: 0,
       initPlayerWidth: 0,
       initPlayerHeight: 0,
       isLoading: false,
-      lang: this.$i18n.locale,
       currentTimeValue: 0,
       durationTimeValue: 0,
       curBack: '',
@@ -517,13 +512,14 @@ export default {
       userId: '',
       blob: null,
       ezvizExpireTime: 0,
-      currentStoreId: null,
+      currentChannelId: null,
       isLoaded: false,
       editCount: 0,
       showEventNameInfo: false,
       changeId: false,
       eventNameRuletip: false,
       eventDesRuletip: false,
+      paused: true,
       qualityVisible: false,
       curQualityIndex: 1,
       videoQualityList: [
@@ -540,11 +536,32 @@ export default {
   },
 
   watch: {
+    channelInfo: {
+     handler(newChannel, oldChannel) {
+        console.log(newChannel)
+        if (Object.keys(oldChannel).length > 0 && newChannel.ivsId !== oldChannel.ivsId) {
+          this.getEzvizAccessToken(newChannel.ivsId);
+          if (this.playState) {
+            this.stopRealTime();
+            this.$nextTick(() => {
+              this.realTime();
+            });
+          } else {
+            this.$nextTick(() => {
+              this.realTime();
+            });
+          }
+        }
+      },
+      deep: true
+    },
+
     accountChanged(val) {
       console.log(val);
       const self = this;
-      if (val != 0) {
+      if (val !== 0) {
         self.channelInfo = null;
+        self.showError = false;
         self.stopVideo();
       }
     },
@@ -569,31 +586,28 @@ export default {
       console.log(val);
       if (val >= 300) {
         if (self.fullWindow) {
-          if (self.ifOpenSound) {
-            self.fullDecoder.closeSound();
-          }
+          !self.muted && self.fullDecoder.closeSound();
           self.fullDecoder.stop();
         } else {
-          if (self.ifOpenSound) {
-            self.decoder.closeSound();
-          }
+          !self.muted && self.decoder.closeSound();
           self.decoder.stop();
         }
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = null;
         self.playState = false;
         self.showModelContent = false;
-        self.ifOpenSound = false;
+        self.muted = true;
         self.times = 0;
         self.playBackState = false;
       }
     },
 
-    async storeId(newValue, oldValue) {
-      const self = this;
+    async ivsId(newValue, oldValue) {
+      console.log(newValue);
+      console.log(oldValue);
       if (newValue.length > 0) {
-        self.getVideoQualityIndex();
-        await self.getEzvizAccessToken(newValue);
+        this.getVideoQualityIndex();
+        await this.getEzvizAccessToken(newValue);
       }
     }
   },
@@ -603,27 +617,21 @@ export default {
     const o = self.$refs.myPlayer;
     self.initPlayerWidth = o.offsetWidth;
     self.initPlayerHeight = 420;
-    if (!self.isStoreMonitor) {
-      await self.getEzvizAccessToken(self.storeId);
-      self.checkIfEncry();
-    }
     window.addEventListener('resize', self.resizeFun, false);
     window.addEventListener('visibilitychange', self.visibleChange, false);
   },
 
   beforeDestroy() {
-    const self = this;
-    console.log(self.playState);
-    window.clearInterval(self.timerPlayReal);
-    self.realTimeSpeed = 0;
-    if (self.playState) {
-      self.decoder.closeSound();
-      self.decoder.stop();
+    window.clearInterval(this.timerPlayReal);
+    this.realTimeSpeed = 0;
+    if (this.playState) {
+      this.decoder.closeSound();
+      this.decoder.stop();
     }
-    window.removeEventListener('resize', self.resizeFun);
-    window.removeEventListener('visibilitychange', self.visibleChange);
-    self.resizeFun = null;
-    self.visibleChange = null;
+    window.removeEventListener('resize', this.resizeFun);
+    window.removeEventListener('visibilitychange', this.visibleChange);
+    this.resizeFun = null;
+    this.visibleChange = null;
   },
 
   computed: {
@@ -643,9 +651,8 @@ export default {
       accountChanged: 'accountChanged'
     }),
 
-    isEzviz() {
-      const self = this;
-      return self.$store.state.user.isEzviz;
+    ivsId() {
+      return this.channelInfo ? this.channelInfo.ivsId : ''
     }
   },
 
@@ -678,18 +685,14 @@ export default {
     stopPlayingVideoAndPlay(){
       if (this.fullWindow) {
         if (this.playState) {
-          if (this.ifOpenSound) {
-            this.fullDecoder.closeSound();
-          }
+          !this.muted && this.fullDecoder.closeSound();
           this.fullDecoder.stop();
           this.fullDecoder = null;
         }
         this.resetVideoSize();
       } else {
         if (this.playState) {
-          if (this.ifOpenSound) {
-            this.decoder.closeSound();
-          }
+          !this.muted && this.decoder.closeSound();
           this.decoder.stop();
           this.decoder = null;
         }
@@ -702,18 +705,14 @@ export default {
       self.proportion = item;
       if (self.fullWindow) {
         if (self.playState) {
-          if (self.ifOpenSound) {
-            self.fullDecoder.closeSound();
-          }
+          !self.muted && self.fullDecoder.closeSound();
           self.fullDecoder.stop();
           self.fullDecoder = null;
         }
         self.resetVideoSize();
       } else {
         if (self.playState) {
-          if (self.ifOpenSound) {
-            self.decoder.closeSound();
-          }
+          !self.muted && self.decoder.closeSound();
           self.decoder.stop();
           self.decoder = null;
         }
@@ -776,20 +775,20 @@ export default {
       }
     },
 
-    getEzvizAccessToken(storeId) {
+    getEzvizAccessToken(ivsId) {
       const self = this;
       if (this.videoAuthority === false) {
         return;
       }
       const params = {};
-      params.storeId = storeId;
+      params.ivsId = ivsId;
       return new Promise((resolve, reject) => {
-        if (self.currentStoreId === storeId && (Date.parse(new Date()) < self.ezvizExpireTime)) {
+        if (self.currentIvsId === ivsId) {
           resolve(self.accessToken);
         } else {
           getEzvizAccessToken(params)
             .then(result => {
-              self.currentStoreId = storeId;
+              self.currentIvsId = ivsId;
               self.accessToken = result.data.accessToken;
               self.areaDomain = {
                 domain: result.data.areaDomain
@@ -955,21 +954,17 @@ export default {
       self.errorMsg = self.getErrorMsg(e);
       if (self.playState) {
         if (!self.fullWindow) {
-          if (self.ifOpenSound) {
-            self.decoder.closeSound();
-          }
+          !self.muted && self.decoder.closeSound();
           self.decoder.stop();
         } else {
-          if (self.ifOpenSound) {
-            self.fullDecoder.closeSound();
-          }
+          !self.muted && self.fullDecoder.closeSound();
           self.fullDecoder.stop();
         }
       } else {
         self.decoder.stop();
       }
       self.playState = false;
-      self.ifOpenSound = false;
+      self.muted = true;
       self.realTimeSpeed = 0;
       self.times = 0;
       window.clearInterval(self.timerPlayReal);
@@ -1044,14 +1039,8 @@ export default {
         self.playState = true;
         self.isLoading = false;
         self.showModelContent = true;
-        if (self.fullWindow) {
-          if (self.ifOpenSound) {
-            self.fullDecoder.openSound();
-          }
-        } else {
-          if (self.ifOpenSound) {
-            self.decoder.openSound();
-          }
+        if(!self.muted){
+          self.fullWindow ? self.fullDecoder.openSound() : self.decoder.openSound();
         }
         if (self.playBack) {
           self.playBackState = true;
@@ -1077,7 +1066,7 @@ export default {
       setTimeout(() => {
         self.showModelContent = true;
         self.isLoading = false;
-        if (self.ifOpenSound) {
+        if (!self.muted) {
           self.fullDecoder.openSound();
         }
       }, 2000);
@@ -1103,7 +1092,7 @@ export default {
         self.isLoading = false;
         self.showModelContent = true;
         // self.showInfoContent=false;
-        if (self.ifOpenSound) {
+        if (!self.muted) {
           self.decoder.openSound();
         }
       }, 2000);
@@ -1127,8 +1116,8 @@ export default {
       const self = this;
       self.fullWindow = true;
       var ele = document.getElementById('videoContent');
-      ele.style.width = '100%';
-      ele.style.height = '100%';
+      // ele.style.width = '100%';
+      // ele.style.height = '100%';
       const width = self.varyWindowWidth;
       const height = self.varyWindowHeight;
 
@@ -1150,8 +1139,14 @@ export default {
       self.fullWindow = false;
       var ele = document.getElementById('videoContent');
       var playerEle = self.$refs.myPlayer;
-      playerEle.style.width = self.initPlayerWidth + 'px';
-      playerEle.style.height = self.initPlayerHeight + 'px';
+      if (!self.showError) {
+        playerEle.style.width = self.initPlayerWidth + 'px';
+        playerEle.style.height = self.initPlayerHeight + 'px';
+      }else{
+        const errEle = self.$refs.errorModel;
+        errEle.style.width = '100%';
+        errEle.style.height = '100%';
+      }
       self.$nextTick(() => {
         ele.style.width = self.initPlayerWidth + 'px';
         ele.style.height = self.initPlayerHeight + 'px';
@@ -1172,7 +1167,7 @@ export default {
     exitFullScreenPlayer() {
       const self = this;
       if (self.playState) {
-        if (self.ifOpenSound) {
+        if (!self.muted) {
           self.fullDecoder.closeSound();
         }
         self.fullDecoder.stop();
@@ -1383,30 +1378,24 @@ export default {
         self.stopVideoTime = false;
         self.timerPlayReal = null;
       }
-      self.ifOpenSound = false;
+      self.muted = true;
       self.showModelContent = false;
       self.playState = false;
       self.curBack = '';
       self.currentTimeValue = 0;
     },
 
-    openSound() {
-      const self = this;
-      self.ifOpenSound = true;
-      if (self.fullWindow) {
-        self.fullDecoder.openSound();
-      } else {
-        self.decoder.openSound();
-      }
-    },
-
-    closeSound() {
-      const self = this;
-      self.ifOpenSound = false;
-      if (self.fullWindow) {
-        self.fullDecoder.closeSound();
-      } else {
-        self.decoder.closeSound();
+    onMuted(){
+      const muted = !this.muted;
+      try {
+        if(muted){
+          this.fullWindow ? this.fullDecoder.closeSound() : this.decoder.closeSound();
+        } else {
+          this.fullWindow ? this.fullDecoder.openSound() : this.decoder.openSound();
+        }
+        this.muted = muted;
+      } catch (e) {
+        console.log('onMuted-' + e);
       }
     },
 
@@ -1548,8 +1537,6 @@ export default {
 
     confirmEdit() {
       const self = this;
-      const obj = {};
-      obj.mediaType = 2;
       const src = self.canvasEl.toDataURL('image/jpeg');
       self.$emit('confirmEzvizCanvas', src);
       self.showCutDialog = false;
@@ -1891,7 +1878,6 @@ export default {
               self.channelInfo.channelId + videoStream;
           }
         }
-        console.log(self.videoUrl)
       }
     },
 
@@ -1939,14 +1925,14 @@ export default {
     #{$poi}:checkRem($val);
   }
   .errorVideo-model{
-    margin: calc(25/1920*100vw);
     margin-bottom: 0;
-    height: auto;
+    height: 100%;
+    width: 100%;
     position: relative;
     min-height: 420px;
     background-color: #232730;
     color: $red;
-    z-index: 100;
+    z-index: 9;
     span{
       position: absolute;
       top: 50%;

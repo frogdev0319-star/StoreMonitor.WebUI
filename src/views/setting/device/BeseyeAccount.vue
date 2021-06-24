@@ -166,7 +166,8 @@ export default {
         this.grantCode = this.$route.params.code;
         this.state = this.$route.params.state;
         const stateStr = this.base64ToStr(this.state);
-        this.beseyeAccount = stateStr.split('-')[2];
+        console.log(stateStr);
+        this.beseyeAccount = stateStr.split('-')[1];
         this.grantCode !== 'error' && this.authorizeBeseyeAccount();
         this.grantCode === 'error' && this.getAuthorizeMsg('refuse');
       }

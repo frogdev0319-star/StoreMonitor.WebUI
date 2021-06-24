@@ -16,8 +16,7 @@
         <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.name }}</span>
         <div v-if="showInfoContent" class="icon-footer">
           <div class="iconlside">
-            <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="startPlay"/>
-            <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopPlay"/>
+            <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'" class= "iconfont iconplay" @click="onPlay"/>
           </div>
           <div class="iconrside">
             <div v-if="playBack" class="speed-content">
@@ -279,6 +278,10 @@ export default {
     storeId: {
       type: String,
       default: ''
+    },
+    videoAuthority: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -411,7 +414,8 @@ export default {
       timeid: null,
       startTs: 0,
       ifContinuePlay: false,
-      clipStartTime: 0
+      clipStartTime: 0,
+      paused: true
     };
   },
 
@@ -615,7 +619,7 @@ export default {
 
     onPlayerWaiting(e) {
       console.log('video is loading');
-      this.playState = false;
+      this.paused = true;
       this.showModelContent = false;
       this.isLoading = true;
       if (this.playBack) {
@@ -626,7 +630,7 @@ export default {
 
     onPlayerPlaying(e) {
       console.log('video is playing');
-      this.playState = true;
+      this.paused = false;
       this.editCount++;
       this.showModelContent = true;
       this.isLoading = false;
@@ -663,11 +667,7 @@ export default {
       }
       self.durationTimeValue = duration;
       self.currentTimeValue = curTime;
-      console.log(duration);
-      console.log(curTime);
-      console.log(self.startTs);
       self.realTimeStartTs++;
-      console.log(self.realTimeStartTs);
       if (curTime >= duration) {
         window.clearInterval(self.timeid);
         self.timeid = null;
@@ -753,16 +753,77 @@ export default {
     },
 
     visibleChange() {
-      const self = this;
       if (document.hidden) {
-        if (self.playState) {
-          self.ifContinuePlay = true;
-          self.stopPlay();
+        if (!this.paused) {
+          this.ifContinuePlay = true;
+          this.stopPlay();
         }
       } else {
-        console.log(self.playState);
-        if (self.ifContinuePlay) {
-          self.startPlay();
+        if (this.ifContinuePlay) {
+          this.startPlay();
+        }
+      }
+    },
+
+    async onPlay() {
+      const paused = !this.paused;
+      this.showError = false;
+      this.errorText = '';
+      if (paused) {
+        this.stopPlay();
+        this.paused = true;
+      } else {
+        if (this.channelInfo === null) {
+          this.paused = true;
+        } else {
+          await this.startVideo();
+        }
+      }
+    },
+
+    startVideo(){
+      if (this.videoAuthority === false) {
+        this.showError = true;
+        this.errorText = this.$t('remotePatrol.videoLicense');
+        return;
+      }
+      if (this.channelInfo === null) {
+        const error = this.$t('remotePatrol.dashServerError') + '5';
+        this.errorText = error;
+        this.showError = true;
+      } else {
+        this.isLoading = true;
+        this.showError = false;
+        this.stopPlay();
+        this.startPlay();
+      }
+    },
+
+    stopPlay() {
+      const self = this;
+      if (!self.playBack) {
+        if (self.peerConnection != null) {
+          self.peerConnection.close();
+          self.peerConnection = null;
+        }
+        if (self.wsConnection != null) {
+          self.wsConnection.close();
+          self.wsConnection = null;
+        }
+        self.beseyeVideo.removeAttribute('src');
+        window.clearInterval(self.timerPlayReal);
+        self.timerPlayReal = null;
+        self.realTimeSpeed = 0;
+        self.paused = true;
+        self.showModelContent = false;
+      } else {
+        if (!self.paused) {
+          self.players.mainPlayer.video.pause();
+          // self.players = null;
+          self.playBackState = true;
+          self.paused = true;
+          window.clearInterval(self.timeId);
+          self.timeId = null;
         }
       }
     },
@@ -814,7 +875,6 @@ export default {
           }
         };
         self.peerConnection.oniceconnectionstatechange = function() {
-          self.isLoading = false;
           console.log('ice state change: ' + self.peerConnection.iceConnectionState);
         };
 
@@ -848,10 +908,6 @@ export default {
           var sdpData = msgJSON['sdp'];
           if (sdpData !== undefined) {
             console.log('sdp: ' + JSON.stringify(msgJSON['sdp']));
-
-            // We mundge the SDP here, before creating an Answer
-            // If you can get the new MediaAPI to work this might
-            // not be needed.
             msgJSON.sdp.sdp = self.enhanceSDP(msgJSON.sdp.sdp);
 
             self.peerConnection.setRemoteDescription(new RTCSessionDescription(msgJSON.sdp), function() {
@@ -888,16 +944,12 @@ export default {
       };
 
       self.wsConnection.onclose = function(event) {
+        self.isLoading = false;
         console.log('wsConnection.onclose ' + event.code + event.reason);
-        // self.isLoading = false;
-        // self.showError = true;
-        // self.errorText = self.$t('remotePatrol.closeConnection');
       };
 
       self.wsConnection.onerror = function(evt) {
-        // self.isLoading = false;
-        // self.showError = true;
-        // self.errorText = self.$t('remotePatrol.errorConnection');
+        self.isLoading = false;
         console.log('wsConnection.onerror: ' + JSON.stringify(evt));
       };
     },
@@ -913,40 +965,9 @@ export default {
       });
     },
 
-    stopPlay() {
-      const self = this;
-      if (!self.playBack) {
-        if (self.peerConnection != null) {
-          self.peerConnection.close();
-          self.peerConnection = null;
-        }
-        if (self.wsConnection != null) {
-          self.wsConnection.close();
-          self.wsConnection = null;
-        }
-        self.beseyeVideo.removeAttribute('src');
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = null;
-        self.realTimeSpeed = 0;
-        self.playState = false;
-        self.showModelContent = false;
-      } else {
-        if (self.playState) {
-          self.players.mainPlayer.video.pause();
-          // self.players = null;
-          self.playBackState = true;
-          self.playState = false;
-          window.clearInterval(self.timeId);
-          self.timeId = null;
-        }
-      }
-    },
-
     sendPlayGetOffer() {
-      const self = this;
-      console.log('sendPlayGetOffer: ' + JSON.stringify(self.streamInfo));
-      self.wsConnection.send('{"direction":"play", "command":"getOffer", "streamInfo":' +
-        JSON.stringify(self.streamInfo) + ', "userData":' + JSON.stringify(self.userData) + '}');
+      this.wsConnection.send('{"direction":"play", "command":"getOffer", "streamInfo":' +
+        JSON.stringify(this.streamInfo) + ', "userData":' + JSON.stringify(this.userData) + '}');
     },
 
     enhanceSDP(sdpStr) {
@@ -1014,8 +1035,8 @@ export default {
         'platform': 1
       };
       getStreamInfo(params).then(response => {
-        console.log(response);
         if (Object.keys(response.data).length === 0) {
+          self.isLoading = false;
           self.showError = true;
           self.errorText = this.$t('remotePatrol.getBeseyeStreamError');
         } else {
@@ -1027,7 +1048,6 @@ export default {
         self.isLoading = false;
         self.showError = true;
         self.errorText = this.$t('remotePatrol.getBeseyeStreamError');
-        console.log(err);
       });
     },
 
@@ -1240,7 +1260,7 @@ export default {
         // to-da request new playlist
         console.warn('Out of playlist');
         window.clearInterval(self.timeId);
-        self.playState = false;
+        self.paused = true;
         // self.playBackState = false
         self.isLoading = false;
         self.showModelContent = false;
@@ -1357,14 +1377,14 @@ export default {
       self.startTs = newValue;
       self.clipStartTime = self.startTs;
       if (newValue === 0) {
-        if (self.playState) {
+        if (!self.paused) {
           self.stopPlay();
         }
         self.startPlay();
       } else {
-        if (self.playState) {
+        if (!self.paused) {
           self.stopPlay();
-          self.playState = false;
+          self.paused = true;
         }
         self.$nextTick(() => {
           self.video2 = document.getElementById('video2');
@@ -1390,13 +1410,12 @@ export default {
   },
   watch: {
     accountChanged(val, oldVal) {
-      console.log(val);
       const self = this;
       if (val != 0) {
         self.channelInfo = null;
         self.showError = false;
         self.errorText = '';
-        if (self.playState) {
+        if (!self.paused) {
           self.stopPlay();
         }
         if (self.playBackState) {
@@ -1413,20 +1432,16 @@ export default {
     //   }
     // },
     async channelId(newValue, oldValue) {
-      console.log(newValue);
-      console.log(oldValue);
       const self = this;
       if (newValue.length > 0) {
         await self.getBeseyeAccessToken(newValue);
       }
     },
     'channelInfo.ivsId'(newValue, oldValue) {
-      console.log(newValue);
-      console.log(oldValue);
       const self = this;
       self.showError = false;
       if (!self.isStoreMonitor) {
-        if (self.playState) {
+        if (!self.paused) {
           self.stopPlay();
           self.startPlay();
         } else {
@@ -1437,38 +1452,35 @@ export default {
       }
     },
     realTimeSpeed(val, oldVal) {
-      const self = this;
-      console.log(val);
       if (val >= 300) {
-        self.stopPlay();
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = null;
-        self.playState = false;
-        self.showModelContent = false;
-        self.realTimeSpeed = 0;
+        this.stopPlay();
+        window.clearInterval(this.timerPlayReal);
+        this.timerPlayReal = null;
+        this.paused = true;
+        this.showModelContent = false;
+        this.realTimeSpeed = 0;
       }
     }
   },
 
   beforeDestroy() {
-    const self = this;
-    console.log(self.playState);
-    window.clearInterval(self.timerPlayReal);
-    self.realTimeSpeed = 0;
-    if (self.playState) {
-      self.stopPlay();
+    window.clearInterval(this.timerPlayReal);
+    this.realTimeSpeed = 0;
+    if (!this.paused) {
+      this.stopPlay();
     }
-    window.removeEventListener('visibilitychange', self.visibleChange);
-    self.visibleChange = null;
+    window.clearInterval(this.timeId);
+    this.timeId = null;
+    window.removeEventListener('visibilitychange', this.visibleChange);
+    this.visibleChange = null;
   },
 
   mounted() {
-    const self = this;
-    self.beseyeVideo = document.getElementById('beseyeVideo');
-    self.video1 = document.getElementById('video1');
-    self.video2 = document.getElementById('video2');
-    self.getBeseyeAccessToken(self.channelInfo.ivsId);
-    window.addEventListener('visibilitychange', self.visibleChange, false);
+    this.beseyeVideo = document.getElementById('beseyeVideo');
+    this.video1 = document.getElementById('video1');
+    this.video2 = document.getElementById('video2');
+    this.channelInfo && this.getBeseyeAccessToken(this.channelInfo.ivsId);
+    window.addEventListener('visibilitychange', this.visibleChange, false);
   }
 };
 </script>
