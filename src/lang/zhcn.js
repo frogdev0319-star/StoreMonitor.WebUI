@@ -935,7 +935,7 @@ export default {
     'comment': '巡检建议',
     'statistics': '统计图',
     'summaryTable': '统计表',
-    'focalItem': '重点关注项',
+    'focalItem': '不合格项',
     'feedbackItem': '问题反馈项',
     'qualifiedItem': '合格项',
     'ignoredItem': '不适用项',
