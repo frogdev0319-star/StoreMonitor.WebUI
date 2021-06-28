@@ -705,7 +705,7 @@ export default {
     'nvrChannelSetting': 'NVR通道号名称设置',
     'selectNvrChannel': '请选择NVR通道号',
     'addNvr': '添加NVR',
-    'NvrnameRuletip': '最多可输入20个字符',
+    'NvrnameRuletip': '最多可输入30个字符',
     'validateRuletip': '最多可输入10个字符',
     'deleteNvrInfo': '此操作将会删除当前NVR及通道，是否继续？',
     'nvr': 'NVR名称',
