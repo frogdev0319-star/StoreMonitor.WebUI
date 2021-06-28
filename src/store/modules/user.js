@@ -217,7 +217,7 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-          if (res.data && res.data.services.includes("Custom_Inspection")){
+          if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection'))) {
             commit('SET_AUTHORITY', res.data.authorities);
             commit('SET_ROLES', [res.data.title]);
           } else {
@@ -243,7 +243,7 @@ const user = {
     generateRoutes({ commit }) {
       return new Promise(resolve => {
         const accessedRoutes = [];
-        if (user.state.authorities.length > 0){
+        if (user.state.authorities.length > 0) {
           PermissionHelper.setData(user.state.authorities);
 
           const overviewRoute = navbarRoute.getOverviewRoute();
@@ -277,7 +277,7 @@ const user = {
         commit('SET_ROUTES', accessedRoutes);
         if (user.state.authorities.length === 6) {
           const videoAccess = !!PermissionHelper.enableVideo();
-          commit('SET_Video_Authority', videoAccess)
+          commit('SET_Video_Authority', videoAccess);
         }
         resolve(accessedRoutes);
       });
