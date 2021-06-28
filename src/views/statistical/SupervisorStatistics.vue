@@ -359,17 +359,6 @@ export default {
       exportPng: require('../../../static/img/excel.png'),
       lang: this.$i18n.locale,
       supervisorTableData: [],
-      titleList: [
-        {
-          label: this.$t('insSettingView.storesupervisor'),
-          value: 3
-        },
-        {
-          label: this.$t('insSettingView.storesuperManage'),
-          value: 4
-        }
-      ],
-      ModelPost: 3,
       supervisorInfoData: [
         {
           'prop': 'supervisorName',

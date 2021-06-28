@@ -285,7 +285,7 @@ import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/resize';
 import TablePagination from '@/components/TablePagination';
 import DialogPop from '@/components/DialogPop';
-import DelayButton from '../../components/DelayButton';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'PatrolEvaluationSta',
@@ -555,7 +555,7 @@ export default {
       ispdf: false,
       regionMode: 2,
       ifSaveParams: false,
-      defaultSort: {prop: 'qualifiedRateStr', order: 'ascending'}
+      defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' }
     };
   },
 
@@ -1322,7 +1322,7 @@ export default {
       this.order = this.params.order = paramsObj.order;
       this.sizeNum = paramsObj.filter.size;
       this.page = paramsObj.filter.page + 1;
-    },
+    }
   }
 };
 </script>
