@@ -416,7 +416,9 @@ export default {
     'noVideoAccess': 'No video access, please contact system administrator',
     'highDefinition': 'HD',
     'fluency': 'SD',
-    'totalScoreUnit': 'Total Score:'
+    'totalScoreUnit': 'Total Score:',
+    'storeGroup': 'Store Groups',
+    'storeType': 'Store Type'
   },
 
   // event Management page language

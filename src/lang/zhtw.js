@@ -421,7 +421,9 @@ export default {
     'loading': '加載中...',
     'highDefinition': '高清',
     'fluency': '流暢',
-    'totalScoreUnit': '總分：'
+    'totalScoreUnit': '總分：',
+    'storeGroup': '門店群組',
+    'storeType': '門店類型'
   },
 
   // event Management page language
