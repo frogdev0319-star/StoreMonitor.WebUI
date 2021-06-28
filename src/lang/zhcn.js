@@ -637,7 +637,7 @@ export default {
     'parentCatergyName': '上级巡检类别',
     'parentCatergyNameTooltip1': '1. 一级类别若存在直属巡检项目，系统不允许创建子类别',
     'parentCatergyNameTooltip2': '2. 一级类别中若存在子类别，系统不允许调整为二级类别',
-    'btnAttributeValues': '按钮属性值（Pass&Fail、Others）',
+    'btnAttributeValues': '自定义评估选项',
     'passFail': '合格/不合格',
     'yesNo': '是/否',
     'userDefined': '自定义',
@@ -647,9 +647,9 @@ export default {
     'no': '无',
     'updateCategory': '编辑巡检类别',
     'btnAttrLength': '最多可输入8个字符',
-    'enterBtnAttr': '请输入表格属性值',
-    'passFailAttr': 'Pass&Fail按钮显示',
-    'othersAttr': 'Others按钮显示',
+    'enterBtnAttr': '请输入',
+    'passFailAttr': '合格率评估类选项显示',
+    'othersAttr': '附加评分类选项显示',
     'subCategoryHeader': '子类别（选填，30字符）',
     'subCategory': '子类别'
   },
@@ -981,7 +981,7 @@ export default {
     'showAllDetails': '巡检详情全部展示',
     'showPartsDetails': '巡检详情部分展示',
     'basicInfo': '基本信息',
-    'notJoinItem': '基础信息（不参与评估项）',
+    'notJoinItem': '不参与评估项目',
     'defaultAll': '巡检详情',
     'draggableInfo': '拖动项目，调整显示顺序'
   }

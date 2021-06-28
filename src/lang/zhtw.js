@@ -637,7 +637,7 @@ export default {
     'parentCatergyName': '上級巡檢類別',
     'parentCatergyNameTooltip1': '1. 一級類別若存在直屬巡檢項目，系統不允許創建子類別',
     'parentCatergyNameTooltip2': '2. 一級類別中若存在子類別，系統不允許調整為二級類別',
-    'btnAttributeValues': '按鈕屬性值（Pass&Fail、Others）',
+    'btnAttributeValues': '自定義評估選項',
     'passFail': '合格/不合格',
     'yesNo': '是/否',
     'userDefined': '自定義',
@@ -647,9 +647,9 @@ export default {
     'no': '無',
     'updateCategory': '編輯巡檢類別',
     'btnAttrLength': '最多可輸入8個字符',
-    'enterBtnAttr': '請輸入表格屬性值',
-    'passFailAttr': 'Pass&Fail按鈕顯示',
-    'othersAttr': 'Others按鈕顯示',
+    'enterBtnAttr': '請輸入',
+    'passFailAttr': '合格率評估類選項顯示',
+    'othersAttr': '附加評分類選項顯示',
     'subCategoryHeader': '子類別（選填，30字符）',
     'subCategory': '子類別'
   },
@@ -981,7 +981,7 @@ export default {
     'showAllDetails': '巡檢詳情全部展示',
     'showPartsDetails': '巡檢詳情部分展示',
     'basicInfo': '基本信息',
-    'notJoinItem': '基礎信息（不參與評估項）',
+    'notJoinItem': '純紀錄不計分項',
     'defaultAll': '巡檢詳情',
     'draggableInfo': '拖動項目，調整顯示順序'
   }
