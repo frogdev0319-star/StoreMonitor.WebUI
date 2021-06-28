@@ -30,7 +30,7 @@ $store: #fccc3f;
   color: $black;
   .header-details1{
     text-align: left;
-    padding-left: calc(30/1920*100vw);
+    //padding-left: calc(30/1920*100vw);
     padding-right: calc(30/1920*100vw);
     height: 20px;
     line-height: 20px;
@@ -79,7 +79,7 @@ $store: #fccc3f;
   }
   .header-details{
     text-align: left;
-    padding-left: calc(30/1920*100vw);
+    //padding-left: calc(30/1920*100vw);
     position: relative;
     .search-content{
       display: inline-block;
