@@ -2,68 +2,10 @@
   <el-row id="el-containter">
     <el-col :span="24" class="report-header">
       <el-col :span="24" class="header-details">
-        <span>{{ $t('remotePatrol.storeSelect') }}</span>
-        <el-select
-          v-model="curCountry"
-          :placeholder="$t('remotePatrol.country')"
-          size="mini"
-          class="el-province"
-          @change="changeCountry">
-          <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
-            <el-option
-              v-for="item in group.countryList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"/>
-          </el-option-group>
-        </el-select>
-        <region-multi-select
-          ref="proviceSelect"
-          :selected="curProvince"
-          :placeholder="$t('remotePatrol.regionI')"
-          :options="provinceList"
-          :disabled="curCountry.length === 0 || curCountry === '-1'"
-          :all="$t('overview.allZoneI')"
-          style="display: inline"
-          @changeInput="handleProChange"/>
-        <region-multi-select
-          ref="citySelect"
-          :selected="curCity"
-          :placeholder="$t('remotePatrol.regionII')"
-          :options="cityList"
-          :disabled="curProvince.length === 0 || curCountry === '-1'"
-          :all="$t('overview.allZoneII')"
-          style="display: inline"
-          @changeInput="handleCityChange"/>
-        <multi-select
-          ref="multiSelect"
-          :selected="curStore"
-          :options="storeDataList"
-          style="display: inline"
-          @changeInput="handleStoreChange"/>
-        <span class="select-title">{{ $t('remotePatrol.selectStoreTag') }}</span>
-        <multi-select
-          ref="TagMultiSelect"
-          :selected="curStoreTag"
-          :placeholder="$t('remotePatrol.selectStoreTag')"
-          :all-select="0"
-          :alltype="0"
-          :options="storeTagList"
-          style="display: inline;margin-left: calc(20/1920*100vw);"
-          @changeInput="changeStoreTag"/>
-        <span>{{ $t('remotePatrol.resultType') }}</span>
-        <el-select
-          v-model="curAppraise"
-          :placeholder="$t('remotePatrol.all')"
-          size="mini"
-          class="el-province "
-        >
-          <el-option
-            v-for="item in appraiseList"
-            :key="item.status"
-            :label="item.label"
-            :value="item.status"/>
-        </el-select>
+        <store-filter
+          :cached-params="searchParams"
+          @storeChange = "onStoreChange"
+        />
       </el-col>
       <el-col :span="24" class="header-details">
         <span :class="lang === 'en' ? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
@@ -91,6 +33,19 @@
           <div slot="content">*{{ $t('remotePatrol.timePlaceholder') }}</div>
           <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"/>
         </el-tooltip>
+        <span>{{ $t('remotePatrol.resultType') }}</span>
+        <el-select
+          v-model="curAppraise"
+          :placeholder="$t('remotePatrol.all')"
+          size="mini"
+          class="el-province "
+        >
+          <el-option
+            v-for="item in appraiseList"
+            :key="item.status"
+            :label="item.label"
+            :value="item.status"/>
+        </el-select>
         <span>{{ $t('remotePatrol.reportType') }}</span>
         <el-select
           v-model="curReportType"
@@ -117,15 +72,20 @@
             :label="item.name"
             :value="item.id"/>
         </el-select>
+      </el-col>
+      <el-col :span="24" class="header-details">
         <div class="search-content">
           <span>{{ $t('remotePatrol.keywords') }}</span>
           <el-input v-model="searchInput" size="mini" class="search-input" clearable/>
         </div>
-        <el-button
-          :class="lang === 'en'? 'en-search-btn':'search-btn' "
-          size="mini"
+        <delay-button
+          class="search-button"
           type="primary"
-          @click="searchData">{{ $t('remotePatrol.search') }}</el-button>
+          size="mini"
+          @click="searchData"
+        >
+          <span>{{ $t('remotePatrol.search') }}</span>
+        </delay-button>
       </el-col>
     </el-col>
     <el-col :span="24" class="report-content loading">
@@ -273,18 +233,17 @@
 </template>
 <script>
 import { getInspectReportList, GetInspectTagList } from '@/api/inspect';
-import { getBriefStoreList, GetTagList } from '@/api/store';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
-import MultiSelect from '@/components/MultiSelect';
-import RegionMultiSelect from '@/components/RegionMultiSelect';
-import SearchConditionUtil from '../../common/SearchConditionUtil';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
+import StoreFilter from '@/components/StoreFilter';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'InspectReportList',
   components: {
-    MultiSelect,
-    RegionMultiSelect
+    DelayButton,
+    StoreFilter
   },
   data() {
     return {
@@ -392,15 +351,6 @@ export default {
           width: '164'
         }
       ],
-      curCountry: '',
-      countryList: [],
-      curProvince: [],
-      curStoreTag: [],
-      storeTagList: [],
-      provinceList: [],
-      curCity: [],
-      cityList: [],
-      curStore: [],
       storeList: [],
       searchInput: '',
       sizeNum: 12,
@@ -454,17 +404,17 @@ export default {
         this.$t('remotePatrol.patrolDate')],
       inspectId: '',
       inspectTableList: [],
-      filterStoreIds: [],
       isLoading: false,
-      ifSaveParams: true,
+      ifSaveParams: false,
       ifGetParamsFromCash: false,
-      inspectCatch: ''
+      inspectCatch: '',
+      storeFilterObj: {},
+      searchParams: {}
     };
   },
 
   created() {
-    const self = this;
-    self.isFirstLoad = true;
+    this.isFirstLoad = true;
   },
 
   computed: {
@@ -501,24 +451,10 @@ export default {
   },
 
   methods: {
-    changeBrand() {
-      const self = this;
-      self.curCountry = '';
-      self.countryList = [];
-      self.curProvince = [];
-      self.provinceList = [];
-      self.curCity = [];
-      self.cityList = [];
-      self.curStore = [];
-      self.storeList = [];
-      self.searchInput = '';
-      self.curStoreTag = [];
-    },
-
     initData() {
       const self = this;
       self.isLoading = true;
-      self.changeBrand();
+      this.searchInput = '';
       self.defaultTime = [];
       self.storeStr = '';
       self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, new Date()];
@@ -528,12 +464,9 @@ export default {
       self.showMonthDrap = false;
       self.showStoreContent = false;
       self.checkAllStore = false;
-      self.curStore = [];
-      self.storeTagList = [];
       self.curReportType = -1;
       self.getSearchParams();
-      self.getCountryStore();
-      self.getTagListData();
+      self.getInspectList();
     },
 
     async export2Excel() {
@@ -547,8 +480,7 @@ export default {
       that.params.beginTs = start;
       that.params.endTs = end;
       that.params.filter = { page: 0, size: that.total };
-      // let storeIds = that.storeStr.split('，');
-      const storeIds = this.filterStoreIds;
+      const storeIds = this.storeFilterObj.filterStoreIds;
       that.params.clause = { storeId: storeIds };
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
@@ -702,373 +634,6 @@ export default {
       this.getReportList(this.params);
     },
 
-    async getCountryStore() {
-      const self = this;
-      self.storeList = await self.getBriefStoreData();
-      await self.getInspectList();
-      const temp = [];
-      if (self.storeList.length !== 0) {
-        self.storeList.forEach(item => {
-          const country = item.country;
-          if (temp.map(x => x.label).indexOf(country) === -1) {
-            const obj = {
-              value: country,
-              label: country
-            };
-            temp.push(obj);
-          }
-        });
-      }
-      const countryList = temp;
-      self.countryList[0] = {};
-      self.countryList[0].label = self.$t('remotePatrol.country');
-      self.countryList[0].countryList = countryList;
-      self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-      self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value : self.curCountry;
-      self.selectAllProAndCity(self.curCountry, true);
-    },
-
-    getBriefStoreData() {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        getBriefStoreList().then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            const data = res.data;
-            resolve(data);
-          }
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    handleStoreChange(arr) {
-      this.curStore = arr;
-      this.changeStoreNew(arr);
-    },
-
-    handleProChange(arr) {
-      this.curProvince = arr;
-      this.changePro(arr);
-    },
-
-    handleCityChange(arr) {
-      this.curCity = arr;
-      this.changeCity(arr);
-    },
-
-    changeStoreNew(val) {
-      const self = this;
-      let str = '';
-      self.storeList.forEach((item, index) => {
-        val.forEach(_item => {
-          if (item.storeId === _item) {
-            str += item.name + '，';
-          }
-        });
-      });
-      str = str.substr(0, str.length - 1);
-      self.storeStr = str;
-      self.filterStore();
-    },
-
-    changeStore(val) {
-      const self = this;
-      let str = '';
-      self.storeList.forEach((item, index) => {
-        val.forEach(_item => {
-          if (item.storeId === _item) {
-            self.curStoreTag.length !== 0 ? self.curStoreTag.forEach(v_item => {
-              item.tagIds.forEach(t_item => {
-                if ((t_item === v_item && self.curCountry === item.country) ||
-                  (t_item === v_item && self.curCountry === '-1')) {
-                  str += _item + '，';
-                }
-              });
-            }) : (item.storeId === _item ? str += _item + '，' : null);
-          }
-        });
-      });
-      str = str.substr(0, str.length - 1);
-      self.storeStr = str;
-    },
-
-    filterStore() {
-      const self = this;
-      let filterStoreArray = [];
-      if (self.curStoreTag.length > 0) {
-        filterStoreArray = self.storeList.filter(storeItem => self.curStoreTag.find(tagItem => storeItem.tagIds.find(tagId => tagItem === tagId)));
-        console.log(filterStoreArray);
-      } else {
-        filterStoreArray = self.storeList;
-      }
-      console.log(filterStoreArray);
-      const filterSameStore = [];
-      filterStoreArray.forEach(store => {
-        self.curStore.forEach(selectStore => {
-          if (selectStore === store.storeId) {
-            filterSameStore.push(store);
-          }
-        });
-      });
-      console.log(filterSameStore);
-      const filterStoreIds = [];
-      let filterStoreStr = '';
-      filterSameStore.map(store => {
-        filterStoreIds.push(store.storeId);
-        filterStoreStr += `${store.name}，`;
-      });
-      self.filterStoreIds = filterStoreIds;
-      self.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-    },
-
-    changePro(val) {
-      const self = this;
-      self.curCity = [];
-      self.clearCityInfo();
-      self.clearStoreInfo();
-      const storeList = self.storeList;
-      const temp = [];
-      const tempStore = [];
-      if (val === '') {
-        storeList.forEach(item => {
-          if (item.country === self.curCountry) {
-            const obj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              tagIds: item.tagIds
-            };
-            tempStore.push(obj);
-          }
-        });
-      } else {
-        val.forEach(_item => {
-          storeList.forEach(item => {
-            if (item.province === _item) {
-              if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                const obj = {
-                  label: item.city,
-                  value: item.city
-                };
-                temp.push(obj);
-              }
-              const obj = {
-                storeId: item.storeId,
-                label: item.name,
-                value: item.name,
-                userId: item.userId,
-                tagIds: item.tagIds
-              };
-              tempStore.push(obj);
-            }
-          });
-        });
-        self.cityList = temp;
-        const cityArr = [];
-        if (self.cityList.length !== 0) {
-          self.cityList.forEach(item => {
-            cityArr.push(item.value);
-          });
-          self.curCity = cityArr;
-        }
-      }
-      self.storeDataList = tempStore;
-      let storeArr = [], arr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-        arr.push(item.value);
-      });
-
-      self.curStore = storeArr;
-      self.changeStoreNew(self.curStore);
-    },
-
-    changeCountry(val) {
-      const self = this;
-      const temp = [];
-      self.clearProviceInfo();
-      self.clearCityInfo();
-      self.clearStoreInfo();
-      self.selectAllProAndCity(val, false);
-    },
-
-    changeStoreTag(val) {
-      const self = this;
-      self.curStoreTag = val;
-      this.filterStore();
-    },
-
-    getTagListData() {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        GetTagList().then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            res.data.forEach(item => {
-              const obj = {};
-              obj.value = item.tagId;
-              obj.label = item.tagName;
-              obj.disabled = false;
-              self.storeTagList.push(obj);
-            });
-            resolve(res);
-          }
-        }).catch(res => {
-          resolve(res);
-        });
-      });
-    },
-
-    changeCity(val) {
-      const self = this;
-      self.clearStoreInfo();
-      const storeList = self.storeList;
-      const temp = [];
-      if (val.length !== 0) {
-        val.forEach(_item => {
-          storeList.forEach(item => {
-            if (item.city === _item) {
-              if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                const obj = {
-                  storeId: item.storeId,
-                  label: item.name,
-                  value: item.name,
-                  userId: item.userId,
-                  userName: item.userName
-                };
-                temp.push(obj);
-              }
-            }
-          });
-        });
-      }
-      self.storeDataList = temp;
-      let str = '', storeArr = [], arr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-        arr.push(item.value);
-      });
-      self.curStore = storeArr;
-      self.changeStoreNew(self.curStore);
-    },
-
-    clearStoreInfo() {
-      const self = this;
-      self.curStore = [];
-      self.storeStr = '';
-      self.$refs.multiSelect.selectedArray = [];
-      self.$refs.multiSelect.input = '';
-    },
-
-    clearProviceInfo() {
-      const self = this;
-      self.curProvince = [];
-      self.$refs.proviceSelect.selectedArray = [];
-      self.$refs.proviceSelect.input = '';
-    },
-
-    clearCityInfo() {
-      const self = this;
-      self.curCity = [];
-      self.$refs.citySelect.selectedArray = [];
-      self.$refs.citySelect.input = '';
-    },
-
-    selectAllProAndCity(val, isFirst) {
-      const self = this;
-      const storeList = self.storeList;
-      const temp = [];
-      const tempStore = [];
-      storeList.forEach(item => {
-        if (item.country === val || val === '-1') {
-          if (temp.map(x => x.value).indexOf(item.province) === -1) {
-            const obj = {
-              label: item.province,
-              value: item.province
-            };
-            temp.push(obj);
-          }
-          let storeObj = {};
-          if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
-            if (self.curCity.length > 0 && self.curCity !== '-1') {
-              if (self.curProvince.includes(item.province) && self.curCity.includes(item.city)) {
-                storeObj = {
-                  storeId: item.storeId,
-                  label: item.name,
-                  value: item.name,
-                  userId: item.userId,
-                  userName: item.userName
-                };
-              }
-            }
-          } else {
-            storeObj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              userName: item.userName
-            };
-          }
-          Object.keys(storeObj).length > 0 && tempStore.push(storeObj);
-        }
-      });
-      self.provinceList = temp;
-      const cityTemp = [];
-      self.provinceList.forEach(_item => {
-        storeList.forEach(item => {
-          if (item.province === _item.value) {
-            let citObj = {};
-            if (self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== '-1') {
-              if (self.curCity.length > 0 && self.curCity !== '-1') {
-                if (self.curProvince.includes(item.province)) {
-                  if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-                    citObj = {
-                      label: item.city,
-                      value: item.city
-                    };
-                  }
-                }
-              }
-            } else {
-              if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-                citObj = {
-                  label: item.city,
-                  value: item.city
-                };
-              }
-            }
-            Object.keys(citObj).length > 0 && cityTemp.push(citObj);
-          }
-        });
-      });
-      self.cityList = cityTemp;
-      const provinceArr = [];
-      self.provinceList.forEach(item => {
-        provinceArr.push(item.value);
-      });
-      self.curProvince = isFirst ? ((!self.ifGetParamsFromCash) ? provinceArr : self.curProvince) : provinceArr;
-
-      const cityArr = [];
-      self.cityList.forEach(item => {
-        cityArr.push(item.value);
-      });
-      self.curCity = isFirst ? ((!self.ifGetParamsFromCash) ? cityArr : self.curCity) : cityArr;
-      self.storeDataList = tempStore;
-      const storeArr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-      });
-      setTimeout(() => {
-        self.curStore = isFirst ? ((!self.ifGetParamsFromCash) ? storeArr : self.curStore) : storeArr;
-        self.changeStoreNew(self.curStore);
-        isFirst ? self.getInitReportList(0) : null;
-      }, 100);
-    },
-
     dateFocus() {
       const self = this;
       self.getDeafultTime();
@@ -1093,7 +658,7 @@ export default {
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       const threeMonthAgo = util.getThreeMonths(end);
       if (end - start > end - threeMonthAgo) {
-        util.notify(that.$t('eventView.changeTimeRange'), 'warning', 3000);
+        util.notify(self.$t('eventView.changeTimeRange'), 'warning', 3000);
         self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
       }
     },
@@ -1121,8 +686,7 @@ export default {
       self.params.endTs = end;
       self.page = 1;
       const clause = {};
-      // clause.storeId = self.storeStr.split('，');
-      clause.storeId = self.filterStoreIds;
+      clause.storeId = this.storeFilterObj.filterStoreIds;
       if (self.curReportType != null && self.curReportType !== -1) {
         clause.mode = self.curReportType;
       }
@@ -1143,7 +707,8 @@ export default {
       }
 
       self.params.filter = { page: 0, size: self.sizeNum };
-      self.saveSearchParams();
+      self.ifSaveParams && self.saveSearchParams();
+      self.ifSaveParams = true;
       self.getReportList(self.params);
     },
 
@@ -1163,7 +728,7 @@ export default {
       self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
     },
 
-    sortChange(col){
+    sortChange(col) {
       let self = this;
       let order = col.order;
       if (order === 'ascending') {
@@ -1183,7 +748,6 @@ export default {
     },
 
     getTagAll() {
-      const self = this;
       return new Promise((resolve, reject) => {
         GetInspectTagList().then(res => {
           const data = res.data;
@@ -1224,16 +788,12 @@ export default {
       } else {
         self.inspectId = '';
       }
+      self.getInitReportList();
     },
 
     saveSearchParams() {
-      const tempsearchParamsObj = {};
+      const tempsearchParamsObj = this.storeFilterObj;
       tempsearchParamsObj.searchCondition = this.params;
-      tempsearchParamsObj.curCountry = this.curCountry;
-      tempsearchParamsObj.curProvince = this.curProvince;
-      tempsearchParamsObj.curCity = this.curCity;
-      tempsearchParamsObj.curStore = this.curStore;
-      tempsearchParamsObj.curStoreTag = this.curStoreTag;
       tempsearchParamsObj.curReportType = this.curReportType;
       const searchParamsObj = {
         path: 'inspectReport',
@@ -1249,20 +809,13 @@ export default {
         this.dateValue[1] = new Date(searchParams.searchCondition.endTs);
         this.params.beginTs = searchParams.beginTs;
         this.params.endTs = searchParams.endTs;
-        this.curStore = searchParams.storeIds;
-        this.timeMode = searchParams.timeMode;
-        this.curCountry = searchParams.curCountry;
-        this.curProvince = searchParams.curProvince;
-        this.curCity = searchParams.curCity;
-        this.curStore = searchParams.curStore;
-        this.curStoreTag = searchParams.curStoreTag;
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.params = searchParams.searchCondition;
         this.curAppraise = searchParams.searchCondition.clause.status;
         this.curReportType = searchParams.curReportType;
         this.inspectCatch = searchParams.searchCondition.inspectTagId.length === 0 ? '-1' : searchParams.searchCondition.inspectTagId;
-        // this.setDefaultSort();
+        this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
       } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
@@ -1270,11 +823,16 @@ export default {
         this.params.beginTs = start;
         this.params.endTs = end;
         this.params.filter = { page: 0, size: this.sizeNum };
-        // let storeIds = self.storeStr.split('，');
-        const storeIds = this.filterStoreIds;
-        this.params.clause = { storeId: storeIds };
+        this.params.clause = { storeId: [] };
         this.ifGetParamsFromCash = false;
+        this.searchParams = {};
       }
+    },
+
+    onStoreChange(storeObj) {
+      console.log(storeObj);
+      this.storeStr = storeObj.storeStr;
+      this.storeFilterObj = storeObj;
     }
   },
 
@@ -1380,7 +938,7 @@ $suggestBack:#F1F6FE;
         }
         .header-details{
             text-align: left;
-            padding-left: calc(50/1920*100vw);
+            padding-left: calc(30/1920*100vw);
             position: relative;
             .search-content{
                 display: inline-block;
@@ -1435,36 +993,16 @@ $suggestBack:#F1F6FE;
                   width: 85px;
                 };
             }
-            .search-btn{
-              width: calc(130/1920*100vw);
-              height: calc(36/1920*100vw);
-              padding: 0 0;
-              font-size: calc(14/1920*100vw);
-              margin-left: calc(20/1920*100vw);
-            }
-            .en-search-btn{
-              width: calc(130/1920*100vw);
-              height: calc(36/1920*100vw);
-              padding: 0 0;
-              font-size: calc(14/1920*100vw);
-              margin-left: calc(20/1920*100vw);
-              @media screen and (min-width: 1280px) and (max-width: 1360px){
-                width: 85px;
-              };
-              @media screen and (max-width: 1024px){
-                margin-left: 10px;
-              };
-            }
-            // .storename-str{
-            //     width: 100%;
-            //     white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-            //     overflow: hidden; //隐藏超出单元格的部分。
-            //     text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
-            // }
         }
-      .header-details:nth-child(2){
-        padding-top:20px;
+      .header-details{
         padding-bottom: 30px;
+        padding-right: calc(20/1920*100vw);
+      }
+      .header-details:nth-child(1){
+        padding-bottom: 0px;
+      }
+      .header-details:nth-child(2){
+        padding-bottom: 15px;
       }
     }
     .report-content{
