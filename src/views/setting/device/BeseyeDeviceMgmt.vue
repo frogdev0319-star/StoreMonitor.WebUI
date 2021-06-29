@@ -173,32 +173,37 @@
           <div class="deviceForm">
             <span class="available-span">{{ $t('deviceView.availableDevice') }}</span>
             <div class="available-device-info">
-              <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
-                <div class="available-checkbox">
-                  <el-checkbox v-model="item.checked" @change="changeAvailableDeviceChecked(item, index)"/>
+              <template v-if="avilableDeviceList.length > 0">
+                <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
+                  <div class="available-checkbox">
+                    <el-checkbox v-model="item.checked" @change="changeAvailableDeviceChecked(item, index)"/>
+                  </div>
+                  <div class="available-sn">
+                    <span>{{ item.serialNumber }}</span>
+                  </div>
+                  <div class="available-name">
+                    <span>{{ item.name }}</span>
+                  </div>
+                  <div class="available-store">
+                    <el-select
+                      v-model="item.storeId"
+                      :filter-method="filterStoreOption"
+                      :placeholder="$t('deviceView.selectStore')"
+                      style="width: 100%;"
+                      filterable
+                    >
+                      <el-option
+                        v-for="item in storeDataList"
+                        :key="item.storeId"
+                        :label="item.label"
+                        :value="item.storeId"/>
+                    </el-select>
+                  </div>
                 </div>
-                <div class="available-sn">
-                  <span>{{ item.serialNumber }}</span>
-                </div>
-                <div class="available-name">
-                  <span>{{ item.name }}</span>
-                </div>
-                <div class="available-store">
-                  <el-select
-                    v-model="item.storeId"
-                    :filter-method="filterStoreOption"
-                    :placeholder="$t('deviceView.selectStore')"
-                    style="width: 100%;"
-                    filterable
-                  >
-                    <el-option
-                      v-for="item in storeDataList"
-                      :key="item.storeId"
-                      :label="item.label"
-                      :value="item.storeId"/>
-                  </el-select>
-                </div>
-              </div>
+              </template>
+              <template v-else>
+                <div class="no-data-container">{{ $t('deviceView.noData') }}</div>
+              </template>
             </div>
           </div>
         </div>
