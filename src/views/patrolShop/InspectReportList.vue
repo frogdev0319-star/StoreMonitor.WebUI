@@ -309,8 +309,8 @@ export default {
           width: '120'
         },
         {
-          prop: 'storeTag',
-          label: this.$t('remotePatrol.storeTag'),
+          prop: 'storeType',
+          label: this.$t('remotePatrol.storeType'),
           sortable: false,
           width: '115'
         },
@@ -395,7 +395,7 @@ export default {
         this.$t('remotePatrol.regionII'),
         this.$t('remotePatrol.code'),
         this.$t('remotePatrol.patrolStore'),
-        this.$t('remotePatrol.storeTag'),
+        this.$t('remotePatrol.storeType'),
         this.$t('scheduleView.InspectPerson'),
         this.$t('overview.patrolLists'),
         this.$t('remotePatrol.patrolWay'),
@@ -485,7 +485,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportReportHeader;
-        const filterVal = ['province', 'city', 'code', 'storeName', 'storeTag', 'submitterName', 'tagName',
+        const filterVal = ['province', 'city', 'code', 'storeName', 'storeType', 'submitterName', 'tagName',
           'modeText', 'status', 'totalScore', 'datestr'];
         let curData = [];
         curData = await that.getReportList(that.params);
@@ -538,12 +538,12 @@ export default {
             } else if (item.mode === 1) {
               reportObj.modeText = self.$t('overview.onsitePatrol');
             }
-            let storeTag = '';
+            let storeType = '';
             item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
               const isuu = _index === item.tags.length - 1 ? '' : ',';
-              storeTag += _item + isuu;
-            }) : storeTag = '--';
-            reportObj.storeTag = storeTag;
+              storeType += _item + isuu;
+            }) : storeType = '--';
+            reportObj.storeType = storeType;
             self.storeList.forEach(_item => {
               if (item.storeId === _item.storeId) {
                 reportObj.province = _item.province;
