@@ -1,11 +1,20 @@
 <template>
   <div class="el-overview-content">
     <div class="overview-date">
+      <store-filter
+        :cached-params = "searchParams"
+        @storeChange = "onStoreChange"
+      />
       <span class="date-title">{{ $t('overview.date') }}</span>
-      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
-      <span class="el-store">
-        {{ $t('overview.totalStore') }}{{ totalStoreNum }}{{ $t('overview.totalUnit') }}
-      </span>
+      <date-time-picker :date-value="dateValue" @change="dateChange"/>
+      <delay-button
+        class="search-button"
+        type="primary"
+        size="mini"
+        @click="getPatrolOverviewData"
+      >
+        <span>{{ $t('remotePatrol.search') }}</span>
+      </delay-button>
     </div>
     <div class="el-overview">
       <el-row class="zone-row">
@@ -244,11 +253,15 @@ import { mapGetters } from 'vuex';
 import resize from '@/components/mixins/resize';
 import SearchConditionUtil from '@/common/SearchConditionUtil.js';
 import DateTimePicker from '@/components/DateTimePicker';
+import StoreFilter from '../../components/StoreFilter';
+import DelayButton from '../../components/DelayButton';
 
 export default {
   name: 'PatrolOverview',
 
   components: {
+    DelayButton,
+    StoreFilter,
     DateTimePicker,
     'v-chart': ECharts
   },
@@ -274,7 +287,6 @@ export default {
       curItemId: '',
       curItemName: '',
       itemsRadarOption: null,
-      totalStoreNum: 0,
       numOfInspects: 0,
       cycleOfInspect: 0,
       passRateList: [
@@ -338,7 +350,10 @@ export default {
       descending: require('../../../static/img/descending.png'),
       ascending: require('../../../static/img/ascending.png'),
       currentIndex: 0,
-      fontFamily: 'Roboto, Microsoft YaHei'
+      fontFamily: 'Roboto, Microsoft YaHei',
+      storeFilterObj: {},
+      searchParams: {},
+      ifSaveParams: false
     };
   },
 
@@ -355,14 +370,14 @@ export default {
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.currentIndex = 0;
         self.getSearchParams();
-        self.initData();
+        self.getPatrolOverviewData();
       }
     }
   },
 
   created() {
+    this.ifSaveParams = false;
     this.getSearchParams();
-    this.initData();
   },
 
   beforeDestroy() {
@@ -672,11 +687,11 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
       this.params.endTs = end;
-      this.saveSearchParams();
-      this.initData();
     },
 
-    initData() {
+    getPatrolOverviewData() {
+      this.params.storeIds = this.storeFilterObj.curStore.filter(item => item !== -1);
+      this.ifSaveParams && this.saveSearchParams();
       this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
       this.getStoreNumAndCycle();
       this.getBestAndWorstStores();
@@ -684,6 +699,7 @@ export default {
       this.getInspectTaskRanking();
       this.getPassRateAndCycle();
       this.getRegionInspectResult();
+      this.ifSaveParams = true;
     },
 
     compareDanger(a, b) {
@@ -809,17 +825,14 @@ export default {
         if (storeNumAndCycle.errCode === 0) {
           const result = storeNumAndCycle.data;
           if (result) {
-            self.totalStoreNum = result.numOfStores;
             self.numOfInspects = result.numOfInspects;
             self.cycleOfInspect = result.cycleOfInspect === -1 ? 'N/A' : result.cycleOfInspect;
           }
         } else {
-          self.totalStoreNum = 0;
           self.numOfInspects = 0;
           self.cycleOfInspect = 0;
         }
       } catch (e) {
-        self.totalStoreNum = 0;
         self.numOfInspects = 0;
         self.cycleOfInspect = 0;
         console.log('PatrolOverview-getStoreNumAndCycle:' + e);
@@ -1610,29 +1623,45 @@ export default {
       this.$refs.cycleChart && this.$refs.cycleChart.resize();
     },
 
-    saveSearchParams(){
+    saveSearchParams() {
+      const tempSearchParamsObj = this.storeFilterObj;
+      tempSearchParamsObj.searchCondition = this.params;
       const searchConditon = {
         path: 'patrolOverview',
-        params: this.params
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+        params: tempSearchParamsObj
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('patrolOverview');
-      if(Object.keys(searchParams).length > 0){
-        this.dateValue[0] = new Date(searchParams.beginTs);
-        this.dateValue[1] = new Date(searchParams.endTs);
-        this.params.beginTs = searchParams.beginTs;
-        this.params.endTs = searchParams.endTs;
-      }else{
+      if (Object.keys(searchParams).length > 0) {
+        if (searchParams.searchCondition) {
+          this.params.beginTs = searchParams.searchCondition.beginTs;
+          this.params.endTs = searchParams.searchCondition.endTs;
+        } else {
+          this.params.beginTs = searchParams.beginTs;
+          this.params.endTs = searchParams.endTs;
+        }
+        this.dateValue[0] = new Date(this.params.beginTs);
+        this.dateValue[1] = new Date(this.params.endTs);
+        this.searchParams = searchParams;
+      } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
         this.params.endTs = end;
+        this.searchParams = {};
       }
       const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;
+    },
+
+    onStoreChange(storeObj) {
+      console.log(storeObj);
+      this.storeStr = storeObj.storeStr;
+      this.storeFilterObj = storeObj;
+      !this.ifSaveParams && this.getPatrolOverviewData();
     }
 
   }
