@@ -139,6 +139,7 @@ export default {
         self.params.beginTs = start;
         self.params.endTs = end;
         self.ifGetParamsFromCash = false;
+        self.ifSaveParams = false;
         await this.getSearchParams();
         self.initDaysRange();
         self.initData();
@@ -211,8 +212,11 @@ export default {
     },
 
     async searchData() {
+      this.params.storeIds = this.storeFilterObj.filterStoreIds;
+      this.params.timeMode = this.timeMode;
       this.$emit('emitSearch', this.params, this.daysRangeList, this.storeFilterObj.curRegionI, this.storeFilterObj.curRegionII,
-        this.storeFilterObj.regionMode, this.storePatrolLists, this.storeFilterObj.storeStr, this.tagNameStr, this.timeMode);
+        this.storeFilterObj.regionMode, this.storePatrolLists, this.storeFilterObj.storeStr, this.storeFilterObj.storeGroupString,
+        this.storeFilterObj.storeTypeString, this.timeMode);
     },
 
     getInspectId() {
@@ -258,7 +262,7 @@ export default {
     },
 
     handleExportPdf() {
-      this.$emit('exportPdf', this.storeStr, this.tagNameStr);
+      this.$emit('exportPdf', this.storeFilterObj.storeStr, this.storeFilterObj.storeGroupString, this.storeFilterObj.storeTypeString);
     },
 
     getTagAll() {

@@ -105,8 +105,12 @@
             <span class="content-header">{{ storeNameStr }}</span>
           </p>
           <p>
-            <span>{{ $t('remotePatrol.selectStoreTag') }}：</span>
-            <span class="content-header">{{ storeTagStr }}</span>
+            <span>{{ $t('remotePatrol.storeGroup') }}：</span>
+            <span class="content-header">{{ storeGroupStr }}</span>
+          </p>
+          <p>
+            <span>{{ $t('remotePatrol.storeType') }}：</span>
+            <span class="content-header">{{ storeTypeStr }}</span>
           </p>
           <p>
             <span>{{ $t('remotePatrol.time') }}：</span>
@@ -281,7 +285,8 @@ export default {
       ispdf: false,
       pdfSrc: '',
       storeNameStr: '',
-      storeTagStr: '',
+      storeGroupStr: '',
+      storeTypeStr: '',
       storeDateValue: '',
       htmlTitle: this.$t('overview.htmltopdfD'),
       eventKPIs: [
@@ -971,7 +976,7 @@ export default {
     },
 
     emitSearch(searchParams, dateRangeList, curRegionI, curRegionII,
-      regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
+      regionMode, storePatrolLists, storeStr, groupStr, typeStr, timeMode) {
       this.params = searchParams;
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
@@ -980,9 +985,10 @@ export default {
       this.searchData();
     },
 
-    exportPdf(storeNameStr, storeTagStr) {
+    exportPdf(storeNameStr, groupStr, typeStr) {
       this.storeNameStr = storeNameStr;
-      this.storeTagStr = storeTagStr;
+      this.storeGroupStr = groupStr;
+      this.storeTypeStr = typeStr;
       this.handleDown();
     },
 

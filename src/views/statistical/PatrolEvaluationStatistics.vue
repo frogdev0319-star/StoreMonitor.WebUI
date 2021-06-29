@@ -147,8 +147,12 @@
           <span class="content-header">{{ storeNameStr }}</span>
         </p>
         <p>
-          <span>{{ $t('remotePatrol.selectStoreTag') }}：</span>
-          <span class="content-header">{{ storeTagStr }}</span>
+          <span>{{ $t('remotePatrol.storeGroup') }}：</span>
+          <span class="content-header">{{ storeGroupStr }}</span>
+        </p>
+        <p>
+          <span>{{ $t('remotePatrol.storeType') }}：</span>
+          <span class="content-header">{{ storeTypeStr }}</span>
         </p>
         <p>
           <span>{{ $t('overview.patrolLists') }}：</span>
@@ -226,8 +230,7 @@
               :show-pagination="false"
               :is-pdf-column="true"
               :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-              @handleChange="handlePageAndSizeChange"
-              @sortChange="handleSortChange"/>
+              />
           </div>
 
         </el-col>
@@ -252,8 +255,7 @@
                 :show-pagination="false"
                 :is-pdf-column="true"
                 :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-                @handleChange="handlePageAndSizeChange"
-                @sortChange="handleSortChange"/>
+              />
             </div>
           </el-col>
 
@@ -304,7 +306,8 @@ export default {
       htmlTitle: this.$t('overview.htmltopdfA'),
       isexportPDF: false,
       storeNameStr: '',
-      storeTagStr: '',
+      storeGroupStr: '',
+      storeTypeStr: '',
       storePatrolLists: '',
       curRegion: [],
       timeMode: 1,
@@ -1239,7 +1242,7 @@ export default {
       this.$refs.storeChart && this.$refs.storeChart.resize();
     },
 
-    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
+    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeStr, groupStr, typeStr, timeMode) {
       this.params = searchParams;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
@@ -1256,10 +1259,11 @@ export default {
       this.searchData();
     },
 
-    exportPdf(storeNameStr, storeTagStr) {
+    exportPdf(storeNameStr, storeGroupStr, storeTypeStr) {
       this.isexportPDF = true;
       this.storeNameStr = storeNameStr;
-      this.storeTagStr = storeTagStr;
+      this.storeGroupStr = storeGroupStr;
+      this.storeTypeStr = storeTypeStr;
       this.handleExportReport();
     },
 
@@ -1446,6 +1450,7 @@ export default {
       .region-header{
         border-bottom: 1px solid $border;
         margin-bottom: 30px;
+        padding-right: 0;
       }
       .el-table-panel{
         margin-left: calc(30/1920*100vw);
@@ -1460,6 +1465,7 @@ export default {
       .region-header{
         border-bottom: 1px solid $border;
         margin-bottom: 30px;
+        padding-right: 0;
       }
       .el-table-panel{
         margin-left: calc(30/1920*100vw);

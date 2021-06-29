@@ -119,7 +119,6 @@ export default {
       storeDataList: [],
       lang: this.$i18n.locale,
       storeStr: '',
-      tagNameStr: '',
       filterStoreIds: [],
       inspectTypeList: [],
       inspectList: '',
@@ -138,8 +137,7 @@ export default {
       curRegionII: [],
       regionMode: 1,
       storeGroupString: '',
-      storeTypeString: '',
-      storeNameStr: ''
+      storeTypeString: ''
     };
   },
 
@@ -154,18 +152,25 @@ export default {
         self.ifGetParamsFromCash = false;
         await this.getSearchParams();
         this.getCountryStore();
-        this.getStoreGroupAndType();
       }
     },
     cachedParams() {
       this.getSearchParams();
+    },
+
+    curStoreGroup() {
+      this.getStoreGroupString();
+    },
+
+    curStoreType() {
+      this.getStoreTypeString();
     }
   },
 
   async created() {
+    this.getStoreGroupAndType();
     await this.getSearchParams();
     this.getCountryStore();
-    this.getStoreGroupAndType();
   },
 
   methods: {
@@ -197,7 +202,7 @@ export default {
       }
     },
 
-    async getStoreGroupAndType() {
+    getStoreGroupAndType() {
       const storeGroupPromise = this.getStoreDefineList(0);
       const storeTypePromise = this.getStoreDefineList(1);
       Promise.all([storeGroupPromise, storeTypePromise]).then(results => {
@@ -215,12 +220,6 @@ export default {
         });
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
-        const allStoreGroup = groupList.map(item => item.defineId);
-        const allStoreType = typeList.map(item => item.defineId);
-        allStoreGroup.unshift('-1');
-        allStoreType.unshift('-1');
-        this.curStoreGroup = (!this.ifGetParamsFromCash) ? allStoreGroup : this.curStoreGroup;
-        this.curStoreType = (!this.ifGetParamsFromCash) ? allStoreType : this.curStoreType;
       }).catch(err => {
         console.log('StoreFilter - getStoreGroupAndType: ' + err);
       });
@@ -335,21 +334,11 @@ export default {
 
     onChangeStoreGroup(val) {
       this.curStoreGroup = val;
-      const groupIdArray = this.storeGroupList.filter(groupItem => val.find(groupId => groupId === groupItem.value));
-      groupIdArray.forEach(groupItem => {
-        this.storeGroupString += groupItem.label + '，';
-      });
-      this.storeGroupString = this.storeGroupString.substr(0, this.storeGroupString.length - 1);
       this.filterStore();
     },
 
     onChangeStoreType(val) {
       this.curStoreType = val;
-      const typeIdArr = this.storeTypeList.filter(typeItem => val.find(typeId => typeId === typeItem.value));
-      typeIdArr.forEach(typeItem => {
-        this.storeTypeString += typeItem.label + '，';
-      });
-      this.storeTypeString = this.storeTypeString.substr(0, this.storeTypeString.length - 1);
       this.filterStore();
     },
 
@@ -364,7 +353,6 @@ export default {
       } else {
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
       }
-      console.log(filterStoreId);
       let filterStoreStr = '';
       filterStoreId.forEach(storeId => {
         this.storeList.forEach(store => {
@@ -373,9 +361,31 @@ export default {
           }
         });
       });
-      this.filterStoreIds = filterStoreId;
+      this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
 
+      this.emitParams();
+    },
+
+    getStoreGroupString() {
+      this.storeGroupString = '';
+      const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
+      groupIdArray.forEach(groupItem => {
+        this.storeGroupString += groupItem.label + '，';
+      });
+      this.storeGroupString = this.storeGroupString.substr(0, this.storeGroupString.length - 1);
+    },
+
+    getStoreTypeString() {
+      this.storeTypeString = '';
+      const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
+      typeIdArr.forEach(typeItem => {
+        this.storeTypeString += typeItem.label + '，';
+      });
+      this.storeTypeString = this.storeTypeString.substr(0, this.storeTypeString.length - 1);
+    },
+
+    emitParams() {
       const tempsearchParamsObj = {};
       tempsearchParamsObj.curCountry = this.curCountry;
       tempsearchParamsObj.curProvince = this.curProvince;
@@ -396,8 +406,6 @@ export default {
     },
 
     getStoreIdsOfGroupAndType(groupArr, typeArr) {
-      console.log(groupArr);
-      console.log(typeArr);
       let groupIdArr = [];
       let typeIdArr = [];
       if (groupArr.length === 0 && typeArr.length === 0) return [];
@@ -639,7 +647,6 @@ export default {
     }
   }
   .header-details{
-    padding-right: calc(60/1920*100vw);
     padding-bottom: 15px;
     @media screen and (max-width: 1360px){
       padding-right: calc(20/1920*100vw);
