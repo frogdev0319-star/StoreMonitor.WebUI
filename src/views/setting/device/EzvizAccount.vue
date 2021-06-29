@@ -1,18 +1,29 @@
 <template>
   <div class="device-container">
     <div class="btn-col">
-      <div class="operation-btns">
-        <el-button
-          class="el-add-btn btn-class"
-          size="mini"
-          type="primary"
-          @click="showAddEzvizAccountDialog"
-        >
-          <div class="btn-area">
-            <i class="iconfont el-icon-plus"/>
-            <span>{{ $t('deviceView.addEzvizAccount') }}</span>
+      <div class="operation-title">
+        <div class="prompt-info">
+          <img :src="errorImgSource" class="error-img"/>
+          <span class="error-msg">
+            {{ $t('deviceView.deviceLimitation') }}
+          </span>
+        </div>
+        <div class="device-num-btn">
+          <div>
+            {{ $t('deviceView.authorizedDevicesNum') }}
           </div>
-        </el-button>
+          <div class="available-device">
+            {{ $t('deviceView.availableDeviceNum') }}
+          </div>
+          <delay-button @click="showAddEzvizAccountDialog"
+                        class="inspction-btn">
+            <div class="button-area">
+              <i class="iconfont el-icon-plus"/>
+              <span>{{ $t('deviceView.addEzvizAccount') }}</span>
+            </div>
+          </delay-button>
+        </div>
+
       </div>
     </div>
     <div class="table-container">
@@ -200,10 +211,11 @@ import vm from '@/main.js';
 import util from '@/common/util.js';
 import { mapGetters } from 'vuex';
 import DialogPop from '@/components/DialogPop';
+import DelayButton from '../../../components/DelayButton';
 
 export default {
   name: 'EzvizAccount',
-  components: { TablePagination, DialogPop },
+  components: { DelayButton, TablePagination, DialogPop },
   data() {
     const validateEzvizAccount = (rule, value, callback) => {
       const self = this;
@@ -393,7 +405,8 @@ export default {
       accountHead: 'account-header',
       accountCell: '',
       accountRow: '',
-      isLoadingAccount: true
+      isLoadingAccount: true,
+      errorImgSource: require('../../../../static/img/icon_error.png')
     };
   },
 
@@ -803,4 +816,41 @@ export default {
 <style lang="scss">
   @import '../../../assets/css/importfile.css';
   @import '../../../assets/sass/device.scss';
+
+  .btn-col{
+    line-height: unset;
+  }
+  .operation-title{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 28px;
+    margin-right: calc(20/1920*100vw);
+    font-size: calc(14/1920*100vw);
+    font-weight: bold;
+    color: #7d8cad;
+  }
+  .prompt-info{
+    display: inline-flex;
+    align-items: center;
+    padding-left: calc(40/1920*100vw);
+    max-width: 45%;
+  }
+  .device-num-btn{
+    display: inline-flex;
+    align-items: center;
+  }
+  .available-device{
+    padding: 0 calc(34/1920*100vw) 0 calc(20/1920*100vw);
+  }
+  .error-img{
+    height: calc(24/1920*100vw);
+    width: calc(24/1920*100vw);
+    padding-right: calc(8/1920*100vw);
+  }
+  .error-msg{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 </style>

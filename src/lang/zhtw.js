@@ -814,7 +814,10 @@ export default {
     'reauthorizeRefused': '重新授權被拒絕',
     'deleteBeseyeUser': '刪除Beseye用戶',
     'selectDevice': '請選擇設備',
-    'isAuthorizing': '授權中...'
+    'isAuthorizing': '授權中...',
+    'deviceLimitation': '當前設備數量超限，請續約或減少設備數量',
+    'authorizedDevicesNum': '授權設備數量：',
+    'availableDeviceNum': '可添加設備數量：'
 
   },
 

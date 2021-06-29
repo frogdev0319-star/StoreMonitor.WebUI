@@ -806,7 +806,10 @@ export default {
     'reauthorizeRefused': 'Authorization denied',
     'deleteBeseyeUser': 'Delete Beseye account',
     'selectDevice': 'Please select device',
-    'isAuthorizing': 'Authorizing...'
+    'isAuthorizing': 'Authorizing...',
+    'deviceLimitation': 'The current number of devices exceeds the limitation, please renew or reduce the number of devices',
+    'authorizedDevicesNum': 'Number of authorized devices:',
+    'availableDeviceNum': 'The number of devices that can be added:'
   },
 
   // Store Management page language
