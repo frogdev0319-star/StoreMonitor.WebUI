@@ -79,7 +79,6 @@ $store: #fccc3f;
   }
   .header-details{
     text-align: left;
-    //padding-left: calc(30/1920*100vw);
     position: relative;
     .search-content{
       display: inline-block;
@@ -127,9 +126,6 @@ $store: #fccc3f;
       font-size: calc(14/1920*100vw);
       margin-left: calc(20/1920*100vw);
     }
-  }
-  .header-details:nth-child(1){
-    padding-right: calc(60/1920*100vw);
   }
 
   .header-details:nth-child(2){
