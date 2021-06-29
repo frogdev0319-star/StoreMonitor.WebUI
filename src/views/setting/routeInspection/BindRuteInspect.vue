@@ -85,7 +85,7 @@
   </div>
 </template>
 <script>
-import { getBriefStoreList, GetTagList } from '@/api/store';
+import { getBriefStoreList } from '@/api/store';
 import { applyItemInspectItem, UnapplyInspectItem, getInspectBindList } from '@/api/inspect';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
@@ -182,18 +182,10 @@ export default {
             tempArray.push(tempStore[i]);
           }
         }
-      }else{
+      } else {
         self.tempStoreData.forEach(item => {
-          if(self.curStore.map(x=>x).indexOf(item.storeId) !== -1){
-            if(self.curStoreTag.length !== 0){
-              item.tagIds.forEach(_item=>{
-                if (self.curStoreTag.map(x => x).indexOf(_item) !== -1) {
-                  tempArray.push(item);
-                }
-              })
-            }else{
-              tempArray.push(item);
-            }
+          if (self.curStore.map(x => x).indexOf(item.storeId) !== -1) {
+            tempArray.push(item);
           }
         });
       }
@@ -212,16 +204,8 @@ export default {
       const self = this;
       let curStoreTemp = [];
       self.tempStoreData.forEach(item => {
-        if(self.curStore.map(x=>x).indexOf(item.storeId) !== -1){
-          if(self.curStoreTag.length !== 0){
-            item.tagIds.forEach(_item=>{
-              if (self.curStoreTag.map(x => x).indexOf(_item) !== -1) {
-                curStoreTemp.push(item);
-              }
-            })
-          }else{
-            curStoreTemp.push(item);
-          }
+        if (self.curStore.map(x => x).indexOf(item.storeId) !== -1) {
+          curStoreTemp.push(item);
         }
       });
       self.showCityContent = false;
@@ -488,7 +472,7 @@ export default {
     onStoreChange(storeObj) {
       this.storeStr = storeObj.storeStr;
       this.storeFilterObj = storeObj;
-      this.curStore = storeObj.curStore;
+      this.curStore = storeObj.filterStoreIds;
       this.searchStore();
     }
 
