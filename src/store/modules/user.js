@@ -217,14 +217,14 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-          if (res.data && res.data.services.includes("Custom_Inspection")){
-            commit('SET_AUTHORITY', res.data.authorities);
-            commit('SET_ROLES', [res.data.title]);
-          } else {
-            commit('SET_AUTHORITY', []);
-            commit('SET_ROLES', []);
-          }
-          resolve(res);
+        if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection'))){
+          commit('SET_AUTHORITY', res.data.authorities);
+          commit('SET_ROLES', [res.data.title]);
+        } else {
+          commit('SET_AUTHORITY', []);
+          commit('SET_ROLES', []);
+        }
+        resolve(res);
         }).catch(error => {
           reject(error);
         });
