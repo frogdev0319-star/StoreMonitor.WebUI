@@ -226,8 +226,8 @@
               :show-pagination="false"
               :is-pdf-column="true"
               :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-              @handleChange="handlePageAndSizeChange"
-              @sortChange="handleSortChange"/>
+              @handleChange="handleRegionPageAndSizeChange"
+              @sortChange="handleRegionSortChange"/>
           </div>
 
         </el-col>
@@ -252,8 +252,8 @@
                 :show-pagination="false"
                 :is-pdf-column="true"
                 :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-                @handleChange="handlePageAndSizeChange"
-                @sortChange="handleSortChange"/>
+                @handleChange="handleStorePageAndSizeChange"
+                @sortChange="handleStoreSortChange"/>
             </div>
           </el-col>
 
