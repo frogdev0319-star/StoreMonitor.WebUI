@@ -380,7 +380,7 @@ export default {
     validateName() {
       if (this.curTemplate.name.trim().length === 0) {
         this.showTemplateTip = true;
-        this.templateNameTip = this.$t('scheduleView.enterTemplateName');
+        this.templateNameTip = this.$t('titleView.enterTemplateName');
         return false;
       }
       const nameList = this.templateList.filter(item => item.id !== -1 && item.id !== this.templateList[this.curTemplateIndex].id)
