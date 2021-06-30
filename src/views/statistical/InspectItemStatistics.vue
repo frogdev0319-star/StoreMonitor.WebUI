@@ -56,7 +56,7 @@
             <el-col :span="12" class="evalution-pct">
               <div class="title radar-select-title">
                 <div class="radar-title ">
-                  {{ curType === 0? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite') }}
+                  {{ $t('overview.proportionOfRemote') }}
                 </div>
                 <div>
                   <el-select v-model="itemChart.chart" class="chart-select" size="mini" @change="getChartData">
@@ -184,7 +184,7 @@
             <el-col :span="12" class="evalution-pct">
               <div class="title radar-select-title">
                 <div>
-                  {{ curType === 0 ? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite') }}
+                  {{ $t('overview.proportionOfRemote') }}
                 </div>
               </div>
               <div class="inspect-catergy">
@@ -226,6 +226,7 @@ import { mapGetters } from 'vuex';
 import util from '@/common/util.js';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/resize';
+import filterString from '@/common/filterString';
 
 import {
   getInspectStatsItemOverviewV2
@@ -249,7 +250,6 @@ export default {
       storeGroupStr: '',
       storeTypeStr: '',
       storePatrolLists: '',
-      curType: 0,
       params: {},
       exportPng: require('../../../static/img/excel.png'),
       lang: this.$i18n.locale,
@@ -442,12 +442,16 @@ export default {
     },
 
     async searchData() {
-      const self = this;
-      self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.params.order = self.order;
-      self.params.mode = self.curType;
-      await self.getInspectItemsTable();
+      this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+      this.params.filter = { page: this.page - 1, size: this.sizeNum };
+      this.params.order = this.order;
+      this.params.storeIds.length > 0 ? this.getInspectItemsTable() : this.setNoData();
+    },
+
+    setNoData() {
+      this.itemsTableData = [];
+      this.total = [];
+      this.getInspectCharts();
     },
 
     async getInspectItemsTable() {
@@ -614,9 +618,9 @@ export default {
         let score = 0;
         datasArray.forEach(_item => {
           sumNum += _item.numOfTotal;
-          score += qualified ? (_item.numOfExcellent * 2 + _item.numOfQualified) : _item.numOfUnqualified;
+          score += qualified ? _item.numOfQualified : _item.numOfUnqualified;
         });
-        obj.max = sumNum * 2;
+        obj.max = sumNum;
         if (index < 2) {
           tempIndicator.push(obj);
           seriesValue.push(score);
@@ -796,7 +800,7 @@ export default {
       const pieOption = {
         tooltip: {
           trigger: 'item',
-          formatter: '{a} <br/>{b} : {c} ({d}%)',
+          formatter: '{b} : {c} ({d}%)',
           textStyle: {
             align: 'left'
           },
@@ -829,7 +833,6 @@ export default {
             itemStyle: {
               normal: {
                 color: function(params) {
-                  console.log(params);
                   const colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
                     '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
                   return colorList[params.dataIndex];
@@ -839,18 +842,22 @@ export default {
             label: {
               fontSize: 14,
               color: '#9A9A9C',
-              formatter: '{b}-{d}%'
+              formatter(v) {
+                const text = v.name;
+                const countLength = filterString.getContentLength(text);
+                if (countLength < 20) {
+                  return `${text}: ${v.percent}%`
+                } else {
+                  return `${text.slice(0, 10)}... : ${v.percent}%`
+                }
+              }
             },
             labelLine: {
               length: 10,
-              length2: 50,
+              length2: 20,
               lineStyle: {
                 color: '#9A9A9C'
               }
-            },
-            tooltip: {
-              trigger: 'item',
-              formatter: '{b}-{d}%'
             },
             z: 1,
             data: []
@@ -873,7 +880,6 @@ export default {
     async initData() {
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = { direction: this.direction, property: this.property };
-      this.params.mode = this.curType;
     },
 
     export2Excel() {
@@ -903,7 +909,7 @@ export default {
           }
         }
         const data = that.formatJson(filterVal, curData);
-        const patrolName = that.curType === 0 ? 'Remote Patrol' : 'Onsite Patrol';
+        const patrolName = that.storePatrolLists;
         const fileName = patrolName + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
