@@ -1,20 +1,11 @@
 <template>
   <div class="el-overview-content">
     <div class="overview-date">
-      <store-filter
-        :cached-params = "searchParams"
-        @storeChange = "onStoreChange"
-      />
       <span class="date-title">{{ $t('overview.date') }}</span>
-      <date-time-picker :date-value="dateValue" @change="dateChange"/>
-      <delay-button
-        class="search-button"
-        type="primary"
-        size="mini"
-        @click="getEventOverviewData"
-      >
-        <span>{{ $t('remotePatrol.search') }}</span>
-      </delay-button>
+      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
+      <span class="el-store">
+        {{ $t('overview.totalStore') }}{{ numOfStores }}{{ $t('overview.totalUnit') }}
+      </span>
     </div>
     <div class="el-overview">
       <el-row class="first-row">
@@ -143,15 +134,11 @@ import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } 
 import resize from '@/components/mixins/resize';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimePicker from '@/components/DateTimePicker';
-import StoreFilter from '../../components/StoreFilter';
-import DelayButton from '../../components/DelayButton';
 
 export default {
   name: 'EventOverview',
 
   components: {
-    DelayButton,
-    StoreFilter,
     DateTimePicker,
     'v-chart': ECharts
   },
@@ -183,7 +170,6 @@ export default {
           eventNum: 0
         }
       ],
-      allStoreDataList: [],
       storeDataList: [],
       checkAllStore: true,
       storeIds: [],
@@ -300,10 +286,7 @@ export default {
       ],
       echartAxiasColor: '#e3e9f4',
       echartBackground: 'rgba(30,34,52,0.75)',
-      fontFamily: 'Roboto, Microsoft YaHei',
-      storeFilterObj: {},
-      searchParams: {},
-      ifSaveParams: false
+      fontFamily: 'Roboto, Microsoft YaHei'
     };
   },
 
@@ -330,6 +313,7 @@ export default {
   created() {
     this.getBriefStoreData();
     this.getSearchParams();
+    this.getEventOverviewData();
   },
 
   beforeDestroy() {
@@ -348,6 +332,8 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
       this.params.endTs = end;
+      this.saveSearchParams();
+      this.getEventOverviewData();
     },
 
     getBriefStoreData() {
@@ -367,8 +353,16 @@ export default {
             };
             tempStore.push(obj);
           });
+          if (tempStore.length > 0) {
+            tempStore.unshift(
+              {
+                storeId: '-1',
+                label: self.$t('overview.all'),
+                value: '-1'
+              }
+            );
+          }
           self.storeDataList = tempStore;
-          self.allStoreDataList = tempStore;
         }
       });
     },
@@ -376,7 +370,7 @@ export default {
     changeStore(val) {
       const self = this;
       self.storeIds = [];
-      if (val === "-1") {
+      if (val === '-1') {
         self.storeIds = [];
       } else {
         self.storeIds.push(self.curStore);
@@ -386,13 +380,10 @@ export default {
     },
 
     getEventOverviewData() {
-      this.params.storeIds = this.storeFilterObj.filterStoreIds;
-      this.ifSaveParams && this.saveSearchParams();
       this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
       this.getEventStatsStatics();
       this.getEventRankingInfo();
       this.getStoreEventStatics();
-      this.ifSaveParams = true;
     },
 
     async getEventStatsStatics() {
@@ -964,12 +955,15 @@ export default {
     },
 
     saveSearchParams() {
-      const tempSearchParamsObj = this.storeFilterObj;
-      tempSearchParamsObj.searchCondition = this.params;
-      tempSearchParamsObj.rankType = this.rankType;
+      const params = {
+        beginTs: this.params.beginTs,
+        endTs: this.params.endTs,
+        storeId: this.curStore,
+        rankType: this.rankType
+      };
       const searchConditon = {
         path: 'eventOverview',
-        params: tempSearchParamsObj
+        params: params
       };
       SearchConditionUtil.saveSearchCondition(searchConditon);
     },
@@ -977,24 +971,18 @@ export default {
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventOverview');
       if (Object.keys(searchParams).length > 0) {
-        if (searchParams.searchCondition) {
-          this.params.beginTs = searchParams.searchCondition.beginTs;
-          this.params.endTs = searchParams.searchCondition.endTs;
-        } else {
-          this.params.beginTs = searchParams.beginTs;
-          this.params.endTs = searchParams.endTs;
-        }
-        this.dateValue[0] = new Date(this.params.beginTs);
-        this.dateValue[1] = new Date(this.params.endTs);
-        this.searchParams = searchParams;
+        this.dateValue[0] = new Date(searchParams.beginTs);
+        this.dateValue[1] = new Date(searchParams.endTs);
+        this.params.beginTs = searchParams.beginTs;
+        this.params.endTs = searchParams.endTs;
         this.rankType = searchParams.rankType;
-        this.curStore = searchParams.curStore;
-        if (this.curStore === '-1' || this.curStore.length === 0) {
+        this.curStore = searchParams.storeId;
+        if (this.curStore === "-1" || this.curStore.length === 0) {
           this.storeIds = [];
         } else {
           this.storeIds.push(this.curStore);
         }
-      } else {
+      }else{
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
@@ -1002,19 +990,6 @@ export default {
       }
       const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;
-    },
-
-    onStoreChange(storeObj) {
-      this.storeStr = storeObj.storeStr;
-      this.storeFilterObj = storeObj;
-      const filterStore = this.allStoreDataList.filter(store => storeObj.filterStoreIds.includes(store.storeId));
-      filterStore && filterStore.length > 0 && filterStore.unshift({
-        storeId: '-1',
-        label: this.$t('overview.all'),
-        value: '-1'
-      });
-      this.storeDataList = filterStore;
-      !this.ifSaveParams && this.getEventOverviewData();
     }
   }
 };

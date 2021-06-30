@@ -305,20 +305,27 @@ $black: #182752;
 }
 
 .overview-date {
+  height: 80px;
+  line-height: 80px;
   text-align: left;
   margin-bottom: 30px;
   border-bottom: 1px solid $border;
   position: relative;
   background: #fff;
-  padding: 30px calc(30/1920*100vw);
 
   .date-title {
+    margin-left: calc(60 / 1920 * 100vw);
     margin-right: calc(40 / 1920 * 100vw);
     font-size: 14px;
     color: $black;
   }
   .content {
     display: inline-block;
+  }
+  .el-store {
+    position: absolute;
+    right: 0px;
+    margin-right: calc(30/1920*100vw);
   }
 }
 .iconbangzhu {
