@@ -716,6 +716,12 @@ export default {
         self.storeEventsOptions && (self.storeEventsOptions.dataset.source = []);
         self.getEventBySourcePie();
         self.isLoading = false;
+        self.params.timeMode = self.timeMode;
+        const searchParamsObj = {
+          path: 'eventStatistics',
+          params: this.params
+        };
+        this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
       } else {
         self.params.filter = { page: self.page - 1, size: self.sizeNum };
         self.params.order = this.order;
