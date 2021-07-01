@@ -442,6 +442,7 @@ export default {
     },
 
     async searchData() {
+      this.PDFData = [];
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
@@ -450,15 +451,27 @@ export default {
 
     setNoData() {
       this.itemsTableData = [];
-      this.total = [];
+      this.total = 0;
       this.getInspectCharts();
+    },
+
+    setItemInfoRequestParams() {
+      const params = {};
+      params.beginTs = this.params.beginTs;
+      params.endTs = this.params.endTs;
+      params.storeIds = this.params.storeIds;
+      params.inspectId = this.params.inspectId;
+      return params;
     },
 
     async getInspectItemsTable() {
       const self = this;
       let seriesData = [];
       try {
-        const inspectItems = await self.getInspectStatsItemInfo(self.params);
+        const params = this.setItemInfoRequestParams();
+        params.filter = { page: this.page - 1, size: this.sizeNum };
+        params.order = this.order;
+        const inspectItems = await self.getInspectStatsItemInfo(params);
         const ignorePer = 0;
         const errCode = inspectItems.errCode;
         if (errCode === 0) {
@@ -540,19 +553,11 @@ export default {
 
     async getInspectCharts() {
       const self = this;
-      const params = {};
-      params.beginTs = self.params.beginTs;
-      params.endTs = self.params.endTs;
-      params.storeIds = self.params.storeIds;
-      params.mode = self.params.mode;
       self.itemsOptions = self.getInspectChartOption();
       if (self.total > 0) {
+        const params = this.setItemInfoRequestParams();
         self.hasNoData = false;
-        params.filter = {
-          page: 0,
-          size: self.total
-        };
-        params.inspectId = self.params.inspectId;
+        params.filter = { page: 0, size: this.total };
         const inspectItems = await self.getInspectStatsItemInfo(params);
         const ignorePer = 0;
         const errCode = inspectItems.errCode;
@@ -652,7 +657,7 @@ export default {
         const datasArray = item.data;
         let score = 0;
         datasArray.forEach(_item => {
-          score += (qualified ? (_item.numOfQualified + _item.numOfExcellent) : _item.numOfUnQualified);
+          score += (qualified ? (_item.numOfQualified + _item.numOfExcellent) : _item.numOfUnqualified);
         });
         obj.value = score;
         obj.value > 0 && seriesData.push(obj);
