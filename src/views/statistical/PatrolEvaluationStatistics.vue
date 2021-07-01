@@ -53,12 +53,16 @@
             </div>
             <div class="region-result">
               <div class="region-content">
-                <div class="region-result-panel">
-                  <v-chart
-                    ref="storeChart"
-                    :options="regionsChartsOptions"
-                    :auto-resize="true"
-                    class="result-content" />
+                <div class="region-content">
+                  <div class="region-result-panel" v-if="regionsChartsOptions">
+                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                             class="result-content"/>
+                  </div>
+                  <div v-else class="region-result-panel">
+                    <span class="no-data-text">
+                      {{ $t('deviceView.noData') }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -205,8 +209,14 @@
             </div>
             <div class="region-result">
               <div class="region-content">
-                <div class="region-result-panel">
-                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true" class="result-content" />
+                <div class="region-result-panel" v-if="regionsChartsOptions">
+                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                           class="result-content"/>
+                </div>
+                <div v-else class="region-result-panel">
+                  <span class="no-data-text">
+                    {{ $t('deviceView.noData') }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -650,11 +660,20 @@ export default {
     },
 
     async searchData() {
-      const self = this;
-      self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      await self.getInspectStatsOverviewOfRegion();
-      await self.getInspectStatsOverviewOfStore();
-      await self.getInspectStatsLine();
+      this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+      if (this.params.storeIds.length > 0) {
+        await this.getInspectStatsOverviewOfRegion();
+        await this.getInspectStatsOverviewOfStore();
+        await this.getInspectStatsLine();
+      } else {
+        this.totalRegion = 0;
+        this.regionTableData = [];
+        this.getRegionPie();
+        this.storeTableData = [];
+        this.regionsList = [];
+        this.curRegion = [];
+        this.regionsChartsOptions = null;
+      }
     },
 
     async export2Excel() {
@@ -772,7 +791,8 @@ export default {
       params.endTs = self.params.endTs;
       params.region = this.regionMode;
       params.timeMode = self.timeMode;
-      params.inspectId = self.params.inspectId;
+      params.inspectTagId = self.params.inspectId;
+      params.storeIds = self.params.storeIds;
       try {
         const regionResult = await self.getInspectResultOverRegion(params);
         const option = self.getInspectLineOption();
@@ -1320,7 +1340,7 @@ export default {
       this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
-    setDefaultSortAndPage(paramsObj){
+    setDefaultSortAndPage(paramsObj) {
       console.log(paramsObj)
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
