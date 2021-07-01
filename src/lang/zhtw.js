@@ -617,6 +617,7 @@ export default {
     'description': '請輸入巡檢項目詳細說明',
     'descriptionRuletip': '最多可輸入1200個字元',
     'titleEmpty': '類別名稱不能為空！',
+    'itemTitleEmpty': '巡檢項名稱不能為空',
     'ScoreEmpty': '項目分值不能為空',
     'illegalStr': '當前輸入含有非法字元！',
     'remotePatrol': '遠端巡檢',

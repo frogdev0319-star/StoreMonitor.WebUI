@@ -610,6 +610,7 @@ export default {
     'description': 'Description',
     'descriptionRuletip': 'Enter up to 1200 characters',
     'titleEmpty': 'Title may not be empty.',
+    'itemTitleEmpty': 'Title may not be empty.',
     'ScoreEmpty': "The Score can't empty",
     'illegalStr': 'Illegal strings!',
     'remotePatrol': 'Remote Inspection',

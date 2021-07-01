@@ -617,6 +617,7 @@ export default {
     'description': '请输入巡检项目详细说明',
     'descriptionRuletip': '最多可输入1200个字符',
     'titleEmpty': '类别名称不能为空！',
+    'itemTitleEmpty': '巡检项名称不能为空',
     'ScoreEmpty': '项目分值不能为空',
     'illegalStr': '当前输入含有非法字符！',
     'remotePatrol': '远程巡检',
