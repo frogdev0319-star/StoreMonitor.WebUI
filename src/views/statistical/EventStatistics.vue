@@ -28,12 +28,17 @@
               <div
                 v-loading="isLoading"
                 :element-loading-text="$t('insSettingView.loadingbindstore')"
-                class="charts-content self-loading">
+                class="charts-content self-loading" v-if="!hasNoData">
                 <v-chart
                   ref="storeEventRef"
                   :options="storeEventsOptions"
                   :auto-resize="true"
                   class="result-content"/>
+              </div>
+              <div v-else class="charts-content">
+                <span class="no-data-text">
+                  {{ $t('deviceView.noData') }}
+                </span>
               </div>
             </div>
           </el-col>
@@ -136,14 +141,20 @@
               </div>
             </el-col>
             <el-col :span="14" class="store-events" style="background-color:#ffffff;">
-              <div class="region-result">
-                <div class="charts-content">
-                  <v-chart
-                    ref="storeEventRef"
-                    :options="storeEventsOptions"
-                    :auto-resize="true"
-                    class="result-content"/>
-                </div>
+              <div
+                v-loading="isLoading"
+                :element-loading-text="$t('insSettingView.loadingbindstore')"
+                class="charts-content self-loading" v-if="!hasNoData">
+                <v-chart
+                  ref="storeEventRef"
+                  :options="storeEventsOptions"
+                  :auto-resize="true"
+                  class="result-content"/>
+              </div>
+              <div v-else class="charts-content">
+                <span class="no-data-text">
+                  {{ $t('deviceView.noData') }}
+                </span>
               </div>
             </el-col>
             <el-col :span="7" class="source-list" style="background-color:#ffffff;">
@@ -717,14 +728,17 @@ export default {
         self.getEventBySourcePie();
         self.isLoading = false;
         self.params.timeMode = self.timeMode;
+        self.hasNoData = true;
         const searchParamsObj = {
           path: 'eventStatistics',
           params: this.params
         };
         this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
+        this.ifSaveParams = true;
       } else {
         self.params.filter = { page: self.page - 1, size: self.sizeNum };
         self.params.order = this.order;
+        self.hasNoData = false;
 
         /**
          *firstly, call getEventTableData to get all event num and display the first page of table
@@ -811,11 +825,6 @@ export default {
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.timeMode = self.timeMode;
-      // if (self.curProvince.length === 0) {
-      //   self.hasNoData = true;
-      //   self.itemsTableData = [];
-      //   return;
-      // }
       params.storeIds = self.params.storeIds;
       params.filter = { page: self.page - 1, size: self.total };
       params.order = self.order;

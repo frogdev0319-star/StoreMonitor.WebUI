@@ -429,8 +429,6 @@ export default {
       const self = this;
       if (val !== 0) {
         self.storeDataList = [];
-        self.$refs.multiSelect.selectedArray = [];
-        self.$refs.multiSelect.input = '';
         self.initData();
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
@@ -513,6 +511,10 @@ export default {
 
     getReportList(params) {
       const self = this;
+      if (params.clause.storeId.length === 0) {
+        this.setNoData();
+        return;
+      }
       return new Promise((resolve) => {
         getInspectReportList(params).then(res => {
           const errCode = res.errCode;
@@ -707,9 +709,15 @@ export default {
       }
 
       self.params.filter = { page: 0, size: self.sizeNum };
-      self.ifSaveParams && self.saveSearchParams();
-      self.ifSaveParams = true;
+      self.saveSearchParams();
       self.getReportList(self.params);
+    },
+
+    setNoData() {
+      this.reportList = [];
+      this.total = 0;
+      this.isLoading = false;
+      this.noData = this.$t('deviceView.noData');
     },
 
     checkSortType(typeId) {

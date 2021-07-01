@@ -393,14 +393,6 @@ export default {
       });
     },
 
-    async getCountryStore() {
-      const self = this;
-      const data = await self.getBriefStoreData();
-      if (data.errCode === 0 && data.errMsg === 'Success') {
-        self.tempStoreData = data.data;
-      }
-    },
-
     handleStateChange(val) {
       const self = this;
       self.curState = val;
@@ -557,7 +549,7 @@ export default {
       } else {
         like = {};
       }
-      const storeId = this.storeFilterObj.filterStoreIds;
+      const storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
 
       let status = [];
       if (this.curState.length !== 0) {
@@ -644,7 +636,7 @@ export default {
       const start = self.dateValue[0];
       const endTime = self.dateValue[1];
       const end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
-      const storeId = this.storeFilterObj.filterStoreIds;
+      const storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         like = {
@@ -663,17 +655,24 @@ export default {
         },
         like: like
       };
-      eventRESTful.GetEventCountByStatus(params).then(res => {
-        const data = res.data;
-        let numOfEventTotal = 0;
+      if (storeId.length === 0) {
         for (let i = 0; i < 4; i++) {
-          self.tableDataList[i].eventCount = data[i].numOfEvent;
-          numOfEventTotal += data[i].numOfEvent;
+          self.tableDataList[i].eventCount = 0;
         }
-        self.tableDataList[4].eventCount = numOfEventTotal;
-      }).catch(err => {
-        console.log('EventManagement-getEventCount:' + err);
-      });
+        self.tableDataList[4].eventCount = 0;
+      } else {
+        eventRESTful.GetEventCountByStatus(params).then(res => {
+          const data = res.data;
+          let numOfEventTotal = 0;
+          for (let i = 0; i < 4; i++) {
+            self.tableDataList[i].eventCount = data[i].numOfEvent;
+            numOfEventTotal += data[i].numOfEvent;
+          }
+          self.tableDataList[4].eventCount = numOfEventTotal;
+        }).catch(err => {
+          console.log('EventManagement-getEventCount:' + err);
+        });
+      }
     },
 
     getExportDataSize() {
@@ -790,10 +789,9 @@ export default {
     },
 
     initData() {
-      console.log('initData');
       const self = this;
       self.activeName = '0';
-      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, new Date()];
+      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, new Date().getTime()];
       self.inputSearchValue = '';
       self.total = 0;
       self.getSearchParams();
@@ -802,12 +800,7 @@ export default {
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
       }
-      try {
-        self.getCountryStore();
-        this.searchData();
-      } catch (err) {
-        console.log('EventMangement-initData: ' + err);
-      }
+      this.searchData();
     },
 
     saveSearchParams() {
@@ -852,13 +845,14 @@ export default {
         this.params.beginTs = start;
         this.params.endTs = end;
         this.searchParams = {};
+        this.curState = [0];
       }
     },
 
     onStoreChange(storeObj) {
       console.log(storeObj);
       this.storeFilterObj = storeObj;
-      !this.ifSaveParams && this.searchEventList();
+      !this.ifSaveParams && this.searchData();
     }
   },
 
