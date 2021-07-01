@@ -137,7 +137,10 @@ export default {
       curRegionII: [],
       regionMode: 1,
       storeGroupString: '',
-      storeTypeString: ''
+      storeTypeString: '',
+      countries: [],
+      provinces: [],
+      cities: []
     };
   },
 
@@ -150,64 +153,53 @@ export default {
       const self = this;
       if (val !== 0) {
         self.ifGetParamsFromCash = false;
+        this.getStoreListAndGroupAndType();
         await this.getSearchParams();
         this.getCountryStore();
       }
     },
     cachedParams() {
       this.getSearchParams();
-    },
-
-    curStoreGroup() {
-      this.getStoreGroupString();
-    },
-
-    curStoreType() {
-      this.getStoreTypeString();
     }
   },
 
-  async created() {
-    this.getStoreGroupAndType();
-    await this.getSearchParams();
-    this.getCountryStore();
+  created() {
+    this.getSearchParams();
+    this.getStoreListAndGroupAndType();
   },
 
   methods: {
-    async getCountryStore() {
-      const self = this;
-      const data = await self.getBriefStoreData();
-      const temp = [];
-      if (data.errCode === 0) {
-        self.storeList = data.data;
-        if (self.storeList.length !== 0) {
-          self.storeList.forEach(item => {
-            const country = item.country;
-            if (temp.map(x => x.label).indexOf(country) === -1) {
-              const obj = {
-                value: country,
-                label: country
-              };
-              temp.push(obj);
-            }
-          });
-        }
-        const countryList = temp;
-        self.countryList[0] = {};
-        self.countryList[0].label = self.$t('remotePatrol.country');
-        self.countryList[0].countryList = countryList;
-        self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value : self.curCountry;
-        self.selectAllProAndCity(self.curCountry, true);
+    getCountryStore() {
+      let temp = [];
+      if (this.storeList.length !== 0) {
+        this.storeList.forEach(item => {
+          const country = item.country;
+          if (temp.map(x => x.label).indexOf(country) === -1) {
+            const obj = {
+              value: country,
+              label: country
+            };
+            temp.push(obj);
+          }
+        });
       }
+      const countryList = temp;
+      this.countryList[0] = {};
+      this.countryList[0].label = this.$t('remotePatrol.country');
+      this.countryList[0].countryList = countryList;
+      this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
+      this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
+      this.selectAllProAndCity(this.curCountry, true);
     },
 
-    getStoreGroupAndType() {
-      const storeGroupPromise = this.getStoreDefineList(0);
-      const storeTypePromise = this.getStoreDefineList(1);
-      Promise.all([storeGroupPromise, storeTypePromise]).then(results => {
-        const groupList = results[0];
-        const typeList = results[1];
+    getStoreListAndGroupAndType() {
+      const storeListPromise = this.getBriefStoreData();
+      const storeGroupPromise = this.getStoreDefineList(1);
+      const storeTypePromise = this.getStoreDefineList(0);
+      Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
+        const storeList = results[0];
+        const groupList = results[1];
+        const typeList = results[2];
         groupList.map(item => {
           item.label = item.defineName;
           item.value = item.defineId;
@@ -218,6 +210,8 @@ export default {
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
+        this.storeList = storeList;
+        this.getCountryStore();
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
       }).catch(err => {
@@ -324,7 +318,7 @@ export default {
         getBriefStoreList().then(res => {
           const errMsg = res.errMsg;
           if (errMsg && errMsg === 'Success') {
-            resolve(res);
+            resolve(res.data);
           }
         }).catch(err => {
           reject(err);
@@ -343,16 +337,16 @@ export default {
     },
 
     filterStore() {
-      const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
-      const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
-
-      const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
       let filterStoreId = [];
-      if (filterStoreArray.length === 0) {
+      if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
         filterStoreId = this.curStore;
       } else {
+        const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
+        const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
+        const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
       }
+
       let filterStoreStr = '';
       filterStoreId.forEach(storeId => {
         this.storeList.forEach(store => {
@@ -364,6 +358,8 @@ export default {
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
 
+      this.getStoreGroupString();
+      this.getStoreTypeString();
       this.emitParams();
     },
 

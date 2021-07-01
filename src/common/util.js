@@ -885,8 +885,6 @@ export default {
   },
 
   getIntersectionOfArrs(arr1, arr2) {
-    console.log(arr1);
-    console.log(arr2);
     const arr2Set = new Set(arr2);
     const intersection = arr1.filter(item => arr2Set.has(item));
     return intersection;

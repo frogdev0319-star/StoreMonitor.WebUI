@@ -354,3 +354,12 @@ $black: #182752;
   height: 60px;
   padding-left: calc(30/1920*100vw);
 }
+
+.no-data-text{
+  font-size: calc(16/1920*100vw);
+  color: #7d8cad;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
