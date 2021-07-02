@@ -410,6 +410,7 @@ export default {
       } else {
         self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
       }
+      self.dateValue[1] = self.dateValue[1] + 999;
       self.inputSearchValue = '';
       self.tableDataList[tabIndex].page = 1;
     },
@@ -843,7 +844,7 @@ export default {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
-        this.params.endTs = end;
+        this.params.endTs = end + 999;
         this.searchParams = {};
         this.curState = [0];
       }
