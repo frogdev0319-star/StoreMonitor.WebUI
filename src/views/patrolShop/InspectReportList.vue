@@ -393,8 +393,8 @@ export default {
       headerClass: 'report-header-class',
       exportReportHeader: [this.$t('remotePatrol.regionI'),
         this.$t('remotePatrol.regionII'),
-        this.$t('remotePatrol.code'),
         this.$t('remotePatrol.patrolStore'),
+        this.$t('remotePatrol.code'),
         this.$t('remotePatrol.storeType'),
         this.$t('scheduleView.InspectPerson'),
         this.$t('overview.patrolLists'),
@@ -483,7 +483,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportReportHeader;
-        const filterVal = ['province', 'city', 'code', 'storeName', 'storeType', 'submitterName', 'tagName',
+        const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
           'modeText', 'status', 'totalScore', 'datestr'];
         let curData = [];
         curData = await that.getReportList(that.params);
@@ -525,6 +525,8 @@ export default {
           const temp = [];
           data.forEach(item => {
             const reportObj = {};
+            reportObj.province = item.province;
+            reportObj.city = item.city;
             reportObj.id = item.id;
             reportObj.datestr = util.getDateStr(item.ts);
             reportObj.storeName = item.storeName;
