@@ -283,6 +283,7 @@
       <div class="form-slot">
         <el-form
           ref="channelForm"
+          class="addDevice"
           :model="addChannelData"
           :rules="channelRules"
           label-position="top"
@@ -1801,14 +1802,14 @@ export default {
 
     channelNameChange(val, item) {
       const self = this;
-      const comment = filterString.all(val, 20);
+      const comment = filterString.all(val, 30);
       if (Object.keys(item).length === 0) {
         self.addChannelData.name = comment;
       } else {
         item.tempName = comment;
       }
       const length = filterString.getContentLength(val);
-      if (length > 20) {
+      if (length > 30) {
         this.channelNameRuletip = true;
       } else {
         this.channelNameRuletip = false;
@@ -1817,10 +1818,10 @@ export default {
 
     serialNumberChange(val) {
       const self = this;
-      const comment = filterString.all(val, 20);
+      const comment = filterString.all(val, 30);
       self.addDeviceData.serialNumber = comment;
       const length = filterString.getContentLength(val);
-      if (length > 20) {
+      if (length > 30) {
         this.serialRuletip = true;
       } else {
         this.serialRuletip = false;
@@ -1841,10 +1842,10 @@ export default {
 
     deviceNameChange(val) {
       const self = this;
-      const comment = filterString.all(val, 20);
+      const comment = filterString.all(val, 30);
       self.addDeviceData.name = comment;
       const length = filterString.getContentLength(val);
-      if (length > 20) {
+      if (length > 30) {
         this.deviceRuletip = true;
       } else {
         this.deviceRuletip = false;
