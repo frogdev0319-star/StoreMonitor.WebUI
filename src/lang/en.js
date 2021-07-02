@@ -678,7 +678,7 @@ export default {
     'nvrChannelSetting': 'Channel Number and Name setting',
     'selectNvrChannel': 'Please select channel order',
     'addNvr': 'Add NVR',
-    'NvrnameRuletip': 'Enter up to 20 characters',
+    'NvrnameRuletip': 'Enter up to 30 characters',
     'validateRuletip': 'Enter up to 10 characters',
     'deleteNvrInfo': 'This operation will delete the current NVR and channel, continue?',
     'nvr': 'NVR',

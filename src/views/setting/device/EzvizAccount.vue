@@ -141,7 +141,7 @@
               </el-col>
               <el-col :span="11" :offset="1">
                 <el-form-item :label="$t('deviceView.accountName')" prop="accountName">
-                  <el-input v-model="ezvizAccountInfo.accountName" />
+                  <el-input v-model="ezvizAccountInfo.accountName" @change="accountNameChanged"/>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -785,9 +785,13 @@ export default {
     },
 
     ezvizAccountChanged(val) {
-      const self = this;
       const comment = filterString.all(val, 40);
-      self.ezvizAccountInfo.ezvizAccount = comment;
+      this.ezvizAccountInfo.ezvizAccount = comment;
+    },
+
+    accountNameChanged(val) {
+      const comment = filterString.all(val, 20);
+      this.ezvizAccountInfo.accountName = comment;
     }
   }
 };
