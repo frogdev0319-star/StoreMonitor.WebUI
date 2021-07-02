@@ -220,13 +220,13 @@ export default {
       const emitParmas = {};
       emitParmas.searchParams = this.params;
       emitParmas.dateRangeList = this.daysRangeList;
-      emitParmas.curRegionI = this.storeFilterObj.curRegionI;
-      emitParmas.curRegionII = this.storeFilterObj.curRegionII;
+      emitParmas.regionI = this.storeFilterObj.curRegionI;
+      emitParmas.regionII = this.storeFilterObj.curRegionII;
       emitParmas.regionMode = this.storeFilterObj.regionMode;
       emitParmas.storePatrolLists = this.storePatrolLists;
       emitParmas.storeStr = this.storeFilterObj.storeStr;
       emitParmas.storeGroupStr = this.storeFilterObj.storeGroupString;
-      emitParmas.storeTypeString = this.storeFilterObj.storeTypeString;
+      emitParmas.storeTypeStr = this.storeFilterObj.storeTypeString;
       emitParmas.timeMode = this.timeMode;
       this.$emit('emitSearch', emitParmas);
     },

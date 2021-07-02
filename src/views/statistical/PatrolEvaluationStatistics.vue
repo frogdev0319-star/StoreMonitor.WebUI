@@ -1297,7 +1297,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleRegionSortChange(order) {
@@ -1311,7 +1311,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStorePageAndSizeChange(pageObj) {
@@ -1323,7 +1323,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStoreSortChange(order) {
@@ -1337,7 +1337,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     setDefaultSortAndPage(paramsObj) {
