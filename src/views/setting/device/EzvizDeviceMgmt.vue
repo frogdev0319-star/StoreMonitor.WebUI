@@ -277,6 +277,7 @@
       :close-on-click-modal="false"
       :visible="showAddChannelDialog"
       dialog-width="510px"
+      custom-class="add-dialog"
       @visibleChangeHandler="updateAddChannelDialogFlag"
       @cancelHandler="hideAddChannelDialog"
       @confirmHandler="addSingleChannel">
@@ -351,6 +352,7 @@
       :close-on-click-modal="false"
       :visible="showAddNvrDialog"
       dialog-width="510px"
+      custom-class="add-dialog"
       @visibleChangeHandler="updateAddDeviceDialogFlag"
       @cancelHandler="hideAddDeviceDialog"
       @confirmHandler="addSingleNvr">
