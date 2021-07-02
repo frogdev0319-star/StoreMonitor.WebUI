@@ -11,7 +11,7 @@
       <span :class="isInspectItem ? 'inspect-span' : 'normal-span'" >
         {{ $t('remotePatrol.time') }}</span>
       <date-time-picker :date-value="dateValue" @change="dateChange"/>
-      <span v-if="isInspectItem">
+      <span v-if="isInspectItem || isPatrol">
         <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
         <el-select
           v-model="inspectList"
@@ -195,7 +195,10 @@ export default {
     },
 
     async getCountryStore() {
-      this.isPatrol && await this.getInspectList() && this.getInspectId();
+      if (this.isInspectItem || this.isPatrol) {
+        await this.getInspectList();
+        this.getInspectId();
+      }
     },
 
     getBriefStoreData() {
@@ -214,9 +217,18 @@ export default {
     async searchData() {
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
       this.params.timeMode = this.timeMode;
-      this.$emit('emitSearch', this.params, this.daysRangeList, this.storeFilterObj.curRegionI, this.storeFilterObj.curRegionII,
-        this.storeFilterObj.regionMode, this.storePatrolLists, this.storeFilterObj.storeStr, this.storeFilterObj.storeGroupString,
-        this.storeFilterObj.storeTypeString, this.timeMode);
+      const emitParmas = {};
+      emitParmas.searchParams = this.params;
+      emitParmas.dateRangeList = this.daysRangeList;
+      emitParmas.curRegionI = this.storeFilterObj.curRegionI;
+      emitParmas.curRegionII = this.storeFilterObj.curRegionII;
+      emitParmas.regionMode = this.storeFilterObj.regionMode;
+      emitParmas.storePatrolLists = this.storePatrolLists;
+      emitParmas.storeStr = this.storeFilterObj.storeStr;
+      emitParmas.storeGroupStr = this.storeFilterObj.storeGroupString;
+      emitParmas.storeTypeString = this.storeFilterObj.storeTypeString;
+      emitParmas.timeMode = this.timeMode;
+      this.$emit('emitSearch', emitParmas);
     },
 
     getInspectId() {
@@ -299,13 +311,14 @@ export default {
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
         this.params.endTs = searchParams.endTs;
+        this.params.timeMode = this.timeMode;
+        this.params.inspectId = searchParams.inspectId;
         this.timeMode = searchParams.timeMode;
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.inspectCatch = searchParams.inspectId;
         this.ifGetParamsFromCash = true;
         this.searchParams = searchParams;
-        console.log(this.params);
       } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
@@ -325,7 +338,6 @@ export default {
     },
 
     onStoreChange(storeObj) {
-      console.log(storeObj);
       this.storeFilterObj = storeObj;
       !this.ifSaveParams && this.searchData();
       this.ifSaveParams = true;

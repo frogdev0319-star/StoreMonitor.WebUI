@@ -1262,7 +1262,7 @@ export default {
       this.$refs.storeChart && this.$refs.storeChart.resize();
     },
 
-    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeStr, groupStr, typeStr, timeMode) {
+    emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       this.params = searchParams;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
@@ -1341,7 +1341,6 @@ export default {
     },
 
     setDefaultSortAndPage(paramsObj) {
-      console.log(paramsObj)
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
       this.sizeNum = paramsObj.filter.size;

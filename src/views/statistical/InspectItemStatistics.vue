@@ -613,7 +613,6 @@ export default {
       const options = self.getCatergyRadarOption();
       const tempIndicator = [];
       const seriesValue = [];
-      console.log(mergeData);
       const qualified = this.itemChart.qualified;
       mergeData.forEach((item, index) => {
         const obj = {};
@@ -929,10 +928,10 @@ export default {
       this.$refs.itemsRadar && this.$refs.itemsRadar.resize();
     },
 
-    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeNameStr, storeGroupStr, storeTypeStr) {
+    emitSearch({ searchParams, storePatrolLists, storeStr, storeGroupStr, storeTypeStr }) {
       this.params = searchParams;
       this.storePatrolLists = storePatrolLists;
-      this.storeNameStr = storeNameStr;
+      this.storeNameStr = storeStr;
       this.storeGroupStr = storeGroupStr;
       this.storeTypeStr = storeTypeStr;
       const searchParamsObj = {
@@ -972,7 +971,6 @@ export default {
     },
 
     setDefaultSortAndPage(paramsObj) {
-      console.log(paramsObj);
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
       this.sizeNum = paramsObj.filter.size;

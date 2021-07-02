@@ -990,8 +990,7 @@ export default {
       });
     },
 
-    emitSearch(searchParams, dateRangeList, curRegionI, curRegionII,
-      regionMode, storePatrolLists, storeStr, groupStr, typeStr, timeMode) {
+    emitSearch({ searchParams, dateRangeList, timeMode }) {
       this.params = searchParams;
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;

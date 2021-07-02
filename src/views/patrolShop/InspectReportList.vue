@@ -662,7 +662,10 @@ export default {
       if (end - start > end - threeMonthAgo) {
         util.notify(self.$t('eventView.changeTimeRange'), 'warning', 3000);
         self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
+      } else {
+        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
       }
+      self.inputSearchValue = '';
     },
 
     currentChange(val) {
