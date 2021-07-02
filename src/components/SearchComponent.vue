@@ -17,7 +17,8 @@
           v-model="inspectList"
           :placeholder="$t('insSettingView.selectPost')"
           size="mini"
-          class="el-province">
+          class="el-province"
+          @change="onInspectListChange">
           <el-option
             v-for="item in inspectTypeList"
             :key="item.id"
@@ -172,6 +173,11 @@ export default {
       this.daysRangeList = util.getDaysRangeList(start, end, this.timeMode);
     },
 
+    onInspectListChange() {
+      const filterInspect = this.inspectTypeList.filter(inspect => this.inspectList === inspect.id);
+      this.storePatrolLists = filterInspect.length > 0 ? filterInspect[0].name : '';
+    },
+
     async getInspectList() {
       const self = this;
       const newArr = [];
@@ -186,9 +192,9 @@ export default {
       self.inspectTypeList = inspectList;
       self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
       if (inspectList.length !== 0) {
-        self.inspectList = self.ifGetParamsFromCash ?
-          (self.inspectTypeList.map(x => x.id).indexOf(self.inspectCatch) !== -1 ?
-            self.inspectCatch : '') : self.inspectTypeList[0].id;
+        self.inspectList = self.ifGetParamsFromCash
+          ? (self.inspectTypeList.map(x => x.id).indexOf(self.inspectCatch) !== -1
+            ? self.inspectCatch : '') : self.inspectTypeList[0].id;
       } else {
         self.inspectList = '';
       }
