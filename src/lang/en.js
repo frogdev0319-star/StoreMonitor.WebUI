@@ -417,7 +417,10 @@ export default {
     'fluency': 'SD',
     'totalScoreUnit': 'Total Score:',
     'storeGroup': 'Store Groups',
-    'storeType': 'Store Type'
+    'storeType': 'Store Type',
+    'passwordErr': 'Password Error',
+    'accessTokenErr': 'AccessToken Error',
+    'unknownErr': 'Unknown Error'
   },
 
   // event Management page language

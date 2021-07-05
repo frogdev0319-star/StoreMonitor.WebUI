@@ -873,7 +873,6 @@ export default {
     },
 
     async getDeviceIsEncrypt(params) {
-      const self = this;
       const ret = await getIsEncrypt(params);
       return ret;
     },

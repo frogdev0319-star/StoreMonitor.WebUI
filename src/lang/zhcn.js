@@ -422,7 +422,10 @@ export default {
     'fluency': '流畅',
     'totalScoreUnit': '总分：',
     'storeGroup': '门店群组',
-    'storeType': '门店类型'
+    'storeType': '门店类型',
+    'passwordErr': '密码错误',
+    'accessTokenErr': 'AccessToken错误',
+    'unknownErr': '未知错误'
   },
 
   // event Management page language
