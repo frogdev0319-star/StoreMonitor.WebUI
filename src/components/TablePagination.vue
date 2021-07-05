@@ -64,7 +64,7 @@
               v-for="(item,index) in tableOperation.operation"
               :key="index"
               :type="item.type"
-              :class="item.icon"
+              :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
               class="iconfont"
               size="mini"
               @click="handleOperationButton(item.methods, scope.row, scope.$index)">
@@ -423,6 +423,9 @@ export default {
     margin-left: 20px;
     font-size: calc(16/1920*100vw);
     color: #7d8cad;
+  }
+  .icon-disabled{
+    cursor: not-allowed;
   }
 </style>
 
