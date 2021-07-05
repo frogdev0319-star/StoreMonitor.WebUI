@@ -89,3 +89,42 @@ $tab:#7d8cad;
   display: block;
 }
 
+.account-title-btn{
+  height: 70px;
+  line-height: inherit;
+  border-bottom: 1px solid #e3e9f4;
+  overflow: hidden;
+}
+.operation-title{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 28px;
+  margin-right: calc(20/1920*100vw);
+  font-size: calc(14/1920*100vw);
+  font-weight: bold;
+  color: #7d8cad;
+}
+.prompt-info{
+  display: inline-flex;
+  align-items: center;
+  padding-left: calc(40/1920*100vw);
+  max-width: 45%;
+}
+.device-num-btn{
+  display: inline-flex;
+  align-items: center;
+}
+.available-device{
+  padding: 0 calc(34/1920*100vw) 0 calc(20/1920*100vw);
+}
+.error-img{
+  height: calc(24/1920*100vw);
+  width: calc(24/1920*100vw);
+  padding-right: calc(8/1920*100vw);
+}
+.error-msg{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
