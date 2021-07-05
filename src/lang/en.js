@@ -743,7 +743,7 @@ export default {
     'developerService': 'Streaming Service Key',
     'confirmAdd': 'Confirm',
     'obtain': 'Obtain',
-    'enterAppKey': 'Please enter appKey',
+    'enterAppKey': 'Please enter AppKey',
     'enterSecret': 'Please enter secret',
     'obtainToken': 'Please obatin Access Token',
     'confirmDelete': 'Delete Streaming Service Account?',

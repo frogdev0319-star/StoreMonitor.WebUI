@@ -956,7 +956,7 @@ export default {
       }
     },
 
-    updateEzvizChannel(item) {
+    async updateEzvizChannel(item) {
       const self = this;
       const obj = {};
       self.isUpdate = false;
@@ -968,32 +968,23 @@ export default {
         return false;
       }
       const params = obj;
-      let attachRes = {};
-      deviceRESTful.updateDevice(params).then(async res => {
-        const errMsg = res.errMsg;
-        if (errMsg != undefined && errMsg === 'Success') {
-          if (item.tempUrl !== item.pictureUrl) {
-            const fm = new FormData();
-            fm.append('id', self.curChannelItem.id);
-            fm.append('picture', self.file);
-            attachRes = await self.attachImageToDevice(fm);
-          }
-          if (attachRes.errMsg === 'Success') {
-            util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-          }
-          self.curChannelItem.isClick = false;
-          self.file = '';
-        } else {
-          item.checkedStatus = item.status === 1;
-          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-        }
-      })
-        .then(async() => {
-          self.channelData = await self.getChannelData();
-          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
-        }).catch(err => {
-          console.log('EzvizDeviceManagement-updateEzvizChannel: ' + err);
-        });
+      try {
+        const updateDevicePromise = await deviceRESTful.updateDevice(params);
+        item.tempUrl !== item.pictureUrl && await this.updateAttachImage();
+        self.channelData = await self.getChannelData();
+        self.getChannelListByDevice(self.curEzvizItem.serialNumber);
+        util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+      } catch (e) {
+        item.checkedStatus = item.status === 1;
+        util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+      }
+    },
+
+    updateAttachImage(){
+      const fm = new FormData();
+      fm.append('id', this.curChannelItem.id);
+      fm.append('picture', this.file);
+      return this.attachImageToDevice(fm);
     },
 
     addEzvizChannel(item) {

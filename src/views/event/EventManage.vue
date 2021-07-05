@@ -1231,7 +1231,6 @@ export default {
         this.storeStr = searchParams.storeStr.join(',');
         this.tableDataList[Number(this.activeName)].page = searchParams.page;
         this.params = searchParams.searchParams;
-        console.log(this.params);
         this.ifGetParamsFromCash = true;
       } else {
         this.getDeafultTime();

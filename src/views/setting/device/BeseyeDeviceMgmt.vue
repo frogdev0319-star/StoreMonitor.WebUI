@@ -972,7 +972,7 @@ export default {
     }
   }
   .no-data-container{
-    height: calc(100vh - 260px - 46px - calc(60/1920*100vw));
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
