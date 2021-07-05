@@ -1,18 +1,28 @@
 <template>
   <div class="device-container">
-    <div class="btn-col">
-      <div class="operation-btns">
-        <el-button
-          class="el-add-btn btn-class"
-          size="mini"
-          type="primary"
-          @click="getBeseyeGrantCode"
-        >
-          <div class="btn-area">
-            <i class="iconfont icon-authorize"/>
-            <span>{{ $t('deviceView.beseyeAuthorize') }}</span>
+    <div class="account-title-btn">
+      <div class="operation-title">
+        <div class="prompt-info">
+          <img :src="errorImgSource" class="error-img"/>
+          <span class="error-msg">
+            {{ $t('deviceView.deviceLimitation') }}
+          </span>
+        </div>
+        <div class="device-num-btn">
+          <div>
+            {{ $t('deviceView.authorizedDevicesNum') }}
           </div>
-        </el-button>
+          <div class="available-device">
+            {{ $t('deviceView.availableDeviceNum') }}
+          </div>
+          <delay-button @click="getBeseyeGrantCode"
+                        class="inspction-btn">
+            <div class="button-area">
+              <i class="iconfont icon-authorize"/>
+              <span>{{ $t('deviceView.beseyeAuthorize') }}</span>
+            </div>
+          </delay-button>
+        </div>
       </div>
     </div>
     <div v-loading="isAuthorizing" :text="$t('deviceView.isAuthorizing')" class="table-container">
@@ -68,10 +78,11 @@ import util from '@/common/util.js';
 import { mapGetters } from 'vuex';
 import BeseyeAuthorizeConfig from '@/common/BeseyeAuthorizeConfig';
 import { getBeseyeUserList, deleteBeseyeUser, beseyeAccountAuthorize } from '@/api/beseye';
+import DelayButton from '../../../components/DelayButton';
 
 export default {
   name: 'BeseyeUser',
-  components: { TablePagination },
+  components: { DelayButton, TablePagination },
   data() {
     return {
       varyWindowWidth: window.innerWidth,
@@ -123,7 +134,8 @@ export default {
       state: '',
       beseyeAccount: '',
       isAuthorizing: false,
-      isLoadingData: true
+      isLoadingData: true,
+      errorImgSource: require('../../../../static/img/icon_error.png')
     };
   },
 
