@@ -51,9 +51,7 @@
           v-model="inputSearchValue"
           size="small"
           class="el-search"
-          clearable
-          @clear="searchData(true)"
-          @keyup.enter.native="searchData(true)"/>
+          clearable/>
         <delay-button
           class="search-button"
           type="primary"
@@ -542,10 +540,11 @@ export default {
       const tabIndex = Number(this.activeName);
       let like = {};
       if (this.inputSearchValue.trim().length !== 0) {
+        const inputValue = this.inputSearchValue.trim();
         like = {
-          subject: this.inputSearchValue.trim(),
-          assignerName: this.inputSearchValue.trim(),
-          storeName: this.inputSearchValue.trim()
+          subject: inputValue,
+          assignerName: inputValue,
+          storeName: inputValue
         };
       } else {
         like = {};
@@ -640,10 +639,11 @@ export default {
       const storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
+        const inputValue = self.inputSearchValue.trim();
         like = {
-          subject: self.inputSearchValue.trim(),
-          assignerName: self.inputSearchValue.trim(),
-          storeName: self.inputSearchValue.trim()
+          subject: inputValue,
+          assignerName: inputValue,
+          storeName: inputValue
         };
       } else {
         like = {};
