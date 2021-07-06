@@ -189,7 +189,7 @@
                 @blur="notShowInputRuleTips"/>
             </el-form-item>
             <span class="text" style="float: right;color: #909399;">{{ curLength }}/100</span>
-            <span v-if="commentRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
+            <span v-if="commentRuletip" class="rules">{{ $t('deviceView.commentLengthPrompt') }}</span>
           </el-col>
         </el-form>
       </div>

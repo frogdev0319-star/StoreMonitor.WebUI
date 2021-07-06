@@ -779,7 +779,8 @@ export default {
     'duplicateSeriNum': '重复的设备序列号',
     'storeNotExist': '门店不存在',
     'noAuthorityForStore': '对门店无操作权限',
-    'otherError': '其他错误'
+    'otherError': '其他错误',
+    'commentLengthPrompt': '最多可输入100个字符'
   },
 
   // Store Management page language

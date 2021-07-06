@@ -771,7 +771,8 @@ export default {
     'duplicateSeriNum': 'Duplicate device serial number',
     'storeNotExist': 'Store does not exist',
     'noAuthorityForStore': 'No authority for the specified store',
-    'otherError': 'Other Errors'
+    'otherError': 'Other Errors',
+    'commentLengthPrompt': 'Enter up to 100 characters'
   },
 
   // Store Management page language
