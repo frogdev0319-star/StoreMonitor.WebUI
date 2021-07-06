@@ -127,7 +127,7 @@
                 <el-input
                   v-model="ezvizAccountInfo.authorizedDevices"
                   style="width: 100%;"
-                  @input="(val)=>{ezvizAccountInfo.authorizedDevices = val.replace(/[^\d:]/g, '')}" />
+                  @input="updateAuthorizedDevice" />
               </el-form-item>
             </el-col>
           </div>
@@ -553,10 +553,9 @@ export default {
           }
           await self.getAccountList();
         } else {
-          if (self.ezvizAccountInfo.scope === 1) {
+          if (!appFormValid && self.ezvizAccountInfo.scope === 1) {
             self.errorMsg = self.$t('deviceView.enterDeveloperKey');
           }
-
           return false;
         }
       });
@@ -724,16 +723,18 @@ export default {
       accountType === 0 ? this.showDeleteStoreVueAccount = val : this.showDeleteAccount = val;
     },
 
-    hideDeleteAccountDialog(accountType){
+    hideDeleteAccountDialog(accountType) {
       accountType === 0 ? this.showDeleteStoreVueAccount = false : this.showDeleteAccount = false;
     },
 
-    updateAddAccountDialogFlag(val){
+    updateAddAccountDialogFlag(val) {
       this.showAddAccount = val;
+      this.$refs.accountForm && this.$refs.accountForm.clearValidate();
     },
 
-    hideAddAccountDialog(){
+    hideAddAccountDialog() {
       this.showAddAccount = false;
+      this.$refs.accountForm && this.$refs.accountForm.clearValidate();
     },
 
     commentChange(val) {
@@ -792,6 +793,10 @@ export default {
     accountNameChanged(val) {
       const comment = filterString.all(val, 20);
       this.ezvizAccountInfo.accountName = comment;
+    },
+
+    updateAuthorizedDevice(val) {
+      this.ezvizAccountInfo.authorizedDevices = val.replace(/[^\d:]/g, '').replace(/^[0]+[0-9]*$/gi, '');
     }
   }
 };
