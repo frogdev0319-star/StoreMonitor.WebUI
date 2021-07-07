@@ -155,7 +155,7 @@
                   label-position="left"
                   class="ezviz-account"
                   size="mini">
-                  <el-form-item label="AppKey" prop="appKey">
+                  <el-form-item label="AppKey" prop="appKey" :error="errorAppkeyMsg">
                     <el-input v-model="ezvizAccountInfo.appKey" :type="isAdd ? '': 'password'" />
                   </el-form-item>
                   <el-form-item label="AppSecret" prop="appSecret">
@@ -319,6 +319,7 @@ export default {
       sizeNum: 10,
       lang: this.$i18n.locale,
       errorMsg: '',
+      errorAppkeyMsg: '',
       rules: {
         ezvizAccount: [
           { required: true, validator: validateEzvizAccount, trigger: 'blur' }
@@ -414,6 +415,7 @@ export default {
       self.isAdd = true;
       self.accountTitle = this.$t('deviceView.addNewAccount');
       self.errorMsg = '';
+      self.errorAppkeyMsg = '';
       self.errorAccessKey = '';
       self.errorAuthDeviceNum = '';
       self.errorAccount = '';
@@ -488,6 +490,7 @@ export default {
     async getAccessTokenMethod() {
       const self = this;
       self.errorMsg = '';
+      self.errorAppkeyMsg = '';
       const obj = {};
       obj.appKey = self.ezvizAccountInfo.appKey;
       obj.appSecret = self.ezvizAccountInfo.appSecret;
@@ -499,11 +502,11 @@ export default {
         if (code !== '200') {
           switch (code) {
             case '10005': {
-              self.errorMsg = self.$t('deviceView.appKeyFrozen');
+              self.errorAppkeyMsg = self.$t('deviceView.appKeyFrozen');
               break;
             }
             case '10017': {
-              self.errorMsg = self.$t('deviceView.appKeyNotExist');
+              self.errorAppkeyMsg = self.$t('deviceView.appKeyNotExist');
               break;
             }
             case '10030': {
