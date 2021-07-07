@@ -1637,17 +1637,17 @@ export default {
     },
 
     confirmEditNvr(index, item) {
-      let self = this;
+      const self = this;
+      if (item.tempDeviceName.trim().length === 0) {
+        util.notify(self.$t('deviceView.nvrNameEmpty'), 'warning', 3000);
+        return false;
+      }
       item.name = item.tempDeviceName;
       let obj = {};
       obj.ivsId = item.ivsId;
       obj.name = item.tempDeviceName;
       obj.storeId = item.storeId;
       obj.channelCount = item.tempChannelCount;
-      if (obj.name.trim().length === 0) {
-        util.notify(self.$t('deviceView.nvrNameEmpty'), 'warning', 3000);
-        return false;
-      }
       let arr = [];
       arr.push(obj);
       let params = {};
@@ -1671,7 +1671,6 @@ export default {
     },
 
     cancelEditNvr(index, item) {
-      let self = this;
       item.isEditing = false;
       item.tempDeviceName = item.name;
       item.tempChannelCount = item.channelCount;
