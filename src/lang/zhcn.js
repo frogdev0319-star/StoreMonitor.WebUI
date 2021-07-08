@@ -817,7 +817,7 @@ export default {
     'isAuthorizing': '授权中...',
     'deviceLimitation': '当前设备数量超限，请续约或减少设备数量',
     'authorizedDevicesNum': '授权设备数量：',
-    'availableDeviceNum': '可添加设备数量：'
+    'addedDeviceNumber': '已添加设备数量：'
   },
 
   // Store Management page language

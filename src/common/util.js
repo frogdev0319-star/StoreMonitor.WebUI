@@ -2,6 +2,7 @@ import ConvertPinyin from '@/common/getpinyin';
 import i18n from '@/lang/index';
 import { message } from '@/common/singleton-message';
 import moment from 'moment';
+import { getCookie } from './auth';
 
 export default {
   getOneHourTime(para) {
@@ -885,6 +886,12 @@ export default {
     sortedArray.sort((a, b) => { return a[key] - b[key]; })
   },
 
+  getVideoAuthority(num){
+    const auth = parseInt(getCookie('deviceAuth'));
+    console.log(auth);
+    if(num === 0) return 0;
+    return ((auth & (1 << num -1)) >> (num-1)) === 1 ? 1 : 0;
+  }
 };
 class indexedDB {
   init() {

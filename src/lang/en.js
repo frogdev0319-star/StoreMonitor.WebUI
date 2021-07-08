@@ -809,7 +809,7 @@ export default {
     'isAuthorizing': 'Authorizing...',
     'deviceLimitation': 'The current number of devices exceeds the limitation, please renew or reduce the number of devices',
     'authorizedDevicesNum': 'Number of authorized devices:',
-    'availableDeviceNum': 'The number of devices that can be added:'
+    'addedDeviceNumber': 'Number of added devices:'
   },
 
   // Store Management page language
