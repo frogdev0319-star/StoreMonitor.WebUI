@@ -63,6 +63,38 @@ export const getEzvizAccountList = data => {
   });
 };
 
+export const addEzvizDeviceChannel = data => {
+  return request({
+    url: `${version}/ezviz/device/channel/add`,
+    method: 'post',
+    data
+  });
+}
+
+export const deleteEzvizChannel = data => {
+  return request({
+    url: `${version}/ezviz/device/channel/delete`,
+    method: 'post',
+    data
+  });
+}
+
+export const enableEzvizDeviceChannel = data => {
+  return request({
+    url: `${version}/ezviz/device/channel/enable`,
+    method: 'post',
+    data
+  });
+}
+
+export const disableEzvizDeviceChannel = data => {
+  return request({
+    url: `${version}/ezviz/device/channel/disable`,
+    method: 'post',
+    data
+  });
+}
+
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 const instance = axios.create({
   baseURL: isGlobalWebsite ? 'https://open.ezvizlife.com/api/' : 'https://open.ys7.com/api/',

@@ -96,3 +96,11 @@ export const attachImageToDevice = data => {
     data
   });
 };
+
+export const getDeviceAuthNumber = params => {
+  return request({
+    url: `${version}/device/usage`,
+    method: 'get',
+    params
+  });
+};

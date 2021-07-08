@@ -26,22 +26,6 @@ export const getBeseyeAccessToken = params => {
   });
 };
 
-const instance = axios.create({
-  baseURL: 'http://104.199.172.143/api/',
-  timeout: 10000,
-  headers: {
-    'Accept': 'application/json'
-  }
-});
-
-export const getStreamInfoFromTW = params => {
-  return instance({
-    url: `beseye/streamInfo`,
-    method: 'get',
-    params
-  });
-};
-
 export const getBeseyeDeviceList = data => {
   return request({
     url: `${version}/beseye/device/list`,
@@ -111,4 +95,20 @@ export const getAvailableBeseyeDevice = params => {
     method: 'get',
     params
   })
+}
+
+export const addBeseyeChannel = data => {
+  return request({
+    url: `${version}/beseye/device/channel/add`,
+    method: 'post',
+    data
+  });
+}
+
+export const deleteBeseyeChannel = data => {
+  return request({
+    url: `${version}/beseye/device/channel/delete`,
+    method: 'post',
+    data
+  });
 }
