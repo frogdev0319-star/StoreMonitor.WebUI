@@ -217,14 +217,14 @@ const user = {
     GetUserAuthorities({ commit }) {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
-        if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection'))){
-          commit('SET_AUTHORITY', res.data.authorities);
-          commit('SET_ROLES', [res.data.title]);
-        } else {
-          commit('SET_AUTHORITY', []);
-          commit('SET_ROLES', []);
-        }
-        resolve(res);
+          if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection'))) {
+            commit('SET_AUTHORITY', res.data.authorities);
+            commit('SET_ROLES', [res.data.title]);
+          } else {
+            commit('SET_AUTHORITY', []);
+            commit('SET_ROLES', []);
+          }
+          resolve(res);
         }).catch(error => {
           reject(error);
         });
@@ -243,7 +243,7 @@ const user = {
     generateRoutes({ commit }) {
       return new Promise(resolve => {
         const accessedRoutes = [];
-        if (user.state.authorities.length > 0){
+        if (user.state.authorities.length > 0) {
           PermissionHelper.setData(user.state.authorities);
 
           const overviewRoute = navbarRoute.getOverviewRoute();
@@ -264,20 +264,20 @@ const user = {
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
+          accessedRoutes.push({
+            'path': '*',
+            'redirect': '/',
+            'hidden': true
+          });
         } else {
           const errorRoute = navbarRoute.getErrorRoute();
           accessedRoutes.push(errorRoute);
           errorRoute.redirect = errorRoute.children[0].path;
         }
-        accessedRoutes.push({
-          'path': '*',
-          'redirect': '/',
-          'hidden': true
-        });
         commit('SET_ROUTES', accessedRoutes);
         if (user.state.authorities.length === 6) {
           const videoAccess = !!PermissionHelper.enableVideo();
-          commit('SET_Video_Authority', videoAccess)
+          commit('SET_Video_Authority', videoAccess);
         }
         resolve(accessedRoutes);
       });

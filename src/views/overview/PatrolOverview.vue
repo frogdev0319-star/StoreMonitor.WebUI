@@ -355,14 +355,14 @@ export default {
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.currentIndex = 0;
         self.getSearchParams();
-        self.initData();
+        self.getPatrolOverviewData();
       }
     }
   },
 
   created() {
     this.getSearchParams();
-    this.initData();
+    this.getPatrolOverviewData();
   },
 
   beforeDestroy() {
@@ -673,10 +673,10 @@ export default {
       this.params.beginTs = start;
       this.params.endTs = end;
       this.saveSearchParams();
-      this.initData();
+      this.getPatrolOverviewData();
     },
 
-    initData() {
+    getPatrolOverviewData() {
       this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
       this.getStoreNumAndCycle();
       this.getBestAndWorstStores();

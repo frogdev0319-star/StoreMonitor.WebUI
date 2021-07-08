@@ -891,7 +891,14 @@ export default {
     console.log(auth);
     if(num === 0) return 0;
     return ((auth & (1 << num -1)) >> (num-1)) === 1 ? 1 : 0;
+  },
+
+  getIntersectionOfArrs(arr1, arr2) {
+    const arr2Set = new Set(arr2);
+    const intersection = arr1.filter(item => arr2Set.has(item));
+    return intersection;
   }
+
 };
 class indexedDB {
   init() {

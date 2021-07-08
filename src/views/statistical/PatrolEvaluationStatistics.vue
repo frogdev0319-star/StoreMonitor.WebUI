@@ -53,12 +53,16 @@
             </div>
             <div class="region-result">
               <div class="region-content">
-                <div class="region-result-panel">
-                  <v-chart
-                    ref="storeChart"
-                    :options="regionsChartsOptions"
-                    :auto-resize="true"
-                    class="result-content" />
+                <div class="region-content">
+                  <div class="region-result-panel" v-if="regionsChartsOptions">
+                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                             class="result-content"/>
+                  </div>
+                  <div v-else class="region-result-panel">
+                    <span class="no-data-text">
+                      {{ $t('deviceView.noData') }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -147,8 +151,12 @@
           <span class="content-header">{{ storeNameStr }}</span>
         </p>
         <p>
-          <span>{{ $t('remotePatrol.selectStoreTag') }}：</span>
-          <span class="content-header">{{ storeTagStr }}</span>
+          <span>{{ $t('remotePatrol.storeGroup') }}：</span>
+          <span class="content-header">{{ storeGroupStr }}</span>
+        </p>
+        <p>
+          <span>{{ $t('remotePatrol.storeType') }}：</span>
+          <span class="content-header">{{ storeTypeStr }}</span>
         </p>
         <p>
           <span>{{ $t('overview.patrolLists') }}：</span>
@@ -201,8 +209,14 @@
             </div>
             <div class="region-result">
               <div class="region-content">
-                <div class="region-result-panel">
-                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true" class="result-content" />
+                <div class="region-result-panel" v-if="regionsChartsOptions">
+                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                           class="result-content"/>
+                </div>
+                <div v-else class="region-result-panel">
+                  <span class="no-data-text">
+                    {{ $t('deviceView.noData') }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -252,8 +266,7 @@
                 :show-pagination="false"
                 :is-pdf-column="true"
                 :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-                @handleChange="handleStorePageAndSizeChange"
-                @sortChange="handleStoreSortChange"/>
+              />
             </div>
           </el-col>
 
@@ -304,7 +317,8 @@ export default {
       htmlTitle: this.$t('overview.htmltopdfA'),
       isexportPDF: false,
       storeNameStr: '',
-      storeTagStr: '',
+      storeGroupStr: '',
+      storeTypeStr: '',
       storePatrolLists: '',
       curRegion: [],
       timeMode: 1,
@@ -555,7 +569,7 @@ export default {
       ispdf: false,
       regionMode: 2,
       ifSaveParams: false,
-      defaultSort: {prop: 'qualifiedRateStr', order: 'ascending'}
+      defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' }
     };
   },
 
@@ -647,11 +661,20 @@ export default {
     },
 
     async searchData() {
-      const self = this;
-      self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      await self.getInspectStatsOverviewOfRegion();
-      await self.getInspectStatsOverviewOfStore();
-      await self.getInspectStatsLine();
+      this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+      if (this.params.storeIds.length > 0) {
+        await this.getInspectStatsOverviewOfRegion();
+        await this.getInspectStatsOverviewOfStore();
+        await this.getInspectStatsLine();
+      } else {
+        this.totalRegion = 0;
+        this.regionTableData = [];
+        this.getRegionPie();
+        this.storeTableData = [];
+        this.regionsList = [];
+        this.curRegion = [];
+        this.regionsChartsOptions = null;
+      }
     },
 
     async export2Excel() {
@@ -769,7 +792,8 @@ export default {
       params.endTs = self.params.endTs;
       params.region = this.regionMode;
       params.timeMode = self.timeMode;
-      params.inspectId = self.params.inspectId;
+      params.inspectTagId = self.params.inspectId;
+      params.storeIds = self.params.storeIds;
       try {
         const regionResult = await self.getInspectResultOverRegion(params);
         const option = self.getInspectLineOption();
@@ -1239,7 +1263,7 @@ export default {
       this.$refs.storeChart && this.$refs.storeChart.resize();
     },
 
-    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
+    emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       this.params = searchParams;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
@@ -1256,10 +1280,11 @@ export default {
       this.searchData();
     },
 
-    exportPdf(storeNameStr, storeTagStr) {
+    exportPdf(storeNameStr, storeGroupStr, storeTypeStr) {
       this.isexportPDF = true;
       this.storeNameStr = storeNameStr;
-      this.storeTagStr = storeTagStr;
+      this.storeGroupStr = storeGroupStr;
+      this.storeTypeStr = storeTypeStr;
       this.handleExportReport();
     },
 
@@ -1273,7 +1298,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleRegionSortChange(order) {
@@ -1287,7 +1312,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStorePageAndSizeChange(pageObj) {
@@ -1299,7 +1324,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStoreSortChange(order) {
@@ -1313,16 +1338,15 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
-    setDefaultSortAndPage(paramsObj){
-      console.log(paramsObj)
+    setDefaultSortAndPage(paramsObj) {
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
       this.sizeNum = paramsObj.filter.size;
       this.page = paramsObj.filter.page + 1;
-    },
+    }
   }
 };
 </script>
@@ -1446,6 +1470,7 @@ export default {
       .region-header{
         border-bottom: 1px solid $border;
         margin-bottom: 30px;
+        padding-right: 0;
       }
       .el-table-panel{
         margin-left: calc(30/1920*100vw);
@@ -1460,6 +1485,7 @@ export default {
       .region-header{
         border-bottom: 1px solid $border;
         margin-bottom: 30px;
+        padding-right: 0;
       }
       .el-table-panel{
         margin-left: calc(30/1920*100vw);

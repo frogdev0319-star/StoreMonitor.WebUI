@@ -1671,16 +1671,16 @@ export default {
 
     confirmEditNvr(index, item) {
       const self = this;
+      if (item.tempDeviceName.trim().length === 0) {
+        util.notify(self.$t('deviceView.nvrNameEmpty'), 'warning', 3000);
+        return false;
+      }
       item.name = item.tempDeviceName;
       const obj = {};
       obj.ivsId = item.ivsId;
       obj.name = item.tempDeviceName;
       obj.storeId = item.storeId;
       obj.channelCount = item.tempChannelCount;
-      if (obj.name.trim().length === 0) {
-        util.notify(self.$t('deviceView.nvrNameEmpty'), 'warning', 3000);
-        return false;
-      }
       const arr = [];
       arr.push(obj);
       const params = {};

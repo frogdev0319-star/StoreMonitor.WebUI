@@ -2,10 +2,13 @@
   <div>
     <div class="item-container">
       <el-col :span="24">
-        <search-component :is-inspect-item = "true" @emitSearch = "emitSearch"
-                          ref="inspectItemSearch"
-                          path="inspectItemStatistics" :defaultSort="defaultSort"
-                          @setDefaultSortAndPage="setDefaultSortAndPage"/>
+        <search-component
+          ref="inspectItemSearch"
+          :is-inspect-item = "true"
+          :default-sort="defaultSort"
+          path="inspectItemStatistics"
+          @emitSearch = "emitSearch"
+          @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
       <el-col :span="24" class="items-content content">
         <el-col :span="24" class="contents-container">
@@ -51,8 +54,20 @@
 
             </el-col>
             <el-col :span="12" class="evalution-pct">
-              <div class="title radar-title">
-                {{ curType === 0? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite') }}
+              <div class="title radar-select-title">
+                <div class="radar-title ">
+                  {{ $t('overview.proportionOfRemote') }}
+                </div>
+                <div>
+                  <el-select v-model="itemChart.chart" class="chart-select" size="mini" @change="getChartData">
+                    <el-option :value="0" :label="$t('titleView.radar')"/>
+                    <el-option :value="1" :label="$t('titleView.pie')"/>
+                  </el-select>
+                  <el-select v-model="itemChart.qualified" class="chart-select" size="mini" @change="getChartData">
+                    <el-option :value="1" :label="$t('titleView.qualified')"/>
+                    <el-option :value="0" :label="$t('titleView.unqualified')"/>
+                  </el-select>
+                </div>
               </div>
               <div class="inspect-catergy">
                 <div class="rader-panel">
@@ -122,8 +137,12 @@
             <span class="content-header">{{ storeNameStr }}</span>
           </p>
           <p>
-            <span>{{ $t('remotePatrol.selectStoreTag') }}：</span>
-            <span class="content-header">{{ storeTagStr }}</span>
+            <span>{{ $t('remotePatrol.storeGroup') }}：</span>
+            <span class="content-header">{{ storeGroupStr }}</span>
+          </p>
+          <p>
+            <span>{{ $t('remotePatrol.storeType') }}：</span>
+            <span class="content-header">{{ storeTypeStr }}</span>
           </p>
           <p>
             <span>{{ $t('overview.patrolLists') }}：</span>
@@ -163,8 +182,10 @@
               </div>
             </el-col>
             <el-col :span="12" class="evalution-pct">
-              <div class="title radar-title">
-                {{ curType === 0 ? $t('overview.proportionOfRemote') : $t('overview.proportionOfOnsite') }}
+              <div class="title radar-select-title">
+                <div>
+                  {{ $t('overview.proportionOfRemote') }}
+                </div>
               </div>
               <div class="inspect-catergy">
                 <div class="rader-panel">
@@ -204,6 +225,7 @@ import ECharts from 'vue-echarts';
 import { mapGetters } from 'vuex';
 import util from '@/common/util.js';
 import SearchComponent from '@/components/SearchComponent';
+import filterString from '@/common/filterString';
 import resize from '@/components/mixins/echartResize';
 
 import {
@@ -225,9 +247,9 @@ export default {
   data() {
     return {
       storeNameStr: '',
-      storeTagStr: '',
+      storeGroupStr: '',
+      storeTypeStr: '',
       storePatrolLists: '',
-      curType: 0,
       params: {},
       exportPng: require('../../../static/img/excel.png'),
       lang: this.$i18n.locale,
@@ -336,8 +358,13 @@ export default {
         direction: 'asc',
         property: 'qualifiedRate'
       },
-      defaultSort: {prop: 'qualifiedRateStr', order: 'ascending'},
-      ifSaveParams: false
+      defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' },
+      ifSaveParams: false,
+      itemChart: {
+        chart: 0,
+        qualified: 1
+      },
+      chartList: []
     };
   },
 
@@ -415,19 +442,36 @@ export default {
     },
 
     async searchData() {
-      const self = this;
-      self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.params.order = self.order;
-      self.params.mode = self.curType;
-      await self.getInspectItemsTable();
+      this.PDFData = [];
+      this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+      this.params.filter = { page: this.page - 1, size: this.sizeNum };
+      this.params.order = this.order;
+      this.params.storeIds.length > 0 ? this.getInspectItemsTable() : this.setNoData();
+    },
+
+    setNoData() {
+      this.itemsTableData = [];
+      this.total = 0;
+      this.getInspectCharts();
+    },
+
+    setItemInfoRequestParams() {
+      const params = {};
+      params.beginTs = this.params.beginTs;
+      params.endTs = this.params.endTs;
+      params.storeIds = this.params.storeIds;
+      params.inspectId = this.params.inspectId;
+      return params;
     },
 
     async getInspectItemsTable() {
       const self = this;
       let seriesData = [];
       try {
-        const inspectItems = await self.getInspectStatsItemInfo(self.params);
+        const params = this.setItemInfoRequestParams();
+        params.filter = { page: this.page - 1, size: this.sizeNum };
+        params.order = this.order;
+        const inspectItems = await self.getInspectStatsItemInfo(params);
         const ignorePer = 0;
         const errCode = inspectItems.errCode;
         if (errCode === 0) {
@@ -509,19 +553,11 @@ export default {
 
     async getInspectCharts() {
       const self = this;
-      const params = {};
-      params.beginTs = self.params.beginTs;
-      params.endTs = self.params.endTs;
-      params.storeIds = self.params.storeIds;
-      params.mode = self.params.mode;
       self.itemsOptions = self.getInspectChartOption();
       if (self.total > 0) {
+        const params = this.setItemInfoRequestParams();
         self.hasNoData = false;
-        params.filter = {
-          page: 0,
-          size: self.total
-        };
-        params.inspectId = self.params.inspectId;
+        params.filter = { page: 0, size: this.total };
         const inspectItems = await self.getInspectStatsItemInfo(params);
         const ignorePer = 0;
         const errCode = inspectItems.errCode;
@@ -555,7 +591,8 @@ export default {
           self.itemsOptions.series[0].data = seriesData;
         }
         self.itemsPerArray = jsonArray;
-        self.getCatergyRadar(resultData.content);
+        this.chartList = resultData.content;
+        self.getChartData();
       } else {
         const jsonArray = self.itemsLegend;
         jsonArray[0].percent = 0;
@@ -566,13 +603,18 @@ export default {
       }
     },
 
+    getChartData() {
+      this.itemChart.chart === 0 ? this.getCatergyRadar(this.chartList) : this.getCategoyPie(this.chartList);
+    },
+
     getCatergyRadar(arr) {
       const self = this;
       const mergeData = self.getCatergyByMerge(arr);
       const options = self.getCatergyRadarOption();
       const tempIndicator = [];
       const seriesValue = [];
-      mergeData.forEach(item => {
+      const qualified = this.itemChart.qualified;
+      mergeData.forEach((item, index) => {
         const obj = {};
         obj.name = item.name;
         const datasArray = item.data;
@@ -580,11 +622,16 @@ export default {
         let score = 0;
         datasArray.forEach(_item => {
           sumNum += _item.numOfTotal;
-          score += _item.numOfExcellent * 2 + _item.numOfQualified;
+          score += qualified ? _item.numOfQualified : _item.numOfUnqualified;
         });
-        obj.max = sumNum * 2;
-        tempIndicator.push(obj);
-        seriesValue.push(score);
+        obj.max = sumNum;
+        if (index < 2) {
+          tempIndicator.push(obj);
+          seriesValue.push(score);
+        } else {
+          tempIndicator.splice(1, 0, obj);
+          seriesValue.splice(1, 0, score);
+        }
       });
       const temp = [];
       const obj = { value: seriesValue };
@@ -594,6 +641,27 @@ export default {
       options.series[0].data = temp;
       options.series[1].data = temp;
       options.radar.splitNumber = 5;
+      self.itemsRadarOption = options;
+    },
+
+    getCategoyPie(arr) {
+      const self = this;
+      const mergeData = self.getCatergyByMerge(arr);
+      const options = self.getCategoryPieOption();
+      const qualified = this.itemChart.qualified;
+      const seriesData = [];
+      mergeData.forEach(item => {
+        const obj = {};
+        obj.name = item.name;
+        const datasArray = item.data;
+        let score = 0;
+        datasArray.forEach(_item => {
+          score += (qualified ? (_item.numOfQualified + _item.numOfExcellent) : _item.numOfUnqualified);
+        });
+        obj.value = score;
+        obj.value > 0 && seriesData.push(obj);
+      });
+      options.series[1].data = seriesData;
       self.itemsRadarOption = options;
     },
 
@@ -732,6 +800,77 @@ export default {
       return radarOptions;
     },
 
+    getCategoryPieOption() {
+      const pieOption = {
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b} : {c} ({d}%)',
+          textStyle: {
+            align: 'left'
+          },
+          backgroundColor: this.echartBackground
+        },
+        series: [
+          {
+            type: 'pie',
+            radius: ['60%', '90%'],
+            itemStyle: {
+              normal: {
+                color: function(params) {
+                  const colorList = ['#f4f5f9'];
+                  return colorList[params.dataIndex];
+                }
+              }
+            },
+            silent: true,
+            z: 0,
+            data: [{ value: 1, name: '' }]
+          },
+          {
+            type: 'pie',
+            radius: ['70%', '80%'],
+            emphasis: {
+              label: {
+                show: true
+              }
+            },
+            itemStyle: {
+              normal: {
+                color: function(params) {
+                  const colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
+                    '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
+                  return colorList[params.dataIndex];
+                }
+              }
+            },
+            label: {
+              fontSize: 14,
+              color: '#9A9A9C',
+              formatter(v) {
+                const text = v.name;
+                const countLength = filterString.getContentLength(text);
+                if (countLength < 20) {
+                  return `${text}: ${v.percent}%`
+                } else {
+                  return `${text.slice(0, 10)}... : ${v.percent}%`
+                }
+              }
+            },
+            labelLine: {
+              length: 10,
+              length2: 20,
+              lineStyle: {
+                color: '#9A9A9C'
+              }
+            },
+            z: 1,
+            data: []
+          }
+        ]
+      };
+      return pieOption;
+    },
+
     getInspectStatsItemInfo(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsItemOverviewV2(params).then(res => {
@@ -745,7 +884,6 @@ export default {
     async initData() {
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = { direction: this.direction, property: this.property };
-      this.params.mode = this.curType;
     },
 
     export2Excel() {
@@ -775,7 +913,7 @@ export default {
           }
         }
         const data = that.formatJson(filterVal, curData);
-        const patrolName = that.curType === 0 ? 'Remote Patrol' : 'Onsite Patrol';
+        const patrolName = that.storePatrolLists;
         const fileName = patrolName + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
@@ -790,11 +928,12 @@ export default {
       this.$refs.itemsRadar && this.$refs.itemsRadar.resize();
     },
 
-    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeNameStr, storeTagStr) {
+    emitSearch({ searchParams, storePatrolLists, storeStr, storeGroupStr, storeTypeStr }) {
       this.params = searchParams;
       this.storePatrolLists = storePatrolLists;
-      this.storeNameStr = storeNameStr;
-      this.storeTagStr = storeTagStr;
+      this.storeNameStr = storeStr;
+      this.storeGroupStr = storeGroupStr;
+      this.storeTypeStr = storeTypeStr;
       const searchParamsObj = {
         path: 'inspectItemStatistics',
         params: this.params
@@ -831,13 +970,12 @@ export default {
       this.getInspectItemsTable();
     },
 
-    setDefaultSortAndPage(paramsObj){
-      console.log(paramsObj)
+    setDefaultSortAndPage(paramsObj) {
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
       this.sizeNum = paramsObj.filter.size;
       this.page = paramsObj.filter.page + 1;
-    },
+    }
   }
 };
 </script>
@@ -977,9 +1115,18 @@ export default {
             line-height: 222px;
           }
           .radar-title {
+            max-width: 50%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+          }
+          .radar-select-title{
+            display: flex;
+            justify-content: space-between;
+            padding-right: calc(20/1920*100vw);
+            height: auto;
+            align-items: center;
+            margin-bottom: 22px;
           }
           .inspect-catergy {
             border-left: 1px solid $border;
@@ -1121,6 +1268,13 @@ export default {
         }
       }
     }
+  }
 
+  .chart-select{
+    width: calc(130/1920*100vw);
+    >>> .el-input__inner{
+      color: #7d8cad;
+      font-size: 12px;
+    }
   }
 </style>

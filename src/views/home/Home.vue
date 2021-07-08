@@ -200,7 +200,6 @@
               <p style="text-align:left;">v1.7.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
-
         </section>
       </el-col>
     </el-row>
@@ -593,7 +592,7 @@ export default {
           srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
         if (res && res.length) {
           accountItem['srp'] = res;
-          tempAccount.push(accountItem)
+          tempAccount.push(accountItem);
         }
       })
       this.brandList = tempAccount;

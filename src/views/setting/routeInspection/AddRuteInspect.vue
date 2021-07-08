@@ -217,7 +217,7 @@
                       :placeholder="$t('insSettingView.enterItemName')"
                       @input="napeNameChange"></el-input>
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
-            <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.titleEmpty') }}</span>
+            <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
           <el-form-item v-if="activeSheetName==='1'" style="height: 57px;">
             <el-col :span="10">

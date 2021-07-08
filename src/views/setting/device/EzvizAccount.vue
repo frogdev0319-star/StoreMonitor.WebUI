@@ -131,7 +131,7 @@
                   label-position="left"
                   class="ezviz-account"
                   size="mini">
-                  <el-form-item label="AppKey" prop="appKey">
+                  <el-form-item label="AppKey" prop="appKey" :error="errorAppkeyMsg">
                     <el-input v-model="ezvizAccountInfo.appKey" :type="isAdd ? '': 'password'" />
                   </el-form-item>
                   <el-form-item label="AppSecret" prop="appSecret">
@@ -165,7 +165,7 @@
                 @blur="notShowInputRuleTips"/>
             </el-form-item>
             <span class="text" style="float: right;color: #909399;">{{ curLength }}/100</span>
-            <span v-if="commentRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
+            <span v-if="commentRuletip" class="rules">{{ $t('deviceView.commentLengthPrompt') }}</span>
           </el-col>
         </el-form>
       </div>
@@ -317,6 +317,7 @@ export default {
       sizeNum: 10,
       lang: this.$i18n.locale,
       errorMsg: '',
+      errorAppkeyMsg: '',
       rules: {
         ezvizAccount: [
           { required: true, validator: validateEzvizAccount, trigger: 'blur' }
@@ -401,6 +402,7 @@ export default {
         comment: ''
       };
       this.errorMsg = '';
+      this.errorAppkeyMsg = '';
       this.errorAccessKey = '';
       this.curLength = 0;
     },
@@ -414,16 +416,12 @@ export default {
 
     getAccountTableList() {
       this.tableData = [];
-      this.authorizedDevicesNum = 0;
-      this.addedDeviceNumber = 0;
       this.isLoadingAccount = true;
       this.getEzvizAccountList().then(res => {
         this.tableData = res.data;
         const listArray = [];
         this.tableData.forEach(item => {
           listArray.push(item.ezvizAccount);
-          this.authorizedDevicesNum += item.authDeviceNumber;
-          this.addedDeviceNumber += item.addedDeviceNumber;
         });
         this.accountList = listArray;
         this.isLoadingAccount = false;
@@ -473,6 +471,7 @@ export default {
     async getAccessTokenFromEzviz() {
       const self = this;
       self.errorMsg = '';
+      self.errorAppkeyMsg = '';
       const obj = {};
       obj.appKey = self.ezvizAccountInfo.appKey;
       obj.appSecret = self.ezvizAccountInfo.appSecret;
@@ -482,7 +481,25 @@ export default {
         const code = data.code;
         if (code !== '200') {
           const msg = data.msg;
-          self.setEzvizTokenErrorMsg(code, msg);
+          switch (code) {
+            case '10005': {
+              self.errorAppkeyMsg = self.$t('deviceView.appKeyFrozen');
+              break;
+            }
+            case '10017': {
+              self.errorAppkeyMsg = self.$t('deviceView.appKeyNotExist');
+              break;
+            }
+            case '10030': {
+              self.errorMsg = self.$t('deviceView.mismatchInfo');
+              break;
+            }
+            default: {
+              self.errorMsg = data.msg;
+              break;
+            }
+          }
+
           self.ezvizAccountInfo.accessToken = '';
         } else {
           this.$set( self.ezvizAccountInfo,'accessToken',data.data.accessToken);
@@ -533,10 +550,9 @@ export default {
             await self.updateEzvizAccount();
           }
         } else {
-          if (self.ezvizAccountInfo.scope === 1) {
+          if (!appFormValid && self.ezvizAccountInfo.scope === 1) {
             self.errorMsg = self.$t('deviceView.enterDeveloperKey');
           }
-
           return false;
         }
       });
@@ -713,14 +729,17 @@ export default {
 
 
     ezvizAccountChanged(val) {
-      const self = this;
       const comment = filterString.all(val, 40);
-      self.ezvizAccountInfo.ezvizAccount = comment;
+      this.ezvizAccountInfo.ezvizAccount = comment;
     },
 
-    accountNameChanged(val){
+    accountNameChanged(val) {
       const comment = filterString.all(val, 20);
       this.ezvizAccountInfo.accountName = comment;
+    },
+
+    updateAuthorizedDevice(val) {
+      this.ezvizAccountInfo.authorizedDevices = val.replace(/[^\d:]/g, '').replace(/^[0]+[0-9]*$/gi, '');
     },
 
     setEzvizAccount(row) {

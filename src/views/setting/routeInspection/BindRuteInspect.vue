@@ -2,55 +2,11 @@
   <div class="el-bind-device">
     <div class="el-bind-header">
       <div class="seacrh-content">
-        <span>{{ $t('remotePatrol.storeSelect') }}</span>
-        <el-select
-          v-model="curCountry"
-          :placeholder="$t('remotePatrol.country')"
-          :disabled="loading"
-          size="mini"
-          class="el-province"
-          @change="changeCountry">
-          <el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">
-            <el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"/>
-          </el-option-group>
-        </el-select>
-        <region-multi-select
-          ref="proviceSelect"
-          :selected="curProvince"
-          :placeholder="$t('remotePatrol.regionI')"
-          :options="provinceList"
-          :disabled="curCountry.length === 0 || curCountry === '-1' || loading"
-          :all="$t('overview.allZoneI')"
-          style="display: inline;margin-left: calc(20/1920*100vw);"
-          @changeInput="handleProChange"/>
-        <region-multi-select
-          ref="citySelect"
-          :selected="curCity"
-          :placeholder="$t('remotePatrol.regionII')"
-          :options="cityList"
-          :disabled="curProvince.length === 0 || curCountry === '-1' || loading"
-          :all="$t('overview.allZoneII')"
-          style="display: inline"
-          @changeInput="handleCityChange"/>
-
-        <multi-select
-          ref="multiSelect"
-          :selected="curStore"
-          :placeholder="$t('remotePatrol.stores')"
-          :options="storeDataList"
-          :disabled="loading"
-          style="display: inline"
-          @changeInput="handleStoreChange"/>
-        <span class="select-title">{{ $t('remotePatrol.selectStoreTag') }}</span>
-        <multi-select
-          ref="TagMultiSelect"
-          :selected="curStoreTag"
-          :placeholder="$t('remotePatrol.selectStoreTag')"
-          :all-select="0"
-          :alltype="0"
-          :options="StoreTagList"
-          style="display: inline;margin-left: calc(20/1920*100vw);"
-          @changeInput="changeStoreTag"/>
+        <store-filter
+          :is-patrol = "true"
+          :set-width-flag="true"
+          @storeChange = "onStoreChange"
+        />
         <el-input
           :placeholder= "$t('insSettingView.searchPlaceholder')"
           v-model="serachVale"
@@ -129,16 +85,18 @@
   </div>
 </template>
 <script>
-import {getBriefStoreList, GetTagList } from '@/api/store';
+import { getBriefStoreList } from '@/api/store';
 import { applyItemInspectItem, UnapplyInspectItem, getInspectBindList } from '@/api/inspect';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import util from '@/common/util';
+import StoreFilter from '@/components/StoreFilter';
 
 export default {
   name: 'BindRuteInspect',
 
   components: {
+    StoreFilter,
     MultiSelect,
     RegionMultiSelect
   },
@@ -155,19 +113,10 @@ export default {
       tempStoreList: [],
       varyWindowHeight: window.innerHeight,
       varyWindowWidth: window.innerWidth,
-      curCountry: '',
-      curProvince: [],
-      provinceList: [],
-      cityList: [],
       storeDataList: [],
-      CountryList: [],
-      StoreTagList: [],
-      curCity: [],
       curStore: [],
       curStoreTag: [],
       storeStr: '',
-      multeCityList: [],
-      citys: '',
       isChecked: false,
       allCityChecked: false,
       showCityContent: false,
@@ -180,7 +129,8 @@ export default {
       curCitys: this.$t('storeView.cityPlaceholder'),
       showPopoVer: true,
       lang: this.$i18n.locale,
-      loadingGif: require('../../../../static/img/loading.gif')
+      loadingGif: require('../../../../static/img/loading.gif'),
+      storeFilterObj: {}
     };
   },
 
@@ -188,7 +138,6 @@ export default {
     const self = this;
     self.InitData();
     self.getCountryStore();
-    self.getTagListData();
   },
   destroyed() {
     sessionStorage.removeItem('bindStoreData');
@@ -196,12 +145,10 @@ export default {
 
   methods: {
     getBriefStoreData() {
-      const self = this;
       return new Promise((resolve, reject) => {
         getBriefStoreList().then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
-            const data = res.data;
             resolve(res);
           }
         }).catch(res => {
@@ -210,278 +157,22 @@ export default {
       });
     },
 
-    getTagListData() {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        GetTagList().then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            res.data.forEach(item => {
-              const obj = {};
-              obj.value = item.tagId;
-              obj.label = item.tagName;
-              obj.disabled = false;
-              self.StoreTagList.push(obj);
-            });
-            resolve(res);
-          }
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
     async getCountryStore() {
       const self = this;
       const data = await self.getBriefStoreData();
-      const temp = [];
       self.totalCount = data.data.length;
-      if (data.errCode === 0 && data.errMsg === 'Success') {
+      if (data.errCode === 0) {
         self.tempStoreData = data.data;
-        if (self.tempStoreData.length !== 0) {
-          self.tempStoreData.forEach(item => {
-            const country = item.country;
-            if (temp.map(x => x.label).indexOf(country) === -1) {
-              const obj = {
-                value: country,
-                label: country
-              };
-              temp.push(obj);
-            }
-          });
-        }
-        const countryList = temp;
-        self.CountryList[0] = {};
-        self.CountryList[0].label = self.$t('remotePatrol.country');
-        self.CountryList[0].countryList = countryList;
-        self.CountryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        self.curCountry = countryList[0].value;
-        self.selectAllProAndCity(self.curCountry);
       }
-    },
-
-    selectAllProAndCity(val) {
-      const self = this;
-      const storeList = self.tempStoreData;
-      const temp = [];
-      const tempStore = [];
-      storeList.forEach(item => {
-        if (item.country === val || val === '-1') {
-          if (temp.map(x => x.value).indexOf(item.province) === -1) {
-            const obj = {
-              label: item.province,
-              value: item.province
-            };
-            temp.push(obj);
-          }
-          const obj = {
-            storeId: item.storeId,
-            label: item.name,
-            value: item.name,
-            userId: item.userId,
-            tagIds: item.tagIds
-          };
-          tempStore.push(obj);
-        }
-      });
-      self.provinceList = temp;
-      const cityTemp = [];
-      self.provinceList.forEach(_item => {
-        storeList.forEach(item => {
-          if (item.province === _item.value) {
-            if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-              const obj = {
-                label: item.city,
-                value: item.city
-              };
-              cityTemp.push(obj);
-            }
-          }
-        });
-      });
-      self.cityList = cityTemp;
-      const provinceArr = [];
-      self.provinceList.forEach(item => {
-        provinceArr.push(item.value);
-      });
-      self.curProvince = provinceArr;
-
-      const cityArr = [];
-      self.cityList.forEach(item => {
-        cityArr.push(item.value);
-      });
-      self.curCity = cityArr;
-      self.storeDataList = tempStore;
-      const storeArr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-      });
-      setTimeout(()=>{
-        self.curStore = storeArr;
-        self.searchStore();
-      },100)
-    },
-
-    changeStoreTag(val) {
-      const self = this;
-      self.curStoreTag = val;
-      self.searchStore();
-    },
-
-    changeCountry(val) {
-      const self = this;
-      const temp = [];
-      self.clearProviceInfo();
-      self.clearCityInfo();
-      self.clearStoreInfo();
-      self.selectAllProAndCity(val);
-    },
-
-    changePro(val) {
-      const self = this;
-      self.curCity = [];
-      self.clearCityInfo();
-      self.clearStoreInfo();
-      const storeList = self.tempStoreData;
-      const temp = [];
-      const tempStore = [];
-      if (val === '') {
-        storeList.forEach(item => {
-          if (item.country === self.curCountry) {
-            const obj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              tagIds: item.tagIds
-            };
-            tempStore.push(obj);
-          }
-        });
-      } else {
-        val.forEach(_item => {
-          storeList.forEach(item => {
-            if (item.province === _item) {
-              if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                const obj = {
-                  label: item.city,
-                  value: item.city
-                };
-                temp.push(obj);
-              }
-              const obj = {
-                storeId: item.storeId,
-                label: item.name,
-                value: item.name,
-                userId: item.userId,
-                tagIds: item.tagIds
-              };
-              tempStore.push(obj);
-            }
-          });
-        });
-        self.cityList = temp;
-        const cityArr = [];
-        if (self.cityList.length !== 0) {
-          self.cityList.forEach(item => {
-            cityArr.push(item.value);
-          });
-          self.curCity = cityArr;
-        }
-      }
-      self.storeDataList = tempStore;
-      let storeArr = [], arr = [];
-
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-        arr.push(item.value);
-      });
-
-      self.curStore = storeArr;
-      self.searchStore();
-    },
-
-    changeCity(val) {
-      const self = this;
-      self.clearStoreInfo();
-      const storeList = self.tempStoreData;
-      const temp = [];
-      if (val.length !== 0) {
-        val.forEach(_item => {
-          storeList.forEach(item => {
-            if (item.city === _item) {
-              if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                const obj = {
-                  storeId: item.storeId,
-                  label: item.name,
-                  value: item.name,
-                  userId: item.userId,
-                  tagIds: item.tagIds
-                };
-                temp.push(obj);
-              }
-            }
-          });
-        });
-      }
-      self.storeDataList = temp;
-      let storeArr = [], arr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-        arr.push(item.value);
-      });
-      self.curStore = storeArr;
-      self.searchStore();
-    },
-
-    handleStoreChange(arr) {
-      const self = this;
-      self.curStore = arr;
-      self.searchStore();
-    },
-
-    handleProChange(arr) {
-      const self = this;
-      self.curProvince = arr;
-      self.changePro(arr);
-    },
-
-    handleCityChange(arr) {
-      const self = this;
-      self.curCity = arr;
-      self.changeCity(arr);
-    },
-
-    clearStoreInfo() {
-      const self = this;
-      self.curStore = [];
-      self.storeStr = '';
-      self.$refs.multiSelect.selectedArray = [];
-      self.$refs.multiSelect.input = '';
-    },
-
-    clearProviceInfo() {
-      const self = this;
-      self.curProvince = [];
-      self.$refs.proviceSelect.selectedArray = [];
-      self.$refs.proviceSelect.input = '';
-    },
-
-    clearCityInfo() {
-      const self = this;
-      self.curCity = [];
-      self.$refs.citySelect.selectedArray = [];
-      self.$refs.citySelect.input = '';
     },
 
     async searchStoreInput() {
       const self = this;
-
       const temp = [];
       let tempArray = [];
       const tempStore = [];
-      if(self.serachVale.length !== 0){
-        self.tempStoreData.forEach(item=>{
+      if (self.serachVale.length !== 0) {
+        self.tempStoreData.forEach( item => {
           temp.push(util.getPinyinList(item.name));
           tempStore.push(item);
         })
@@ -491,18 +182,10 @@ export default {
             tempArray.push(tempStore[i]);
           }
         }
-      }else{
+      } else {
         self.tempStoreData.forEach(item => {
-          if(self.curStore.map(x=>x).indexOf(item.storeId) !== -1){
-            if(self.curStoreTag.length !== 0){
-              item.tagIds.forEach(_item=>{
-                if (self.curStoreTag.map(x => x).indexOf(_item) !== -1) {
-                  tempArray.push(item);
-                }
-              })
-            }else{
-              tempArray.push(item);
-            }
+          if (self.curStore.map(x => x).indexOf(item.storeId) !== -1) {
+            tempArray.push(item);
           }
         });
       }
@@ -521,16 +204,8 @@ export default {
       const self = this;
       let curStoreTemp = [];
       self.tempStoreData.forEach(item => {
-        if(self.curStore.map(x=>x).indexOf(item.storeId) !== -1){
-          if(self.curStoreTag.length !== 0){
-            item.tagIds.forEach(_item=>{
-              if (self.curStoreTag.map(x => x).indexOf(_item) !== -1) {
-                curStoreTemp.push(item);
-              }
-            })
-          }else{
-            curStoreTemp.push(item);
-          }
+        if (self.curStore.map(x => x).indexOf(item.storeId) !== -1) {
+          curStoreTemp.push(item);
         }
       });
       self.showCityContent = false;
@@ -792,6 +467,13 @@ export default {
         }
       }
       self.tabName = nameLang;
+    },
+
+    onStoreChange(storeObj) {
+      this.storeStr = storeObj.storeStr;
+      this.storeFilterObj = storeObj;
+      this.curStore = storeObj.filterStoreIds;
+      this.searchStore();
     }
 
   }
@@ -822,10 +504,11 @@ $h1:#292e36;
     #{$poi}:checkRem($val);
 }
 .el-search-input{
-    width: calc(260/1920*100vw);
-    margin-right: calc(25/1920*100vw);
-    position:absolute;
-    right: 0px;
+  width: calc(260/1920*100vw);
+  margin-right: calc(25/1920*100vw);
+  position:absolute;
+  right: 0px;
+  top: 30px;
 }
 .city-panel{
     @include point(height,auto);
@@ -850,19 +533,13 @@ $h1:#292e36;
     }
 }
 .el-bind-device{
-//   border: 1px solid $border;
-//   background-color: #fff;
   .el-bind-header{
-    // position: relative;
     background-color: #fff;
     padding:30px;
+    border-bottom: 1px solid $border;
   }
     .seacrh-content{
-        // margin-top: 40px;
-        // margin-left: calc(40/1920*100vw);
-        // position: relative;
-        // display: flex;
-        // align-items: center;
+      overflow: hidden;
         span{
             font-size: calc(14/1920*100vw);;
         }
@@ -934,10 +611,7 @@ $h1:#292e36;
     .choice-device{
         font-size: 12px;
         color: $tab;
-        // display: inline;
         float:right;
-        // position: absolute;
-        // right: calc(25/1920*100vw);
         margin-top: 10px;
       .icon-tishi1{
         font-size: calc(16/1920*100vw);
@@ -946,15 +620,13 @@ $h1:#292e36;
     .el-bind-content-box{
         float: left;
         background-color: #fff;
-        margin: calc(30/1920*100vw);
-        padding:30px 30px 0 30px;
+        margin: 30px calc(30/1920*100vw);
+        padding: 30px 30px 0 30px;
         width:92.5%;
         border: 1px solid $border;
     }
     .el-bind-content{
-        // margin-left: calc(40/1920*100vw);
         margin-top: 15px;
-        // margin-right: calc(25/1920*100vw);
         background-color: #F6F7FB;
         border:0.5px solid #e3e9f4;
         color: $black;

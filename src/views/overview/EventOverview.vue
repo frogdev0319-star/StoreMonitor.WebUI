@@ -305,7 +305,7 @@ export default {
         self.getBriefStoreData();
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.getSearchParams();
-        self.initData();
+        self.getEventOverviewData();
       }
     }
   },
@@ -313,7 +313,7 @@ export default {
   created() {
     this.getBriefStoreData();
     this.getSearchParams();
-    this.initData();
+    this.getEventOverviewData();
   },
 
   beforeDestroy() {
@@ -333,7 +333,7 @@ export default {
       this.params.beginTs = start;
       this.params.endTs = end;
       this.saveSearchParams();
-      this.initData();
+      this.getEventOverviewData();
     },
 
     getBriefStoreData() {
@@ -379,7 +379,7 @@ export default {
       self.getStoreEventStatics();
     },
 
-    initData() {
+    getEventOverviewData() {
       this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
       this.getEventStatsStatics();
       this.getEventRankingInfo();

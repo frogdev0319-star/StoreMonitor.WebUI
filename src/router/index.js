@@ -372,26 +372,6 @@ export const navbarRoute = {
     return systemSettingRoute;
   },
 
-  getErrorRoute(){
-    const errorRoute = {
-      path: '/home',
-      name: 'overview',
-      component: Home,
-      hidden: true,
-      iconCls: 'iconfont icon-zonglan',
-      styles: 'font-size:22px',
-      leaf: true,
-      isReadOnly: false,
-      children: [{
-        path: '/noRight',
-        name: 'noRight',
-        component: resolve => require(['@/views/overview/NoRight'], resolve)
-      }]
-    };
-
-    return errorRoute;
-  },
-
   getDeviceRoutes(){
     const deviceRoutes = [];
     util.getVideoAuthority(1) && deviceRoutes.push({
@@ -429,5 +409,25 @@ export const navbarRoute = {
         hidden: true
       });
     return deviceRoutes;
+  },
+
+  getErrorRoute() {
+    const errorRoute = {
+      path: '/home',
+      name: 'overview',
+      component: Home,
+      hidden: true,
+      iconCls: 'iconfont icon-zonglan',
+      styles: 'font-size:22px',
+      leaf: true,
+      isReadOnly: false,
+      children: [{
+        path: '/noRight',
+        name: 'noRight',
+        component: resolve => require(['@/views/overview/NoRight'], resolve)
+      }]
+    };
+
+    return errorRoute;
   }
 };
