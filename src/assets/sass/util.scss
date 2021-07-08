@@ -350,3 +350,12 @@ $black: #182752;
   height: 60px;
   padding-left: calc(30/1920*100vw);
 }
+
+.no-data-container{
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: calc(16/1920*100vw);
+  color: #7d8cad;
+}

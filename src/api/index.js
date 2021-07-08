@@ -4,6 +4,7 @@ import * as deviceRESTful from './device';
 import * as eventRESTful from './event';
 import * as ezvizRESTful from './ezviz';
 import * as titleRESTful from './title';
+import * as beseyeRESTful from './beseye'
 
 export default api;
 
@@ -12,5 +13,6 @@ export {
   deviceRESTful,
   eventRESTful,
   ezvizRESTful,
-  titleRESTful
+  titleRESTful,
+  beseyeRESTful
 };

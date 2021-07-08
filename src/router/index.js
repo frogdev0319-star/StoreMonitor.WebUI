@@ -4,6 +4,7 @@ import LoginForm from '@/views/login/LoginForm';
 import AuthRedirect from '@/views/login/AuthRedirect';
 import Home from '@/views/home/Home';
 import PermissionHelper from '@/api/PermissionHelper';
+import util from '../common/util';
 
 Vue.use(Router);
 /**
@@ -255,7 +256,8 @@ export const navbarRoute = {
       children: []
     };
 
-    PermissionHelper.enableDeviceSetting() && systemSettingRoute.children.push({
+    const deviceRoutes = this.getDeviceRoutes();
+    PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push({
         path: '/device',
         name: 'deviceManage',
         hidden: false,
@@ -264,42 +266,7 @@ export const navbarRoute = {
         meta: {
           requireAuth: true
         },
-        children: [
-          {
-            path: '/dashDevice',
-            name: 'dashDevice',
-            component: resolve => require(['@/views/setting/device/NvrDeviceMgmt'], resolve)
-          },
-          {
-            path: '/ezvizDevice',
-            name: 'ezvizDevice',
-            component: resolve => require(['@/views/setting/device/EzvizAccount'], resolve)
-          },
-          {
-            path: '/beseyeAccount',
-            name: 'beseyeAccount',
-            // hidden: true,
-            component: resolve => require(['@/views/setting/device/BeseyeAccount'], resolve)
-          },
-          {
-            path: '/ezvizeDeviceSetting',
-            name: 'deviceSetting',
-            component: resolve => require(['@/views/setting/device/EzvizDeviceMgmt'], resolve),
-            hidden: true
-          },
-          {
-            path: '/beseyeDeviceSetting',
-            name: 'beseyeDeviceSetting',
-            component: resolve => require(['@/views/setting/device/BeseyeDeviceMgmt'], resolve),
-            hidden: true
-          },
-          {
-            path: '/beseye/authorize',
-            name: 'auth',
-            component: resolve => require(['@/views/setting/device/Authorize'], resolve),
-            hidden: true
-          }
-        ]
+        children: deviceRoutes
       });
 
     const inspectionRoute = {
@@ -423,5 +390,44 @@ export const navbarRoute = {
     };
 
     return errorRoute;
+  },
+
+  getDeviceRoutes(){
+    const deviceRoutes = [];
+    util.getVideoAuthority(1) && deviceRoutes.push({
+      path: '/dashDevice',
+      name: 'dashDevice',
+      component: resolve => require(['@/views/setting/device/NvrDeviceMgmt'], resolve)
+    });
+
+    util.getVideoAuthority(2) && deviceRoutes.push({
+        path: '/ezvizDevice',
+        name: 'ezvizDevice',
+        component: resolve => require(['@/views/setting/device/EzvizAccount'], resolve)
+      },
+      {
+        path: '/ezvizeDeviceSetting',
+        name: 'deviceSetting',
+        component: resolve => require(['@/views/setting/device/EzvizDeviceMgmt'], resolve),
+        hidden: true
+      });
+    util.getVideoAuthority(3) && deviceRoutes.push({
+        path: '/beseyeAccount',
+        name: 'beseyeAccount',
+        component: resolve => require(['@/views/setting/device/BeseyeAccount'], resolve)
+      },
+      {
+        path: '/beseyeDeviceSetting',
+        name: 'beseyeDeviceSetting',
+        component: resolve => require(['@/views/setting/device/BeseyeDeviceMgmt'], resolve),
+        hidden: true
+      },
+      {
+        path: '/beseye/authorize',
+        name: 'auth',
+        component: resolve => require(['@/views/setting/device/Authorize'], resolve),
+        hidden: true
+      });
+    return deviceRoutes;
   }
 };
