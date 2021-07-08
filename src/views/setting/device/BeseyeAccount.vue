@@ -2,18 +2,20 @@
   <div class="device-container">
     <div class="account-title-btn">
       <div class="operation-title">
-        <div class="prompt-info">
-          <img :src="errorImgSource" class="error-img"/>
-          <span class="error-msg">
-            {{ $t('deviceView.deviceLimitation') }}
-          </span>
+        <div>
+          <div class="prompt-info" v-show="authorizedDevicesNum < addedDeviceNumber">
+            <img :src="errorImgSource" class="error-img"/>
+            <span class="error-msg">
+              {{ $t('deviceView.deviceLimitation') }}
+            </span>
+          </div>
         </div>
         <div class="device-num-btn">
           <div>
-            {{ $t('deviceView.authorizedDevicesNum') }}
+            {{ $t('deviceView.authorizedDevicesNum') }} {{ authorizedDevicesNum }}
           </div>
           <div class="available-device">
-            {{ $t('deviceView.availableDeviceNum') }}
+            {{ $t('deviceView.addedDeviceNumber') }} {{ addedDeviceNumber }}
           </div>
           <delay-button @click="getBeseyeGrantCode"
                         class="inspction-btn">
@@ -78,7 +80,8 @@ import util from '@/common/util.js';
 import { mapGetters } from 'vuex';
 import BeseyeAuthorizeConfig from '@/common/BeseyeAuthorizeConfig';
 import { getBeseyeUserList, deleteBeseyeUser, beseyeAccountAuthorize } from '@/api/beseye';
-import DelayButton from '../../../components/DelayButton';
+import DelayButton from '@/components/DelayButton';
+import { getDeviceAuthNumber } from '@/api/device';
 
 export default {
   name: 'BeseyeUser',
@@ -135,7 +138,9 @@ export default {
       beseyeAccount: '',
       isAuthorizing: false,
       isLoadingData: true,
-      errorImgSource: require('../../../../static/img/icon_error.png')
+      errorImgSource: require('../../../../static/img/icon_error.png'),
+      authorizedDevicesNum: 0,
+      addedDeviceNumber: 0
     };
   },
 
@@ -156,6 +161,7 @@ export default {
 
   mounted() {
     this.getBeseyeUserList();
+    this.getBeseyeDeviceNum();
     this.getCodeAndState();
   },
 
@@ -169,6 +175,18 @@ export default {
         this.tableData = [];
         this.isLoadingData = false;
         console.log('BeseyeAccount-getBeseyeUserList: ' + err);
+      })
+    },
+
+    getBeseyeDeviceNum(){
+      this.authorizedDevicesNum = 0;
+      this.addedDeviceNumber = 0;
+      const params = {vendor: 2};
+      getDeviceAuthNumber(params).then(res => {
+        this.authorizedDevicesNum = res.data.authDeviceNumber;
+        this.addedDeviceNumber = res.data.addedDeviceNumber;
+      }).catch(err => {
+        console.log('getBeseyeDeviceNum' + err)
       })
     },
 

@@ -2,18 +2,20 @@
   <div class="device-container">
     <div class="account-title-btn">
       <div class="operation-title">
-        <div class="prompt-info">
-          <img :src="errorImgSource" class="error-img"/>
-          <span class="error-msg">
+        <div>
+          <div class="prompt-info" v-show="authorizedDevicesNum < addedDeviceNumber">
+            <img :src="errorImgSource" class="error-img"/>
+            <span class="error-msg">
             {{ $t('deviceView.deviceLimitation') }}
           </span>
+          </div>
         </div>
         <div class="device-num-btn">
           <div>
-            {{ $t('deviceView.authorizedDevicesNum') }}
+            {{ $t('deviceView.authorizedDevicesNum') }} {{ authorizedDevicesNum }}
           </div>
           <div class="available-device">
-            {{ $t('deviceView.availableDeviceNum') }}
+            {{ $t('deviceView.addedDeviceNumber') }} {{ addedDeviceNumber }}
           </div>
           <delay-button @click="showAddEzvizAccountDialog"
                         class="inspction-btn">
@@ -180,7 +182,8 @@ import vm from '@/main.js';
 import util from '@/common/util.js';
 import { mapGetters } from 'vuex';
 import DialogPop from '@/components/DialogPop';
-import DelayButton from '../../../components/DelayButton';
+import DelayButton from '@/components/DelayButton';
+import { getDeviceAuthNumber } from '@/api/device';
 
 export default {
   name: 'EzvizAccount',
@@ -358,7 +361,9 @@ export default {
       accountCell: '',
       accountRow: '',
       isLoadingAccount: true,
-      errorImgSource: require('../../../../static/img/icon_error.png')
+      errorImgSource: require('../../../../static/img/icon_error.png'),
+      authorizedDevicesNum: 0,
+      addedDeviceNumber: 0
     };
   },
 
@@ -380,6 +385,7 @@ export default {
   mounted() {
     this.initEzvizAccountInfo();
     this.getAccountTableList();
+    this.getEzvizDeviceNum();
   },
 
   methods: {
@@ -408,12 +414,16 @@ export default {
 
     getAccountTableList() {
       this.tableData = [];
+      this.authorizedDevicesNum = 0;
+      this.addedDeviceNumber = 0;
       this.isLoadingAccount = true;
       this.getEzvizAccountList().then(res => {
         this.tableData = res.data;
         const listArray = [];
         this.tableData.forEach(item => {
           listArray.push(item.ezvizAccount);
+          this.authorizedDevicesNum += item.authDeviceNumber;
+          this.addedDeviceNumber += item.addedDeviceNumber;
         });
         this.accountList = listArray;
         this.isLoadingAccount = false;
@@ -431,6 +441,18 @@ export default {
           reject(err);
         });
       });
+    },
+
+    getEzvizDeviceNum(){
+      this.authorizedDevicesNum = 0;
+      this.addedDeviceNumber = 0;
+      const params = {vendor: 1};
+      getDeviceAuthNumber(params).then(res => {
+        this.authorizedDevicesNum = res.data.authDeviceNumber;
+        this.addedDeviceNumber = res.data.addedDeviceNumber;
+      }).catch(err => {
+        console.log('getBeseyeDeviceNum' + err)
+      })
     },
 
     async getAccessToken() {
