@@ -29,6 +29,7 @@ export default{
           }
           setCookie(TokenKey, obj.token);
           setCookie('UserId', obj.userId);
+          setCookie('deviceAuth', obj.deviceAuth);
           let lang = 'en';
           if (obj.lang === 'zh-CN') {
             lang = 'zh';

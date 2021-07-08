@@ -258,17 +258,14 @@ export default {
                   PermissionHelper.setData(resultData.authorities);
                 }
               });
-              self.$router.push({ path: '/', query: { token: resData.token, userId: resData.userId, ezvizProtrol: resData.ezvizProtrol, lang: resData.lang }});
+              self.$router.push({ path: '/', query: {
+                token: resData.token,
+                  userId: resData.userId,
+                  ezvizProtrol: resData.ezvizProtrol,
+                  lang: resData.lang,
+                  deviceAuth: resData.deviceAuth
+              }});
 
-              // self.$router.push({path:self.redirect||'/'});
-              // setCookie('UserId',resData.userId);
-              // sessionStorage.setItem('UserId',resData.userId);
-              // if(self.rememberUserName){  //如果勾选，保存用户名跟密码
-              //     setCookie('user',JSON.stringify(self.loginForm));
-              // }
-              // else{
-              //     removeCookie('user');
-              // }
             } else {
               console.log(res);
               const code = res.errCode;
