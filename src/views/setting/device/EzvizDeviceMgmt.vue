@@ -331,32 +331,37 @@
           <div v-if="accountScope === 1 && deviceType === 1">
             <span class="available-span">{{ $t('deviceView.availableDevice') }}</span>
             <div v-if="deviceType === 1" class="available-device-info">
-              <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
-                <div class="available-checkbox">
-                  <el-checkbox v-model="item.checked"/>
+              <template v-if="avilableDeviceList.length > 0">
+                <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
+                  <div class="available-checkbox">
+                    <el-checkbox v-model="item.checked"/>
+                  </div>
+                  <div class="available-sn">
+                    <span>{{ item.serialNumber }}</span>
+                  </div>
+                  <div class="available-name">
+                    <span>{{ item.name }}</span>
+                  </div>
+                  <div class="available-store">
+                    <el-select
+                      v-model="item.storeId"
+                      :filter-method="filterStoreOption"
+                      :placeholder="$t('deviceView.selectStore')"
+                      style="width: 100%;"
+                      filterable
+                    >
+                      <el-option
+                        v-for="item in storeDataList"
+                        :key="item.storeId"
+                        :label="item.label"
+                        :value="item.storeId"/>
+                    </el-select>
+                  </div>
                 </div>
-                <div class="available-sn">
-                  <span>{{ item.serialNumber }}</span>
-                </div>
-                <div class="available-name">
-                  <span>{{ item.name }}</span>
-                </div>
-                <div class="available-store">
-                  <el-select
-                    v-model="item.storeId"
-                    :filter-method="filterStoreOption"
-                    :placeholder="$t('deviceView.selectStore')"
-                    style="width: 100%;"
-                    filterable
-                  >
-                    <el-option
-                      v-for="item in storeDataList"
-                      :key="item.storeId"
-                      :label="item.label"
-                      :value="item.storeId"/>
-                  </el-select>
-                </div>
-              </div>
+              </template>
+              <template v-else>
+                <div class="no-data-container">{{ $t('deviceView.noData') }}</div>
+              </template>
             </div>
           </div>
           <div v-else class="main-device-info">
@@ -481,19 +486,15 @@
 </template>
 <script>
 import { deviceRESTful, ezvizRESTful } from '@/api/index';
-import { getStoreList, getBriefStoreList } from '@/api/store';
-import EzvizAccount from './EzvizAccount';
+import { getBriefStoreList } from '@/api/store';
 import filterString from '@/common/filterString';
 import util from '@/common/util';
 import lodash from 'lodash';
-import DelayButton from '@/components/DelayButton';
-import DialogPop from '@/components/DialogPop';
 import TablePagination from '@/components/TablePagination';
 
 export default {
   name: 'EzvizDeviceMgmt',
   components: {
-    EzvizAccount,
     TablePagination
   },
   data() {
@@ -896,7 +897,7 @@ export default {
         deviceIds: channelList
       };
       return new Promise((resolve, reject) => {
-        deviceRESTful.deleteDevice(params).then(res => {
+        ezvizRESTful.deleteEzvizChannel(params).then(res => {
           resolve(res);
         });
       });
@@ -962,15 +963,16 @@ export default {
       self.isUpdate = false;
       obj.id = self.curChannelItem.id;
       obj.name = self.curChannelItem.tempName;
-      obj.status = self.curChannelItem.checkedStatus ? 1 : 0;
+      // obj.status = self.curChannelItem.checkedStatus ? 1 : 0;
       if (obj.name.trim().length === 0) {
         util.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
         return false;
       }
       const params = obj;
       try {
-        const updateDevicePromise = await deviceRESTful.updateDevice(params);
+        await deviceRESTful.updateDevice(params);
         item.tempUrl !== item.pictureUrl && await this.updateAttachImage();
+        self.curChannelItem.checkedStatus ? await this.enableEzvizChannel() : await this.disableEzvizChannel();
         self.channelData = await self.getChannelData();
         self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
@@ -987,6 +989,32 @@ export default {
       return this.attachImageToDevice(fm);
     },
 
+    enableEzvizChannel(){
+      const params = {
+        deviceIds: [this.curChannelItem.id]
+      };
+      return new Promise((resolve, reject) => {
+        ezvizRESTful.enableEzvizDeviceChannel(params).then(resDevice => {
+          resolve(resDevice);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    disableEzvizChannel(){
+      const params = {
+        deviceIds: [this.curChannelItem.id]
+      };
+      return new Promise((resolve, reject) => {
+        ezvizRESTful.disableEzvizDeviceChannel(params).then(resDevice => {
+          resolve(resDevice);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
     addEzvizChannel(item) {
       const self = this;
       const json = {};
@@ -994,12 +1022,12 @@ export default {
       json.storeId = self.curEzvizItem.storeId;
       json.ivsId = self.curEzvizItem.serialNumber;
       json.channelId = item.channelId;
-      json.vendor = 1;
+      // json.vendor = 1;
       const deviceArr = [];
       deviceArr.push(json);
       const params = {};
       params.device = deviceArr;
-      deviceRESTful.addDevice(params).then(res => {
+      ezvizRESTful.addEzvizDeviceChannel(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
@@ -1138,48 +1166,9 @@ export default {
       self.getDeviceList(params);
     },
 
-    async getAllStoreList() {
-      const self = this;
-      const params = {
-        'filter': {
-          'page': 0,
-          'size': 2000
-        }
-      };
-      const retData = await self.getStoreData(params);
-      const storeList = retData.data.content;
-      self.storeList = storeList;
-      const tempStore = [];
-      storeList.forEach(item => {
-        const obj = {
-          storeId: item.storeId,
-          label: item.name,
-          value: item.name,
-          userId: item.userId,
-          userName: item.userName
-        };
-        tempStore.push(obj);
-      });
-      self.storeDataList = tempStore;
-      self.allStoreDataList = tempStore;
-    },
-
-    getStoreData(params) {
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
-            resolve(res);
-          }
-        }).catch(res => {
-          resolve(res);
-        });
-      });
-    },
-
     addDevice(params) {
       return new Promise((resolve, reject) => {
-        deviceRESTful.addDevice(params).then(resDevice => {
+        ezvizRESTful.addEzvizDeviceChannel(params).then(resDevice => {
           resolve(resDevice);
         }).catch(err => {
           reject(err);
@@ -1283,7 +1272,7 @@ export default {
           json.storeId = self.curEzvizItem.storeId;
           json.ivsId = self.curEzvizItem.serialNumber;
           json.channelId = self.addChannelData.channelId;
-          json.vendor = 1;
+          // json.vendor = 1;
           const deviceArr = [];
           deviceArr.push(json);
           const devParams = {};
@@ -1362,7 +1351,7 @@ export default {
       const obj = {};
       obj.deviceIds = idsArr;
       const params = obj;
-      deviceRESTful.deleteDevice(params).then(res => {
+      ezvizRESTful.deleteEzvizChannel(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg != undefined && errMsg === 'Success') {
           util.notify(self.$t('deviceView.deleteSuccess'), 'success', 3000);

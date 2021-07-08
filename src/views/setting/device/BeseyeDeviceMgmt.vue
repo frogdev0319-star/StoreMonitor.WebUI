@@ -176,7 +176,7 @@
               <template v-if="avilableDeviceList.length > 0">
                 <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
                   <div class="available-checkbox">
-                    <el-checkbox v-model="item.checked" @change="changeAvailableDeviceChecked(item, index)"/>
+                    <el-checkbox v-model="item.checked"/>
                   </div>
                   <div class="available-sn">
                     <span>{{ item.serialNumber }}</span>
@@ -224,10 +224,9 @@
   </div>
 </template>
 <script>
-import { deviceRESTful } from '@/api/index';
+import { deviceRESTful, beseyeRESTful} from '@/api/index';
 import { getBriefStoreList } from '@/api/store';
 import filterString from '@/common/filterString';
-import { addBeseyeDevice, deleteBeseyeDevice, getBeseyeDeviceList, updateBeseyeDevice, getAvailableBeseyeDevice } from '@/api/beseye';
 import util from '@/common/util';
 import lodash from 'lodash';
 
@@ -254,7 +253,8 @@ export default {
       avilableDeviceList: [],
       deleteSerialNums: [],
       deleteChannelIds: [],
-      loadingData: true
+      loadingData: true,
+      deleteInfo: ''
     };
   },
 
@@ -326,7 +326,7 @@ export default {
     getAvailableBeseyeDevice() {
       const params = {};
       params.beseyeAccount = this.beseyeAccount;
-      getAvailableBeseyeDevice(params).then(res => {
+      beseyeRESTful.getAvailableBeseyeDevice(params).then(res => {
         const avilableDevices = res.errCode === 0 && res.data.length > 0 ? res.data : [];
         avilableDevices.forEach(item => { item.checked = false; });
         this.avilableDeviceList = [...avilableDevices];
@@ -421,7 +421,7 @@ export default {
 
     deleteBeseyeChannel(params) {
       return new Promise((resolve, reject) => {
-        deviceRESTful.deleteDevice(params).then(res => {
+        beseyeRESTful.deleteBeseyeChannel(params).then(res => {
           resolve(res);
         }).catch(error => {
           reject(error);
@@ -432,7 +432,7 @@ export default {
     deleteBeseyeDevice(params) {
       console.log(params);
       return new Promise((resolve, reject) => {
-        deleteBeseyeDevice(params).then(res => {
+        beseyeRESTful.deleteBeseyeDevice(params).then(res => {
           resolve(res);
         }).catch(error => {
           reject(error);
@@ -440,76 +440,57 @@ export default {
       });
     },
 
-    addBeseye(params) {
-      return new Promise((resolve, reject) => {
-        addBeseyeDevice(params).then(res => {
-          resolve(res);
-        });
-      });
-    },
-
-    confirmUpdateChannle(index, item) {
+    async confirmUpdateChannle(index, item) {
       const self = this;
       self.isUpdate = false;
       const params = {};
       params.id = item.id;
       params.name = item.name;
-      return new Promise((resolve, reject) => {
-        deviceRESTful.updateDevice(params).then(async res => {
-          console.log(res.data);
-        }).then(() => {
-          if (item.tempUrl !== item.pictureUrl) {
-            const fm = new FormData();
-            fm.append('id', item.id);
-            fm.append('picture', self.file);
-            resolve(self.attachImageToDevice(fm));
-          } else {
-            resolve();
-          }
-        }).catch(error => {
-          console.log('BeseyeDeviceMgmt-confirmUpdateChannle: ' + error);
-        });
-      });
+      const updateDeviceRes = await deviceRESTful.updateDevice(params);
+      item.tempUrl !== item.pictureUrl && updateDeviceRes.errCode === 0 && this.updateImage();
     },
 
-    getBeseyeDeviceList(params) {
+    updateImage(){
+      const fm = new FormData();
+      fm.append('id', item.id);
+      fm.append('picture', this.file);
+      return this.attachImageToDevice(fm);
+    },
+
+    async getBeseyeDeviceList(params) {
       const self = this;
       self.beseyeDevices = [];
       self.beseyeDevicesList = [];
-      getBeseyeDeviceList(params).then(res => {
-        const errCode = res.errCode;
-        const tempDevice = [];
-        if (errCode === 0) {
-          const data = res.data.content;
-          data.forEach((item, index) => {
-            const deviceObj = {};
-            deviceObj.serialNumber = item.serialNumber;
-            deviceObj.name = item.name;
-            deviceObj.tempDeviceName = item.name;
-            deviceObj.store = item.storeName;
-            deviceObj.storeId = item.storeId;
-            deviceObj.isEditing = false;
-            deviceObj.isClick = false;
-            deviceObj.isChecked = false;
-            tempDevice.push(deviceObj);
-          });
-          self.loadingData = false;
-          self.beseyeDevices = tempDevice;
-          self.total = res.data.totalElements;
-        }
-      })
-        .then(async() => {
-          if (self.beseyeDevices.length !== 0) {
-            self.channelData = await self.getBeseyeChannel();
-            console.log(self.channelData);
-            self.getDeviceThumbnails();
-          } else {
-            self.channelData = [];
-            self.channelList = [];
-          }
-        }).catch(error => {
-          console.log('BeseyeDeviceMgmt-getBeseyeDeviceList: ' + error);
+      const deviceResult = await beseyeRESTful.getBeseyeDeviceList(params);
+
+      const errCode = deviceResult.errCode;
+      const tempDevice = [];
+      if (errCode === 0) {
+        const data = deviceResult.data.content;
+        data.forEach((item, index) => {
+          const deviceObj = {};
+          deviceObj.serialNumber = item.serialNumber;
+          deviceObj.name = item.name;
+          deviceObj.tempDeviceName = item.name;
+          deviceObj.store = item.storeName;
+          deviceObj.storeId = item.storeId;
+          deviceObj.isEditing = false;
+          deviceObj.isClick = false;
+          deviceObj.isChecked = false;
+          tempDevice.push(deviceObj);
         });
+        self.loadingData = false;
+        self.beseyeDevices = tempDevice;
+        self.total = res.data.totalElements;
+      }
+
+      if (self.beseyeDevices.length !== 0) {
+        self.channelData = await self.getBeseyeChannel();
+        self.getDeviceThumbnails();
+      } else {
+        self.channelData = [];
+        self.channelList = [];
+      }
     },
 
     getBeseyeChannel() {
@@ -518,7 +499,6 @@ export default {
       return new Promise((resolve, reject) => {
         deviceRESTful.getDeviceList().then(res => {
           const errCode = res.errCode;
-          console.log(res);
           if (errCode === 0) {
             resolve(res.data);
           } else {
@@ -571,28 +551,26 @@ export default {
     },
 
     confirmEditBeseye(index, item) {
-      console.log(item);
+      if (item.tempDeviceName.trim().length === 0) {
+        util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
+        return false;
+      }
       item.name = item.tempDeviceName;
       const params = {};
       params.serialNumber = item.serialNumber;
       params.name = item.tempDeviceName;
-      if (params.name.trim().length === 0) {
-        util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
-        return false;
-      }
-      updateBeseyeDevice(params).then(res => {
-        console.log(res.data);
-      }).then(async() => {
-        await this.confirmUpdateChannle(index, item);
-      }).then(() => {
+      try {
+        const updateDeviceRes = beseyeRESTful.updateBeseyeDevice(params);
+        updateDeviceRes.errCode === 0 && this.confirmUpdateChannle(index, item);
+
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         this.isEditing = false;
-        this.getBeseyeDeviceList(this.setParams());
-      }).catch(error => {
+        this.getBeseyeDeviceList(this.setParams())
+      }catch (error) {
         item.isEditing = false;
         util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
         console.log('BeseyeDeviceMgmt-confirmEditBeseye: ' + error);
-      });
+      }
     },
 
     cancelEditBeseye(index, item) {
@@ -640,24 +618,18 @@ export default {
       this.showDeleteDialog = false;
       const deleteChannelParmas = this.setDeleteChannelParams();
       deleteChannelParmas.deviceIds = this.deleteChannelIds;
-      this.deleteBeseyeChannel(deleteChannelParmas).then(result => {
-        console.log(result);
-        if (result.errCode !== 0) {
-          return Promise.reject(new Error(result.errMsg));
-        } else {
-          return result;
-        }
-      }).then(async() => {
-        const deleteParmas = this.setDeleteDeviceParmas();
-        await this.deleteBeseyeDevice(deleteParmas);
-      }).then(async() => {
+      const deleteParmas = this.setDeleteDeviceParmas();
+      try {
+        const deleteChannelResult = await this.deleteBeseyeChannel(deleteChannelParmas);
+        deleteChannelResult.errCode === 0 && await this.deleteBeseyeDevice(deleteParmas);
+
         util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
         const params = this.setParams();
         await this.getBeseyeDeviceList(params);
-      }).catch(error => {
+      } catch (error) {
         util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
         console.log('BeseyeDeviceMgmt-deleteBeseyeDevice: ' + error);
-      });
+      }
     },
 
     setDeleteChannelParams() {
@@ -674,7 +646,6 @@ export default {
 
     deviceNameChange(val, item) {
       const comment = filterString.all(val, 20);
-      console.log(comment);
       item.tempDeviceName = comment;
     },
 
@@ -690,28 +661,25 @@ export default {
           channel.storeId = item.storeId;
           channel.ivsId = item.serialNumber;
           channel.channelId = 1;
-          channel.vendor = 2;
+          //channel.vendor = 2;
           channelArray.push(channel);
         });
         deviceParams.device = selectDevice;
-        self.addBeseyeDevice(deviceParams).then((res) => {
-          console.log(res);
-          if (res.errCode === 0) {
-            const channelParams = {};
-            channelParams.device = channelArray;
-            self.addBeseyeChannel(channelParams);
-          } else {
-            return Promise.reject((new Error(res.errMsg)));
-          }
-        }).then(() => {
+        const channelParams = {};
+        channelParams.device = channelArray;
+
+        try {
+          const addDeviceResult = await self.addBeseyeDevice(deviceParams);
+          addDeviceResult.errCode === 0 && self.addBeseyeChannel(channelParams);
+
           util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
           self.showAddBeseyeDialog = false;
           self.getBeseyeDeviceList(self.setParams());
-        }).catch(error => {
+        } catch (error) {
           util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
           self.showAddBeseyeDialog = false;
           console.log('BeseyeDeviceMgmt-confirmAddBeseyeDevice: ' + error);
-        });
+        }
       }
     },
 
@@ -737,7 +705,7 @@ export default {
 
     addBeseyeDevice(params) {
       return new Promise((resolve, reject) => {
-        addBeseyeDevice(params).then(resDevice => {
+        beseyeRESTful.addBeseyeDevice(params).then(resDevice => {
           resolve(resDevice);
         }).catch((err) => {
           reject(err);
@@ -747,16 +715,12 @@ export default {
 
     addBeseyeChannel(channelParams) {
       return new Promise((resolve, reject) => {
-        deviceRESTful.addDevice(channelParams).then(resDevice => {
+        beseyeRESTful.addBeseyeChannel(channelParams).then(resDevice => {
           resolve(resDevice);
         }).catch(err => {
           reject(err);
         });
       });
-    },
-
-    changeAvailableDeviceChecked(item, index) {
-      console.log(item);
     },
 
     filterStoreOption(value) {
@@ -971,18 +935,8 @@ export default {
       }
     }
   }
-  .no-data-container{
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: calc(16/1920*100vw);
-    color: #7d8cad;
-  }
 </style>
 <style>
-  @import '../../../assets/css/pagination.css';
-  @import '../../../assets/css/tabsItem.css';
 
   #importId .el-dialog__body{
     padding-top:0px !important;
