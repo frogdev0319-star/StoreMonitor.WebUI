@@ -592,9 +592,8 @@ export default {
 
   created() {
     this.getStoredTemplateId();
-    this.getInspectTemplateList();
     this.getRouterData();
-    this.getReportInfo();
+    this.getReportTemplateAndInfo();
   },
 
   mounted() {
@@ -602,26 +601,27 @@ export default {
   },
 
   methods: {
-    getInspectTemplateList() {
-      const params = {};
-      params.enable = true;
-      ReportSetting.getInspectReportTemplateList(params).then(res => {
-        if (res.errCode === 0 && res.data.length > 0) {
-          this.templateList = res.data;
-          const savedTemplateIndex = this.templateList.findIndex(item => { return item.id === this.cachedTemplateId; });
-          if (savedTemplateIndex !== -1) {
-            this.curTemplateIndex = savedTemplateIndex;
-          } else {
-            this.curTemplateIndex = 0;
-          }
-          this.setTemplateAndStaticalConfig();
-        } else {
-          this.templateList = [];
-          this.templateConfig = [];
-        }
+    getReportTemplateAndInfo() {
+      const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
+      const reportInfoPromise = getInspectReportInfo({ reportIds: [this.report.reportId] });
+      Promise.all([templatePromise, reportInfoPromise]).then(results => {
+        this.getInspectTemplateList(results[0]);
+        this.getReportInfo(results[1]);
       }).catch(err => {
-        console.log('ReportSetting:' + err);
-      });
+        console.log('ReportDetail-getReportTemplateAndInfo:' + err);
+      })
+    },
+
+    getInspectTemplateList(res) {
+      if (res.errCode === 0 && res.data.length > 0) {
+        this.templateList = res.data;
+        const savedTemplateIndex = this.templateList.findIndex(item => { return item.id === this.cachedTemplateId; });
+        this.curTemplateIndex = savedTemplateIndex !== -1 ? savedTemplateIndex : 0;
+        this.setTemplateAndStaticalConfig();
+      } else {
+        this.templateList = [];
+        this.templateConfig = [];
+      }
     },
 
     setTemplateAndStaticalConfig() {
@@ -874,26 +874,15 @@ export default {
       });
     },
 
-    async getReportInfo() {
-      const self = this;
-      const reportId = self.report.reportId;
-      const temp = [];
-      temp.push(reportId);
-      const params = {
-        reportIds: temp
-      };
-      getInspectReportInfo(params).then(async res => {
-        if (res.errCode === 0 && res.data.length > 0) {
-          const data = res.data[0].info;
-          self.totalScore = data.totalScore;
-          this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
-          self.getGroupsData(data.groups);
-          self.reportData = data;
-          self.getPageDataBasedOnTemplate(self.reportData);
-        }
-      }).catch(err => {
-        console.log('InspectReportDetail-getReportInfo: ' + err);
-      });
+    async getReportInfo(res) {
+      if (res.errCode === 0 && res.data.length > 0) {
+        const data = res.data[0].info;
+        this.totalScore = data.totalScore;
+        this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
+        this.getGroupsData(data.groups);
+        this.reportData = data;
+        this.getPageDataBasedOnTemplate(this.reportData);
+      }
     },
 
     getGroupsData(groups) {
@@ -947,6 +936,7 @@ export default {
       const map = this.getDetailNameAndHandlerMap();
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
+      console.log(this.templateConfig);
       this.templateConfig.forEach(config => {
         if (map.has(config.name)) {
           const fnName = map.get(config.name);
@@ -1266,7 +1256,6 @@ export default {
             itemStyle: {
               normal: {
                 color: function(params) {
-                  console.log(params);
                   const colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
                     '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
                   return colorList[params.dataIndex];
