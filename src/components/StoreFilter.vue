@@ -155,7 +155,6 @@ export default {
         self.ifGetParamsFromCash = false;
         this.getStoreListAndGroupAndType();
         await this.getSearchParams();
-        this.getCountryStore();
       }
     },
     cachedParams() {
@@ -336,11 +335,32 @@ export default {
       this.filterStore();
     },
 
+    filterArr(arr1, arr2) {
+      let filterArr = [];
+      if (arr1.includes('-1')) {
+        filterArr = arr2.map(item => item.value);
+      } else {
+        const tempArr = arr2.filter(item => arr1.indexOf(item.value) !== -1);
+        if (tempArr.length > 0) {
+          filterArr = tempArr.map(item => item.value);
+        }
+      }
+      console.log(filterArr);
+      filterArr.length === arr2.length && arr2.length !== 0 && filterArr.unshift('-1');
+      return filterArr;
+    },
+
+    formatGroupAndType() {
+      this.curStoreGroup = this.filterArr(this.curStoreGroup, this.storeGroupList);
+      this.curStoreType = this.filterArr(this.curStoreType, this.storeTypeList);
+    },
+
     filterStore() {
       let filterStoreId = [];
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
         filterStoreId = this.curStore;
       } else {
+        this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
         const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
@@ -574,20 +594,20 @@ export default {
       self.provinceList.forEach(item => {
         provinceArr.push(item.value);
       });
-      self.curProvince = (!self.ifGetParamsFromCash) ? provinceArr : self.curProvince;
+      self.curProvince = (self.ifGetParamsFromCash && self.curProvince.indexOf('-1') === -1) ? self.curProvince : provinceArr;
 
       const cityArr = [];
       self.cityList.forEach(item => {
         cityArr.push(item.value);
       });
-      self.curCity = (!self.ifGetParamsFromCash) ? cityArr : self.curCity;
+      self.curCity = (self.ifGetParamsFromCash && self.curCity.indexOf('-1') === -1) ? self.curCity : cityArr;
       self.storeDataList = tempStore;
       const storeArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
       setTimeout(async() => {
-        self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
+        self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
         self.ifGetParamsFromCash = false;
         self.changeStoreNew(self.curStore);
       }, 100);
