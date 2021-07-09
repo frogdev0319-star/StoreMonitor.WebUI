@@ -75,7 +75,6 @@
               <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfQualified }}</span></td>
               <td v-if="s_item.type==0||s_item.type==2"><span>{{ item.numOfUnqualified }}</span></td>
               <td v-if="s_item.type==1"><span>{{ item.itemScore }}</span></td>
-              <!--<td><span>{{ item.numIgnore }}</span></td>-->
               <td><span>{{ item.itemgetScore }}</span></td>
             </tr>
           </tbody>
@@ -706,6 +705,7 @@ export default {
           item['numIgnore'] = IgnoredArr.length;
           if(inspectSettings.qualifiedForIgnoredWithType2){
             item['itemScore'] = totalScore;
+            item['numIgnore'] ++;
           }else{
             item['itemScore'] = notAddIgnoretotalScore;
           }
@@ -716,7 +716,8 @@ export default {
           }
           if (inspect.length === 1 && inspect[0].type === 0) {
             if (inspectSettings.qualifiedForIgnoredWithType1) {
-              item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;;
+              item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+              item['numIgnore'] ++;
             } else {
               item['itemgetScore'] = tab1GetScoreNoContainedIngored;
             }
@@ -724,6 +725,7 @@ export default {
             if (inspectSettings.includedInTotalScoreWithType1) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
                 item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                item['numIgnore'] ++;
               } else {
                 item['itemgetScore'] = tab1GetScoreNoContainedIngored;
               }
