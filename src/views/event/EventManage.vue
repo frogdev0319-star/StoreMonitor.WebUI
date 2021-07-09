@@ -358,10 +358,12 @@ export default {
     const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
-      self.initData();
+      //self.initData();
     } else {
       self.getEventList('Back');
       self.getEventCount();
+      self.$route.meta.isBack = false;
+      self.isFirstLoad = false;
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
@@ -851,9 +853,12 @@ export default {
     },
 
     onStoreChange(storeObj) {
-      console.log(storeObj);
       this.storeFilterObj = storeObj;
-      !this.ifSaveParams && this.searchData();
+      if (!this.$route.meta.isBack || this.isFirstLoad) {
+        this.initData();
+      }
+      this.$route.meta.isBack = false;
+      this.isFirstLoad = false;
     }
   },
 
