@@ -278,23 +278,23 @@ export default {
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
       theaderPassFail: [
         { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:16%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:17%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;' }
       ],
       theaderScore: [
         { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:26%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:34%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:25%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:25%;' }
       ],
       theaderOther: [
         { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:16%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:17%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;' }
       ],
       suggest: '',
       store: {},

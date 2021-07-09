@@ -543,23 +543,23 @@ export default {
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
       theaderPassFail: [
         { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:16%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:17%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
       ],
       theaderScore: [
         { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:30%;', pdfWidth: 'width:25%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:25%;', pdfWidth: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:25%;', pdfWidth: 'width:20%;' }
       ],
       theaderOther: [
         { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:16%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:17%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
       ],
       showSignatureFlag: false,
       signatureSrc: '',
