@@ -942,7 +942,7 @@ $h1:#292e36;
         background-color: #fff;
         border-bottom: 1px solid #e3e9f4;
         padding: 30px 20px 30px 30px;
-        font-size: 14px;
+        font-size: calc(14/1920*100vw);
         color: $black;
         .el-area{
             overflow: hidden;
