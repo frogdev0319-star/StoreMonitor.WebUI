@@ -296,11 +296,11 @@ export default {
               'position': 1
             },
             {
-              'qualified': 0,
+              'qualified': 1,
               'enable': true,
               'name': 'statistics',
               'position': 2,
-              'chart': 0
+              'chart': 1
             },
             {
               'enable': true,
