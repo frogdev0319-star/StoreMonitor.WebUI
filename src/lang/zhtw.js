@@ -634,7 +634,11 @@ export default {
     'addSuss': '添加成功',
     'addFail': '添加失敗',
     'needBind': '表，需要綁定的門店',
-    'itemsOfCate': '類別巡檢項'
+    'itemsOfCate': '類別巡檢項',
+    'tab1FailedDangeous': 'Tab1（Pass&Fail）中存在不合格項時，巡檢結果為：立即督導',
+    'tab1CalculateScore': '與其他tab組合時，Tab1（Pass&Fail）項目分值參與考評總分運算',
+    'tab1IgnoredQualified': 'Tab1(Pass&Fail)中忽略項目視同得分',
+    'tab2IgnoredQualified': 'Tab2（Score）中忽略項目視同得分',
   },
 
   // Device Management page language

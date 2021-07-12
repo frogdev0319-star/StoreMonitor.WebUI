@@ -626,7 +626,12 @@ export default {
     'searchPlaceholder': 'Enter keywords to search stores',
     'addSuss': 'Successfully added',
     'addFail': 'Failed to add',
-    'itemsOfCate': 'Inspection items of '
+    'itemsOfCate': 'Inspection items of ',
+
+    'tab1FailedDangeous': 'When there are unqualified items in Tab1 (Pass&Fail), the inspection result is: Dangerous.',
+    'tab1CalculateScore': 'When combined with other tabs, the Tab1 (Pass&Fail) project score will participate in the evaluation of the total score calculation',
+    'tab1IgnoredQualified': 'Calculate the score of ignored items in Tab1 (Pass&Fail)',
+    'tab2IgnoredQualified': 'Calculate the score of ignored items in Tab2 (Score)'
   },
 
   // Device Management page language
