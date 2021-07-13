@@ -424,7 +424,8 @@ export default {
     'storeType': '门店类型',
     'passwordErr': '密码错误',
     'accessTokenErr': 'AccessToken错误',
-    'unknownErr': '未知错误'
+    'unknownErr': '未知错误',
+    'selectInspectListWithStore': '请选择，{storeName} 关联巡检表'
   },
 
   // event Management page language
@@ -638,7 +639,9 @@ export default {
     'tab1FailedDangeous': 'Tab1（Pass&Fail）中存在不合格项时，巡检结果为：立即督导',
     'tab1CalculateScore': '与其他tab组合时，Tab1（Pass&Fail）项目分值参与考评总分运算',
     'tab1IgnoredQualified': 'Tab1(Pass&Fail)中忽略项目视同得分',
-    'tab2IgnoredQualified': 'Tab2（Score）中忽略项目视同得分'
+    'tab2IgnoredQualified': 'Tab2（Score）中忽略项目视同得分',
+    'selectStoreToBind': '请选择{tableName}巡检表，需要绑定的门店',
+    'hasBoundStoreNum': '{tableName}共有{allStoreNum}家门店，已绑定{boundStoreNum}家门店'
   },
 
   // Device Management page language

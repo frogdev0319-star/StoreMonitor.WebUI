@@ -424,7 +424,8 @@ export default {
     'storeType': '門店類型',
     'passwordErr': '密碼錯誤',
     'accessTokenErr': 'AccessToken錯誤',
-    'unknownErr': '未知錯誤'
+    'unknownErr': '未知錯誤',
+    'selectInspectListWithStore': '請選擇，{storeName}關聯巡檢表'
   },
 
   // event Management page language
@@ -639,6 +640,8 @@ export default {
     'tab1CalculateScore': '與其他tab組合時，Tab1（Pass&Fail）項目分值參與考評總分運算',
     'tab1IgnoredQualified': 'Tab1(Pass&Fail)中忽略項目視同得分',
     'tab2IgnoredQualified': 'Tab2（Score）中忽略項目視同得分',
+    'selectStoreToBind': '請選擇{tableName}巡檢表，需要綁定的門店',
+    'hasBoundStoreNum': '{tableName}共有{allStoreNum}家門店，已綁定{boundStoreNum}家門店'
   },
 
   // Device Management page language

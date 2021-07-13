@@ -420,7 +420,8 @@ export default {
     'storeType': 'Store Type',
     'passwordErr': 'Password Error',
     'accessTokenErr': 'AccessToken Error',
-    'unknownErr': 'Unknown Error'
+    'unknownErr': 'Unknown Error',
+    'selectInspectListWithStore': 'Please select the inspection list associated with {storeName}'
   },
 
   // event Management page language
@@ -632,7 +633,9 @@ export default {
     'tab1FailedDangeous': 'When there are unqualified items in Tab1 (Pass&Fail), the inspection result is: Dangerous.',
     'tab1CalculateScore': 'When combined with other tabs, the Tab1 (Pass&Fail) project score will participate in the evaluation of the total score calculation',
     'tab1IgnoredQualified': 'Calculate the score of ignored items in Tab1 (Pass&Fail)',
-    'tab2IgnoredQualified': 'Calculate the score of ignored items in Tab2 (Score)'
+    'tab2IgnoredQualified': 'Calculate the score of ignored items in Tab2 (Score)',
+    'selectStoreToBind': 'Bound Stores',
+    'hasBoundStoreNum': '{allStoreNum} stores in total with {boundStoreNum} bound'
   },
 
   // Device Management page language

@@ -424,7 +424,8 @@ export default {
     'comentRuletip': 'Enter up to 200 characters',
     'comentRuletip_suggest': 'Enter up to 600 characters',
     'confirmSwitchInspectconfirmSwitchInspect': '',
-    'confirmSwitchInspect': ''
+    'confirmSwitchInspect': '',
+    'selectInspectListWithStore': '관련 검사목록가 {storeName} 와 관련해서 선택하십시오'
   },
 
   // event Management page language
@@ -600,6 +601,8 @@ export default {
     'sheetother': '기타 항목',
     'editStore': '연결 채널에 검사 항목을 선택하십시오',
     'editStoretips': '알림: 제출 버튼을 누르고 현재 감사 목록을 저장할 수 있다',
+    'selectStoreToBind': '연동 메모리',
+    'hasBoundStoreNum': '총 {allStoreNum} 메모리, {boundStoreNum} 연동',
 
     'inspectionSignature': 'Inspection signature',
     'needSignatrue': 'Onsite signature required',
@@ -718,6 +721,8 @@ export default {
     'selectFile': '파일 선택',
     'devChannelNum': '채널 번호',
     'addEzvizAccount': '장부 추가',
+    'deviceName': '이름',
+    'deviceChannelNum': '채널 수',
 
     'addDevice': 'Add Device',
     'nvr': 'NVR',
@@ -726,8 +731,6 @@ export default {
     'addAgain': 'Add Again',
     'serialNum': 'Serial Number',
     'validationCode': 'Validation Code',
-    'deviceName': 'Name',
-    'deviceChannelNum': 'Channel Number',
     'selectStoreInfo': 'After selected, the store can not be edit, please choose carefully.',
     'thumbnailInfo': 'Only jpg, jpeg, png format and size less than 60KB picture support',
     'selectPicture': 'Select Picture',
