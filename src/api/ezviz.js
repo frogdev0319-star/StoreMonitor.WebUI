@@ -262,3 +262,11 @@ export const getAvailableDevices = params => {
     params
   });
 }
+
+export const updateEzvizChannel = data => {
+  return request({
+    url: `${version}/ezviz/device/channel/update`,
+    method: 'post',
+    data
+  });
+}

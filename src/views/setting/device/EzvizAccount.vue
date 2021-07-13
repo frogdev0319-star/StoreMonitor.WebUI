@@ -422,6 +422,8 @@ export default {
         const listArray = [];
         this.tableData.forEach(item => {
           listArray.push(item.ezvizAccount);
+          item.tempComment = item.comment;
+          item.comment = item.comment.length === 0 ? '--' : item.comment;
         });
         this.accountList = listArray;
         this.isLoadingAccount = false;
@@ -617,7 +619,8 @@ export default {
       self.ezvizAccountInfo.oldEzvizAccount = row.ezvizAccount;
       self.curLength = row.comment ? filterString.getContentLength(row.comment) : 0;
       self.deleteId = row.id;
-      self.ezvizAccountInfo.authorizedDevices = row.authDeviceNumber;
+      self.ezvizAccountInfo.comment = row.tempComment;
+      self.ezvizAccountInfo.authorizedDevices = this.authorizedDevicesNum;
       self.appliedStores = row.appliedStores;
       if (row.scope === 1) {
         self.getAccessToken();

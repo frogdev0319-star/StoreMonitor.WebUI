@@ -959,26 +959,35 @@ export default {
 
     async updateEzvizChannel(item) {
       const self = this;
+      if (self.curChannelItem.tempName.trim().length === 0) {
+        util.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
+        return false;
+      }
       const obj = {};
       self.isUpdate = false;
       obj.id = self.curChannelItem.id;
       obj.name = self.curChannelItem.tempName;
-      // obj.status = self.curChannelItem.checkedStatus ? 1 : 0;
-      if (obj.name.trim().length === 0) {
-        util.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
-        return false;
-      }
       const params = obj;
       try {
-        await deviceRESTful.updateDevice(params);
-        item.tempUrl !== item.pictureUrl && await this.updateAttachImage();
-        self.curChannelItem.checkedStatus ? await this.enableEzvizChannel() : await this.disableEzvizChannel();
+        const promiseArr = [];
+        self.curChannelItem.name !== self.curChannelItem.tempName && promiseArr.push(ezvizRESTful.updateEzvizChannel(params));
+        self.curChannelItem.checkedStatus && self.curChannelItem.status === 0 && promiseArr.push(this.enableEzvizChannel());
+        !self.curChannelItem.checkedStatus && self.curChannelItem.status === 1 && promiseArr.push(this.disableEzvizChannel());
+        item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateAttachImage());
+
+        const results = await Promise.all(promiseArr);
+        results.forEach(result => {
+          if (result.errCode !== 0) {
+            throw Error(result.errMsg);
+          }
+        });
         self.channelData = await self.getChannelData();
         self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
       } catch (e) {
         item.checkedStatus = item.status === 1;
         util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+        item.isEditing = false;
       }
     },
 
@@ -1097,9 +1106,10 @@ export default {
 
     getChannelData() {
       const params = {};
-      params.showDisabled = true;
+      console.log(this.curEzvizItem.serialNumber)
+      params.serialNumber = this.curEzvizItem.serialNumber;
       return new Promise((resolve, reject) => {
-        deviceRESTful.getDeviceList(params).then(res => {
+        ezvizRESTful.getEzvizChannelList(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg && errMsg === 'Success') {
             const data = res.data;
@@ -1232,7 +1242,7 @@ export default {
                 return false;
               } else {
                 selectDevice.map(item => {
-                  item.beseyeAccount = this.beseyeAccount;
+                  item.ezvizAccount = this.ezvizAccount;
                 });
               }
             }
@@ -1540,7 +1550,8 @@ export default {
         { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
         { ret: 'storeNotExist', match: ['Store does not exist'] },
         { ret: 'noAuthorityForStore', match: ['No authority'] },
-        { ret: 'illegalSeriNum', match: ['deviceSerial'] }
+        { ret: 'illegalSeriNum', match: ['deviceSerial']},
+        { ret: 'licenseOverdue', match: ['Device License overdue']}
       ];
       const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
       if (!result) {
