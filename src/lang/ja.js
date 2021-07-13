@@ -252,7 +252,7 @@ export default {
     'storeName': 'ストアネーム',
     'item': 'アイテム',
     'groupPerfor': 'グループパフォーマンス',
-    'pass': 'Pass',
+    'pass': 'パス',
     'failed': 'Failed',
     'sentFail': '送信に失敗しました',
     'tryAgain': '再試行',

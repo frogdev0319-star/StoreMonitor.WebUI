@@ -28,11 +28,11 @@ const messages = {
     ...zhtwLocale,
     ...elementZhTWLocale
   },
-  ja: {
+  'ja-JP': {
     ...jaLocale,
     ...elementJaLocale
   },
-  ko: {
+  'ko-KR': {
     ...koLocale,
     ...elementKoLocale
   }

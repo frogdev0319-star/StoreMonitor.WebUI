@@ -83,7 +83,7 @@ export default {
     'worstPatrol': '최저한 검사 완성 (상위 5)',
     'bestPatrol': '최고의 사 완성 (상위 5)',
     'itemsAssessment': '검사 항목 평가',
-    'pass': '합격하다',
+    'pass': '통과',
     'failed': '실패',
     'ignored': '해당 없음',
     'worstItems': '최저한 검사 항목 (상위 5)',
