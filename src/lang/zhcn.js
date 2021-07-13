@@ -823,7 +823,8 @@ export default {
     'authorizedDevicesNum': '授权设备数量：',
     'addedDeviceNumber': '已添加设备数量：',
     'otherError': '其他错误',
-    'commentLengthPrompt': '最多可输入100个字符'
+    'commentLengthPrompt': '最多可输入100个字符',
+    'licenseOverdue': '订阅权限过期'
   },
 
   // Store Management page language

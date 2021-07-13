@@ -823,7 +823,8 @@ export default {
     'isAuthorizing': '授權中...',
     'deviceLimitation': '當前設備數量超限，請續約或減少設備數量',
     'authorizedDevicesNum': '授權設備數量：',
-    'addedDeviceNumber': '已添加設備數量：'
+    'addedDeviceNumber': '已添加設備數量：',
+    'licenseOverdue': '订阅权限过期'
   },
 
   // Store Management page language

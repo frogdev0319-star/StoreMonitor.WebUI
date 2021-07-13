@@ -338,11 +338,11 @@ export default {
     },
 
     confirmEdit(row) {
-      row.isEditing = false;
       if (row.tempDeviceName.trim().length === 0) {
         util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
         return;
       }
+      row.isEditing = false;
       row.name = row.tempDeviceName;
       this.$emit('handleEdit', row);
     },
