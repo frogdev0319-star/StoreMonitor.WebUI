@@ -5,11 +5,11 @@
         {{ itemhoverName }}<div class="triangle"/>
       </div>
       <el-col :span="7" class="el-route-btns">
-        <span :class="lang === 'en'? 'en-bind-title': 'bind-title'">
+        <span :class="lang.indexOf('zh') === -1 ? 'en-bind-title': 'bind-title'">
           {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
         </span>
         <delay-button
-          :class="lang === 'en' ? 'en-bind-btn' : 'bind-btn' "
+          :class="lang.indexOf('zh') === -1 ? 'en-bind-btn' : 'bind-btn' "
           :disabled="elTableData[Number(activeName)].data.length === 0"
           @click="bindStore"
         >
@@ -27,7 +27,7 @@
           v-for="(item,index) in btnList"
           :key="index"
           :disabled="item.enabled"
-          :class="lang === 'en' ? 'en-el-handle-btn' : 'el-handle-btn' "
+          :class="lang.indexOf('zh') === -1 ? 'en-el-handle-btn' : 'el-handle-btn' "
           size="mini"
           @click="handleNape(index,item)">
           <div class="btn-area">

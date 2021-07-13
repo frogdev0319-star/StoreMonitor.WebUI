@@ -30,7 +30,7 @@
           </p>
           <p class="rule-item">
             <el-checkbox v-model="qualifiedForIgnoredWithType2">
-              <span>{{ $t('insSettingView.tab1IgnoredQualified') }}</span>
+              <span>{{ $t('insSettingView.tab2IgnoredQualified') }}</span>
             </el-checkbox>
           </p>
           <p class="rule-score">

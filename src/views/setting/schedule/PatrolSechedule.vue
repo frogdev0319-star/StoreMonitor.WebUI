@@ -3,8 +3,8 @@
     <div class="el-schedule-header">
       <el-col :span="24" class="el-schedule-btns">
         <div class="left-title">
-          <span v-if="lang !== 'en'" class="title">{{ $t('scheduleView.scheduleTitle') }}</span>
-          <span v-if="lang === 'en' && varyWindowWidth > 1366" class="title">
+          <span v-if="lang.indexOf('zh') !== -1" class="title">{{ $t('scheduleView.scheduleTitle') }}</span>
+          <span v-if="lang.indexOf('zh') === -1 && varyWindowWidth > 1366" class="title">
             {{ $t('scheduleView.noscheduleInspect') }}</span>
           <el-tooltip
             v-if="varyWindowWidth <= 1366"
@@ -12,7 +12,7 @@
             class="item"
             effect="dark"
             placement="top">
-            <span v-if="lang === 'en'" class="title">{{ $t('scheduleView.noscheduleInspect') }}</span>
+            <span v-if="lang.indexOf('zh') === -1" class="title">{{ $t('scheduleView.noscheduleInspect') }}</span>
           </el-tooltip>
           <el-select v-model="isActive" :placeholder="$t('storeView.selectPlaceholder')" @change="changePatrolType">
             <el-option v-for="item in patrolList" :key="item.flag" :label="item.tag" :value="item.flag"/>
@@ -59,7 +59,7 @@
                   :label="`${item.name}`">
                   <div class="header-details">
                     <div>
-                      <span :id="lang === 'en'? 'en-span' : 'span'">{{ $t('scheduleView.scheduleName') }}</span>
+                      <span :id="lang.indexOf('zh') === -1? 'en-span' : 'span'">{{ $t('scheduleView.scheduleName') }}</span>
                       <div class="NameInput" style="margin-right:calc(25/1920*100vw);">
                         <el-input
                           ref="scheduleName"
@@ -73,7 +73,7 @@
                       </div>
                     </div>
                     <div>
-                      <span :id="lang === 'en'? 'en-span': 'span'">{{ $t('scheduleView.scheduleType') }}</span>
+                      <span :id="lang.indexOf('zh') === -1 ? 'en-span': 'span'">{{ $t('scheduleView.scheduleType') }}</span>
                       <el-select
                         v-if="activePatrol === '0'"
                         v-model="item.mode"
@@ -114,7 +114,7 @@
                           @changeInput="changeSelectWeek(arguments,item)"/>
                       </div>
                       <div v-if="item.mode === 2" class="day-detail">
-                        <span :id="lang=='en'? 'en-span': 'span'">{{ $t('scheduleView.execDays') }}</span>
+                        <span :id="lang.indexOf('zh') === -1 ? 'en-span': 'span'">{{ $t('scheduleView.execDays') }}</span>
                         <region-multi-select
                           :options="bigMonthList.slice(0, 28)"
                           :selected="item.schedule[0].day"
@@ -129,7 +129,7 @@
                   <div v-for="(_item, _index) in item.schedule" v-if="item.mode === 3"
                           :key="'mode3'+_index" class="header-details">
                     <div class="self-detail">
-                      <span :id="lang === 'en'? 'en-span' : 'span'">{{ $t('scheduleView.selectMonth') }}</span>
+                      <span :id="lang.indexOf('zh') === -1 ? 'en-span' : 'span'">{{ $t('scheduleView.selectMonth') }}</span>
                     </div>
                     <el-select
                       v-model="_item.month"
@@ -168,7 +168,7 @@
                   <div
                     :key="index"
                     class="header-details">
-                    <span :id="lang === 'en' ? 'en-span' : 'span'">{{ $t('scheduleView.notifyTime') }}</span>
+                    <span :id="lang.indexOf('zh') === -1 ? 'en-span' : 'span'">{{ $t('scheduleView.notifyTime') }}</span>
                     <el-time-select
                       v-model="item.notifyTime"
                       :clearable="false"
@@ -192,7 +192,7 @@
                   </div>
                   <div class="header-details header-person">
                     <div :span="7">
-                      <span :id="lang === 'en' ? 'en-span' : 'span'">{{ $t('scheduleView.dueDays') }}</span>
+                      <span :id="lang.indexOf('zh') === -1 ? 'en-span' : 'span'">{{ $t('scheduleView.dueDays') }}</span>
                       <el-select
                         v-model="item.dueDays"
                         size="mini"
@@ -206,8 +206,8 @@
                       </el-select>
                     </div>
                     <div
-                      :id="lang === 'en' ? 'en-span' : 'span'"
-                      :style="lang === 'en' ? '' : 'padding-right:14px;'"
+                      :id="lang.indexOf('zh') === -1 ? 'en-span' : 'span'"
+                      :style="lang.indexOf('zh') === -1 ? '' : 'padding-right:14px;'"
                       class="inspctor">
                       <div class="inspector-item">
                         <span class="required-name">*</span>
