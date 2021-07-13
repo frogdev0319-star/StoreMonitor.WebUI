@@ -314,7 +314,7 @@ export default {
           'sortable': 'custom',
           'pdfmaxWidth': '10%',
           'width': '130',
-          'maxWidth': '150'
+          'maxWidth': '160'
         },
         {
           'prop': 'numOfIgnored',

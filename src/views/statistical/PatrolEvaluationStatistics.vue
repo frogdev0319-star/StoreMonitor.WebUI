@@ -367,7 +367,7 @@ export default {
           'pdfwidth': '12%',
           'pdfmaxWidth': '14%',
           'width': '160',
-          'maxWidth': '190'
+          'maxWidth': '230'
         },
         {
           'prop': 'numOfReport',
@@ -376,7 +376,7 @@ export default {
           'pdfwidth': '12%',
           'pdfmaxWidth': '12%',
           'width': '160',
-          'maxWidth': '160'
+          'maxWidth': '180'
         },
         {
           'prop': 'numOfQualified',
@@ -468,7 +468,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '16%',
           'width': '160',
-          'maxWidth': '190'
+          'maxWidth': '230'
         },
         {
           'prop': 'numOfReport',
@@ -476,7 +476,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '14%',
           'width': '150',
-          'maxWidth': '150'
+          'maxWidth': '180'
         },
         {
           'prop': 'numOfQualified',
@@ -492,7 +492,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '110',
-          'maxWidth': '110'
+          'maxWidth': '120'
         },
         {
           'prop': 'numOfDangerous',
