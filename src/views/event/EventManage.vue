@@ -64,7 +64,7 @@
     </div>
     <div class="el-table-content">
       <delay-button
-        :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+        :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
         class="absolute-btn"
         type="primary"
         size="mini"
