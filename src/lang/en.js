@@ -284,7 +284,8 @@ export default {
     'maximumAttach': 'Up to 10 attachments!',
     'sentSucc': 'Successfully Sent!',
     'sentFail': 'Failed to sent!',
-    'return': 'Automatically return in ',
+    'return': 'Automatically return in {seconds}s',
+    'returnStoreMonitor': 'Automatically return in {seconds}s',
     'storeName': 'Store Name',
     'item': 'Item',
     'ifpass': 'Pass',
@@ -807,7 +808,9 @@ export default {
     'successSubmit': 'Successfully sent',
     'all': 'All',
     'supervisor': 'Supervisor',
-    'bindSchedule': 'Bound Schedule'
+    'bindSchedule': 'Bound Schedule',
+    'editStore': 'Please select the inspection item to bind channels',
+    'editStoretips': 'Reminder: Click the submit button to save the current inspection list',
   },
 
   // Schedule Management page language

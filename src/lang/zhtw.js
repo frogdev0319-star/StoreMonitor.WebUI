@@ -289,8 +289,8 @@ export default {
     'maximumAttach': '每個巡檢項最多上傳10個資源檔​！',
     'sentSucc': '提交成功！',
     'sentFail': '提交失敗！',
-    'return': '秒後自動返回遠端巡檢頁面！',
-    'returnStoreMonitor': '秒後自動返回門店監控頁面！',
+    'return': '{seconds}秒後自動返回遠端巡檢頁面！',
+    'returnStoreMonitor': '{seconds}秒後自動返回門店監控頁面！',
     'storeName': '門店名稱：',
     'item': '項目',
     'ifpass': '是否合格',
@@ -813,7 +813,9 @@ export default {
     'successSubmit': '提交成功',
     'all': '全部',
     'supervisor': '督導',
-    'bindSchedule': '綁定排程'
+    'bindSchedule': '綁定排程',
+    'editStore': '遠程巡檢項通道綁定',
+    'editStoretips': '溫馨提示：點擊提交按鈕，保存當前巡檢表'
   },
 
   // Schedule Management page language

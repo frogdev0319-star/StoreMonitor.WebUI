@@ -289,8 +289,8 @@ export default {
     'maximumAttach': '每个巡检项最多上传10个资源文件​！',
     'sentSucc': '提交成功！',
     'sentFail': '提交失败！',
-    'return': '秒后自动返回远程巡检页面！',
-    'returnStoreMonitor': '秒后自动返回门店监控页面！',
+    'return': '{seconds}秒后自动返回远程巡检页面！',
+    'returnStoreMonitor': '{seconds}秒后自动返回门店监控页面！',
     'storeName': '门店名称',
     'item': '项目',
     'ifpass': '是否合格',
@@ -813,7 +813,9 @@ export default {
     'successSubmit': '提交成功',
     'all': '全部',
     'supervisor': '督导',
-    'bindSchedule': '绑定排程'
+    'bindSchedule': '绑定排程',
+    'editStore': '远程巡检项通道绑定',
+    'editStoretips': '温馨提示：点击提交按钮，保存当前巡检表'
   },
 
   // Schedule Management page language
