@@ -59,7 +59,7 @@ $ignored: #cad1db;
             }
             padding-left: calc(34/1920*100vw);
             .total-title {
-              font-size: calc(16/1920*100vw);
+              font-size: calc(15/1920*100vw);
               color: $tab;
               text-align: left;
             }
@@ -771,7 +771,7 @@ $ignored: #cad1db;
       }
       .store-events{
         height: auto;
-        @media screen and (max-width: 1680px){
+        @media screen and (max-width: 1920px){
           width: 51%;
         }
         .region-result{
@@ -800,7 +800,7 @@ $ignored: #cad1db;
 
       }
       .source-list{
-        @media screen and (max-width: 1680px){
+        @media screen and (max-width: 1920px){
           width: 32%;
         }
         .pct-content{

@@ -315,13 +315,13 @@ export default {
           prop: 'tagName',
           label: this.$t('overview.patrolLists'),
           sortable: false,
-          width: '150'
+          width: '200'
         },
         {
           prop: 'modeText',
           label: this.$t('remotePatrol.patrolWay'),
           sortable: false,
-          width: '150'
+          width: '200'
         },
         {
           prop: 'status',
@@ -339,7 +339,7 @@ export default {
           prop: 'datestr',
           label: this.$t('remotePatrol.patrolDate'),
           sortable: 'custom',
-          width: '164'
+          width: '220'
         }
       ],
       storeList: [],

@@ -583,8 +583,9 @@
       </el-tabs>
       <div class="patrol-select">
         <div class="patrol-content">
-          <p v-if="lang!= 'en'" class="patrol-title">{{ $t('storeView.selectPlaceholder') }}，<span v-if="patrolStoreName!=null">{{ patrolStoreName }}</span><span v-else>{{ $t('remotePatrol.stores') }}</span>{{ $t('storeView.bindInspectList') }}</p>
-          <p v-if="lang== 'en'" class="patrol-title">Please select the inspection list associated with <span v-if="patrolStoreName!=null">{{ patrolStoreName }}</span><span v-else>{{ $t('remotePatrol.stores') }}</span></p>
+          <p class="patrol-title">
+            {{ $t('remotePatrol.selectInspectListWithStore', {storeName: patrolStoreName}) }}
+          </p>
           <el-dropdown trigger="click" placement="bottom" class="patrol-dropdown" @command="changeInspect">
             <span class="el-dropdown-link">
               <p v-if="patrolstore!=''" class="link-span">{{ patrolstore }}</p>
@@ -3835,7 +3836,7 @@ export default {
           position: absolute;
           top: 30%;
           right: 20px;
-          width: 260px;
+          width: auto;
           img{
             @include point(height,42);
             position: relative;
@@ -4200,6 +4201,7 @@ export default {
           position: absolute;
           width: auto;
           z-index: 1000;
+          max-width: 330px;
           img{
             @include point(height,42);
             position: relative;
