@@ -249,7 +249,7 @@
               />
             </div>
 
-            <div v-if="showCutContent" :class="lang === 'en' ? 'en-iconright' : 'iconright'">
+            <div v-if="showCutContent" :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'">
               <div class="paizhao-content" @click="cutPicture">
                 <i
                   class="iconfont icon-xiangji iconpaizhao"

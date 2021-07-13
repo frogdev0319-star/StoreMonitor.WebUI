@@ -223,12 +223,12 @@
           </div>
           <img :src="arrows2Src" alt="arrow2">
           <div class="iconright-content">
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
+            <div :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'">
               <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
               <span>{{ $t('remotePatrol.snapshot') }}</span>
             </div>
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'" style="display: none">
-              <i v-if="lang =='en' " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
+            <div :class="lang.indexOf('zh') === -1? 'en-iconright' : 'iconright'" style="display: none">
+              <i v-if="lang.indexOf('zh') === -1 " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
               <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
               <span>{{ $t('remotePatrol.record') }}</span>
             </div>
@@ -269,7 +269,7 @@
               </div>
             </div>
             <transition name="fade">
-              <div v-if="showModelContent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
+              <div v-if="showModelContent" :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'" @click="cutPicture">
                 <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
                 <span>{{ $t('remotePatrol.snapshot') }}</span>
               </div>

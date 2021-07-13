@@ -504,7 +504,7 @@ export default {
       inspectSrc4: require('../../../static/img/dangerous_en.png'),
       inspectSrc5: require('../../../static/img/good_en.png'),
       inspectSrc6: require('../../../static/img/improved_en.png'),
-      inspectSrc7: require('../../../static/img/dangerout_tw.png'),
+      inspectSrc7: require('../../../static/img/dangerous_tw.png'),
       inspectSrc8: require('../../../static/img/excellent_cn.png'),
       inspectSrc9: require('../../../static/img/excellent_en.png'),
       inspectSrc10: require('../../../static/img/excellent_tw.png'),
