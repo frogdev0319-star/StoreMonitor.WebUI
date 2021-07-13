@@ -34,7 +34,7 @@
         :label="_item.label"
         :sortable="canSortable ? _item.sortable : false"
         :sort-orders="['ascending', 'descending']"
-        :min-width="isexportPDF ? _item.pdfwidth : (lang !== 'en' ? _item.width : _item.maxWidth)"
+        :min-width="isexportPDF ? _item.pdfwidth : (lang.indexOf('zh') !== -1 ? _item.width : _item.maxWidth)"
         :formatter="_item.formatter">
         <template slot-scope="{row}">
           <template v-if="_item.canEdit && row.isEditing">
@@ -76,7 +76,7 @@
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
-          :min-width="lang !== 'en'? 120 : 160"
+          :min-width="lang.indexOf('zh') !== -1 ? 120 : 160"
           :sortable="true"
           :sort-method="(a, b) => sortHandle(a, b, 'RemoteStr')"
           prop="RemoteStr">
@@ -88,7 +88,7 @@
         </el-table-column>
         <el-table-column
           :label="$t('overview.onsitePatrol')"
-          :min-width="lang !== 'en' ? 120 : 160"
+          :min-width="lang.indexOf('zh') !== -1 ? 120 : 160"
           :sortable="true"
           :sort-method="(a, b) => sortHandle(a, b, 'OnsiteStr')"
           prop="OnsiteStr">
@@ -100,7 +100,7 @@
         </el-table-column>
         <el-table-column
           :label="$t('overview.storeMonitor')"
-          :min-width="lang !== 'en' ? 120 : 160"
+          :min-width="lang.indexOf('zh') !== -1 ? 120 : 160"
           :sortable="true"
           :sort-method="(a, b) => sortHandle(a, b, 'VideoStr')"
           prop="VideoStr">

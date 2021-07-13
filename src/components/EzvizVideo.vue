@@ -96,7 +96,7 @@
             height="0.2rem"/>
         </div>
         <transition name="fade">
-          <div v-if="showModelContent && !isEvent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
+          <div v-if="showModelContent && !isEvent" :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'" @click="cutPicture">
             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
             <span>{{ $t('remotePatrol.snapshot') }}</span>
           </div>
@@ -200,7 +200,7 @@
         </div>
 
         <transition name="fade">
-          <div v-if="showModelContent && !isEvent" :class="lang === 'en' ? 'en-iconright' : 'iconright'" @click="cutPicture">
+          <div v-if="showModelContent && !isEvent" :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'" @click="cutPicture">
             <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
             <span>{{ $t('remotePatrol.snapshot') }}</span>
           </div>
