@@ -112,3 +112,11 @@ export const deleteBeseyeChannel = data => {
     data
   });
 }
+
+export const updateBeseyeChannel = data => {
+  return request({
+    url: `${version}/beseye/device/channel/update`,
+    method: 'post',
+    data
+  });
+}

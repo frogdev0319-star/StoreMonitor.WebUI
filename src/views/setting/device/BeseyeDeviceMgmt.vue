@@ -430,7 +430,6 @@ export default {
     },
 
     deleteBeseyeDevice(params) {
-      console.log(params);
       return new Promise((resolve, reject) => {
         beseyeRESTful.deleteBeseyeDevice(params).then(res => {
           resolve(res);
@@ -446,7 +445,7 @@ export default {
       const params = {};
       params.id = item.id;
       params.name = item.name;
-      const updateDeviceRes = await deviceRESTful.updateDevice(params);
+      const updateDeviceRes = await beseyeRESTful.updateBeseyeChannel(params);
       item.tempUrl !== item.pictureUrl && updateDeviceRes.errCode === 0 && this.updateImage();
     },
 
@@ -481,7 +480,7 @@ export default {
         });
         self.loadingData = false;
         self.beseyeDevices = tempDevice;
-        self.total = res.data.totalElements;
+        self.total = deviceResult.data.totalElements;
       }
 
       if (self.beseyeDevices.length !== 0) {
@@ -550,7 +549,7 @@ export default {
       });
     },
 
-    confirmEditBeseye(index, item) {
+    async confirmEditBeseye(index, item) {
       if (item.tempDeviceName.trim().length === 0) {
         util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
         return false;
@@ -560,12 +559,12 @@ export default {
       params.serialNumber = item.serialNumber;
       params.name = item.tempDeviceName;
       try {
-        const updateDeviceRes = beseyeRESTful.updateBeseyeDevice(params);
-        updateDeviceRes.errCode === 0 && this.confirmUpdateChannle(index, item);
+        const updateDeviceRes = await beseyeRESTful.updateBeseyeDevice(params);
+        updateDeviceRes.errCode === 0 && await this.confirmUpdateChannle(index, item);
 
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         this.isEditing = false;
-        this.getBeseyeDeviceList(this.setParams())
+        this.getBeseyeDeviceList(this.setParams());
       }catch (error) {
         item.isEditing = false;
         util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
@@ -661,7 +660,6 @@ export default {
           channel.storeId = item.storeId;
           channel.ivsId = item.serialNumber;
           channel.channelId = 1;
-          //channel.vendor = 2;
           channelArray.push(channel);
         });
         deviceParams.device = selectDevice;
@@ -670,11 +668,20 @@ export default {
 
         try {
           const addDeviceResult = await self.addBeseyeDevice(deviceParams);
-          addDeviceResult.errCode === 0 && self.addBeseyeChannel(channelParams);
-
-          util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
-          self.showAddBeseyeDialog = false;
-          self.getBeseyeDeviceList(self.setParams());
+          const addChannelResult = await self.addBeseyeChannel(channelParams);
+          if (addDeviceResult.errCode === 0 && addChannelResult.errCode === 0) {
+            util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
+            self.showAddBeseyeDialog = false;
+            self.getBeseyeDeviceList(self.setParams());
+          } else {
+            if (addDeviceResult.errCode !== 0){
+              self.deleteBeseyeChannel({deviceIds: addChannelResult.data})
+            } else if (addChannelResult !== 0) {
+              self.deleteBeseyeDevice({deviceIds: addDeviceResult.data})
+            }
+            util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+            self.showAddBeseyeDialog = false;
+          }
         } catch (error) {
           util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
           self.showAddBeseyeDialog = false;
@@ -1053,7 +1060,8 @@ export default {
     padding: 0px;
   }
   .el-dialog__body .dialog-content .deviceForm{
-    margin: 32px calc(40/1920*100vw) 0px calc(40/1920*100vw);
+    box-sizing: border-box;
+    padding: 32px calc(40/1920*100vw) 0px calc(40/1920*100vw);
   }
   .el-dialog__body .dialog-content .deviceForm .picture-tips{
     display: inline;

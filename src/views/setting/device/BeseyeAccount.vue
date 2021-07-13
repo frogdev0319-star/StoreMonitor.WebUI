@@ -210,6 +210,7 @@ export default {
         const succMsg = this.getAuthorizeMsg('success');
         util.notify(succMsg, 'sucess', 3000);
         this.getBeseyeUserList();
+        this.getBeseyeDeviceNum();
         this.isAuthorizing = false;
       }).catch(error => {
         const failMsg = this.getAuthorizeMsg('warning');
@@ -319,6 +320,7 @@ export default {
           util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
           this.showDeleteBeseyeUser = false;
           this.getBeseyeUserList();
+          this.getBeseyeDeviceNum();
         } else {
           util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
           this.showDeleteBeseyeUser = false;
