@@ -120,7 +120,7 @@
                   <span class="event-subject">{{ scope.row.subject }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="160"/>
+              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="180"/>
               <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="120">
                 <template slot-scope="scope">
                   <div v-if="scope.row.attachment.length!==0">
