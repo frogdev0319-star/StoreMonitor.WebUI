@@ -126,10 +126,16 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
   response => {
-    const res = response.data;
+    console.log(response)
     return response.data;
   }, err => {
-    console.log(err);
+    if (err.code === 'ECONNABORTED' || err.message === 'Network Error') {
+      message({
+        message: i18n.t('route.networkError'),
+        type: 'error',
+        duration: 5 * 1000
+      });
+    }
     if (err.response) {
       const errCode = err.response.data.errCode;
       const errMsg = err.response.data.errMsg;
