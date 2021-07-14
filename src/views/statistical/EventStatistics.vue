@@ -15,7 +15,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="title">{{ $t('overview.eventGraph') }}</div>
           </el-col>
-          <el-col :span="3" class="kpi-list">
+          <el-col :span="3" :class="lang.indexOf('ja') !== -1 ? 'ja-kpi-list' : 'kpi-list'">
             <div class="kpi-content">
               <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
                 <div class="event-title">{{ item.eventTitle }}</div>
@@ -23,7 +23,7 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="14" class="store-events">
+          <el-col :span="14" :class="lang.indexOf('ja') !== -1 ? 'ja-store-events' : 'store-events'">
             <div class="region-result">
               <div
                 v-loading="isLoading"
@@ -42,7 +42,7 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="7" class="source-list">
+          <el-col :span="7" :class="lang.indexOf('ja') !== -1 ? 'ja-source-list' : 'source-list'">
             <div class="pct-content">
               <div class="pct-panel">
                 <v-chart
@@ -373,7 +373,7 @@ export default {
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
           'width': '140',
-          'maxWidth': '140',
+          'maxWidth': '150',
           'pdfwidth': '11%'
         },
         {
@@ -1219,6 +1219,19 @@ export default {
             padding-top: 140px;
             border-top: 1px solid $border;
           }
+        }
+
+        .ja-kpi-list{
+          @extend .kpi-list;
+          width: 15%;
+        }
+        .ja-store-events{
+          @extend .store-events;
+          width: 53%;
+        }
+        .ja-source-list{
+          @extend .source-list;
+          width: 32%;
         }
       }
       .second-row {

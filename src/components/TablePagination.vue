@@ -76,7 +76,7 @@
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
-          :min-width="lang.indexOf('zh') !== -1 ? 120 : 160"
+          :min-width="lang.indexOf('zh') !== -1 ? 120 : 180"
           :sortable="true"
           :sort-method="(a, b) => sortHandle(a, b, 'RemoteStr')"
           prop="RemoteStr">
@@ -88,7 +88,7 @@
         </el-table-column>
         <el-table-column
           :label="$t('overview.onsitePatrol')"
-          :min-width="lang.indexOf('zh') !== -1 ? 120 : 160"
+          :min-width="lang.indexOf('zh') !== -1 ? 120 : 180"
           :sortable="true"
           :sort-method="(a, b) => sortHandle(a, b, 'OnsiteStr')"
           prop="OnsiteStr">

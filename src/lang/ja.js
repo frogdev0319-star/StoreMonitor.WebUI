@@ -1063,7 +1063,7 @@ export default {
   // Schedule Management page language
   'scheduleView': {
     'schedule': 'スケジュール',
-    'addSchedule': 'スケジュールを追加します',
+    'addSchedule': 'Add Schedule',
     'newSchedule': '新しいスケジュール',
     'scheduleName': 'スケジュール名',
     'scheduleType': 'スケジュールタイプ',
