@@ -100,10 +100,30 @@
                 header-align="center"
                 align="center">
                 <template slot-scope="scope" >
-                  <span v-if="scope.row.status === 0" class="icon-span" style="background-color:#FDBA40;" >{{ $t('eventView.pending') }}</span>
-                  <span v-else-if="scope.row.status === 1" class="icon-span" style="background-color:#434C5E;" >{{ $t('eventView.handled') }}</span>
-                  <span v-else-if="scope.row.status === 2" class="icon-span" style="background-color:#6097F3;" >{{ $t('eventView.closed') }}</span>
-                  <span v-else-if="scope.row.status === 3" class="icon-span" style="background-color:#FDBA40;" >{{ $t('eventView.returnStatus') }}</span>
+                  <span
+                    v-if="scope.row.status === 0"
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
+                    style="background-color:#FDBA40;" >
+                    {{ $t('eventView.pending') }}
+                  </span>
+                  <span
+                    v-else-if="scope.row.status === 1"
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
+                    style="background-color:#434C5E;" >
+                    {{ $t('eventView.handled') }}
+                  </span>
+                  <span
+                    v-else-if="scope.row.status === 2"
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
+                    style="background-color:#6097F3;" >
+                    {{ $t('eventView.closed') }}
+                  </span>
+                  <span
+                    v-else-if="scope.row.status === 3"
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
+                    style="background-color:#FDBA40;" >
+                    {{ $t('eventView.returnStatus') }}
+                  </span>
                 </template>
               </el-table-column>
               <el-table-column
@@ -929,6 +949,10 @@ $h1:#292e36;
         height:22px;
         color:white;
         font-size: 12px;
+    }
+    .ja-icon{
+      @extend .icon-span;
+      width: 80px;
     }
     .icon-gengduo{
       font-size: calc(24/1920*100vw);
