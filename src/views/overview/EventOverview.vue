@@ -4,7 +4,7 @@
       <span class="date-title">{{ $t('overview.date') }}</span>
       <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
       <span class="el-store">
-        {{ $t('overview.totalStore') }}{{ numOfStores }}{{ $t('overview.totalUnit') }}
+        {{ $t('overview.totalStore', {storeNum: numOfStores}) }}
       </span>
     </div>
     <div class="el-overview">
