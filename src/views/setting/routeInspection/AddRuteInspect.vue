@@ -1197,6 +1197,8 @@ export default {
           }
         } else {
           self.ItemScoreOption = '0';
+          self.ItemMinScore = 0;
+          self.ItemTotalScore = 0;
         }
         if(self.ItemTotalScore === ''){
           self.ItemTotalScoreTip0 = true;
