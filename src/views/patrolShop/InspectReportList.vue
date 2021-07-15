@@ -17,13 +17,13 @@
           :picker-options="dateOpt"
           :popper-class="poperClass"
           :default-time="defaultTime"
+          :start-placeholder="$t('overview.startDate')"
+          :end-placeholder="$t('overview.endDate')"
           type="datetimerange"
           range-separator="~"
           size="mini"
           format="yyyy/MM/dd HH:mm:ss"
           class="date-range"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
           @change="dateChange"
           @focus="dateFocus"/>
         <el-tooltip
@@ -605,7 +605,7 @@ export default {
       const filterMap = statusAndLangAndIconMap.filter(map => map.status === status);
       if (filterMap.length > 0) {
         statusAndIconObj.status = filterMap[0].statusStr;
-        for (let lang in filterMap[0].children[0]) {
+        for (const lang in filterMap[0].children[0]) {
           if (lang === this.lang) {
             statusAndIconObj.iconSrc = filterMap[0].children[0][lang];
           }

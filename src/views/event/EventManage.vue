@@ -17,13 +17,13 @@
           :popper-class="poperClass"
           :picker-options="dateOpt"
           :default-time="defaultTime"
+          :start-placeholder="$t('overview.startDate')"
+          :end-placeholder="$t('overview.endDate')"
           type="datetimerange"
           range-separator="~"
           size="mini"
           format="yyyy/MM/dd HH:mm:ss"
           class="date-range"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
           @change="dateChange"/>
         <el-tooltip
           :popper-class="toolTipClass"
