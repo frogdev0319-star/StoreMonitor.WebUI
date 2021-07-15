@@ -84,7 +84,7 @@
           size="mini"
           @click="searchData"
         >
-          <span>{{ $t('remotePatrol.search') }}</span>
+          <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
         </delay-button>
       </el-col>
     </el-col>
@@ -126,6 +126,7 @@
             </div>
             <delay-button
               :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+              class="export-report-btn"
               type="primary"
               size="mini"
               @click="export2Excel"
@@ -569,33 +570,33 @@ export default {
           status: 0,
           statusStr: this.$t('overview.danger'),
           children: [{
-            'zh': '../../../static/img/dangerous_cn.png',
-            'zhtw': '../../../static/img/dangerous_tw.png',
-            'en': '../../../static/img/dangerous_en.png',
-            'ja': '../../../static/img/dangerous_ja.png',
-            'ko': '../../../static/img/dangerous_ko.png'
+            'zh': require('../../../static/img/dangerous_cn.png'),
+            'zhtw': require('../../../static/img/dangerous_tw.png'),
+            'en': require('../../../static/img/dangerous_en.png'),
+            'ja-JP': require('../../../static/img/dangerous_ja.png'),
+            'ko-KR': require('../../../static/img/dangerous_ko.png')
           }]
         },
         {
           status: 1,
           statusStr: this.$t('overview.improve'),
           children: [{
-            'zh': '../../../static/img/improved_cn.png',
-            'zhtw': '../../../static/img/improved_cn.png',
-            'en': '../../../static/img/improved_en.png',
-            'ja': '../../../static/img/improved_ja.png',
-            'ko': '../../../static/img/improved_ko.png'
+            'zh': require('../../../static/img/improved_cn.png'),
+            'zhtw': require('../../../static/img/improved_cn.png'),
+            'en': require('../../../static/img/improved_en.png'),
+            'ja-JP': require('../../../static/img/improved_ja.png'),
+            'ko-KR': require('../../../static/img/improved_ko.png')
           }]
         },
         {
           status: 2,
           statusStr: this.$t('overview.pass'),
           children: [{
-            'zh': '../../../static/img/good_cn.png',
-            'zhtw': '../../../static/img/good_cn.png',
-            'en': '../../../static/img/good_en.png',
-            'ja': '../../../static/img/good_ja.png',
-            'ko': '../../../static/img/good_ko.png'
+            'zh': require('../../../static/img/good_cn.png'),
+            'zhtw': require('../../../static/img/good_cn.png'),
+            'en': require('../../../static/img/good_en.png'),
+            'ja-JP': require('../../../static/img/good_ja.png'),
+            'ko-KR': require('../../../static/img/good_ko.png')
           }]
         }
       ];
@@ -1045,6 +1046,9 @@ $suggestBack:#F1F6FE;
                   font-size: calc(12/1920*100vw);
                   vertical-align: middle;
                 }
+              }
+              .export-report-btn{
+                margin-left: calc(20/1920*100vw);
               }
             }
         }

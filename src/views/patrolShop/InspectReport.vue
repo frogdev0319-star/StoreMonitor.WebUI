@@ -497,17 +497,6 @@ export default {
       videoSrc: require('../../../static/img/monitor.png'),
       inspectSrc: require('../../../static/img/remote_patrol.png'),
       insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
-
-      inspectSrc1: require('../../../static/img/dangerous_cn.png'),
-      inspectSrc2: require('../../../static/img/good_cn.png'),
-      inspectSrc3: require('../../../static/img/improved_cn.png'),
-      inspectSrc4: require('../../../static/img/dangerous_en.png'),
-      inspectSrc5: require('../../../static/img/good_en.png'),
-      inspectSrc6: require('../../../static/img/improved_en.png'),
-      inspectSrc7: require('../../../static/img/dangerous_tw.png'),
-      inspectSrc8: require('../../../static/img/excellent_cn.png'),
-      inspectSrc9: require('../../../static/img/excellent_en.png'),
-      inspectSrc10: require('../../../static/img/excellent_tw.png'),
       report: null,
       suggest: '',
       totalScore: '',
@@ -680,6 +669,7 @@ export default {
       obj.dateStr = util.getDateStr(routeData.ts);
       obj.submitterName = routeData.submitterName;
       obj.tagName = routeData.tagName;
+      obj.iconSrc = this.getIconSrc(routeData.status);
       switch (routeData.mode) {
         case 0:
           obj.inspectSrc = self.inspectSrc;
@@ -694,62 +684,57 @@ export default {
           obj.inspectSrc = self.videoSrc;
           break;
       }
-      switch (routeData.status) {
-        case 0: {
-          // dangerous
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc1;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc4;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc7;
-          } else {
-            obj.iconSrc = self.inspectSrc1;
-          }
-          break;
-        }
-        case 1: {
-          // improved
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc3;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc6;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc3;
-          } else {
-            obj.iconSrc = self.inspectSrc3;
-          }
-          break;
-        }
+      self.report = obj;
+    },
 
-        case 2: {
-          // pass
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc2;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc5;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc2;
-          } else {
-            obj.iconSrc = self.inspectSrc2;
-          }
-          break;
+    getIconSrc(status) {
+      const statusAndLangAndIconMap = [
+        {
+          status: 0,
+          statusStr: this.$t('overview.danger'),
+          children: [{
+            'zh': require('../../../static/img/dangerous_cn.png'),
+            'zhtw': require('../../../static/img/dangerous_tw.png'),
+            'en': require('../../../static/img/dangerous_en.png'),
+            'ja-JP': require('../../../static/img/dangerous_ja.png'),
+            'ko-KR': require('../../../static/img/dangerous_ko.png')
+          }]
+        },
+        {
+          status: 1,
+          statusStr: this.$t('overview.improve'),
+          children: [{
+            'zh': require('../../../static/img/improved_cn.png'),
+            'zhtw': require('../../../static/img/improved_cn.png'),
+            'en': require('../../../static/img/improved_en.png'),
+            'ja-JP': require('../../../static/img/improved_ja.png'),
+            'ko-KR': require('../../../static/img/improved_ko.png')
+          }]
+        },
+        {
+          status: 2,
+          statusStr: this.$t('overview.pass'),
+          children: [{
+            'zh': require('../../../static/img/good_cn.png'),
+            'zhtw': require('../../../static/img/good_cn.png'),
+            'en': require('../../../static/img/good_en.png'),
+            'ja-JP': require('../../../static/img/good_ja.png'),
+            'ko-KR': require('../../../static/img/good_ko.png')
+          }]
         }
-        default: {
-          // good
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc8;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc9;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc10;
-          } else {
-            obj.iconSrc = self.inspectSrc8;
+      ];
+
+      let iconSrc = '';
+      const filterMap = statusAndLangAndIconMap.filter(map => map.status === status);
+      if (filterMap.length > 0) {
+        for (let lang in filterMap[0].children[0]) {
+          if (lang === this.lang) {
+            iconSrc = filterMap[0].children[0][lang];
           }
-          break;
         }
       }
-      self.report = obj;
+      console.log(iconSrc);
+      return iconSrc;
     },
 
     getItemsPassOrFailed(groupType, grade, qualifiedScore) {
