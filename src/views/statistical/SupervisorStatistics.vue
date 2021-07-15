@@ -75,7 +75,7 @@
                     :sortable="_item.sortable"
                     :sort-orders="['ascending', 'descending']"
                     :min-width="lang.indexOf('zh') !== -1 ? _item.width : _item.maxWidth"/>
-                  <el-table-column :label="$t('overview.detail')" :width="lang!=='en'? 100: 130" type="expand">
+                  <el-table-column :label="$t('overview.detail')" :width="lang.indexOf('ja') !== -1 ? '160px': '130px'" type="expand">
                     <template slot-scope="props">
                       <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="patrolPlan">

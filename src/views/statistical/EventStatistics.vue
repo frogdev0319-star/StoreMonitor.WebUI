@@ -1223,11 +1223,11 @@ export default {
 
         .ja-kpi-list{
           @extend .kpi-list;
-          width: 15%;
+          width: 16%;
         }
         .ja-store-events{
           @extend .store-events;
-          width: 53%;
+          width: 52%;
         }
         .ja-source-list{
           @extend .source-list;

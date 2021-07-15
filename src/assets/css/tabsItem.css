@@ -24,6 +24,15 @@
   height: 4px;
 }
 
+#ja-devicetabs-content .el-tabs__item {
+  padding: 0 0;
+  font-size: 14px;
+  width: 220px;
+}
+#ja-devicetabs-content .el-tabs__active-bar{
+  height: 4px;
+}
+
 #en-tabs-content  .el-tabs__nav-scroll{
   margin-left:20px !important;
 }

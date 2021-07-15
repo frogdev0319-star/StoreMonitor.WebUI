@@ -32,7 +32,10 @@
       </div>
     </el-col>
     <el-col :span="24" class="el-tabPanels">
-      <el-tabs id="en-devicetabs-content" v-model="activeName" @tab-click="handleClick">
+      <el-tabs
+        :id="lang.indexOf('ja') !== -1 ? 'ja-devicetabs-content' : 'en-devicetabs-content'"
+        v-model="activeName"
+        @tab-click="handleClick">
         <el-tab-pane :label="$t('deviceView.mediaService')" name="dash">
           <el-col :span="varWindowWidth < 1540 ? 12 : 10"
                   :style="varWindowWidth < 1366 ? {'font-size':'12px'}:{'font-size':'14px'}" class="dash-content">
