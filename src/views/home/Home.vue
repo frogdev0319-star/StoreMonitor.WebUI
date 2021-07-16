@@ -197,7 +197,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v1.7.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v1.7.0.1 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
         </section>
@@ -272,11 +272,6 @@ export default {
 
     routerList() {
       const routes = this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
-      if (routes.length === 3) {
-        this.$router.push('/noRight');
-      } else {
-        window.location.pathname.indexOf('noRight') > -1 ? window.location.reload() : ''
-      }
       return routes;
     },
 
@@ -617,7 +612,13 @@ export default {
       const self = this;
       const result = await self.$store.dispatch('GetUserAuthorities');
       if (result.errCode === 0) {
-        self.$store.dispatch('generateRoutes');
+        await self.$store.dispatch('generateRoutes');
+        const routes = this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
+        if (routes.length === 2) {
+          this.$router.push('/noRight');
+        } else {
+          window.location.pathname.indexOf('noRight') > -1 &&  this.$router.push(routes[1].children[0].path);
+        }
       }
     },
 
