@@ -378,7 +378,7 @@ export default {
     const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
-      //self.initData();
+      self.initData();
     } else {
       self.getEventList('Back');
       self.getEventCount();
@@ -451,17 +451,18 @@ export default {
     },
 
     searchEventList() {
-      const self = this;
-      self.tableDataList[Number(self.activeName)].page = 1;
-      self.getEventList();
-      self.getEventCount();
+      this.tableDataList[Number(this.activeName)].page = 1;
+      this.getEventListAndCount();
     },
 
     searchData() {
-      const self = this;
-      self.tableDataList[Number(self.activeName)].page = self.page;
-      self.getEventList();
-      self.getEventCount();
+      this.tableDataList[Number(this.activeName)].page = this.page;
+      this.getEventListAndCount();
+    },
+
+    getEventListAndCount() {
+      this.getEventList();
+      this.getEventCount();
     },
 
     rowClickItem(row) {
@@ -515,6 +516,14 @@ export default {
       self.getEventListRequestParams(val);
       this.ifSaveParams && self.saveSearchParams();
       this.ifSaveParams = true;
+      if (self.params.clause.storeId.length === 0) {
+        this.tableDataList[tabIndex].tableData = [];
+        this.tableDataList[tabIndex].total = 0;
+        this.tableDataList[tabIndex].eventCount = 0;
+        this.totalElements = 0;
+        this.numberOfElements = 0;
+        return;
+      }
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
         const temp = [];
@@ -874,11 +883,6 @@ export default {
 
     onStoreChange(storeObj) {
       this.storeFilterObj = storeObj;
-      if (!this.$route.meta.isBack || this.isFirstLoad) {
-        this.initData();
-      }
-      this.$route.meta.isBack = false;
-      this.isFirstLoad = false;
     }
   },
 
