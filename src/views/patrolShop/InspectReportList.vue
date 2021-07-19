@@ -824,7 +824,6 @@ export default {
     },
 
     onStoreChange(storeObj) {
-      console.log(storeObj);
       this.storeStr = storeObj.storeStr;
       this.storeFilterObj = storeObj;
     }
