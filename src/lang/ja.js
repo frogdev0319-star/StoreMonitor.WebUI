@@ -51,9 +51,9 @@ export default {
     'rightBracket': ')',
     'titleSetting': 'ポジション設定',
 
-    'meta': 'Inspection',
+    'meta': 'インスペクション',
     'title': 'ViuMo',
-    'mgt': 'Inspection',
+    'mgt': 'インスペクション',
     'operPerm': 'No operation permission',
     'patrolPlan': 'Inspection Task',
     'networkError': 'Network error, please check network connection status!',
