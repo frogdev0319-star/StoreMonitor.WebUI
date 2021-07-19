@@ -706,8 +706,10 @@ export default {
           item['numIgnore'] = IgnoredArr.length;
           if(inspectSettings.qualifiedForIgnoredWithType2){
             item['itemScore'] = totalScore;
-            item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
-            item['numIgnore'] = 0;
+            if (p_item.type === 1) {
+              item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
+              item['numIgnore'] = 0;
+            }
           }else{
             item['itemScore'] = notAddIgnoretotalScore;
           }
@@ -733,8 +735,6 @@ export default {
               } else {
                 item['itemgetScore'] = tab1GetScoreNoContainedIngored;
               }
-            } else {
-              item['itemgetScore'] = '--';
             }
           }
           if (p_item.type === 0) {
