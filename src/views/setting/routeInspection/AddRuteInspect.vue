@@ -817,7 +817,7 @@ export default {
 
     getParentCatergoryList(){
       this.parentCatergoryList = [];
-      const parentCatergoryList = this.groupList.filter(item => item.children || item.items.length === 0);
+      const parentCatergoryList = this.groupList.filter(item => item.children || (item.items.length === 0 && this.activeId !== item.id));
       parentCatergoryList.forEach(item => {
         const catergoryObj = {};
         catergoryObj.label = item.name;
