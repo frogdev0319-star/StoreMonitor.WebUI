@@ -202,7 +202,7 @@ import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
 import DialogPop from '@/components/DialogPop';
 import deepClone from 'nanoclone';
-import i18n from '../../../lang';
+import i18n from '@/lang';
 const XLSX = require('xlsx');
 
 export default {
@@ -1103,8 +1103,7 @@ export default {
       const availableScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderG', 'availableScore');
       const qualifiedScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderF', 'qualifiedScore');
       const mapping = {};
-      Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping)
-      console.log(mapping);
+      Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping);
 
       Object.values(rowCellsObject).forEach(rowCells => {
         const item = {};
@@ -1550,21 +1549,41 @@ export default {
           let PassFailCopy = deepClone(PassFail);
           let ScoreCopy = deepClone(Score);
           let OthersCopy = deepClone(Others);
-
           const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
 
           outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
           outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
 
+          if (outdata.PassFail.length > 0) {
+            if (!outdata.PassFail[0].catergyName) {
+              PassFailCopy.A2 = {
+                h: _this.$t('insSettingView.Ratingitems'),
+                r: '',
+                t: 's',
+                v: _this.$t('insSettingView.Ratingitems'),
+                w: _this.$t('insSettingView.Ratingitems')
+              };
+            }
+          }
+
+          if (outdata.Others.length > 0) {
+            if (!outdata.Others[0].catergyName) {
+              OthersCopy.A2 = {
+                h: _this.$t('insSettingView.Addscoreitems'),
+                r: '',
+                t: 's',
+                v: _this.$t('insSettingView.Addscoreitems'),
+                w: _this.$t('insSettingView.Addscoreitems')
+              };
+            }
+          }
           PassFailCopy = outdata.PassFail.length > 0 ? PassFailCopy : undefined;
           ScoreCopy = outdata.Score.length > 0 ? ScoreCopy : undefined;
           OthersCopy = outdata.Others.length > 0 ? OthersCopy : undefined;
 
           const passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
-          console.log(passFailSheetFlagObj);
           const scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
-
           const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
 
           const flagTempError = !!(outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined);
@@ -1579,7 +1598,7 @@ export default {
             return false;
           }
 
-          const arrSheet1 = _this.getPassAndFailArrData(outdata.PassFail, passFailSheetFlagObj.indexArrPassFail, passFailSheetFlagObj.indexSubCatergyPassFail);
+          const arrSheet1 = _this.getPassAndFailArrData(outdata.PassFail, passFailSheetFlagObj.indexArrPassFail);
           const arrSheet2 = _this.getScoreArrData(outdata.Score, scoreSheetFlagObj.indexArrScore);
           const arrSheet3 = _this.getOtherArrData(outdata.Others, otherSheetFlagObj.indexArrOthers);
 
@@ -1697,7 +1716,6 @@ export default {
       const ITEMSLENGTH = 250;
       const passFailFlagObj = {
         indexArrPassFail: [],
-        indexSubCatergyPassFail: [],
         flags: {
           flagGroupLengthPassFail: false,
           flagSubGroupLengthPassFail: false,
@@ -1719,7 +1737,6 @@ export default {
           }
         }
         if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
-          passFailFlagObj.indexSubCatergyPassFail.push(index);
           if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
             passFailFlagObj.flags.flagSubGroupLengthPassFail = true;
           }
@@ -1820,8 +1837,7 @@ export default {
           } else {
             scoreFlagObj.flags.flagScoreItemEmpty = true;
           }
-        }
-        else {
+        } else {
           if (item.score != undefined) {
             if (typeof item.score !== 'number' && item.score.indexOf('/') !== -1) {
               const f_Score = item.score.split('/');
@@ -1856,7 +1872,8 @@ export default {
           item.totalScore = maxScore;
 
           if (item.scoreThreshold !== undefined) {
-            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) > parseFloat(item.totalScore)) {
+            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50 ||
+              parseFloat(item.scoreThreshold) > parseFloat(item.totalScore)) {
               scoreFlagObj.flags.flagMinScoreType = true;
             }
           } else {
@@ -2014,18 +2031,13 @@ export default {
       return warningInfo;
     },
 
-    getPassAndFailArrData(sheetData, indexArray, subCatergyIndexArr) {
+    getPassAndFailArrData(sheetData, indexArray) {
       const passFailSheet = [];
       if (sheetData != undefined) {
         if (indexArray.length !== 0) {
           for (let i = 0; i < indexArray.length; i++) {
             passFailSheet[i] = {};
             passFailSheet[i].category = sheetData.slice(indexArray[i], indexArray[i + 1]);
-            for (let j = 0; j < subCatergyIndexArr.length; j++) {
-              if (subCatergyIndexArr[j] <= indexArray[indexArray.length - 1]) {
-                passFailSheet[i].subcategory = sheetData.slice(subCatergyIndexArr[j], subCatergyIndexArr[j + 1]);
-              }
-            }
           }
         } else {
           if (sheetData.length !== 0) {
