@@ -1100,7 +1100,7 @@ export default {
       const subjectMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderB', 'subject');
       const itemScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderE', 'itemScore');
       const descriptionMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderD', 'description');
-      const availableScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderG', 'availableScore');
+      const availableScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderG', 'availableScores');
       const qualifiedScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderF', 'qualifiedScore');
       const mapping = {};
       Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping);
@@ -1110,7 +1110,7 @@ export default {
         rowCells.forEach(cell => {
           const key = cell.header && cell.header.tag;
           if (!mapping[key]) return;
-          if (mapping[key] === 'availableScore') {
+          if (mapping[key] === 'availableScores') {
             item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
           } else if (mapping[key] === 'itemScore') {
             item[mapping[key]] = cell.v ? Number(cell.v) : cell.v === 0 ? 0 : 10;
@@ -1123,7 +1123,7 @@ export default {
         });
 
         if (type === 'Score') {
-          const availableScore = deepClone(item['availableScore']);
+          const availableScore = deepClone(item['availableScores']);
           const maxAvailableScore = availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
           item['itemScore'] = maxAvailableScore;
         }
