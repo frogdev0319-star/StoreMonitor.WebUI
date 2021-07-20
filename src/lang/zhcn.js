@@ -566,7 +566,7 @@ export default {
     'passfailexcelEmpty': '巡检项名称不能为空！',
     'excelPassFailScoreType': '项目分值选填，取值范围为0.5~50',
     'excelFullScoreType': '项目总分值必填，取值范围为0~50',
-    'excelMinScoreType': 'Score 巡检项最低分值选填，取值范围为-50~评分选项最高分',
+    'excelMinScoreType': 'Score 巡检项最低分值选填，取值范围不高于评分选项最高分',
     'excelScoreItemType': '评分选项必填，取值范围为-50~50',
     'excelOtherScoreType': '项目分值必填，取值范围为-100~100',
     'excelScoreItemEmpty': '评分选项不能为空！',
@@ -651,7 +651,8 @@ export default {
     'passFailAttr': '合格率评估类选项显示',
     'othersAttr': '附加评分类选项显示',
     'subCategoryHeader': '子类别（选填，30字符）',
-    'subCategory': '子类别'
+    'subCategory': '子类别',
+    'accumulateTotalScoreInfo': '考评总分= SUM(每项巡检得分) + 扣分起始分数'
   },
 
   // Device Management page language

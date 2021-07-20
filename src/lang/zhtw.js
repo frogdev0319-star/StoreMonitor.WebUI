@@ -566,7 +566,7 @@ export default {
     'passfailexcelEmpty': '巡检项不能為空！',
     'excelPassFailScoreType': '項目分值選填，取值範圍為0.5~50',
     'excelFullScoreType': '項目總分值必填，取值範圍為0~50',
-    'excelMinScoreType': 'Score 巡檢項最低分值选填，取值範圍為-50~評分選項最高分',
+    'excelMinScoreType': 'Score 巡檢項最低分值选填，取值範圍為不高於評分選項最高分',
     'excelScoreItemType': '評分選項必填，取值範圍為-50~50',
     'excelOtherScoreType': '項目分值必填，取值範圍為-100~100',
     'excelScoreItemEmpty': '評分選項不能為空！',
@@ -651,7 +651,8 @@ export default {
     'passFailAttr': '合格率評估類選項顯示',
     'othersAttr': '附加評分類選項顯示',
     'subCategoryHeader': '子類別（選填，30字符）',
-    'subCategory': '子類別'
+    'subCategory': '子類別',
+    'accumulateTotalScoreInfo': '考評總分= SUM(每項巡檢得分) + 扣分起始分數'
   },
 
   // Device Management page language
