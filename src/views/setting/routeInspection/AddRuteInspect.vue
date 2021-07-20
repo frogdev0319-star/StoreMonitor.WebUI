@@ -515,7 +515,8 @@ export default {
       oldGroupSequence: [],
       newGroupSequence: [],
       oldSubcategorySequence: [],
-      newSubcategorySequence: []
+      newSubcategorySequence: [],
+      activeId: -1
     };
   },
   computed: {
@@ -850,10 +851,10 @@ export default {
       self.showAddGroup = false;
     },
 
-    async updateInspectGroup(){
+    async updateInspectGroup() {
       const params = {
         'groups': [{
-          id: this.activeParentId,
+          id: this.activeId,
           name: this.groupNameInput,
           tag: this.tabName,
           parentId: this.parentId
@@ -938,6 +939,7 @@ export default {
       this.isEditCategory = true;
       this.parentId = item.parentId;
       this.showAddGroup = true;
+      this.activeId = item.id;
       this.getParentCatergoryList();
     },
 
