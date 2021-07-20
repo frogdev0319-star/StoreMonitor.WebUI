@@ -202,6 +202,7 @@ import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
 import DialogPop from '@/components/DialogPop';
 import deepClone from 'nanoclone';
+import i18n from '../../../lang';
 const XLSX = require('xlsx');
 
 export default {
@@ -785,7 +786,7 @@ export default {
       const range = XLSX.utils.decode_range(sheet['!ref']);
       const secondaryColumnCellAddress = { c: range.s.c + 1, r: range.s.r };
       const cell = sheet[XLSX.utils.encode_cell(secondaryColumnCellAddress)];
-      const subCategoryArr = ['子类别', '子類別', 'Subcategory'];
+      const subCategoryArr = this.getAllTranslationBasedOnKey('insSettingView.subCategory');
       return cell && subCategoryArr.includes(cell.tag) && cell;
     },
 
@@ -1096,24 +1097,16 @@ export default {
         return current;
       }, {});
 
+      const subjectMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderB', 'subject');
+      const itemScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderE', 'itemScore');
+      const descriptionMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderD', 'description');
+      const availableScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderG', 'availableScore');
+      const qualifiedScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderF', 'qualifiedScore');
+      const mapping = {};
+      Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping)
+      console.log(mapping);
+
       Object.values(rowCellsObject).forEach(rowCells => {
-        const mapping = {
-          '巡检项名称': 'subject',
-          '项目分值': 'itemScore',
-          '巡检项目详细说明': 'description',
-          '评分选项': 'availableScore',
-          '低于*分，须门店负责人处理': 'qualifiedScore',
-          '巡檢項名稱': 'subject',
-          '項目分值': 'itemScore',
-          '巡檢項目詳細說明': 'description',
-          '評分選項': 'availableScore',
-          '低於*分，須門店負責人處理': 'qualifiedScore',
-          'Inspection Items': 'subject',
-          'Score': 'itemScore',
-          'Inspection Item Description': 'description',
-          'Score Options': 'availableScore',
-          'Anomaly Events-Score Threshold': 'qualifiedScore'
-        };
         const item = {};
         rowCells.forEach(cell => {
           const key = cell.header && cell.header.tag;
@@ -1153,6 +1146,15 @@ export default {
       };
 
       addItemParams.request.length > 0 && await this.addItem(addItemParams);
+    },
+
+    getTranslationMappingBasedOnKey(key, value) {
+      const translationArr = this.getAllTranslationBasedOnKey(key);
+      const mapping = {};
+      translationArr.forEach(translation => {
+        mapping[this.formatTableHeader(translation)] = value;
+      });
+      return mapping;
     },
 
     getGroupType(type) {
@@ -1606,8 +1608,15 @@ export default {
       }
     },
 
+    getAllTranslationBasedOnKey(key) {
+      const languages = Object.keys(i18n.messages);
+      const allTranslation = [];
+      languages.forEach(lang => allTranslation.push(this.$t(key, lang)));
+      return allTranslation;
+    },
+
     getTableVersonBasedOnB1(sheet1, sheet2, sheet3) {
-      const subCategoryArr = ['子类别', '子類別', 'Subcategory'];
+      const subCategoryArr = this.getAllTranslationBasedOnKey('insSettingView.subCategory');
       const containSubColumn = (sheet1 && subCategoryArr.includes(this.formatTableHeader(sheet1.B1.h))) ||
           (sheet2 && subCategoryArr.includes(this.formatTableHeader(sheet2.B1.h))) ||
           (sheet3 && subCategoryArr.includes(this.formatTableHeader(sheet3.B1.h)));
@@ -1811,7 +1820,8 @@ export default {
           } else {
             scoreFlagObj.flags.flagScoreItemEmpty = true;
           }
-        } else {
+        }
+        else {
           if (item.score != undefined) {
             if (typeof item.score !== 'number' && item.score.indexOf('/') !== -1) {
               const f_Score = item.score.split('/');
@@ -1845,9 +1855,8 @@ export default {
           }
           item.totalScore = maxScore;
 
-          if (item.scoreThreshold != undefined) {
-            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50 ||
-                parseFloat(item.scoreThreshold) > parseFloat(item.maxScore)) {
+          if (item.scoreThreshold !== undefined) {
+            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) > parseFloat(item.totalScore)) {
               scoreFlagObj.flags.flagMinScoreType = true;
             }
           } else {
@@ -2007,7 +2016,6 @@ export default {
 
     getPassAndFailArrData(sheetData, indexArray, subCatergyIndexArr) {
       const passFailSheet = [];
-      const maxCategoryIndex = indexArray[indexArray.length - 1];
       if (sheetData != undefined) {
         if (indexArray.length !== 0) {
           for (let i = 0; i < indexArray.length; i++) {
@@ -2068,16 +2076,6 @@ export default {
       if (strIndex === -1) { return str; }
       str = str.substring(0, strIndex + 2);
       return str;
-    },
-
-    addTab(targetName) {
-      const newTabName = ++this.tabIndex + '';
-      this.editableTabs2.push({
-        title: 'New Tab',
-        name: newTabName,
-        content: 'New Tab content'
-      });
-      this.editableTabsValue2 = newTabName;
     },
 
     handleNape(index) {
