@@ -160,7 +160,7 @@ import ReportSetting from '@/api/reportSetting';
 import draggable from 'vuedraggable';
 import DialogPop from '@/components/DialogPop';
 import ButtonList from '@/components/ButtonList';
-import SettingTable from '../../../components/SettingTable';
+import SettingTable from '@/components/SettingTable';
 
 export default {
   name: 'ReportSetting',

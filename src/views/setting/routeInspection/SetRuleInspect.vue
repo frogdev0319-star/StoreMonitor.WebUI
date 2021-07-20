@@ -18,7 +18,7 @@
           <p class="rule-item">
             <el-checkbox v-model="includedInTotalScoreWithType1">
               {{ $t('insSettingView.PSCrule1') }}Tab1
-            （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}
+              （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}
             </el-checkbox>
           </p>
           <p class="rule-item">
@@ -44,14 +44,14 @@
           </p>
           <p class="rule-item">
             <!--<el-radio v-model="hundredMarkType" label="0" class="radio">-->
-              <!--{{ $t('insSettingView.Proportional') }}-->
+            <!--{{ $t('insSettingView.Proportional') }}-->
             <!--</el-radio>-->
             <!--<el-tooltip-->
-              <!--class="item"-->
-              <!--effect="dark"-->
-              <!--placement="bottom-end">-->
-              <!--<div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>-->
-              <!--<i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>-->
+            <!--class="item"-->
+            <!--effect="dark"-->
+            <!--placement="bottom-end">-->
+            <!--<div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>-->
+            <!--<i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>-->
             <!--</el-tooltip>-->
             <el-radio v-model="hundredMarkType" label="-1" class="radio">
               {{ $t('insSettingView.totalScore') }}
@@ -70,7 +70,7 @@
               class="item"
               effect="dark"
               placement="bottom-end">
-              <div slot="content">{{ $t('insSettingView.totalScoreDes') }} + {{$t('insSettingView.accumulateTotalScore')}}</div>
+              <div slot="content">{{ $t('insSettingView.accumulateTotalScoreInfo') }}</div>
               <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
             </el-tooltip>
           </p>
@@ -89,12 +89,12 @@
             <span v-if="ScoreMsg" class="score_msg">*{{ $t('insSettingView.rangeScoreTips') }}</span>
             <template v-if="hundredMarkType === '1'">
               <span class="rangeScore">
-              {{ $t('remotePatrol.startingScore') }}
-            </span>
+                {{ $t('remotePatrol.startingScore') }}
+              </span>
               <el-input :placeholder="$t('insSettingView.setMinScore')" v-model="baseScore" class="input" @input="inputChangeBaseScore"/>
               <span class="input-text">
-              {{ $t('remotePatrol.scorecount') }}
-            </span>
+                {{ $t('remotePatrol.scorecount') }}
+              </span>
             </template>
           </p>
         </div>
@@ -117,7 +117,7 @@
         </div>
       </setting-table>
     </el-col>
-    <el-col :span="24" class="el-rute-content" v-if="mode === 1">
+    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.isCheckAnnex')">
         <div slot="tableDetail">
           <p class="rule-item">
@@ -130,9 +130,9 @@
         </div>
       </setting-table>
     </el-col>
-    <el-col :span="24" class="el-rute-content" v-if="mode === 1">
+    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionSignature')">
-        <div class="setting-config rule-item" slot="tableDetail">
+        <div slot="tableDetail" class="setting-config rule-item">
           <el-checkbox v-model="onSiteSignature">
             <span>
               {{ $t('insSettingView.needSignatrue') }}
@@ -144,33 +144,38 @@
 
     <el-col :span="24" class="el-rute-content" style="margin-bottom:20px;">
       <setting-table :table-name="$t('insSettingView.btnAttributeValues')">
-        <div class="setting-config" slot="tableDetail" >
+        <div slot="tableDetail" class="setting-config" >
           <div class="radio-setting-content">
             <div class="btn-title rule-score">{{ $t('insSettingView.passFailAttr') }}</div>
             <div class="attribute-group">
               <div v-for="(btnAttrItem, btnAttrIndex) in itemOptionsForType1">
-                <el-radio :label="btnAttrItem.key" :key="btnAttrIndex"
-                          v-model="passFailBtnAttr" v-if="btnAttrIndex < btnAttrItem.items.length">
-                  {{btnAttrItem.items[0].name}} {{slash}} {{btnAttrItem.items[1].name}}
+                <el-radio
+                  v-if="btnAttrIndex < btnAttrItem.items.length"
+                  :label="btnAttrItem.key"
+                  :key="btnAttrIndex"
+                  v-model="passFailBtnAttr">
+                  {{ btnAttrItem.items[0].name }} {{ slash }} {{ btnAttrItem.items[1].name }}
                 </el-radio>
-                <div class="input-list" v-else>
+                <div v-else class="input-list">
                   <el-radio :label="btnAttrItem.key" :key="btnAttrIndex" v-model="passFailBtnAttr">
                     {{ $t('insSettingView.userDefined') }}
                   </el-radio>
                   <template>
-                    <validate-input ref="validateInput"
+                    <validate-input
+                      ref="validateInput"
                       :input-limit-length="8"
                       :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
                       :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
                       :input-name="btnAttrItem.items[0].name"
-                      @getInputValue="val => getPassFailBtnName(val, 0)"></validate-input>
+                      @getInputValue="val => getPassFailBtnName(val, 0)"/>
                     {{ slash }}
-                    <validate-input ref="validateInput"
+                    <validate-input
+                      ref="validateInput"
                       :input-limit-length="8"
                       :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
                       :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
                       :input-name="btnAttrItem.items[1].name"
-                      @getInputValue="val => getPassFailBtnName(val, 1)"></validate-input>
+                      @getInputValue="val => getPassFailBtnName(val, 1)"/>
                   </template>
                 </div>
               </div>
@@ -179,28 +184,33 @@
               <div class="btn-title rule-score">{{ $t('insSettingView.othersAttr') }}</div>
               <div class="attribute-group">
                 <div v-for="(btnAttrItem, btnAttrIndex) in itemOptionsForType3">
-                  <el-radio :label="btnAttrItem.key" :key="btnAttrIndex"
-                            v-model="otherBtnAttr" v-if="btnAttrIndex < btnAttrItem.items.length">
-                    {{btnAttrItem.items[0].name}} {{slash}} {{btnAttrItem.items[1].name}}
+                  <el-radio
+                    v-if="btnAttrIndex < btnAttrItem.items.length"
+                    :label="btnAttrItem.key"
+                    :key="btnAttrIndex"
+                    v-model="otherBtnAttr">
+                    {{ btnAttrItem.items[0].name }} {{ slash }} {{ btnAttrItem.items[1].name }}
                   </el-radio>
-                  <div class="input-list" v-else>
+                  <div v-else class="input-list">
                     <el-radio :label="btnAttrItem.key" :key="btnAttrIndex" v-model="otherBtnAttr">
                       {{ $t('insSettingView.userDefined') }}
                     </el-radio>
                     <template>
-                      <validate-input ref="validateInput"
-                                      :input-limit-length="8"
-                                      :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
-                                      :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
-                                      :input-name="btnAttrItem.items[0].name"
-                                      @getInputValue="val => getOtherBtnName(val, 0)"></validate-input>
+                      <validate-input
+                        ref="validateInput"
+                        :input-limit-length="8"
+                        :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
+                        :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
+                        :input-name="btnAttrItem.items[0].name"
+                        @getInputValue="val => getOtherBtnName(val, 0)"/>
                       {{ slash }}
-                      <validate-input ref="validateInput"
-                                      :input-limit-length="8"
-                                      :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
-                                      :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
-                                      :input-name="btnAttrItem.items[1].name"
-                                      @getInputValue="val => getOtherBtnName(val, 1)"></validate-input>
+                      <validate-input
+                        ref="validateInput"
+                        :input-limit-length="8"
+                        :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
+                        :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
+                        :input-name="btnAttrItem.items[1].name"
+                        @getInputValue="val => getOtherBtnName(val, 1)"/>
                     </template>
                   </div>
                 </div>
@@ -218,11 +228,11 @@ import { inpectRESTful } from '@/api/index';
 import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import ValidateInput from "../../../components/ValidateInput";
+import ValidateInput from '@/components/ValidateInput';
 
 export default {
   name: 'SetRuleInspect',
-  components: {ValidateInput, SettingTable, DelayButton },
+  components: { ValidateInput, SettingTable, DelayButton },
   data() {
     return {
       hundredMarkType: '',
@@ -246,17 +256,20 @@ export default {
       passFailBtnAttr: '',
       itemOptionsForType3: {},
       otherBtnAttr: ''
-    }
+    };
   },
   mounted() {
     const self = this;
     self.getRule();
   },
+  // destroyed() {
+  //   sessionStorage.removeItem('ruleData');
+  // },
   methods: {
     async submitRule() {
       const self = this;
-      if( (this.passFailBtnAttr === 'userDefined' && !this.validateUserDefinedPassFailBtnValue())
-          || (this.otherBtnAttr === 'userDefined' && !this.validateUserDefinedOtherBtnValue()) ){
+      if ((this.passFailBtnAttr === 'userDefined' && !this.validateUserDefinedPassFailBtnValue()) ||
+          (this.otherBtnAttr === 'userDefined' && !this.validateUserDefinedOtherBtnValue())) {
         util.notify(this.$t('insSettingView.enterBtnAttr'), 'warning', 3000);
         return false;
       }
@@ -270,20 +283,20 @@ export default {
             { name: 'hundredMarkType', value: parseInt(self.hundredMarkType) },
             { name: 'minScore', value: parseFloat(self.minScore) },
             { name: 'maxScore', value: parseFloat(self.maxScore) },
-            {name: "baseScore", value: parseFloat(self.baseScore)},
+            { name: 'baseScore', value: parseFloat(self.baseScore) },
             { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
             { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
             { name: 'onSiteSignature', value: self.onSiteSignature },
             {
-              "name": "itemOptionsForType1",
-              "value": this.passFailBtnAttr,
-              "extra": this.itemOptionsForType1
+              'name': 'itemOptionsForType1',
+              'value': this.passFailBtnAttr,
+              'extra': this.itemOptionsForType1
             },
             {
-              "name": "itemOptionsForType3",
-              "value": this.otherBtnAttr,
-              "extra": this.itemOptionsForType3
-            },
+              'name': 'itemOptionsForType3',
+              'value': this.otherBtnAttr,
+              'extra': this.itemOptionsForType3
+            }
           ]
         };
         const res = await self.updateInspectRule(params);
@@ -338,7 +351,7 @@ export default {
               case 'baseScore':
                 self.baseScore = item.value;
                 break;
-              case 'itemOptionsForType1':{
+              case 'itemOptionsForType1': {
                 this.itemOptionsForType1 = item.extra;
                 this.passFailBtnAttr = item.value;
               }
@@ -384,44 +397,41 @@ export default {
       self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
     },
 
-    getUtilScore(val){
-        val = val.replace(/[^-?\d\.]/g,"");
-        val = val.replace(/\.{2,}/g,".");
-        val = val.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
-        val = val.replace("-","$#$").replace(/\-/g,"").replace("$#$","-");
-        val = val.replace(/^(\-)*(\d+)\.(\d).*$/,'$1$2.$3');
-        if(val!=="-0" && !isNaN(val) && val.indexOf(".")< 0 && val!=""){
-            val= parseFloat(val);
-        }
-        return val;
+    getUtilScore(val) {
+      val = val.replace(/[^-?\d\.]/g, '');
+      val = val.replace(/\.{2,}/g, '.');
+      val = val.replace('.', '$#$').replace(/\./g, '').replace('$#$', '.');
+      val = val.replace('-', '$#$').replace(/\-/g, '').replace('$#$', '-');
+      val = val.replace(/^(\-)*(\d+)\.(\d).*$/, '$1$2.$3');
+      if (val !== '-0' && !isNaN(val) && val.indexOf('.') < 0 && val != '') {
+        val = parseFloat(val);
+      }
+      return val;
     },
-    inputChangeBaseScore(val){
+    inputChangeBaseScore(val) {
       this.baseScore = this.getUtilScore(val);
     },
 
-    getPassFailBtnName(val, index){
+    getPassFailBtnName(val, index) {
       const length = this.itemOptionsForType1.length;
-      this.itemOptionsForType1[length -1].items[index].name = val;
+      this.itemOptionsForType1[length - 1].items[index].name = val;
     },
 
-    getOtherBtnName(val, index){
+    getOtherBtnName(val, index) {
       const length = this.itemOptionsForType3.length;
-      this.itemOptionsForType3[length -1].items[index].name = val;
+      this.itemOptionsForType3[length - 1].items[index].name = val;
     },
 
-    validateUserDefinedPassFailBtnValue(){
+    validateUserDefinedPassFailBtnValue() {
       const length = this.itemOptionsForType1.length;
-      return this.itemOptionsForType1[length -1].items[0].name && this.itemOptionsForType1[length -1].items[1].name;
+      return this.itemOptionsForType1[length - 1].items[0].name && this.itemOptionsForType1[length - 1].items[1].name;
     },
 
-    validateUserDefinedOtherBtnValue(){
+    validateUserDefinedOtherBtnValue() {
       const length = this.itemOptionsForType3.length;
-      return this.itemOptionsForType3[length -1].items[0].name && this.itemOptionsForType3[length -1].items[1].name;
-    },
+      return this.itemOptionsForType3[length - 1].items[0].name && this.itemOptionsForType3[length - 1].items[1].name;
+    }
 
-  },
-  destroyed(){
-    sessionStorage.removeItem('ruleData');
   }
 };
 </script>
