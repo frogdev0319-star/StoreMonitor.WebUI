@@ -321,7 +321,7 @@
               <i class="iconfont icon-bangzhu iconbangzhu"/>
             </icon-tooltip>
           </div>
-          <el-select v-model="parentId" style="width:100%" size="mini" :disabled="ifCanChangeParentId">
+          <el-select v-model="parentId" style="width:100%" size="mini" :disabled="notAllowedChangeParentId">
             <el-option v-for="(catergy, index) in parentCatergoryList"
                        :key="index"
                        :label="catergy.label" :value="catergy.value"></el-option>
@@ -508,7 +508,7 @@ export default {
       activeChildId: -1,
       isEditCategory: false,
       hoverId: '',
-      ifCanChangeParentId: false,
+      notAllowedChangeParentId: false,
       ifClickSubCategory: false,
       itemType: 0,
       childIndex: -1,
@@ -811,7 +811,7 @@ export default {
       this.groupNameInput = '';
       this.parentId = -1;
       this.isEditCategory = false;
-      this.ifCanChangeParentId = false;
+      this.notAllowedChangeParentId = false;
       this.getParentCatergoryList();
     },
 
@@ -933,8 +933,7 @@ export default {
     editCategory(index, item) {
       item.isEdit = true;
       item.showEdit = false;
-      this.ifCanChangeParentId = item.parentId === -1 ? (!item.children && item.groupNum > 0)
-                              || (item.children && item.children.length > 0) : false;
+      this.notAllowedChangeParentId = !((item.parentId === -1 && !item.children) || item.parentId !== -1);
       this.groupNameInput = item.name;
       this.isEditCategory = true;
       this.parentId = item.parentId;
