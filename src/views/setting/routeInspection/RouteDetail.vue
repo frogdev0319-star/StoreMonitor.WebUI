@@ -10,7 +10,7 @@
         <div class="route-btns">
           <delay-button
             :disabled="routeData.length === 0"
-            class="inspction-btn"
+            :class="lang.indexOf('ja') !== -1 ? 'ja-inspction-btn' : 'inspction-btn'"
             button-type="default"
             @click="deleteNapes"
           >
