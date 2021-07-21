@@ -792,7 +792,7 @@ export default {
     'otherError': '기타 오류',
     'commentLengthPrompt': '최대 100자까지 입력할 수 있습니다',
     'description': '설명',
-    'addDevice': 'Add Device',
+    'addDevice': '기기 추가',
     'nvr': 'NVR',
     'deviceModel': 'Model Number',
     'total': 'Total ',
