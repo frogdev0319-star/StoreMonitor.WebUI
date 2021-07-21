@@ -58,72 +58,74 @@
                 </el-tabs>
               </div>
             </div>
-            <draggable v-model="groupList" :group="{name: 'parent', pull: true}" @update="handleUpdateCategorySequence">
+            <draggable v-model="groupList" @update="handleUpdateCategorySequence">
               <template v-for="(item,index) in groupList">
                 <div :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
-                           class="groupItem" @click="clickCategory(index,item)"
+                     class="groupItem" @click="clickCategory(index,item)"
                      @mouseenter="onShowCategoryEditBtn(index,item)">
-                  <div>
-                    <div class="group-left">
-                      <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
-                      <div>
-                        <span :style="activeParentId === item.id?{'color':'#f31d65'}:{}">
-                          {{ item.name }}（{{ item.groupNum }}）
-                        </span>
+                  <div class="category-list">
+                    <div class="category-name">
+                      <div class="group-left">
+                        <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
+                        <div>
+                          <span :style="activeParentId === item.id?{'color':'#f31d65'}:{}">
+                            {{ item.name }}（{{ item.groupNum }}）
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div class="group-right">
-                      <div class="show-edit">
-                        <div class="nape-items-handle" v-if="hoverId === item.id">
-                          <i
-                            class="iconfont icon-bianji"
-                            style="cursor:pointer;"
-                            @click="editCategory(index,item)"/>
-                          <i
-                            class="iconfont icon-shanchu"
-                            style="cursor:pointer;"
-                            @click="deleteGroup(index, item)"/>
+                      <div class="group-right">
+                        <div class="show-edit">
+                          <div class="nape-items-handle" v-if="hoverId === item.id">
+                            <i
+                              class="iconfont icon-bianji"
+                              style="cursor:pointer;"
+                              @click="editCategory(index,item)"/>
+                            <i
+                              class="iconfont icon-shanchu"
+                              style="cursor:pointer;"
+                              @click="deleteGroup(index, item)"/>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <template v-if="activeParentId === item.id">
-                  <draggable v-model="item.children" :group="{name: 'children', pull: true}"
-                             @start="getSubCategorySequence(item.children)"
-                             @update="handleUpdateSubCategorySequence(item.children)">
-                    <div v-for="(childItem, childIndex) in item.children" :key='`child-${childIndex}`' class="groupItem">
-                      <div :key="index" :class="childItem.isClick ? 'noraml-color':'noraml-groupColor'"
-                           class="groupItem" @click="clickSubCategory(index, item.id, childIndex,childItem)"
-                           @mouseenter="onShowSubcategoryEditBtn(childIndex, childItem)">
-                          <div v-if="activeChildId === childItem.id" class="proper-flag"/>
-                          <div>
-                            <div class="group-left">
-                              <div class="subcatergy-item">
-                              <span :style="activeChildId === childItem.id?{'color':'#f31d65'}:{}">
-                                {{ childItem.name }}
-                              </span>
+                    <div v-if="activeParentId === item.id">
+                      <draggable v-model="item.children" :group="{name: 'children'}"
+                                 @start="getSubCategorySequence(item.children)"
+                                 @update="handleUpdateSubCategorySequence(item.children)">
+                        <div v-for="(childItem, childIndex) in item.children" :key='`child-${childIndex}`' class="groupItem">
+                          <div :key="index" :class="childItem.isClick ? 'noraml-color':'noraml-groupColor'"
+                               class="groupItem" @click.stop="clickSubCategory(index, item.id, childIndex,childItem)"
+                               @mouseenter="onShowSubcategoryEditBtn(childIndex, childItem)">
+                            <div v-if="activeChildId === childItem.id" class="proper-flag"/>
+                            <div class="category-name">
+                              <div class="group-left">
+                                <div class="subcatergy-item">
+                                  <span :style="activeChildId === childItem.id?{'color':'#f31d65'}:{}">
+                                    {{ childItem.name }}
+                                  </span>
+                                </div>
                               </div>
-                            </div>
-                            <div class="group-right">
-                              <div class="show-edit">
-                                <div v-if="hoverId === childItem.id" class="nape-items-handle">
-                                  <i
-                                    class="iconfont icon-bianji"
-                                    style="cursor:pointer;"
-                                    @click="editCategory(childIndex,childItem)"/>
-                                  <i
-                                    class="iconfont icon-shanchu"
-                                    style="cursor:pointer;"
-                                    @click="deleteGroup(childIndex, childItem, item)"/>
+                              <div class="group-right">
+                                <div class="show-edit">
+                                  <div v-if="hoverId === childItem.id" class="nape-items-handle">
+                                    <i
+                                      class="iconfont icon-bianji"
+                                      style="cursor:pointer;"
+                                      @click="editCategory(childIndex,childItem)"/>
+                                    <i
+                                      class="iconfont icon-shanchu"
+                                      style="cursor:pointer;"
+                                      @click="deleteGroup(childIndex, childItem, item)"/>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                      </div>
+                        </div>
+                      </draggable>
                     </div>
-                  </draggable>
-                </template>
+                  </div>
+                </div>
               </template>
             </draggable>
           </div>
@@ -660,7 +662,6 @@ export default {
     },
 
     getInspectGroupBindAll(params) {
-      const self = this;
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectGroupBindList(params).then(res => {
           const data = res.data;
@@ -1707,7 +1708,7 @@ export default {
       this.updateCategorySequence(this.oldSubcategorySequence, this.newSubcategorySequence);
     },
 
-    handleUpdateCategorySequence(){
+    handleUpdateCategorySequence() {
       this.newGroupSequence = this.groupList.map(value => {
         return {
           id: value.id,
@@ -2024,11 +2025,8 @@ export default {
                     }
                 }
                 .groupItem{
-                    height: 60px;
                     line-height: 60px;
                     position: relative;
-                    overflow: hidden;
-                    border-bottom: 1px solid $border;
                     cursor: pointer;
                     text-align: left;
                     .proper-flag{
@@ -2088,10 +2086,19 @@ export default {
                             }
                         }
                     }
-                    &:last-child{
-                        @include point(margin-bottom,20);
-                    }
                 }
+              .category-list{
+                display: flex;
+                flex-direction: column;
+              }
+              .category-name{
+                height: 60px;
+                line-height: 60px;
+                position: relative;
+                overflow: hidden;
+                border-bottom: 1px solid $border;
+                cursor: pointer;
+              }
             }
             .group-add{
                 margin-top: 5px;
