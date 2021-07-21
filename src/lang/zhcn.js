@@ -652,7 +652,8 @@ export default {
     'othersAttr': '附加评分类选项显示',
     'subCategoryHeader': '子类别（选填，30字符）',
     'subCategory': '子类别',
-    'accumulateTotalScoreInfo': '考评总分= SUM(每项巡检得分) + 扣分起始分数'
+    'accumulateTotalScoreInfo': '考评总分= SUM(每项巡检得分) + 扣分起始分数',
+    'totalScoreLimitation': '项目总分值须等于评分选项最高分值'
   },
 
   // Device Management page language

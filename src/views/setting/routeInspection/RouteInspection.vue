@@ -1778,7 +1778,8 @@ export default {
           flagDesLengthPassFail: false,
           flagScoreItemType: false,
           flagDesLengthScore: false,
-          flagScoreItemEmpty: false
+          flagScoreItemEmpty: false,
+          flagFullScoreLimitation: false
         }
       };
       if (scoreArr.length === 0) {
@@ -1833,6 +1834,11 @@ export default {
               } else {
                 scoreFlagObj.flags.flagScoreItemType = true;
               }
+            }
+            const maxScore = item.score.sort((a, b) => { return a - b; })[item.score.length - 1];
+            console.log(maxScore)
+            if (!scoreFlagObj.flags.flagFullScoreType && item.totalScore !== maxScore) {
+              scoreFlagObj.flags.flagFullScoreLimitation = true;
             }
           } else {
             scoreFlagObj.flags.flagScoreItemEmpty = true;
@@ -2026,6 +2032,9 @@ export default {
         }
         if (scoreFlag.flagScoreItemEmpty) {
           warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemEmpty'));
+        }
+        if (scoreFlag.flagFullScoreLimitation) {
+          warningInfo.push('Score' + ' ' + this.$t('insSettingView.totalScoreLimitation'));
         }
       }
       return warningInfo;

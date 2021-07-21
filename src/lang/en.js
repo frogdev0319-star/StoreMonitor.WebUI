@@ -633,9 +633,9 @@ export default {
     'passFail': 'Pass/Fail',
     'yesNo': 'Yes/No',
     'userDefined': 'Customize',
-    'inspectItemType':'Inspection Item Type',
-    'evaluationType':'Participating in scoring',
-    'remarksType':'Not participating in scoring',
+    'inspectItemType': 'Inspection Item Type',
+    'evaluationType': 'Participating in scoring',
+    'remarksType': 'Not participating in scoring',
     'no': 'No',
     'updateCategory': 'Edit Category',
     'btnAttrLength': 'Enter up to 8 characters',
@@ -644,7 +644,8 @@ export default {
     'othersAttr': 'Others Button Options',
     'subCategoryHeader': 'Subcategory (Optional, 30 characters)',
     'subCategory': 'Subcategory',
-    'accumulateTotalScoreInfo': 'Total score = SUM (per inspection score) + Total score'
+    'accumulateTotalScoreInfo': 'Total score = SUM (per inspection score) + Total score',
+    'totalScoreLimitation': 'Total score should be equal to the highest score of Score Options'
   },
 
   // Device Management page language

@@ -652,7 +652,8 @@ export default {
     'othersAttr': '附加評分類選項顯示',
     'subCategoryHeader': '子類別（選填，30字符）',
     'subCategory': '子類別',
-    'accumulateTotalScoreInfo': '考評總分= SUM(每項巡檢得分) + 扣分起始分數'
+    'accumulateTotalScoreInfo': '考評總分= SUM(每項巡檢得分) + 扣分起始分數',
+    'totalScoreLimitation': '項目總分值須等於評分選項最高分值'
   },
 
   // Device Management page language
