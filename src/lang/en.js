@@ -560,7 +560,7 @@ export default {
     'passfailexcelEmpty': "The inspection item can't empty",
     'excelPassFailScoreType': 'Score:Optional, 0.5~50points',
     'excelFullScoreType': 'Total Score: Required, 0~50points',
-    'excelMinScoreType': 'Score Anomaly Events-Score Threshold: Optional, less or equal than the highest score of Score Options',
+    'excelMinScoreType': 'Score Anomaly Events-Score Threshold: Optional, -50~the highest score of Score Options',
     'excelScoreItemType': 'Score Options: Required, -50~50',
     'excelOtherScoreType': 'Score:Required, -100~100points',
     'excelScoreItemEmpty': 'The score options cannot be empty!',
