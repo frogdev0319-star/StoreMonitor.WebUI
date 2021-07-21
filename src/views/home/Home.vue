@@ -206,9 +206,8 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import { getUserInfo, getAccountList } from '@/api/login';
+import { getAccountList } from '@/api/login';
 import PubSub from 'pubsub-js';
-import { getCookie } from '@/common/auth';
 
 export default {
   name: 'Home',
@@ -567,12 +566,10 @@ export default {
     },
 
     getAccountList() {
-      const self = this;
       getAccountList().then(res => {
         if (res.errCode === 0) {
           const data = res.data;
           this.getBrandList(data);
-          self.getUserName();
         }
       });
     },
@@ -600,7 +597,6 @@ export default {
         if (res.errCode === 0) {
           self.changeRoutes();
           self.$route.meta.keepAlive = false;
-          self.getUserName();
         }
       });
     },
@@ -610,32 +606,25 @@ export default {
       const result = await self.$store.dispatch('GetUserAuthorities');
       if (result.errCode === 0) {
         await self.$store.dispatch('generateRoutes');
-        const routes = this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
+        self.getUserName(result.data);
+        const allRoutes = this.$store.state.user.routes;
+        const routes = allRoutes[0].path === '/login' ? allRoutes.slice(1, allRoutes.length) : allRoutes;
         if (routes.length === 2) {
           this.$router.push('/noRight');
         } else {
-          window.location.pathname.indexOf('noRight') > -1 &&  this.$router.push(routes[1].children[0].path);
+          window.location.pathname.indexOf('noRight') > -1 && this.$router.push(routes[1].children[0].path);
         }
       }
     },
 
-    getUserName() {
+    getUserName(result) {
       const self = this;
-      const userId = getCookie('UserId');
-      getUserInfo().then(res => {
-        self.personList = res.data;
-        res.data.forEach(item => {
-          if (item.userId === userId) {
-            self.userName = item.userName.length > 10 ? item.userName.substr(0, 10) + '...' : item.userName;
-            self.accountId = item.accountId;
-            const accountId = item.accountId.toLowerCase();
-            localStorage.setItem('oss_bucket', accountId);
-            const idIndex = self.brandList.map(item => item.accountId).indexOf(self.accountId);
-            idIndex !== '-1' ? sessionStorage.setItem('accountName', self.brandList[idIndex].name) : null;
-            self.roleId = item.roleId;
-          }
-        });
-      });
+      self.userName = result.userName.length > 10 ? result.userName.substr(0, 10) + '...' : result.userName;
+      self.accountId = result.accountId;
+      const accountId = result.accountId.toLowerCase();
+      localStorage.setItem('oss_bucket', accountId);
+      const idIndex = self.brandList.map(item => item.accountId).indexOf(self.accountId);
+      idIndex !== -1 && sessionStorage.setItem('accountName', self.brandList[idIndex].name);
     },
 
     updateTitle() {
