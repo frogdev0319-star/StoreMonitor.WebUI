@@ -72,7 +72,7 @@
             <span class="title">{{ $t('overview.eventList') }}</span>
             <div class="operation-btns">
               <delay-button
-                :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
@@ -421,7 +421,7 @@ export default {
           'label': this.$t('overview.numProcessEvents'),
           'sortable': 'custom',
           'width': '145',
-          'maxWidth': '160',
+          'maxWidth': '180',
           'pdfwidth': '12%'
         },
         {

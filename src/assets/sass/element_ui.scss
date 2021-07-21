@@ -148,6 +148,7 @@ body .el-table th.gutter {
     justify-content: center;
     align-items: center;
     height: 32px;
+    position: relative;
   }
 
   .el-loading-text {
@@ -156,7 +157,8 @@ body .el-table th.gutter {
     display: inline-block;
     height: 32px;
     line-height: 32px;
-    margin: 3px 0 3px 90px;
+    position: absolute;
+    right: calc(50% - 105px);
   }
 }
 

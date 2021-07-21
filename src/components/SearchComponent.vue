@@ -38,7 +38,7 @@
         </delay-button>
         <delay-button
           v-if="!isInspectItem"
-          :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn' "
+          :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
           type="primary"
           size="mini"
           style="vertical-align: middle;"

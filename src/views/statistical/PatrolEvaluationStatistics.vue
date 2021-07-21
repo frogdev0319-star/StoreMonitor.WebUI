@@ -76,7 +76,7 @@
               </span>
               <div class="operation-btns">
                 <delay-button
-                  :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                  :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                   type="primary"
                   size="mini"
                   @click="export2Excel"
@@ -112,7 +112,7 @@
               </span>
               <div class="operation-btns">
                 <delay-button
-                  :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                  :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                   type="primary"
                   size="mini"
                   @click="exportStore2Excel"

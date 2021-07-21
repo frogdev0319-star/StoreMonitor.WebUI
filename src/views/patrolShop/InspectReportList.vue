@@ -125,7 +125,7 @@
               <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
             </div>
             <delay-button
-              :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+              :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
               class="export-report-btn"
               type="primary"
               size="mini"

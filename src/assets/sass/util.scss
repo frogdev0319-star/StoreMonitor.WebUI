@@ -193,6 +193,10 @@ $black: #182752;
   @extend .export-btn;
   width: calc(160/1920*100vw);
 }
+.ja-export-btn{
+  @extend .export-btn;
+  width: 200px;
+}
 .button-area{
   display: flex;
   align-items: center;
@@ -226,9 +230,24 @@ $black: #182752;
     width: 100px;
   }
 }
+.ja-bind-btn{
+  @extend .storevue-button;
+  @extend .en-bind-btn;
+  width: calc(180/1920*100vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .inspction-btn{
   @extend .storevue-button;
+  @extend .text-ellipsis;
   .iconfont{
     font-size: calc(16/1920*100vw);
   }
@@ -241,7 +260,13 @@ $black: #182752;
   border-color: $mainColor;
   color: $mainColor;
 }
-
+.ja-inspction-btn{
+  @extend .inspction-btn;
+  width: calc(180/1920*100vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .picture-tips{
   display: inline;
   font-size: 12px;

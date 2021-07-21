@@ -15,10 +15,18 @@
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
           <div style="display:inline-block;">
             <div class="no-print">
-              <div class="exportbtn" @click="handleDown">
-                <i class="iconfont icon-pdf export"/>
-                <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-              </div>
+              <delay-button
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                class="exportbtn"
+                type="primary"
+                size="mini"
+                @click="handleDown"
+              >
+                <div class="button-area">
+                  <i class="iconfont icon-pdf export"/>
+                  <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+                </div>
+              </delay-button>
             </div>
           </div>
         </div>
@@ -82,20 +90,20 @@
                         <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
                         <div
                           v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0"
-                          :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'"
+                          :style="isexportPDF ? 'width:160px;height:40px;line-height:40px;' : 'width:100px;'"
                           class="title-btn-failed">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }} </span>
                         </div>
                         <div
                           v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1"
-                          :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'"
+                          :style="isexportPDF ? 'width:160px;height:40px;line-height:40px;' : 'width:100px;'"
                           class="title-btn-pass">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }} </span>
                         </div>
                         <div
                           v-if="item.groupType==1 &&_item.grade!=Math.pow(-2,31)"
                           :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
-                          :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'">
+                          :style="isexportPDF ? 'width:160px;height:40px;line-height:40px;' : 'width:100px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
                         </div>
                         <div
@@ -1450,23 +1458,7 @@ export default {
         }
         .exportbtn{
           display: inline-block;
-          width:120px;
-          min-width: 85px;
-          height:36px;
-          line-height: 36px;
-          border-radius: 2px;
-          text-align: center;
-          margin-left:calc(20 / 1920 * 100vw);
-          margin-right: calc(30 / 1920 * 100vw);
-          background-color: $red;
-          color:#ffffff;
-          cursor: pointer;
-          span{
-            font-size:14px;
-          }
-          .export{
-            font-size:20px;
-          }
+          min-width:120px;
         }
       }
     }
@@ -1733,6 +1725,7 @@ export default {
               padding-top:10px;
               padding-bottom: 10px;
               display: flex;
+              justify-content: space-between;
               .ignore-btn{
                 width:50px;
                 height:24px;
@@ -1765,7 +1758,6 @@ export default {
                 border-radius: 20px;
               }
               .detail-title{
-                flex: 1;
                 .title1{
                 font-size: calc(14 / 1920 * 100vw);
                 color:#182752;
