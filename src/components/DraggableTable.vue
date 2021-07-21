@@ -65,11 +65,11 @@ export default {
   props: {
     tableHeader: {
       type: Array,
-      default: []
+      default: () => []
     },
     tableData: {
       type: Array,
-      default: []
+      default: () => []
     },
     isScoreSheet: {
       type: Boolean,
@@ -144,7 +144,8 @@ export default {
       if (params.items.length > 0) {
         inpectRESTful.updateInspectItem(params).then(res => {
           if (res.errCode === 0) {
-            this.$emit('updateTableData', this.sortableTableData);
+            // this.$emit('updateTableData', this.sortableTableData);
+            // this.oldSequenceList = this.newSequenceList.map(value => value.sequence);
           }
         }).catch(err => {
           console.log('updateItemsSequence: ' + err);

@@ -72,7 +72,7 @@
                 <template v-for="(child,childIndex) in item.children">
                   <div class="catergy-title subcatergy" :key="childIndex">
                     <el-checkbox v-model="child.checked" class="all-checkBox" @change="checkSubcatergy(child, item)"/>
-                    <span class="table-title">{{ child.groupName  }}</span>
+                    <span class="table-title">{{ child.groupName }}</span>
                   </div>
                   <div v-if="child.itemData.length !== 0" class="table-class">
                     <draggable-table
