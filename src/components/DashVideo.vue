@@ -773,6 +773,7 @@ export default {
         this.paused = false;
         this.errorText = '';
         this.isLoading = false;
+        this.editCount ++;
         return true;
       } else {
         let error = this.$t('remotePatrol.dashServerError');
@@ -811,6 +812,7 @@ export default {
         this.errorText = '';
         this.onEndflag = false;
         this.lastTime = startTs + 300;
+        this.editCount ++;
         return true;
       } else {
         let error = this.$t('remotePatrol.dashServerError');

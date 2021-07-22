@@ -1654,7 +1654,7 @@ export default {
 
     stopVendorVideo(){
       if (this.vendor === 0) {
-        this.editCount = 0;
+        !this.showGuide ? this.$refs.dashVideo.editCount = 0 : '';
         this.$refs.dashVideo.stopVideoPlay();
         this.$refs.dashVideo.showError = false;
       } else if(this.vendor === 1){
@@ -1888,7 +1888,7 @@ export default {
       const self = this;
       self.leaveObj.dialogCosed = false;
       if (self.vendor === 0) {
-        self.editCount = 0;
+        self.$refs.dashVideo.editCount = 0;
       } else if(self.vendor === 1) {
         self.$refs.ezvizVideo.editCount = 0;
       } else{
@@ -2203,7 +2203,7 @@ export default {
       _item.isActive = true;
       self.showStoreUp = true;
       if (self.vendor === 0) {
-        self.editCount = 0;
+        !self.showGuide ? self.$refs.dashVideo.editCount = 0 : '';
         self.$refs.dashVideo.stopVideoPlay();
       } else if(self.vendor === 1){
         !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
@@ -2274,7 +2274,7 @@ export default {
       self.changeInspectList(self.beforepatrolstore);
       switch (self.vendor) {
         case 0: {
-          self.editCount = 0
+          self.$refs.dashVideo.editCount = 0
           break
         }
         case 1: {
@@ -2387,7 +2387,7 @@ export default {
     },
     changeInspect(val) {
       const self = this;
-      if ((self.vendor === 0 && self.editCount != 0) ||
+      if ((self.vendor === 0 && !self.showGuide && self.$refs.dashVideo.editCount !== 0) ||
         (self.vendor === 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0) ||
         (self.vendor === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !== 0) ||
         (self.$store.getters.PatrolHistory != null)) {
@@ -2400,7 +2400,7 @@ export default {
     changeInspectList(val) {
       const self = this;
       if (self.vendor === 0) {
-        self.editCount = 0;
+        !self.showGuide ? self.$refs.dashVideo.editCount = 0 : '';
         self.$refs.dashVideo.stopVideoPlay();
       } else if(self.vendor === 1){
         !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
