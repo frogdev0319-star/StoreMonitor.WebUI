@@ -49,7 +49,11 @@
         <el-col :span="24" class="">
           <div class="header-score">
             <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
-            <span class="span-2"><span class="pdf_font_26">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span></span>
+            <span class="span-2"><span class="pdf_font_26">
+              {{ totalScore }}
+              <span>{{ $t('remotePatrol.scorecount') }}</span>
+            </span>
+            </span>
           </div>
         </el-col>
       </el-row>
@@ -82,7 +86,7 @@
                         <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
                         <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
                       </div>
-                      <div class="score-title">
+                      <div class="score-title" :style="isexportPDF ? 'width:160px' : 'width:100px;'">
                         <div
                           v-if="_item.grade === Math.pow(-2,31)"
                           :style="isexportPDF ? 'width:100px;height:40px;line-height:40px;' : 'width:50px;'"

@@ -5,7 +5,7 @@
         <span v-if="showStoreUp" class="lside-title">
           {{ store.storeTitle }}
         </span>
-        <div v-if="showStoreUp" :class="store.storeUp?'coll':'nocoll'" class="storeUp-content" @click="addStoreUp">
+        <div v-if="showStoreUp" :class="storeUpClass" @click="addStoreUp">
           <i :class="store.storeUp?'coll-icon':'nocoll-icon'" class="iconfont icon-iconfontstart" style="vertical-align: middle;"/>
           <span :class="store.storeUp?'coll-font':'nocoll-font'">{{ store.storeUpTitle }}</span>
         </div>
@@ -923,7 +923,16 @@ export default {
     }),
     ...mapGetters(
       ['isEzviz']
-    )
+    ),
+
+    storeUpClass() {
+      return {
+        'coll': this.store.storeUp,
+        'nocoll': !this.store.storeUp,
+        'storeUp-content': this.lang.indexOf('ja') === -1,
+        'ja-storeUp-content': this.lang.indexOf('ja') !== -1
+      }
+    }
   },
   watch: {
     accountChanged(val, oldVal) {
@@ -3774,6 +3783,12 @@ export default {
             margin-left: 4px;
           }
         }
+
+        .ja-storeUp-content{
+          @extend .storeUp-content;
+          width: 120px;
+        }
+
         .el-submit{
           position: absolute;
           @include point(right,20);
@@ -4652,6 +4667,9 @@ export default {
             display: block;
             @include point(margin,5);
             @include point(margin-left,15);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .activeClass{
             background-color: #FDE8EF !important;

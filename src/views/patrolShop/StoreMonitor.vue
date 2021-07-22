@@ -7,7 +7,7 @@
         </span>
         <div
           v-if="showStoreUp"
-          :class="store.storeUp ? 'coll' : 'nocoll'"
+          :class="storeUpClass"
           class="storeUp-content"
           @click="addStoreUp"
         >
@@ -371,7 +371,7 @@
                 <el-radio
                   v-model="curEvent"
                   :label="item.id"
-                  class="radio-class"
+                  class="store-radio-class"
                   @change="checkEvent"
                 >
                   <span :title="item.name" class="event-name">{{
@@ -853,6 +853,15 @@ export default {
     isEzviz() {
       let self = this;
       return self.$store.state.user.isEzviz;
+    },
+
+    storeUpClass() {
+      return {
+        'coll': this.store.storeUp,
+        'nocoll': !this.store.storeUp,
+        'storeUp-content': this.lang.indexOf('ja') === -1,
+        'ja-storeUp-content': this.lang.indexOf('ja') !== -1
+      }
     }
 
   },
@@ -2977,6 +2986,10 @@ $h1: #292e36;
           margin-left: 4px;
         }
       }
+      .ja-storeUp-content{
+        @extend .storeUp-content;
+        width: 120px;
+      }
       .el-submit {
         position: absolute;
         right: calc(25 / 1920 * 100vw);
@@ -3539,7 +3552,7 @@ $h1: #292e36;
           padding-bottom: 20px;
           .event-details {
             position: relative;
-            .radio-class {
+            .store-radio-class {
               width: calc(100% - 70px);
             }
             .event-name {

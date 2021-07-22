@@ -198,6 +198,7 @@ $black: #182752;
   width: 200px;
 }
 .button-area{
+  @extend .text-ellipsis;
   display: flex;
   align-items: center;
   justify-content: center;

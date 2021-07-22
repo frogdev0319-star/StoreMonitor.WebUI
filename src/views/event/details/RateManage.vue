@@ -228,7 +228,10 @@
           <span>{{ $t('eventView.methods') }}</span><br>
           <div class="btn-content">
             <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
-              <span v-if="item.isShow" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
+              <span
+                v-if="item.isShow"
+                :class="{'activeClass': item.isActive, 'ja-span': lang.indexOf('ja') !== -1}"
+                @click="clickSubBtn(item,index)">
                 {{ item.name }}
               </span>
             </div>
@@ -1505,9 +1508,9 @@ $h1:#292e36;
                         text-align: center;
                         background-color: #fff;
                     }
-                    //  &:first-child{
-                    //         margin-left: 0;
-                    //     }
+                    .ja-span{
+                      width: 90px;
+                    }
                     .activeClass{
                         background-color: #FDE8EF !important;
                         color: $red;
