@@ -730,11 +730,13 @@ export default {
             if (inspectSettings.includedInTotalScoreWithType1) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
                 item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
-                item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
-                item['numIgnore'] = 0;
               } else {
                 item['itemgetScore'] = tab1GetScoreNoContainedIngored;
               }
+            }
+            if (inspectSettings.qualifiedForIgnoredWithType1) {
+              item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
+              item['numIgnore'] = 0;
             }
           }
           if (p_item.type === 0) {
