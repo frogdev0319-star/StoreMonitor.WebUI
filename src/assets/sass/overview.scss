@@ -18,6 +18,11 @@ $ignored: #cad1db;
   box-sizing: border-box;
 }
 
+.text-ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .title{
   height: 70px;
   padding-top: 30px;
@@ -59,6 +64,7 @@ $ignored: #cad1db;
             }
             padding-left: calc(34/1920*100vw);
             .total-title {
+              @extend .text-ellipsis;
               font-size: calc(15/1920*100vw);
               color: $tab;
               text-align: left;
@@ -749,6 +755,7 @@ $ignored: #cad1db;
               border-bottom: none;
             }
             .event-title{
+              @extend .text-ellipsis;
               font-size: calc(16/1920*100vw);
               height: 16px;
               line-height:16px;

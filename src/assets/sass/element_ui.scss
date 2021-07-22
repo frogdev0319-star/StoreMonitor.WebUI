@@ -143,7 +143,7 @@ body .el-table th.gutter {
   }
   .el-loading-spinner {
     background: url("../../../static/img/loading.gif") no-repeat;
-    background-position: center;
+    background-position: calc(50% - 50px) 50%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -158,7 +158,7 @@ body .el-table th.gutter {
     height: 32px;
     line-height: 32px;
     position: absolute;
-    right: calc(50% - 105px);
+    left: calc(50% - 32px);
   }
 }
 
