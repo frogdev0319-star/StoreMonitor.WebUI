@@ -141,7 +141,7 @@
                 </template>
               </el-table-column>
               <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="180"/>
-              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="120">
+              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="130">
                 <template slot-scope="scope">
                   <div v-if="scope.row.attachment.length!==0">
                     <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="enclosure-icon">
