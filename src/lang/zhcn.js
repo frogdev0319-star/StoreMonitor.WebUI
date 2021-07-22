@@ -422,7 +422,7 @@ export default {
     'passwordErr': '密码错误',
     'accessTokenErr': 'AccessToken错误',
     'unknownErr': '未知错误',
-    'selectInspectListWithStore': '请选择，{storeName} 关联巡检表'
+    'selectInspectListWithStore': '请选择，{storeName}关联巡检表'
   },
 
   // event Management page language

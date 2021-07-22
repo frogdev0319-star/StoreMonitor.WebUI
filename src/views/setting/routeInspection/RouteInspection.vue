@@ -9,8 +9,7 @@
           {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
         </span>
         <delay-button
-          :class="lang.indexOf('ja') !== -1 ? 'ja-bind-btn' :
-          lang.indexOf('zh') === -1 ? 'en-bind-btn' : 'bind-btn' "
+          :class="lang.indexOf('zh') === -1 ? 'en-bind-btn' : 'bind-btn' "
           :disabled="elTableData[Number(activeName)].data.length === 0"
           @click="bindStore"
         >
