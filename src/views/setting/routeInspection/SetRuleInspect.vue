@@ -290,12 +290,12 @@ export default {
             {
               'name': 'itemOptionsForType1',
               'value': this.passFailBtnAttr,
-              'extra': this.itemOptionsForType1
+              'extra': this.itemOptionsForType1[2]
             },
             {
               'name': 'itemOptionsForType3',
               'value': this.otherBtnAttr,
-              'extra': this.itemOptionsForType3
+              'extra': this.itemOptionsForType3[2]
             }
           ]
         };
