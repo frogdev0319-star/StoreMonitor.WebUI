@@ -595,7 +595,7 @@ export default {
           }
         }
       } else {
-        status = -1;
+        status = [0, 1, 2, 3];
       }
       let page = 0;
       if (val === 'currentChange') {
