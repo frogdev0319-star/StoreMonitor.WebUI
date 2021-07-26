@@ -320,7 +320,8 @@ export default {
       ifGetParamsFromCash: false,
       ifSaveParams: false,
       storeFilterObj: {},
-      searchParams: {}
+      searchParams: {},
+      ifSearchData: true
     };
   },
 
@@ -348,6 +349,7 @@ export default {
         300);
         self.ifChangeAccount = true;
         self.ifSaveParams = false;
+        this.ifSearchData = true;
       }
     },
 
@@ -832,7 +834,6 @@ export default {
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
       }
-      this.searchData();
     },
 
     saveSearchParams() {
@@ -883,6 +884,8 @@ export default {
 
     onStoreChange(storeObj) {
       this.storeFilterObj = storeObj;
+      this.ifSearchData && this.searchData();
+      this.ifSearchData = false;
     }
   },
 

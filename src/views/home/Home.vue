@@ -585,6 +585,8 @@ export default {
         }
       })
       this.brandList = tempAccount;
+      const idIndex = this.brandList.map(item => item.accountId).indexOf(this.accountId);
+      idIndex !== -1 && sessionStorage.setItem('accountName', this.brandList[idIndex].name);
     },
 
     changeAccount(accountId) {
@@ -623,8 +625,6 @@ export default {
       self.accountId = result.accountId;
       const accountId = result.accountId.toLowerCase();
       localStorage.setItem('oss_bucket', accountId);
-      const idIndex = self.brandList.map(item => item.accountId).indexOf(self.accountId);
-      idIndex !== -1 && sessionStorage.setItem('accountName', self.brandList[idIndex].name);
     },
 
     updateTitle() {
