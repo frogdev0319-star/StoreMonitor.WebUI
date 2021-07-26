@@ -63,7 +63,19 @@ export default {
     'insepctionReportSetting': '보고서 구성',
     'inspectingSettingOfReport': '일정 설치 (보고서 구성)',
     'noInspectionAccessRights': 'No Inspection Access Rights',
-    'noRight': ''
+    'noRight': '',
+
+    'dashDevice': 'Dash',
+    'ezvizDevice': 'StoreVue',
+    'beseyeAccount': 'Beseye',
+    'dashDeviceMgt': '모니터 장치 관리(Dash)',
+    'ezvizDeviceMgt': '모니터 장치 관리(StoreVue)',
+    'beseyeDeviceMgt': '모니터 장치 관리（Beseye）',
+    'deviceSetting': '장치 설정',
+    'storeViuAccountDeviceSetting': 'StoreVue 계정 장치 설정',
+    'userAccountDeviceSetting': '엔터프라이즈 계정 장치 설정',
+    'auth': '승인',
+    'beseyeDeviceSetting': 'Beseye 장치 설정',
   },
 
   'overview': {
@@ -420,7 +432,11 @@ export default {
     'storeType': '저장소 유형',
     'passwordErr': '암호 오류',
     'accessTokenErr': 'AccessToken 오류',
-    'unknownErr': '알 수 없는 오류'
+    'unknownErr': '알 수 없는 오류',
+
+    'getBeseyeStreamError': '获取Beseye视频流信息失败！',
+    'closeConnection': '连接关闭',
+    'errorConnection': '连接错误',
   },
 
   // event Management page language
@@ -798,7 +814,35 @@ export default {
     'total': 'Total ',
     'ezvizAccountNum': ' streaming service account:',
     'storeViuNum': ' storeViu acccount,',
-    'userAccountNum': ' business account'
+    'userAccountNum': ' business account',
+
+    'emptyDeleteDevice': '삭제할 장치를 선택하십시오',
+    'confirmDeleteDevice': '이 장치를 삭제하시겠습니까?',
+    'confirmDeleteDevices': '확인된 장치를 삭제하시겠습니까?',
+    'deviceDetail': '장치 세부 정보',
+    'availableDevice': '추가할 수 있는 장치',
+    'deviceSeriNum': '장치 SN',
+    'enableStatus': '상태',
+    'addAvailableDevice': '사용 가능한 장치 추가',
+    'addMainAccountDevice': '기본 계정 장치 추가',
+    'addSharedDevice': '공유 장치 추가',
+    'illegalSeriNum': '잘못된 디바이스 sN',
+    'selectBoundStore': '저장소 선택',
+    'beseyeAuthorize': '승인',
+    'deleteBeseyeUserInfo': 'Beseye 계정 삭제?',
+    'authorizeRefused': '승인 거부',
+    'authorizeSucc': '권한 부여 성공',
+    'authorizeFail': '권한 부여 실패',
+    'reauthorizeSucc': '권한 부여 성공',
+    'reauthorizeFail': '권한 부여 실패',
+    'reauthorizeRefused': '승인 거부',
+    'deleteBeseyeUser': 'Beseye 계정 삭제',
+    'selectDevice': '장치 선택',
+    'isAuthorizing': '승인 중...',
+    'deviceLimitation': '현재 장치 수가 한도를 초과합니다. 장치 수를 갱신하거나 줄이십시오',
+    'authorizedDevicesNum': '승인된 기기 수:',
+    'addedDeviceNumber': '추가된 기기 수:',
+    'licenseOverdue': '구독 권한이 만료되었습니다'
   },
 
   // Store Management page language

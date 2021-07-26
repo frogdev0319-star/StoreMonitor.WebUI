@@ -64,7 +64,19 @@ export default {
     'insepctionReportSetting': 'レポート構成',
     'inspectingSettingOfReport': 'スケジュール設定(レポート構成)',
     'noInspectionAccessRights': 'No Inspection Access Rights',
-    'noRight': ''
+    'noRight': '',
+
+    'dashDevice': 'Dash',
+    'ezvizDevice': 'StoreVue',
+    'beseyeAccount': 'Beseye',
+    'dashDeviceMgt': 'モニターデバイス管理（Dash）',
+    'ezvizDeviceMgt': 'モニターデバイス管理（StoreVue）',
+    'beseyeDeviceMgt': 'モニタデバイス管理（Beseye）',
+    'deviceSetting': 'デバイスの設定',
+    'storeViuAccountDeviceSetting': 'StoreVueアカウントのデバイス設定',
+    'userAccountDeviceSetting': 'エンタープライズアカウントのデバイス設定',
+    'auth': '承認',
+    'beseyeDeviceSetting': 'Beseyeのデバイス設定',
   },
 
   'overview': {
@@ -417,7 +429,11 @@ export default {
     'storeType': 'ストアタイプ',
     'passwordErr': 'パスワードエラー',
     'accessTokenErr': 'AccessTokenエラー',
-    'unknownErr': '不明なエラー'
+    'unknownErr': '不明なエラー',
+
+    'getBeseyeStreamError': '获取Beseye视频流信息失败！',
+    'closeConnection': '连接关闭',
+    'errorConnection': '连接错误',
   },
 
   // event Management page language
@@ -795,7 +811,35 @@ export default {
     'total': 'Total ',
     'ezvizAccountNum': ' streaming service account:',
     'storeViuNum': ' storeViu acccount,',
-    'userAccountNum': ' business account'
+    'userAccountNum': ' business account',
+
+    'emptyDeleteDevice': '削除するデバイスを選択してください',
+    'confirmDeleteDevice': 'このデバイスを削除してもよろしいですか？',
+    'confirmDeleteDevices': 'チェックされたデバイスを削除することを確認しますか？',
+    'deviceDetail': 'デバイスの詳細',
+    'availableDevice': '追加可能なデバイス',
+    'deviceSeriNum': 'デバイスSN',
+    'enableStatus': 'ステータス',
+    'addAvailableDevice': '使用可能なデバイスの追加',
+    'addMainAccountDevice': '主勘定のデバイスの追加',
+    'addSharedDevice': '共有デバイスの追加',
+    'illegalSeriNum': '不正なデバイスsN',
+    'selectBoundStore': 'ストアを選択してください',
+    'beseyeAuthorize': '承認',
+    'deleteBeseyeUserInfo': 'Beseyeアカウントの削除？',
+    'authorizeRefused': '承認が拒否されました',
+    'authorizeSucc': '承認に成功しました',
+    'authorizeFail': '承認に失敗しました',
+    'reauthorizeSucc': '承認に成功しました',
+    'reauthorizeFail': '承認に失敗しました',
+    'reauthorizeRefused': '承認が拒否されました',
+    'deleteBeseyeUser': 'Beseyeアカウントの削除',
+    'selectDevice': 'デバイスを選択してください',
+    'isAuthorizing': '承認しています...',
+    'deviceLimitation': '現在のデバイス数が制限を超えています。デバイス数を更新または削減してください',
+    'authorizedDevicesNum': '許可されたデバイスの数:',
+    'addedDeviceNumber': '追加されたデバイスの数:',
+    'licenseOverdue': 'サブスクリプション許可の有効期限が切れました'
   },
 
   // Store Management page language
