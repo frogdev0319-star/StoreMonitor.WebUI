@@ -102,12 +102,12 @@
       </transition>
       <div class="storeInfo-content">
         <div class="storeInfo-details">
-          <dd><span :class="lang==='en'? 'en-w4': 'w4'">{{ $t('eventView.storeName') }}：</span></dd>
+          <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">{{ $t('eventView.storeName') }}：</span></dd>
           <span class="details-info">{{ event.storeName }}</span>
         </div>
         <div class="storeInfo-details">
-          <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
-            <dd><span :class="lang==='en'? 'en-w3': 'w3'">{{ $t('eventView.submitter') }}：</span></dd>
+          <div :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
+            <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w3': 'w3'">{{ $t('eventView.submitter') }}：</span></dd>
             <el-tooltip
               :popper-class="tooltipClass"
               :content="event.createor"
@@ -118,13 +118,17 @@
           </div>
         </div>
         <div class="storeInfo-details">
-          <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
-            <dd><span :class="lang === 'en' ? 'en-w4' : 'w4'">{{ $t('eventView.submitTime') }}：</span></dd>
+          <div :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
+            <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4' : 'w4'">{{ $t('eventView.submitTime') }}：</span></dd>
             <span class="details-info">{{ event.createDate }}</span>
           </div>
-          <div v-if="event.sourceType === 1 && relatedChannels.length > 0" :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
-            <dd :class="lang === 'en' ? 'en-w3' : 'w3'" >
-              <div :class="lang === 'en' ? 'en-related-channel' : 'related-channel'" @click="showRelatedChannel">
+          <div
+            v-if="event.sourceType === 1 && relatedChannels.length > 0"
+            :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
+            <dd :class="lang.indexOf('zh') === -1 ? 'en-w3' : 'w3'" >
+              <div
+                :class="lang.indexOf('zh') === -1 ? 'en-related-channel' : 'related-channel'"
+                @click="showRelatedChannel">
                 <img :src="cameraImg" class="img-class">
                 <span class="related-span">{{ $t('eventView.associatedChannel') }}</span>
               </div>
@@ -133,7 +137,7 @@
         </div>
       </div>
       <div class="eventInfo-content">
-        <strong v-if="lang === 'en'" style="margin-right: 28px">{{ $t('eventView.eventDetails') }}:</strong>
+        <strong v-if="lang.indexOf('zh') === -1" style="margin-right: 28px">{{ $t('eventView.eventDetails') }}:</strong>
         <strong v-else>{{ $t('eventView.eventDetails') }}：</strong>
         <div class="content">
           <div v-if="showAudio" class="speech-content">
@@ -188,7 +192,10 @@
           <span>{{ $t('eventView.methods') }}</span><br>
           <div class="btn-content">
             <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
-              <span v-if="item.isShow" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
+              <span
+                v-if="item.isShow"
+                :class="{'activeClass': item.isActive, 'ja-span': lang.indexOf('ja') !== -1}"
+                @click="clickSubBtn(item,index)">
                 {{ item.name }}
               </span>
             </div>
@@ -1351,9 +1358,9 @@ $h1:#292e36;
                         text-align: center;
                         background-color: #fff;
                     }
-                    //  &:first-child{
-                    //         margin-left: 0;
-                    //     }
+                    .ja-span{
+                      width: 90px;
+                    }
                     .activeClass{
                         background-color: #FDE8EF !important;
                         color: $red;

@@ -27,18 +27,9 @@
       v-loading="loading"
       class="el-bind-content-box"
       element-loading-background="rgba(255, 255, 255, 0.6)">
-      <p v-if="lang==='en'" class="el-header-title">{{ $t('insSettingView.bindStores') }}</p>
-      <p v-else class="el-header-title" >
-        {{ $t('insSettingView.selectStore') }}{{ tabName }}{{ $t('insSettingView.needBind') }}
-      </p>
-      <p v-if="lang=='en'" class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
-        {{ totalCount }} {{ $t('insSettingView.total') }}
-        {{ storeCount }} {{ $t('insSettingView.bind') }}
-      </p>
-      <p v-else class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
-        {{ tabName }}{{ $t('insSettingView.total') }}{{ totalCount }}
-        {{ $t('insSettingView.bindStore') }},{{ $t('insSettingView.bindWith') }}{{ storeCount }}
-        {{ $t('insSettingView.bindStore') }}
+      <p class="el-header-title">{{ $t('insSettingView.selectStoreToBind', {tableName: tabName}) }}</p>
+      <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
+        {{ $t('insSettingView.hasBoundStoreNum', {tableName: tabName, allStoreNum: totalCount, boundStoreNum: storeCount}) }}
       </p>
       <div :style="{'height' : varyWindowHeight*0.56+'px'}" class="el-bind-content">
         <div v-if="storeList.length === 0" :style="{'line-height': varyWindowHeight*0.56+'px'}">

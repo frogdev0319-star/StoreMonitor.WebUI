@@ -23,7 +23,7 @@
             <span class="title">{{ $t('overview.patrolList') }}</span>
             <div class="operation-btns">
               <delay-button
-                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
@@ -34,7 +34,7 @@
                 </div>
               </delay-button>
               <delay-button
-                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
                 @click="handleDown"
@@ -74,8 +74,8 @@
                     :label="_item.label"
                     :sortable="_item.sortable"
                     :sort-orders="['ascending', 'descending']"
-                    :min-width="lang!=='en'? _item.width : _item.maxWidth"/>
-                  <el-table-column :label="$t('overview.detail')" :width="lang!=='en'? 100: 130" type="expand">
+                    :min-width="lang.indexOf('zh') !== -1 ? _item.width : _item.maxWidth"/>
+                  <el-table-column :label="$t('overview.detail')" :width="lang.indexOf('ja') !== -1 ? '160px': '130px'" type="expand">
                     <template slot-scope="props">
                       <el-tabs v-model="activeName" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="patrolPlan">
@@ -213,7 +213,7 @@
                     :prop="_item.prop"
                     :label="_item.label"
                     :sortable="_item.sortable"
-                    :min-width="lang!=='en'? _item.pdfwidth : _item.pdfmaxWidth"/>
+                    :min-width="lang.indexOf('zh') !== -1 ? _item.pdfwidth : _item.pdfmaxWidth"/>
                   <el-table-column :label="$t('overview.detail')" type="expand" width="100px">
                     <template slot-scope="scope">
                       <el-tabs v-model="activePDFFirst" @tab-click="handleClick" style="width:990px;">
@@ -385,7 +385,7 @@ export default {
           'pdfwidth': '15%',
           'pdfmaxWidth': '16%',
           'width': 227,
-          'maxWidth': 210
+          'maxWidth': 227
         },
         {
           'prop': 'numOfCompleted',
@@ -403,7 +403,7 @@ export default {
           'pdfwidth': '15%',
           'pdfmaxWidth': '16%',
           'width': 227,
-          'maxWidth': 220
+          'maxWidth': 240
         },
         {
           'prop': 'completionRateStr',

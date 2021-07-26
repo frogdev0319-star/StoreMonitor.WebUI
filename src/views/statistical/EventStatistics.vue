@@ -15,7 +15,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="title">{{ $t('overview.eventGraph') }}</div>
           </el-col>
-          <el-col :span="3" class="kpi-list">
+          <el-col :span="3" :class="lang.indexOf('ja') !== -1 ? 'ja-kpi-list' : 'kpi-list'">
             <div class="kpi-content">
               <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
                 <div class="event-title">{{ item.eventTitle }}</div>
@@ -23,7 +23,7 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="14" class="store-events">
+          <el-col :span="14" :class="lang.indexOf('ja') !== -1 ? 'ja-store-events' : 'store-events'">
             <div class="region-result">
               <div
                 v-loading="isLoading"
@@ -42,7 +42,7 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="7" class="source-list">
+          <el-col :span="7" :class="lang.indexOf('ja') !== -1 ? 'ja-source-list' : 'source-list'">
             <div class="pct-content">
               <div class="pct-panel">
                 <v-chart
@@ -72,7 +72,7 @@
             <span class="title">{{ $t('overview.eventList') }}</span>
             <div class="operation-btns">
               <delay-button
-                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
@@ -141,20 +141,14 @@
               </div>
             </el-col>
             <el-col :span="14" class="store-events" style="background-color:#ffffff;">
-              <div
-                v-loading="isLoading"
-                :element-loading-text="$t('insSettingView.loadingbindstore')"
-                class="charts-content self-loading" v-if="!hasNoData">
-                <v-chart
-                  ref="storeEventRef"
-                  :options="storeEventsOptions"
-                  :auto-resize="true"
-                  class="result-content"/>
-              </div>
-              <div v-else class="charts-content">
-                <span class="no-data-text">
-                  {{ $t('deviceView.noData') }}
-                </span>
+              <div class="region-result">
+                <div class="charts-content">
+                  <v-chart
+                    ref="storeEventRef"
+                    :options="storeEventsOptions"
+                    :auto-resize="true"
+                    class="result-content"/>
+                </div>
               </div>
             </el-col>
             <el-col :span="7" class="source-list" style="background-color:#ffffff;">
@@ -212,7 +206,7 @@
                     :min-width="_item.pdfwidth"/>
                   <el-table-column
                     :label="$t('overview.remotePatrol')"
-                    :min-width="lang !== 'en' ? '8% ': '9%'"
+                    :min-width="lang.indexOf('zh') !== -1 ? '8% ': '9%'"
                     prop="RemoteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper remote">
@@ -222,7 +216,7 @@
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.onsitePatrol')"
-                    :min-width="lang !== 'en' ? '8%' : '9%'"
+                    :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
                     prop="OnsiteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper onsite">
@@ -232,7 +226,7 @@
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.storeMonitor')"
-                    :min-width="lang !== 'en' ? '8%' : '9%'"
+                    :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
                     prop="VideoStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper video">
@@ -392,7 +386,7 @@ export default {
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
           'width': '140',
-          'maxWidth': '140',
+          'maxWidth': '150',
           'pdfwidth': '11%'
         },
         {
@@ -440,7 +434,7 @@ export default {
           'label': this.$t('overview.numProcessEvents'),
           'sortable': 'custom',
           'width': '145',
-          'maxWidth': '160',
+          'maxWidth': '180',
           'pdfwidth': '12%'
         },
         {
@@ -1238,6 +1232,19 @@ export default {
             padding-top: 140px;
             border-top: 1px solid $border;
           }
+        }
+
+        .ja-kpi-list{
+          @extend .kpi-list;
+          width: 16%;
+        }
+        .ja-store-events{
+          @extend .store-events;
+          width: 52%;
+        }
+        .ja-source-list{
+          @extend .source-list;
+          width: 32%;
         }
       }
       .second-row {

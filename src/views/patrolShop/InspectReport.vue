@@ -15,10 +15,18 @@
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
           <div style="display:inline-block;">
             <div class="no-print">
-              <div class="exportbtn" @click="handleDown">
-                <i class="iconfont icon-pdf export"/>
-                <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-              </div>
+              <delay-button
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                class="exportbtn"
+                type="primary"
+                size="mini"
+                @click="handleDown"
+              >
+                <div class="button-area">
+                  <i class="iconfont icon-pdf export"/>
+                  <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+                </div>
+              </delay-button>
             </div>
           </div>
         </div>
@@ -41,7 +49,11 @@
         <el-col :span="24" class="">
           <div class="header-score">
             <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
-            <span class="span-2"><span class="pdf_font_26">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span></span>
+            <span class="span-2"><span class="pdf_font_26">
+              {{ totalScore }}
+              <span>{{ $t('remotePatrol.scorecount') }}</span>
+            </span>
+            </span>
           </div>
         </el-col>
       </el-row>
@@ -74,7 +86,7 @@
                         <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
                         <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
                       </div>
-                      <div class="score-title">
+                      <div class="score-title" :style="isexportPDF ? 'width:160px' : 'width:100px;'">
                         <div
                           v-if="_item.grade === Math.pow(-2,31)"
                           :style="isexportPDF ? 'width:100px;height:40px;line-height:40px;' : 'width:50px;'"
@@ -82,20 +94,20 @@
                         <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
                         <div
                           v-if="(item.groupType === 0 || item.groupType === 2) && _item.grade === 0"
-                          :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'"
+                          :style="isexportPDF ? 'width:160px;height:40px;line-height:40px;' : 'width:100px;'"
                           class="title-btn-failed">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.failed') }} </span>
                         </div>
                         <div
                           v-if="(item.groupType === 0||item.groupType === 2) && _item.grade === 1"
-                          :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'"
+                          :style="isexportPDF ? 'width:160px;height:40px;line-height:40px;' : 'width:100px;'"
                           class="title-btn-pass">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ $t('remotePatrol.pass') }} </span>
                         </div>
                         <div
                           v-if="item.groupType==1 &&_item.grade!=Math.pow(-2,31)"
                           :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
-                          :style="isexportPDF ? 'width:130px;height:40px;line-height:40px;' : 'width:100px;'">
+                          :style="isexportPDF ? 'width:160px;height:40px;line-height:40px;' : 'width:100px;'">
                           <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
                         </div>
                         <div
@@ -497,17 +509,6 @@ export default {
       videoSrc: require('../../../static/img/monitor.png'),
       inspectSrc: require('../../../static/img/remote_patrol.png'),
       insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
-
-      inspectSrc1: require('../../../static/img/dangerous_cn.png'),
-      inspectSrc2: require('../../../static/img/good_cn.png'),
-      inspectSrc3: require('../../../static/img/improved_cn.png'),
-      inspectSrc4: require('../../../static/img/dangerous_en.png'),
-      inspectSrc5: require('../../../static/img/good_en.png'),
-      inspectSrc6: require('../../../static/img/improved_en.png'),
-      inspectSrc7: require('../../../static/img/dangerout_tw.png'),
-      inspectSrc8: require('../../../static/img/excellent_cn.png'),
-      inspectSrc9: require('../../../static/img/excellent_en.png'),
-      inspectSrc10: require('../../../static/img/excellent_tw.png'),
       report: null,
       suggest: '',
       totalScore: '',
@@ -543,23 +544,23 @@ export default {
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
       theaderPassFail: [
         { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:16%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:17%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
       ],
       theaderScore: [
         { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:30%;', pdfWidth: 'width:25%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:25%;', pdfWidth: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:25%;', pdfWidth: 'width:20%;' }
       ],
       theaderOther: [
         { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;', pdfWidth: 'width:29%;' },
-        { name: this.$t('remotePatrol.pass'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.failed'), width: 'width:20%;', pdfWidth: 'width:15%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;', pdfWidth: 'width:15%;' }
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
+        { name: this.$t('remotePatrol.pass'), width: 'width:16%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.failed'), width: 'width:17%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
       ],
       showSignatureFlag: false,
       signatureSrc: '',
@@ -592,9 +593,8 @@ export default {
 
   created() {
     this.getStoredTemplateId();
-    this.getInspectTemplateList();
     this.getRouterData();
-    this.getReportInfo();
+    this.getReportTemplateAndInfo();
   },
 
   mounted() {
@@ -602,26 +602,27 @@ export default {
   },
 
   methods: {
-    getInspectTemplateList() {
-      const params = {};
-      params.enable = true;
-      ReportSetting.getInspectReportTemplateList(params).then(res => {
-        if (res.errCode === 0 && res.data.length > 0) {
-          this.templateList = res.data;
-          const savedTemplateIndex = this.templateList.findIndex(item => { return item.id === this.cachedTemplateId; });
-          if (savedTemplateIndex !== -1) {
-            this.curTemplateIndex = savedTemplateIndex;
-          } else {
-            this.curTemplateIndex = 0;
-          }
-          this.setTemplateAndStaticalConfig();
-        } else {
-          this.templateList = [];
-          this.templateConfig = [];
-        }
+    getReportTemplateAndInfo() {
+      const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
+      const reportInfoPromise = getInspectReportInfo({ reportIds: [this.report.reportId] });
+      Promise.all([templatePromise, reportInfoPromise]).then(results => {
+        this.getInspectTemplateList(results[0]);
+        this.getReportInfo(results[1]);
       }).catch(err => {
-        console.log('ReportSetting:' + err);
-      });
+        console.log('ReportDetail-getReportTemplateAndInfo:' + err);
+      })
+    },
+
+    getInspectTemplateList(res) {
+      if (res.errCode === 0 && res.data.length > 0) {
+        this.templateList = res.data;
+        const savedTemplateIndex = this.templateList.findIndex(item => { return item.id === this.cachedTemplateId; });
+        this.curTemplateIndex = savedTemplateIndex !== -1 ? savedTemplateIndex : 0;
+        this.setTemplateAndStaticalConfig();
+      } else {
+        this.templateList = [];
+        this.templateConfig = [];
+      }
     },
 
     setTemplateAndStaticalConfig() {
@@ -679,6 +680,7 @@ export default {
       obj.dateStr = util.getDateStr(routeData.ts);
       obj.submitterName = routeData.submitterName;
       obj.tagName = routeData.tagName;
+      obj.iconSrc = this.getIconSrc(routeData.status);
       switch (routeData.mode) {
         case 0:
           obj.inspectSrc = self.inspectSrc;
@@ -693,62 +695,57 @@ export default {
           obj.inspectSrc = self.videoSrc;
           break;
       }
-      switch (routeData.status) {
-        case 0: {
-          // dangerous
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc1;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc4;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc7;
-          } else {
-            obj.iconSrc = self.inspectSrc1;
-          }
-          break;
-        }
-        case 1: {
-          // improved
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc3;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc6;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc3;
-          } else {
-            obj.iconSrc = self.inspectSrc3;
-          }
-          break;
-        }
+      self.report = obj;
+    },
 
-        case 2: {
-          // pass
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc2;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc5;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc2;
-          } else {
-            obj.iconSrc = self.inspectSrc2;
-          }
-          break;
+    getIconSrc(status) {
+      const statusAndLangAndIconMap = [
+        {
+          status: 0,
+          statusStr: this.$t('overview.danger'),
+          children: [{
+            'zh': require('../../../static/img/dangerous_cn.png'),
+            'zhtw': require('../../../static/img/dangerous_tw.png'),
+            'en': require('../../../static/img/dangerous_en.png'),
+            'ja-JP': require('../../../static/img/dangerous_ja.png'),
+            'ko-KR': require('../../../static/img/dangerous_ko.png')
+          }]
+        },
+        {
+          status: 1,
+          statusStr: this.$t('overview.improve'),
+          children: [{
+            'zh': require('../../../static/img/improved_cn.png'),
+            'zhtw': require('../../../static/img/improved_cn.png'),
+            'en': require('../../../static/img/improved_en.png'),
+            'ja-JP': require('../../../static/img/improved_ja.png'),
+            'ko-KR': require('../../../static/img/improved_ko.png')
+          }]
+        },
+        {
+          status: 2,
+          statusStr: this.$t('overview.pass'),
+          children: [{
+            'zh': require('../../../static/img/good_cn.png'),
+            'zhtw': require('../../../static/img/good_cn.png'),
+            'en': require('../../../static/img/good_en.png'),
+            'ja-JP': require('../../../static/img/good_ja.png'),
+            'ko-KR': require('../../../static/img/good_ko.png')
+          }]
         }
-        default: {
-          // good
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc8;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc9;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc10;
-          } else {
-            obj.iconSrc = self.inspectSrc8;
+      ];
+
+      let iconSrc = '';
+      const filterMap = statusAndLangAndIconMap.filter(map => map.status === status);
+      if (filterMap.length > 0) {
+        for (let lang in filterMap[0].children[0]) {
+          if (lang === this.lang) {
+            iconSrc = filterMap[0].children[0][lang];
           }
-          break;
         }
       }
-      self.report = obj;
+      console.log(iconSrc);
+      return iconSrc;
     },
 
     getItemsPassOrFailed(groupType, grade, qualifiedScore) {
@@ -873,26 +870,15 @@ export default {
       });
     },
 
-    async getReportInfo() {
-      const self = this;
-      const reportId = self.report.reportId;
-      const temp = [];
-      temp.push(reportId);
-      const params = {
-        reportIds: temp
-      };
-      getInspectReportInfo(params).then(async res => {
-        if (res.errCode === 0 && res.data.length > 0) {
-          const data = res.data[0].info;
-          self.totalScore = data.totalScore;
-          this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
-          self.getGroupsData(data.groups);
-          self.reportData = data;
-          self.getPageDataBasedOnTemplate(self.reportData);
-        }
-      }).catch(err => {
-        console.log('InspectReportDetail-getReportInfo: ' + err);
-      });
+    async getReportInfo(res) {
+      if (res.errCode === 0 && res.data.length > 0) {
+        const data = res.data[0].info;
+        this.totalScore = data.totalScore;
+        this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
+        this.getGroupsData(data.groups);
+        this.reportData = data;
+        this.getPageDataBasedOnTemplate(this.reportData);
+      }
     },
 
     getGroupsData(groups) {
@@ -946,6 +932,7 @@ export default {
       const map = this.getDetailNameAndHandlerMap();
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
+      console.log(this.templateConfig);
       this.templateConfig.forEach(config => {
         if (map.has(config.name)) {
           const fnName = map.get(config.name);
@@ -1265,7 +1252,6 @@ export default {
             itemStyle: {
               normal: {
                 color: function(params) {
-                  console.log(params);
                   const colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
                     '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
                   return colorList[params.dataIndex];
@@ -1475,23 +1461,7 @@ export default {
         }
         .exportbtn{
           display: inline-block;
-          width:120px;
-          min-width: 85px;
-          height:36px;
-          line-height: 36px;
-          border-radius: 2px;
-          text-align: center;
-          margin-left:calc(20 / 1920 * 100vw);
-          margin-right: calc(30 / 1920 * 100vw);
-          background-color: $red;
-          color:#ffffff;
-          cursor: pointer;
-          span{
-            font-size:14px;
-          }
-          .export{
-            font-size:20px;
-          }
+          min-width:120px;
         }
       }
     }
@@ -1758,6 +1728,7 @@ export default {
               padding-top:10px;
               padding-bottom: 10px;
               display: flex;
+              justify-content: space-between;
               .ignore-btn{
                 width:50px;
                 height:24px;
@@ -1790,7 +1761,6 @@ export default {
                 border-radius: 20px;
               }
               .detail-title{
-                flex: 1;
                 .title1{
                 font-size: calc(14 / 1920 * 100vw);
                 color:#182752;

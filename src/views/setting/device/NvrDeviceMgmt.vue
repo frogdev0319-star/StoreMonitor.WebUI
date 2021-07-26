@@ -23,7 +23,7 @@
         <el-button
           v-for="(item,index) in btnList"
           :key="index"
-          :class="lang === 'en' ? 'en-el-handle-btn': 'el-handle-btn'"
+          :class="lang.indexOf('zh') === -1 ? 'en-el-handle-btn': 'el-handle-btn'"
           :disabled="index === 2"
           size="mini"
           @click="handleNVR(index,item)">
@@ -35,7 +35,10 @@
       </div>
     </el-col>
     <el-col :span="24" class="el-tabPanels">
-      <el-tabs id="en-devicetabs-content" v-model="activeName" @tab-click="handleClick">
+      <el-tabs
+        :id="lang.indexOf('ja') !== -1 ? 'ja-devicetabs-content' : 'en-devicetabs-content'"
+        v-model="activeName"
+        @tab-click="handleClick">
         <el-tab-pane :label="$t('deviceView.mediaService')" name="dash">
           <el-col
             :span="varWindowWidth < 1540 ? 12 : 10"
@@ -116,7 +119,7 @@
           </el-col>
         </el-tab-pane>
         <el-tab-pane :label="$t('deviceView.videoMangement')" name="video">
-          <el-col :span="lang === 'en' && varWindowWidth < 1920 ? 9 : 10" class="lisde">
+          <el-col :span="lang.indexOf('zh') === -1 && varWindowWidth < 1920 ? 9 : 10" class="lisde">
             <div class="nvr-info">
               <span class="info-title">{{ $t('deviceView.deviceInfo') }}</span>
               <el-button
@@ -128,21 +131,21 @@
               </el-button>
             </div>
             <div class="nvr-title tabTitle">
-              <div :class="lang === 'en' ? 'en-name-title titles': 'name-title titles'">
+              <div :class="lang.indexOf('zh') === -1 ? 'en-name-title titles': 'name-title titles'">
                 <span>{{ $t('deviceView.nvr') }}</span>
                 <i
                   :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}"
                   class="icon-filter"
                   @click="filterNVR"/>
               </div>
-              <div :class="lang=='en' ? 'en-store-title titles': 'store-title titles'" >
+              <div :class="lang.indexOf('zh') === -1 ? 'en-store-title titles': 'store-title titles'" >
                 <span>{{ $t('deviceView.store') }}</span>
                 <i
                   :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}"
                   class="icon-filter"
                   @click="filterStore"/>
               </div>
-              <div :class="lang === 'en' ? 'en-count-title titles': 'count-title titles'" >
+              <div :class="lang.indexOf('zh') === -1 ? 'en-count-title titles': 'count-title titles'" >
                 <span>{{ $t('deviceView.channelNum') }}</span>
               </div>
             </div>
@@ -314,7 +317,7 @@
               </el-button>
             </div>
           </el-dialog>
-          <el-col :span="lang === 'en' && varWindowWidth < 1920 ? 15 : 14" class="risde">
+          <el-col :span="lang.indexOf('zh') === -1 && varWindowWidth < 1920 ? 15 : 14" class="risde">
             <div class="nvr-info">
               <span class="info-title">{{ $t('deviceView.nvrChannelSetting') }}</span>
               <el-button

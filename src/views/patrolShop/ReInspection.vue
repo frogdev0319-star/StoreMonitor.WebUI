@@ -5,7 +5,7 @@
         <span v-if="showStoreUp" class="lside-title">
           {{ store.storeTitle }}
         </span>
-        <div v-if="showStoreUp" :class="store.storeUp?'coll':'nocoll'" class="storeUp-content" @click="addStoreUp">
+        <div v-if="showStoreUp" :class="storeUpClass" @click="addStoreUp">
           <i :class="store.storeUp?'coll-icon':'nocoll-icon'" class="iconfont icon-iconfontstart" style="vertical-align: middle;"/>
           <span :class="store.storeUp?'coll-font':'nocoll-font'">{{ store.storeUpTitle }}</span>
         </div>
@@ -156,12 +156,12 @@
           </div>
           <img :src="arrows2Src" alt="arrow2">
           <div class="iconright-content">
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
+            <div :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'">
               <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
               <span>{{ $t('remotePatrol.snapshot') }}</span>
             </div>
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'" style="display: none">
-              <i v-if="lang =='en' " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
+            <div :class="lang.indexOf('zh') === -1? 'en-iconright' : 'iconright'" style="display: none">
+              <i v-if="lang.indexOf('zh') === -1 " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
               <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
               <span>{{ $t('remotePatrol.record') }}</span>
             </div>
@@ -484,8 +484,9 @@
       </el-tabs>
       <div class="patrol-select">
         <div class="patrol-content">
-          <p v-if="lang!= 'en'" class="patrol-title">{{ $t('storeView.selectPlaceholder') }}，<span v-if="patrolStoreName!=null">{{ patrolStoreName }}</span><span v-else>{{ $t('remotePatrol.stores') }}</span>{{ $t('storeView.bindInspectList') }}</p>
-          <p v-if="lang== 'en'" class="patrol-title">Please select the inspection list associated with <span v-if="patrolStoreName!=null">{{ patrolStoreName }}</span><span v-else>{{ $t('remotePatrol.stores') }}</span></p>
+          <p class="patrol-title">
+            {{ $t('remotePatrol.selectInspectListWithStore', {storeName: patrolStoreName}) }}
+          </p>
           <el-dropdown trigger="click" placement="bottom" class="patrol-dropdown" @command="changeInspect">
             <span class="el-dropdown-link">
               <p v-if="patrolstore!=''" class="link-span">{{ patrolstore }}</p>
@@ -749,7 +750,16 @@ export default {
     }),
     ...mapGetters(
       ['isEzviz']
-    )
+    ),
+
+    storeUpClass() {
+      return {
+        'coll': this.store.storeUp,
+        'nocoll': !this.store.storeUp,
+        'storeUp-content': this.lang.indexOf('ja') === -1,
+        'ja-storeUp-content': this.lang.indexOf('ja') !== -1
+      }
+    }
   },
   watch: {
     accountChanged(val, oldVal) {
@@ -1638,8 +1648,8 @@ export default {
         self.$refs.dashVideo.editCount++;
       } else if(self.vendor === 1) {
         self.$refs.ezvizVideo.editCount++;
-      } else {
-        self.$refs.beseyeVideo.editCount++;
+      }else{
+        self.editCount++;
       }
       self.curItemIndex = index;
       self.curItem = item;
@@ -3168,6 +3178,12 @@ export default {
             margin-left: 4px;
           }
         }
+
+        .ja-storeUp-content{
+          @extend .storeUp-content;
+          width: 120px;
+        }
+
         .el-submit{
           position: absolute;
           @include point(right,20);
@@ -3230,7 +3246,7 @@ export default {
           position: absolute;
           top: 30%;
           right: 20px;
-          width: 260px;
+          width: auto;
           img{
             @include point(height,42);
             position: relative;
@@ -3595,6 +3611,7 @@ export default {
           position: absolute;
           width: auto;
           z-index: 1000;
+          max-width: 330px;
           img{
             @include point(height,42);
             position: relative;
@@ -4045,6 +4062,9 @@ export default {
             display: block;
             @include point(margin,5);
             @include point(margin-left,15);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .activeClass{
             background-color: #FDE8EF !important;

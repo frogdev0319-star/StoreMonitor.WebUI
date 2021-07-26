@@ -17,7 +17,7 @@
               <span class="title">{{ $t('overview.itemChartReport') }}</span>
               <div class="operation-btns">
                 <delay-button
-                  :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                  :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                   type="primary"
                   size="mini"
                   @click="handleDown"
@@ -88,7 +88,7 @@
           <el-col :span="24" class="items-table">
             <div class="operation-btns">
               <delay-button
-                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
@@ -314,7 +314,7 @@ export default {
           'sortable': 'custom',
           'pdfmaxWidth': '10%',
           'width': '130',
-          'maxWidth': '150'
+          'maxWidth': '160'
         },
         {
           'prop': 'numOfIgnored',

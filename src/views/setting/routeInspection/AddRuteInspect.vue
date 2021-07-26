@@ -111,7 +111,7 @@
     <el-col :span="17" class="el-rute-nape">
       <div class="nape-content">
         <div class="title-content">
-          <span :class="lang=='en' ? 'en-item-title': 'item-title'" class="level2">
+          <span :class="lang.indexOf('zh') === -1 ? 'en-item-title': 'item-title'" class="level2">
             <i class="iconfont icon-icon-test icontitle"/>
           <span class="level2-name">{{ napeTitle }}</span></span>
           <div class="btn-content">
@@ -154,7 +154,7 @@
               <div v-if="activeSheetName!='1'" class="nape-score1-title" style="flex:1;">
                 <span>{{ $t('insSettingView.score') }}</span>
               </div>
-              <div :class="lang=='en'? 'en-nape-handle-title':'nape-handle-title'" style="flex:1;">
+              <div :class="lang.indexOf('zh') === -1 ? 'en-nape-handle-title':'nape-handle-title'" style="flex:1;">
                 <span>{{ $t('insSettingView.operation') }}</span>
               </div>
             </div>
@@ -172,19 +172,19 @@
                 <span>{{ item.napeDep }}</span>
               </div>
               <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
-                <span style="position:relative;left:15%;">{{ item.Score_1 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
+                <span style="position:relative;left:15%;">{{ item.Score_1 }}{{ lang.indexOf('zh') !== -1 ? $t('remotePatrol.scorecount'):'' }}</span>
               </div>
               <div v-if="activeSheetName=='1'" :style="item.isClick?'':'flex:1;'" class="nape-scores-handle">
                 <el-tooltip class="item" effect="dark" placement="top">
                   <div slot="content" style="max-width:120px;">{{ item.availableScoreStr }}</div>
-                  <span style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.availableScoreStr }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
+                  <span style="width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ item.availableScoreStr }}{{ lang.indexOf('zh') !== -1 ? $t('remotePatrol.scorecount'):'' }}</span>
                 </el-tooltip>
               </div>
               <div v-if="activeSheetName=='1'" class="nape-scores-handle" style="flex:1;">
-                <span>{{ item.Score_2 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
+                <span>{{ item.Score_2 }}{{ lang.indexOf('zh') !== -1 ? $t('remotePatrol.scorecount'):'' }}</span>
               </div>
               <div v-if="activeSheetName!='1'" class="nape-scores-handle" style="flex:1;">
-                <span>{{ item.Score_3 }}{{ lang!='en'?$t('remotePatrol.scorecount'):'' }}</span>
+                <span>{{ item.Score_3 }}{{ lang.indexOf('zh') !== -1 ? $t('remotePatrol.scorecount'):'' }}</span>
               </div>
               <div class="nape-items-handle" style="flex:1;">
                 <i class="iconfont icon-bianji" style="cursor:pointer;margin-right:10px;" @click="handleEdit(index,item)"/>
@@ -515,7 +515,7 @@ export default {
       item.isClick = true;
       self.groupIndex = index;
       self.curGroup = item;
-      if (self.lang == 'en') {
+      if (self.lang.indexOf('zh') === -1) {
         self.napeTitle = `${self.$t('insSettingView.itemsOfCate')} ${item.groupName}`;
       } else {
         self.napeTitle = `${item.groupName} ${self.$t('insSettingView.itemsOfCate')}`;
@@ -1324,7 +1324,7 @@ export default {
         })
         self.curGroup = self.groupList[index];
         self.groupIndex = index;
-        if (self.lang === 'en') {
+        if (self.lang.indexOf('zh') === -1) {
           self.napeTitle = `${self.$t('insSettingView.itemsOfCate')} ${self.groupList[index].groupName}`;
         } else {
           self.napeTitle = `${self.groupList[index].groupName} ${self.$t('insSettingView.itemsOfCate')}`;
@@ -1332,7 +1332,7 @@ export default {
         self.getNapeList(index, self.groupList[index]);
       } else {
         self.napeList = [];
-        if (self.lang === 'en') {
+        if (self.lang.indexOf('zh') === -1) {
           self.napeTitle = `${self.$t('insSettingView.itemsOfCate')}`;
         } else {
           self.napeTitle = `${self.$t('insSettingView.itemsOfCate')}`;

@@ -17,13 +17,13 @@
           :picker-options="dateOpt"
           :popper-class="poperClass"
           :default-time="defaultTime"
+          :start-placeholder="$t('overview.startDate')"
+          :end-placeholder="$t('overview.endDate')"
           type="datetimerange"
           range-separator="~"
           size="mini"
           format="yyyy/MM/dd HH:mm:ss"
           class="date-range"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
           @change="dateChange"
           @focus="dateFocus"/>
         <el-tooltip
@@ -84,7 +84,7 @@
           size="mini"
           @click="searchData"
         >
-          <span>{{ $t('remotePatrol.search') }}</span>
+          <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
         </delay-button>
       </el-col>
     </el-col>
@@ -124,16 +124,18 @@
               <i class="iconfont icon-liebiao iconCard"/>
               <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
             </div>
-            <el-button
-              :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+            <delay-button
+              :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+              class="export-report-btn"
               type="primary"
               size="mini"
-              @click="export2Excel" >
-              <div class="btn-area">
+              @click="export2Excel"
+            >
+              <div class="button-area">
                 <img :src="exportPng" class="icon-excel">
-                <span class="spanClass">{{ $t('eventView.exportReport') }}</span>
+                <span>{{ $t('eventView.exportReport') }}</span>
               </div>
-            </el-button>
+            </delay-button>
           </div>
         </el-col>
         <div v-if="ShowCard" :style="{'height':varyWindowHeight*0.54+'px'}" class="showCardHeight">
@@ -154,7 +156,7 @@
                       class="iconfont inspectIcon"/>
                     <div class="item-score">
                       <span class="score-num">{{ item.totalScore }}</span>
-                      <span class="score-unit" v-if="lang !== 'en'">{{ $t('insSettingView.scores')}}</span>
+                      <span v-if="lang.indexOf('zh') !== -1" class="score-unit">{{ $t('insSettingView.scores') }}</span>
                     </div>
                   </div>
                   <div class="item-content">
@@ -253,16 +255,6 @@ export default {
       inspectSrc: require('../../../static/img/remote_patrol.png'),
       insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
       searchContent: false,
-      inspectSrc1: require('../../../static/img/dangerous_cn.png'),
-      inspectSrc2: require('../../../static/img/good_cn.png'),
-      inspectSrc3: require('../../../static/img/improved_cn.png'),
-      inspectSrc4: require('../../../static/img/dangerous_en.png'),
-      inspectSrc5: require('../../../static/img/good_en.png'),
-      inspectSrc6: require('../../../static/img/improved_en.png'),
-      inspectSrc7: require('../../../static/img/dangerout_tw.png'),
-      inspectSrc8: require('../../../static/img/excellent_cn.png'),
-      inspectSrc9: require('../../../static/img/excellent_en.png'),
-      inspectSrc10: require('../../../static/img/excellent_tw.png'),
       exportPng: require('../../../static/img/excel.png'),
       reportList: [],
       curSortType: 0,
@@ -324,13 +316,13 @@ export default {
           prop: 'tagName',
           label: this.$t('overview.patrolLists'),
           sortable: false,
-          width: '150'
+          width: '200'
         },
         {
           prop: 'modeText',
           label: this.$t('remotePatrol.patrolWay'),
           sortable: false,
-          width: '150'
+          width: '200'
         },
         {
           prop: 'status',
@@ -348,7 +340,7 @@ export default {
           prop: 'datestr',
           label: this.$t('remotePatrol.patrolDate'),
           sortable: 'custom',
-          width: '164'
+          width: '220'
         }
       ],
       storeList: [],
@@ -573,65 +565,53 @@ export default {
     },
 
     getIconSrc(status) {
-      const statusAndIconObj = {};
-      switch (status) {
-        case 0: {
-          // dangerous
-          statusAndIconObj.status = this.$t('overview.danger');
-          if (this.lang === 'zh') {
-            statusAndIconObj.iconSrc = this.inspectSrc1;
-          } else if (this.lang === 'en') {
-            statusAndIconObj.iconSrc = this.inspectSrc4;
-          } else if (this.lang === 'zhtw') {
-            statusAndIconObj.iconSrc = this.inspectSrc7;
-          } else {
-            statusAndIconObj.iconSrc = this.inspectSrc1;
-          }
-          return statusAndIconObj;
+      const statusAndLangAndIconMap = [
+        {
+          status: 0,
+          statusStr: this.$t('overview.danger'),
+          children: [{
+            'zh': require('../../../static/img/dangerous_cn.png'),
+            'zhtw': require('../../../static/img/dangerous_tw.png'),
+            'en': require('../../../static/img/dangerous_en.png'),
+            'ja-JP': require('../../../static/img/dangerous_ja.png'),
+            'ko-KR': require('../../../static/img/dangerous_ko.png')
+          }]
+        },
+        {
+          status: 1,
+          statusStr: this.$t('overview.improve'),
+          children: [{
+            'zh': require('../../../static/img/improved_cn.png'),
+            'zhtw': require('../../../static/img/improved_cn.png'),
+            'en': require('../../../static/img/improved_en.png'),
+            'ja-JP': require('../../../static/img/improved_ja.png'),
+            'ko-KR': require('../../../static/img/improved_ko.png')
+          }]
+        },
+        {
+          status: 2,
+          statusStr: this.$t('overview.pass'),
+          children: [{
+            'zh': require('../../../static/img/good_cn.png'),
+            'zhtw': require('../../../static/img/good_cn.png'),
+            'en': require('../../../static/img/good_en.png'),
+            'ja-JP': require('../../../static/img/good_ja.png'),
+            'ko-KR': require('../../../static/img/good_ko.png')
+          }]
         }
-        case 1: {
-          // improved
-          statusAndIconObj.status = this.$t('overview.improve');
-          if (this.lang === 'zh') {
-            statusAndIconObj.iconSrc = this.inspectSrc3;
-          } else if (this.lang === 'en') {
-            statusAndIconObj.iconSrc = this.inspectSrc6;
-          } else if (this.lang === 'zhtw') {
-            statusAndIconObj.iconSrc = this.inspectSrc3;
-          } else {
-            statusAndIconObj.iconSrc = this.inspectSrc3;
-          }
-          return statusAndIconObj;
-        }
+      ];
 
-        case 2: {
-          // pass
-          statusAndIconObj.status = this.$t('overview.pass');
-          if (this.lang === 'zh') {
-            statusAndIconObj.iconSrc = this.inspectSrc2;
-          } else if (this.lang === 'en') {
-            statusAndIconObj.iconSrc = this.inspectSrc5;
-          } else if (this.lang === 'zhtw') {
-            statusAndIconObj.iconSrc = this.inspectSrc2;
-          } else {
-            statusAndIconObj.iconSrc = this.inspectSrc2;
+      const statusAndIconObj = {};
+      const filterMap = statusAndLangAndIconMap.filter(map => map.status === status);
+      if (filterMap.length > 0) {
+        statusAndIconObj.status = filterMap[0].statusStr;
+        for (const lang in filterMap[0].children[0]) {
+          if (lang === this.lang) {
+            statusAndIconObj.iconSrc = filterMap[0].children[0][lang];
           }
-          return statusAndIconObj;
-        }
-        default : {
-          // good
-          if (this.lang === 'zh') {
-            statusAndIconObj.iconSrc = this.inspectSrc8;
-          } else if (this.lang === 'en') {
-            statusAndIconObj.iconSrc = this.inspectSrc9;
-          } else if (this.lang === 'zhtw') {
-            statusAndIconObj.iconSrc = this.inspectSrc10;
-          } else {
-            statusAndIconObj.iconSrc = this.inspectSrc8;
-          }
-          return statusAndIconObj;
         }
       }
+      return statusAndIconObj;
     },
 
     getInitReportList() {
@@ -743,8 +723,8 @@ export default {
     },
 
     sortChange(col) {
-      let self = this;
-      let order = col.order;
+      const self = this;
+      const order = col.order;
       if (order === 'ascending') {
         self.params.order = {
           'direction': 'asc',
@@ -844,7 +824,6 @@ export default {
     },
 
     onStoreChange(storeObj) {
-      console.log(storeObj);
       this.storeStr = storeObj.storeStr;
       this.storeFilterObj = storeObj;
     }
@@ -1048,6 +1027,8 @@ $suggestBack:#F1F6FE;
             margin-bottom: 15px;
             .list_card{
               float: right;
+              display: flex;
+              align-items: center;
               .pattern_btn{
                 display: inline-block;
                 height: calc(36/1920*100vw);
@@ -1065,69 +1046,8 @@ $suggestBack:#F1F6FE;
                   vertical-align: middle;
                 }
               }
-              .export-btn{
-                border-color: $red;
-                height: calc(36/1920*100vw);
-                width: calc(130/1920*100vw);
-                margin: 0;
-                padding: 0;
-                font-size: calc(14/1920*100vw);
-                line-height: calc(36/1920*100vw);
-                color: #ffffff;
-                border-width: 0;
-                border-radius: 4px;
-                top: calc(24/1920*100vw);
-                margin-left: calc(40/1920*100vw);
-                vertical-align: middle;
-                .btn-area{
-                  padding: 0 calc(6/1920*100vw);
-                  height: calc(36/1920*100vw);
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  .icon-excel{
-                    margin-right: calc(18/1920*100vw);
-                    font-size: calc(24/1920*100vw);
-                    height: calc(24/1920*100vw);
-                    width: calc(24/1920*100vw);
-                  }
-                  .spanClass{
-                    font-size: calc(14/1920*100vw);
-                    display: inline-block;
-                  }
-                }
-              }
-              .en-export-btn{
-                border-color: $red;
-                height: calc(36/1920*100vw);
-                margin: 0;
-                padding: 0;
-                font-size: calc(14/1920*100vw);
-                line-height: calc(36/1920*100vw);
-                color: #ffffff;
-                border-width: 0;
-                border-radius: 4px;
-                width: calc(130/1920*100vw);
-                min-width: 120px;
-                margin-left: calc(40/1920*100vw);
-                vertical-align: middle;
-                .btn-area{
-                  position: relative;
-                  padding: 0 calc(6/1920*100vw);
-                  height: calc(36/1920*100vw);
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  .icon-excel{
-                    margin-right: calc(10/1920*100vw);
-                    width: calc(24/1920*100vw);
-                    height: calc(24/1920*100vw);
-                  }
-                  .spanClass{
-                    font-size: calc(14/1920*100vw);
-                    display: inline-block;
-                  }
-                }
+              .export-report-btn{
+                margin-left: calc(20/1920*100vw);
               }
             }
         }

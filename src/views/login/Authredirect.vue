@@ -38,7 +38,7 @@ export default{
           } else if (obj.lang === 'zh-TW') {
             lang = 'zhtw';
           } else {
-            lang = 'en';
+            lang = obj.lang;
           }
           setCookie('lang', lang);
         }

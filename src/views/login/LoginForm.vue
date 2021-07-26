@@ -258,13 +258,16 @@ export default {
                   PermissionHelper.setData(resultData.authorities);
                 }
               });
-              self.$router.push({ path: '/', query: {
-                token: resData.token,
+              self.$router.push({
+                path: '/',
+                query: {
+                  token: resData.token,
                   userId: resData.userId,
                   ezvizProtrol: resData.ezvizProtrol,
                   lang: resData.lang,
                   deviceAuth: resData.deviceAuth
-              }});
+                }
+              });
 
             } else {
               console.log(res);

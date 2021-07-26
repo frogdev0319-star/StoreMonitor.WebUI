@@ -17,13 +17,13 @@
           :popper-class="poperClass"
           :picker-options="dateOpt"
           :default-time="defaultTime"
+          :start-placeholder="$t('overview.startDate')"
+          :end-placeholder="$t('overview.endDate')"
           type="datetimerange"
           range-separator="~"
           size="mini"
           format="yyyy/MM/dd HH:mm:ss"
           class="date-range"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
           @change="dateChange"/>
         <el-tooltip
           :popper-class="toolTipClass"
@@ -64,7 +64,7 @@
     </div>
     <div class="el-table-content">
       <delay-button
-        :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+        :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
         class="absolute-btn"
         type="primary"
         size="mini"
@@ -100,10 +100,30 @@
                 header-align="center"
                 align="center">
                 <template slot-scope="scope" >
-                  <span v-if="scope.row.status === 0" class="icon-span" style="background-color:#FDBA40;" >{{ $t('eventView.pending') }}</span>
-                  <span v-else-if="scope.row.status === 1" class="icon-span" style="background-color:#434C5E;" >{{ $t('eventView.handled') }}</span>
-                  <span v-else-if="scope.row.status === 2" class="icon-span" style="background-color:#6097F3;" >{{ $t('eventView.closed') }}</span>
-                  <span v-else-if="scope.row.status === 3" class="icon-span" style="background-color:#FDBA40;" >{{ $t('eventView.returnStatus') }}</span>
+                  <span
+                    v-if="scope.row.status === 0"
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
+                    style="background-color:#FDBA40;" >
+                    {{ $t('eventView.pending') }}
+                  </span>
+                  <span
+                    v-else-if="scope.row.status === 1"
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
+                    style="background-color:#434C5E;" >
+                    {{ $t('eventView.handled') }}
+                  </span>
+                  <span
+                    v-else-if="scope.row.status === 2"
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
+                    style="background-color:#6097F3;" >
+                    {{ $t('eventView.closed') }}
+                  </span>
+                  <span
+                    v-else-if="scope.row.status === 3"
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
+                    style="background-color:#FDBA40;" >
+                    {{ $t('eventView.returnStatus') }}
+                  </span>
                 </template>
               </el-table-column>
               <el-table-column
@@ -120,8 +140,8 @@
                   <span class="event-subject">{{ scope.row.subject }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="160"/>
-              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="120">
+              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="180"/>
+              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="130">
                 <template slot-scope="scope">
                   <div v-if="scope.row.attachment.length!==0">
                     <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="enclosure-icon">
@@ -362,6 +382,8 @@ export default {
     } else {
       self.getEventList('Back');
       self.getEventCount();
+      self.$route.meta.isBack = false;
+      self.isFirstLoad = false;
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
@@ -429,17 +451,18 @@ export default {
     },
 
     searchEventList() {
-      const self = this;
-      self.tableDataList[Number(self.activeName)].page = 1;
-      self.getEventList();
-      self.getEventCount();
+      this.tableDataList[Number(this.activeName)].page = 1;
+      this.getEventListAndCount();
     },
 
     searchData() {
-      const self = this;
-      self.tableDataList[Number(self.activeName)].page = self.page;
-      self.getEventList();
-      self.getEventCount();
+      this.tableDataList[Number(this.activeName)].page = this.page;
+      this.getEventListAndCount();
+    },
+
+    getEventListAndCount() {
+      this.getEventList();
+      this.getEventCount();
     },
 
     rowClickItem(row) {
@@ -493,6 +516,14 @@ export default {
       self.getEventListRequestParams(val);
       this.ifSaveParams && self.saveSearchParams();
       this.ifSaveParams = true;
+      if (self.params.clause.storeId.length === 0) {
+        this.tableDataList[tabIndex].tableData = [];
+        this.tableDataList[tabIndex].total = 0;
+        this.tableDataList[tabIndex].eventCount = 0;
+        this.totalElements = 0;
+        this.numberOfElements = 0;
+        return;
+      }
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
         const temp = [];
@@ -851,9 +882,7 @@ export default {
     },
 
     onStoreChange(storeObj) {
-      console.log(storeObj);
       this.storeFilterObj = storeObj;
-      !this.ifSaveParams && this.searchData();
     }
   },
 
@@ -925,6 +954,10 @@ $h1:#292e36;
         color:white;
         font-size: 12px;
     }
+    .ja-icon{
+      @extend .icon-span;
+      width: 80px;
+    }
     .icon-gengduo{
       font-size: calc(24/1920*100vw);
       vertical-align: middle;
@@ -937,7 +970,7 @@ $h1:#292e36;
         background-color: #fff;
         border-bottom: 1px solid #e3e9f4;
         padding: 30px 20px 30px 30px;
-        font-size: 14px;
+        font-size: calc(14/1920*100vw);
         color: $black;
         .el-area{
             overflow: hidden;

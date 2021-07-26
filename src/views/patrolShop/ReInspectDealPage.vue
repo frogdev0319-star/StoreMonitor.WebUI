@@ -3,8 +3,7 @@
     <div class="page-icon">
       <div class="icon-content">
         <img :src="isSuccess?sucSrc:errSrc" class="suc-icon">
-        <p v-if="isSuccess && lang !== 'en'" class="sucret-info">{{ curSecond }}s{{ $t('remotePatrol.return') }}</p>
-        <p v-if="isSuccess && lang === 'en'" class="sucret-info">{{ $t('remotePatrol.return') }} {{ curSecond }}s !</p>
+        <p v-if="isSuccess" class="sucret-info">{{ $t('remotePatrol.return', {seconds: curSecond}) }}</p>
       </div>
     </div>
     <div v-if="!isSuccess" class="page-err-btn">

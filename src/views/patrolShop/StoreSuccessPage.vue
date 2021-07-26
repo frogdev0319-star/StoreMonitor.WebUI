@@ -4,8 +4,7 @@
       <div class="icon-content">
         <img :src="isSuccess ? sucSrc:errSrc" class="suc-icon">
         <p :class="isSuccess ? 'sucInfo':'errInfo'">{{ retInfo }}</p>
-        <p v-if="isSuccess && lang !== 'en'" class="sucret-info">{{ curSecond }}{{ $t('remotePatrol.returnStoreMonitor') }}</p>
-        <p v-if="isSuccess && lang === 'en'" class="sucret-info">{{ $t('remotePatrol.return') }} {{ curSecond }}s!</p>
+        <p v-if="isSuccess" class="sucret-info">{{ $t('remotePatrol.returnStoreMonitor', {seconds: curSecond}) }}</p>
       </div>
     </div>
     <el-dialog
@@ -23,22 +22,22 @@
     </el-dialog>
     <div v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}" class="page-content">
       <div class="details">
-        <span v-if="lang ==='en'" class="en-event-label" style="margin-right: 25px;">{{ $t('remotePatrol.storeName') }}:</span>
-        <span v-else class="event-label" >{{ $t('remotePatrol.storeName') }}</span>
+        <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 25px;">{{ $t('remotePatrol.storeName') }}:</span>
+        <span v-else class="event-label" >{{ $t('remotePatrol.storeName') }}:</span>
         <span>{{ storeName }}</span>
       </div>
       <div class="details">
-        <span v-if="lang ==='en'" class="en-event-label" style="margin-right: 75px;">{{ $t('remotePatrol.eventTitle') }}:</span>
+        <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 75px;">{{ $t('remotePatrol.eventTitle') }}:</span>
         <span v-else class="event-label" >{{ $t('remotePatrol.eventTitle') }}：</span>
         <span>{{ eventName }}</span>
       </div>
       <div class="details">
-        <span v-if="lang ==='en'" class="en-event-label" style="margin-right: 60px;">{{ $t('remotePatrol.eventStatus') }}:</span>
+        <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 60px;">{{ $t('remotePatrol.eventStatus') }}:</span>
         <span v-else class="event-label" >{{ $t('remotePatrol.eventStatus') }}：</span>
         <span class="icon-span">{{ $t('remotePatrol.untreated') }}</span>
       </div>
       <div class="details">
-        <span :class="lang === 'en' ? 'en-event-label' : 'event-label'">{{ $t('remotePatrol.description') }}:</span>
+        <span :class="lang.indexOf('zh') === -1 ? 'en-event-label' : 'event-label'">{{ $t('remotePatrol.description') }}:</span>
         <div
           v-for="(item,index) in commentList"
           v-if="item.eventDes.length > 0"

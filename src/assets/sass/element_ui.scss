@@ -212,11 +212,12 @@ body .el-table th.gutter {
   }
   .el-loading-spinner {
     background: url("~@/../static/img/loading.gif") no-repeat;
-    background-position: center;
+    background-position: calc(50% - 50px) 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 32px;
+    position: relative;
   }
 
   .el-loading-text {
@@ -225,7 +226,8 @@ body .el-table th.gutter {
     display: inline-block;
     height: 32px;
     line-height: 32px;
-    margin: 3px 0 3px 90px;
+    position: absolute;
+    left: calc(50% - 32px);
   }
 }
 
