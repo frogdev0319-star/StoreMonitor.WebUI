@@ -39,7 +39,7 @@ export default {
     'patrolShop': 'インスペクション管理/デーリーインスペクション',
     'monitorStoreSet': 'デバイス管理の監視',
     'checkSchedule': 'スケジュール設定（スケジュールをチェックする）',
-    'patrolSecheduleManage': 'スケジュール設定（スケジュールをインスペクションする)',
+    'patrolSecheduleManage': 'スケジュール設定（スケジュールをインスペクションする）',
     'confirmSum': '確認',
     'reportDetails': 'レポートの詳細',
     'eventDetails': 'イベントの詳細',
@@ -62,7 +62,7 @@ export default {
     'noAuthority': 'No authority!',
     'loginAbnormal': 'The login information is abnormal, please sign in again!',
     'insepctionReportSetting': 'レポート構成',
-    'inspectingSettingOfReport': 'スケジュール設定(レポート構成)',
+    'inspectingSettingOfReport': 'スケジュール設定（レポート構成）',
     'noInspectionAccessRights': 'No Inspection Access Rights',
     'noRight': ''
   },
