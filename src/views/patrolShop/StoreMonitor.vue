@@ -105,26 +105,6 @@
           </el-button>
         </div>
       </el-dialog>
-      <el-dialog
-        v-if="showOuter"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="showOuter"
-        :close-on-click-modal="false"
-        :width="680 * percentHeight + 'px'"
-        height="300px"
-        top="5%"
-      >
-        <div class="canvas-content" style="overflow: hidden">
-          <hr class="dialog-hr" >
-          <div class="dialog-img-content">
-            <img
-              :src="checkImgSrc"
-              :width="600 * percentHeight"
-              :height="430 * percentHeight"
-            >
-          </div>
-        </div>
-      </el-dialog>
       <dialog-vue
         :dialog-title="changeStoreObj.title"
         :show-info="changeStoreObj.showInfo"
@@ -342,13 +322,10 @@
                       class="el-icon-close icondelete"
                       @click="deleteImg(item, index)"
                     />
-                    <img
+                    <el-image
                       :src="item.src"
-                      :width="item.width"
-                      :height="item.height"
-                      style="cursor: pointer"
-                      @click="openOuter(item)"
-                    >
+                      :style="{width: item.width, height: item.height}"
+                      :preview-src-list="getImgList(index, sourceList)"/>
                   </div>
                 </div>
                 <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
@@ -680,8 +657,6 @@ export default {
       removeIconSrc: require('../../../static/img/cancel.png'),
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
-      checkImgSrc: '',
-      showOuter: false,
       showPenBtn: false,
       penList: [
         {
@@ -1461,17 +1436,20 @@ export default {
       return url;
     },
 
-    openOuter(item) {
-      let self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.src;
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
 
     deleteImg(item, index) {
-      let self = this;
-      self.sourceList.splice(index, 1);
+      this.sourceList.splice(index, 1);
     },
 
     getStorageInfo(){

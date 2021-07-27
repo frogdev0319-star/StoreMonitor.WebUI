@@ -106,46 +106,45 @@
                         </div>
                         <div v-if="inspectItem.type==1&&item.detailType!=1" class="title-btn">{{ $t('remotePatrol.scoreUnit') }}
                           <span>
-                        <span>{{ inspectItem.itemgetScore }}</span>
-                        <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
-                      </span>
+                            <span>{{ inspectItem.itemgetScore }}</span>
+                            <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
+                          </span>
                         </div>
-                        <div class="total-score" v-if="inspectItem.showTotalScore">
-                          {{$t('remotePatrol.totalScoreUnit')}}{{inspectItem.itemScore}}
+                        <div v-if="inspectItem.showTotalScore" class="total-score">
+                          {{ $t('remotePatrol.totalScoreUnit') }}{{ inspectItem.itemScore }}
                         </div>
                       </div>
                     </div>
-                    <div v-if="inspectItem.sourceList!= null && inspectItem.sourceList.length !== 0
+                    <div
+                      v-if="inspectItem.sourceList!= null && inspectItem.sourceList.length !== 0
                       || inspectItem.inspectInput != null&&inspectItem.inspectInput !== ''"
-                           class="content-detail-main"
-                           style="padding-bottom: 20px;">
-                        <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                        <div v-if="inspectItem.inspectInput!=null&&inspectItem.inspectInput!=''" class="cdm-word">
-                          <span>{{ inspectItem.inspectInput }}</span>
-                        </div>
-                        <div v-if="inspectItem.sourceList!=null&&inspectItem.sourceList.length!=0" class="cdm-pic">
-                          <div
-                            v-for="(sourceitem,sourceindex) in inspectItem.sourceList"
-                            :key="sourceindex"
-                            :height="imgHeight+'px'"
-                            class="source-details">
-                            <div v-if="sourceitem.mediaType==2" class="img-content">
-                              <img
-                                :title="imgTitle"
-                                :src="sourceitem.src"
-                                :height="imgHeight+'px'"
-                                :onerror="deafultImg"
-                                class="imgLittle imgInner"
-                                @click="openOuter(sourceitem,$event)">
-                            </div>
-                            <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
-                              <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                              <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
-                            </div>
+                      class="content-detail-main"
+                      style="padding-bottom: 20px;">
+                      <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
+                      <div v-if="inspectItem.inspectInput!=null&&inspectItem.inspectInput!=''" class="cdm-word">
+                        <span>{{ inspectItem.inspectInput }}</span>
+                      </div>
+                      <div v-if="inspectItem.sourceList!=null&&inspectItem.sourceList.length!=0" class="cdm-pic">
+                        <div
+                          v-for="(sourceitem,sourceindex) in inspectItem.sourceList"
+                          :key="sourceindex"
+                          :height="imgHeight+'px'"
+                          class="source-details">
+                          <div v-if="sourceitem.mediaType==2" class="img-content">
+                            <el-image
+                              :src="sourceitem.src"
+                              :style="{width: imgWidth, height: imgHeight+'px'}"
+                              :preview-src-list="getImgList(sourceindex, inspectItem.sourceList)"
+                              class="imgLittle imgInner"/>
+                          </div>
+                          <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                            <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                            <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
                           </div>
                         </div>
                       </div>
                     </div>
+                  </div>
                 </template>
                 <template v-else>
                   <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
@@ -161,13 +160,11 @@
                     <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
                       <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
                         <div v-if="sourceitem.mediaType==2" class="img-content">
-                          <img
-                            :title="imgTitle"
+                          <el-image
                             :src="sourceitem.src"
-                            :height="imgHeight+'px'"
-                            :onerror="deafultImg"
-                            class="imgLittle imgInner"
-                            @click="openOuter(sourceitem,$event)">
+                            :style="{width: imgWidth, height: imgHeight+'px'}"
+                            :preview-src-list="getImgList(sourceindex, inspectItem.sourceList)"
+                            class="imgLittle imgInner"/>
                         </div>
                         <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -201,22 +198,6 @@
                 </div>
               </div>
             </el-dialog>
-            <transition name="fade">
-              <el-dialog
-                v-if="showOuter"
-                :title="$t('eventView.view')"
-                :visible.sync="showOuter"
-                :close-on-click-modal="false"
-                width="850px"
-                top="12%">
-                <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-                  <hr class="dialog-hr">
-                  <div class="dialog-source-content">
-                    <img v-if="showImg" :src="checkImgSrc">
-                  </div>
-                </div>
-              </el-dialog>
-            </transition>
           </div>
         </el-col>
       </el-row>
@@ -248,9 +229,6 @@ export default {
       uploadProgress: false,
       totalnumOfPic: 0,
       uploadingnumOfPic: 0,
-      showOuter: false,
-      showImg: false,
-      checkImgSrc: '',
       scorecount: 0,
       radioList: [],
       imgTitle: '',
@@ -363,16 +341,19 @@ export default {
         this.previewplayer.play();
       });
     },
-    openOuter(item, $ev) {
-      const self = this;
-      console.log(item);
-      console.log($ev.target.onerror);
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.src;
-        self.showImg = true;
+
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
+
     getFileUrl(fileName) {
       const self = this;
       const bucketName = self.oss.ossBucketName;
@@ -480,9 +461,9 @@ export default {
             objItem.ts = new Date().getTime();
             objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
             if (inspect[i].type === 0 || inspect[i].type === 2) {
-              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
+              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
             } else {
-              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
+              objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : inspect[i].inspectList[g].items[j].itemgetScore;
             }
 
             objItem.storeId = self.store.storeId;
@@ -605,7 +586,7 @@ export default {
       const allTypeArr = new Set();
       let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
       let PassFileXN = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0;
-      let ScoreX = 0,ScoreN = 0,ScoreXN = 0,ScoreTotalScoreX = 0, allScoreB = 0,ScoreTotalScoreSystem = 0;
+      let ScoreX = 0, ScoreN = 0, ScoreXN = 0, ScoreTotalScoreX = 0, allScoreB = 0, ScoreTotalScoreSystem = 0;
       let otherGetscoreTotal = 0, OtherTotalScoreSystem = 0;
       inspect.forEach(p_item => {
         if (p_item.dealCount !== 0) {
@@ -617,7 +598,7 @@ export default {
       let inspectPic = 0;
       inspect.forEach(p_item => {
         let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
-        let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
+        let PassFile_totalScoreX = 0, Score_totalScoreX = 0;
         p_item.inspectList.forEach(item => {
           let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
           let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
@@ -649,50 +630,48 @@ export default {
             if (p_item.type === 0) {
               PassFileTS += s_item.itemgetScore;
               totalScore0 += s_item.itemScore;
-              if (!s_item.isIgnore&&!s_item.manualIgnore) {
+              if (!s_item.isIgnore && !s_item.manualIgnore) {
                 PassFileX += s_item.itemgetScore;
                 PassFile_totalScoreX += s_item.itemScore;
                 tab1GetScoreNoContainedIngored += s_item.itemgetScore;
-              }else{
+              } else {
                 PassFileN += s_item.itemScore;
                 tab1GetScoreContainedIgnored += s_item.itemScore;
               }
-              if(inspect.length > 1){
-                if(!inspectSettings.includedInTotalScoreWithType1){
+              if (inspect.length > 1) {
+                if (!inspectSettings.includedInTotalScoreWithType1) {
                   s_item.showTotalScore = false;
-                } else if(s_item.isIgnore || s_item.manualIgnore){
-                  if(inspectSettings.qualifiedForIgnoredWithType1){
+                } else if (s_item.isIgnore || s_item.manualIgnore) {
+                  if (inspectSettings.qualifiedForIgnoredWithType1) {
                     s_item.showTotalScore = true;
-                  }
-                  else{
+                  } else {
                     s_item.showTotalScore = false;
                   }
-                } else{
+                } else {
                   s_item.showTotalScore = true;
                 }
               } else {
-                if(s_item.isIgnore || s_item.manualIgnore){
+                if (s_item.isIgnore || s_item.manualIgnore) {
                   s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType1;
-                }
-                else{
+                } else {
                   s_item.showTotalScore = true;
                 }
               }
             } else if (p_item.type === 1) {
               totalScore += s_item.itemScore;
               ScoreTS += s_item.itemgetScore;
-              if (!s_item.isIgnore&&!s_item.manualIgnore) {
+              if (!s_item.isIgnore && !s_item.manualIgnore) {
                 ScoreX += s_item.itemgetScore;
                 Score_totalScoreX += s_item.itemScore;
                 notAddIgnoretotalScore += s_item.itemScore;
                 tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
-              }else{
+              } else {
                 ScoreN += s_item.itemScore;
                 tab2IgnoredItemsGetScore += s_item.itemScore;
               }
-              if(s_item.isIgnore || s_item.manualIgnore){
+              if (s_item.isIgnore || s_item.manualIgnore) {
                 s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType2;
-              } else{
+              } else {
                 s_item.showTotalScore = true;
               }
             } else if (p_item.type === 2 && !s_item.isIgnore) {
@@ -704,18 +683,18 @@ export default {
           item['numOfQualified'] = QualifiedArr.length;
           item['numOfUnqualified'] = UnqualifiedArr.length;
           item['numIgnore'] = IgnoredArr.length;
-          if(inspectSettings.qualifiedForIgnoredWithType2){
+          if (inspectSettings.qualifiedForIgnoredWithType2) {
             item['itemScore'] = totalScore;
             if (p_item.type === 1) {
               item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
               item['numIgnore'] = 0;
             }
-          }else{
+          } else {
             item['itemScore'] = notAddIgnoretotalScore;
           }
-          if(p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1){
+          if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1) {
             item['itemgetScore'] = '--';
-          } else{
+          } else {
             item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
           }
           if (inspect.length === 1 && inspect[0].type === 0) {
@@ -753,8 +732,8 @@ export default {
             ScoreXN = ScoreX + ScoreN;
             ScoreTotalScoreX = Score_totalScoreX;
             item['itemgetScore'] =
-              inspectSettings.qualifiedForIgnoredWithType2 ?
-                (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
+              inspectSettings.qualifiedForIgnoredWithType2
+                ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
           }
           if (p_item.type === 2) {
             CurOtherTotalScore += totalGetscore;
@@ -779,9 +758,9 @@ export default {
       let s_count = 0;
       if (inspect.length === 1 && inspect[0].type === 0) {
         if (inspectSettings.hundredMarkType === '-1') {
-          if(inspectSettings.qualifiedForIgnoredWithType1){
+          if (inspectSettings.qualifiedForIgnoredWithType1) {
             s_count = PassFileXN;
-          }else{
+          } else {
             s_count = PassFileTotalScoreSystem;
           }
         } else {
@@ -804,7 +783,7 @@ export default {
               s_count = PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem;
             }
           } else {
-            let total_a = 0,total_b = 0,total_c = 0;
+            let total_a = 0, total_b = 0, total_c = 0;
             if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
               total_a = PassFileXN + ScoreTotalScoreSystem;
               total_b = PassFileTotalScore + ScoreTotalScoreX;
@@ -818,7 +797,7 @@ export default {
               total_a = PassFileXS + ScoreTotalScoreSystem;
               total_b = PassFileTotalScoreX + ScoreTotalScoreX;
             }
-            total_c = total_a===0 || total_b===0 ? 0 : (total_a / total_b * 100);
+            total_c = total_a === 0 || total_b === 0 ? 0 : (total_a / total_b * 100);
             s_count = total_c + otherGetscoreTotal;
           }
         } else {
@@ -831,9 +810,9 @@ export default {
           } else {
             let total_a = 0;
             if (inspectSettings.qualifiedForIgnoredWithType2) {
-              total_a = allScoreB===0 || ScoreXN===0 ? 0 : (ScoreXN / allScoreB * 100);
+              total_a = allScoreB === 0 || ScoreXN === 0 ? 0 : (ScoreXN / allScoreB * 100);
             } else {
-              total_a = ScoreTotalScoreX===0 || ScoreTotalScoreSystem===0 ? 0 : (ScoreTotalScoreSystem / ScoreTotalScoreX * 100);
+              total_a = ScoreTotalScoreX === 0 || ScoreTotalScoreSystem === 0 ? 0 : (ScoreTotalScoreSystem / ScoreTotalScoreX * 100);
             }
             s_count = total_a + otherGetscoreTotal;
           }

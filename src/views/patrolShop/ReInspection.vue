@@ -81,21 +81,6 @@
         </div>
       </el-dialog>
       <el-dialog
-        v-if="showOuter"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="showOuter"
-        :close-on-click-modal="false"
-        :width="680*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="dialog-img-content">
-            <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight">
-          </div>
-        </div>
-      </el-dialog>
-      <el-dialog
         v-if="showFeedDialog1"
         :title="$t('remotePatrol.feedbacks')"
         :visible.sync="showFeedDialog1"
@@ -387,7 +372,10 @@
                     <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                       <div v-if="_item.mediaType==2" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="_item.src" :width="_item.width" :height="_item.height" style="cursor: pointer" @click="openOuter(_item)">
+                        <el-image
+                          :src="_item.src"
+                          :style="{width: _item.width, height: _item.height}"
+                          :preview-src-list="getImgList(_index, item.sourceList)"/>
                       </div>
                       <div v-if="_item.mediaType==1" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
@@ -420,12 +408,10 @@
                         <span class="feedback-eventdes">{{ item.eventDes }}</span>
                       </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                        <img
+                        <el-image
                           :src="item.sourceObj.src"
-                          :width="item.sourceObj.width"
-                          :height="item.sourceObj.height"
-                          class="feedback-pic"
-                          @click="openOuter(item.sourceObj)">
+                          :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                          :preview-src-list="getImgList(0, [item.sourceObj])"/>
                       </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
                         <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(item,index)">
@@ -486,7 +472,10 @@
                     <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                       <div v-if="_item.mediaType==2" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="_item.src" :width="_item.width" :height="_item.height" style="cursor: pointer" @click="openOuter(_item)">
+                        <el-image
+                          :src="_item.src"
+                          :style="{width: _item.width, height: _item.height}"
+                          :preview-src-list="getImgList(_index, item.sourceList)"/>
                       </div>
                       <div v-if="_item.mediaType==1" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
@@ -672,8 +661,6 @@ export default {
       clearIconSrc: require('../../../static/img/clear.png'),
       removeIconSrc: require('../../../static/img/cancel.png'),
       backicon: require('../../../static/img/back.png'),
-      checkImgSrc: '',
-      showOuter: false,
       showModelContent: false,
       showInfoContent: true,
       activeIndex: '0',
@@ -904,7 +891,8 @@ export default {
       currentTime: null,
       onEndflag: false,
       previewplayer: null,
-      feedbackIndex: -1
+      feedbackIndex: -1,
+      itemImageSrcList: null
     };
   },
   computed: {
@@ -1931,13 +1919,19 @@ export default {
       });
       return device;
     },
-    openOuter(item) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.src;
+
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
+
     deleteImg(item, index) {
       const self = this;
       item.sourceList.splice(index, 1);

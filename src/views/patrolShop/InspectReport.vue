@@ -140,17 +140,14 @@
                         <div
                           v-for="(sourceitem,sourceindex) in _item.sourceList"
                           :key="sourceindex"
-                          :height="imgHeight+'px'"
+                          :height="elImgHeight"
                           class="source-details">
                           <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
-                            <img
-                              :title="imgTitle"
-                              :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                            <el-image
+                              :style="isexportPDF ? exportImageStyle : imageStyle"
                               :src="sourceitem.url"
-                              :height="imgHeight+'px'"
-                              :onerror="deafultImg"
-                              class="imgLittle imgInner"
-                              @click="openOuter(sourceitem,$event)">
+                              :preview-src-list="getImgList(sourceindex, _item.sourceList)"
+                              class="imgLittle imgInner"/>
                           </div>
                           <div
                             v-if="sourceitem.mediaType==1"
@@ -158,9 +155,9 @@
                             @click="playCommentVideo(sourceitem,sourceindex)">
                             <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                             <img
-                              :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                              :style="isexportPDF ? exportImageStyle : imageStyle"
                               :src="videoImgSrc"
-                              :height="imgHeight+'px'"
+                              :height="elImgHeight"
                               class="imgLittle">
                           </div>
                         </div>
@@ -196,17 +193,14 @@
                         <div
                           v-for="(sourceitem,index) in item.sourceList"
                           :key="index"
-                          :height="imgHeight+'px'"
+                          :height="elImgHeight"
                           class="source-details">
                           <div v-if="sourceitem.mediaType === 2" class="img-content">
-                            <img
-                              :title="imgTitle"
-                              :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                            <el-image
+                              :style="isexportPDF ? exportImageStyle : imageStyle"
                               :src="sourceitem.url"
-                              :height="imgHeight+'px'"
-                              :onerror="deafultImg"
-                              class="imgLittle imgInner"
-                              @click="openOuter(sourceitem,$event)">
+                              :preview-src-list="getImgList(0, [sourceitem])"
+                              class="imgLittle imgInner"/>
                           </div>
                           <div
                             v-if="sourceitem.mediaType === 1"
@@ -214,9 +208,9 @@
                             @click="playCommentVideo(sourceitem,index)">
                             <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                             <img
-                              :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                              :style="isexportPDF ? exportImageStyle : imageStyle"
                               :src="videoImgSrc"
-                              :height="imgHeight+'px'"
+                              :height="elImgHeight"
                               class="imgLittle">
                           </div>
                         </div>
@@ -246,22 +240,6 @@
                     </div>
                   </div>
                 </el-dialog>
-                <transition name="fade">
-                  <el-dialog
-                    v-if="showOuter"
-                    :title="$t('eventView.view')"
-                    :visible.sync="showOuter"
-                    :close-on-click-modal="false"
-                    width="850px"
-                    top="12%">
-                    <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-                      <hr class="dialog-hr">
-                      <div class="dialog-source-content">
-                        <img v-if="showImg" :src="checkImgSrc">
-                      </div>
-                    </div>
-                  </el-dialog>
-                </transition>
               </div>
             </div>
           </div>
@@ -311,17 +289,14 @@
                     <div
                       v-for="(sourceitem,index) in item.sourceList"
                       :key="index"
-                      :height="imgHeight+'px'"
+                      :height="elImgHeight"
                       class="source-details">
                       <div v-if="sourceitem.mediaType === 2" class="img-content">
-                        <img
-                          :title="imgTitle"
-                          :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                        <el-image
+                          :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw); height: elImgHeight'"
                           :src="sourceitem.url"
-                          :height="imgHeight+'px'"
-                          :onerror="deafultImg"
-                          class="imgLittle imgInner"
-                          @click="openOuter(sourceitem,$event)">
+                          :preview-src-list="getImgList(0, [sourceitem])"
+                          class="imgLittle imgInner"/>
                       </div>
                       <div
                         v-if="sourceitem.mediaType === 1"
@@ -331,7 +306,7 @@
                         <img
                           :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
                           :src="videoImgSrc"
-                          :height="imgHeight+'px'"
+                          :height="elImgHeight"
                           class="imgLittle">
                       </div>
                     </div>
@@ -434,9 +409,11 @@
                 <div
                   v-for="(signatureItem, signatureIndex) in pageItem.data"
                   :key="signatureIndex"
-                  class="signature-item"
-                  @click="displayEnlargeSignature(signatureItem.content)">
-                  <img :src="signatureItem.content" class="signature-content">
+                  class="signature-item">
+                  <el-image
+                    :src="signatureItem.content"
+                    :preview-src-list="[signatureItem.content]"
+                    class="signature-content"/>
                 </div>
               </div>
             </div>
@@ -456,20 +433,6 @@
         </el-dialog>
       </div>
     </div>
-    <el-dialog
-      v-if="showSignatureFlag"
-      :title="$t('eventView.view')"
-      :visible.sync="showSignatureFlag"
-      :close-on-click-modal="false"
-      width="850px"
-      top="12%">
-      <div class="video-dialog-content" style="overflow:hidden;">
-        <hr class="dialog-hr">
-        <div class="dialog-source-content">
-          <img :src="signatureSrc">
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
@@ -535,11 +498,7 @@ export default {
       feedbacks: [],
       showFeedBacks: false,
       dialogCommentVideo: false,
-      showOuter: false,
-      showImg: false,
-      checkImgSrc: '',
       previewplayer: '',
-      imgTitle: '',
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
@@ -563,15 +522,17 @@ export default {
         { name: this.$t('remotePatrol.failed'), width: 'width:17%;', pdfWidth: 'width:13%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
       ],
-      showSignatureFlag: false,
-      signatureSrc: '',
       staticalConfig: null,
       pageData: null,
       signaturesList: null,
       reportData: null,
       cachedTemplateId: -1,
       showAllDetailsEnable: true,
-      hasChart: false
+      hasChart: false,
+      exportImageStyle: {
+        width: '260px',
+        height: '148px'
+      }
     };
   },
 
@@ -589,6 +550,17 @@ export default {
         height = 75;
       }
       return height;
+    },
+
+    imageStyle() {
+      return {
+        width: 'calc(130/1920*100vw)',
+        height: `${this.imgHeight}px`
+      }
+    },
+
+    elImgHeight() {
+      return `${this.imgHeight}px`
     }
   },
 
@@ -785,13 +757,16 @@ export default {
       });
     },
 
-    openOuter(item, $ev) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.url;
-        self.showImg = true;
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.url);
     },
 
     getGroupsDuration(item) {
@@ -1310,11 +1285,6 @@ export default {
 
     turnSuggest(data) {
       return data.replace(/(\r\n|\n|\r)/gm, '<br/>');
-    },
-
-    displayEnlargeSignature(src) {
-      this.showSignatureFlag = true;
-      this.signatureSrc = src;
     },
 
     hideOrShowDetail(pageItem, pageIndex) {
