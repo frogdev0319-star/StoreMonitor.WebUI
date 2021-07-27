@@ -9,7 +9,6 @@ import 'vue-video-player/src/custom-theme.css';
 import 'videojs-flash';
 import router from './router';
 import axios from 'axios';
-import { getToken } from '@/common/auth';
 import { message } from '@/common/singleton-message';
 import Print from '@/plugins/print';
 import { ProgressPlugin } from 'bootstrap-vue';
