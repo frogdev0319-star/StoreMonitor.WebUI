@@ -1489,7 +1489,7 @@ export default {
         overflow-y: auto;
         border: 1px solid #a0c1f8;
         .suggest-content {
-          max-height: 100px;
+          max-height: 180px;
           display: flex;
           padding-left: calc(30 / 1920 * 100vw);
         }
