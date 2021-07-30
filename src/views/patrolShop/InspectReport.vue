@@ -906,7 +906,7 @@ export default {
     },
 
     getPageDataBasedOnTemplate(data) {
-      const map = this.getDetailNameAndHandlerMap();
+      const map = this.getDetailNameAndHandlerMap(data);
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
       console.log(this.templateConfig);
@@ -929,7 +929,7 @@ export default {
       this.pageData = pageData;
     },
 
-    getDetailNameAndHandlerMap() {
+    getDetailNameAndHandlerMap(data) {
       let map = null;
       if (this.showAllDetailsEnable) {
         map = new Map([
@@ -948,6 +948,9 @@ export default {
           ['qualifiedItem', 'getQualifiedItems'],
           ['ignoredItem', 'getIgnoreItems']
         ]);
+      }
+      if (!data.comment) {
+        map.delete('comment');
       }
       return map;
     },
