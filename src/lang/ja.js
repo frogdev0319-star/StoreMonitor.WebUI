@@ -213,7 +213,7 @@ export default {
     'checkinList': 'チェックインリスト',
     'name': '名前',
     'checkinTimeLimit': '日付範囲は31日で、調整されています！',
-    'personalCheckinList': '${userName} のチェックイン統計',
+    'personalCheckinList': '{userName} のチェックイン統計',
     'checkinAddress': 'アドレス',
     'time': '時間',
 

@@ -217,7 +217,7 @@ export default {
     'checkinList': '签到统计列表',
     'name': '名称',
     'checkinTimeLimit': '时间范围最长31天，已调整！',
-    'personalCheckinList': '${userName}签到统计',
+    'personalCheckinList': '{userName}签到统计',
     'checkinAddress': '签到地址',
     'time': '时间'
   },

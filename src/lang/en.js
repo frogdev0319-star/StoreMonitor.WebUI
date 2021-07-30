@@ -214,7 +214,7 @@ export default {
     'checkinList': 'Checkin List',
     'name': 'Name',
     'checkinTimeLimit': 'Date range is 31 days, which has been adjusted!',
-    'personalCheckinList': 'Checkin Statistics of ${userName}',
+    'personalCheckinList': 'Checkin Statistics of {userName}',
     'checkinAddress': 'Address',
     'time': 'Time'
   },

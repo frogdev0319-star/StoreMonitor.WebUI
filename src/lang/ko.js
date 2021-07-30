@@ -216,7 +216,7 @@ export default {
     'checkinList': '체크인 목록',
     'name': '이름',
     'checkinTimeLimit': '날짜 범위는 31일이며 조정되었습니다!',
-    'personalCheckinList': '${userName} 의 통계 확인',
+    'personalCheckinList': '{userName} 의 통계 확인',
     'checkinAddress': '주소',
     'time': '시간',
 
