@@ -59,6 +59,7 @@ export default {
     'patrolItemsStat': 'Inspection Items Statistics',
     'eventStat': 'Event Processing Statistics',
     'supervisorStat': 'Inspection Work Statistics',
+    'checkInStatistics': 'Check-in Statistics',
     'customers': 'Customers',
     'networkError': 'Network error, please check network connection status!',
     'serverException': 'Server exception, please refresh and try again!',
@@ -206,7 +207,16 @@ export default {
     'allZoneII': 'All Region II',
     'dataZoomInfo': 'Scroll the mouse in the coordinate system to zoom the data area and see the data details',
     'startDate': 'Start Date',
-    'endDate': 'End Date'
+    'endDate': 'End Date',
+    'department': 'Department',
+    'user': 'Personnel',
+    'position': 'Position',
+    'checkinList': 'Checkin List',
+    'name': 'Name',
+    'checkinTimeLimit': 'Date range is 31 days, which has been adjusted!',
+    'personalCheckinList': 'Checkin Statistics of ${userName}',
+    'checkinAddress': 'Address',
+    'time': 'Time'
   },
 
   // Patrol page language

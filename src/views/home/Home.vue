@@ -294,7 +294,7 @@ export default {
 
     showHeader() {
       const showBorderPathArr = ['/report', '/patrolOverview', '/eventOverview', '/patrolEvaluation',
-        '/patrolItem', '/supervisorStat', '/eventStat', '/storedetail', '/storemanage', '/bindroute'];
+        '/patrolItem', '/supervisorStat', '/eventStat', '/storedetail', '/storemanage', '/bindroute', '/checkInStatistics'];
       return showBorderPathArr.includes(this.$route.path);
     },
 
