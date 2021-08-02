@@ -1,32 +1,13 @@
 <template>
   <div class="device-container">
-    <div class="account-title-btn">
-      <div class="operation-title">
-        <div>
-          <div class="prompt-info" v-show="authorizedDevicesNum < addedDeviceNumber">
-            <img :src="errorImgSource" class="error-img"/>
-            <span class="error-msg">
-            {{ $t('deviceView.deviceLimitation') }}
-          </span>
-          </div>
-        </div>
-        <div class="device-num-btn">
-          <div>
-            {{ $t('deviceView.authorizedDevicesNum') }} {{ authorizedDevicesNum }}
-          </div>
-          <div class="available-device">
-            {{ $t('deviceView.addedDeviceNumber') }} {{ addedDeviceNumber }}
-          </div>
-          <delay-button @click="showAddEzvizAccountDialog"
-                        class="inspction-btn">
-            <div class="button-area">
-              <i class="iconfont el-icon-plus"/>
-              <span>{{ $t('deviceView.addEzvizAccount') }}</span>
-            </div>
-          </delay-button>
-        </div>
+    <account-header @click="showAddEzvizAccountDialog"
+                    :added-device-number="addedDeviceNumber"
+                    :authorized-devices-num="authorizedDevicesNum">
+      <div class="button-area">
+        <i class="iconfont el-icon-plus"/>
+        <span>{{ $t('deviceView.addEzvizAccount') }}</span>
       </div>
-    </div>
+    </account-header>
     <div class="table-container">
       <table-pagination
         ref="ezvizAccoutTable"
@@ -115,11 +96,6 @@
                   <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />
                 </el-form-item>
               </el-col>
-              <el-col :span="11" :offset="1">
-                <el-form-item :label="$t('deviceView.accountName')" prop="accountName">
-                  <el-input v-model="ezvizAccountInfo.accountName" @input="accountNameChanged" />
-                </el-form-item>
-              </el-col>
             </el-row>
             <el-form-item :label="$t('deviceView.developerService')" required>
               <div class="account-list">
@@ -184,10 +160,11 @@ import { mapGetters } from 'vuex';
 import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import { getDeviceAuthNumber } from '@/api/device';
+import AccountHeader from '../AccountHeader';
 
 export default {
   name: 'EzvizAccount',
-  components: { DelayButton, TablePagination, DialogPop },
+  components: { AccountHeader, DelayButton, TablePagination, DialogPop },
   data() {
     const validateEzvizAccount = (rule, value, callback) => {
       const self = this;
@@ -322,9 +299,6 @@ export default {
         ezvizAccount: [
           { required: true, validator: validateEzvizAccount, trigger: 'blur' }
         ],
-        accountName: [
-          { required: true, validator: validateAccountName, trigger: 'blur' }
-        ],
         accessKey: [
           { required: true, validator: validateAccessKey, trigger: 'blur' }
         ],
@@ -362,7 +336,7 @@ export default {
       accountCell: '',
       accountRow: '',
       isLoadingAccount: true,
-      errorImgSource: require('../../../../static/img/icon_error.png'),
+      errorImgSource: require('../../../../../static/img/icon_error.png'),
       authorizedDevicesNum: 0,
       addedDeviceNumber: 0
     };
@@ -393,7 +367,6 @@ export default {
     initEzvizAccountInfo() {
       this.ezvizAccountInfo = {
         ezvizAccount: '',
-        accountName: '',
         appKey: '',
         appSecret: '',
         accessToken: '',
@@ -602,7 +575,6 @@ export default {
       accountParams.comment = this.ezvizAccountInfo.comment;
       accountParams.scope = Number(this.ezvizAccountInfo.scope);
       if (this.ezvizAccountInfo.scope === 1) {
-        accountParams.accountName = this.ezvizAccountInfo.accountName;
         accountParams.appKey = this.ezvizAccountInfo.appKey;
         accountParams.appSecret = this.ezvizAccountInfo.appSecret;
       } else {
@@ -736,11 +708,6 @@ export default {
       this.ezvizAccountInfo.ezvizAccount = comment;
     },
 
-    accountNameChanged(val) {
-      const comment = filterString.all(val, 20);
-      this.ezvizAccountInfo.accountName = comment;
-    },
-
     updateAuthorizedDevice(val) {
       this.ezvizAccountInfo.authorizedDevices = val.replace(/[^\d:]/g, '').replace(/^[0]+[0-9]*$/gi, '');
     },
@@ -776,6 +743,6 @@ export default {
 </script>
 
 <style lang="scss">
-  @import '../../../assets/css/importfile.css';
-  @import '../../../assets/sass/device.scss';
+  @import '../../../../assets/css/importfile.css';
+  @import '../../../../assets/sass/device';
 </style>
