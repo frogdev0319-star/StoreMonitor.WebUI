@@ -13,7 +13,7 @@ export default {
       code: ''
     };
   },
-  mounted: function() {
+  mounted() {
     this.getQueryParams();
   },
 
@@ -28,17 +28,6 @@ export default {
         this.state = '';
       }
       this.$router.push({ name: 'beseyeAccount', params: { code: this.code, state: this.state }});
-    },
-
-    base64ToStr(base64Str) {
-      const decodeStr = atob(base64Str);
-      const str = decodeURI(decodeStr);
-      return str;
-    },
-
-    getSiteFromState() {
-      const stateStr = this.base64ToStr(this.state);
-      return stateStr.split('-');
     }
   }
 };

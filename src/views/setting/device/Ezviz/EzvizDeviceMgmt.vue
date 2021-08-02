@@ -1596,8 +1596,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../assets/css/importfile.css';
-  @import '../../../assets/css/textstyle.css';
+  @import '../../../../assets/css/importfile.css';
+  @import '../../../../assets/css/textstyle.css';
   $mainColor:#f31d65;
   $border:#e3e9f4;
   $background:#f5f7fa;
@@ -1954,8 +1954,8 @@ export default {
   }
 </style>
 <style>
-  @import '../../../assets/css/pagination.css';
-  @import '../../../assets/css/tabsItem.css';
+  @import '../../../../assets/css/pagination.css';
+  @import '../../../../assets/css/tabsItem.css';
   #el-menuscrollbar{
     height: calc(100% - 120px);
   }

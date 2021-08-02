@@ -1858,8 +1858,8 @@ export default {
 
 </style>
 <style lang="scss" scoped>
-  @import '../../../assets/css/importfile.css';
-  @import '../../../assets/css/textstyle.css';
+  @import '../../../../assets/css/importfile.css';
+  @import '../../../../assets/css/textstyle.css';
   $mainColor:#f31d65;
   $border:#e3e9f4;
   $tab: #7d8cad;
@@ -2371,8 +2371,8 @@ export default {
   }
 </style>
 <style>
-  @import '../../../assets/css/pagination.css';
-  @import '../../../assets/css/tabsItem.css';
+  @import '../../../../assets/css/pagination.css';
+  @import '../../../../assets/css/tabsItem.css';
 
   #importId .el-dialog__body{
     padding-top:0px !important;

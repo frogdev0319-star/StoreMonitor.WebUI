@@ -117,30 +117,6 @@
                 </div>
               </div>
             </div>
-            <el-dialog
-              v-if="showDeleteDialog"
-              :visible.sync="showDeleteDialog"
-              :append-to-body="true"
-              :close-on-click-modal="false"
-              :title="$t('deviceView.deleteDevice')"
-              width="510px"
-              top="35vh"
-              left="40vh">
-              <div class="dialog-content">
-                <hr class="dialog-hr">
-
-                <p class="dialog-box">
-                  <i class="el-icon-warning"/>
-                  <span class="warning-content">{{ $t('deviceView.deleteDevice') }}</span>
-                </p>
-              </div>
-              <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteDialog = false">
-                  {{ $t('deviceView.cancle') }}</el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteBeseyeDevice()">
-                  {{ $t('deviceView.confirm') }}</el-button>
-              </div>
-            </el-dialog>
           </div>
         </el-scrollbar>
         <div class="toolbar pagination" style="width:100%; margin-top:10px;">
@@ -218,6 +194,30 @@
             size="mini"
             type="primary"
             @click="confirmAddBeseyeDevice">{{ $t('deviceView.confirm') }}</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog
+        v-if="showDeleteDialog"
+        :visible.sync="showDeleteDialog"
+        :append-to-body="true"
+        :close-on-click-modal="false"
+        :title="$t('deviceView.deleteDevice')"
+        width="510px"
+        top="35vh"
+        left="40vh">
+        <div class="dialog-content">
+          <hr class="dialog-hr">
+
+          <p class="dialog-box">
+            <i class="el-icon-warning"/>
+            <span class="warning-content">{{ $t('deviceView.deleteDevice') }}</span>
+          </p>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteDialog = false">
+            {{ $t('deviceView.cancle') }}</el-button>
+          <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteBeseyeDevice()">
+            {{ $t('deviceView.confirm') }}</el-button>
         </div>
       </el-dialog>
     </div>
@@ -756,9 +756,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import '../../../assets/css/importfile.css';
-  @import '../../../assets/css/textstyle.css';
-  @import '../../../assets/sass/device.scss';
+  @import '../../../../assets/css/importfile.css';
+  @import '../../../../assets/css/textstyle.css';
+  @import '../../../../assets/sass/device';
   $mainColor:#f31d65;
   $border:#e3e9f4;
   $tab: #7d8cad;
@@ -1048,8 +1048,8 @@ export default {
   }
 </style>
 <style>
-  @import '../../../assets/css/pagination.css';
-  @import '../../../assets/css/tabsItem.css';
+  @import '../../../../assets/css/pagination.css';
+  @import '../../../../assets/css/tabsItem.css';
   #el-menuscrollbar{
     height: calc(100% - 120px);
   }

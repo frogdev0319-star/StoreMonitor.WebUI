@@ -1,32 +1,14 @@
 <template>
   <div class="device-container">
-    <div class="account-title-btn">
-      <div class="operation-title">
-        <div>
-          <div class="prompt-info" v-show="authorizedDevicesNum < addedDeviceNumber">
-            <img :src="errorImgSource" class="error-img"/>
-            <span class="error-msg">
-              {{ $t('deviceView.deviceLimitation') }}
-            </span>
-          </div>
-        </div>
-        <div class="device-num-btn">
-          <div>
-            {{ $t('deviceView.authorizedDevicesNum') }} {{ authorizedDevicesNum }}
-          </div>
-          <div class="available-device">
-            {{ $t('deviceView.addedDeviceNumber') }} {{ addedDeviceNumber }}
-          </div>
-          <delay-button @click="getBeseyeGrantCode"
-                        class="inspction-btn">
-            <div class="button-area">
-              <i class="iconfont icon-authorize"/>
-              <span>{{ $t('deviceView.beseyeAuthorize') }}</span>
-            </div>
-          </delay-button>
-        </div>
+    <account-header @click="getBeseyeGrantCode"
+                    :added-device-number="addedDeviceNumber"
+                    :authorized-devices-num="authorizedDevicesNum"
+    >
+      <div class="button-area">
+        <i class="iconfont icon-authorize"/>
+        <span>{{ $t('deviceView.beseyeAuthorize') }}</span>
       </div>
-    </div>
+    </account-header>
     <div v-loading="isAuthorizing" :text="$t('deviceView.isAuthorizing')" class="table-container">
       <table-pagination
         ref="ezvizAccoutTable"
@@ -80,12 +62,12 @@ import util from '@/common/util.js';
 import { mapGetters } from 'vuex';
 import BeseyeAuthorizeConfig from '@/common/BeseyeAuthorizeConfig';
 import { getBeseyeUserList, deleteBeseyeUser, beseyeAccountAuthorize } from '@/api/beseye';
-import DelayButton from '@/components/DelayButton';
 import { getDeviceAuthNumber } from '@/api/device';
+import AccountHeader from '../AccountHeader';
 
 export default {
   name: 'BeseyeUser',
-  components: { DelayButton, TablePagination },
+  components: { AccountHeader, TablePagination },
   data() {
     return {
       varyWindowWidth: window.innerWidth,
@@ -138,7 +120,7 @@ export default {
       beseyeAccount: '',
       isAuthorizing: false,
       isLoadingData: true,
-      errorImgSource: require('../../../../static/img/icon_error.png'),
+      errorImgSource: require('../../../../../static/img/icon_error.png'),
       authorizedDevicesNum: 0,
       addedDeviceNumber: 0
     };
@@ -343,6 +325,6 @@ export default {
 </script>
 
 <style lang="scss">
-  @import '../../../assets/css/importfile.css';
-  @import '../../../assets/sass/device.scss';
+  @import '../../../../assets/css/importfile.css';
+  @import '../../../../assets/sass/device';
 </style>
