@@ -1833,7 +1833,6 @@ export default {
           overflow: hidden;
           position: relative;
           padding-left: 1%;
-          cursor: pointer;
           font-size: 14px;
           height: 90px;
           line-height: 90px;
