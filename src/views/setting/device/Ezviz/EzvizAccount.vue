@@ -76,17 +76,6 @@
                 <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" readonly/>
               </el-form-item>
             </el-col>
-            <el-col :span="24">
-              <el-form-item
-                :label="$t('deviceView.authorizedDevices')"
-                :error="errorAuthDeviceNum"
-                prop="authorizedDevices">
-                <el-input
-                  v-model="ezvizAccountInfo.authorizedDevices"
-                  style="width: 100%;"
-                  readonly />
-              </el-form-item>
-            </el-col>
           </div>
           <div v-else>
             <el-row>
@@ -216,13 +205,6 @@ export default {
         }
       }
     };
-    const validateAuthorizedDevices = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error(this.$t('deviceView.enterAuthorizedDevices')));
-      } else {
-        callback();
-      }
-    };
     return {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
@@ -301,11 +283,6 @@ export default {
         ],
         accessKey: [
           { required: true, validator: validateAccessKey, trigger: 'blur' }
-        ],
-        authorizedDevices: [
-          {
-            required: true, validator: validateAuthorizedDevices, trigger: 'blur'
-          }
         ],
         app: [
           { required: true, message: '' }
@@ -577,8 +554,6 @@ export default {
       if (this.ezvizAccountInfo.scope === 1) {
         accountParams.appKey = this.ezvizAccountInfo.appKey;
         accountParams.appSecret = this.ezvizAccountInfo.appSecret;
-      } else {
-        accountParams.authDeviceNumber = parseInt(this.ezvizAccountInfo.authorizedDevices);
       }
       return accountParams;
     },
@@ -592,7 +567,6 @@ export default {
       self.curLength = row.comment ? filterString.getContentLength(row.comment) : 0;
       self.deleteId = row.id;
       self.ezvizAccountInfo.comment = row.tempComment;
-      self.ezvizAccountInfo.authorizedDevices = this.authorizedDevicesNum;
       self.appliedStores = row.appliedStores;
       if (row.scope === 1) {
         self.getAccessToken();
@@ -706,10 +680,6 @@ export default {
     ezvizAccountChanged(val) {
       const comment = filterString.all(val, 40);
       this.ezvizAccountInfo.ezvizAccount = comment;
-    },
-
-    updateAuthorizedDevice(val) {
-      this.ezvizAccountInfo.authorizedDevices = val.replace(/[^\d:]/g, '').replace(/^[0]+[0-9]*$/gi, '');
     },
 
     setEzvizAccount(row) {
