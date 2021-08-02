@@ -52,7 +52,7 @@
           class="date-time-tooltip"
           effect="dark"
           placement="right">
-          <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
+          <div slot="content">{{ $t('overview.checkinTimeLimit') }}</div>
           <i class="iconfont icon-bangzhu iconbangzhu"/>
         </el-tooltip>
         <delay-button
@@ -90,7 +90,9 @@
           :cell-class-name="cellClass"
           border
           style="width: 100%"
-          class="check-in-table">
+          class="check-in-table"
+          @expand-change="onExpandChange"
+        >
           <el-table-column
             v-for="(fixedColumn) in tableFixedColumns"
             :key="fixedColumn.label"
@@ -116,7 +118,7 @@
               </el-button>
             </template>
           </el-table-column>
-          <el-table-column type="expand">
+          <el-table-column type="expand" width="65">
             <template slot-scope="props">
               <personal-checkin
                 :user-id="props.row.userId"
@@ -209,7 +211,8 @@ export default {
       exportPng: require('../../../static/img/excel.png'),
       selectTime: 0,
       headerClass: 'header-class',
-      cellClass: 'cell-class'
+      cellClass: 'cell-class',
+      setSelectTimeFlag: true
     };
   },
   created() {
@@ -373,11 +376,13 @@ export default {
           table.toggleRowExpansion(item, false);
         }
       });
-      table.toggleRowExpansion(row, true);
+      table.toggleRowExpansion(row);
+      this.setSelectTimeFlag = false;
     },
 
-    onExpandChange(row, expanded) {
-      this.selectTime = this.$moment(this.dateValue[0]).valueOf();
+    onExpandChange() {
+      this.selectTime = this.setSelectTimeFlag ? this.$moment(this.dateValue[0]).valueOf() : this.selectTime;
+      this.setSelectTimeFlag = true;
     },
 
     handleSizeChange(val) {
