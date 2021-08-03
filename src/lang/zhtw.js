@@ -60,6 +60,7 @@ export default {
     'patrolItemsStat': '巡檢項統計',
     'eventStat': '事件處理統計',
     'supervisorStat': '巡店效率統計',
+    'checkInStatistics': '巡店簽到統計',
     'customers': '店客',
     'networkError': '網絡異常，請檢查網絡連接狀況！',
     'serverException': '伺服器異常，請刷新後重試！',
@@ -220,7 +221,16 @@ export default {
     'allZoneII': '全部區域二',
     'dataZoomInfo': '坐標系內滾動鼠標實現數據區域縮放，查看數據細節',
     'startDate': '開始日期',
-    'endDate': '結束日期'
+    'endDate': '結束日期',
+    'department': '部門',
+    'user': '人員',
+    'position': '職務',
+    'checkinList': '簽到統計列表',
+    'name': '名稱',
+    'checkinTimeLimit': '時間範圍最長31天，已調整！',
+    'personalCheckinList': '{userName}簽到統計',
+    'checkinAddress': '簽到地址',
+    'time': '時間'
   },
 
   // Patrol page language

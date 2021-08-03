@@ -27,11 +27,11 @@ export default {
     'logOut': '로그아웃',
     'select': '선택하십시오',
     'inspectListSetting': '검사 목록 설정',
-    'inspectingSettingOfInspectList': '검사 설정（검사 목록 설정）',
-    'inspectingSettingOfDevice': '검사 설정（감사 징치 연결）',
-    'inspectingSettingOfSchedule': '검사 설정（검사 일정）',
-    'checkSchedule': '일정 설치（체크 일정）',
-    'patrolSecheduleManage': '일정 설치（검사 일정)',
+    'inspectingSettingOfInspectList': '검사 설정 (검사 목록 설정)',
+    'inspectingSettingOfDevice': '검사 설정 (감사 징치 연결)',
+    'inspectingSettingOfSchedule': '검사 설정 (검사 일정)',
+    'checkSchedule': '일정 설치 (체크 일정)',
+    'patrolSecheduleManage': '일정 설치 (검사 일정)',
     'monitorStoreSet': '모니터 장치 관리',
     'confirmSum': '확인',
     'reportDetails': '보고서 세부',
@@ -50,6 +50,7 @@ export default {
     'patrolItemsStat': '검사 항목 통계',
     'eventStat': '이벤트 진행 통계',
     'supervisorStat': '감독 작업 통계',
+    'checkInStatistics': '검사 체크인 통계',
 
     'meta': '검사',
     'title': 'ViuMo',
@@ -220,6 +221,17 @@ export default {
     'dataZoomInfo': '좌표계에서 마우스를 스크롤하여 데이터 영역으로 확대하고 데이터의 세부 정보를 봅니다.',
     'startDate': '시작 날짜',
     'endDate': '종료 날짜',
+
+    'department': '부서',
+    'user': '직원',
+    'position': '위치',
+    'checkinList': '체크인 목록',
+    'name': '이름',
+    'checkinTimeLimit': '날짜 범위는 31일이며 조정되었습니다!',
+    'personalCheckinList': '{userName} 의 통계 확인',
+    'checkinAddress': '주소',
+    'time': '시간',
+
     'emptyItemList': 'The inspection item list is empty, please re-filter the data'
   },
 

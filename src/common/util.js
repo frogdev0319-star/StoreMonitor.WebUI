@@ -601,6 +601,13 @@ export default {
     const arr2Set = new Set(arr2);
     const intersection = arr1.filter(item => arr2Set.has(item));
     return intersection;
+  },
+
+  formDatetime(cellValue) {
+    if (cellValue === undefined) {
+      return '';
+    }
+    return moment(cellValue).format('HH:mm:ss');
   }
 
 };

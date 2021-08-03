@@ -14,6 +14,74 @@
         </el-button>
       </div>
       <el-dialog
+        v-if="showCutDialog"
+        :title="$t('remotePatrol.edit')"
+        :visible.sync="showCutDialog"
+        :close-on-click-modal="false"
+        :width="860*percentHeight+'px'"
+        height="300px"
+        top="5%">
+        <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
+          <hr class="dialog-hr">
+          <div v-if="showPenBtn" id="iconR" class="icon-right">
+            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
+            <transition name="fadepen">
+              <div v-if="showPen" class="pen-content">
+                <div v-for="(item,index) in penList" :key="index" class="content">
+                  <div :class="{colorActive:item.showContent}"/>
+                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
+                </div>
+              </div>
+            </transition>
+          </div>
+          <canvas
+            id="icanvas"
+            :width="767*percentHeight"
+            :height="431*percentHeight"
+            @mousedown="mouseDownAction($event)"
+            @mousemove="mouseMoveAction($event)"/>
+          <div
+            v-if="showCancelContent"
+            :style="{'width':767*percentHeight+'px',
+                     'margin-left':47*percentHeight+'px'}"
+            class="cancel-content">
+            <div class="content" @click="cancelEditCanvas">
+              <img :src="clearIconSrc" class="icon-clear" height="22px">
+              <span>{{ $t('remotePatrol.clear') }}</span>
+            </div>
+            <div class="content" @click="confirmEditCanvas">
+              <img :src="removeIconSrc" class="icon-clear" height="22px">
+              <span>{{ $t('remotePatrol.cancel') }}</span>
+            </div>
+          </div>
+        </div>
+        <div slot="footer">
+          <el-button id="cancelBtn" size="mini" @click="showCutDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
+          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmEdit">{{ $t('remotePatrol.confirm') }}</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog
+        v-if="dialogCommentVideo"
+        :title="$t('remotePatrol.view')"
+        :visible.sync="dialogCommentVideo"
+        :close-on-click-modal="false"
+        :width="680*percentHeight+'px'"
+        height="300px"
+        top="5%">
+        <div class="canvas-content">
+          <hr class="dialog-hr">
+          <video
+            id="previewCutVideo"
+            :width="580*percentHeight"
+            :height="420*percentHeight"
+            :src="curVideoSrc"
+            prload
+            controls
+            autoplay/>
+        </div>
+      </el-dialog>
+      <el-dialog
+        v-if="showFeedDialog1"
         v-if="showOuter"
         :title="$t('remotePatrol.view')"
         :visible.sync="showOuter"
@@ -288,7 +356,10 @@
                     <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                       <div v-if="_item.mediaType==2" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="_item.src" :width="_item.width" :height="_item.height" style="cursor: pointer" @click="openOuter(_item)">
+                        <el-image
+                          :src="_item.src"
+                          :style="{width: _item.width, height: _item.height}"
+                          :preview-src-list="getImgList(_index, item.sourceList)"/>
                       </div>
                       <div v-if="_item.mediaType==1" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
@@ -321,12 +392,10 @@
                         <span class="feedback-eventdes">{{ item.eventDes }}</span>
                       </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                        <img
+                        <el-image
                           :src="item.sourceObj.src"
-                          :width="item.sourceObj.width"
-                          :height="item.sourceObj.height"
-                          class="feedback-pic"
-                          @click="openOuter(item.sourceObj)">
+                          :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                          :preview-src-list="getImgList(0, [item.sourceObj])"/>
                       </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
                         <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(item,index)">
@@ -387,7 +456,10 @@
                     <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                       <div v-if="_item.mediaType==2" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="_item.src" :width="_item.width" :height="_item.height" style="cursor: pointer" @click="openOuter(_item)">
+                        <el-image
+                          :src="_item.src"
+                          :style="{width: _item.width, height: _item.height}"
+                          :preview-src-list="getImgList(_index, item.sourceList)"/>
                       </div>
                       <div v-if="_item.mediaType==1" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
@@ -576,8 +648,6 @@ export default {
       arrows2Src: require('../../../static/img/arrows_right.png'),
       plusSrc: require('../../../static/img/add_icon.png'),
       backicon: require('../../../static/img/back.png'),
-      checkImgSrc: '',
-      showOuter: false,
       showModelContent: false,
       showInfoContent: true,
       activeIndex: '0',
@@ -1545,13 +1615,19 @@ export default {
       });
       return device;
     },
-    openOuter(item) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.src;
+
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
+
     deleteImg(item, index) {
       const self = this;
       item.sourceList.splice(index, 1);
@@ -1661,32 +1737,6 @@ export default {
       self.hiddenChannelBtn();
       self.handleIgnore();
     },
-
-    stopVendorVideo(){
-      if (this.vendor === 0) {
-        !this.showGuide ? this.$refs.dashVideo.editCount = 0 : '';
-        this.$refs.dashVideo.stopVideoPlay();
-        this.$refs.dashVideo.showError = false;
-      } else if(this.vendor === 1){
-        !this.showGuide ? this.$refs.ezvizVideo.editCount = 0 : '';
-        if (this.$refs.ezvizVideo != undefined) {
-          this.$refs.ezvizVideo.playState ? this.$refs.ezvizVideo.stopRealTime() : '';
-          this.$refs.ezvizVideo.showError = false;
-        }
-      } else {
-        !this.showGuide ? this.$refs.beseyeVideo.editCount = 0 : '';
-        if (this.$refs.beseyeVideo != undefined){
-          this.$refs.beseyeVideo.playState ? this.$refs.beseyeVideo.stopPlay() : '';
-          this.$refs.beseyeVideo.showError = false;
-        }
-      }
-    },
-
-    hiddenChannelBtn(){
-      this.hideLast = false;
-      this.hideNext = false;
-    },
-
     CancleIgnoreItem(item, index) {
       const self = this;
       switch (self.vendor) {

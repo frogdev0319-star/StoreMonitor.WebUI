@@ -60,6 +60,7 @@ export default {
     'patrolItemsStat': '巡检项统计',
     'eventStat': '事件处理统计',
     'supervisorStat': '巡店效率统计',
+    'checkInStatistics': '巡店签到统计',
     'customers': '店客',
     'networkError': '网络异常，请检查网络连接状况！',
     'serverException': '服务器异常，请刷新后重试！',
@@ -220,7 +221,16 @@ export default {
     'allZoneII': '全部区域二',
     'dataZoomInfo': '坐标系内滚动鼠标实现数据区域缩放，查看数据细节',
     'startDate': '开始日期',
-    'endDate': '结束日期'
+    'endDate': '结束日期',
+    'department': '部门',
+    'user': '人员',
+    'position': '职务',
+    'checkinList': '签到统计列表',
+    'name': '名称',
+    'checkinTimeLimit': '时间范围最长31天，已调整！',
+    'personalCheckinList': '{userName}签到统计',
+    'checkinAddress': '签到地址',
+    'time': '时间'
   },
 
   // Patrol page language

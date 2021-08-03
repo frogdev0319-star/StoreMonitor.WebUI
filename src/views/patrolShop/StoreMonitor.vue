@@ -30,23 +30,79 @@
         </el-button>
       </div>
       <el-dialog
-        v-if="showOuter"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="showOuter"
+        v-if="showSnapShotDialog"
+        :title="$t('remotePatrol.edit')"
+        :visible.sync="showSnapShotDialog"
         :close-on-click-modal="false"
-        :width="680 * percentHeight + 'px'"
+        :width="860 * percentHeight + 'px'"
         height="300px"
         top="5%"
       >
-        <div class="canvas-content" style="overflow: hidden">
+        <div
+          class="canvas-content"
+          @mouseenter="showCancel"
+          @mouseleave="hiddenCancel"
+        >
           <hr class="dialog-hr" >
-          <div class="dialog-img-content">
-            <img
-              :src="checkImgSrc"
-              :width="600 * percentHeight"
-              :height="430 * percentHeight"
-            >
+          <transition name="fade">
+            <div v-if="showPenBtn" id="iconR" class="icon-right">
+              <img :src="penBtnSrc" class="pen-btn" @click="showPenList" >
+              <transition name="fadepen">
+                <div v-if="showPen" class="pen-content">
+                  <div
+                    v-for="(item, index) in penList"
+                    :key="index"
+                    class="content"
+                  >
+                    <div :class="{ colorActive: item.showContent }" />
+                    <div
+                      :id="item.id"
+                      class="color"
+                      @click="checkPen(item, index)"
+                    />
+                  </div>
+                </div>
+              </transition>
+            </div>
+          </transition>
+          <canvas
+            id="icanvas"
+            :width="767 * percentHeight"
+            :height="431 * percentHeight"
+            @mousedown="mouseDownAction($event)"
+            @mousemove="mouseMoveAction($event)"
+            @mouseleave="mouseLeaveAction($event)"
+            @mouseup="mouseUpAction($event)"
+          />
+          <div
+            v-if="showCancelContent"
+            :style="{
+              width: 767 * percentHeight + 'px',
+              'margin-left': 47 * percentHeight + 'px',
+            }"
+            class="cancel-content"
+          >
+            <div class="content" @click="cancleEditCanvas">
+              <img :src="clearIconSrc" class="icon-clear" height="22px" >
+              <span>{{ $t("remotePatrol.clear") }}</span>
+            </div>
+            <div class="content" @click="confirmEditCanvas">
+              <img :src="removeIconSrc" class="icon-clear" height="22px" >
+              <span>{{ $t("remotePatrol.cancel") }}</span>
+            </div>
           </div>
+        </div>
+        <div slot="footer">
+          <el-button id="cancelBtn" size="mini" @click="cancelEdit">{{
+            $t("remotePatrol.cancel")}}</el-button>
+          <el-button
+            id="confirmBtn"
+            size="mini"
+            type="primary"
+            @click="confirmEdit"
+          >
+            {{ $t("remotePatrol.confirm") }}
+          </el-button>
         </div>
       </el-dialog>
       <dialog-vue
@@ -163,13 +219,10 @@
                       class="el-icon-close icondelete"
                       @click="deleteImg(item, index)"
                     />
-                    <img
+                    <el-image
                       :src="item.src"
-                      :width="item.width"
-                      :height="item.height"
-                      style="cursor: pointer"
-                      @click="openOuter(item)"
-                    >
+                      :style="{width: item.width, height: item.height}"
+                      :preview-src-list="getImgList(index, sourceList)"/>
                   </div>
                 </div>
                 <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
@@ -454,6 +507,33 @@ export default {
       timeVideo: 0,
       checkImgSrc: '',
       showOuter: false,
+      startTimeCutVideo: 0,
+      endTImeCutVideo: 0,
+
+      showCutModel: false,
+      penBtnSrc: require('../../../static/img/edit_btn.png'),
+      clearIconSrc: require('../../../static/img/clear.png'),
+      removeIconSrc: require('../../../static/img/cancel.png'),
+      startIcon: require('../../../static/img/play_icon.png'),
+      videoImgSrc: require('../../../static/img/video_thumbnail.png'),
+      showPenBtn: false,
+      penList: [
+        {
+          id: 'white',
+          showContent: false
+        },
+        {
+          id: 'red',
+          showContent: true
+        },
+        {
+          id: 'yellow',
+          showContent: false
+        }
+      ],
+      penChecked: 'red',
+      showPen: false,
+      showModel: true,
       X: 0,
       Y: 0,
       X1: 0,
@@ -1162,17 +1242,20 @@ export default {
       return url;
     },
 
-    openOuter(item) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.src;
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
 
     deleteImg(item, index) {
-      const self = this;
-      self.sourceList.splice(index, 1);
+      this.sourceList.splice(index, 1);
     },
 
     getStorageInfo() {

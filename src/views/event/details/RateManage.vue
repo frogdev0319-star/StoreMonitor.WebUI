@@ -84,22 +84,6 @@
           </el-button>
         </span>
       </el-dialog>
-      <transition name="fade">
-        <el-dialog
-          v-if="showOuter"
-          :title="$t('eventView.view')"
-          :visible.sync="showOuter"
-          :close-on-click-modal="false"
-          width="850px"
-          top="12%">
-          <div class="video-dialog-content" style="overflow:hidden;">
-            <hr class="dialog-hr">
-            <div class="dialog-source-content">
-              <img v-if="showImg" :src="checkImgSrc">
-            </div>
-          </div>
-        </el-dialog>
-      </transition>
       <div class="storeInfo-content">
         <div class="storeInfo-details">
           <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">{{ $t('eventView.storeName') }}：</span></dd>
@@ -168,13 +152,11 @@
             <div v-for="(item,index) in imgsourceList" :key="'img-' + index" class="source-content">
               <div v-if="item.mediaType===2" class="img-content">
                 <!--image-->
-                <img
+                <el-image
                   :src="item.url"
-                  :title="imgTitle"
-                  :onerror="deafultImg"
-                  :height="imgHeight+'px'"
-                  class="imgLittle imgInner"
-                  @click="openOuter(item,$event)">
+                  :style="{height: imgHeight+'px', width: 'calc(130/1920*100vw)'}"
+                  :preview-src-list="getImgList(index, imgsourceList)"
+                  class="imgLittle imgInner"/>
               </div>
             </div>
           </div>
@@ -252,13 +234,11 @@
                   :height="imgHeight+'px'"
                   class="source-details">
                   <div v-if="_item.mediaType === 2" class="img-content">
-                    <img
-                      :title="imgTitle"
+                    <el-image
                       :src="_item.url"
-                      :height="imgHeight+'px'"
-                      :onerror="deafultImg"
-                      class="imgLittle imgInner"
-                      @click="openOuter(_item,$event)">
+                      :style="{height: imgHeight+'px',width: 'calc(100/1920*100vw)'}"
+                      :preview-src-list="getImgList(_index, item.sourceList)"
+                      class="imgLittle imgInner"/>
                   </div>
                   <div v-else class="img-content " @click="playCommentVideo(_item,_index)">
                     <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -327,9 +307,6 @@ export default {
       windowHeight: window.innerHeight,
       varyWindowWidth: window.innerWidth,
       showOuter: false,
-      bigImgSrc: '',
-      checkImgSrc: '',
-      imgTitle: '',
       showCheckVideo: false,
       showPhotoContent: false,
       deafultImg: 'this.src="' + require('../../../../static/img/picture_failed.png') + '"',
@@ -460,19 +437,16 @@ export default {
       });
     },
 
-    openOuter(item, $ev) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.url;
-        self.showImg = true;
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
-    },
-
-    showOuterPhoto(target) {
-      const self = this;
-      var src = target.src;
-      self.bigImgSrc = src;
+      return arr.filter(source => source.mediaType === 2).map(source => source.url);
     },
 
     closeRealTime() {
@@ -1436,7 +1410,6 @@ $h1:#292e36;
                     float: left;
                     @include point(margin,5);
                     @include point(max-width,220);
-
                     .img-content{
                         position: relative;
                         cursor: pointer;
@@ -1623,15 +1596,18 @@ $h1:#292e36;
                         word-wrap:break-word; /* Internet Explorer 5.5+ */
                     }
                     .source-content{
-                        @include point(margin-left,8);
+                      margin-left: calc(20/1920*100vw);
                         overflow: hidden;
                         min-width: 90%;
+                      display: flex;
+                      justify-content: flex-start;
+                      overflow: hidden;
+                      flex-wrap: wrap;
                         @include point(margin-top,15);
                         .source-details{
-                            float: left;
                             @include point(max-width,220);
-                            @include point(width,100);
-                            //@include point(height,65);
+                          margin-right: calc(10/1920*100vw);
+                            width: calc(100/1920*100vw);
                             .img-content{
                                 position: relative;
                                 cursor: pointer;
@@ -1644,15 +1620,6 @@ $h1:#292e36;
                                 width: calc(130/1920*100vw);
                               }
                             }
-                            &:nth-child(2n+1){
-                                @include point(margin-left,15);
-                            }
-                          @media screen and (min-width: 1280px) and(max-width: 1366px){
-                            width: 90px;
-                            .img-content .imgLittle{
-                              width: 85px;
-                            }
-                          }
                         }
                     }
                     .viedo-info{

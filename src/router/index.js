@@ -241,6 +241,20 @@ export const navbarRoute = {
         }
       }
     );
+
+    // PermissionHelper.enableCheckinStatistics() &&
+    statisticsRoute.children.push(
+      {
+        path: '/checkInStatistics',
+        name: 'checkInStatistics',
+        component: resolve => require(['@/views/statistical/CheckInStatistics'], resolve),
+        hidden: false,
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        }
+      }
+    );
     return statisticsRoute;
   },
 

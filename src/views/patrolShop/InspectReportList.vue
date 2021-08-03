@@ -401,7 +401,8 @@ export default {
       ifGetParamsFromCash: false,
       inspectCatch: '',
       storeFilterObj: {},
-      searchParams: {}
+      searchParams: {},
+      ifSearchData: true
     };
   },
 
@@ -427,6 +428,7 @@ export default {
         },
         300);
         self.ifSaveParams = true;
+        self.ifSearchData = true;
       }
     }
   },
@@ -826,6 +828,8 @@ export default {
     onStoreChange(storeObj) {
       this.storeStr = storeObj.storeStr;
       this.storeFilterObj = storeObj;
+      this.ifSearchData && this.searchData();
+      this.ifSearchData = false;
     }
   },
 

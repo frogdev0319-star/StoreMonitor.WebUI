@@ -101,6 +101,10 @@ export default class PermissionHelper {
     return this.enableAuthorities(3, 0x0, 0x8);
   }
 
+  static enableCheckinStatistics() {
+    return this.enableAuthorities(3, 0x0, 0x10);
+  }
+
   static enableStatistics() {
     return this.enableAuthorities(3, 0x8, 0x0);
   }
