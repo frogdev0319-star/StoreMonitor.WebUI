@@ -153,6 +153,8 @@ import DelayButton from '@/components/DelayButton';
 import { getBrifCheckinList } from '@/api/checkin';
 import { titleRESTful, inpectRESTful } from '@/api/index';
 import { getUserInfo } from '@/api/login';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'CheckInStatistics',
@@ -162,6 +164,7 @@ export default {
     MultiSelect,
     DateTimePicker
   },
+
   data() {
     return {
       lang: this.$i18n.locale,
@@ -177,6 +180,7 @@ export default {
       departmentList: [],
       userIds: [],
       userList: [],
+      origianlUserList: [],
       positionIds: [],
       positionsList: [],
       tableFixedColumns: [
@@ -212,10 +216,33 @@ export default {
       selectTime: 0,
       headerClass: 'header-class',
       cellClass: 'cell-class',
-      setSelectTimeFlag: true
+      setSelectTimeFlag: true,
+      ifSaveParams: false,
+      ifCachedParams: false
     };
   },
+
+  computed: {
+    ...mapGetters({
+      accountChanged: 'accountChanged'
+    })
+  },
+
+  watch: {
+    async accountChanged(val) {
+      if (val !== 0) {
+        this.dateValue = [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()];
+        this.getSearchParams();
+        this.getDaysColumn();
+        this.getUserList();
+        this.getTitleList();
+        this.searchCheckInList();
+        this.ifSaveParams = false;
+      }
+    }
+  },
   created() {
+    this.getSearchParams();
     this.getDaysColumn();
     this.getUserList();
     this.getTitleList();
@@ -225,16 +252,17 @@ export default {
   methods: {
     getUserList() {
       this.userList = [];
-      this.userIds = [];
+      this.origianlUserList = [];
       getUserInfo().then(res => {
         res.data.map(user => {
           const userJson = {};
           userJson.label = user.userName;
           userJson.value = user.userId;
-          userJson.roleId = user.roleId;
+          userJson.title = user.title;
+          this.origianlUserList.push(userJson);
           this.userList.push(userJson);
         });
-        this.userIds = this.userList.map(user => user.value);
+        this.userIds = this.ifCachedParams ? this.userIds : this.userList.map(user => user.value);
       })
         .catch(err => {
           console.log('CheckinStatistics-getUserList: ' + err);
@@ -247,10 +275,10 @@ export default {
         res.data.map(title => {
           const titleJson = {};
           titleJson.label = title.title;
-          titleJson.value = title.id;
+          titleJson.value = title.titleId;
           this.positionsList.push(titleJson);
         });
-        this.positionIds = this.positionsList.map(position => position.value);
+        this.positionIds = this.ifCachedParams ? this.positionIds : this.positionsList.map(position => position.value);
       })
         .catch(err => {
           console.log('CheckinStatistics-getTitleList: ' + err);
@@ -281,7 +309,6 @@ export default {
       const startDay = this.$moment(this.dateValue[0]).format('YYYY-MM-DD');
       const endDay = this.$moment(this.dateValue[1]).format('YYYY-MM-DD');
       this.daysList = this.getMonthAndDay(startDay, endDay);
-      this.getTableColumns(this.daysList);
     },
 
     getTableColumns(daysList) {
@@ -321,10 +348,17 @@ export default {
 
     handlePositionChange(positionIds) {
       this.positionIds = positionIds;
+      this.userList = this.origianlUserList.filter(item => {
+        return positionIds.includes(item.title);
+      });
+      this.userIds = this.userList.map(user => user.value);
+      console.log(this.userIds)
     },
 
     async searchCheckInList() {
       const parmas = this.generateCallParams();
+      this.ifSaveParams && this.saveSearchParams();
+      this.ifSaveParams = true;
       const checkinList = await getBrifCheckinList(parmas);
       const checkinData = checkinList.data;
       this.total = checkinData.length;
@@ -333,7 +367,6 @@ export default {
       this.daysList.map(day => {
         dayAndTimesJson[day] = 0;
       });
-
       checkinData.forEach(checkin => {
         const tableJson = { ...dayAndTimesJson };
         tableJson.userId = checkin.userId;
@@ -343,6 +376,7 @@ export default {
         });
         tableData.push(tableJson);
       });
+      this.getTableColumns(this.daysList);
       this.checkinList = tableData;
     },
 
@@ -409,9 +443,38 @@ export default {
 
           var workbook = XLSX.read(binary, { type: 'array' });
           const sheet = XLSX.utils.sheet_to_json(workbook.Sheets['Pass&Fail']);
-        }
+        };
         reader.readAsBinaryString(res);
       });
+    },
+
+    saveSearchParams() {
+      const params = {
+        'userIds': this.userIds,
+        'positionIds': this.positionIds,
+        'dateValue': this.dateValue
+      };
+      const searchConditon = {
+        path: 'checkinStatistics',
+        params: params
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
+    },
+
+    getSearchParams() {
+      const searchParams = SearchConditionUtil.getSearchCondition('checkinStatistics');
+      if (Object.keys(searchParams).length > 0) {
+        const dateValue = searchParams.dateValue;
+        const start = typeof (dateValue[0]) === 'object' ? dateValue[0].getTime() : dateValue[0];
+        const end = typeof (dateValue[1]) === 'object' ? dateValue[1].getTime() : dateValue[1];
+        this.dateValue[0] = new Date(start);
+        this.dateValue[1] = new Date(end);
+        this.userIds = searchParams.userIds;
+        this.positionIds = searchParams.positionIds;
+        this.ifCachedParams = true;
+      } else {
+        this.ifCachedParams = false;
+      }
     }
 
   }
