@@ -1217,7 +1217,6 @@ export default {
       const self = this;
       const content = filterString.all(val, 600);
       const length = filterString.getContentLength(val);
-      console.log(content);
       self.suggest = content;
       if (length > 600) {
         this.adviceInfoRuletip = true;

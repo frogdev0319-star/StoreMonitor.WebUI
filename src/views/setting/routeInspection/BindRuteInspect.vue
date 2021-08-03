@@ -122,7 +122,8 @@ export default {
       showPopoVer: true,
       lang: this.$i18n.locale,
       loadingGif: require('../../../../static/img/loading.gif'),
-      storeFilterObj: {}
+      storeFilterObj: {},
+      tempStoreData: []
     };
   },
 

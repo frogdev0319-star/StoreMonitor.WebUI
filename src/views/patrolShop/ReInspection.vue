@@ -81,22 +81,6 @@
         </div>
       </el-dialog>
       <el-dialog
-        v-if="showFeedDialog1"
-        v-if="showOuter"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="showOuter"
-        :close-on-click-modal="false"
-        :width="680*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="dialog-img-content">
-            <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight">
-          </div>
-        </div>
-      </el-dialog>
-      <el-dialog
         v-if="showAddTextFeedbackDialog"
         :title="$t('remotePatrol.feedbacks')"
         :visible.sync="showAddTextFeedbackDialog"
@@ -1123,7 +1107,7 @@ export default {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
         this.eventList[this.feedbackIndex].eventDes = this.eventDes;
       }
-      this.confirmAddTextFeedback = false;
+      this.showAddTextFeedbackDialog = false;
       this.showFeedBackInfo = false;
     },
 
