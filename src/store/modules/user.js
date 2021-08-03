@@ -161,6 +161,7 @@ const user = {
               commit('SET_ISEZVIZ', false);
               setCookie('isEzviz', false);
             }
+            setCookie('deviceAuth', res.data.deviceAuth);
           } else {
             commit('Account_Changed', 0);
           }
