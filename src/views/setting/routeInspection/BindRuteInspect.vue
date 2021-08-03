@@ -3,6 +3,7 @@
     <div class="el-bind-header">
       <div class="seacrh-content">
         <store-filter
+          class="store-filter"
           :is-patrol = "true"
           :set-width-flag="true"
           @storeChange = "onStoreChange"
@@ -534,44 +535,6 @@ $h1:#292e36;
         span{
             font-size: calc(14/1920*100vw);;
         }
-        .el-province{
-            width: calc(160/1920*100vw);
-            min-width: 85px;
-            margin-left:calc(20/1920*100vw);
-            margin-right: 0;
-        }
-        .city-input{
-            width: calc(160/1920*100vw);
-            height: calc(36/1920*100vw);
-            line-height: calc(36/1920*100vw);
-            background: #F4F5F9 !important;
-            cursor: pointer;
-            border: 1px solid #E4E7ED;
-            box-sizing: border-box;
-            border-radius: 3px;
-            overflow: hidden;
-            min-height: 28px;
-            min-width: 85px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            span{
-                display: inline-block;
-                font-size: 12px;
-                color: #7d8cad;
-                margin-left: 15px;
-                width: calc(160/1920*100vw - 40px);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .icon-input{
-                position: absolute;
-                right: calc(15/1920*100vw);
-                font-size: calc(14/1920*100vw);
-                color: #C0C4CC;
-            }
-        }
         .el-search-btn{
             font-size: calc(14/1920*100vw);
             height: calc(36/1920*100vw);
@@ -583,10 +546,14 @@ $h1:#292e36;
             /*padding: 9px 15px;*/
         }
     }
+    @media screen and (min-width: 1920px){
+      .store-filter{
+        width: 90%;
+      }
+    }
     .el-header-title{
         font-size: 18px;
         font-weight: bold;
-        // margin-left: calc(40/1920*100vw);
         position: relative;
         top: 5px;
         display: inline;

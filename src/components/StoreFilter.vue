@@ -1,7 +1,7 @@
 <template>
   <el-col :span="24" class="">
     <el-col :span="24" :class="setWidthFlag ? 'width-limit' : ''" class="header-details">
-      <div>
+      <div :class="setWidthFlag ? 'first-header' : ''">
         <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeSelect') }}</span>
         <el-select
           v-model="curCountry"
@@ -48,6 +48,7 @@
       <div :class="setWidthFlag ? 'store-group-type' : ''">
         <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeGroup') }}</span>
         <multi-select
+          class="store-group-select"
           :selected="curStoreGroup"
           :prompt-msg="$t('remotePatrol.storeGroup')"
           :all-select="0"
@@ -56,6 +57,7 @@
           @changeInput="onChangeStoreGroup"/>
         <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeType') }}</span>
         <multi-select
+          class="store-group-select"
           :selected="curStoreType"
           :prompt-msg="$t('remotePatrol.storeType')"
           :all-select="0"
@@ -673,6 +675,13 @@ export default {
     flex-wrap: wrap;
   }
   .store-group-type{
-    padding-top: 20px;
+    position: relative;
+  }
+  .header-details.width-limit:first-child{
+    padding-bottom: 0px;
+  }
+
+  .first-header{
+    padding-bottom: 20px;
   }
 </style>

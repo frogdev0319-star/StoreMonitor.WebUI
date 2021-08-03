@@ -276,6 +276,10 @@ export default {
     min-width: 85px;
   }
 
+  .store-group-select .input-class{
+    bottom: 0;
+  }
+
 </style>
 <style>
   @import '../assets/css/pagination.css';
