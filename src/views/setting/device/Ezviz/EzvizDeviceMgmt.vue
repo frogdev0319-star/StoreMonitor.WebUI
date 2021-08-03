@@ -166,7 +166,7 @@
                     <i class="el-icon-close"/>
                   </div>
                 </div>
-                <div v-if="!item.isClick">
+                <div v-if="!item.isClick" class="icon-list">
                   <i
                     class="iconfont icon-bianji"
                     style="cursor:pointer;margin-right:10px;"
@@ -1850,7 +1850,7 @@ export default {
             position: relative;
             /*margin-right: 6%;*/
             span{
-              margin-left: 20%;
+              margin-left: 10%;
               position: relative;
               @include point(max-width,90);
               overflow: hidden;
@@ -1926,6 +1926,9 @@ export default {
             .iconfont{
               font-size: calc(24/1920*100vw);
               color: #7d8cad !important;
+            }
+            .icon-list{
+              display: flex;
             }
           }
         }
