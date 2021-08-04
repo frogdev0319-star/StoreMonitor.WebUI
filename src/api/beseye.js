@@ -1,14 +1,8 @@
 import request from '@/common/request';
 import Environment from '@/common/environment';
-import * as axios from 'axios';
 import { getToken } from '@/common/auth.js';
 
 const version = Environment.VERSION;
-
-const VCAMID = '93aed0a82f284c9884c1956121db809f';
-const DD = '{Web}_{YH-EXTERNAL}_{97557807-1149-4004-8e92-91c344539ded}';
-
-const baseUrl = Environment.BASE_URL;
 
 export const getStreamInfo = params => {
   return request({

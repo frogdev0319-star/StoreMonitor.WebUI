@@ -133,13 +133,11 @@ export default {
     getRouterData() {
       const self = this;
       let routeData = self.$route.params.data;
-      console.log(routeData);
       if (self.$route.params.data === undefined) {
         routeData = JSON.parse(sessionStorage.getItem('store_submit'));
       }
       self.routeData = routeData;
       self.isSuccess = routeData.flag.isSuccess;
-      // self.isSuccess=false;
       if (self.isSuccess === false) {
         PubSub.publish('success-page', { changeStyle: true });
       }
