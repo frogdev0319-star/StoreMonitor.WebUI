@@ -522,7 +522,6 @@ export default {
       showImportContent: false,
       showConfirmImport: false,
       channelList: [],
-      channelData: [],
       curChannelItem: {},
       varWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
@@ -968,7 +967,6 @@ export default {
             throw Error(result.errMsg);
           }
         });
-        self.channelData = await self.getChannelData();
         self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
       } catch (e) {
@@ -1033,7 +1031,6 @@ export default {
         }
       })
         .then(async() => {
-          self.channelData = await self.getChannelData();
           self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         }).catch(err => {
           console.log('EzvizDeviceManagement-addEzvizChannel: ' + err);
@@ -1077,11 +1074,9 @@ export default {
         .then(async() => {
           if (self.tableData.length !== 0) {
             self.curEzvizItem = self.tableData[0];
-            self.channelData = await self.getChannelData();
             self.getChannelListByDevice(self.tableData[0].serialNumber);
           } else {
             self.channelBtnDisabled = true;
-            self.channelData = [];
             self.channelList = [];
           }
           this.isLoadingData = false;
@@ -1091,9 +1086,9 @@ export default {
         });
     },
 
-    getChannelData() {
+    getChannelData(serialNumber) {
       const params = {};
-      params.serialNumber = this.curEzvizItem.serialNumber;
+      params.serialNumber = serialNumber;
       return new Promise((resolve, reject) => {
         ezvizRESTful.getEzvizChannelList(params).then(res => {
           const errMsg = res.errMsg;
@@ -1110,8 +1105,8 @@ export default {
     getChannelListByDevice(serialNumber) {
       const self = this;
       const temp = [];
-      self.channelData.forEach(item => {
-        if (item.ivsId === serialNumber) {
+      this.getChannelData(serialNumber).then(res => {
+        res.forEach(item => {
           const obj = {};
           obj.id = item.id;
           obj.name = item.name;
@@ -1123,7 +1118,7 @@ export default {
           obj.status = item.status;
           obj.checkedStatus = item.status === 1;
           temp.push(obj);
-        }
+        })
       });
       self.channelList = temp;
       if (Object.keys(self.curEzvizItem).length === 0 ||
@@ -1257,7 +1252,6 @@ export default {
           }
           self.initAddChannelFormData();
           self.page = 1;
-          self.channelData = await self.getChannelData();
           self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         } else {
           return false;
@@ -1322,7 +1316,6 @@ export default {
         }
       })
         .then(async() => {
-          self.channelData = await self.getChannelData(); // modify data
           self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         }).catch(err => {
           console.log('EzvizDeviceManagement-deleteSingleChannel: ' + err);
