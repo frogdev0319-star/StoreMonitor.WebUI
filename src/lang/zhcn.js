@@ -837,7 +837,8 @@ export default {
     'addedDeviceNumber': '已添加设备数量：',
     'otherError': '其他错误',
     'commentLengthPrompt': '最多可输入100个字符',
-    'licenseOverdue': '订阅权限过期'
+    'licenseOverdue': '订阅权限过期',
+    'hasBoundItem': '设备已绑定通道'
   },
 
   // Store Management page language

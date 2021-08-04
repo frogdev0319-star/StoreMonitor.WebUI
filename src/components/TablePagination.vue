@@ -343,7 +343,6 @@ export default {
         return;
       }
       row.isEditing = false;
-      row.name = row.tempDeviceName;
       this.$emit('handleEdit', row);
     },
 

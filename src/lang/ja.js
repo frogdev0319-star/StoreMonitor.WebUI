@@ -849,7 +849,8 @@ export default {
     'deviceLimitation': '現在のデバイス数が制限を超えています。デバイス数を更新または削減してください',
     'authorizedDevicesNum': '許可されたデバイスの数:',
     'addedDeviceNumber': '追加されたデバイスの数:',
-    'licenseOverdue': 'サブスクリプション許可の有効期限が切れました'
+    'licenseOverdue': 'サブスクリプション許可の有効期限が切れました',
+    'hasBoundItem': 'デバイスがアイテムにバインドされています'
   },
 
   // Store Management page language

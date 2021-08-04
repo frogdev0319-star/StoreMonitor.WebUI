@@ -301,7 +301,7 @@
     </div>
     <el-dialog
       v-if="showAddDeviceDialog"
-      :title="isAddAgain ? $t('deviceView.updateDevice') : $t('deviceView.addDevice')"
+      :title="$t('deviceView.addDevice')"
       :visible.sync="showAddDeviceDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
@@ -370,7 +370,6 @@
                 <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
                   <el-input
                     v-model="addDeviceData.serialNumber"
-                    :disabled="isAddAgain"
                     style="width: 100%;"
                     @input="(val)=>serialNumberChange(val)"
                     @blur="notShowInputRuleTips('serialNum')"/>
@@ -401,16 +400,7 @@
               </el-col>
               <el-col v-if="deviceType !== 0 && accountScope !== 0" :span="9" :offset="2">
                 <el-form-item :label="$t('deviceView.deviceChannelNum')" prop="channelCount">
-                  <el-select v-if="isAddAgain" v-model="addDeviceData.channelCount" size="mini">
-                    <el-option
-                      v-for="numList in editChannelNumList"
-                      :key="numList.value"
-                      :label="numList.label"
-                      :value="numList.value"
-                      :disabled="numList.disabled"
-                    />
-                  </el-select>
-                  <el-select v-else v-model="addDeviceData.channelCount" size="mini">
+                  <el-select v-model="addDeviceData.channelCount" size="mini">
                     <el-option
                       v-for="numList in channelNumList"
                       :key="numList.value"
@@ -423,7 +413,6 @@
             <el-form-item :label="$t('deviceView.store')" prop="storeId">
               <el-select
                 v-model="addDeviceData.storeId"
-                :disabled="isAddAgain"
                 :filter-method="filterStoreOption"
                 filterable
                 style="width: 100%;">
@@ -451,7 +440,7 @@
           class="file-confirm-btn"
           size="mini"
           type="primary"
-          @click="confirmAddEzvizDevice">{{ $t('deviceView.confirm') }}</el-button>
+          @click="addEzvizDeviceBasedForm">{{ $t('deviceView.confirm') }}</el-button>
       </div>
     </el-dialog>
     <el-dialog
@@ -603,7 +592,6 @@ export default {
       },
       showDeleteChannel: false,
       deleteFromEzviz: false,
-      isAddAgain: false,
       addChannelData: { },
       channelRules: {
         name: [
@@ -751,16 +739,15 @@ export default {
       const self = this;
       const params = {};
       params.serialNumber = deviceInfo.serialNumber;
-      params.name = deviceInfo.name;
+      params.name = deviceInfo.tempDeviceName;
       params.syncToEzviz = false;
       ezvizRESTful.updateEzvizDevice(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-          deviceInfo.isEditing = false;
         } else {
-          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-          deviceInfo.isEditing = false;
+          deviceInfo.tempDeviceName = deviceInfo.name;
+          this.setErrorMsg(res.errMsg, false);
         }
       })
         .then(async() => {
@@ -986,8 +973,8 @@ export default {
         util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
       } catch (e) {
         item.checkedStatus = item.status === 1;
-        util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-        item.isEditing = false;
+        item.isClick = false;
+        this.setErrorMsg(e.message, false);
       }
     },
 
@@ -1106,7 +1093,6 @@ export default {
 
     getChannelData() {
       const params = {};
-      console.log(this.curEzvizItem.serialNumber)
       params.serialNumber = this.curEzvizItem.serialNumber;
       return new Promise((resolve, reject) => {
         ezvizRESTful.getEzvizChannelList(params).then(res => {
@@ -1186,40 +1172,6 @@ export default {
       });
     },
 
-    confirmAddEzvizDevice() {
-      this.addEzvizDeviceBasedForm();
-    },
-
-    updateEzvizDeviceInfo() {
-      const self = this;
-      const obj = self.addDeviceData;
-      const params = {};
-      params.serialNumber = obj.serialNumber;
-      params.name = obj.name;
-      params.syncToEzviz = false;
-      params.channelCount = obj.channelCount;
-      params.validationCode = obj.validationCode;
-      params.ezvizAccount = obj.ezvizAccount;
-      ezvizRESTful.updateEzvizDevice(params).then(res => {
-        const errMsg = res.errMsg;
-        if (errMsg != undefined && errMsg === 'Success') {
-          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-          self.showAddDeviceDialog = false;
-          self.isAddAgain = false;
-        } else {
-          self.setErrorMsg(errMsg);
-          self.showAddDeviceDialog = false;
-          self.isAddAgain = false;
-        }
-      })
-        .then(async() => {
-          self.channelData = await self.getChannelData();
-          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
-        }).catch(err => {
-          console.log('EzvizDeviceManagement-updateEzvizDeviceInfo: ' + err);
-        });
-    },
-
     addEzvizDeviceBasedForm() {
       const self = this;
       self.$refs['deviceForm'].validate(async(valid) => {
@@ -1263,7 +1215,7 @@ export default {
             util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             self.showAddDeviceDialog = false;
           } else {
-            self.setErrorMsg(errMsg);
+            self.setErrorMsg(errMsg, true);
           }
           self.initAddDeviceFormData();
           self.setDeviceListParams();
@@ -1380,7 +1332,6 @@ export default {
     showAddDialog() {
       this.showAddDeviceDialog = true;
       this.storeDataList = this.allStoreDataList;
-      this.isAddAgain = false;
       this.deviceType = 0;
       this.initAddDeviceFormData();
       this.accountScope === 1 && this.getAvailableEzvizDevice();
@@ -1540,7 +1491,7 @@ export default {
       }
     },
 
-    setErrorMsg(msg) {
+    setErrorMsg(msg, addOrUpdateFlag) {
       let displayedMsg = '';
       const msgMap = [
         { ret: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
@@ -1551,11 +1502,12 @@ export default {
         { ret: 'storeNotExist', match: ['Store does not exist'] },
         { ret: 'noAuthorityForStore', match: ['No authority'] },
         { ret: 'illegalSeriNum', match: ['deviceSerial']},
-        { ret: 'licenseOverdue', match: ['Device License overdue']}
+        { ret: 'licenseOverdue', match: ['Device License overdue']},
+        { ret: 'hasBoundItem', match: ['binding to item']}
       ];
       const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
       if (!result) {
-        displayedMsg = this.isAddAgain ? this.$t('deviceView.editFail') : this.$t('deviceView.addFailed');
+        displayedMsg = addOrUpdateFlag ? this.$t('deviceView.addFailed') : this.$t('deviceView.editFail');
       } else {
         displayedMsg = this.$t(`deviceView.${result.ret}`);
       }
