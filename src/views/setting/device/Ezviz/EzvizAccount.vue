@@ -519,7 +519,7 @@ export default {
           self.showAddAccount = false;
           self.getAccountTableList();
         } else {
-          util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+          self.setErrorMsg(res.errMsg, true);
           self.showAddAccount = false;
         }
       }).catch(err => {
@@ -537,8 +537,7 @@ export default {
           self.showAddAccount = false;
           self.getAccountTableList();
         } else {
-          const msg = self.ezvizAccountInfo.scope === 0 ? res.errMsg : self.$t('deviceView.editFail');
-          util.notify(msg, 'warning', 3000);
+          self.setErrorMsg(res.errMsg, false);
           self.showAddAccount = false;
         }
       }).catch(err => {
@@ -556,6 +555,21 @@ export default {
         accountParams.appSecret = this.ezvizAccountInfo.appSecret;
       }
       return accountParams;
+    },
+
+    setErrorMsg(msg, addOrUpdateFlag) {
+      let displayedMsg = '';
+      const msgMap = [
+        { ret: 'accountExist', match: ['Account already exists'] },
+        { ret: 'enterCorrentAccount', match: ['Account is invalid'] }
+      ];
+      const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
+      if (!result) {
+        displayedMsg = addOrUpdateFlag ? this.$t('deviceView.addFailed') : this.$t('deviceView.editFail');
+      } else {
+        displayedMsg = this.$t(`deviceView.${result.ret}`);
+      }
+      util.notify(displayedMsg, 'warning', 3000);
     },
 
     updateAccount(row) {
