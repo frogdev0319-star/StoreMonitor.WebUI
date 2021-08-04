@@ -61,6 +61,7 @@
         :store-id="store.storeId"
         :channel-info="channel"
         :is-history="playBackState"
+        :video-authority="videoAuthority"
         :source-list-length="sourceList.length"
         @confirmEzvizCanvas="editEzvizCanvas"
       />

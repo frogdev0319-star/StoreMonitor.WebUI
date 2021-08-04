@@ -30,9 +30,27 @@
           @mousemove="showControlInfo=true"
           @mouseleave="showControlInfo = false">
           <hr class="dialog-hr">
-          <dash-video v-if="vendor === 0" ref="dashVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
-          <ezviz-video v-else-if="vendor === 1" ref="ezvizVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
-          <beseye-video v-else ref="beseyeVideo" :channel-info="channelInfo" :is-event="isEvent" :store-id="event.storeId"/>
+          <dash-video
+            v-if="vendor === 0"
+            ref="dashVideo"
+            :channel-info="channelInfo"
+            :is-event="isEvent"
+            :store-id="event.storeId"
+            :video-authority="videoAuthority"/>
+          <ezviz-video
+            v-else-if="vendor === 1"
+            ref="ezvizVideo"
+            :channel-info="channelInfo"
+            :is-event="isEvent"
+            :store-id="event.storeId"
+            :video-authority="videoAuthority"/>
+          <beseye-video
+            v-else
+            ref="beseyeVideo"
+            :channel-info="channelInfo"
+            :is-event="isEvent"
+            :store-id="event.storeId"
+            :video-authority="videoAuthority"/>
         </div>
       </el-dialog>
       <el-dialog
@@ -258,7 +276,6 @@
 </template>
 <script>
 import util from '@/common/util';
-import dashAPI from '@/api/dash';
 import videojs from '../../../../static/video.js';
 import 'videojs-contrib-hls';
 import { eventRESTful } from '@/api/index';
