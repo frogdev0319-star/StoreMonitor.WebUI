@@ -350,7 +350,7 @@ export default {
     'createProblem': '新建问题',
     'relateProblem': '已创建问题',
     'title': '问题名称',
-    'storeMaxAttach': '视频图片最多支持插入10个。',
+    'storeMaxAttach': '视频图片不能为空，最多支持插入10个。',
     'relevantEvent': '相关事件',
     'selectDate': '选择日期',
     'playTime': '播放时间',

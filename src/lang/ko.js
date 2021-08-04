@@ -293,7 +293,7 @@ export default {
     'createMothod': '창조의 방법',
     'createProblem': '문제 생성',
     'relateProblem': '역사적인 문제',
-    'storeMaxAttach': '최대한 첨부 10개',
+    'storeMaxAttach': '첨부 파일은 비워둘 수 없으며 최대 10개까지 지원됩니다',
     'relevantEvent': '관련 이벤트',
     'edit': ' 캡쳐 어플 편집',
     'selectDate': '날짜 선택',

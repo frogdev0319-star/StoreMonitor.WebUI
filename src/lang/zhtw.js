@@ -350,7 +350,7 @@ export default {
     'createProblem': '新建問題',
     'relateProblem': '已創建問題',
     'title': '問題名稱',
-    'storeMaxAttach': '影像圖片最多支援插入10個。',
+    'storeMaxAttach': '影像圖片不能為空，最多支援插入10個。',
     'relevantEvent': '相關事件',
     'selectDate': '選擇日期',
     'playTime': '播放時間',

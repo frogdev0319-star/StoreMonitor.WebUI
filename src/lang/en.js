@@ -347,7 +347,7 @@ export default {
     'createProblem': 'Create Problem',
     'relateProblem': 'Historical problem',
     'title': 'Title',
-    'storeMaxAttach': 'Up to 10 attachments!',
+    'storeMaxAttach': 'Attachment may not empty, supports up to 10!',
     'relevantEvent': 'Relevant Event',
     'selectDate': 'Select Date',
     'playTime': 'Play Time',

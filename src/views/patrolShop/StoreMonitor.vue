@@ -22,6 +22,7 @@
         <el-button
           v-loading.fullscreen.lock="fullscreenLoading"
           v-if="showStoreUp"
+          :disabled="sourceList.length === 0"
           :size="varyWindowWidth > 1680 ? 'small' : 'mini'"
           class="el-submit"
           type="primary"
@@ -29,82 +30,6 @@
         >{{ $t("remotePatrol.submit") }}
         </el-button>
       </div>
-      <el-dialog
-        v-if="showSnapShotDialog"
-        :title="$t('remotePatrol.edit')"
-        :visible.sync="showSnapShotDialog"
-        :close-on-click-modal="false"
-        :width="860 * percentHeight + 'px'"
-        height="300px"
-        top="5%"
-      >
-        <div
-          class="canvas-content"
-          @mouseenter="showCancel"
-          @mouseleave="hiddenCancel"
-        >
-          <hr class="dialog-hr" >
-          <transition name="fade">
-            <div v-if="showPenBtn" id="iconR" class="icon-right">
-              <img :src="penBtnSrc" class="pen-btn" @click="showPenList" >
-              <transition name="fadepen">
-                <div v-if="showPen" class="pen-content">
-                  <div
-                    v-for="(item, index) in penList"
-                    :key="index"
-                    class="content"
-                  >
-                    <div :class="{ colorActive: item.showContent }" />
-                    <div
-                      :id="item.id"
-                      class="color"
-                      @click="checkPen(item, index)"
-                    />
-                  </div>
-                </div>
-              </transition>
-            </div>
-          </transition>
-          <canvas
-            id="icanvas"
-            :width="767 * percentHeight"
-            :height="431 * percentHeight"
-            @mousedown="mouseDownAction($event)"
-            @mousemove="mouseMoveAction($event)"
-            @mouseleave="mouseLeaveAction($event)"
-            @mouseup="mouseUpAction($event)"
-          />
-          <div
-            v-if="showCancelContent"
-            :style="{
-              width: 767 * percentHeight + 'px',
-              'margin-left': 47 * percentHeight + 'px',
-            }"
-            class="cancel-content"
-          >
-            <div class="content" @click="cancleEditCanvas">
-              <img :src="clearIconSrc" class="icon-clear" height="22px" >
-              <span>{{ $t("remotePatrol.clear") }}</span>
-            </div>
-            <div class="content" @click="confirmEditCanvas">
-              <img :src="removeIconSrc" class="icon-clear" height="22px" >
-              <span>{{ $t("remotePatrol.cancel") }}</span>
-            </div>
-          </div>
-        </div>
-        <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="cancelEdit">{{
-            $t("remotePatrol.cancel")}}</el-button>
-          <el-button
-            id="confirmBtn"
-            size="mini"
-            type="primary"
-            @click="confirmEdit"
-          >
-            {{ $t("remotePatrol.confirm") }}
-          </el-button>
-        </div>
-      </el-dialog>
       <dialog-vue
         :dialog-title="changeStoreObj.title"
         :show-info="changeStoreObj.showInfo"
@@ -1313,7 +1238,6 @@ export default {
       let isSuccess = false;
       addEvent(params).then((res) => {
         self.fullscreenLoading = false;
-        const notifiedTo = res.data.notifiedTo;
         if (res.errCode === 0) {
           isSuccess = true;
         } else {
@@ -1337,7 +1261,6 @@ export default {
             description: self.eventDes.trim(),
             fileList: tempFileUrl
           },
-          user: notifiedTo,
           ts: curTs
         };
         sessionStorage.setItem('store_submit', JSON.stringify(routeData));

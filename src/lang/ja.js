@@ -289,7 +289,7 @@ export default {
     'createMothod': '作成方法',
     'createProblem': '問題を作成します',
     'relateProblem': '歴史的な問題',
-    'storeMaxAttach': '最大10個の添付ファイル',
+    'storeMaxAttach': '添付ファイルを空にすることはできません、最大10個',
     'relevantEvent': '関連イベント',
     'edit': 'スクリーンショットの編集',
     'selectDate': '日付を選択します',
