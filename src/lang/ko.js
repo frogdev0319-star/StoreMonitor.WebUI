@@ -855,7 +855,8 @@ export default {
     'authorizedDevicesNum': '승인된 기기 수:',
     'addedDeviceNumber': '추가된 기기 수:',
     'licenseOverdue': '구독 권한이 만료되었습니다',
-    'hasBoundItem': '장치가 항목에 바인딩되었습니다'
+    'hasBoundItem': '장치가 항목에 바인딩되었습니다',
+    'hasAdded': '다른 사람이 기기를 추가했습니다'
   },
 
   // Store Management page language

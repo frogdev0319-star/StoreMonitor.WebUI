@@ -838,7 +838,8 @@ export default {
     'authorizedDevicesNum': '授權設備數量：',
     'addedDeviceNumber': '已添加設備數量：',
     'licenseOverdue': '訂閱權限過期',
-    'hasBoundItem': '設備已綁定通道'
+    'hasBoundItem': '設備已綁定通道',
+    'hasAdded': '設備已被別人添加'
   },
 
   // Store Management page language

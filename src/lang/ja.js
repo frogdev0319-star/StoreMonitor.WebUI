@@ -850,7 +850,8 @@ export default {
     'authorizedDevicesNum': '許可されたデバイスの数:',
     'addedDeviceNumber': '追加されたデバイスの数:',
     'licenseOverdue': 'サブスクリプション許可の有効期限が切れました',
-    'hasBoundItem': 'デバイスがアイテムにバインドされています'
+    'hasBoundItem': 'デバイスがアイテムにバインドされています',
+    'hasAdded': 'デバイスは他の誰かによって追加されました'
   },
 
   // Store Management page language

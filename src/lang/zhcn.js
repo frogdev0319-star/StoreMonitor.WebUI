@@ -838,7 +838,8 @@ export default {
     'otherError': '其他错误',
     'commentLengthPrompt': '最多可输入100个字符',
     'licenseOverdue': '订阅权限过期',
-    'hasBoundItem': '设备已绑定通道'
+    'hasBoundItem': '设备已绑定通道',
+    'hasAdded': '设备已被别人添加'
   },
 
   // Store Management page language

@@ -1503,7 +1503,8 @@ export default {
         { ret: 'noAuthorityForStore', match: ['No authority'] },
         { ret: 'illegalSeriNum', match: ['deviceSerial']},
         { ret: 'licenseOverdue', match: ['Device License overdue']},
-        { ret: 'hasBoundItem', match: ['binding to item']}
+        { ret: 'hasBoundItem', match: ['binding to item']},
+        { ret: 'hasAdded', match: ['设备已被别人添加']}
       ];
       const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
       if (!result) {

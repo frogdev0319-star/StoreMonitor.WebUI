@@ -834,7 +834,8 @@ export default {
     'authorizedDevicesNum': 'Number of authorized devices:',
     'addedDeviceNumber': 'Number of added devices:',
     'licenseOverdue': 'Device license overdue',
-    'hasBoundItem': 'Device has been binding to item'
+    'hasBoundItem': 'Device has been binding to item',
+    'hasAdded': 'Device has been added by someone else'
   },
 
   // Store Management page language
