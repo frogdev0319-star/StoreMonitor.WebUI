@@ -137,7 +137,6 @@ service.interceptors.response.use(
       const errMsg = err.response.data.errMsg;
       if (errCode === 500 && (errMsg == 'Invalid token' ||
                 errMsg == 'Failed to verify token' || errMsg == 'User does not exist')) {
-        // router.push('/login');
         const url = sessionStorage.getItem('LoginURL');
         window.location.href = url;
         message({
@@ -146,7 +145,6 @@ service.interceptors.response.use(
           duration: 5 * 1000
         });
       } else if (errCode === 500 && errMsg == 'Token does not exist') {
-        // router.push('/login');
         const url = sessionStorage.getItem('LoginURL');
         window.location.href = url;
       } else if (errCode === 500 && errMsg == 'No authority') {
