@@ -5,6 +5,7 @@ import * as eventRESTful from './event';
 import * as ezvizRESTful from './ezviz';
 import * as titleRESTful from './title';
 import * as beseyeRESTful from './beseye'
+import * as skywatchRESTful from './skywatch'
 
 export default api;
 
@@ -14,5 +15,6 @@ export {
   eventRESTful,
   ezvizRESTful,
   titleRESTful,
-  beseyeRESTful
+  beseyeRESTful,
+  skywatchRESTful
 };

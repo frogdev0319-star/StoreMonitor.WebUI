@@ -391,37 +391,61 @@ export const navbarRoute = {
     util.getVideoAuthority(1) && deviceRoutes.push({
       path: '/dashDevice',
       name: 'dashDevice',
-      component: resolve => require(['@/views/setting/device/NvrDeviceMgmt'], resolve)
+      component: resolve => require(['@/views/setting/device/Dash/NvrDeviceMgmt'], resolve)
     });
 
-    util.getVideoAuthority(2) && deviceRoutes.push({
+    util.getVideoAuthority(2) && deviceRoutes.push(
+      {
         path: '/ezvizDevice',
         name: 'ezvizDevice',
-        component: resolve => require(['@/views/setting/device/EzvizAccount'], resolve)
+        component: resolve => require(['@/views/setting/device/Ezviz/EzvizAccount'], resolve)
       },
       {
         path: '/ezvizeDeviceSetting',
         name: 'deviceSetting',
-        component: resolve => require(['@/views/setting/device/EzvizDeviceMgmt'], resolve),
+        component: resolve => require(['@/views/setting/device/Ezviz/EzvizDeviceMgmt'], resolve),
         hidden: true
-      });
+      }
+    );
+
     util.getVideoAuthority(3) && deviceRoutes.push({
         path: '/beseyeAccount',
         name: 'beseyeAccount',
-        component: resolve => require(['@/views/setting/device/BeseyeAccount'], resolve)
+        component: resolve => require(['@/views/setting/device/Beseye/BeseyeAccount'], resolve)
       },
       {
         path: '/beseyeDeviceSetting',
         name: 'beseyeDeviceSetting',
-        component: resolve => require(['@/views/setting/device/BeseyeDeviceMgmt'], resolve),
+        component: resolve => require(['@/views/setting/device/Beseye/BeseyeDeviceMgmt'], resolve),
         hidden: true
       },
       {
         path: '/beseye/authorize',
         name: 'auth',
-        component: resolve => require(['@/views/setting/device/Authorize'], resolve),
+        component: resolve => require(['@/views/setting/device/Beseye/Authorize'], resolve),
         hidden: true
-      });
+      }
+    );
+
+    util.getVideoAuthority(4) && deviceRoutes.push({
+        path: '/skywatchAccount',
+        name: 'skywatchAccount',
+        component: resolve => require(['@/views/setting/device/Skywatch/SkywatchAccount'], resolve)
+      },
+      {
+        path: '/skywatchDeviceSetting',
+        name: 'skywatchDeviceSetting',
+        component: resolve => require(['@/views/setting/device/Skywatch/SkywatchDeviceMgmt'], resolve),
+        hidden: true
+      },
+      {
+        path: '/skywatch/authorize',
+        name: 'auth',
+        component: resolve => require(['@/views/setting/device/Skywatch/Authorize'], resolve),
+        hidden: true
+      }
+    );
+
     return deviceRoutes;
   },
 
