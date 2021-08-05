@@ -38,7 +38,7 @@
         :formatter="_item.formatter">
         <template slot-scope="{row}">
           <template v-if="_item.canEdit && row.isEditing">
-            <el-input v-model="row.tempDeviceName" class="edit-input" size="small" />
+            <el-input v-model="row.tempDeviceName" class="edit-input" size="small" @input="val => inputDeviceNameChange(val, row)"/>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row[_item.prop])"/>
           <span v-else>{{ row[_item.prop] }}</span>
@@ -141,6 +141,7 @@
 
 <script>
 import util from '@/common/util';
+import filterString from '@/common/filterString'
 
 export default {
   props: {
@@ -349,6 +350,11 @@ export default {
     cancelEdit(row) {
       row.isEditing = false;
       row.tempDeviceName = row.name;
+    },
+
+    inputDeviceNameChange(val, row) {
+      const comment = filterString.all(val, 30);
+      row.tempDeviceName = comment;
     }
 
   }
