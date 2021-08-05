@@ -743,15 +743,15 @@ export default {
       ezvizRESTful.updateEzvizDevice(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
+          deviceInfo.name = deviceInfo.tempDeviceName;
+          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
         } else {
           deviceInfo.tempDeviceName = deviceInfo.name;
           this.setErrorMsg(res.errMsg, false);
         }
       })
-        .then(async() => {
-          self.getChannelListByDevice(self.curEzvizItem.serialNumber);
-        }).catch(err => {
+        .catch(err => {
           console.log('EzvizDeviceManagement-confirmUpdateDevice: ' + err);
         });
     },
