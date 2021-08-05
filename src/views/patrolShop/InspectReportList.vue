@@ -505,6 +505,7 @@ export default {
 
     getReportList(params) {
       const self = this;
+      params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
         this.setNoData();
         return;
@@ -649,7 +650,7 @@ export default {
       } else {
         self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
       }
-      self.dateValue[1] = self.dateValue[1] + 999;
+      self.dateValue[1] = self.dateValue[1];
       self.inputSearchValue = '';
     },
 
@@ -817,7 +818,7 @@ export default {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
-        this.params.endTs = end + 999;
+        this.params.endTs = end;
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
         this.ifGetParamsFromCash = false;

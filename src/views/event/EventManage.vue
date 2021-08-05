@@ -432,7 +432,7 @@ export default {
       } else {
         self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
       }
-      self.dateValue[1] = self.dateValue[1] + 999;
+      self.dateValue[1] = self.dateValue[1];
       self.inputSearchValue = '';
       self.tableDataList[tabIndex].page = 1;
     },
@@ -615,6 +615,7 @@ export default {
         const endTime = this.dateValue[1];
         end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
       }
+      end = end - end % 1000 + 999;
       this.params = {
         beginTs: start,
         endTs: end,
@@ -668,7 +669,8 @@ export default {
       const self = this;
       const start = self.dateValue[0];
       const endTime = self.dateValue[1];
-      const end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+      let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+      end = end - end % 1000 + 999;
       const storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
@@ -876,7 +878,7 @@ export default {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
-        this.params.endTs = end + 999;
+        this.params.endTs = end;
         this.searchParams = {};
         this.curState = [0];
       }
