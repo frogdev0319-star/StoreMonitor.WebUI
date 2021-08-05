@@ -228,6 +228,10 @@ export default {
     'personalCheckinList': '{userName} のチェックイン統計',
     'checkinAddress': 'アドレス',
     'time': '時間',
+    'selectUser': '選択をする人',
+    'allDepartment': 'すべての部門',
+    'allPosition': 'すべてのポジション',
+    'allUser': 'すべての人',
 
     'emptyItemList': 'The inspection item list is empty, please re-filter the data'
   },

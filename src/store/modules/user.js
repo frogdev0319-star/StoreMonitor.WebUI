@@ -30,7 +30,8 @@ const user = {
     PatrolHistory: null,
     InspectHistory: null,
     PatrolComment: '',
-    videoAuthority: false
+    videoAuthority: false,
+    roleId: 0
   },
 
   mutations: {
@@ -108,6 +109,10 @@ const user = {
 
     SET_Video_Authority: (state, videoAccess) => {
       state.videoAuthority = videoAccess;
+    },
+
+    SET_ROLE_ID: (state, roleId) => {
+      state.roleId = roleId;
     }
 
   },
@@ -221,9 +226,11 @@ const user = {
           if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection'))) {
             commit('SET_AUTHORITY', res.data.authorities);
             commit('SET_ROLES', [res.data.title]);
+            commit('SET_ROLE_ID', res.data.roleId);
           } else {
             commit('SET_AUTHORITY', []);
             commit('SET_ROLES', []);
+            commit('SET_ROLE_ID', 0);
           }
           resolve(res);
         }).catch(error => {

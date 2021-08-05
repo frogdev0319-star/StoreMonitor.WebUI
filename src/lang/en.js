@@ -227,7 +227,11 @@ export default {
     'checkinTimeLimit': 'Date range is 31 days, which has been adjusted!',
     'personalCheckinList': 'Checkin Statistics of {userName}',
     'checkinAddress': 'Address',
-    'time': 'Time'
+    'time': 'Time',
+    'selectUser': 'Select Person',
+    'allDepartment': 'All Departments',
+    'allPosition': 'All Positions',
+    'allUser': 'All Persons'
   },
 
   // Patrol page language

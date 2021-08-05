@@ -231,6 +231,10 @@ export default {
     'personalCheckinList': '{userName} 의 통계 확인',
     'checkinAddress': '주소',
     'time': '시간',
+    'selectUser': '사람 선택',
+    'allDepartment': '모든 부서',
+    'allPosition': '모든 위치',
+    'allUser': '모든 사람',
 
     'emptyItemList': 'The inspection item list is empty, please re-filter the data'
   },

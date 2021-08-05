@@ -230,7 +230,11 @@ export default {
     'checkinTimeLimit': '时间范围最长31天，已调整！',
     'personalCheckinList': '{userName}签到统计',
     'checkinAddress': '签到地址',
-    'time': '时间'
+    'time': '时间',
+    'selectUser': '选择人员',
+    'allDepartment': '全部部门',
+    'allPosition': '全部职务',
+    'allUser': '全部人员'
   },
 
   // Patrol page language

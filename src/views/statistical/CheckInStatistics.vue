@@ -2,32 +2,32 @@
   <div class="el-overview-content">
     <div class="statistics-header">
       <div class="header-details">
-        <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('overview.department') }}</span>
-        <multi-select
+        <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('overview.selectUser') }}</span>
+        <region-multi-select
           ref="multiState"
           :selected="departmentIds"
-          :alltype="0"
           :options="departmentList"
+          :all="$t('overview.allDepartment')"
           style="display:inline;"
           @changeInput="handleDepartmentChange"/>
 
-        <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('overview.user') }}</span>
-        <multi-select
-          ref="multiState"
-          :selected="userIds"
-          :alltype="0"
-          :options="userList"
-          style="display:inline;"
-          @changeInput="handleUserChange"/>
-
-        <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('overview.position') }}</span>
-        <multi-select
+        <region-multi-select
           ref="multiState"
           :selected="positionIds"
-          :alltype="0"
+          :placeholder="$t('overview.position')"
+          :all="$t('overview.allPosition')"
           :options="positionsList"
           style="display:inline;"
           @changeInput="handlePositionChange"/>
+
+        <region-multi-select
+          ref="multiState"
+          :selected="userIds"
+          :all="$t('overview.allUser')"
+          :placeholder="$t('overview.user')"
+          :options="userList"
+          style="display:inline;"
+          @changeInput="handleUserChange"/>
 
         <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
         <el-date-picker
@@ -155,10 +155,12 @@ import { titleRESTful, inpectRESTful } from '@/api/index';
 import { getUserInfo } from '@/api/login';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import { mapGetters } from 'vuex';
+import RegionMultiSelect from '../../components/RegionMultiSelect';
 
 export default {
   name: 'CheckInStatistics',
   components: {
+    RegionMultiSelect,
     PersonalCheckin: resolve => require(['@/components/PersonalCheckin'], resolve),
     DelayButton,
     MultiSelect,
