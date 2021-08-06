@@ -71,12 +71,15 @@ export default {
     'beseyeAccount': 'Beseye',
     'dashDeviceMgt': '모니터 장치 관리(Dash)',
     'ezvizDeviceMgt': '모니터 장치 관리(StoreVue)',
-    'beseyeDeviceMgt': '모니터 장치 관리（Beseye）',
+    'beseyeDeviceMgt': '모니터 장치 관리(Beseye)',
     'deviceSetting': '장치 설정',
     'storeViuAccountDeviceSetting': 'StoreVue 계정 장치 설정',
     'userAccountDeviceSetting': '엔터프라이즈 계정 장치 설정',
     'auth': '승인',
     'beseyeDeviceSetting': 'Beseye 장치 설정',
+    'skywatchAccount': 'Skywatch',
+    'skywatchDeviceMgt': '모니터 장치 관리(Skywatch)',
+    'skywatchDeviceSetting': 'Skywatch 장치 설정'
   },
 
   'overview': {

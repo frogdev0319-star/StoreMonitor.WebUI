@@ -80,7 +80,10 @@ export default {
     'auth': '授权',
     'beseyeDeviceSetting': 'Beseye设备配置',
     'noInspectionAccessRights': '无巡检访问权限',
-    'noRight': ''
+    'noRight': '',
+    'skywatchAccount': 'Skywatch',
+    'skywatchDeviceMgt': '监控设备管理（Skywatch）',
+    'skywatchDeviceSetting': 'Skywatch设备配置'
   },
 
   'overview': {
@@ -450,8 +453,8 @@ export default {
     'selectInspectListWithStore': '请选择，{storeName}关联巡检表',
     'getBeseyeStreamError': '获取Beseye视频流信息失败！',
     'closeConnection': '连接关闭',
-    'errorConnection': '连接错误',
-  },
+    'errorConnection': '连接错误'
+ },
 
   // event Management page language
   'eventView': {

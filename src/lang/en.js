@@ -79,7 +79,10 @@ export default {
     'auth': 'Authorize',
     'beseyeDeviceSetting': 'Device Settings of Beseye',
     'noInspectionAccessRights': 'No Inspection Access Rights',
-    'noRight': ''
+    'noRight': '',
+    'skywatchAccount': 'Skywatch',
+    'skywatchDeviceMgt': 'Monitor Device Management (Skywatch)',
+    'skywatchDeviceSetting': 'Device Settings of Skywatch'
   },
 
   'overview': {

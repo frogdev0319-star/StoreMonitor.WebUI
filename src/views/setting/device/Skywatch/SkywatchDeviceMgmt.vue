@@ -31,7 +31,7 @@
               :key="index"
               :class="!item.isClick ? 'noraml-color' : 'active-color'"
               class="device-data group-title"
-              @click="clickBeseyeDevice(index,item)">
+              @click="clickSkywatchDevice(index,item)">
               <div class="data-sn titles">
                 <el-checkbox v-model="item.isChecked" class="data-checkbox" @change="changeIfCheckDevice(item, index)"/>
                 <div class="data-sn-name titles">
@@ -80,22 +80,22 @@
               </div>
               <div class="data-operation titles">
                 <div v-if="item.isEditing" class="iconcontent">
-                  <div class="iconlised" @click="confirmEditBeseye(index,item)">
+                  <div class="iconlised" @click="confirmEditSkywatch(index,item)">
                     <i class="el-icon-check"/>
                   </div>
-                  <div class="iconrised" @click="cancelEditBeseye(index,item)">
+                  <div class="iconrised" @click="cancelEditSkywatch(index,item)">
                     <i class="el-icon-close"/>
                   </div>
                 </div>
                 <div v-if="!item.isEditing" class="iconcontent">
                   <div
                     class="iconlised normal-left-icon"
-                    @click="editBeseyeDevice(index,item)">
+                    @click="editSkywatchDevice(index,item)">
                     <i class="iconfont icon-bianji"/>
                   </div>
                   <div
                     class="iconrised normal-right-icon"
-                    @click="showDeleteBeseyeDeviceDialog(index,item)">
+                    @click="showDeleteSkywatchDeviceDialog(index,item)">
                     <i class="iconfont icon-shanchu"/>
                   </div>
                 </div>
@@ -118,9 +118,9 @@
       </div>
       <div v-else class="no-data-container">{{ $t('deviceView.noData') }}</div>
       <el-dialog
-        v-if="showAddBeseyeDialog"
+        v-if="showAddSkywatchDialog"
         :title="$t('deviceView.addDevice')"
-        :visible.sync="showAddBeseyeDialog"
+        :visible.sync="showAddSkywatchDialog"
         :append-to-body="true"
         :close-on-click-modal="false"
         width="610px"
@@ -172,7 +172,7 @@
             class="file-cancel-btn"
             size="mini"
             style=""
-            @click="showAddBeseyeDialog = false">{{ $t('deviceView.cancle') }}</el-button>
+            @click="showAddSkywatchDialog = false">{{ $t('deviceView.cancle') }}</el-button>
           <el-button
             class="file-confirm-btn"
             size="mini"
@@ -228,9 +228,9 @@
         checkAllDevice: false,
         varWindowWidth: window.innerWidth,
         varyWindowHeight: window.innerHeight,
-        curBeseyeItem: null,
+        curSkywatchItem: null,
         lang: this.$i18n.locale,
-        showAddBeseyeDialog: false,
+        showAddSkywatchDialog: false,
         storeDataList: [],
         allStoreDataList: [],
         showDeleteDialog: false,
@@ -301,10 +301,10 @@
         this.checkAllDevice = checkedDeviceNum === minSize;
       },
 
-      clickBeseyeDevice(index, item) {
+      clickSkywatchDevice(index, item) {
         const self = this;
         item.isClick = true;
-        self.curBeseyeItem = item;
+        self.curSkywatchItem = item;
         self.beseyeDevicesList.forEach((_item, _index) => {
           if (index !== _index) {
             _item.isClick = false;
@@ -374,9 +374,9 @@
         });
       },
 
-      deleteBeseyeDevice(params) {
+      deleteSkywatchDevice(params) {
         return new Promise((resolve, reject) => {
-          skywatchRESTful.deleteBeseyeDevice(params).then(res => {
+          skywatchRESTful.deleteSkywatchDevice(params).then(res => {
             resolve(res);
           }).catch(error => {
             reject(error);
@@ -390,7 +390,7 @@
         const params = {};
         params.id = item.id;
         params.name = item.name;
-        const updateDeviceRes = await skywatchRESTful.updateBeseyeChannel(params);
+        const updateDeviceRes = await skywatchRESTful.updateSkywatchChannel(params);
         item.tempUrl !== item.pictureUrl && updateDeviceRes.errCode === 0 && this.updateImage();
       },
 
@@ -429,7 +429,7 @@
         }
 
         if (self.beseyeDevices.length !== 0) {
-          self.channelData = await self.getBeseyeChannel();
+          self.channelData = await self.getSkywatchChannel();
           self.getDeviceThumbnails();
         } else {
           self.channelData = [];
@@ -437,7 +437,7 @@
         }
       },
 
-      getBeseyeChannel() {
+      getSkywatchChannel() {
         const params = {};
         params.showDisabled = true;
         return new Promise((resolve, reject) => {
@@ -485,7 +485,7 @@
         });
       },
 
-      editBeseyeDevice(index, item) {
+      editSkywatchDevice(index, item) {
         item.isEditing = true;
         this.beseyeDevicesList.forEach((_item, _index) => {
           if (index !== _index) {
@@ -494,7 +494,7 @@
         });
       },
 
-      async confirmEditBeseye(index, item) {
+      async confirmEditSkywatch(index, item) {
         if (item.tempDeviceName.trim().length === 0) {
           util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
           return false;
@@ -504,7 +504,7 @@
         params.serialNumber = item.serialNumber;
         params.name = item.tempDeviceName;
         try {
-          const updateDeviceRes = await skywatchRESTful.updateBeseyeDevice(params);
+          const updateDeviceRes = await skywatchRESTful.updateSkywatchDevice(params);
           updateDeviceRes.errCode === 0 && await this.confirmUpdateChannle(index, item);
 
           util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
@@ -513,11 +513,11 @@
         }catch (error) {
           item.isEditing = false;
           util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
-          console.log('BeseyeDeviceMgmt-confirmEditBeseye: ' + error);
+          console.log('SkywatchDeviceMgmt-confirmEditSkywatch: ' + error);
         }
       },
 
-      cancelEditBeseye(index, item) {
+      cancelEditSkywatch(index, item) {
         item.isEditing = false;
         item.tempDeviceName = item.name;
         item.tempChannelCount = item.channelCount;
@@ -527,7 +527,7 @@
         this.file = '';
       },
 
-      showDeleteBeseyeDeviceDialog(index, item) {
+      showDeleteSkywatchDeviceDialog(index, item) {
         this.deleteSerialNums.push(item.serialNumber);
         this.deleteChannelIds.push(item.id);
         //this.showDeleteDialog = true;
@@ -564,14 +564,14 @@
         const {deleteChannelParmas, deleteParmas} = {...deleteDeviceObj};
         try {
           const deleteChannelResult = await this.deleteSkywatchChannel(deleteChannelParmas);
-          deleteChannelResult.errCode === 0 && await this.deleteBeseyeDevice(deleteParmas);
+          deleteChannelResult.errCode === 0 && await this.deleteSkywatchDevice(deleteParmas);
 
           util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
           const params = this.setParams();
           await this.getSkywatchDeviceList(params);
         } catch (error) {
           util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
-          console.log('BeseyeDeviceMgmt-deleteBeseyeDevice: ' + error);
+          console.log('SkywatchDeviceMgmt-confirmDeleteSkywatchDevice: ' + error);
         }
       },
 
@@ -596,41 +596,26 @@
         const self = this;
         const {deviceParams, channelParams }= {...deviceAndChannelObj};
         try {
-          const addDeviceResult = await self.addBeseyeDevice(deviceParams);
-          const addChannelResult = await self.addBeseyeChannel(channelParams);
+          const addDeviceResult = await self.addSkywatchDevice(deviceParams);
+          const addChannelResult = await self.addSkywatchChannel(channelParams);
           if (addDeviceResult.errCode === 0 && addChannelResult.errCode === 0) {
             util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
-            self.showAddBeseyeDialog = false;
+            self.showAddSkywatchDialog = false;
             self.getSkywatchDeviceList(self.setParams());
           } else {
             if (addDeviceResult.errCode !== 0){
               self.deleteSkywatchChannel({deviceIds: addChannelResult.data})
             } else if (addChannelResult !== 0) {
-              self.deleteBeseyeDevice({deviceIds: addDeviceResult.data})
+              self.deleteSkywatchDevice({deviceIds: addDeviceResult.data})
             }
             util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-            self.showAddBeseyeDialog = false;
+            self.showAddSkywatchDialog = false;
           }
         } catch (error) {
           util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-          self.showAddBeseyeDialog = false;
-          console.log('BeseyeDeviceMgmt-confirmAddSkywatchDevice: ' + error);
+          self.showAddSkywatchDialog = false;
+          console.log('SkywatchDeviceMgmt-confirmAddSkywatchDevice: ' + error);
         }
-
-        // const channelArray = [];
-        // const selectDevice = self.avilableDeviceList.filter(item => item.checked === true);
-        // if (self.validateParams(selectDevice)) {
-        //   selectDevice.forEach(item => {
-        //     const channel = {};
-        //     channel.name = item.name;
-        //     channel.storeId = item.storeId;
-        //     channel.ivsId = item.serialNumber;
-        //     channel.channelId = 1;
-        //     channelArray.push(channel);
-        //   });
-        //   deviceParams.device = selectDevice;
-        //   const channelParams = {};
-        //   channelParams.device = channelArray;
       },
 
       validateParams(selectDevice) {
@@ -653,9 +638,9 @@
         return validate;
       },
 
-      addBeseyeDevice(params) {
+      addSkywatchDevice(params) {
         return new Promise((resolve, reject) => {
-          skywatchRESTful.addBeseyeDevice(params).then(resDevice => {
+          skywatchRESTful.addSkywatchDevice(params).then(resDevice => {
             resolve(resDevice);
           }).catch((err) => {
             reject(err);
@@ -663,9 +648,9 @@
         });
       },
 
-      addBeseyeChannel(channelParams) {
+      addSkywatchChannel(channelParams) {
         return new Promise((resolve, reject) => {
-          skywatchRESTful.addBeseyeChannel(channelParams).then(resDevice => {
+          skywatchRESTful.addSkywatchChannel(channelParams).then(resDevice => {
             resolve(resDevice);
           }).catch(err => {
             reject(err);
@@ -917,18 +902,6 @@
   .warning-content{
     display: inline-block;
     vertical-align: middle;
-  }
-  .addBeseye .el-dialog__footer{
-    margin-top: 20px;
-    line-height: 24px;
-  }
-  .addBeseye .rules{
-    font-size: 10px;
-    color:#ff2400;
-    font-weight: 400;
-    line-height: 10px;
-    margin-top: 3px;
-    display: block;
   }
   .avatar-uploader .picture-tips{
     display: inline;

@@ -239,18 +239,31 @@
 
       confirmAddDevice() {
         const deviceParams = {};
+        const devcieArr = [];
         const channelArray = [];
         const selectDevice = this.avilableDeviceList.filter(item => item.checked === true);
         if (this.validateParams(selectDevice)) {
           selectDevice.forEach(item => {
-            const channel = {};
-            channel.name = item.name;
-            channel.storeId = item.storeId;
-            channel.ivsId = item.serialNumber;
-            channel.channelId = 1;
+            const accountName = this.vendor === 2 ? 'beseyeAccount' : 'skywatchAccount'
+
+            const device = {
+              name: item.name,
+              storeId: item.storeId,
+              serialNumber: item.serialNumber,
+              mac: item.mac,
+              [accountName]: this.account,
+            };
+
+            const channel = {
+              name: item.name,
+              storeId: item.storeId,
+              ivsId: item.serialNumber,
+              channelId: 1
+            };
+            devcieArr.push(device);
             channelArray.push(channel);
           });
-          deviceParams.device = selectDevice;
+          deviceParams.device = devcieArr;
           const channelParams = {};
           channelParams.device = channelArray;
 

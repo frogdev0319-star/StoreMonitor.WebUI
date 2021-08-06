@@ -314,7 +314,7 @@ export default {
         { curPath: ['/storedetail'], activePath: '/storemanage' },
         { curPath: ['/ezvizeDeviceSetting'], activePath: '/ezvizDevice' },
         { curPath: ['/beseyeDeviceSetting'], activePath: '/beseyeAccount' },
-        { curPath: ['/beseyeDeviceSetting'], activePath: '/beseyeAccount' },
+        { curPath: ['/skywatchDeviceSetting'], activePath: '/skywatchAccount' },
         { curPath: ['/titleSetting'], activePath: '/title' }
       ];
       const pathMAP = pathMapArr.find(item => item.curPath.includes(path));
@@ -345,7 +345,6 @@ export default {
     },
 
     curPath(val) {
-      console.log(val);
       if (this.path.indexOf(val)) {
         this.wrapperAll = false;
       }
@@ -398,7 +397,6 @@ export default {
     },
 
     handleopen(index) {
-      console.log('handleopen');
       switch (Number(index)) {
         case 1:
           document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#f31d65';
@@ -446,7 +444,7 @@ export default {
       const matchedParentName = matched[1].name;
       const inspectSettingNameArr = ['inspectSetting', 'inspectingSettingOfInspectList',
         'inspectingSettingOfDevice', 'inspectingSettingOfSchedule', 'insepctionReportSetting'];
-      const deviceSettingNameArr = ['deviceManage', 'ezvizDeviceMgt', 'beseyeDeviceMgt'];
+      const deviceSettingNameArr = ['deviceManage', 'ezvizDeviceMgt', 'beseyeDeviceMgt', 'skywatchDeviceMgt'];
       if (inspectSettingNameArr.includes(matchedParentName)) {
         this.setInspectionSettingBread(matched, currentRoute);
       } else if (deviceSettingNameArr.includes(matchedParentName)) {
@@ -510,7 +508,6 @@ export default {
         }
         case '/beseyeAccount': {
           this.setFirstBread(matched, 'beseyeDeviceMgt');
-
           break;
         }
         case '/ezvizeDeviceSetting': {
@@ -519,6 +516,14 @@ export default {
         }
         case '/beseyeDeviceSetting': {
           this.setSecondBread(matched, 'beseyeDeviceMgt', '/beseyeAccount');
+          break;
+        }
+        case '/skywatchAccount': {
+          this.setFirstBread(matched, 'skywatchDeviceMgt');
+          break;
+        }
+        case '/skywatchDeviceSetting': {
+          this.setSecondBread(matched, 'skywatchDeviceMgt', '/skywatchAccount');
           break;
         }
         default: {

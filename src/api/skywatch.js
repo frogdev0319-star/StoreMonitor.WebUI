@@ -89,14 +89,21 @@ export const getBeseyeAccessToken = params => {
 };
 
 
-export const updateBeseyeDevice = data => {
+export const updateSkywatchDevice = data => {
   return request({
-    url: `${version}/beseye/device/update`,
+    url: `${version}/skywatch/device/update`,
     method: 'post',
     data
   });
 };
 
+export const updateSkywatchChannel = data => {
+  return request({
+    url: `${version}/skywatch/device/channel/update`,
+    method: 'post',
+    data
+  });
+};
 
 export const getPlaylistInfo = params => {
   return request({
@@ -105,14 +112,3 @@ export const getPlaylistInfo = params => {
     params
   });
 };
-
-
-
-
-export const updateBeseyeChannel = data => {
-  return request({
-    url: `${version}/beseye/device/channel/update`,
-    method: 'post',
-    data
-  });
-}

@@ -221,7 +221,7 @@
       setAuthorizeUrl() {
         const redirectUrl = SkywatchAuthorizeConfig.redirect_server_uri;
         let authorUrl = SkywatchAuthorizeConfig.userAuthorizationUri;
-        authorUrl = `${authorUrl}?redirect_uri=${redirectUrl}&state=${this.accountId},${this.redirectUrl},${this.skywatchAccount}`;
+        authorUrl = `${authorUrl}?redirect_uri=${redirectUrl}&state=${this.accountId},${redirectUrl},${this.skywatchAccount}`;
         window.location.href = authorUrl;
       },
 

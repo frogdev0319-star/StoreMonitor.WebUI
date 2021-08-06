@@ -80,7 +80,10 @@ export default {
     'auth': '授權',
     'beseyeDeviceSetting': 'Beseye設備配置',
     'noInspectionAccessRights': '無巡檢訪問權限',
-    'noRight': ''
+    'noRight': '',
+    'skywatchAccount': 'Skywatch',
+    'skywatchDeviceMgt': '監控設備管理（Skywatch）',
+    'skywatchDeviceSetting': 'Skywatch設備配置'
   },
 
   'overview': {

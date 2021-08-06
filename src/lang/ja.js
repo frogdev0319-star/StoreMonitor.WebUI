@@ -78,6 +78,9 @@ export default {
     'userAccountDeviceSetting': 'エンタープライズアカウントのデバイス設定',
     'auth': '承認',
     'beseyeDeviceSetting': 'Beseyeのデバイス設定',
+    'skywatchAccount': 'Skywatch',
+    'skywatchDeviceMgt': 'モニタデバイス管理（Skywatch）',
+    'skywatchDeviceSetting': 'Skywatchのデバイス設定'
   },
 
   'overview': {
