@@ -16,7 +16,7 @@
           :editable="false"
           :picker-options="dateOpt"
           :popper-class="poperClass"
-          :default-time="defaultTime"
+          :default-time="['00:00:00', '23:59:59']"
           :start-placeholder="$t('overview.startDate')"
           :end-placeholder="$t('overview.endDate')"
           type="datetimerange"
@@ -24,8 +24,7 @@
           size="mini"
           format="yyyy/MM/dd HH:mm:ss"
           class="date-range"
-          @change="dateChange"
-          @focus="dateFocus"/>
+          @change="dateChange"/>
         <el-tooltip
           class="item"
           effect="dark"
@@ -346,11 +345,10 @@ export default {
       storeList: [],
       searchInput: '',
       sizeNum: 12,
-      defaultTime: [],
       dateValue: [],
       dateOpt: {
         disabledDate: (time) => {
-          return time.getTime() > Date.now();
+          return time.getTime() > new Date(this.$moment(new Date()).endOf('day'));
         }
       },
       curReportType: -1,
@@ -447,9 +445,9 @@ export default {
       const self = this;
       self.isLoading = true;
       this.searchInput = '';
-      self.defaultTime = [];
       self.storeStr = '';
-      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, new Date()];
+      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24,
+        new Date(this.$moment(new Date()).endOf('day'))];
       self.reportList = [];
       self.curSortType = 0;
       self.storeName = '';
@@ -619,24 +617,6 @@ export default {
 
     getInitReportList() {
       this.getReportList(this.params);
-    },
-
-    dateFocus() {
-      const self = this;
-      self.getDeafultTime();
-    },
-
-    getDeafultTime() {
-      const self = this;
-      const date = new Date();
-      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-      const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-      const dateStr = hour + ':' + minutes + ':' + second;
-      const timeTemp = [];
-      timeTemp[0] = '00:00:00';
-      timeTemp[1] = dateStr;
-      self.defaultTime = timeTemp;
     },
 
     dateChange(val) {
