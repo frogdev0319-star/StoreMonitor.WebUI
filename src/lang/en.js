@@ -977,7 +977,7 @@ export default {
   'titleView': {
     'deleteTitle': 'Delete',
     'titleName': 'Position',
-    'createTime': 'Create Time',
+    'createTime': 'Update Time',
     'description': 'Note',
     'operation': 'Operation',
     'save': 'Save',

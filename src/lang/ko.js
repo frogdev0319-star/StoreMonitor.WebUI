@@ -1004,7 +1004,7 @@ export default {
     'titleSetting': '위치 설정',
     'save': '저장',
     'roleSetting': '메뉴 위치 설정',
-    'createTime': '시간',
+    'createTime': '생성 시간',
     'roleId1Title': '관리',
     'roleId2Title': '관리자',
     'roleId3Title': '관리자',

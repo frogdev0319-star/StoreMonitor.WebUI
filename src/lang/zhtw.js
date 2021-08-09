@@ -980,7 +980,7 @@ export default {
   'titleView': {
     'deleteTitle': '刪除',
     'titleName': '職務名稱',
-    'createTime': '創建時間',
+    'createTime': '更新時間',
     'description': '備註',
     'operation': '操作',
     'save': '保存',

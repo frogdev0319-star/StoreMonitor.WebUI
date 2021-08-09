@@ -1001,7 +1001,7 @@ export default {
     'titleSetting': 'ポジション設定',
     'save': 'セーブ',
     'roleSetting': 'メニュー許可設定',
-    'createTime': 'タイム',
+    'createTime': '作成時間',
     'roleId1Title': '管理者',
     'roleId2Title': 'マネージャー',
     'roleId3Title': 'スーパーバイザー',
