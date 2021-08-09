@@ -299,17 +299,19 @@ export default {
       } else {
         self.order.direction = order === 'ascending' ? 'asc' : 'desc';
         const property = col.column.property;
+        self.defaultSort.prop = property;
+        self.defaultSort.order = order;
         if (!self.isEvent) {
           if (property.indexOf('Str') > -1) {
             self.order.property = property.substr(0, property.indexOf('Str'));
           } else {
             self.order.property = property;
           }
-          this.$emit('sortChange', self.order);
+          this.$emit('sortChange', self.order, self.defaultSort);
         } else {
           if (property.indexOf('Str') === -1) {
             self.order.property = property;
-            this.$emit('sortChange', self.order);
+            this.$emit('sortChange', self.order, self.defaultSort);
           }
         }
       }
