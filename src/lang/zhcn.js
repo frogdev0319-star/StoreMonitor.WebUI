@@ -237,7 +237,8 @@ export default {
     'selectUser': '选择人员',
     'allDepartment': '全部部门',
     'allPosition': '全部职务',
-    'allUser': '全部人员'
+    'allUser': '全部人员',
+    'checkinReport': '签到统计报表-{time1}-{time2}'
   },
 
   // Patrol page language

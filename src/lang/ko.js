@@ -238,6 +238,7 @@ export default {
     'allDepartment': '모든 부서',
     'allPosition': '모든 위치',
     'allUser': '모든 사람',
+    'checkinReport': '로그인 보고서-{time1}-{time2}',
 
     'emptyItemList': 'The inspection item list is empty, please re-filter the data'
   },

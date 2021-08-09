@@ -148,14 +148,13 @@
 
 <script>
 import DateTimePicker from '@/components/DateTimePicker';
-import MultiSelect from '@/components/MultiSelect';
 import DelayButton from '@/components/DelayButton';
-import { getBrifCheckinList } from '@/api/checkin';
+import { getBrifCheckinList, getCheckinReport } from '@/api/checkin';
 import { titleRESTful, inpectRESTful } from '@/api/index';
 import { getUserInfo } from '@/api/login';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import { mapGetters } from 'vuex';
-import RegionMultiSelect from '../../components/RegionMultiSelect';
+import RegionMultiSelect from '@/components/RegionMultiSelect'
 
 export default {
   name: 'CheckInStatistics',
@@ -163,7 +162,6 @@ export default {
     RegionMultiSelect,
     PersonalCheckin: resolve => require(['@/components/PersonalCheckin'], resolve),
     DelayButton,
-    MultiSelect,
     DateTimePicker
   },
 
@@ -430,24 +428,17 @@ export default {
       this.currentPage = val;
     },
 
-    export2Excel() {
-      inpectRESTful.downLoadTemplate().then(res => {
-        const reader = new FileReader();
-        reader.onload = function() {
-          const content = reader.result;
-          var bytes = new Uint8Array(content);
-          var length = bytes.byteLength;
-          let binary = '';
-          for (var i = 0; i < length; i++) {
-            binary += String.fromCharCode(bytes[i]);
-          }
-          var XLSX = require('xlsx');
-
-          var workbook = XLSX.read(binary, { type: 'array' });
-          const sheet = XLSX.utils.sheet_to_json(workbook.Sheets['Pass&Fail']);
-        };
-        reader.readAsBinaryString(res);
-      });
+    async export2Excel() {
+      const params = this.generateCallParams();
+      const result = await getCheckinReport(params);
+      const url = URL.createObjectURL(new Blob([result],{ type: 'application/vnd.ms-excel;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = url;
+      const time1 = this.$moment(this.dateValue[0]).format('YYYYMMDD');
+      const time2 = this.$moment(this.dateValue[1]).format('YYYYMMDD');
+      link.setAttribute('download', this.$t('overview.checkinReport', {time1: time1, time2: time2}));
+      document.body.appendChild(link);
+      link.click();
     },
 
     saveSearchParams() {

@@ -237,7 +237,8 @@ export default {
     'selectUser': '選擇人員',
     'allDepartment': '全部部門',
     'allPosition': '全部職務',
-    'allUser': '全部人員'
+    'allUser': '全部人員',
+    'checkinReport': '簽到統計報表-{time1}-{time2}'
   },
 
   // Patrol page language

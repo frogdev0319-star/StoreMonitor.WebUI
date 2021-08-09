@@ -235,6 +235,7 @@ export default {
     'allDepartment': 'すべての部門',
     'allPosition': 'すべてのポジション',
     'allUser': 'すべての人',
+    'checkinReport': 'サインインレポート-{time1}-{time2}',
 
     'emptyItemList': 'The inspection item list is empty, please re-filter the data'
   },
