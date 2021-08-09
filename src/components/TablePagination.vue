@@ -78,7 +78,7 @@
           :label="$t('overview.remotePatrol')"
           :min-width="lang.indexOf('zh') !== -1 ? 120 : 180"
           :sortable="true"
-          :sort-method="(a, b) => sortHandle(a, b, 'RemoteStr')"
+          :sort-orders="['ascending', 'descending']"
           prop="RemoteStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper remote">
@@ -90,7 +90,7 @@
           :label="$t('overview.onsitePatrol')"
           :min-width="lang.indexOf('zh') !== -1 ? 120 : 180"
           :sortable="true"
-          :sort-method="(a, b) => sortHandle(a, b, 'OnsiteStr')"
+          :sort-orders="['ascending', 'descending']"
           prop="OnsiteStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper onsite">
@@ -102,7 +102,7 @@
           :label="$t('overview.storeMonitor')"
           :min-width="lang.indexOf('zh') !== -1 ? 120 : 160"
           :sortable="true"
-          :sort-method="(a, b) => sortHandle(a, b, 'VideoStr')"
+          :sort-orders="['ascending', 'descending']"
           prop="VideoStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper video">
@@ -307,14 +307,21 @@ export default {
           } else {
             self.order.property = property;
           }
-          this.$emit('sortChange', self.order, self.defaultSort);
         } else {
           if (property.indexOf('Str') === -1) {
             self.order.property = property;
-            this.$emit('sortChange', self.order, self.defaultSort);
+          } else {
+            self.order.property = this.getEventSourceProperty(property);
           }
         }
+        this.$emit('sortChange', self.order, self.defaultSort);
       }
+    },
+
+    getEventSourceProperty(property) {
+      let propertyStr = '';
+      propertyStr = property.indexOf('Remote') > -1 ? 'numOfRemote' : (property.indexOf('Onsite') > -1 ? 'numOfOnsite' : 'numOfVideo');
+      return propertyStr;
     },
 
     getOrderBasedOnDefaultSort() {
@@ -326,12 +333,6 @@ export default {
         this.order.property = property;
       }
       this.order.direction = defaultSort.order === 'ascending' ? 'asc' : 'desc';
-    },
-
-    sortHandle(obj1, obj2, column) {
-      const val1 = obj1[column].substr(0, obj1[column].length - 1);
-      const val2 = obj2[column].substr(0, obj2[column].length - 1);
-      return val1 - val2;
     },
 
     handleOperationButton(methods, row, index) {
