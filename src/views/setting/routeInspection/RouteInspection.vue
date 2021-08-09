@@ -378,7 +378,7 @@ export default {
       const self = this;
       inpectRESTful.downLoadTemplate().then(res => {
         const blob = new Blob([res], {
-          type: 'application/vnd.ms-excel'
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
         const objectUrl = URL.createObjectURL(blob);
         const url = objectUrl;

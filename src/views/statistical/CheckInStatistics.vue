@@ -154,7 +154,7 @@ import { titleRESTful, inpectRESTful } from '@/api/index';
 import { getUserInfo } from '@/api/login';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import { mapGetters } from 'vuex';
-import RegionMultiSelect from '@/components/RegionMultiSelect'
+import RegionMultiSelect from '@/components/RegionMultiSelect';
 
 export default {
   name: 'CheckInStatistics',
@@ -352,7 +352,7 @@ export default {
         return positionIds.includes(item.title);
       });
       this.userIds = this.userList.map(user => user.value);
-      console.log(this.userIds)
+      console.log(this.userIds);
     },
 
     async searchCheckInList() {
@@ -431,12 +431,15 @@ export default {
     async export2Excel() {
       const params = this.generateCallParams();
       const result = await getCheckinReport(params);
-      const url = URL.createObjectURL(new Blob([result],{ type: 'application/vnd.ms-excel;charset=utf-8' }));
+      const url = URL.createObjectURL(
+        new Blob([result],
+          { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+        ));
       const link = document.createElement('a');
       link.href = url;
       const time1 = this.$moment(this.dateValue[0]).format('YYYYMMDD');
       const time2 = this.$moment(this.dateValue[1]).format('YYYYMMDD');
-      link.setAttribute('download', this.$t('overview.checkinReport', {time1: time1, time2: time2}));
+      link.setAttribute('download', this.$t('overview.checkinReport', { time1: time1, time2: time2 }));
       document.body.appendChild(link);
       link.click();
     },
