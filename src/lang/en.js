@@ -840,7 +840,7 @@ export default {
     'isAuthorizing': 'Authorizing...',
     'deviceLimitation': 'The current number of devices exceeds the limitation, please renew or reduce the number of devices',
     'authorizedDevicesNum': 'Number of authorized devices:',
-    'addedDeviceNumber': 'Number of added devices:',
+    'addedDeviceNumber': 'Number of enabled devices:',
     'licenseOverdue': 'Device license overdue',
     'hasBoundItem': 'Device has been binding to item',
     'hasAdded': 'Device has been added by someone else'

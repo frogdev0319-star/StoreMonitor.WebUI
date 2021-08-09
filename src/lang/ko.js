@@ -861,7 +861,7 @@ export default {
     'isAuthorizing': '승인 중...',
     'deviceLimitation': '현재 장치 수가 한도를 초과합니다. 장치 수를 갱신하거나 줄이십시오',
     'authorizedDevicesNum': '승인된 기기 수:',
-    'addedDeviceNumber': '추가된 기기 수:',
+    'addedDeviceNumber': '활성화된 장치의 수:',
     'licenseOverdue': '구독 권한이 만료되었습니다',
     'hasBoundItem': '장치가 항목에 바인딩되었습니다',
     'hasAdded': '다른 사람이 기기를 추가했습니다'

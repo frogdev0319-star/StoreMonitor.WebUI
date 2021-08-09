@@ -842,7 +842,7 @@ export default {
     'isAuthorizing': '授权中...',
     'deviceLimitation': '当前设备数量超限，请续约或减少设备数量',
     'authorizedDevicesNum': '授权设备数量：',
-    'addedDeviceNumber': '已添加设备数量：',
+    'addedDeviceNumber': '已启用设备数量：',
     'otherError': '其他错误',
     'commentLengthPrompt': '最多可输入100个字符',
     'licenseOverdue': '订阅权限过期',
