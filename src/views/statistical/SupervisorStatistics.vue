@@ -192,7 +192,7 @@
                 <el-table
                   :data="elPDFtableData"
                   :highlight-current-row="true"
-                  :default-sort = "{prop: 'completionRateStr', order: 'ascending'}"
+                  :default-sort = "defaultSort"
                   :header-cell-class-name="headerClass"
                   :cell-class-name="cellClass"
                   :row-key="getRowKeys"
@@ -372,7 +372,7 @@ export default {
         {
           'prop': 'numOfStores',
           'label': this.$t('overview.storeNum'),
-          'sortable': 'custom',
+          'sortable': false,
           'pdfwidth': '15%',
           'pdfmaxWidth': '17%',
           'width': 227,
@@ -617,6 +617,8 @@ export default {
       let order = col.order;
       self.order = order;
       self.direction = col.column.property;
+      self.defaultSort.order = order;
+      self.defaultSort.prop = col.column.property;
       let prop = '';
       let tempOrder = '';
       if (order === 'ascending') {
