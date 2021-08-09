@@ -301,7 +301,6 @@ export default {
       userId: '',
       poperClass: 'date-picker-poper',
       selectpoperClass: 'select-poper',
-      defaultTime: [],
       lang: this.$i18n.locale,
       isFirstLoad: false,
       order: '',
