@@ -98,7 +98,7 @@
               :highlight-current-row= "true"
               :pagesize="sizeNumRegion"
               :current-page="pageRegion"
-              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+              :default-sort = "defaultRegionSort"
               @handleChange="handleRegionPageAndSizeChange"
               @sortChange="handleRegionSortChange"/>
           </div>
@@ -135,7 +135,7 @@
                 :highlight-current-row= "true"
                 :pagesize="sizeNumStore"
                 :current-page="pageStore"
-                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+                :default-sort = "defaultStoreSort"
                 @handleChange="handleStorePageAndSizeChange"
                 @sortChange="handleStoreSortChange"/>
             </div>
@@ -239,9 +239,7 @@
               :highlight-current-row= "true"
               :show-pagination="false"
               :is-pdf-column="true"
-              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-              @handleChange="handleRegionPageAndSizeChange"
-              @sortChange="handleRegionSortChange"/>
+              :default-sort = "defaultRegionSort"/>
           </div>
 
         </el-col>
@@ -265,7 +263,7 @@
                 :highlight-current-row= "true"
                 :show-pagination="false"
                 :is-pdf-column="true"
-                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+                :default-sort = "defaultStoreSort"
               />
             </div>
           </el-col>
@@ -569,7 +567,9 @@ export default {
       ispdf: false,
       regionMode: 2,
       ifSaveParams: false,
-      defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' }
+      defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' },
+      defaultStoreSort: { prop: 'qualifiedRateStr', order: 'ascending' },
+      defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' }
     };
   },
 
@@ -1301,7 +1301,8 @@ export default {
       this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
-    handleRegionSortChange(order) {
+    handleRegionSortChange(order, defaultSort) {
+      this.defaultRegionSort = defaultSort;
       this.regionOrder = order;
       this.regionFilter = {
         page: this.pageRegion - 1,
@@ -1327,7 +1328,8 @@ export default {
       this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
-    handleStoreSortChange(order) {
+    handleStoreSortChange(order, defaultSort) {
+      this.defaultStoreSort = defaultSort;
       this.storeOrder = order;
       this.storeFilter = {
         page: this.pageStore - 1,
