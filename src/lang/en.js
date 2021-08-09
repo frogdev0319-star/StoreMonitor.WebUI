@@ -234,7 +234,8 @@ export default {
     'selectUser': 'Select Person',
     'allDepartment': 'All Departments',
     'allPosition': 'All Positions',
-    'allUser': 'All Persons'
+    'allUser': 'All Persons',
+    'checkinReport': 'Checkin Report-{time1}-{time2}'
   },
 
   // Patrol page language
