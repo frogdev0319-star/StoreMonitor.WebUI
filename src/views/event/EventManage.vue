@@ -16,7 +16,7 @@
           :editable="false"
           :popper-class="poperClass"
           :picker-options="dateOpt"
-          :default-time="defaultTime"
+          :default-time="['00:00:00', '23:59:59']"
           :start-placeholder="$t('overview.startDate')"
           :end-placeholder="$t('overview.endDate')"
           type="datetimerange"
@@ -220,7 +220,7 @@ export default {
       dateValue: [],
       dateOpt: {
         disabledDate: (time) => {
-          return time.getTime() > Date.now();
+          return time.getTime() > this.$moment(new Date()).endOf('day');
         }
       },
       toolTipClass: 'page-login-toolTipClass',
@@ -230,7 +230,7 @@ export default {
         { value: 2, label: this.$t('eventView.closed'), disabled: false },
         { value: 3, label: this.$t('eventView.returnStatus'), disabled: false }
       ],
-      curState: null,
+      curState: [0],
       value: 0,
       inputSearchValue: '',
       serachData: '',
@@ -347,6 +347,7 @@ export default {
           self.$route.meta.keepAlive = true;
         },
         300);
+        self.initData();
         self.ifChangeAccount = true;
         self.ifSaveParams = false;
         this.ifSearchData = true;
@@ -369,7 +370,6 @@ export default {
   async mounted() {
     const self = this;
     self.userId = getCookie('UserId');
-    self.getDeafultTime();
     const windowHeight = window.innerHeight;
     if (windowHeight > 800) {
       self.tableHeight = 770 + 'px';
@@ -608,12 +608,12 @@ export default {
       }
       let start = '', end = '';
       if (val === 0) {
-        start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
-        end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+        start = this.$moment(this.dateValue[0]);
+        end = this.$moment(this.dateValue[1]);
       } else {
         start = this.dateValue[0];
         const endTime = this.dateValue[1];
-        end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+        end = this.$moment(endTime);
       }
       end = end - end % 1000 + 999;
       this.params = {
@@ -802,19 +802,6 @@ export default {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
 
-    getDeafultTime() {
-      const self = this;
-      const date = new Date();
-      const hour = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-      const minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-      const second = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-      const dateStr = hour + ':' + minutes + ':' + second;
-      const timeTemp = [];
-      timeTemp[0] = '00:00:00';
-      timeTemp[1] = dateStr;
-      self.defaultTime = timeTemp;
-    },
-
     isLoginIn() {
       return new Promise((resolve, reject) => {
         isLoginIn().then(res => {
@@ -828,11 +815,10 @@ export default {
     initData() {
       const self = this;
       self.activeName = '0';
-      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, new Date().getTime()];
+      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
       self.inputSearchValue = '';
       self.total = 0;
       self.getSearchParams();
-      self.getDeafultTime();
       const windowHeight = window.innerHeight;
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
@@ -860,8 +846,7 @@ export default {
       const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
       if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = searchParams.dateValue[0];
-        this.dateValue[1] = searchParams.dateValue[1].constructor === Date ?
-          new Date(searchParams.dateValue[1]).getTime() : searchParams.dateValue[1];
+        this.dateValue[1] = this.$moment(this.dateValue[1]);
         this.inputSearchValue = searchParams.inputSearchValue;
         this.dateValue = searchParams.dateValue;
         this.curState = searchParams.curState;
@@ -874,9 +859,8 @@ export default {
         this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
       } else {
-        this.getDeafultTime();
-        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
-        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+        const start = this.$moment(this.dateValue[0]);
+        const end = this.$moment(this.dateValue[1]);
         this.params.beginTs = start;
         this.params.endTs = end;
         this.searchParams = {};
