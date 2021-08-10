@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%">
     <div class="checkin-header">
-      <div class="checkin-title">{{ $t('overview.personalCheckinList', {userName: userId}) }}</div>
+      <div class="checkin-title">{{ $t('overview.personalCheckinList', {userName: userName}) }}</div>
       <div class="time-btns">
         <el-button type="text" icon="el-icon-arrow-left" @click="subtractDate"/>
         <span class="date-string">{{ formatSelectTime(date) }}</span>

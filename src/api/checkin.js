@@ -26,3 +26,11 @@ export const getCheckinReport = (data) => {
     data
   });
 };
+
+export const getDepartmentList = params => {
+  return request({
+    url: `${version}/user/define/list`,
+    method: 'get',
+    params
+  });
+}

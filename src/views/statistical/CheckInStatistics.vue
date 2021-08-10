@@ -11,14 +11,14 @@
           style="display:inline;"
           @changeInput="handleDepartmentChange"/>
 
-        <region-multi-select
-          ref="multiState"
-          :selected="positionIds"
-          :placeholder="$t('overview.position')"
-          :all="$t('overview.allPosition')"
-          :options="positionsList"
-          style="display:inline;"
-          @changeInput="handlePositionChange"/>
+        <!--<region-multi-select-->
+          <!--ref="multiState"-->
+          <!--:selected="positionIds"-->
+          <!--:placeholder="$t('overview.position')"-->
+          <!--:all="$t('overview.allPosition')"-->
+          <!--:options="positionsList"-->
+          <!--style="display:inline;"-->
+          <!--@changeInput="handlePositionChange"/>-->
 
         <region-multi-select
           ref="multiState"
@@ -149,12 +149,13 @@
 <script>
 import DateTimePicker from '@/components/DateTimePicker';
 import DelayButton from '@/components/DelayButton';
-import { getBrifCheckinList, getCheckinReport } from '@/api/checkin';
-import { titleRESTful, inpectRESTful } from '@/api/index';
+import { getBrifCheckinList, getCheckinReport, getDepartmentList } from '@/api/checkin';
+import { titleRESTful } from '@/api/index';
 import { getUserInfo } from '@/api/login';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import { mapGetters } from 'vuex';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
+import util from '@/common/util';
 
 export default {
   name: 'CheckInStatistics',
@@ -225,7 +226,8 @@ export default {
   computed: {
     ...mapGetters({
       accountChanged: 'accountChanged'
-    })
+    }),
+    ...mapGetters({ roleId: 'roleId' })
   },
 
   watch: {
@@ -234,9 +236,7 @@ export default {
         this.dateValue = [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()];
         this.getSearchParams();
         this.getDaysColumn();
-        this.getUserList();
-        this.getTitleList();
-        this.searchCheckInList();
+        this.getSearchCondition();
         this.ifSaveParams = false;
       }
     }
@@ -244,45 +244,69 @@ export default {
   created() {
     this.getSearchParams();
     this.getDaysColumn();
-    this.getUserList();
-    this.getTitleList();
+    this.getSearchCondition();
     this.searchCheckInList();
   },
 
   methods: {
-    getUserList() {
-      this.userList = [];
-      this.origianlUserList = [];
-      getUserInfo().then(res => {
-        res.data.map(user => {
-          const userJson = {};
-          userJson.label = user.userName;
-          userJson.value = user.userId;
-          userJson.title = user.title;
-          this.origianlUserList.push(userJson);
-          this.userList.push(userJson);
-        });
-        this.userIds = this.ifCachedParams ? this.userIds : this.userList.map(user => user.value);
-      })
-        .catch(err => {
-          console.log('CheckinStatistics-getUserList: ' + err);
-        });
+    async getSearchCondition() {
+      const departmentPro = getDepartmentList({ type: 0 });
+      const userPromise = getUserInfo();
+      const titlePromise = titleRESTful.getUserTitleList();
+      try {
+        const result = await Promise.all([departmentPro, userPromise, titlePromise]);
+        this.getUserList(result[1].data);
+        this.getTitleList(result[2].data);
+        this.getDepartmentList(result[0].data);
+        this.searchCheckInList();
+      } catch (e) {
+        console.log(e);
+      }
     },
 
-    getTitleList() {
-      this.positionsList = [];
-      titleRESTful.getUserTitleList().then(res => {
-        res.data.map(title => {
-          const titleJson = {};
-          titleJson.label = title.title;
-          titleJson.value = title.titleId;
-          this.positionsList.push(titleJson);
-        });
-        this.positionIds = this.ifCachedParams ? this.positionIds : this.positionsList.map(position => position.value);
-      })
-        .catch(err => {
-          console.log('CheckinStatistics-getTitleList: ' + err);
-        });
+    getDepartmentList(data) {
+      this.departmentList = [];
+      const userIdList = [];
+      data.map(department => {
+        const departmentJson = {};
+        departmentJson.label = department.defineName;
+        departmentJson.value = department.defineId;
+        departmentJson.contents = department.contents;
+        userIdList.push(department.contents);
+        this.departmentList.push(departmentJson);
+      });
+      const userList = this.origianlUserList.map(user => user.value);
+      const filterUser = util.getDiffBetweenArrays(userIdList, userList);
+      this.roleId === 1 && this.departmentList.push({
+        label: this.$t('titleView.others'),
+        value: '00',
+        content: filterUser
+      });
+      this.departmentIds = this.ifCachedParams ? this.departmentIds : this.departmentList.map(depart => depart.value);
+    },
+
+    getUserList(data) {
+      this.userList = [];
+      this.origianlUserList = [];
+      data.map(user => {
+        const userJson = {};
+        userJson.label = user.userName;
+        userJson.value = user.userId;
+        userJson.title = user.title;
+        this.origianlUserList.push(userJson);
+        this.userList.push(userJson);
+      });
+      this.userIds = this.ifCachedParams ? this.userIds : this.userList.map(user => user.value);
+    },
+
+    getTitleList(data) {
+      data.map(title => {
+        const titleJson = {};
+        titleJson.label = title.title;
+        titleJson.value = title.titleId;
+        this.positionsList.push(titleJson);
+      });
+      this.positionIds = this.ifCachedParams ? this.positionIds : this.positionsList.map(position => position.value);
     },
 
     dateChange(val) {
@@ -340,6 +364,16 @@ export default {
 
     handleDepartmentChange(departmentIds) {
       this.departmentIds = departmentIds;
+      this.filterUserIds();
+    },
+
+    filterUserIds() {
+      const filterDepart = this.departmentList.filter(department => this.departmentIds.includes(department.value));
+      const departUserId = filterDepart.map(user => user.content).flat();
+      this.userList = this.origianlUserList.filter(item => {
+        return departUserId.includes(item.value);
+      });
+      this.userIds = this.userList.map(user => user.value);
     },
 
     handleUserChange(userIds) {
@@ -370,6 +404,15 @@ export default {
       checkinData.forEach(checkin => {
         const tableJson = { ...dayAndTimesJson };
         tableJson.userId = checkin.userId;
+        const user = this.origianlUserList.filter(user => user.value === checkin.userId);
+        tableJson.userName = user.length > 0 ? user[0].label : '--';
+
+        const depart = this.departmentList.filter(department => department.value === checkin.userId);
+        tableJson.department = depart.length > 0 ? depart[0].label : '--';
+
+        const position = this.positionsList.filter(position => position.value === user[0].title);
+        tableJson.position = position.length > 0 ? position[0].label : '--';
+
         checkin.checkinTimes.forEach(time => {
           const ts = this.$moment(time.ts).format('M/D');
           tableJson[ts] = time.times !== 0 ? time.times : 0;
@@ -377,7 +420,7 @@ export default {
         tableData.push(tableJson);
       });
       this.getTableColumns(this.daysList);
-      this.checkinList = tableData;
+      this.checkinList = this.userIds.length > 0 ? tableData : [];
     },
 
     generateCallParams() {
@@ -448,6 +491,7 @@ export default {
       const params = {
         'userIds': this.userIds,
         'positionIds': this.positionIds,
+        'departmentIds': this.departmentIds,
         'dateValue': this.dateValue
       };
       const searchConditon = {
@@ -467,6 +511,7 @@ export default {
         this.dateValue[1] = new Date(end);
         this.userIds = searchParams.userIds;
         this.positionIds = searchParams.positionIds;
+        this.departmentIds = searchParams.departmentIds;
         this.ifCachedParams = true;
       } else {
         this.ifCachedParams = false;

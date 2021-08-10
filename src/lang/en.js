@@ -59,7 +59,7 @@ export default {
     'patrolItemsStat': 'Inspection Items Statistics',
     'eventStat': 'Event Processing Statistics',
     'supervisorStat': 'Inspection Work Statistics',
-    'checkInStatistics': 'Check-in Statistics',
+    'checkInStatistics': 'Check In Statistics',
     'customers': 'Customers',
     'networkError': 'Network error, please check network connection status!',
     'serverException': 'Server exception, please refresh and try again!',
