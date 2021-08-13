@@ -573,7 +573,7 @@ export default {
                     }).then(function() {
                       self.$print(self.$refs.printPDF);
                       self.ispdf = false;
-                    }).catch(err =>{
+                    }).catch(err => {
                       console.log("SupervisorStatistics-handleDown:" + err);
                     });
                   }
@@ -754,6 +754,7 @@ export default {
         supervisorId = self.expands[0];
       }
       params.supervisorId = supervisorId;
+      params.inspectTagId = this.inspectTagId;
       params.category = [0, 1];
       let result = await self.getInspectorPlan(params);
       let retData = await self.getBriefStoreData();
@@ -848,6 +849,7 @@ export default {
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.supervisorId = supervisorId;
+      params.inspectTagId = this.inspectTagId;
       params.filter = {
         'page': 0,
         'size': 3
