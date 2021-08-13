@@ -242,8 +242,7 @@ export const navbarRoute = {
       }
     );
 
-    // PermissionHelper.enableCheckinStatistics() &&
-    statisticsRoute.children.push(
+    PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
       {
         path: '/checkInStatistics',
         name: 'checkInStatistics',
@@ -427,7 +426,8 @@ export const navbarRoute = {
       }
     );
 
-    util.getVideoAuthority(4) && deviceRoutes.push({
+    // util.getVideoAuthority(4) &&
+    deviceRoutes.push({
         path: '/skywatchAccount',
         name: 'skywatchAccount',
         component: resolve => require(['@/views/setting/device/Skywatch/SkywatchAccount'], resolve)
