@@ -1,8 +1,9 @@
 <template>
   <div class="device-container">
-    <account-header @click="getSkywatchGrantCode"
-                    :added-device-number="addedDeviceNumber"
-                    :authorized-devices-num="authorizedDevicesNum"
+    <account-header
+      :added-device-number="addedDeviceNumber"
+      :authorized-devices-num="authorizedDevicesNum"
+      @click="getSkywatchGrantCode"
     >
       <div class="button-area">
         <i class="iconfont icon-authorize"/>
@@ -56,240 +57,242 @@
 </template>
 
 <script>
-  import qs from 'qs';
-  import TablePagination from '@/components/TablePagination';
-  import util from '@/common/util.js';
-  import { mapGetters } from 'vuex';
-  import SkywatchAuthorizeConfig from '@/common/SkywatchAuthorizeConfig';
-  import { getSkywatchAccountList, deleteSkywatchAccount, skywatchAccountAuthorize } from '@/api/skywatch';
-  import { getDeviceAuthNumber } from '@/api/device';
-  import AccountHeader from '../AccountHeader';
+import qs from 'qs';
+import TablePagination from '@/components/TablePagination';
+import util from '@/common/util.js';
+import { mapGetters } from 'vuex';
+import SkywatchAuthorizeConfig from '@/common/SkywatchAuthorizeConfig';
+import { getSkywatchAccountList, deleteSkywatchAccount, skywatchAccountAuthorize } from '@/api/skywatch';
+import { getDeviceAuthNumber } from '@/api/device';
+import AccountHeader from '../AccountHeader';
 
-  export default {
-    name: 'SkywatchAccount',
-    components: { AccountHeader, TablePagination },
-    data() {
-      return {
-        varyWindowWidth: window.innerWidth,
-        varyWindowHeight: window.innerHeight,
-        tableData: [],
-        columnData: [
+export default {
+  name: 'SkywatchAccount',
+  components: { AccountHeader, TablePagination },
+  data() {
+    return {
+      varyWindowWidth: window.innerWidth,
+      varyWindowHeight: window.innerHeight,
+      tableData: [],
+      columnData: [
+        {
+          'prop': 'name',
+          'label': this.$t('deviceView.accountName'),
+          'width': 130,
+          'maxWidth': 130
+        }
+      ],
+      columnOperationData: {
+        label: this.$t('deviceView.operation'),
+        minWidth: '120',
+        align: 'center',
+        operation: [
           {
-            'prop': 'name',
-            'label': this.$t('deviceView.accountName'),
-            'width': 130,
-            'maxWidth': 130
+            lable: '',
+            icon: 'icon-button',
+            methods: 'set'
+          },
+          {
+            lable: '',
+            icon: 'icon-shanchu',
+            methods: 'delete'
+          },
+          {
+            lable: '',
+            icon: 'icon-reauthorize',
+            methods: 'reauthorize'
           }
-        ],
-        columnOperationData: {
-          label: this.$t('deviceView.operation'),
-          minWidth: '120',
-          align: 'center',
-          operation: [
-            {
-              lable: '',
-              icon: 'icon-button',
-              methods: 'set'
-            },
-            {
-              lable: '',
-              icon: 'icon-shanchu',
-              methods: 'delete'
-            },
-            {
-              lable: '',
-              icon: 'icon-reauthorize',
-              methods: 'reauthorize'
-            }
-          ]
-        },
-        total: 0,
-        page: 1,
-        sizeNum: 10,
-        lang: this.$i18n.locale,
-        showDeleteBeseyeUser: false,
-        deleteId: '',
-        accountList: [],
-        commentRuletip: false,
-        showDeleteStoreVueAccount: false,
-        accountHead: 'account-header',
-        accountCell: '',
-        accountRow: '',
-        code: '',
-        state: '',
-        skywatchAccount: '',
-        isAuthorizing: false,
-        isLoadingData: true,
-        errorImgSource: require('../../../../../static/img/icon_error.png'),
-        authorizedDevicesNum: 0,
-        addedDeviceNumber: 0,
-        accountId: ''
-      };
-    },
-
-    watch: {
-      accountChanged(val) {
-        const self = this;
-        if (val !== 0) {
-          self.getAccountTableList();
-        }
-      }
-    },
-
-    computed: {
-      ...mapGetters({
-        accountChanged: 'accountChanged'
-      })
-    },
-
-    mounted() {
-      this.getAccountId();
-      this.getSkywatchAccountList();
-      this.getSkywatchDeviceNum();
-      this.getAuthorzationResult();
-    },
-
-    methods: {
-      getAccountId(){
-        this.accountId = localStorage.getItem('oss_bucket');
+        ]
       },
+      total: 0,
+      page: 1,
+      sizeNum: 10,
+      lang: this.$i18n.locale,
+      showDeleteBeseyeUser: false,
+      deleteId: '',
+      accountList: [],
+      commentRuletip: false,
+      showDeleteStoreVueAccount: false,
+      accountHead: 'account-header',
+      accountCell: '',
+      accountRow: '',
+      code: '',
+      state: '',
+      skywatchAccount: '',
+      isAuthorizing: false,
+      isLoadingData: true,
+      errorImgSource: require('../../../../../static/img/icon_error.png'),
+      authorizedDevicesNum: 0,
+      addedDeviceNumber: 0,
+      accountId: ''
+    };
+  },
 
-      getSkywatchAccountList() {
-        this.isLoadingData = true;
-        getSkywatchAccountList().then(res => {
-          this.tableData = res.data;
-          this.isLoadingData = false;
-        }).catch(err => {
-          this.tableData = [];
-          this.isLoadingData = false;
-          console.log('BeseyeAccount-getSkywatchAccountList: ' + err);
-        })
-      },
-
-      getSkywatchDeviceNum(){
-        this.authorizedDevicesNum = 0;
-        this.addedDeviceNumber = 0;
-        const params = { vendor: 3 };
-        getDeviceAuthNumber(params).then(res => {
-          this.authorizedDevicesNum = res.data.authDeviceNumber;
-          this.addedDeviceNumber = res.data.addedDeviceNumber;
-        }).catch(err => {
-          console.log('getSkywatchDeviceNum' + err)
-        })
-      },
-
-      getAuthorzationResult() {
-        const paramsLength = Object.keys(this.$route.params).length;
-        if (paramsLength > 0) {
-          this.skywatchAccount = this.$route.params.msg;
-          if (this.$route.params.success){
-            const succMsg = this.getAuthorizeMsg('success');
-            util.notify(succMsg, 'sucess', 3000);
-            this.getSkywatchAccountList();
-            this.getSkywatchDeviceNum();
-          } else {
-            const refusedMsg = this.getAuthorizeMsg('refuse');
-            util.notify(refusedMsg, 'warning', 3000);
-          }
-        }
-      },
-
-      getAuthorizeMsg(type) {
-        const succMsg = this.skywatchAccount.length > 0 ? this.$t('deviceView.reauthorizeSucc') : this.$t('deviceView.authorizeSucc');
-        const failMsg = this.skywatchAccount.length > 0 ? this.$t('deviceView.reauthorizeFail') : this.$t('deviceView.authorizeFail');
-        const refuseMsg = this.skywatchAccount.length > 0 ? this.$t('deviceView.reauthorizeRefused') : this.$t('deviceView.authorizeRefused');
-        const returnMsg = type === 'success' ? succMsg : type === 'warning' ? failMsg : refuseMsg;
-        return returnMsg;
-      },
-
-      strToBase64(str) {
-        const encodeStr = encodeURI(str);
-        const base64Str = btoa(encodeStr);
-        return base64Str;
-      },
-
-      base64ToStr(base64Str) {
-        const decodeStr = atob(base64Str);
-        const str = decodeURI(decodeStr);
-        return str;
-      },
-
-      getSkywatchGrantCode() {
-        this.setAuthorizeUrl();
-      },
-
-      setAuthorizeUrl() {
-        const redirectUrl = SkywatchAuthorizeConfig.redirect_server_uri;
-        let authorUrl = SkywatchAuthorizeConfig.userAuthorizationUri;
-        authorUrl = `${authorUrl}?redirect_uri=${redirectUrl}&state=${this.accountId},${redirectUrl},${this.skywatchAccount}`;
-        window.location.href = authorUrl;
-      },
-
-      handleEmitOperation(methodsAndRowObj) {
-        const method = methodsAndRowObj.method;
-        switch (method) {
-          case 'set': {
-            this.setSkywatchDevice(methodsAndRowObj.row);
-            break;
-          }
-          case 'reauthorize': {
-            this.skywatchReauthorization(methodsAndRowObj.row);
-            break;
-          }
-          case 'delete': {
-            this.showDeleteBeseyeUserDialog(methodsAndRowObj.row);
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      },
-
-      setSkywatchDevice(row) {
-        const rowData = { rowData: row };
-        sessionStorage.setItem('skywatchAccountInfo', JSON.stringify(rowData));
-        this.$router.push({ name: 'skywatchDeviceSetting' });
-      },
-
-      skywatchReauthorization(row) {
-        this.skywatchAccount = row.skywatchAccount;
-        this.setAuthorizeUrl();
-      },
-
-      showDeleteBeseyeUserDialog(row) {
-        const self = this;
-        self.deleteId = row.skywatchAccount;
-        self.showDeleteBeseyeUser = true;
-      },
-
-      deleteSkywatchAccount() {
-        const deleteAccountParams = this.setDeleteUserParams();
-        deleteSkywatchAccount(deleteAccountParams).then(res => {
-          if (res.errCode === 0) {
-            util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
-            this.showDeleteBeseyeUser = false;
-            this.getSkywatchAccountList();
-            this.getSkywatchDeviceNum();
-          } else {
-            util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
-            this.showDeleteBeseyeUser = false;
-          }
-        })
-          .catch(err => {
-            console.log('BeseyeAccount-deleteSkywatchAccount: ' + err);
-          });
-      },
-
-      setDeleteUserParams() {
-        const idArray = [];
-        idArray.push(this.deleteId);
-        const accountParams = {};
-        accountParams.skywatchAccounts = idArray;
-        return accountParams;
+  watch: {
+    accountChanged(val) {
+      if (val !== 0) {
+        this.getAccountId();
+        this.getSkywatchAccountList();
+        this.getSkywatchDeviceNum();
+        this.getAuthorzationResult();
       }
     }
-  };
+  },
+
+  computed: {
+    ...mapGetters({
+      accountChanged: 'accountChanged'
+    })
+  },
+
+  mounted() {
+    this.getAccountId();
+    this.getSkywatchAccountList();
+    this.getSkywatchDeviceNum();
+    this.getAuthorzationResult();
+  },
+
+  methods: {
+    getAccountId() {
+      this.accountId = localStorage.getItem('oss_bucket');
+    },
+
+    getSkywatchAccountList() {
+      this.isLoadingData = true;
+      getSkywatchAccountList().then(res => {
+        this.tableData = res.data;
+        this.isLoadingData = false;
+      }).catch(err => {
+        this.tableData = [];
+        this.isLoadingData = false;
+        console.log('BeseyeAccount-getSkywatchAccountList: ' + err);
+      });
+    },
+
+    getSkywatchDeviceNum() {
+      this.authorizedDevicesNum = 0;
+      this.addedDeviceNumber = 0;
+      const params = { vendor: 3 };
+      getDeviceAuthNumber(params).then(res => {
+        this.authorizedDevicesNum = res.data.authDeviceNumber;
+        this.addedDeviceNumber = res.data.addedDeviceNumber;
+      }).catch(err => {
+        console.log('getSkywatchDeviceNum' + err);
+      });
+    },
+
+    getAuthorzationResult() {
+      const paramsLength = Object.keys(this.$route.params).length;
+      if (paramsLength > 0) {
+        this.skywatchAccount = this.$route.params.msg;
+        if (this.$route.params.success) {
+          const succMsg = this.getAuthorizeMsg('success');
+          util.notify(succMsg, 'sucess', 3000);
+          this.getSkywatchAccountList();
+          this.getSkywatchDeviceNum();
+        } else {
+          const refusedMsg = this.getAuthorizeMsg('refuse');
+          util.notify(refusedMsg, 'warning', 3000);
+        }
+      }
+    },
+
+    getAuthorizeMsg(type) {
+      const succMsg = this.skywatchAccount.length > 0 ? this.$t('deviceView.reauthorizeSucc') : this.$t('deviceView.authorizeSucc');
+      const failMsg = this.skywatchAccount.length > 0 ? this.$t('deviceView.reauthorizeFail') : this.$t('deviceView.authorizeFail');
+      const refuseMsg = this.skywatchAccount.length > 0 ? this.$t('deviceView.reauthorizeRefused') : this.$t('deviceView.authorizeRefused');
+      const returnMsg = type === 'success' ? succMsg : type === 'warning' ? failMsg : refuseMsg;
+      return returnMsg;
+    },
+
+    strToBase64(str) {
+      const encodeStr = encodeURI(str);
+      const base64Str = btoa(encodeStr);
+      return base64Str;
+    },
+
+    base64ToStr(base64Str) {
+      const decodeStr = atob(base64Str);
+      const str = decodeURI(decodeStr);
+      return str;
+    },
+
+    getSkywatchGrantCode() {
+      this.setAuthorizeUrl();
+    },
+
+    setAuthorizeUrl() {
+      const redirectUrl = SkywatchAuthorizeConfig.redirect_server_uri;
+      let authorUrl = SkywatchAuthorizeConfig.userAuthorizationUri;
+      authorUrl = `${authorUrl}?redirect_uri=${redirectUrl}&state=${this.accountId},${redirectUrl},${this.skywatchAccount}`;
+      window.location.href = authorUrl;
+    },
+
+    handleEmitOperation(methodsAndRowObj) {
+      const method = methodsAndRowObj.method;
+      switch (method) {
+        case 'set': {
+          this.setSkywatchDevice(methodsAndRowObj.row);
+          break;
+        }
+        case 'reauthorize': {
+          this.skywatchReauthorization(methodsAndRowObj.row);
+          break;
+        }
+        case 'delete': {
+          this.showDeleteBeseyeUserDialog(methodsAndRowObj.row);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+    setSkywatchDevice(row) {
+      const rowData = { rowData: row };
+      sessionStorage.setItem('skywatchAccountInfo', JSON.stringify(rowData));
+      this.$router.push({ name: 'skywatchDeviceSetting' });
+    },
+
+    skywatchReauthorization(row) {
+      this.skywatchAccount = row.skywatchAccount;
+      this.setAuthorizeUrl();
+    },
+
+    showDeleteBeseyeUserDialog(row) {
+      const self = this;
+      self.deleteId = row.skywatchAccount;
+      self.showDeleteBeseyeUser = true;
+    },
+
+    deleteSkywatchAccount() {
+      const deleteAccountParams = this.setDeleteUserParams();
+      deleteSkywatchAccount(deleteAccountParams).then(res => {
+        if (res.errCode === 0) {
+          util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
+          this.showDeleteBeseyeUser = false;
+          this.getSkywatchAccountList();
+          this.getSkywatchDeviceNum();
+        } else {
+          util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
+          this.showDeleteBeseyeUser = false;
+        }
+      })
+        .catch(err => {
+          console.log('BeseyeAccount-deleteSkywatchAccount: ' + err);
+        });
+    },
+
+    setDeleteUserParams() {
+      const idArray = [];
+      idArray.push(this.deleteId);
+      const accountParams = {};
+      accountParams.skywatchAccounts = idArray;
+      return accountParams;
+    }
+  }
+};
 </script>
 
 <style lang="scss">
