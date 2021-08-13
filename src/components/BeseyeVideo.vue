@@ -799,6 +799,10 @@ export default {
       }
     },
 
+    stopVideoPlay(){
+      this.stopPlay();
+    },
+
     stopPlay() {
       const self = this;
       if (!self.playBack) {

@@ -1894,6 +1894,20 @@ export default {
           break;
       }
       return width;
+    },
+
+    async startVideo(ivsId, channelId, startTs){
+      await this.getEzvizAccessToken(ivsId);
+      this.playState && this.stopRealTime();
+      this.realTime();
+    },
+
+    stopVideoPlay(){
+      this.stopRealTime();
+    },
+
+    playHistoryVideo(){
+
     }
   }
 };

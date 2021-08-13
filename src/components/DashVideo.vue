@@ -314,7 +314,7 @@ export default {
       type: Boolean,
       default: false
     },
-    isHistory: {
+    playBack: {
       type: Boolean,
       default: false
     },
@@ -503,7 +503,6 @@ export default {
     },
 
     realTimeSpeed(val) {
-      console.log(val);
       if (val >= 300) {
         this.stopVideoPlay();
         this.stopTimer();
@@ -511,11 +510,15 @@ export default {
     },
 
     async storeId(newValue, oldValue) {
-      console.log(newValue);
-      console.log(oldValue);
       if (newValue.length > 0) {
         // await self.getEzvizAccessToken(newValue);
       }
+    }
+  },
+
+  computed:{
+    isHistory(){
+      return this.playBack
     }
   },
 
@@ -1100,7 +1103,7 @@ export default {
       }
     },
 
-    playHistoryVideo(startTs) {
+    changeHistoryTime(startTs) {
       console.log(startTs);
       this.startTs = startTs;
       this.startVideo(this.channelInfo.ivsId, this.channelInfo.channelId, this.startTs);
