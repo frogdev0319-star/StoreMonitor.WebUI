@@ -221,9 +221,9 @@
                           <el-table
                             :data="scope.row.planTableData"
                             :highlight-current-row="true"
-                            :header-cell-class-name="insideHeaderClass"
-                            :row-class-name="insideRowClass"
-                            :cell-class-name="insideCellClass"
+                            :header-cell-class-name="headerClass"
+                            :cell-class-name="cellClass"
+                            :row-class-name="rowClass"
                             align="left"
                             stripe
                             border
@@ -233,9 +233,9 @@
                           >
                             <el-table-column type="expand">
                               <template slot-scope="props">
-                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
-                                  <span>{{$t('overview.patrolStore')}}:</span>
-                                  <span style="flex:1;">{{props.row.appliedStores}}</span>
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw); align-items: center;font-size: 12px">
+                                  <span>{{ $t('overview.patrolStore') }}:</span>
+                                  <span style="flex:1;">{{ props.row.appliedStores }}</span>
                                 </div>
                               </template>
                             </el-table-column>
@@ -254,9 +254,9 @@
                           <el-table
                             :data="scope.row.implementTableData"
                             :highlight-current-row="true"
-                            :header-cell-class-name="insideHeaderClass"
-                            :row-class-name="insideRowClass"
-                            :cell-class-name="insideCellClass"
+                            :header-cell-class-name="headerClass"
+                            :cell-class-name="cellClass"
+                            :row-class-name="rowClass"
                             align="left"
                             stripe
                             border
@@ -266,13 +266,13 @@
                           >
                             <el-table-column type="expand">
                               <template slot-scope="props">
-                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
-                                  <span>{{$t('overview.inspectedStores')}}:</span>
-                                  <span style="flex:1;">{{props.row.completedStoresStr}}</span>
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw); align-items: center;font-size: 12px">
+                                  <span>{{ $t('overview.inspectedStores') }}:</span>
+                                  <span style="flex:1;">{{ props.row.completedStoresStr }}</span>
                                 </div>
-                                <div style="display:flex;margin-left:calc(-50/1920*100vw);">
-                                  <span>{{$t('overview.uninspectedStores')}}:</span>
-                                  <span style="flex:1;">{{props.row.incompletedStoresStr}}</span>
+                                <div style="display:flex;margin-left:calc(-50/1920*100vw); align-items: center;font-size: 12px">
+                                  <span>{{ $t('overview.uninspectedStores') }}:</span>
+                                  <span style="flex:1;">{{ props.row.incompletedStoresStr }}</span>
                                 </div>
                               </template>
                             </el-table-column>
