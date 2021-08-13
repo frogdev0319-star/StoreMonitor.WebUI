@@ -205,7 +205,7 @@ export default {
     'inspectedStores': '已巡检门店',
     'uninspectedStores': '未巡检门店',
     'taskPerformance': '任务执行情况',
-    'emptyPatrolList': '督导巡店列表为空，请重新筛选数据',
+    'emptyPatrolList': '巡店KPI列表为空，请重新筛选数据',
     'eventGraph': '事件解决趋势图',
     'sumEvents': '事件总数',
     'sumUnprocessEvents': '待处理事件总数',

@@ -240,7 +240,8 @@ export default {
     'allUser': '모든 사람',
     'checkinReport': '로그인 보고서-{time1}-{time2}',
 
-    'emptyItemList': 'The inspection item list is empty, please re-filter the data'
+    'emptyPatrolList': '검사 KPI가 비어 있습니다. 데이터를 다시 필터링하십시오',
+    'emptyItemList': '검사 항목 목록이 비어 있습니다. 데이터를 다시 필터링하십시오'
   },
 
   // Patrol page language

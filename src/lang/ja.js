@@ -237,7 +237,8 @@ export default {
     'allUser': 'すべての人',
     'checkinReport': 'サインインレポート-{time1}-{time2}',
 
-    'emptyItemList': 'The inspection item list is empty, please re-filter the data'
+    'emptyPatrolList': 'インスペクションリストが空です。データを再フィルターしてください',
+    'emptyItemList': '検査項目一覧が空です。データを再フィルターしてください'
   },
 
   // Patrol page language

@@ -202,7 +202,7 @@ export default {
     'inspectedStores': 'Inspected Store',
     'uninspectedStores': 'Uninspected Store',
     'taskPerformance': 'Task Progession',
-    'emptyPatrolList': 'Supervision tour list is empty, please re-filter the data',
+    'emptyPatrolList': 'Inspection KPI is empty, please refilter the data',
     'eventGraph': 'Analysis of Event Trends',
     'sumEvents': 'Total Events',
     'sumUnprocessEvents': 'Pending Events',
