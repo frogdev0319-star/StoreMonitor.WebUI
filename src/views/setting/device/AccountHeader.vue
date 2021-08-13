@@ -16,9 +16,11 @@
         <div class="available-device">
           {{ $t('deviceView.addedDeviceNumber') }} {{ addedDeviceNumber }}
         </div>
-        <delay-button @click="onClick"
-                      class="inspction-btn">
-          <slot class="button"></slot>
+        <delay-button
+          :disabled="authorizedDevicesNum === 0"
+          class="inspction-btn"
+          @click="onClick">
+          <slot class="button"/>
         </delay-button>
       </div>
     </div>
