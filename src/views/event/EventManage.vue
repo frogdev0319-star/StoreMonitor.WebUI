@@ -858,10 +858,6 @@ export default {
         this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
       } else {
-        const start = this.$moment(this.dateValue[0]);
-        const end = this.$moment(this.dateValue[1]);
-        this.params.beginTs = start;
-        this.params.endTs = end;
         this.searchParams = {};
         this.curState = [0];
       }

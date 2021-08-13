@@ -592,7 +592,6 @@ export default {
 
   getVideoAuthority(num){
     const auth = parseInt(getCookie('deviceAuth'));
-    console.log(auth);
     if(num === 0) return 0;
     return ((auth & (1 << num -1)) >> (num-1)) === 1 ? 1 : 0;
   },

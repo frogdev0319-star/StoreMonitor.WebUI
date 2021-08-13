@@ -117,93 +117,6 @@
         </div>
       </div>
       <div v-else class="no-data-container">{{ $t('deviceView.noData') }}</div>
-      <el-dialog
-        v-if="showAddSkywatchDialog"
-        :title="$t('deviceView.addDevice')"
-        :visible.sync="showAddSkywatchDialog"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        width="610px"
-        top="35vh"
-        left="40vh"
-        custom-class="addDevice"
-      >
-        <div class="dialog-content">
-          <hr class="dialog-hr">
-          <div class="deviceForm">
-            <span class="available-span">{{ $t('deviceView.availableDevice') }}</span>
-            <div class="available-device-info">
-              <template v-if="avilableDeviceList.length > 0">
-                <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
-                  <div class="available-checkbox">
-                    <el-checkbox v-model="item.checked"/>
-                  </div>
-                  <div class="available-sn">
-                    <span>{{ item.serialNumber }}</span>
-                  </div>
-                  <div class="available-name">
-                    <span>{{ item.name }}</span>
-                  </div>
-                  <div class="available-store">
-                    <el-select
-                      v-model="item.storeId"
-                      :filter-method="filterStoreOption"
-                      :placeholder="$t('deviceView.selectStore')"
-                      style="width: 100%;"
-                      filterable
-                    >
-                      <el-option
-                        v-for="item in storeDataList"
-                        :key="item.storeId"
-                        :label="item.label"
-                        :value="item.storeId"/>
-                    </el-select>
-                  </div>
-                </div>
-              </template>
-              <template v-else>
-                <div class="no-data-container">{{ $t('deviceView.noData') }}</div>
-              </template>
-            </div>
-          </div>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button
-            class="file-cancel-btn"
-            size="mini"
-            style=""
-            @click="showAddSkywatchDialog = false">{{ $t('deviceView.cancle') }}</el-button>
-          <el-button
-            class="file-confirm-btn"
-            size="mini"
-            type="primary"
-            @click="confirmAddSkywatchDevice">{{ $t('deviceView.confirm') }}</el-button>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showDeleteDialog"
-        :visible.sync="showDeleteDialog"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        :title="$t('deviceView.deleteDevice')"
-        width="510px"
-        top="35vh"
-        left="40vh">
-        <div class="dialog-content">
-          <hr class="dialog-hr">
-
-          <p class="dialog-box">
-            <i class="el-icon-warning"/>
-            <span class="warning-content">{{ $t('deviceView.deleteDevice') }}</span>
-          </p>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteDialog = false">
-            {{ $t('deviceView.cancle') }}</el-button>
-          <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteSkywatchDevice()">
-            {{ $t('deviceView.confirm') }}</el-button>
-        </div>
-      </el-dialog>
     </div>
   </div>
 </template>
@@ -230,10 +143,8 @@
         varyWindowHeight: window.innerHeight,
         curSkywatchItem: null,
         lang: this.$i18n.locale,
-        showAddSkywatchDialog: false,
         storeDataList: [],
         allStoreDataList: [],
-        showDeleteDialog: false,
         file: '',
         isUpdate: false,
         avilableDeviceList: [],
@@ -391,14 +302,14 @@
         params.id = item.id;
         params.name = item.name;
         const updateDeviceRes = await skywatchRESTful.updateSkywatchChannel(params);
-        item.tempUrl !== item.pictureUrl && updateDeviceRes.errCode === 0 && this.updateImage();
+        return item.tempUrl !== item.pictureUrl && updateDeviceRes.errCode === 0 && await this.updateImage(item.id);
       },
 
-      updateImage(){
+      updateImage(id){
         const fm = new FormData();
-        fm.append('id', item.id);
+        fm.append('id', id);
         fm.append('picture', this.file);
-        return this.attachImageToDevice(fm);
+        deviceRESTful.attachImageToDevice(fm);
       },
 
       async getSkywatchDeviceList(params) {
@@ -470,21 +381,6 @@
         self.beseyeDevicesList = lodash.cloneDeep(self.beseyeDevices);
       },
 
-      attachImageToDevice(params) {
-        return new Promise((resolve, reject) => {
-          deviceRESTful.attachImageToDevice(params).then(resDevice => {
-            if (resDevice.errCode === 0) {
-              resolve(resDevice);
-            } else {
-              reject(resDevice.errMsg);
-            }
-            resolve(resDevice);
-          }).catch(error => {
-            reject(error);
-          });
-        });
-      },
-
       editSkywatchDevice(index, item) {
         item.isEditing = true;
         this.beseyeDevicesList.forEach((_item, _index) => {
@@ -530,37 +426,10 @@
       showDeleteSkywatchDeviceDialog(index, item) {
         this.deleteSerialNums.push(item.serialNumber);
         this.deleteChannelIds.push(item.id);
-        //this.showDeleteDialog = true;
         this.$refs.deviceHeader.deleteDeviceFromTable();
       },
 
-      showDeleteDialogMethod() {
-        this.deleteSerialNums = [];
-        this.deleteChannelIds = [];
-        const deviceSerialsArr = [];
-        const channelIdsArr = [];
-        const selectRows = this.beseyeDevicesList.filter(item => item.isChecked);
-        selectRows.forEach(item => {
-          deviceSerialsArr.push(item.serialNumber);
-          channelIdsArr.push(item.id);
-        });
-        this.deleteSerialNums = deviceSerialsArr;
-        this.deleteChannelIds = channelIdsArr;
-        if (this.deleteSerialNums.length === 0) {
-          util.notify(this.$t('deviceView.emptyDeleteDevice'), 'warning', 3000);
-          return false;
-        } else {
-          if (this.deleteSerialNums.length === 1) {
-            this.deleteInfo = this.$t('deviceView.confirmDeleteDevice');
-          } else {
-            this.deleteInfo = this.$t('deviceView.confirmDeleteDevices');
-          }
-          this.showDeleteDialog = true;
-        }
-      },
-
       async confirmDeleteSkywatchDevice(deleteDeviceObj) {
-        this.showDeleteDialog = false;
         const {deleteChannelParmas, deleteParmas} = {...deleteDeviceObj};
         try {
           const deleteChannelResult = await this.deleteSkywatchChannel(deleteChannelParmas);
@@ -600,7 +469,6 @@
           const addChannelResult = await self.addSkywatchChannel(channelParams);
           if (addDeviceResult.errCode === 0 && addChannelResult.errCode === 0) {
             util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
-            self.showAddSkywatchDialog = false;
             self.getSkywatchDeviceList(self.setParams());
           } else {
             if (addDeviceResult.errCode !== 0){
@@ -609,11 +477,9 @@
               self.deleteSkywatchDevice({deviceIds: addDeviceResult.data})
             }
             util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-            self.showAddSkywatchDialog = false;
           }
         } catch (error) {
           util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-          self.showAddSkywatchDialog = false;
           console.log('SkywatchDeviceMgmt-confirmAddSkywatchDevice: ' + error);
         }
       },

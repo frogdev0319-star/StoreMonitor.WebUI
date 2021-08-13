@@ -25,9 +25,9 @@
       </el-button>
     </div>
     <el-dialog
-      v-if="showAddBeseyeDialog"
+      v-if="showAddDeviceDialog"
       :title="$t('deviceView.addDevice')"
-      :visible.sync="showAddBeseyeDialog"
+      :visible.sync="showAddDeviceDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
       width="610px"
@@ -79,7 +79,7 @@
           class="file-cancel-btn"
           size="mini"
           style=""
-          @click="showAddBeseyeDialog = false">{{ $t('deviceView.cancle') }}</el-button>
+          @click="showAddDeviceDialog = false">{{ $t('deviceView.cancle') }}</el-button>
         <el-button
           class="file-confirm-btn"
           size="mini"
@@ -146,7 +146,7 @@
 
     data(){
       return {
-        showAddBeseyeDialog: false,
+        showAddDeviceDialog: false,
         showDeleteDialog: false,
         avilableDeviceList: [],
         storeDataList: [],
@@ -208,7 +208,7 @@
 
       async onShowAddBeseyeDeviceDialog() {
         this.vendor === 2 ? await this.getAvailableBeseyeDevice() : await this.getAvailableSkywatchDevice();
-        this.showAddBeseyeDialog = true;
+        this.showAddDeviceDialog = true;
       },
 
       getAvailableBeseyeDevice() {
@@ -266,7 +266,7 @@
           deviceParams.device = devcieArr;
           const channelParams = {};
           channelParams.device = channelArray;
-
+          this.showAddDeviceDialog = false;
           this.$emit('addDeviceHandler', {deviceParams, channelParams})
         }
       },

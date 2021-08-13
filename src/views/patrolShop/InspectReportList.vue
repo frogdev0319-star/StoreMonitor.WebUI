@@ -795,10 +795,6 @@ export default {
         this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
       } else {
-        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
-        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
-        this.params.beginTs = start;
-        this.params.endTs = end;
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
         this.ifGetParamsFromCash = false;
