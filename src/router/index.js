@@ -13,15 +13,15 @@ Vue.use(Router);
  * all roles can be accessed
  */
 export const constantRoutes = [
-  {
-    path: '/login',
-    name: 'Login',
-    hidden: true,
-    component: LoginForm,
-    meta: {
-      requireAuth: false
-    }
-  },
+  // {
+  //   path: '/login',
+  //   name: 'Login',
+  //   hidden: true,
+  //   component: LoginForm,
+  //   meta: {
+  //     requireAuth: false
+  //   }
+  // },
   {
     path: '/',
     name: 'AuthRedirect',
@@ -242,19 +242,18 @@ export const navbarRoute = {
       }
     );
 
-    // PermissionHelper.enableCheckinStatistics() &&
-    statisticsRoute.children.push(
-      {
-        path: '/checkInStatistics',
-        name: 'checkInStatistics',
-        component: resolve => require(['@/views/statistical/CheckInStatistics'], resolve),
-        hidden: false,
-        meta: {
-          requireAuth: true,
-          keepAlive: false
-        }
-      }
-    );
+    // PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
+    //   {
+    //     path: '/checkInStatistics',
+    //     name: 'checkInStatistics',
+    //     component: resolve => require(['@/views/statistical/CheckInStatistics'], resolve),
+    //     hidden: false,
+    //     meta: {
+    //       requireAuth: true,
+    //       keepAlive: false
+    //     }
+    //   }
+    // );
     return statisticsRoute;
   },
 
@@ -427,24 +426,24 @@ export const navbarRoute = {
       }
     );
 
-    util.getVideoAuthority(4) && deviceRoutes.push({
-        path: '/skywatchAccount',
-        name: 'skywatchAccount',
-        component: resolve => require(['@/views/setting/device/Skywatch/SkywatchAccount'], resolve)
-      },
-      {
-        path: '/skywatchDeviceSetting',
-        name: 'skywatchDeviceSetting',
-        component: resolve => require(['@/views/setting/device/Skywatch/SkywatchDeviceMgmt'], resolve),
-        hidden: true
-      },
-      {
-        path: '/skywatch/authorize',
-        name: 'auth',
-        component: resolve => require(['@/views/setting/device/Skywatch/Authorize'], resolve),
-        hidden: true
-      }
-    );
+    // util.getVideoAuthority(4) && deviceRoutes.push({
+    //     path: '/skywatchAccount',
+    //     name: 'skywatchAccount',
+    //     component: resolve => require(['@/views/setting/device/Skywatch/SkywatchAccount'], resolve)
+    //   },
+    //   {
+    //     path: '/skywatchDeviceSetting',
+    //     name: 'skywatchDeviceSetting',
+    //     component: resolve => require(['@/views/setting/device/Skywatch/SkywatchDeviceMgmt'], resolve),
+    //     hidden: true
+    //   },
+    //   {
+    //     path: '/skywatch/authorize',
+    //     name: 'auth',
+    //     component: resolve => require(['@/views/setting/device/Skywatch/Authorize'], resolve),
+    //     hidden: true
+    //   }
+    // );
 
     return deviceRoutes;
   },
