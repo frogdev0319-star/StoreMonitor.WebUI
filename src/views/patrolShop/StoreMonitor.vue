@@ -54,32 +54,9 @@
         @confirmed="noBindDeviceDialog"
         @canceled="canceldNoBind"
       />
-
-      <dash-video
-        v-if="vendor === 0"
-        ref="dashVideo"
-        :store-id="store.storeId"
-        :channel-info="channel"
-        :is-history="playBackState"
-        :video-authority="videoAuthority"
-        :source-list-length="sourceList.length"
-        @confirmEzvizCanvas="editEzvizCanvas"
-      />
-      <ezviz-video
-        v-else-if="vendor === 1"
-        ref="ezvizVideo"
-        :store-id="store.storeId"
-        :channel-info="channel"
-        :source-list-length="sourceList.length"
-        :is-store-monitor="true"
-        :play-back="playBackState"
-        :cur-time="playBackTime"
-        :video-authority="videoAuthority"
-        @confirmEzvizCanvas="editEzvizCanvas"
-      />
-      <beseye-video
-        v-else
-        ref="beseyeVideo"
+      <component
+        :is="currentVideoComponent"
+        ref="vendorVideo"
         :store-id="store.storeId"
         :channel-info="channel"
         :source-list-length= "sourceList.length"
@@ -88,8 +65,8 @@
         :is-event="false"
         :cur-time="playBackTime"
         :video-authority="videoAuthority"
-        @confirmEzvizCanvas="editEzvizCanvas"
-      />
+        @confirmEzvizCanvas="editEzvizCanvas"/>
+
       <div class="el-event">
         <div :class="corEvent ? 'event-lside' : ''">
           <span class="event-title">{{ $t("remotePatrol.createMothod") }}</span>
@@ -370,9 +347,6 @@ import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import DialogVue from '@/components/DialogVue.vue';
 import filterString from '@/common/filterString.js';
 import { getCookie } from '@/common/auth';
-import EzvizVideo from '@/components/EzvizVideo.vue';
-import BeseyeVideo from '@/components/BeseyeVideo.vue';
-import DashVideo from '@/components/DashVideo';
 
 export default {
   name: 'StoreMoinitor',
@@ -380,9 +354,10 @@ export default {
   components: {
     ChannelIconBtn,
     DialogVue,
-    EzvizVideo,
-    BeseyeVideo,
-    DashVideo
+    SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
+    DashVideo: () => import('@/components/DashVideo.vue'),
+    EzvizVideo: () => import('@/components/EzvizVideo.vue'),
+    BeseyeVideo: () => import('@/components/BeseyeVideo.vue')
   },
 
   data() {
@@ -404,7 +379,6 @@ export default {
       errorText: '',
       showCancelContent: false,
       showCutContent: false,
-      playState: false,
       playBackState: false,
       activeIndex: '0',
 
@@ -615,8 +589,9 @@ export default {
         self.stopTimer();
       }
     },
+
     vendor(){
-      this.currentVideoComponent = [DashVideo, EzvizVideo, BeseyeVideo][this.vendor];
+      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
     }
   },
 
@@ -638,13 +613,7 @@ export default {
     self.isPlayingFlag = -1;
     self.timerPlayReal = null;
     self.timeid = null;
-    if (self.vendor === 0) {
-      // self.stopVideoPlay();
-    } else if (self.vendor === 1) {
-      self.$refs.ezvizVideo.stopRealTime();
-    } else {
-      self.$refs.beseyeVideo.stopPlay();
-    }
+    self.$refs.vendorVideo.stopVideoPlay();
     if (to.name !== 'storeSubEvent') {
       from.meta.keepAlive = false;
       if (self.previewplayer) {
@@ -804,6 +773,7 @@ export default {
           obj.userId = item.userId;
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
+          obj.status = item.status;
           temp.push(obj);
         });
         return temp;
@@ -828,6 +798,7 @@ export default {
             obj.userName = storeData[0].userName;
             obj.storeUp = true;
             obj.storeUpTitle = self.$t('remotePatrol.stared');
+            obj.status = storeData[0].status;
             self.store = obj;
             self.showStoreUp = true;
             const curStoreId = storeData[0].storeId;
@@ -870,9 +841,9 @@ export default {
               obj.userId = data[j].userId;
               obj.city = data[j].city;
               obj.province = data[j].province;
-              obj.favorite =
-                data[j].favorite == undefined ? true : data[j].favorite;
+              obj.favorite = data[j].favorite == undefined ? true : data[j].favorite;
               obj.device = data[j].device;
+              obj.status = data[j].status;
               temp.push(obj);
             }
           }
@@ -1078,15 +1049,9 @@ export default {
         self.timeid = null;
         self.timeid = 0;
       }
-      if (self.vendor === 0) {
-        self.$refs.dashVideo.playHistoryVideo(self.startTs);
-      } else if(self.vendor === 1){
-        self.changeFlag = false;
-        self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
-      }else{
-        self.changeFlag = false;
-        self.$refs.beseyeVideo.changeHistoryTime(self.playBackTime);
-      }
+      self.changeFlag = false;
+      const startTime = [0, 3].includes(self.vendor) ? self.startTs : self.playBackTime;
+      self.$refs.vendorVideo.changeHistoryTime(startTime);
     },
 
     getFileUrl(fileName) {
@@ -1567,11 +1532,7 @@ export default {
       self.curTabItem = item;
       self.curStoreIndex = _index;
       self.curStoreItem = _item;
-      if (
-        (self.vendor === 0 && (self.playState || self.eventName.length !== 0)) ||
-          self.vendor === 1 && (self.$refs.ezvizVideo.playState || self.eventName.length !== 0) ||
-        (self.vendor === 2 && (self.$refs.beseyeVideo.playState || self.eventName.length !== 0))
-      ) {
+      if (self.$refs.vendorVideo.playState || self.eventName.length !== 0){
         self.changeStoreObj.dialogCosed = true;
       } else {
         self.changeStore(item, index, _item, _index);
@@ -1584,22 +1545,11 @@ export default {
       self.hideLast = false;
       self.hideNext = false;
       self.showCutContent = false;
-      if (self.vendor === 0) {
-        if (self.playState) {
-          self.stopRealTime();
-        }
-      } else if (self.vendor === 1) {
-        self.$refs.ezvizVideo.showError = false;
-        self.$refs.ezvizVideo.playBack && (self.$refs.ezvizVideo.startTs = self.playBackTime);
-        if (self.$refs.ezvizVideo.playState) {
-          self.$refs.ezvizVideo.stopRealTime();
-        }
-      } else {
-        if (self.$refs.beseyeVideo.playState) {
-          self.$refs.beseyeVideo.video2 && (self.$refs.beseyeVideo.video2.style.display = 'none');
-          self.$refs.beseyeVideo.stopPlay();
-        }
-      }
+      self.$refs.vendorVideo.playState && self.$refs.vendorVideo.stopVideoPlay();
+      if (storeItem.status && [20, 21, 60].includes(storeItem.status)) {
+        util.notify(this.$t('deviceView.licenseOverdue'), 'warning', 3000);
+        return false;
+      };
       storeItem.device.forEach((item, index) => {
         const obj = {};
         obj.id = item.id;
@@ -1670,46 +1620,15 @@ export default {
           _item.isClick = false;
         }
       });
-      if (self.vendor === 0) {
-        self.$nextTick(() => {
-          if (self.playBackState) {
-            self.$refs.dashVideo.playHistoryVideo(self.startTs);
-          } else {
-            self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
-          }
-        })
-      } else if (self.vendor === 1) {
-        self.$nextTick(async() => {
-          await self.$refs.ezvizVideo.getEzvizAccessToken(self.channel.ivsId);
-          self.$refs.ezvizVideo.playBack &&
-          (self.$refs.ezvizVideo.startTs = self.playBackTime);
-          if (self.$refs.ezvizVideo.playState) {
-            self.$refs.ezvizVideo.stopRealTime();
-            self.$nextTick(() => {
-              self.$refs.ezvizVideo.realTime();
-            });
-          } else {
-            self.$nextTick(() => {
-              self.$refs.ezvizVideo.realTime();
-            });
-          }
-        })
+
+      if (this.vendor === 3) {
+        self.$refs.vendorVideo.playBack &&
+        (self.$refs.vendorVideo.startTs = self.playBackTime) && (self.$refs.vendorVideo.clipStartTime = self.playBackTime);
+      }
+      if (self.playBackState) {
+        self.$refs.vendorVideo.changeHistoryTime(self.startTs);
       } else {
-        self.$nextTick(async() => {
-          await self.$refs.beseyeVideo.getBeseyeAccessToken(self.channel.ivsId);
-          self.$refs.beseyeVideo.playBack &&
-          (self.$refs.beseyeVideo.startTs = self.playBackTime) && (self.$refs.beseyeVideo.clipStartTime = self.playBackTime);
-          if (self.$refs.beseyeVideo.playState) {
-            self.$refs.beseyeVideo.stopPlay();
-            self.$nextTick(() => {
-              self.$refs.beseyeVideo.startPlay();
-            })
-          } else {
-            self.$nextTick(() => {
-              self.$refs.beseyeVideo.startPlay();
-            })
-          }
-        })
+        self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
       }
     },
 
@@ -1817,21 +1736,8 @@ export default {
       self.curYear = new Date().getFullYear();
       self.curMonth = new Date().getMonth() + 1;
       self.realType = true;
-      if (self.vendor === 0) {
-        if (self.store.storeId != undefined) {
-          self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
-        }
-      } else if (self.vendor === 1) {
-        self.playBackTime = 0;
-        self.$nextTick(() => {
-          self.$refs.ezvizVideo.changeHistoryTime(self.playBackTime);
-        });
-      } else{
-        self.playBackTime = 0;
-        self.$nextTick(() => {
-          self.$refs.beseyeVideo.changeHistoryTime(self.playBackTime);
-        })
-      }
+      this.playBackTime = 0;
+      this.$refs.vendorVideo.changeHistoryTime(null);
     },
 
     myDivHeight() {

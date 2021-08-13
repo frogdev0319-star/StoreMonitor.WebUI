@@ -30,27 +30,14 @@
           @mousemove="showControlInfo=true"
           @mouseleave="showControlInfo = false">
           <hr class="dialog-hr">
-          <dash-video
-            v-if="vendor === 0"
-            ref="dashVideo"
+          <component
+            :is="currentVideoComponent"
+            ref="vendorVideo"
             :channel-info="channelInfo"
             :is-event="isEvent"
             :store-id="event.storeId"
-            :video-authority="videoAuthority"/>
-          <ezviz-video
-            v-else-if="vendor === 1"
-            ref="ezvizVideo"
-            :channel-info="channelInfo"
-            :is-event="isEvent"
-            :store-id="event.storeId"
-            :video-authority="videoAuthority"/>
-          <beseye-video
-            v-else
-            ref="beseyeVideo"
-            :channel-info="channelInfo"
-            :is-event="isEvent"
-            :store-id="event.storeId"
-            :video-authority="videoAuthority"/>
+            :video-authority="videoAuthority">
+          </component>
         </div>
       </el-dialog>
       <el-dialog
@@ -279,24 +266,21 @@ import util from '@/common/util';
 import videojs from '../../../../static/video.js';
 import 'videojs-contrib-hls';
 import { eventRESTful } from '@/api/index';
-import AudioVue from '@/components/AudioVue.vue';
 import { getDetailedStoreInfo } from '@/api/store';
-import EzvizVideo from '@/components/EzvizVideo.vue';
 import PermissionHelper from '@/api/PermissionHelper';
 import filterString from '@/common/filterString';
 import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
-import DashVideo from '../../../components/DashVideo';
-import BeseyeVideo from '@/components/BeseyeVideo.vue';
 
 export default {
   name: 'EventDetail',
   components: {
     DelayButton,
-    DashVideo,
-    AudioVue,
-    EzvizVideo,
-    BeseyeVideo
+    AudioVue: () => import('@/components/AudioVue.vue'),
+    SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
+    DashVideo: () => import('@/components/DashVideo.vue'),
+    EzvizVideo: () => import('@/components/EzvizVideo.vue'),
+    BeseyeVideo: () => import('@/components/BeseyeVideo.vue')
   },
   data() {
     return {
@@ -348,9 +332,16 @@ export default {
       videosourceList: [],
       imgsourceList: [],
       Changestatus: '',
-      vendor: 0
+      vendor: 1,
+      currentVideoComponent: 'EzvizVideo'
     };
   },
+  watch:{
+     vendor(){
+      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
+    }
+  },
+
   computed: {
     player() {
       return this.$refs.videoPlayer.player;
@@ -467,14 +458,7 @@ export default {
     },
 
     closeRealTime() {
-      const self = this;
-      if (self.vendor === 0) {
-        self.$refs.dashVideo.stopVideoPlay();
-      } else if (self.vendor === 1) {
-        self.$refs.ezvizVideo.stopRealTime();
-      }else{
-        self.$refs.beseyeVideo.stopPlay();
-      }
+      this.$refs.vendorVideo.stopVideoPlay();
     },
 
     myfun() {
@@ -651,12 +635,14 @@ export default {
     checkVideo(item, index) {
       const self = this;
       self.dialogFormVisible = true;
-      self.channelInfo = self.curChannel;
-      self.vendor = self.channelInfo.vendor;
-      if (index != undefined) {
-        self.curChannel = item;
-      }
-      self.playVendorVideo();
+      this.$nextTick(() => {
+        self.channelInfo = self.curChannel;
+        self.vendor = self.channelInfo.vendor;
+        if (index != undefined) {
+          self.curChannel = item;
+        }
+        self.playVendorVideo();
+      })
     },
 
     getCommentList(e) {
@@ -875,39 +861,18 @@ export default {
       self.showRelatedChannelFlag = false;
       const channel = self.relatedChannels.filter(item => item.id === self.channelRadio);
       self.curChannel = channel[0];
-      self.dialogFormVisible = true;
-      self.channelRadio = '';
-      self.channelInfo = {};
-      self.channelInfo = self.curChannel;
-      self.vendor = self.curChannel.vendor;
-      self.playVendorVideo();
+      this.$nextTick(()=> {
+        self.dialogFormVisible = true;
+        self.channelRadio = '';
+        self.channelInfo = {};
+        self.channelInfo = self.curChannel;
+        self.vendor = self.curChannel.vendor;
+        self.playVendorVideo();
+      })
     },
 
     playVendorVideo() {
-      const self = this;
-      if (self.vendor === 0) {
-        self.$nextTick(() => {
-          self.$refs.dashVideo.startVideo(self.channelInfo.ivsId, self.channelInfo.channelId, null);
-        })
-      } else if (self.vendor === 1) {
-        self.$nextTick(async() => {
-          await self.$refs.ezvizVideo.getEzvizAccessToken(self.channelInfo.ivsId);
-          if (self.$refs.ezvizVideo.playState) {
-            self.$refs.ezvizVideo.stopRealTime();
-            self.$nextTick(() => {
-              self.$refs.ezvizVideo.realTime();
-            });
-          } else {
-            self.$nextTick(() => {
-              self.$refs.ezvizVideo.realTime();
-            });
-          }
-        })
-      } else {
-        self.$nextTick(() => {
-          self.$refs.beseyeVideo.startPlay();
-        })
-      }
+      this.$refs.vendorVideo.startVideo(this.channelInfo.ivsId, this.channelInfo.channelId, null);
     }
 
   }

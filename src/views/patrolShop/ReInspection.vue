@@ -1,5 +1,5 @@
 <template>
-  <el-row :class="isREC?'noeventClass':''" class="el-container">
+  <el-row class="el-container">
     <el-col :span="16" :class="{liseAnmiClass:showSpread}" class="lside">
       <div class="el-header-title">
         <span v-if="showStoreUp" class="lside-title">
@@ -221,39 +221,16 @@
         </div>
       </div>
       <div v-else>
-        <dash-video
-          v-if="vendor === 0"
-          ref="dashVideo"
-          :store-id="store.storeId"
-          :channel-info="channel"
-          :source-list-length="sourceListLength"
-          :show-feed-back="showFeedBack"
-          :video-authority="videoAuthority"
-          @confirmEzvizCanvas="editEzvizCanvas"
-          @ezvizCutPictureFeedback="ezvizPictureFeedback"
-        />
-        <ezviz-video
-          v-else-if="vendor === 1"
-          ref="ezvizVideo"
+        <component
+          :is="currentVideoComponent"
+          ref="vendorVideo"
           :channel-info="channel"
           :source-list-length= "sourceListLength"
           :show-feed-back="showFeedBack"
           :store-id="store.storeId"
           :video-authority="videoAuthority"
           @confirmEzvizCanvas="editEzvizCanvas"
-          @ezvizCutPictureFeedback="ezvizPictureFeedback"
-        />
-        <beseye-video
-          v-else
-          ref="beseyeVideo"
-          :channel-info="channel"
-          :source-list-length= "sourceListLength"
-          :show-feed-back="showFeedBack"
-          :store-id="store.storeId"
-          :video-authority="videoAuthority"
-          @confirmEzvizCanvas="editEzvizCanvas"
-          @ezvizCutPictureFeedback="ezvizPictureFeedback"
-        />
+          @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
       </div>
       <div class="el-inspect">
         <div v-if="showGuide && sheetName.length > 0" class="guide-lside">
@@ -595,21 +572,17 @@ import DialogVue from '@/components/DialogVue.vue';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import { getCookie } from '@/common/auth';
 import filterString from '@/common/filterString.js';
-import { getDashServerInfo } from '@/api/device.js';
-import DashHttp from '@/common/DashHttp.js';
 import Database from '@/common/Database.js';
-import BeseyeVideo from '@/components/BeseyeVideo';
-import DashVideo from '@/components/DashVideo';
-import EzvizVideo from '@/components/EzvizVideo';
 
 export default {
   name: 'ReInspection',
   components: {
     DialogVue,
     ChannelIconBtn,
-    EzvizVideo,
-    DashVideo,
-    BeseyeVideo
+    SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
+    DashVideo: () => import('@/components/DashVideo.vue'),
+    EzvizVideo: () => import('@/components/EzvizVideo.vue'),
+    BeseyeVideo: () => import('@/components/BeseyeVideo.vue')
   },
   data() {
     return {
@@ -701,7 +674,6 @@ export default {
       playState: false,
       editCount: 0,
       ignoreTemp: [],
-      appliedInspectList: [],
 
       changeBrandObj: {
         title: this.$t('remotePatrol.confirm'),
@@ -760,7 +732,6 @@ export default {
       timeVideo: 0,
       startTimeCutVideo: 0,
       endTImeCutVideo: 0,
-      isREC: false,
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
 
@@ -791,7 +762,8 @@ export default {
       showIgnoreItem: false,
       hasIgnoretemp: [],
       vendor: 1,
-      feedbackIndex: -1
+      feedbackIndex: -1,
+      currentVideoComponent: 'EzvizVideo'
     };
   },
   computed: {
@@ -821,14 +793,15 @@ export default {
       if (val !== 0) {
         self.changeBrand();
       }
+    },
+    vendor(){
+      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
     }
   },
 
   beforeRouteLeave(to, from, next) {
     const self = this;
-    const canLeave = (((self.vendor === 0) && self.editCount !== 0 )) ||
-      ( self.vendor === 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0
-      || self.vendor === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !== 0);
+    const canLeave = !self.showGuide && self.$refs.vendorVideo.editCount !== 0;
     if (canLeave && to.name !== 'confirmSum') {
       self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
         confirmButtonText: self.$t('remotePatrol.confirm'),
@@ -847,17 +820,7 @@ export default {
           //   from.meta.keepAlive = true;
           self.$store.dispatch('setPatrolHistory', self.historyObj);
         }
-        if (self.vendor === 0 && !self.showGuide) {
-          self.$refs.dashVideo.stopVideoPlay();
-          window.clearInterval(self.timerPlayReal);
-          self.timerPlayReal = null;
-        }
-        if (self.vendor === 1 && !self.showGuide) {
-          self.$refs.ezvizVideo.stopRealTime();
-        }
-        if (self.vendor === 2 && !self.showGuide) {
-          self.$refs.beseyeVideo.stopPlay();
-        }
+        !self.showGuide &&  self.$refs.vendorVideo.stopVideoPlay();
         next();
       }).catch(() => {
         next(false);
@@ -871,17 +834,7 @@ export default {
         // from.meta.keepAlive=true;
         self.$store.dispatch('setPatrolHistory', self.historyObj);
       }
-      if (self.vendor === 0 && !self.showGuide) {
-        self.$refs.dashVideo.stopVideoPlay();
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = null;
-      }
-      if(self.vendor == 1 && !self.showGuide){
-        self.$refs.ezvizVideo.stopRealTime();
-      }
-      if(self.vendor == 2 && !self.showGuide){
-        self.$refs.beseyeVideo.stopPlay();
-      }
+      !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       next();
     }
   },
@@ -916,6 +869,8 @@ export default {
       self.curItemIndex = PatrolHistory.curItemIndex;
       self.deviceList = PatrolHistory.deviceList;
       self.isDisabled = true;
+      self.channel = PatrolHistory.channel;
+      self.vendor = self.channel.vendor;
       const isClick = self.sheetName[self.sheetName.length - 1].isClick;
       if (isClick) {
         if (PatrolHistory.eventList.length > 0) {
@@ -938,10 +893,8 @@ export default {
       }
     } else {
       self.getFaStoreData();
-      this.videoAuthority && self.getDashUrlInfo();
     }
     document.onmouseup = self.mouseUpAction;
-    self.isREC = false;
     self.getUpLoadBucketInfo();
     self.getOssInfo();
     window.onresize = function() {
@@ -955,31 +908,10 @@ export default {
   },
 
   methods: {
-    getDashUrlInfo() {
-      getDashServerInfo().then(result => {
-        if(result.errCode === 0){
-          const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
-          this.userName = result.data.loginId;
-          this.password = result.data.password;
-          const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
-          DashHttp.setDashHost(url);
-        } else {
-          console.log(result.errMsg);
-        }
-      }).catch(error => {
-        if (error.message !== 'Network request failed') {
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
-        }
-      });
-    },
 
     changeBrand() {
       const self = this;
-      if (self.vendor === 1 && !self.showGuide) {
-        self.$refs.ezvizVideo.stopRealTime();
-      }
+      !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       self.patrolStoreName = null;
       self.activeIndex = '0';
       self.PatrolList = [];
@@ -1262,7 +1194,6 @@ export default {
     },
 
     getAllStoreList() {
-      const self = this;
       const params = {
         'filter': {
           'page': 0,
@@ -1383,6 +1314,7 @@ export default {
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
           obj.isActive = false;
+          obj.status = item.status;
           if (item.authorizedInspect.length != 0) {
             obj.authorizedInspect = item.authorizedInspect;
             obj.hasInspect = true;
@@ -1413,6 +1345,7 @@ export default {
             obj.storeTitle = storeData[0].name;
             obj.storeUp = true;
             obj.storeUpTitle = this.$t('remotePatrol.stared');
+            obj.status = storeData[0].status;
             self.store = obj;
             self.showStoreUp = true;
             const curStoreId = storeData[0].storeId;
@@ -1462,6 +1395,7 @@ export default {
               obj.province = data[j].province;
               obj.favorite = data[j].favorite == undefined ? true : data[j].favorite;
               obj.device = data[j].device;
+              obj.status = data[j].status;
               if (data[j].authorizedInspect.length != 0) {
                 obj.authorizedInspect = data[j].authorizedInspect;
                 obj.hasInspect = true;
@@ -1704,13 +1638,7 @@ export default {
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
-      if(self.vendor === 0){
-        self.$refs.dashVideo.editCount++;
-      } else if(self.vendor === 1) {
-        self.$refs.ezvizVideo.editCount++;
-      }else{
-        self.editCount++;
-      }
+      self.$refs.vendorVideo.editCount++;
       self.curItemIndex = index;
       self.curItem = item;
       if (item.deviceId === -1) {
@@ -1723,23 +1651,7 @@ export default {
     },
     CancleIgnoreItem(item, index) {
       const self = this;
-      switch (self.vendor) {
-        case 0: {
-          self.$refs.dashVideo.editCount--;
-          break
-        }
-        case 1: {
-          self.$refs.ezvizVideo.editCount--;
-          break
-        }
-        case 2: {
-          self.$refs.beseyeVideo.editCount--;
-          break
-        }
-        default: {
-          break
-        }
-      }
+      self.$refs.vendorVideo.editCount--;
       self.curItemIndex = index;
       self.curItem = item;
       self.cancleIgnore();
@@ -1777,42 +1689,10 @@ export default {
         }
       });
       self.curDeviceId = item.id;
-      if (self.vendor === 0) {
-        self.$nextTick(() => {
-          self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
-        })
-      } else if (self.vendor === 1) {
-        self.$nextTick(async() => {
-          await self.$refs.ezvizVideo.getEzvizAccessToken(self.channel.ivsId);
-          self.$refs.ezvizVideo.playBack &&
-          (self.$refs.ezvizVideo.startTs = self.playBackTime);
-          if (self.$refs.ezvizVideo.playState) {
-            self.$refs.ezvizVideo.stopRealTime();
-            self.$nextTick(() => {
-              self.$refs.ezvizVideo.realTime();
-            });
-          } else {
-            self.$nextTick(() => {
-              self.$refs.ezvizVideo.realTime();
-            });
-          }
-        })
-      } else {
-        self.$nextTick(() => {
-          self.curDeviceId = item.id;
-          if(self.$refs.beseyeVideo.playState){
-            self.$refs.beseyeVideo.stopPlay();
-            self.$nextTick(()=>{
-              self.$refs.beseyeVideo.startPlay();
-            })
-          }
-          else{
-            self.$nextTick(()=>{
-              self.$refs.beseyeVideo.startPlay();
-            })
-          }
-        })
-      }
+
+      self.$nextTick(() => {
+        self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+      });
     },
     clickItem(item, index) {
       const self = this;
@@ -1856,38 +1736,9 @@ export default {
               }
             }
           });
-          if (self.vendor === 0) {
-            self.$nextTick(() => {
-              self.$refs.dashVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
-            })
-          } else if (self.vendor === 1) {
-            self.$nextTick(async () => {
-              await self.$refs.ezvizVideo.getEzvizAccessToken(self.channel.ivsId);
-              if(!self.showGuide && self.$refs.ezvizVideo.playState){
-                self.$refs.ezvizVideo.stopRealTime();
-                self.$nextTick(()=>{
-                  self.$refs.ezvizVideo.realTime();
-                })
-              } else{
-                self.$nextTick( () => {
-                  self.$refs.ezvizVideo.realTime();
-                })
-              }
-            })
-          } else {
-            self.$nextTick( () => {
-              if(!self.showGuide && self.$refs.beseyeVideo.playState){
-                self.$refs.beseyeVideo.stopPlay();
-                self.$nextTick(() => {
-                  self.$refs.beseyeVideo.startPlay();
-                })
-              } else {
-                self.$nextTick(() => {
-                  self.$refs.beseyeVideo.startPlay();
-                })
-              }
-            })
-          }
+          self.$nextTick(() => {
+            self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+          });
           self.curDeviceId = item.deviceId[0];
           item.checked = true;
           self.curItem = item;
@@ -1931,13 +1782,7 @@ export default {
     leaveDialog() {
       const self = this;
       self.leaveObj.dialogCosed = false;
-      if (self.vendor === 0) {
-        self.$refs.dashVideo.editCount = 0;
-      } else if(self.vendor === 1) {
-        self.$refs.ezvizVideo.editCount = 0;
-      } else{
-        self.$refs.beseyeVideo.editCount = 0;
-      }
+      self.$refs.vendorVideo.editCount = 0;
     },
     cancelLeave() {
       const self = this;
@@ -2027,7 +1872,8 @@ export default {
         curSheetIndex: self.curSheetIndex,
         curGroupIndex: self.curGroupIndex,
         curItemIndex: self.curItemIndex,
-        deviceList: self.deviceList
+        deviceList: self.deviceList,
+        channel: self.channel
       };
       self.hasIgnoretemp = [];
       const params = { _id: self.userId, data: obj, rule: inspectSettings };
@@ -2139,7 +1985,8 @@ export default {
         allChannelBtns: self.allChannelBtns,
         curSheetIndex: self.curSheetIndex,
         curGroupIndex: self.curGroupIndex,
-        curItemIndex: self.curItemIndex
+        curItemIndex: self.curItemIndex,
+        channel: self.channel
       };
       self.hasIgnoretemp = [];
       const params = { _id: self.userId, data: obj, rule: inspectSettings };
@@ -2246,21 +2093,9 @@ export default {
       });
       _item.isActive = true;
       self.showStoreUp = true;
-      if (self.vendor === 0) {
-        !self.showGuide ? self.$refs.dashVideo.editCount = 0 : '';
-        self.$refs.dashVideo.stopVideoPlay();
-      } else if(self.vendor === 1){
-        !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
-        if (self.$refs.ezvizVideo != undefined) {
-          self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
-        }
-      } else {
-        !self.showGuide ? self.$refs.beseyeVideo.editCount = 0 : '';
-        if (self.$refs.beseyeVideo != undefined){
-          self.$refs.beseyeVideo.playState ? self.$refs.beseyeVideo.stopPlay() : '';
-        }
-      }
-      // self.editCount=0;
+
+      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
+      self.$refs.vendorVideo.stopVideoPlay();
       self.showError = false;
       self.curDeviceId = -1;
       self.showFeedBack = false;
@@ -2316,20 +2151,7 @@ export default {
       const self = this;
       self.changeInspectObj.dialogCosed = false;
       self.changeInspectList(self.beforepatrolstore);
-      switch (self.vendor) {
-        case 0: {
-          self.$refs.dashVideo.editCount = 0
-          break
-        }
-        case 1: {
-          self.$refs.ezvizVideo.editCount = 0
-          break
-        }
-        case 2: {
-          self.$refs.beseyeVideo.editCount = 0
-          break
-        }
-      }
+      self.$refs.vendorVideo.editCount = 0;
     },
     canceldChangeInspect() {
       const self = this;
@@ -2415,6 +2237,10 @@ export default {
       const temp = [];
       self.hideLast = false;
       self.hideNext = false;
+      if (storeItem.status && [20, 21, 60].includes(storeItem.status)) {
+        util.notify(this.$t('deviceView.licenseOverdue'), 'warning', 3000);
+        return false;
+      };
       storeItem.device.forEach((item, index) => {
         const obj = {};
         obj.id = item.id;
@@ -2431,10 +2257,8 @@ export default {
     },
     changeInspect(val) {
       const self = this;
-      if ((self.vendor === 0 && !self.showGuide && self.$refs.dashVideo.editCount !== 0) ||
-        (self.vendor === 1 && !self.showGuide && self.$refs.ezvizVideo.editCount !== 0) ||
-        (self.vendor === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount !== 0) ||
-        (self.$store.getters.PatrolHistory != null)) {
+      if ( (!self.showGuide && self.$refs.vendorVideo.editCount !== 0)
+          ||(self.$store.getters.PatrolHistory != null) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
       } else {
@@ -2443,20 +2267,10 @@ export default {
     },
     changeInspectList(val) {
       const self = this;
-      if (self.vendor === 0) {
-        !self.showGuide ? self.$refs.dashVideo.editCount = 0 : '';
-        self.$refs.dashVideo.stopVideoPlay();
-      } else if(self.vendor === 1){
-        !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
-        if (self.$refs.ezvizVideo != undefined) {
-          self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
-        }
-      }else{
-        !self.showGuide ? self.$refs.beseyeVideo.editCount = 0 : '';
-        if(self.vendor === 2 &&self.$refs.beseyeVideo != undefined){
-          self.$refs.beseyeVideo.playState ? self.$refs.beseyeVideo.stopPlay() : '';
-        }
-      }
+      if (!self.showGuide) {
+        self.$refs.vendorVideo.editCount = 0;
+        self.$refs.vendorVideo.stopVideoPlay();
+      };
       self.isDisabled = false;
       self.hasIgnoretemp = [];
       self.tempArr = [];
@@ -2705,10 +2519,8 @@ export default {
       self.curStoreIndex = _index;
       self.curStoreItem = _item;
       self.deviceList = _item.device;
-      if ((self.vendor === 0 && self.editCount != 0) ||
-        (self.vendor === 1 && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
-        (self.vendor === 2 && !self.showGuide && self.$refs.beseyeVideo.editCount != 0) ||
-        (self.$store.getters.PatrolHistory != null)) {
+      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
+          || (self.$store.getters.PatrolHistory != null) ) {
         self.changeStoreObj.dialogCosed = true;
       } else {
         self.changeStore(item, index, _item, _index);
