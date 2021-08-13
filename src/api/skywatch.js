@@ -53,15 +53,6 @@ export const deleteSkywatchDevice = data => {
   });
 };
 
-export const deleteSkywatchChannel = data => {
-  return request({
-    url: `${version}/skywatch/device/channel/delete`,
-    method: 'post',
-    data
-  });
-};
-
-
 export const addSkywatchDevice = data => {
   return request({
     url: `${version}/skywatch/device/add`,
@@ -75,6 +66,14 @@ export const addSkywatchChannel = data => {
     url: `${version}/skywatch/device/channel/add`,
     method: 'post',
     data
+  });
+};
+
+export const getBeseyeAccessToken = params => {
+  return request({
+    url: `${version}/beseye/token`,
+    method: 'get',
+    params
   });
 };
 

@@ -275,25 +275,6 @@
         self.getSkywatchDeviceList(this.setParams());
       },
 
-      deleteSkywatchChannel(params) {
-        return new Promise((resolve, reject) => {
-          skywatchRESTful.deleteSkywatchChannel(params).then(res => {
-            resolve(res);
-          }).catch(error => {
-            reject(error);
-          });
-        });
-      },
-
-      deleteSkywatchDevice(params) {
-        return new Promise((resolve, reject) => {
-          skywatchRESTful.deleteSkywatchDevice(params).then(res => {
-            resolve(res);
-          }).catch(error => {
-            reject(error);
-          });
-        });
-      },
 
       async confirmUpdateChannle(index, item) {
         const self = this;
@@ -430,19 +411,22 @@
       },
 
       async confirmDeleteSkywatchDevice(deleteDeviceObj) {
-        const {deleteChannelParmas, deleteParmas} = {...deleteDeviceObj};
-        try {
-          const deleteChannelResult = await this.deleteSkywatchChannel(deleteChannelParmas);
-          deleteChannelResult.errCode === 0 && await this.deleteSkywatchDevice(deleteParmas);
-
+      this.showDeleteDialog = false;
+      const { deleteParmas } = { ...deleteDeviceObj };
+      try {
+        const deleteResult = await skywatchRESTful.deleteSkywatchDevice(deleteParmas);
+        if (deleteResult.errCode === 0) {
           util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
           const params = this.setParams();
           await this.getSkywatchDeviceList(params);
-        } catch (error) {
-          util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
-          console.log('SkywatchDeviceMgmt-confirmDeleteSkywatchDevice: ' + error);
+        } else {
+          throw new Error(deleteResult.errMsg);
         }
-      },
+      } catch (error) {
+        util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
+        console.log('SkywatchDeviceMgmt-confirmDeleteSkywatchDevice: ' + error);
+      }
+    },
 
       setDeleteChannelParams() {
         const deleteChannelParmas = {};
@@ -461,68 +445,43 @@
         item.tempDeviceName = comment;
       },
 
-      async confirmAddSkywatchDevice(deviceAndChannelObj) {
-        const self = this;
-        const {deviceParams, channelParams }= {...deviceAndChannelObj};
-        try {
-          const addDeviceResult = await self.addSkywatchDevice(deviceParams);
-          const addChannelResult = await self.addSkywatchChannel(channelParams);
-          if (addDeviceResult.errCode === 0 && addChannelResult.errCode === 0) {
-            util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
-            self.getSkywatchDeviceList(self.setParams());
-          } else {
-            if (addDeviceResult.errCode !== 0){
-              self.deleteSkywatchChannel({deviceIds: addChannelResult.data})
-            } else if (addChannelResult !== 0) {
-              self.deleteSkywatchDevice({deviceIds: addDeviceResult.data})
-            }
-            util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-          }
-        } catch (error) {
-          util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
-          console.log('SkywatchDeviceMgmt-confirmAddSkywatchDevice: ' + error);
+    async confirmAddSkywatchDevice(deviceAndChannelObj) {
+      const { deviceParams } = { ...deviceAndChannelObj };
+      try {
+        const addDeviceResult = await skywatchRESTful.addSkywatchDevice(deviceParams);
+        if (addDeviceResult.errCode === 0) {
+          util.notify(this.$t('deviceView.addSuccess'), 'success', 3000);
+          this.showAddSkywatchDialog = false;
+          this.getSkywatchDeviceList(this.setParams());
+        } else {
+          throw new Error(addDeviceResult.errMsg);
         }
-      },
+      } catch (error) {
+        util.notify(this.$t('deviceView.addFailed'), 'warning', 3000);
+        this.showAddSkywatchDialog = false;
+        console.log('SkywatchDeviceMgmt-confirmAddSkywatchDevice: ' + error);
+      }
+    },
 
-      validateParams(selectDevice) {
-        let validate = false;
-        if (selectDevice.length === 0) {
-          util.notify(this.$t('deviceView.selectDevice'), 'warning', 3000);
+    validateParams(selectDevice) {
+      let validate = false;
+      if (selectDevice.length === 0) {
+        util.notify(this.$t('deviceView.selectDevice'), 'warning', 3000);
+        validate = false;
+      } else {
+        const noSelectStore = selectDevice.some(item => !item.storeId || item.storeId.length === 0);
+        if (noSelectStore) {
+          util.notify(this.$t('deviceView.selectBoundStore'), 'warning', 3000);
           validate = false;
         } else {
-          const noSelectStore = selectDevice.some(item => !item.storeId || item.storeId.length === 0);
-          if (noSelectStore) {
-            util.notify(this.$t('deviceView.selectBoundStore'), 'warning', 3000);
-            validate = false;
-          } else {
-            selectDevice.map(item => {
-              item.beseyeAccount = this.beseyeAccount;
-            });
-            validate = true;
-          }
+          selectDevice.map(item => {
+            item.beseyeAccount = this.beseyeAccount;
+          });
+          validate = true;
         }
-        return validate;
-      },
-
-      addSkywatchDevice(params) {
-        return new Promise((resolve, reject) => {
-          skywatchRESTful.addSkywatchDevice(params).then(resDevice => {
-            resolve(resDevice);
-          }).catch((err) => {
-            reject(err);
-          });
-        });
-      },
-
-      addSkywatchChannel(channelParams) {
-        return new Promise((resolve, reject) => {
-          skywatchRESTful.addSkywatchChannel(channelParams).then(resDevice => {
-            resolve(resDevice);
-          }).catch(err => {
-            reject(err);
-          });
-        });
-      },
+      }
+      return validate;
+    },
 
       filterStoreOption(value) {
         const storeList = lodash.cloneDeep(this.allStoreDataList);
