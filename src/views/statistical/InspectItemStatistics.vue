@@ -113,21 +113,17 @@
           </el-col>
         </el-col>
       </el-col>
-      <el-dialog
-        v-if="ispdf"
+      <dialog-pop
         :title="$t('insSettingView.export')"
-        :visible.sync="ispdf"
         :append-to-body="true"
         :close-on-click-modal="false"
+        :visible="ispdf"
+        :show-button="false"
+        :show-close="false"
         class="LoadDialog"
-        width="510px"
-        top="35vh"
-        left="40vh">
-        <div style="overflow:hidden;width:100%;">
-          <hr style="border: 0.5px solid #dfe2e9;">
-          <p style="margin-top:40px;color:#000;">{{ $t('insSettingView.isExportPDF') }}......</p>
-        </div>
-      </el-dialog>
+      >
+        <p>{{ $t('insSettingView.isExportPDF') }}......</p>
+      </dialog-pop>
     </div>
     <div v-if="ispdf" class="item-container">
       <el-col id="pdfDom" :span="24" class="items-content content" style="padding:40px 20px;">
