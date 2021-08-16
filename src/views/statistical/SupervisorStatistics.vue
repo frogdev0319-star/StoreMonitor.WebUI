@@ -498,8 +498,9 @@ export default {
       elPDFtableData: [],
       htmlTitle: this.$t('overview.htmltopdfC'),
       defaultSort: { prop: 'completionRateStr', order: 'ascending' },
-      inspectTagId: -1,
-      inspectList: []
+      inspectTagId: '',
+      inspectList: [],
+      getCachedParamsFlag: false
     };
   },
 
@@ -515,6 +516,8 @@ export default {
         this.dateValue = [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()];
         this.defaultSort = { prop: 'completionRateStr', order: 'ascending' };
         this.params = {};
+        this.getCachedParamsFlag = false;
+        this.inspectTagId = '';
         this.getSearchParams();
         this.getInspctList();
       }
@@ -916,8 +919,10 @@ export default {
           this.params.inspectTagId = searchParams.inspectTagId;
           this.inspectTagId = searchParams.inspectTagId;
         }
+        this.getCachedParamsFlag = true;
         this.setDefaultSort();
       } else {
+        this.params = {};
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
@@ -941,14 +946,12 @@ export default {
         inpectRESTful.GetInspectTagList(params).then(res => {
           if (res.errCode === 0) {
             this.inspectList = res.data;
-            if(this.inspectTagId === -1){
-              this.inspectTagId = this.inspectList.length > 0 ? this.inspectList[0].id : -1;
-            }
+            this.inspectTagId = this.getCachedParamsFlag ? this.inspectTagId : this.inspectList.length > 0 ? this.inspectList[0].id : '';
             this.getInspectPersonTable();
             resolve(res);
           } else {
             this.inspectList = [];
-            this.inspectTagId = -1;
+            this.inspectTagId = '';
             resolve(res);
           }
         }).catch(err => {
@@ -958,7 +961,10 @@ export default {
     },
 
     async getInspectPersonTable() {
-      this.params.inspectTagId = this.inspectTagId;
+      if (this.inspectTagId === '') {
+        delete this.params.inspectTagId;
+      }
+      typeof this.inspectTagId === 'number' && (this.params.inspectTagId = this.inspectTagId);
       this.getInspectStatsPersonInfo(this.params).then(res => {
         const errCode = res.errCode;
         if (errCode === 0) {
