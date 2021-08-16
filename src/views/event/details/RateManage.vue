@@ -144,12 +144,14 @@
         <div class="content">
           <div v-if="showAudio" class="speech-content">
             <div class="speech-info" @click="startSpeech">
-              <i :class="speech?'icon-yuyin':'icon-yuyin'" class="iconfont icon-speech"/>
+              <i v-show="!speech" :class="speech?'icon-yuyin':'icon-yuyin'" class="iconfont icon-speech"/>
+              <img v-show="speech" class="audio-gif icon-speech" :src="audioPlayGif">
             </div>
-            <audio id="audio" :ref="audioRef" @canplay="getDuration">
+            <audio id="audio" :ref="audioRef" @canplay="getDuration" @ended="onEndAudio">
               <source :src="audioSrc" type="audio/mpeg" >
             </audio>
-            <span class="often-text">{{ audioOftenText }}</span>
+            <span v-if="hasNotPlayAudio" class="not-play-audio"/>
+            <span :class="hasNotPlayAudio ? 'time-text' : 'has-play-time-text'">{{ audioOftenText }}</span>
           </div>
 
           <pre class="description">{{ event.description }}</pre>
@@ -236,12 +238,14 @@
                 <span class="creator">{{ item.createOr }}</span>
                 <div v-if="item.showAudio" class="speech-content deal-speech">
                   <div class="speech-info" @click="startSpeechItem(item,index)">
-                    <i class="iconfont icon-yuyin icon-speech"/>
+                    <i v-show="!item.audio.isPlaying" class="iconfont icon-yuyin icon-speech"/>
+                    <img v-show="item.audio.isPlaying" :src="audioPlayGif" class="audio-gif icon-speech">
                   </div>
-                  <audio :ref="item.audio.audioRef" @canplay="getCommentDuration(item)">
+                  <audio :ref="item.audio.audioRef" @canplay="getCommentDuration(item)" @ended="onEndCommentAudio(item)">
                     <source :src="item.audio.audioSrc" type="audio/mpeg" >
                   </audio>
-                  <span class="often-text">{{ item.audio.audioOftenText }}</span>
+                  <span v-if="item.audio.hasNotPlayAudio" class="not-play-audio"/>
+                  <span :class="item.audio.hasNotPlayAudio ? 'time-text' : 'has-play-time-text'">{{ item.audio.audioOftenText }}</span>
                 </div>
               </div>
               <pre v-if="item.description != null" class="description">{{ item.description }}</pre>
@@ -348,7 +352,9 @@ export default {
       videosourceList: [],
       imgsourceList: [],
       Changestatus: '',
-      vendor: 0
+      vendor: 0,
+      audioPlayGif: require('../../../../static/img/audio-play.gif'),
+      hasNotPlayAudio: true
     };
   },
   computed: {
@@ -583,6 +589,15 @@ export default {
       }
     },
 
+    onEndAudio() {
+      this.isPlaying = false;
+      this.speech = false;
+    },
+
+    onEndCommentAudio(item) {
+      item.audio.isPlaying = false;
+    },
+
     getCommentDuration(item) {
       const self = this;
       if (item.showAudio) {
@@ -615,6 +630,7 @@ export default {
 
     startSpeech() {
       const self = this;
+      self.hasNotPlayAudio = false;
       self.$refs.audioRef.ended ? self.isPlaying = false : null;
       if (!self.isPlaying) {
         self.$refs.audioRef.play();
@@ -631,6 +647,7 @@ export default {
     startSpeechItem(item, index) {
       const self = this;
       self.$refs[item.audio.audioRef][0].ended ? item.audio.isPlaying = false : null;
+      item.audio.hasNotPlayAudio = false;
       if (!item.audio.isPlaying) {
         self.$refs[item.audio.audioRef][0].play();
         item.audio.isPlaying = true;
@@ -718,6 +735,7 @@ export default {
                   audioObj.audioRef = 'audioRef' + index;
                   audioObj.isPlaying = false;
                   audioObj.audioOftenText = '';
+                  audioObj.hasNotPlayAudio = true;
                   obj.showAudio = true;
                 } else {
                   _temp.push(_item);
@@ -1400,6 +1418,8 @@ $h1:#292e36;
                 word-wrap:break-word; /* Internet Explorer 5.5+ */
             }
             .speech-content{
+              display: inline-flex;
+              align-items: center;
                 .speech-info{
                     @include point(width,80);
                     @include point(height,26);
@@ -1407,16 +1427,19 @@ $h1:#292e36;
                     color: $red;
                     border: 1px solid #FEC0C7;
                     @include point(border-radius,15);
-                    display: inline-block;
                     cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
                     .icon-speech{
                         @include point(font-size,18);
                         @include point(line-height,26);
                         @include point(margin-left,5);
                     }
-                }
-                .often-text{
-                    @include point(margin-left,20);
+                  .audio-gif{
+                    position: absolute;
+                    top: 50%;
+                    transform: translate(0, -50%);
+                  }
                 }
             }
             .photo-content{
@@ -1578,6 +1601,8 @@ $h1:#292e36;
                             }
                         }
                         .speech-content{
+                          display: inline-flex;
+                          align-items: center;
                             .speech-info{
                                 @include point(width,80);
                                 @include point(height,26);
@@ -1585,16 +1610,14 @@ $h1:#292e36;
                                 color: $red;
                                 border: 1px solid #FEC0C7;
                                 @include point(border-radius,15);
-                                display: inline-block;
                                 cursor: pointer;
+                                display: inline-flex;
+                                align-items: center;
                                 .icon-speech{
                                     @include point(font-size,18);
                                     @include point(line-height,26);
                                     @include point(margin-left,5);
                                 }
-                            }
-                            .often-text{
-                                @include point(margin-left,20);
                             }
                         }
                     }
@@ -1650,6 +1673,20 @@ $h1:#292e36;
             }
         }
     }
+}
+
+.audio-gif {
+  height: 1.125rem;
+}
+.not-play-audio{
+  height: 6px;
+  width: 6px;
+  border-radius: 6px;
+  background-color: #ff625f;
+  margin: 0 calc(10/1920*100vw);
+}
+.has-play-time-text{
+  margin: 0 calc(26/1920*100vw);
 }
 </style>
 <style>
