@@ -113,17 +113,6 @@
           </el-col>
         </el-col>
       </el-col>
-      <dialog-pop
-        :title="$t('insSettingView.export')"
-        :append-to-body="true"
-        :close-on-click-modal="false"
-        :visible="ispdf"
-        :show-button="false"
-        :show-close="false"
-        class="LoadDialog"
-      >
-        <p>{{ $t('insSettingView.isExportPDF') }}......</p>
-      </dialog-pop>
     </div>
     <div v-if="ispdf" class="item-container">
       <el-col id="pdfDom" :span="24" class="items-content content" style="padding:40px 20px;">
@@ -144,7 +133,7 @@
             <span>{{ $t('overview.patrolLists') }}：</span>
             <span class="content-header">{{ storePatrolLists }}</span>
           </p>
-          <p>
+          <p style="align-items: baseline">
             <span>{{ $t('remotePatrol.time') }}：</span>
             <span class="content-header">{{ storeDateValue }}</span>
           </p>
@@ -204,15 +193,23 @@
               :highlight-current-row= "true"
               :pagesize="sizeNum"
               :current-page="page"
-              :can-sortable="false"
               :show-pagination="false"
-              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-              @handleChange="handlePageAndSizeChange"
-              @sortChange="handleSortChange"/>
+              :default-sort = "defaultSort"/>
           </el-col>
         </el-col>
       </el-col>
     </div>
+    <dialog-pop
+      :title="$t('insSettingView.export')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="ispdf"
+      :show-button="false"
+      :show-close="false"
+      class="LoadDialog"
+    >
+      <p>{{ $t('insSettingView.isExportPDF') }}......</p>
+    </dialog-pop>
   </div>
 </template>
 
@@ -227,13 +224,15 @@ import resize from '@/components/mixins/echartResize';
 import {
   getInspectStatsItemOverviewV2
 } from '@/api/inspectOverview';
-import TablePagination from '../../components/TablePagination';
-import DelayButton from '../../components/DelayButton';
+import TablePagination from '@/components/TablePagination';
+import DelayButton from '@/components/DelayButton';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'InspectItemStatistics',
 
   components: {
+    DialogPop,
     DelayButton,
     TablePagination,
     'v-chart': ECharts,
