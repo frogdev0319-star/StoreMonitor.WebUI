@@ -564,22 +564,28 @@ export default {
                 let dataLabel = new Array(result.content.length).fill(false);
                 result.content.forEach(async(item, index) => {
                   item.completionRateStr = item.completionRate + '%';
-                  await self.getPlanDetail(item.supervisorId);
-                  item.planTableData = self.planTableData;
-                  await self.getScheduleTaskImplementation(item.supervisorId);
-                  item.implementTableData = self.implementTableData;
-                  dataLabel[index] = true;
+                  try {
+                    await self.getPlanDetail(item.supervisorId);
+                    item.planTableData = self.planTableData;
+                    await self.getScheduleTaskImplementation(item.supervisorId);
+                    item.implementTableData = self.implementTableData;
+                    dataLabel[index] = true;
 
-                  if (dataLabel.findIndex(p => p === false) === -1) {
-                    new Promise(function(resolve) {
-                      self.elPDFtableData = result.content;
-                      resolve(true);
-                    }).then(function() {
-                      self.$print(self.$refs.printPDF);
-                      self.ispdf = false;
-                    }).catch(err => {
-                      console.log("SupervisorStatistics-handleDown:" + err);
-                    });
+                    if (dataLabel.findIndex(p => p === false) === -1) {
+                      new Promise(function(resolve) {
+                        self.elPDFtableData = result.content;
+                        resolve(true);
+                      }).then(function() {
+                        self.$print(self.$refs.printPDF);
+                        self.ispdf = false;
+                      }).catch(err => {
+                        console.log("SupervisorStatistics-handleDown:" + err);
+                      });
+                    }
+                  } catch (e) {
+                    self.ispdf = false;
+                    util.notify(self.$t('insSettingView.exportFailTitle'), 'warning', 3000);
+                    return false;
                   }
                 });
               }
@@ -896,6 +902,7 @@ export default {
           });
           self.implementTableData = content;
         } catch (e) {
+          console.log(e)
           self.implementTableData = [];
         }
       }
