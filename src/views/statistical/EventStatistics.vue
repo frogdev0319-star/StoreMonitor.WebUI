@@ -504,6 +504,10 @@ export default {
   methods: {
     handleDown() {
       const self = this;
+      if (self.eventTableData.length === 0) {
+        util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+        return false;
+      }
       self.ispdf = true;
       this.$nextTick(() => {
         const img = document.getElementById('imgTest');
@@ -693,7 +697,7 @@ export default {
 
     export2Excel() {
       const that = this;
-      if (that.allEventData.length === 0) {
+      if (that.eventTableData.length === 0) {
         util.notify(that.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
@@ -742,7 +746,6 @@ export default {
         }
       } catch (e) {
         this.ispdf = false;
-        console.log(e);
       }
       return content;
     },
