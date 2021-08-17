@@ -922,7 +922,7 @@ $suggestBack:#F1F6FE;
                 display: inline-block;
             }
             .date-range{
-                width:290px;
+                width:300px;
             }
             .iconbangzhu{
               font-size: calc(20/1920*100vw);

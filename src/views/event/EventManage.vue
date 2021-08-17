@@ -997,7 +997,7 @@ $h1:#292e36;
                 color:$tab;
             }
             .date-range{
-                width:290px;
+                width:300px;
             }
         }
         .store-handle{
