@@ -721,23 +721,28 @@ export default {
       params.storeIds = this.params.storeIds;
       params.filter = { page: this.page - 1, size: this.total };
       params.order = this.order;
-      const eventResult = await this.getEventTableDataInfo(params);
-      const result = eventResult.data;
       let content = [];
-      if (result) {
-        content = result.content;
-        content.forEach(item => {
-          const numOfTotal = item.numOfTotal;
-          if (numOfTotal === 0) {
-            item.RemoteStr = 0 + '%';
-            item.OnsiteStr = 0 + '%';
-            item.VideoStr = 0 + '%';
-          } else {
-            item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-            item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-            item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
-          }
-        });
+      try {
+        const eventResult = await this.getEventTableDataInfo(params);
+        const result = eventResult.data;
+        if (result) {
+          content = result.content;
+          content.forEach(item => {
+            const numOfTotal = item.numOfTotal;
+            if (numOfTotal === 0) {
+              item.RemoteStr = 0 + '%';
+              item.OnsiteStr = 0 + '%';
+              item.VideoStr = 0 + '%';
+            } else {
+              item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+              item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+              item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+            }
+          });
+        }
+      } catch (e) {
+        this.ispdf = false;
+        console.log(e);
       }
       return content;
     },
