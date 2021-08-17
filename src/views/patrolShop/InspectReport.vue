@@ -124,15 +124,12 @@
                       class="content-detail-main"
                       style="padding-bottom: 20px;">
                       <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
-                      <div v-if="_item.showAudio" class="cdm-voice">
-                        <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
-                          <i class="iconfont icon-yuyin icon-speech"/>
-                        </div>
-                        <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-                          <source :src="_item.audio.audioSrc" type="audio/mpeg" >
-                        </audio>
-                        <span class="often-text">{{ _item.audio.audioOftenText }}</span>
-                      </div>
+                      <audio-vue
+                        v-if="_item.showAudio"
+                        :is-export-pdf="isexportPDF"
+                        :audio-ref="_item.audio.audioRef"
+                        :audio-src="_item.audio.audioSrc"
+                      />
                       <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
                         <span class="pdf_font_24">{{ _item.comment }}</span>
                       </div>
@@ -179,15 +176,12 @@
                       v-if="item.showAttachment || item.description != null&&item.description !== ''"
                       class="content-detail-main">
                       <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
-                      <div v-if="item.showAudio" class="cdm-voice">
-                        <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
-                          <i class="iconfont icon-yuyin icon-speech"/>
-                        </div>
-                        <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                          <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                        </audio>
-                        <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                      </div>
+                      <audio-vue
+                        v-if="item.showAudio"
+                        :is-export-pdf="isexportPDF"
+                        :audio-ref="item.audio.audioRef"
+                        :audio-src="item.audio.audioSrc"
+                      />
                       <div v-if="item.description !=null && item.description !=''" class="cdm-word">
                         <span class="pdf_font_24">{{ item.description }}</span>
                       </div>
@@ -253,15 +247,12 @@
                   v-if="item.showAttachment || item.description != null&&item.description !== ''"
                   class="content-detail-main">
                   <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
-                  <div v-if="item.showAudio" class="cdm-voice">
-                    <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
-                      <i class="iconfont icon-yuyin icon-speech"/>
-                    </div>
-                    <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                      <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                    </audio>
-                    <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                  </div>
+                  <audio-vue
+                    v-if="item.showAudio"
+                    :is-export-pdf="isexportPDF"
+                    :audio-ref="item.audio.audioRef"
+                    :audio-src="item.audio.audioSrc"
+                  />
                   <div v-if="item.description !=null && item.description !=''" class="cdm-word">
                     <span class="pdf_font_24">{{ item.description }}</span>
                   </div>
@@ -447,10 +438,12 @@ import resize from '@/components/mixins/echartResize.js'
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import AudioVue from '@/components/AudioVue';
 
 export default {
   name: 'InspectReport',
   components: {
+    AudioVue,
     DelayButton,
     'v-chart': ECharts
   },
@@ -768,84 +761,6 @@ export default {
         }
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.url);
-    },
-
-    getGroupsDuration(item) {
-      const self = this;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
-    getFeedBacksDuration(item) {
-      const self = this;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
-    startSpeechItem(item, index) {
-      const self = this;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
-      }
-      self.groups.forEach((groupitem) => {
-        groupitem.items.forEach((_item, _index) => {
-          if (_item.audio !== undefined) {
-            if (_index !== index) {
-              if (self.$refs[_item.audio.audioRef] !== undefined) {
-                self.$refs[_item.audio.audioRef][0].pause();
-                _item.audio.isPlaying = false;
-              }
-            }
-          }
-        });
-      });
-    },
-
-    startSpeechFeedBacks(item, index) {
-      const self = this;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
-      }
-      self.feedbacks.forEach((_item, _index) => {
-        if (_item.audio !== undefined) {
-          if (_index !== index) {
-            if (self.$refs[_item.audio.audioRef] !== undefined) {
-              self.$refs[_item.audio.audioRef][0].pause();
-              _item.audio.isPlaying = false;
-            }
-          }
-        }
-      });
     },
 
     async getReportInfo(res) {
