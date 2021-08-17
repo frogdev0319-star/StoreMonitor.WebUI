@@ -142,9 +142,11 @@
                           :key="sourceindex"
                           :height="elImgHeight"
                           class="source-details">
-                          <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
+                          <div v-if="sourceitem.mediaType === 2"
+                               :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''"
+                               class="img-content">
                             <el-image
-                              :style="isexportPDF ? exportImageStyle : imageStyle"
+                              :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
                               :preview-src-list="getImgList(sourceindex, _item.sourceList)"
                               class="imgLittle imgInner"/>
@@ -197,7 +199,7 @@
                           class="source-details">
                           <div v-if="sourceitem.mediaType === 2" class="img-content">
                             <el-image
-                              :style="isexportPDF ? exportImageStyle : imageStyle"
+                              :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
                               :preview-src-list="getImgList(0, [sourceitem])"
                               class="imgLittle imgInner"/>
@@ -205,7 +207,7 @@
                           <div
                             v-if="sourceitem.mediaType === 1"
                             class="img-content "
-                            @click="playCommentVideo(sourceitem,index)">
+                            @click="playCommentVideo(sourceitem, index)">
                             <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                             <img
                               :style="isexportPDF ? exportImageStyle : imageStyle"
@@ -218,28 +220,6 @@
                     </div>
                   </div>
                 </div>
-                <el-dialog
-                  v-if="dialogCommentVideo"
-                  :title="$t('eventView.view')"
-                  :visible.sync="dialogCommentVideo"
-                  :close-on-click-modal="false"
-                  width="850px"
-                  top="12%"
-                  class="rate-video-dialog"
-                  @close="stopCommentVideo">
-                  <div class="video-dialog-content" style="overflow:hidden;">
-                    <hr class="dialog-hr">
-                    <div class="video-content" >
-                      <video
-                        id="previewVideo"
-                        height="83%"
-                        width="90%"
-                        prload
-                        controls
-                        class="video-js vjs-fill"/>
-                    </div>
-                  </div>
-                </el-dialog>
               </div>
             </div>
           </div>
@@ -293,7 +273,7 @@
                       class="source-details">
                       <div v-if="sourceitem.mediaType === 2" class="img-content">
                         <el-image
-                          :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw); height: elImgHeight'"
+                          :style="isexportPDF ? exportImageStyle :imageStyle"
                           :src="sourceitem.url"
                           :preview-src-list="getImgList(0, [sourceitem])"
                           class="imgLittle imgInner"/>
@@ -426,6 +406,28 @@
         </el-col>
       </el-row>
       <div class="no-print">
+        <el-dialog
+          v-if="dialogCommentVideo"
+          :title="$t('eventView.view')"
+          :visible.sync="dialogCommentVideo"
+          :close-on-click-modal="false"
+          width="850px"
+          top="12%"
+          class="rate-video-dialog"
+          @close="stopCommentVideo">
+          <div class="video-dialog-content" style="overflow:hidden;">
+            <hr class="dialog-hr">
+            <div class="video-content" >
+              <video
+                id="previewVideo"
+                height="83%"
+                width="90%"
+                prload
+                controls
+                class="video-js vjs-fill"/>
+            </div>
+          </div>
+        </el-dialog>
         <el-dialog :visible.sync="downloadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
           <div class="body-content">
             <p>{{ $t('remotePatrol.downloading') }}</p>
@@ -554,8 +556,8 @@ export default {
 
     imageStyle() {
       return {
-        width: 'calc(130/1920*100vw)',
-        height: `${this.imgHeight}px`
+        'width': 'calc(130/1920*100vw)',
+        'height': `${this.imgHeight}px`
       }
     },
 
@@ -2058,6 +2060,10 @@ export default {
   }
   .radior-content{
     padding-top: 30px;
+  }
+  .imgLittle .el-image__inner{
+    height: 100%;
+    width: 100%;
   }
 </style>
 <style>
