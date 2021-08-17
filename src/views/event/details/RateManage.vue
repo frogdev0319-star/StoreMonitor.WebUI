@@ -354,7 +354,8 @@ export default {
       Changestatus: '',
       vendor: 0,
       audioPlayGif: require('../../../../static/img/audio-play.gif'),
-      hasNotPlayAudio: true
+      hasNotPlayAudio: true,
+      licenseStatus: -1
     };
   },
   computed: {
@@ -398,10 +399,6 @@ export default {
       } else {
         return this.windowHeight * 0.609;
       }
-    },
-    isEzviz() {
-      const self = this;
-      return self.$store.state.user.isEzviz;
     },
     ...mapGetters({
       videoAuthority: 'videoAuthority'
@@ -501,6 +498,7 @@ export default {
         getDetailedStoreInfo(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
+            this.licenseStatus = res.data.status;
             resolve(res.data.device);
           }
         });
@@ -667,6 +665,9 @@ export default {
 
     checkVideo(item, index) {
       const self = this;
+      if (!util.validateLicense(this.licenseStatus)) {
+        return;
+      }
       self.dialogFormVisible = true;
       self.channelInfo = self.curChannel;
       self.vendor = self.channelInfo.vendor;
@@ -890,6 +891,9 @@ export default {
 
     confirmSelect() {
       const self = this;
+      if (!util.validateLicense(this.licenseStatus)) {
+        return;
+      }
       self.showRelatedChannelFlag = false;
       const channel = self.relatedChannels.filter(item => item.id === self.channelRadio);
       self.curChannel = channel[0];

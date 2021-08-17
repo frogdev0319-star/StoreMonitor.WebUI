@@ -608,8 +608,16 @@ export default {
       return '';
     }
     return moment(cellValue).format('HH:mm:ss');
-  }
+  },
 
+  validateLicense(status) {
+    if (![20, 21, 60].includes(status)) {
+      this.notify(i18n.t('deviceView.licenseOverdue'), 'warning', 3000);
+      return false;
+    } else {
+      return true;
+    }
+  }
 };
 class indexedDB {
   init() {

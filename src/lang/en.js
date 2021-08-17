@@ -841,7 +841,7 @@ export default {
     'deviceLimitation': 'The current number of devices exceeds the limitation, please renew or reduce the number of devices',
     'authorizedDevicesNum': 'Number of authorized devices:',
     'addedDeviceNumber': 'Number of enabled devices:',
-    'licenseOverdue': 'Device license overdue',
+    'licenseOverdue': 'Inspection service expired',
     'hasBoundItem': 'Device has been binding to item',
     'hasAdded': 'Device has been added by someone else'
   },

@@ -355,7 +355,6 @@
 import {
   addFavoriteStore,
   deleteFavoriteStore,
-  getFavoriteList,
   getStoreList
 } from '@/api/store';
 import {
@@ -663,7 +662,6 @@ export default {
     self.getOssInfo();
     self.getUpLoadBucketInfo();
     self.getInitStoreData();
-    self.getFaStoreData();
   },
 
   beforeDestroy() {
@@ -688,7 +686,6 @@ export default {
       self.currentTimeValue = 0;
       self.showModelContent = true;
       self.getInitStoreData();
-      self.getFaStoreData();
     },
 
     getUpLoadBucketInfo() {
@@ -713,17 +710,7 @@ export default {
       self.showEventNameInfo = false;
     },
 
-    getFaStoreList() {
-      const self = this;
-      return new Promise((resolve, reject) => {
-        getFavoriteList().then((res) => {
-          resolve(res);
-        });
-      });
-    },
-
     getAllStoreList() {
-      const self = this;
       const params = {
         filter: {
           page: 0,
@@ -754,6 +741,7 @@ export default {
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
           obj.vendor = item.vendor;
+          obj.status = item.status;
           temp.push(obj);
         });
         return temp;
@@ -761,11 +749,8 @@ export default {
       let data;
       switch (Number(self.activeIndex)) {
         case 0:
-          data = await self.getFaStoreList();
-          if (data.errCode === 0) {
-            const storeData = data.data;
-            self.tabList[0].storeList = getStoreTemp(storeData);
-          }
+          const favoriteStoreList = self.allInitStoreList.filter(store => store.favorite === true);
+          self.tabList[0].storeList = getStoreTemp(favoriteStoreList);
           break;
         case 1:
           data = self.getStoreObj();
@@ -804,43 +789,40 @@ export default {
           obj.userId = item.userId;
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
+          obj.status = item.status;
           temp.push(obj);
         });
         return temp;
       };
-      try {
-        const res = await self.getFaStoreList();
-        if (res.errCode === 0) {
-          const storeData = res.data;
-          self.tabList[0].storeList = getStoreTemp(storeData);
-          if (storeData.length === 0) {
-            self.showStoreUp = false;
-            self.store = {};
-            self.channel = {};
-            self.channelBtns = [];
-            self.showChannelBtns = [];
-            self.allChannelBtns = [];
-          } else {
-            const obj = {};
-            obj.storeId = storeData[0].storeId;
-            obj.storeName = storeData[0].name;
-            obj.storeTitle = storeData[0].name;
-            obj.userName = storeData[0].userName;
-            obj.storeUp = true;
-            obj.storeUpTitle = self.$t('remotePatrol.stared');
-            self.store = obj;
-            self.showStoreUp = true;
-            const curStoreId = storeData[0].storeId;
-
-            const storeObj = {
-              storeId: curStoreId
-            };
-            self.saveStoreObj(storeObj);
-            self.getChannelByStore(self.tabList[0].storeList[0]);
-          }
+      self.tabList[0].storeList = getStoreTemp(storeData);
+      if (storeData.length === 0) {
+        self.showStoreUp = false;
+        self.store = {};
+        self.channel = {};
+        self.channelBtns = [];
+        self.showChannelBtns = [];
+        self.allChannelBtns = [];
+      } else {
+        if (!util.validateLicense(storeData[0].status)) {
+          return false;
         }
-      } catch (err) {
-        console.log('StoreMonitor-getFaStoreData: ' + err);
+        const obj = {};
+        obj.storeId = storeData[0].storeId;
+        obj.storeName = storeData[0].name;
+        obj.storeTitle = storeData[0].name;
+        obj.userName = storeData[0].userName;
+        obj.storeUp = true;
+        obj.storeUpTitle = self.$t('remotePatrol.stared');
+        obj.status = storeData[0].status;
+        self.store = obj;
+        self.showStoreUp = true;
+        const curStoreId = storeData[0].storeId;
+
+        const storeObj = {
+          storeId: curStoreId
+        };
+        self.saveStoreObj(storeObj);
+        self.getChannelByStore(self.tabList[0].storeList[0]);
       }
     },
 
@@ -870,9 +852,9 @@ export default {
               obj.userId = data[j].userId;
               obj.city = data[j].city;
               obj.province = data[j].province;
-              obj.favorite =
-                data[j].favorite == undefined ? true : data[j].favorite;
+              obj.favorite = data[j].favorite == undefined ? true : data[j].favorite;
               obj.device = data[j].device;
+              obj.status = data[j].status;
               temp.push(obj);
             }
           }
@@ -885,6 +867,8 @@ export default {
       try {
         const res = await self.getAllStoreList();
         if (res.errCode === 0) {
+          const favoriteStoreList = res.data.content.filter(item => item.favorite === true);
+          self.getFaStoreData(favoriteStoreList);
           const storeData = res.data.content;
           self.allInitStoreList = storeData;
           if (storeData.length === 0) {
@@ -906,7 +890,6 @@ export default {
         if (res.errCode === 0) {
           self.store.storeUp = true;
           self.store.storeUpTitle = self.$t('remotePatrol.stared');
-          self.getStoreList();
           self.tabList[2].storeList.forEach((item, index) => {
             item.storeList.forEach((_item, _index) => {
               if (self.store.storeId === _item.storeId) {
@@ -926,6 +909,7 @@ export default {
               item.favorite = true;
             }
           });
+          this.getStoreList();
         }
       }).catch(err => {
         console.log('StoreMonitor-addFavoriteStore: ' + err);
@@ -938,7 +922,6 @@ export default {
         if (res.errCode === 0) {
           self.store.storeUp = false;
           self.store.storeUpTitle = self.$t('remotePatrol.clickToStar');
-          self.getStoreList();
           self.tabList[2].storeList.forEach((item, index) => {
             item.storeList.forEach((_item, _index) => {
               if (self.store.storeId === _item.storeId) {
@@ -958,6 +941,7 @@ export default {
               item.favorite = false;
             }
           });
+          self.getStoreList();
         }
       }).catch(err => {
         console.log('StoreMonitor-deleteFavoriteStore: ' + err);
@@ -1555,14 +1539,15 @@ export default {
     },
 
     canceldChangeStore() {
-      let self = this;
-      self.changeStoreObj.dialogCosed = false;
+      this.changeStoreObj.dialogCosed = false;
     },
 
     clickStore(item, index, _item, _index) {
       let self = this;
       self.showStoreUp = true;
-
+      if (!util.validateLicense(_item.status)) {
+        return false;
+      }
       self.curTabIndex = index;
       self.curTabItem = item;
       self.curStoreIndex = _index;

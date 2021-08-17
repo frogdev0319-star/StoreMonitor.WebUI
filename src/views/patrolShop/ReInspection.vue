@@ -587,10 +587,9 @@
 <script>
 import { checkOutInspectItemV3 } from '@/api/inspect';
 import util from '@/common/util';
-import { getStoreList, getFavoriteList, addFavoriteStore, deleteFavoriteStore } from '@/api/store';
+import { getStoreList, addFavoriteStore, deleteFavoriteStore } from '@/api/store';
 import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
-import { getDeviceList } from '@/api/device';
 import DialogVue from '@/components/DialogVue.vue';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import { getCookie } from '@/common/auth';
@@ -1179,14 +1178,6 @@ export default {
       });
     },
 
-    getFaStoreList() {
-      return new Promise((resolve, reject) => {
-        getFavoriteList().then(res => {
-          resolve(res);
-        });
-      });
-    },
-
     checkIgnoreScore(item, itemDS, e, index) {
       const self = this;
       item.manualIgnore = false;
@@ -1327,6 +1318,7 @@ export default {
           obj.userId = item.userId;
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
+          obj.status = item.status;
           if (item.authorizedInspect.length != 0) {
             const remoteInspectList = item.authorizedInspect.filter(inspcetItem => inspcetItem.mode === 0);
             if(remoteInspectList.length > 0){
@@ -1345,14 +1337,9 @@ export default {
       };
       let data;
       switch (Number(self.activeIndex)) {
-        case 0: data = await self.getFaStoreList();
-          if (data.errCode == 0) {
-            const storeData = data.data;
-            self.tabList[0].storeList = getStoreTemp(storeData);
-          }
-          if (data.errCode == 500) {
-            self.tabList[0].storeList = [];
-          }
+        case 0:
+          const favoriteStoreList = self.allInitStoreList.filter(store => store.favorite === true);
+          self.tabList[0].storeList = getStoreTemp(favoriteStoreList);
           break;
         case 1:
           data = self.getStoreObj();
@@ -1383,6 +1370,7 @@ export default {
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
           obj.isActive = false;
+          obj.status = item.status;
           if (item.authorizedInspect.length != 0) {
             obj.authorizedInspect = item.authorizedInspect;
             obj.hasInspect = true;
@@ -1396,25 +1384,31 @@ export default {
         });
         return temp;
       };
-      const data = await self.getFaStoreList();
       const allStoreData = await self.getAllStoreList();
-      self.getInitStoreData(allStoreData);
-      if (data.errCode == 0) {
-        const storeData = data.data;
+      if (allStoreData.errCode === 0) {
+        self.getInitStoreData(allStoreData);
+        const storeData = allStoreData.data.content.filter(store => store.favorite === true);
         self.tabList[0].storeList = getStoreTemp(storeData);
-        if (storeData.length == 0) {
+        if (storeData.length === 0) {
           self.showStoreUp = false;
           self.inspectList = [];
         } else {
-          if (storeData[0].authorizedInspect.length != 0) {
+          if (storeData[0].authorizedInspect.length !== 0) {
+            if (!util.validateLicense(storeData[0].status)) {
+              return false;
+            }
             const obj = {};
             obj.storeId = storeData[0].storeId;
             obj.storeName = storeData[0].name;
             obj.storeTitle = storeData[0].name;
             obj.storeUp = true;
             obj.storeUpTitle = this.$t('remotePatrol.stared');
+            obj.status = storeData[0].status;
             self.store = obj;
             self.showStoreUp = true;
+            if (!util.validateLicense(storeData[0].status)) {
+              return false;
+            }
             const curStoreId = storeData[0].storeId;
             const storeObj = {
               storeId: curStoreId
@@ -1462,6 +1456,7 @@ export default {
               obj.province = data[j].province;
               obj.favorite = data[j].favorite == undefined ? true : data[j].favorite;
               obj.device = data[j].device;
+              obj.status = data[j].status;
               if (data[j].authorizedInspect.length != 0) {
                 obj.authorizedInspect = data[j].authorizedInspect;
                 obj.hasInspect = true;
@@ -1477,7 +1472,6 @@ export default {
         }
         return storeListTemp;
       };
-      // let data=await self.getAllStoreList();
       if (data.errCode == 0) {
         const storeData = data.data.content;
         self.allInitStoreList = storeData;
@@ -1508,7 +1502,6 @@ export default {
           if (res.errCode == 0) {
             self.store.storeUp = true;
             self.store.storeUpTitle = this.$t('remotePatrol.stared');
-            self.getStoreList();
             self.tabList[2].storeList.forEach((item, index) => {
               item.storeList.forEach((_item, _index) => {
                 if (self.store.storeId == _item.storeId) {
@@ -1528,6 +1521,7 @@ export default {
                 item.favorite = true;
               }
             });
+            self.getStoreList();
           }
         });
       } else {
@@ -1535,7 +1529,6 @@ export default {
           if (res.errCode == 0) {
             self.store.storeUp = false;
             self.store.storeUpTitle = this.$t('remotePatrol.clickToStar');
-            self.getStoreList();
             self.tabList[2].storeList.forEach((item, index) => {
               item.storeList.forEach((_item, _index) => {
                 if (self.store.storeId == _item.storeId) {
@@ -1555,6 +1548,7 @@ export default {
                 item.favorite = false;
               }
             });
+            self.getStoreList();
           }
         });
       }
@@ -2698,6 +2692,9 @@ export default {
     clickStore(item, index, _item, _index) {
       const self = this;
       if (!_item.hasInspect && _item.hasInspect != undefined) {
+        return false;
+      }
+      if (!util.validateLicense(_item.status)) {
         return false;
       }
       self.curTabIndex = index;
