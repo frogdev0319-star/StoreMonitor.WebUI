@@ -109,6 +109,22 @@ export const getSkywatchApiKey = params => {
   });
 };
 
+export const enableSkywatchChannel = data => {
+  return request({
+    url: `${version}/skywatch/device/channel/enable`,
+    method: 'post',
+    data
+  });
+};
+
+export const disableSkywatchChannel = data => {
+  return request({
+    url: `${version}/skywatch/device/channel/disable`,
+    method: 'post',
+    data
+  });
+};
+
 const instance = axios.create({
   timeout: 30 * 1000,
   withCredentials: false,

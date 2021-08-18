@@ -18,6 +18,7 @@
         </div>
         <div class="header-name">{{ $t('deviceView.deviceName') }}</div>
         <div class="header-store">{{ $t('deviceView.store') }}</div>
+        <div class="header-status">{{ $t('deviceView.enableStatus') }}</div>
         <div class="header-picture">
           <span>{{ $t('deviceView.thumbnail') }}</span>
         </div>
@@ -49,6 +50,12 @@
               </div>
               <div class="data-store titles">
                 <span>{{ item.store }}</span>
+              </div>
+              <div class="data-status titles">
+                <el-switch
+                  :disabled="!item.isClick"
+                  v-model="item.checkedStatus"
+                />
               </div>
               <div class="data-picture titles">
                 <span v-if="item.tempUrl">
@@ -282,7 +289,19 @@
         const params = {};
         params.id = item.id;
         params.name = item.name;
-        const updateDeviceRes = await skywatchRESTful.updateSkywatchChannel(params);
+
+        const promiseArr = [];
+        item.name !== item.tempDeviceName && promiseArr.push(skywatchRESTful.updateSkywatchChannel(params));
+        item.checkedStatus && item.status === 0 && promiseArr.push(skywatchRESTful.enableSkywatchChannel({ deviceIds: [item.id] }));
+        !item.checkedStatus && item.status === 1 && promiseArr.push(skywatchRESTful.disableSkywatchChannel({ deviceIds: [item.id] }));
+        item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateImage(item.id));
+        const results = await Promise.all(promiseArr);
+        results.forEach(result => {
+          if (result.errCode !== 0) {
+            throw Error(result.errMsg);
+          }
+        });
+
         return item.tempUrl !== item.pictureUrl && updateDeviceRes.errCode === 0 && await this.updateImage(item.id);
       },
 
@@ -355,6 +374,8 @@
               deviceItem.channelId = channelItem.channelId;
               deviceItem.pictureUrl = channelItem.thumbnailUrl;
               deviceItem.tempUrl = channelItem.thumbnailUrl;
+              deviceItem.status = channelItem.status;
+              deviceItem.checkedStatus = channelItem.status === 1;
             }
           });
         });
@@ -389,6 +410,7 @@
           this.getSkywatchDeviceList(this.setParams());
         }catch (error) {
           item.isEditing = false;
+          item.checkedStatus = item.status === 1;
           util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
           console.log('SkywatchDeviceMgmt-confirmEditSkywatch: ' + error);
         }
@@ -401,6 +423,7 @@
         this.isUpdate = false;
         item.isClick = false;
         item.tempUrl = item.pictureUrl;
+        item.checkedStatus = item.status === 1;
         this.file = '';
       },
 
@@ -544,10 +567,13 @@
         width: 20%;
       }
       .header-store{
-        width: 25%;
+        width: 20%;
+      }
+      .header-status{
+        width: 10%;
       }
       .header-picture{
-        width: 25%;
+        width: 20%;
       }
       .header-operation{
         width: 10%;
@@ -587,10 +613,13 @@
         width: 20%;
       }
       .data-store{
-        width: 25%;
+        width: 20%;
+      }
+      .data-status{
+        width: 10%;
       }
       .data-picture{
-        width: 25%;
+        width: 20%;
       }
       .data-operation{
         width: 10%;
