@@ -264,7 +264,7 @@ export default {
                   token: resData.token,
                   userId: resData.userId,
                   ezvizProtrol: resData.ezvizProtrol,
-                  lang: resData.lang,
+                  lang: 'zh',
                   deviceAuth: resData.deviceAuth
                 }
               });
