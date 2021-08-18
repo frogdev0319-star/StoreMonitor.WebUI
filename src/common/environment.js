@@ -17,8 +17,8 @@ const _Environments = {
     VERSION: version
   },
   QA: {
-    CHINA_WEBSITE: 'http://222.91.163.149:19085/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://172.21.81.141:8080/storemonitor/api/',
+    CHINA_WEBSITE: 'http://axa.wise-insightapm.com:19085/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://172.21.81.176:9050/storemonitor/api/',
     VERSION: version
   },
   Beta: {
@@ -28,8 +28,8 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.Preview;
-const isGlobalWebsite = true;
+const environJSON = _Environments.QA;
+const isGlobalWebsite = false;
 
 let Environment;
 export default Environment = {
