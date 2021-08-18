@@ -4,7 +4,7 @@
       <el-col :span="24" class="statistics-header">
         <div class="header-details">
           <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
-          <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
+          <date-time-picker :date-value="dateValue" @change="dateChange"/>
         </div>
         <div class="header-mul-select">
           <span class="mul-label">{{ $t('overview.patrolLists') }}</span>
@@ -94,8 +94,8 @@
                             <el-table-column type="expand">
                               <template slot-scope="props">
                                 <div style="display:flex;margin-left:calc(-50/1920*100vw);">
-                                  <span>{{$t('overview.patrolStore')}}:</span>
-                                  <span style="flex:1;">{{props.row.appliedStores}}</span>
+                                  <span>{{ $t('overview.patrolStore') }}:</span>
+                                  <span style="flex:1;">{{ props.row.appliedStores }}</span>
                                 </div>
                               </template>
                             </el-table-column>
@@ -124,12 +124,12 @@
                             <el-table-column type="expand">
                               <template slot-scope="props">
                                 <div style="display:flex;margin-left:calc(-50/1920*100vw);">
-                                  <span>{{$t('overview.inspectedStores')}}:</span>
-                                  <span style="flex:1;">{{props.row.completedStoresStr}}</span>
+                                  <span>{{ $t('overview.inspectedStores') }}:</span>
+                                  <span style="flex:1;">{{ props.row.completedStoresStr }}</span>
                                 </div>
                                 <div style="display:flex;margin-left:calc(-50/1920*100vw);">
-                                  <span>{{$t('overview.uninspectedStores')}}:</span>
-                                  <span style="flex:1;">{{props.row.incompletedStoresStr}}</span>
+                                  <span>{{ $t('overview.uninspectedStores') }}:</span>
+                                  <span style="flex:1;">{{ props.row.incompletedStoresStr }}</span>
                                 </div>
                               </template>
                             </el-table-column>
@@ -216,7 +216,7 @@
                     :min-width="lang.indexOf('zh') !== -1 ? _item.pdfwidth : _item.pdfmaxWidth"/>
                   <el-table-column :label="$t('overview.detail')" type="expand" width="100px">
                     <template slot-scope="scope">
-                      <el-tabs v-model="activePDFFirst" @tab-click="handleClick" style="width:990px;">
+                      <el-tabs v-model="activePDFFirst" style="width:990px;" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="First">
                           <el-table
                             :data="scope.row.planTableData"
@@ -249,7 +249,7 @@
                           </el-table>
                         </el-tab-pane>
                       </el-tabs>
-                      <el-tabs v-model="activePDFSecond" @tab-click="handleClick" style="width:990px;">
+                      <el-tabs v-model="activePDFSecond" style="width:990px;" @tab-click="handleClick">
                         <el-tab-pane :label="$t('overview.patrolExecution')" name="Second">
                           <el-table
                             :data="scope.row.implementTableData"
@@ -540,7 +540,7 @@ export default {
     },
 
     async handleDown() {
-      let self = this;
+      const self = this;
       self.ispdf = true;
       self.inspectList.forEach(item => {
         if (item.id === self.inspectTagId) {
@@ -555,11 +555,11 @@ export default {
               'page': 0,
               'size': self.total
             };
-            let regionResult = await self.getInspectStatsPersonInfo(self.params);
+            const regionResult = await self.getInspectStatsPersonInfo(self.params);
             if (regionResult.errCode === 0) {
-              let result = regionResult.data;
+              const result = regionResult.data;
               if (result) {
-                let dataLabel = new Array(result.content.length).fill(false);
+                const dataLabel = new Array(result.content.length).fill(false);
                 result.content.forEach(async(item, index) => {
                   item.completionRateStr = item.completionRate + '%';
                   try {
@@ -577,7 +577,7 @@ export default {
                         self.$print(self.$refs.printPDF);
                         self.ispdf = false;
                       }).catch(err => {
-                        console.log("SupervisorStatistics-handleDown:" + err);
+                        console.log('SupervisorStatistics-handleDown:' + err);
                       });
                     }
                   } catch (e) {
@@ -607,7 +607,7 @@ export default {
     },
 
     expandSelect(row, expandedRows) {
-      let self = this;
+      const self = this;
       if (expandedRows.length) {
         self.expands = [];
         if (row) {
@@ -621,8 +621,8 @@ export default {
     },
 
     sortChange(col) {
-      let self = this;
-      let order = col.order;
+      const self = this;
+      const order = col.order;
       self.order = order;
       self.defaultSort.order = order;
       self.defaultSort.prop = col.column.property;
@@ -653,7 +653,7 @@ export default {
     },
 
     sizeChange(val) {
-      let self = this;
+      const self = this;
       self.sizeNum = val;
       self.page = 1;
       self.params.filter = { page: self.page - 1, size: val };
@@ -661,7 +661,7 @@ export default {
     },
 
     currentChange(val) {
-      let self = this;
+      const self = this;
       self.page = val;
       self.params.filter = { page: val - 1, size: self.sizeNum };
       self.getInspectPersonTable();
@@ -670,7 +670,7 @@ export default {
     getBriefStoreData() {
       return new Promise((resolve, reject) => {
         getBriefStoreList().then(res => {
-          let errMsg = res.errMsg;
+          const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
             resolve(res);
           }
@@ -683,8 +683,8 @@ export default {
     dateChange(val) {
       this.currentIndex = 0;
       this.dateValue = val;
-      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      let end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       const daysDiff = this.$moment(end).diff(start, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
@@ -704,31 +704,31 @@ export default {
         getInspectScheduleOverview(params).then(res => {
           resolve(res);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
-      })
+      });
     },
 
     export2Excel() {
-      let that = this;
+      const that = this;
       if (that.supervisorTableData.length === 0) {
         util.notify(that.$t('overview.emptyPatrolList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {
-        let { export_json_to_excel } = require('@/excel/Export2Excel');
-        let tHeader = that.exportItmesHeader;
-        let filterVal = ['supervisorName', 'numOfStores', 'numOfTasked', 'numOfCompleted',
-                          'numOfUnscheduled', 'completionRatePer'];
-        let self = this;
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = that.exportItmesHeader;
+        const filterVal = ['supervisorName', 'numOfStores', 'numOfTasked', 'numOfCompleted',
+          'numOfUnscheduled', 'completionRatePer'];
+        const self = this;
         self.params.filter = {
           'page': 0,
           'size': self.total
         };
-        let regionResult = await that.getInspectStatsPersonInfo(self.params);
+        const regionResult = await that.getInspectStatsPersonInfo(self.params);
         let curData = [];
         if (regionResult.errCode === 0) {
-          let result = regionResult.data;
+          const result = regionResult.data;
           if (result) {
             result.content.forEach(item => {
               item.completionRatePer = item.completionRate + '%';
@@ -736,8 +736,8 @@ export default {
             curData = result.content;
           }
         }
-        let data = that.formatJson(filterVal, curData);
-        let fileName = 'Supervisor' + '-' + util.getCurDateStr();
+        const data = that.formatJson(filterVal, curData);
+        const fileName = 'Supervisor' + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -751,8 +751,8 @@ export default {
     },
 
     async getPlanDetail(e) {
-      let self = this;
-      let params = {};
+      const self = this;
+      const params = {};
       let supervisorId = '';
       if (e != undefined) {
         supervisorId = e;
@@ -762,12 +762,12 @@ export default {
       params.supervisorId = supervisorId;
       params.inspectTagId = this.inspectTagId;
       params.category = [0, 1];
-      let result = await self.getInspectorPlan(params);
-      let retData = await self.getBriefStoreData();
-      let storeList = retData.data;
-      let errCode = result.errCode;
+      const result = await self.getInspectorPlan(params);
+      const retData = await self.getBriefStoreData();
+      const storeList = retData.data;
+      const errCode = result.errCode;
       if (errCode === 0) {
-        let resultData = result.data;
+        const resultData = result.data;
         resultData.forEach(item => {
           item.category = item.category === 0 ? self.$t('overview.remotePatrol') : self.$t('overview.onsitePatrol');
           let scheduleStr = '';
@@ -784,7 +784,7 @@ export default {
             case 1:
               item.mode = self.$t('overview.superTaskmode1');
               item.schedule.forEach((_item, _index) => {
-                let isuu = _index === item.schedule.length - 1 ? '' : ',';
+                const isuu = _index === item.schedule.length - 1 ? '' : ',';
                 if (self.lang !== 'en') {
                   if (_item.day === 7) {
                     _item.day = self.$t('overview.superTaskmode0');
@@ -803,11 +803,11 @@ export default {
             case 2:
               item.mode = self.$t('overview.superTaskmode2');
               item.schedule.forEach((_item, _index) => {
-                let isuu = _index === item.schedule.length - 1 ? '' : ',';
+                const isuu = _index === item.schedule.length - 1 ? '' : ',';
                 if (self.lang !== 'en') {
                   scheduleStr += _item.day + self.$t('overview.daysww') + isuu;
                 } else {
-                  let idx = _item.day > 3 ? 3 : _item.day - 1;
+                  const idx = _item.day > 3 ? 3 : _item.day - 1;
                   scheduleStr += _item.day + self.month[idx] + isuu;
                 }
               });
@@ -820,11 +820,11 @@ export default {
             default:
               item.mode = self.$t('overview.superTaskmode3');
               item.schedule.forEach((_item, _index) => {
-                let days = self.$moment('20200101').add(_item.day, 'days');
-                let isuu = _index === item.schedule.length - 1 ? '' : ',';
+                const days = self.$moment('20200101').add(_item.day, 'days');
+                const isuu = _index === item.schedule.length - 1 ? '' : ',';
                 if (self.lang !== 'en') {
-                  scheduleStr += days.format('M') + self.$t('overview.superTaskmode2') + days.format('D')
-                    + self.$t('overview.superTaskmode0') + isuu;
+                  scheduleStr += days.format('M') + self.$t('overview.superTaskmode2') + days.format('D') +
+                    self.$t('overview.superTaskmode0') + isuu;
                 } else {
                   scheduleStr += days.format('LL') + ' ';
                 }
@@ -844,8 +844,8 @@ export default {
     },
 
     async getScheduleTaskImplementation(e) {
-      let self = this;
-      let params = {};
+      const self = this;
+      const params = {};
       let supervisorId = '';
       if (e != undefined) {
         supervisorId = e;
@@ -860,12 +860,12 @@ export default {
         'page': 0,
         'size': 3
       };
-      let result = await self.getInspectScheduleImplemention(params);
-      let errCode = result.errCode;
+      const result = await self.getInspectScheduleImplemention(params);
+      const errCode = result.errCode;
       if (errCode === 0) {
-        let resultData = result.data;
+        const resultData = result.data;
         try {
-          let content = resultData.content;
+          const content = resultData.content;
           content.forEach(item => {
             item.fromDateStr = self.$moment(item.fromDate).format('YYYY-MM-DD HH:mm:ss');
             item.toDateStr = self.$moment(item.toDate).format('YYYY-MM-DD HH:mm:ss');
@@ -886,19 +886,19 @@ export default {
             incompletedStoresStr = incompletedStoresStr.slice(0, incompletedStoresStr.length - 1);
             item.completedStoresStr = completeStoresNum === 0 ? self.$t('overview.none') : completedStoresStr;
             item.incompletedStoresStr = incompleteStoresNum === 0 ? self.$t('overview.none') : incompletedStoresStr;
-            let sumStores = completeStoresNum + incompleteStoresNum;
+            const sumStores = completeStoresNum + incompleteStoresNum;
             let percentSchedule = 0;
             if (sumStores === 0) {
               percentSchedule = 0;
             } else {
-              let percent = completeStoresNum / sumStores * 100;
+              const percent = completeStoresNum / sumStores * 100;
               percentSchedule = percent.toFixed(0) + '%';
             }
             item.percentSchedule = percentSchedule;
           });
           self.implementTableData = content;
         } catch (e) {
-          console.log(e)
+          console.log(e);
           self.implementTableData = [];
         }
       }
@@ -910,12 +910,11 @@ export default {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
-        this.params.endTs = searchParams.endTs
+        this.params.endTs = searchParams.endTs;
         if (!searchParams.inspectTagId) {
           this.params.inspectTagId = this.inspectTagId;
         } else {
           this.params.inspectTagId = searchParams.inspectTagId;
-          this.inspectTagId = searchParams.inspectTagId;
         }
         this.params.order = { direction: 'asc', property: 'completionRate' };
         this.getCachedParamsFlag = true;
@@ -939,7 +938,8 @@ export default {
         inpectRESTful.GetInspectTagList(params).then(res => {
           if (res.errCode === 0) {
             this.inspectList = res.data;
-            this.inspectTagId = this.getCachedParamsFlag ? this.inspectTagId : this.inspectList.length > 0 ? this.inspectList[0].id : '';
+            this.inspectTagId = this.getCachedParamsFlag ? this.params.inspectTagId
+              : this.inspectList.length > 0 ? this.inspectList[0].id : '';
             this.getInspectPersonTable();
             resolve(res);
           } else {
@@ -949,8 +949,8 @@ export default {
           }
         }).catch(err => {
           console.log('SupervisorStatistics-getInspctList:' + err);
-        })
-      })
+        });
+      });
     },
 
     async getInspectPersonTable() {
@@ -972,7 +972,7 @@ export default {
       }).catch(e => {
         console.log('SupervisorStatistics-getInspectPersonTable:' + e);
         this.supervisorTableData = [];
-      })
+      });
     },
 
     saveSearchParams() {
@@ -983,8 +983,8 @@ export default {
           endTs: this.params.endTs,
           inspectTagId: this.params.inspectTagId
         }
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
     getInspectStatsPersonInfo(params) {
@@ -992,7 +992,7 @@ export default {
         getInspectStatsOverPersonV2(params).then(res => {
           resolve(res);
         }).catch(err => {
-          reject(err)
+          reject(err);
         });
       });
     }
