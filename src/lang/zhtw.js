@@ -776,7 +776,7 @@ export default {
     'mobilePhone': '帳號',
     'developerService': '串流服務密鑰',
     'confirmAdd': '確認添加',
-    'obtain': '獲取',
+    'obtain': '驗證AccessToken',
     'enterAppKey': '請輸入AppKey',
     'enterSecret': '請輸入Secret',
     'obtainToken': '請獲取Access Token',
@@ -847,7 +847,9 @@ export default {
     'addedDeviceNumber': '已啟用設備數量：',
     'licenseOverdue': '門店巡檢服務已逾期',
     'hasBoundItem': '設備已綁定通道',
-    'hasAdded': '設備已被別人添加'
+    'hasAdded': '設備已被別人添加',
+    'validateSucc': '驗證成功！',
+    'validateFailed': '驗證失敗！'
   },
 
   // Store Management page language

@@ -728,7 +728,7 @@ export default {
     'ezvizAccount': '장부',
     'accountName': '상용자 이름',
     'ezvizAccountSetting': '개발자 서비스',
-    'obtain': '얻다',
+    'obtain': 'AccessToken 확인',
     'EzvizAccount': '장부',
     'inputDeviceName': '장치 이름을 입력하십시오',
     'noData': '테이터 없다',
@@ -865,7 +865,9 @@ export default {
     'addedDeviceNumber': '활성화된 장치의 수:',
     'licenseOverdue': '매장 점검 서비스가 만료되었습니다',
     'hasBoundItem': '장치가 항목에 바인딩되었습니다',
-    'hasAdded': '다른 사람이 기기를 추가했습니다'
+    'hasAdded': '다른 사람이 기기를 추가했습니다',
+    'validateSucc': '성공적으로 확인!',
+    'validateFailed': '검증 실패!'
   },
 
   // Store Management page language

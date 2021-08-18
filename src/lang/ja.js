@@ -725,7 +725,7 @@ export default {
     'ezvizAccount': 'アカウント',
     'accountName': 'ユーザーネーム',
     'ezvizAccountSetting': '開発者サービス',
-    'obtain': '入手',
+    'obtain': 'AccessTokenを確認する',
     'EzvizAccount': 'アカウント',
     'inputDeviceName': 'デバイス名を入力してください',
     'noData': 'データなし',
@@ -860,7 +860,9 @@ export default {
     'addedDeviceNumber': '有効なデバイスの数:',
     'licenseOverdue': 'サブスクリプション許可の有効期限が切れました',
     'hasBoundItem': 'デバイスがアイテムにバインドされています',
-    'hasAdded': 'デバイスは他の誰かによって追加されました'
+    'hasAdded': 'デバイスは他の誰かによって追加されました',
+    'validateSucc': '検証に成功！',
+    'validateFailed': '検証に失敗！'
   },
 
   // Store Management page language
