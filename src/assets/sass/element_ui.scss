@@ -146,7 +146,7 @@ body .el-table th.gutter {
   }
 }
 .ezviz-account .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before{
-  color: #ccc;
+  color: #fff;
 }
 .ezviz-account .el-form-item__content{
   display: inline-block;
@@ -155,7 +155,7 @@ body .el-table th.gutter {
 }
 .access-token .el-form-item__content{
   width: 70%;
-  display: inline-flex;
+  display: inline-block;
   align-items: center;
 }
 .access-button .el-form-item__content{

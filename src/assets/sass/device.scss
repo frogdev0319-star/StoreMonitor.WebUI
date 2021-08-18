@@ -66,10 +66,11 @@ $tab:#7d8cad;
   background-color: $mainColor;
   border-color:  $mainColor;
   color: #fff;
-  position: absolute;
-  right: calc(10/1920*100vw);
-  height: 24px;
   font-size: 12px;
+}
+.validate-text{
+  float: right;
+  color: #fccc3f;
 }
 .account-list{
   padding: 20px calc(20/1920*100vw);

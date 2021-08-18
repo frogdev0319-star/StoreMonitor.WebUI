@@ -781,14 +781,14 @@ export default {
       }
     },
 
-    startVideo(){
+    startVideo() {
       if (this.videoAuthority === false) {
         this.showError = true;
         this.errorText = this.$t('remotePatrol.videoLicense');
         return;
       }
       if (this.channelInfo === null) {
-        const error = this.$t('remotePatrol.dashServerError') + '5';
+        const error = this.$t('remotePatrol.lackParams');
         this.errorText = error;
         this.showError = true;
       } else {

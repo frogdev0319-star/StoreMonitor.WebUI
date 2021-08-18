@@ -128,7 +128,7 @@ export async function getDeviceCapacity(data) {
     }
   })
     .catch(err => {
-      console.log(err)
+      console.log(err);
     });
   return ret;
 }
@@ -184,13 +184,11 @@ function getUpdatePasswordMsg(code) {
  */
 export async function updateDevicePassword(data) {
   let ret = false;
-  console.log(data);
   await instance({
     method: 'post',
     url: '/lapp/device/password/update',
     data: data
   }).then(res => {
-    console.log(res);
     const data = res.data;
     const code = data.code;
     const msgCode = getUpdatePasswordMsg(code);
@@ -204,7 +202,6 @@ export async function updateDevicePassword(data) {
       ret = true;
     }
   }).catch((err) => {
-    console.log(err);
     const msg = getMsg();
     Message({
       message: msg,
@@ -217,13 +214,11 @@ export async function updateDevicePassword(data) {
 
 export async function getAccessToken(data) {
   let ret = null;
-  console.log(data);
   await instance({
     method: 'post',
     url: '/lapp/token/get',
     data: data
   }).then(res => {
-    console.log(res);
     const data = res.data;
     ret = res;
   }).catch((err) => {

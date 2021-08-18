@@ -124,15 +124,12 @@
                       class="content-detail-main"
                       style="padding-bottom: 20px;">
                       <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
-                      <div v-if="_item.showAudio" class="cdm-voice">
-                        <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
-                          <i class="iconfont icon-yuyin icon-speech"/>
-                        </div>
-                        <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-                          <source :src="_item.audio.audioSrc" type="audio/mpeg" >
-                        </audio>
-                        <span class="often-text">{{ _item.audio.audioOftenText }}</span>
-                      </div>
+                      <audio-vue
+                        v-if="_item.showAudio"
+                        :is-export-pdf="isexportPDF"
+                        :audio-ref="_item.audio.audioRef"
+                        :audio-src="_item.audio.audioSrc"
+                      />
                       <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
                         <span class="pdf_font_24">{{ _item.comment }}</span>
                       </div>
@@ -142,9 +139,11 @@
                           :key="sourceindex"
                           :height="elImgHeight"
                           class="source-details">
-                          <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
+                          <div v-if="sourceitem.mediaType === 2"
+                               :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''"
+                               class="img-content">
                             <el-image
-                              :style="isexportPDF ? exportImageStyle : imageStyle"
+                              :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
                               :preview-src-list="getImgList(sourceindex, _item.sourceList)"
                               class="imgLittle imgInner"/>
@@ -177,15 +176,12 @@
                       v-if="item.showAttachment || item.description != null&&item.description !== ''"
                       class="content-detail-main">
                       <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
-                      <div v-if="item.showAudio" class="cdm-voice">
-                        <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
-                          <i class="iconfont icon-yuyin icon-speech"/>
-                        </div>
-                        <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                          <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                        </audio>
-                        <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                      </div>
+                      <audio-vue
+                        v-if="item.showAudio"
+                        :is-export-pdf="isexportPDF"
+                        :audio-ref="item.audio.audioRef"
+                        :audio-src="item.audio.audioSrc"
+                      />
                       <div v-if="item.description !=null && item.description !=''" class="cdm-word">
                         <span class="pdf_font_24">{{ item.description }}</span>
                       </div>
@@ -197,7 +193,7 @@
                           class="source-details">
                           <div v-if="sourceitem.mediaType === 2" class="img-content">
                             <el-image
-                              :style="isexportPDF ? exportImageStyle : imageStyle"
+                              :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
                               :preview-src-list="getImgList(0, [sourceitem])"
                               class="imgLittle imgInner"/>
@@ -205,7 +201,7 @@
                           <div
                             v-if="sourceitem.mediaType === 1"
                             class="img-content "
-                            @click="playCommentVideo(sourceitem,index)">
+                            @click="playCommentVideo(sourceitem, index)">
                             <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                             <img
                               :style="isexportPDF ? exportImageStyle : imageStyle"
@@ -218,28 +214,6 @@
                     </div>
                   </div>
                 </div>
-                <el-dialog
-                  v-if="dialogCommentVideo"
-                  :title="$t('eventView.view')"
-                  :visible.sync="dialogCommentVideo"
-                  :close-on-click-modal="false"
-                  width="850px"
-                  top="12%"
-                  class="rate-video-dialog"
-                  @close="stopCommentVideo">
-                  <div class="video-dialog-content" style="overflow:hidden;">
-                    <hr class="dialog-hr">
-                    <div class="video-content" >
-                      <video
-                        id="previewVideo"
-                        height="83%"
-                        width="90%"
-                        prload
-                        controls
-                        class="video-js vjs-fill"/>
-                    </div>
-                  </div>
-                </el-dialog>
               </div>
             </div>
           </div>
@@ -273,15 +247,12 @@
                   v-if="item.showAttachment || item.description != null&&item.description !== ''"
                   class="content-detail-main">
                   <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
-                  <div v-if="item.showAudio" class="cdm-voice">
-                    <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
-                      <i class="iconfont icon-yuyin icon-speech"/>
-                    </div>
-                    <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                      <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                    </audio>
-                    <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                  </div>
+                  <audio-vue
+                    v-if="item.showAudio"
+                    :is-export-pdf="isexportPDF"
+                    :audio-ref="item.audio.audioRef"
+                    :audio-src="item.audio.audioSrc"
+                  />
                   <div v-if="item.description !=null && item.description !=''" class="cdm-word">
                     <span class="pdf_font_24">{{ item.description }}</span>
                   </div>
@@ -293,7 +264,7 @@
                       class="source-details">
                       <div v-if="sourceitem.mediaType === 2" class="img-content">
                         <el-image
-                          :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw); height: elImgHeight'"
+                          :style="isexportPDF ? exportImageStyle :imageStyle"
                           :src="sourceitem.url"
                           :preview-src-list="getImgList(0, [sourceitem])"
                           class="imgLittle imgInner"/>
@@ -426,6 +397,28 @@
         </el-col>
       </el-row>
       <div class="no-print">
+        <el-dialog
+          v-if="dialogCommentVideo"
+          :title="$t('eventView.view')"
+          :visible.sync="dialogCommentVideo"
+          :close-on-click-modal="false"
+          width="850px"
+          top="12%"
+          class="rate-video-dialog"
+          @close="stopCommentVideo">
+          <div class="video-dialog-content" style="overflow:hidden;">
+            <hr class="dialog-hr">
+            <div class="video-content" >
+              <video
+                id="previewVideo"
+                height="83%"
+                width="90%"
+                prload
+                controls
+                class="video-js vjs-fill"/>
+            </div>
+          </div>
+        </el-dialog>
         <el-dialog :visible.sync="downloadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
           <div class="body-content">
             <p>{{ $t('remotePatrol.downloading') }}</p>
@@ -445,10 +438,12 @@ import resize from '@/components/mixins/echartResize.js'
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import AudioVue from '@/components/AudioVue';
 
 export default {
   name: 'InspectReport',
   components: {
+    AudioVue,
     DelayButton,
     'v-chart': ECharts
   },
@@ -554,8 +549,8 @@ export default {
 
     imageStyle() {
       return {
-        width: 'calc(130/1920*100vw)',
-        height: `${this.imgHeight}px`
+        'width': 'calc(130/1920*100vw)',
+        'height': `${this.imgHeight}px`
       }
     },
 
@@ -766,84 +761,6 @@ export default {
         }
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.url);
-    },
-
-    getGroupsDuration(item) {
-      const self = this;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
-    getFeedBacksDuration(item) {
-      const self = this;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
-    startSpeechItem(item, index) {
-      const self = this;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
-      }
-      self.groups.forEach((groupitem) => {
-        groupitem.items.forEach((_item, _index) => {
-          if (_item.audio !== undefined) {
-            if (_index !== index) {
-              if (self.$refs[_item.audio.audioRef] !== undefined) {
-                self.$refs[_item.audio.audioRef][0].pause();
-                _item.audio.isPlaying = false;
-              }
-            }
-          }
-        });
-      });
-    },
-
-    startSpeechFeedBacks(item, index) {
-      const self = this;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
-      }
-      self.feedbacks.forEach((_item, _index) => {
-        if (_item.audio !== undefined) {
-          if (_index !== index) {
-            if (self.$refs[_item.audio.audioRef] !== undefined) {
-              self.$refs[_item.audio.audioRef][0].pause();
-              _item.audio.isPlaying = false;
-            }
-          }
-        }
-      });
     },
 
     async getReportInfo(res) {
@@ -2058,6 +1975,10 @@ export default {
   }
   .radior-content{
     padding-top: 30px;
+  }
+  .imgLittle .el-image__inner{
+    height: 100%;
+    width: 100%;
   }
 </style>
 <style>

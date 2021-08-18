@@ -259,6 +259,7 @@
       :close-on-click-modal="false"
       :visible="ispdf"
       :show-button="false"
+      :show-close="false"
       class="LoadDialog"
     >
       <p>{{ $t('insSettingView.isExportPDF') }}......</p>
@@ -503,6 +504,10 @@ export default {
   methods: {
     handleDown() {
       const self = this;
+      if (self.eventTableData.length === 0) {
+        util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+        return false;
+      }
       self.ispdf = true;
       this.$nextTick(() => {
         const img = document.getElementById('imgTest');
@@ -692,7 +697,7 @@ export default {
 
     export2Excel() {
       const that = this;
-      if (that.allEventData.length === 0) {
+      if (that.eventTableData.length === 0) {
         util.notify(that.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
@@ -720,23 +725,27 @@ export default {
       params.storeIds = this.params.storeIds;
       params.filter = { page: this.page - 1, size: this.total };
       params.order = this.order;
-      const eventResult = await this.getEventTableDataInfo(params);
-      const result = eventResult.data;
       let content = [];
-      if (result) {
-        content = result.content;
-        content.forEach(item => {
-          const numOfTotal = item.numOfTotal;
-          if (numOfTotal === 0) {
-            item.RemoteStr = 0 + '%';
-            item.OnsiteStr = 0 + '%';
-            item.VideoStr = 0 + '%';
-          } else {
-            item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-            item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-            item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
-          }
-        });
+      try {
+        const eventResult = await this.getEventTableDataInfo(params);
+        const result = eventResult.data;
+        if (result) {
+          content = result.content;
+          content.forEach(item => {
+            const numOfTotal = item.numOfTotal;
+            if (numOfTotal === 0) {
+              item.RemoteStr = 0 + '%';
+              item.OnsiteStr = 0 + '%';
+              item.VideoStr = 0 + '%';
+            } else {
+              item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+              item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+              item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+            }
+          });
+        }
+      } catch (e) {
+        this.ispdf = false;
       }
       return content;
     },

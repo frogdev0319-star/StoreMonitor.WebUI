@@ -202,7 +202,7 @@ export default {
     'inspectedStores': 'Inspected Store',
     'uninspectedStores': 'Uninspected Store',
     'taskPerformance': 'Task Progession',
-    'emptyPatrolList': 'Supervision tour list is empty, please re-filter the data',
+    'emptyPatrolList': 'Inspection KPI is empty, please refilter the data',
     'eventGraph': 'Analysis of Event Trends',
     'sumEvents': 'Total Events',
     'sumUnprocessEvents': 'Pending Events',
@@ -772,7 +772,7 @@ export default {
     'mobilePhone': 'Account',
     'developerService': 'Streaming Service Key',
     'confirmAdd': 'Confirm',
-    'obtain': 'Obtain',
+    'obtain': 'Validate AccessToken',
     'enterAppKey': 'Please enter AppKey',
     'enterSecret': 'Please enter secret',
     'obtainToken': 'Please obatin Access Token',
@@ -841,9 +841,11 @@ export default {
     'deviceLimitation': 'The current number of devices exceeds the limitation, please renew or reduce the number of devices',
     'authorizedDevicesNum': 'Number of authorized devices:',
     'addedDeviceNumber': 'Number of enabled devices:',
-    'licenseOverdue': 'Device license overdue',
+    'licenseOverdue': 'Inspection service expired',
     'hasBoundItem': 'Device has been binding to item',
-    'hasAdded': 'Device has been added by someone else'
+    'hasAdded': 'Device has been added by someone else',
+    'validateSucc': 'Successfully validate!',
+    'validateFailed': 'Failed to validate!'
   },
 
   // Store Management page language

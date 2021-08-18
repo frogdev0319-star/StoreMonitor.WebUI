@@ -129,15 +129,11 @@
         <strong v-if="lang.indexOf('zh') === -1" style="margin-right: 28px">{{ $t('eventView.eventDetails') }}:</strong>
         <strong v-else>{{ $t('eventView.eventDetails') }}：</strong>
         <div class="content">
-          <div v-if="showAudio" class="speech-content">
-            <div class="speech-info" @click="startSpeech">
-              <i :class="speech?'icon-yuyin':'icon-yuyin'" class="iconfont icon-speech"/>
-            </div>
-            <audio id="audio" :ref="audioRef" @canplay="getDuration">
-              <source :src="audioSrc" type="audio/mpeg" >
-            </audio>
-            <span class="often-text">{{ audioOftenText }}</span>
-          </div>
+          <audio-vue
+            v-if="showAudio"
+            :audio-ref="audioRef"
+            :audio-src="audioSrc"
+            :if-show-margin="false"/>
 
           <pre class="description">{{ event.description }}</pre>
           <div class="photo-content">
@@ -202,7 +198,7 @@
         </el-scrollbar>
       </div>
     </el-col>
-    <el-col :span="8" class="rside">
+    <el-col :span="8" class="rside" :style="{'min-height':windowHeight*0.82+'px'}">
       <div id="rside-title" class="title-content">
         <span>{{ $t('eventView.details') }}</span>
       </div>
@@ -221,15 +217,12 @@
             <div class="deal-rside">
               <div class="audio">
                 <span class="creator">{{ item.createOr }}</span>
-                <div v-if="item.showAudio" class="speech-content deal-speech">
-                  <div class="speech-info" @click="startSpeechItem(item,index)">
-                    <i class="iconfont icon-yuyin icon-speech"/>
-                  </div>
-                  <audio :ref="item.audio.audioRef" @canplay="getCommentDuration(item)">
-                    <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                  </audio>
-                  <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                </div>
+                <audio-vue
+                  v-if="item.showAudio"
+                  :audio-ref="item.audio.audioRef"
+                  :audio-src="item.audio.audioSrc"
+                  :if-show-margin="false"
+                  class="deal-speech"/>
               </div>
               <pre v-if="item.description != null" class="description">{{ item.description }}</pre>
               <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="source-content">
@@ -384,10 +377,6 @@ export default {
         return this.windowHeight * 0.609;
       }
     },
-    isEzviz() {
-      const self = this;
-      return self.$store.state.user.isEzviz;
-    },
     ...mapGetters({
       videoAuthority: 'videoAuthority'
     })
@@ -398,17 +387,6 @@ export default {
     self.getBtnList();
     self.getSessionData();
     self.getCommentList(0);
-    self.$nextTick(function() {
-      setTimeout(() => {
-        self.myfun();
-      }, 500);
-      setTimeout(() => {
-        self.getDuration();
-        self.commentList.forEach((_item, _index) => {
-          self.getCommentDuration(_item);
-        });
-      }, 0);
-    });
   },
 
   methods: {
@@ -479,6 +457,7 @@ export default {
         getDetailedStoreInfo(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
+            this.licenseStatus = res.data.status;
             resolve(res.data.device);
           }
         });
@@ -550,90 +529,11 @@ export default {
       });
     },
 
-    getDuration() {
-      const self = this;
-      if (self.showAudio) {
-        const audio = self.$refs.audioRef;
-        let du = audio.duration;
-        if (isNaN(du)) {
-          self.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          self.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
-    getCommentDuration(item) {
-      const self = this;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
-    getCommentProcess() {
-      const self = this;
-      self.commentList.forEach((_item, _index) => {
-        if (_item.showAudio) {
-          if (isNaN(self.$refs[_item.audio.audioRef][0].duration)) {
-            _item.showAudio = false;
-          } else {
-            _item.audio.audioOftenText = parseInt(self.$refs[_item.audio.audioRef][0].duration) + '"';
-          }
-        }
-      });
-    },
-
-    startSpeech() {
-      const self = this;
-      self.$refs.audioRef.ended ? self.isPlaying = false : null;
-      if (!self.isPlaying) {
-        self.$refs.audioRef.play();
-        self.isPlaying = true;
-        self.speech = true;
-      } else {
-        self.$refs.audioRef.pause();
-        self.isPlaying = false;
-        self.speech = false;
-        clearInterval(self.timeid);
-      }
-    },
-
-    startSpeechItem(item, index) {
-      const self = this;
-      self.$refs[item.audio.audioRef][0].ended ? item.audio.isPlaying = false : null;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
-      }
-      self.commentList.forEach((_item, _index) => {
-        if (_item.audio != undefined) {
-          if (_index !== index) {
-            self.$refs[_item.audio.audioRef][0].pause();
-            _item.audio.isPlaying = false;
-          }
-        }
-      });
-    },
-
     checkVideo(item, index) {
       const self = this;
+      if (!util.validateLicense(this.licenseStatus)) {
+        return;
+      }
       self.dialogFormVisible = true;
       this.$nextTick(() => {
         self.channelInfo = self.curChannel;
@@ -858,6 +758,9 @@ export default {
 
     confirmSelect() {
       const self = this;
+      if (!util.validateLicense(this.licenseStatus)) {
+        return;
+      }
       self.showRelatedChannelFlag = false;
       const channel = self.relatedChannels.filter(item => item.id === self.channelRadio);
       self.curChannel = channel[0];
@@ -1364,26 +1267,6 @@ $h1:#292e36;
                 white-space:-o-pre-wrap; /* Opera 7 */
                 word-wrap:break-word; /* Internet Explorer 5.5+ */
             }
-            .speech-content{
-                .speech-info{
-                    @include point(width,80);
-                    @include point(height,26);
-                    background-color: #FFEDED;
-                    color: $red;
-                    border: 1px solid #FEC0C7;
-                    @include point(border-radius,15);
-                    display: inline-block;
-                    cursor: pointer;
-                    .icon-speech{
-                        @include point(font-size,18);
-                        @include point(line-height,26);
-                        @include point(margin-left,5);
-                    }
-                }
-                .often-text{
-                    @include point(margin-left,20);
-                }
-            }
             .photo-content{
                 overflow: hidden;
                 @include point(margin-top,15);
@@ -1532,35 +1415,9 @@ $h1:#292e36;
                             font-size: 14px;
                         }
                         .deal-speech{
-                            display: inline-block;
                             @include point(margin-left,10);
                             position: relative;
                             @include point(bottom,10);
-                            .often-text{
-                                @include point(margin-left,20);
-                                display: inline-block;
-                                font-size: 12px;
-                            }
-                        }
-                        .speech-content{
-                            .speech-info{
-                                @include point(width,80);
-                                @include point(height,26);
-                                background-color: #FFEDED;
-                                color: $red;
-                                border: 1px solid #FEC0C7;
-                                @include point(border-radius,15);
-                                display: inline-block;
-                                cursor: pointer;
-                                .icon-speech{
-                                    @include point(font-size,18);
-                                    @include point(line-height,26);
-                                    @include point(margin-left,5);
-                                }
-                            }
-                            .often-text{
-                                @include point(margin-left,20);
-                            }
                         }
                     }
 

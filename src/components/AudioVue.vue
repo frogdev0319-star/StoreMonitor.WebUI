@@ -1,12 +1,14 @@
 <template>
-  <div class="speech-content">
-    <div class="speech-info" @click.native="startSpeech">
-      <i :class="speech ? 'icon-yuyin':'icon-yuyin'" class="iconfont icon-speech"/>
+  <div :class="{'noPadding': !ifShowMargin}" class="cdm-voice">
+    <div :class="isExportPdf ? 'pdf_speech_info' : 'speech-info'" @click="startAudio">
+      <i v-show="!isPlaying" class="iconfont icon-yuyin icon-speech"/>
+      <img v-show="isPlaying" :src="audioPlayGif" class="audio-gif icon-speech">
     </div>
-    <audio :ref="audioRef">
+    <audio :ref="audioRef" @canplay="getDuration" @ended="onEndAudio">
       <source :src="audioSrc" type="audio/mpeg" >
     </audio>
-    <span class="often-text">{{ audioOftenText }}</span>
+    <span v-if="hasNotPlayAudio" class="not-play-audio"/>
+    <span :class="hasNotPlayAudio ? 'time-text' : 'has-play-time-text'">{{ audioOftenText }}</span>
   </div>
 </template>
 <script>
@@ -14,57 +16,63 @@ export default {
   name: 'AudioVue',
 
   props: {
-    audioRef: String,
-    audioSrc: String
+    isExportPdf: {
+      type: Boolean,
+      default: false
+    },
+    audioRef: {
+      type: String,
+      default: ''
+    },
+    audioSrc: {
+      type: String,
+      default: ''
+    },
+    ifShowMargin: {
+      type: Boolean,
+      default: true
+    }
   },
 
   data() {
     return {
-      speech: false,
       isPlaying: false,
       audioOftenText: '',
-      timeid: 0
+      audioPlayGif: require('../../static/img/audio-play.gif'),
+      hasNotPlayAudio: true
     };
   },
 
-  mounted() {
-    const self = this;
-    self.$nextTick(() => {
-      setTimeout(() => {
-        self.getProcess();
-      }, 1000);
-    });
-  },
-
   methods: {
-    startSpeech() {
-      const self = this;
-      if (!self.isPlaying) {
-        self.$refs[self.audioRef].play();
-        self.isPlaying = true;
-        self.speech = true;
-        self.timeid = setInterval(function() {
-          self.getProcess();
-        }, 1000);
+    startAudio() {
+      this.hasNotPlayAudio = false;
+      if (!this.isPlaying) {
+        this.$refs[this.audioRef].play();
+        this.isPlaying = true;
       } else {
-        self.$refs[self.audioRef].pause();
-        self.isPlaying = false;
-        self.speech = false;
-        clearInterval(self.timeid);
+        this.$refs[this.audioRef].pause();
+        this.isPlaying = false;
       }
-      self.$emit('clickFunc');
     },
 
-    getProcess() {
+    onEndAudio() {
+      this.isPlaying = false;
+    },
+
+    getDuration() {
       const self = this;
-      const audioOften = parseInt(self.$refs[self.audioRef].duration - self.$refs[self.audioRef].currentTime);
-      self.audioOftenText = parseInt(self.$refs[self.audioRef].duration - self.$refs[self.audioRef].currentTime) + '"';
-      if (audioOften == 0) {
-        self.isPlaying = false;
-        self.speech = false;
+      const audio = self.$refs[this.audioRef];
+      let du = audio.duration;
+      if (isNaN(du)) {
+        this.showAudio = false;
+      } else {
+        const duration = Math.floor(du);
+        if (duration === 0) {
+          du = 1;
+        }
+        this.audioOftenText = parseInt(du) + '"';
       }
     }
-
   }
 };
 </script>
@@ -80,25 +88,57 @@ export default {
     @mixin point($poi,$val){
         #{$poi}:checkRem($val);
     }
-    .speech-content{
-        margin: 20px auto;
-        .speech-info{
-            @include point(width,120);
-            @include point(height,30);
-            background-color: #FFEDED;
-            color: #FB4C5D;
-            border: 1px solid #FEC0C7;
-            @include point(border-radius,15);
-            display: inline-block;
-            cursor: pointer;
-            .icon-speech{
-                @include point(font-size,22);
-                @include point(line-height,30);
-                @include point(margin-left,15);
-            }
+    .cdm-voice{
+      margin-top: 10px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 14px;
+      .speech-info{
+        @include point(width,80);
+        @include point(height,26);
+        background-color: #FFEDED;
+        color: #f31b65;
+        border: 1px solid #FEC0C7;
+        @include point(border-radius,15);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        .icon-speech{
+          @include point(font-size,18);
+          @include point(line-height,26);
+          @include point(margin-left,5);
         }
-        .often-text{
-            @include point(margin-left,20);
+      }
+      .pdf_speech_info{
+        width:160px;
+        height:52px;
+        background-color: #FFEDED;
+        color: #f31b65;
+        border: 1px solid #FEC0C7;
+        border-radius:30px;
+        display: inline-block;
+        .icon-speech{
+          font-size:26px;
+          line-height:52px;
+          margin-left:10px;
         }
+      }
     }
+
+    .audio-gif {
+      height: 1.125rem;
+    }
+    .not-play-audio{
+      height: 6px;
+      width: 6px;
+      border-radius: 6px;
+      background-color: #ff625f;
+      margin: 0 calc(10/1920*100vw);
+    }
+    .has-play-time-text{
+      margin: 0 calc(26/1920*100vw);
+    }
+  .noPadding{
+    margin-top: 0;
+  }
 </style>

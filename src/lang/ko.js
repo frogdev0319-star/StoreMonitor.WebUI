@@ -204,9 +204,9 @@ export default {
     'queryFail': '쿼리 실패',
     'selectStores': '저장소 선택',
     'rankType': '순위 유형',
-    'totaFive': '총 이벤트 tOP5',
-    'pendingFive': '보류 중인 이벤트 tOP5',
-    'closedFive': '이벤트 tOP5 종료',
+    'totaFive': '총 이벤트 TOP5',
+    'pendingFive': '보류 중인 이벤트 TOP5',
+    'closedFive': '이벤트 TOP5 종료',
     'orders': '오름차순/내림차순',
     'descendingOrder': '내림차순',
     'ascendingOrder': '오름차순',
@@ -240,7 +240,8 @@ export default {
     'allUser': '모든 사람',
     'checkinReport': '로그인 보고서-{time1}-{time2}',
 
-    'emptyItemList': 'The inspection item list is empty, please re-filter the data'
+    'emptyPatrolList': '검사 KPI가 비어 있습니다. 데이터를 다시 필터링하십시오',
+    'emptyItemList': '검사 항목 목록이 비어 있습니다. 데이터를 다시 필터링하십시오'
   },
 
   // Patrol page language
@@ -727,7 +728,7 @@ export default {
     'ezvizAccount': '장부',
     'accountName': '상용자 이름',
     'ezvizAccountSetting': '개발자 서비스',
-    'obtain': '얻다',
+    'obtain': 'AccessToken 확인',
     'EzvizAccount': '장부',
     'inputDeviceName': '장치 이름을 입력하십시오',
     'noData': '테이터 없다',
@@ -862,9 +863,11 @@ export default {
     'deviceLimitation': '현재 장치 수가 한도를 초과합니다. 장치 수를 갱신하거나 줄이십시오',
     'authorizedDevicesNum': '승인된 기기 수:',
     'addedDeviceNumber': '활성화된 장치의 수:',
-    'licenseOverdue': '구독 권한이 만료되었습니다',
+    'licenseOverdue': '매장 점검 서비스가 만료되었습니다',
     'hasBoundItem': '장치가 항목에 바인딩되었습니다',
-    'hasAdded': '다른 사람이 기기를 추가했습니다'
+    'hasAdded': '다른 사람이 기기를 추가했습니다',
+    'validateSucc': '성공적으로 확인!',
+    'validateFailed': '검증 실패!'
   },
 
   // Store Management page language

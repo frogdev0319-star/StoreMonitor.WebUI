@@ -205,7 +205,7 @@ export default {
     'inspectedStores': '已巡檢門店',
     'uninspectedStores': '未巡檢門店',
     'taskPerformance': '任務執行情況',
-    'emptyPatrolList': '督導巡店列表為空，請重新篩選數據',
+    'emptyPatrolList': '巡店KPI列表為空，請重新篩選數據',
     'eventGraph': '事件解決趨勢圖',
     'sumEvents': '事件總數',
     'sumUnprocessEvents': '待處理事件總數',
@@ -776,7 +776,7 @@ export default {
     'mobilePhone': '帳號',
     'developerService': '串流服務密鑰',
     'confirmAdd': '確認添加',
-    'obtain': '獲取',
+    'obtain': '驗證AccessToken',
     'enterAppKey': '請輸入AppKey',
     'enterSecret': '請輸入Secret',
     'obtainToken': '請獲取Access Token',
@@ -845,9 +845,11 @@ export default {
     'deviceLimitation': '當前設備數量超限，請續約或減少設備數量',
     'authorizedDevicesNum': '授權設備數量：',
     'addedDeviceNumber': '已啟用設備數量：',
-    'licenseOverdue': '訂閱權限過期',
+    'licenseOverdue': '門店巡檢服務已逾期',
     'hasBoundItem': '設備已綁定通道',
-    'hasAdded': '設備已被別人添加'
+    'hasAdded': '設備已被別人添加',
+    'validateSucc': '驗證成功！',
+    'validateFailed': '驗證失敗！'
   },
 
   // Store Management page language

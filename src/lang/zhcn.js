@@ -205,7 +205,7 @@ export default {
     'inspectedStores': '已巡检门店',
     'uninspectedStores': '未巡检门店',
     'taskPerformance': '任务执行情况',
-    'emptyPatrolList': '督导巡店列表为空，请重新筛选数据',
+    'emptyPatrolList': '巡店KPI列表为空，请重新筛选数据',
     'eventGraph': '事件解决趋势图',
     'sumEvents': '事件总数',
     'sumUnprocessEvents': '待处理事件总数',
@@ -776,7 +776,7 @@ export default {
     'mobilePhone': '账号',
     'developerService': '串流服务密钥',
     'confirmAdd': '确认添加',
-    'obtain': '获取',
+    'obtain': '验证AccessToken',
     'enterAppKey': '请输入AppKey',
     'enterSecret': '请输入Secret',
     'obtainToken': '请获取Access Token',
@@ -845,9 +845,11 @@ export default {
     'addedDeviceNumber': '已启用设备数量：',
     'otherError': '其他错误',
     'commentLengthPrompt': '最多可输入100个字符',
-    'licenseOverdue': '订阅权限过期',
+    'licenseOverdue': '门店巡检服务已逾期',
     'hasBoundItem': '设备已绑定通道',
-    'hasAdded': '设备已被别人添加'
+    'hasAdded': '设备已被别人添加',
+    'validateSucc': '验证成功！',
+    'validateFailed': '验证失败！'
   },
 
   // Store Management page language

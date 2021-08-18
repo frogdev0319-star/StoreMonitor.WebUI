@@ -634,7 +634,7 @@ export default {
           return;
         }
         if (IVSID === null || channelId === null) {
-          const error = this.$t('remotePatrol.dashServerError') + '5';
+          const error = this.$t('remotePatrol.lackParams');
           this.currentState = 'blank';
           this.errorText = error;
           this.showError = true;

@@ -128,9 +128,10 @@ export default {
 
   watch: {
     accountChanged(val) {
-      const self = this;
       if (val !== 0) {
-        self.getAccountTableList();
+        this.getBeseyeUserList();
+        this.getBeseyeDeviceNum();
+        this.getCodeAndState();
       }
     }
   },
@@ -189,11 +190,15 @@ export default {
       this.isAuthorizing = true;
       const params = this.setBeseyeAccountParams();
       beseyeAccountAuthorize(params).then(res => {
-        const succMsg = this.getAuthorizeMsg('success');
-        util.notify(succMsg, 'sucess', 3000);
-        this.getBeseyeUserList();
-        this.getBeseyeDeviceNum();
-        this.isAuthorizing = false;
+        if (res.errCode === 0) {
+          const succMsg = this.getAuthorizeMsg('success');
+          util.notify(succMsg, 'sucess', 3000);
+          this.getBeseyeUserList();
+          this.getBeseyeDeviceNum();
+          this.isAuthorizing = false;
+        } else {
+          throw new Error(res.errorMsg);
+        }
       }).catch(error => {
         const failMsg = this.getAuthorizeMsg('warning');
         util.notify(failMsg, 'warning', 3000);

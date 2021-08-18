@@ -426,8 +426,7 @@ export const navbarRoute = {
       }
     );
 
-    // util.getVideoAuthority(4) &&
-    deviceRoutes.push({
+    util.getVideoAuthority(4) && deviceRoutes.push({
         path: '/skywatchAccount',
         name: 'skywatchAccount',
         component: resolve => require(['@/views/setting/device/Skywatch/SkywatchAccount'], resolve)
