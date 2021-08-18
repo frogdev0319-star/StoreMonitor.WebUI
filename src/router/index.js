@@ -436,12 +436,6 @@ export const navbarRoute = {
         name: 'skywatchDeviceSetting',
         component: resolve => require(['@/views/setting/device/Skywatch/SkywatchDeviceMgmt'], resolve),
         hidden: true
-      },
-      {
-        path: '/skywatch/authorize',
-        name: 'auth',
-        component: resolve => require(['@/views/setting/device/Skywatch/Authorize'], resolve),
-        hidden: true
       }
     );
 
