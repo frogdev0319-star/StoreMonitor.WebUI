@@ -98,3 +98,19 @@ export const updateBeseyeChannel = data => {
     data
   });
 };
+
+export const enableBeseyeChannel = data => {
+  return request({
+    url: `${version}/beseye/device/channel/enable`,
+    method: 'post',
+    data
+  });
+};
+
+export const disableBeseyeChannel = data => {
+  return request({
+    url: `${version}/beseye/device/channel/disable`,
+    method: 'post',
+    data
+  });
+};

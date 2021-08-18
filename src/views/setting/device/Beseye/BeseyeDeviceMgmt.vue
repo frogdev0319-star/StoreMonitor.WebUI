@@ -34,6 +34,7 @@
         </div>
         <div class="header-name">{{ $t('deviceView.deviceName') }}</div>
         <div class="header-store">{{ $t('deviceView.store') }}</div>
+        <div class="header-status">{{ $t('deviceView.enableStatus') }}</div>
         <div class="header-picture">
           <span>{{ $t('deviceView.thumbnail') }}</span>
         </div>
@@ -65,6 +66,12 @@
               </div>
               <div class="data-store titles">
                 <span>{{ item.store }}</span>
+              </div>
+              <div class="data-status titles">
+                <el-switch
+                  :disabled="!item.isClick"
+                  v-model="item.checkedStatus"
+                />
               </div>
               <div class="data-picture titles">
                 <span v-if="item.tempUrl">
@@ -425,8 +432,17 @@ export default {
       const params = {};
       params.id = item.id;
       params.name = item.name;
-      const updateDeviceRes = await beseyeRESTful.updateBeseyeChannel(params);
-      item.tempUrl !== item.pictureUrl && updateDeviceRes.errCode === 0 && this.updateImage(item.id);
+      const promiseArr = [];
+      item.name !== item.tempDeviceName && promiseArr.push(beseyeRESTful.updateBeseyeChannel(params));
+      item.checkedStatus && item.status === 0 && promiseArr.push(beseyeRESTful.enableBeseyeChannel({ deviceIds: [item.id] }));
+      !item.checkedStatus && item.status === 1 && promiseArr.push(beseyeRESTful.disableBeseyeChannel({ deviceIds: [item.id] }));
+      item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateImage(item.id));
+      const results = await Promise.all(promiseArr);
+      results.forEach(result => {
+        if (result.errCode !== 0) {
+          throw Error(result.errMsg);
+        }
+      });
     },
 
     updateImage(id) {
@@ -498,6 +514,8 @@ export default {
             deviceItem.channelId = channelItem.channelId;
             deviceItem.pictureUrl = channelItem.thumbnailUrl;
             deviceItem.tempUrl = channelItem.thumbnailUrl;
+            deviceItem.status = channelItem.status;
+            deviceItem.checkedStatus = channelItem.status === 1;
           }
         });
       });
@@ -545,8 +563,9 @@ export default {
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         this.isEditing = false;
         this.getBeseyeDeviceList(this.setParams());
-      }catch (error) {
+      } catch (error) {
         item.isEditing = false;
+        item.checkedStatus = item.status === 1;
         util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
         console.log('BeseyeDeviceMgmt-confirmEditBeseye: ' + error);
       }
@@ -559,6 +578,7 @@ export default {
       this.isUpdate = false;
       item.isClick = false;
       item.tempUrl = item.pictureUrl;
+      item.checkedStatus = item.status === 1;
       this.file = '';
     },
 
@@ -735,10 +755,13 @@ export default {
         width: 20%;
       }
       .header-store{
-        width: 25%;
+        width: 20%;
+      }
+      .header-status{
+        width: 10%;
       }
       .header-picture{
-        width: 25%;
+        width: 20%;
       }
       .header-operation{
         width: 10%;
@@ -778,10 +801,13 @@ export default {
         width: 20%;
       }
       .data-store{
-        width: 25%;
+        width: 20%;
+      }
+      .data-status{
+        width: 10%;
       }
       .data-picture{
-        width: 25%;
+        width: 20%;
       }
       .data-operation{
         width: 10%;
