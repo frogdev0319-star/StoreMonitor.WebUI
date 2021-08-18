@@ -419,8 +419,6 @@ export default {
       total: 0,
       page: 1,
       sizeNum: 10,
-      direction: 'asc',
-      property: 'completionRate',
       hasNoData: false,
       exportItmesHeader: [
         this.$t('scheduleView.InspectPerson'), this.$t('overview.storeNum'),
@@ -626,7 +624,6 @@ export default {
       let self = this;
       let order = col.order;
       self.order = order;
-      self.direction = col.column.property;
       self.defaultSort.order = order;
       self.defaultSort.prop = col.column.property;
       let prop = '';
@@ -697,7 +694,6 @@ export default {
 
     async searchData() {
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
-      this.params.order = { direction: this.direction, property: this.property };
       this.params.inspectTagId = parseInt(this.inspectTagId);
       this.saveSearchParams();
       await this.getInspectPersonTable();
@@ -914,21 +910,15 @@ export default {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
-        this.params.endTs = searchParams.endTs;
-        this.page = searchParams.filter.page + 1;
-        this.sizeNum = searchParams.filter.size;
-        this.direction = searchParams.order.direction;
-        this.property = searchParams.order.property;
-        this.params.filter = searchParams.filter;
-        this.params.order = searchParams.order;
+        this.params.endTs = searchParams.endTs
         if (!searchParams.inspectTagId) {
           this.params.inspectTagId = this.inspectTagId;
         } else {
           this.params.inspectTagId = searchParams.inspectTagId;
           this.inspectTagId = searchParams.inspectTagId;
         }
+        this.params.order = { direction: 'asc', property: 'completionRate' };
         this.getCachedParamsFlag = true;
-        this.setDefaultSort();
       } else {
         this.params = {};
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
@@ -936,15 +926,10 @@ export default {
         this.params.beginTs = start;
         this.params.endTs = end;
         this.params.filter = { page: this.page - 1, size: this.sizeNum };
-        this.params.order = { direction: this.direction, property: this.property };
+        this.params.order = { direction: 'asc', property: 'completionRate' };
         this.params.inspectTagId = this.inspectTagId;
         this.defaultSort = { prop: 'completionRateStr', order: 'ascending' };
       }
-    },
-
-    setDefaultSort() {
-      this.defaultSort.order = this.direction === 'asc' ? 'ascending' : 'descending';
-      this.defaultSort.prop = this.property === 'completionRate' ? 'completionRateStr' : this.property;
     },
 
     getInspctList() {
@@ -986,14 +971,18 @@ export default {
         }
       }).catch(e => {
         console.log('SupervisorStatistics-getInspectPersonTable:' + e);
-        self.supervisorTableData = [];
+        this.supervisorTableData = [];
       })
     },
 
     saveSearchParams() {
       const searchConditon = {
         path: 'supervisorStatistics',
-        params: this.params
+        params: {
+          beginTs: this.params.beginTs,
+          endTs: this.params.endTs,
+          inspectTagId: this.params.inspectTagId
+        }
       }
       SearchConditionUtil.saveSearchCondition(searchConditon)
     },
