@@ -462,6 +462,7 @@ export default {
     },
 
     getEventListAndCount() {
+      if (this.dateValue.length === 0) return;
       this.getEventList();
       this.getEventCount();
     },

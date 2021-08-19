@@ -651,6 +651,7 @@ export default {
     searchData() {
       const self = this;
       const val = self.dateValue;
+      if (val.length === 0) return;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       self.params.beginTs = start;
@@ -797,6 +798,8 @@ export default {
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
+        this.params.beginTs = this.$moment(this.dateValue[0]).valueOf();
+        this.params.endTs = this.$moment(this.dateValue[1]).valueOf();
         this.ifGetParamsFromCash = false;
         this.searchParams = {};
       }
