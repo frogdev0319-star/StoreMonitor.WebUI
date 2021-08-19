@@ -501,7 +501,7 @@ export default {
     'tHeaderD': 'Inspection Item Description(Optional,1200 characters)',
     'tHeaderE': 'Score(Optional, 0.5~50points,default 10 points)',
     'tHeaderF': 'Anomaly Events-Score Threshold(Optional，-50~full marks)',
-    'tHeaderG': 'Score Options(Required-50~full marks)',
+    'tHeaderG': 'Score options(Required-50~full marks)',
     'haveNothingToExport': 'There are currently no inspection tables to export',
     'bindWith': 'Binded with ',
     'bindStore': 'stores',

@@ -1803,31 +1803,21 @@ export default {
         } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
           scoreFlagObj.flags.flagItemLengthScore = true;
         }
+        let maxScore = 0;
         if (tableVersion === 1) {
-          if (item.totalScore == undefined || item.totalScore.length == 0 || isNaN(item.totalScore) ||
-              parseFloat(item.totalScore) < 0 || parseFloat(item.totalScore) > 50) {
-            scoreFlagObj.flags.flagFullScoreType = true;
-          }
-          if (item.scoreThreshold != undefined) {
-            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50 ||
-                parseFloat(item.scoreThreshold) > parseFloat(item.totalScore)) {
-              scoreFlagObj.flags.flagMinScoreType = true;
-            }
-          } else {
-            item.scoreThreshold = parseFloat(item.totalScore);
-          }
           if (item.score != undefined) {
             if (typeof item.score !== 'number' && item.score.indexOf('/') !== -1) {
               const f_Score = item.score.split('/');
               const scoreArr = [];
               f_Score.forEach(f_item => {
-                if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= parseFloat(item.totalScore)) {
+                if (!isNaN(Number(f_item)) && parseFloat(f_item) >= -50 && parseFloat(f_item) <= 50) {
                   scoreArr.push(parseFloat(_this.getFloat(f_item)));
                 }
               });
               scoreArr.length === 0 ? scoreFlagObj.flags.flagScoreItemType = true : item.score = scoreArr;
             } else {
-              if (!isNaN(Number(item.score)) && parseFloat(item.score) >= -50 && parseFloat(item.score) <= parseFloat(item.totalScore)) {
+              if (!isNaN(Number(item.score)) && parseFloat(item.score) >= -50 &&
+                parseFloat(item.score) <= 50) {
                 const a = [];
                 a.push(parseFloat(_this.getFloat(item.score)));
                 item.score = a;
@@ -1835,13 +1825,21 @@ export default {
                 scoreFlagObj.flags.flagScoreItemType = true;
               }
             }
-            const maxScore = item.score.sort((a, b) => { return a - b; })[item.score.length - 1];
-            console.log(maxScore)
-            if (!scoreFlagObj.flags.flagFullScoreType && item.totalScore !== maxScore) {
-              scoreFlagObj.flags.flagFullScoreLimitation = true;
-            }
+            maxScore = item.score.sort((a, b) => { return a - b; })[item.score.length - 1];
           } else {
             scoreFlagObj.flags.flagScoreItemEmpty = true;
+          }
+          if (item.totalScore == undefined || item.totalScore.length == 0 || isNaN(item.totalScore) ||
+            item.totalScore.toString() !== maxScore.toString()) {
+            scoreFlagObj.flags.flagFullScoreLimitation = true;
+          }
+          if (item.scoreThreshold != undefined) {
+            if (isNaN(item.scoreThreshold) || parseFloat(item.scoreThreshold) < -50 ||
+                parseFloat(item.scoreThreshold) > maxScore) {
+              scoreFlagObj.flags.flagMinScoreType = true;
+            }
+          } else {
+            item.scoreThreshold = parseFloat(item.totalScore);
           }
         } else {
           if (item.score != undefined) {
