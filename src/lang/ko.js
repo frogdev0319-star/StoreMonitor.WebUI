@@ -239,6 +239,7 @@ export default {
     'allPosition': '모든 위치',
     'allUser': '모든 사람',
     'checkinReport': '로그인 보고서-{time1}-{time2}',
+    'visitor': '면접관',
 
     'emptyPatrolList': '검사 KPI가 비어 있습니다. 데이터를 다시 필터링하십시오',
     'emptyItemList': '검사 항목 목록이 비어 있습니다. 데이터를 다시 필터링하십시오'

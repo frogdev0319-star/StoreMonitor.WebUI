@@ -236,6 +236,7 @@ export default {
     'allPosition': 'すべてのポジション',
     'allUser': 'すべての人',
     'checkinReport': 'サインインレポート-{time1}-{time2}',
+    'visitor': 'インタビュアー',
 
     'emptyPatrolList': 'インスペクションリストが空です。データを再フィルターしてください',
     'emptyItemList': '検査項目一覧が空です。データを再フィルターしてください'

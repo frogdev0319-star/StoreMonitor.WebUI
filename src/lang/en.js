@@ -235,7 +235,8 @@ export default {
     'allDepartment': 'All Departments',
     'allPosition': 'All Positions',
     'allUser': 'All Persons',
-    'checkinReport': 'Checkin Report-{time1}-{time2}'
+    'checkinReport': 'Checkin Report-{time1}-{time2}',
+    'visitor': 'Interviewer'
   },
 
   // Patrol page language

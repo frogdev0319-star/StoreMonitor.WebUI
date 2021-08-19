@@ -238,7 +238,8 @@ export default {
     'allDepartment': '全部部门',
     'allPosition': '全部职务',
     'allUser': '全部人员',
-    'checkinReport': '签到统计报表-{time1}-{time2}'
+    'checkinReport': '签到统计报表-{time1}-{time2}',
+    'visitor': '拜访对象'
   },
 
   // Patrol page language

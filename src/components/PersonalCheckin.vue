@@ -81,7 +81,7 @@ export default {
           'prop': 'place',
           'label': this.$t('overview.checkinAddress'),
           'sortable': false,
-          'width': '300'
+          'width': '200'
         },
         {
           'prop': 'ts',
@@ -91,6 +91,12 @@ export default {
           'formatter': function(row, column, cellValue) {
             return util.formDatetime(cellValue);
           }
+        },
+        {
+          'prop': 'visitor',
+          'label': this.$t('overview.visitor'),
+          'sortable': false,
+          'width': '100'
         },
         {
           'prop': 'description',
