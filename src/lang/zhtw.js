@@ -566,7 +566,7 @@ export default {
     'passfailexcelEmpty': '巡检项不能為空！',
     'excelPassFailScoreType': '項目分值選填，取值範圍為0.5~50',
     'excelFullScoreType': '項目總分值必填，取值範圍為0~50',
-    'excelMinScoreType': 'Score 巡檢項最低分值选填，取值範圍為-50~評分選項最高分',
+    'excelMinScoreType': '巡檢項最低分值选填，取值範圍為-50~評分選項最高分',
     'excelScoreItemType': '評分選項必填，取值範圍為-50~50',
     'excelOtherScoreType': '項目分值必填，取值範圍為-100~100',
     'excelScoreItemEmpty': '評分選項不能為空！',

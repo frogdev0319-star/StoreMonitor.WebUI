@@ -1955,13 +1955,13 @@ export default {
         if (passFailFlag.flagGroupLengthPassFail || scoreFlag.flagGroupLengthScore || othersFlag.flagGroupLengthOthers) {
           const flagArr = [];
           if (passFailFlag.flagGroupLengthPassFail) {
-            flagArr.push('PassFail');
+            flagArr.push('[PassFail]');
           }
           if (scoreFlag.flagGroupLengthScore) {
-            flagArr.push('Score');
+            flagArr.push('[Score]');
           }
           if (othersFlag.flagGroupLengthOthers) {
-            flagArr.push('Others');
+            flagArr.push('[Others]');
           }
           const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
           warningInfo.push(flag);
@@ -1969,13 +1969,13 @@ export default {
         if (passFailFlag.flagSubGroupLengthPassFail || scoreFlag.flagSubGroupLengthScore || othersFlag.flagSubGroupLengthOthers) {
           const flagArr = [];
           if (passFailFlag.flagSubGroupLengthPassFail) {
-            flagArr.push('PassFail');
+            flagArr.push('[PassFail]');
           }
           if (scoreFlag.flagSubGroupLengthScore) {
-            flagArr.push('Score');
+            flagArr.push('[Score]');
           }
           if (othersFlag.flagSubGroupLengthOthers) {
-            flagArr.push('Others');
+            flagArr.push('[Others]');
           }
           const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
           warningInfo.push(flag);
@@ -1983,15 +1983,15 @@ export default {
         if (passFailFlag.flagItemNamePassFail || scoreFlag.flagItemNameScore || othersFlag.flagItemNameOthers) {
           const flagArr = [];
           if (scoreFlag.flagItemNameScore) {
-            const flag = 'Score' + ' ' + this.$t('insSettingView.excelEmpty');
+            const flag = '[Score]' + ' ' + this.$t('insSettingView.excelEmpty');
             warningInfo.push(flag);
           }
           if (passFailFlag.flagItemNamePassFail || othersFlag.flagItemNameOthers) {
             if (passFailFlag.flagItemNamePassFail) {
-              flagArr.push('PassFail');
+              flagArr.push('[PassFail]');
             }
             if (othersFlag.flagItemNameOthers) {
-              flagArr.push('Others');
+              flagArr.push('[Others]');
             }
             const flag = flagArr.toString() + ' ' + this.$t('insSettingView.passfailexcelEmpty');
             warningInfo.push(flag);
@@ -2014,25 +2014,25 @@ export default {
           warningInfo.push(flag);
         }
         if (passFailFlag.flagPassFailScoreType) {
-          warningInfo.push('PassFail' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));
+          warningInfo.push('[PassFail]' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));
         }
         if (scoreFlag.flagFullScoreType) {
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelFullScoreType'));
+          warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelFullScoreType'));
         }
         if (scoreFlag.flagMinScoreType) {
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelMinScoreType'));
+          warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelMinScoreType'));
         }
         if (othersFlag.flagOtherScoreType) {
-          warningInfo.push('Others' + ' ' + this.$t('insSettingView.excelOtherScoreType'));
+          warningInfo.push('[Others]' + ' ' + this.$t('insSettingView.excelOtherScoreType'));
         }
         if (scoreFlag.flagScoreItemType) {
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemType'));
+          warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelScoreItemType'));
         }
         if (scoreFlag.flagScoreItemEmpty) {
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.excelScoreItemEmpty'));
+          warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelScoreItemEmpty'));
         }
         if (scoreFlag.flagFullScoreLimitation) {
-          warningInfo.push('Score' + ' ' + this.$t('insSettingView.totalScoreLimitation'));
+          warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.totalScoreLimitation'));
         }
       }
       return warningInfo;
