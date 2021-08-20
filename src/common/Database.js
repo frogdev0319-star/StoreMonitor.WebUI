@@ -54,9 +54,7 @@ export default class Database {
           throw err;
         }
       }).then((hasDataFlag) => {
-        console.log(hasDataFlag);
         if (hasDataFlag === true) {
-          console.log('update');
           return this.DataBase.put(text);
         } else if (hasDataFlag.data) {
           hasDataFlag.data = text.data;

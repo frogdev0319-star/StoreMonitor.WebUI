@@ -321,6 +321,7 @@ export default {
     if (to.name !== 'remotePatrol') {
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
+      Database.addDataToDB(self.userId, {data: {}, rule: {}})
       next();
     } else {
       self.$store.dispatch('setPatrolComment', self.suggest);

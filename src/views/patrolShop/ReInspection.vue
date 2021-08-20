@@ -773,9 +773,6 @@ export default {
       accountChanged: 'accountChanged',
       videoAuthority: 'videoAuthority'
     }),
-    ...mapGetters(
-      ['isEzviz']
-    ),
 
     storeUpClass() {
       return {
@@ -815,6 +812,7 @@ export default {
           self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
+          Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
           self.$store.dispatch('setPatrolHistory', self.historyObj);
@@ -829,6 +827,7 @@ export default {
         // from.meta.keepAlive=false;
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
+        Database.addDataToDB(self.userId, {data: {}, rule: {}});
       } else {
         // from.meta.keepAlive=true;
         self.$store.dispatch('setPatrolHistory', self.historyObj);
@@ -869,6 +868,7 @@ export default {
       self.deviceList = PatrolHistory.deviceList;
       self.isDisabled = true;
       self.channel = PatrolHistory.channel;
+      self.curItemId = PatrolHistory.curItemId;
       self.vendor = self.channel.vendor;
       const isClick = self.sheetName[self.sheetName.length - 1].isClick;
       if (isClick) {
@@ -1141,7 +1141,7 @@ export default {
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
       });
-      self.isEzviz ? self.$refs.ezvizVideo.editCount++ : self.editCount++;
+      self.$refs.vendorVideo.editCount++;
       if (e === 0) {
         if (item.type === 2) {
           if (item.itemScore < 0) {
@@ -1636,8 +1636,7 @@ export default {
         self.noBindDeviceObj.dialogCosed = true;
         return false;
       }
-      self.stopVendorVideo();
-      self.hiddenChannelBtn();
+      self.$refs.vendorVideo.stopVideoPlay();
       self.handleIgnore();
     },
     CancleIgnoreItem(item, index) {
@@ -1864,7 +1863,8 @@ export default {
         curGroupIndex: self.curGroupIndex,
         curItemIndex: self.curItemIndex,
         deviceList: self.deviceList,
-        channel: self.channel
+        channel: self.channel,
+        curItemId: self.curItemId
       };
       self.hasIgnoretemp = [];
       const params = { _id: self.userId, data: obj, rule: inspectSettings };
@@ -1977,7 +1977,8 @@ export default {
         curSheetIndex: self.curSheetIndex,
         curGroupIndex: self.curGroupIndex,
         curItemIndex: self.curItemIndex,
-        channel: self.channel
+        channel: self.channel,
+        curItemId: self.curItemId
       };
       self.hasIgnoretemp = [];
       const params = { _id: self.userId, data: obj, rule: inspectSettings };
@@ -2086,7 +2087,7 @@ export default {
       self.showStoreUp = true;
 
       !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
-      self.$refs.vendorVideo.stopVideoPlay();
+      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
       self.showError = false;
       self.curDeviceId = -1;
       self.showFeedBack = false;
@@ -2263,6 +2264,7 @@ export default {
       self.tempArr = [];
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
+      Database.addDataToDB(self.userId, {data: {}, rule: {}});
       self.isShowWarn = false;
       self.notShowAlert = false;
       self.showIgnoreItem = false;

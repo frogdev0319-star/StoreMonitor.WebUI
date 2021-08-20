@@ -77,7 +77,7 @@
         <el-table-column
           :label="$t('overview.remotePatrol')"
           :min-width="lang.indexOf('zh') !== -1 ? 120 : 180"
-          :sortable="true"
+          sortable="custom"
           :sort-orders="['ascending', 'descending']"
           prop="RemoteStr">
           <template slot-scope="scope">
@@ -89,7 +89,7 @@
         <el-table-column
           :label="$t('overview.onsitePatrol')"
           :min-width="lang.indexOf('zh') !== -1 ? 120 : 180"
-          :sortable="true"
+          sortable="custom"
           :sort-orders="['ascending', 'descending']"
           prop="OnsiteStr">
           <template slot-scope="scope">
@@ -101,7 +101,7 @@
         <el-table-column
           :label="$t('overview.storeMonitor')"
           :min-width="lang.indexOf('zh') !== -1 ? 120 : 160"
-          :sortable="true"
+          sortable="custom"
           :sort-orders="['ascending', 'descending']"
           prop="VideoStr">
           <template slot-scope="scope">
@@ -308,20 +308,10 @@ export default {
             self.order.property = property;
           }
         } else {
-          if (property.indexOf('Str') === -1) {
-            self.order.property = property;
-          } else {
-            self.order.property = this.getEventSourceProperty(property);
-          }
+          self.order.property = property;
         }
         this.$emit('sortChange', self.order, self.defaultSort);
       }
-    },
-
-    getEventSourceProperty(property) {
-      let propertyStr = '';
-      propertyStr = property.indexOf('Remote') > -1 ? 'numOfRemote' : (property.indexOf('Onsite') > -1 ? 'numOfOnsite' : 'numOfVideo');
-      return propertyStr;
     },
 
     getOrderBasedOnDefaultSort() {
