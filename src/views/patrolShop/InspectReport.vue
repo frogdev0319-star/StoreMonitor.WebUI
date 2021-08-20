@@ -195,7 +195,7 @@
                             <el-image
                               :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
-                              :preview-src-list="getImgList(0, [sourceitem])"
+                              :preview-src-list="getImgList(index, item.sourceList)"
                               class="imgLittle imgInner"/>
                           </div>
                           <div
@@ -266,7 +266,7 @@
                         <el-image
                           :style="isexportPDF ? exportImageStyle :imageStyle"
                           :src="sourceitem.url"
-                          :preview-src-list="getImgList(0, [sourceitem])"
+                          :preview-src-list="getImgList(index, item.sourceList)"
                           class="imgLittle imgInner"/>
                       </div>
                       <div
@@ -383,7 +383,7 @@
                   class="signature-item">
                   <el-image
                     :src="signatureItem.content"
-                    :preview-src-list="[signatureItem.content]"
+                    :preview-src-list="getSignatureList(signatureIndex, pageItem.data)"
                     class="signature-content"/>
                 </div>
               </div>
@@ -761,6 +761,20 @@ export default {
         }
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.url);
+    },
+
+    getSignatureList(index, sourceList) {
+      console.log(sourceList)
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
+      }
+      console.log(arr.filter(source => source.type === 2).map(source => source.content));
+      return arr.filter(source => source.type === 2).map(source => source.content);
     },
 
     async getReportInfo(res) {
