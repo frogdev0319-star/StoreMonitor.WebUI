@@ -764,7 +764,6 @@ export default {
     },
 
     getSignatureList(index, sourceList) {
-      console.log(sourceList)
       const arr = [];
       let i = 0;
       for (i; i < sourceList.length; i++) {
@@ -773,7 +772,6 @@ export default {
           index = 0 - (i + 1);
         }
       }
-      console.log(arr.filter(source => source.type === 2).map(source => source.content));
       return arr.filter(source => source.type === 2).map(source => source.content);
     },
 
