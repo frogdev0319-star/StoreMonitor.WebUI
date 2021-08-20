@@ -473,18 +473,24 @@ export default {
 
     async export2Excel() {
       const params = this.generateCallParams();
-      const result = await getCheckinReport(params);
-      const url = URL.createObjectURL(
-        new Blob([result],
-          { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
-        ));
-      const link = document.createElement('a');
-      link.href = url;
-      const time1 = this.$moment(this.dateValue[0]).format('YYYYMMDD');
-      const time2 = this.$moment(this.dateValue[1]).format('YYYYMMDD');
-      link.setAttribute('download', this.$t('overview.checkinReport', { time1: time1, time2: time2 }));
-      document.body.appendChild(link);
-      link.click();
+      let {beginTs, endTs, userIds } = {... params};
+      try {
+        const result = await getCheckinReport({beginTs, endTs, userIds});
+        const url = URL.createObjectURL(
+          new Blob([result],
+            { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+          ));
+        const link = document.createElement('a');
+        link.href = url;
+        const time1 = this.$moment(this.dateValue[0]).format('YYYYMMDD');
+        const time2 = this.$moment(this.dateValue[1]).format('YYYYMMDD');
+        link.setAttribute('download', this.$t('overview.checkinReport', { time1: time1, time2: time2 }));
+        document.body.appendChild(link);
+        link.click();
+      } catch (e) {
+        console.log(e);
+      }
+
     },
 
     saveSearchParams() {

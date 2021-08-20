@@ -77,7 +77,7 @@
                     :min-width="lang.indexOf('zh') !== -1 ? _item.width : _item.maxWidth"/>
                   <el-table-column :label="$t('overview.detail')" :width="lang.indexOf('ja') !== -1 ? '160px': '130px'" type="expand">
                     <template slot-scope="props">
-                      <el-tabs v-model="activeName" @tab-click="handleClick">
+                      <el-tabs v-model="activeName">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="patrolPlan">
                           <el-table
                             :data="planTableData"
@@ -216,7 +216,7 @@
                     :min-width="lang.indexOf('zh') !== -1 ? _item.pdfwidth : _item.pdfmaxWidth"/>
                   <el-table-column :label="$t('overview.detail')" type="expand" width="100px">
                     <template slot-scope="scope">
-                      <el-tabs v-model="activePDFFirst" style="width:990px;" @tab-click="handleClick">
+                      <el-tabs v-model="activePDFFirst" style="width:990px;">
                         <el-tab-pane :label="$t('overview.patrolPlan')" name="First">
                           <el-table
                             :data="scope.row.planTableData"
@@ -249,7 +249,7 @@
                           </el-table>
                         </el-tab-pane>
                       </el-tabs>
-                      <el-tabs v-model="activePDFSecond" style="width:990px;" @tab-click="handleClick">
+                      <el-tabs v-model="activePDFSecond" style="width:990px;">
                         <el-tab-pane :label="$t('overview.patrolExecution')" name="Second">
                           <el-table
                             :data="scope.row.implementTableData"
@@ -744,10 +744,6 @@ export default {
 
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
-    },
-
-    handleClick(tab, event) {
-      console.log(tab, event);
     },
 
     async getPlanDetail(e) {
