@@ -185,7 +185,7 @@
             <div class="table">
               <div class="event-content">
                 <el-table
-                  :data="eventPDFData"
+                  :data="allEventData"
                   :highlight-current-row="true"
                   :default-sort = "defaultSort"
                   :header-cell-class-name="headerClass"
@@ -208,7 +208,7 @@
                   <el-table-column
                     :label="$t('overview.remotePatrol')"
                     :min-width="lang.indexOf('zh') !== -1 ? '8% ': '9%'"
-                    :sortable="true"
+                    sortable="custom"
                     prop="RemoteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper remote">
@@ -219,7 +219,7 @@
                   <el-table-column
                     :label="$t('overview.onsitePatrol')"
                     :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
-                    :sortable="true"
+                    sortable="custom"
                     prop="OnsiteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper onsite">
@@ -230,7 +230,7 @@
                   <el-table-column
                     :label="$t('overview.storeMonitor')"
                     :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
-                    :sortable="true"
+                    sortable="custom"
                     prop="VideoStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper video">
@@ -371,7 +371,6 @@ export default {
       echartBackground: 'rgba(30,34,52,0.75)',
       exportPng: require('../../../static/img/excel.png'),
       eventTableData: [],
-      eventPDFData: [],
       eventInfoData: [
         {
           'prop': 'province',
@@ -516,16 +515,11 @@ export default {
             var oGrayImg = canvas.toDataURL('image/jpeg');
             self.pdfSrc = oGrayImg;
           });
-          new Promise(async resolve => {
-            self.eventPDFData = await self.getExportData();
-            resolve(true);
-          }).then(function() {
-            setTimeout(() => {
-              self.$print(self.$refs.printPDF);
-              self.ispdf = false;
-            }, 1000);
-          });
-        }, 1000);
+          setTimeout(() => {
+            self.$print(self.$refs.printPDF);
+            self.ispdf = false;
+          }, 1000);
+        }, 5000);
       });
     },
 
@@ -706,7 +700,7 @@ export default {
         const tHeader = that.exportEventHeader;
         const filterVal = ['province', 'city', 'storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
           'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
-        const curData = await that.getExportData();
+        const curData = that.allEventData;
         const data = that.formatJson(filterVal, curData);
         const fileName = 'EventList' + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
@@ -731,18 +725,6 @@ export default {
         const result = eventResult.data;
         if (result) {
           content = result.content;
-          content.forEach(item => {
-            const numOfTotal = item.numOfTotal;
-            if (numOfTotal === 0) {
-              item.RemoteStr = 0 + '%';
-              item.OnsiteStr = 0 + '%';
-              item.VideoStr = 0 + '%';
-            } else {
-              item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-              item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-              item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
-            }
-          });
         }
       } catch (e) {
         this.ispdf = false;
@@ -832,19 +814,6 @@ export default {
         if (result) {
           const content = result.content;
           self.total = result.totalElements;
-          content.forEach(item => {
-            const numOfTotal = item.numOfTotal;
-            if (numOfTotal === 0) {
-              item.RemoteStr = 0 + '%';
-              item.OnsiteStr = 0 + '%';
-              item.VideoStr = 0 + '%';
-            } else {
-              item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-              item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-              item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
-            }
-          });
-          self.eventTableData = content;
         } else {
           self.eventTableData = 0;
           self.eventKPIs.forEach(item => {
@@ -865,7 +834,22 @@ export default {
       params.order = self.order;
       try {
         self.allEventData = await self.getExportData();
-        self.getEventTableDataFromEventData();
+        self.allEventData.forEach(item => {
+          const numOfTotal = item.numOfTotal;
+          if (numOfTotal === 0) {
+            item.RemoteStr = 0 + '%';
+            item.OnsiteStr = 0 + '%';
+            item.VideoStr = 0 + '%';
+          } else {
+            item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+            item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+            item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+          }
+          item.Remote = Number(item.RemoteStr.replace('%', ''));
+          item.Onsite = Number(item.OnsiteStr.replace('%', ''));
+          item.Video = Number(item.VideoStr.replace('%', ''));
+        });
+        self.setEventTableData();
         self.getEventsNum();
         self.getEventBySourcePie();
       } catch (e) {
@@ -873,15 +857,17 @@ export default {
       }
     },
 
-    getEventTableDataFromEventData() {
-      const allTableData = this.allEventData;
-      if (this.totalElements < this.params.filter.size) {
-        this.tableData = Lodash.cloneDeep(allTableData);
-      } else {
-        const startIndex = this.params.filter.page;
-        const endIndex = this.params.filter.size;
-        this.tableData = allTableData.slice(startIndex, endIndex);
-      }
+    setEventTableData(){
+      this.orderAllTableData();
+      this.eventTableData = [];
+      this.eventTableData = [...this.allEventData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+    },
+
+    orderAllTableData(){
+      let key = this.defaultSort.prop;
+      key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
+      this.defaultSort.order === 'descending' ? this.allEventData.sort((a,b) => { return b[key] - a[key] })
+                                : this.allEventData.sort((a,b) => { return a[key] - b[key] });
     },
 
     getEventsNum() {
@@ -1020,7 +1006,7 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.getEventTableData();
+      self.setEventTableData();
     },
 
     handleSortChange(order, defaultSort) {
@@ -1030,7 +1016,7 @@ export default {
         page: this.page - 1,
         size: this.sizeNum
       };
-      this.getEventTableData();
+      this.setEventTableData();
     },
 
     setDefaultSortAndPage(paramsObj) {
