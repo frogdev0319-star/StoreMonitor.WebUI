@@ -133,7 +133,7 @@
                           <div v-if="sourceitem.mediaType==2" class="img-content">
                             <el-image
                               :src="sourceitem.src"
-                              :style="{width: imgWidth, height: imgHeight+'px'}"
+                              :style="imageStyle"
                               :preview-src-list="getImgList(sourceindex, inspectItem.sourceList)"
                               class="imgLittle imgInner"/>
                           </div>
@@ -162,8 +162,8 @@
                         <div v-if="sourceitem.mediaType==2" class="img-content">
                           <el-image
                             :src="sourceitem.src"
-                            :style="{width: imgWidth, height: imgHeight+'px'}"
-                            :preview-src-list="getImgList(sourceindex, inspectItem.sourceList)"
+                            :style="imageStyle"
+                            :preview-src-list="getImgList(index, _item.sourceList)"
                             class="imgLittle imgInner"/>
                         </div>
                         <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
@@ -307,7 +307,14 @@ export default {
         height = 75;
       }
       return height;
-    }
+    },
+
+    imageStyle() {
+      return {
+        'width': 'calc(130/1920*100vw)',
+        'height': `${this.imgHeight}px`
+      }
+    },
   },
   beforeRouteLeave(to, from, next) {
     const self = this;
@@ -391,12 +398,10 @@ export default {
             .then((results) => {
               // 上传完成
               const url = self.getFileUrl(results.name);
-              console.log(url);
               resolve(url);
             })
             .catch((err) => {
               reject(err);
-              console.log(err);
             });
         });
       } else {
@@ -408,12 +413,10 @@ export default {
             .then((results) => {
               // 上传完成
               const url = self.getFileUrl(fileItem.fileName);
-              console.log(url);
               resolve(url);
             })
             .catch((error) => {
               reject(error);
-              console.log(error);
             });
         });
       }
@@ -451,7 +454,6 @@ export default {
       await getStorageInfo(storageParams).then(res => {
         if (res.errCode === 0) {
           self.oss = res.data;
-          console.log(self.oss);
         }
       });
       const temp = [];
@@ -502,7 +504,6 @@ export default {
         }
       }
       const feedEventList = [];
-      console.log(self.eventList);
 
       for (const i in self.eventList) {
         const obj = {};
@@ -1180,7 +1181,6 @@ export default {
       const userId = getCookie('UserId');
       return new Promise((resolve, reject) => {
         getUserInfo().then(res => {
-          console.log(res);
           res.data.forEach(item => {
             if (item.userId === userId) {
               const accountId = item.accountId.toLowerCase();
@@ -1195,14 +1195,7 @@ export default {
     async getOssInfo() {
       const self = this;
       const accountId = await self.getAccountId();
-      console.log(accountId);
       self.accountId = localStorage.getItem('oss_bucket');
-      // getStorageInfo().then(res=>{
-      //     console.log(res);
-      //     if(res.errCode==0){
-      //         self.oss=res.data;
-      //     }
-      // })
     },
     getUpLoadBucketInfo() {
       const self = this;
