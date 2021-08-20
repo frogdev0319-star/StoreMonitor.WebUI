@@ -516,12 +516,6 @@ export default {
     }
   },
 
-  computed:{
-    isHistory(){
-      return this.playBack
-    }
-  },
-
   async created() {
     window.addEventListener('resize', this.resizeFun, false);
     window.addEventListener('visibilitychange', this.visibilityChange, false);
@@ -539,15 +533,15 @@ export default {
   },
 
   computed: {
-    graphBtnWidth: function() {
+    graphBtnWidth() {
       return this.varyWindowHeight * 0.185;
     },
 
-    btnFontSize: function() {
+    btnFontSize() {
       return this.varyWindowHeight * 0.022;
     },
 
-    percentHeight: function() {
+    percentHeight() {
       return this.varyWindowHeight / 758;
     },
 
@@ -555,9 +549,8 @@ export default {
       accountChanged: 'accountChanged'
     }),
 
-    isEzviz() {
-      const self = this;
-      return self.$store.state.user.isEzviz;
+    isHistory(){
+      return this.playBack
     }
   },
 

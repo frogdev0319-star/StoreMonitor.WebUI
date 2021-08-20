@@ -1302,6 +1302,7 @@ export default {
         this.errorMsg = this.$t('remotePatrol.videoLicense');
         return;
       }
+      await this.getEzvizAccessToken(this.channelInfo.ivsId);
       if (self.isStoreMonitor) {
         self.checkIfEncry();
         self.isLoaded = true;
@@ -1897,6 +1898,7 @@ export default {
     },
 
     async startVideo(ivsId, channelId, startTs){
+      console.log('startVideo' + ivsId)
       await this.getEzvizAccessToken(ivsId);
       this.playState && this.stopRealTime();
       this.realTime();

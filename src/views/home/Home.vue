@@ -598,6 +598,8 @@ export default {
 
     changeAccount(accountId) {
       const self = this;
+      const idIndex = this.brandList.map(item => item.accountId).indexOf(accountId);
+      idIndex !== -1 && sessionStorage.setItem('accountName', this.brandList[idIndex].name);
       const params = {
         accountId: accountId
       };
