@@ -34,10 +34,10 @@
         </div>
         <div class="header-name">{{ $t('deviceView.deviceName') }}</div>
         <div class="header-store">{{ $t('deviceView.store') }}</div>
-        <div class="header-status">{{ $t('deviceView.enableStatus') }}</div>
         <div class="header-picture">
           <span>{{ $t('deviceView.thumbnail') }}</span>
         </div>
+        <div class="header-status">{{ $t('deviceView.enableStatus') }}</div>
         <div class="header-operation">{{ $t('deviceView.operation') }}</div>
       </div>
       <div v-if="beseyeDevicesList.length > 0">
@@ -67,12 +67,6 @@
               <div class="data-store titles">
                 <span>{{ item.store }}</span>
               </div>
-              <div class="data-status titles">
-                <el-switch
-                  :disabled="!item.isClick"
-                  v-model="item.checkedStatus"
-                />
-              </div>
               <div class="data-picture titles">
                 <span v-if="item.tempUrl">
                   <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
@@ -100,6 +94,12 @@
                     <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
                   </el-button>
                 </el-upload >
+              </div>
+              <div class="data-status titles">
+                <el-switch
+                  :disabled="!item.isClick"
+                  v-model="item.checkedStatus"
+                />
               </div>
               <div class="data-operation titles">
                 <div v-if="item.isEditing" class="iconcontent">
