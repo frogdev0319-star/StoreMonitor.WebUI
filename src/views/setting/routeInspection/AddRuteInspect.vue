@@ -302,6 +302,7 @@
       </div>
     </dialog-pop>
     <dialog-pop
+      v-if="showAddGroup"
       :title="isEditCategory ? $t('insSettingView.updateCategory') : $t('insSettingView.addCategory')"
       :append-to-body="true"
       :close-on-click-modal="false"
@@ -320,13 +321,13 @@
         >
           <div slot class="dialog-form-item-name">
             <span class="required-name">*</span>
-            <span>{{$t('insSettingView.catergyName')}}</span>
+            <span>{{ $t('insSettingView.catergyName') }}</span>
           </div>
         </validate-input>
         <div class="dialog-form-item">
           <div class="dialog-form-item-name">
-            <span>{{$t('insSettingView.parentCatergyName')}}</span>
-            <icon-tooltip placement="right" :is-catergy-setting="true">
+            <span>{{ $t('insSettingView.parentCatergyName') }}</span>
+            <icon-tooltip :is-catergy-setting="true" placement="right">
               <i class="iconfont icon-bangzhu iconbangzhu"/>
             </icon-tooltip>
           </div>
@@ -1696,23 +1697,23 @@ export default {
       }
     },
 
-    hideAddGroupDialog(){
+    hideAddGroupDialog() {
       this.showAddGroup = false;
     },
 
-    confirmAddSubGroup(){
+    confirmAddSubGroup() {
       this.showAddGroup = false;
     },
 
-    getInputCatergyName(val){
+    getInputCatergyName(val) {
       this.groupNameInput = val;
     },
 
-    getSubCategorySequence(children){
+    getSubCategorySequence(children) {
       this.oldSubcategorySequence = children.map(value => value.sequence);
     },
 
-    handleUpdateSubCategorySequence(children){
+    handleUpdateSubCategorySequence(children) {
       this.newSubcategorySequence = children.map(value => {
         return {
           id: value.id,
