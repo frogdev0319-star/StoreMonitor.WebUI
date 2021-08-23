@@ -847,7 +847,7 @@ export default {
     'authorizedDevicesNum': '授權設備數量：',
     'addedDeviceNumber': '已啟用設備數量：',
     'licenseOverdue': '門店巡檢服務已逾期',
-    'hasBoundItem': '設備已綁定通道',
+    'hasBoundItem': '設備已綁定巡檢項',
     'hasAdded': '設備已被別人添加',
     'validateSucc': '驗證成功！',
     'validateFailed': '驗證失敗！'

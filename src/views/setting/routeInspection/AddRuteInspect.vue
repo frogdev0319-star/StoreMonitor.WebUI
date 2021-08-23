@@ -61,8 +61,15 @@
               <div v-if="item.isClick" class="proper-flag"/>
               <div>
                 <div class="group-left">
-                  <span v-if="!item.isEdit" :style="item.isClick?{'color':'#f31d65'}:{}">{{ item.groupName }}（{{ item.groupNum }}）</span>
-                  <el-input v-if="item.isEdit" v-model="item.groupName" size="mini" class="group-input" @input="(val)=>groupNameChange(val,item)"/>
+                  <span v-if="!item.isEdit"
+                        :style="item.isClick?{'color':'#f31d65'}:{}">
+                    {{ item.groupName }}（{{ item.groupNum }}）
+                  </span>
+                  <el-input v-if="item.isEdit"
+                            v-model="item.groupName"
+                            size="mini"
+                            class="group-input"
+                            @input="(val)=>groupNameChange(val,item)"/>
                 </div>
                 <div class="group-right">
                   <div v-if="item.showEdit" class="show-edit">
@@ -90,7 +97,12 @@
             </div>
             <div v-if="showAddGroup" class="group-add">
               <div class="group-name-left">
-                <el-input :placeholder="$t('insSettingView.enterName')" v-model="groupNameInput" size="mini" class="groupName-input" @input="(val)=>groupNameChange(val,{})" @blur="notShowInputRuleTips('enterName')"/>
+                <el-input :placeholder="$t('insSettingView.enterName')"
+                          v-model="groupNameInput"
+                          size="mini"
+                          class="groupName-input"
+                          @input="(val)=>groupNameChange(val,{})"
+                          @blur="notShowInputRuleTips('enterName')"/>
                 <span v-if="enterNameRuletip" class="rules">{{ $t('insSettingView.enterNameRuletip') }}</span>
               </div>
               <div class="group-name-right">
