@@ -1093,7 +1093,7 @@ export default {
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       const threeMonthAgo = util.getThreeMonths(end);
       if (end - start > end - threeMonthAgo) {
-        util.notify(that.$t('eventView.changeTimeRange'), 'warning', 3000);
+        util.notify(self.$t('eventView.changeTimeRange'), 'warning', 3000);
         self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
       }
     },

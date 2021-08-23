@@ -82,7 +82,7 @@
           class="item"
           effect="dark"
           placement="bottom-end">
-          <div slot="content">*{{ $t('eventView.timePlaceholder') }}</div>
+          <div slot="content">*{{ $t('remotePatrol.timePlaceholder') }}</div>
           <i class="iconfont icon-bangzhu iconbangzhu"/>
         </el-tooltip>
         <span
