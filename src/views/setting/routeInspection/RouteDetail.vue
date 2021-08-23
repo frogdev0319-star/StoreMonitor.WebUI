@@ -36,7 +36,7 @@
       </el-col>
       <el-col :span="24">
         <div class="data-box">
-          <div v-for="item in sheetName" :key="item.id" class="sheet_title" @click="changeSheet(item.id)">
+          <div v-for="(item, sheetIndex) in sheetName" :key="item.id" class="sheet_title" @click="changeSheet(item.id, sheetIndex)">
             <p :style="item.isClick?'background-color: #f31b65;color:#fff;':''" class="item_title">{{ item.label }}</p>
           </div>
         </div>
@@ -56,6 +56,12 @@
               </div>
               <template v-if="!item.children">
                 <div v-if="item.itemData.length !== 0" class="table-class">
+                  <div class="prompt-content" v-if="sheetIndex === 0 && index === 0 && showDragInfo">
+                    <div class="prompt-info">
+                      <img :src="dragImgSrc" class="prompt-image" alt="">
+                      <div class="prompt-msg">{{ $t('titleView.draggableInfo') }}</div>
+                    </div>
+                  </div>
                   <draggable-table
                     :is-score-sheet= "isScoreItemActive"
                     :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
@@ -75,6 +81,12 @@
                     <span class="table-title">{{ child.groupName }}</span>
                   </div>
                   <div v-if="child.itemData.length !== 0" class="table-class">
+                    <div class="prompt-content" v-if="sheetIndex === 0 && index === 0 && childIndex === 0 && showDragInfo">
+                      <div class="prompt-info">
+                        <img :src="dragImgSrc" class="prompt-image" alt="">
+                        <div class="prompt-msg">{{ $t('titleView.draggableInfo') }}</div>
+                      </div>
+                    </div>
                     <draggable-table
                       :is-score-sheet= "isScoreItemActive"
                       :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
@@ -141,7 +153,11 @@ export default {
     downSrc: String,
     routeName: String,
     allRoutedata: Array,
-    sheetName: Array
+    sheetName: Array,
+    showDragInfo: {
+      type: Boolean,
+      default: true
+    }
   },
 
   data() {
@@ -250,7 +266,9 @@ export default {
       ],
       inspectCategoryList: util.handleInspctionCatergyTree(this.routeData),
       categoryIndex: -1,
-      subcategoryIndex: -1
+      subcategoryIndex: -1,
+      dragImgSrc: require('../../../../static/img/arrows_down.png'),
+      sheetIndex: 0
     };
   },
 
@@ -294,10 +312,11 @@ export default {
       });
     },
 
-    changeSheet(e) {
+    changeSheet(e, index) {
       const self = this;
       self.curSheet = e;
       self.allchecked = false;
+      self.sheetIndex = index;
       self.routeData.forEach(item => {
         item.checked = false;
         item.itemData.forEach(_item => {
@@ -828,12 +847,31 @@ export default {
         }
       }
       .table-class{
+        position: relative;
         .iconfont{
           font-size: calc(24/1920*100vw);
           color: #7d8cad;
         }
         .el-table{
           font-size: calc(14/1920*100vw);
+        }
+        .prompt-content{
+          position: absolute;
+          left: calc(258/1920*100vw);
+          bottom: 40px;
+          .prompt-info{
+            display: inline-flex;
+          }
+          .prompt-image{
+            height: 60px;
+            width: 80px;
+          }
+          .prompt-msg{
+            margin-left: calc(30/1920*100vw);
+            font-size: 20px;
+            color: #f31b65;
+            font-weight: bold;
+          }
         }
       }
       .table-title{

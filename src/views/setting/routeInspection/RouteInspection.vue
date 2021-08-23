@@ -1,5 +1,5 @@
 <template>
-  <el-row class="el-route-container">
+  <el-row id="inspectSetting" class="el-route-container">
     <el-col :span="24" class="el-route-header">
       <div v-if="itemhoverName.length > 0" :style="{'left':120*itemIndex+4*itemIndex+'px'}" class="item_name">
         {{ itemhoverName }}<div class="triangle"/>
@@ -70,6 +70,7 @@
                     :all-routedata="_item.allRoutedata"
                     :sheet-name="_item.sheetName"
                     :tab-name="_item.name"
+                    :show-drag-info="showDragInfo"
                     @refreshList="getTagList"
                     @change-routeData="changerouteData"/>
                 </div>
@@ -295,7 +296,8 @@ export default {
       fileName: this.$t('insSettingView.patrolExample'),
       lang: this.$i18n.locale,
       taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')],
-      isLoading: true
+      isLoading: true,
+      showDragInfo: true
     };
   },
 
@@ -362,9 +364,16 @@ export default {
     }
     self.getTagList();
     self.initData();
+    document.getElementById('inspectSetting').addEventListener('mousedown', this.notShowDragInfo, false);
   },
 
   methods: {
+    notShowDragInfo() {
+      this.showDragInfo = false;
+      document.getElementById('inspectSetting')
+      && document.getElementById('inspectSetting').removeEventListener('mousedown', this.notShowDragInfo, false);
+    },
+
     getScheduleFromDB(params) {
       return new Promise((resolve, reject) => {
         getScheduleListService(params).then(res => {

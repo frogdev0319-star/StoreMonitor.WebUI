@@ -1,5 +1,5 @@
 <template>
-  <el-row class="el-addrute">
+  <el-row class="el-addrute" id="addInspection">
     <el-col :span="24" class="el-rute-title">
       <span v-if="!showEditTab" class="tab-name">{{ routeName }}<i class="iconfont icon-bianji icon-tabname" @click="editTabName"/></span>
       <el-input v-if="showEditTab" :size="varyWindowWidth>1600?'small':'mini'"
@@ -35,6 +35,13 @@
         </delay-button>
       </div>
     </el-col>
+    <div class="prompt-content" v-if="showDragInfo && groupList.length > 0">
+      <div class="prompt-info">
+        <img :src="dragTopImgSrc" class="prompt-image image-top" alt="">
+        <div class="prompt-msg">{{ $t('titleView.draggableInfo') }}</div>
+        <img :src="dragLeftImgSrc" class="prompt-image image-left" alt="">
+      </div>
+    </div>
     <el-col :span="7" class="el-rute-group">
       <div class="group-content">
         <div class="title-content">
@@ -518,7 +525,10 @@ export default {
       newGroupSequence: [],
       oldSubcategorySequence: [],
       newSubcategorySequence: [],
-      activeId: -1
+      activeId: -1,
+      dragLeftImgSrc: require('../../../../static/img/arrows_left.png'),
+      dragTopImgSrc: require('../../../../static/img/arrows_top.png'),
+      showDragInfo: true
     };
   },
   computed: {
@@ -536,6 +546,7 @@ export default {
   mounted() {
     this.initData();
     this.getTitleList();
+    document.getElementById('addInspection').addEventListener('mousedown', this.notShowDragInfo, false);
   },
 
   destroyed() {
@@ -543,6 +554,11 @@ export default {
   },
 
   methods: {
+    notShowDragInfo() {
+      this.showDragInfo = false;
+      document.getElementById('addInspection').removeEventListener('mousedown', this.notShowDragInfo);
+    },
+
     getTitleList() {
       this.getUserTitleList().then(res => {
         let listArray = [];
@@ -1823,6 +1839,7 @@ export default {
         border: 1px solid $border;
         background-color: #fff;
         font-size: calc(18/1920*100vw);
+        position: relative;
         @media screen and (min-width:1366px){
             .tab-name{
                 font-size: 18px;
@@ -1999,12 +2016,14 @@ export default {
             .group-items{
                 font-size: 14px;
                 .top-group-title{
-                    height: 60px;
+                  position: relative;
+                  height: 60px;
                     line-height: 60px;
                     text-align: center;
                     font-size: 14px;
                     color: $tab;
                     .group-name-title{
+                      position: relative;
                         #group-content >>> .el-tabs__nav-wrap{
                             margin-left: 6px;
                         }
@@ -2383,6 +2402,38 @@ export default {
   }
   .el-radio{
     margin-right: calc(20/1920*100vw);
+  }
+
+  .prompt-content{
+    position: absolute;
+    left: calc(230/1920*100vw);
+    top: 335px;
+    z-index: 1;
+  }
+  .prompt-info{
+    display: inline-flex;
+    flex-direction: column;
+  }
+  .prompt-image{
+    height: 60px;
+    width: 80px;
+  }
+
+  .prompt-msg{
+    line-height: 25px;
+    font-size: calc(20/1920*100vw);
+    color: #f31b65;
+    font-weight: bold;
+    text-align: left;
+  }
+  .image-top{
+    align-self: flex-end;
+    position: relative;
+    left: 90px;
+  }
+
+  .image-left{
+    margin-left: calc(24/1920*100vw);
   }
 </style>
 <style>
