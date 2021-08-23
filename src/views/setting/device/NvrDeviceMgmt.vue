@@ -1663,6 +1663,7 @@ export default {
         }
       })
         .then(async() => {
+          item.channelCount = item.tempChannelCount;
           self.channelData = await self.getChannelData();
           self.getChannelListByNVR(self.curNVRItem.ivsId);
         }).catch(err => {
