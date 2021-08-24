@@ -833,9 +833,10 @@ export default {
       this.getParentCatergoryList();
     },
 
-    getParentCatergoryList(){
+    getParentCatergoryList() {
       this.parentCatergoryList = [];
-      const parentCatergoryList = this.groupList.filter(item => item.children || (item.items.length === 0 && this.activeId !== item.id));
+      let parentCatergoryList = this.groupList.filter(item => item.children || (!item.children && item.items.length === 0));
+      parentCatergoryList = this.isEditCategory ? parentCatergoryList.filter(item => this.activeId !== item.id) : parentCatergoryList;
       parentCatergoryList.forEach(item => {
         const catergoryObj = {};
         catergoryObj.label = item.name;
