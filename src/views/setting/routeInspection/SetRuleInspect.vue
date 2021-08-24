@@ -43,16 +43,6 @@
             {{ $t('insSettingView.CalculationMethod') }}：
           </p>
           <p class="rule-item">
-            <!--<el-radio v-model="hundredMarkType" label="0" class="radio">-->
-            <!--{{ $t('insSettingView.Proportional') }}-->
-            <!--</el-radio>-->
-            <!--<el-tooltip-->
-            <!--class="item"-->
-            <!--effect="dark"-->
-            <!--placement="bottom-end">-->
-            <!--<div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>-->
-            <!--<i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>-->
-            <!--</el-tooltip>-->
             <el-radio v-model="hundredMarkType" label="-1" class="radio">
               {{ $t('insSettingView.totalScore') }}
             </el-radio>
@@ -162,7 +152,7 @@
                   </el-radio>
                   <template>
                     <validate-input
-                      ref="validateInput"
+                      ref="tab1PassInput"
                       :input-limit-length="8"
                       :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
                       :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
@@ -170,7 +160,7 @@
                       @getInputValue="val => getPassFailBtnName(val, 0)"/>
                     {{ slash }}
                     <validate-input
-                      ref="validateInput"
+                      ref="tab1FailInput"
                       :input-limit-length="8"
                       :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
                       :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
@@ -197,7 +187,7 @@
                     </el-radio>
                     <template>
                       <validate-input
-                        ref="validateInput"
+                        ref="tab3PassInput"
                         :input-limit-length="8"
                         :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
                         :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
@@ -205,7 +195,7 @@
                         @getInputValue="val => getOtherBtnName(val, 0)"/>
                       {{ slash }}
                       <validate-input
-                        ref="validateInput"
+                        ref="tab3FailInput"
                         :input-limit-length="8"
                         :empty-prompt-msg="$t('insSettingView.enterBtnAttr')"
                         :out-limit-prompt-msg="$t('insSettingView.btnAttrLength')"
@@ -258,13 +248,21 @@ export default {
       otherBtnAttr: ''
     };
   },
-  mounted() {
-    const self = this;
-    self.getRule();
+  watch: {
+    passFailBtnAttr() {
+      this.$refs.tab1PassInput[0].showPromotMsgFlag = false;
+      this.$refs.tab1FailInput[0].showPromotMsgFlag = false;
+    },
+
+    otherBtnAttr() {
+      this.$refs.tab3PassInput[0].showPromotMsgFlag = false;
+      this.$refs.tab3FailInput[0].showPromotMsgFlag = false;
+    }
   },
-  // destroyed() {
-  //   sessionStorage.removeItem('ruleData');
-  // },
+  mounted() {
+    this.getRule();
+  },
+  
   methods: {
     async submitRule() {
       const self = this;
@@ -424,11 +422,15 @@ export default {
 
     validateUserDefinedPassFailBtnValue() {
       const length = this.itemOptionsForType1.length;
+      !this.itemOptionsForType1[length - 1].items[0].name && this.$refs.tab1PassInput[0].onBlur();
+      !this.itemOptionsForType1[length - 1].items[1].name && this.$refs.tab1FailInput[0].onBlur();
       return this.itemOptionsForType1[length - 1].items[0].name && this.itemOptionsForType1[length - 1].items[1].name;
     },
 
     validateUserDefinedOtherBtnValue() {
       const length = this.itemOptionsForType3.length;
+      !this.itemOptionsForType3[length - 1].items[0].name && this.$refs.tab3PassInput[0].onBlur();
+      !this.itemOptionsForType3[length - 1].items[1].name && this.$refs.tab3FailInput[0].onBlur();
       return this.itemOptionsForType3[length - 1].items[0].name && this.itemOptionsForType3[length - 1].items[1].name;
     }
 
