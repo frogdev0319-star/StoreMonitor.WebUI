@@ -627,7 +627,7 @@ export default {
     'itemsOfCate': 'Inspection items of ',
     'catergyName': 'Category Name',
     'parentCatergyName': 'Upper category',
-    'parentCatergyNameTooltip1': '1. If the category contains inspection items, it is not allowed to create sub-categories.',
+    'parentCatergyNameTooltip1': '1.If the category contains inspection items, it is not allowed to create sub-categories.',
     'parentCatergyNameTooltip2': '2.If the category contains sub-categories, it is not allowed to be adjusted to a secondary category.',
     'btnAttributeValues': 'Custom Evaluation Options',
     'passFail': 'Pass/Fail',

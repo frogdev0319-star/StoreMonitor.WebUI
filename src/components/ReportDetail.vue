@@ -1,264 +1,276 @@
 <template>
-    <div>
-      <div v-for="(_item,_index) in reportDetailData" :key="_index" class="content-detail">
-        <div class="content-detail-title">
-          <div class="detail-title">
-            <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
-            <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
+  <div>
+    <div v-for="(_item,_index) in reportDetailData" :key="_index" class="content-detail">
+      <div class="content-detail-title">
+        <div class="detail-title">
+          <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
+          <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
+        </div>
+        <div v-if="_item.type === 0" class="score-title">
+          <div
+            v-if="_item.grade === Math.pow(-2,31)"
+            :style="isExportPdf ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'"
+            class="ignore-btn">
+          <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
+          <div
+            v-if="groupType === 0 && _item.grade === 0"
+            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'"
+            class="title-btn-failed">
+            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }} {{ tab1BtnArr[1] }} </span>
           </div>
-          <div class="score-title" v-if="_item.type === 0">
-            <div v-if="_item.grade === Math.pow(-2,31)" class="ignore-btn"
-                 :style="isExportPdf ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'">
-              <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
-            <div v-if="groupType === 0 && _item.grade === 0"
-                 class="title-btn-failed" :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-              <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }} {{tab1BtnArr[1]}} </span>
-            </div>
-            <div v-if="groupType === 2 && _item.grade === 0"
-                 class="title-btn-failed" :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-              <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{tab3BtnArr[1]}} </span>
-            </div>
-            <div v-if="groupType === 0 && _item.grade === 1"
-                 class="title-btn-pass" :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-              <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{tab1BtnArr[0]}} </span>
-            </div>
-            <div v-if="groupType === 2 && _item.grade === 1"
-                 class="title-btn-pass" :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-              <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{tab3BtnArr[0]}} </span>
-            </div>
-            <div v-if="groupType === 1 &&_item.grade!=Math.pow(-2,31)"
-                 :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
-                 :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-              <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
-            </div>
-            <div class="total-score"
-                 v-if="_item.itemScore !== Number.MAX_VALUE">
-                          <span class="pdf_font_18">
-                          {{$t('remotePatrol.totalScoreUnit')}}{{_item.itemScore}}</span>
-            </div>
+          <div
+            v-if="groupType === 2 && _item.grade === 0"
+            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'"
+            class="title-btn-failed">
+            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ tab3BtnArr[1] }} </span>
+          </div>
+          <div
+            v-if="groupType === 0 && _item.grade === 1"
+            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'"
+            class="title-btn-pass">
+            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ tab1BtnArr[0] }} </span>
+          </div>
+          <div
+            v-if="groupType === 2 && _item.grade === 1"
+            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'"
+            class="title-btn-pass">
+            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ tab3BtnArr[0] }} </span>
+          </div>
+          <div
+            v-if="groupType === 1 &&_item.grade!=Math.pow(-2,31)"
+            :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
+            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
+            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
+          </div>
+          <div
+            v-if="_item.itemScore !== Number.MAX_VALUE"
+            class="total-score">
+            <span class="pdf_font_18">
+              {{ $t('remotePatrol.totalScoreUnit') }}{{ _item.itemScore }}</span>
           </div>
         </div>
-        <div
-          v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
-          class="content-detail-main"
-          style="padding-bottom: 20px;">
-          <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
-          <div v-if="_item.showAudio" class="cdm-voice">
-            <div :class="isExportPdf ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
-              <i class="iconfont icon-yuyin icon-speech"/>
+      </div>
+      <div
+        v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
+        class="content-detail-main"
+        style="padding-bottom: 20px;">
+        <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
+        <div v-if="_item.showAudio" class="cdm-voice">
+          <div :class="isExportPdf ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
+            <i class="iconfont icon-yuyin icon-speech"/>
+          </div>
+          <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
+            <source :src="_item.audio.audioSrc" type="audio/mpeg" >
+          </audio>
+          <span class="often-text">{{ _item.audio.audioOftenText }}</span>
+        </div>
+        <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
+          <span class="pdf_font_24">{{ _item.comment }}</span>
+        </div>
+        <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
+          <div
+            v-for="(sourceitem,sourceindex) in _item.sourceList"
+            :key="sourceindex"
+            :height="imgHeight+'px'"
+            class="source-details">
+            <div v-if="sourceitem.mediaType === 2" :style="isExportPdf ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
+              <img
+                :title="imgTitle"
+                :style="isExportPdf ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                :src="sourceitem.url"
+                :height="imgHeight+'px'"
+                :onerror="deafultImg"
+                class="imgLittle imgInner"
+                @click="openOuter(sourceitem,$event)">
             </div>
-            <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-              <source :src="_item.audio.audioSrc" type="audio/mpeg" >
-            </audio>
-            <span class="often-text">{{ _item.audio.audioOftenText }}</span>
-          </div>
-          <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
-            <span class="pdf_font_24">{{ _item.comment }}</span>
-          </div>
-          <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
             <div
-              v-for="(sourceitem,sourceindex) in _item.sourceList"
-              :key="sourceindex"
-              :height="imgHeight+'px'"
-              class="source-details">
-              <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isExportPdf ? 'margin-right:20px;margin-bottom:20px' : ''">
-                <img
-                  :title="imgTitle"
-                  :style="isExportPdf ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
-                  :src="sourceitem.url"
-                  :height="imgHeight+'px'"
-                  :onerror="deafultImg"
-                  class="imgLittle imgInner"
-                  @click="openOuter(sourceitem,$event)">
-              </div>
-              <div
-                v-if="sourceitem.mediaType==1"
-                class="img-content "
-                @click="playCommentVideo(sourceitem,sourceindex)">
-                <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                <img
-                  :style="isExportPdf ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
-                  :src="videoImgSrc"
-                  :height="imgHeight+'px'"
-                  class="imgLittle">
-              </div>
+              v-if="sourceitem.mediaType==1"
+              class="img-content "
+              @click="playCommentVideo(sourceitem,sourceindex)">
+              <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+              <img
+                :style="isExportPdf ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                :src="videoImgSrc"
+                :height="imgHeight+'px'"
+                class="imgLittle">
             </div>
           </div>
         </div>
       </div>
+    </div>
 
+    <el-dialog
+      v-if="dialogCommentVideo"
+      :title="$t('eventView.view')"
+      :visible.sync="dialogCommentVideo"
+      :close-on-click-modal="false"
+      width="850px"
+      top="12%"
+      class="rate-video-dialog"
+      @close="stopCommentVideo">
+      <div class="video-dialog-content" style="overflow:hidden;">
+        <hr class="dialog-hr">
+        <div class="video-content" >
+          <video
+            id="previewVideo"
+            height="83%"
+            width="90%"
+            prload
+            controls
+            class="video-js vjs-fill"/>
+        </div>
+      </div>
+    </el-dialog>
+
+    <transition name="fade">
       <el-dialog
-        v-if="dialogCommentVideo"
+        v-if="showOuter"
         :title="$t('eventView.view')"
-        :visible.sync="dialogCommentVideo"
+        :visible.sync="showOuter"
         :close-on-click-modal="false"
         width="850px"
-        top="12%"
-        class="rate-video-dialog"
-        @close="stopCommentVideo">
-        <div class="video-dialog-content" style="overflow:hidden;">
+        top="12%">
+        <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
           <hr class="dialog-hr">
-          <div class="video-content" >
-            <video
-              id="previewVideo"
-              height="83%"
-              width="90%"
-              prload
-              controls
-              class="video-js vjs-fill"/>
+          <div class="dialog-source-content">
+            <img v-if="showImg" :src="checkImgSrc">
           </div>
         </div>
       </el-dialog>
-
-      <transition name="fade">
-        <el-dialog
-          v-if="showOuter"
-          :title="$t('eventView.view')"
-          :visible.sync="showOuter"
-          :close-on-click-modal="false"
-          width="850px"
-          top="12%">
-          <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-            <hr class="dialog-hr">
-            <div class="dialog-source-content">
-              <img v-if="showImg" :src="checkImgSrc">
-            </div>
-          </div>
-        </el-dialog>
-      </transition>
-    </div>
+    </transition>
+  </div>
 </template>
 
 <script>
-  import videojs from '../../static/video.js';
-  import 'videojs-contrib-hls';
+import videojs from '../../static/video.js';
+import 'videojs-contrib-hls';
 
-    export default {
-      name: "ReportDetail",
-      props: {
-        reportDetailData: {
-          type: Array,
-          default: []
-        },
-        groupType: {
-          type: Number,
-          default: 0
-        },
-        isExportPdf: {
-          type: Boolean,
-          default: false
-        },
-        tab1BtnArr:{
-          type: Array,
-          default: ()=>{[this.$t('remotePatrol.pass'), this.$t('remotePatrol.failed')]}
-        },
-        tab3BtnArr: {
-          type: Array,
-          default: ()=>{[this.$t('remotePatrol.pass'), this.$t('remotePatrol.failed')]}
-        },
-        groups: {
-          type: Array,
-          default: []
-        }
-      },
-      data(){
-        return{
-          dialogCommentVideo: false,
-          showOuter: false,
-          checkImgSrc: '',
-          showImg: false,
-          startIcon: require('../../static/img/play_icon.png'),
-          imgTitle: '',
-          videoImgSrc: require('../../static/img/video_thumbnail.png'),
-          deafultImg: 'this.src="' + require('../../static/img/picture_failed.png') + '"',
-        }
-      },
+export default {
+  name: 'ReportDetail',
+  props: {
+    reportDetailData: {
+      type: Array,
+      default: []
+    },
+    groupType: {
+      type: Number,
+      default: 0
+    },
+    isExportPdf: {
+      type: Boolean,
+      default: false
+    },
+    tab1BtnArr: {
+      type: Array,
+      default: () => { [this.$t('remotePatrol.pass'), this.$t('remotePatrol.failed')]; }
+    },
+    tab3BtnArr: {
+      type: Array,
+      default: () => { [this.$t('remotePatrol.pass'), this.$t('remotePatrol.failed')]; }
+    },
+    groups: {
+      type: Array,
+      default: []
+    }
+  },
+  data() {
+    return {
+      dialogCommentVideo: false,
+      showOuter: false,
+      checkImgSrc: '',
+      showImg: false,
+      startIcon: require('../../static/img/play_icon.png'),
+      imgTitle: '',
+      videoImgSrc: require('../../static/img/video_thumbnail.png'),
+      deafultImg: 'this.src="' + require('../../static/img/picture_failed.png') + '"'
+    };
+  },
 
-      computed: {
-        reportImgHeight() {
-          return (this.varyWindowWidth / 1920) * 100;
-        },
-        imgHeight() {
-          let height = 0;
-          if (this.varyWindowWidth > 1800) {
-            height = this.varyWindowWidth * 0.039;
-          } else if (this.varyWindowWidth > 1400) {
-            height = this.varyWindowWidth * 0.035;
-          } else {
-            height = 75;
-          }
-          return height;
-        }
-      },
+  computed: {
+    reportImgHeight() {
+      return (this.varyWindowWidth / 1920) * 100;
+    },
+    imgHeight() {
+      let height = 0;
+      if (this.varyWindowWidth > 1800) {
+        height = this.varyWindowWidth * 0.039;
+      } else if (this.varyWindowWidth > 1400) {
+        height = this.varyWindowWidth * 0.035;
+      } else {
+        height = 75;
+      }
+      return height;
+    }
+  },
 
-      methods: {
-        startSpeechItem(item, index) {
-          const self = this;
-          if (!item.audio.isPlaying) {
-            self.$refs[item.audio.audioRef][0].play();
-            item.audio.isPlaying = true;
-          } else {
-            self.$refs[item.audio.audioRef][0].pause();
-            item.audio.isPlaying = false;
-          }
-          self.groups.forEach((groupitem) => {
-            groupitem.items.forEach((_item, _index) => {
-              if (_item.audio !== undefined) {
-                if (_index !== index) {
-                  if (self.$refs[_item.audio.audioRef] !== undefined) {
-                    self.$refs[_item.audio.audioRef][0].pause();
-                    _item.audio.isPlaying = false;
-                  }
-                }
+  methods: {
+    startSpeechItem(item, index) {
+      const self = this;
+      if (!item.audio.isPlaying) {
+        self.$refs[item.audio.audioRef][0].play();
+        item.audio.isPlaying = true;
+      } else {
+        self.$refs[item.audio.audioRef][0].pause();
+        item.audio.isPlaying = false;
+      }
+      self.groups.forEach((groupitem) => {
+        groupitem.items.forEach((_item, _index) => {
+          if (_item.audio !== undefined) {
+            if (_index !== index) {
+              if (self.$refs[_item.audio.audioRef] !== undefined) {
+                self.$refs[_item.audio.audioRef][0].pause();
+                _item.audio.isPlaying = false;
               }
-            });
-          });
-        },
-
-        getGroupsDuration(item) {
-          const self = this;
-          if (item.showAudio) {
-            const audio = self.$refs[item.audio.audioRef][0];
-            let du = audio.duration;
-            if (isNaN(du)) {
-              item.showAudio = false;
-            } else {
-              const duration = Math.floor(du);
-              if (duration === 0) {
-                du = 1;
-              }
-              item.audio.audioOftenText = parseInt(du) + '"';
             }
           }
-        },
+        });
+      });
+    },
 
-        playCommentVideo(item, index) {
-          const self = this;
-          self.dialogCommentVideo = true;
-          self.$nextTick(function() {
-            var video = document.getElementById('previewVideo');
-            this.previewplayer = videojs(video);
-            this.previewplayer.src({ src: item.url });
-            this.previewplayer.play();
-          });
-        },
-
-        openOuter(item, $ev) {
-          const self = this;
-          if (item != null) {
-            self.showOuter = true;
-            self.checkImgSrc = item.url;
-            self.showImg = true;
+    getGroupsDuration(item) {
+      const self = this;
+      if (item.showAudio) {
+        const audio = self.$refs[item.audio.audioRef][0];
+        let du = audio.duration;
+        if (isNaN(du)) {
+          item.showAudio = false;
+        } else {
+          const duration = Math.floor(du);
+          if (duration === 0) {
+            du = 1;
           }
-        },
-
-        stopCommentVideo() {
-          var video = document.getElementById('previewVideo');
-          this.previewplayer = videojs(video);
-          this.previewplayer.pause();
-        },
+          item.audio.audioOftenText = parseInt(du) + '"';
+        }
       }
+    },
+
+    playCommentVideo(item, index) {
+      const self = this;
+      self.dialogCommentVideo = true;
+      self.$nextTick(function() {
+        var video = document.getElementById('previewVideo');
+        this.previewplayer = videojs(video);
+        this.previewplayer.src({ src: item.url });
+        this.previewplayer.play();
+      });
+    },
+
+    openOuter(item, $ev) {
+      const self = this;
+      if (item != null) {
+        self.showOuter = true;
+        self.checkImgSrc = item.url;
+        self.showImg = true;
+      }
+    },
+
+    stopCommentVideo() {
+      var video = document.getElementById('previewVideo');
+      this.previewplayer = videojs(video);
+      this.previewplayer.pause();
     }
+  }
+};
 </script>
 
 <style scoped lang="scss">

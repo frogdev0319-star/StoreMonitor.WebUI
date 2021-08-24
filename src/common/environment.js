@@ -30,7 +30,7 @@ const _Environments = {
   },
   QA: {
     CHINA_WEBSITE: 'http://222.91.163.149:19085/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://172.21.81.141:8080/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://172.21.81.176:9050/storemonitor/api/',
     USHOP_URL: 'http://172.21.73.207/',
     POST_URL: 'http://pos.ushop-plus.com/',
     VERSION: version
@@ -42,8 +42,8 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.Beta;
-const isGlobalWebsite = false;
+const environJSON = _Environments.QA;
+const isGlobalWebsite = true;
 
 let Environment;
 export default Environment = {

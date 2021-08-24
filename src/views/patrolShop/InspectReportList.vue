@@ -799,11 +799,9 @@ export default {
       let filterStoreArray = [];
       if (self.curStoreTag.length > 0) {
         filterStoreArray = self.storeList.filter(storeItem => self.curStoreTag.find(tagItem => storeItem.tagIds.find(tagId => tagItem === tagId)));
-        console.log(filterStoreArray);
       } else {
         filterStoreArray = self.storeList;
       }
-      console.log(filterStoreArray);
       const filterSameStore = [];
       filterStoreArray.forEach(store => {
         self.curStore.forEach(selectStore => {
@@ -812,7 +810,6 @@ export default {
           }
         });
       });
-      console.log(filterSameStore);
       const filterStoreIds = [];
       let filterStoreStr = '';
       filterSameStore.map(store => {

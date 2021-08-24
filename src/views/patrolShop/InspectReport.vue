@@ -25,12 +25,13 @@
       </div>
     </div>
     <div class="template-titles">
-      <div class="names" v-if="templateList.length > 1">
-        <div v-for="(item,index) in templateList"
-             class="template-name no-print"
-             :class="{'click-btn' : curTemplateIndex === index}"
-             :key="index"
-             @click="getTemplateConfig(index)">
+      <div v-if="templateList.length > 1" class="names">
+        <div
+          v-for="(item,index) in templateList"
+          :class="{'click-btn' : curTemplateIndex === index}"
+          :key="index"
+          class="template-name no-print"
+          @click="getTemplateConfig(index)">
           {{ item.name }}
         </div>
       </div>
@@ -47,36 +48,47 @@
       <el-row v-for="(pageItem, pageIndex) in pageData" :class="pageItem.class" :key="pageIndex">
         <el-col>
           <div v-if="pageItem.class === 'row-detail'">
-            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
-                 @click="hideOrShowDetail(pageItem, pageIndex)">
+            <div
+              :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
+              class="item-header"
+              @click="hideOrShowDetail(pageItem, pageIndex)">
               <div class="icon-header">
-                <i :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icontemp"
-                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'">
-                </i>
+                <i
+                  :style="isexportPDF ? 'font-size:22px;' : ''"
+                  :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
+                  class="iconfont icontemp"/>
                 <span class="title-lable"><span class="pdf_font_20">{{ $t(`titleView.${pageItem.name}`) }}</span></span>
               </div>
-              <div class="count-header" v-if="pageItem.itemCount > -1">
+              <div v-if="pageItem.itemCount > -1" class="count-header">
                 <span class="count"><span class="pdf_font_36">{{ pageItem.itemCount }}</span></span>
                 <span class="blag"><span class="pdf_font_18">{{ $t('remotePatrol.unit') }}</span></span>
               </div>
             </div>
-            <div class="item-content" v-if="pageItem.ifExpand">
+            <div v-if="pageItem.ifExpand" class="item-content">
               <div class="pdf_font_20">
                 <div v-for="(item,index) in pageItem.data" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
                   <div class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
                   <template v-if="!item.children">
-                    <report-detail :report-detail-data="item.cateryItems" :is-exportPdf="isexportPDF" :groups="groups"
-                                   :group-type="item.groupType" :tab1-btn-arr="tab1BtnArr" :tab3-btn-arr="tab3BtnArr">
-                    </report-detail>
+                    <report-detail
+                      :report-detail-data="item.cateryItems"
+                      :is-export-pdf="isexportPDF"
+                      :groups="groups"
+                      :group-type="item.groupType"
+                      :tab1-btn-arr="tab1BtnArr"
+                      :tab3-btn-arr="tab3BtnArr"/>
                   </template>
                   <template v-else>
                     <div v-for="(child, childIndex) in item.children" :key="childIndex">
                       <div class="subcatergy-title">
-                          {{ child.groupName}}
+                        {{ child.groupName }}
                       </div>
-                      <report-detail :report-detail-data="child.cateryItems" :is-exportPdf="isexportPDF" :groups="groups"
-                                     :group-type="item.groupType" :tab1-btn-arr="tab1BtnArr" :tab3-btn-arr="tab3BtnArr">
-                      </report-detail>
+                      <report-detail
+                        :report-detail-data="child.cateryItems"
+                        :is-export-pdf="isexportPDF"
+                        :groups="groups"
+                        :group-type="item.groupType"
+                        :tab1-btn-arr="tab1BtnArr"
+                        :tab3-btn-arr="tab3BtnArr"/>
                     </div>
                   </template>
                 </div>
@@ -180,20 +192,23 @@
         </el-col>
         <el-col>
           <div v-if="pageItem.class === 'feedback-detail'" class="row-detail">
-            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
-                 @click="hideOrShowDetail(pageItem, pageIndex)">
+            <div
+              :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
+              class="item-header"
+              @click="hideOrShowDetail(pageItem, pageIndex)">
               <div class="icon-header">
-                <i :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icontemp"
-                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'">
-                </i>
+                <i
+                  :style="isexportPDF ? 'font-size:22px;' : ''"
+                  :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
+                  class="iconfont icontemp"/>
                 <span class="title-lable"><span class="pdf_font_20">{{ $t(`titleView.${pageItem.name}`) }}</span></span>
               </div>
-              <div class="count-header" v-if="pageItem.itemCount > -1">
+              <div v-if="pageItem.itemCount > -1" class="count-header">
                 <span class="count"><span class="pdf_font_36">{{ pageItem.itemCount }}</span></span>
                 <span class="blag"><span class="pdf_font_18">{{ $t('remotePatrol.unit') }}</span></span>
               </div>
             </div>
-            <div class="item-content" v-if="pageItem.ifExpand">
+            <div v-if="pageItem.ifExpand" class="item-content">
               <div v-for="(item,index) in feedbacks" :key="index" class="content-detail" style="margin-bottom: 20px">
                 <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
                   <div class="detail-title">
@@ -265,7 +280,7 @@
                   v-for="(t_item ,t_index) in theaderScore"
                   :key="t_index"
                   :style="isexportPDF ? t_item.pdfWidth: t_item.width"
-                  scope="col">{{ t_item.name}} </th>
+                  scope="col">{{ t_item.name }} </th>
               </tr>
               <tr v-if="tableItem[0].type === 2">
                 <th
@@ -276,59 +291,74 @@
               </tr>
             </thead>
             <template v-for="(categoryItem, categoryIndex) in tableItem">
-              <tbody class="pdf_font_20" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'">
+              <tbody :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
                     <span>{{ categoryItem.groupName }}</span>
                   </td>
                 </tr>
-                <tr v-for="(subcategory,subcategoryIndex) in categoryItem.children" :key="subcategoryIndex"
-                    :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
+                <tr
+                  v-for="(subcategory,subcategoryIndex) in categoryItem.children"
+                  :key="subcategoryIndex"
+                  :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
                   <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ subcategory.groupName }}</span>
                     <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
                   </td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
-                  <td><span>{{ subcategory.actualScore | filterScore}}</span></td>
+                  <td><span>{{ subcategory.actualScore | filterScore }}</span></td>
                 </tr>
               </tbody>
             </template>
           </table>
         </el-col>
-        <template  v-if="pageItem.class === 'radior-content' && pageItem.data">
-          <el-col v-if="staticalConfig.chart" class="pie-content"
-                  :style="isexportPDF ? 'height:450px;' : ''">
+        <template v-if="pageItem.class === 'radior-content' && pageItem.data">
+          <el-col
+            v-if="staticalConfig.chart"
+            :style="isexportPDF ? 'height:450px;' : ''"
+            class="pie-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
-            <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
-                     class="pie-chart-content"/>
+            <v-chart
+              ref="chartRadar"
+              :options="pageItem.data"
+              :auto-resize="true"
+              class="pie-chart-content"/>
           </el-col>
-          <el-col v-if="!staticalConfig.chart" class="radar-content"
-                  :style="isexportPDF ? 'height:450px;' : ''">
+          <el-col
+            v-if="!staticalConfig.chart"
+            :style="isexportPDF ? 'height:450px;' : ''"
+            class="radar-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
-            <v-chart ref="chartRadar" :options="pageItem.data" :auto-resize="true"
-                     class="radar-chart-content"/>
+            <v-chart
+              ref="chartRadar"
+              :options="pageItem.data"
+              :auto-resize="true"
+              class="radar-chart-content"/>
           </el-col>
         </template>
 
         <el-col v-if="pageItem.class === 'suggest'">
-          <div class="suggest-content" v-if="pageItem.data !== null && pageItem.data.length !== 0">
+          <div v-if="pageItem.data !== null && pageItem.data.length !== 0" class="suggest-content">
             <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
             <span class="pdf_font_20" v-html="turnSuggest(pageItem.data)"/>
           </div>
         </el-col>
         <el-col>
           <div v-if="pageItem.class === 'signature-detail'">
-            <div class="item-header" :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
-                 @click="hideOrShowDetail(pageItem, pageIndex)">
+            <div
+              :style="isexportPDF ? 'height:60px;line-height:60px' : ''"
+              class="item-header"
+              @click="hideOrShowDetail(pageItem, pageIndex)">
               <div class="icon-header">
-                <i :style="isexportPDF ? 'font-size:22px;' : ''" class="iconfont icontemp"
-                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'">
-                </i>
+                <i
+                  :style="isexportPDF ? 'font-size:22px;' : ''"
+                  :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
+                  class="iconfont icontemp"/>
                 <span class="title-lable"><span class="pdf_font_20">{{ $t(`remotePatrol.${pageItem.name}`) }}</span></span>
               </div>
             </div>
-            <div class="item-content" v-if="pageItem.ifExpand">
+            <div v-if="pageItem.ifExpand" class="item-content">
               <div class="signature-details">
                 <div
                   v-for="(signatureItem, signatureIndex) in pageItem.data"
@@ -343,8 +373,8 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-col class="pie-content" v-if="!hasChart" :style="isexportPDF ? 'height:450px;' : 'height:0px;'">
-          <v-chart ref="chartRadar" class="pie-chart-content" :auto-resize="true"></v-chart>
+        <el-col v-if="!hasChart" :style="isexportPDF ? 'height:450px;' : 'height:0px;'" class="pie-content">
+          <v-chart ref="chartRadar" :auto-resize="true" class="pie-chart-content"/>
         </el-col>
       </el-row>
       <div class="no-print">
@@ -377,11 +407,11 @@ import { getInspectReportInfo, getInspectReportDetail } from '@/api/inspect';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
-import resize from '@/components/mixins/resize.js'
+import resize from '@/components/mixins/resize.js';
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
-import ReportDetail from "@/components/ReportDetail";
+import ReportDetail from '@/components/ReportDetail';
 
 export default {
   name: 'InspectReport',
@@ -393,7 +423,7 @@ export default {
 
   filters: {
     filterScore(value) {
-      return value === Number.MAX_VALUE ? '--': value;
+      return value === Number.MAX_VALUE ? '--' : value;
     }
   },
 
@@ -501,30 +531,29 @@ export default {
   },
 
   methods: {
-    getInspectTemplateList(){
+    getInspectTemplateList() {
       const params = {};
       params.enable = true;
       ReportSetting.getInspectReportTemplateList(params).then(res => {
-        if(res.errCode === 0 && res.data.length > 0) {
+        if (res.errCode === 0 && res.data.length > 0) {
           this.templateList = res.data;
-          const savedTemplateIndex = this.templateList.findIndex(item => {return item.id === this.cachedTemplateId});
-          if(savedTemplateIndex !== -1){
+          const savedTemplateIndex = this.templateList.findIndex(item => { return item.id === this.cachedTemplateId; });
+          if (savedTemplateIndex !== -1) {
             this.curTemplateIndex = savedTemplateIndex;
           } else {
             this.curTemplateIndex = 0;
           }
           this.setTemplateAndStaticalConfig();
+        } else {
+          this.templateList = [];
+          this.templateConfig = [];
         }
-        else{
-            this.templateList = [];
-            this.templateConfig = [];
-          }
-        }).catch(err => {
-          console.log('ReportSetting:' + err);
-        })
+      }).catch(err => {
+        console.log('ReportSetting:' + err);
+      });
     },
 
-    setTemplateAndStaticalConfig(){
+    setTemplateAndStaticalConfig() {
       this.templateConfig = this.templateList[this.curTemplateIndex].config.switches.filter(item => item.enable === true);
       util.sortArrayByKeyAsc(this.templateConfig, 'position');
       const chartOption = this.templateConfig.filter(item => item.name === 'statistics');
@@ -532,7 +561,7 @@ export default {
       this.showAllDetailsEnable = this.templateConfig.some(item => item.name === 'defaultAll');
     },
 
-    getTemplateConfig(index){
+    getTemplateConfig(index) {
       this.curTemplateIndex = index;
       this.hasChart = false;
       this.setTemplateAndStaticalConfig();
@@ -551,7 +580,7 @@ export default {
             self.isup = true;
             self.pageData.forEach(item => {
               item.ifExpand = true;
-            })
+            });
             self.isexportPDF = true;
             resolve(true);
           }).then(function() {
@@ -561,7 +590,6 @@ export default {
                 self.downloadProgress = false;
               }
             }, timer * 10);
-            console.log('timer', timer);
             document.getElementById('isNeedRemove') && document.getElementById('isNeedRemove').remove();
             self.isexportPDF = false;
           });
@@ -652,17 +680,17 @@ export default {
       self.report = obj;
     },
 
-    getItemsPassOrFailed(groupType, grade, qualifiedScore){
-      if(grade === -1<<31){
-        return 0; //ignored
-      } else if(groupType === 0 || groupType === 2){
-        if(grade === 0){
+    getItemsPassOrFailed(groupType, grade, qualifiedScore) {
+      if (grade === -1 << 31) {
+        return 0; // ignored
+      } else if (groupType === 0 || groupType === 2) {
+        if (grade === 0) {
           return 1; // unqualified
         } else {
           return 2; // qualified
         }
-      } else if(groupType === 1 && grade !== -1<<31){
-        if(grade < qualifiedScore){
+      } else if (groupType === 1 && grade !== -1 << 31) {
+        if (grade < qualifiedScore) {
           return 1; // unqualified
         } else {
           return 2; // qualified
@@ -696,25 +724,9 @@ export default {
       }
     },
 
-    getGroupsDuration(item) {
-      const self = this;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
     getFeedBacksDuration(item) {
       const self = this;
+      debugger;
       if (item.showAudio) {
         const audio = self.$refs[item.audio.audioRef][0];
         let du = audio.duration;
@@ -725,7 +737,7 @@ export default {
           if (duration === 0) {
             du = 1;
           }
-          item.audio.audioOftenText = parseInt(du) + '"';
+          item.audio.audioOftenText = 9 + '"';
         }
       }
     },
@@ -774,7 +786,7 @@ export default {
       });
     },
 
-    getGroupsData(groups){
+    getGroupsData(groups) {
       const temp = [];
       groups.sort((a, b) => { return a.groupType - b.groupType; });
       groups.forEach((groupitem, groupindex) => {
@@ -824,32 +836,32 @@ export default {
       this.groups = temp;
     },
 
-    getPageDataBasedOnTemplate(data){
+    getPageDataBasedOnTemplate(data) {
       const map = this.getDetailNameAndHandlerMap();
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
       this.templateConfig.forEach(config => {
-        if(map.has(config.name)){
+        if (map.has(config.name)) {
           const fnName = map.get(config.name);
           const returnDataJson = this[fnName](data);
           returnDataJson.name = config.name;
           pageData.push(returnDataJson);
         }
       });
-      if(this.showAllDetailsEnable){
+      if (this.showAllDetailsEnable) {
         pageData.push(pageData.shift(pageData.length - 1));
         this.getFeedbacks(data);
       }
-      if(this.isInsiteInspect && this.signaturesList.length > 0){
-        const signatureObj = {name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList};
+      if (this.isInsiteInspect && this.signaturesList.length > 0) {
+        const signatureObj = { name: 'signature', class: 'signature-detail', ifExpand: false, data: this.signaturesList };
         pageData.push(signatureObj);
       }
       this.pageData = pageData;
     },
 
-    getDetailNameAndHandlerMap(){
+    getDetailNameAndHandlerMap() {
       let map = null;
-      if(this.showAllDetailsEnable){
+      if (this.showAllDetailsEnable) {
         map = new Map([
           ['comment', 'getComment'],
           ['statistics', 'getOptions'],
@@ -871,39 +883,39 @@ export default {
       return map;
     },
 
-    sortArrayByKey(sortedArray, key){
-      sortedArray.sort((a, b) => { return a[key] - b[key]; })
+    sortArrayByKey(sortedArray, key) {
+      sortedArray.sort((a, b) => { return a[key] - b[key]; });
     },
 
-    sortArrayByKeyDesc(key){
-      return function(a,b){
-        if (a[key] > b[key]){
+    sortArrayByKeyDesc(key) {
+      return function(a, b) {
+        if (a[key] > b[key]) {
           return -1;
-        } else if(a[key] < b[key]){
+        } else if (a[key] < b[key]) {
           return 1;
         }
         return 0;
-      }
+      };
     },
-    getComment(data){
+    getComment(data) {
       const suggest = data.comment;
-      return {class: 'suggest', data: suggest};
+      return { class: 'suggest', data: suggest };
     },
 
-    getTableData(data){
+    getTableData(data) {
       this.getTableHeader();
       const summary = data.summary;
       util.sortArrayByKeyAsc(summary, 'type');
       const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
       summaryTree.forEach(item => {
-        if(!item.children){
+        if (!item.children) {
           item.children = [];
           item.children.push(item);
         } else {
           item.children.forEach(child => {
             item.numOfCommentItems += child.numOfCommentItems;
             item.numOfTotalItems += child.numOfTotalItems;
-          })
+          });
         }
       });
       const filterTree = summaryTree.filter(item => item.numOfTotalItems !== item.numOfCommentItems);
@@ -916,10 +928,10 @@ export default {
           typeIndex[0].type === 2 ? te_temp.push(typeIndex) : '';
         }
       }
-      return {class: 'row-table', data: te_temp};
+      return { class: 'row-table', data: te_temp };
     },
 
-    getTableHeader(){
+    getTableHeader() {
       this.theaderPassFail = [
         { name: '', width: 'width:11%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
@@ -942,18 +954,18 @@ export default {
       ];
     },
 
-    getReportDetail(){
+    getReportDetail() {
       const allReportDetails = this.getGroupsItems(-1);
-      return {class: 'row-detail', ifExpand: false, itemCount: -1, data: allReportDetails};
+      return { class: 'row-detail', ifExpand: false, itemCount: -1, data: allReportDetails };
     },
 
-    getOptions(data){
+    getOptions(data) {
       this.hasChart = true;
       const options = this.getStaticOptions(data.summary);
-      return {class: 'radior-content', data: options};
+      return { class: 'radior-content', data: options };
     },
 
-    getStaticOptions(summary){
+    getStaticOptions(summary) {
       if (summary.length === 0) {
         this.hasChart = false;
         return null;
@@ -966,11 +978,11 @@ export default {
       return this.staticalConfig.chart === 0 ? this.getRadarChart(summaryTree) : this.getPieChart(summaryTree);
     },
 
-    getCategorySummary(summary){
+    getCategorySummary(summary) {
       util.sortArrayByKeyAsc(summary, 'type');
       const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
       summaryTree.forEach(summaryItem => {
-        if(summaryItem.children){
+        if (summaryItem.children) {
           summaryItem.numOfIgnored = this.addChildrenDataToParent(summaryItem.children, 'numOfIgnored');
           summaryItem.numOfQualifiedItems = this.addChildrenDataToParent(summaryItem.children, 'numOfQualifiedItems');
           summaryItem.numOfUnqualifiedItems = this.addChildrenDataToParent(summaryItem.children, 'numOfUnqualifiedItems');
@@ -985,29 +997,29 @@ export default {
       return filterTree;
     },
 
-    addChildrenDataToParent(jsonArr, key){
-      let arr = Array.isArray(jsonArr) ? jsonArr : [jsonArr];
+    addChildrenDataToParent(jsonArr, key) {
+      const arr = Array.isArray(jsonArr) ? jsonArr : [jsonArr];
       let sum = 0;
-      if(arr.length > 1){
+      if (arr.length > 1) {
         sum = arr.reduce((prev, cur) => {
           return prev[key] + cur[key];
-        })
+        });
       } else {
         sum = arr[0][key];
       }
       return sum;
     },
 
-    getTab1AndTab3BtnName(inspectSettings){
-      let itemOptionsForType1 = inspectSettings.filter(settingItem => settingItem.name === 'itemOptionsForType1');
-      let itemOptionsForType3 = inspectSettings.filter(settingItem => settingItem.name === 'itemOptionsForType3');
-      let tab1BtnArr = [itemOptionsForType1[0].value[0].name ,itemOptionsForType1[0].value[1].name];
-      let tab3BtnArr = [itemOptionsForType3[0].value[0].name ,itemOptionsForType3[0].value[1].name];
+    getTab1AndTab3BtnName(inspectSettings) {
+      const itemOptionsForType1 = inspectSettings.filter(settingItem => settingItem.name === 'itemOptionsForType1');
+      const itemOptionsForType3 = inspectSettings.filter(settingItem => settingItem.name === 'itemOptionsForType3');
+      const tab1BtnArr = [itemOptionsForType1[0].value[0].name, itemOptionsForType1[0].value[1].name];
+      const tab3BtnArr = [itemOptionsForType3[0].value[0].name, itemOptionsForType3[0].value[1].name];
       this.tab1BtnArr = tab1BtnArr;
       this.tab3BtnArr = tab3BtnArr;
     },
 
-    getFeedbacks(data){
+    getFeedbacks(data) {
       const feedbackTemp = [];
       if (data.feedback.length === 0) {
         this.showFeedBacks = false;
@@ -1042,42 +1054,42 @@ export default {
         });
         this.feedbacks = feedbackTemp;
       }
-      return {class: 'feedback-detail', ifExpand: false, itemCount: this.feedbacks.length, data: this.feedbacks};
+      return { class: 'feedback-detail', ifExpand: false, itemCount: this.feedbacks.length, data: this.feedbacks };
     },
 
-    getFocalItems(){
+    getFocalItems() {
       const focalItems = this.getGroupsItems(1);
-      let focalCount = this.getItemsLength(focalItems);
-      return {class: 'row-detail', ifExpand: false, itemCount: focalCount, data: focalItems};
+      const focalCount = this.getItemsLength(focalItems);
+      return { class: 'row-detail', ifExpand: false, itemCount: focalCount, data: focalItems };
     },
 
-    getQualifiedItems(){
+    getQualifiedItems() {
       const qualifiedItems = this.getGroupsItems(2);
-      let qualifiedCount = this.getItemsLength(qualifiedItems);
-      return {class: 'row-detail', ifExpand: false, itemCount: qualifiedCount, data: qualifiedItems};
+      const qualifiedCount = this.getItemsLength(qualifiedItems);
+      return { class: 'row-detail', ifExpand: false, itemCount: qualifiedCount, data: qualifiedItems };
     },
 
-    getIgnoreItems(){
+    getIgnoreItems() {
       const ignoreItems = this.getGroupsItems(0);
-      let ignoreCount = this.getItemsLength(ignoreItems);
-      return {class: 'row-detail', ifExpand: false, itemCount: ignoreCount, data: ignoreItems};
+      const ignoreCount = this.getItemsLength(ignoreItems);
+      return { class: 'row-detail', ifExpand: false, itemCount: ignoreCount, data: ignoreItems };
     },
 
-    getCommentItems(){
+    getCommentItems() {
       const commentItems = this.getGroupsItems(3);
-      let commentCount = this.getItemsLength(commentItems);
-      return {class: 'row-detail', ifExpand: false, itemCount: commentCount, data: commentItems};
+      const commentCount = this.getItemsLength(commentItems);
+      return { class: 'row-detail', ifExpand: false, itemCount: commentCount, data: commentItems };
     },
 
-    getItemsLength(itemsArr){
+    getItemsLength(itemsArr) {
       let sum = 0;
       itemsArr.forEach(item => {
-        if(!item.children){
+        if (!item.children) {
           sum += item.cateryItems.length;
         } else {
           item.children.forEach(child => {
             sum += child.cateryItems.length;
-          })
+          });
         }
       });
       return sum;
@@ -1188,29 +1200,29 @@ export default {
       return radarChartOption;
     },
 
-    getPieChart(summary){
+    getPieChart(summary) {
       const pieOptions = this.getPieChartsOption();
       let otherUnqualified = 0;
       let otherQualified = 0;
       this.staticalConfig.qualified ? summary.sort(this.sortArrayByKeyDesc('numOfUnqualifiedItems'))
         : summary.sort(this.sortArrayByKeyDesc('numOfQualifiedItems'));
       const summaryTempArr = [];
-      for(let summaryIndex = 0; summaryIndex < summary.length; summaryIndex++){
-        if(summaryIndex < 10){
+      for (let summaryIndex = 0; summaryIndex < summary.length; summaryIndex++) {
+        if (summaryIndex < 10) {
           summaryTempArr.push(summary[summaryIndex]);
-        }else{
+        } else {
           otherUnqualified += summary[summaryIndex].numOfUnqualifiedItems;
           otherQualified += summary[summaryIndex].numOfQualifiedItems;
         }
       }
-      if(otherUnqualified !== 0 || otherQualified !== 0){
-        const otherItems = {numOfUnqualifiedItems: otherUnqualified,
-                            numOfQualifiedItems: otherQualified, groupName: this.$t('titleView.others')};
+      if (otherUnqualified !== 0 || otherQualified !== 0) {
+        const otherItems = { numOfUnqualifiedItems: otherUnqualified,
+          numOfQualifiedItems: otherQualified, groupName: this.$t('titleView.others') };
         summaryTempArr.push(otherItems);
       }
       const seriesData = [];
       summaryTempArr.forEach(item => {
-        let obj = {};
+        const obj = {};
         obj.name = item.groupName;
         obj.value = this.staticalConfig.qualified ? item.numOfUnqualifiedItems : item.numOfQualifiedItems;
         obj.value > 0 && seriesData.push(obj);
@@ -1219,23 +1231,23 @@ export default {
       return pieOptions;
     },
 
-    getPieChartsOption(){
+    getPieChartsOption() {
       const pieOption = {
         series: [
           {
             type: 'pie',
             radius: ['43%', '70%'],
             itemStyle: {
-              normal:{
-                color: function(params){
-                  let colorList = ['#f4f5f9'];
+              normal: {
+                color: function(params) {
+                  const colorList = ['#f4f5f9'];
                   return colorList[params.dataIndex];
-                },
+                }
               }
             },
             silent: true,
             z: 0,
-            data: [{value: 1, name: ''}],
+            data: [{ value: 1, name: '' }]
           },
           {
             type: 'pie',
@@ -1246,24 +1258,24 @@ export default {
               }
             },
             itemStyle: {
-              normal:{
-                color: function(params){
-                  let colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
+              normal: {
+                color: function(params) {
+                  const colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
                     '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
                   return colorList[params.dataIndex];
-                },
+                }
               }
             },
             label: {
-              fontSize:14,
+              fontSize: 14,
               color: '#9A9A9C',
-              formatter: '{b}-{d}%',
+              formatter: '{b}-{d}%'
             },
             labelLine: {
               length: 10,
               length2: 50,
               lineStyle: {
-                color: "#9A9A9C",
+                color: '#9A9A9C'
               }
             },
             tooltip: {
@@ -1278,7 +1290,7 @@ export default {
       return pieOption;
     },
 
-    getGroupsItems(status){
+    getGroupsItems(status) {
       const treeData = util.handleInspctionCatergyTree(this.groups, 'groupId');
       const group = [];
       treeData.forEach(catergy => {
@@ -1286,20 +1298,19 @@ export default {
         tempGroupItem.groupId = catergy.groupId;
         tempGroupItem.groupName = catergy.groupName;
         tempGroupItem.groupType = catergy.groupType;
-        if(!catergy.children){
+        if (!catergy.children) {
           tempGroupItem.cateryItems = [];
           catergy.items.forEach(inspectItem => {
-            if(status >= 0){
-              if(status === 3 && inspectItem.type === 1){
+            if (status >= 0) {
+              if (status === 3 && inspectItem.type === 1) {
                 tempGroupItem.cateryItems.push(inspectItem);
-              }
-              else if(inspectItem.passOfFailFlag === status && inspectItem.type === 0){
+              } else if (inspectItem.passOfFailFlag === status && inspectItem.type === 0) {
                 tempGroupItem.cateryItems.push(inspectItem);
               }
             } else {
               tempGroupItem.cateryItems.push(inspectItem);
             }
-          })
+          });
           if (tempGroupItem.cateryItems.length > 0) {
             group.push(tempGroupItem);
           }
@@ -1312,29 +1323,28 @@ export default {
             tempChildItem.groupType = child.groupType;
             tempChildItem.cateryItems = [];
             child.items.forEach(inspectItem => {
-              if(status >= 0){
+              if (status >= 0) {
                 // if(inspectItem.passOfFailFlag === status){
                 //   tempChildItem.cateryItems.push(inspectItem);
                 // }
-                if(status === 3 && inspectItem.type === 1){
+                if (status === 3 && inspectItem.type === 1) {
                   tempChildItem.cateryItems.push(inspectItem);
-                }
-                else if(inspectItem.passOfFailFlag === status && inspectItem.type === 0){
+                } else if (inspectItem.passOfFailFlag === status && inspectItem.type === 0) {
                   tempChildItem.cateryItems.push(inspectItem);
                 }
               } else {
                 tempChildItem.cateryItems.push(inspectItem);
               }
-            })
+            });
             if (tempChildItem.cateryItems.length > 0) {
               tempGroupItem.children.push(tempChildItem);
             }
           });
-          if(tempGroupItem.children.length > 0){
+          if (tempGroupItem.children.length > 0) {
             group.push(tempGroupItem);
           }
         }
-      })
+      });
       return group;
     },
 
@@ -1347,26 +1357,26 @@ export default {
       this.signatureSrc = src;
     },
 
-    hideOrShowDetail(pageItem, pageIndex){
+    hideOrShowDetail(pageItem, pageIndex) {
       this.pageData.forEach((item, index) => {
-        pageIndex === index && (item.ifExpand = !item.ifExpand)
-      })
+        pageIndex === index && (item.ifExpand = !item.ifExpand);
+      });
     },
 
-    saveTemplateId(){
-      let params = {
-        templateId: this.templateList[this.curTemplateIndex].id,
-      }
+    saveTemplateId() {
+      const params = {
+        templateId: this.templateList[this.curTemplateIndex].id
+      };
       const searchConditon = {
         path: 'reportDetail',
         params: params
-      }
+      };
       SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
-    getStoredTemplateId(){
+    getStoredTemplateId() {
       const templateJson = SearchConditionUtil.getSearchCondition('reportDetail');
-      if(Object.keys(templateJson).length > 0){
+      if (Object.keys(templateJson).length > 0) {
         this.cachedTemplateId = templateJson.templateId;
       }
     }

@@ -43,6 +43,12 @@
         <el-scrollbar id="el-menuscrollbar">
           <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
             <div v-for="(item,index) in inspectCategoryList" :key="index" class="data-content">
+              <div class="prompt-content" v-if="sheetIndex === 0 && index === 0 && showDragInfo">
+                <div class="prompt-info">
+                  <img :src="dragImgSrc" class="prompt-image" alt="">
+                  <div class="prompt-msg">{{ $t('titleView.draggableInfo') }}</div>
+                </div>
+              </div>
               <div class="dragable-table-header" v-if="index === 0">
                 <div class="table-header-item" v-for="(headerItem, headerIndex) in tableHeader" :key="headerIndex"
                      :style="headerItem.headerStyle">
@@ -56,12 +62,6 @@
               </div>
               <template v-if="!item.children">
                 <div v-if="item.itemData.length !== 0" class="table-class">
-                  <div class="prompt-content" v-if="sheetIndex === 0 && index === 0 && showDragInfo">
-                    <div class="prompt-info">
-                      <img :src="dragImgSrc" class="prompt-image" alt="">
-                      <div class="prompt-msg">{{ $t('titleView.draggableInfo') }}</div>
-                    </div>
-                  </div>
                   <draggable-table
                     :is-score-sheet= "isScoreItemActive"
                     :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
@@ -81,12 +81,6 @@
                     <span class="table-title">{{ child.groupName }}</span>
                   </div>
                   <div v-if="child.itemData.length !== 0" class="table-class">
-                    <div class="prompt-content" v-if="sheetIndex === 0 && index === 0 && childIndex === 0 && showDragInfo">
-                      <div class="prompt-info">
-                        <img :src="dragImgSrc" class="prompt-image" alt="">
-                        <div class="prompt-msg">{{ $t('titleView.draggableInfo') }}</div>
-                      </div>
-                    </div>
                     <draggable-table
                       :is-score-sheet= "isScoreItemActive"
                       :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
@@ -832,6 +826,7 @@ export default {
     .data-content{
       overflow: hidden;
       width: calc(100% - 4px);
+      position: relative;
       .catergy-title{
         font-size: 0;
         width:80%;
@@ -854,24 +849,6 @@ export default {
         }
         .el-table{
           font-size: calc(14/1920*100vw);
-        }
-        .prompt-content{
-          position: absolute;
-          left: calc(258/1920*100vw);
-          bottom: 40px;
-          .prompt-info{
-            display: inline-flex;
-          }
-          .prompt-image{
-            height: 60px;
-            width: 80px;
-          }
-          .prompt-msg{
-            margin-left: calc(30/1920*100vw);
-            font-size: 20px;
-            color: #f31b65;
-            font-weight: bold;
-          }
         }
       }
       .table-title{
@@ -897,6 +874,24 @@ export default {
         margin-right: calc(38/1920*100vw);
       }
     }
+.prompt-content{
+  position: absolute;
+  left: calc(258/1920*100vw);
+  top: 60px;
+  .prompt-info{
+    display: inline-flex;
+  }
+  .prompt-image{
+    height: 60px;
+    width: 80px;
+  }
+  .prompt-msg{
+    margin-left: calc(30/1920*100vw);
+    font-size: 20px;
+    color: #f31b65;
+    font-weight: bold;
+  }
+}
 </style>
 <style>
 #el-menuscrollbar .el-scrollbar__wrap {
