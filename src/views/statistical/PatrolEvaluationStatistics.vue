@@ -87,7 +87,6 @@
           </el-col>
           <div class="el-table-panel">
             <table-pagination
-              ref="elTP"
               :column-data="regionInfoData"
               :table-data="regionTableData"
               :total="totalRegion"
@@ -124,7 +123,6 @@
           <el-col :span="24">
             <div class="el-table-panel">
               <table-pagination
-                ref="elTP"
                 :column-data="storeInfoData"
                 :table-data="storeTableData"
                 :total="totalStore"
@@ -219,19 +217,14 @@
           </el-col>
           <div class="el-table-panel">
             <table-pagination
-              ref="elTP"
               :column-data="regionInfoData"
               :table-data="regionPDFData"
               :highlight-current-row= "true"
               :show-pagination="false"
               :is-pdf-column="true"
-              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-              @handleChange="handlePageAndSizeChange"
-              @sortChange="handleSortChange"/>
+              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"/>
           </div>
-
         </el-col>
-
         <el-col :sapn="24" class="store-list" style="padding-bottom:20px;">
           <el-col :span="24" class="region-header header">
             <div class="region-titles">
@@ -244,19 +237,15 @@
           <el-col :span="24">
             <div class="el-table-panel">
               <table-pagination
-                ref="elTP"
                 :isexportPDF="isexportPDF"
                 :column-data="storeInfoData"
                 :table-data="storePDFData"
                 :highlight-current-row= "true"
                 :show-pagination="false"
                 :is-pdf-column="true"
-                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
-                @handleChange="handlePageAndSizeChange"
-                @sortChange="handleSortChange"/>
+                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"/>
             </div>
           </el-col>
-
         </el-col>
       </div>
     </el-row>
@@ -581,10 +570,10 @@ export default {
   },
 
   methods: {
-    handleExportReport() {
+    async handleExportReport() {
       const self = this;
       self.ispdf = true;
-      require.ensure([], async() => {
+      try {
         if (self.totalRegion > 0) {
           const size = self.totalRegion;
           const params = {};
@@ -631,7 +620,10 @@ export default {
             }
           }
         }
-      });
+      } catch (e) {
+        self.ispdf = false;
+        return;
+      }
       setTimeout(() => {
         self.getPdf();
         if (sessionStorage.getItem('startPDF') === 'start') {
@@ -1273,7 +1265,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleRegionSortChange(order) {
@@ -1287,7 +1279,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStorePageAndSizeChange(pageObj) {
@@ -1299,7 +1291,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStoreSortChange(order) {
@@ -1313,7 +1305,7 @@ export default {
         path: 'inspectEvalutionStatistics',
         params: this.params
       };
-      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
     setDefaultSortAndPage(paramsObj){
