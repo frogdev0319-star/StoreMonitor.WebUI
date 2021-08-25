@@ -139,6 +139,13 @@
                               :prop="_item.prop"
                               :label="_item.label"
                               :min-width="_item.width"/>
+                            <el-table-column :label="$t('overview.taskPerformance')">
+                              <template slot-scope="props">
+                                <span :class="props.row.percentSchedule !== '100%' ? 'unfinished-schedule': ''">
+                                  {{ props.row.percentSchedule }}
+                                </span>
+                              </template>
+                            </el-table-column>
                           </el-table>
                         </el-tab-pane>
                       </el-tabs>
@@ -282,6 +289,13 @@
                               :prop="_item.prop"
                               :label="_item.label"
                               :min-width="_item.width"/>
+                            <el-table-column :label="$t('overview.taskPerformance')">
+                              <template slot-scope="props">
+                                <span :class="props.row.percentSchedule !== '100%' ? 'unfinished-schedule': ''">
+                                  {{ props.row.percentSchedule }}
+                                </span>
+                              </template>
+                            </el-table-column>
                           </el-table>
                         </el-tab-pane>
                       </el-tabs>
@@ -483,10 +497,6 @@ export default {
         {
           'prop': 'inspectTagName',
           'label': this.$t('overview.patrolLists')
-        },
-        {
-          'prop': 'percentSchedule',
-          'label': this.$t('overview.taskPerformance')
         }
       ],
       expands: [],
@@ -1155,5 +1165,8 @@ export default {
       }
     }
 
+  }
+  .unfinished-schedule{
+    color: #f31b65;
   }
 </style>
