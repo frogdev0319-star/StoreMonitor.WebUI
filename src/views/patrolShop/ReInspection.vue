@@ -1290,16 +1290,14 @@ export default {
           }
         });
       } else {
-        sheetName.forEach(s_item => {
-          s_item.inspectList.forEach((item, index) => {
-            item.items.forEach((_item, _index) => {
-              if (_item.id == id) {
-                tempId = {
-                  groupIndex: index,
-                  itemIndex: _index
-                };
-              }
-            });
+        sheetName.forEach((s_item, s_index) => {
+          s_item.inspectList[0].items.forEach((item, index) => {
+            if (item.id === id) {
+              tempId = {
+                groupIndex: s_index,
+                itemIndex: index
+              };
+            }
           });
         });
       }
@@ -1462,8 +1460,8 @@ export default {
       const tempId = self.getIndexById(self.curItemId);
       if (tempId != null) {
         if (!self.showIgnoreItem) {
-          self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-          if(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].itemType === 1){
+          self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
+          if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
               this.sheetName[this.curSheetIndex].dealCount++;
               this.sheetName[this.curSheetIndex].Effective++;
@@ -1964,6 +1962,7 @@ export default {
       this.hideLast = false;
       this.channelBtns = [];
       this.isCategory = false;
+      this.inspectList = item.inspectList;
       item.isClick = true;
       this.$nextTick(() => {
         this.anchorLinkTo();
@@ -3449,8 +3448,8 @@ export default {
       const tempId = self.getIndexById(self.curItemId);
       if (tempId != null) {
         if (!self.showIgnoreItem) {
-          self.inspectList[tempId.groupIndex].items[tempId.itemIndex].sourceList.push(obj);
-          if(self.inspectList[tempId.groupIndex].items[tempId.itemIndex].itemType === 1){
+          self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
+          if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
               this.sheetName[this.curSheetIndex].dealCount++;
               this.sheetName[this.curSheetIndex].Effective++;
@@ -3690,6 +3689,7 @@ export default {
       }
       #icanvas{
         @include point(margin-top,15);
+        margin-left: 20px;
       }
       .dialog-img-content{
         @include point(padding,15);
