@@ -262,7 +262,7 @@ export default {
   mounted() {
     this.getRule();
   },
-  
+
   methods: {
     async submitRule() {
       const self = this;

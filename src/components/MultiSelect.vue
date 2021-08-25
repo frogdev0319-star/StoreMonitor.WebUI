@@ -67,7 +67,6 @@ export default {
   },
 
   mounted() {
-    console.log(this.selected);
     this.initData();
   },
 
@@ -128,7 +127,6 @@ export default {
     },
 
     changeSelect(val) {
-      console.log(val);
       this.changed = true;
       if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
         this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');

@@ -438,11 +438,9 @@ export default {
       let filterStoreArray = [];
       if (self.curStoreTag.length > 0) {
         filterStoreArray = self.storeList.filter(storeItem => self.curStoreTag.find(tagItem => storeItem.tagIds.find(tagId => tagItem === tagId)));
-        console.log(filterStoreArray);
       } else {
         filterStoreArray = self.storeList;
       }
-      console.log(filterStoreArray);
       const filterSameStore = [];
       filterStoreArray.forEach(store => {
         self.curStore.forEach(selectStore => {
@@ -451,7 +449,6 @@ export default {
           }
         });
       });
-      console.log(filterSameStore);
       const filterStoreIds = [];
       let filterStoreStr = '';
       filterSameStore.map(store => {
@@ -622,7 +619,6 @@ export default {
     async searchData() {
       this.getSelectedStoreIds();
       this.isPatrol ? this.getSelectCountryOrCity() : '';
-      console.log(this.params);
       this.$emit('emitSearch', this.params, this.daysRangeList, this.curRegionI, this.curRegionII,
         this.regionMode, this.storePatrolLists, this.storeStr, this.tagNameStr, this.timeMode);
     },
@@ -648,7 +644,6 @@ export default {
 
     getSelectCountryOrCity() {
       const self = this;
-      console.log(self.curCity.length);
       self.regionMode = self.curCity.length > 0 ? 2 : 1;
       if (self.curProvince.length !== 0) {
         self.curRegionI = self.curProvince;
@@ -722,8 +717,7 @@ export default {
       params.curStore = this.curStore;
       params.curStoreTag = this.curStoreTag;
       params.timeMode = this.timeMode;
-      params.inspectId = this.inspectList === '-1' ? '' : this.inspectList
-      console.log(params)
+      params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
 
@@ -746,7 +740,6 @@ export default {
         this.inspectCatch = searchParams.inspectId;
         // this.setDefaultSort();
         this.ifGetParamsFromCash = true;
-        console.log(this.params);
       } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
