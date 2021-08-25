@@ -1,9 +1,6 @@
 <template>
   <el-row class="el-route-container">
     <el-col :span="24" class="el-route-header">
-      <div v-if="itemhoverName.length > 0" :style="{'left':120*itemIndex+4*itemIndex+'px'}" class="item_name">
-        {{ itemhoverName }}<div class="triangle"/>
-      </div>
       <el-col :span="7" class="el-route-btns">
         <span :class="lang.indexOf('zh') === -1 ? 'en-bind-title': 'bind-title'">
           {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
@@ -47,7 +44,9 @@
             <el-tabs v-if="item.data.length !== 0 && !isLoading" id="patrltabs-content" v-model="patrolActive"
                      :style="{'min-height':varyWindowWidth*0.70+'px'}" @tab-click="handleClickPatrol" >
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
-                <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{ _item.name }}</span>
+                <el-tooltip popper-class="item-tabs" effect="dark" :content="_item.name" placement="top"  slot="label">
+                  <span>{{ _item.name }}</span>
+                </el-tooltip>
                 <div v-if="_item.routeData && !loading">
                   <route-detail :ref="curIndex" :route-data="_item.routeData" :route-name="_item.name"
                                 :down-src="downLoadSrc" :all-routedata="_item.allRoutedata"
@@ -200,8 +199,6 @@ export default {
         }
       ],
       showNoPostDialog: false,
-      itemhoverName: '',
-      itemIndex: 0,
       loading: false,
       varyWindowWidth: window.innerHeight,
       addPatrol: '新增巡检表',
@@ -919,17 +916,6 @@ export default {
       self.getTagList();
     },
 
-    overItem(item, index) {
-      const self = this;
-      self.itemhoverName = item.name;
-      self.itemIndex = index;
-    },
-
-    outItem(item, index) {
-      const self = this;
-      self.itemhoverName = '';
-    },
-
     handleClickPatrol(val) {
       const self = this;
       if (self.activeName === '0') {
@@ -1608,7 +1594,13 @@ export default {
 };
 </script>
 <style>
-@import '../../../assets/css/importfile.css';
+  .item-tabs{
+    min-width: 80px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    text-align: center;
+  }
 </style>
 <style lang="scss" scoped>
     $mainColor:#f31d65;
@@ -1669,28 +1661,6 @@ export default {
         background-color: #fff;
         .el-route-header{
             margin-top: calc(15/1920*100vw);
-            .item_name{
-                    position: absolute;
-                    top:55px;
-                    margin-left:47px;
-                    z-index: 100;
-                    height:18px;
-                    line-height: 18px;
-                    border-radius: 3px;
-                    background-color: rgb(0, 0, 0);
-                    color:#fff;
-                    padding:5px 2px;
-                    min-width: 100px;
-                    text-align: center;
-                    font-size: calc(12/1920*100vw);
-                    .triangle{
-                        width:10px;
-                        height:10px;
-                        margin:0 auto;
-                        transform:rotate(45deg);
-                        background-color: rgb(0, 0, 0);
-                    }
-                }
             .el-route-tabs{
                 width: 98%;
                 margin-left: calc(15/1920*100vw);
@@ -1813,12 +1783,11 @@ export default {
     #en-patrltabs-content >>> .el-tabs__item {
       padding: 0 0;
       font-size: 14px;
-      width: calc(160/1920*100vw);
+      width: 160px;
       display: inline-block;
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-
     #en-patrltabs-content >>> .el-tabs__active-bar{
       height: 4px;
     }
