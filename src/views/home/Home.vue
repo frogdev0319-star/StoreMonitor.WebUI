@@ -72,7 +72,7 @@
             </el-select>
           </div>
           <div v-else class="collapsed-brand-panel"/>
-          <el-scrollbar id="el-menuscrollbar">
+          <el-scrollbar id="el-menuscrollbar" ref="scroll">
             <el-menu
               id="nav-menu"
               :default-active="activePath"
@@ -382,7 +382,7 @@ export default {
       });
     }
   },
-
+  
   methods: {
     setBrandListDisabled(booleanFlag) {
       this.brandDisabled = booleanFlag;
@@ -397,15 +397,12 @@ export default {
     },
 
     handleopen(index) {
-      switch (Number(index)) {
-        case 1:
-          document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#f31d65';
-          document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor = '#222538'; break;
-        case 5:
-          document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor = '#f31d65';
-          document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#222538'; break;
-        default: console.log('this is not a group'); break;
-      }
+      setTimeout(() => {
+        const height = this.$refs.scroll.wrap.scrollHeight;
+        this.$nextTick(() => {
+          this.$refs.scroll.wrap.scrollTop = height;
+        })
+      },300);
     },
 
     routerHome() {
@@ -604,7 +601,6 @@ export default {
         accountId: accountId
       };
       self.$store.dispatch('changeAccount', params).then((res) => {
-        console.log(res);
         if (res.errCode === 0) {
           self.changeRoutes();
           self.$route.meta.keepAlive = false;
