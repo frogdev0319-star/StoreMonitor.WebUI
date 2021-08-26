@@ -865,6 +865,7 @@ export default {
     'authorizedDevicesNum': '승인된 기기 수:',
     'addedDeviceNumber': '활성화된 장치의 수:',
     'licenseOverdue': '매장 점검 서비스가 만료되었습니다',
+    'videoLicenseOverdue': '비디오 라이선스 기한이 만료됨',
     'hasBoundItem': '장치가 항목에 바인딩되었습니다',
     'hasAdded': '다른 사람이 기기를 추가했습니다',
     'validateSucc': '성공적으로 확인!',

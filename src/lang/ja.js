@@ -860,6 +860,7 @@ export default {
     'authorizedDevicesNum': '許可されたデバイスの数:',
     'addedDeviceNumber': '有効なデバイスの数:',
     'licenseOverdue': 'サブスクリプション許可の有効期限が切れました',
+    'videoLicenseOverdue': 'ビデオライセンスの延滞',
     'hasBoundItem': 'デバイスがアイテムにバインドされています',
     'hasAdded': 'デバイスは他の誰かによって追加されました',
     'validateSucc': '検証に成功！',

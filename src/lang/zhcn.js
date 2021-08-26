@@ -847,6 +847,7 @@ export default {
     'otherError': '其他错误',
     'commentLengthPrompt': '最多可输入100个字符',
     'licenseOverdue': '门店巡检服务已逾期',
+    'videoLicenseOverdue': '视频服务过期',
     'hasBoundItem': '设备已绑定巡检项',
     'hasAdded': '设备已被别人添加',
     'validateSucc': '验证成功！',

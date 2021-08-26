@@ -843,6 +843,7 @@ export default {
     'authorizedDevicesNum': 'Number of authorized devices:',
     'addedDeviceNumber': 'Number of enabled devices:',
     'licenseOverdue': 'Inspection service expired',
+    'videoLicenseOverdue': 'Video license overdue',
     'hasBoundItem': 'Device has been binding to item',
     'hasAdded': 'Device has been added by someone else',
     'validateSucc': 'Successfully validate!',

@@ -1495,7 +1495,7 @@ export default {
         { ret: 'storeNotExist', match: ['Store does not exist'] },
         { ret: 'noAuthorityForStore', match: ['No authority'] },
         { ret: 'illegalSeriNum', match: ['deviceSerial']},
-        { ret: 'licenseOverdue', match: ['Device License overdue']},
+        { ret: 'videoLicenseOverdue', match: ['Device License overdue']},
         { ret: 'hasBoundItem', match: ['binding to item']},
         { ret: 'hasAdded', match: ['设备已被别人添加']}
       ];
