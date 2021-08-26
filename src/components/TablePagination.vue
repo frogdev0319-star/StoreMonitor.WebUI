@@ -41,7 +41,14 @@
             <el-input v-model="row.tempDeviceName" class="edit-input" size="small" @input="val => inputDeviceNameChange(val, row)"/>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row[_item.prop])"/>
-          <span v-else>{{ row[_item.prop] }}</span>
+          <template v-else>
+            <template v-if="isDevice && _index < 3">
+              <el-tooltip class="item" effect="dark" :content="row[_item.prop]" placement="bottom">
+                <div>{{ row[_item.prop] | addEllipsis}}</div>
+              </el-tooltip>
+            </template>
+            <span v-else>{{ row[_item.prop]}}</span>
+          </template>
         </template>
       </el-table-column>
       <el-table-column
@@ -253,6 +260,13 @@ export default {
       loadingGif: require('../../static/img/loading.gif')
     };
   },
+  filters:{
+    addEllipsis(value){
+      if(value.length <= 10) return value;
+      return value.substr(0, 10) + '...';
+    }
+  },
+
   computed: {
     tableSelection() {
       return this.$refs.tablePagination.selection;
