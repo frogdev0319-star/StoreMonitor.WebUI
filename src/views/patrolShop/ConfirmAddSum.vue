@@ -706,18 +706,18 @@ export default {
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored.toFixed(1);
                 item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
                 item['numIgnore'] = 0;
               } else {
-                item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = tab1GetScoreNoContainedIngored.toFixed(1);
               }
             } else {
               if (inspectSettings.includedInTotalScoreWithType1) {
                 if (inspectSettings.qualifiedForIgnoredWithType1) {
-                  item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                  item['itemgetScore'] = (tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored).toFixed(1);
                 } else {
-                  item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                  item['itemgetScore'] = tab1GetScoreNoContainedIngored.toFixed(1);
                 }
               }
               if (inspectSettings.qualifiedForIgnoredWithType1) {
@@ -741,6 +741,7 @@ export default {
               item['itemgetScore'] =
                 inspectSettings.qualifiedForIgnoredWithType2 ?
                   (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
+              item['itemgetScore'] = item['itemgetScore'].toFixed(1);
             }
             if (p_item.type === 2) {
               CurOtherTotalScore += totalGetscore;
