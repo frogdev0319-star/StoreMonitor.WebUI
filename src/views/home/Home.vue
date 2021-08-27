@@ -382,7 +382,7 @@ export default {
       });
     }
   },
-  
+
   methods: {
     setBrandListDisabled(booleanFlag) {
       this.brandDisabled = booleanFlag;
@@ -591,12 +591,14 @@ export default {
       this.brandList = tempAccount;
       const idIndex = this.brandList.map(item => item.accountId).indexOf(this.accountId);
       idIndex !== -1 && sessionStorage.setItem('accountName', this.brandList[idIndex].name);
+      sessionStorage.setItem('accountId', this.accountId);
     },
 
     changeAccount(accountId) {
       const self = this;
       const idIndex = this.brandList.map(item => item.accountId).indexOf(accountId);
       idIndex !== -1 && sessionStorage.setItem('accountName', this.brandList[idIndex].name);
+      sessionStorage.setItem('accountId', this.accountId);
       const params = {
         accountId: accountId
       };

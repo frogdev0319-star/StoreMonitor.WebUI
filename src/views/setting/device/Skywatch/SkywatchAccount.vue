@@ -154,7 +154,7 @@ export default {
 
   methods: {
     getAccountId() {
-      this.accountId = localStorage.getItem('oss_bucket');
+      this.accountId = sessionStorage.getItem('accountId');
     },
 
     getSkywatchAccountList() {
@@ -182,15 +182,16 @@ export default {
     },
 
     getAuthorzationResult() {
-      const paramsLength = Object.keys(this.$route.params).length;
+      const paramsLength = Object.keys(this.$route.query).length;
       if (paramsLength > 0) {
-        this.skywatchAccount = this.$route.params.msg;
-        if (this.$route.params.success) {
+        if (this.$route.query.success === "true") {
+          this.skywatchAccount = this.$route.query.msg;
           const succMsg = this.getAuthorizeMsg('success');
           util.notify(succMsg, 'sucess', 3000);
           this.getSkywatchAccountList();
           this.getSkywatchDeviceNum();
         } else {
+          this.skywatchAccount = '';
           const refusedMsg = this.getAuthorizeMsg('refuse');
           util.notify(refusedMsg, 'warning', 3000);
         }
@@ -222,9 +223,10 @@ export default {
     },
 
     setAuthorizeUrl() {
-      const redirectUrl = SkywatchAuthorizeConfig.redirect_server_uri;
+      const redirectServerUrl = SkywatchAuthorizeConfig.redirect_server_uri;
+      const redirectClientUrl = SkywatchAuthorizeConfig.redirect_client_uri;
       let authorUrl = SkywatchAuthorizeConfig.userAuthorizationUri;
-      authorUrl = `${authorUrl}?redirect_uri=${redirectUrl}&state=${this.accountId},${redirectUrl},${this.skywatchAccount}`;
+      authorUrl = `${authorUrl}?redirect_uri=${redirectServerUrl}&state=${this.accountId},${redirectClientUrl},${this.skywatchAccount}`;
       window.location.href = authorUrl;
     },
 
