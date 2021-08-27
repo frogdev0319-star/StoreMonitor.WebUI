@@ -48,7 +48,7 @@
         <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteBeseyeUser = false">
           {{ $t('deviceView.cancle') }}
         </el-button>
-        <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteBeseyeUser()">
+        <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteSkywatchAccount">
           {{ $t('deviceView.confirm') }}
         </el-button>
       </div>
