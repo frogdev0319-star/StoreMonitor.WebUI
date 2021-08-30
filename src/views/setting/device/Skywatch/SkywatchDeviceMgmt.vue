@@ -286,14 +286,16 @@
       async confirmUpdateChannle(index, item) {
         const self = this;
         self.isUpdate = false;
-        const params = {};
-        params.id = item.id;
-        params.name = item.name;
-
         const promiseArr = [];
-        item.name !== item.tempDeviceName && promiseArr.push(skywatchRESTful.updateSkywatchChannel(params));
-        item.checkedStatus && item.status === 0 && promiseArr.push(skywatchRESTful.enableSkywatchChannel({ deviceIds: [item.id] }));
-        !item.checkedStatus && item.status === 1 && promiseArr.push(skywatchRESTful.disableSkywatchChannel({ deviceIds: [item.id] }));
+        item.name !== item.tempDeviceName && promiseArr.push(skywatchRESTful.updateSkywatchDevice(
+          {serialNumber: item.serialNumber, name: item.tempDeviceName}
+          ));
+        item.name = item.tempDeviceName;
+        item.checkedStatus && item.status === 0 && promiseArr.push(skywatchRESTful.enableSkywatchChannel(
+          { deviceIds: [item.id] }));
+        !item.checkedStatus && item.status === 1 && promiseArr.push(skywatchRESTful.disableSkywatchChannel(
+          { deviceIds: [item.id] }));
+
         item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateImage(item.id));
         const results = await Promise.all(promiseArr);
         results.forEach(result => {
@@ -301,15 +303,13 @@
             throw Error(result.errMsg);
           }
         });
-
-        return item.tempUrl !== item.pictureUrl && updateDeviceRes.errCode === 0 && await this.updateImage(item.id);
       },
 
       updateImage(id){
         const fm = new FormData();
         fm.append('id', id);
         fm.append('picture', this.file);
-        deviceRESTful.attachImageToDevice(fm);
+        return deviceRESTful.attachImageToDevice(fm);
       },
 
       async getSkywatchDeviceList(params) {
@@ -352,7 +352,7 @@
         const params = {};
         params.showDisabled = true;
         return new Promise((resolve, reject) => {
-          deviceRESTful.getDeviceList().then(res => {
+          deviceRESTful.getDeviceList(params).then(res => {
             const errCode = res.errCode;
             if (errCode === 0) {
               resolve(res.data);
@@ -397,13 +397,8 @@
           util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
           return false;
         }
-        item.name = item.tempDeviceName;
-        const params = {};
-        params.serialNumber = item.serialNumber;
-        params.name = item.tempDeviceName;
         try {
-          const updateDeviceRes = await skywatchRESTful.updateSkywatchDevice(params);
-          updateDeviceRes.errCode === 0 && await this.confirmUpdateChannle(index, item);
+          await this.confirmUpdateChannle(index, item);
 
           util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
           this.isEditing = false;
@@ -411,9 +406,32 @@
         }catch (error) {
           item.isEditing = false;
           item.checkedStatus = item.status === 1;
-          util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
-          console.log('SkywatchDeviceMgmt-confirmEditSkywatch: ' + error);
+          this.setErrorMsg(error.message, false);
         }
+      },
+
+      setErrorMsg(msg, addOrUpdateFlag) {
+        let displayedMsg = '';
+        const msgMap = [
+          { ret: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
+          { ret: 'deviceExist', match: ['Device already existed'] },
+          { ret: 'multipleAccOnSameStore', match: ['Multiple accounts'] },
+          { ret: 'getAccessTokenError', match: ['Ezviz access token'] },
+          { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
+          { ret: 'storeNotExist', match: ['Store does not exist'] },
+          { ret: 'noAuthorityForStore', match: ['No authority'] },
+          { ret: 'illegalSeriNum', match: ['deviceSerial']},
+          { ret: 'videoLicenseOverdue', match: ['Device License overdue']},
+          { ret: 'hasBoundItem', match: ['binding to item']},
+          { ret: 'hasAdded', match: ['设备已被别人添加']}
+        ];
+        const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
+        if (!result) {
+          displayedMsg = addOrUpdateFlag ? this.$t('deviceView.addFailed') : this.$t('deviceView.editFail');
+        } else {
+          displayedMsg = this.$t(`deviceView.${result.ret}`);
+        }
+        util.notify(displayedMsg, 'warning', 3000);
       },
 
       cancelEditSkywatch(index, item) {
