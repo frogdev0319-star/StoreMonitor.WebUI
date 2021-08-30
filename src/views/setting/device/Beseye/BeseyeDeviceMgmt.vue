@@ -492,7 +492,7 @@ export default {
       const params = {};
       params.showDisabled = true;
       return new Promise((resolve, reject) => {
-        deviceRESTful.getDeviceList().then(res => {
+        deviceRESTful.getDeviceList(params).then(res => {
           const errCode = res.errCode;
           if (errCode === 0) {
             resolve(res.data);
