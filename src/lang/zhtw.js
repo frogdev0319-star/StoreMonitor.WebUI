@@ -851,7 +851,9 @@ export default {
     'hasBoundItem': '設備已綁定巡檢項',
     'hasAdded': '設備已被別人添加',
     'validateSucc': '驗證成功！',
-    'validateFailed': '驗證失敗！'
+    'validateFailed': '驗證失敗！',
+    'deleteSkywatchAccount': '刪除Skywatch用戶',
+    'deleteSkywatchAccountInfo': '確認刪除該Skywatch用戶？'
   },
 
   // Store Management page language

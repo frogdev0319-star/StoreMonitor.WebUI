@@ -869,7 +869,9 @@ export default {
     'hasBoundItem': '장치가 항목에 바인딩되었습니다',
     'hasAdded': '다른 사람이 기기를 추가했습니다',
     'validateSucc': '성공적으로 확인!',
-    'validateFailed': '검증 실패!'
+    'validateFailed': '검증 실패!',
+    'deleteSkywatchAccount': 'Skywatch 계정 삭제',
+    'deleteSkywatchAccountInfo': 'Skywatch 계정 삭제?'
   },
 
   // Store Management page language

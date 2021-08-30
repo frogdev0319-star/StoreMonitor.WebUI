@@ -851,7 +851,9 @@ export default {
     'hasBoundItem': '设备已绑定巡检项',
     'hasAdded': '设备已被别人添加',
     'validateSucc': '验证成功！',
-    'validateFailed': '验证失败！'
+    'validateFailed': '验证失败！',
+    'deleteSkywatchAccount': '删除Skywatch账号',
+    'deleteSkywatchAccountInfo': '确认删除该Skywatch账号？'
   },
 
   // Store Management page language

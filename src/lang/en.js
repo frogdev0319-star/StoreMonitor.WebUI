@@ -847,7 +847,9 @@ export default {
     'hasBoundItem': 'Device has been binding to item',
     'hasAdded': 'Device has been added by someone else',
     'validateSucc': 'Successfully validate!',
-    'validateFailed': 'Failed to validate!'
+    'validateFailed': 'Failed to validate!',
+    'deleteSkywatchAccount': 'Delete Skywatch account',
+    'deleteSkywatchAccountInfo': 'Delete the Skywatch User?'
   },
 
   // Store Management page language

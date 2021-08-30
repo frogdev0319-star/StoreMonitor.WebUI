@@ -864,7 +864,9 @@ export default {
     'hasBoundItem': 'デバイスがアイテムにバインドされています',
     'hasAdded': 'デバイスは他の誰かによって追加されました',
     'validateSucc': '検証に成功！',
-    'validateFailed': '検証に失敗！'
+    'validateFailed': '検証に失敗！',
+    'deleteSkywatchAccount': 'Skywatchアカウントを削除',
+    'deleteSkywatchAccountInfo': 'Skywatchユーザーを削除しますか？'
   },
 
   // Store Management page language

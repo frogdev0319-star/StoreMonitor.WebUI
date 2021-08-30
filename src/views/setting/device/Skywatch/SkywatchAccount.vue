@@ -27,7 +27,7 @@
     </div>
     <el-dialog
       v-if="showDeleteBeseyeUser"
-      :title="$t('deviceView.deleteBeseyeUser')"
+      :title="$t('deviceView.deleteSkywatchAccount')"
       :visible.sync="showDeleteBeseyeUser"
       :append-to-body="true"
       :close-on-click-modal="false"
@@ -41,7 +41,7 @@
             class="el-icon-warning"
             style="font-size:26px;margin-right:20px;color:#FF9803;
             display: inline-block; vertical-align: middle"/>
-          <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteBeseyeUserInfo') }}</span>
+          <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteSkywatchAccountInfo') }}</span>
         </p>
       </div>
       <div slot="footer" class="dialog-footer">
