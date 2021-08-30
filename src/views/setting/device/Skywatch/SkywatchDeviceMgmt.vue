@@ -81,8 +81,8 @@
               </div>
               <div class="data-status titles">
                 <el-switch
-                  :disabled="!item.isClick"
                   v-model="item.checkedStatus"
+                  @change="updateChannelImage(item)"
                 />
               </div>
               <div class="data-operation titles">
@@ -291,11 +291,6 @@
           {serialNumber: item.serialNumber, name: item.tempDeviceName}
           ));
         item.name = item.tempDeviceName;
-        item.checkedStatus && item.status === 0 && promiseArr.push(skywatchRESTful.enableSkywatchChannel(
-          { deviceIds: [item.id] }));
-        !item.checkedStatus && item.status === 1 && promiseArr.push(skywatchRESTful.disableSkywatchChannel(
-          { deviceIds: [item.id] }));
-
         item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateImage(item.id));
         const results = await Promise.all(promiseArr);
         results.forEach(result => {
@@ -303,6 +298,27 @@
             throw Error(result.errMsg);
           }
         });
+      },
+
+      async updateChannelImage(item){
+        try {
+          let result = '';
+          item.checkedStatus && item.status === 0 && ( result = await skywatchRESTful.enableSkywatchChannel(
+            { deviceIds: [item.id] }) );
+          !item.checkedStatus && item.status === 1 && (result = await skywatchRESTful.disableSkywatchChannel(
+            { deviceIds: [item.id] }) );
+          if (result.errCode === 0){
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+            this.getSkywatchDeviceList(this.setParams());
+          } else {
+            throw Error(result.errMsg);
+          }
+
+        } catch (error) {
+          item.checkedStatus = item.status === 1;
+          item.isEditing = false;
+          this.setErrorMsg(error.message, false);
+        }
       },
 
       updateImage(id){
@@ -405,7 +421,6 @@
           this.getSkywatchDeviceList(this.setParams());
         }catch (error) {
           item.isEditing = false;
-          item.checkedStatus = item.status === 1;
           this.setErrorMsg(error.message, false);
         }
       },
