@@ -317,7 +317,7 @@
         } catch (error) {
           item.checkedStatus = item.status === 1;
           item.isEditing = false;
-          this.setErrorMsg(error.message, false);
+          util.setErrorMsg(error.message, false);
         }
       },
 
@@ -421,32 +421,8 @@
           this.getSkywatchDeviceList(this.setParams());
         }catch (error) {
           item.isEditing = false;
-          this.setErrorMsg(error.message, false);
+          util.setErrorMsg(error.message, false);
         }
-      },
-
-      setErrorMsg(msg, addOrUpdateFlag) {
-        let displayedMsg = '';
-        const msgMap = [
-          { ret: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
-          { ret: 'deviceExist', match: ['Device already existed'] },
-          { ret: 'multipleAccOnSameStore', match: ['Multiple accounts'] },
-          { ret: 'getAccessTokenError', match: ['Ezviz access token'] },
-          { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
-          { ret: 'storeNotExist', match: ['Store does not exist'] },
-          { ret: 'noAuthorityForStore', match: ['No authority'] },
-          { ret: 'illegalSeriNum', match: ['deviceSerial']},
-          { ret: 'videoLicenseOverdue', match: ['Device License overdue']},
-          { ret: 'hasBoundItem', match: ['binding to item']},
-          { ret: 'hasAdded', match: ['设备已被别人添加']}
-        ];
-        const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
-        if (!result) {
-          displayedMsg = addOrUpdateFlag ? this.$t('deviceView.addFailed') : this.$t('deviceView.editFail');
-        } else {
-          displayedMsg = this.$t(`deviceView.${result.ret}`);
-        }
-        util.notify(displayedMsg, 'warning', 3000);
       },
 
       cancelEditSkywatch(index, item) {
