@@ -153,8 +153,8 @@
               </div>
               <div class="nape-enable-handle">
                 <el-switch
-                  :disabled="!item.isClick"
                   v-model="item.checkedStatus"
+                  @change="updateChannelImage(item)"
                 />
               </div>
               <div class="nape-items-handle">
@@ -748,7 +748,8 @@ export default {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
         } else {
           deviceInfo.tempDeviceName = deviceInfo.name;
-          this.setErrorMsg(res.errMsg, false);
+          util.setErrorMsg(res.errMsg, false);
+          this.showAddDeviceDialog = false;
         }
       })
         .catch(err => {
@@ -933,6 +934,27 @@ export default {
       }
     },
 
+    async updateChannelImage(item){
+      try {
+        let result = '';
+        item.checkedStatus && item.status === 0 && ( result = await ezvizRESTful.enableEzvizDeviceChannel(
+          { deviceIds: [item.id] }) );
+        !item.checkedStatus && item.status === 1 && (result = await ezvizRESTful.disableEzvizDeviceChannel(
+          { deviceIds: [item.id] }) );
+        if (result.errCode === 0){
+          util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+          item.status = item.checkedStatus ? 1 : 0;
+        } else {
+          throw Error(result.errMsg);
+        }
+
+      } catch (error) {
+        item.checkedStatus = item.status === 1;
+        item.isEditing = false;
+        util.setErrorMsg(error.message, false);
+      }
+    },
+
     confrimEditEzvizChannle(index, item) {
       const self = this;
       if (item.id !== 0) {
@@ -957,8 +979,6 @@ export default {
       try {
         const promiseArr = [];
         self.curChannelItem.name !== self.curChannelItem.tempName && promiseArr.push(ezvizRESTful.updateEzvizChannel(params));
-        self.curChannelItem.checkedStatus && self.curChannelItem.status === 0 && promiseArr.push(this.enableEzvizChannel());
-        !self.curChannelItem.checkedStatus && self.curChannelItem.status === 1 && promiseArr.push(this.disableEzvizChannel());
         item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateAttachImage());
 
         const results = await Promise.all(promiseArr);
@@ -970,9 +990,9 @@ export default {
         self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
       } catch (e) {
-        item.checkedStatus = item.status === 1;
         item.isClick = false;
-        this.setErrorMsg(e.message, false);
+        util.setErrorMsg(e.message, false);
+        this.showAddDeviceDialog = false;
       }
     },
 
@@ -981,32 +1001,6 @@ export default {
       fm.append('id', this.curChannelItem.id);
       fm.append('picture', this.file);
       return this.attachImageToDevice(fm);
-    },
-
-    enableEzvizChannel(){
-      const params = {
-        deviceIds: [this.curChannelItem.id]
-      };
-      return new Promise((resolve, reject) => {
-        ezvizRESTful.enableEzvizDeviceChannel(params).then(resDevice => {
-          resolve(resDevice);
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    disableEzvizChannel(){
-      const params = {
-        deviceIds: [this.curChannelItem.id]
-      };
-      return new Promise((resolve, reject) => {
-        ezvizRESTful.disableEzvizDeviceChannel(params).then(resDevice => {
-          resolve(resDevice);
-        }).catch(err => {
-          reject(err);
-        });
-      });
     },
 
     addEzvizChannel(item) {
@@ -1210,7 +1204,8 @@ export default {
             util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             self.showAddDeviceDialog = false;
           } else {
-            self.setErrorMsg(errMsg, true);
+            util.setErrorMsg(errMsg, true);
+            self.showAddDeviceDialog = false;
           }
           self.initAddDeviceFormData();
           self.setDeviceListParams();
@@ -1482,31 +1477,6 @@ export default {
       } else {
         this.storeDataList = storeList;
       }
-    },
-
-    setErrorMsg(msg, addOrUpdateFlag) {
-      let displayedMsg = '';
-      const msgMap = [
-        { ret: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
-        { ret: 'deviceExist', match: ['Device already existed'] },
-        { ret: 'multipleAccOnSameStore', match: ['Multiple accounts'] },
-        { ret: 'getAccessTokenError', match: ['Ezviz access token'] },
-        { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
-        { ret: 'storeNotExist', match: ['Store does not exist'] },
-        { ret: 'noAuthorityForStore', match: ['No authority'] },
-        { ret: 'illegalSeriNum', match: ['deviceSerial']},
-        { ret: 'videoLicenseOverdue', match: ['Device License overdue']},
-        { ret: 'hasBoundItem', match: ['binding to item']},
-        { ret: 'hasAdded', match: ['设备已被别人添加']}
-      ];
-      const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
-      if (!result) {
-        displayedMsg = addOrUpdateFlag ? this.$t('deviceView.addFailed') : this.$t('deviceView.editFail');
-      } else {
-        displayedMsg = this.$t(`deviceView.${result.ret}`);
-      }
-      util.notify(displayedMsg, 'warning', 3000);
-      this.showAddDeviceDialog = false;
     },
 
     getAvailableDevice(params) {
