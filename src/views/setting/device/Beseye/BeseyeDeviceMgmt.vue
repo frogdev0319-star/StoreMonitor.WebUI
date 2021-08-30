@@ -97,8 +97,8 @@
               </div>
               <div class="data-status titles">
                 <el-switch
-                  :disabled="!item.isClick"
                   v-model="item.checkedStatus"
+                  @change="changeBeseyeChannelImage(item)"
                 />
               </div>
               <div class="data-operation titles">
@@ -433,10 +433,11 @@ export default {
       params.id = item.id;
       params.name = item.name;
       const promiseArr = [];
-      item.name !== item.tempDeviceName && promiseArr.push(beseyeRESTful.updateBeseyeChannel(params));
-      item.checkedStatus && item.status === 0 && promiseArr.push(beseyeRESTful.enableBeseyeChannel({ deviceIds: [item.id] }));
-      !item.checkedStatus && item.status === 1 && promiseArr.push(beseyeRESTful.disableBeseyeChannel({ deviceIds: [item.id] }));
+      item.name !== item.tempDeviceName && promiseArr.push(beseyeRESTful.updateBeseyeDevice(
+        {serialNumber: item.serialNumber, name: item.tempDeviceName}));
+
       item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateImage(item.id));
+      item.name = item.tempDeviceName;
       const results = await Promise.all(promiseArr);
       results.forEach(result => {
         if (result.errCode !== 0) {
@@ -547,18 +548,34 @@ export default {
       });
     },
 
+    async changeBeseyeChannelImage(item){
+      try {
+        let result = '';
+        item.checkedStatus && item.status === 0 && ( result = await beseyeRESTful.enableBeseyeChannel(
+          { deviceIds: [item.id] }) );
+        !item.checkedStatus && item.status === 1 && (result = await beseyeRESTful.disableBeseyeChannel(
+          { deviceIds: [item.id] }) );
+        if (result.errCode === 0){
+          util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+          this.getBeseyeDeviceList(this.setParams());
+        } else {
+          throw Error(result.errMsg);
+        }
+
+      } catch (error) {
+        item.checkedStatus = item.status === 1;
+        item.isEditing = false;
+        util.setErrorMsg(error.message, false);
+      }
+    },
+
     async confirmEditBeseye(index, item) {
       if (item.tempDeviceName.trim().length === 0) {
         util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
         return false;
       }
-      item.name = item.tempDeviceName;
-      const params = {};
-      params.serialNumber = item.serialNumber;
-      params.name = item.tempDeviceName;
       try {
-        const updateDeviceRes = await beseyeRESTful.updateBeseyeDevice(params);
-        updateDeviceRes.errCode === 0 && await this.confirmUpdateChannle(index, item);
+        await this.confirmUpdateChannle(index, item);
 
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         this.isEditing = false;
@@ -566,8 +583,7 @@ export default {
       } catch (error) {
         item.isEditing = false;
         item.checkedStatus = item.status === 1;
-        util.notify(this.$t('deviceView.editFail'), 'warning', 3000);
-        console.log('BeseyeDeviceMgmt-confirmEditBeseye: ' + error);
+        util.setErrorMsg(error.message, false);
       }
     },
 
