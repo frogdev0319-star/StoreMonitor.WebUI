@@ -17,7 +17,10 @@
         <strong style="margin-right:20px;">{{ $t('storeView.contact') }}</strong>
         <span style="min-width:100px;display:inline-block;"><el-input v-model="store.phone" disabled size="mini" style="" class="input"/></span>
         <span style="font-size:12px;font-weight:bold;">{{ $t('storeView.bindInspectList') }}</span>
-        <span style="font-size:12px; display:inline-block;"><el-input v-model="store.napeTable" disabled size="mini" style="" class="input"/></span>
+        <span style="font-size:12px; display:inline-block;">
+          <el-input v-model="store.napeTable" disabled size="mini"
+                    :class="{'en-input': lang === 'en' || lang === 'ja-JQ'}" class="input"/>
+        </span>
       </div>
     </el-col>
     <el-col :span="24" :style="{'min-height': emptyContentHeight+'px'}" class="storeEdit-content">
@@ -96,7 +99,8 @@ export default {
       alleList: [],
       varyWindowHeight: window.innerHeight,
       varyWindowWidth: window.innerWidth,
-      appliedInspect: []
+      appliedInspect: [],
+      lang: this.$i18n.locale
     };
   },
   computed: {
@@ -434,14 +438,16 @@ export default {
                 }
               }
                 .input{
-                  @include point(width,140);
-                 // @include point(margin-right,25);
+                  width: 140px;
                   border: none;
                    >>> .el-input.is-disabled .el-input__inner{
                     border: none;
                     background-color: #f0f5f8 !important;
                   }
                 }
+              .en-input{
+                width: 245px
+              }
             }
             .store-handle{
               .header-details1{
