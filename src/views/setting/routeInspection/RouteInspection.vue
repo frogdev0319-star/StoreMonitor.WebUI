@@ -1,15 +1,12 @@
 <template>
   <el-row id="inspectSetting" class="el-route-container">
     <el-col :span="24" class="el-route-header">
-      <div v-if="itemhoverName.length > 0" :style="{'left':120*itemIndex+4*itemIndex+'px'}" class="item_name">
-        {{ itemhoverName }}<div class="triangle"/>
-      </div>
       <el-col :span="7" class="el-route-btns">
-        <span :class="lang === 'en'? 'en-bind-title': 'bind-title'">
+        <span :class="lang.indexOf('zh') === -1 ? 'en-bind-title': 'bind-title'">
           {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
         </span>
         <delay-button
-          :class="lang === 'en' ? 'en-bind-btn' : 'bind-btn' "
+          :class="lang.indexOf('zh') === -1 ? 'en-bind-btn' : 'bind-btn' "
           :disabled="elTableData[Number(activeName)].data.length === 0"
           @click="bindStore"
         >
@@ -27,7 +24,7 @@
           v-for="(item,index) in btnList"
           :key="index"
           :disabled="item.enabled"
-          :class="lang === 'en' ? 'en-el-handle-btn' : 'el-handle-btn' "
+          :class="lang.indexOf('zh') === -1 ? 'en-el-handle-btn' : 'el-handle-btn' "
           size="mini"
           @click="handleNape(index,item)">
           <div class="btn-area">
@@ -60,7 +57,9 @@
               :style="{'min-height':varyWindowWidth*0.70+'px'}"
               @tab-click="handleClickPatrol" >
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
-                <span slot="label" @mouseover="overItem(_item,_index)" @mouseout="outItem(_item,_index)">{{ _item.name }}</span>
+                <el-tooltip popper-class="item-tabs" effect="dark" :content="_item.name" placement="top"  slot="label">
+                  <span>{{ _item.name }}</span>
+                </el-tooltip>
                 <div v-if="_item.routeData && !loading">
                   <route-detail
                     :ref="curIndex"
@@ -228,8 +227,6 @@ export default {
         }
       ],
       showNoPostDialog: false,
-      itemhoverName: '',
-      itemIndex: 0,
       loading: false,
       varyWindowWidth: window.innerHeight,
       addPatrol: '新增巡检表',
@@ -412,7 +409,7 @@ export default {
       const self = this;
       inpectRESTful.downLoadTemplate().then(res => {
         const blob = new Blob([res], {
-          type: 'application/vnd.ms-excel'
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
         const objectUrl = URL.createObjectURL(blob);
         const url = objectUrl;
@@ -430,7 +427,7 @@ export default {
       const self = this;
       inpectRESTful.downLoadTemplate().then(res => {
         const blob = new Blob([res], {
-          type: 'application/vnd.ms-excel'
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
         const objectUrl = URL.createObjectURL(blob);
         const url = objectUrl;
@@ -1314,17 +1311,6 @@ export default {
       self.getTagList();
     },
 
-    overItem(item, index) {
-      const self = this;
-      self.itemhoverName = item.name;
-      self.itemIndex = index;
-    },
-
-    outItem(item, index) {
-      const self = this;
-      self.itemhoverName = '';
-    },
-
     handleClickPatrol(val) {
       const self = this;
       if (self.activeName === '0') {
@@ -1516,7 +1502,8 @@ export default {
       if (ret.data != undefined && ret.data.isLogin) {
         self.export2Excel();
       } else {
-        window.location.href = 'https://portals.storeviu.com';
+        const url = sessionStorage.getItem('LoginURL');
+        window.location.href = url;
       }
     },
 
@@ -2326,6 +2313,13 @@ export default {
 </script>
 <style>
   @import '../../../assets/css/importfile.css';
+  .item-tabs{
+    min-width: 80px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    text-align: center;
+  }
 </style>
 <style lang="scss" scoped>
   $mainColor:#f31d65;
@@ -2380,122 +2374,100 @@ export default {
     }
   }
 
-  .el-route-container{
-    padding: 20px calc(20/1920*100vw) 15px calc(20/1920*100vw);
-    border: 1px solid $border;
-    background-color: #fff;
-    .el-route-header{
-      margin-top: calc(15/1920*100vw);
-      .item_name{
-        position: absolute;
-        top:55px;
-        margin-left:47px;
-        z-index: 100;
-        height:18px;
-        line-height: 18px;
-        border-radius: 3px;
-        background-color: rgb(0, 0, 0);
-        color:#fff;
-        padding:5px 2px;
-        min-width: 100px;
-        text-align: center;
-        font-size: calc(12/1920*100vw);
-        .triangle{
-          width:10px;
-          height:10px;
-          margin:0 auto;
-          transform:rotate(45deg);
-          background-color: rgb(0, 0, 0);
-        }
-      }
-      .el-route-tabs{
-        width: 98%;
-        margin-left: calc(15/1920*100vw);
-        .bind-empty{
-          text-align: center;
-          img{
-            width:32px;
-            height:32px;
-            vertical-align: middle;
-          }
-          .empty-text{
-            font-size: calc(14/1920*100vw);
-            color:#7d8cad;
-            vertical-align: middle;
-          }
-        }
-        .data-empty{
-          margin: 0 auto;
-          margin-top: 14%;
-          position: relative;
-          .empty-title{
-            font-weight: bold;
-            span{
-              color: $mainColor;
-              cursor: pointer;
+    .el-route-container{
+        padding: 20px calc(20/1920*100vw) 15px calc(20/1920*100vw);
+        border: 1px solid $border;
+        background-color: #fff;
+        .el-route-header{
+            margin-top: calc(15/1920*100vw);
+            .el-route-tabs{
+                width: 98%;
+                margin-left: calc(15/1920*100vw);
+                .bind-empty{
+                    text-align: center;
+                    img{
+                        width:32px;
+                        height:32px;
+                        vertical-align: middle;
+                    }
+                    .empty-text{
+                        font-size: calc(14/1920*100vw);
+                        color:#7d8cad;
+                        vertical-align: middle;
+                    }
+                }
+                .data-empty{
+                    margin: 0 auto;
+                    margin-top: 14%;
+                    position: relative;
+                    .empty-title{
+                        font-weight: bold;
+                        span{
+                            color: $mainColor;
+                            cursor: pointer;
+                        }
+                        .downLoad-btn{
+                            color:  $mainColor;
+                            text-decoration: none;
+                            cursor: pointer;
+                        }
+                    }
+                }
             }
-            .downLoad-btn{
-              color:  $mainColor;
-              text-decoration: none;
-              cursor: pointer;
-            }
-          }
-        }
-      }
-      .el-route-btns{
-        position: absolute;
-        right: calc(40/1920*100vw);
-        z-index: 10;
-        width: auto;
-        top: 25px;
-        display: flex;
-        align-items: center;
-        .bind-title{
-          margin-right:calc(20/1920*100vw);
-          color:$tab;
-          font-size: 12px;
-        }
-        .en-bind-title{
-          margin-right:calc(20/1920*100vw);
-          color:$tab;
-          font-size: 12px;
-        }
-        .downLoad-btn{
-          margin-left: 0px !important;
-          border-color: $mainColor !important;
-          color: $mainColor !important;
-          border-radius: 0px;
-          padding: 2px 5px !important;
-          position: relative;
-          display: inline-block;
-          text-decoration: none;
-          font-size: 12px;
-          border: 1px solid;
-          border-left-width: 0px;
-          @include point(right,5);
-          cursor: pointer;
-          &:hover{
-            background-color: #FEE4E7;
-          }
-          &:focus{
-            background-color: #FEE4E7;
-          }
-          span{
-            position: relative;
-            bottom: 3px;
-          }
-        }
-        .el-handle-btn{
-          margin-left: 0px !important;
-          border-color: $mainColor !important;
-          color: $mainColor !important;
-          border-radius: 0px;
-          border-right: 0;
-          height: calc(36/1920*100vw);
-          padding: 0 0;
-          font-size: calc(14/1920*100vw);
-          min-width: 85px;
-          min-height: 28px;
+            .el-route-btns{
+                position: absolute;
+                right: calc(40/1920*100vw);
+                z-index: 10;
+                width: auto;
+                top: 25px;
+                display: flex;
+                align-items: center;
+                .bind-title{
+                    margin-right:calc(20/1920*100vw);
+                    color:$tab;
+                    font-size: 12px;
+                }
+                .en-bind-title{
+                  margin-right:calc(20/1920*100vw);
+                  color:$tab;
+                  font-size: 12px;
+                }
+                .downLoad-btn{
+                    margin-left: 0px !important;
+                    border-color: $mainColor !important;
+                    color: $mainColor !important;
+                    border-radius: 0px;
+                    padding: 2px 5px !important;
+                    position: relative;
+                    display: inline-block;
+                    text-decoration: none;
+                    font-size: 12px;
+                    border: 1px solid;
+                    border-left-width: 0px;
+                    @include point(right,5);
+                    cursor: pointer;
+                    &:hover{
+                        background-color: #FEE4E7;
+                    }
+                    &:focus{
+                        background-color: #FEE4E7;
+                    }
+                    span{
+                        position: relative;
+                        bottom: 3px;
+                    }
+                }
+                .el-handle-btn{
+                    margin-left: 0px !important;
+                    border-color: $mainColor !important;
+                    color: $mainColor !important;
+                    border-radius: 0px;
+                    border-right: 0;
+                    height: calc(36/1920*100vw);
+                    padding: 0 0;
+                    font-size: calc(14/1920*100vw);
+                    min-width: 85px;
+                    min-height: 28px;
 
           &:last-child{
             border-right: 1px solid $mainColor !important;
@@ -2521,52 +2493,51 @@ export default {
     }
   }
 
-  .nameinput >>> .el-input__inner{
-    border:0;
-  }
-  #en-patrltabs-content >>> .el-tabs__nav-scroll {
-    height: 40px;
-  }
-  #en-patrltabs-content >>> .el-tabs__item {
-    padding: 0 0;
-    font-size: 14px;
-    width: calc(160/1920*100vw);
-    display: inline-block;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  #en-patrltabs-content >>> .el-tabs__active-bar{
-    height: 4px;
-  }
-  .el-dropbtn{
-    position: relative;
-    bottom: 2px;
-    border: 1px solid $mainColor;
-  }
-  .file-sliver{
-    @include point(width,76);
-    @include point(height,28);
-    background-color: transparent;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-  }
-  .tabName-input-content{
-    background: #fff;
-    @include point(height,73);
-    width: 100%;
-  }
-  .el-search-input{
-    @include point(width,200);
-    @include point(margin-right,20);
-    position:absolute;
-    right: 0px;
-    top: 3px;
-  }
-  #patrltabs-content >>> .el-tabs__nav-next, #patrltabs-content >>> .el-tabs__nav-prev {
-    line-height: 30px;
-  }
+    .nameinput >>> .el-input__inner{
+        border:0;
+    }
+    #en-patrltabs-content >>> .el-tabs__nav-scroll {
+      height: 40px;
+    }
+    #en-patrltabs-content >>> .el-tabs__item {
+      padding: 0 0;
+      font-size: 14px;
+      width: 160px;
+      display: inline-block;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    #en-patrltabs-content >>> .el-tabs__active-bar{
+      height: 4px;
+    }
+    .el-dropbtn{
+        position: relative;
+        bottom: 2px;
+        border: 1px solid $mainColor;
+    }
+    .file-sliver{
+        @include point(width,76);
+        @include point(height,28);
+        background-color: transparent;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+    .tabName-input-content{
+        background: #fff;
+        @include point(height,73);
+        width: 100%;
+    }
+    .el-search-input{
+      @include point(width,200);
+      @include point(margin-right,20);
+      position:absolute;
+      right: 0px;
+      top: 3px;
+    }
+    #patrltabs-content >>> .el-tabs__nav-next, #patrltabs-content >>> .el-tabs__nav-prev {
+      line-height: 30px;
+    }
   #patrltabs-content >>> .el-tabs__item {
     padding: 0 0;
     margin: 0 12px;
@@ -2595,7 +2566,7 @@ export default {
     height: 0 !important;
   }
 
-  .self-loading.loading_area >>> .el-loading-mask{
-    background-color: transparent;
-  }
+    .self-loading.loading_area >>> .el-loading-mask{
+      background-color: transparent;
+    }
 </style>

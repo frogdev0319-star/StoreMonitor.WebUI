@@ -30,45 +30,14 @@
           @mousemove="showControlInfo=true"
           @mouseleave="showControlInfo = false">
           <hr class="dialog-hr">
-          <div v-if="!isEzviz" id="videoContent" class="video-content">
-            <template v-if="videoAuthority">
-              <div v-if="showControlInfo" id="channelName"><span>{{ curChannel.name }}</span></div>
-              <div v-if="showControlInfo" class="icon-footer">
-                <div class="iconlside">
-                  <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
-                  <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
-                </div>
-                <div class="iconrside">
-                  <div class="screen-content">
-                    <i
-                      :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
-                      class="iconfont iconscreen"
-                      @click="controlScreen"/>
-                  </div>
-                </div>
-              </div>
-              <video
-                id="previewVideo"
-                :controls="false"
-                height="83%"
-                width="90%"
-                prload
-                class="video-js vjs-fill"/>
-            </template>
-            <div v-else class="errorVideo-model">
-              <span>
-                {{ $t('remotePatrol.videoLicense') }}
-              </span>
-            </div>
-          </div>
-          <ezviz-video
-            v-else
-            ref="ezvizVideo"
+          <component
+            :is="currentVideoComponent"
+            ref="vendorVideo"
             :channel-info="channelInfo"
             :is-event="isEvent"
             :store-id="event.storeId"
-            :video-authority="videoAuthority"
-          />
+            :video-authority="videoAuthority">
+          </component>
         </div>
       </el-dialog>
       <el-dialog
@@ -120,30 +89,14 @@
           </el-button>
         </span>
       </el-dialog>
-      <transition name="fade">
-        <el-dialog
-          v-if="showOuter"
-          :title="$t('eventView.view')"
-          :visible.sync="showOuter"
-          :close-on-click-modal="false"
-          width="850px"
-          top="12%">
-          <div class="video-dialog-content" style="overflow:hidden;">
-            <hr class="dialog-hr">
-            <div class="dialog-source-content">
-              <img v-if="showImg" :src="checkImgSrc">
-            </div>
-          </div>
-        </el-dialog>
-      </transition>
       <div class="storeInfo-content">
         <div class="storeInfo-details">
-          <dd><span :class="lang==='en'? 'en-w4': 'w4'">{{ $t('eventView.storeName') }}：</span></dd>
+          <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4': 'w4'">{{ $t('eventView.storeName') }}：</span></dd>
           <span class="details-info">{{ event.storeName }}</span>
         </div>
         <div class="storeInfo-details">
-          <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
-            <dd><span :class="lang==='en'? 'en-w3': 'w3'">{{ $t('eventView.submitter') }}：</span></dd>
+          <div :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
+            <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w3': 'w3'">{{ $t('eventView.submitter') }}：</span></dd>
             <el-tooltip
               :popper-class="tooltipClass"
               :content="event.createor"
@@ -154,13 +107,17 @@
           </div>
         </div>
         <div class="storeInfo-details">
-          <div :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
-            <dd><span :class="lang === 'en' ? 'en-w4' : 'w4'">{{ $t('eventView.submitTime') }}：</span></dd>
+          <div :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
+            <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4' : 'w4'">{{ $t('eventView.submitTime') }}：</span></dd>
             <span class="details-info">{{ event.createDate }}</span>
           </div>
-          <div v-if="event.sourceType === 1 && relatedChannels.length > 0" :class="lang === 'en' ? 'en-w3-content' : 'w3-content'">
-            <dd :class="lang === 'en' ? 'en-w3' : 'w3'" >
-              <div :class="lang === 'en' ? 'en-related-channel' : 'related-channel'" @click="showRelatedChannel">
+          <div
+            v-if="event.sourceType === 1 && relatedChannels.length > 0"
+            :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
+            <dd :class="lang.indexOf('zh') === -1 ? 'en-w3' : 'w3'" >
+              <div
+                :class="lang.indexOf('zh') === -1 ? 'en-related-channel' : 'related-channel'"
+                @click="showRelatedChannel">
                 <img :src="cameraImg" class="img-class">
                 <span class="related-span">{{ $t('eventView.associatedChannel') }}</span>
               </div>
@@ -169,18 +126,14 @@
         </div>
       </div>
       <div class="eventInfo-content">
-        <strong v-if="lang === 'en'" style="margin-right: 28px">{{ $t('eventView.eventDetails') }}:</strong>
+        <strong v-if="lang.indexOf('zh') === -1" style="margin-right: 28px">{{ $t('eventView.eventDetails') }}:</strong>
         <strong v-else>{{ $t('eventView.eventDetails') }}：</strong>
         <div class="content">
-          <div v-if="showAudio" class="speech-content">
-            <div class="speech-info" @click="startSpeech">
-              <i :class="speech?'icon-yuyin':'icon-yuyin'" class="iconfont icon-speech"/>
-            </div>
-            <audio id="audio" :ref="audioRef" @canplay="getDuration">
-              <source :src="audioSrc" type="audio/mpeg" >
-            </audio>
-            <span class="often-text">{{ audioOftenText }}</span>
-          </div>
+          <audio-vue
+            v-if="showAudio"
+            :audio-ref="audioRef"
+            :audio-src="audioSrc"
+            :if-show-margin="false"/>
 
           <pre class="description">{{ event.description }}</pre>
           <div class="photo-content">
@@ -200,13 +153,11 @@
             <div v-for="(item,index) in imgsourceList" :key="'img-' + index" class="source-content">
               <div v-if="item.mediaType===2" class="img-content">
                 <!--image-->
-                <img
+                <el-image
                   :src="item.url"
-                  :title="imgTitle"
-                  :onerror="deafultImg"
-                  :height="imgHeight+'px'"
-                  class="imgLittle imgInner"
-                  @click="openOuter(item,$event)">
+                  :style="{height: imgHeight+'px', width: 'calc(130/1920*100vw)'}"
+                  :preview-src-list="getImgList(index, imgsourceList)"
+                  class="imgLittle imgInner"/>
               </div>
             </div>
           </div>
@@ -224,7 +175,10 @@
           <span>{{ $t('eventView.methods') }}</span><br>
           <div class="btn-content">
             <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
-              <span v-if="item.isShow" :class="item.isActive?'activeClass':''" @click="clickSubBtn(item,index)">
+              <span
+                v-if="item.isShow"
+                :class="{'activeClass': item.isActive, 'ja-span': lang.indexOf('ja') !== -1}"
+                @click="clickSubBtn(item,index)">
                 {{ item.name }}
               </span>
             </div>
@@ -244,7 +198,7 @@
         </el-scrollbar>
       </div>
     </el-col>
-    <el-col :span="8" class="rside">
+    <el-col :span="8" class="rside" :style="{'min-height':windowHeight*0.82+'px'}">
       <div id="rside-title" class="title-content">
         <span>{{ $t('eventView.details') }}</span>
       </div>
@@ -263,15 +217,12 @@
             <div class="deal-rside">
               <div class="audio">
                 <span class="creator">{{ item.createOr }}</span>
-                <div v-if="item.showAudio" class="speech-content deal-speech">
-                  <div class="speech-info" @click="startSpeechItem(item,index)">
-                    <i class="iconfont icon-yuyin icon-speech"/>
-                  </div>
-                  <audio :ref="item.audio.audioRef" @canplay="getCommentDuration(item)">
-                    <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                  </audio>
-                  <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                </div>
+                <audio-vue
+                  v-if="item.showAudio"
+                  :audio-ref="item.audio.audioRef"
+                  :audio-src="item.audio.audioSrc"
+                  :if-show-margin="false"
+                  class="deal-speech"/>
               </div>
               <pre v-if="item.description != null" class="description">{{ item.description }}</pre>
               <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="source-content">
@@ -281,13 +232,11 @@
                   :height="imgHeight+'px'"
                   class="source-details">
                   <div v-if="_item.mediaType === 2" class="img-content">
-                    <img
-                      :title="imgTitle"
+                    <el-image
                       :src="_item.url"
-                      :height="imgHeight+'px'"
-                      :onerror="deafultImg"
-                      class="imgLittle imgInner"
-                      @click="openOuter(_item,$event)">
+                      :style="{height: imgHeight+'px',width: 'calc(100/1920*100vw)'}"
+                      :preview-src-list="getImgList(_index, item.sourceList)"
+                      class="imgLittle imgInner"/>
                   </div>
                   <div v-else class="img-content " @click="playCommentVideo(_item,_index)">
                     <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -307,13 +256,10 @@
 </template>
 <script>
 import util from '@/common/util';
-import dashAPI from '@/api/dash';
 import videojs from '../../../../static/video.js';
 import 'videojs-contrib-hls';
 import { eventRESTful } from '@/api/index';
-import AudioVue from '@/components/AudioVue.vue';
 import { getDetailedStoreInfo } from '@/api/store';
-import EzvizVideo from '@/components/EzvizVideo.vue';
 import PermissionHelper from '@/api/PermissionHelper';
 import filterString from '@/common/filterString';
 import { mapGetters } from 'vuex';
@@ -323,8 +269,11 @@ export default {
   name: 'EventDetail',
   components: {
     DelayButton,
-    AudioVue,
-    EzvizVideo
+    AudioVue: () => import('@/components/AudioVue.vue'),
+    SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
+    DashVideo: () => import('@/components/DashVideo.vue'),
+    EzvizVideo: () => import('@/components/EzvizVideo.vue'),
+    BeseyeVideo: () => import('@/components/BeseyeVideo.vue')
   },
   data() {
     return {
@@ -341,13 +290,10 @@ export default {
       isPlaying: false,
       audioSrc: '',
       showAudio: false,
-      videoSrc: '',
       curChannel: null,
       sourceList: [],
       commentList: [],
-      protocal: 'DASH',
       selGID: 0,
-      mpdurl: '',
       initialized: false,
       previewplayer: '',
       winpDes: '',
@@ -355,13 +301,9 @@ export default {
       windowHeight: window.innerHeight,
       varyWindowWidth: window.innerWidth,
       showOuter: false,
-      bigImgSrc: '',
-      checkImgSrc: '',
-      imgTitle: '',
       showCheckVideo: false,
       showPhotoContent: false,
       deafultImg: 'this.src="' + require('../../../../static/img/picture_failed.png') + '"',
-      sessionId: '',
       eventDes: '',
       videoSrc: require('../../../../static/img/monitor.png'),
       inspectSrc: require('../../../../static/img/remote_patrol.png'),
@@ -369,9 +311,7 @@ export default {
       startIcon: require('../../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
       curStatus: null,
-      fullScreen: false,
       showControlInfo: true,
-      playState: false,
       lang: this.$i18n.locale,
       isEvent: true,
       channelInfo: {},
@@ -381,14 +321,20 @@ export default {
       showRelatedChannelFlag: false,
       relatedChannels: [],
       channelRadio: '',
-      timerPlayReal: null,
-      realTimeSpeed: 0,
       ivsIdRuletip: false,
       videosourceList: [],
       imgsourceList: [],
-      Changestatus: ''
+      Changestatus: '',
+      vendor: 1,
+      currentVideoComponent: 'EzvizVideo'
     };
   },
+  watch:{
+     vendor(){
+      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
+    }
+  },
+
   computed: {
     player() {
       return this.$refs.videoPlayer.player;
@@ -431,22 +377,9 @@ export default {
         return this.windowHeight * 0.609;
       }
     },
-    isEzviz() {
-      const self = this;
-      return self.$store.state.user.isEzviz;
-    },
     ...mapGetters({
       videoAuthority: 'videoAuthority'
     })
-  },
-  watch: {
-    realTimeSpeed(val) {
-      const self = this;
-      if (val >= 300) {
-        self.stopRealTime();
-        self.showControlInfo = false;
-      }
-    }
   },
 
   mounted() {
@@ -454,31 +387,6 @@ export default {
     self.getBtnList();
     self.getSessionData();
     self.getCommentList(0);
-    self.$nextTick(function() {
-      setTimeout(() => {
-        self.myfun();
-      }, 500);
-      setTimeout(() => {
-        self.getDuration();
-        self.commentList.forEach((_item, _index) => {
-          self.getCommentDuration(_item);
-        });
-      }, 0);
-    });
-
-    window.onresize = function() {
-      if (!self.checkFull()) {
-        self.fullScreen = false;
-        var ele = document.getElementById('videoContent');
-        ele.style.width = 'auto';
-        ele.style.height = 'auto';
-      }
-    };
-  },
-
-  beforeDestroy() {
-    window.clearInterval(this.timeid);
-    window.onresize = null;
   },
 
   methods: {
@@ -498,15 +406,6 @@ export default {
       this.ivsIdRuletip = false;
     },
 
-    async playVideo(url) {
-      const self = this;
-      self.playState = true;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      this.previewplayer.src({ src: url, type: this.protocal === 'HLS' ? 'application/x-mpegURL' : 'application/dash+xml' });
-      this.previewplayer.play();
-    },
-
     stopCommentVideo() {
       var video = document.getElementById('previewVideo');
       this.previewplayer = videojs(video);
@@ -524,133 +423,20 @@ export default {
       });
     },
 
-    openOuter(item, $ev) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.url;
-        self.showImg = true;
-      }
-    },
-
-    showOuterPhoto(target) {
-      const self = this;
-      var src = target.src;
-      self.bigImgSrc = src;
-    },
-
-    async realTime() {
-      const self = this;
-      if (this.videoAuthority === false) {
-        this.showControlInfo = false;
-        return;
-      }
-      self.realTimeSpeed = 0;
-      const sessionId = await dashAPI.Online();
-      self.sessionId = sessionId;
-      const data = {
-        request: {
-          method: 'connection',
-          sessionID: sessionId,
-          streamingProtocol: this.protocal,
-          IVSID: self.curChannel.ivsId,
-          channel: JSON.stringify(self.curChannel.channelId),
-          streamType: 'SubStream'
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
         }
-      };
-      self.mpdurl = await dashAPI.RealTime(1, data); // 1 is start, 0 is stop
-      if (self.mpdurl.ErrorCode == undefined && self.mpdurl.length !== 0) {
-        self.playVideo(self.mpdurl);
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = window.setInterval(() => {
-          self.realTimeSpeed = self.realTimeSpeed + 1;
-        }, 1000);
       }
-    },
-
-    destroyVideo() {
-      const self = this;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      self.previewplayer.dispose();
-    },
-
-    stopVideo() {
-      const self = this;
-      self.previewplayer.pause();
-      self.playState = false;
+      return arr.filter(source => source.mediaType === 2).map(source => source.url);
     },
 
     closeRealTime() {
-      const self = this;
-      if (!self.isEzviz) {
-        if (self.playState) {
-          self.stopRealTime();
-        }
-        self.previewplayer.dispose();
-      } else {
-        self.$refs.ezvizVideo.stopRealTime();
-      }
-    },
-
-    async stopRealTime() {
-      const self = this;
-      self.stopVideo();
-      const data = {
-        request: {
-          method: 'disconnection',
-          sessionID: self.sessionId,
-          IVSID: self.curChannel.ivsId,
-          channel: JSON.stringify(self.curChannel.channelId),
-          streamType: 'SubStream'
-        }
-      };
-      const ret = await dashAPI.RealTime(0, data);
-      await dashAPI.Offline(self.sessionId);
-      self.realTimeSpeed = 0;
-      window.clearInterval(self.timerPlayReal);
-      self.timerPlayReal = null;
-    },
-
-    controlScreen() {
-      const self = this;
-      if (!self.fullScreen) {
-        self.fullWindowScreen();
-        self.fullScreen = true;
-      } else {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-    },
-
-    fullWindowScreen(...val) {
-      const self = this;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = '100%';
-      ele.style.height = '100%';
-      if (ele.requestFullscreen) {
-        ele.requestFullscreen();
-      } else if (ele.mozRequestFullScreen) {
-        ele.mozRequestFullScreen();
-      } else if (ele.webkitRequestFullScreen) {
-        ele.webkitRequestFullScreen();
-      } else if (ele.msRequestFullscreen) {
-        ele.msRequestFullscreen();
-      }
-    },
-
-    exitFullscreen() {
-      var de = document;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = 'auto';
-      ele.style.height = 'auto';
-      if (de.exitFullscreen) {
-        de.exitFullscreen();
-      } else if (de.mozCancelFullScreen) {
-        de.mozCancelFullScreen();
-      } else if (de.webkitCancelFullScreen) {
-        de.webkitCancelFullScreen();
-      }
+      this.$refs.vendorVideo.stopVideoPlay();
     },
 
     myfun() {
@@ -671,6 +457,7 @@ export default {
         getDetailedStoreInfo(params).then(res => {
           const errMsg = res.errMsg;
           if (errMsg != undefined && errMsg === 'Success') {
+            this.licenseStatus = res.data.status;
             resolve(res.data.device);
           }
         });
@@ -722,6 +509,7 @@ export default {
               item.channelId = _item.channelId;
               item.name = _item.name;
               item.ivsId = _item.ivsId;
+              item.vendor = _item.vendor;
             }
           });
           temp.push(item);
@@ -741,99 +529,20 @@ export default {
       });
     },
 
-    getDuration() {
-      const self = this;
-      if (self.showAudio) {
-        const audio = self.$refs.audioRef;
-        let du = audio.duration;
-        if (isNaN(du)) {
-          self.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          self.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
-    getCommentDuration(item) {
-      const self = this;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
-    getCommentProcess() {
-      const self = this;
-      self.commentList.forEach((_item, _index) => {
-        if (_item.showAudio) {
-          if (isNaN(self.$refs[_item.audio.audioRef][0].duration)) {
-            _item.showAudio = false;
-          } else {
-            _item.audio.audioOftenText = parseInt(self.$refs[_item.audio.audioRef][0].duration) + '"';
-          }
-        }
-      });
-    },
-
-    startSpeech() {
-      const self = this;
-      self.$refs.audioRef.ended ? self.isPlaying = false : null;
-      if (!self.isPlaying) {
-        self.$refs.audioRef.play();
-        self.isPlaying = true;
-        self.speech = true;
-      } else {
-        self.$refs.audioRef.pause();
-        self.isPlaying = false;
-        self.speech = false;
-        clearInterval(self.timeid);
-      }
-    },
-
-    startSpeechItem(item, index) {
-      const self = this;
-      self.$refs[item.audio.audioRef][0].ended ? item.audio.isPlaying = false : null;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
-      }
-      self.commentList.forEach((_item, _index) => {
-        if (_item.audio != undefined) {
-          if (_index !== index) {
-            self.$refs[_item.audio.audioRef][0].pause();
-            _item.audio.isPlaying = false;
-          }
-        }
-      });
-    },
-
     checkVideo(item, index) {
       const self = this;
+      if (!util.validateLicense(this.licenseStatus)) {
+        return;
+      }
       self.dialogFormVisible = true;
-      if (index != undefined) {
-        self.curChannel = item;
-      }
-      if (!self.isEzviz) {
-        self.realTime();
-      } else {
+      this.$nextTick(() => {
         self.channelInfo = self.curChannel;
-      }
+        self.vendor = self.channelInfo.vendor;
+        if (index != undefined) {
+          self.curChannel = item;
+        }
+        self.playVendorVideo();
+      })
     },
 
     getCommentList(e) {
@@ -1049,17 +758,24 @@ export default {
 
     confirmSelect() {
       const self = this;
+      if (!util.validateLicense(this.licenseStatus)) {
+        return;
+      }
       self.showRelatedChannelFlag = false;
       const channel = self.relatedChannels.filter(item => item.id === self.channelRadio);
       self.curChannel = channel[0];
-      self.dialogFormVisible = true;
-      self.channelRadio = '';
-      if (!self.isEzviz) {
-        self.realTime();
-      } else {
+      this.$nextTick(()=> {
+        self.dialogFormVisible = true;
+        self.channelRadio = '';
         self.channelInfo = {};
         self.channelInfo = self.curChannel;
-      }
+        self.vendor = self.curChannel.vendor;
+        self.playVendorVideo();
+      })
+    },
+
+    playVendorVideo() {
+      this.$refs.vendorVideo.startVideo(this.channelInfo.ivsId, this.channelInfo.channelId, null);
     }
 
   }
@@ -1501,9 +1217,9 @@ $h1:#292e36;
                         text-align: center;
                         background-color: #fff;
                     }
-                    //  &:first-child{
-                    //         margin-left: 0;
-                    //     }
+                    .ja-span{
+                      width: 90px;
+                    }
                     .activeClass{
                         background-color: #FDE8EF !important;
                         color: $red;
@@ -1551,26 +1267,6 @@ $h1:#292e36;
                 white-space:-o-pre-wrap; /* Opera 7 */
                 word-wrap:break-word; /* Internet Explorer 5.5+ */
             }
-            .speech-content{
-                .speech-info{
-                    @include point(width,80);
-                    @include point(height,26);
-                    background-color: #FFEDED;
-                    color: $red;
-                    border: 1px solid #FEC0C7;
-                    @include point(border-radius,15);
-                    display: inline-block;
-                    cursor: pointer;
-                    .icon-speech{
-                        @include point(font-size,18);
-                        @include point(line-height,26);
-                        @include point(margin-left,5);
-                    }
-                }
-                .often-text{
-                    @include point(margin-left,20);
-                }
-            }
             .photo-content{
                 overflow: hidden;
                 @include point(margin-top,15);
@@ -1579,7 +1275,6 @@ $h1:#292e36;
                     float: left;
                     @include point(margin,5);
                     @include point(max-width,220);
-
                     .img-content{
                         position: relative;
                         cursor: pointer;
@@ -1720,35 +1415,9 @@ $h1:#292e36;
                             font-size: 14px;
                         }
                         .deal-speech{
-                            display: inline-block;
                             @include point(margin-left,10);
                             position: relative;
                             @include point(bottom,10);
-                            .often-text{
-                                @include point(margin-left,20);
-                                display: inline-block;
-                                font-size: 12px;
-                            }
-                        }
-                        .speech-content{
-                            .speech-info{
-                                @include point(width,80);
-                                @include point(height,26);
-                                background-color: #FFEDED;
-                                color: $red;
-                                border: 1px solid #FEC0C7;
-                                @include point(border-radius,15);
-                                display: inline-block;
-                                cursor: pointer;
-                                .icon-speech{
-                                    @include point(font-size,18);
-                                    @include point(line-height,26);
-                                    @include point(margin-left,5);
-                                }
-                            }
-                            .often-text{
-                                @include point(margin-left,20);
-                            }
                         }
                     }
 
@@ -1766,15 +1435,18 @@ $h1:#292e36;
                         word-wrap:break-word; /* Internet Explorer 5.5+ */
                     }
                     .source-content{
-                        @include point(margin-left,8);
+                      margin-left: calc(20/1920*100vw);
                         overflow: hidden;
                         min-width: 90%;
+                      display: flex;
+                      justify-content: flex-start;
+                      overflow: hidden;
+                      flex-wrap: wrap;
                         @include point(margin-top,15);
                         .source-details{
-                            float: left;
                             @include point(max-width,220);
-                            @include point(width,100);
-                            //@include point(height,65);
+                          margin-right: calc(10/1920*100vw);
+                            width: calc(100/1920*100vw);
                             .img-content{
                                 position: relative;
                                 cursor: pointer;
@@ -1787,15 +1459,6 @@ $h1:#292e36;
                                 width: calc(130/1920*100vw);
                               }
                             }
-                            &:nth-child(2n+1){
-                                @include point(margin-left,15);
-                            }
-                          @media screen and (min-width: 1280px) and(max-width: 1366px){
-                            width: 90px;
-                            .img-content .imgLittle{
-                              width: 85px;
-                            }
-                          }
                         }
                     }
                     .viedo-info{

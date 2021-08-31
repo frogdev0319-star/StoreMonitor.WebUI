@@ -15,10 +15,18 @@
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
           <div style="display:inline-block;">
             <div class="no-print">
-              <div class="exportbtn" @click="handleDown">
-                <i class="iconfont icon-pdf export"/>
-                <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-              </div>
+              <delay-button
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                class="exportbtn"
+                type="primary"
+                size="mini"
+                @click="handleDown"
+              >
+                <div class="button-area">
+                  <i class="iconfont icon-pdf export"/>
+                  <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+                </div>
+              </delay-button>
             </div>
           </div>
         </div>
@@ -41,7 +49,11 @@
         <el-col :span="24" class="">
           <div class="header-score">
             <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
-            <span class="span-2"><span class="pdf_font_26">{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></span></span>
+            <span class="span-2"><span class="pdf_font_26">
+              {{ totalScore }}
+              <span>{{ $t('remotePatrol.scorecount') }}</span>
+            </span>
+            </span>
           </div>
         </el-col>
       </el-row>
@@ -104,15 +116,12 @@
                       v-if="item.showAttachment || item.description != null&&item.description !== ''"
                       class="content-detail-main">
                       <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
-                      <div v-if="item.showAudio" class="cdm-voice">
-                        <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
-                          <i class="iconfont icon-yuyin icon-speech"/>
-                        </div>
-                        <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                          <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                        </audio>
-                        <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                      </div>
+                      <audio-vue
+                        v-if="item.showAudio"
+                        :is-export-pdf="isexportPDF"
+                        :audio-ref="item.audio.audioRef"
+                        :audio-src="item.audio.audioSrc"
+                      />
                       <div v-if="item.description !=null && item.description !=''" class="cdm-word">
                         <span class="pdf_font_24">{{ item.description }}</span>
                       </div>
@@ -120,27 +129,24 @@
                         <div
                           v-for="(sourceitem,index) in item.sourceList"
                           :key="index"
-                          :height="imgHeight+'px'"
+                          :height="elImgHeight"
                           class="source-details">
                           <div v-if="sourceitem.mediaType === 2" class="img-content">
-                            <img
-                              :title="imgTitle"
-                              :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                            <el-image
+                              :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
-                              :height="imgHeight+'px'"
-                              :onerror="deafultImg"
-                              class="imgLittle imgInner"
-                              @click="openOuter(sourceitem,$event)">
+                              :preview-src-list="getImgList(index, item.sourceList)"
+                              class="imgLittle imgInner"/>
                           </div>
                           <div
                             v-if="sourceitem.mediaType === 1"
                             class="img-content "
-                            @click="playCommentVideo(sourceitem,index)">
+                            @click="playCommentVideo(sourceitem, index)">
                             <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                             <img
-                              :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                              :style="isexportPDF ? exportImageStyle : imageStyle"
                               :src="videoImgSrc"
-                              :height="imgHeight+'px'"
+                              :height="elImgHeight"
                               class="imgLittle">
                           </div>
                         </div>
@@ -148,44 +154,6 @@
                     </div>
                   </div>
                 </div>
-                <el-dialog
-                  v-if="dialogCommentVideo"
-                  :title="$t('eventView.view')"
-                  :visible.sync="dialogCommentVideo"
-                  :close-on-click-modal="false"
-                  width="850px"
-                  top="12%"
-                  class="rate-video-dialog"
-                  @close="stopCommentVideo">
-                  <div class="video-dialog-content" style="overflow:hidden;">
-                    <hr class="dialog-hr">
-                    <div class="video-content" >
-                      <video
-                        id="previewVideo"
-                        height="83%"
-                        width="90%"
-                        prload
-                        controls
-                        class="video-js vjs-fill"/>
-                    </div>
-                  </div>
-                </el-dialog>
-                <transition name="fade">
-                  <el-dialog
-                    v-if="showOuter"
-                    :title="$t('eventView.view')"
-                    :visible.sync="showOuter"
-                    :close-on-click-modal="false"
-                    width="850px"
-                    top="12%">
-                    <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-                      <hr class="dialog-hr">
-                      <div class="dialog-source-content">
-                        <img v-if="showImg" :src="checkImgSrc">
-                      </div>
-                    </div>
-                  </el-dialog>
-                </transition>
               </div>
             </div>
           </div>
@@ -219,15 +187,12 @@
                   v-if="item.showAttachment || item.description != null&&item.description !== ''"
                   class="content-detail-main">
                   <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
-                  <div v-if="item.showAudio" class="cdm-voice">
-                    <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechFeedBacks(item,index)">
-                      <i class="iconfont icon-yuyin icon-speech"/>
-                    </div>
-                    <audio :ref="item.audio.audioRef" @canplay="getFeedBacksDuration(item)">
-                      <source :src="item.audio.audioSrc" type="audio/mpeg" >
-                    </audio>
-                    <span class="often-text">{{ item.audio.audioOftenText }}</span>
-                  </div>
+                  <audio-vue
+                    v-if="item.showAudio"
+                    :is-export-pdf="isexportPDF"
+                    :audio-ref="item.audio.audioRef"
+                    :audio-src="item.audio.audioSrc"
+                  />
                   <div v-if="item.description !=null && item.description !=''" class="cdm-word">
                     <span class="pdf_font_24">{{ item.description }}</span>
                   </div>
@@ -235,17 +200,14 @@
                     <div
                       v-for="(sourceitem,index) in item.sourceList"
                       :key="index"
-                      :height="imgHeight+'px'"
+                      :height="elImgHeight"
                       class="source-details">
                       <div v-if="sourceitem.mediaType === 2" class="img-content">
-                        <img
-                          :title="imgTitle"
-                          :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+                        <el-image
+                          :style="isexportPDF ? exportImageStyle :imageStyle"
                           :src="sourceitem.url"
-                          :height="imgHeight+'px'"
-                          :onerror="deafultImg"
-                          class="imgLittle imgInner"
-                          @click="openOuter(sourceitem,$event)">
+                          :preview-src-list="getImgList(index, item.sourceList)"
+                          class="imgLittle imgInner"/>
                       </div>
                       <div
                         v-if="sourceitem.mediaType === 1"
@@ -255,7 +217,7 @@
                         <img
                           :style="isexportPDF?'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
                           :src="videoImgSrc"
-                          :height="imgHeight+'px'"
+                          :height="elImgHeight"
                           class="imgLittle">
                       </div>
                     </div>
@@ -363,9 +325,11 @@
                 <div
                   v-for="(signatureItem, signatureIndex) in pageItem.data"
                   :key="signatureIndex"
-                  class="signature-item"
-                  @click="displayEnlargeSignature(signatureItem.content)">
-                  <img :src="signatureItem.content" class="signature-content">
+                  class="signature-item">
+                  <el-image
+                    :src="signatureItem.content"
+                    :preview-src-list="getSignatureList(signatureIndex, pageItem.data)"
+                    class="signature-content"/>
                 </div>
               </div>
             </div>
@@ -378,6 +342,28 @@
         </el-col>
       </el-row>
       <div class="no-print">
+        <el-dialog
+          v-if="dialogCommentVideo"
+          :title="$t('eventView.view')"
+          :visible.sync="dialogCommentVideo"
+          :close-on-click-modal="false"
+          width="850px"
+          top="12%"
+          class="rate-video-dialog"
+          @close="stopCommentVideo">
+          <div class="video-dialog-content" style="overflow:hidden;">
+            <hr class="dialog-hr">
+            <div class="video-content" >
+              <video
+                id="previewVideo"
+                height="83%"
+                width="90%"
+                prload
+                controls
+                class="video-js vjs-fill"/>
+            </div>
+          </div>
+        </el-dialog>
         <el-dialog :visible.sync="downloadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
           <div class="body-content">
             <p>{{ $t('remotePatrol.downloading') }}</p>
@@ -385,20 +371,6 @@
         </el-dialog>
       </div>
     </div>
-    <el-dialog
-      v-if="showSignatureFlag"
-      :title="$t('eventView.view')"
-      :visible.sync="showSignatureFlag"
-      :close-on-click-modal="false"
-      width="850px"
-      top="12%">
-      <div class="video-dialog-content" style="overflow:hidden;">
-        <hr class="dialog-hr">
-        <div class="dialog-source-content">
-          <img :src="signatureSrc">
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
@@ -407,16 +379,18 @@ import { getInspectReportInfo, getInspectReportDetail } from '@/api/inspect';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
-import resize from '@/components/mixins/resize.js';
+import resize from '@/components/mixins/echartResize.js'
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import AudioVue from '@/components/AudioVue';
 import ReportDetail from '@/components/ReportDetail';
 
 export default {
   name: 'InspectReport',
   components: {
     ReportDetail,
+    AudioVue,
     DelayButton,
     'v-chart': ECharts
   },
@@ -441,17 +415,6 @@ export default {
       videoSrc: require('../../../static/img/monitor.png'),
       inspectSrc: require('../../../static/img/remote_patrol.png'),
       insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
-
-      inspectSrc1: require('../../../static/img/dangerous_cn.png'),
-      inspectSrc2: require('../../../static/img/good_cn.png'),
-      inspectSrc3: require('../../../static/img/improved_cn.png'),
-      inspectSrc4: require('../../../static/img/dangerous_en.png'),
-      inspectSrc5: require('../../../static/img/good_en.png'),
-      inspectSrc6: require('../../../static/img/improved_en.png'),
-      inspectSrc7: require('../../../static/img/dangerout_tw.png'),
-      inspectSrc8: require('../../../static/img/excellent_cn.png'),
-      inspectSrc9: require('../../../static/img/excellent_en.png'),
-      inspectSrc10: require('../../../static/img/excellent_tw.png'),
       report: null,
       suggest: '',
       totalScore: '',
@@ -477,11 +440,7 @@ export default {
       feedbacks: [],
       showFeedBacks: false,
       dialogCommentVideo: false,
-      showOuter: false,
-      showImg: false,
-      checkImgSrc: '',
       previewplayer: '',
-      imgTitle: '',
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
@@ -498,7 +457,11 @@ export default {
       showAllDetailsEnable: true,
       tab1BtnArr: [],
       tab3BtnArr: [],
-      hasChart: false
+      hasChart: false,
+      exportImageStyle: {
+        width: '260px',
+        height: '148px'
+      }
     };
   },
 
@@ -516,14 +479,24 @@ export default {
         height = 75;
       }
       return height;
+    },
+
+    imageStyle() {
+      return {
+        'width': 'calc(130/1920*100vw)',
+        'height': `${this.imgHeight}px`
+      }
+    },
+
+    elImgHeight() {
+      return `${this.imgHeight}px`
     }
   },
 
   created() {
     this.getStoredTemplateId();
-    this.getInspectTemplateList();
     this.getRouterData();
-    this.getReportInfo();
+    this.getReportTemplateAndInfo();
   },
 
   mounted() {
@@ -531,26 +504,27 @@ export default {
   },
 
   methods: {
-    getInspectTemplateList() {
-      const params = {};
-      params.enable = true;
-      ReportSetting.getInspectReportTemplateList(params).then(res => {
-        if (res.errCode === 0 && res.data.length > 0) {
-          this.templateList = res.data;
-          const savedTemplateIndex = this.templateList.findIndex(item => { return item.id === this.cachedTemplateId; });
-          if (savedTemplateIndex !== -1) {
-            this.curTemplateIndex = savedTemplateIndex;
-          } else {
-            this.curTemplateIndex = 0;
-          }
-          this.setTemplateAndStaticalConfig();
-        } else {
-          this.templateList = [];
-          this.templateConfig = [];
-        }
+    getReportTemplateAndInfo() {
+      const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
+      const reportInfoPromise = getInspectReportInfo({ reportIds: [this.report.reportId] });
+      Promise.all([templatePromise, reportInfoPromise]).then(results => {
+        this.getInspectTemplateList(results[0]);
+        this.getReportInfo(results[1]);
       }).catch(err => {
-        console.log('ReportSetting:' + err);
-      });
+        console.log('ReportDetail-getReportTemplateAndInfo:' + err);
+      })
+    },
+
+    getInspectTemplateList(res) {
+      if (res.errCode === 0 && res.data.length > 0) {
+        this.templateList = res.data;
+        const savedTemplateIndex = this.templateList.findIndex(item => { return item.id === this.cachedTemplateId; });
+        this.curTemplateIndex = savedTemplateIndex !== -1 ? savedTemplateIndex : 0;
+        this.setTemplateAndStaticalConfig();
+      } else {
+        this.templateList = [];
+        this.templateConfig = [];
+      }
     },
 
     setTemplateAndStaticalConfig() {
@@ -608,6 +582,7 @@ export default {
       obj.dateStr = util.getDateStr(routeData.ts);
       obj.submitterName = routeData.submitterName;
       obj.tagName = routeData.tagName;
+      obj.iconSrc = this.getIconSrc(routeData.status);
       switch (routeData.mode) {
         case 0:
           obj.inspectSrc = self.inspectSrc;
@@ -622,62 +597,57 @@ export default {
           obj.inspectSrc = self.videoSrc;
           break;
       }
-      switch (routeData.status) {
-        case 0: {
-          // dangerous
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc1;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc4;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc7;
-          } else {
-            obj.iconSrc = self.inspectSrc1;
-          }
-          break;
-        }
-        case 1: {
-          // improved
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc3;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc6;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc3;
-          } else {
-            obj.iconSrc = self.inspectSrc3;
-          }
-          break;
-        }
+      self.report = obj;
+    },
 
-        case 2: {
-          // pass
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc2;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc5;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc2;
-          } else {
-            obj.iconSrc = self.inspectSrc2;
-          }
-          break;
+    getIconSrc(status) {
+      const statusAndLangAndIconMap = [
+        {
+          status: 0,
+          statusStr: this.$t('overview.danger'),
+          children: [{
+            'zh': require('../../../static/img/dangerous_cn.png'),
+            'zhtw': require('../../../static/img/dangerous_tw.png'),
+            'en': require('../../../static/img/dangerous_en.png'),
+            'ja-JP': require('../../../static/img/dangerous_ja.png'),
+            'ko-KR': require('../../../static/img/dangerous_ko.png')
+          }]
+        },
+        {
+          status: 1,
+          statusStr: this.$t('overview.improve'),
+          children: [{
+            'zh': require('../../../static/img/improved_cn.png'),
+            'zhtw': require('../../../static/img/improved_cn.png'),
+            'en': require('../../../static/img/improved_en.png'),
+            'ja-JP': require('../../../static/img/improved_ja.png'),
+            'ko-KR': require('../../../static/img/improved_ko.png')
+          }]
+        },
+        {
+          status: 2,
+          statusStr: this.$t('overview.pass'),
+          children: [{
+            'zh': require('../../../static/img/good_cn.png'),
+            'zhtw': require('../../../static/img/good_cn.png'),
+            'en': require('../../../static/img/good_en.png'),
+            'ja-JP': require('../../../static/img/good_ja.png'),
+            'ko-KR': require('../../../static/img/good_ko.png')
+          }]
         }
-        default: {
-          // good
-          if (self.lang === 'zh') {
-            obj.iconSrc = self.inspectSrc8;
-          } else if (self.lang === 'en') {
-            obj.iconSrc = self.inspectSrc9;
-          } else if (self.lang === 'zhtw') {
-            obj.iconSrc = self.inspectSrc10;
-          } else {
-            obj.iconSrc = self.inspectSrc8;
+      ];
+
+      let iconSrc = '';
+      const filterMap = statusAndLangAndIconMap.filter(map => map.status === status);
+      if (filterMap.length > 0) {
+        for (let lang in filterMap[0].children[0]) {
+          if (lang === this.lang) {
+            iconSrc = filterMap[0].children[0][lang];
           }
-          break;
         }
       }
-      self.report = obj;
+      console.log(iconSrc);
+      return iconSrc;
     },
 
     getItemsPassOrFailed(groupType, grade, qualifiedScore) {
@@ -715,75 +685,39 @@ export default {
       });
     },
 
-    openOuter(item, $ev) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.url;
-        self.showImg = true;
-      }
-    },
-
-    getFeedBacksDuration(item) {
-      const self = this;
-      debugger;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = 9 + '"';
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
         }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.url);
     },
 
-    startSpeechFeedBacks(item, index) {
-      const self = this;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
+    getSignatureList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
-      self.feedbacks.forEach((_item, _index) => {
-        if (_item.audio !== undefined) {
-          if (_index !== index) {
-            if (self.$refs[_item.audio.audioRef] !== undefined) {
-              self.$refs[_item.audio.audioRef][0].pause();
-              _item.audio.isPlaying = false;
-            }
-          }
-        }
-      });
+      return arr.filter(source => source.type === 2).map(source => source.content);
     },
 
-    async getReportInfo() {
-      const self = this;
-      const reportId = self.report.reportId;
-      const temp = [];
-      temp.push(reportId);
-      const params = {
-        reportIds: temp
-      };
-      getInspectReportInfo(params).then(async res => {
-        if (res.errCode === 0 && res.data.length > 0) {
-          const data = res.data[0].info;
-          self.totalScore = data.totalScore;
-          this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
-          self.getGroupsData(data.groups);
-          self.reportData = data;
-          self.getTab1AndTab3BtnName(res.data[0].inspectSettings);
-          self.getPageDataBasedOnTemplate(self.reportData);
-        }
-      }).catch(err => {
-        console.log('InspectReportDetail-getReportInfo: ' + err);
-      });
+    async getReportInfo(res) {
+      if (res.errCode === 0 && res.data.length > 0) {
+        const data = res.data[0].info;
+        this.totalScore = data.totalScore;
+        this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
+        this.getGroupsData(data.groups);
+        this.reportData = data;
+        this.getPageDataBasedOnTemplate(this.reportData);
+      }
     },
 
     getGroupsData(groups) {
@@ -837,7 +771,7 @@ export default {
     },
 
     getPageDataBasedOnTemplate(data) {
-      const map = this.getDetailNameAndHandlerMap();
+      const map = this.getDetailNameAndHandlerMap(data);
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
       this.templateConfig.forEach(config => {
@@ -859,7 +793,7 @@ export default {
       this.pageData = pageData;
     },
 
-    getDetailNameAndHandlerMap() {
+    getDetailNameAndHandlerMap(data) {
       let map = null;
       if (this.showAllDetailsEnable) {
         map = new Map([
@@ -880,6 +814,9 @@ export default {
           ['notJoinItem', 'getCommentItems']
         ]);
       }
+      if (!data.comment) {
+        map.delete('comment');
+      }
       return map;
     },
 
@@ -897,6 +834,7 @@ export default {
         return 0;
       };
     },
+
     getComment(data) {
       const suggest = data.comment;
       return { class: 'suggest', data: suggest };
@@ -933,24 +871,30 @@ export default {
 
     getTableHeader() {
       this.theaderPassFail = [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.tab1BtnArr[0], width: 'width:20%;' },
-        { name: this.tab1BtnArr[1], width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
+        { name: this.tab1BtnArr[0], width: 'width:16%;', pdfWidth: 'width:13%;' },
+        { name: this.tab1BtnArr[1], width: 'width:17%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
       ];
       this.theaderOther = [
         { name: '', width: 'width:11%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
         { name: this.tab3BtnArr[0], width: 'width:20%;' },
         { name: this.tab3BtnArr[1], width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' },
+
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
+        { name: this.tab3BtnArr[0], width: 'width:16%;', pdfWidth: 'width:13%;' },
+        { name: this.tab3BtnArr[1], width: 'width:17%;', pdfWidth: 'width:13%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
       ];
       this.theaderScore = [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:26%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:34%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
+        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:25%;', pdfWidth: 'width:20%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:25%;', pdfWidth: 'width:20%;' }
       ];
     },
 
@@ -1100,13 +1044,20 @@ export default {
       const options = self.getRadarChartOption();
       const tempIndicator = [];
       const seriesValue = [];
-      summary.forEach(item => {
+      summary.forEach((item, index) => {
         const obj = {};
         obj.name = item.groupName;
         obj.max = Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems) === 0
           ? 1 : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
-        tempIndicator.unshift(obj);
-        this.staticalConfig.qualified ? seriesValue.unshift(item.numOfUnqualifiedItems) : seriesValue.unshift(item.numOfQualifiedItems);
+        if (index < 2) {
+          tempIndicator.push(obj);
+          this.staticalConfig.qualified ? seriesValue.push(item.numOfUnqualifiedItems)
+            : seriesValue.push(item.numOfQualifiedItems);
+        } else {
+          tempIndicator.splice(1, 0, obj);
+          this.staticalConfig.qualified ? seriesValue.splice(1, 0, item.numOfUnqualifiedItems)
+            : seriesValue.splice(1, 0, item.numOfQualifiedItems);
+        }
       });
       const temp = [];
       const obj = { value: seriesValue };
@@ -1127,7 +1078,10 @@ export default {
       const radarChartOption = {
         backgroundColor: '#fff',
         tooltip: {
-          backgroundColor: 'rgba(30,34,52,0.75)'
+          backgroundColor: 'rgba(30,34,52,0.75)',
+          position: function(point) {
+            return [point[0], '10%'];
+          }
         },
         textStyle: {
           fontFamily: 'Roboto, Microsoft YaHei'
@@ -1190,12 +1144,7 @@ export default {
             trigger: 'item'
           }
         }
-        ],
-        tooltip: {
-          position: function(point) {
-            return [point[0], '10%'];
-          }
-        }
+        ]
       };
       return radarChartOption;
     },
@@ -1352,11 +1301,6 @@ export default {
       return data.replace(/(\r\n|\n|\r)/gm, '<br/>');
     },
 
-    displayEnlargeSignature(src) {
-      this.showSignatureFlag = true;
-      this.signatureSrc = src;
-    },
-
     hideOrShowDetail(pageItem, pageIndex) {
       this.pageData.forEach((item, index) => {
         pageIndex === index && (item.ifExpand = !item.ifExpand);
@@ -1503,23 +1447,7 @@ export default {
         }
         .exportbtn{
           display: inline-block;
-          width:120px;
-          min-width: 85px;
-          height:36px;
-          line-height: 36px;
-          border-radius: 2px;
-          text-align: center;
-          margin-left:calc(20 / 1920 * 100vw);
-          margin-right: calc(30 / 1920 * 100vw);
-          background-color: $red;
-          color:#ffffff;
-          cursor: pointer;
-          span{
-            font-size:14px;
-          }
-          .export{
-            font-size:20px;
-          }
+          min-width:120px;
         }
       }
     }
@@ -1538,13 +1466,13 @@ export default {
         font-weight: bold;
         background-color: $suggestBack;
         color: $qualified;
-        max-height: 100px;
         height: auto;
         overflow-y: auto;
+        border: 1px solid #a0c1f8;
         .suggest-content {
+          max-height: 180px;
           display: flex;
           padding-left: calc(30 / 1920 * 100vw);
-          border: 1px solid #a0c1f8;
         }
         span:first-child {
           padding-right: 20px;
@@ -1786,6 +1714,7 @@ export default {
               padding-top:10px;
               padding-bottom: 10px;
               display: flex;
+              justify-content: space-between;
               .ignore-btn{
                 width:50px;
                 height:24px;
@@ -1818,7 +1747,6 @@ export default {
                 border-radius: 20px;
               }
               .detail-title{
-                flex: 1;
                 .title1{
                 font-size: calc(14 / 1920 * 100vw);
                 color:#182752;
@@ -2141,6 +2069,10 @@ export default {
   }
   .radior-content{
     padding-top: 30px;
+  }
+  .imgLittle .el-image__inner{
+    height: 100%;
+    width: 100%;
   }
 </style>
 <style>

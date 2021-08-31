@@ -14,7 +14,7 @@
     color: #424151;
 }
 .tabTitle{
-    font-size: 14px;
+    font-size: calc(14/1920*100vw);
     font-weight: bold;
     color: #909399;
 }

@@ -2,7 +2,7 @@
   <div class="content">
     <el-select
       v-model="selectedArray"
-      :placeholder="alltype === 0 ? (allSelect === 0 ? $t('remotePatrol.selectStoreTag'):$t('remotePatrol.all')):$t('remotePatrol.stores')"
+      :placeholder="alltype === 0 ? (allSelect === 0 ? promptMsg : $t('remotePatrol.all')):$t('remotePatrol.stores')"
       :disabled="disabled"
       multiple
       collapse-tags
@@ -42,6 +42,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    promptMsg: {
+      type: String,
+      default: ''
     }
   },
 
@@ -268,6 +272,10 @@ export default {
     border-radius: 3px;
     min-height: 28px;
     min-width: 85px;
+  }
+
+  .store-group-select .input-class{
+    bottom: 0;
   }
 
 </style>

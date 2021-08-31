@@ -142,7 +142,7 @@
     <el-col :span="17" class="el-rute-nape">
       <div class="nape-content">
         <div class="title-content">
-          <span :class="lang == 'en' ? 'en-item-title': 'item-title'" class="level2">
+          <span :class="lang.indexOf('zh') === -1 ? 'en-item-title': 'item-title'" class="level2">
             <i class="iconfont icon-icon-test icontitle"/>
           <span class="level2-name">{{ napeTitle }}</span></span>
           <div class="btn-content">
@@ -198,7 +198,7 @@
                       :placeholder="$t('insSettingView.enterItemName')"
                       @input="napeNameChange"></el-input>
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
-            <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.titleEmpty') }}</span>
+            <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
           <el-form-item>
             <p class="score_item">
@@ -662,7 +662,7 @@ export default {
     },
 
     setItemTitle(name){
-      if (this.lang == 'en') {
+      if (this.lang.indexOf('zh') === -1) {
         this.napeTitle = `${this.$t('insSettingView.itemsOfCate')} ${name}`;
       } else {
         this.napeTitle = `${name} ${this.$t('insSettingView.itemsOfCate')}`;

@@ -1,64 +1,24 @@
 <template>
   <el-col :span="24" class="statistics-header">
     <el-col :span="24" class="header-details">
-      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeSelect') }}</span>
-      <el-select
-        v-model="curCountry"
-        :placeholder="$t('remotePatrol.country')"
-        size="mini"
-        class="el-province"
-        @change="changeCountry">
-        <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
-          <el-option
-            v-for="item in group.countryList"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"/>
-        </el-option-group>
-      </el-select>
-      <region-multi-select
-        ref="proviceSelect"
-        :selected="curProvince"
-        :placeholder="$t('remotePatrol.regionI')"
-        :options="provinceList"
-        :disabled="curCountry.length === 0 || curCountry === '-1'"
-        :all="$t('overview.allZoneI')"
-        style="display: inline"
-        @changeInput="handleProChange"/>
-      <region-multi-select
-        ref="citySelect"
-        :selected="curCity"
-        :placeholder="$t('remotePatrol.regionII')"
-        :options="cityList"
-        :disabled="curProvince.length === 0 || curCountry === '-1'"
-        :all="$t('overview.allZoneII')"
-        style="display: inline"
-        @changeInput="handleCityChange"/>
-
-      <multi-select
-        ref="multiSelect"
-        :selected="curStore"
-        :placeholder="$t('remotePatrol.stores')"
-        :options="storeDataList"
-        style="display: inline"
-        @changeInput="handleStoreChange"/>
-      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.selectStoreTag') }}</span>
-      <multi-select
-        ref="TagMultiSelect"
-        :selected="curStoreTag"
-        :placeholder="$t('remotePatrol.selectStoreTag')"
-        :all-select="0"
-        :alltype="0"
-        :options="storeTagList"
-        style="display: inline;margin-left: calc(20/1920*100vw);"
-        @changeInput="handleStoreTagChange"/>
+      <store-filter
+        :cached-params="searchParams"
+        :is-patrol="isPatrol"
+        @storeChange = "onStoreChange"
+      />
+    </el-col>
+    <el-col :span="24" class="header-details">
+      <span :class="isInspectItem ? 'inspect-span' : 'normal-span'" >
+        {{ $t('remotePatrol.time') }}</span>
+      <date-time-picker :date-value="dateValue" @change="dateChange"/>
       <span v-if="isInspectItem || isPatrol">
-        <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
+        <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
         <el-select
           v-model="inspectList"
           :placeholder="$t('insSettingView.selectPost')"
           size="mini"
-          class="el-province">
+          class="el-province"
+          @change="onInspectListChange">
           <el-option
             v-for="item in inspectTypeList"
             :key="item.id"
@@ -66,17 +26,10 @@
             :value="item.id"/>
         </el-select>
       </span>
-
-    </el-col>
-
-    <el-col :span="24" class="header-details">
-      <span :class="isInspectItem || isPatrol ? 'inspect-span' : 'normal-span'" >
-        {{ $t('remotePatrol.time') }}</span>
-      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
       <div class="search-btns">
         <delay-button
           :disabled="storeListLength === 0"
-          :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+          :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
           type="primary"
           size="mini"
           @click="searchData"
@@ -85,7 +38,7 @@
         </delay-button>
         <delay-button
           v-if="!isInspectItem"
-          :class="lang === 'en'? 'en-export-btn':'export-btn' "
+          :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
           type="primary"
           size="mini"
           style="vertical-align: middle;"
@@ -110,10 +63,12 @@ import { inpectRESTful } from '@/api/index';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
 import DateTimePicker from './DateTimePicker';
+import StoreFilter from './StoreFilter';
 
 export default {
   name: 'SearchComponent',
   components: {
+    StoreFilter,
     DateTimePicker,
     DelayButton,
     MultiSelect,
@@ -140,17 +95,6 @@ export default {
 
   data() {
     return {
-      curCountry: '',
-      curStoreTag: [],
-      storeTagList: [],
-      countryList: [],
-      curProvince: [],
-      provinceList: [],
-      curCity: [],
-      cityList: [],
-      curStore: [],
-      storeList: [],
-      storeDataList: [],
       dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
       dateOpt: {
         disabledDate: (time) => {
@@ -162,10 +106,7 @@ export default {
       params: {},
       poperClass: 'date-picker-poper',
       selectpoperClass: 'select-poper',
-      timeMode: 1, // weekly mode
       daysRangeList: [],
-      storeStr: '',
-      tagNameStr: '',
       filterStoreIds: [],
       curRegionI: [],
       curRegionII: [],
@@ -176,9 +117,12 @@ export default {
       storePatrolLists: [],
       ifGetParamsFromCash: false,
       storeListLength: -1,
-      order: {direction: '', property: ''},
-      filter: {page: 0, size: 10},
-      inspectCatch:''
+      order: { direction: '', property: '' },
+      filter: { page: 0, size: 10 },
+      inspectCatch: '',
+      storeFilterObj: {},
+      searchParams: {},
+      ifSaveParams: false
     };
   },
 
@@ -196,6 +140,7 @@ export default {
         self.params.beginTs = start;
         self.params.endTs = end;
         self.ifGetParamsFromCash = false;
+        self.ifSaveParams = false;
         await this.getSearchParams();
         self.initDaysRange();
         self.initData();
@@ -211,38 +156,26 @@ export default {
     self.params.beginTs = start;
     self.params.endTs = end;
     self.params.timeMode = self.timeMode;
-    self.tagNameStr = '--';
     await this.getSearchParams();
     self.initDaysRange();
     self.initData();
   },
 
-  mounted() {
-    const self = this;
-    window.addEventListener('resize', self.adjustChart, false);
-    self.sidebarElm = document.getElementsByClassName('aside-menu')[0];
-    self.sidebarElm && self.sidebarElm.addEventListener('transitionend', self.handleSideBar, false);
-  },
-
-  beforeDestroy() {
-    const self = this;
-    window.removeEventListener('resize', self.adjustChart);
-    self.adjustChart = null;
-    self.sidebarElm && self.sidebarElm.removeEventListener('transitionend', self.handleSideBar, false);
-    self.$refs.eventSourceRef && self.$refs.eventSourceRef.dispose();
-    self.$refs.storeEventRef && self.$refs.storeEventRef.dispose();
-  },
-
   methods: {
     dateChange(val) {
       this.dateValue = val;
-      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
       const daysDiff = this.$moment(end).diff(start, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;
       this.params.beginTs = start;
       this.params.endTs = end;
       this.daysRangeList = util.getDaysRangeList(start, end, this.timeMode);
+    },
+
+    onInspectListChange() {
+      const filterInspect = this.inspectTypeList.filter(inspect => this.inspectList === inspect.id);
+      this.storePatrolLists = filterInspect.length > 0 ? filterInspect[0].name : '';
     },
 
     async getInspectList() {
@@ -259,132 +192,19 @@ export default {
       self.inspectTypeList = inspectList;
       self.isPatrol ? self.inspectTypeList.unshift({ id: '-1', name: self.$t('remotePatrol.all') }) : null;
       if (inspectList.length !== 0) {
-        self.inspectList = self.ifGetParamsFromCash ? (self.inspectTypeList.map(x=>x.id).indexOf(self.inspectCatch) !==-1 ? self.inspectCatch : '') : self.inspectTypeList[0].id;
+        self.inspectList = self.ifGetParamsFromCash
+          ? (self.inspectTypeList.map(x => x.id).indexOf(self.inspectCatch) !== -1
+            ? self.inspectCatch : '') : self.inspectTypeList[0].id;
       } else {
         self.inspectList = '';
       }
     },
 
     async getCountryStore() {
-      const self = this;
-      const data = await self.getBriefStoreData();
-      await self.getInspectList();
-      this.isInspectItem || this.isPatrol ? this.getInspectId() : '';
-      const temp = [];
-      if (data.errCode === 0 && data.errMsg === 'Success') {
-        self.storeList = data.data;
-        if (self.storeList.length !== 0) {
-          self.storeList.forEach(item => {
-            const country = item.country;
-            if (temp.map(x => x.label).indexOf(country) === -1) {
-              const obj = {
-                value: country,
-                label: country
-              };
-              temp.push(obj);
-            }
-          });
-        }
-        const countryList = temp;
-        self.countryList[0] = {};
-        self.countryList[0].label = self.$t('remotePatrol.country');
-        self.countryList[0].countryList = countryList;
-        self.countryList[0].countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        self.curCountry = (!self.ifGetParamsFromCash) ? countryList[0].value : self.curCountry;
-        self.selectAllProAndCity(self.curCountry, true);
+      if (this.isInspectItem || this.isPatrol) {
+        await this.getInspectList();
+        this.getInspectId();
       }
-    },
-
-    handleStoreChange(arr) {
-      this.curStore = arr;
-      this.changeStoreNew(arr);
-    },
-
-    changeStoreNew(val) {
-      const self = this;
-      let str = '';
-      self.storeList.forEach((item, index) => {
-        val.forEach(_item => {
-          if (item.storeId === _item) {
-            str += item.name + '，';
-          }
-        });
-      });
-      str = str.substr(0, str.length - 1);
-      self.storeStr = str;
-      self.filterStore();
-    },
-
-    handleProChange(arr) {
-      this.curProvince = arr;
-      this.changePro(arr);
-    },
-
-    handleCityChange(arr) {
-      this.curCity = arr;
-      this.changeCity(arr);
-    },
-
-    changePro(val) {
-      const self = this;
-      self.curCity = [];
-      self.clearCityInfo();
-      self.clearStoreInfo();
-      const storeList = self.storeList;
-      const temp = [];
-      const tempStore = [];
-      if (val === '') {
-        storeList.forEach(item => {
-          if (item.country === self.curCountry) {
-            const storeObj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              tagIds: item.tagIds
-            };
-            tempStore.push(storeObj);
-          }
-        });
-      } else {
-        val.forEach(_item => {
-          storeList.forEach(item => {
-            if (item.province === _item) {
-              if (temp.map(x => x.value).indexOf(item.city) === -1) {
-                const obj = {
-                  label: item.city,
-                  value: item.city
-                };
-                temp.push(obj);
-              }
-              const obj = {
-                storeId: item.storeId,
-                label: item.name,
-                value: item.name
-              };
-              tempStore.push(obj);
-            }
-          });
-        });
-        self.cityList = temp;
-        const cityArr = [];
-        if (self.cityList.length !== 0) {
-          self.cityList.forEach(item => {
-            cityArr.push(item.value);
-          });
-          self.curCity = cityArr;
-        }
-      }
-      self.storeDataList = tempStore;
-      self.storeListLength = this.storeDataList.length;
-      let storeArr = [], arr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-        arr.push(item.value);
-      });
-
-      self.curStore = storeArr;
-      self.changeStoreNew(self.curStore);
     },
 
     getBriefStoreData() {
@@ -400,232 +220,21 @@ export default {
       });
     },
 
-    getTagListData() {
-      const self = this;
-      self.storeTagList = [];
-      return new Promise((resolve, reject) => {
-        GetTagList().then(res => {
-          const errMsg = res.errMsg;
-          if (errMsg && errMsg === 'Success') {
-            res.data.forEach(item => {
-              const tabObj = {};
-              tabObj.value = item.tagId;
-              tabObj.label = item.tagName;
-              tabObj.disabled = false;
-              self.storeTagList.push(tabObj);
-            });
-            resolve(res);
-          }
-        }).catch(err => {
-          reject(err);
-        });
-      });
-    },
-
-    handleStoreTagChange(val) {
-      this.curStoreTag = val;
-      this.tagNameStr = '';
-      const tagArray = this.storeTagList.filter(tagItem => val.find(tagId => tagId === tagItem.value));
-      tagArray.forEach(tagItem => {
-        this.tagNameStr += tagItem.label + '，';
-      });
-      this.tagNameStr = this.tagNameStr.substr(0, this.tagNameStr.length - 1);
-      this.filterStore();
-    },
-
-    filterStore() {
-      const self = this;
-      let filterStoreArray = [];
-      if (self.curStoreTag.length > 0) {
-        filterStoreArray = self.storeList.filter(storeItem => self.curStoreTag.find(tagItem => storeItem.tagIds.find(tagId => tagItem === tagId)));
-      } else {
-        filterStoreArray = self.storeList;
-      }
-      const filterSameStore = [];
-      filterStoreArray.forEach(store => {
-        self.curStore.forEach(selectStore => {
-          if (selectStore === store.storeId) {
-            filterSameStore.push(store);
-          }
-        });
-      });
-      const filterStoreIds = [];
-      let filterStoreStr = '';
-      filterSameStore.map(store => {
-        filterStoreIds.push(store.storeId);
-        filterStoreStr += `${store.name}，`;
-      });
-      self.filterStoreIds = filterStoreIds;
-      self.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-    },
-
-    changeCountry(val) {
-      const self = this;
-      self.clearProviceInfo();
-      self.clearCityInfo();
-      self.clearStoreInfo();
-      self.selectAllProAndCity(val,false);
-    },
-
-    changeCity(val) {
-      const self = this;
-      self.clearStoreInfo();
-      const storeList = self.storeList;
-      const tempStore = [];
-      if (val.length !== 0) {
-        val.forEach(_item => {
-          storeList.forEach(item => {
-            if (item.city === _item) {
-              if (tempStore.map(x => x.value).indexOf(item.city) === -1) {
-                const storeObj = {
-                  storeId: item.storeId,
-                  label: item.name,
-                  value: item.name
-                };
-                tempStore.push(storeObj);
-              }
-            }
-          });
-        });
-      }
-      self.storeDataList = tempStore;
-      self.storeListLength = this.storeDataList.length;
-      let storeArr = [], arr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-        arr.push(item.value);
-      });
-      self.curStore = storeArr;
-      self.changeStoreNew(self.curStore);
-    },
-
-    clearStoreInfo() {
-      const self = this;
-      self.curStore = [];
-      self.paramsStoreIds = [];
-      self.$refs.multiSelect.selectedArray = [];
-      self.$refs.multiSelect.input = '';
-    },
-
-    clearProviceInfo() {
-      const self = this;
-      self.curProvince = [];
-      self.$refs.proviceSelect.selectedArray = [];
-      self.$refs.proviceSelect.input = '';
-    },
-
-    clearCityInfo() {
-      const self = this;
-      self.curCity = [];
-      self.$refs.citySelect.selectedArray = [];
-      self.$refs.citySelect.input = '';
-    },
-
-    async selectAllProAndCity(val,isFirst) {
-      const self = this;
-      const storeList = self.storeList;
-      const temp = [];
-      const tempStore = [];
-      storeList.forEach(item => {
-        if (item.country === val || val === '-1') {
-          if (temp.map(x => x.value).indexOf(item.province) === -1) {
-            const obj = {
-              label: item.province,
-              value: item.province
-            };
-            temp.push(obj);
-          }
-          let storeObj = {};
-          if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-            if(self.curCity.length > 0 && self.curCity !== "-1"){
-              if(self.curProvince.includes(item.province) && self.curCity.includes(item.city)){
-                storeObj = {
-                  storeId: item.storeId,
-                  label: item.name,
-                  value: item.name,
-                  userId: item.userId,
-                  userName: item.userName
-                };
-              }
-            }
-          }
-          else{
-            storeObj = {
-              storeId: item.storeId,
-              label: item.name,
-              value: item.name,
-              userId: item.userId,
-              userName: item.userName
-            };
-          }
-          Object.keys(storeObj).length > 0 && tempStore.push(storeObj);
-        }
-      });
-      self.provinceList = temp;
-      const cityTemp = [];
-      self.provinceList.forEach(_item => {
-        storeList.forEach(item => {
-          if (item.province === _item.value) {
-            let citObj = {};
-            if(self.ifGetParamsFromCash && self.curProvince.length > 0 && self.curProvince !== "-1"){
-              if(self.curCity.length > 0 && self.curCity !== "-1"){
-                if(self.curProvince.includes(item.province)){
-                  if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-                    citObj = {
-                      label: item.city,
-                      value: item.city
-                    };
-                  }
-                }
-              }
-            }
-            else{
-              if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-                citObj = {
-                  label: item.city,
-                  value: item.city
-                };
-              }
-            }
-            Object.keys(citObj).length > 0 && cityTemp.push(citObj);
-          }
-        });
-      });
-      self.cityList = cityTemp;
-      const provinceArr = [];
-      self.provinceList.forEach(item => {
-        provinceArr.push(item.value);
-      });
-      self.curProvince = (!self.ifGetParamsFromCash) ? provinceArr : self.curProvince;
-
-      const cityArr = [];
-      self.cityList.forEach(item => {
-        cityArr.push(item.value);
-      });
-      self.curCity = (!self.ifGetParamsFromCash) ? cityArr : self.curCity;
-      self.storeDataList = tempStore;
-      const storeArr = [];
-      self.storeDataList.forEach(item => {
-        storeArr.push(item.storeId);
-      });
-      setTimeout(async()=>{
-        self.curStore = (!self.ifGetParamsFromCash) ? storeArr : self.curStore;
-        self.ifGetParamsFromCash = false;
-        self.changeStoreNew(self.curStore);
-        isFirst ? await self.searchData() : null;
-      },100)
-    },
-
     async searchData() {
-      this.getSelectedStoreIds();
-      this.isPatrol ? this.getSelectCountryOrCity() : '';
-      this.$emit('emitSearch', this.params, this.daysRangeList, this.curRegionI, this.curRegionII,
-        this.regionMode, this.storePatrolLists, this.storeStr, this.tagNameStr, this.timeMode);
-    },
-
-    getSelectedStoreIds() {
-      const storeIds = this.filterStoreIds.filter(item => item !== '-1');
-      this.params.storeIds = storeIds;
+      this.params.storeIds = this.storeFilterObj.filterStoreIds;
+      this.params.timeMode = this.timeMode;
+      const emitParmas = {};
+      emitParmas.searchParams = this.params;
+      emitParmas.dateRangeList = this.daysRangeList;
+      emitParmas.regionI = this.storeFilterObj.curRegionI;
+      emitParmas.regionII = this.storeFilterObj.curRegionII;
+      emitParmas.regionMode = this.storeFilterObj.regionMode;
+      emitParmas.storePatrolLists = this.storePatrolLists;
+      emitParmas.storeStr = this.storeFilterObj.storeStr;
+      emitParmas.storeGroupStr = this.storeFilterObj.storeGroupString;
+      emitParmas.storeTypeStr = this.storeFilterObj.storeTypeString;
+      emitParmas.timeMode = this.timeMode;
+      this.$emit('emitSearch', emitParmas);
     },
 
     getInspectId() {
@@ -637,29 +246,8 @@ export default {
           this.params.inspectId = id;
           this.storePatrolLists = name;
         } else {
-          this.params.inspectId = this.inspectList==='-1' ? '' : this.inspectList;
+          this.params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
         }
-      }
-    },
-
-    getSelectCountryOrCity() {
-      const self = this;
-      self.regionMode = self.curCity.length > 0 ? 2 : 1;
-      if (self.curProvince.length !== 0) {
-        self.curRegionI = self.curProvince;
-        self.curRegionII = self.curCity;
-      } else {
-        let rI = [], rII = [];
-        self.storeList.forEach((item, index) => {
-          self.params.storeIds.forEach(_item => {
-            if (item.storeId === _item) {
-              rI.some(x => x === item.province) ? null : rI.push(item.province);
-              rII.some(x => x === item.city) ? null : rII.push(item.city);
-            }
-          });
-          self.curRegionI = rI;
-          self.curRegionII = rII;
-        });
       }
     },
 
@@ -689,11 +277,10 @@ export default {
 
     initData() {
       this.getCountryStore();
-      this.getTagListData();
     },
 
     handleExportPdf() {
-      this.$emit('exportPdf', this.storeStr, this.tagNameStr);
+      this.$emit('exportPdf', this.storeFilterObj.storeStr, this.storeFilterObj.storeGroupString, this.storeFilterObj.storeTypeString);
     },
 
     getTagAll() {
@@ -711,13 +298,15 @@ export default {
 
     saveSearchParams(saveParamsObj) {
       const params = saveParamsObj.params;
-      params.curCountry = this.curCountry;
-      params.curProvince = this.curProvince;
-      params.curCity = this.curCity;
-      params.curStore = this.curStore;
-      params.curStoreTag = this.curStoreTag;
+      params.curCountry = this.storeFilterObj.curCountry;
+      params.curProvince = this.storeFilterObj.curProvince;
+      params.curCity = this.storeFilterObj.curCity;
+      params.curStore = this.storeFilterObj.curStore;
+      params.curStoreGroup = this.storeFilterObj.curStoreGroup;
+      params.curStoreType = this.storeFilterObj.curStoreType;
       params.timeMode = this.timeMode;
       params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
+      params.storeIds = this.storeFilterObj.filterStoreIds;
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
 
@@ -728,36 +317,36 @@ export default {
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;
         this.params.endTs = searchParams.endTs;
-        this.curStore = searchParams.storeIds;
+        this.params.timeMode = this.timeMode;
+        this.params.inspectId = searchParams.inspectId;
         this.timeMode = searchParams.timeMode;
-        this.curCountry = searchParams.curCountry;
-        this.curProvince = searchParams.curProvince;
-        this.curCity = searchParams.curCity;
-        this.curStore = searchParams.curStore;
-        this.curStoreTag = searchParams.curStoreTag;
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.inspectCatch = searchParams.inspectId;
-        // this.setDefaultSort();
         this.ifGetParamsFromCash = true;
+        this.searchParams = searchParams;
       } else {
         const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
         const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
         this.params.beginTs = start;
         this.params.endTs = end;
+        this.searchParams = {};
       }
       const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;
     },
 
     setDefaultSort() {
-      // this.defaultSort.order = this.order.direction === 'asc' ? 'ascending' : 'descending';
-      // this.defaultSort.prop = this.order.property === 'completionRate' ? 'completionRateStr': this.order.property;
       const paramsObj = {};
       paramsObj.defaultSort = this.defaultSort;
-      // paramsObj.order = this.order;
       paramsObj.filter = this.filter;
       this.$emit('setDefaultSortAndPage', paramsObj);
+    },
+
+    onStoreChange(storeObj) {
+      this.storeFilterObj = storeObj;
+      !this.ifSaveParams && this.searchData();
+      this.ifSaveParams = true;
     }
   }
 };
@@ -806,7 +395,6 @@ export default {
       .normal-span{
         font-size: calc(14/1920*100vw);
         margin-right: calc(20/1920*100vw);
-        margin-left: calc(20/1920*100vw);
       }
       .inspect-span{
         margin-right: calc(20/1920*100vw);

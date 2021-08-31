@@ -13,7 +13,7 @@
       <el-button class="cancel-btn" size="mini" @click="cancelHandler">
         {{ $t('remotePatrol.cancel') }}
       </el-button>
-      <el-button class="confirm-btn" size="mini" type="primary" @click="confirmHandler">
+      <el-button :disabled="confirmBtnDisabled" class="confirm-btn" size="mini" type="primary" @click="confirmHandler">
         {{ confirmText }}
       </el-button>
     </div>
@@ -47,6 +47,10 @@ export default {
       }
     },
     isForm: {
+      type: Boolean,
+      default: false
+    },
+    confirmBtnDisabled: {
       type: Boolean,
       default: false
     }

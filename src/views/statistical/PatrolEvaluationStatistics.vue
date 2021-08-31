@@ -53,12 +53,16 @@
             </div>
             <div class="region-result">
               <div class="region-content">
-                <div class="region-result-panel">
-                  <v-chart
-                    ref="storeChart"
-                    :options="regionsChartsOptions"
-                    :auto-resize="true"
-                    class="result-content" />
+                <div class="region-content">
+                  <div class="region-result-panel" v-if="regionsChartsOptions">
+                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                             class="result-content"/>
+                  </div>
+                  <div v-else class="region-result-panel">
+                    <span class="no-data-text">
+                      {{ $t('deviceView.noData') }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -72,7 +76,7 @@
               </span>
               <div class="operation-btns">
                 <delay-button
-                  :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                  :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                   type="primary"
                   size="mini"
                   @click="export2Excel"
@@ -93,7 +97,7 @@
               :highlight-current-row= "true"
               :pagesize="sizeNumRegion"
               :current-page="pageRegion"
-              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+              :default-sort = "defaultRegionSort"
               @handleChange="handleRegionPageAndSizeChange"
               @sortChange="handleRegionSortChange"/>
           </div>
@@ -107,7 +111,7 @@
               </span>
               <div class="operation-btns">
                 <delay-button
-                  :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                  :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                   type="primary"
                   size="mini"
                   @click="exportStore2Excel"
@@ -129,7 +133,7 @@
                 :highlight-current-row= "true"
                 :pagesize="sizeNumStore"
                 :current-page="pageStore"
-                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"
+                :default-sort = "defaultStoreSort"
                 @handleChange="handleStorePageAndSizeChange"
                 @sortChange="handleStoreSortChange"/>
             </div>
@@ -145,8 +149,12 @@
           <span class="content-header">{{ storeNameStr }}</span>
         </p>
         <p>
-          <span>{{ $t('remotePatrol.selectStoreTag') }}：</span>
-          <span class="content-header">{{ storeTagStr }}</span>
+          <span>{{ $t('remotePatrol.storeGroup') }}：</span>
+          <span class="content-header">{{ storeGroupStr }}</span>
+        </p>
+        <p>
+          <span>{{ $t('remotePatrol.storeType') }}：</span>
+          <span class="content-header">{{ storeTypeStr }}</span>
         </p>
         <p>
           <span>{{ $t('overview.patrolLists') }}：</span>
@@ -199,8 +207,14 @@
             </div>
             <div class="region-result">
               <div class="region-content">
-                <div class="region-result-panel">
-                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true" class="result-content" />
+                <div class="region-result-panel" v-if="regionsChartsOptions">
+                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                           class="result-content"/>
+                </div>
+                <div v-else class="region-result-panel">
+                  <span class="no-data-text">
+                    {{ $t('deviceView.noData') }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -222,7 +236,7 @@
               :highlight-current-row= "true"
               :show-pagination="false"
               :is-pdf-column="true"
-              :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"/>
+              :default-sort = "defaultRegionSort"/>
           </div>
         </el-col>
         <el-col :sapn="24" class="store-list" style="padding-bottom:20px;">
@@ -243,7 +257,8 @@
                 :highlight-current-row= "true"
                 :show-pagination="false"
                 :is-pdf-column="true"
-                :default-sort = "{prop: 'qualifiedRateStr', order: 'ascending'}"/>
+                :default-sort = "defaultStoreSort"
+              />
             </div>
           </el-col>
         </el-col>
@@ -255,6 +270,7 @@
       :close-on-click-modal="false"
       :visible="ispdf"
       :show-button="false"
+      :show-close="false"
       class="LoadDialog"
     >
       <p>{{ $t('insSettingView.isExportPDF') }}......</p>
@@ -271,10 +287,10 @@ import {
   getInspectStatsOverviewWithRegionV2
 } from '@/api/inspectOverview';
 import SearchComponent from '@/components/SearchComponent';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination';
 import DialogPop from '@/components/DialogPop';
-import DelayButton from '../../components/DelayButton';
+import DelayButton from '@/components/DelayButton';
 
 export default {
   name: 'PatrolEvaluationSta',
@@ -293,7 +309,8 @@ export default {
       htmlTitle: this.$t('overview.htmltopdfA'),
       isexportPDF: false,
       storeNameStr: '',
-      storeTagStr: '',
+      storeGroupStr: '',
+      storeTypeStr: '',
       storePatrolLists: '',
       curRegion: [],
       timeMode: 1,
@@ -343,7 +360,7 @@ export default {
           'pdfwidth': '12%',
           'pdfmaxWidth': '14%',
           'width': '160',
-          'maxWidth': '190'
+          'maxWidth': '230'
         },
         {
           'prop': 'numOfReport',
@@ -352,7 +369,7 @@ export default {
           'pdfwidth': '12%',
           'pdfmaxWidth': '12%',
           'width': '160',
-          'maxWidth': '160'
+          'maxWidth': '180'
         },
         {
           'prop': 'numOfQualified',
@@ -444,7 +461,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '16%',
           'width': '160',
-          'maxWidth': '190'
+          'maxWidth': '230'
         },
         {
           'prop': 'numOfReport',
@@ -452,7 +469,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '14%',
           'width': '150',
-          'maxWidth': '150'
+          'maxWidth': '180'
         },
         {
           'prop': 'numOfQualified',
@@ -468,7 +485,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '110',
-          'maxWidth': '110'
+          'maxWidth': '120'
         },
         {
           'prop': 'numOfDangerous',
@@ -544,7 +561,9 @@ export default {
       ispdf: false,
       regionMode: 2,
       ifSaveParams: false,
-      defaultSort: {prop: 'qualifiedRateStr', order: 'ascending'}
+      defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' },
+      defaultStoreSort: { prop: 'qualifiedRateStr', order: 'ascending' },
+      defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' }
     };
   },
 
@@ -639,11 +658,20 @@ export default {
     },
 
     async searchData() {
-      const self = this;
-      self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      await self.getInspectStatsOverviewOfRegion();
-      await self.getInspectStatsOverviewOfStore();
-      await self.getInspectStatsLine();
+      this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+      if (this.params.storeIds.length > 0) {
+        await this.getInspectStatsOverviewOfRegion();
+        await this.getInspectStatsOverviewOfStore();
+        await this.getInspectStatsLine();
+      } else {
+        this.totalRegion = 0;
+        this.regionTableData = [];
+        this.getRegionPie();
+        this.storeTableData = [];
+        this.regionsList = [];
+        this.curRegion = [];
+        this.regionsChartsOptions = null;
+      }
     },
 
     async export2Excel() {
@@ -761,7 +789,8 @@ export default {
       params.endTs = self.params.endTs;
       params.region = this.regionMode;
       params.timeMode = self.timeMode;
-      params.inspectId = self.params.inspectId;
+      params.inspectTagId = self.params.inspectId;
+      params.storeIds = self.params.storeIds;
       try {
         const regionResult = await self.getInspectResultOverRegion(params);
         const option = self.getInspectLineOption();
@@ -1231,7 +1260,7 @@ export default {
       this.$refs.storeChart && this.$refs.storeChart.resize();
     },
 
-    emitSearch(searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
+    emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       this.params = searchParams;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
@@ -1248,10 +1277,11 @@ export default {
       this.searchData();
     },
 
-    exportPdf(storeNameStr, storeTagStr) {
+    exportPdf(storeNameStr, storeGroupStr, storeTypeStr) {
       this.isexportPDF = true;
       this.storeNameStr = storeNameStr;
-      this.storeTagStr = storeTagStr;
+      this.storeGroupStr = storeGroupStr;
+      this.storeTypeStr = storeTypeStr;
       this.handleExportReport();
     },
 
@@ -1268,7 +1298,8 @@ export default {
       this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
-    handleRegionSortChange(order) {
+    handleRegionSortChange(order, defaultSort) {
+      this.defaultRegionSort = defaultSort;
       this.regionOrder = order;
       this.regionFilter = {
         page: this.pageRegion - 1,
@@ -1294,7 +1325,8 @@ export default {
       this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
-    handleStoreSortChange(order) {
+    handleStoreSortChange(order, defaultSort) {
+      this.defaultStoreSort = defaultSort;
       this.storeOrder = order;
       this.storeFilter = {
         page: this.pageStore - 1,
@@ -1308,13 +1340,12 @@ export default {
       this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
     },
 
-    setDefaultSortAndPage(paramsObj){
-      console.log(paramsObj)
+    setDefaultSortAndPage(paramsObj) {
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
       this.sizeNum = paramsObj.filter.size;
       this.page = paramsObj.filter.page + 1;
-    },
+    }
   }
 };
 </script>
@@ -1438,6 +1469,7 @@ export default {
       .region-header{
         border-bottom: 1px solid $border;
         margin-bottom: 30px;
+        padding-right: 0;
       }
       .el-table-panel{
         margin-left: calc(30/1920*100vw);
@@ -1452,6 +1484,7 @@ export default {
       .region-header{
         border-bottom: 1px solid $border;
         margin-bottom: 30px;
+        padding-right: 0;
       }
       .el-table-panel{
         margin-left: calc(30/1920*100vw);

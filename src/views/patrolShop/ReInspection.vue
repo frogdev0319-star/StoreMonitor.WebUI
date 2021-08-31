@@ -1,11 +1,11 @@
 <template>
-  <el-row :class="isREC?'noeventClass':''" class="el-container">
+  <el-row class="el-container">
     <el-col :span="16" :class="{liseAnmiClass:showSpread}" class="lside">
       <div class="el-header-title">
         <span v-if="showStoreUp" class="lside-title">
           {{ store.storeTitle }}
         </span>
-        <div v-if="showStoreUp" :class="store.storeUp?'coll':'nocoll'" class="storeUp-content" @click="addStoreUp">
+        <div v-if="showStoreUp" :class="storeUpClass" @click="addStoreUp">
           <i :class="store.storeUp?'coll-icon':'nocoll-icon'" class="iconfont icon-iconfontstart" style="vertical-align: middle;"/>
           <span :class="store.storeUp?'coll-font':'nocoll-font'">{{ store.storeUpTitle }}</span>
         </div>
@@ -83,24 +83,9 @@
         </div>
       </el-dialog>
       <el-dialog
-        v-if="showOuter"
-        :title="$t('remotePatrol.view')"
-        :visible.sync="showOuter"
-        :close-on-click-modal="false"
-        :width="680*percentHeight+'px'"
-        height="300px"
-        top="5%">
-        <div class="canvas-content" style="overflow:hidden;">
-          <hr class="dialog-hr">
-          <div class="dialog-img-content">
-            <img :src="checkImgSrc" :width="600*percentHeight" :height="430*percentHeight">
-          </div>
-        </div>
-      </el-dialog>
-      <el-dialog
-        v-if="showFeedDialog1"
+        v-if="showAddTextFeedbackDialog"
         :title="$t('remotePatrol.feedbacks')"
-        :visible.sync="showFeedDialog1"
+        :visible.sync="showAddTextFeedbackDialog"
         :close-on-click-modal="false"
         :width="480*percentHeight+'px'"
         top="12%">
@@ -126,8 +111,8 @@
           </div>
         </div>
         <div slot="footer">
-          <el-button id="cancelBtn" size="mini" @click="showFeedDialog1 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack1">
+          <el-button id="cancelBtn" size="mini" @click="showAddTextFeedbackDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
+          <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddTextFeedback">
             {{ $t('remotePatrol.confirm') }}
           </el-button>
         </div>
@@ -225,12 +210,12 @@
           </div>
           <img :src="arrows2Src" alt="arrow2">
           <div class="iconright-content">
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'">
+            <div :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'">
               <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
               <span>{{ $t('remotePatrol.snapshot') }}</span>
             </div>
-            <div :class="lang== 'en'? 'en-iconright' : 'iconright'" style="display: none">
-              <i v-if="lang =='en' " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
+            <div :class="lang.indexOf('zh') === -1? 'en-iconright' : 'iconright'" style="display: none">
+              <i v-if="lang.indexOf('zh') === -1 " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
               <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
               <span>{{ $t('remotePatrol.record') }}</span>
             </div>
@@ -238,67 +223,12 @@
         </div>
       </div>
       <div v-else>
-        <div v-if="!isEzviz">
-          <div v-if="showError" class="errorVideo-model">
-            <span>{{ errorText }}</span>
-          </div>
-          <div
-            v-loading="isLoading"
-            v-else
-            id="videoContent"
-            element-loading-background="rgba(0, 0, 0, 0.8)"
-            class="video-content"
-            @mouseleave="hiddenModel"
-            @mouseenter="showModel"
-            @mousemove="showModel">
-            <div v-if="showGetVideo" class="getvideo-content">
-              <div class="btn-graph">
-                <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"/>
-              </div>
-              <canvas id="vcanvas" :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"/>
-            </div>
-            <span v-if="showInfoContent" id="channelName">{{ channel!=null?channel.channelName:'' }}</span>
-            <div v-if="showInfoContent" class="icon-footer" >
-              <div class="iconlside">
-                <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'"class= "iconfont iconplay" @click="onPlay"/>
-              </div>
-              <div class="screen-content">
-                <i
-                  :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
-                  class="iconfont iconscreen"
-                  @click="controlScreen"/>
-                <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
-              </div>
-            </div>
-            <transition name="fade">
-              <div v-if="showModelContent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
-                <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-                <span>{{ $t('remotePatrol.snapshot') }}</span>
-              </div>
-            </transition>
-            <video
-              v-if="showVideo"
-              id="previewVideo"
-              :controls="showControls"
-              :paused="paused"
-              :muted = "muted"
-              :src="uri"
-              height="83%"
-              width="90%"
-              prload
-              autoplay
-              class="video-js vjs-fill"
-              @waiting="onPlayerWaiting($event)"
-              @playing="onPlayerPlaying($event)"/>
-          </div>
-        </div>
-        <ezviz-video
-          v-else
-          ref="ezvizVideo"
+        <component
+          :is="currentVideoComponent"
+          ref="vendorVideo"
           :channel-info="channel"
           :source-list-length= "sourceListLength"
           :show-feed-back="showFeedBack"
-          :show-feed-dialog2="showFeedDialog2"
           :store-id="store.storeId"
           :video-authority="videoAuthority"
           @confirmEzvizCanvas="editEzvizCanvas"
@@ -405,7 +335,10 @@
                     <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                       <div v-if="_item.mediaType==2" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="_item.src" :width="_item.width" :height="_item.height" style="cursor: pointer" @click="openOuter(_item)">
+                        <el-image
+                          :src="_item.src"
+                          :style="{width: _item.width, height: _item.height}"
+                          :preview-src-list="getImgList(_index, item.sourceList)"/>
                       </div>
                       <div v-if="_item.mediaType==1" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
@@ -438,12 +371,10 @@
                         <span class="feedback-eventdes">{{ item.eventDes }}</span>
                       </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                        <img
+                        <el-image
                           :src="item.sourceObj.src"
-                          :width="item.sourceObj.width"
-                          :height="item.sourceObj.height"
-                          class="feedback-pic"
-                          @click="openOuter(item.sourceObj)">
+                          :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                          :preview-src-list="getImgList(0, [item.sourceObj])"/>
                       </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
                         <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(item,index)">
@@ -509,7 +440,10 @@
                     <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                       <div v-if="_item.mediaType==2" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                        <img :src="_item.src" :width="_item.width" :height="_item.height" style="cursor: pointer" @click="openOuter(_item)">
+                        <el-image
+                          :src="_item.src"
+                          :style="{width: _item.width, height: _item.height}"
+                          :preview-src-list="getImgList(_index, item.sourceList)"/>
                       </div>
                       <div v-if="_item.mediaType==1" class="img-content">
                         <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
@@ -606,8 +540,9 @@
       </el-tabs>
       <div class="patrol-select">
         <div class="patrol-content">
-          <p v-if="lang!= 'en'" class="patrol-title">{{ $t('storeView.selectPlaceholder') }}，<span v-if="patrolStoreName!=null">{{ patrolStoreName }}</span><span v-else>{{ $t('remotePatrol.stores') }}</span>{{ $t('storeView.bindInspectList') }}</p>
-          <p v-if="lang== 'en'" class="patrol-title">Please select the inspection list associated with <span v-if="patrolStoreName!=null">{{ patrolStoreName }}</span><span v-else>{{ $t('remotePatrol.stores') }}</span></p>
+          <p class="patrol-title">
+            {{ $t('remotePatrol.selectInspectListWithStore', {storeName: patrolStoreName}) }}
+          </p>
           <el-dropdown trigger="click" placement="bottom" class="patrol-dropdown" @command="changeInspect">
             <span class="el-dropdown-link">
               <p v-if="patrolstore!=''" class="link-span">{{ patrolstore }}</p>
@@ -615,7 +550,7 @@
               <i class="el-icon-arrow-down el-icon--right"/>
             </span>
             <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
-              <el-dropdown-item v-if="PatrolList.length===0">{{$t('overview.noData')}}</el-dropdown-item>
+              <el-dropdown-item v-if="PatrolList.length===0">{{$t('deviceView.noData')}}</el-dropdown-item>
               <el-dropdown-item v-else v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -630,7 +565,7 @@
             <div class="arrow-content">
               <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
             </div>
-            <div class="btn-content">
+            <div class="btn-content" v-if="!curItem.disabled">
               <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
                 <channel-icon-btn
                   :channel-name="item.name"
@@ -652,24 +587,24 @@
 <script>
 import { checkOutInspectItemV3 } from '@/api/inspect';
 import util from '@/common/util';
-import { getStoreList, getFavoriteList, addFavoriteStore, deleteFavoriteStore } from '@/api/store';
+import { getStoreList, addFavoriteStore, deleteFavoriteStore } from '@/api/store';
 import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
-import videojs from '../../../static/video.js';
 import DialogVue from '@/components/DialogVue.vue';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import { getCookie } from '@/common/auth';
-import EzvizVideo from '@/components/EzvizVideo.vue';
 import filterString from '@/common/filterString.js';
-import { getDashServerInfo } from '@/api/device.js';
-import DashHttp from '@/common/DashHttp.js';
+import Database from '@/common/Database.js';
 
 export default {
   name: 'ReInspection',
   components: {
     DialogVue,
     ChannelIconBtn,
-    EzvizVideo
+    SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
+    DashVideo: () => import('@/components/DashVideo.vue'),
+    EzvizVideo: () => import('@/components/EzvizVideo.vue'),
+    BeseyeVideo: () => import('@/components/BeseyeVideo.vue')
   },
   data() {
     return {
@@ -686,16 +621,12 @@ export default {
       showPenBtn: true,
       showPen: false,
       showStoreUp: false,
-      showFeedDialog1: false,
+      showAddTextFeedbackDialog: false,
       showFeedDialog2: false,
       arrows1Src: require('../../../static/img/arrows_left.png'),
       arrows2Src: require('../../../static/img/arrows_right.png'),
       plusSrc: require('../../../static/img/add_icon.png'),
-      clearIconSrc: require('../../../static/img/clear.png'),
-      removeIconSrc: require('../../../static/img/cancel.png'),
       backicon: require('../../../static/img/back.png'),
-      checkImgSrc: '',
-      showOuter: false,
       showModelContent: false,
       showInfoContent: true,
       activeIndex: '0',
@@ -706,64 +637,11 @@ export default {
       tempArr: [],
       playDate: new Date(),
       channel: null,
-      penList: [
-        {
-          id: 'white',
-          showContent: false
-        },
-        {
-          id: 'red',
-          showContent: true
-        },
-        {
-          id: 'yellow',
-          showContent: false
-        }
-      ],
-      penChecked: 'red',
       showCutModel: false,
       errorText: '',
       showError: false,
       showVideo: true,
       showCancelContent: false,
-      speedList: [
-        {
-          value: 0,
-          label: '0.5 X'
-        },
-        {
-          value: 1,
-          label: '1 X'
-        },
-        {
-          value: 2,
-          label: '1.5 X'
-        },
-        {
-          value: 3,
-          label: '2 X'
-        }
-      ],
-      testSpeed: '1 X',
-      backList: [
-        {
-          value: 0,
-          label: '10s'
-        },
-        {
-          value: 1,
-          label: '20s'
-        },
-        {
-          value: 2,
-          label: '30s'
-        },
-        {
-          value: 3,
-          label: '40s'
-        }
-      ],
-      testBack: '10s',
       showSpread: false,
       tabList: [
         {
@@ -795,7 +673,7 @@ export default {
       curGroupIndex: 0,
       curItemIndex: 0,
       curSheetIndex: 0,
-      curItem: null,
+      curItem: {disabled : false},
       curItemId: 0,
       curhasIgnoreItem: 0,
 
@@ -818,7 +696,6 @@ export default {
       playState: false,
       editCount: 0,
       ignoreTemp: [],
-      appliedInspectList: [],
 
       changeBrandObj: {
         title: this.$t('remotePatrol.confirm'),
@@ -877,7 +754,6 @@ export default {
       timeVideo: 0,
       startTimeCutVideo: 0,
       endTImeCutVideo: 0,
-      isREC: false,
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
 
@@ -907,26 +783,9 @@ export default {
       beforepatrolstore: '',
       showIgnoreItem: false,
       hasIgnoretemp: [],
-
-      uri: null,
-      play: true,
-      fullScreen: false,
-      paused: true,
-      muted: false,
-      currentState: 'blank', // 'blank','loading','play','inline'
-      error: '',
-      streamProtocol: 'DASH',
-      sessionId: null,
-      userName: null,
-      password: null,
-      IVSID: null,
-      channelId: null,
-      realType: true,
-      lastTime: null,
-      currentTime: null,
-      onEndflag: false,
-      previewplayer: null,
+      vendor: 1,
       feedbackIndex: -1,
+      currentVideoComponent: 'EzvizVideo',
       groupType: -1,
       isCategory: false,
       itemOptionsForType1: [],
@@ -935,12 +794,6 @@ export default {
     };
   },
   computed: {
-    graphBtnWidth: function() {
-      return this.varyWindowHeight * 0.185;
-    },
-    btnFontSize: function() {
-      return this.varyWindowHeight * 0.022;
-    },
     percentHeight: function() {
       return this.varyWindowHeight / 758;
     },
@@ -948,31 +801,32 @@ export default {
       accountChanged: 'accountChanged',
       videoAuthority: 'videoAuthority'
     }),
-    ...mapGetters(
-      ['isEzviz']
-    )
+
+    storeUpClass() {
+      return {
+        'coll': this.store.storeUp,
+        'nocoll': !this.store.storeUp,
+        'storeUp-content': this.lang.indexOf('ja') === -1,
+        'ja-storeUp-content': this.lang.indexOf('ja') !== -1
+      }
+    }
   },
   watch: {
     accountChanged(val, oldVal) {
       const self = this;
-      if (val != 0) {
+      if (val !== 0) {
         self.changeBrand();
       }
     },
-
-    realTimeSpeed(val) {
-      if (val >= 300) {
-        this.stopVideoPlay();
-        this.stopTimer();
-      }
+    vendor(){
+      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
     }
   },
 
   beforeRouteLeave(to, from, next) {
     const self = this;
-    const canLeave = (((!self.isEzviz) && self.editCount != 0)) ||
-      (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0);
-    if (canLeave && to.name != 'confirmSum') {
+    const canLeave = !self.showGuide && self.$refs.vendorVideo.editCount !== 0;
+    if (canLeave && to.name !== 'confirmSum') {
       self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
         confirmButtonText: self.$t('remotePatrol.confirm'),
         cancelButtonText: self.$t('remotePatrol.cancel'),
@@ -986,18 +840,12 @@ export default {
           self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
+          Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
           self.$store.dispatch('setPatrolHistory', self.historyObj);
         }
-        if (self.playState) {
-          self.stopVideoPlay();
-          window.clearInterval(self.timerPlayReal);
-          self.timerPlayReal = null;
-        }
-        if (self.isEzviz && !self.showGuide) {
-          self.$refs.ezvizVideo.stopRealTime();
-        }
+        !self.showGuide &&  self.$refs.vendorVideo.stopVideoPlay();
         next();
       }).catch(() => {
         next(false);
@@ -1007,18 +855,12 @@ export default {
         // from.meta.keepAlive=false;
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
+        Database.addDataToDB(self.userId, {data: {}, rule: {}});
       } else {
         // from.meta.keepAlive=true;
         self.$store.dispatch('setPatrolHistory', self.historyObj);
       }
-      if (self.playState) {
-        self.stopVideoPlay();
-        window.clearInterval(self.timerPlayReal);
-        self.timerPlayReal = null;
-      }
-      if (self.isEzviz && !self.showGuide) {
-        self.$refs.ezvizVideo.stopRealTime();
-      }
+      !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       next();
     }
   },
@@ -1053,6 +895,9 @@ export default {
       self.curItemIndex = PatrolHistory.curItemIndex;
       self.deviceList = PatrolHistory.deviceList;
       self.isDisabled = true;
+      self.channel = PatrolHistory.channel;
+      self.curItemId = PatrolHistory.curItemId;
+      self.vendor = self.channel.vendor;
       const isClick = self.sheetName[self.sheetName.length - 1].isClick;
       if (isClick) {
         if (PatrolHistory.eventList.length > 0) {
@@ -1075,10 +920,8 @@ export default {
       }
     } else {
       self.getFaStoreData();
-      this.videoAuthority && self.getDashUrlInfo();
     }
     document.onmouseup = self.mouseUpAction;
-    self.isREC = false;
     self.getUpLoadBucketInfo();
     self.getOssInfo();
     window.onresize = function() {
@@ -1089,60 +932,13 @@ export default {
         ele.style.height = 'auto';
       }
     };
-    window.addEventListener('visibilitychange', self.visibilityChange, false);
-  },
-
-  beforeDestroy() {
-    const self = this;
-    window.removeEventListener('visibilitychange', self.visibilityChange);
-    window.onresize = null;
-    self.visibilityChange = null;
   },
 
   methods: {
-    getDashUrlInfo() {
-      getDashServerInfo().then(result => {
-        if(result.errCode === 0){
-          const apiport = result.data.url.indexOf('https') !== -1 ? result.data.httpsCmdPort : result.data.httpCmdPort;
-          this.userName = result.data.loginId;
-          this.password = result.data.password;
-          const url = result.data.url + ':' + apiport + '/AdvStreamingService/';
-          DashHttp.setDashHost(url);
-        } else {
-          console.log(result.errMsg);
-        }
-      }).catch(error => {
-        if (error.message !== 'Network request failed') {
-          this.currentState = 'blank';
-          this.errorText = error;
-          this.showError = true;
-        }
-      });
-    },
-
-    visibilityChange() {
-      const self = this;
-      if (!self.isEzviz) {
-        if (document.hidden) {
-          self.stopVideoPlay();
-          self.stopTimer();
-        } else {
-          if (this.currentState === 'loading') {
-            self.startVideo(self.channel.ivsId, self.channel.channelId, null);
-          }
-        }
-      }
-    },
 
     changeBrand() {
       const self = this;
-      if (!self.isEzviz) {
-        self.stopVideoPlay();
-        self.playState && self.previewplayer && self.previewplayer.dispose();
-      }
-      if (self.isEzviz && !self.showGuide) {
-        self.$refs.ezvizVideo.stopRealTime();
-      }
+      !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       self.patrolStoreName = null;
       self.activeIndex = '0';
       self.PatrolList = [];
@@ -1208,72 +1004,70 @@ export default {
       const url = `http://${bucketName}.${endpoint}/${fileName}`;
       return url;
     },
+
     deleteEvent(item, index) {
-      const self = this;
-      self.eventList.splice(index, 1);
-      self.showFeedBackInfo = self.eventList.length == 0;
+      this.eventList.splice(index, 1);
+      this.showFeedBackInfo = this.eventList.length == 0;
     },
 
     addFeedBack() {
       this.feedbackIndex = -1;
-      this.showFeedDialog1 = true;
+      this.showAddTextFeedbackDialog = true;
       this.eventName = '';
       this.eventDes = '';
       this.showEventNameInfo = false;
     },
 
     confirmAddFeedBack2() {
-      const self = this;
-      if (self.eventName.trim().length === 0) {
-        self.showEventNameInfo = true;
+      if (this.eventName.trim().length === 0) {
+        this.showEventNameInfo = true;
         return false;
       }
       if(this.feedbackIndex === -1){
         let srcObj = null;
-        const src = self.canvasEl.toDataURL('image/jpeg');
+        const src = this.canvasEl.toDataURL('image/jpeg');
         srcObj = {
           mediaType: 2,
           src: src,
           height: '100px',
           width: '140px',
-          fileName: `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`,
+          fileName: `${this.bucketImage}/inspect_${util.getCurTimeStr()}_${this.store.storeId}_${this.curItemId}.jpg`,
           file: util.base64ToBlob(src),
-          deviceId: self.channel.id
+          deviceId: this.channel.id
         };
 
         const obj = {
-          eventName: self.eventName,
-          eventDes: self.eventDes,
+          eventName: this.eventName,
+          eventDes: this.eventDes,
           sourceObj: srcObj
         };
-        self.eventList.push(obj);
+        this.eventList.push(obj);
       } else {
-        self.eventList[this.feedbackIndex].eventName = self.eventName;
-        self.eventList[this.feedbackIndex].eventDes = self.eventDes;
+        this.eventList[this.feedbackIndex].eventName = this.eventName;
+        this.eventList[this.feedbackIndex].eventDes = this.eventDes;
       }
-      self.showFeedDialog2 = false;
-      self.showFeedBackInfo = false;
+      this.showFeedDialog2 = false;
+      this.showFeedBackInfo = false;
     },
 
-    confirmAddFeedBack1() {
-      const self = this;
+    confirmAddTextFeedback() {
       if(this.feedbackIndex == -1){
         const obj = {
-          eventName: self.eventName,
-          eventDes: self.eventDes,
+          eventName: this.eventName,
+          eventDes: this.eventDes,
           sourceObj: null
         };
-        if (self.eventName.trim().length == 0) {
-          self.showEventNameInfo = true;
+        if (this.eventName.trim().length == 0) {
+          this.showEventNameInfo = true;
           return false;
         }
-        self.eventList.push(obj);
+        this.eventList.push(obj);
       } else {
-        self.eventList[this.feedbackIndex].eventName = self.eventName;
-        self.eventList[this.feedbackIndex].eventDes = self.eventDes;
+        this.eventList[this.feedbackIndex].eventName = this.eventName;
+        this.eventList[this.feedbackIndex].eventDes = this.eventDes;
       }
-      self.showFeedDialog1 = false;
-      self.showFeedBackInfo = false;
+      this.showAddTextFeedbackDialog = false;
+      this.showFeedBackInfo = false;
     },
 
     getIndexById(id) {
@@ -1342,210 +1136,6 @@ export default {
       });
     },
 
-    playCutVideo(item, index) {
-      const self = this;
-      self.dialogCommentVideo = true;
-      if (self.showFeedBack) {
-        self.curVideoSrc = item.sourceObj.src;
-      } else {
-        self.curVideoSrc = item.src;
-      }
-    },
-
-    cutPicture() {
-      const self = this;
-      self.videoEl = document.getElementById('previewVideo').children[0];
-      self.imageCanvasList = [];
-      if (self.fullScreen) {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-      if (self.showFeedBack) {
-        self.feedbackIndex = -1;
-        self.showFeedDialog2 = true;
-        self.eventName = '';
-        self.eventDes = '';
-        self.showEventNameInfo = false;
-        this.$nextTick(() => {
-          self.canvasEl = document.getElementById('icanvas');
-          var ctx = self.canvasEl.getContext('2d');
-          ctx.drawImage(self.videoEl, 0, 0, 520 * self.percentHeight, 340 * self.percentHeight);
-          var oGrayImg = icanvas.toDataURL('image/jpeg');
-          self.imageCanvas.src = oGrayImg;
-          const imgObj = new Image();
-          imgObj.src = oGrayImg;
-          self.imageCanvasList.push(imgObj);
-        });
-      } else {
-        self.showCancelContent = false;
-        if (self.sourceListLength >= 10) {
-          self.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
-          return false;
-        }
-        self.showCutDialog = true;
-        this.$nextTick(() => {
-          self.canvasEl = document.getElementById('icanvas');
-          var ctx = self.canvasEl.getContext('2d');
-          ctx.drawImage(self.videoEl, 0, 0, 767 * self.percentHeight, 431 * self.percentHeight);
-          var oGrayImg = icanvas.toDataURL('image/jpeg');
-          self.imageCanvas.src = oGrayImg;
-          const imgObj = new Image();
-          imgObj.src = oGrayImg;
-          self.imageCanvasList.push(imgObj);
-        });
-      }
-    },
-    showPenList() {
-      const self = this;
-      self.showPen = !self.showPen;
-      self.showCancelContent = false;
-    },
-    checkPen(item, index) {
-      const self = this;
-      item.showContent = true;
-      self.penList.forEach((_item, _index) => {
-        if (index != _index) {
-          _item.showContent = false;
-        }
-      });
-      self.penChecked = item.id;
-    },
-    cancelEditCanvas() {
-      const self = this;
-      self.showCancelContent = false;
-      self.canvasEl = document.getElementById('icanvas');
-      var ctx = self.canvasEl.getContext('2d');
-      let vcanvas = null;
-      if (self.showFeedBack) {
-        vcanvas = { width: 520 * self.percentHeight, height: 340 * self.percentHeight };
-      } else {
-        vcanvas = { width: 767 * self.percentHeight, height: 431 * self.percentHeight };
-      }
-      ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
-      ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
-      self.imageCanvasList = [];
-    },
-    confirmEditCanvas() {
-      const self = this;
-      self.showCancelContent = false;
-      self.imageCanvasList.pop();
-      self.canvasEl = document.getElementById('icanvas');
-      var ctx = self.canvasEl.getContext('2d');
-      let vcanvas = null;
-      if (self.showFeedBack) {
-        vcanvas = { width: 520 * self.percentHeight, height: 340 * self.percentHeight };
-      } else {
-        vcanvas = { width: 767 * self.percentHeight, height: 431 * self.percentHeight };
-      }
-      ctx.clearRect(0, 0, vcanvas.width, vcanvas.height);
-      if (self.imageCanvasList.length == 0) {
-        ctx.drawImage(self.imageCanvas, 0, 0, vcanvas.width, vcanvas.height);
-      } else {
-        ctx.drawImage(self.imageCanvasList[self.imageCanvasList.length - 1], 0, 0, vcanvas.width, vcanvas.height);
-      }
-    },
-    confirmEdit() {
-      const self = this;
-      self.sourceList = [];
-      const obj = {};
-      obj.mediaType = 2;
-      obj.src = self.canvasEl.toDataURL('image/jpeg');
-      obj.height = '100px';
-      obj.width = '140px';
-      obj.fileName = `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`;
-      obj.file = util.base64ToBlob(obj.src);
-      obj.deviceId = self.channel.id;
-      self.sourceList.push(obj);
-      self.showCutDialog = false;
-      const tempId = self.getIndexById(self.curItemId);
-      if (tempId != null) {
-        if (!self.showIgnoreItem) {
-          self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
-          if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
-            if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
-              this.sheetName[this.curSheetIndex].dealCount++;
-              this.sheetName[this.curSheetIndex].Effective++;
-              this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
-              this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].Effective++;
-            }
-            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
-          }
-        } else {
-          self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
-        }
-      } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
-      }
-      if (!self.showIgnoreItem) {
-        self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
-      } else {
-        self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;
-      }
-    },
-    mouseDownAction(e) {
-      const self = this;
-      self.isMouseDown = true;
-      self.X = e.offsetX;
-      self.Y = e.offsetY;
-      self.showCutModel = false;
-      self.showPenBtn = false;
-      self.showCancelContent = false;
-    },
-    mouseMoveAction(e) {
-      const self = this;
-      if (self.isMouseDown) {
-        self.X1 = e.offsetX;
-        self.Y1 = e.offsetY;
-        self.drawLine(self.X, self.Y, self.X1, self.Y1);
-        self.showPenBtn = false;
-        self.flag++;
-      }
-    },
-    mouseUpAction(e) {
-      const self = this;
-      self.isMouseDown = false;
-      self.showCutModel = true;
-      self.showPenBtn = true;
-      self.showCancelContent = true;
-      if (self.flag != 0 && self.canvasEl != '') {
-        const imgObj = new Image();
-        imgObj.src = self.canvasEl.toDataURL('image/jpeg');
-        self.imageCanvasList.push(imgObj);
-      }
-      self.flag = 0;
-    },
-    drawLine(x, y, x1, y1) {
-      const self = this;
-      var ctx = self.canvasEl.getContext('2d');
-      if (self.flag) {
-        ctx.beginPath();
-      }
-      ctx.moveTo(x, y);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = self.penChecked;
-      ctx.lineTo(x1, y1);
-      ctx.stroke();
-      if (self.flag != 0) {
-        self.X = self.X1;
-        self.Y = self.Y1;
-      }
-    },
-    showCancel() {
-      this.showCancelContent = true;
-      this.showPenBtn = true;
-    },
-    hiddenCancel() {
-      this.showCancelContent = false;
-      this.showPenBtn = false;
-    },
-    getFaStoreList() {
-      return new Promise((resolve, reject) => {
-        getFavoriteList().then(res => {
-          resolve(res);
-        });
-      });
-    },
-
     checkIgnoreScore(item, itemDS, e, index) {
       const self = this;
       item.manualIgnore = false;
@@ -1577,7 +1167,7 @@ export default {
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
       });
-      self.isEzviz ? self.$refs.ezvizVideo.editCount++ : self.editCount++;
+      self.$refs.vendorVideo.editCount++;
       if (e === 0) {
         if (item.groupType === 2) {
           if (item.itemScore < 0) {
@@ -1621,7 +1211,6 @@ export default {
     },
 
     getAllStoreList() {
-      const self = this;
       const params = {
         'filter': {
           'page': 0,
@@ -1686,6 +1275,7 @@ export default {
           obj.userId = item.userId;
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
+          obj.status = item.status;
           if (item.authorizedInspect.length != 0) {
             const remoteInspectList = item.authorizedInspect.filter(inspcetItem => inspcetItem.mode === 0);
             if(remoteInspectList.length > 0){
@@ -1704,14 +1294,9 @@ export default {
       };
       let data;
       switch (Number(self.activeIndex)) {
-        case 0: data = await self.getFaStoreList();
-          if (data.errCode == 0) {
-            const storeData = data.data;
-            self.tabList[0].storeList = getStoreTemp(storeData);
-          }
-          if (data.errCode == 500) {
-            self.tabList[0].storeList = [];
-          }
+        case 0:
+          const favoriteStoreList = self.allInitStoreList.filter(store => store.favorite === true);
+          self.tabList[0].storeList = getStoreTemp(favoriteStoreList);
           break;
         case 1:
           data = self.getStoreObj();
@@ -1742,6 +1327,7 @@ export default {
           obj.favorite = item.favorite == undefined ? true : item.favorite;
           obj.device = item.device;
           obj.isActive = false;
+          obj.status = item.status;
           if (item.authorizedInspect.length != 0) {
             obj.authorizedInspect = item.authorizedInspect;
             obj.hasInspect = true;
@@ -1755,25 +1341,31 @@ export default {
         });
         return temp;
       };
-      const data = await self.getFaStoreList();
       const allStoreData = await self.getAllStoreList();
-      self.getInitStoreData(allStoreData);
-      if (data.errCode == 0) {
-        const storeData = data.data;
+      if (allStoreData.errCode === 0) {
+        self.getInitStoreData(allStoreData);
+        const storeData = allStoreData.data.content.filter(store => store.favorite === true);
         self.tabList[0].storeList = getStoreTemp(storeData);
-        if (storeData.length == 0) {
+        if (storeData.length === 0) {
           self.showStoreUp = false;
           self.inspectList = [];
         } else {
-          if (storeData[0].authorizedInspect.length != 0) {
+          if (storeData[0].authorizedInspect.length !== 0) {
+            if (!util.validateLicense(storeData[0].status)) {
+              return false;
+            }
             const obj = {};
             obj.storeId = storeData[0].storeId;
             obj.storeName = storeData[0].name;
             obj.storeTitle = storeData[0].name;
             obj.storeUp = true;
             obj.storeUpTitle = this.$t('remotePatrol.stared');
+            obj.status = storeData[0].status;
             self.store = obj;
             self.showStoreUp = true;
+            if (!util.validateLicense(storeData[0].status)) {
+              return false;
+            }
             const curStoreId = storeData[0].storeId;
             const storeObj = {
               storeId: curStoreId
@@ -1821,6 +1413,7 @@ export default {
               obj.province = data[j].province;
               obj.favorite = data[j].favorite == undefined ? true : data[j].favorite;
               obj.device = data[j].device;
+              obj.status = data[j].status;
               if (data[j].authorizedInspect.length != 0) {
                 obj.authorizedInspect = data[j].authorizedInspect;
                 obj.hasInspect = true;
@@ -1836,7 +1429,6 @@ export default {
         }
         return storeListTemp;
       };
-      // let data=await self.getAllStoreList();
       if (data.errCode == 0) {
         const storeData = data.data.content;
         self.allInitStoreList = storeData;
@@ -1867,7 +1459,6 @@ export default {
           if (res.errCode == 0) {
             self.store.storeUp = true;
             self.store.storeUpTitle = this.$t('remotePatrol.stared');
-            self.getStoreList();
             self.tabList[2].storeList.forEach((item, index) => {
               item.storeList.forEach((_item, _index) => {
                 if (self.store.storeId == _item.storeId) {
@@ -1887,6 +1478,7 @@ export default {
                 item.favorite = true;
               }
             });
+            self.getStoreList();
           }
         });
       } else {
@@ -1894,7 +1486,6 @@ export default {
           if (res.errCode == 0) {
             self.store.storeUp = false;
             self.store.storeUpTitle = this.$t('remotePatrol.clickToStar');
-            self.getStoreList();
             self.tabList[2].storeList.forEach((item, index) => {
               item.storeList.forEach((_item, _index) => {
                 if (self.store.storeId == _item.storeId) {
@@ -1914,6 +1505,7 @@ export default {
                 item.favorite = false;
               }
             });
+            self.getStoreList();
           }
         });
       }
@@ -1986,13 +1578,19 @@ export default {
       });
       return device;
     },
-    openOuter(item) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.src;
+
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
+
     deleteImg(item, index) {
       const self = this;
       item.sourceList.splice(index, 1);
@@ -2008,7 +1606,7 @@ export default {
       self.curItem.manualIgnore = true;
       self.curItem.disabled = true;
       if (self.showIgnoreItem) {
-        if (self.hasIgnoretemp[self.curItemIndex].dealCount == 0) {
+        if (self.hasIgnoretemp[self.curItemIndex].dealCount === 0) {
           self.hasIgnoretemp[self.curItemIndex].dealCount = 1;
         }
         if (self.hasIgnoretemp[self.curItemIndex].manualIgnore) {
@@ -2088,26 +1686,23 @@ export default {
       if (e === 0) {
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
-      }else{
+      } else {
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
-      if(self.isEzviz && self.$refs.ezvizVideo !== undefined){
-        self.$refs.ezvizVideo.editCount++;
-      }else{
-        self.editCount++;
-      }
+      self.$refs.vendorVideo.editCount++;
       self.curItemIndex = index;
       self.curItem = item;
-      if (item.deviceId == -1) {
+      if (item.deviceId === -1) {
         self.noBindDeviceObj.dialogCosed = true;
         return false;
       }
+      self.$refs.vendorVideo.stopVideoPlay();
       self.handleIgnore();
     },
     CancleIgnoreItem(item, index) {
       const self = this;
-      self.isEzviz ? self.$refs.ezvizVideo.editCount-- : self.editCount--;
+      self.$refs.vendorVideo.editCount--;
       self.curItemIndex = index;
       self.curItem = item;
       self.cancleIgnore();
@@ -2127,9 +1722,11 @@ export default {
         id: item.id,
         channelId: item.channelId,
         ivsId: item.ivsId,
-        channelName: item.name
+        channelName: item.name,
+        vendor: item.vendor
       };
       self.channel = obj;
+      self.vendor = item.vendor;
       item.isClick = true;
       if (self.showFeedBack) {
         self.inspectItemList.forEach(_item => {
@@ -2142,22 +1739,11 @@ export default {
           _item.isClick = false;
         }
       });
-      if (!self.isEzviz) {
-        self.curDeviceId = item.id;
-        self.startVideo(self.channel.ivsId, self.channel.channelId, null);
-      } else {
-        self.curDeviceId = item.id;
-        if (self.$refs.ezvizVideo.playState) {
-          self.$refs.ezvizVideo.stopRealTime();
-          self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime();
-          });
-        } else {
-          self.$nextTick(() => {
-            self.$refs.ezvizVideo.realTime();
-          });
-        }
-      }
+      self.curDeviceId = item.id;
+
+      self.$nextTick(() => {
+        self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+      });
     },
     clickItem(item, index) {
       const self = this;
@@ -2168,13 +1754,16 @@ export default {
       self.sourceListLength = item.sourceList.length;
       const obj = {};
       if (item.deviceId.length > 0) {
+        self.showGuide = false;
         const device = self.getDeviceById(item.deviceId);
         if (device.length > 0) {
           obj.id = device[0].id;
           obj.ivsId = device[0].ivsId;
           obj.channelName = device[0].name;
           obj.channelId = device[0].channelId;
+          obj.vendor = device[0].vendor;
           self.channel = obj;
+          self.vendor = device[0].vendor;
           self.channelBtns = [];
           self.showError = false;
           self.showGuide = false;
@@ -2186,34 +1775,21 @@ export default {
             });
           });
           self.$nextTick(() => {
+            self.showGuide = false;
             self.getshowBtns(self.channelBtns);
           });
           self.channelBtns.forEach((_item, _index) => {
             if (self.channel != null) {
-              if (_item.id == self.channel.id) {
+              if (_item.id === self.channel.id) {
                 _item.isClick = true;
               } else {
                 _item.isClick = false;
               }
             }
           });
-          if (!self.isEzviz) {
-            self.startVideo(self.channel.ivsId, self.channel.channelId, null);
-          } else {
-            // Ezviz
-            if (self.$refs.ezvizVideo != undefined) {
-              if (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.playState) {
-                self.$refs.ezvizVideo.stopRealTime();
-                self.$nextTick(() => {
-                  self.$refs.ezvizVideo.realTime();
-                });
-              } else {
-                self.$nextTick(() => {
-                  self.$refs.ezvizVideo.realTime();
-                });
-              }
-            }
-          }
+          self.$nextTick(() => {
+            self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+          });
           self.curDeviceId = item.deviceId[0];
           item.checked = true;
           self.curItem = item;
@@ -2257,13 +1833,13 @@ export default {
     leaveDialog() {
       const self = this;
       self.leaveObj.dialogCosed = false;
-      self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+      self.$refs.vendorVideo.editCount = 0;
     },
     cancelLeave() {
       const self = this;
       self.leaveObj.dialogCosed = false;
     },
-    noAllInspectDialog() {
+    async noAllInspectDialog() {
       const self = this;
       self.noAllInspectObj.dialogCosed = false;
       const temp = [];
@@ -2348,10 +1924,13 @@ export default {
         curSheetIndex: self.curSheetIndex,
         curGroupIndex: self.curGroupIndex,
         curItemIndex: self.curItemIndex,
-        deviceList: self.deviceList
+        deviceList: self.deviceList,
+        channel: self.channel,
+        curItemId: self.curItemId
       };
       self.hasIgnoretemp = [];
-      const params = { data: obj, rule: inspectSettings };
+      const params = { _id: self.userId, data: obj, rule: inspectSettings };
+      await Database.addDataToDB(self.userId, params);
       self.$router.push({ name: 'confirmSum', params: params });
     },
     canceldNoAllInspect() {
@@ -2464,12 +2043,16 @@ export default {
         allChannelBtns: self.allChannelBtns,
         curSheetIndex: self.curSheetIndex,
         curGroupIndex: self.curGroupIndex,
-        curItemIndex: self.curItemIndex
+        curItemIndex: self.curItemIndex,
+        channel: self.channel,
+        curItemId: self.curItemId
       };
       self.hasIgnoretemp = [];
-      const params = { data: obj, rule: inspectSettings };
+      const params = { _id: self.userId, data: obj, rule: inspectSettings };
+      await Database.addDataToDB(self.userId, params);
       self.$router.push({ name: 'confirmSum', params: params });
     },
+
     spreadContent() {
       const self = this;
       self.showSpread = true;
@@ -2478,349 +2061,7 @@ export default {
       const self = this;
       self.showSpread = false;
     },
-    async playVideo(url) {
-      const self = this;
-      self.showModelContent = true;
-      self.playState = true;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      this.previewplayer.src({ src: url, type: this.protocal == 'HLS' ? 'application/x-mpegURL' : 'application/dash+xml' });
-      this.previewplayer.play();
-    },
-    destroyVideo() {
-      const self = this;
-      var video = document.getElementById('previewVideo');
-      this.previewplayer = videojs(video);
-      self.previewplayer.dispose();
-    },
-    hiddenModel() {
-      const self = this;
-      // self.showModelContent=false;
-      // self.showInfoContent=false;
-    },
-    showModel() {
-      const self = this;
-      // self.showInfoContent=true;
-      // if(self.playState){
-      //     self.showModelContent=true;
-      // }
-    },
 
-    async onPlay() {
-      const paused = !this.paused;
-      this.showError = false;
-      this.errorText = '';
-      if (this.realType === true) {
-        if (paused) {
-          await this.stopVideo();
-          await this.disconnectVideo();
-          await this.offline();
-          this.paused = true;
-        } else {
-          if (this.channel === null || Object.keys(this.channel).length === 0) {
-            this.paused = true;
-          } else {
-            await this.startVideo(this.channel.ivsId, this.channel.channelId, null);
-          }
-        }
-      } else {
-        if (paused) {
-          this.paused = true;
-        } else {
-          if (this.onEndflag) {
-            this.startVideo(this.channel.ivsId, this.channel.channelId, this.lastTime);
-          } else {
-            this.paused = false;
-          }
-        }
-      }
-    },
-
-    async startVideo(IVSID, channelId, startTs) {
-      try {
-        if (this.videoAuthority === false) {
-          this.showError = true;
-          this.errorText = this.$t('remotePatrol.videoLicense');
-          return;
-        }
-        if (IVSID === null || channelId === null) {
-          const error = this.$t('remotePatrol.dashServerError') + '5';
-          this.currentState = 'blank';
-          this.errorText = error;
-        } else {
-          this.showError = false;
-          this.isLoading = true;
-          if (!await this.stopVideoPlay()) {
-            return;
-          }
-          if (!await this.online()) {
-            return;
-          }
-          this.IVSID = IVSID;
-          this.channelId = channelId.toString();
-          if (startTs) {
-            await this.history(startTs);
-          } else {
-            if (await this.connectVideo()) {
-              this.startTimer();
-            }
-          }
-        }
-      } catch (e) {
-        if (e.message !== 'Network request failed') {
-          this.currentState = 'blank';
-          this.errorText = e.message;
-          this.showError = true;
-          this.isLoading = false;
-        }
-      }
-    },
-
-    startTimer() {
-      this.realTimeSpeed = 0;
-      this.isLoading = false;
-      this.timerPlayReal = window.setInterval(() => {
-        this.realTimeSpeed = this.realTimeSpeed + 1;
-      }, 1000);
-    },
-
-    stopTimer() {
-      window.clearInterval(this.timerPlayReal);
-      this.realTimeSpeed = 0;
-    },
-
-    async stopVideoPlay() {
-      if (this.sessionId) {
-        const state = this.currentState;
-        this.currentState = 'loading';
-        if (state === 'play') {
-          this.stopVideo();
-          await this.disconnectVideo();
-        }
-        this.paused = true;
-        return await this.offline();
-      } else {
-        this.paused = true;
-        return true;
-      }
-    },
-
-    async online() {
-      const data = {};
-      const request = {};
-      request.username = this.userName;
-      request.password = this.password;
-      data.request = request;
-      this.currentState = 'loading';
-      if (await DashHttp.putDash('Authority/Online', data)) {
-        this.sessionId = DashHttp.getResult().SessionID;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-        }
-        this.currentState = 'blank';
-        this.errorText = error;
-        this.showError = true;
-        this.isLoading = false;
-        this.destroyVideo();
-        return false;
-      }
-    },
-
-    async offline() {
-      if (this.sessionId != null) {
-        const data = {};
-        const request = {};
-        request.sessionID = this.sessionId;
-        data.request = request;
-        if (await DashHttp.putDash('Authority/Offline', data)) {
-          this.sessionId = null;
-          return true;
-        } else {
-          if (DashHttp.getResult() != null) {
-            const errorCode = DashHttp.getResult().ErrorCode;
-            if (errorCode === 3) {
-              this.sessionId = null;
-              return true;
-            } else {
-              const error = this.$t('remotePatrol.dashServerError') + errorCode;
-              return false;
-            }
-          } else {
-            return false;
-          }
-        }
-      } else {
-        return true;
-      }
-    },
-
-    async connectVideo() {
-      const data = {};
-      const request = {};
-      request.method = 'connection';
-      request.sessionID = this.sessionId;
-      request.streamingProtocol = this.streamProtocol;
-      request.withAudio = true;
-      request.streamType = 'SubStream';
-      request.IVSID = this.IVSID;
-      request.channel = this.channelId;
-      data.request = request;
-      this.realType = true;
-      if (await DashHttp.putDash('LiveStream', data)) {
-        const url = DashHttp.getResult().mpd;
-        this.uri = url;
-        this.playVideo(url);
-        this.currentState = 'play';
-        this.paused = false;
-        this.errorText = '';
-        this.isLoading = false;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-        }
-        this.currentState = 'blank';
-        this.errorText = error;
-        this.showError = true;
-        this.isLoading = false;
-        this.destroyVideo();
-        return false;
-      }
-    },
-
-    async history(startTs) {
-      const data = {};
-      const request = {};
-      request.method = 'connection';
-      request.sessionID = this.sessionId;
-      request.streamingProtocol = this.streamProtocol;
-      request.withAudio = true;
-      request.transcodeResolution = 'D1';
-      request.IVSID = this.IVSID;
-      request.channel = this.channelId;
-      request.beginTime = startTs.toString();
-      request.endTime = (startTs + 300).toString();
-
-      data.request = request;
-      this.realType = false;
-      if (await DashHttp.putDash('PlaybackStream', data)) {
-        const url = DashHttp.getResult().mpd;
-        this.uri = url;
-        this.currentState = 'play';
-        this.paused = false;
-        this.errorText = '';
-        this.onEndflag = false;
-        this.lastTime = startTs + 300;
-        return true;
-      } else {
-        let error = this.$t('remotePatrol.dashServerError');
-        if (DashHttp.getResult() != null) {
-          error += DashHttp.getResult().ErrorCode;
-        }
-        this.currentState = 'blank';
-        this.paused = false;
-        this.errorText = error;
-        this.isLoading = false;
-        this.showError = true;
-        return false;
-      }
-    },
-
-    async disconnectVideo() {
-      if (this.sessionId != null) {
-        const data = {};
-        const request = {};
-        request.method = 'disconnection';
-        request.sessionID = this.sessionId;
-        request.IVSID = this.IVSID;
-        request.channel = this.channelId;
-        request.streamType = 'SubStream';
-        data.request = request;
-        const url = this.realType ? 'LiveStream' : 'PlaybackStream';
-        if (await DashHttp.putDash(url, data)) {
-          return true;
-        } else {
-          if (DashHttp.getResult() != null) {
-            const errorCode = DashHttp.getResult().ErrorCode;
-            if (errorCode === 3) {
-              return true;
-            } else {
-              if (errorCode !== 24) {
-                const error = this.$t('remotePatrol.dashServerError') + errorCode;
-              }
-              return false;
-            }
-          } else {
-            return false;
-          }
-        }
-      } else {
-        return true;
-      }
-    },
-
-    stopVideo() {
-      const self = this;
-      self.showModelContent = false;
-      self.playState = false;
-      var video = document.getElementById('previewVideo');
-      self.previewplayer = videojs(video);
-      self.previewplayer.pause();
-      self.stopTimer();
-    },
-
-    controlScreen() {
-      const self = this;
-      if (!self.fullScreen) {
-        self.fullWindowScreen();
-        self.fullScreen = true;
-      } else {
-        self.exitFullscreen();
-        self.fullScreen = false;
-      }
-    },
-
-    fullWindowScreen(...val) {
-      var ele = document.getElementById('videoContent');
-      ele.style.width = '100%';
-      ele.style.height = '100%';
-      if (ele.requestFullscreen) {
-        ele.requestFullscreen();
-      } else if (ele.mozRequestFullScreen) {
-        ele.mozRequestFullScreen();
-      } else if (ele.webkitRequestFullScreen) {
-        ele.webkitRequestFullScreen();
-      } else if (ele.msRequestFullscreen) {
-        ele.msRequestFullscreen();
-      }
-    },
-
-    exitFullscreen() {
-      var de = document;
-      var ele = document.getElementById('videoContent');
-      ele.style.width = 'auto';
-      ele.style.height = 'auto';
-      if (de.exitFullscreen) {
-        de.exitFullscreen();
-      } else if (de.mozCancelFullScreen) {
-        de.mozCancelFullScreen();
-      } else if (de.webkitCancelFullScreen) {
-        de.webkitCancelFullScreen();
-      }
-    },
-
-    gonggeScreen() {
-      const self = this;
-      self.showgongge = true;
-    },
-    recoverScreen() {
-      const self = this;
-      self.showgongge = false;
-    },
     searchStore() {
       const self = this;
       const tempStoreList = self.tempStoreList;
@@ -2905,22 +2146,15 @@ export default {
       self.notShowAlert = false;
       self.showIgnoreItem = false;
       _item.authorizedInspect.forEach(au_item => {
-        if (au_item.mode == 0) {
+        if (au_item.mode === 0) {
           self.PatrolList.push(au_item);
         }
       });
       _item.isActive = true;
       self.showStoreUp = true;
-      if (!self.isEzviz) {
-        self.editCount = 0;
-        self.stopVideoPlay();
-      } else {
-        !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
-        if (self.$refs.ezvizVideo != undefined) {
-          self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
-        }
-      }
-      // self.editCount=0;
+
+      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
+      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
       self.showError = false;
       self.curDeviceId = -1;
       self.showFeedBack = false;
@@ -2976,7 +2210,7 @@ export default {
       const self = this;
       self.changeInspectObj.dialogCosed = false;
       self.changeInspectList(self.beforepatrolstore);
-      self.isEzviz ? self.$refs.ezvizVideo.editCount = 0 : self.editCount = 0;
+      self.$refs.vendorVideo.editCount = 0;
     },
     canceldChangeInspect() {
       const self = this;
@@ -3070,6 +2304,7 @@ export default {
         obj.channelId = item.channelId;
         obj.isonline = true;
         obj.isClick = false;
+        obj.vendor = item.vendor;
         temp.push(obj);
       });
       self.channelBtns = temp;
@@ -3077,33 +2312,26 @@ export default {
     },
     changeInspect(val) {
       const self = this;
-      if(val!==undefined){
-        if ((!self.isEzviz && self.editCount != 0) ||
-          (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
-          (self.$store.getters.PatrolHistory != null)) {
-          self.changeInspectObj.dialogCosed = true;
-          self.beforepatrolstore = val;
-        } else {
-          self.changeInspectList(val);
-        }
+      if ( (!self.showGuide && self.$refs.vendorVideo.editCount !== 0)
+          ||(self.$store.getters.PatrolHistory != null) ) {
+        self.changeInspectObj.dialogCosed = true;
+        self.beforepatrolstore = val;
+      } else {
+        self.changeInspectList(val);
       }
     },
     changeInspectList(val) {
       const self = this;
-      if (!self.isEzviz) {
-        self.editCount = 0;
-        self.playState ? self.stopVideoPlay() : '';
-      } else {
-        !self.showGuide ? self.$refs.ezvizVideo.editCount = 0 : '';
-        if (self.$refs.ezvizVideo != undefined) {
-          self.$refs.ezvizVideo.playState ? self.$refs.ezvizVideo.stopRealTime() : '';
-        }
-      }
+      if (!self.showGuide) {
+        self.$refs.vendorVideo.editCount = 0;
+        self.$refs.vendorVideo.stopVideoPlay();
+      };
       self.isDisabled = false;
       self.hasIgnoretemp = [];
       self.tempArr = [];
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
+      Database.addDataToDB(self.userId, {data: {}, rule: {}});
       self.isShowWarn = false;
       self.notShowAlert = false;
       self.showIgnoreItem = false;
@@ -3403,19 +2631,22 @@ export default {
       if (!_item.hasInspect && _item.hasInspect != undefined) {
         return false;
       }
+      if (!util.validateLicense(_item.status)) {
+        return false;
+      }
       self.curTabIndex = index;
       self.curTabItem = item;
       self.curStoreIndex = _index;
       self.curStoreItem = _item;
       self.deviceList = _item.device;
-      if ((!self.isEzviz && self.editCount != 0) ||
-        (self.isEzviz && !self.showGuide && self.$refs.ezvizVideo.editCount != 0) ||
-        (self.$store.getters.PatrolHistory != null)) {
+      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
+          || (self.$store.getters.PatrolHistory != null) ) {
         self.changeStoreObj.dialogCosed = true;
       } else {
         self.changeStore(item, index, _item, _index);
       }
     },
+
     checkFull() {
       var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
       if (isFull === undefined) {
@@ -3423,6 +2654,7 @@ export default {
       }
       return isFull;
     },
+
     notify(msg, type, time) {
       this.$message({
         message: msg,
@@ -3575,7 +2807,7 @@ export default {
 
     editFeedback(feedbackObj, index){
       this.feedbackIndex = index;
-      !feedbackObj.sourceObj ? this.showFeedDialog1 = true : this.showFeedDialog2 = true;
+      !feedbackObj.sourceObj ? this.showAddTextFeedbackDialog = true : this.showFeedDialog2 = true;
       this.eventName = feedbackObj.eventName;
       this.eventDes = feedbackObj.eventDes;
       this.showEventNameInfo = false;
@@ -3950,6 +3182,12 @@ export default {
             margin-left: 4px;
           }
         }
+
+        .ja-storeUp-content{
+          @extend .storeUp-content;
+          width: 120px;
+        }
+
         .el-submit{
           position: absolute;
           @include point(right,20);
@@ -4012,7 +3250,7 @@ export default {
           position: absolute;
           top: 30%;
           right: 20px;
-          width: 260px;
+          width: auto;
           img{
             @include point(height,42);
             position: relative;
@@ -4377,6 +3615,7 @@ export default {
           position: absolute;
           width: auto;
           z-index: 1000;
+          max-width: 330px;
           img{
             @include point(height,42);
             position: relative;
@@ -4827,6 +4066,9 @@ export default {
             display: block;
             @include point(margin,5);
             @include point(margin-left,15);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .activeClass{
             background-color: #FDE8EF !important;
@@ -5020,7 +4262,7 @@ export default {
       visibility: hidden;
     }
     .el-tabs__nav-next{
-      visibility: hidden;
+        visibility: hidden;
     }
   }
   #storetab-content div#tab-0{

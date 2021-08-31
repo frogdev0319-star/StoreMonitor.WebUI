@@ -4,7 +4,7 @@
       <span class="date-title">{{ $t('overview.date') }}</span>
       <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
       <span class="el-store">
-        {{ $t('overview.totalStore') }}{{ totalStoreNum }}{{ $t('overview.totalUnit') }}
+        {{ $t('overview.totalStore', {storeNum: totalStoreNum}) }}
       </span>
     </div>
     <div class="el-overview">
@@ -241,7 +241,7 @@ import {
   getInspectStatsOverRegion
 } from '@/api/inspectOverview';
 import { mapGetters } from 'vuex';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil.js';
 import DateTimePicker from '@/components/DateTimePicker';
 
@@ -355,14 +355,14 @@ export default {
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.currentIndex = 0;
         self.getSearchParams();
-        self.initData();
+        self.getPatrolOverviewData();
       }
     }
   },
 
   created() {
     this.getSearchParams();
-    this.initData();
+    this.getPatrolOverviewData();
   },
 
   beforeDestroy() {
@@ -673,10 +673,10 @@ export default {
       this.params.beginTs = start;
       this.params.endTs = end;
       this.saveSearchParams();
-      this.initData();
+      this.getPatrolOverviewData();
     },
 
-    initData() {
+    getPatrolOverviewData() {
       this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
       this.getStoreNumAndCycle();
       this.getBestAndWorstStores();

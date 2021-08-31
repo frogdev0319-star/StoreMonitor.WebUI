@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Message, MessageBox } from 'element-ui';
+import { MessageBox } from 'element-ui';
 import store from '@/store';
 import router from '@/router';
 import i18n from '@/lang';
@@ -8,9 +8,6 @@ import Environment from './environment.js';
 import { message } from '@/common/singleton-message';
 
 const baseUrl = Environment.BASE_URL;
-// create an axios instance
-
-const itempath = '/storemonitor/api/';
 
 axios.defaults.withCredentials = true;
 const service = axios.create({
@@ -126,16 +123,20 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
   response => {
-    const res = response.data;
     return response.data;
   }, err => {
-    console.log(err);
+    if (err.code === 'ECONNABORTED' || err.message === 'Network Error') {
+      message({
+        message: i18n.t('route.networkError'),
+        type: 'error',
+        duration: 5 * 1000
+      });
+    }
     if (err.response) {
       const errCode = err.response.data.errCode;
       const errMsg = err.response.data.errMsg;
       if (errCode === 500 && (errMsg == 'Invalid token' ||
                 errMsg == 'Failed to verify token' || errMsg == 'User does not exist')) {
-        // router.push('/login');
         const url = sessionStorage.getItem('LoginURL');
         window.location.href = url;
         message({
@@ -144,7 +145,6 @@ service.interceptors.response.use(
           duration: 5 * 1000
         });
       } else if (errCode === 500 && errMsg == 'Token does not exist') {
-        // router.push('/login');
         const url = sessionStorage.getItem('LoginURL');
         window.location.href = url;
       } else if (errCode === 500 && errMsg == 'No authority') {

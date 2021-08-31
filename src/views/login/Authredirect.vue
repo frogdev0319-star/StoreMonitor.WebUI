@@ -29,6 +29,7 @@ export default{
           }
           setCookie(TokenKey, obj.token);
           setCookie('UserId', obj.userId);
+          setCookie('deviceAuth', obj.deviceAuth);
           let lang = 'en';
           if (obj.lang === 'zh-CN') {
             lang = 'zh';
@@ -37,12 +38,12 @@ export default{
           } else if (obj.lang === 'zh-TW') {
             lang = 'zhtw';
           } else {
-            lang = 'en';
+            lang = obj.lang;
           }
           setCookie('lang', lang);
         }
       }
-      //self.$router.push('home');
+      // self.$router.push('home');
       window.location.href = window.location.origin + window.location.pathname + 'home';
     },
 

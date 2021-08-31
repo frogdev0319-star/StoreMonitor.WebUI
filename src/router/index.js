@@ -4,6 +4,7 @@ import LoginForm from '@/views/login/LoginForm';
 import AuthRedirect from '@/views/login/AuthRedirect';
 import Home from '@/views/home/Home';
 import PermissionHelper from '@/api/PermissionHelper';
+import util from '../common/util';
 
 Vue.use(Router);
 /**
@@ -38,7 +39,6 @@ const createRouter = () => new Router({
 
 const router = createRouter();
 
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
   const newRouter = createRouter();
   router.matcher = newRouter.matcher; // reset router
@@ -241,6 +241,19 @@ export const navbarRoute = {
         }
       }
     );
+
+    PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
+      {
+        path: '/checkInStatistics',
+        name: 'checkInStatistics',
+        component: resolve => require(['@/views/statistical/CheckInStatistics'], resolve),
+        hidden: false,
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        }
+      }
+    );
     return statisticsRoute;
   },
 
@@ -255,14 +268,19 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    PermissionHelper.enableDeviceSetting() && systemSettingRoute.children.push({
-      path: '/device',
-      name: 'deviceManage',
-      component: resolve => require(['@/views/setting/device/DeviceSetMge'], resolve),
-      meta: {
-        requireAuth: true
-      }
-    });
+
+    const deviceRoutes = this.getDeviceRoutes();
+    PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push({
+        path: '/device',
+        name: 'deviceManage',
+        hidden: false,
+        threeChild: true,
+        component: resolve => require(['@/views/setting/device/DevicesMgmt'], resolve),
+        meta: {
+          requireAuth: true
+        },
+        children: deviceRoutes
+      });
 
     const inspectionRoute = {
       path: '/inspectionSetting',
@@ -365,5 +383,82 @@ export const navbarRoute = {
       }
     );
     return systemSettingRoute;
+  },
+
+  getDeviceRoutes(){
+    const deviceRoutes = [];
+    util.getVideoAuthority(1) && deviceRoutes.push({
+      path: '/dashDevice',
+      name: 'dashDevice',
+      component: resolve => require(['@/views/setting/device/Dash/NvrDeviceMgmt'], resolve)
+    });
+
+    util.getVideoAuthority(2) && deviceRoutes.push(
+      {
+        path: '/ezvizDevice',
+        name: 'ezvizDevice',
+        component: resolve => require(['@/views/setting/device/Ezviz/EzvizAccount'], resolve)
+      },
+      {
+        path: '/ezvizeDeviceSetting',
+        name: 'deviceSetting',
+        component: resolve => require(['@/views/setting/device/Ezviz/EzvizDeviceMgmt'], resolve),
+        hidden: true
+      }
+    );
+
+    util.getVideoAuthority(3) && deviceRoutes.push({
+        path: '/beseyeAccount',
+        name: 'beseyeAccount',
+        component: resolve => require(['@/views/setting/device/Beseye/BeseyeAccount'], resolve)
+      },
+      {
+        path: '/beseyeDeviceSetting',
+        name: 'beseyeDeviceSetting',
+        component: resolve => require(['@/views/setting/device/Beseye/BeseyeDeviceMgmt'], resolve),
+        hidden: true
+      },
+      {
+        path: '/beseye/authorize',
+        name: 'auth',
+        component: resolve => require(['@/views/setting/device/Beseye/Authorize'], resolve),
+        hidden: true
+      }
+    );
+
+    util.getVideoAuthority(4) && deviceRoutes.push({
+        path: '/skywatchAccount',
+        name: 'skywatchAccount',
+        component: resolve => require(['@/views/setting/device/Skywatch/SkywatchAccount'], resolve)
+      },
+      {
+        path: '/skywatchDeviceSetting',
+        name: 'skywatchDeviceSetting',
+        component: resolve => require(['@/views/setting/device/Skywatch/SkywatchDeviceMgmt'], resolve),
+        hidden: true
+      }
+    );
+
+    return deviceRoutes;
+  },
+
+  getErrorRoute() {
+    const errorRoute = {
+      path: '/home',
+      name: 'overview',
+      component: Home,
+      hidden: true,
+      iconCls: 'iconfont icon-zonglan',
+      styles: 'font-size:22px',
+      leaf: true,
+      isReadOnly: false,
+      children: [{
+        path: '/noRight',
+        name: 'noRight',
+        component: resolve => require(['@/views/overview/NoRight'], resolve)
+      }]
+    };
+
+    return errorRoute;
   }
 };

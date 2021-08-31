@@ -21,8 +21,8 @@
       </div>
     </el-col>
     <el-col :span="24" :style="{'min-height': emptyContentHeight+'px'}" class="storeEdit-content">
-      <p class="tab-title"><span class="tab-title-1">{{ $t('insSettingView.editStore') }}</span>
-        <span class="tab-title-2">{{ $t('insSettingView.editStoretips') }}
+      <p class="tab-title"><span class="tab-title-1">{{ $t('storeView.editStore') }}</span>
+        <span class="tab-title-2">{{ $t('storeView.editStoretips') }}
         </span>
       </p>
       <div class="tab-main">

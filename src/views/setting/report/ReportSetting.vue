@@ -183,6 +183,18 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters({ accountChanged: 'accountChanged' })
+  },
+
+  watch: {
+    accountChanged(val) {
+      if (val !== 0) {
+        this.getInspectTemplateList();
+      }
+    }
+  },
+
   created() {
     this.getInspectTemplateList();
   },
@@ -283,11 +295,11 @@ export default {
               'position': 1
             },
             {
-              'qualified': 0,
+              'qualified': 1,
               'enable': true,
               'name': 'statistics',
               'position': 2,
-              'chart': 0
+              'chart': 1
             },
             {
               'enable': true,

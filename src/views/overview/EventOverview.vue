@@ -4,7 +4,7 @@
       <span class="date-title">{{ $t('overview.date') }}</span>
       <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
       <span class="el-store">
-        {{ $t('overview.totalStore') }}{{ numOfStores }}{{ $t('overview.totalUnit') }}
+        {{ $t('overview.totalStore', {storeNum: numOfStores}) }}
       </span>
     </div>
     <div class="el-overview">
@@ -131,7 +131,7 @@ import util from '@/common/util.js';
 import { getBriefStoreList } from '@/api/store';
 import { mapGetters } from 'vuex';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimePicker from '@/components/DateTimePicker';
 
@@ -305,7 +305,7 @@ export default {
         self.getBriefStoreData();
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         self.getSearchParams();
-        self.initData();
+        self.getEventOverviewData();
       }
     }
   },
@@ -313,7 +313,7 @@ export default {
   created() {
     this.getBriefStoreData();
     this.getSearchParams();
-    this.initData();
+    this.getEventOverviewData();
   },
 
   beforeDestroy() {
@@ -333,7 +333,7 @@ export default {
       this.params.beginTs = start;
       this.params.endTs = end;
       this.saveSearchParams();
-      this.initData();
+      this.getEventOverviewData();
     },
 
     getBriefStoreData() {
@@ -353,7 +353,7 @@ export default {
             };
             tempStore.push(obj);
           });
-          if(tempStore.length > 0){
+          if (tempStore.length > 0) {
             tempStore.unshift(
               {
                 storeId: '-1',
@@ -370,7 +370,7 @@ export default {
     changeStore(val) {
       const self = this;
       self.storeIds = [];
-      if (val === "-1") {
+      if (val === '-1') {
         self.storeIds = [];
       } else {
         self.storeIds.push(self.curStore);
@@ -379,7 +379,7 @@ export default {
       self.getStoreEventStatics();
     },
 
-    initData() {
+    getEventOverviewData() {
       this.daysRangeList = util.getDaysRangeList(this.params.beginTs,  this.params.endTs, this.timeMode);
       this.getEventStatsStatics();
       this.getEventRankingInfo();
@@ -954,23 +954,23 @@ export default {
       this.$refs.eventStatusRef && this.$refs.eventStatusRef.resize();
     },
 
-    saveSearchParams(){
-      let params = {
+    saveSearchParams() {
+      const params = {
         beginTs: this.params.beginTs,
         endTs: this.params.endTs,
         storeId: this.curStore,
         rankType: this.rankType
-      }
+      };
       const searchConditon = {
         path: 'eventOverview',
         params: params
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
-    getSearchParams(){
+    getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventOverview');
-      if(Object.keys(searchParams).length > 0){
+      if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
         this.params.beginTs = searchParams.beginTs;

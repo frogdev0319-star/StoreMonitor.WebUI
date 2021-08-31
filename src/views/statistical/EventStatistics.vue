@@ -15,7 +15,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="title">{{ $t('overview.eventGraph') }}</div>
           </el-col>
-          <el-col :span="3" class="kpi-list">
+          <el-col :span="3" :class="lang.indexOf('ja') !== -1 ? 'ja-kpi-list' : 'kpi-list'">
             <div class="kpi-content">
               <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
                 <div class="event-title">{{ item.eventTitle }}</div>
@@ -23,21 +23,26 @@
               </div>
             </div>
           </el-col>
-          <el-col :span="14" class="store-events">
+          <el-col :span="14" :class="lang.indexOf('ja') !== -1 ? 'ja-store-events' : 'store-events'">
             <div class="region-result">
               <div
                 v-loading="isLoading"
                 :element-loading-text="$t('insSettingView.loadingbindstore')"
-                class="charts-content self-loading">
+                class="charts-content self-loading" v-if="!hasNoData">
                 <v-chart
                   ref="storeEventRef"
                   :options="storeEventsOptions"
                   :auto-resize="true"
                   class="result-content"/>
               </div>
+              <div v-else class="charts-content">
+                <span class="no-data-text">
+                  {{ $t('deviceView.noData') }}
+                </span>
+              </div>
             </div>
           </el-col>
-          <el-col :span="7" class="source-list">
+          <el-col :span="7" :class="lang.indexOf('ja') !== -1 ? 'ja-source-list' : 'source-list'">
             <div class="pct-content">
               <div class="pct-panel">
                 <v-chart
@@ -67,7 +72,7 @@
             <span class="title">{{ $t('overview.eventList') }}</span>
             <div class="operation-btns">
               <delay-button
-                :class="lang === 'en' ? 'en-export-btn':'export-btn'"
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
@@ -89,7 +94,7 @@
               :pagesize="sizeNum"
               :current-page="page"
               :is-event = "true"
-              :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
+              :default-sort = "defaultSort"
               @handleChange="handlePageAndSizeChange"
               @sortChange="handleSortChange"
             />
@@ -105,8 +110,12 @@
             <span class="content-header">{{ storeNameStr }}</span>
           </p>
           <p>
-            <span>{{ $t('remotePatrol.selectStoreTag') }}：</span>
-            <span class="content-header">{{ storeTagStr }}</span>
+            <span>{{ $t('remotePatrol.storeGroup') }}：</span>
+            <span class="content-header">{{ storeGroupStr }}</span>
+          </p>
+          <p>
+            <span>{{ $t('remotePatrol.storeType') }}：</span>
+            <span class="content-header">{{ storeTypeStr }}</span>
           </p>
           <p>
             <span>{{ $t('remotePatrol.time') }}：</span>
@@ -176,9 +185,9 @@
             <div class="table">
               <div class="event-content">
                 <el-table
-                  :data="eventPDFData"
+                  :data="allEventData"
                   :highlight-current-row="true"
-                  :default-sort = "{prop: 'numOfTotal', order: 'ascending'}"
+                  :default-sort = "defaultSort"
                   :header-cell-class-name="headerClass"
                   :cell-class-name="cellClass"
                   :row-class-name="rowClass"
@@ -194,10 +203,12 @@
                     :key="_index"
                     :prop="_item.prop"
                     :label="_item.label"
-                    :min-width="_item.pdfwidth"/>
+                    :min-width="_item.pdfwidth"
+                    :sortable="_item.sortable"/>
                   <el-table-column
                     :label="$t('overview.remotePatrol')"
-                    :min-width="lang !== 'en' ? '8% ': '9%'"
+                    :min-width="lang.indexOf('zh') !== -1 ? '8% ': '9%'"
+                    sortable="custom"
                     prop="RemoteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper remote">
@@ -207,7 +218,8 @@
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.onsitePatrol')"
-                    :min-width="lang !== 'en' ? '8%' : '9%'"
+                    :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
+                    sortable="custom"
                     prop="OnsiteStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper onsite">
@@ -217,7 +229,8 @@
                   </el-table-column>
                   <el-table-column
                     :label="$t('overview.storeMonitor')"
-                    :min-width="lang !== 'en' ? '8%' : '9%'"
+                    :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
+                    sortable="custom"
                     prop="VideoStr">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper video">
@@ -246,6 +259,7 @@
       :close-on-click-modal="false"
       :visible="ispdf"
       :show-button="false"
+      :show-close="false"
       class="LoadDialog"
     >
       <p>{{ $t('insSettingView.isExportPDF') }}......</p>
@@ -261,7 +275,7 @@ import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOve
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
-import resize from '@/components/mixins/resize';
+import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
@@ -281,7 +295,8 @@ export default {
       ispdf: false,
       pdfSrc: '',
       storeNameStr: '',
-      storeTagStr: '',
+      storeGroupStr: '',
+      storeTypeStr: '',
       storeDateValue: '',
       htmlTitle: this.$t('overview.htmltopdfD'),
       eventKPIs: [
@@ -356,14 +371,13 @@ export default {
       echartBackground: 'rgba(30,34,52,0.75)',
       exportPng: require('../../../static/img/excel.png'),
       eventTableData: [],
-      eventPDFData: [],
       eventInfoData: [
         {
           'prop': 'province',
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
           'width': '140',
-          'maxWidth': '140',
+          'maxWidth': '150',
           'pdfwidth': '11%'
         },
         {
@@ -411,7 +425,7 @@ export default {
           'label': this.$t('overview.numProcessEvents'),
           'sortable': 'custom',
           'width': '145',
-          'maxWidth': '160',
+          'maxWidth': '180',
           'pdfwidth': '12%'
         },
         {
@@ -489,6 +503,10 @@ export default {
   methods: {
     handleDown() {
       const self = this;
+      if (self.eventTableData.length === 0) {
+        util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+        return false;
+      }
       self.ispdf = true;
       this.$nextTick(() => {
         const img = document.getElementById('imgTest');
@@ -497,16 +515,11 @@ export default {
             var oGrayImg = canvas.toDataURL('image/jpeg');
             self.pdfSrc = oGrayImg;
           });
-          new Promise(function(resolve) {
-            self.eventPDFData = self.allEventData;
-            resolve(true);
-          }).then(function() {
-            setTimeout(() => {
-              self.$print(self.$refs.printPDF);
-              self.ispdf = false;
-            }, 1000);
-          });
-        }, 1000);
+          setTimeout(() => {
+            self.$print(self.$refs.printPDF);
+            self.ispdf = false;
+          }, 1000);
+        }, 5000);
       });
     },
 
@@ -678,7 +691,7 @@ export default {
 
     export2Excel() {
       const that = this;
-      if (that.allEventData.length === 0) {
+      if (that.eventTableData.length === 0) {
         util.notify(that.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
@@ -687,8 +700,7 @@ export default {
         const tHeader = that.exportEventHeader;
         const filterVal = ['province', 'city', 'storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
           'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
-        let curData = [];
-        curData = that.allEventData;
+        const curData = that.allEventData;
         const data = that.formatJson(filterVal, curData);
         const fileName = 'EventList' + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
@@ -697,6 +709,27 @@ export default {
 
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+
+    async getExportData() {
+      const params = {};
+      params.beginTs = this.params.beginTs;
+      params.endTs = this.params.endTs;
+      params.timeMode = this.timeMode;
+      params.storeIds = this.params.storeIds;
+      params.filter = { page: this.page - 1, size: this.total };
+      params.order = this.order;
+      let content = [];
+      try {
+        const eventResult = await this.getEventTableDataInfo(params);
+        const result = eventResult.data;
+        if (result) {
+          content = result.content;
+        }
+      } catch (e) {
+        this.ispdf = false;
+      }
+      return content;
     },
 
     async searchData() {
@@ -711,9 +744,18 @@ export default {
         self.storeEventsOptions && (self.storeEventsOptions.dataset.source = []);
         self.getEventBySourcePie();
         self.isLoading = false;
+        self.params.timeMode = self.timeMode;
+        self.hasNoData = true;
+        const searchParamsObj = {
+          path: 'eventStatistics',
+          params: this.params
+        };
+        this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
+        this.ifSaveParams = true;
       } else {
         self.params.filter = { page: self.page - 1, size: self.sizeNum };
         self.params.order = this.order;
+        self.hasNoData = false;
 
         /**
          *firstly, call getEventTableData to get all event num and display the first page of table
@@ -772,19 +814,6 @@ export default {
         if (result) {
           const content = result.content;
           self.total = result.totalElements;
-          content.forEach(item => {
-            const numOfTotal = item.numOfTotal;
-            if (numOfTotal === 0) {
-              item.RemoteStr = 0 + '%';
-              item.OnsiteStr = 0 + '%';
-              item.VideoStr = 0 + '%';
-            } else {
-              item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-              item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-              item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
-            }
-          });
-          self.eventTableData = content;
         } else {
           self.eventTableData = 0;
           self.eventKPIs.forEach(item => {
@@ -800,43 +829,27 @@ export default {
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.timeMode = self.timeMode;
-      // if (self.curProvince.length === 0) {
-      //   self.hasNoData = true;
-      //   self.itemsTableData = [];
-      //   return;
-      // }
       params.storeIds = self.params.storeIds;
       params.filter = { page: self.page - 1, size: self.total };
       params.order = self.order;
       try {
-        if (self.total > 0) {
-          const eventResult = await self.getEventTableDataInfo(params);
-          const errCode = eventResult.errCode;
-          if (errCode === 0) {
-            const result = eventResult.data;
-            if (result) {
-              const content = result.content;
-              content.forEach(item => {
-                const numOfTotal = item.numOfTotal;
-                if (numOfTotal === 0) {
-                  item.RemoteStr = 0 + '%';
-                  item.OnsiteStr = 0 + '%';
-                  item.VideoStr = 0 + '%';
-                } else {
-                  item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-                  item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-                  item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
-                }
-              });
-              self.allEventData = content;
-            }
+        self.allEventData = await self.getExportData();
+        self.allEventData.forEach(item => {
+          const numOfTotal = item.numOfTotal;
+          if (numOfTotal === 0) {
+            item.RemoteStr = 0 + '%';
+            item.OnsiteStr = 0 + '%';
+            item.VideoStr = 0 + '%';
           } else {
-            self.allEventData = [];
+            item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
+            item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
+            item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
           }
-        } else {
-          self.allEventData = [];
-        }
-        self.getEventTableDataFromEventData();
+          item.Remote = Number(item.RemoteStr.replace('%', ''));
+          item.Onsite = Number(item.OnsiteStr.replace('%', ''));
+          item.Video = Number(item.VideoStr.replace('%', ''));
+        });
+        self.setEventTableData();
         self.getEventsNum();
         self.getEventBySourcePie();
       } catch (e) {
@@ -844,15 +857,17 @@ export default {
       }
     },
 
-    getEventTableDataFromEventData() {
-      const allTableData = this.allEventData;
-      if (this.totalElements < this.params.filter.size) {
-        this.tableData = Lodash.cloneDeep(allTableData);
-      } else {
-        const startIndex = this.params.filter.page;
-        const endIndex = this.params.filter.size;
-        this.tableData = allTableData.slice(startIndex, endIndex);
-      }
+    setEventTableData(){
+      this.orderAllTableData();
+      this.eventTableData = [];
+      this.eventTableData = [...this.allEventData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+    },
+
+    orderAllTableData(){
+      let key = this.defaultSort.prop;
+      key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
+      this.defaultSort.order === 'descending' ? this.allEventData.sort((a,b) => { return b[key] - a[key] })
+                                : this.allEventData.sort((a,b) => { return a[key] - b[key] });
     },
 
     getEventsNum() {
@@ -970,8 +985,7 @@ export default {
       });
     },
 
-    emitSearch(searchParams, dateRangeList, curRegionI, curRegionII,
-      regionMode, storePatrolLists, storeStr, tagNameStr, timeMode) {
+    emitSearch({ searchParams, dateRangeList, timeMode }) {
       this.params = searchParams;
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
@@ -980,9 +994,10 @@ export default {
       this.searchData();
     },
 
-    exportPdf(storeNameStr, storeTagStr) {
+    exportPdf(storeNameStr, groupStr, typeStr) {
       this.storeNameStr = storeNameStr;
-      this.storeTagStr = storeTagStr;
+      this.storeGroupStr = groupStr;
+      this.storeTypeStr = typeStr;
       this.handleDown();
     },
 
@@ -991,16 +1006,17 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.getEventTableData();
+      self.setEventTableData();
     },
 
-    handleSortChange(order) {
+    handleSortChange(order, defaultSort) {
+      this.defaultSort = { ...defaultSort };
       this.order = this.params.order = order;
       this.params.filter = {
         page: this.page - 1,
         size: this.sizeNum
       };
-      this.getEventTableData();
+      this.setEventTableData();
     },
 
     setDefaultSortAndPage(paramsObj) {
@@ -1205,6 +1221,19 @@ export default {
             padding-top: 140px;
             border-top: 1px solid $border;
           }
+        }
+
+        .ja-kpi-list{
+          @extend .kpi-list;
+          width: 16%;
+        }
+        .ja-store-events{
+          @extend .store-events;
+          width: 52%;
+        }
+        .ja-source-list{
+          @extend .source-list;
+          width: 32%;
         }
       }
       .second-row {

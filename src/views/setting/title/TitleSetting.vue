@@ -70,7 +70,7 @@
             <div class="role-content">
               <div
                 v-for="(_item,_index) in item.children"
-                :class="lang === 'en'? 'en-role-detail': 'role-detail'"
+                :class="lang.indexOf('zh') === -1 ? 'en-role-detail': 'role-detail'"
                 :key="_index">
                 <el-checkbox
                   v-model="_item.checked"
@@ -236,6 +236,11 @@ export default {
               roleName: this.$t('route.supervisorStat'),
               checked: false,
               disabled: false
+            },
+            {
+              roleName: this.$t('route.checkInStatistics'),
+              checked: false,
+              disabled: false
             }
           ]
         },
@@ -352,6 +357,7 @@ export default {
       this.roleNameList[3].children[1].checked = !!PermissionHelper.enableInspectStatistics();
       this.roleNameList[3].children[2].checked = !!PermissionHelper.enableEventStatistics();
       this.roleNameList[3].children[3].checked = !!PermissionHelper.enableSupervisionEffStatistics();
+      this.roleNameList[3].children[4].checked = !!PermissionHelper.enableCheckinStatistics();
 
       this.roleNameList[4].children[0].checked = !!PermissionHelper.enableDeviceSetting();
       this.roleNameList[4].children[1].checked = !!PermissionHelper.enablePatrolSetting();

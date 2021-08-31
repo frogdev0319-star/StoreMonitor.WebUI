@@ -34,14 +34,21 @@
         :label="_item.label"
         :sortable="canSortable ? _item.sortable : false"
         :sort-orders="['ascending', 'descending']"
-        :min-width="isexportPDF ? _item.pdfwidth : (lang !== 'en' ? _item.width : _item.maxWidth)"
+        :min-width="isexportPDF ? _item.pdfwidth : (lang.indexOf('zh') !== -1 ? _item.width : _item.maxWidth)"
         :formatter="_item.formatter">
         <template slot-scope="{row}">
           <template v-if="_item.canEdit && row.isEditing">
-            <el-input v-model="row.tempDeviceName" class="edit-input" size="small" />
+            <el-input v-model="row.tempDeviceName" class="edit-input" size="small" @input="val => inputDeviceNameChange(val, row)"/>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row[_item.prop])"/>
-          <span v-else>{{ row[_item.prop] }}</span>
+          <template v-else>
+            <template v-if="isDevice && _index < 3">
+              <el-tooltip class="item" effect="dark" :content="row[_item.prop]" placement="bottom">
+                <div>{{ row[_item.prop] | addEllipsis}}</div>
+              </el-tooltip>
+            </template>
+            <span v-else>{{ row[_item.prop]}}</span>
+          </template>
         </template>
       </el-table-column>
       <el-table-column
@@ -64,7 +71,7 @@
               v-for="(item,index) in tableOperation.operation"
               :key="index"
               :type="item.type"
-              :class="item.icon"
+              :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
               class="iconfont"
               size="mini"
               @click="handleOperationButton(item.methods, scope.row, scope.$index)">
@@ -76,9 +83,9 @@
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
-          :min-width="lang !== 'en'? 120 : 160"
-          :sortable="true"
-          :sort-method="(a, b) => sortHandle(a, b, 'RemoteStr')"
+          :min-width="lang.indexOf('zh') !== -1 ? 120 : 180"
+          sortable="custom"
+          :sort-orders="['ascending', 'descending']"
           prop="RemoteStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper remote">
@@ -88,9 +95,9 @@
         </el-table-column>
         <el-table-column
           :label="$t('overview.onsitePatrol')"
-          :min-width="lang !== 'en' ? 120 : 160"
-          :sortable="true"
-          :sort-method="(a, b) => sortHandle(a, b, 'OnsiteStr')"
+          :min-width="lang.indexOf('zh') !== -1 ? 120 : 180"
+          sortable="custom"
+          :sort-orders="['ascending', 'descending']"
           prop="OnsiteStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper onsite">
@@ -100,9 +107,9 @@
         </el-table-column>
         <el-table-column
           :label="$t('overview.storeMonitor')"
-          :min-width="lang !== 'en' ? 120 : 160"
-          :sortable="true"
-          :sort-method="(a, b) => sortHandle(a, b, 'VideoStr')"
+          :min-width="lang.indexOf('zh') !== -1 ? 120 : 160"
+          sortable="custom"
+          :sort-orders="['ascending', 'descending']"
           prop="VideoStr">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper video">
@@ -141,6 +148,7 @@
 
 <script>
 import util from '@/common/util';
+import filterString from '@/common/filterString'
 
 export default {
   props: {
@@ -252,6 +260,13 @@ export default {
       loadingGif: require('../../static/img/loading.gif')
     };
   },
+  filters:{
+    addEllipsis(value){
+      if(value.length <= 10) return value;
+      return value.substr(0, 10) + '...';
+    }
+  },
+
   computed: {
     tableSelection() {
       return this.$refs.tablePagination.selection;
@@ -271,7 +286,6 @@ export default {
 
     handleRowClick(row) {
       this.currentRow = row;
-      console.log(row);
       this.$emit('emitRowClick', row);
     },
 
@@ -299,19 +313,18 @@ export default {
       } else {
         self.order.direction = order === 'ascending' ? 'asc' : 'desc';
         const property = col.column.property;
+        self.defaultSort.prop = property;
+        self.defaultSort.order = order;
         if (!self.isEvent) {
           if (property.indexOf('Str') > -1) {
             self.order.property = property.substr(0, property.indexOf('Str'));
           } else {
             self.order.property = property;
           }
-          this.$emit('sortChange', self.order);
         } else {
-          if (property.indexOf('Str') === -1) {
-            self.order.property = property;
-            this.$emit('sortChange', self.order);
-          }
+          self.order.property = property;
         }
+        this.$emit('sortChange', self.order, self.defaultSort);
       }
     },
 
@@ -326,13 +339,6 @@ export default {
       this.order.direction = defaultSort.order === 'ascending' ? 'asc' : 'desc';
     },
 
-    sortHandle(obj1, obj2, column) {
-      const val1 = obj1[column].substr(0, obj1[column].length - 1);
-      const val2 = obj2[column].substr(0, obj2[column].length - 1);
-      return val1 - val2;
-      console.log(this.order);
-    },
-
     handleOperationButton(methods, row, index) {
       this.tableData.map(item => { item.isEditing = false; });
       row.isEditing = this.isDevice && methods === 'edit';
@@ -340,18 +346,22 @@ export default {
     },
 
     confirmEdit(row) {
-      row.isEditing = false;
       if (row.tempDeviceName.trim().length === 0) {
         util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
         return;
       }
-      row.name = row.tempDeviceName;
+      row.isEditing = false;
       this.$emit('handleEdit', row);
     },
 
     cancelEdit(row) {
       row.isEditing = false;
       row.tempDeviceName = row.name;
+    },
+
+    inputDeviceNameChange(val, row) {
+      const comment = filterString.all(val, 30);
+      row.tempDeviceName = comment;
     }
 
   }
@@ -425,6 +435,9 @@ export default {
     margin-left: 20px;
     font-size: calc(16/1920*100vw);
     color: #7d8cad;
+  }
+  .icon-disabled{
+    cursor: not-allowed;
   }
 </style>
 

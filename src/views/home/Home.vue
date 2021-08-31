@@ -72,7 +72,7 @@
             </el-select>
           </div>
           <div v-else class="collapsed-brand-panel"/>
-          <el-scrollbar id="el-menuscrollbar">
+          <el-scrollbar id="el-menuscrollbar" ref="scroll">
             <el-menu
               id="nav-menu"
               :default-active="activePath"
@@ -163,7 +163,7 @@
                         :index="grandChild.path"
                         :disabled="grandChild.isReadOnly"
                         :key="grandChild.path"
-                        class="submenu-item" >
+                        class="submenu-item">
                         <template>
                           <span
                             :class="lang === 'en' ? 'third-child-span' : 'zh-third-child-span'">
@@ -196,10 +196,9 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v2.0.0.1 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v2.0.0.3 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
-
         </section>
       </el-col>
     </el-row>
@@ -207,9 +206,9 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import { getUserInfo, getAccountList } from '@/api/login';
+import { getAccountList } from '@/api/login';
 import PubSub from 'pubsub-js';
-import { getCookie } from '@/common/auth';
+import Database from '@/common/Database';
 
 export default {
   name: 'Home',
@@ -270,7 +269,8 @@ export default {
     },
 
     routerList() {
-      return this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
+      const routes = this.$store.state.user.routes.slice(1, this.$store.state.user.routes.length);
+      return routes;
     },
 
     groupHeight() {
@@ -295,7 +295,7 @@ export default {
 
     showHeader() {
       const showBorderPathArr = ['/report', '/patrolOverview', '/eventOverview', '/patrolEvaluation',
-        '/patrolItem', '/supervisorStat', '/eventStat', '/storedetail', '/storemanage', '/bindroute'];
+        '/patrolItem', '/supervisorStat', '/eventStat', '/storedetail', '/storemanage', '/bindroute', '/checkInStatistics'];
       return showBorderPathArr.includes(this.$route.path);
     },
 
@@ -314,7 +314,7 @@ export default {
         { curPath: ['/storedetail'], activePath: '/storemanage' },
         { curPath: ['/ezvizeDeviceSetting'], activePath: '/ezvizDevice' },
         { curPath: ['/beseyeDeviceSetting'], activePath: '/beseyeAccount' },
-        { curPath: ['/beseyeDeviceSetting'], activePath: '/beseyeAccount' },
+        { curPath: ['/skywatchDeviceSetting'], activePath: '/skywatchAccount' },
         { curPath: ['/titleSetting'], activePath: '/title' }
       ];
       const pathMAP = pathMapArr.find(item => item.curPath.includes(path));
@@ -345,7 +345,6 @@ export default {
     },
 
     curPath(val) {
-      console.log(val);
       if (this.path.indexOf(val)) {
         this.wrapperAll = false;
       }
@@ -398,19 +397,17 @@ export default {
     },
 
     handleopen(index) {
-      switch (Number(index)) {
-        case 1:
-          document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#f31d65';
-          document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor = '#222538'; break;
-        case 5:
-          document.getElementsByClassName('el-submenu__title')[1].style.backgroundColor = '#f31d65';
-          document.getElementsByClassName('el-submenu__title')[0].style.backgroundColor = '#222538'; break;
-        default: break;
-      }
+      setTimeout(() => {
+        const height = this.$refs.scroll.wrap.scrollHeight;
+        this.$nextTick(() => {
+          this.$refs.scroll.wrap.scrollTop = height;
+        })
+      },300);
     },
 
     routerHome() {
       const url = sessionStorage.getItem('LoginURL');
+      Database.destoryDB();
       window.location.href = url + '/homepage';
     },
 
@@ -444,7 +441,7 @@ export default {
       const matchedParentName = matched[1].name;
       const inspectSettingNameArr = ['inspectSetting', 'inspectingSettingOfInspectList',
         'inspectingSettingOfDevice', 'inspectingSettingOfSchedule', 'insepctionReportSetting'];
-      const deviceSettingNameArr = ['deviceManage', 'ezvizDeviceMgt', 'beseyeDeviceMgt'];
+      const deviceSettingNameArr = ['deviceManage', 'ezvizDeviceMgt', 'beseyeDeviceMgt', 'skywatchDeviceMgt'];
       if (inspectSettingNameArr.includes(matchedParentName)) {
         this.setInspectionSettingBread(matched, currentRoute);
       } else if (deviceSettingNameArr.includes(matchedParentName)) {
@@ -508,7 +505,6 @@ export default {
         }
         case '/beseyeAccount': {
           this.setFirstBread(matched, 'beseyeDeviceMgt');
-
           break;
         }
         case '/ezvizeDeviceSetting': {
@@ -517,6 +513,14 @@ export default {
         }
         case '/beseyeDeviceSetting': {
           this.setSecondBread(matched, 'beseyeDeviceMgt', '/beseyeAccount');
+          break;
+        }
+        case '/skywatchAccount': {
+          this.setFirstBread(matched, 'skywatchDeviceMgt');
+          break;
+        }
+        case '/skywatchDeviceSetting': {
+          this.setSecondBread(matched, 'skywatchDeviceMgt', '/skywatchAccount');
           break;
         }
         default: {
@@ -554,7 +558,7 @@ export default {
     },
 
     fedlogout() {
-      const self = this;
+      Database.destoryDB();
       const url = sessionStorage.getItem('LoginURL');
       window.location.href = url;
     },
@@ -566,12 +570,10 @@ export default {
     },
 
     getAccountList() {
-      const self = this;
       getAccountList().then(res => {
         if (res.errCode === 0) {
           const data = res.data;
           this.getBrandList(data);
-          self.getUserName();
         }
       });
     },
@@ -583,23 +585,27 @@ export default {
           srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
         if (res && res.length) {
           accountItem['srp'] = res;
-          tempAccount.push(accountItem)
+          tempAccount.push(accountItem);
         }
       })
       this.brandList = tempAccount;
+      const idIndex = this.brandList.map(item => item.accountId).indexOf(this.accountId);
+      idIndex !== -1 && sessionStorage.setItem('accountName', this.brandList[idIndex].name);
+      sessionStorage.setItem('accountId', this.accountId);
     },
 
     changeAccount(accountId) {
       const self = this;
+      const idIndex = this.brandList.map(item => item.accountId).indexOf(accountId);
+      idIndex !== -1 && sessionStorage.setItem('accountName', this.brandList[idIndex].name);
+      sessionStorage.setItem('accountId', this.accountId);
       const params = {
         accountId: accountId
       };
       self.$store.dispatch('changeAccount', params).then((res) => {
-        console.log(res);
         if (res.errCode === 0) {
           self.changeRoutes();
           self.$route.meta.keepAlive = false;
-          self.getUserName();
         }
       });
     },
@@ -608,27 +614,24 @@ export default {
       const self = this;
       const result = await self.$store.dispatch('GetUserAuthorities');
       if (result.errCode === 0) {
-        self.$store.dispatch('generateRoutes');
+        await self.$store.dispatch('generateRoutes');
+        self.getUserName(result.data);
+        const allRoutes = this.$store.state.user.routes;
+        const routes = allRoutes[0].path === '/login' ? allRoutes.slice(1, allRoutes.length) : allRoutes;
+        if (routes.length === 2) {
+          this.$router.push('/noRight');
+        } else {
+          window.location.pathname.indexOf('noRight') > -1 && this.$router.push(routes[1].children[0].path);
+        }
       }
     },
 
-    getUserName() {
+    getUserName(result) {
       const self = this;
-      const userId = getCookie('UserId');
-      getUserInfo().then(res => {
-        self.personList = res.data;
-        res.data.forEach(item => {
-          if (item.userId === userId) {
-            self.userName = item.userName.length > 10 ? item.userName.substr(0, 10) + '...' : item.userName;
-            self.accountId = item.accountId;
-            const accountId = item.accountId.toLowerCase();
-            localStorage.setItem('oss_bucket', accountId);
-            const idIndex = self.brandList.map(item => item.accountId).indexOf(self.accountId);
-            idIndex !== '-1' ? sessionStorage.setItem('accountName', self.brandList[idIndex].name) : null;
-            self.roleId = item.roleId;
-          }
-        });
-      });
+      self.userName = result.userName.length > 10 ? result.userName.substr(0, 10) + '...' : result.userName;
+      self.accountId = result.accountId;
+      const accountId = result.accountId.toLowerCase();
+      localStorage.setItem('oss_bucket', accountId);
     },
 
     updateTitle() {

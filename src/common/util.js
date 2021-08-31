@@ -2,6 +2,7 @@ import ConvertPinyin from '@/common/getpinyin';
 import i18n from '@/lang/index';
 import { message } from '@/common/singleton-message';
 import moment from 'moment';
+import { getCookie } from './auth';
 
 export default {
   getOneHourTime(para) {
@@ -248,302 +249,6 @@ export default {
     const second = t.getSeconds() < 10 ? '0' + t.getSeconds() : t.getSeconds();
     dateStr = years + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + second;
     return dateStr;
-  },
-
-  getErrorText(errorCode) {
-    const lang = i18n.locale;
-    let msg = '';
-    switch (errorCode) {
-      case 1: {
-        if (lang == 'zh') {
-          msg = 'XML/JSON 参数不正确';
-        } else if (lang == 'en') {
-          msg = 'Incorrect parameters of XML/JSON';
-        } else if (lang == 'zhtw') {
-          msg = 'XML/JSON 參數不正確';
-        } else {
-          msg = 'XML/JSON 参数不正确';
-        }
-        break;
-      }
-      case 2: {
-        if (lang == 'zh') {
-          msg = '用户名或密码错误';
-        } else if (lang == 'en') {
-          msg = 'Wrong user name or password';
-        } else if (lang == 'zhtw') {
-          msg = '用戶名或密碼錯誤';
-        } else {
-          msg = '用户名或密码错误';
-        }
-        break;
-      }
-      case 3: {
-        if (lang == 'zh') {
-          msg = '用户不在线';
-        } else if (lang == 'en') {
-          msg = 'User offline';
-        } else if (lang == 'zhtw') {
-          msg = '用戶不在線';
-        } else {
-          msg = '用户不在线';
-        }
-        break;
-      }
-      case 4: {
-        if (lang == 'zh') {
-          msg = '连接 PV6SvrRemote COM 接口出错';
-        } else if (lang == 'en') {
-          msg = 'Connection to PV6SvrRemote COM interface error';
-        } else if (lang == 'zhtw') {
-          msg = '連接 PV6SvrRemote COM 接口出錯';
-        } else {
-          msg = '连接 PV6SvrRemote COM 接口出错';
-        }
-        break;
-      }
-      case 5: {
-        if (lang == 'zh') {
-          msg = '请求的 IVS 数据库中不存在';
-        } else if (lang == 'en') {
-          msg = 'The requested IVS does not exist in  database';
-        } else if (lang == 'zhtw') {
-          msg = '請求的 IVS 數據庫中不存在';
-        } else {
-          msg = '请求的 IVS 数据库中不存在';
-        }
-        break;
-      }
-      case 7: {
-        if (lang == 'zh') {
-          msg = '视频请求 DASH 服务器网络出错';
-        } else if (lang == 'en') {
-          msg = 'Video request DASH server network error';
-        } else if (lang == 'zhtw') {
-          msg = '視頻請求 DASH 伺服器網絡出錯';
-        } else {
-          msg = '视频请求 DASH 服务器网络出错';
-        }
-        break;
-      }
-      case 8: {
-        if (lang == 'zh') {
-          msg = '用户下线出错';
-        } else if (lang == 'en') {
-          msg = 'Error appears in user go offline';
-        } else if (lang == 'zhtw') {
-          msg = '用戶下線出錯';
-        } else {
-          msg = '用户下线出错';
-        }
-        break;
-      }
-      case 9: {
-        if (lang == 'zh') {
-          msg = 'IVS 不支持的参数';
-        } else if (lang == 'en') {
-          msg = 'Parameters not supported by IVS';
-        } else if (lang == 'zhtw') {
-          msg = 'IVS 不支持的參數';
-        } else {
-          msg = 'IVS 不支持的参数';
-        }
-        break;
-      }
-      case 10: {
-        if (lang == 'zh') {
-          msg = '非法的 URL 地址';
-        } else if (lang == 'en') {
-          msg = 'Illegal URL address';
-        } else if (lang == 'zhtw') {
-          msg = '非法的 URL 地址';
-        } else {
-          msg = '非法的 URL 地址';
-        }
-        break;
-      }
-      case 11: {
-        if (lang == 'zh') {
-          msg = '超过 License 授权最大使用数量';
-        } else if (lang == 'en') {
-          msg = 'Exceeding the maximum user number of licenses';
-        } else if (lang == 'zhtw') {
-          msg = '超過 License 授權最大使用數量';
-        } else {
-          msg = '超过 License 授权最大使用数量';
-        }
-        break;
-      }
-      case 12: {
-        if (lang == 'zh') {
-          msg = 'License 不可用';
-        } else if (lang == 'en') {
-          msg = 'License is not available';
-        } else if (lang == 'zhtw') {
-          msg = 'License 不可用';
-        } else {
-          msg = 'License 不可用';
-        }
-        break;
-      }
-      case 13: {
-        if (lang == 'zh') {
-          msg = '视频停止错误';
-        } else if (lang == 'en') {
-          msg = 'Video stop error';
-        } else if (lang == 'zhtw') {
-          msg = '視頻停止錯誤';
-        } else {
-          msg = '视频停止错误';
-        }
-        break;
-      }
-      case 15: {
-        if (lang == 'zh') {
-          msg = 'SDK 打开视频错误';
-        } else if (lang == 'en') {
-          msg = 'SDK open video error';
-        } else if (lang == 'zhtw') {
-          msg = 'SDK 打開視頻錯誤';
-        } else {
-          msg = 'SDK 打开视频错误';
-        }
-        break;
-      }
-      case 16: {
-        if (lang == 'zh') {
-          msg = 'SDK 没有返回数据';
-        } else if (lang == 'en') {
-          msg = 'SDK does not have return data';
-        } else if (lang == 'zhtw') {
-          msg = 'SDK 沒有返回數據';
-        } else {
-          msg = 'SDK 没有返回数据';
-        }
-        break;
-      }
-      case 17: {
-        if (lang == 'zh') {
-          msg = '视频播放端连接数量超过 DASH 服务的最大连接数';
-        } else if (lang == 'en') {
-          msg = 'The number of video player connections exceeds the maximum number of connections for the DASH service';
-        } else if (lang == 'zhtw') {
-          msg = '視頻播放端連接數量超過 DASH 服務的最大連接數';
-        } else {
-          msg = '视频播放端连接数量超过 DASH 服务的最大连接数';
-        }
-        break;
-      }
-      case 18: {
-        if (lang == 'zh') {
-          msg = 'SessionID 已过期';
-        } else if (lang == 'en') {
-          msg = 'SessionID has expired';
-        } else if (lang == 'zhtw') {
-          msg = 'SessionID 已過期';
-        } else {
-          msg = 'SessionID 已过期';
-        }
-        break;
-      }
-      case 19: {
-        if (lang == 'zh') {
-          msg = '内存不足';
-        } else if (lang == 'en') {
-          msg = 'Not enough storage';
-        } else if (lang == 'zhtw') {
-          msg = '內存不足';
-        } else {
-          msg = '内存不足';
-        }
-        break;
-      }
-      case 20: {
-        if (lang == 'zh') {
-          msg = '不支持此功能';
-        } else if (lang == 'en') {
-          msg = 'The feature is not supported';
-        } else if (lang == 'zhtw') {
-          msg = '不支持此功能';
-        } else {
-          msg = '不支持此功能';
-        }
-        break;
-      }
-      case 21: {
-        if (lang == 'zh') {
-          msg = '内部web服务器不能正常工作';
-        } else if (lang == 'en') {
-          msg = 'Internal web server is not working properly';
-        } else if (lang == 'zhtw') {
-          msg = '內部web伺服器不能正常工作';
-        } else {
-          msg = '内部web服务器不能正常工作';
-        }
-        break;
-      }
-      case 22: {
-        if (lang == 'zh') {
-          msg = '缺少必要参数';
-        } else if (lang == 'en') {
-          msg = 'Lack of necessary parameters';
-        } else if (lang == 'zhtw') {
-          msg = '缺少必要參數';
-        } else {
-          msg = '缺少必要参数';
-        }
-        break;
-      }
-      case 23: {
-        if (lang == 'zh') {
-          msg = '视频已经打开';
-        } else if (lang == 'en') {
-          msg = 'The video is already open';
-        } else if (lang == 'zhtw') {
-          msg = '視頻已經打開';
-        } else {
-          msg = '视频已经打开';
-        }
-        break;
-      }
-      case 24: {
-        if (lang == 'zh') {
-          msg = '视频未打开';
-        } else if (lang == 'en') {
-          msg = 'Video not open';
-        } else if (lang == 'zhtw') {
-          msg = '視頻未打開';
-        } else {
-          msg = '视频未打开';
-        }
-        break;
-      }
-      case 25: {
-        if (lang == 'zh') {
-          msg = 'SessionID被占用';
-        } else if (lang == 'en') {
-          msg = 'SessionID is occupied';
-        } else if (lang == 'zhtw') {
-          msg = 'SessionID被占用';
-        } else {
-          msg = 'SessionID被占用';
-        }
-        break;
-      }
-      default: {
-        if (lang == 'zh') {
-          msg = '未知的错误';
-        } else if (lang == 'en') {
-          msg = 'Unknown error';
-        } else if (lang == 'zhtw') {
-          msg = '未知的錯誤';
-        } else {
-          msg = '未知的错误';
-        }
-        break;
-      }
-    }
-    return msg;
   },
 
   getCurDate2Str() {
@@ -823,6 +528,7 @@ export default {
     }
     return seats[idx] / digits;
   },
+
   groupArrayOnSize(array, size) {
     const length = array.length;
     if (!length || !size || size < 1) {
@@ -900,6 +606,58 @@ export default {
     })
     return itemsLength;
   },
+
+  getVideoAuthority(num){
+    const auth = parseInt(getCookie('deviceAuth'));
+    if(num === 0) return 0;
+    return ((auth & (1 << num -1)) >> (num-1)) === 1 ? 1 : 0;
+  },
+
+  getIntersectionOfArrs(arr1, arr2) {
+    const arr2Set = new Set(arr2);
+    const intersection = arr1.filter(item => arr2Set.has(item));
+    return intersection;
+  },
+
+  formDatetime(cellValue) {
+    if (cellValue === undefined) {
+      return '';
+    }
+    return moment(cellValue).format('HH:mm:ss');
+  },
+
+  validateLicense(status) {
+    if (![20, 21, 60].includes(status)) {
+      this.notify(i18n.t('deviceView.licenseOverdue'), 'warning', 3000);
+      return false;
+    } else {
+      return true;
+    }
+  },
+
+  setErrorMsg(msg, addOrUpdateFlag) {
+    let displayedMsg = '';
+    const msgMap = [
+      { ret: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
+      { ret: 'deviceExist', match: ['Device already existed'] },
+      { ret: 'multipleAccOnSameStore', match: ['Multiple accounts'] },
+      { ret: 'getAccessTokenError', match: ['Ezviz access token'] },
+      { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
+      { ret: 'storeNotExist', match: ['Store does not exist'] },
+      { ret: 'noAuthorityForStore', match: ['No authority'] },
+      { ret: 'illegalSeriNum', match: ['deviceSerial']},
+      { ret: 'videoLicenseOverdue', match: ['Device License overdue']},
+      { ret: 'hasBoundItem', match: ['binding to item']},
+      { ret: 'hasAdded', match: ['设备已被别人添加']}
+    ];
+    const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
+    if (!result) {
+      displayedMsg = addOrUpdateFlag ? i18n.t('deviceView.addFailed') : i18n.t('deviceView.editFail');
+    } else {
+      displayedMsg = i18n.t(`deviceView.${result.ret}`);
+    }
+    this.notify(displayedMsg, 'warning', 3000);
+  }
 
 };
 class indexedDB {

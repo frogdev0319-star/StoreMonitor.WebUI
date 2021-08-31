@@ -17,26 +17,19 @@
         <div slot="tableDetail">
           <p class="rule-item">
             <el-checkbox v-model="includedInTotalScoreWithType1">
-              {{ $t('insSettingView.PSCrule1') }}Tab1
-              （{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.PSCrule2') }}
+              {{ $t('insSettingView.tab1CalculateScore') }}
             </el-checkbox>
           </p>
           <p class="rule-item">
             <el-checkbox v-model="qualifiedForIgnoredWithType1">
-              <span v-if="lang==='en'">
-                {{ $t('insSettingView.PSCrule3') }}
-              </span> Tab1（{{ $t('insSettingView.sheetpassfail') }}）
-              <span v-if="lang!=='en'">{{ $t('insSettingView.PSCrule3') }}</span>
+              <span>
+                {{ $t('insSettingView.tab1IgnoredQualified') }}
+              </span>
             </el-checkbox>
           </p>
           <p class="rule-item">
             <el-checkbox v-model="qualifiedForIgnoredWithType2">
-              <span v-if="lang==='en'">{{ $t('insSettingView.PSCrule3') }}
-              </span>
-              Tab2（{{ $t('insSettingView.sheetscore') }}）
-              <span v-if="lang!=='en'">
-                {{ $t('insSettingView.PSCrule3') }}
-              </span>
+              <span>{{ $t('insSettingView.tab2IgnoredQualified') }}</span>
             </el-checkbox>
           </p>
           <p class="rule-score">
@@ -95,12 +88,8 @@
         <div slot="tableDetail">
           <p class="rule-item">
             <el-checkbox v-model="dangerousOnFailedItem">
-              <span v-if="lang!=='en'">
-                Tab1（{{ $t('insSettingView.sheetpassfail') }}）{{ $t('insSettingView.patrolSuggest') }}
-              </span>
-              <span v-else>
-                When there are unqualified items in Tab1 ({{ $t('insSettingView.sheetpassfail') }}),
-                the inspection result is: Dangerous.
+              <span>
+                {{ $t('insSettingView.tab1FailedDangeous') }}
               </span>
             </el-checkbox>
           </p>

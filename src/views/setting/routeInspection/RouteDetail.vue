@@ -715,10 +715,8 @@ export default {
 };
 </script>
 <style>
-@import '../../../assets/css/importfile.css';
 </style>
 <style lang="scss" scoped>
-@import '../../../assets/css/importfile.css';
 @import '../../../assets/css/textstyle.css';
     $mainColor:#f31d65;
     @function rem($val){

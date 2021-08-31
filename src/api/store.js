@@ -72,3 +72,11 @@ export const getDetailedStoreInfo = params => {
     params
   });
 }
+
+export const getStoreDefineGroup = params => {
+  return request({
+    url: `${version}/store/define/list`,
+    method: 'get',
+    params
+  });
+}
