@@ -455,7 +455,7 @@ export default {
     'selectInspectListWithStore': '請選擇，{storeName}關聯巡檢表',
     'getBeseyeStreamError': '獲取Beseye視頻流信息失敗！',
     'closeConnection': '連接關閉',
-    'errorConnection': '連接錯誤'
+    'errorConnection': '連接錯誤',
     'startingScore': '扣分起始分數：',
     'invalidInspection': '無效的巡檢信息，請填寫內容'
   },
@@ -675,8 +675,7 @@ export default {
     'tab1IgnoredQualified': 'Tab1(Pass&Fail)中忽略項目視同得分',
     'tab2IgnoredQualified': 'Tab2（Score）中忽略項目視同得分',
     'selectStoreToBind': '請選擇{tableName}巡檢表，需要綁定的門店',
-    'hasBoundStoreNum': '{tableName}共有{allStoreNum}家門店，已綁定{boundStoreNum}家門店'
-    'itemsOfCate': '類別巡檢項',
+    'hasBoundStoreNum': '{tableName}共有{allStoreNum}家門店，已綁定{boundStoreNum}家門店',
     'catergyName': '巡檢類別名稱',
     'parentCatergyName': '上級巡檢類別',
     'parentCatergyNameTooltip1': '1. 一級類別若存在直屬巡檢項目，系統不允許創建子類別',

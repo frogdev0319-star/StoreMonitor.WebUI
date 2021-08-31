@@ -453,7 +453,7 @@ export default {
     'selectInspectListWithStore': 'Please select the inspection list associated with {storeName}',
     'getBeseyeStreamError': 'Failed to get beseye stream info!',
     'closeConnection': 'Connection close',
-    'errorConnection': 'Connection error'
+    'errorConnection': 'Connection error',
     'startingScore': 'Total score:',
     'invalidInspection': 'Invalid inspection, please enter content'
   },
@@ -685,9 +685,7 @@ export default {
     'subCategoryHeader': 'Subcategory (Optional, 30 characters)',
     'subCategory': 'Subcategory',
     'accumulateTotalScoreInfo': 'Total score = SUM (per inspection score) + Total score',
-    'totalScoreLimitation': 'Total score should be equal to the highest score of Score Options'
-    'itemsOfCate': 'Inspection items of ',
-
+    'totalScoreLimitation': 'Total score should be equal to the highest score of Score Options',
     'tab1FailedDangeous': 'When there are unqualified items in Tab1 (Pass&Fail), the inspection result is: Dangerous.',
     'tab1CalculateScore': 'When combined with other tabs, the Tab1 (Pass&Fail) project score will participate in the evaluation of the total score calculation',
     'tab1IgnoredQualified': 'Calculate the score of ignored items in Tab1 (Pass&Fail)',
