@@ -406,3 +406,24 @@ $black: #182752;
   font-size: calc(16/1920*100vw);
   color: #7d8cad;
 }
+
+.img-class .el-image__inner{
+  height: 70px;
+  width: calc(100/1920*100vw);
+  min-width: 85px;
+}
+
+.image-class{
+  @extend .el-image__inner;
+  border: 1px dashed #7d8cad;
+  float: left;
+}
+
+.image-slot{
+  height: calc(70/1920*100vw);
+  width: calc(100/1920*100vw);
+  color: #7d8cad;
+  font-size: 12px;
+  text-align: center;
+  overflow: hidden;
+}
