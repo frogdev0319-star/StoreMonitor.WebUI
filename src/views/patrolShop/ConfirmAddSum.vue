@@ -142,13 +142,11 @@
                             :height="imgHeight+'px'"
                             class="source-details">
                             <div v-if="sourceitem.mediaType==2" class="img-content">
-                              <img
-                                :title="imgTitle"
-                                :src="sourceitem.src"
-                                :height="imgHeight+'px'"
-                                :onerror="deafultImg"
-                                class="imgLittle imgInner"
-                                @click="openOuter(sourceitem,$event)">
+                               <el-image
+                              :src="sourceitem.src"
+                              :style="imageStyle"
+                              :preview-src-list="getImgList(sourceindex, categoryItem.sourceList)"
+                              class="imgLittle imgInner"/>
                             </div>
                             <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
                               <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -211,6 +209,11 @@
                                   :onerror="deafultImg"
                                   class="imgLittle imgInner"
                                   @click="openOuter(sourceitem,$event)">
+				  <el-image
+	                              :src="sourceitem.src"
+	                              :style="imageStyle"
+	                              :preview-src-list="getImgList(sourceindex, childItem.sourceList)"
+	                              class="imgLittle imgInner"/>
                               </div>
                               <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
                                 <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -243,14 +246,11 @@
                               :height="imgHeight+'px'"
                               class="source-details">
                               <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''">
-                                <img
-                                  :title="imgTitle"
-                                  :style="isexportPDF ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
-                                  :src="sourceitem.url"
-                                  :height="imgHeight+'px'"
-                                  :onerror="deafultImg"
-                                  class="imgLittle imgInner"
-                                  @click="openOuter(sourceitem,$event)">
+				  <el-image
+	                              :src="sourceitem.src"
+	                              :style="imageStyle"
+	                              :preview-src-list="getImgList(sourceindex, sourceitem.sourceList)"
+	                              class="imgLittle imgInner"/>
                               </div>
                               <div
                                 v-if="sourceitem.mediaType==1"
@@ -284,13 +284,11 @@
                     <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
                       <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
                         <div v-if="sourceitem.mediaType==2" class="img-content">
-                          <img
-                            :title="imgTitle"
+                          <el-image
                             :src="sourceitem.src"
-                            :height="imgHeight+'px'"
-                            :onerror="deafultImg"
-                            class="imgLittle imgInner"
-                            @click="openOuter(sourceitem,$event)">
+                            :style="imageStyle"
+                            :preview-src-list="getImgList(index, sourceitem.sourceList)"
+                            class="imgLittle imgInner"/>
                         </div>
                         <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
                           <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -324,22 +322,6 @@
                 </div>
               </div>
             </el-dialog>
-            <transition name="fade">
-              <el-dialog
-                v-if="showOuter"
-                :title="$t('eventView.view')"
-                :visible.sync="showOuter"
-                :close-on-click-modal="false"
-                width="850px"
-                top="12%">
-                <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-                  <hr class="dialog-hr">
-                  <div class="dialog-source-content">
-                    <img v-if="showImg" :src="checkImgSrc">
-                  </div>
-                </div>
-              </el-dialog>
-            </transition>
           </div>
         </el-col>
       </el-row>
@@ -347,20 +329,22 @@
     <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
       <div class="body-content">
         <p>{{ $t('remotePatrol.uploading') }}</p>
-        <p v-if="lang!=='en'" style="margin-bottom:15px;">{{ $t('remotePatrol.upload0') }}<span>{{ totalnumOfPic }}</span>{{ $t('remotePatrol.upload1') }}<span>{{ uploadingnumOfPic }}</span>{{ $t('remotePatrol.unit') }}</p>
-        <p v-if="lang==='en'" style="margin-bottom:15px;"><span>{{ totalnumOfPic }}  attachments in total,</span><span>{{ uploadingnumOfPic }} uploaded.</span></p>
+        <p style="margin-bottom:15px;">
+          {{ $t('remotePatrol.uploadInfo', {totalNum: totalnumOfPic, uploadedNum: uploadingnumOfPic}) }}
+        </p>
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>
   </el-row>
 </template>
 <script>
-  import { getStorageInfo } from '@/api/event';
-  import { submitInspectItem1 } from '@/api/inspect';
-  import util from '@/common/util';
-  import { getCookie } from '@/common/auth';
-  import { getUserInfo } from '@/api/login';
-  import filterString from '@/common/filterString.js';
+import { getStorageInfo } from '@/api/event';
+import { submitInspectItem1 } from '@/api/inspect';
+import util from '@/common/util';
+import { getCookie } from '@/common/auth';
+import { getUserInfo } from '@/api/login';
+import filterString from '@/common/filterString.js';
+import Database from '@/common/Database.js';
 
   export default {
     name: 'ConfirmAddSum',
@@ -370,9 +354,6 @@
         uploadProgress: false,
         totalnumOfPic: 0,
         uploadingnumOfPic: 0,
-        showOuter: false,
-        showImg: false,
-        checkImgSrc: '',
         scorecount: 0,
         radioList: [],
         imgTitle: '',
@@ -436,49 +417,60 @@
           height = 75;
         }
         return height;
+    },
+
+    imageStyle() {
+      return {
+        'width': 'calc(130/1920*100vw)',
+        'height': `${this.imgHeight}px`
       }
     },
-    beforeRouteLeave(to, from, next) {
+  },
+  beforeRouteLeave(to, from, next) {
+    const self = this;
+    if (to.name !== 'remotePatrol') {
+      self.$store.dispatch('setPatrolHistory', null);
+      self.$store.dispatch('setPatrolComment', null);
+      Database.addDataToDB(self.userId, {data: {}, rule: {}})
+      next();
+    } else {
+      self.$store.dispatch('setPatrolComment', self.suggest);
+      next();
+    }
+  },
+  mounted() {
+    const self = this;
+    self.getRouteData();
+    self.getUpLoadBucketInfo();
+    self.getOssInfo();
+  },
+  methods: {
+    stopCommentVideo() {
+      var video = document.getElementById('previewVideo');
+      this.previewplayer = videojs(video);
+      this.previewplayer.pause();
+    },
+    playCommentVideo(item, index) {
       const self = this;
-      if (to.name !== 'remotePatrol') {
-        self.$store.dispatch('setPatrolHistory', null);
-        self.$store.dispatch('setPatrolComment', null);
-        next();
-      } else {
-        self.$store.dispatch('setPatrolComment', self.suggest);
-        next();
-      }
-    },
-    mounted() {
-      this.getRouteData();
-      this.getUpLoadBucketInfo();
-      this.getOssInfo();
-    },
-    methods: {
-      stopCommentVideo() {
+      self.dialogCommentVideo = true;
+      self.$nextTick(function() {
         var video = document.getElementById('previewVideo');
         this.previewplayer = videojs(video);
-        this.previewplayer.pause();
-      },
-      playCommentVideo(item, index) {
-        const self = this;
-        self.dialogCommentVideo = true;
-        self.$nextTick(function() {
-          var video = document.getElementById('previewVideo');
-          this.previewplayer = videojs(video);
-          this.previewplayer.src({ src: item.url });
-          this.previewplayer.play();
-        });
-      },
-      openOuter(item, $ev) {
-        const self = this;
-        console.log(item);
-        console.log($ev.target.onerror);
-        if (item != null) {
-          self.showOuter = true;
-          self.checkImgSrc = item.src;
-          self.showImg = true;
+        this.previewplayer.src({ src: item.url });
+        this.previewplayer.play();
+      });
+    },
+
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
         }
+      }
+      return arr.filter(source => source.mediaType === 2).map(source => source.src);
       },
       getFileUrl(fileName) {
         const self = this;
@@ -516,12 +508,10 @@
               .then((results) => {
                 // 上传完成
                 const url = self.getFileUrl(results.name);
-                console.log(url);
                 resolve(url);
               })
               .catch((err) => {
                 reject(err);
-                console.log(err);
               });
           });
         } else {
@@ -533,12 +523,10 @@
               .then((results) => {
                 // 上传完成
                 const url = self.getFileUrl(fileItem.fileName);
-                console.log(url);
                 resolve(url);
               })
               .catch((error) => {
                 reject(error);
-                console.log(error);
               });
           });
         }
@@ -576,7 +564,6 @@
         await getStorageInfo(storageParams).then(res => {
           if (res.errCode === 0) {
             self.oss = res.data;
-            console.log(self.oss);
           }
         });
         const temp = [];
@@ -633,7 +620,6 @@
           }
         }
         const feedEventList = [];
-        console.log(self.eventList);
 
         for (const i in self.eventList) {
           const obj = {};
@@ -701,14 +687,16 @@
         self.uploadProgress = false;
       },
 
-      getRouteData() {
-        const self = this;
-        const PatrolComment = self.$store.getters.PatrolComment;
-        if (PatrolComment != null) {
-          self.suggest = PatrolComment;
-        }
-        const routeData = self.$route.params.data;
-        const inspectSettings = self.$route.params.rule;
+    async getRouteData() {
+      const self = this;
+      const PatrolComment = self.$store.getters.PatrolComment;
+      if (PatrolComment != null) {
+        self.suggest = PatrolComment;
+      }
+      Database.getDataFromDB(getCookie('UserId')).then(res => {
+        const inpectResult = res;
+        const routeData = inpectResult.data;
+        const inspectSettings = inpectResult.rule;
         const inspect = routeData.inspect;
         const eventList = routeData.event;
         const store = routeData.store;
@@ -833,6 +821,10 @@
             item['numIgnore'] = IgnoredArr.length;
             if(inspectSettings.qualifiedForIgnoredWithType2){
               item['itemScore'] = totalScore;
+              if (p_item.type === 1) {
+                item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
+                item['numIgnore'] = 0;
+              }
             }else{
               item['itemScore'] = notAddIgnoretotalScore;
             }
@@ -843,19 +835,23 @@
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored.toFixed(1);
+                item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
+                item['numIgnore'] = 0;
               } else {
-                item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = tab1GetScoreNoContainedIngored.toFixed(1);
               }
             } else {
               if (inspectSettings.includedInTotalScoreWithType1) {
                 if (inspectSettings.qualifiedForIgnoredWithType1) {
-                  item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                  item['itemgetScore'] = (tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored).toFixed(1);
                 } else {
-                  item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                  item['itemgetScore'] = tab1GetScoreNoContainedIngored.toFixed(1);
                 }
-              } else {
-                item['itemgetScore'] = p_item.type === 0 ? '--' : item['itemgetScore'];
+              }
+              if (inspectSettings.qualifiedForIgnoredWithType1) {
+                item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
+                item['numIgnore'] = 0;
               }
             }
             if (p_item.type === 0) {
@@ -874,6 +870,7 @@
               item['itemgetScore'] =
                 inspectSettings.qualifiedForIgnoredWithType2 ?
                   (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
+              item['itemgetScore'] = item['itemgetScore'].toFixed(1);
             }
             if (p_item.type === 2) {
               CurOtherTotalScore += totalGetscore;
@@ -1002,6 +999,9 @@
           detailType: 2
         };
         self.tempList = tempList;
+      }).catch(err => {
+        console.log(err);
+      });
       },
 
       getGroupsItems(key){
@@ -1596,10 +1596,11 @@
                 }
               }
               .cdm-pic{
-                margin-top: 20px;
+                    margin-top: 10px;
                 overflow: hidden;
                 .source-details{
                   display: inline-block;
+                        margin-top: 10px;
                   .img-content{
                     margin-right: calc(10/1920*100vw);
                     position: relative;
