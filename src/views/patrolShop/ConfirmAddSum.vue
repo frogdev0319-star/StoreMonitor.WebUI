@@ -30,7 +30,7 @@
         <span v-if="adviceInfoRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
       </div>
     </el-col>
-    <el-col :span="24" class="sum-data" v-if="!allRemarkItemsFlag">
+    <el-col v-if="!allRemarkItemsFlag" :span="24" class="sum-data">
       <el-row class="divider-content">
         <el-col :span="11">
           <hr class="divider-hr">
@@ -56,11 +56,11 @@
         </div>
         <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered">
           <thead>
-          <tr>
-            <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
-              {{ t_item.name }}
-            </th>
-          </tr>
+            <tr>
+              <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
+                {{ t_item.name }}
+              </th>
+            </tr>
           </thead>
           <template v-for="(inspectItem, inspectIndex) in s_item.data">
             <tbody :key="inspectIndex">
@@ -69,8 +69,10 @@
                   <span class="sheet_title">{{ inspectItem.label }}</span>
                 </td>
               </tr>
-              <tr v-for="(item,index) in inspectItem.inspectList" :key="index"
-                  :style=" index%2 != 0?{'background-color':'#F7F8FC'}:{}">
+              <tr
+                v-for="(item,index) in inspectItem.inspectList"
+                :key="index"
+                :style=" index%2 != 0?{'background-color':'#F7F8FC'}:{}">
                 <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span><span class="count-blag">
                   {{ item.items.length }}</span>
                 </td>
@@ -103,15 +105,17 @@
                           <p class="title1">{{ categoryIndex+1 }}.{{ categoryItem.subject }}</p>
                           <p class="title2">{{ categoryItem.description }}</p>
                         </div>
-                        <div class="score-title" v-if="categoryItem.itemType === 0">
+                        <div v-if="categoryItem.itemType === 0" class="score-title">
                           <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
                           <template v-if="item.detailType !== 1">
-                            <div v-if="categoryItem.type === 0"
-                                 class="title-btn">
+                            <div
+                              v-if="categoryItem.type === 0"
+                              class="title-btn">
                               {{ $t('remotePatrol.scoreUnit') }}<span>{{ tab1BtnArr[1] }}</span>
                             </div>
-                            <div v-if="categoryItem.type === 2"
-                                 class="title-btn">
+                            <div
+                              v-if="categoryItem.type === 2"
+                              class="title-btn">
                               {{ $t('remotePatrol.scoreUnit') }}<span>{{ tab3BtnArr[1] }}</span>
                             </div>
                             <div v-if="categoryItem.type === 1" class="title-btn">
@@ -119,18 +123,19 @@
                               <span>
                                 <span>{{ categoryItem.itemgetScore }}</span>
                                 <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
-                            </span>
+                              </span>
                             </div>
                           </template>
-                          <div class="total-score" v-if="categoryItem.showTotalScore">
-                            {{$t('remotePatrol.totalScoreUnit')}}{{categoryItem.itemScore}}
+                          <div v-if="categoryItem.showTotalScore" class="total-score">
+                            {{ $t('remotePatrol.totalScoreUnit') }}{{ categoryItem.itemScore }}
                           </div>
                         </div>
                       </div>
-                      <div v-if="categoryItem.sourceList!= null && categoryItem.sourceList.length !== 0
-                      || categoryItem.inspectInput != null&&categoryItem.inspectInput !== ''"
-                           class="content-detail-main"
-                           style="padding-bottom: 20px;">
+                      <div
+                        v-if="categoryItem.sourceList!= null && categoryItem.sourceList.length !== 0
+                        || categoryItem.inspectInput != null&&categoryItem.inspectInput !== ''"
+                        class="content-detail-main"
+                        style="padding-bottom: 20px;">
                         <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
                         <div v-if="categoryItem.inspectInput!=null&&categoryItem.inspectInput!=''" class="cdm-word">
                           <span>{{ categoryItem.inspectInput }}</span>
@@ -142,11 +147,11 @@
                             :height="imgHeight+'px'"
                             class="source-details">
                             <div v-if="sourceitem.mediaType==2" class="img-content">
-                               <el-image
-                              :src="sourceitem.src"
-                              :style="imageStyle"
-                              :preview-src-list="getImgList(sourceindex, categoryItem.sourceList)"
-                              class="imgLittle imgInner"/>
+                              <el-image
+                                :src="sourceitem.src"
+                                :style="imageStyle"
+                                :preview-src-list="getImgList(sourceindex, categoryItem.sourceList)"
+                                class="imgLittle imgInner"/>
                             </div>
                             <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
                               <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -160,7 +165,7 @@
                   <template v-else>
                     <div v-for="(child, childIndex) in _item.children" :key="childIndex">
                       <div class="subcatergy-title">
-                        {{ child.groupName}}
+                        {{ child.groupName }}
                       </div>
                       <div v-for="(childItem, childIndex) in child.cateryItems" :key="childIndex" class="content-detail">
                         <div class="content-detail-title">
@@ -168,10 +173,11 @@
                             <p class="title1">{{ childIndex+1 }}.{{ childItem.subject }}</p>
                             <p class="title2">{{ childItem.description }}</p>
                           </div>
-                          <div class="score-title" v-if="childItem.itemType === 0">
+                          <div v-if="childItem.itemType === 0" class="score-title">
                             <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                            <div v-if="(childItem.type === 0 ||childItem.type === 2)&&item.detailType !== 1"
-                                 class="title-btn">
+                            <div
+                              v-if="(childItem.type === 0 ||childItem.type === 2)&&item.detailType !== 1"
+                              class="title-btn">
                               {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
                             </div>
                             <div v-if="childItem.type==1&&item.detailType!=1" class="title-btn">
@@ -179,18 +185,19 @@
                               <span>
                                 <span>{{ childItem.itemgetScore }}</span>
                                 <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}
+                                </span>
                               </span>
-                            </span>
                             </div>
-                            <div class="total-score" v-if="childItem.showTotalScore">
-                              {{$t('remotePatrol.totalScoreUnit')}}{{childItem.itemScore}}
+                            <div v-if="childItem.showTotalScore" class="total-score">
+                              {{ $t('remotePatrol.totalScoreUnit') }}{{ childItem.itemScore }}
                             </div>
                           </div>
                         </div>
-                        <div v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
-                      || childItem.inspectInput != null&&childItem.inspectInput !== ''"
-                             class="content-detail-main"
-                             style="padding-bottom: 20px;">
+                        <div
+                          v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
+                          || childItem.inspectInput != null&&childItem.inspectInput !== ''"
+                          class="content-detail-main"
+                          style="padding-bottom: 20px;">
                           <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
                           <div v-if="childItem.inspectInput!=null&&childItem.inspectInput!=''" class="cdm-word">
                             <span>{{ childItem.inspectInput }}</span>
@@ -209,11 +216,11 @@
                                   :onerror="deafultImg"
                                   class="imgLittle imgInner"
                                   @click="openOuter(sourceitem,$event)">
-				  <el-image
-	                              :src="sourceitem.src"
-	                              :style="imageStyle"
-	                              :preview-src-list="getImgList(sourceindex, childItem.sourceList)"
-	                              class="imgLittle imgInner"/>
+                                <el-image
+                                  :src="sourceitem.src"
+                                  :style="imageStyle"
+                                  :preview-src-list="getImgList(sourceindex, childItem.sourceList)"
+                                  class="imgLittle imgInner"/>
                               </div>
                               <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
                                 <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
@@ -245,12 +252,12 @@
                               :key="sourceindex"
                               :height="imgHeight+'px'"
                               class="source-details">
-                              <div v-if="sourceitem.mediaType === 2" class="img-content" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''">
-				  <el-image
-	                              :src="sourceitem.src"
-	                              :style="imageStyle"
-	                              :preview-src-list="getImgList(sourceindex, sourceitem.sourceList)"
-	                              class="imgLittle imgInner"/>
+                              <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
+                                <el-image
+                                  :src="sourceitem.src"
+                                  :style="imageStyle"
+                                  :preview-src-list="getImgList(sourceindex, sourceitem.sourceList)"
+                                  class="imgLittle imgInner"/>
                               </div>
                               <div
                                 v-if="sourceitem.mediaType==1"
@@ -346,92 +353,92 @@ import { getUserInfo } from '@/api/login';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
 
-  export default {
-    name: 'ConfirmAddSum',
-    data() {
-      return {
-        dialogCommentVideo: false,
-        uploadProgress: false,
-        totalnumOfPic: 0,
-        uploadingnumOfPic: 0,
-        scorecount: 0,
-        radioList: [],
-        imgTitle: '',
-        resultList: [
-          {
-            'label': 2,
-            'name': this.$t('overview.echartGood'),
-            'isActive': false,
-            'isShow': true
-          },
-          {
-            'label': 1,
-            'name': this.$t('remotePatrol.improve'),
-            'isActive': false,
-            'isShow': true
-          },
-          {
-            'label': 0,
-            'name': this.$t('remotePatrol.dangerous'),
-            'isActive': false,
-            'isShow': true
-          }
-        ],
-        startIcon: require('../../../static/img/play_icon.png'),
-        videoImgSrc: require('../../../static/img/video_thumbnail.png'),
-        deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
-        theaderPassFail: [],
-        theaderScore: [],
-        theaderOther: [],
-        suggest: '',
-        store: {},
-        channel: {},
-        summary: [],
-        tempList: [],
-        inspectList: [],
-        eventList: [],
-        oss: null,
-        bucketVideo: '',
-        bucketImage: '',
-        percentage: 0,
-        accountId: '',
-        curSumIndex: 0,
-        varyWindowWidth: window.innerWidth,
-        pass: this.$t('remotePatrol.pass'),
-        fail: this.$t('remotePatrol.failed'),
-        lang: this.$i18n.locale,
-        adviceInfoRuletip: false,
-        tab1BtnArr: [],
-        tab3BtnArr: [],
-        allRemarkItemsFlag: true
-      };
-    },
-    computed: {
-      imgHeight() {
-        let height = 0;
-        if (this.varyWindowWidth > 1800) {
-          height = this.varyWindowWidth * 0.039;
-        } else if (this.varyWindowWidth > 1400) {
-          height = this.varyWindowWidth * 0.035;
-        } else {
-          height = 75;
+export default {
+  name: 'ConfirmAddSum',
+  data() {
+    return {
+      dialogCommentVideo: false,
+      uploadProgress: false,
+      totalnumOfPic: 0,
+      uploadingnumOfPic: 0,
+      scorecount: 0,
+      radioList: [],
+      imgTitle: '',
+      resultList: [
+        {
+          'label': 2,
+          'name': this.$t('overview.echartGood'),
+          'isActive': false,
+          'isShow': true
+        },
+        {
+          'label': 1,
+          'name': this.$t('remotePatrol.improve'),
+          'isActive': false,
+          'isShow': true
+        },
+        {
+          'label': 0,
+          'name': this.$t('remotePatrol.dangerous'),
+          'isActive': false,
+          'isShow': true
         }
-        return height;
+      ],
+      startIcon: require('../../../static/img/play_icon.png'),
+      videoImgSrc: require('../../../static/img/video_thumbnail.png'),
+      deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
+      theaderPassFail: [],
+      theaderScore: [],
+      theaderOther: [],
+      suggest: '',
+      store: {},
+      channel: {},
+      summary: [],
+      tempList: [],
+      inspectList: [],
+      eventList: [],
+      oss: null,
+      bucketVideo: '',
+      bucketImage: '',
+      percentage: 0,
+      accountId: '',
+      curSumIndex: 0,
+      varyWindowWidth: window.innerWidth,
+      pass: this.$t('remotePatrol.pass'),
+      fail: this.$t('remotePatrol.failed'),
+      lang: this.$i18n.locale,
+      adviceInfoRuletip: false,
+      tab1BtnArr: [],
+      tab3BtnArr: [],
+      allRemarkItemsFlag: true
+    };
+  },
+  computed: {
+    imgHeight() {
+      let height = 0;
+      if (this.varyWindowWidth > 1800) {
+        height = this.varyWindowWidth * 0.039;
+      } else if (this.varyWindowWidth > 1400) {
+        height = this.varyWindowWidth * 0.035;
+      } else {
+        height = 75;
+      }
+      return height;
     },
 
     imageStyle() {
       return {
         'width': 'calc(130/1920*100vw)',
         'height': `${this.imgHeight}px`
-      }
-    },
+      };
+    }
   },
   beforeRouteLeave(to, from, next) {
     const self = this;
     if (to.name !== 'remotePatrol') {
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
-      Database.addDataToDB(self.userId, {data: {}, rule: {}})
+      Database.addDataToDB(self.userId, { data: {}, rule: {}});
       next();
     } else {
       self.$store.dispatch('setPatrolComment', self.suggest);
@@ -471,221 +478,221 @@ import Database from '@/common/Database.js';
         }
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.src);
-      },
-      getFileUrl(fileName) {
-        const self = this;
-        const bucketName = self.oss.ossBucketName;
-        const endpoint = self.oss.ossEndPoint;
-        const key = fileName;
-        if (self.oss.ossVendor === 2) {
-          return `https://${endpoint}/${bucketName}/${fileName}`;
-        } else {
-          return `http://${bucketName}.${endpoint}/${fileName}`;
-        }
-      },
-      upLoadFile(fileItem) {
-        const self = this;
-        self.percentage = 0;
-        if (self.oss.ossVendor === null) {
-          self.oss.ossVendor = 1; // 1 -aliyun  2-azure
-        }
-        if (self.oss.ossVendor === 1) {
-          const OSS = require('ali-oss');
-          const client = new OSS({
-            region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-            accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
-            accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
-            // bucket: 'viumo-'+self.accountId,
-            bucket: self.oss.ossBucketName
-          });
-          const name = fileItem.fileName;
-          return new Promise((resolve, reject) => {
-            client.put(name, fileItem.file, {
-              progress: function * (percentage, cpt) {
-                self.percentage = percentage;
-              }
+    },
+    getFileUrl(fileName) {
+      const self = this;
+      const bucketName = self.oss.ossBucketName;
+      const endpoint = self.oss.ossEndPoint;
+      const key = fileName;
+      if (self.oss.ossVendor === 2) {
+        return `https://${endpoint}/${bucketName}/${fileName}`;
+      } else {
+        return `http://${bucketName}.${endpoint}/${fileName}`;
+      }
+    },
+    upLoadFile(fileItem) {
+      const self = this;
+      self.percentage = 0;
+      if (self.oss.ossVendor === null) {
+        self.oss.ossVendor = 1; // 1 -aliyun  2-azure
+      }
+      if (self.oss.ossVendor === 1) {
+        const OSS = require('ali-oss');
+        const client = new OSS({
+          region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
+          accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
+          accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
+          // bucket: 'viumo-'+self.accountId,
+          bucket: self.oss.ossBucketName
+        });
+        const name = fileItem.fileName;
+        return new Promise((resolve, reject) => {
+          client.put(name, fileItem.file, {
+            progress: function * (percentage, cpt) {
+              self.percentage = percentage;
+            }
+          })
+            .then((results) => {
+              // 上传完成
+              const url = self.getFileUrl(results.name);
+              resolve(url);
             })
-              .then((results) => {
-                // 上传完成
-                const url = self.getFileUrl(results.name);
-                resolve(url);
-              })
-              .catch((err) => {
-                reject(err);
-              });
-          });
-        } else {
-          const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
-          const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
-          const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
-          return new Promise((resolve, reject) => {
-            azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
-              .then((results) => {
-                // 上传完成
-                const url = self.getFileUrl(fileItem.fileName);
-                resolve(url);
-              })
-              .catch((error) => {
-                reject(error);
-              });
-          });
-        }
-      },
-      clickSum(item, index) {
-        const self = this;
-        item.isActive = true;
-        self.resultList.forEach((_item, _index) => {
-          if (index !== _index) {
-            _item.isActive = false;
-          }
-        });
-        self.curSumIndex = item.label;
-      },
-      async submit() {
-        const self = this;
-        let upload = 0;
-        const inspect = self.inspectList;
-        const eventList = self.eventList;
-        let status = 0;
-        let flag = false;
-        self.uploadingnumOfPic = 0;
-        self.resultList.forEach(item => {
-          if (item.isActive) {
-            flag = true;
-          }
-        });
-        if (!flag) {
-          util.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
-          return false;
-        }
-        self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
-        const storageParams = {};
-        storageParams.storeId = self.store.storeId;
-        await getStorageInfo(storageParams).then(res => {
-          if (res.errCode === 0) {
-            self.oss = res.data;
-          }
-        });
-        const temp = [];
-        for (const i in inspect) {
-          for (const g in inspect[i].inspectList) {
-            for (const j in inspect[i].inspectList[g].items) {
-              const objItem = {};
-              objItem.ts = new Date().getTime();
-              objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
-              if (inspect[i].inspectList[g].items[j].itemType === 1) {
-                objItem.grade = Math.pow(-2,31);
-              } else {
-                if (inspect[i].type === 0 || inspect[i].type === 2) {
-                  objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
-                  inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
-                } else {
-                  objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
-                  inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2,31) : inspect[i].inspectList[g].items[j].itemgetScore;
-                }
-              }
-
-              objItem.storeId = self.store.storeId;
-              objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
-              const tempFileUrl = [];
-              if (!inspect[i].inspectList[g].items[j].isIgnore) {
-                for (const k in inspect[i].inspectList[g].items[j].sourceList) {
-                  const obj = {};
-                  await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
-                    self.uploadingnumOfPic++;
-                    if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
-                      obj.mediaType = 2;
-                      obj.url = url;
-                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                    } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
-                      obj.mediaType = 1;
-                      obj.url = url;
-                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                    }
-                  }).catch((err) => {
-                    upload++;
-                  });
-                  if (upload !== 0) {
-                    self.uploadProgress = false;
-                    util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-                    return false;
-                  }
-
-                  tempFileUrl.push(obj);
-                }
-              }
-              objItem.attachment = tempFileUrl;
-              temp.push(objItem);
-            }
-          }
-        }
-        const feedEventList = [];
-
-        for (const i in self.eventList) {
-          const obj = {};
-          obj.ts = new Date().getTime();
-          obj.storeId = self.store.storeId;
-
-          obj.subject = self.eventList[i].eventName;
-          obj.description = self.eventList[i].eventDes;
-
-          const commentTemp = [];
-          if (self.eventList[i].sourceObj != null) { // 通过通道创建的反馈问题
-            await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
-              self.uploadingnumOfPic++;
-              const commentObj = {
-                mediaType: self.eventList[i].sourceObj.mediaType,
-                url: url,
-                deviceId: self.eventList[i].sourceObj.deviceId
-              };
-              commentTemp.push(commentObj);
-            }).catch((err) => {
-              upload++;
+            .catch((err) => {
+              reject(err);
             });
-            if (upload !== 0) {
-              self.uploadProgress = false;
-              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-              return false;
+        });
+      } else {
+        const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+        const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
+        const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+        return new Promise((resolve, reject) => {
+          azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+            .then((results) => {
+              // 上传完成
+              const url = self.getFileUrl(fileItem.fileName);
+              resolve(url);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        });
+      }
+    },
+    clickSum(item, index) {
+      const self = this;
+      item.isActive = true;
+      self.resultList.forEach((_item, _index) => {
+        if (index !== _index) {
+          _item.isActive = false;
+        }
+      });
+      self.curSumIndex = item.label;
+    },
+    async submit() {
+      const self = this;
+      let upload = 0;
+      const inspect = self.inspectList;
+      const eventList = self.eventList;
+      let status = 0;
+      let flag = false;
+      self.uploadingnumOfPic = 0;
+      self.resultList.forEach(item => {
+        if (item.isActive) {
+          flag = true;
+        }
+      });
+      if (!flag) {
+        util.notify(self.$t('remotePatrol.summaryInfo'), 'warning', 3000);
+        return false;
+      }
+      self.totalnumOfPic > 0 ? self.uploadProgress = true : self.uploadProgress = false;
+      const storageParams = {};
+      storageParams.storeId = self.store.storeId;
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode === 0) {
+          self.oss = res.data;
+        }
+      });
+      const temp = [];
+      for (const i in inspect) {
+        for (const g in inspect[i].inspectList) {
+          for (const j in inspect[i].inspectList[g].items) {
+            const objItem = {};
+            objItem.ts = new Date().getTime();
+            objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
+            if (inspect[i].inspectList[g].items[j].itemType === 1) {
+              objItem.grade = Math.pow(-2, 31);
+            } else {
+              if (inspect[i].type === 0 || inspect[i].type === 2) {
+                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
+                  inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
+              } else {
+                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
+                  inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : inspect[i].inspectList[g].items[j].itemgetScore;
+              }
             }
 
-            obj.deviceId = self.eventList[i].sourceObj.deviceId;
-          } else { // 通过加号创建的问题反馈
-            // obj.diviceId=-1;
+            objItem.storeId = self.store.storeId;
+            objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
+            const tempFileUrl = [];
+            if (!inspect[i].inspectList[g].items[j].isIgnore) {
+              for (const k in inspect[i].inspectList[g].items[j].sourceList) {
+                const obj = {};
+                await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
+                  self.uploadingnumOfPic++;
+                  if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
+                    obj.mediaType = 2;
+                    obj.url = url;
+                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                  } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
+                    obj.mediaType = 1;
+                    obj.url = url;
+                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                  }
+                }).catch((err) => {
+                  upload++;
+                });
+                if (upload !== 0) {
+                  self.uploadProgress = false;
+                  util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                  return false;
+                }
+
+                tempFileUrl.push(obj);
+              }
+            }
+            objItem.attachment = tempFileUrl;
+            temp.push(objItem);
           }
-          obj.attachment = commentTemp;
-          feedEventList.push(obj);
         }
-        let curSumIndex = [];
-        curSumIndex = self.resultList.filter(x => x.isActive);
-        status = curSumIndex[0].label;
-        const params = {
-          status: status,
-          comment: self.suggest.trim(),
-          items: temp,
-          feedback: feedEventList
-        };
-        let routeData = null;
-        upload === 0 && submitInspectItem1(params).then(res => {
-          if (res.errCode === 0) {
-            const data = res.data;
-            self.editFlag = true;
-            routeData = {
-              isSuccess: true,
-              user: data.notifiedTo
+      }
+      const feedEventList = [];
+
+      for (const i in self.eventList) {
+        const obj = {};
+        obj.ts = new Date().getTime();
+        obj.storeId = self.store.storeId;
+
+        obj.subject = self.eventList[i].eventName;
+        obj.description = self.eventList[i].eventDes;
+
+        const commentTemp = [];
+        if (self.eventList[i].sourceObj != null) { // 通过通道创建的反馈问题
+          await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
+            self.uploadingnumOfPic++;
+            const commentObj = {
+              mediaType: self.eventList[i].sourceObj.mediaType,
+              url: url,
+              deviceId: self.eventList[i].sourceObj.deviceId
             };
-          } else {
-            routeData = {
-              isSuccess: false,
-              reLoadData: self.$route.params
-            };
+            commentTemp.push(commentObj);
+          }).catch((err) => {
+            upload++;
+          });
+          if (upload !== 0) {
+            self.uploadProgress = false;
+            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+            return false;
           }
-          self.$router.push({ name: 'submitEvent', params: { data: routeData }});
-        }).catch(err => {
-          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-          return false;
-        });
-        self.uploadProgress = false;
-      },
+
+          obj.deviceId = self.eventList[i].sourceObj.deviceId;
+        } else { // 通过加号创建的问题反馈
+          // obj.diviceId=-1;
+        }
+        obj.attachment = commentTemp;
+        feedEventList.push(obj);
+      }
+      let curSumIndex = [];
+      curSumIndex = self.resultList.filter(x => x.isActive);
+      status = curSumIndex[0].label;
+      const params = {
+        status: status,
+        comment: self.suggest.trim(),
+        items: temp,
+        feedback: feedEventList
+      };
+      let routeData = null;
+      upload === 0 && submitInspectItem1(params).then(res => {
+        if (res.errCode === 0) {
+          const data = res.data;
+          self.editFlag = true;
+          routeData = {
+            isSuccess: true,
+            user: data.notifiedTo
+          };
+        } else {
+          routeData = {
+            isSuccess: false,
+            reLoadData: self.$route.params
+          };
+        }
+        self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+      }).catch(err => {
+        util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+        return false;
+      });
+      self.uploadProgress = false;
+    },
 
     async getRouteData() {
       const self = this;
@@ -708,7 +715,7 @@ import Database from '@/common/Database.js';
         const allTypeArr = new Set();
         let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
         let PassFileXN = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0;
-        let ScoreX = 0,ScoreN = 0,ScoreXN = 0,ScoreTotalScoreX = 0, allScoreB = 0,ScoreTotalScoreSystem = 0;
+        let ScoreX = 0, ScoreN = 0, ScoreXN = 0, ScoreTotalScoreX = 0, allScoreB = 0, ScoreTotalScoreSystem = 0;
         let otherGetscoreTotal = 0, OtherTotalScoreSystem = 0;
         inspect.forEach(p_item => {
           if (p_item.dealCount !== 0) {
@@ -719,7 +726,7 @@ import Database from '@/common/Database.js';
         let Tab0Status = false;
         let inspectPic = 0;
         let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
-        let PassFile_totalScoreX = 0,Score_totalScoreX = 0;
+        let PassFile_totalScoreX = 0, Score_totalScoreX = 0;
         inspect.forEach(p_item => {
           p_item.inspectList.forEach(item => {
             let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
@@ -733,9 +740,9 @@ import Database from '@/common/Database.js';
             item.numOfCommentItem = 0;
             item.numOfTotalItems = 0;
             item.items.forEach(s_item => {
-              item.numOfTotalItems ++;
-              if (s_item.itemType === 1){
-                item.numOfCommentItem ++;
+              item.numOfTotalItems++;
+              if (s_item.itemType === 1) {
+                item.numOfCommentItem++;
                 return;
               }
               if (s_item.isIgnore) {
@@ -764,50 +771,48 @@ import Database from '@/common/Database.js';
               if (p_item.type === 0) {
                 PassFileTS += s_item.itemgetScore;
                 totalScore0 += s_item.itemScore;
-                if (!s_item.isIgnore&&!s_item.manualIgnore) {
+                if (!s_item.isIgnore && !s_item.manualIgnore) {
                   PassFileX += s_item.itemgetScore;
                   PassFile_totalScoreX += s_item.itemScore;
                   tab1GetScoreNoContainedIngored += s_item.itemgetScore;
-                }else{
+                } else {
                   PassFileN += s_item.itemScore;
                   tab1GetScoreContainedIgnored += s_item.itemScore;
                 }
-                if(inspect.length > 1){
-                  if(!inspectSettings.includedInTotalScoreWithType1){
+                if (inspect.length > 1) {
+                  if (!inspectSettings.includedInTotalScoreWithType1) {
                     s_item.showTotalScore = false;
-                  } else if(s_item.isIgnore || s_item.manualIgnore){
-                    if(inspectSettings.qualifiedForIgnoredWithType1){
+                  } else if (s_item.isIgnore || s_item.manualIgnore) {
+                    if (inspectSettings.qualifiedForIgnoredWithType1) {
                       s_item.showTotalScore = true;
-                    }
-                    else{
+                    } else {
                       s_item.showTotalScore = false;
                     }
-                  } else{
+                  } else {
                     s_item.showTotalScore = true;
                   }
                 } else {
-                  if(s_item.isIgnore || s_item.manualIgnore){
+                  if (s_item.isIgnore || s_item.manualIgnore) {
                     s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType1;
-                  }
-                  else{
+                  } else {
                     s_item.showTotalScore = true;
                   }
                 }
               } else if (p_item.type === 1) {
                 totalScore += s_item.itemScore;
                 ScoreTS += s_item.itemgetScore;
-                if (!s_item.isIgnore&&!s_item.manualIgnore) {
+                if (!s_item.isIgnore && !s_item.manualIgnore) {
                   ScoreX += s_item.itemgetScore;
                   Score_totalScoreX += s_item.itemScore;
                   notAddIgnoretotalScore += s_item.itemScore;
                   tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
-                }else{
+                } else {
                   ScoreN += s_item.itemScore;
                   tab2IgnoredItemsGetScore += s_item.itemScore;
                 }
-                if(s_item.isIgnore || s_item.manualIgnore){
+                if (s_item.isIgnore || s_item.manualIgnore) {
                   s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType2;
-                } else{
+                } else {
                   s_item.showTotalScore = true;
                 }
               } else if (p_item.type === 2 && !s_item.isIgnore) {
@@ -819,18 +824,18 @@ import Database from '@/common/Database.js';
             item['numOfQualified'] = QualifiedArr.length;
             item['numOfUnqualified'] = UnqualifiedArr.length;
             item['numIgnore'] = IgnoredArr.length;
-            if(inspectSettings.qualifiedForIgnoredWithType2){
+            if (inspectSettings.qualifiedForIgnoredWithType2) {
               item['itemScore'] = totalScore;
               if (p_item.type === 1) {
                 item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
                 item['numIgnore'] = 0;
               }
-            }else{
+            } else {
               item['itemScore'] = notAddIgnoretotalScore;
             }
-            if(p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1){
+            if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1) {
               item['itemgetScore'] = '--';
-            } else{
+            } else {
               item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
@@ -868,8 +873,8 @@ import Database from '@/common/Database.js';
               ScoreXN = ScoreX + ScoreN;
               ScoreTotalScoreX = Score_totalScoreX;
               item['itemgetScore'] =
-                inspectSettings.qualifiedForIgnoredWithType2 ?
-                  (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
+                inspectSettings.qualifiedForIgnoredWithType2
+                  ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
               item['itemgetScore'] = item['itemgetScore'].toFixed(1);
             }
             if (p_item.type === 2) {
@@ -895,9 +900,9 @@ import Database from '@/common/Database.js';
         let s_count = 0;
         if (inspect.length === 1 && inspect[0].type === 0) {
           if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
-            if(inspectSettings.qualifiedForIgnoredWithType1){
+            if (inspectSettings.qualifiedForIgnoredWithType1) {
               s_count = PassFileXN;
-            }else{
+            } else {
               s_count = PassFileTotalScoreSystem;
             }
           } else {
@@ -920,7 +925,7 @@ import Database from '@/common/Database.js';
                 s_count = PassFileTotalScoreSystem + ScoreTotalScoreSystem + OtherTotalScoreSystem;
               }
             } else {
-              let total_a = 0,total_b = 0,total_c = 0;
+              let total_a = 0, total_b = 0, total_c = 0;
               if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
                 total_a = PassFileXN + ScoreTotalScoreSystem;
                 total_b = PassFileTotalScore + ScoreTotalScoreX;
@@ -934,7 +939,7 @@ import Database from '@/common/Database.js';
                 total_a = PassFileXS + ScoreTotalScoreSystem;
                 total_b = PassFileTotalScoreX + ScoreTotalScoreX;
               }
-              total_c = total_a===0 || total_b===0 ? 0 : (total_a / total_b * 100);
+              total_c = total_a === 0 || total_b === 0 ? 0 : (total_a / total_b * 100);
               s_count = total_c + otherGetscoreTotal;
             }
           } else {
@@ -947,9 +952,9 @@ import Database from '@/common/Database.js';
             } else {
               let total_a = 0;
               if (inspectSettings.qualifiedForIgnoredWithType2) {
-                total_a = allScoreB===0 || ScoreXN===0 ? 0 : (ScoreXN / allScoreB * 100);
+                total_a = allScoreB === 0 || ScoreXN === 0 ? 0 : (ScoreXN / allScoreB * 100);
               } else {
-                total_a = ScoreTotalScoreX===0 || ScoreTotalScoreSystem===0 ? 0 : (ScoreTotalScoreSystem / ScoreTotalScoreX * 100);
+                total_a = ScoreTotalScoreX === 0 || ScoreTotalScoreSystem === 0 ? 0 : (ScoreTotalScoreSystem / ScoreTotalScoreX * 100);
               }
               s_count = total_a + otherGetscoreTotal;
             }
@@ -961,11 +966,11 @@ import Database from '@/common/Database.js';
             item.isActive = false;
           });
         }
-        if(inspectSettings.hundredMarkType === '1'){
+        if (inspectSettings.hundredMarkType === '1') {
           s_count = s_count + inspectSettings.baseScore;
         }
-        self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore :
-          (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
+        self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore
+          : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
         self.summary = this.groupbyKey(inspect, 'type');
         eventList.forEach((item, index) => {
           const objFeedBack = {};
@@ -1002,153 +1007,154 @@ import Database from '@/common/Database.js';
       }).catch(err => {
         console.log(err);
       });
-      },
+    },
 
-      getGroupsItems(key){
-        const group = [];
-        console.log(this.inspectList);
-        this.inspectList.forEach(catergy => {
-          const tempGroupItem = {};
-          tempGroupItem.groupName = catergy.label;
-          tempGroupItem.type = catergy.type;
-          if(!catergy.isCategory){
-            if (catergy.inspectList[0][key].length > 0) {
-              tempGroupItem.cateryItems = catergy.inspectList[0][key];
-              group.push(tempGroupItem);
-            }
-          } else {
-            tempGroupItem.children = [];
-            catergy.inspectList.forEach(child => {
-              const tempChildItem = {};
-              tempChildItem.groupId = child.groupId;
-              tempChildItem.groupName = child.groupName;
-              tempChildItem.type = child.type;
-              tempChildItem.cateryItems = [];
-              if (child[key].length > 0) {
-                tempChildItem.cateryItems = child[key];
-              }
-              if (tempChildItem.cateryItems.length > 0) {
-                tempGroupItem.children.push(tempChildItem);
-              }
-            });
-
-            if(tempGroupItem.children.length > 0){
-              group.push(tempGroupItem);
-            }
+    getGroupsItems(key) {
+      const group = [];
+      console.log(this.inspectList);
+      this.inspectList.forEach(catergy => {
+        const tempGroupItem = {};
+        tempGroupItem.groupName = catergy.label;
+        tempGroupItem.type = catergy.type;
+        if (!catergy.isCategory) {
+          if (catergy.inspectList[0][key].length > 0) {
+            tempGroupItem.cateryItems = catergy.inspectList[0][key];
+            group.push(tempGroupItem);
           }
-        });
-        console.log(group)
-        return group;
-      },
-
-      groupbyKey(data, key) {
-        const tempData = [];
-        data.forEach((item) => {
-          const res = item.inspectList.filter(inspect => {
-            return inspect.numOfCommentItem !== inspect.numOfTotalItems;
-          });
-          if (res && res.length) {
-            item.inspectList = res;
-            tempData.push(item);
-          }
-        })
-        let map = {}, dest = [];
-        for (var i = 0; i < tempData.length; i++) {
-          var ai = tempData[i];
-          if (!map[ai[key]]) {
-            dest.push({
-              name: ai[key],
-              data: [ai]
-            });
-            map[ai[key]] = ai;
-          } else {
-            for (var j = 0; j < dest.length; j++) {
-              var dj = dest[j];
-              if (dj.name == ai[key]) {
-                dj.data.push(ai);
-                break;
-              }
-            }
-          }
-        }
-        return dest;
-      },
-
-      getAccountId() {
-        const self = this;
-        const userId = getCookie('UserId');
-        return new Promise((resolve, reject) => {
-          getUserInfo().then(res => {
-            console.log(res);
-            res.data.forEach(item => {
-              if (item.userId === userId) {
-                const accountId = item.accountId.toLowerCase();
-                self.accountId = accountId;
-                localStorage.setItem('oss_bucket', accountId);
-                resolve(accountId);
-              }
-            });
-          });
-        });
-      },
-      async getOssInfo() {
-        const self = this;
-        const accountId = await self.getAccountId();
-        console.log(accountId);
-        self.accountId = localStorage.getItem('oss_bucket');
-      },
-      getUpLoadBucketInfo() {
-        const self = this;
-        self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
-        self.bucketImage = 'image' + '/' + util.getCurDate2Str();
-      },
-
-      notShowInputRuleTips() {
-        this.adviceInfoRuletip = false;
-      },
-
-      adviceChanged(val) {
-        const self = this;
-        const content = filterString.all(val, 600);
-        const length = filterString.getContentLength(val);
-        console.log(content);
-        self.suggest = content;
-        if (length > 600) {
-          this.adviceInfoRuletip = true;
         } else {
-          this.adviceInfoRuletip = false;
-        }
-      },
+          tempGroupItem.children = [];
+          catergy.inspectList.forEach(child => {
+            const tempChildItem = {};
+            tempChildItem.groupId = child.groupId;
+            tempChildItem.groupName = child.groupName;
+            tempChildItem.type = child.type;
+            tempChildItem.cateryItems = [];
+            if (child[key].length > 0) {
+              tempChildItem.cateryItems = child[key];
+            }
+            if (tempChildItem.cateryItems.length > 0) {
+              tempGroupItem.children.push(tempChildItem);
+            }
+          });
 
-      getTab1AndTab3BtnName(setting){
-        let tab1BtnArr = [setting.itemOptionsForType1[0].name , setting.itemOptionsForType1[1].name];
-        let tab3BtnArr = [setting.itemOptionsForType3[0].name , setting.itemOptionsForType3[1].name];
-        this.theaderPassFail = [
-          { name: '', width: 'width:11%;' },
-          { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-          { name: tab1BtnArr[0], width: 'width:20%;' },
-          { name: tab1BtnArr[1], width: 'width:20%;' },
-          { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
-        ];
-        this.theaderOther = [
-          { name: '', width: 'width:11%;' },
-          { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-          { name: tab3BtnArr[0], width: 'width:20%;' },
-          { name: tab3BtnArr[1], width: 'width:20%;' },
-          { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
-        ];
-        this.theaderScore = [
-          { name: '', width: 'width:11%;' },
-          { name: this.$t('remotePatrol.item'), width: 'width:26%;' },
-          { name: this.$t('remotePatrol.TableTotal'), width: 'width:34%;' },
-          { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' }
-        ];
-        this.tab1BtnArr = tab1BtnArr;
-        this.tab3BtnArr = tab3BtnArr;
-      },
+          if (tempGroupItem.children.length > 0) {
+            group.push(tempGroupItem);
+          }
+        }
+      });
+      console.log(group);
+      return group;
+    },
+
+    groupbyKey(data, key) {
+      const tempData = [];
+      data.forEach((item) => {
+        const res = item.inspectList.filter(inspect => {
+          return inspect.numOfCommentItem !== inspect.numOfTotalItems;
+        });
+        if (res && res.length) {
+          item.inspectList = res;
+          tempData.push(item);
+        }
+      });
+      let map = {}, dest = [];
+      for (var i = 0; i < tempData.length; i++) {
+        var ai = tempData[i];
+        if (!map[ai[key]]) {
+          dest.push({
+            name: ai[key],
+            data: [ai]
+          });
+          map[ai[key]] = ai;
+        } else {
+          for (var j = 0; j < dest.length; j++) {
+            var dj = dest[j];
+            if (dj.name == ai[key]) {
+              dj.data.push(ai);
+              break;
+            }
+          }
+        }
+      }
+      return dest;
+    },
+
+    getAccountId() {
+      const self = this;
+      const userId = getCookie('UserId');
+      return new Promise((resolve, reject) => {
+        getUserInfo().then(res => {
+          console.log(res);
+          res.data.forEach(item => {
+            if (item.userId === userId) {
+              const accountId = item.accountId.toLowerCase();
+              self.accountId = accountId;
+              localStorage.setItem('oss_bucket', accountId);
+              resolve(accountId);
+            }
+          });
+        });
+      });
+    },
+    async getOssInfo() {
+      const self = this;
+      const accountId = await self.getAccountId();
+      console.log(accountId);
+      self.accountId = localStorage.getItem('oss_bucket');
+    },
+    getUpLoadBucketInfo() {
+      const self = this;
+      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
+      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+    },
+
+    notShowInputRuleTips() {
+      this.adviceInfoRuletip = false;
+    },
+
+    adviceChanged(val) {
+      const self = this;
+      const content = filterString.all(val, 600);
+      const length = filterString.getContentLength(val);
+      console.log(content);
+      self.suggest = content;
+      if (length > 600) {
+        this.adviceInfoRuletip = true;
+      } else {
+        this.adviceInfoRuletip = false;
+      }
+    },
+
+    getTab1AndTab3BtnName(setting) {
+      const tab1BtnArr = [setting.itemOptionsForType1[0].name, setting.itemOptionsForType1[1].name];
+      const tab3BtnArr = [setting.itemOptionsForType3[0].name, setting.itemOptionsForType3[1].name];
+
+      this.theaderPassFail = [
+        { name: '', width: 'width:32%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:32%;' },
+        { name: this.tab1BtnArr[0], width: 'width:12%;' },
+        { name: this.tab1BtnArr[1], width: 'width:12%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
+      ];
+      this.theaderOther = [
+        { name: '', width: 'width:32%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:32%;' },
+        { name: this.tab3BtnArr[0], width: 'width:12%;' },
+        { name: this.tab3BtnArr[1], width: 'width:12%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
+      ];
+      this.theaderScore = [
+        { name: '', width: 'width:32%;' },
+        { name: this.$t('remotePatrol.item'), width: 'width:32%;' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:24%;' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
+      ];
+      this.tab1BtnArr = tab1BtnArr;
+      this.tab3BtnArr = tab3BtnArr;
+    }
 
   }
-  };
+};
 </script>
 <style lang="scss" scoped>
   $red:#f31d65;
