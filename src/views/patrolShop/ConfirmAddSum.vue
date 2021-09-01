@@ -153,7 +153,10 @@
                                 :preview-src-list="getImgList(sourceindex, categoryItem.sourceList)"
                                 class="imgLittle imgInner"/>
                             </div>
-                            <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                            <div
+                              v-if="sourceitem.mediaType==1"
+                              class="img-content "
+                              @click="playCommentVideo(sourceitem,sourceindex)">
                               <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
                               <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
                             </div>
@@ -209,13 +212,6 @@
                               :height="imgHeight+'px'"
                               class="source-details">
                               <div v-if="sourceitem.mediaType==2" class="img-content">
-                                <img
-                                  :title="imgTitle"
-                                  :src="sourceitem.src"
-                                  :height="imgHeight+'px'"
-                                  :onerror="deafultImg"
-                                  class="imgLittle imgInner"
-                                  @click="openOuter(sourceitem,$event)">
                                 <el-image
                                   :src="sourceitem.src"
                                   :style="imageStyle"
@@ -256,7 +252,7 @@
                                 <el-image
                                   :src="sourceitem.src"
                                   :style="imageStyle"
-                                  :preview-src-list="getImgList(sourceindex, sourceitem.sourceList)"
+                                  :preview-src-list="getImgList(sourceindex, _item.sourceList)"
                                   class="imgLittle imgInner"/>
                               </div>
                               <div
@@ -294,7 +290,7 @@
                           <el-image
                             :src="sourceitem.src"
                             :style="imageStyle"
-                            :preview-src-list="getImgList(index, sourceitem.sourceList)"
+                            :preview-src-list="getImgList(index, _item.sourceList)"
                             class="imgLittle imgInner"/>
                         </div>
                         <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
@@ -836,22 +832,23 @@ export default {
             if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1) {
               item['itemgetScore'] = '--';
             } else {
-              item['itemgetScore'] = parseFloat(totalGetscore.toFixed(1));
+              item['itemgetScore'] = util.isDouble(totalGetscore);
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored.toFixed(1);
+                item['itemgetScore'] = tab1GetScoreContainedIgnored + util.isDouble(tab1GetScoreNoContainedIngored);
                 item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
                 item['numIgnore'] = 0;
               } else {
-                item['itemgetScore'] = tab1GetScoreNoContainedIngored.toFixed(1);
+                item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored);
               }
             } else {
               if (inspectSettings.includedInTotalScoreWithType1) {
                 if (inspectSettings.qualifiedForIgnoredWithType1) {
-                  item['itemgetScore'] = (tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored).toFixed(1);
+                  item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored +
+                                          tab1GetScoreNoContainedIngored);
                 } else {
-                  item['itemgetScore'] = tab1GetScoreNoContainedIngored.toFixed(1);
+                  item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored);
                 }
               }
               if (inspectSettings.qualifiedForIgnoredWithType1) {
@@ -875,7 +872,7 @@ export default {
               item['itemgetScore'] =
                 inspectSettings.qualifiedForIgnoredWithType2
                   ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
-              item['itemgetScore'] = item['itemgetScore'].toFixed(1);
+              item['itemgetScore'] = util.isDouble(item['itemgetScore']);
             }
             if (p_item.type === 2) {
               CurOtherTotalScore += totalGetscore;
@@ -1126,8 +1123,8 @@ export default {
     },
 
     getTab1AndTab3BtnName(setting) {
-      const tab1BtnArr = [setting.itemOptionsForType1[0].name, setting.itemOptionsForType1[1].name];
-      const tab3BtnArr = [setting.itemOptionsForType3[0].name, setting.itemOptionsForType3[1].name];
+      this.tab1BtnArr = [setting.itemOptionsForType1[0].name, setting.itemOptionsForType1[1].name];
+      this.tab3BtnArr = [setting.itemOptionsForType3[0].name, setting.itemOptionsForType3[1].name];
 
       this.theaderPassFail = [
         { name: '', width: 'width:32%;' },
@@ -1149,8 +1146,6 @@ export default {
         { name: this.$t('remotePatrol.TableTotal'), width: 'width:24%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
       ];
-      this.tab1BtnArr = tab1BtnArr;
-      this.tab3BtnArr = tab3BtnArr;
     }
 
   }

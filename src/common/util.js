@@ -645,10 +645,10 @@ export default {
       { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
       { ret: 'storeNotExist', match: ['Store does not exist'] },
       { ret: 'noAuthorityForStore', match: ['No authority'] },
-      { ret: 'illegalSeriNum', match: ['deviceSerial']},
-      { ret: 'videoLicenseOverdue', match: ['Device License overdue']},
-      { ret: 'hasBoundItem', match: ['binding to item']},
-      { ret: 'hasAdded', match: ['设备已被别人添加']}
+      { ret: 'illegalSeriNum', match: ['deviceSerial'] },
+      { ret: 'videoLicenseOverdue', match: ['Device License overdue'] },
+      { ret: 'hasBoundItem', match: ['binding to item'] },
+      { ret: 'hasAdded', match: ['设备已被别人添加'] }
     ];
     const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
     if (!result) {
@@ -658,6 +658,12 @@ export default {
     }
     this.notify(displayedMsg, 'warning', 3000);
     return displayedMsg;
+  },
+
+  isDouble(num, n = 1) {
+    const y = String(num).indexOf('.') + 1;
+    console.log(y)
+    return y > 0 ? parseFloat(num.toFixed(n)) : parseInt(num);
   }
 
 };
