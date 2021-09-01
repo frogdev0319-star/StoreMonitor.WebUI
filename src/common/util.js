@@ -641,6 +641,11 @@ export default {
     }
     this.notify(displayedMsg, 'warning', 3000);
     return displayedMsg;
+  },
+
+  isDouble(num, n = 1) {
+    const y = String(num).indexOf('.') + 1;
+    return y > 0 ? parseFloat(parseFloat(num).toFixed(n)) : parseInt(num);
   }
 
 };
