@@ -531,25 +531,29 @@ export default {
           label: this.$t('remotePatrol.fluency'),
           value: 1
         }
-      ]
+      ],
+      notUpdateMsg: false
     };
   },
 
   watch: {
     channelInfo: {
      handler(newChannel, oldChannel) {
-        console.log(newChannel)
         if (Object.keys(oldChannel).length > 0 && newChannel.ivsId !== oldChannel.ivsId) {
-          this.getEzvizAccessToken(newChannel.ivsId);
-          if (this.playState) {
-            this.stopRealTime();
-            this.$nextTick(() => {
-              this.realTime();
-            });
-          } else {
-            this.$nextTick(() => {
-              this.realTime();
-            });
+          try {
+            this.getEzvizAccessToken(newChannel.ivsId);
+            if (this.playState) {
+              this.stopRealTime();
+              this.$nextTick(() => {
+                this.realTime();
+              });
+            } else {
+              this.$nextTick(() => {
+                this.realTime();
+              });
+            };
+          }catch (e) {
+            console.log(e);
           }
         }
       },
@@ -557,7 +561,6 @@ export default {
     },
 
     accountChanged(val) {
-      console.log(val);
       const self = this;
       if (val !== 0) {
         self.channelInfo = null;
@@ -603,11 +606,14 @@ export default {
     },
 
     async ivsId(newValue, oldValue) {
-      console.log(newValue);
-      console.log(oldValue);
       if (newValue.length > 0) {
         this.getVideoQualityIndex();
-        await this.getEzvizAccessToken(newValue);
+        try {
+          await this.getEzvizAccessToken(newValue);
+        }catch (e) {
+          console.log(e);
+        }
+
       }
     }
   },
@@ -780,21 +786,28 @@ export default {
       if (this.videoAuthority === false) {
         return;
       }
+      this.notUpdateMsg = false;
       const params = {};
       params.ivsId = ivsId;
       return new Promise((resolve, reject) => {
         if (self.currentIvsId === ivsId) {
           resolve(self.accessToken);
         } else {
-          getEzvizAccessToken(params)
-            .then(result => {
-              self.currentIvsId = ivsId;
-              self.accessToken = result.data.accessToken;
-              self.areaDomain = {
-                domain: result.data.areaDomain
-              };
-              self.ezvizExpireTime = result.data.expireTime;
-              resolve(result.data.accessToken);
+          getEzvizAccessToken(params).then(result => {
+              if(result.errCode === 0){
+                self.currentIvsId = ivsId;
+                self.accessToken = result.data.accessToken;
+                self.areaDomain = {
+                  domain: result.data.areaDomain
+                };
+                self.ezvizExpireTime = result.data.expireTime;
+                resolve(result.data.accessToken);
+              } else {
+                this.showError = true;
+                this.errorMsg =util.setErrorMsg(result.errMsg, false);
+                this.notUpdateMsg = true;
+                throw Error(result.errMsg);
+              }
             })
             .catch(error => {
               reject(error);
@@ -882,7 +895,7 @@ export default {
       self.showModelContent = false;
       if (self.accessToken.length === 0) {
         self.showError = true;
-        self.errorMsg = self.$t('remotePatrol.getAccessTokenError');
+        self.errorMsg = this.notUpdateMsg ? this.errorMsg : this.$t('remotePatrol.getAccessTokenError');
         return;
       }
       if (self.channelInfo == null) {
@@ -1302,7 +1315,11 @@ export default {
         this.errorMsg = this.$t('remotePatrol.videoLicense');
         return;
       }
-      await this.getEzvizAccessToken(this.channelInfo.ivsId);
+      try {
+        await this.getEzvizAccessToken(this.channelInfo.ivsId);
+      } catch (e) {
+        console.log(e);
+      }
       if (self.isStoreMonitor) {
         self.checkIfEncry();
         self.isLoaded = true;
@@ -1898,10 +1915,14 @@ export default {
     },
 
     async startVideo(ivsId, channelId, startTs){
-      console.log('startVideo' + ivsId)
-      await this.getEzvizAccessToken(ivsId);
-      this.playState && this.stopRealTime();
-      this.realTime();
+      try {
+        await this.getEzvizAccessToken(ivsId);
+        this.playState && this.stopRealTime();
+        this.realTime();
+      } catch (e) {
+        console.log(e);
+      }
+
     },
 
     stopVideoPlay(){

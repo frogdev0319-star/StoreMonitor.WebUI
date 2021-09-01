@@ -1016,11 +1016,16 @@ export default {
         } else {
           getBeseyeAccessToken(params)
             .then(result => {
-              console.log(result);
-              self.currentStoreId = channelId;
-              self.accessToken = result.data.accessToken;
-              self.expireTime = result.data.expireTime;
-              resolve(result.data.accessToken);
+              if (result.errCode === 0){
+                self.currentStoreId = channelId;
+                self.accessToken = result.data.accessToken;
+                self.expireTime = result.data.expireTime;
+                resolve(result.data.accessToken);
+              } else{
+                this.showError = true;
+                this.errorText = util.setErrorMsg(result.errMsg, false);
+              }
+
             })
             .catch(error => {
               reject(error);

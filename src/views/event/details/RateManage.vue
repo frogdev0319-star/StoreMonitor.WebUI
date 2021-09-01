@@ -620,9 +620,11 @@ export default {
     },
 
     clickSubBtn(item, index) {
-      const self = this;
+      if (!util.validateLicense(this.licenseStatus)) {
+        return;
+      }
       item.isActive = true;
-      self.subBtnList.forEach((_item, _index) => {
+      this.subBtnList.forEach((_item, _index) => {
         if (index !== _index) {
           _item.isActive = false;
         }
@@ -664,6 +666,9 @@ export default {
     },
 
     submit() {
+      if (!util.validateLicense(this.licenseStatus)) {
+        return;
+      }
       const self = this;
       let status = 0;
       const description = self.eventDes;
