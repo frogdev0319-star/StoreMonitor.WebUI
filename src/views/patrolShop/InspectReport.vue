@@ -706,7 +706,7 @@ export default {
           index = 0 - (i + 1);
         }
       }
-      return arr.filter(source => source.type === 2).map(source => source.content);
+      return arr.filter(source => source.type === 1).map(source => source.content);
     },
 
     async getReportInfo(res) {
@@ -716,6 +716,7 @@ export default {
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.getGroupsData(data.groups);
         this.reportData = data;
+        this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
         this.getPageDataBasedOnTemplate(this.reportData);
       }
     },
@@ -871,30 +872,24 @@ export default {
 
     getTableHeader() {
       this.theaderPassFail = [
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
-        { name: this.tab1BtnArr[0], width: 'width:16%;', pdfWidth: 'width:13%;' },
-        { name: this.tab1BtnArr[1], width: 'width:17%;', pdfWidth: 'width:13%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
+        { name: '', width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('remotePatrol.item'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.tab1BtnArr[0], width: 'width:12%;', pdfWidth: 'width: 10%' },
+        { name: this.tab1BtnArr[1], width: 'width:12%;', pdfWidth: 'width: 10%' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;', pdfWidth: 'width: 10%' }
       ];
       this.theaderOther = [
-        { name: '', width: 'width:11%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:20%;' },
-        { name: this.tab3BtnArr[0], width: 'width:20%;' },
-        { name: this.tab3BtnArr[1], width: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:20%;' },
-
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
-        { name: this.tab3BtnArr[0], width: 'width:16%;', pdfWidth: 'width:13%;' },
-        { name: this.tab3BtnArr[1], width: 'width:17%;', pdfWidth: 'width:13%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
+        { name: '', width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('remotePatrol.item'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.tab3BtnArr[0], width: 'width:12%;', pdfWidth: 'width: 10%' },
+        { name: this.tab3BtnArr[1], width: 'width:12%;', pdfWidth: 'width: 10%' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;', pdfWidth: 'width: 10%' }
       ];
       this.theaderScore = [
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
-        { name: this.$t('remotePatrol.TableTotal'), width: 'width:25%;', pdfWidth: 'width:20%;' },
-        { name: this.$t('remotePatrol.TableGet'), width: 'width:25%;', pdfWidth: 'width:20%;' }
+        { name: '', width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('remotePatrol.item'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('remotePatrol.TableTotal'), width: 'width:24%;', pdfWidth: 'width: 20%' },
+        { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;', pdfWidth: 'width: 10%' }
       ];
     },
 

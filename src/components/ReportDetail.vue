@@ -55,15 +55,12 @@
         class="content-detail-main"
         style="padding-bottom: 20px;">
         <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
-        <div v-if="_item.showAudio" class="cdm-voice">
-          <div :class="isExportPdf ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
-            <i class="iconfont icon-yuyin icon-speech"/>
-          </div>
-          <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-            <source :src="_item.audio.audioSrc" type="audio/mpeg" >
-          </audio>
-          <span class="often-text">{{ _item.audio.audioOftenText }}</span>
-        </div>
+        <audio-vue
+          v-if="_item.showAudio"
+          :is-export-pdf="isExportPdf"
+          :audio-ref="_item.audio.audioRef"
+          :audio-src="_item.audio.audioSrc"
+        />
         <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
           <span class="pdf_font_24">{{ _item.comment }}</span>
         </div>
@@ -73,15 +70,15 @@
             :key="sourceindex"
             :height="imgHeight+'px'"
             class="source-details">
-            <div v-if="sourceitem.mediaType === 2" :style="isExportPdf ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
-              <img
-                :title="imgTitle"
-                :style="isExportPdf ? 'width:260px;height:148px;' : 'width: calc(130/1920*100vw);'"
+            <div
+              v-if="sourceitem.mediaType === 2"
+              :style="isExportPdf ? 'margin-right:20px;margin-bottom:20px' : ''"
+              class="img-content">
+              <el-image
+                :style="isExportPdf ? exportImageStyle :imageStyle"
                 :src="sourceitem.url"
-                :height="imgHeight+'px'"
-                :onerror="deafultImg"
-                class="imgLittle imgInner"
-                @click="openOuter(sourceitem,$event)">
+                :preview-src-list="getImgList(sourceindex, _item.sourceList)"
+                class="imgLittle imgInner"/>
             </div>
             <div
               v-if="sourceitem.mediaType==1"
@@ -121,36 +118,21 @@
         </div>
       </div>
     </el-dialog>
-
-    <transition name="fade">
-      <el-dialog
-        v-if="showOuter"
-        :title="$t('eventView.view')"
-        :visible.sync="showOuter"
-        :close-on-click-modal="false"
-        width="850px"
-        top="12%">
-        <div class="video-dialog-content" style="overflow:hidden;text-align:center;">
-          <hr class="dialog-hr">
-          <div class="dialog-source-content">
-            <img v-if="showImg" :src="checkImgSrc">
-          </div>
-        </div>
-      </el-dialog>
-    </transition>
   </div>
 </template>
 
 <script>
 import videojs from '../../static/video.js';
 import 'videojs-contrib-hls';
+import AudioVue from './AudioVue';
 
 export default {
   name: 'ReportDetail',
+  components: { AudioVue },
   props: {
     reportDetailData: {
       type: Array,
-      default: []
+      default: () => []
     },
     groupType: {
       type: Number,
@@ -170,19 +152,19 @@ export default {
     },
     groups: {
       type: Array,
-      default: []
+      default: () => []
     }
   },
   data() {
     return {
       dialogCommentVideo: false,
-      showOuter: false,
-      checkImgSrc: '',
-      showImg: false,
       startIcon: require('../../static/img/play_icon.png'),
-      imgTitle: '',
       videoImgSrc: require('../../static/img/video_thumbnail.png'),
-      deafultImg: 'this.src="' + require('../../static/img/picture_failed.png') + '"'
+      deafultImg: 'this.src="' + require('../../static/img/picture_failed.png') + '"',
+      exportImageStyle: {
+        width: '260px',
+        height: '148px'
+      }
     };
   },
 
@@ -200,50 +182,17 @@ export default {
         height = 75;
       }
       return height;
+    },
+
+    imageStyle() {
+      return {
+        'width': 'calc(130/1920*100vw)',
+        'height': `${this.imgHeight}px`
+      }
     }
   },
 
   methods: {
-    startSpeechItem(item, index) {
-      const self = this;
-      if (!item.audio.isPlaying) {
-        self.$refs[item.audio.audioRef][0].play();
-        item.audio.isPlaying = true;
-      } else {
-        self.$refs[item.audio.audioRef][0].pause();
-        item.audio.isPlaying = false;
-      }
-      self.groups.forEach((groupitem) => {
-        groupitem.items.forEach((_item, _index) => {
-          if (_item.audio !== undefined) {
-            if (_index !== index) {
-              if (self.$refs[_item.audio.audioRef] !== undefined) {
-                self.$refs[_item.audio.audioRef][0].pause();
-                _item.audio.isPlaying = false;
-              }
-            }
-          }
-        });
-      });
-    },
-
-    getGroupsDuration(item) {
-      const self = this;
-      if (item.showAudio) {
-        const audio = self.$refs[item.audio.audioRef][0];
-        let du = audio.duration;
-        if (isNaN(du)) {
-          item.showAudio = false;
-        } else {
-          const duration = Math.floor(du);
-          if (duration === 0) {
-            du = 1;
-          }
-          item.audio.audioOftenText = parseInt(du) + '"';
-        }
-      }
-    },
-
     playCommentVideo(item, index) {
       const self = this;
       self.dialogCommentVideo = true;
@@ -255,13 +204,16 @@ export default {
       });
     },
 
-    openOuter(item, $ev) {
-      const self = this;
-      if (item != null) {
-        self.showOuter = true;
-        self.checkImgSrc = item.url;
-        self.showImg = true;
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
       }
+      return arr.filter(source => source.mediaType === 2).map(source => source.url);
     },
 
     stopCommentVideo() {
