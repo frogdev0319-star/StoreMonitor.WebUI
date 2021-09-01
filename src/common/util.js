@@ -662,8 +662,7 @@ export default {
 
   isDouble(num, n = 1) {
     const y = String(num).indexOf('.') + 1;
-    console.log(y)
-    return y > 0 ? parseFloat(num.toFixed(n)) : parseInt(num);
+    return y > 0 ? parseFloat(parseFloat(num).toFixed(n)) : parseInt(num);
   }
 
 };
