@@ -556,6 +556,8 @@
           result.errCode === 0 && this.getVideoStream(startTs);
         } catch (e) {
           this.apiKey = '';
+          this.showError = true;
+          this.errorText = util.setErrorMsg(e.message, false);
           console.log('skywatchPlayer- getToken:' + e.message);
         }
       },

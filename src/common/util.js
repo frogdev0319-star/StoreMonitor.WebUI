@@ -640,6 +640,7 @@ export default {
       displayedMsg = i18n.t(`deviceView.${result.ret}`);
     }
     this.notify(displayedMsg, 'warning', 3000);
+    return displayedMsg;
   }
 
 };
