@@ -443,39 +443,38 @@
       },
 
       async confirmDeleteSkywatchDevice(deleteDeviceObj) {
-      this.showDeleteDialog = false;
-      const { deleteParmas } = { ...deleteDeviceObj };
-      try {
-        const deleteResult = await skywatchRESTful.deleteSkywatchDevice(deleteParmas);
-        if (deleteResult.errCode === 0) {
-          util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
-          const params = this.setParams();
-          await this.getSkywatchDeviceList(params);
-        } else {
-          throw new Error(deleteResult.errMsg);
+        const { deleteParmas } = { ...deleteDeviceObj };
+        try {
+          const deleteResult = await skywatchRESTful.deleteSkywatchDevice(deleteParmas);
+          if (deleteResult.errCode === 0) {
+            util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
+            const params = this.setParams();
+            await this.getSkywatchDeviceList(params);
+          } else {
+            throw new Error(deleteResult.errMsg);
+          }
+        } catch (error) {
+          util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
+          console.log('SkywatchDeviceMgmt-confirmDeleteSkywatchDevice: ' + error);
         }
-      } catch (error) {
-        util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
-        console.log('SkywatchDeviceMgmt-confirmDeleteSkywatchDevice: ' + error);
-      }
     },
 
-      setDeleteChannelParams() {
-        const deleteChannelParmas = {};
-        deleteChannelParmas.deviceIds = this.deleteChannelIds;
-        return deleteChannelParmas;
-      },
+    setDeleteChannelParams() {
+      const deleteChannelParmas = {};
+      deleteChannelParmas.deviceIds = this.deleteChannelIds;
+      return deleteChannelParmas;
+    },
 
-      setDeleteDeviceParmas() {
-        const deleteParmas = {};
-        deleteParmas.serialNumbers = this.deleteSerialNums;
-        return deleteParmas;
-      },
+    setDeleteDeviceParmas() {
+      const deleteParmas = {};
+      deleteParmas.serialNumbers = this.deleteSerialNums;
+      return deleteParmas;
+    },
 
-      deviceNameChange(val, item) {
-        const comment = filterString.all(val, 20);
-        item.tempDeviceName = comment;
-      },
+    deviceNameChange(val, item) {
+      const comment = filterString.all(val, 20);
+      item.tempDeviceName = comment;
+    },
 
     async confirmAddSkywatchDevice(deviceAndChannelObj) {
       const { deviceParams } = { ...deviceAndChannelObj };
@@ -483,14 +482,12 @@
         const addDeviceResult = await skywatchRESTful.addSkywatchDevice(deviceParams);
         if (addDeviceResult.errCode === 0) {
           util.notify(this.$t('deviceView.addSuccess'), 'success', 3000);
-          this.showAddSkywatchDialog = false;
           this.getSkywatchDeviceList(this.setParams());
         } else {
           throw new Error(addDeviceResult.errMsg);
         }
       } catch (error) {
         util.notify(this.$t('deviceView.addFailed'), 'warning', 3000);
-        this.showAddSkywatchDialog = false;
         console.log('SkywatchDeviceMgmt-confirmAddSkywatchDevice: ' + error);
       }
     },

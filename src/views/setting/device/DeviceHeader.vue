@@ -39,7 +39,7 @@
         <hr class="dialog-hr">
         <div class="deviceForm">
           <span class="available-span">{{ $t('deviceView.availableDevice') }}</span>
-          <div class="available-device-info">
+          <div class="available-device-info self-loading" v-loading="isLoadingAvailableDevice">
             <template v-if="avilableDeviceList.length > 0">
               <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
                 <div class="available-checkbox">
@@ -152,7 +152,8 @@
         storeDataList: [],
         allStoreDataList: [],
         deleteSerialNums: [],
-        deleteChannelIds: []
+        deleteChannelIds: [],
+        isLoadingAvailableDevice: false
       }
     },
 
@@ -209,6 +210,7 @@
       async onShowAddBeseyeDeviceDialog() {
         this.vendor === 2 ? await this.getAvailableBeseyeDevice() : await this.getAvailableSkywatchDevice();
         this.showAddDeviceDialog = true;
+        this.isLoadingAvailableDevice = true;
       },
 
       getAvailableBeseyeDevice() {
@@ -221,6 +223,8 @@
         }).catch(error => {
           this.avilableDeviceList = [];
           console.log('BeseyeDeviceMgmt-getAvailableEzvizDevice: ' + error);
+        }).finally(() => {
+          this.isLoadingAvailableDevice = false;
         });
       },
 
@@ -234,6 +238,8 @@
         }).catch(error => {
           this.avilableDeviceList = [];
           console.log('BeseyeDeviceMgmt-getAvailableEzvizDevice: ' + error);
+        }).finally(() => {
+          this.isLoadingAvailableDevice = false;
         });
       },
 
