@@ -1081,7 +1081,6 @@ export default {
       const userId = getCookie('UserId');
       return new Promise((resolve, reject) => {
         getUserInfo().then(res => {
-          console.log(res);
           res.data.forEach(item => {
             if (item.userId === userId) {
               const accountId = item.accountId.toLowerCase();
@@ -1096,7 +1095,6 @@ export default {
     async getOssInfo() {
       const self = this;
       const accountId = await self.getAccountId();
-      console.log(accountId);
       self.accountId = localStorage.getItem('oss_bucket');
     },
     getUpLoadBucketInfo() {
@@ -1113,7 +1111,6 @@ export default {
       const self = this;
       const content = filterString.all(val, 600);
       const length = filterString.getContentLength(val);
-      console.log(content);
       self.suggest = content;
       if (length > 600) {
         this.adviceInfoRuletip = true;

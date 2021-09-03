@@ -595,16 +595,20 @@ import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import { getCookie } from '@/common/auth';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
+import SkywatchVideo from '@/components/SkywatchVideo';
+import DashVideo from '@/components/DashVideo';
+import EzvizVideo from '@/components/EzvizVideo';
+import BeseyeVideo from '@/components/BeseyeVideo';
 
 export default {
   name: 'ReInspection',
   components: {
     DialogVue,
     ChannelIconBtn,
-    SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
-    DashVideo: () => import('@/components/DashVideo.vue'),
-    EzvizVideo: () => import('@/components/EzvizVideo.vue'),
-    BeseyeVideo: () => import('@/components/BeseyeVideo.vue')
+    SkywatchVideo,
+    DashVideo,
+    EzvizVideo,
+    BeseyeVideo
   },
   data() {
     return {
@@ -1842,97 +1846,12 @@ export default {
     async noAllInspectDialog() {
       const self = this;
       self.noAllInspectObj.dialogCosed = false;
-      const temp = [];
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
       const inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
-      if (self.hasIgnoretemp.length == 0) {
-        sheetName.forEach(s_item => {
-          s_item.inspectList.forEach(item => {
-            temp.push(item);
-            item.items.forEach((_item, _index) => {
-              if (_item.inputCount == 0) {
-                _item.isIgnore = true;
-                _item.inspectInput = '';
-                _item.sourceList = [];
-                if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0 || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
-                  _item.itemgetScore = _item.itemScore;
-                }
-                _item.itemgetScore = _item.manualIgnore ? '--' : null;
-              }
-            });
-          });
-        });
-      } else {
-        sheetName.forEach(s_item => {
-          const dealtemp = [];
-          s_item.inspectList.forEach(item => {
-            item.items.forEach((_item, _index) => {
-              self.hasIgnoretemp.forEach((h_item, h_index) => {
-                if (self.hasIgnoretemp[h_index].inputCount == 0) {
-                  self.hasIgnoretemp[h_index].isIgnore = true;
-                  self.hasIgnoretemp[h_index].inspectInput = '';
-                  self.hasIgnoretemp[h_index].sourceList = [];
-                  if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0 || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
-                    h_item.itemgetScore = h_item.itemScore;
-                  }
-                  h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
-                }
-                if (self.hasIgnoretemp[h_index].id == item.items[_index].id) {
-                  item.items[_index] = self.hasIgnoretemp[h_index];
-                }
-              });
-              if (_item.inputCount != 0 || _item.manualIgnore) {
-                const obj = {};
-                obj.dealCount = 1;
-                dealtemp.push(obj);
-              }
-            });
-            temp.push(item);
-          });
-          s_item.dealCount = dealtemp.length;
-        });
-      }
-      const obj = {
-        inspect: sheetName,
-        event: self.eventList,
-        store: self.store,
-        channel: self.channel,
-        allRemarkItemsFlag: self.allRemarkItemsFlag
-      };
-      const hasIgnoretemp = [];
-      temp.forEach(item => {
-        item.items.forEach(_item => {
-          if (_item.inputCount == 0 && !_item.manualIgnore) {
-            _item['type'] = item.type;
-            hasIgnoretemp.push(_item);
-          }
-        });
-      });
-      self.historyObj = {
-        storeList: self.tabList[Number(self.activeIndex)].storeList,
-        patrolstore: self.patrolstore,
-        sheetName: self.sheetName,
-        PatrolList: self.PatrolList,
-        activeIndex: self.activeIndex,
-        store: self.store,
-        hasIgnoretemp: hasIgnoretemp,
-        inspectItemList: self.inspectItemList,
-        eventList: self.eventList,
-        showChannelBtns: self.showChannelBtns,
-        allChannelBtns: self.allChannelBtns,
-        curSheetIndex: self.curSheetIndex,
-        curGroupIndex: self.curGroupIndex,
-        curItemIndex: self.curItemIndex,
-        deviceList: self.deviceList,
-        channel: self.channel,
-        curItemId: self.curItemId
-      };
-      self.hasIgnoretemp = [];
-      const params = { _id: self.userId, data: obj, rule: inspectSettings };
-      await Database.addDataToDB(self.userId, params);
-      self.$router.push({ name: 'confirmSum', params: params });
+      this.resolveConfoirmSummaryData();
     },
+
     canceldNoAllInspect() {
       const self = this;
       self.noAllInspectObj.dialogCosed = false;
@@ -1946,6 +1865,100 @@ export default {
       self.allIgnoreObj.dialogCosed = false;
     },
 
+    async resolveConfoirmSummaryData() {
+      const inspectList = [];
+      const indexFeed = this.sheetName.map(x => x.groupId).indexOf('feedBack');
+      const sheetName = this.sheetName.slice(0, indexFeed);
+      const inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
+      if (this.hasIgnoretemp.length === 0) {
+        sheetName.forEach(s_item => {
+          s_item.inspectList.forEach(item => {
+            inspectList.push(item);
+            item.items.forEach((_item, _index) => {
+              if (_item.inputCount === 0) {
+                _item.isIgnore = true;
+                _item.inspectInput = '';
+                _item.sourceList = [];
+                if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0
+                  || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
+                  _item.itemgetScore = _item.itemScore;
+                }
+                _item.itemgetScore = _item.manualIgnore ? '--' : null;
+              }
+            });
+          });
+        });
+      } else {
+        sheetName.forEach(s_item => {
+          const dealtemp = [];
+          s_item.inspectList.forEach(item => {
+            item.items.forEach((_item, _index) => {
+              this.hasIgnoretemp.forEach((h_item, h_index) => {
+                if (this.hasIgnoretemp[h_index].inputCount == 0) {
+                  this.hasIgnoretemp[h_index].isIgnore = true;
+                  this.hasIgnoretemp[h_index].inspectInput = '';
+                  this.hasIgnoretemp[h_index].sourceList = [];
+                  if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0
+                    || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
+                    h_item.itemgetScore = h_item.itemScore;
+                  }
+                  h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
+                }
+                if (this.hasIgnoretemp[h_index].id == item.items[_index].id) {
+                  item.items[_index] = self.hasIgnoretemp[h_index];
+                }
+              });
+              if (_item.inputCount != 0 || _item.manualIgnore) {
+                const obj = {};
+                obj.dealCount = 1;
+                dealtemp.push(obj);
+              }
+            });
+            inspectList.push(item);
+          });
+          s_item.dealCount = dealtemp.length;
+        });
+      }
+      const hasIgnoretemp = [];
+      inspectList.forEach(item => {
+        item.items.forEach(_item => {
+          if (_item.inputCount == 0 && !_item.manualIgnore) {
+            _item['type'] = item.type;
+            hasIgnoretemp.push(_item);
+          }
+        });
+      });
+      const obj = {
+        inspect: sheetName,
+        event: this.eventList,
+        store: this.store,
+        channel: this.channel
+      };
+      this.historyObj = {
+        storeList: this.tabList[Number(this.activeIndex)].storeList,
+        patrolstore: this.patrolstore,
+        sheetName: this.sheetName,
+        PatrolList: this.PatrolList,
+        activeIndex: this.activeIndex,
+        store: this.store,
+        hasIgnoretemp: hasIgnoretemp,
+        inspectItemList: this.inspectItemList,
+        eventList: this.eventList,
+        showChannelBtns: this.showChannelBtns,
+        allChannelBtns: this.allChannelBtns,
+        curSheetIndex: this.curSheetIndex,
+        curGroupIndex: this.curGroupIndex,
+        curItemIndex: this.curItemIndex,
+        channel: this.channel,
+        curItemId: this.curItemId,
+        deviceList: this.deviceList
+      };
+      this.hasIgnoretemp = [];
+      const params = { _id: this.userId, data: obj, rule: inspectSettings };
+      await Database.addDataToDB(this.userId, params);
+      this.$router.push({ name: 'confirmSum', params: params });
+    },
+
     async confirmSummary() {
       const self = this;
       const temp = [];
@@ -1953,23 +1966,8 @@ export default {
       let dealCount = 0;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-      const inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
-      if (self.hasIgnoretemp.length == 0) {
+      if (self.hasIgnoretemp.length === 0) {
         sheetName.forEach(s_item => {
-          s_item.inspectList.forEach(item => {
-            temp.push(item);
-            item.items.forEach((_item, _index) => {
-              if (_item.inputCount == 0) {
-                _item.isIgnore = true;
-                _item.inspectInput = '';
-                _item.sourceList = [];
-                if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0 || inspectSettings.qualifiedForIgnoredWithType2 && _item.type === 1) {
-                  _item.itemgetScore = _item.itemScore;
-                }
-                _item.itemgetScore = _item.manualIgnore ? '--' : null;
-              }
-            });
-          });
           dealCount = dealCount + s_item.dealCount;
           count = count + s_item.count;
         });
@@ -1978,20 +1976,6 @@ export default {
           const dealtemp = [];
           s_item.inspectList.forEach(item => {
             item.items.forEach((_item, _index) => {
-              self.hasIgnoretemp.forEach((h_item, h_index) => {
-                if (self.hasIgnoretemp[h_index].inputCount == 0) {
-                  self.hasIgnoretemp[h_index].isIgnore = true;
-                  self.hasIgnoretemp[h_index].inspectInput = '';
-                  self.hasIgnoretemp[h_index].sourceList = [];
-                  if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0 || inspectSettings.qualifiedForIgnoredWithType2 && h_item.type === 1) {
-                    h_item.itemgetScore = h_item.itemScore;
-                  }
-                  h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
-                }
-                if (self.hasIgnoretemp[h_index].id == item.items[_index].id) {
-                  item.items[_index] = self.hasIgnoretemp[h_index];
-                }
-              });
               if (_item.inputCount != 0 || _item.manualIgnore) {
                 const obj = {};
                 obj.dealCount = 1;
@@ -2013,44 +1997,7 @@ export default {
         self.noAllInspectObj.dialogCosed = true;
         return false;
       }
-      const hasIgnoretemp = [];
-      temp.forEach(item => {
-        item.items.forEach(_item => {
-          if (_item.inputCount == 0 && !_item.manualIgnore) {
-            _item['type'] = item.type;
-            hasIgnoretemp.push(_item);
-          }
-        });
-      });
-      const obj = {
-        inspect: sheetName,
-        event: self.eventList,
-        store: self.store,
-        channel: self.channel,
-        allRemarkItemsFlag: self.allRemarkItemsFlag
-      };
-      self.historyObj = {
-        storeList: self.tabList[Number(self.activeIndex)].storeList,
-        patrolstore: self.patrolstore,
-        sheetName: self.sheetName,
-        PatrolList: self.PatrolList,
-        activeIndex: self.activeIndex,
-        store: self.store,
-        hasIgnoretemp: hasIgnoretemp,
-        inspectItemList: self.inspectItemList,
-        eventList: self.eventList,
-        showChannelBtns: self.showChannelBtns,
-        allChannelBtns: self.allChannelBtns,
-        curSheetIndex: self.curSheetIndex,
-        curGroupIndex: self.curGroupIndex,
-        curItemIndex: self.curItemIndex,
-        channel: self.channel,
-        curItemId: self.curItemId
-      };
-      self.hasIgnoretemp = [];
-      const params = { _id: self.userId, data: obj, rule: inspectSettings };
-      await Database.addDataToDB(self.userId, params);
-      self.$router.push({ name: 'confirmSum', params: params });
+      this.resolveConfoirmSummaryData();
     },
 
     spreadContent() {

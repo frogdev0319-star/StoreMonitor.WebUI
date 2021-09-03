@@ -8,7 +8,6 @@
 <script>
 import NvrDeviceMgmt from '@/views/setting/device/NvrDeviceMgmt.vue';
 import EzvizDeviceMgmt from '@/views/setting/device/EzvizDeviceMgmt.vue';
-import { getCookie } from '../../../common/auth';
 import { mapGetters } from 'vuex';
 
 export default {
@@ -22,7 +21,7 @@ export default {
     ...mapGetters(
       ['isEzviz']
     )
-  },
+  }
 };
 </script>
 <style lang="scss" scoped>

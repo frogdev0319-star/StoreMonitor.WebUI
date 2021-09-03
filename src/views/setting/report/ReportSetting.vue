@@ -161,6 +161,7 @@ import draggable from 'vuedraggable';
 import DialogPop from '@/components/DialogPop';
 import ButtonList from '@/components/ButtonList';
 import SettingTable from '@/components/SettingTable';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'ReportSetting',
