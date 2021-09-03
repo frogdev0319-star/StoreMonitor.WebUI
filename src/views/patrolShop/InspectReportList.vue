@@ -1127,14 +1127,16 @@ $suggestBack:#F1F6FE;
         }
         .item-content{
             text-align: left;
-            padding-left: calc(20/1920*100vw);
+            padding: 0 calc(20/1920*100vw);
             /*position: absolute;*/
             /*bottom: 0;*/
             span{
-                font-size: calc(14/1920*100vw);
-                color: $tab;
-                display: block;
-                margin-bottom: calc(15/1920*100vw);
+              font-size: calc(14/1920*100vw);
+              color: $tab;
+              display: block;
+              margin-bottom: calc(15/1920*100vw);
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
         }
     }
