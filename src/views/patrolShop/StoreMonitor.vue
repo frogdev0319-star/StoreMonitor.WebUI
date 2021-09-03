@@ -346,6 +346,10 @@ import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import DialogVue from '@/components/DialogVue.vue';
 import filterString from '@/common/filterString.js';
 import { getCookie } from '@/common/auth';
+import SkywatchVideo from '@/components/SkywatchVideo';
+import DashVideo from '@/components/DashVideo';
+import EzvizVideo from '@/components/EzvizVideo';
+import BeseyeVideo from '@/components/BeseyeVideo';
 
 export default {
   name: 'StoreMoinitor',
@@ -353,10 +357,10 @@ export default {
   components: {
     ChannelIconBtn,
     DialogVue,
-    SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
-    DashVideo: () => import('@/components/DashVideo.vue'),
-    EzvizVideo: () => import('@/components/EzvizVideo.vue'),
-    BeseyeVideo: () => import('@/components/BeseyeVideo.vue')
+    SkywatchVideo,
+    DashVideo,
+    EzvizVideo,
+    BeseyeVideo
   },
 
   data() {
