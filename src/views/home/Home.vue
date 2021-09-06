@@ -120,7 +120,8 @@
                         :style="collapsed ? {'margin-left':'0'} : {}"
                         class="en-navIcon"/>
                       <i v-else :class="item.iconCls" :style="collapsed ? {'margin-left':'0'} : {}" class="navIcon"/>
-                      <span :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'">{{ $t(`route.${item.name}`) }}</span>
+                      <span :class="lang === 'en' ? 'en-el-submenu-group' : 'el-submenu-group'">
+                        {{ $t(`route.${item.name}`) }}</span>
                     </template>
                     <el-menu-item
                       v-for="child in item.children"
@@ -333,7 +334,8 @@ export default {
 
     ...mapGetters([
       'token',
-      'name'
+      'name',
+      'availabePathList'
     ])
   },
 
@@ -533,11 +535,13 @@ export default {
       const pathAndBreadMaps = [
         { paths: ['/storedetail'], parentBread: { path: '/storemanage', name: 'storeManage' }},
         { paths: ['/titleSetting'], parentBread: { path: '/title', name: 'titleManage' }},
-        { paths: ['/addroute', '/setroute', '/bindroute'], parentBread: { path: '/routeinspection', name: 'inspectSetting' }},
+        { paths: ['/addroute', '/setroute', '/bindroute'],
+          parentBread: { path: '/routeinspection', name: 'inspectSetting' }},
         { paths: ['/rate'], parentBread: { path: '/event', name: 'eventManage' }},
         { paths: ['/reportdetails'], parentBread: { path: '/report', name: 'reports' }},
         { paths: ['/storemonitor/submit'], parentBread: { path: '/storemonitor', name: 'storeMonitor' }},
-        { paths: ['/reinspect/confirmrein', '/reinspect/submit'], parentBread: { path: '/reinspection', name: 'remotePatrol' }}
+        { paths: ['/reinspect/confirmrein', '/reinspect/submit'],
+          parentBread: { path: '/reinspection', name: 'remotePatrol' }}
       ];
       const pathAndBreadMap = pathAndBreadMaps.find(map => map.paths.includes(currentRoute));
       pathAndBreadMap && matched.splice(1, 0, pathAndBreadMap.parentBread);
@@ -616,12 +620,13 @@ export default {
       if (result.errCode === 0) {
         await self.$store.dispatch('generateRoutes');
         self.getUserName(result.data);
-        const allRoutes = this.$store.state.user.routes;
-        const routes = allRoutes[0].path === '/login' ? allRoutes.slice(1, allRoutes.length) : allRoutes;
-        if (routes.length === 2) {
+        const availablePathesList = this.availabePathList;
+        if (availablePathesList.includes('/noRight')) {
           this.$router.push('/noRight');
+        } else if (!availablePathesList.includes(window.location.pathname)) {
+          this.$router.push(availablePathesList[0]);
         } else {
-          window.location.pathname.indexOf('noRight') > -1 && this.$router.push(routes[1].children[0].path);
+          this.$router.push(window.location.pathname);
         }
       }
     },
