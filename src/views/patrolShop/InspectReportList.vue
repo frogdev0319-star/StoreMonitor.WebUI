@@ -667,6 +667,7 @@ export default {
       }
       self.params.clause = clause;
       self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
+      typeof (self.params.inspectTagId) === 'string' && delete self.params.inspectTagId;
       const search = self.searchInput.trim();
       if (search.length !== 0) {
         self.params.like = {
@@ -792,7 +793,7 @@ export default {
         this.params = searchParams.searchCondition;
         this.curAppraise = searchParams.searchCondition.clause.status;
         this.curReportType = searchParams.curReportType;
-        this.inspectCatch = searchParams.searchCondition.inspectTagId.length === 0 ? '-1' : searchParams.searchCondition.inspectTagId;
+        this.inspectCatch = !searchParams.searchCondition.inspectTagId ? '-1' : searchParams.searchCondition.inspectTagId;
         this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
       } else {
