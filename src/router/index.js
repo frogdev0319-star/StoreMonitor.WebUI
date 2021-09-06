@@ -12,6 +12,10 @@ Vue.use(Router);
  * a base page that does not have permission requirements
  * all roles can be accessed
  */
+const originalPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err);
+}
 export const constantRoutes = [
   {
     path: '/login',
@@ -21,6 +25,11 @@ export const constantRoutes = [
     meta: {
       requireAuth: false
     }
+  },
+  {
+    path: '/:token/:userId/:ezvizAppKey/:ezvizProtocol/:lang/:deviceAuth',
+    redirect: '/',
+    hidden: true
   },
   {
     path: '/',
@@ -46,8 +55,11 @@ export function resetRouter() {
 
 export default router;
 
+let primaryPathesList = [];
+
 export const navbarRoute = {
   getOverviewRoute() {
+    primaryPathesList = [];
     const overviewRoute = {
       path: '/home',
       name: 'overview',
@@ -63,12 +75,12 @@ export const navbarRoute = {
       path: '/patrolOverview',
       name: 'patrolOverview',
       component: resolve => require(['@/views/overview/PatrolOverview'], resolve)
-    });
+    }) && primaryPathesList.push('/patrolOverview');
     PermissionHelper.enableEventOverview() && overviewRoute.children.push({
       path: '/eventOverview',
       name: 'eventOverview',
       component: resolve => require(['@/views/overview/EventOverview'], resolve)
-    });
+    }) && primaryPathesList.push('/eventOverview');
     return overviewRoute;
   },
 
@@ -105,7 +117,7 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/patrolShop/ReInspectDealPage'], resolve)
       }
-    );
+    ) && primaryPathesList.push('/reinspection');
     PermissionHelper.enableStoreMonitor() && patrolRoute.children.push(
       {
         path: '/storemonitor',
@@ -123,7 +135,7 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/patrolShop/StoreSuccessPage'], resolve)
       }
-    );
+    ) && primaryPathesList.push('/storemonitor');
     PermissionHelper.enableInspectReport() && patrolRoute.children.push(
       {
         path: '/report',
@@ -144,7 +156,7 @@ export const navbarRoute = {
         },
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
-    );
+    ) && primaryPathesList.push('/report');
     return patrolRoute;
   },
 
@@ -176,7 +188,7 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/event/details/RateManage'], resolve)
       }
-    );
+    ) && primaryPathesList.push('/event');
     return eventRoute;
   },
 
@@ -202,7 +214,7 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    );
+    ) && primaryPathesList.push('/patrolEvaluation');
     PermissionHelper.enableInspectStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolItem',
@@ -214,7 +226,7 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    );
+    ) && primaryPathesList.push('/patrolItem');
 
     PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
@@ -227,7 +239,7 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    );
+    ) && primaryPathesList.push('/supervisorStat');
 
     PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
       {
@@ -240,7 +252,7 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    );
+    ) && primaryPathesList.push('/eventStat');
 
     PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
       {
@@ -253,7 +265,7 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    );
+    ) && primaryPathesList.push('/checkInStatistics');
     return statisticsRoute;
   },
 
@@ -270,7 +282,9 @@ export const navbarRoute = {
     };
 
     const deviceRoutes = this.getDeviceRoutes();
-    PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push({
+    console.log(deviceRoutes)
+    PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push(
+      {
         path: '/device',
         name: 'deviceManage',
         hidden: false,
@@ -280,7 +294,7 @@ export const navbarRoute = {
           requireAuth: true
         },
         children: deviceRoutes
-      });
+      }) && primaryPathesList.push('/device');
 
     const inspectionRoute = {
       path: '/inspectionSetting',
@@ -322,7 +336,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/routeInspection/BindRuteInspect'], resolve)
       }
 
-    );
+    ) && primaryPathesList.push('/routeinspection');
 
     PermissionHelper.enableStoreSetting() && inspectionRoute.children.push(
       {
@@ -336,7 +350,8 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/store/EditStoreVue'], resolve),
         hidden: true
       }
-    );
+    ) && primaryPathesList.push('/storemanage');
+
     PermissionHelper.enableScheduleSetting() && inspectionRoute.children.push({
       path: '/patrolSchedule',
       name: 'scheduleManage',
@@ -347,7 +362,7 @@ export const navbarRoute = {
         keepAlive: false, // the component is't to be cache.
         requireAuth: true
       }
-    });
+    }) && primaryPathesList.push('/patrolSchedule');
 
     PermissionHelper.enableReportSetting() &&
     inspectionRoute.children.push({
@@ -360,7 +375,7 @@ export const navbarRoute = {
         keepAlive: false,
         requireAuth: true
       }
-    });
+    }) && primaryPathesList.push('/insepctionReportSetting');
 
     inspectionRoute.children.length > 0 && systemSettingRoute.children.push(inspectionRoute);
     PermissionHelper.enableTitleSetting() && systemSettingRoute.children.push(
@@ -381,17 +396,17 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/title/TitleSetting'], resolve),
         hidden: true
       }
-    );
+    ) && primaryPathesList.push('/title');
     return systemSettingRoute;
   },
 
-  getDeviceRoutes(){
+  getDeviceRoutes() {
     const deviceRoutes = [];
     util.getVideoAuthority(1) && deviceRoutes.push({
       path: '/dashDevice',
       name: 'dashDevice',
       component: resolve => require(['@/views/setting/device/Dash/NvrDeviceMgmt'], resolve)
-    });
+    }) && primaryPathesList.push('/dashDevice');
 
     util.getVideoAuthority(2) && deviceRoutes.push(
       {
@@ -405,9 +420,10 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/device/Ezviz/EzvizDeviceMgmt'], resolve),
         hidden: true
       }
-    );
+    ) && primaryPathesList.push('/ezvizDevice');
 
-    util.getVideoAuthority(3) && deviceRoutes.push({
+    util.getVideoAuthority(3) && deviceRoutes.push(
+      {
         path: '/beseyeAccount',
         name: 'beseyeAccount',
         component: resolve => require(['@/views/setting/device/Beseye/BeseyeAccount'], resolve)
@@ -424,9 +440,10 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/device/Beseye/Authorize'], resolve),
         hidden: true
       }
-    );
+    ) && primaryPathesList.push('/beseyeAccount');
 
-    util.getVideoAuthority(4) && deviceRoutes.push({
+    util.getVideoAuthority(4) && deviceRoutes.push(
+      {
         path: '/skywatchAccount',
         name: 'skywatchAccount',
         component: resolve => require(['@/views/setting/device/Skywatch/SkywatchAccount'], resolve)
@@ -437,7 +454,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/setting/device/Skywatch/SkywatchDeviceMgmt'], resolve),
         hidden: true
       }
-    );
+    ) && primaryPathesList.push('/skywatchAccount');
 
     return deviceRoutes;
   },
@@ -458,7 +475,12 @@ export const navbarRoute = {
         component: resolve => require(['@/views/overview/NoRight'], resolve)
       }]
     };
-
+    primaryPathesList.push('/noRight');
     return errorRoute;
+  },
+
+  getAvailablePath() {
+
+    return [...new Set(primaryPathesList)];
   }
 };

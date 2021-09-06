@@ -2,8 +2,7 @@ import { loginByUsername, logout, changeAccount, getUserAuthorities } from '@/ap
 import { getDashServerInfo } from '@/api/device';
 import { getToken, setToken, removeToken, getCookie, setCookie } from '@/common/auth';
 import PermissionHelper from '@/api/PermissionHelper';
-import router, { resetRouter, constantRoutes, navbarRoute } from '@/router';
-import { getUserTitleList } from '@/api/title';
+import { resetRouter, constantRoutes, navbarRoute } from '@/router';
 
 const user = {
   state: {
@@ -31,7 +30,8 @@ const user = {
     InspectHistory: null,
     PatrolComment: '',
     videoAuthority: false,
-    roleId: 0
+    roleId: 0,
+    availabePathList: []
   },
 
   mutations: {
@@ -113,6 +113,10 @@ const user = {
 
     SET_ROLE_ID: (state, roleId) => {
       state.roleId = roleId;
+    },
+
+    SET_Available_Path_List: (state, pathList) => {
+      state.availabePathList = pathList;
     }
 
   },
@@ -272,17 +276,13 @@ const user = {
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';
-          accessedRoutes.push({
-            'path': '*',
-            'redirect': '/',
-            'hidden': true
-          });
         } else {
           const errorRoute = navbarRoute.getErrorRoute();
           accessedRoutes.push(errorRoute);
           errorRoute.redirect = errorRoute.children[0].path;
         }
         commit('SET_ROUTES', accessedRoutes);
+        commit('SET_Available_Path_List', navbarRoute.getAvailablePath());
         if (user.state.authorities.length === 6) {
           const videoAccess = !!PermissionHelper.enableVideo();
           commit('SET_Video_Authority', videoAccess);

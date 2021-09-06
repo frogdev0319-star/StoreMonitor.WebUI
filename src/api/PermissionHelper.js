@@ -12,7 +12,6 @@ export default class PermissionHelper {
   static data = [];
 
   static setData(data) {
-    console.log(data);
     (data.length > 0) && (this.data = data);
   }
 

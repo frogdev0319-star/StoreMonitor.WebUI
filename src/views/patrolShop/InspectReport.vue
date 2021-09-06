@@ -2,15 +2,17 @@
   <div ref="printPDF" class="report-container">
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
-      <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
-      <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
-        {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
-        <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
-      </p>
+      <div class="left-header">
+        <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
+        <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
+          {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
+          <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
+        </p>
+      </div>
       <div class="info-content">
-        <div class="pdf_font_24">
+        <div class="pdf_font_24 right-header">
           <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
-          <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.submitterName }}</span>
+          <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
           <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
           <div style="display:inline-block;">
@@ -132,6 +134,11 @@
                           :height="elImgHeight"
                           class="source-details">
                           <div v-if="sourceitem.mediaType === 2" class="img-content">
+                            <img
+                              v-if="isexportPDF"
+                              :style="exportImageStyle"
+                              :src="sourceitem.url"
+                              class="imgLittle imgInner">
                             <el-image
                               :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
@@ -203,7 +210,13 @@
                       :height="elImgHeight"
                       class="source-details">
                       <div v-if="sourceitem.mediaType === 2" class="img-content">
+                        <img
+                          v-if="isexportPDF"
+                          :style="exportImageStyle"
+                          :src="sourceitem.url"
+                          class="imgLittle imgInner">
                         <el-image
+                          v-else
                           :style="isexportPDF ? exportImageStyle :imageStyle"
                           :src="sourceitem.url"
                           :preview-src-list="getImgList(index, item.sourceList)"
@@ -317,7 +330,9 @@
                   :style="isexportPDF ? 'font-size:22px;' : ''"
                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
                   class="iconfont icontemp"/>
-                <span class="title-lable"><span class="pdf_font_20">{{ $t(`remotePatrol.${pageItem.name}`) }}</span></span>
+                <span class="title-lable"><span class="pdf_font_20">
+                  {{ $t(`remotePatrol.${pageItem.name}`) }}</span>
+                </span>
               </div>
             </div>
             <div v-if="pageItem.ifExpand" class="item-content">
@@ -326,7 +341,13 @@
                   v-for="(signatureItem, signatureIndex) in pageItem.data"
                   :key="signatureIndex"
                   class="signature-item">
+                  <img
+                    v-if="isexportPDF"
+                    :style="exportImageStyle"
+                    :src="signatureItem.content"
+                    class="signature-content">
                   <el-image
+                    v-else
                     :src="signatureItem.content"
                     :preview-src-list="getSignatureList(signatureIndex, pageItem.data)"
                     class="signature-content"/>
@@ -646,7 +667,6 @@ export default {
           }
         }
       }
-      console.log(iconSrc);
       return iconSrc;
     },
 
@@ -1397,6 +1417,8 @@ export default {
       position: relative;
       display: flex;
       align-items: center;
+      padding-right: calc(110/1920*100vw);
+      justify-content: space-between;
       .pdf-title-icon{
         width:46px;
         height:54px;
@@ -1407,7 +1429,7 @@ export default {
         height:34px;
       }
       .pdf-report-title{
-        font-size: 30px;
+        font-size: 26px;
         font-weight: bold;
         margin:0;
         vertical-align: middle;
@@ -1428,6 +1450,10 @@ export default {
       .nochart-report-title{
         font-size: 20px;
       }
+      .left-header{
+        display: inline-flex;
+        align-items: center;
+      }
       .info-content {
         position: absolute;
         right: calc(110 / 1920 * 100vw);
@@ -1437,13 +1463,23 @@ export default {
         .info-label {
           margin-left: calc(40 / 1920 * 100vw);
         }
+        .info-value{
+          max-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         .pdf-info-value{
+          @extend .info-value;
           margin-right: 40px;
         }
         .exportbtn{
           display: inline-block;
           min-width:120px;
         }
+      }
+      .right-header{
+        display: inline-flex;
       }
     }
     .el-acticle {

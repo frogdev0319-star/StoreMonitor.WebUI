@@ -16,6 +16,7 @@ const getters = {
   InspectHistory: state => state.user.InspectHistory,
   PatrolComment: state => state.user.PatrolComment,
   videoAuthority: state => state.user.videoAuthority,
-  roleId: state => state.user.roleId
+  roleId: state => state.user.roleId,
+  availabePathList: state => state.user.availabePathList
 };
 export default getters;
