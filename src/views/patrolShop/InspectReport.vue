@@ -142,7 +142,14 @@
                           <div v-if="sourceitem.mediaType === 2"
                                :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''"
                                class="img-content">
+                            <img
+                              v-if="isexportPDF"
+                              :style="exportImageStyle"
+                              :src="sourceitem.url"
+                              :height="elImgHeight"
+                              class="imgLittle imgInner">
                             <el-image
+                              v-else
                               :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
                               :preview-src-list="getImgList(sourceindex, _item.sourceList)"
@@ -192,6 +199,11 @@
                           :height="elImgHeight"
                           class="source-details">
                           <div v-if="sourceitem.mediaType === 2" class="img-content">
+                            <img
+                              v-if="isexportPDF"
+                              :style="exportImageStyle"
+                              :src="sourceitem.url"
+                              class="imgLittle imgInner">
                             <el-image
                               :style="isexportPDF ? exportImageStyle :imageStyle"
                               :src="sourceitem.url"
@@ -263,6 +275,11 @@
                       :height="elImgHeight"
                       class="source-details">
                       <div v-if="sourceitem.mediaType === 2" class="img-content">
+                        <img
+                          v-if="isexportPDF"
+                          :style="exportImageStyle"
+                          :src="sourceitem.url"
+                          class="imgLittle imgInner">
                         <el-image
                           :style="isexportPDF ? exportImageStyle :imageStyle"
                           :src="sourceitem.url"
@@ -372,7 +389,9 @@
                   :style="isexportPDF ? 'font-size:22px;' : ''"
                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
                   class="iconfont icontemp"/>
-                <span class="title-lable"><span class="pdf_font_20">{{ $t(`remotePatrol.${pageItem.name}`) }}</span></span>
+                <span class="title-lable"><span class="pdf_font_20">
+                  {{ $t(`remotePatrol.${pageItem.name}`) }}</span>
+                </span>
               </div>
             </div>
             <div v-if="pageItem.ifExpand" class="item-content">
@@ -381,7 +400,13 @@
                   v-for="(signatureItem, signatureIndex) in pageItem.data"
                   :key="signatureIndex"
                   class="signature-item">
+                  <img
+                    v-if="isexportPDF"
+                    :style="exportImageStyle"
+                    :src="signatureItem.content"
+                    class="signature-content">
                   <el-image
+                    v-else
                     :src="signatureItem.content"
                     :preview-src-list="getSignatureList(signatureIndex, pageItem.data)"
                     class="signature-content"/>
@@ -498,20 +523,20 @@ export default {
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
       theaderPassFail: [
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: '', width: 'width:11%;', pdfWidth: 'width:15%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
         { name: this.$t('remotePatrol.pass'), width: 'width:16%;', pdfWidth: 'width:13%;' },
         { name: this.$t('remotePatrol.failed'), width: 'width:17%;', pdfWidth: 'width:13%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:17%;', pdfWidth: 'width:14%;' }
       ],
       theaderScore: [
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: '', width: 'width:11%;', pdfWidth: 'width:15%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
         { name: this.$t('remotePatrol.TableTotal'), width: 'width:25%;', pdfWidth: 'width:20%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:25%;', pdfWidth: 'width:20%;' }
       ],
       theaderOther: [
-        { name: '', width: 'width:11%;', pdfWidth: 'width:12%;' },
+        { name: '', width: 'width:11%;', pdfWidth: 'width:15%;' },
         { name: this.$t('remotePatrol.item'), width: 'width:30%;', pdfWidth: 'width:35%;' },
         { name: this.$t('remotePatrol.pass'), width: 'width:16%;', pdfWidth: 'width:13%;' },
         { name: this.$t('remotePatrol.failed'), width: 'width:17%;', pdfWidth: 'width:13%;' },
@@ -712,7 +737,6 @@ export default {
           }
         }
       }
-      console.log(iconSrc);
       return iconSrc;
     },
 
@@ -837,7 +861,6 @@ export default {
       const map = this.getDetailNameAndHandlerMap(data);
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
-      console.log(this.templateConfig);
       this.templateConfig.forEach(config => {
         if (map.has(config.name)) {
           const fnName = map.get(config.name);
