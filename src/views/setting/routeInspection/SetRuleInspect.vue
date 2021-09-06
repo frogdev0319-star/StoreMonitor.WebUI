@@ -318,7 +318,7 @@ export default {
                 self.qualifiedForIgnoredWithType2 = item.value;
                 break;
               case 'hundredMarkType':
-                self.hundredMarkType = item.value.toString();
+                self.hundredMarkType = item.value === 0 ? '-1' : item.value.toString();
                 break;
               case 'minScore':
                 self.minScore = item.value;
