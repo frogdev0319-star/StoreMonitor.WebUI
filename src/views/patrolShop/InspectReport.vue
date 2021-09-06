@@ -2,15 +2,17 @@
   <div ref="printPDF" class="report-container">
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
-      <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
-      <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
-        {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
-        <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
-      </p>
+      <div class="left-header">
+        <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
+        <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
+          {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
+          <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
+        </p>
+      </div>
       <div class="info-content">
-        <div class="pdf_font_24">
+        <div class="pdf_font_24 right-header">
           <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
-          <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.submitterName }}</span>
+          <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
           <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
           <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
           <div style="display:inline-block;">
@@ -1342,6 +1344,8 @@ export default {
       position: relative;
       display: flex;
       align-items: center;
+      padding-right: calc(110/1920*100vw);
+      justify-content: space-between;
       .pdf-title-icon{
         width:46px;
         height:54px;
@@ -1352,7 +1356,7 @@ export default {
         height:34px;
       }
       .pdf-report-title{
-        font-size: 30px;
+        font-size: 26px;
         font-weight: bold;
         margin:0;
         vertical-align: middle;
@@ -1373,6 +1377,10 @@ export default {
       .nochart-report-title{
         font-size: 20px;
       }
+      .left-header{
+        display: inline-flex;
+        align-items: center;
+      }
       .info-content {
         position: absolute;
         right: calc(110 / 1920 * 100vw);
@@ -1382,13 +1390,23 @@ export default {
         .info-label {
           margin-left: calc(40 / 1920 * 100vw);
         }
+        .info-value{
+          max-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
         .pdf-info-value{
+          @extend .info-value;
           margin-right: 40px;
         }
         .exportbtn{
           display: inline-block;
           min-width:120px;
         }
+      }
+      .right-header{
+        display: inline-flex;
       }
     }
     .el-acticle {
