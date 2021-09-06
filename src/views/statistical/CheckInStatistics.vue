@@ -11,15 +11,6 @@
           style="display:inline;"
           @changeInput="handleDepartmentChange"/>
 
-        <!--<region-multi-select-->
-          <!--ref="multiState"-->
-          <!--:selected="positionIds"-->
-          <!--:placeholder="$t('overview.position')"-->
-          <!--:all="$t('overview.allPosition')"-->
-          <!--:options="positionsList"-->
-          <!--style="display:inline;"-->
-          <!--@changeInput="handlePositionChange"/>-->
-
         <region-multi-select
           ref="multiState"
           :selected="userIds"
