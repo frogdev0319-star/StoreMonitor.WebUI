@@ -18,61 +18,6 @@
         <i slot="prefix" class="iconfont icon-sousuo iconsou"/>
       </el-input>
     </el-col>
-
-    <!--<el-col :span="24" class="seacrh-content">-->
-      <!--<span class="select-title">{{ $t('remotePatrol.storeSelect') }}</span>-->
-      <!--<el-select v-model="curCountry" :placeholder="$t('remotePatrol.country')" size="mini" class="el-province"-->
-                 <!--@change="changeCountry">-->
-        <!--<el-option-group v-for="group in CountryList" :key="group.label" :label="group.label">-->
-          <!--<el-option v-for="item in group.countryList" :key="item.value" :label="item.label" :value="item.value"/>-->
-        <!--</el-option-group>-->
-      <!--</el-select>-->
-      <!--<region-multi-select-->
-        <!--ref="proviceSelect"-->
-        <!--:selected="curProvince"-->
-        <!--:placeholder="$t('remotePatrol.regionI')"-->
-        <!--:options="provinceList"-->
-        <!--:disabled="curCountry.length === 0 || curCountry === '-1'"-->
-        <!--:all="$t('overview.allZoneI')"-->
-        <!--style="display: inline;margin-left: calc(20/1920*100vw);"-->
-        <!--@changeInput="handleProChange"/>-->
-      <!--<region-multi-select-->
-        <!--ref="citySelect"-->
-        <!--:selected="curCity"-->
-        <!--:placeholder="$t('remotePatrol.regionII')"-->
-        <!--:options="cityList"-->
-        <!--:disabled="curProvince.length == 0 || curCountry === '-1'"-->
-        <!--:all="$t('overview.allZoneII')"-->
-        <!--style="display: inline;"-->
-        <!--@changeInput="handleCityChange"/>-->
-
-      <!--<multi-select-->
-        <!--ref="multiSelect"-->
-        <!--:selected="curStore"-->
-        <!--:placeholder="$t('remotePatrol.stores')"-->
-        <!--:options="storeDataList"-->
-        <!--style="display: inline;"-->
-        <!--@changeInput="handleStoreChange"/>-->
-      <!--<span class="select-title">{{ $t('remotePatrol.selectStoreTag') }}</span>-->
-      <!--<multi-select-->
-        <!--ref="TagMultiSelect"-->
-        <!--:selected="curStoreTag"-->
-        <!--:placeholder="$t('remotePatrol.selectStoreTag')"-->
-        <!--:all-select="0"-->
-        <!--:alltype="0"-->
-        <!--:options="StoreTagList"-->
-        <!--style="display: inline;margin-left: calc(20/1920*100vw);"-->
-        <!--@changeInput="changeStoreTag"/>-->
-      <!--<el-input-->
-        <!--v-model="serachVale"-->
-        <!--size="small"-->
-        <!--class="el-search-input"-->
-        <!--clearable-->
-        <!--@keyup.enter.native="searchEventList"-->
-        <!--@clear="searchEventList">-->
-        <!--<i slot="prefix" class="iconfont icon-sousuo iconsou"/>-->
-      <!--</el-input>-->
-    <!--</el-col>-->
     <el-col :span="24" class="el-table-content">
       <el-table
         :data="tableData"
@@ -339,7 +284,6 @@ export default {
     getInitData() {
       let self = this;
       self.getSearchParams();
-      self.getTagListData();
       self.params.filter = {
         'page': self.page - 1,
         'size': self.sizeNum
