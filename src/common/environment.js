@@ -2,7 +2,7 @@ const version = 'v1.0';
 
 const _Environments = {
   Debug_XA: {
-    CHINA_WEBSITE: 'http://172.21.81.63:8081/storemonitor/api/',
+    CHINA_WEBSITE: 'http://172.21.81.63:8080/storemonitor/api/',
     GLOBAL_WEBSITE: 'http://172.21.81.63:8081/storemonitor/api/',
     VERSION: version
   },
@@ -25,11 +25,16 @@ const _Environments = {
     CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://rc-inspection.storevue.com/storemonitor/api/',
     VERSION: version
+  },
+  RC: {
+    CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://rc-inspect.advantech-ics.com/storemonitor/api/',
+    VERSION: version
   }
 };
 
-const environJSON = _Environments.QA;
-const isGlobalWebsite = false;
+const environJSON = _Environments.RC;
+const isGlobalWebsite = true;
 
 let Environment;
 export default Environment = {
