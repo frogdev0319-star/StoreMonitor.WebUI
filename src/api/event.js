@@ -5,7 +5,7 @@ const version = Environment.VERSION;
 
 export const getEventList = data => {
   return request({
-    url: `${version}/event/list`,
+    url: `v2.0/event/list`,
     method: 'post',
     data
   });
@@ -29,7 +29,7 @@ export const addComment = data => {
 
 export const getCommentList = data => {
   return request({
-    url: `${version}/event/comment/list`,
+    url: `v2.0/event/comment/list`,
     method: 'post',
     data
   });

@@ -4,7 +4,9 @@
       <div class="title-content">
         <img :src="sourceSrc" :height="varyWindowWidth>1366?'40px':'32px'" class="title-img" >
         <span class="event-title">{{ event.eventTitle }}</span>
-        <span v-if="event.score!==Math.pow(-2,31)" class="event-score">{{ $t('eventView.scores') }} {{ event.score }}</span>
+        <span v-if="event.score!==Math.pow(-2,31)" class="event-score">
+          {{ $t('eventView.scores') }} {{ event.score }}
+        </span>
         <delay-button
           v-if="showWinpBtn"
           type="primary"
@@ -131,11 +133,11 @@
         <div class="content">
           <audio-vue
             v-if="showAudio"
-            :audio-ref="audioRef"
-            :audio-src="audioSrc"
-            :if-show-margin="false"/>
-
-          <pre class="description">{{ event.description }}</pre>
+            :audio-list="audioList"/>
+          <description-text
+            v-if="descriptionList.length > 0"
+            :discription-list = "descriptionList"
+            class="description"/>
           <div class="photo-content">
             <div v-for="(item,index) in videosourceList" :key="index" class="source-content">
               <!--video-->
@@ -219,12 +221,14 @@
                 <span class="creator">{{ item.createOr }}</span>
                 <audio-vue
                   v-if="item.showAudio"
-                  :audio-ref="item.audio.audioRef"
-                  :audio-src="item.audio.audioSrc"
+                  :audio-list="item.audioList"
                   :if-show-margin="false"
                   class="deal-speech"/>
               </div>
-              <pre v-if="item.description != null" class="description">{{ item.description }}</pre>
+              <description-text
+                v-if="item.descriptionList.length > 0"
+                :discription-list = "item.descriptionList"
+                class="description"/>
               <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="source-content">
                 <div
                   v-for="(_item,_index) in item.sourceList"
@@ -264,10 +268,12 @@ import PermissionHelper from '@/api/PermissionHelper';
 import filterString from '@/common/filterString';
 import { mapGetters } from 'vuex';
 import DelayButton from '@/components/DelayButton';
+import DescriptionText from "../../../components/DescriptionText";
 
 export default {
   name: 'EventDetail',
   components: {
+    DescriptionText,
     DelayButton,
     AudioVue: () => import('@/components/AudioVue.vue'),
     SkywatchVideo: () => import('@/components/SkywatchVideo.vue'),
@@ -326,7 +332,9 @@ export default {
       imgsourceList: [],
       Changestatus: '',
       vendor: 1,
-      currentVideoComponent: 'EzvizVideo'
+      currentVideoComponent: 'EzvizVideo',
+      audioList: [],
+      descriptionList: []
     };
   },
   watch:{
@@ -497,12 +505,20 @@ export default {
       }
       const attachment = event.initialComment.attachment;
       const temp = [];
+      self.audioList = [];
+      self.descriptionList = [];
       attachment.forEach(item => {
         if (item.mediaType === 0) {
+          const audioObj = {};
           self.audioSrc = item.url;
           self.showAudio = true;
-          // self.audio.audioSrc=item.url;
-          // self.audio.audioRef='audioRef';
+          audioObj.audioSrc = item.url;
+          audioObj.isPlaying = false;
+          audioObj.audioOftenText = '';
+          audioObj.hasNotPlayAudio = true;
+          self.audioList.push(audioObj);
+        } else if (item.mediaType === 3) {
+          self.descriptionList.push({ description: item.url });
         } else {
           deviceList.forEach(_item => {
             if (_item.id === item.deviceId) {
@@ -596,21 +612,24 @@ export default {
             }
             obj.showContent = index === 0;
             if (item.attachment.length !== 0) {
-              const _temp = [];
-              const audioObj = {};
+              obj.audioList = [];
+              obj.sourceList = [];
+              obj.descriptionList = [];
               item.attachment.forEach((_item, _index) => {
                 if (_item.mediaType === 0) {
+                  const audioObj = {};
                   audioObj.audioSrc = _item.url;
-                  audioObj.audioRef = 'audioRef' + index;
                   audioObj.isPlaying = false;
                   audioObj.audioOftenText = '';
+                  audioObj.hasNotPlayAudio = true;
                   obj.showAudio = true;
+                  obj.audioList.push(audioObj);
+                } else if (_item.mediaType === 3) {
+                  obj.descriptionList.push({ description: _item.url });
                 } else {
-                  _temp.push(_item);
+                  obj.sourceList.push(_item);
                 }
               });
-              obj.audio = audioObj;
-              obj.sourceList = _temp;
             }
             temp.push(obj);
           });
@@ -1408,12 +1427,16 @@ $h1:#292e36;
                     height: 100%;
                     @include point(min-height,100);
                     border-left: 1px solid #ddd;
-                    float: left;
                     @include point(padding-top,5);
+                  display: flex;
+                  flex-direction: column;
+                  align-items: flex-start;
                     .audio{
                         padding-top: 26px;
                         overflow: hidden;
                         text-align: left;
+                        display: inline-flex;
+                        justify-content: flex-start;
                         .creator{
                             @include point(margin-left,20);
                             float: left;

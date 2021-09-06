@@ -58,12 +58,14 @@
         <audio-vue
           v-if="_item.showAudio"
           :is-export-pdf="isExportPdf"
-          :audio-ref="_item.audio.audioRef"
-          :audio-src="_item.audio.audioSrc"
+          :audio-list="_item.audioList"
         />
-        <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
-          <span class="pdf_font_24">{{ _item.comment }}</span>
-        </div>
+        <!--<div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">-->
+          <!--<span class="pdf_font_24">{{ _item.comment }}</span>-->
+        <!--</div>-->
+        <description-text
+          v-if="_item.descriptionList.length > 0"
+          :discription-list = "_item.descriptionList"/>
         <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
           <div
             v-for="(sourceitem,sourceindex) in _item.sourceList"
@@ -125,10 +127,11 @@
 import videojs from '../../static/video.js';
 import 'videojs-contrib-hls';
 import AudioVue from './AudioVue';
+import DescriptionText from "./DescriptionText";
 
 export default {
   name: 'ReportDetail',
-  components: { AudioVue },
+  components: {DescriptionText, AudioVue },
   props: {
     reportDetailData: {
       type: Array,

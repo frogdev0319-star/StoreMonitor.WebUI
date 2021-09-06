@@ -71,7 +71,9 @@
                   :style="isexportPDF ? 'font-size:22px;' : ''"
                   :class="pageItem.ifExpand ? 'icon-zhedie1': 'icon-zhankai1'"
                   class="iconfont icontemp"/>
-                <span class="title-lable"><span class="pdf_font_20">{{ $t(`titleView.${pageItem.name}`) }}</span></span>
+                <span class="title-lable"><span class="pdf_font_20">
+                  {{ $t(`titleView.${pageItem.name}`) }}</span>
+                </span>
               </div>
               <div v-if="pageItem.itemCount > -1" class="count-header">
                 <span class="count"><span class="pdf_font_36">{{ pageItem.itemCount }}</span></span>
@@ -107,7 +109,8 @@
                   </template>
                 </div>
                 <div v-if="showFeedBacks && showAllDetailsEnable" style="margin-bottom:20px;">
-                  <div class="content-title"><span class="pdf_font_20">{{ $t('remotePatrol.feedbacks') }}</span></div>
+                  <div class="content-title"><span class="pdf_font_20">
+                    {{ $t('remotePatrol.feedbacks') }}</span></div>
                   <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
                     <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
                       <div class="detail-title">
@@ -117,16 +120,17 @@
                     <div
                       v-if="item.showAttachment || item.description != null&&item.description !== ''"
                       class="content-detail-main">
-                      <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
+                      <p class="cdm-title">
+                        <span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span>
+                      </p>
                       <audio-vue
                         v-if="item.showAudio"
                         :is-export-pdf="isexportPDF"
-                        :audio-ref="item.audio.audioRef"
-                        :audio-src="item.audio.audioSrc"
+                        :audio-list = "item.audioList"
                       />
-                      <div v-if="item.description !=null && item.description !=''" class="cdm-word">
-                        <span class="pdf_font_24">{{ item.description }}</span>
-                      </div>
+                      <description-text
+                        v-if="item.descriptionList.length > 0"
+                        :discription-list = "item.descriptionList"/>
                       <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
                         <div
                           v-for="(sourceitem,index) in item.sourceList"
@@ -191,18 +195,17 @@
                   </div>
                 </div>
                 <div
-                  v-if="item.showAttachment || item.description != null&&item.description !== ''"
+                  v-if="item.showAttachment"
                   class="content-detail-main">
                   <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
                   <audio-vue
                     v-if="item.showAudio"
                     :is-export-pdf="isexportPDF"
-                    :audio-ref="item.audio.audioRef"
-                    :audio-src="item.audio.audioSrc"
+                    :audio-list="item.audioList"
                   />
-                  <div v-if="item.description !=null && item.description !=''" class="cdm-word">
-                    <span class="pdf_font_24">{{ item.description }}</span>
-                  </div>
+                  <description-text
+                    v-if="item.descriptionList.length > 0"
+                    :discription-list = "item.descriptionList"/>
                   <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="cdm-pic">
                     <div
                       v-for="(sourceitem,index) in item.sourceList"
@@ -396,20 +399,21 @@
 </template>
 <script>
 import ECharts from 'vue-echarts';
-import { getInspectReportInfo, getInspectReportDetail } from '@/api/inspect';
+import { getInspectReportInfo } from '@/api/inspect';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
-import resize from '@/components/mixins/echartResize.js'
 import DelayButton from '@/components/DelayButton';
 import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import AudioVue from '@/components/AudioVue';
 import ReportDetail from '@/components/ReportDetail';
+import DescriptionText from "../../components/DescriptionText";
 
 export default {
   name: 'InspectReport',
   components: {
+    DescriptionText,
     ReportDetail,
     AudioVue,
     DelayButton,
@@ -743,14 +747,14 @@ export default {
 
     getGroupsData(groups) {
       const temp = [];
-      groups.sort((a, b) => { return a.groupType - b.groupType; });
+      groups.sort((a, b) => { return a.type - b.type; });
       groups.forEach((groupitem, groupindex) => {
         const obj = {
           items: []
         };
         obj.groupId = groupitem.groupId;
         obj.groupName = groupitem.groupName;
-        obj.groupType = groupitem.groupType;
+        obj.groupType = groupitem.type;
         obj.parentId = groupitem.parentId;
         obj.parentName = '';
         groupitem.items.forEach((item, index) => {
@@ -758,29 +762,33 @@ export default {
           details.subject = item.subject;
           details.comment = item.comment;
           details.description = item.description;
-          details.grade = item.grade;
+          details.grade = item.score;
           details.qualifiedScore = item.qualifiedScore;
           details.itemScore = item.itemScore;
           details.type = item.type;
-          details.passOfFailFlag = this.getItemsPassOrFailed(groupitem.groupType, item.grade, item.qualifiedScore);
+          details.passOfFailFlag = this.getItemsPassOrFailed(groupitem.type, item.score, item.qualifiedScore);
           if (item.attachment.length !== 0) {
-            const _temp = [];
-            const audioObj = {};
             this.hasAttachment++;
             details.showAttachment = true;
+            details.audioList = [];
+            details.sourceList = [];
+            details.descriptionList = [];
             item.attachment.forEach((_item, _index) => {
               if (_item.mediaType === 0) {
+                const audioObj = {};
                 audioObj.audioSrc = _item.url;
                 audioObj.audioRef = 'audioRef' + groupindex + index + _index;
                 audioObj.isPlaying = false;
                 audioObj.audioOftenText = '';
+                audioObj.hasNotPlayAudio = true;
                 details.showAudio = true;
+                details.audioList.push(audioObj);
+              } else if (_item.mediaType === 3) {
+                details.descriptionList.push({ description: _item.url });
               } else {
-                _temp.push(_item);
+                details.sourceList.push(_item);
               }
             });
-            details.audio = audioObj;
-            details.sourceList = _temp;
           } else {
             details.showAttachment = false;
           }
@@ -989,23 +997,27 @@ export default {
           obj.subject = item.subject;
           obj.description = item.description;
           if (item.attachment.length !== 0) {
-            const _temp = [];
             const audioObj = {};
             this.hasAttachment++;
             obj.showAttachment = true;
+            obj.sourceList = [];
+            obj.audioList = [];
+            obj.descriptionList = [];
             item.attachment.forEach((_item, _index) => {
               if (_item.mediaType === 0) {
                 audioObj.audioSrc = _item.url;
-                audioObj.audioRef = 'audioRef' + index;
+                audioObj.audioRef = 'audioRef' + _index;
                 audioObj.isPlaying = false;
                 audioObj.audioOftenText = '';
+                audioObj.hasNotPlayAudio = true;
                 obj.showAudio = true;
+                obj.audioList.push(audioObj);
+              } else if (_item.mediaType === 3) {
+                obj.descriptionList.push({ description: _item.url });
               } else {
-                _temp.push(_item);
+                obj.sourceList.push(_item);
               }
             });
-            obj.audio = audioObj;
-            obj.sourceList = _temp;
           } else {
             obj.showAttachment = false;
           }

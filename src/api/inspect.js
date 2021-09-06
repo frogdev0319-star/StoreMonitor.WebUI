@@ -180,7 +180,7 @@ export const getInspectReportList = data => {
 
 export const getInspectReportInfo = data => {
   return request({
-    url: `v4.0/inspect/report/info`,
+    url: `v5.0/inspect/report/info`,
     method: 'post',
     data
   });
