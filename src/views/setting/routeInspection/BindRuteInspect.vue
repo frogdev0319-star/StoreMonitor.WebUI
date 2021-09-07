@@ -127,10 +127,9 @@ export default {
     };
   },
 
-  mounted() {
-    const self = this;
-    self.InitData();
-    self.getCountryStore();
+  created() {
+    this.InitData();
+    this.getCountryStore();
   },
   destroyed() {
     sessionStorage.removeItem('bindStoreData');
