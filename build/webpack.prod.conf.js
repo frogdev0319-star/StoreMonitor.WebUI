@@ -18,7 +18,11 @@ var GenerateAssetPlugin = require('generate-asset-webpack-plugin');
 var createServerConfig = function(compilation){
   let cfgJson={loginURL:'https://portals.storeviu.com'};
   return JSON.stringify(cfgJson);
+}
 
+var createBeseyeConfig = function() {
+  let cfgJson = { client_id: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a' };
+  return JSON.stringify(cfgJson);
 }
 
 
@@ -52,6 +56,13 @@ const webpackConfig = merge(baseWebpackConfig, {
       extraFiles: []
     }),
 
+    new GenerateAssetPlugin({
+      filename: 'beseyeconfig.json',
+      fn: (compilation, cb) => {
+        cb(null, createBeseyeConfig(compilation));
+      },
+      extraFiles: []
+    }),
 
     new UglifyJsPlugin({
       uglifyOptions: {
