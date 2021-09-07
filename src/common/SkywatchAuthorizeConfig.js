@@ -14,7 +14,7 @@ function getRedirectServerUrl() {
   return redirectUrl;
 }
 
-function getRedirectClientUrl(){
+function getRedirectClientUrl() {
   const baseUrl = Environment.BASE_URL;
   const storemonitorIndex = baseUrl.indexOf('storemonitor');
   const redirectUrl = `${baseUrl.substr(0, storemonitorIndex)}storemonitor_ui/skywatchAccount`;

@@ -245,7 +245,6 @@ export default {
       const stateStr = `Beseye-${this.beseyeAccount}`;
       const base64StateStr = this.strToBase64(stateStr);
       BeseyeAuthorizeConfig.state = base64StateStr;
-      console.log(BeseyeAuthorizeConfig.state);
       return stateStr;
     },
 
