@@ -623,10 +623,10 @@ export default {
         const availablePathesList = this.availabePathList;
         if (availablePathesList.includes('/noRight')) {
           this.$router.push('/noRight');
-        } else if (!availablePathesList.includes(window.location.pathname)) {
+        } else if (!availablePathesList.includes(this.$route.path)) {
           this.$router.push(availablePathesList[0]);
         } else {
-          this.$router.push(window.location.pathname);
+          this.$router.push(this.$route.path);
         }
       }
     },
