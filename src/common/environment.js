@@ -28,8 +28,8 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.QA;
-const isGlobalWebsite = false;
+const environJSON = _Environments.Preview;
+const isGlobalWebsite = true;
 
 let Environment;
 export default Environment = {
