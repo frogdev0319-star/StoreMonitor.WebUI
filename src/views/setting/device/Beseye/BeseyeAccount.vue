@@ -1,8 +1,9 @@
 <template>
   <div class="device-container">
-    <account-header @click="getBeseyeGrantCode"
-                    :added-device-number="addedDeviceNumber"
-                    :authorized-devices-num="authorizedDevicesNum"
+    <account-header
+      :added-device-number="addedDeviceNumber"
+      :authorized-devices-num="authorizedDevicesNum"
+      @click="getBeseyeGrantCode"
     >
       <div class="button-area">
         <i class="iconfont icon-authorize"/>
@@ -126,6 +127,12 @@ export default {
     };
   },
 
+  computed: {
+    ...mapGetters({
+      accountChanged: 'accountChanged'
+    })
+  },
+
   watch: {
     accountChanged(val) {
       if (val !== 0) {
@@ -134,12 +141,6 @@ export default {
         this.getCodeAndState();
       }
     }
-  },
-
-  computed: {
-    ...mapGetters({
-      accountChanged: 'accountChanged'
-    })
   },
 
   mounted() {
@@ -158,19 +159,19 @@ export default {
         this.tableData = [];
         this.isLoadingData = false;
         console.log('BeseyeAccount-getBeseyeUserList: ' + err);
-      })
+      });
     },
 
-    getBeseyeDeviceNum(){
+    getBeseyeDeviceNum() {
       this.authorizedDevicesNum = 0;
       this.addedDeviceNumber = 0;
-      const params = {vendor: 2};
+      const params = { vendor: 2 };
       getDeviceAuthNumber(params).then(res => {
         this.authorizedDevicesNum = res.data.authDeviceNumber;
         this.addedDeviceNumber = res.data.addedDeviceNumber;
       }).catch(err => {
-        console.log('getBeseyeDeviceNum' + err)
-      })
+        console.log('getBeseyeDeviceNum' + err);
+      });
     },
 
     getCodeAndState() {
@@ -212,7 +213,7 @@ export default {
       params.grantCode = this.grantCode;
       if (this.beseyeAccount && this.beseyeAccount.length > 0) {
         params.beseyeAccount = this.beseyeAccount;
-      };
+      }
       return params;
     },
 
@@ -245,7 +246,6 @@ export default {
       const stateStr = `Beseye-${this.beseyeAccount}`;
       const base64StateStr = this.strToBase64(stateStr);
       BeseyeAuthorizeConfig.state = base64StateStr;
-      console.log(BeseyeAuthorizeConfig.state);
       return stateStr;
     },
 

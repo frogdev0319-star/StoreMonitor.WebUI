@@ -236,7 +236,7 @@ export default {
               roleName: this.$t('route.supervisorStat'),
               checked: false,
               disabled: false
-            },
+            }
             // {
             //   roleName: this.$t('route.checkInStatistics'),
             //   checked: false,

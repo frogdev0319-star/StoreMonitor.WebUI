@@ -33,8 +33,8 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.RC;
-const isGlobalWebsite = true;
+const environJSON = _Environments.QA;
+const isGlobalWebsite = false;
 
 let Environment;
 export default Environment = {
