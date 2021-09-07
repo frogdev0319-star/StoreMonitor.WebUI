@@ -3,9 +3,9 @@
     <div class="el-bind-header">
       <div class="seacrh-content">
         <store-filter
-          class="store-filter"
           :is-patrol = "true"
           :set-width-flag="true"
+          class="store-filter"
           @storeChange = "onStoreChange"
         />
         <el-input

@@ -798,7 +798,7 @@ export default {
           index = 0 - (i + 1);
         }
       }
-      return arr.filter(source => source.type === 1).map(source => source.content);
+      return arr.map(source => source.content);
     },
 
     async getReportInfo(res) {
