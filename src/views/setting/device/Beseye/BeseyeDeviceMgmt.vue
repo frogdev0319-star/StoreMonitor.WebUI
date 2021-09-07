@@ -1125,11 +1125,6 @@ export default {
     min-width: 85px;
     border: 1px dashed #7d8cad;
   }
-  .el-image__inner{
-    height: 70px;
-    width: calc(100/1920*100vw);
-    min-width: 85px;
-  }
   .image-slot{
     height: 70px;
     width: calc(100/1920*100vw);
@@ -1299,11 +1294,6 @@ export default {
     width: calc(100/1920*100vw);
     min-width: 85px;
     border: 1px dashed #7d8cad;
-  }
-  .el-image__inner{
-    height: 70px;
-    width: calc(100/1920*100vw);
-    min-width: 85px;
   }
   .image-slot{
     height: 70px;
