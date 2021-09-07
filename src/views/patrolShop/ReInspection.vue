@@ -1671,12 +1671,6 @@ export default {
       self.channel = obj;
       self.vendor = item.vendor;
       item.isClick = true;
-      if (self.showFeedBack) {
-        self.inspectItemList.forEach(_item => {
-          _item.checked = false;
-          _item.disabled = true;
-        });
-      }
       self.showChannelBtns.forEach((_item, _index) => {
         if (_index !== index) {
           _item.isClick = false;
