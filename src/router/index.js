@@ -17,15 +17,15 @@ Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err);
 }
 export const constantRoutes = [
-  {
-    path: '/login',
-    name: 'Login',
-    hidden: true,
-    component: LoginForm,
-    meta: {
-      requireAuth: false
-    }
-  },
+  // {
+  //   path: '/login',
+  //   name: 'Login',
+  //   hidden: true,
+  //   component: LoginForm,
+  //   meta: {
+  //     requireAuth: false
+  //   }
+  // },
   {
     path: '/:token/:userId/:ezvizAppKey/:ezvizProtocol/:lang/:deviceAuth',
     redirect: '/',
@@ -254,18 +254,18 @@ export const navbarRoute = {
       }
     ) && primaryPathesList.push('/eventStat');
 
-    PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
-      {
-        path: '/checkInStatistics',
-        name: 'checkInStatistics',
-        component: resolve => require(['@/views/statistical/CheckInStatistics'], resolve),
-        hidden: false,
-        meta: {
-          requireAuth: true,
-          keepAlive: false
-        }
-      }
-    ) && primaryPathesList.push('/checkInStatistics');
+    // PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
+    //   {
+    //     path: '/checkInStatistics',
+    //     name: 'checkInStatistics',
+    //     component: resolve => require(['@/views/statistical/CheckInStatistics'], resolve),
+    //     hidden: false,
+    //     meta: {
+    //       requireAuth: true,
+    //       keepAlive: false
+    //     }
+    //   }
+    // ) && primaryPathesList.push('/checkInStatistics');
     return statisticsRoute;
   },
 
