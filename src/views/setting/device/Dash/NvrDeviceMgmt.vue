@@ -321,7 +321,7 @@
             <div class="nvr-info">
               <span class="info-title">{{ $t('deviceView.nvrChannelSetting') }}</span>
               <el-button
-                :disabled="channelBtnDisabled"
+                :disabled="channelList.length === curNVRItem.channelCount"
                 type="primary"
                 size="mini"
                 class="add-btn"
@@ -488,7 +488,7 @@
                       </el-form-item>
                     </el-col>
                   </el-form-item>
-                  <el-from-item>
+                  <el-form-item>
                     <el-col :span="8">
                       <el-form-item ref="uploadElement" :label="$t('deviceView.thumbnail')" prop="pictureUrl">
                         <el-input v-if="false" v-model="addChannelData.pictureUrl"/>
@@ -519,7 +519,7 @@
                         <span class="picture-tips">*{{ $t('deviceView.thumbnailInfo') }}</span>
                       </el-form-item>
                     </el-col>
-                  </el-from-item>
+                  </el-form-item>
 
                 </el-form>
               </div>
@@ -635,7 +635,6 @@ export default {
       ],
       storeDataList: [],
       newChannelNumList: [],
-      channelBtnDisabled: false,
       editNvrChannelNumList: [],
       showConfirmDelete: false,
       rules: {
@@ -1294,7 +1293,8 @@ export default {
           self.curChannelItem.isClick = false;
           self.file = '';
         } else {
-          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          // util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          util.setErrorMsg(errMsg, false, true);
         }
       })
         .then(async() => {
@@ -1323,7 +1323,8 @@ export default {
           util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
           self.curChannelItem.isClick = false;
         } else {
-          util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+          util.setErrorMsg(errMsg, true, true);
+          // util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
         }
       })
         .then(async() => {
@@ -1410,11 +1411,6 @@ export default {
         }
       });
       self.channelList = temp;
-      if (self.channelList.length === self.curNVRItem.channelCount) {
-        self.channelBtnDisabled = true;
-      } else {
-        self.channelBtnDisabled = false;
-      }
       // order by channeId of channelList to get max channel num
       if (self.channelList.length === 0) {
         self.editNvrChannelNumList = self.channelNumList;
@@ -1531,7 +1527,8 @@ export default {
             util.notify(self.$t('deviceView.addSuccess'), 'success', 3000);
             self.showAddNvrDialog = false;
           } else {
-            util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+            util.setErrorMsg(res1.errMsg, true, true);
+            // util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
             self.showAddNvrDialog = false;
           }
           self.addNvrData = { ivsId: '', name: '', channelCount: 1, storeId: self.storeDataList[0].storeId };
@@ -1586,7 +1583,7 @@ export default {
             }
             self.showAddChannelDialog = false;
           } else {
-            util.notify(self.$t('deviceView.addFailed'), 'warning', 3000);
+            util.setErrorMsg(res1.errMsg, false, true);
             self.showAddChannelDialog = false;
           }
           self.addChannelData = { name: '', channelId: '', pictureUrl: '', file: '' };
@@ -1684,6 +1681,7 @@ export default {
       obj.name = item.tempDeviceName;
       obj.storeId = item.storeId;
       obj.channelCount = item.tempChannelCount;
+      self.curNVRItem.channelCount = item.tempChannelCount;
       const arr = [];
       arr.push(obj);
       const params = {};
@@ -1694,7 +1692,8 @@ export default {
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           item.isEditing = false;
         } else {
-          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          util.setErrorMsg(errMsg, false, true);
+          // util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
           item.isEditing = false;
         }
       })
@@ -1707,7 +1706,6 @@ export default {
     },
 
     cancelEditNvr(index, item) {
-      const self = this;
       item.isEditing = false;
       item.tempDeviceName = item.name;
       item.tempChannelCount = item.channelCount;

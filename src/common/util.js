@@ -618,7 +618,7 @@ export default {
     }
   },
 
-  setErrorMsg(msg, addOrUpdateFlag) {
+  setErrorMsg(msg, addOrUpdateFlag, showNotify = true) {
     let displayedMsg = '';
     const msgMap = [
       { ret: 'moreThanAuthorizedDevices', match: ['exceeds the limit'] },
@@ -632,7 +632,9 @@ export default {
       { ret: 'videoLicenseOverdue', match: ['Device License overdue'] },
       { ret: 'hasBoundItem', match: ['binding to item'] },
       { ret: 'hasAdded', match: ['设备已被别人添加'] },
-      { ret: 'noDeviceLicense', match: ['Not Device License'] }
+      { ret: 'noDeviceLicense', match: ['Not Device License'] },
+      { ret: 'accountExist', match: ['Account already exists'] },
+      { ret: 'deviceExist', match: ['NVR ID already existed'] }
     ];
     const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
     if (!result) {
@@ -640,7 +642,7 @@ export default {
     } else {
       displayedMsg = i18n.t(`deviceView.${result.ret}`);
     }
-    this.notify(displayedMsg, 'warning', 3000);
+    showNotify && this.notify(displayedMsg, 'warning', 3000);
     return displayedMsg;
   },
 
