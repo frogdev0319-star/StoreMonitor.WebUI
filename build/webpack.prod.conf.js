@@ -21,7 +21,7 @@ var createServerConfig = function(compilation){
 }
 
 var createBeseyeConfig = function() {
-  let cfgJson = { client_id: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a' };
+  let cfgJson = { client_id: 'abf2c7e17648cc11f1562e2ea26e2d61743cae99c3df395ba68b817f37c99a03' };
   return JSON.stringify(cfgJson);
 }
 

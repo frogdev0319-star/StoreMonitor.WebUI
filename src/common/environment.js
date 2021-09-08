@@ -9,12 +9,14 @@ const _Environments = {
   Preview: {
     CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://preview-inspect.storevue.com/storemonitor/api/',
-    VERSION: version
+    VERSION: version,
+    clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   },
   Stable: {
     CHINA_WEBSITE: 'http://mgmt.storevue.com.cn:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://mgmt.storevue.com/storemonitor/api/',
-    VERSION: version
+    VERSION: version,
+    clientId: 'abf2c7e17648cc11f1562e2ea26e2d61743cae99c3df395ba68b817f37c99a03'
   },
   QA: {
     CHINA_WEBSITE: 'http://axa.wise-insightapm.com:19085/storemonitor/api/',
@@ -28,7 +30,7 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.Preview;
+const environJSON = _Environments.Stable;
 const isGlobalWebsite = true;
 
 let Environment;
