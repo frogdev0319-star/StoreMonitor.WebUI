@@ -849,7 +849,8 @@ export default {
     'validateSucc': 'Successfully validate!',
     'validateFailed': 'Failed to validate!',
     'deleteSkywatchAccount': 'Delete Skywatch account',
-    'deleteSkywatchAccountInfo': 'Delete the Skywatch User?'
+    'deleteSkywatchAccountInfo': 'Delete the Skywatch User?',
+    'noDeviceLicense': 'Please purchase video license'
   },
 
   // Store Management page language

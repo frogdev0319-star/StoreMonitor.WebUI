@@ -628,10 +628,11 @@ export default {
       { ret: 'duplicateSeriNum', match: ['Duplicate device serial'] },
       { ret: 'storeNotExist', match: ['Store does not exist'] },
       { ret: 'noAuthorityForStore', match: ['No authority'] },
-      { ret: 'illegalSeriNum', match: ['deviceSerial']},
-      { ret: 'videoLicenseOverdue', match: ['Device License overdue']},
-      { ret: 'hasBoundItem', match: ['binding to item']},
-      { ret: 'hasAdded', match: ['设备已被别人添加']}
+      { ret: 'illegalSeriNum', match: ['deviceSerial'] },
+      { ret: 'videoLicenseOverdue', match: ['Device License overdue'] },
+      { ret: 'hasBoundItem', match: ['binding to item'] },
+      { ret: 'hasAdded', match: ['设备已被别人添加'] },
+      { ret: 'noDeviceLicense', match: ['Not Device License'] }
     ];
     const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
     if (!result) {
