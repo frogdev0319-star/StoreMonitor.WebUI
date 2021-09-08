@@ -854,7 +854,7 @@ export default {
     'validateFailed': '验证失败！',
     'deleteSkywatchAccount': '删除Skywatch账号',
     'deleteSkywatchAccountInfo': '确认删除该Skywatch账号？',
-    'noDeviceLicense': '请购买video license'
+    'noDeviceLicense': '请购买video license',
   },
 
   // Store Management page language
