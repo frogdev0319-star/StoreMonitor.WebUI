@@ -1195,6 +1195,10 @@ export default {
         } else {
           isSuccess = false;
         }
+        if (!isSuccess) {
+          util.notify(self.$t('remotePatrol.submitFail'), 'error', 3000);
+          return;
+        }
         const routeData = {
           flag: {
             addEventType: 'add',
@@ -1247,6 +1251,10 @@ export default {
           isSuccess = true;
         } else {
           isSuccess = false;
+        }
+        if (!isSuccess) {
+          util.notify(self.$t('remotePatrol.submitFail'), 'error', 3000);
+          return;
         }
         const routeData = {
           flag: {

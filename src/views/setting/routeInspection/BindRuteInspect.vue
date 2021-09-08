@@ -3,9 +3,9 @@
     <div class="el-bind-header">
       <div class="seacrh-content">
         <store-filter
-          class="store-filter"
           :is-patrol = "true"
           :set-width-flag="true"
+          class="store-filter"
           @storeChange = "onStoreChange"
         />
         <el-input
@@ -127,10 +127,9 @@ export default {
     };
   },
 
-  mounted() {
-    const self = this;
-    self.InitData();
-    self.getCountryStore();
+  created() {
+    this.InitData();
+    this.getCountryStore();
   },
   destroyed() {
     sessionStorage.removeItem('bindStoreData');
