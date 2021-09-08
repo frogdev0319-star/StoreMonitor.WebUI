@@ -417,6 +417,9 @@ $black: #182752;
   @extend .el-image__inner;
   border: 1px dashed #7d8cad;
   float: left;
+  height: 70px;
+  width: calc(100/1920*100vw);
+  min-width: 85px;
 }
 
 .image-slot{

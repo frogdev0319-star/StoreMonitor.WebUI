@@ -1196,7 +1196,7 @@ export default {
           isSuccess = false;
         }
         if (!isSuccess) {
-          util.notify(self.$t('remotePatrol.submitFail'), 'error', 3000);
+          util.notify(self.$t('remotePatrol.submitFail'), 'warning', 3000);
           return;
         }
         const routeData = {
@@ -1253,7 +1253,7 @@ export default {
           isSuccess = false;
         }
         if (!isSuccess) {
-          util.notify(self.$t('remotePatrol.submitFail'), 'error', 3000);
+          util.notify(self.$t('remotePatrol.submitFail'), 'warning', 3000);
           return;
         }
         const routeData = {

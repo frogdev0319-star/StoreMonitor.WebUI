@@ -201,7 +201,7 @@ export default {
           throw new Error(res.errorMsg);
         }
       }).catch(error => {
-        const failMsg = this.getAuthorizeMsg('warning');
+        const failMsg = this.getAuthorizeMsg('warning', error.message);
         util.notify(failMsg, 'warning', 3000);
         this.isAuthorizing = false;
         console.log('BeseyeAccount-authorizeBeseyeAccount: ' + error);
@@ -217,11 +217,16 @@ export default {
       return params;
     },
 
-    getAuthorizeMsg(type) {
-      const succMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeSucc') : this.$t('deviceView.authorizeSucc');
-      const failMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeFail') : this.$t('deviceView.authorizeFail');
-      const refuseMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeRefused') : this.$t('deviceView.authorizeRefused');
-      const returnMsg = type === 'success' ? succMsg : type === 'warning' ? failMsg : refuseMsg;
+    getAuthorizeMsg(type, msg) {
+      const succMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeSucc')
+        : this.$t('deviceView.authorizeSucc');
+      const failMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeFail')
+        : this.$t('deviceView.authorizeFail');
+      const refuseMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeRefused')
+        : this.$t('deviceView.authorizeRefused');
+      const promptMsg = util.setErrorMsg(msg, false, false);
+      const returnMsg = type === 'success' ? succMsg : type === 'warning'
+        ? `${failMsg} : ${promptMsg}` : `${refuseMsg} : ${promptMsg}`;
       return returnMsg;
     },
 
