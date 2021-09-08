@@ -192,13 +192,14 @@ export default {
       const params = this.setBeseyeAccountParams();
       beseyeAccountAuthorize(params).then(res => {
         if (res.errCode === 0) {
-          const succMsg = this.getAuthorizeMsg('success');
+          const succMsg = this.beseyeAccount.length > 0 ? this.$t('deviceView.reauthorizeSucc')
+            : this.$t('deviceView.authorizeSucc');
           util.notify(succMsg, 'sucess', 3000);
           this.getBeseyeUserList();
           this.getBeseyeDeviceNum();
           this.isAuthorizing = false;
         } else {
-          throw new Error(res.errorMsg);
+          throw new Error(res.errMsg);
         }
       }).catch(error => {
         const failMsg = this.getAuthorizeMsg('warning', error.message);
@@ -257,12 +258,13 @@ export default {
     setAuthorizeUrl() {
       let authorUrl = BeseyeAuthorizeConfig.userAuthorizationUri;
       authorUrl = authorUrl + ('?' + qs.stringify({
-        client_id: BeseyeAuthorizeConfig.client_id,
+        client_id: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a',
         response_type: BeseyeAuthorizeConfig.response_type,
         redirect_uri: BeseyeAuthorizeConfig.redirect_uri,
         scope: BeseyeAuthorizeConfig.scope,
         state: BeseyeAuthorizeConfig.state
       }));
+      console.log(authorUrl);
       window.location.href = authorUrl;
     },
 
