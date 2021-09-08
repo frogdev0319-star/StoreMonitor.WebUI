@@ -183,7 +183,8 @@ const user = {
       const username = userInfo.username.trim();
       const params = {
         'email': username,
-        'password': userInfo.password
+        'password': userInfo.password,
+        'lang': userInfo.lang
       };
       return new Promise((resolve, reject) => {
         loginByUsername(params).then(res => {

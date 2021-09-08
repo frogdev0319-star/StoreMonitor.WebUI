@@ -79,7 +79,7 @@
           <span class="forget-pass" @click="forgetPass">忘记密码？</span>
         </div>
         <div class="el-il8">
-          <el-select v-model="curIl8" size="small" class="el-il8List">
+          <el-select v-model="loginForm.lang" size="small" class="el-il8List">
             <el-option
               v-for="item in il8List"
               :key="item.value"
@@ -170,18 +170,18 @@ export default {
         androidSrc: './static/img/imgLogin/android.png',
         iosSrc: './static/img/imgLogin/ios.png'
       },
-      curIl8: 'zh-ch',
+      curIl8: 'zh-CN',
       il8List: [
         {
-          value: 'zh-ch',
+          value: 'zh-CN',
           label: '简体中文'
         },
         {
-          value: 'zh-tw',
+          value: 'zh-TW',
           label: '繁體中文'
         },
         {
-          value: 'en',
+          value: 'en-US',
           label: 'English'
         }
       ],
@@ -191,7 +191,8 @@ export default {
         // username:'axazhang.bo@advantech.com.cn',
         // password:'abc123'
         username: '',
-        password: ''
+        password: '',
+        lang: 'zh-CN'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -263,8 +264,9 @@ export default {
                 query: {
                   token: resData.token,
                   userId: resData.userId,
+                  ezvizAppKey: '',
                   ezvizProtrol: resData.ezvizProtrol,
-                  lang: 'zh',
+                  lang: this.loginForm.lang,
                   deviceAuth: resData.deviceAuth
                 }
               });
