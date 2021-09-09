@@ -1,6 +1,6 @@
 <template>
-  <el-col :span="24" class="">
-    <el-col :span="24" :class="setWidthFlag ? 'width-limit' : ''" class="header-details">
+  <div>
+    <div :class="setWidthFlag ? 'width-limit' : ''" class="header-details">
       <div :class="setWidthFlag ? 'first-header' : ''">
         <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeSelect') }}</span>
         <el-select
@@ -66,9 +66,9 @@
           @changeInput="onChangeStoreType"/>
       </div>
 
-    </el-col>
+    </div>
 
-  </el-col>
+  </div>
 </template>
 
 <script>

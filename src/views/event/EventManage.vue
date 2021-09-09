@@ -61,6 +61,7 @@
           <span>{{ $t('remotePatrol.search') }}</span>
         </delay-button>
       </div>
+      <selected-stores :store-str="storeFilterObj.storeStr"/>
     </div>
     <div class="el-table-content">
       <delay-button
@@ -203,11 +204,13 @@ import RegionMultiSelect from '@/components/RegionMultiSelect';
 import LimitSelect from '@/components/LimitSelect';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
-import StoreFilter from '../../components/StoreFilter';
+import StoreFilter from '@/components/StoreFilter';
+import SelectedStores from '@/components/SelectedStores';
 
 export default {
   name: 'EventManage',
   components: {
+    SelectedStores,
     StoreFilter,
     DelayButton,
     LimitSelect,
@@ -667,9 +670,8 @@ export default {
 
     getEventCount() {
       const self = this;
-      const start = self.dateValue[0];
-      const endTime = self.dateValue[1];
-      let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+      const start = this.$moment(this.dateValue[0]).valueOf();
+      let end = this.$moment(this.dateValue[1]).valueOf();
       end = end - end % 1000 + 999;
       const storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
       let like = {};
@@ -866,6 +868,7 @@ export default {
 
     onStoreChange(storeObj) {
       this.storeFilterObj = storeObj;
+      console.log(storeObj)
       this.ifSearchData && this.searchData();
       this.ifSearchData = false;
     }
@@ -954,10 +957,10 @@ $h1:#292e36;
         position: relative;
         background-color: #fff;
         border-bottom: 1px solid #e3e9f4;
-        padding: 30px 20px 30px 30px;
         font-size: calc(14/1920*100vw);
         color: $black;
         .el-area{
+          padding: 30px calc(20/1920*100vw) 0 calc(30/1920*100vw);
             overflow: hidden;
         }
         .el-date >>> .el-select-dropdown__item{
@@ -986,7 +989,7 @@ $h1:#292e36;
         }
         .el-date{
             text-align: left;
-            // position: relative;
+            padding: 0 calc(20/1920*100vw) 15px calc(30/1920*100vw);
             .date-title{
                 margin-right:20px;
             }

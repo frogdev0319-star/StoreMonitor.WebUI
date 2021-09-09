@@ -1,13 +1,13 @@
 <template>
-  <el-col :span="24" class="statistics-header">
-    <el-col :span="24" class="header-details">
+  <div class="statistics-header">
+    <div class="header-details">
       <store-filter
         :cached-params="searchParams"
         :is-patrol="isPatrol"
         @storeChange = "onStoreChange"
       />
-    </el-col>
-    <el-col :span="24" class="header-details">
+    </div>
+    <div class="header-details">
       <span :class="isInspectItem ? 'inspect-span' : 'normal-span'" >
         {{ $t('remotePatrol.time') }}</span>
       <date-time-picker :date-value="dateValue" @change="dateChange"/>
@@ -49,8 +49,9 @@
           </div>
         </delay-button>
       </div>
-    </el-col>
-  </el-col>
+    </div>
+    <selected-stores :store-str="storeFilterObj.storeStr"/>
+  </div>
 </template>
 
 <script>
@@ -64,10 +65,12 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
 import DateTimePicker from './DateTimePicker';
 import StoreFilter from './StoreFilter';
+import SelectedStores from "./SelectedStores";
 
 export default {
   name: 'SearchComponent',
   components: {
+    SelectedStores,
     StoreFilter,
     DateTimePicker,
     DelayButton,
@@ -358,6 +361,7 @@ export default {
   .statistics-header{
     background-color: #fff;
     color: $black;
+    position: relative;
     .header-details{
       text-align: left;
       padding-left: calc(30/1920*100vw);
@@ -412,8 +416,6 @@ export default {
       }
     }
     .header-details:nth-child(2){
-      padding-top:15px;
-      padding-bottom: 30px;
       padding-right: calc(60/1920*100vw);
     }
   }

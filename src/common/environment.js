@@ -19,7 +19,8 @@ const _Environments = {
     clientId: 'abf2c7e17648cc11f1562e2ea26e2d61743cae99c3df395ba68b817f37c99a03'
   },
   QA: {
-    CHINA_WEBSITE: 'http://axa.wise-insightapm.com:19085/storemonitor/api/',
+    // CHINA_WEBSITE: 'http://axa.wise-insightapm.com:19085/storemonitor/api/',
+    CHINA_WEBSITE: 'http://172.21.81.176:9050/storemonitor/api/',
     GLOBAL_WEBSITE: 'http://172.21.81.176:9050/storemonitor/api/',
     VERSION: version
   },
@@ -35,8 +36,8 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.Preview;
-const isGlobalWebsite = true;
+const environJSON = _Environments.Debug_XA;
+const isGlobalWebsite = false;
 
 let Environment;
 export default Environment = {

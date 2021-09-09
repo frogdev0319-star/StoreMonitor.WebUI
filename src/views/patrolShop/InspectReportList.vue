@@ -1,13 +1,12 @@
 <template>
   <el-row id="el-containter">
-    <el-col :span="24" class="report-header">
-      <el-col :span="24" class="header-details">
-        <store-filter
-          :cached-params="searchParams"
-          @storeChange = "onStoreChange"
-        />
-      </el-col>
-      <el-col :span="24" class="header-details">
+    <div class="report-header">
+      <store-filter
+        class="header-details"
+        :cached-params="searchParams"
+        @storeChange = "onStoreChange"
+      />
+      <div class="header-details">
         <span :class="lang === 'en' ? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
         <el-date-picker
           ref="datePicker"
@@ -71,8 +70,8 @@
             :label="item.name"
             :value="item.id"/>
         </el-select>
-      </el-col>
-      <el-col :span="24" class="header-details">
+      </div>
+      <div class="header-details">
         <div class="search-content">
           <span>{{ $t('remotePatrol.keywords') }}</span>
           <el-input v-model="searchInput" size="mini" class="search-input" clearable/>
@@ -85,8 +84,9 @@
         >
           <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
         </delay-button>
-      </el-col>
-    </el-col>
+      </div>
+      <selected-stores :store-str="storeStr"/>
+    </div>
     <el-col :span="24" class="report-content loading">
       <el-row
         v-loading="isLoading"
@@ -239,10 +239,12 @@ import { mapGetters } from 'vuex';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import StoreFilter from '@/components/StoreFilter';
 import DelayButton from '@/components/DelayButton';
+import SelectedStores from "@/components/SelectedStores";
 
 export default {
   name: 'InspectReportList',
   components: {
+    SelectedStores,
     DelayButton,
     StoreFilter
   },
@@ -848,72 +850,12 @@ $qualified:#6097F3;
 $noqualied:#FDBA40;
 $suggestBack:#F1F6FE;
 #el-containter{
-    // padding-top: calc(60/1920*100vw);
-    // padding-right: calc(30/1920*100vw);
     .report-header{
         margin-bottom: 20px;
         border-bottom: 1px solid $border;
         background-color: #fff;
         padding-top: 30px;
-        // padding-bottom: 30px;
         color: $black;
-        .header-details1{
-            text-align: left;
-            padding-left: calc(30/1920*100vw);
-            padding-right: calc(30/1920*100vw);
-            height: 20px;
-            line-height: 20px;
-            span{
-                font-size: calc(14/1920*100vw);
-                margin-right: calc(20/1920*100vw);
-                margin-left: calc(20/1920*100vw);
-            }
-            .choice-store{
-                color: $tab;
-                white-space: nowrap;
-                overflow: hidden;
-                /* text-overflow: ellipsis; */
-                width: 90%;
-                display: inline-block;
-                i{
-                    margin-right: calc(15/1920*100vw);
-                    font-size: calc(16/1920*100vw);
-                }
-            }
-            .store-selected{
-              top: unset;
-              background-color: rgba(30, 34, 52, 0.75);
-              position: absolute;
-              /* display: none; */
-              z-index: 1;
-              padding: 20px;
-              min-width: 200px;
-              border-radius: 10px;
-              left: calc(80 / 1920 * 100vw);
-              h1{
-                white-space: nowrap;
-                font-size: 18px;
-                margin: 0;
-                font-family: Roboto, "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
-                color: #fff;
-                font-weight: 500;
-                line-height: 1.1;
-              }
-              .store-list{
-                margin-top: 10px;
-                margin-left: 10px;
-                padding: 0;
-                .store-item{
-                  // white-space: nowrap;
-                  font-size: 14px;
-                  margin: 0;
-                  list-style-type: none;
-                  font-family: Roboto, "Microsoft YaHei", "Microsoft JhengHei", SimHei, Arial;
-                  color: #fff;
-                }
-              }
-            }
-        }
         .header-details{
             text-align: left;
             padding-left: calc(30/1920*100vw);
@@ -940,11 +882,6 @@ $suggestBack:#F1F6FE;
               @media screen and (min-width: 1280px) and (max-width: 1560px){
                 margin-right: 10px;
               };
-            }
-            @media screen and(max-width: 1280px){
-              .en-span-class{
-                //margin-right: 56px;
-              }
             }
             .el-province{
                 width: calc(160/1920*100vw);
@@ -973,14 +910,11 @@ $suggestBack:#F1F6FE;
             }
         }
       .header-details{
-        padding-bottom: 30px;
+        padding-bottom: 15px;
         padding-right: calc(20/1920*100vw);
       }
       .header-details:nth-child(1){
         padding-bottom: 0px;
-      }
-      .header-details:nth-child(2){
-        padding-bottom: 15px;
       }
     }
     .report-content{
