@@ -676,7 +676,6 @@ export default {
     'tab2IgnoredQualified': 'Tab2（Score）中忽略项目视同得分',
     'selectStoreToBind': '请选择{tableName}巡检表，需要绑定的门店',
     'hasBoundStoreNum': '{tableName}共有{allStoreNum}家门店，已绑定{boundStoreNum}家门店',
-    'itemsOfCate': '类别巡检项',
     'catergyName': '巡检类别名称',
     'parentCatergyName': '上级巡检类别',
     'parentCatergyNameTooltip1': '1. 一级类别若存在直属巡检项目，系统不允许创建子类别',
@@ -697,7 +696,8 @@ export default {
     'subCategoryHeader': '子类别（选填，30字符）',
     'subCategory': '子类别',
     'accumulateTotalScoreInfo': '考评总分= SUM(每项巡检得分) + 扣分起始分数',
-    'totalScoreLimitation': '项目总分值须等于评分选项最高分值'
+    'totalScoreLimitation': '项目总分值须等于评分选项最高分值',
+    'standardScore': '考评达标分数：'
   },
 
   // Device Management page language

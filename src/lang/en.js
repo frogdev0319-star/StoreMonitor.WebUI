@@ -691,7 +691,8 @@ export default {
     'tab1IgnoredQualified': 'Calculate the score of ignored items in Tab1 (Pass&Fail)',
     'tab2IgnoredQualified': 'Calculate the score of ignored items in Tab2 (Score)',
     'selectStoreToBind': 'Bound Stores',
-    'hasBoundStoreNum': '{allStoreNum} stores in total with {boundStoreNum} bound'
+    'hasBoundStoreNum': '{allStoreNum} stores in total with {boundStoreNum} bound',
+    'standardScore': 'Evaluation standard score:'
   },
 
   // Device Management page language

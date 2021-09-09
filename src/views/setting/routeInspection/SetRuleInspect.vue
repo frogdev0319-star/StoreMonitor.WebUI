@@ -58,23 +58,52 @@
             </el-tooltip>
           </p>
           <p class="rule-item">
-            <span class="rangeScore">
-              {{ $t('insSettingView.totalScorRange') }}：
-            </span>
-            <el-input :placeholder="$t('insSettingView.setMinScore')" v-model="minScore" class="input" @input="inputChangeMin"/>
-            <span class="input-text">
-              {{ $t('remotePatrol.scorecount') }}~
-            </span>
-            <el-input :placeholder="$t('insSettingView.setMaxScore')" v-model="maxScore" class="input" @input="inputChangeMax"/>
-            <span class="input-text">
-              {{ $t('remotePatrol.scorecount') }}
-            </span>
-            <span v-if="ScoreMsg" class="score_msg">*{{ $t('insSettingView.rangeScoreTips') }}</span>
             <template v-if="hundredMarkType === '1'">
               <span class="rangeScore">
                 {{ $t('remotePatrol.startingScore') }}
               </span>
-              <el-input :placeholder="$t('insSettingView.setMinScore')" v-model="baseScore" class="input" @input="inputChangeBaseScore"/>
+              <el-input
+                :placeholder="$t('insSettingView.setMinScore')"
+                v-model="baseScore"
+                class="input"
+                @blur="inputChangeBaseScore"/>
+              <span class="input-text">
+                {{ $t('remotePatrol.scorecount') }}
+              </span>
+            </template>
+            <template>
+              <span class="rangeScore">
+                {{ $t('insSettingView.totalScorRange') }}：
+              </span>
+              <el-input
+                :placeholder="$t('insSettingView.setMinScore')"
+                v-model="minScore"
+                class="input"
+                @blur="inputChangeMin"/>
+              <span class="input-text">
+                {{ $t('remotePatrol.scorecount') }}~
+              </span>
+              <el-input
+                :placeholder="$t('insSettingView.setMaxScore')"
+                v-model="maxScore"
+                class="input"
+                @blur="inputChangeMax"/>
+              <span class="input-text">
+                {{ $t('remotePatrol.scorecount') }}
+              </span>
+              <span v-if="ScoreMsg" class="score_msg">
+                *{{ $t('insSettingView.rangeScoreTips') }}
+              </span>
+            </template>
+            <template>
+              <span class="rangeScore">
+                {{ $t('insSettingView.standardScore') }}
+              </span>
+              <el-input
+                :placeholder="$t('insSettingView.standardScore')"
+                v-model="standardScore"
+                class="input"
+                @blur="inputChangeStandardScore"/>
               <span class="input-text">
                 {{ $t('remotePatrol.scorecount') }}
               </span>
@@ -234,18 +263,23 @@ export default {
       itemOptionsForType1: {},
       passFailBtnAttr: '',
       itemOptionsForType3: {},
-      otherBtnAttr: ''
+      otherBtnAttr: '',
+      standardScore: 100
     };
   },
   watch: {
     passFailBtnAttr() {
-      this.$refs.tab1PassInput[0].showPromotMsgFlag = false;
-      this.$refs.tab1FailInput[0].showPromotMsgFlag = false;
+      if (this.$refs.tab1PassInput) {
+        this.$refs.tab1PassInput[0].showPromotMsgFlag = false;
+        this.$refs.tab1FailInput[0].showPromotMsgFlag = false;
+      }
     },
 
     otherBtnAttr() {
-      this.$refs.tab3PassInput[0].showPromotMsgFlag = false;
-      this.$refs.tab3FailInput[0].showPromotMsgFlag = false;
+      if (this.$refs.tab3PassInput) {
+        this.$refs.tab3PassInput[0].showPromotMsgFlag = false;
+        this.$refs.tab3FailInput[0].showPromotMsgFlag = false;
+      }
     }
   },
   mounted() {
@@ -271,6 +305,7 @@ export default {
             { name: 'minScore', value: parseFloat(self.minScore) },
             { name: 'maxScore', value: parseFloat(self.maxScore) },
             { name: 'baseScore', value: parseFloat(self.baseScore) },
+            { name: 'standardScore', value: parseFloat(self.standardScore) },
             { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
             { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
             { name: 'onSiteSignature', value: self.onSiteSignature },
@@ -341,10 +376,16 @@ export default {
               case 'itemOptionsForType1': {
                 this.itemOptionsForType1 = item.extra;
                 this.passFailBtnAttr = item.value;
+                break;
               }
               case 'itemOptionsForType3': {
                 this.itemOptionsForType3 = item.extra;
                 this.otherBtnAttr = item.value;
+                break;
+              }
+              case 'standardScore' : {
+                this.standardScore = item.value;
+                break;
               }
               default:
                 break;
@@ -373,14 +414,20 @@ export default {
         });
       });
     },
-    inputChangeMax(val) {
-      const self = this;
-      self.maxScore = self.getUtilScore(val);
-      self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
+    inputChangeMax(e) {
+      let maxScore = this.getUtilScore(e.target.value);
+      if (this.hundredMarkType === '1') {
+        maxScore = parseFloat(maxScore) > parseFloat(this.baseScore) ? parseFloat(this.baseScore) : maxScore;
+      }
+      this.maxScore = maxScore;
+      this.standardScore = parseFloat(this.standardScore) > parseFloat(this.maxScore)
+        ? parseFloat(this.maxScore) : this.standardScore;
+      this.ScoreMsg = parseFloat(this.minScore) > parseFloat(this.maxScore);
     },
-    inputChangeMin(val) {
+
+    inputChangeMin(e) {
       const self = this;
-      self.minScore = self.getUtilScore(val);
+      self.minScore = self.getUtilScore(e.target.value);
       self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
     },
 
@@ -395,8 +442,12 @@ export default {
       }
       return val;
     },
-    inputChangeBaseScore(val) {
-      this.baseScore = this.getUtilScore(val);
+    inputChangeBaseScore(e) {
+      this.baseScore = this.getUtilScore(e.target.value);
+      this.maxScore = parseFloat(this.maxScore) > parseFloat(this.baseScore)
+        ? parseFloat(this.baseScore) : this.maxScore;
+      this.standardScore = parseFloat(this.standardScore) > parseFloat(this.maxScore)
+        ? parseFloat(this.maxScore) : this.standardScore;
     },
 
     getPassFailBtnName(val, index) {
@@ -421,6 +472,12 @@ export default {
       !this.itemOptionsForType3[length - 1].items[0].name && this.$refs.tab3PassInput[0].onBlur();
       !this.itemOptionsForType3[length - 1].items[1].name && this.$refs.tab3FailInput[0].onBlur();
       return this.itemOptionsForType3[length - 1].items[0].name && this.itemOptionsForType3[length - 1].items[1].name;
+    },
+
+    inputChangeStandardScore(e) {
+      let score = this.getUtilScore(e.target.value);
+      score = parseFloat(score) > parseFloat(this.maxScore) ? parseFloat(this.maxScore) : score;
+      this.standardScore = score;
     }
 
   }

@@ -685,7 +685,8 @@ export default {
     'addSuss': '正常に追加されました',
     'addFail': '追加できませんでした',
     'itemsOfCate': '検査項',
-    'needBind': ''
+    'needBind': '',
+    'standardScore': '評価基準点：'
   },
 
   // Device Management page language

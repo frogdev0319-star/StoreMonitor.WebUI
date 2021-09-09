@@ -690,7 +690,8 @@ export default {
     'addSuss': '추가됨',
     'addFail': '추가하지 못했습니다',
     'itemsOfCate': '항목 확인 ',
-    'needBind': ''
+    'needBind': '',
+    'standardScore': '평가기준점수:'
   },
 
   // Device Management page language

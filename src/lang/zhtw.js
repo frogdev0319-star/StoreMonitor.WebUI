@@ -696,7 +696,8 @@ export default {
     'subCategoryHeader': '子類別（選填，30字符）',
     'subCategory': '子類別',
     'accumulateTotalScoreInfo': '考評總分= SUM(每項巡檢得分) + 扣分起始分數',
-    'totalScoreLimitation': '項目總分值須等於評分選項最高分值'
+    'totalScoreLimitation': '項目總分值須等於評分選項最高分值',
+    'standardScore': '考評達標分數：'
   },
 
   // Device Management page language
