@@ -655,14 +655,14 @@ export default {
     ];
     const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
     if (!result) {
-      displayedMsg = addOrUpdateFlag ? i18n.t('deviceView.addFailed') : i18n.t('deviceView.editFail');
+      // displayedMsg = addOrUpdateFlag ? i18n.t('deviceView.addFailed') : i18n.t('deviceView.editFail');
+      displayedMsg = msg;
     } else {
       displayedMsg = i18n.t(`deviceView.${result.ret}`);
     }
     showNotify && this.notify(displayedMsg, 'warning', 3000);
     return displayedMsg;
   },
-
   isDouble(num, n = 1) {
     const y = String(num).indexOf('.') + 1;
     return y > 0 ? parseFloat(parseFloat(num).toFixed(n)) : parseInt(num);

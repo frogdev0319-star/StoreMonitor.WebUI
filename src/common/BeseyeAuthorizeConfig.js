@@ -5,7 +5,7 @@ const BeseyeAuthorizeConfig = {
   baseOAuthUrl: 'https://oregon-p1-stage-api-1.beseye.com/',
   userAuthorizationUri: 'https://oregon-p1-stage-api-1.beseye.com/oauth/oauth/authorize',
   redirect_uri: getRedirectClientUrl(),
-  client_id: setClientId(),
+  client_id: '',
   scope: 'storevue',
   state: 'a00caec8dbd08e50',
   response_type: 'code',
@@ -30,6 +30,7 @@ async function setClientId() {
     clientId = 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a';
   }
   sessionStorage.setItem('clientId', clientId);
+  BeseyeAuthorizeConfig.client_id = clientId;
 }
 
 function getRedirectClientUrl() {
@@ -38,5 +39,7 @@ function getRedirectClientUrl() {
   const redirectUrl = `${baseUrl.substr(0, storemonitorIndex)}storemonitor_ui/beseye/authorize`;
   return redirectUrl;
 }
+
+setClientId();
 
 export default BeseyeAuthorizeConfig;
