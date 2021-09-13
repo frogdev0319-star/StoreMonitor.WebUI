@@ -4,7 +4,7 @@
       <el-col :span="24" class="statistics-header">
         <div class="header-details">
           <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
-          <date-time-picker :date-value="dateValue" @change="dateChange"/>
+          <date-time-selector @change="dateChange"/>
         </div>
         <div class="header-mul-select">
           <span class="mul-label">{{ $t('overview.patrolLists') }}</span>
@@ -344,13 +344,13 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import { inpectRESTful } from '@/api/index';
-import DateTimePicker from '@/components/DateTimePicker';
+import DateTimeSelector from '@/components/DateTimeSelector';
 
 export default {
   name: 'SupervisorStatistics',
 
   components: {
-    DateTimePicker,
+    DateTimeSelector,
     DialogPop,
     DelayButton
   },
@@ -359,18 +359,12 @@ export default {
     return {
       activePDFFirst: 'First',
       activePDFSecond: 'Second',
-      dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
-      dateOpt: {
-        disabledDate: (time) => {
-          return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
-        }
-      },
+      dateValue: [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()],
       timeMode: 1,
       ispdf: false,
       storeDateValue: '',
       inspectName: '',
       params: {},
-      poperClass: 'date-picker-poper',
       exportPng: require('../../../static/img/excel.png'),
       lang: this.$i18n.locale,
       supervisorTableData: [],
@@ -522,7 +516,7 @@ export default {
   watch: {
     async accountChanged(val) {
       if (val !== 0) {
-        this.dateValue = [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()];
+        this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
         this.defaultSort = { prop: 'completionRateStr', order: 'ascending' };
         this.params = {};
         this.getCachedParamsFlag = false;
@@ -912,11 +906,10 @@ export default {
 
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('supervisorStatistics');
+      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.params.beginTs = this.dateValue[0].valueOf();
+      this.params.endTs = this.dateValue[1].valueOf();
       if (Object.keys(searchParams).length > 0) {
-        this.dateValue[0] = new Date(searchParams.beginTs);
-        this.dateValue[1] = new Date(searchParams.endTs);
-        this.params.beginTs = searchParams.beginTs;
-        this.params.endTs = searchParams.endTs;
         if (!searchParams.inspectTagId) {
           this.params.inspectTagId = this.inspectTagId;
         } else {
@@ -926,10 +919,6 @@ export default {
         this.getCachedParamsFlag = true;
       } else {
         this.params = {};
-        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
-        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
-        this.params.beginTs = start;
-        this.params.endTs = end;
         this.params.filter = { page: this.page - 1, size: this.sizeNum };
         this.params.order = { direction: 'asc', property: 'completionRate' };
         this.params.inspectTagId = this.inspectTagId;

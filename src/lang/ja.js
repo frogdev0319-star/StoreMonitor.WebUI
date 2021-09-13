@@ -237,6 +237,13 @@ export default {
     'allUser': 'すべての人',
     'checkinReport': 'サインインレポート-{time1}-{time2}',
     'visitor': 'インタビュアー',
+    'last7Days': '過去7日',
+    'last30Days': '過去30日',
+    'last90Days': '過去90日',
+    'thisMonth': '今月',
+    'lastMonth': '先月',
+    'thisQuarter': 'この四半期',
+    'customize': 'カスタマイズ',
 
     'emptyPatrolList': 'インスペクションリストが空です。データを再フィルターしてください',
     'emptyItemList': '検査項目一覧が空です。データを再フィルターしてください'

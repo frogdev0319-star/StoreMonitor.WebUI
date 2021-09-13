@@ -10,7 +10,7 @@
     <el-col :span="24" class="header-details">
       <span :class="isInspectItem ? 'inspect-span' : 'normal-span'" >
         {{ $t('remotePatrol.time') }}</span>
-      <date-time-picker :date-value="dateValue" @change="dateChange"/>
+      <date-time-selector class="time-selector" @change="dateChange"/>
       <span v-if="isInspectItem || isPatrol">
         <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
         <el-select
@@ -57,19 +57,19 @@
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
-import { getBriefStoreList, GetTagList } from '@/api/store';
+import { getBriefStoreList } from '@/api/store';
 import util from '@/common/util.js';
 import { inpectRESTful } from '@/api/index';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
-import DateTimePicker from './DateTimePicker';
 import StoreFilter from './StoreFilter';
+import DateTimeSelector from './DateTimeSelector';
 
 export default {
   name: 'SearchComponent',
   components: {
+    DateTimeSelector,
     StoreFilter,
-    DateTimePicker,
     DelayButton,
     MultiSelect,
     RegionMultiSelect
@@ -95,7 +95,7 @@ export default {
 
   data() {
     return {
-      dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
+      dateValue: [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()],
       dateOpt: {
         disabledDate: (time) => {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
@@ -134,11 +134,9 @@ export default {
     async accountChanged(val) {
       const self = this;
       if (val !== 0) {
-        self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
-        const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-        const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-        self.params.beginTs = start;
-        self.params.endTs = end;
+        this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+        this.params.beginTs = this.dateValue[0].valueOf();
+        this.params.endTs = this.dateValue[1].valueOf();
         self.ifGetParamsFromCash = false;
         self.ifSaveParams = false;
         await this.getSearchParams();
@@ -151,10 +149,9 @@ export default {
 
   async created() {
     const self = this;
-    const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
-    const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
-    self.params.beginTs = start;
-    self.params.endTs = end;
+    this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+    this.params.beginTs = this.dateValue[0].valueOf();
+    this.params.endTs = this.dateValue[1].valueOf();
     self.params.timeMode = self.timeMode;
     await this.getSearchParams();
     self.initDaysRange();
@@ -312,11 +309,10 @@ export default {
 
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition(this.path);
+      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.params.beginTs = this.dateValue[0].valueOf();
+      this.params.endTs = this.dateValue[1].valueOf();
       if (Object.keys(searchParams).length > 0) {
-        this.dateValue[0] = new Date(searchParams.beginTs);
-        this.dateValue[1] = new Date(searchParams.endTs);
-        this.params.beginTs = searchParams.beginTs;
-        this.params.endTs = searchParams.endTs;
         this.params.timeMode = this.timeMode;
         this.params.inspectId = searchParams.inspectId;
         this.timeMode = searchParams.timeMode;
@@ -326,10 +322,6 @@ export default {
         this.ifGetParamsFromCash = true;
         this.searchParams = searchParams;
       } else {
-        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
-        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
-        this.params.beginTs = start;
-        this.params.endTs = end;
         this.searchParams = {};
       }
       const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
@@ -415,6 +407,9 @@ export default {
       padding-top:15px;
       padding-bottom: 30px;
       padding-right: calc(60/1920*100vw);
+    }
+    .time-selector{
+      margin-right: calc(30/1920*100vw);
     }
   }
 </style>

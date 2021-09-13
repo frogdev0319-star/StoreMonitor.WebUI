@@ -9,30 +9,7 @@
       </div>
       <div class="el-date">
         <span class="date-title">{{ $t('eventView.time') }}</span>
-        <el-date-picker
-          ref="datePicker"
-          v-model="dateValue"
-          :clearable="false"
-          :editable="false"
-          :popper-class="poperClass"
-          :picker-options="dateOpt"
-          :default-time="['00:00:00', '23:59:59']"
-          :start-placeholder="$t('overview.startDate')"
-          :end-placeholder="$t('overview.endDate')"
-          type="datetimerange"
-          range-separator="~"
-          size="mini"
-          format="yyyy/MM/dd HH:mm:ss"
-          class="date-range"
-          @change="dateChange"/>
-        <el-tooltip
-          :popper-class="toolTipClass"
-          class="item"
-          effect="dark"
-          placement="bottom-end">
-          <div slot="content">*{{ $t('eventView.timePlaceholder') }}</div>
-          <i class="iconfont icon-bangzhu iconbangzhu"/>
-        </el-tooltip>
+        <date-time-selector @change="dateChange"/>
         <span
           class="date-title"
           style="margin-left:30px;">{{ $t('eventView.status') }}</span>
@@ -203,11 +180,13 @@ import RegionMultiSelect from '@/components/RegionMultiSelect';
 import LimitSelect from '@/components/LimitSelect';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
-import StoreFilter from '../../components/StoreFilter';
+import StoreFilter from '@/components/StoreFilter';
+import DateTimeSelector from '@/components/DateTimeSelector';
 
 export default {
   name: 'EventManage',
   components: {
+    DateTimeSelector,
     StoreFilter,
     DelayButton,
     LimitSelect,
@@ -218,11 +197,6 @@ export default {
   data() {
     return {
       dateValue: [],
-      dateOpt: {
-        disabledDate: (time) => {
-          return time.getTime() > this.$moment(new Date()).endOf('day');
-        }
-      },
       toolTipClass: 'page-login-toolTipClass',
       eventStatesList: [
         { value: 0, label: this.$t('eventView.pending'), disabled: false },
@@ -299,8 +273,6 @@ export default {
         this.$t('remotePatrol.code')],
       windowHeight: window.innerHeight,
       userId: '',
-      poperClass: 'date-picker-poper',
-      selectpoperClass: 'select-poper',
       lang: this.$i18n.locale,
       isFirstLoad: false,
       order: '',
@@ -608,10 +580,10 @@ export default {
       }
       let start = '', end = '';
       if (val === 0) {
-        start = this.$moment(this.dateValue[0]);
-        end = this.$moment(this.dateValue[1]);
+        start = this.$moment(this.dateValue[0]).valueOf();
+        end = this.$moment(this.dateValue[1]).valueOf();
       } else {
-        start = this.dateValue[0];
+        start = this.$moment(this.dateValue[0]).valueOf();
         const endTime = this.dateValue[1];
         end = this.$moment(endTime);
       }
@@ -667,8 +639,8 @@ export default {
 
     getEventCount() {
       const self = this;
-      const start = self.dateValue[0];
-      const endTime = self.dateValue[1];
+      const start = this.$moment(self.dateValue[0]).valueOf();
+      const endTime = this.$moment(self.dateValue[1]).valueOf();
       let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
       end = end - end % 1000 + 999;
       const storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
@@ -827,7 +799,8 @@ export default {
 
     saveSearchParams() {
       const params = this.storeFilterObj;
-      params.searchParams = this.params;
+      const { clause, filter, like, order } = { ...this.params };
+      params.searchParams = { clause, filter, like, order };
       params.inputSearchValue = this.inputSearchValue;
       params.dateValue = this.dateValue;
       params.curState = this.curState;
@@ -844,11 +817,11 @@ export default {
 
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
+      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.params.beginTs = this.dateValue[0].valueOf();
+      this.params.endTs = this.dateValue[1].valueOf();
       if (Object.keys(searchParams).length > 0) {
-        this.dateValue[0] = searchParams.dateValue[0];
-        this.dateValue[1] = this.$moment(this.dateValue[1]);
         this.inputSearchValue = searchParams.inputSearchValue;
-        this.dateValue = searchParams.dateValue;
         this.curState = searchParams.curState;
         this.activeName = searchParams.activeName;
         this.sizeNum = searchParams.sizeNum;
