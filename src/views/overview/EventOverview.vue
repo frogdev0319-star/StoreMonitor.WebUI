@@ -2,7 +2,7 @@
   <div class="el-overview-content">
     <div class="overview-date">
       <span class="date-title">{{ $t('overview.date') }}</span>
-      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
+      <date-time-selector @change="dateChange"/>
       <span class="el-store">
         {{ $t('overview.totalStore', {storeNum: numOfStores}) }}
       </span>
@@ -133,13 +133,13 @@ import { mapGetters } from 'vuex';
 import { getEventStatsOverview, getEventStatsRankInfo, getEventStatsOverStore } from '@/api/eventOverview';
 import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
-import DateTimePicker from '@/components/DateTimePicker';
+import DateTimeSelector from '@/components/DateTimeSelector';
 
 export default {
   name: 'EventOverview',
 
   components: {
-    DateTimePicker,
+    DateTimeSelector,
     'v-chart': ECharts
   },
 
@@ -148,11 +148,6 @@ export default {
   data() {
     return {
       dateValue: [this.$moment().startOf('month').toDate(), this.$moment(new Date()).endOf('d').toDate()],
-      dateOpt: {
-        disabledDate: (time) => {
-          return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
-        }
-      },
       numOfStores: 0,
       varWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
@@ -970,23 +965,19 @@ export default {
 
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('eventOverview');
+      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.params.beginTs = this.dateValue[0].valueOf();
+      this.params.endTs = this.dateValue[1].valueOf();
       if (Object.keys(searchParams).length > 0) {
         this.dateValue[0] = new Date(searchParams.beginTs);
         this.dateValue[1] = new Date(searchParams.endTs);
-        this.params.beginTs = searchParams.beginTs;
-        this.params.endTs = searchParams.endTs;
         this.rankType = searchParams.rankType;
         this.curStore = searchParams.storeId;
-        if (this.curStore === "-1" || this.curStore.length === 0) {
+        if (this.curStore === '-1' || this.curStore.length === 0) {
           this.storeIds = [];
         } else {
           this.storeIds.push(this.curStore);
         }
-      }else{
-        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
-        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
-        this.params.beginTs = start;
-        this.params.endTs = end;
       }
       const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;

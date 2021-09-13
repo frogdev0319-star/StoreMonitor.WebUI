@@ -236,7 +236,14 @@ export default {
     'allPosition': 'All Positions',
     'allUser': 'All Persons',
     'checkinReport': 'Checkin Report-{time1}-{time2}',
-    'visitor': 'Interviewer'
+    'visitor': 'Interviewer',
+    'last7Days': 'Last 7 days',
+    'last30Days': 'Last 30 days',
+    'last90Days': 'Last 90 days',
+    'thisMonth': 'This month',
+    'lastMonth': 'Last month',
+    'thisQuarter': 'This quarter',
+    'customize': 'Customize'
   },
 
   // Patrol page language

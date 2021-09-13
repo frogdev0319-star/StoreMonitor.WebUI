@@ -239,7 +239,14 @@ export default {
     'allPosition': '全部職務',
     'allUser': '全部人員',
     'checkinReport': '簽到統計報表-{time1}-{time2}',
-    'visitor': '拜訪對象'
+    'visitor': '拜訪對象',
+    'last7Days': '近7天',
+    'last30Days': '近30天',
+    'last90Days': '近90天',
+    'thisMonth': '本月',
+    'lastMonth': '上月',
+    'thisQuarter': '本季度',
+    'customize': '自定義'
   },
 
   // Patrol page language

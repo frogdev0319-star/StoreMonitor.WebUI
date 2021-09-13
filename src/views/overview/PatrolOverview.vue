@@ -2,7 +2,7 @@
   <div class="el-overview-content">
     <div class="overview-date">
       <span class="date-title">{{ $t('overview.date') }}</span>
-      <date-time-picker :date-value="dateValue" @change="dateChange"></date-time-picker>
+      <date-time-selector @change="dateChange"/>
       <span class="el-store">
         {{ $t('overview.totalStore', {storeNum: totalStoreNum}) }}
       </span>
@@ -243,13 +243,13 @@ import {
 import { mapGetters } from 'vuex';
 import resize from '@/components/mixins/echartResize';
 import SearchConditionUtil from '@/common/SearchConditionUtil.js';
-import DateTimePicker from '@/components/DateTimePicker';
+import DateTimeSelector from '@/components/DateTimeSelector';
 
 export default {
   name: 'PatrolOverview',
 
   components: {
-    DateTimePicker,
+    DateTimeSelector,
     'v-chart': ECharts
   },
 
@@ -1610,7 +1610,7 @@ export default {
       this.$refs.cycleChart && this.$refs.cycleChart.resize();
     },
 
-    saveSearchParams(){
+    saveSearchParams() {
       const searchConditon = {
         path: 'patrolOverview',
         params: this.params
@@ -1618,19 +1618,10 @@ export default {
       SearchConditionUtil.saveSearchCondition(searchConditon)
     },
 
-    getSearchParams(){
-      const searchParams = SearchConditionUtil.getSearchCondition('patrolOverview');
-      if(Object.keys(searchParams).length > 0){
-        this.dateValue[0] = new Date(searchParams.beginTs);
-        this.dateValue[1] = new Date(searchParams.endTs);
-        this.params.beginTs = searchParams.beginTs;
-        this.params.endTs = searchParams.endTs;
-      }else{
-        const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
-        const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
-        this.params.beginTs = start;
-        this.params.endTs = end;
-      }
+    getSearchParams() {
+      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.params.beginTs = this.dateValue[0].valueOf();
+      this.params.endTs = this.dateValue[1].valueOf();
       const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;
     }

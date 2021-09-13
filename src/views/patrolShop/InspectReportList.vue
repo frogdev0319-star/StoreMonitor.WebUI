@@ -8,29 +8,7 @@
       />
       <div class="header-details">
         <span :class="lang === 'en' ? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
-        <el-date-picker
-          ref="datePicker"
-          v-model="dateValue"
-          :clearable="false"
-          :editable="false"
-          :picker-options="dateOpt"
-          :popper-class="poperClass"
-          :default-time="['00:00:00', '23:59:59']"
-          :start-placeholder="$t('overview.startDate')"
-          :end-placeholder="$t('overview.endDate')"
-          type="datetimerange"
-          range-separator="~"
-          size="mini"
-          format="yyyy/MM/dd HH:mm:ss"
-          class="date-range"
-          @change="dateChange"/>
-        <el-tooltip
-          class="item"
-          effect="dark"
-          placement="bottom-end">
-          <div slot="content">*{{ $t('remotePatrol.timePlaceholder') }}</div>
-          <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;vertical-align: middle;"/>
-        </el-tooltip>
+        <date-time-selector @change="dateChange"/>
         <span>{{ $t('remotePatrol.resultType') }}</span>
         <el-select
           v-model="curAppraise"
@@ -236,14 +214,16 @@
 import { getInspectReportList, GetInspectTagList } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
-import SearchConditionUtil from '@/common/SearchConditionUtil';
 import StoreFilter from '@/components/StoreFilter';
 import DelayButton from '@/components/DelayButton';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
+import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
 
 export default {
   name: 'InspectReportList',
   components: {
+    DateTimeSelector,
     SelectedStores,
     DelayButton,
     StoreFilter
@@ -348,11 +328,6 @@ export default {
       searchInput: '',
       sizeNum: 12,
       dateValue: [],
-      dateOpt: {
-        disabledDate: (time) => {
-          return time.getTime() > new Date(this.$moment(new Date()).endOf('day'));
-        }
-      },
       curReportType: -1,
       reportTypeList: [
         { 'mode': -1, 'label': this.$t('remotePatrol.all') },
@@ -372,7 +347,6 @@ export default {
       params: {},
       storeDataList: [],
       storeIdList: [],
-      poperClass: 'date-picker-poper',
       lang: this.$i18n.locale,
       isFirstLoad: false,
       storeName: '',
@@ -785,11 +759,10 @@ export default {
 
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
+      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      this.params.beginTs = this.dateValue[0].valueOf();
+      this.params.endTs = this.dateValue[1].valueOf();
       if (Object.keys(searchParams).length > 0) {
-        this.dateValue[0] = new Date(searchParams.searchCondition.beginTs);
-        this.dateValue[1] = new Date(searchParams.searchCondition.endTs);
-        this.params.beginTs = searchParams.beginTs;
-        this.params.endTs = searchParams.endTs;
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.params = searchParams.searchCondition;
@@ -801,8 +774,6 @@ export default {
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
-        this.params.beginTs = this.$moment(this.dateValue[0]).valueOf();
-        this.params.endTs = this.$moment(this.dateValue[1]).valueOf();
         this.ifGetParamsFromCash = false;
         this.searchParams = {};
       }
@@ -1121,7 +1092,4 @@ $suggestBack:#F1F6FE;
 </style>
 <style>
 @import '../../assets/css/pagination.css';
-.date-picker-poper .el-button--text{
-    visibility: hidden !important;
-}
 </style>

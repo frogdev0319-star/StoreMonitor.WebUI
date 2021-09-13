@@ -1,5 +1,5 @@
 <template>
-  <div style="display: inline-block">
+  <div style="display: inline-flex">
     <el-date-picker
       ref="datePicker"
       v-bind="$attrs"
@@ -35,7 +35,7 @@ export default {
   props: {
     dateValue: {
       type: Array,
-      default: []
+      default: () => []
     }
   },
   data() {
