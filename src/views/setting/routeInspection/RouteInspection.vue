@@ -1132,6 +1132,7 @@ export default {
           const availableScore = deepClone(item['availableScores']);
           const maxAvailableScore = availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
           item['itemScore'] = maxAvailableScore;
+          item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
         }
 
         if (item['subject']) {
