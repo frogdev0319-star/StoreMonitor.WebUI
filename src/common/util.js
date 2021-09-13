@@ -72,7 +72,6 @@ export default {
     const hours = timeOne.getHours();
     const minutes = timeOne.getMinutes();
     const seconds = timeOne.getSeconds();
-    console.log(`now:${year}-${month}-${day} ${hours}:${minutes}:${seconds}`);
     // three month ago
     let ThreeMonths = month - 3;
     if (ThreeMonths <= 0) { year = year - 1; }
@@ -83,7 +82,6 @@ export default {
     const ThreeMonthsDay = timeTow.getDate();
     if (day > ThreeMonthsDay) { day = ThreeMonthsDay; }
     day = day < 10 ? '0' + day : day;
-    console.log(`three month ago:${year}-${ThreeMonths}-${day} 00:00:00`);
     const THREE_MONTHS_AGO = `${year}/${ThreeMonths}/${day} 00:00:00`;
     const THREE_STAMP = new Date(THREE_MONTHS_AGO).getTime();
     return THREE_STAMP;
@@ -139,7 +137,6 @@ export default {
   },
 
   getRouteByTag(curTag, data) {
-    console.log(data);
     const temp = [];
     if (data.length != 0) {
       data.forEach(item => {
@@ -544,7 +541,6 @@ export default {
     while (index < length) {
       result[resIndex++] = array.slice(index, (index += size));
     }
-    console.log(result);
     return result;
   },
 
@@ -557,7 +553,6 @@ export default {
   },
 
   getDaysRangeList(startTime, endTime, timeMode){
-    console.log(timeMode)
     const startDay = moment(startTime).format('YYYY-MM-DD');
     const endDay = moment(endTime).format('YYYY-MM-DD');
     const startDayWithoutYear = moment(startTime).format('MM/DD');
