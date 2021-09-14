@@ -285,6 +285,7 @@ export default {
     'notBindCamera': '항목이 장치와 연결하지 않다!',
     'incompleteInfo': '완성하지 않은 항목, 확인하십시오!',
     'emptyTitle': '제목이 비어있으면 안된다',
+    'emptyEventTitle': '질문 이름은 비워둘 수 없습니다',
     'recordSucc': '기록 성공 ',
     'recording': '기록하다',
     'maximumAttach': '최대한 첨부 10개',

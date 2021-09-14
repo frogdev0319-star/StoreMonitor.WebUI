@@ -315,6 +315,7 @@ export default {
     'notBindCamera': "Items hasn't bind with devices!",
     'incompleteInfo': 'Incomplete items, whether to continue？',
     'emptyTitle': 'Title may not empty!',
+    'emptyEventTitle': 'Title may not empty!',
     'recording': 'Recording',
     'recordSucc': 'Successfully Recorded',
     'maximumAttach': 'Up to 10 attachments!',

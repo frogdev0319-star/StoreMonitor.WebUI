@@ -319,6 +319,7 @@ export default {
     'notBindCamera': '当前门店的巡检项未绑定设备！',
     'incompleteInfo': '巡检项尚未完成评估，是否继续?',
     'emptyTitle': '问题反馈名称不能为空！',
+    'emptyEventTitle': '问题名称不能为空！',
     'recording': '正在录制',
     'recordSucc': '录制成功',
     'maximumAttach': '每个巡检项最多上传10个资源文件​！',

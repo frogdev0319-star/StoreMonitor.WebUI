@@ -94,9 +94,11 @@
               />
               <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{
-              $t("remotePatrol.emptyTitle") }}</span>
+              $t("remotePatrol.emptyEventTitle") }}</span>
               <span v-if="!corEvent" class="event-title">{{ $t("remotePatrol.description") }}</span>
-              <span v-else class="event-title"><span class="is-required">* </span>{{ $t("remotePatrol.description") }}</span>
+              <span v-else class="event-title"><span class="is-required">* </span>
+                {{ $t("remotePatrol.description") }}
+              </span>
               <el-input
                 :autosize="{ minRows: 2, maxRows: 7 }"
                 v-model="eventDes"

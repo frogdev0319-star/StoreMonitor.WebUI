@@ -318,6 +318,7 @@ export default {
     'notBindCamera': '當前門店的巡檢項未綁定設備！',
     'incompleteInfo': '巡檢項尚未完成評估，是否繼續？',
     'emptyTitle': '問題回饋名稱不能為空！',
+    'emptyEventTitle': '問題名稱不能為空！',
     'recording': '正在錄製',
     'recordSucc': '錄製成功',
     'maximumAttach': '每個巡檢項最多上傳10個資源檔​！',
