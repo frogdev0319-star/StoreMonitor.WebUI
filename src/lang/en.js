@@ -462,7 +462,9 @@ export default {
     'closeConnection': 'Connection close',
     'errorConnection': 'Connection error',
     'startingScore': 'Total score:',
-    'invalidInspection': 'Invalid inspection, please enter content'
+    'invalidInspection': 'Invalid inspection, please enter content',
+    'goalAchieved': 'Goal achieved',
+    'farBehind': 'Far Behind'
   },
 
   // event Management page language
@@ -699,7 +701,7 @@ export default {
     'tab2IgnoredQualified': 'Calculate the score of ignored items in Tab2 (Score)',
     'selectStoreToBind': 'Bound Stores',
     'hasBoundStoreNum': '{allStoreNum} stores in total with {boundStoreNum} bound',
-    'standardScore': 'Evaluation standard score:'
+    'standardScore': 'Compliance score:'
   },
 
   // Device Management page language

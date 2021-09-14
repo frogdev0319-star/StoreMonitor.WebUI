@@ -464,8 +464,10 @@ export default {
     'selectInspectListWithStore': '请选择，{storeName}关联巡检表',
     'getBeseyeStreamError': '获取Beseye视频流信息失败！',
     'closeConnection': '连接关闭',
-    'errorConnection': '连接错误'
- },
+    'errorConnection': '连接错误',
+    'goalAchieved': '达标',
+    'farBehind': '未达标'
+  },
 
   // event Management page language
   'eventView': {
@@ -704,7 +706,7 @@ export default {
     'subCategory': '子类别',
     'accumulateTotalScoreInfo': '考评总分= SUM(每项巡检得分) + 扣分起始分数',
     'totalScoreLimitation': '项目总分值须等于评分选项最高分值',
-    'standardScore': '考评达标分数：'
+    'standardScore': '考评达标分：'
   },
 
   // Device Management page language

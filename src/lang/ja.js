@@ -461,6 +461,8 @@ export default {
     'getBeseyeStreamError': '获取Beseye视频流信息失败！',
     'closeConnection': '连接关闭',
     'errorConnection': '连接错误',
+    'goalAchieved': '標準まで',
+    'farBehind': 'しなかった'
   },
 
   // event Management page language
@@ -693,7 +695,7 @@ export default {
     'addFail': '追加できませんでした',
     'itemsOfCate': '検査項',
     'needBind': '',
-    'standardScore': '評価基準点：'
+    'standardScore': '評価スコア：'
   },
 
   // Device Management page language

@@ -666,6 +666,12 @@ export default {
   isDouble(num, n = 1) {
     const y = String(num).indexOf('.') + 1;
     return y > 0 ? parseFloat(parseFloat(num).toFixed(n)) : parseInt(num);
+  },
+
+  setStandardMsg(value) {
+    if (value === -1) return '';
+    return value === 0 ? i18n.t('remotePatrol.farBehind')
+      : i18n.t('remotePatrol.goalAchieved');
   }
 
 };

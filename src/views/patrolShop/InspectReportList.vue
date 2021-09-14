@@ -2,8 +2,8 @@
   <el-row id="el-containter">
     <div class="report-header">
       <store-filter
-        class="header-details"
         :cached-params="searchParams"
+        class="header-details"
         @storeChange = "onStoreChange"
       />
       <div class="header-details">
@@ -119,6 +119,11 @@
           <el-scrollbar id="el-menuscrollbar" style="height:100%;width:100%">
             <el-col v-for="(item,index) in reportList" :span="4" :key="index" class="report-card">
               <div class="cards" @click="clickReport(item,index)">
+                <div class="standard-btn">
+                  <div
+                    :class="{'up-to-standard': item.standard === 1, 'not-up-to-standard': item.standard === 0}"
+                    class="standard-name"> {{ item.standardMsg }}</div>
+                </div>
                 <img :src="item.iconSrc" :height="iconSrcHeight" alt="" class="item-img">
                 <div class="item-flex">
                   <div class="item-header">
@@ -133,7 +138,9 @@
                       class="iconfont inspectIcon"/>
                     <div class="item-score">
                       <span class="score-num">{{ item.totalScore }}</span>
-                      <span v-if="lang.indexOf('zh') !== -1" class="score-unit">{{ $t('insSettingView.scores') }}</span>
+                      <span v-if="lang.indexOf('zh') !== -1" class="score-unit">
+                        {{ $t('insSettingView.scores') }}
+                      </span>
                     </div>
                   </div>
                   <div class="item-content">
@@ -506,6 +513,8 @@ export default {
             reportObj.mode = item.mode;
             reportObj.totalScore = item.totalScore;
             reportObj.code = item.code !== null ? item.code : '--';
+            reportObj.standard = item.standard;
+            reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
             if (item.mode === 0) {
               reportObj.modeText = self.$t('overview.remotePatrol');
             } else if (item.mode === 1) {
@@ -1027,9 +1036,7 @@ $suggestBack:#F1F6FE;
         }
         .item-content{
             text-align: left;
-            padding: 0 calc(20/1920*100vw);
-            /*position: absolute;*/
-            /*bottom: 0;*/
+            padding-left: calc(20/1920*100vw);
             span{
               font-size: calc(14/1920*100vw);
               color: $tab;
@@ -1051,6 +1058,10 @@ $suggestBack:#F1F6FE;
         bottom: 20px;
     }
 }
+}
+.standard-btn{
+  position: absolute;
+  top: 0;
 }
 </style>
 <style scoped>

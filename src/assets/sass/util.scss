@@ -469,3 +469,22 @@ $black: #182752;
   font-weight: bold;
   border-left: 4px solid #fff;
 }
+
+.standard-name{
+  width: 80px;
+  height: 20px;
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.up-to-standard{
+  background-color: rgb(96, 151, 244);
+}
+.not-up-to-standard{
+  background-color: rgb(253, 186, 64);
+}

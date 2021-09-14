@@ -464,7 +464,9 @@ export default {
     'closeConnection': '連接關閉',
     'errorConnection': '連接錯誤',
     'startingScore': '扣分起始分數：',
-    'invalidInspection': '無效的巡檢信息，請填寫內容'
+    'invalidInspection': '無效的巡檢信息，請填寫內容',
+    'goalAchieved': '達標',
+    'farBehind': '未達標'
   },
 
   // event Management page language
@@ -704,7 +706,7 @@ export default {
     'subCategory': '子類別',
     'accumulateTotalScoreInfo': '考評總分= SUM(每項巡檢得分) + 扣分起始分數',
     'totalScoreLimitation': '項目總分值須等於評分選項最高分值',
-    'standardScore': '考評達標分數：'
+    'standardScore': '考評達標分：'
   },
 
   // Device Management page language

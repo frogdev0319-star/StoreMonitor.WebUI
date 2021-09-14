@@ -51,11 +51,17 @@
         <el-col :span="24" class="">
           <div class="header-score">
             <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
-            <span class="span-2"><span class="pdf_font_26">
-              {{ totalScore }}
-              <span>{{ $t('remotePatrol.scorecount') }}</span>
+            <span class="span-2">
+              <span class="pdf_font_26">
+                {{ totalScore }}
+                <span>{{ $t('remotePatrol.scorecount') }}</span>
+              </span>
             </span>
-            </span>
+            <div class="standard-btn">
+              <div
+                :class="{'up-to-standard': standard === 1, 'not-up-to-standard': standard === 0}"
+                class="standard-name"> {{ standardMsg }}</div>
+            </div>
           </div>
         </el-col>
       </el-row>
@@ -408,7 +414,8 @@ import ReportSetting from '@/api/reportSetting';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import AudioVue from '@/components/AudioVue';
 import ReportDetail from '@/components/ReportDetail';
-import DescriptionText from "../../components/DescriptionText";
+import DescriptionText from '@/components/DescriptionText';
+import echartResize from '@/components/mixins/echartResize'
 
 export default {
   name: 'InspectReport',
@@ -425,6 +432,8 @@ export default {
       return value === Number.MAX_VALUE ? '--' : value;
     }
   },
+
+  mixins: [echartResize],
 
   data() {
     return {
@@ -486,7 +495,9 @@ export default {
       exportImageStyle: {
         width: '260px',
         height: '148px'
-      }
+      },
+      standard: 2,
+      standardMsg: ''
     };
   },
 
@@ -737,6 +748,8 @@ export default {
       if (res.errCode === 0 && res.data.length > 0) {
         const data = res.data[0].info;
         this.totalScore = data.totalScore;
+        this.standard = data.standard;
+        this.standardMsg = util.setStandardMsg(this.standard);
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.getGroupsData(data.groups);
         this.reportData = data;
@@ -1350,7 +1363,9 @@ export default {
       if (Object.keys(templateJson).length > 0) {
         this.cachedTemplateId = templateJson.templateId;
       }
-    }
+    },
+
+    adjustChart(){}
   }
 };
 </script>
@@ -1529,6 +1544,8 @@ export default {
       .header-score{
         margin-bottom: 10px;
         font-weight: bold;
+        display: flex;
+        align-items: center;
         .span-1{
           font-size: calc(14/1920*100vw);
           color: $black;
@@ -2116,6 +2133,10 @@ export default {
   .imgLittle .el-image__inner{
     height: 100%;
     width: 100%;
+  }
+  .standard-btn{
+    display: inline-block;
+    margin-left: calc(20/1920*100vw);
   }
 </style>
 <style>
