@@ -100,7 +100,6 @@
                 {{ $t('insSettingView.standardScore') }}
               </span>
               <el-input
-                :placeholder="$t('insSettingView.standardScore')"
                 v-model="standardScore"
                 class="input"
                 @blur="inputChangeStandardScore"/>
@@ -442,6 +441,7 @@ export default {
       }
       return val;
     },
+
     inputChangeBaseScore(e) {
       this.baseScore = this.getUtilScore(e.target.value);
       this.maxScore = parseFloat(this.maxScore) > parseFloat(this.baseScore)
@@ -476,7 +476,11 @@ export default {
 
     inputChangeStandardScore(e) {
       let score = this.getUtilScore(e.target.value);
-      score = parseFloat(score) > parseFloat(this.maxScore) ? parseFloat(this.maxScore) : score;
+      if (parseFloat(score) > parseFloat(this.maxScore)) {
+        score = parseFloat(this.maxScore);
+      } else if (parseFloat(score) < parseFloat(this.minScore)) {
+        score = parseFloat(this.minScore);
+      }
       this.standardScore = score;
     }
 
