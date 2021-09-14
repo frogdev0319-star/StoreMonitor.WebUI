@@ -245,8 +245,7 @@ export default {
     'last90Days': '지난 90일',
     'thisMonth': '이번 달',
     'lastMonth': '지난 달',
-    'thisQuarter': '이 분기',
-    'customize': '사용자 정의',
+    'thisQuarter': '이번 분기',
 
     'emptyPatrolList': '검사 KPI가 비어 있습니다. 데이터를 다시 필터링하십시오',
     'emptyItemList': '검사 항목 목록이 비어 있습니다. 데이터를 다시 필터링하십시오'

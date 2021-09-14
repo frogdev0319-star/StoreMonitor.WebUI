@@ -245,8 +245,7 @@ export default {
     'last90Days': '近90天',
     'thisMonth': '本月',
     'lastMonth': '上月',
-    'thisQuarter': '本季度',
-    'customize': '自定義'
+    'thisQuarter': '本季度'
   },
 
   // Patrol page language
