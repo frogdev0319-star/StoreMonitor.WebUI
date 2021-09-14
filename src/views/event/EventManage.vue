@@ -396,13 +396,7 @@ export default {
       const tabIndex = Number(self.activeName);
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      const threeMonthAgo = util.getThreeMonths(end);
-      if (end - start > end - threeMonthAgo) {
-        util.notify(this.$t('eventView.changeTimeRange'), 'warning', 3 * 1000);
-        self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
-      } else {
-        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
-      }
+      self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
       self.dateValue[1] = self.dateValue[1];
       self.inputSearchValue = '';
       self.tableDataList[tabIndex].page = 1;
