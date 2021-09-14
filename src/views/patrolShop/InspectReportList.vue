@@ -599,13 +599,7 @@ export default {
       const self = this;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      const threeMonthAgo = util.getThreeMonths(end);
-      if (end - start > end - threeMonthAgo) {
-        util.notify(self.$t('eventView.changeTimeRange'), 'warning', 3000);
-        self.dateValue = [new Date().setTime(threeMonthAgo), new Date().setTime(end)];
-      } else {
-        self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
-      }
+      self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
       self.dateValue[1] = self.dateValue[1];
       self.inputSearchValue = '';
     },

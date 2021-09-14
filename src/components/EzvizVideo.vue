@@ -43,16 +43,24 @@
           </div>
           <div class="iconrside">
             <div class="speed-content">
-              <div class="video-quality" v-if="!playBackState">
+              <div
+                v-if="!playBackState"
+                class="video-quality">
                 <el-popover
+                  v-model="qualityVisible"
                   placement="top"
-                  v-model="qualityVisible" popper-class="quality-tooltip"
-                >
-                  <div v-for="(item, index) in videoQualityList" :key="index" @click="onClickQualityLabel(index)"
-                       class="quaility-label" :class="{'checked-label': index === curQualityIndex}">
-                    {{item.label}}
+                  popper-class="quality-tooltip">
+                  <div
+                    v-for="(item, index) in videoQualityList"
+                    :key="index"
+                    :class="{'checked-label': index === curQualityIndex}"
+                    class="quaility-label"
+                    @click="onClickQualityLabel(index)">
+                    {{ item.label }}
                   </div>
-                  <el-button class="quality-button" slot="reference">{{videoQualityList[curQualityIndex].label}}</el-button>
+                  <el-button slot="reference" class="quality-button">
+                    {{ videoQualityList[curQualityIndex].label }}
+                  </el-button>
                 </el-popover>
               </div>
               <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
@@ -145,16 +153,26 @@
             </div>
             <div class="iconrside">
               <div class="speed-content">
-                <div class="video-quality" v-if="!playBackState">
+                <div
+                  v-if="!playBackState"
+                  class="video-quality">
                   <el-popover
+                    v-model="qualityVisible"
+                    :append-to-body="false"
                     placement="top"
-                    v-model="qualityVisible" popper-class="quality-tooltip"
+                    popper-class="quality-tooltip"
                   >
-                    <div v-for="(item, index) in videoQualityList" :key="index" @click="onClickQualityLabel(index)"
-                         class="quaility-label" :class="{'checked-label': index === curQualityIndex}">
-                      {{item.label}}
+                    <div
+                      v-for="(item, index) in videoQualityList"
+                      :key="index"
+                      :class="{'checked-label': index === curQualityIndex}"
+                      class="quaility-label"
+                      @click="onClickQualityLabel(index)">
+                      {{ item.label }}
                     </div>
-                    <el-button class="quality-button" slot="reference">{{videoQualityList[curQualityIndex].label}}</el-button>
+                    <el-button slot="reference" class="quality-button">
+                      {{ videoQualityList[curQualityIndex].label }}
+                    </el-button>
                   </el-popover>
                 </div>
                 <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>

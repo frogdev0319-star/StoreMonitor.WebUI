@@ -7,10 +7,9 @@
       :clearable="false"
       :editable="false"
       :popper-class="poperClass"
-      :picker-options="dateOpt"
-      :default-time="['00:00:00', '23:59:59']"
       :start-placeholder="$t('overview.startDate')"
       :end-placeholder="$t('overview.endDate')"
+      :picker-options="pickerOptions"
       type="daterange"
       range-separator="-"
       size="mini"
@@ -30,14 +29,11 @@
 </template>
 
 <script>
+import moment from 'moment';
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'DateTimePicker',
-  props: {
-    dateValue: {
-      type: Array,
-      default: () => []
-    }
-  },
   data() {
     return {
       poperClass: 'date-picker-poper',
@@ -47,18 +43,82 @@ export default {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         }
       },
-      dateTimeValue: this.dateValue
+      dateTimeValue: [this.$moment().subtract(29, 'days'), this.$moment()],
+      pickerOptions: {
+        disabledDate: (time) => {
+          return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
+        },
+        shortcuts: [{
+          text: this.$t('overview.last7Days'),
+          onClick(picker) {
+            const end = moment();
+            const start = moment().subtract(6, 'days').startOf('d').toDate();
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: this.$t('overview.last30Days'),
+          onClick(picker) {
+            const end = moment();
+            const start = moment().subtract(29, 'days').startOf('d').toDate();
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: this.$t('overview.last90Days'),
+          onClick(picker) {
+            const end = moment();
+            const start = moment().subtract(89, 'days').startOf('d').toDate();
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: this.$t('overview.thisMonth'),
+          onClick(picker) {
+            const end = moment(new Date());
+            const start = moment(new Date()).startOf('month').toDate();
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: this.$t('overview.lastMonth'),
+          onClick(picker) {
+            const end = moment().subtract(1, 'month').endOf('month').startOf('d').toDate();
+            const start = moment().subtract(1, 'month').startOf('month').toDate();
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: this.$t('overview.thisQuarter'),
+          onClick(picker) {
+            const end = moment();
+            const start = moment().startOf('quarter').toDate();
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+      }
     };
   },
+
+  computed: {
+    ...mapGetters({ accountChanged: 'accountChanged' })
+  },
+
   watch: {
-    dateValue(newValue) {
-      this.dateTimeValue = newValue;
+    accountChanged(val) {
+      if (val !== 0) {
+        this.getDefaultTimeList();
+      }
     }
   },
+
+  mounted() {
+    this.getDefaultTimeList();
+  },
+
   methods: {
+    getDefaultTimeList() {
+      this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+    },
+
     dateChange(val) {
-      let start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      let start = this.$moment(val[0]).valueOf();
+      const end = this.$moment(val[1]).valueOf();
       const daysDiff = this.$moment(end).diff(start, 'days');
       if (daysDiff < 6) {
         this.$message({
@@ -81,8 +141,8 @@ export default {
       } else {
         this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
       }
-      this.dateTimeValue[1] = this.dateTimeValue[1] + 999;
-      this.$emit('change', this.dateTimeValue);
+      const endTimeStamp = this.$moment(end).endOf('d').valueOf();
+      this.$emit('change', [this.dateTimeValue[0], endTimeStamp]);
     }
   }
 };
