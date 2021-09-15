@@ -464,8 +464,8 @@ export default {
     'errorConnection': 'Connection error',
     'startingScore': 'Total score:',
     'invalidInspection': 'Invalid inspection, please enter content',
-    'goalAchieved': 'Goal achieved',
-    'farBehind': 'Far Behind'
+    'goalAchieved': 'Compliance',
+    'farBehind': 'Non-compliance'
   },
 
   // event Management page language
