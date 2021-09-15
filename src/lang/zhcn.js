@@ -88,7 +88,7 @@ export default {
 
   'overview': {
     'date': '时间自定',
-    'dataRangeTips': '* 时间范围：最短一周，最长一年',
+    'dataRangeTips': '* 时间范围：最短一天，最长一年',
     'totalStore': '门店总数：{storeNum}家',
     'kpiIndex': 'KPI指标',
     'totalPatrol': '巡店总数',
@@ -143,7 +143,7 @@ export default {
     'excellentRate': '优秀率',
     'dangerRate': '立即督导率',
     'region': '区域',
-    'changeTimeRange': '时间范围最短一周，最长一年，已调整！',
+    'changeTimeRange': '时间范围最短一天，最长一年，已调整！',
     'queryFail': '查询失败',
     'todayNewEvent': '今日新增事件数',
     'todayClosedEvent': '今日结案事件数',
@@ -240,6 +240,7 @@ export default {
     'allUser': '全部人员',
     'checkinReport': '签到统计报表-{time1}-{time2}',
     'visitor': '拜访对象',
+    'last3Days': '近3天',
     'last7Days': '近7天',
     'last30Days': '近30天',
     'last90Days': '近90天',

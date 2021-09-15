@@ -88,7 +88,7 @@ export default {
 
   'overview': {
     'date': '時間自定',
-    'dataRangeTips': '* 時間範圍：最短一週，最長一年',
+    'dataRangeTips': '* 時間範圍：最短一天，最長一年',
     'totalStore': '門店總數：{storeNum}家',
     'kpiIndex': 'KPI指標',
     'totalPatrol': '巡店總數',
@@ -143,7 +143,7 @@ export default {
     'excellentRate': '優秀率',
     'dangerRate': '立即督導率',
     'region': '區域',
-    'changeTimeRange': '時間範圍：最短一週，最長一年, 已調整！',
+    'changeTimeRange': '時間範圍：最短一天，最長一年, 已調整！',
     'queryFail': ' 查詢失敗',
     'todayNewEvent': '今日新增事件數',
     'todayClosedEvent': '今日結案事件數',
@@ -240,6 +240,7 @@ export default {
     'allUser': '全部人員',
     'checkinReport': '簽到統計報表-{time1}-{time2}',
     'visitor': '拜訪對象',
+    'last3Days': '近3天',
     'last7Days': '近7天',
     'last30Days': '近30天',
     'last90Days': '近90天',

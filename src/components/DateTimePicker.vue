@@ -49,6 +49,13 @@ export default {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         },
         shortcuts: [{
+          text: this.$t('overview.last3Days'),
+          onClick(picker) {
+            const end = moment();
+            const start = moment().subtract(2, 'days').startOf('d').toDate();
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
           text: this.$t('overview.last7Days'),
           onClick(picker) {
             const end = moment();
@@ -120,16 +127,6 @@ export default {
       let start = this.$moment(val[0]).valueOf();
       const end = this.$moment(val[1]).valueOf();
       const daysDiff = this.$moment(end).diff(start, 'days');
-      if (daysDiff < 6) {
-        this.$message({
-          message: this.$t('overview.changeTimeRange'),
-          type: 'warning'
-        });
-
-        start = end - 3600 * 24 * 6 * 1000;
-        start = this.$moment(start).startOf('d').toDate().valueOf();
-        this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
-      }
       if (daysDiff > 364) {
         this.$message({
           message: this.$t('overview.changeTimeRange'),
