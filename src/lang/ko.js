@@ -84,7 +84,7 @@ export default {
 
   'overview': {
     'date': '날짜',
-    'dataRangeTips': '날짜 범위: 7 ~ 365 일수',
+    'dataRangeTips': '날짜 범위: 1 ~ 365 일수',
     'totalStore': '총 점수:{storeNum}',
     'kpiIndex': '핵심성과지표',
     'totalPatrol': '검사 수',
@@ -200,7 +200,7 @@ export default {
     'cycle': '주기',
     'excellentRate': '상위 비율',
     'dangerRate': '위험 비율',
-    'changeTimeRange': '날짜 범위가 7일에서 365일로 조정되었습니다!',
+    'changeTimeRange': '날짜 범위가 1일에서 365일로 조정되었습니다!',
     'queryFail': '쿼리 실패',
     'selectStores': '저장소 선택',
     'rankType': '순위 유형',
@@ -240,6 +240,7 @@ export default {
     'allUser': '모든 사람',
     'checkinReport': '로그인 보고서-{time1}-{time2}',
     'visitor': '면접관',
+    'last3Days': '지난 3일',
     'last7Days': '지난 7일',
     'last30Days': '지난 30일',
     'last90Days': '지난 90일',

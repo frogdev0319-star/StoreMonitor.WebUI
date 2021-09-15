@@ -87,7 +87,7 @@ export default {
 
   'overview': {
     'date': 'Date',
-    'dataRangeTips': '* Date ranges :  7 ~ 365 days',
+    'dataRangeTips': '* Date ranges :  1 ~ 365 days',
     'totalStore': 'Total Stores:{storeNum}',
     'kpiIndex': 'KPIs',
     'totalPatrol': 'Number of Inspection',
@@ -140,7 +140,7 @@ export default {
     'excellentRate': 'Excellent rate',
     'dangerRate': 'Dangerous rate',
     'region': 'Region',
-    'changeTimeRange': 'Date range is 7 ~ 365 days, which has been adjusted!',
+    'changeTimeRange': 'Date range is 1 ~ 365 days, which has been adjusted!',
     'queryFail': ' Query Failed',
     'todayNewEvent': 'New Events Today',
     'todayClosedEvent': 'Closed Events Today',
@@ -237,6 +237,7 @@ export default {
     'allUser': 'All Persons',
     'checkinReport': 'Checkin Report-{time1}-{time2}',
     'visitor': 'Interviewer',
+    'last3Days': 'last 3 days',
     'last7Days': 'last 7 days',
     'last30Days': 'last 30 days',
     'last90Days': 'last 90 days',

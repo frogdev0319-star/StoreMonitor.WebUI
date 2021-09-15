@@ -85,7 +85,7 @@ export default {
 
   'overview': {
     'date': '日付',
-    'dataRangeTips': '日付範囲：7〜365日',
+    'dataRangeTips': '日付範囲：1〜365日',
     'totalStore': 'トータルストア:{storeNum}',
     'kpiIndex': 'KPI',
     'totalPatrol': 'インスペクション回数',
@@ -198,7 +198,7 @@ export default {
     'cycle': 'サイクル',
     'excellentRate': '優良率',
     'dangerRate': '危険率',
-    'changeTimeRange': '日付範囲は7～365日、調整されています！',
+    'changeTimeRange': '日付範囲は1～365日、調整されています！',
     'queryFail': 'クエリに失敗しました',
     'selectStores': 'ストアの選択',
     'rankType': 'ランクタイプ',
@@ -237,6 +237,7 @@ export default {
     'allUser': 'すべての人',
     'checkinReport': 'サインインレポート-{time1}-{time2}',
     'visitor': 'インタビュアー',
+    'last3Days': '過去3日間',
     'last7Days': '過去7日間',
     'last30Days': '過去30日間',
     'last90Days': '過去90日間',
