@@ -1899,7 +1899,7 @@ export default {
                   h_item.itemgetScore = h_item.manualIgnore ? '--' : null;
                 }
                 if (this.hasIgnoretemp[h_index].id == item.items[_index].id) {
-                  item.items[_index] = self.hasIgnoretemp[h_index];
+                  item.items[_index] = this.hasIgnoretemp[h_index];
                 }
               });
               if (_item.inputCount != 0 || _item.manualIgnore) {
