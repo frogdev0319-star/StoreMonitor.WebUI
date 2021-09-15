@@ -415,7 +415,7 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import AudioVue from '@/components/AudioVue';
 import ReportDetail from '@/components/ReportDetail';
 import DescriptionText from '@/components/DescriptionText';
-import echartResize from '@/components/mixins/echartResize'
+import echartResize from '@/components/mixins/echartResize';
 
 export default {
   name: 'InspectReport',
@@ -1822,7 +1822,7 @@ export default {
               .score-title{
                 display: inline-flex;
                 flex-direction: column;
-                width: 100px;
+                width: auto;
                 align-items: center;
               }
               .total-score{

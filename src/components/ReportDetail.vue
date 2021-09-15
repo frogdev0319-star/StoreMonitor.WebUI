@@ -307,7 +307,7 @@ export default {
       .score-title{
         display: inline-flex;
         flex-direction: column;
-        width: 100px;
+        width: auto;
         align-items: center;
       }
       .total-score{
