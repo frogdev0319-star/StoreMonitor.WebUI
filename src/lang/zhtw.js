@@ -79,8 +79,7 @@ export default {
     "titleManage": "職務管理",
     "titleSetting": "職務設置",
     "transactionMonitor": "交易巡視",
-    "userAccountDeviceSetting": "企業賬號設備配置",
-    storeChecking
+    "userAccountDeviceSetting": "企業賬號設備配置"
   },
 
   "overview": {
