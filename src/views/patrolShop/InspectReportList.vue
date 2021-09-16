@@ -769,6 +769,7 @@ export default {
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.params = searchParams.searchCondition;
+        this.checkSortType(this.curSortType);
         this.curAppraise = searchParams.searchCondition.clause.status;
         this.curReportType = searchParams.curReportType;
         this.inspectCatch = !searchParams.searchCondition.inspectTagId ? '-1' : searchParams.searchCondition.inspectTagId;
