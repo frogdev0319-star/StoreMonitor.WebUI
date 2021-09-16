@@ -85,7 +85,7 @@
             <div
               :style="isHoverCard || ShowCard ? 'color:#f31d65':''"
               class="pattern_btn"
-              @click="ShowCard=true"
+              @click="getReportListOfCard"
               @mouseover="isHoverCard=true"
               @mouseout="isHoverCard=false">
               <i class="iconfont icon-suolvetu iconCard"/>
@@ -787,6 +787,11 @@ export default {
       this.storeFilterObj = storeObj;
       this.ifSearchData && this.searchData();
       this.ifSearchData = false;
+    },
+
+    getReportListOfCard() {
+      this.ShowCard = true;
+      this.checkSortType(this.curSortType);
     }
   },
 
