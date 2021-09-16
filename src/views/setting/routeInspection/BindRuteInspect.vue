@@ -78,7 +78,7 @@
 </template>
 <script>
 import { getBriefStoreList } from '@/api/store';
-import { applyItemInspectItem, UnapplyInspectItem, getInspectBindList } from '@/api/inspect';
+import { getInspectBindList, bindInspectWithStore } from '@/api/inspect';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import util from '@/common/util';
@@ -264,11 +264,12 @@ export default {
       const cityList = [];
       const bindArr = [];
       const bindStoreId = await self.getBindStoreList();
+      const storeIds = bindStoreId.data.length > 0 ? bindStoreId.data[0].storeIds : [];
       data.forEach(item => {
         if (cityList.indexOf(item.city) === -1) {
           cityList.push(item.city);
         }
-        bindStoreId.data.forEach(_item => {
+        storeIds.forEach(_item => {
           if (item.storeId === _item) {
             bindArr.push(_item);
           }
@@ -301,7 +302,7 @@ export default {
         let _tempCount = 0;
         item.store.forEach(_item => {
           const _obj = {};
-          if (bindStoreId.data.indexOf(_item.storeId) === -1) {
+          if (storeIds.indexOf(_item.storeId) === -1) {
             _obj.checked = false;
           } else {
             _obj.checked = true;
@@ -334,26 +335,6 @@ export default {
       }
     },
 
-    bindNapeToStore(params) {
-      return new Promise((resolve, reject) => {
-        applyItemInspectItem(params).then(res => {
-          resolve(res);
-        }).catch((err) => {
-          reject(err);
-        });
-      });
-    },
-
-    UnbindNapeToStore(params) {
-      return new Promise((resolve, reject) => {
-        UnapplyInspectItem(params).then(res => {
-          resolve(res);
-        }).catch((err) => {
-          reject(err);
-        });
-      });
-    },
-
     async applyNape() {
       const self = this;
       self.loading = true;
@@ -371,55 +352,24 @@ export default {
           }
         });
       });
-      const tempchecked = [];
-      storeIdChecked.forEach(item => {
-        const obj = {
-          storeId: item,
-          itemIds: napeId
-        };
-        tempchecked.push(obj);
-      });
-      const paramsBind = {
-        storeList: tempchecked
+      const bindStoreData = JSON.parse(sessionStorage.getItem('bindStoreData'));
+      const bindParams = {
+        applyItems: [{
+          inspectId: bindStoreData.inspectId,
+          bindStoreIds: storeIdChecked,
+          unbindStoreIds: storeIdUnchecked
+        }]
       };
-      const tempUnchecked = [];
-      storeIdUnchecked.forEach(item => {
-        const obj = {
-          storeId: item,
-          itemIds: napeId
-        };
-        tempUnchecked.push(obj);
-      });
-      const paramsUnBind = {
-        storeList: tempUnchecked
-      };
-      let flag = false;
-      if (storeIdChecked.length === count) { // all checked to bind
-        const resBind = await self.bindNapeToStore(paramsBind).catch((err) => self.loading = false);
-        if (resBind.errMsg === 'Success' && resBind.errCode === 0) {
-          flag = true;
-        }
-      } else if (storeIdUnchecked.length === count) { // all unchecked to unbind
-        const resUnBind = await self.UnbindNapeToStore(paramsUnBind).catch((err) => self.loading = false);
-        if (resUnBind.errMsg === 'Success' && resUnBind.errCode === 0) {
-          flag = true;
-        }
-      } else {
-        const resBind = await self.bindNapeToStore(paramsBind).catch((err) => self.loading = false);
-        const resUnBind = await self.UnbindNapeToStore(paramsUnBind).catch((err) => self.loading = false);
-        if (resBind.errMsg === 'Success' && resUnBind.errMsg === 'Success') {
-          flag = true;
-        }
-      }
-      if (flag) {
+      try {
+        await bindInspectWithStore(bindParams);
         const bindIdList = await self.getBindStoreList();
-        self.storeCount = bindIdList.data.length;
+        self.storeCount = bindIdList.data.length > 0 ? bindIdList.data[0].storeIds.length : 0;
         if (bindIdList.errMsg === 'Success') {
           self.loading = false;
-          util.notify(`${self.$t('insSettingView.editSuss')} ${bindIdList.data.length}
+          util.notify(`${self.$t('insSettingView.editSuss')} ${self.storeCount}
           ${self.$t('insSettingView.storesBound')}`, 'success', 3000);
         }
-      } else {
+      } catch (e) {
         self.loading = false;
         util.notify(self.$t('insSettingView.bindFail'), 'warning', 3000);
         return false;
@@ -428,10 +378,10 @@ export default {
 
     getBindStoreList() {
       const bindStoreData = JSON.parse(sessionStorage.getItem('bindStoreData'));
-      const params = { inspectId: bindStoreData.inspectId };
+      const params = { inspectIds: [bindStoreData.inspectId] };
       return new Promise((resolve, reject) => {
         getInspectBindList(params).then(res => {
-          if (res.errMsg != undefined && res.errMsg === 'Success') {
+          if (res.errCode === 0) {
             resolve(res);
           }
         })

@@ -23,7 +23,7 @@ export const getInspectItemList = params => {
 };
 export const getInspectBindList = data => {
   return request({
-    url: `${version}/inspect/item/bind/list`,
+    url: `${version}/inspect/store/bind/list`,
     method: 'post',
     data
   });
@@ -40,22 +40,6 @@ export const addInspectGroup = data => {
 export const addInspectItem = data => {
   return request({
     url: `${version}/inspect/item/add`,
-    method: 'post',
-    data
-  });
-};
-
-export const applyItemInspectItem = data => {
-  return request({
-    url: `${version}/inspect/item/apply`,
-    method: 'post',
-    data
-  });
-};
-
-export const UnapplyInspectItem = data => {
-  return request({
-    url: `${version}/inspect/item/unapply`,
     method: 'post',
     data
   });
@@ -256,3 +240,11 @@ export const GetInspectRuleSettings = params => {
     params
   });
 };
+
+export const bindInspectWithStore = data => {
+  return request({
+    url: `${version}/inspect/store/apply`,
+    method: 'post',
+    data
+  });
+}

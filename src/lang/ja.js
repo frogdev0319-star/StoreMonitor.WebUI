@@ -6,6 +6,7 @@ export default {
     "beseyeDeviceMgt": "モニタデバイス管理（Beseye）",
     "beseyeDeviceSetting": "Beseyeのデバイス設定",
     "brand": "ブランド",
+    "bindStore": "ストアをバインドする",
     "checkInStatistics": "検査チェックイン統計",
     "checkSchedule": "スケジュール設定（スケジュールをチェックする）",
     "confirmSum": "確認",

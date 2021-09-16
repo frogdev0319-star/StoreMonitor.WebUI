@@ -7,6 +7,7 @@ export default {
     "beseyeDeviceMgt": "監控設備管理（Beseye）",
     "beseyeDeviceSetting": "Beseye設備配置",
     "brand": "品牌",
+    "bindStore": "門店綁定",
     "checkInStatistics": "巡店簽到統計",
     "checkSchedule": "排程配置（點檢排程）",
     "confirmSum": "確認總結",

@@ -6,6 +6,7 @@ export default {
     "beseyeDeviceMgt": "Monitor Device Management (Beseye)",
     "beseyeDeviceSetting": "Device Settings of Beseye",
     "brand": "Brand",
+    "bindStore": "Bind Stores",
     "checkInStatistics": "Check In Statistics",
     "checkSchedule": "Schedule Settings (Check Schedule)",
     "confirmSum": "Confirm Summary",

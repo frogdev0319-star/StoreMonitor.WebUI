@@ -1408,10 +1408,10 @@ export default {
     getBindStoreList() {
       const self = this;
       const inspectId = self.routeData[0].inspectId;
-      const params = { inspectId: inspectId };
+      const params = { inspectIds: [inspectId] };
       inpectRESTful.getInspectBindList(params).then(res => {
-        if (res.errMsg != undefined && res.errMsg === 'Success') {
-          const data = res.data;
+        if (res.errCode === 0) {
+          const data = res.data.length > 0 ? res.data[0].storeIds : [];
           self.bindStoreList = data;
         }
       }).catch(err => {

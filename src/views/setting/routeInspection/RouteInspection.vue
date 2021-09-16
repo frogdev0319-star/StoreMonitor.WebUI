@@ -1469,10 +1469,10 @@ export default {
       const self = this;
       if (self.elTableData[Number(self.activeName)].data.length !== 0) {
         const inspectId = self.elTableData[Number(self.activeName)].data[Number(self.patrolActive)].routeData[0].inspectId;
-        const params = { inspectId: inspectId };
+        const params = { inspectIds: [inspectId] };
         inpectRESTful.getInspectBindList(params).then(res => {
-          if (res.errMsg != undefined && res.errMsg === 'Success') {
-            const data = res.data;
+          if (res.errCode === 0) {
+            const data = res.data.length > 0 ? res.data[0].storeIds : [];
             self.storeNum = data.length;
             self.loading = false;
             self.btnList[1].enabled = false;
@@ -1487,7 +1487,6 @@ export default {
     },
 
     isLoginIn() {
-      const self = this;
       return new Promise((resolve, reject) => {
         isLoginIn().then(res => {
           resolve(res);

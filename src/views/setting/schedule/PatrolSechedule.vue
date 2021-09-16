@@ -880,11 +880,10 @@ export default {
     },
 
     getBindStore() {
-      let self = this;
-      let params = { inspectId: self.inspectId };
+      const params = { inspectIds: [this.inspectId] };
       return new Promise((resolve, reject) => {
         getInspectBindList(params).then(res => {
-          if (res.errMsg != undefined && res.errMsg === 'Success') {
+          if (res.errCode === 0) {
             resolve(res);
           }
         }).catch(err => {
@@ -1119,9 +1118,10 @@ export default {
 
     async getStoreByCity(data) {
       let self = this;
-      let bindStore = [];
-      if (self.isActivePatrol !== 'noInspect'){
-        bindStore = await self.getBindStore();
+      let storeIds = [];
+      if (self.isActivePatrol !== 'noInspect') {
+        const bindStore = await self.getBindStore();
+        storeIds = bindStore.data.length > 0 ? bindStore.data[0].storeIds : [];
       }
       let bindStoreId = await self.getBindStoreList();
       self.hasBindScheduleStoreList = bindStoreId;
@@ -1142,7 +1142,7 @@ export default {
             obj.province = _item.province;
             _obj.storeName = _item.name;
             _obj.storeId = _item.storeId;
-            bindStore.data.includes(_item.storeId) && _temp.push(_obj);
+            storeIds.includes(_item.storeId) && _temp.push(_obj);
           }
         });
         obj.store = _temp;
@@ -1159,7 +1159,7 @@ export default {
         let _tempDisCount = 0;
         item.store.forEach(_item => {
           let _obj = {};
-          if (self.isActivePatrol !== 'noInspect' && bindStore.data.indexOf(_item.storeId) === -1) {
+          if (self.isActivePatrol !== 'noInspect' && storeIds.indexOf(_item.storeId) === -1) {
             _obj.disabled = true;
             _tempDisCount++;
           }
@@ -1329,7 +1329,7 @@ export default {
       const bindFlag = await this.bindStoreWithSchedule(scheId, storesNeedBind);
       const unbindFlag = await this.unbindStoreWithSchedule(scheId, storesNeedUnbind);
       if (bindFlag && unbindFlag) {
-        let bindIdList = await this.getBindStoreList();
+        const bindIdList = await this.getBindStoreList();
         this.hasBindScheduleStoreList = bindIdList;
         util.notify(`${this.$t('insSettingView.editSuss')} ${bindIdList.length}
                     ${this.$t('insSettingView.storesBound')}`, 'success', 3000);
