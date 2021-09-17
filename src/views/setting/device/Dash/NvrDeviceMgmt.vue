@@ -159,7 +159,8 @@
                   @click="clickNVR(index,item)">
                   <div v-if="item.isClick" class="proper-flag"/>
                   <div class="name-data titles">
-                    <span v-if="!item.isEditing">{{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}</span>
+                    <span v-if="!item.isEditing">
+                      {{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}</span>
                     <el-input
                       v-if="item.isEditing"
                       v-model="item.tempDeviceName"
@@ -321,7 +322,7 @@
             <div class="nvr-info">
               <span class="info-title">{{ $t('deviceView.nvrChannelSetting') }}</span>
               <el-button
-                :disabled="channelList.length === curNVRItem.channelCount"
+                :disabled="curNVRItem && channelList.length === curNVRItem.channelCount"
                 type="primary"
                 size="mini"
                 class="add-btn"
@@ -1362,6 +1363,8 @@ export default {
           });
           self.nvrData = temp;
           self.total = res.data.totalElements;
+        } else {
+          throw Error(errMsg);
         }
       })
         .then(async() => {
@@ -1373,7 +1376,9 @@ export default {
             self.channelData = [];
             self.channelList = [];
           }
-        });
+        }).catch(err => {
+          console.log(err);
+        })
     },
 
     searchNVRList() {
