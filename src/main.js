@@ -56,8 +56,6 @@ async function setURL() {
 setURL();
 
 router.beforeEach(async(to, from, next) => {
-  console.log(to)
-  console.log(from)
   if (!to.name) {
     const brandList = await getAccountList();
     getBrandList(brandList.data);

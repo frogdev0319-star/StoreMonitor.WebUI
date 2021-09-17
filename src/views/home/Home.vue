@@ -569,12 +569,12 @@ export default {
       self.$store.dispatch('logout').then(() => {
       });
     },
-    getBrandList() {
+    async getBrandList() {
+      await this.changeRoutes();
       this.brandList = JSON.parse(sessionStorage.getItem('brandList'));
       const idIndex = this.brandList.map(item => item.accountId).indexOf(this.accountId);
       idIndex !== -1 && sessionStorage.setItem('accountName', this.brandList[idIndex].name);
       sessionStorage.setItem('accountId', this.accountId);
-      this.changeRoutes();
       this.getBread();
     },
 

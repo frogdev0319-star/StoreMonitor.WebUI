@@ -1338,16 +1338,8 @@ export default {
       } catch (e) {
         console.log(e);
       }
-      if (self.isStoreMonitor) {
-        self.checkIfEncry();
-        self.isLoaded = true;
-      } else {
-        if (self.fullWindow) {
-          self.initFullWindowVideo();
-        } else {
-          self.initVideo();
-        }
-      }
+      self.checkIfEncry();
+      self.isLoaded = true;
     },
 
     initFullWindowVideo() {
