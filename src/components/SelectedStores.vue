@@ -56,6 +56,7 @@ export default {
       color: #7d8cad;
       white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
       width: 90%;
       display: inline-block;
       i {
