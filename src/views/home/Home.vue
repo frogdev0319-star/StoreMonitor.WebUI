@@ -207,7 +207,6 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import { getAccountList } from '@/api/login';
 import PubSub from 'pubsub-js';
 import Database from '@/common/Database';
 
@@ -359,7 +358,6 @@ export default {
   created() {
     const self = this;
     this.headUrl = './static/img/admin.png';
-    this.getBread();
     PubSub.subscribe('change-color', (event, data) => {
       self.showTag = data.showTag;
     });
@@ -369,9 +367,8 @@ export default {
       }
     });
     window.addEventListener('resize', this.$_isMobile);
-    self.isMobile = self.$_isMobile();
-    this.changeRoutes();
-    this.getAccountList();
+    self.$_isMobile();
+    this.getBrandList();
     this.updateTitle();
   },
 
@@ -572,30 +569,13 @@ export default {
       self.$store.dispatch('logout').then(() => {
       });
     },
-
-    getAccountList() {
-      getAccountList().then(res => {
-        if (res.errCode === 0) {
-          const data = res.data;
-          this.getBrandList(data);
-        }
-      });
-    },
-
-    getBrandList(brandList) {
-      const tempAccount = [];
-      brandList.forEach((accountItem) => {
-        const res = accountItem['srp'].filter((srpItem) =>
-          srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
-        if (res && res.length) {
-          accountItem['srp'] = res;
-          tempAccount.push(accountItem);
-        }
-      })
-      this.brandList = tempAccount;
+    getBrandList() {
+      this.brandList = JSON.parse(sessionStorage.getItem('brandList'));
       const idIndex = this.brandList.map(item => item.accountId).indexOf(this.accountId);
       idIndex !== -1 && sessionStorage.setItem('accountName', this.brandList[idIndex].name);
       sessionStorage.setItem('accountId', this.accountId);
+      this.changeRoutes();
+      this.getBread();
     },
 
     changeAccount(accountId) {
@@ -649,7 +629,7 @@ export default {
       if (rect.width - 1 < 1280) {
         this.collapsed = true;
       }
-      return this.isMobile = rect.width - 1 < 1280;
+      this.isMobile = rect.width - 1 < 1280;
     }
 
   }

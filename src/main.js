@@ -18,6 +18,7 @@ import moment from 'moment';
 import elCascaderMulti from 'el-cascader-multi';
 import htmlToPdf from '@/plugins/htmlToPdf';
 import './assets/sass/index.scss';
+import { getAccountList } from '@/api/login';
 
 Vue.use(ProgressPlugin);
 Vue.use(elCascaderMulti);
@@ -55,7 +56,11 @@ async function setURL() {
 setURL();
 
 router.beforeEach(async(to, from, next) => {
+  console.log(to)
+  console.log(from)
   if (!to.name) {
+    const brandList = await getAccountList();
+    getBrandList(brandList.data);
     await store.dispatch('GetUserAuthorities');
     const accessRoutes = await store.dispatch('generateRoutes');
     router.addRoutes(accessRoutes);
@@ -65,10 +70,23 @@ router.beforeEach(async(to, from, next) => {
   }
 });
 
+function getBrandList(brandList) {
+  const tempAccount = [];
+  brandList.forEach((accountItem) => {
+    const res = accountItem['srp'].filter((srpItem) =>
+      srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
+    if (res && res.length) {
+      accountItem['srp'] = res;
+      tempAccount.push(accountItem);
+    }
+  })
+  sessionStorage.setItem('brandList', JSON.stringify(tempAccount));
+}
+
 router.onError((error) => {
   const pattern = /Loading chunk (\d)+ failed/g;
   const isChunkLoadFailed = error.message.match(pattern);
-  if(isChunkLoadFailed){
+  if(isChunkLoadFailed) {
     const url = sessionStorage.getItem('LoginURL');
     window.location.href = url;
   }
