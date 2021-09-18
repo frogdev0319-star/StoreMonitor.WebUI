@@ -258,13 +258,12 @@ export default {
     setAuthorizeUrl() {
       let authorUrl = BeseyeAuthorizeConfig.userAuthorizationUri;
       authorUrl = authorUrl + ('?' + qs.stringify({
-        client_id: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a',
+        client_id: BeseyeAuthorizeConfig.client_id,
         response_type: BeseyeAuthorizeConfig.response_type,
         redirect_uri: BeseyeAuthorizeConfig.redirect_uri,
         scope: BeseyeAuthorizeConfig.scope,
         state: BeseyeAuthorizeConfig.state
       }));
-      console.log(authorUrl);
       window.location.href = authorUrl;
     },
 
