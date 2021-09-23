@@ -304,6 +304,7 @@
             class="pie-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
             <v-chart
+              v-if="pageItem.data"
               ref="chartRadar"
               :options="pageItem.data"
               :auto-resize="true"
@@ -315,6 +316,7 @@
             class="radar-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
             <v-chart
+              v-if="pageItem.data"
               ref="chartRadar"
               :options="pageItem.data"
               :auto-resize="true"
