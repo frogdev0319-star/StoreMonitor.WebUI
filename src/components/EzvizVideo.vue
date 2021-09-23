@@ -556,7 +556,7 @@ export default {
 
   watch: {
     channelInfo: {
-     handler(newChannel, oldChannel) {
+      handler(newChannel, oldChannel) {
         if (Object.keys(oldChannel).length > 0 && newChannel.ivsId !== oldChannel.ivsId) {
           try {
             this.getEzvizAccessToken(newChannel.ivsId);
@@ -628,7 +628,7 @@ export default {
         this.getVideoQualityIndex();
         try {
           await this.getEzvizAccessToken(newValue);
-        }catch (e) {
+        } catch (e) {
           console.log(e);
         }
 
@@ -688,20 +688,20 @@ export default {
       this.stopPlayingVideoAndPlay();
     },
 
-    saveVideoQuality(){
-      let params = {
+    saveVideoQuality() {
+      const params = {
         videoQualityIndex: this.curQualityIndex
-      }
+      };
       const searchConditon = {
         path: this.storeId,
         params: params
-      }
-      SearchConditionUtil.saveSearchCondition(searchConditon)
+      };
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
-    getVideoQualityIndex(){
+    getVideoQualityIndex() {
       const templateJson = SearchConditionUtil.getSearchCondition(this.storeId);
-      if(Object.keys(templateJson).length > 0){
+      if (Object.keys(templateJson).length > 0) {
         this.curQualityIndex = templateJson.videoQualityIndex;
       }
     },
@@ -812,21 +812,21 @@ export default {
           resolve(self.accessToken);
         } else {
           getEzvizAccessToken(params).then(result => {
-              if(result.errCode === 0){
-                self.currentIvsId = ivsId;
-                self.accessToken = result.data.accessToken;
-                self.areaDomain = {
-                  domain: result.data.areaDomain
-                };
-                self.ezvizExpireTime = result.data.expireTime;
-                resolve(result.data.accessToken);
-              } else {
-                this.showError = true;
-                this.errorMsg =util.setErrorMsg(result.errMsg, false);
-                this.notUpdateMsg = true;
-                throw Error(result.errMsg);
-              }
-            })
+            if (result.errCode === 0) {
+              self.currentIvsId = ivsId;
+              self.accessToken = result.data.accessToken;
+              self.areaDomain = {
+                domain: result.data.areaDomain
+              };
+              self.ezvizExpireTime = result.data.expireTime;
+              resolve(result.data.accessToken);
+            } else {
+              this.showError = true;
+              this.errorMsg = util.setErrorMsg(result.errMsg, false);
+              this.notUpdateMsg = true;
+              throw Error(result.errMsg);
+            }
+          })
             .catch(error => {
               reject(error);
             });
@@ -841,7 +841,7 @@ export default {
       if (self.channelInfo == null) {
         return;
       }
-      if(self.videoAuthority === false){
+      if (self.videoAuthority === false) {
         this.showError = true;
         this.errorMsg = this.$t('remotePatrol.videoLicense');
         return;
@@ -1069,7 +1069,7 @@ export default {
         self.playState = true;
         self.isLoading = false;
         self.showModelContent = true;
-        if(!self.muted){
+        if (!self.muted) {
           self.fullWindow ? self.fullDecoder.openSound() : self.decoder.openSound();
         }
         if (self.playBack) {
@@ -1172,7 +1172,7 @@ export default {
       if (!self.showError) {
         playerEle.style.width = self.initPlayerWidth + 'px';
         playerEle.style.height = self.initPlayerHeight + 'px';
-      }else{
+      } else {
         const errEle = self.$refs.errorModel;
         errEle.style.width = '100%';
         errEle.style.height = '100%';
@@ -1415,7 +1415,7 @@ export default {
     onMuted(){
       const muted = !this.muted;
       try {
-        if(muted){
+        if (muted) {
           this.fullWindow ? this.fullDecoder.closeSound() : this.decoder.closeSound();
         } else {
           this.fullWindow ? this.fullDecoder.openSound() : this.decoder.openSound();
@@ -1924,7 +1924,7 @@ export default {
       return width;
     },
 
-    async startVideo(ivsId, channelId, startTs){
+    async startVideo(ivsId, channelId, startTs) {
       try {
         await this.getEzvizAccessToken(ivsId);
         this.playState && this.stopRealTime();
@@ -1935,11 +1935,11 @@ export default {
 
     },
 
-    stopVideoPlay(){
+    stopVideoPlay() {
       this.stopRealTime();
     },
 
-    playHistoryVideo(){
+    playHistoryVideo() {
 
     }
   }
