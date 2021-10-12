@@ -408,7 +408,7 @@ export default {
     handleTabClick(val) {
       const self = this;
       if (Number(val.index) < 4) {
-        self.curState = [Number(val.index)];
+        self.curState = Number(val.index) === 2 ? [2, 4] : [Number(val.index)];
       } else {
         const stateArr = [];
         self.eventStatesList.forEach(item => {
@@ -560,13 +560,13 @@ export default {
         } else {
           const allStatus = this.curState.some(item => item === '-1');
           if (allStatus) {
-            status = [0, 1, 2, 3];
+            status = [];
           } else {
             status = this.curState;
           }
         }
       } else {
-        status = [0, 1, 2, 3];
+        status = [];
       }
       let page = 0;
       if (val === 'currentChange') {
