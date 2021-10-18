@@ -1632,9 +1632,9 @@ export default {
 
     getTableVersonBasedOnB1(sheet1, sheet2, sheet3) {
       const subCategoryArr = this.getAllTranslationBasedOnKey('insSettingView.subCategory');
-      const containSubColumn = (sheet1 && subCategoryArr.includes(this.formatTableHeader(sheet1.B1.h))) ||
-          (sheet2 && subCategoryArr.includes(this.formatTableHeader(sheet2.B1.h))) ||
-          (sheet3 && subCategoryArr.includes(this.formatTableHeader(sheet3.B1.h)));
+      const containSubColumn = (sheet1 && subCategoryArr.includes(this.formatTableHeader(sheet1.B1.w))) ||
+          (sheet2 && subCategoryArr.includes(this.formatTableHeader(sheet2.B1.w))) ||
+          (sheet3 && subCategoryArr.includes(this.formatTableHeader(sheet3.B1.w)));
       const tableVersion = containSubColumn ? 2 : 1;
       return tableVersion;
     },
