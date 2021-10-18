@@ -673,7 +673,8 @@ export default {
             self.tableDataList[i].eventCount = data[i].numOfEvent;
             numOfEventTotal += data[i].numOfEvent;
           }
-          self.tableDataList[4].eventCount = numOfEventTotal;
+          self.tableDataList[2].eventCount += data[4].numOfEvent;
+          self.tableDataList[4].eventCount = numOfEventTotal + data[4].numOfEvent;
         }).catch(err => {
           console.log('EventManagement-getEventCount:' + err);
         });
