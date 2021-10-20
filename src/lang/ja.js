@@ -604,6 +604,8 @@ export default {
     "inspectName": "名前",
     "inspectionDescp": "説明",
     "inspectionSignature": "検査署名",
+    "inspectionCheckin": "検査チェックイン",
+    "needCheckin": "最初にサインインしてから、検査します",
     "isCheckAnnex": "インスペクションアタッチメント",
     "isCheckSuggest": "インスペクションの推奨値",
     "isExportPDF": "PDFのエクスポート",

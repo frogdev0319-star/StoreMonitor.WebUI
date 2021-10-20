@@ -227,6 +227,18 @@
         </div>
       </setting-table>
     </el-col>
+
+    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
+      <setting-table :table-name="$t('insSettingView.inspectionCheckin')">
+        <div slot="tableDetail" class="setting-config rule-item">
+          <el-checkbox v-model="checkin">
+            <span>
+              {{ $t('insSettingView.needCheckin') }}
+            </span>
+          </el-checkbox>
+        </div>
+      </setting-table>
+    </el-col>
   </el-row>
 </template>
 
@@ -256,6 +268,7 @@ export default {
       routeName: '',
       mode: 0,
       onSiteSignature: true,
+      checkin: false,
       btnAttribute: 0,
       slash: '/',
       baseScore: 100,
@@ -308,6 +321,7 @@ export default {
             { name: 'dangerousOnFailedItem', value: self.dangerousOnFailedItem },
             { name: 'onSitePhotoOnly', value: self.onSitePhotoOnly },
             { name: 'onSiteSignature', value: self.onSiteSignature },
+            { name: 'checkin', value: self.checkin },
             {
               'name': 'itemOptionsForType1',
               'value': this.passFailBtnAttr,
@@ -368,6 +382,8 @@ export default {
                 break;
               case 'onSiteSignature':
                 self.onSiteSignature = item.value;
+              case 'checkin':
+                self.checkin = item.value;
                 break;
               case 'baseScore':
                 self.baseScore = item.value;

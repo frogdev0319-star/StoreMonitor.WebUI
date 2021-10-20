@@ -605,6 +605,8 @@ export default {
     "inspectName": "이름",
     "inspectionDescp": "설명",
     "inspectionSignature": "검사 서명",
+    "inspectionCheckin": "검사 체크인",
+    "needCheckin": "먼저 로그인 후 검사",
     "isCheckAnnex": "검사 첨부",
     "isCheckSuggest": "검사에 추전한 가치를 제공하기",
     "isExportPDF": "PDF 내보내기",

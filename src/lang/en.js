@@ -603,6 +603,8 @@ export default {
     "inspectName": "Name",
     "inspectionDescp": "Descriptions",
     "inspectionSignature": "Inspection signature",
+    "inspectionCheckin": "Inspection check-in",
+    "needCheckin": "Sign in first, then inspect",
     "isCheckAnnex": "Inspection attachments",
     "isCheckSuggest": "Recommended value for inspection",
     "isExportPDF": "Exporting pdf",

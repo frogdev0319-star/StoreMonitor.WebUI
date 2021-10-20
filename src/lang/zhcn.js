@@ -606,6 +606,8 @@ export default {
     "inspectName": "巡检项名称",
     "inspectionDescp": "巡检项目详细说明",
     "inspectionSignature": "巡检签名",
+    "inspectionCheckin": "巡检签到",
+    "needCheckin": "先签到，再巡检",
     "isCheckAnnex": "巡检附件上传",
     "isCheckSuggest": "巡检建议值",
     "isExportPDF": "正在导出PDF",
