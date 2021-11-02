@@ -2262,7 +2262,7 @@ export default {
         });
       } else {
         const obj = {};
-        tableHeader.map(item => obj[item] = '');
+        tableHeader.map(item => obj[item] = undefined);
         sheetData.push(obj);
       }
       return sheetData;
