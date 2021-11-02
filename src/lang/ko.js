@@ -274,6 +274,7 @@ export default {
     "changPageInfo": "아직 완료되지 않았습니다. 페이지를 닫으시겠습니까?",
     "changeTimeRange": "선택할 수 있는 최대 시간 범위는 3개월입니다.",
     "channelPlaceholder": "채널을 검색할 키워드 입력",
+    "checkinSuccess": "성공적으로 체크인",
     "clear": "치우다",
     "clickToContent": "평가하지 않은 항목이 존재하니까 한번더 보십시오!！",
     "clickToStar": "별을 누르다",

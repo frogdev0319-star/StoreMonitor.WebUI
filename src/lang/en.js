@@ -271,6 +271,7 @@ export default {
     "changPageInfo": "Not finish yet, confirm leaving the page? ",
     "changeTimeRange": "The maximum selected time range is three month, which has been adjusted!",
     "channelPlaceholder": "Enter keywords to search channels",
+    "checkinSuccess": "Check-in successfully",
     "clear": "Clear",
     "clickToContent": "Existing unevaluated items, Clicking to view!",
     "clickToStar": "Click to star",

@@ -62,6 +62,12 @@
                 :class="{'up-to-standard': standard === 1, 'not-up-to-standard': standard === 0}"
                 class="standard-name"> {{ standardMsg }}</div>
             </div>
+            <div class="checkin-content">
+              <div class="checkin-info-content"> {{ checkinInfo }}</div>
+            </div>
+            <div class="weather-content">
+              <img class="weather-info-content" :src="weatherImg">
+            </div>
           </div>
         </el-col>
       </el-row>
@@ -418,6 +424,7 @@ import AudioVue from '@/components/AudioVue';
 import ReportDetail from '@/components/ReportDetail';
 import DescriptionText from '@/components/DescriptionText';
 import echartResize from '@/components/mixins/echartResize';
+import i18n from '@/lang/index';
 
 export default {
   name: 'InspectReport',
@@ -499,7 +506,9 @@ export default {
         height: '148px'
       },
       standard: 2,
-      standardMsg: ''
+      standardMsg: '',
+      checkinInfo: '',
+      weatherImg: ''
     };
   },
 
@@ -752,6 +761,8 @@ export default {
         this.totalScore = data.totalScore;
         this.standard = data.standard;
         this.standardMsg = util.setStandardMsg(this.standard);
+        this.checkinInfo = data.checkinRecord ? util.getDateStr(data.checkinRecord.ts) + ' ' + i18n.t('remotePatrol.checkinSuccess') : '';
+        this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.getGroupsData(data.groups);
         this.reportData = data;
@@ -2139,6 +2150,28 @@ export default {
   .standard-btn{
     display: inline-block;
     margin-left: calc(20/1920*100vw);
+  }
+  .checkin-content{
+    display: inline-block;
+    position: absolute;
+    right: 50px;
+    text-align: center;
+    top: 3px;
+    .checkin-info-content{
+      font-weight: normal;
+      font-size: calc(12 / 1920 * 100vw);
+      color: #7d8cad;
+    }
+  }
+  .weather-content{
+    display: inline-block;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: -9px;
+    .weather-info-content{
+      width: 30px;
+    }
   }
 </style>
 <style>

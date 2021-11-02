@@ -273,6 +273,7 @@ export default {
     "changPageInfo": "まだ完了していません。ページを終了することを確認しますか？",
     "changeTimeRange": "選択可能な最大時間範囲は3ヶ月です。",
     "channelPlaceholder": "チャネルを検索するためのキーワードを入力してください",
+    "checkinSuccess": "チェックインに成功",
     "clear": "クリア",
     "clickToContent": "既存の未評価アイテム、クリックして表示します！！",
     "clickToStar": "押してフォロー",

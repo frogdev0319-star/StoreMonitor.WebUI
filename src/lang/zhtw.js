@@ -273,6 +273,7 @@ export default {
     "changPageInfo": "當前巡檢尚未完成，確認是否離開頁面？",
     "changeTimeRange": "當前選擇時間範圍最大為三個月，已調整！",
     "channelPlaceholder": "請輸入關鍵字搜索通道",
+    "checkinSuccess": "簽到成功",
     "clear": "清除",
     "clickToContent": "部分巡檢未評估，點擊查看！",
     "clickToStar": "點擊關注",
