@@ -661,7 +661,9 @@ export default {
       let curSumIndex = [];
       curSumIndex = self.resultList.filter(x => x.isActive);
       status = curSumIndex[0].label;
+      const uuid = sessionStorage.getItem('uuid');
       const params = {
+        uuid: uuid,
         status: status,
         comment: self.suggest.trim(),
         items: temp,

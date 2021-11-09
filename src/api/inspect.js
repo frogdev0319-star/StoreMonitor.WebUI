@@ -5,7 +5,7 @@ const itempath = '/storemonitor/api/v1.0';
 
 import Environment from '@/common/environment';
 const version = Environment.VERSION;
-const version2 = 'v2.0';
+const version3 = 'v3.0';
 
 export const getInspectGroupList = params => {
   return request({
@@ -172,7 +172,7 @@ export const getInspectReportInfo = data => {
 
 export const submitInspectItem1 = data => {
   return request({
-    url: `${version2}/inspect/submit`,
+    url: `${version3}/inspect/submit`,
     method: 'post',
     data
   });

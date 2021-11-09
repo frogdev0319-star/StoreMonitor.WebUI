@@ -2335,6 +2335,7 @@ export default {
             }
           });
           sessionStorage.setItem('inspectSettings', JSON.stringify(inspectSettings));
+          sessionStorage.setItem('uuid', res.data.uuid);
           this.checkIfAllItemsAreRemark(data);
           const temp = [];
           data.forEach((item, index) => {
