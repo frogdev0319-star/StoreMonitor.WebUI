@@ -1619,7 +1619,8 @@ export default {
         (self.$refs.vendorVideo.startTs = self.playBackTime) && (self.$refs.vendorVideo.clipStartTime = self.playBackTime);
       }
       if (self.playBackState) {
-        self.$refs.vendorVideo.changeHistoryTime(self.startTs);
+        const startTime = [0, 3].includes(self.vendor) ? self.startTs : self.playBackTime;
+        self.$refs.vendorVideo.changeHistoryTime(startTime);
       } else {
         self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
       }
