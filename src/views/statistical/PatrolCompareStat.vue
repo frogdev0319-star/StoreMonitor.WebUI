@@ -57,7 +57,7 @@ import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import AreaDateTimeSelected from '@/components/AreaDateTimeSelected';
 export default {
-  name: 'PatrolEvaluationSta',
+  name: 'PatrolCompareStat',
 
   components: {
     DelayButton,

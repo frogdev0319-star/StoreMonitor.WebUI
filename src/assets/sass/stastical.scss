@@ -109,16 +109,10 @@ $store: #fccc3f;
         text-align: left;
         color: #2b2b2b;
     }
+    
   }
 }
-.el-select {
-  background-color: #f7f9fa;
-  border: none;
-  color: #2b2b2b;
-  .el-input__inner{
-    color: #2b2b2b;
-  }
-}
+
 .el-select-dropdown__wrap {
     .el-select-dropdown__item {
         font-family: NotoSansCJKtc;
@@ -132,5 +126,47 @@ $store: #fccc3f;
             color: #E6F3F3
         }
     }
+}
+.el-select-dropdown__item.selected {
+  color: #1375bc;
+  font-weight: 700;
+}
+
+.date-picker {
+  width:130px;
+  height: 25px;
+  line-height: 25px;
+  font-size: 13px;
+  margin-left: 0;
+  align-self: center;
+  .el-input__inner {
+        width: 130px;
+        height: 25px;
+        border: none;
+        background-color:#f7f9fa;
+    
+  }
+  .el-input__prefix {
+    position: absolute;
+    height: 18px;
+    left: 5px;
+    top: 0;
+    text-align: center;
+    color: #c0c4cc;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+  }
+  .el-input__icon {
+      width: 18px;
+      height: 18px;
+      line-height: 25px;
+      /*content: url('/img/date/ic_calender.svg');*/
+  }
+  .el-input--medium .el-input__icon {
+    line-height: 32px;
+  }
+  .el-icon-date::before{
+    content: url(/../../../static/img/statistics/ic_calender.svg);
+  }
 }
 

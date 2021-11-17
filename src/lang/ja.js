@@ -80,7 +80,11 @@ export default {
     "titleManage": "ポジション管理",
     "titleSetting": "ポジション設定",
     "transactionMonitor": "トランザクションモニタリング",
-    "userAccountDeviceSetting": "エンタープライズアカウントのデバイス設定"
+    "userAccountDeviceSetting": "エンタープライズアカウントのデバイス設定",
+    "supervisorCalStat": "巡店考评统计",
+    "patrolItemStat": "巡检项统计",
+    "patrolPersonStat": "巡检人员计统计",
+    "patrolCompareStat": "巡检同比分析",
   },
 
   "overview": {

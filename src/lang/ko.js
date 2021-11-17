@@ -81,7 +81,11 @@ export default {
     "titleSetting": "위치 설정",
     "transactionMonitor": "거래 모니터",
     "userAccountDeviceSetting": "엔터프라이즈 계정 장치 설정",
-    "onsitePatrol": "현장 검사"
+    "onsitePatrol": "현장 검사",
+    "supervisorCalStat": "巡店考评统计",
+    "patrolItemStat": "巡检项统计",
+    "patrolPersonStat": "巡检人员计统计",
+    "patrolCompareStat": "巡檢同比分析",
   },
 
   "overview": {
