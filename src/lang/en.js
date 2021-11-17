@@ -80,7 +80,11 @@ export default {
     "titleSetting": "Position Settings",
     "transactionMonitor": "Transaction Monitoring",
     "userAccountDeviceSetting": "Device Settings of Enterprise Account",
-    "onsitePatrol": "Onsite Inspection"
+    "onsitePatrol": "Onsite Inspection",
+    "supervisorCalStat": "巡店考评统计",
+    "patrolItemStat": "巡检项统计",
+    "patrolPersonStat": "巡检人员计统计",
+    "patrolCompareStat": "巡店考评统计",
   },
 
   "overview": {

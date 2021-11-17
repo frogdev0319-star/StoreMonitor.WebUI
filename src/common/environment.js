@@ -36,8 +36,8 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.Debug_XA;
-const isGlobalWebsite = false;
+const environJSON = _Environments.RC;
+const isGlobalWebsite = true;
 
 let Environment;
 export default Environment = {
