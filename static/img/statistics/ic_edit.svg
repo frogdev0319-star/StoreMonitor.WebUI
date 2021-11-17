@@ -1,0 +1,11 @@
+<svg id="ic_edit" data-name="ic/edit" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <defs>
+        <style>
+            .cls-2{fill:#006ab7}
+        </style>
+    </defs>
+    <path id="Rectangle" style="fill:none" d="M0 0h24v24H0z"/>
+    <path id="Rectangle-2" data-name="Rectangle" class="cls-2" d="m6.126 0 3.368 2.188-6.125 9.432L0 9.432z" transform="translate(12 4)"/>
+    <path id="Path_31" data-name="Path 31" class="cls-2" d="M.5 0 0 4.463l3.872-2.275z" transform="translate(11 14)"/>
+    <path id="Path_4" data-name="Path 4" d="M12 .5H0" transform="translate(2.872 17.963)" style="stroke:#006ab7;stroke-miterlimit:10;fill:none"/>
+</svg>
