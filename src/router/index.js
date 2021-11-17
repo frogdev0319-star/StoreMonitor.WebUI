@@ -227,43 +227,6 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolItem');
-
-    PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
-      {
-        path: '/supervisorStat',
-        name: 'supervisorStat',
-        component: resolve => require(['@/views/statistical/SupervisorStatistics'], resolve),
-        hidden: false,
-        meta: {
-          requireAuth: true,
-          keepAlive: false
-        }
-      }
-    ) && primaryPathesList.push('/supervisorStat');
-    statisticsRoute.children.push(
-      {
-        path: '/supervisorCalStat',
-        name: 'supervisorCalStat',
-        component: resolve => require(['@/views/statistical/SupervisorCalStat'], resolve),
-        hidden: false,
-        meta: {
-          requireAuth: true,
-          keepAlive: false
-        }
-      }
-    ) && primaryPathesList.push('/patrolItemStat');
-    statisticsRoute.children.push(  
-      {
-        path: '/patrolItemStat',
-        name: 'patrolItemStat',
-        component: resolve => require(['@/views/statistical/PatrolItemStat'], resolve),
-        hidden: false,
-        meta: {
-          requireAuth: true,
-          keepAlive: false
-        }
-      }
-    ) && primaryPathesList.push('/patrolPersonStat');
    statisticsRoute.children.push(
       {
         path: '/patrolPersonStat',
@@ -300,6 +263,18 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolCompareStat');
+    PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
+      {
+        path: '/supervisorStat',
+        name: 'supervisorStat',
+        component: resolve => require(['@/views/statistical/SupervisorStatistics'], resolve),
+        hidden: false,
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        }
+      }
+    ) && primaryPathesList.push('/supervisorStat');
 
     // PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
     //   {

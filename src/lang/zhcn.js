@@ -84,9 +84,8 @@ export default {
     "onsitePatrol": "现场巡检",
     "supervisorCalStat": "巡店考评统计",
     "patrolItemStat": "巡检项统计",
-    "patrolPersonStat": "巡检人员计统计",
+    "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
-
   },
 
   "overview": {
