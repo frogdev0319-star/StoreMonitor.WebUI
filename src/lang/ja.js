@@ -81,10 +81,8 @@ export default {
     "titleSetting": "ポジション設定",
     "transactionMonitor": "トランザクションモニタリング",
     "userAccountDeviceSetting": "エンタープライズアカウントのデバイス設定",
-    "supervisorCalStat": "巡店考评统计",
-    "patrolItemStat": "巡检项统计",
-    "patrolPersonStat": "巡检人员计统计",
-    "patrolCompareStat": "巡店考评统计",
+    "patrolPersonStat": "巡檢人員計統計",
+    "patrolCompareStat": "巡檢同比分析",
   },
 
   "overview": {
