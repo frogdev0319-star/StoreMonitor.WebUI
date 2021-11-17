@@ -1072,5 +1072,13 @@ export default {
     "useAndSave": "選擇並套用",
     "useTemplate": "樣板",
     "yes": "允許"
+  },
+  "statistics":{
+    "patrolAssessemntCompare":"巡检同比分析",
+    "averageCompare":"平均分同比分析",
+    "assessemntCompare":"考評達標同比分析",
+    "dateChoose":"時間自定",
+    "monthCompare":"月同比",
+    "weekCompare":"周同比"
   }
 };
