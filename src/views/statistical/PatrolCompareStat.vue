@@ -21,7 +21,7 @@
                         </div>
                     </el-col>
                     <el-col :span="7">
-                        <AreaDateTimeSelected></AreaDateTimeSelected>
+                        <AreaDateTimeSelected @emitFilter="doFilter"></AreaDateTimeSelected>
                     </el-col>
                 </div>
             </div>
@@ -98,6 +98,41 @@ export default {
       initData() {
       this.params.filter = { page: 0, size: this.sizeNumStore };
     },
+    emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
+      this.params = searchParams;
+      this.daysRangeList = dateRangeList;
+      this.curRegionI = regionI;
+      this.curRegionII = regionII;
+      this.regionMode = regionMode;
+      this.timeMode = timeMode;
+      this.storePatrolLists = storePatrolLists;
+      const searchParamsObj = {
+        path: 'inspectEvalutionStatistics',
+        params: this.params
+      };
+      this.ifSaveParams && this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
+      this.searchData();
+    },
+    async searchData() {
+      this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+      if (this.params.storeIds.length > 0) {
+        await this.getInspectStatsOverviewOfRegion();
+        await this.getInspectStatsOverviewOfStore();
+        await this.getInspectStatsLine();
+      } else {
+        this.totalRegion = 0;
+        this.regionTableData = [];
+        this.getRegionPie();
+        this.storeTableData = [];
+        this.regionsList = [];
+        this.curRegion = [];
+        this.regionsChartsOptions = null;
+      }
+    },
+    doFilter(){
+      this.params = paramDate;
+    }
   }
 }
 </script>

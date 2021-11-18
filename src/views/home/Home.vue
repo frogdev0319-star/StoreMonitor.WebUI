@@ -1280,12 +1280,12 @@ export default {
     background-color:#fff;
     color: #484848;
     font-size: calc(24/1920*100vw) !important;
-    font-family: 'Roboto','Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    font-family: 'NotoSansCJKtc','Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
   }
   .options{
     padding-left: 20px;
     font-size: calc(24/1920*100vw) !important;
-    font-family:'Roboto', 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    font-family:'NotoSansCJKtc', 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
     height: 60px;
     line-height: 60px;
     color: #484848;
@@ -1721,10 +1721,10 @@ export default {
     margin-right: -4px !important;
   }
   .el-input__inner{
-    font-family:Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+    font-family:NotoSansCJKtc, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
   }
   .el-select-dropdown__item{
-    font-family: Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+    font-family: NotoSansCJKtc, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
   }
   /**
   add style to schedule setting
@@ -1778,6 +1778,6 @@ export default {
     word-break: break-word;
   }
   .el-message__content, .el-button, .el-time-panel__btn, .el-time-panel, .el-popper, .el-range-input{
-    font-family: Roboto, 'Microsoft YaHei';
+    font-family: NotoSansCJKtc, 'Microsoft YaHei';
   }
 </style>

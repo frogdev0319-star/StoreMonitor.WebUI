@@ -55,6 +55,7 @@ export default {
             this.dateFormat = "yyyy/MM";
             const paramDate = { start_date: this.$moment(this.date).startOf('month'), end_date: this.$moment(this.date).endOf('month') }
         }
+        this.$emit('emitFilter', paramDate );
     }
   }
 }
