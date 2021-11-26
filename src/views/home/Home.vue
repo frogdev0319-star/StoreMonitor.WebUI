@@ -104,6 +104,7 @@
                     <i v-else :class="item.iconCls" :style="collapsed ? {'margin-left' : '0'}:{}" class="navIcon"/>
                     <span>{{ collapsed ? '': $t(`route.${item.children[0].name}`) }}</span>
                   </el-menu-item>
+                                      
                   <!--multi nodes -->
                   <el-submenu
                     v-if="!item.leaf"
@@ -172,6 +173,7 @@
                       </el-menu-item>
                     </el-submenu>
                   </el-submenu>
+                  <div  :key="index" class="bottomline"/>
                 </template>
               </template>
 
@@ -965,25 +967,70 @@ export default {
         }
         .el-submenu-group{
           @include point(margin-left,0);
-          //font-size: 16px;
+          //font-size: 16px;b
         }
         .en-el-submenu-group{
           @include point(margin-left,0);
         }
+
+        .el-submenu-group.el-menu-item .bottomline,
+        .en-el-submenu-group.el-menu-item .bottomline{
+            height:1px;
+            width:calc(100vw-32);
+            margin-left:16px;
+            margin-right:16px;
+            border-bottom: 1px solid #a5a5a5;
+            
+        }
+        
         #en-groupSubItem.el-menu-item,
         #groupSubItem.el-menu-item
         {
           background-color: #ffffff;
           color: #a5a5a5;
-          border-bottom: 1px solid $border;
+          i{
+            color: #a5a5a5;
+          }
+        }
+        #groupSubItem.el-menu-item:hover{
+          background-color: #e4f3fd !important;
+          color: #a5a5a5 !important;
+          span{
+            color:#1375bc;
+          }
+          i{
+            color:#1375bc;
+          }
+        }
+        #groupSubItem.el-menu-item.is-active{
+          background-color: #e4f3fd !important;
+          color: #a5a5a5 !important;
+           span{
+            color:#1375bc;
+          }
+          i{
+            color:#1375bc;
+          }
         }
         #en-groupSubItem.el-menu-item:hover{
           background-color: #e4f3fd !important;
           color: #a5a5a5 !important;
+          span{
+            color:#1375bc;
+          }
+          i{
+            color:#1375bc;
+          }
         }
         #en-groupSubItem.el-menu-item.is-active{
           background-color: #e4f3fd !important;
           color: #a5a5a5 !important;
+           span{
+            color:#1375bc;
+          }
+          i{
+            color:#1375bc;
+          }
         }
         &.aside-width #en-groupSubItem.el-menu-item{
           padding-left: calc(50/1920*100vw) !important;
@@ -1043,6 +1090,25 @@ export default {
             }
           }
         }
+
+        #groupSubItem.submenu-item.el-menu-item.is-active{
+          background-color: #e4f3fd !important;
+            span{
+            color:#006ab7;
+          }
+          i{
+            color:#006ab7;
+          }
+        }
+        #groupSubItem.submenu-item.hover{
+          background-color: #e4f3fd !important;
+          span{
+            color:#006ab7;
+          }
+          i{
+            color:#006ab7;
+          }
+        }
         #en-groupSubItem.submenu-item{
           height: 70px;
           line-height: 70px;
@@ -1054,20 +1120,22 @@ export default {
             }
           }
         }
+        /*
         #en-childSubItem.third-title{
           font-size: calc(14/1920*100vw) ;
-          color: #a0a4ad;
+          color: #a0a4ad!important;
           @media screen and (max-width: 1645px){
             font-size: 12px;
           }
         }
         #childSubItem.third-title{
           font-size: calc(14/1920*100vw) ;
-          color: #a0a4ad;
+          color: #a0a4ad!important;
           @media screen and (max-width: 1645px){
             font-size: 12px;
           }
         }
+        */
         .three-child >>> .el-submenu__title {
           padding-left: calc(60/1920*100vw) !important;
           text-align: left;
@@ -1079,13 +1147,16 @@ export default {
         .three-child .el-submenu__title:hover{
           background-color: #f2f9fe !important;
           color:#fff !important;
+          span{
+            color:#a5a5a5!important;
+          }
         }
         .three-child >>> .el-menu{
           text-align: left !important;
         }
         .zh-third-title{
           font-size: 14px !important;
-          color: #a0a4ad;
+          color: #a0a4ad!important;
         }
         .zh-three-child >>> .el-submenu__title {
           padding-left: calc(60/1920*100vw) !important;
@@ -1108,36 +1179,70 @@ export default {
           position: relative;
           min-width: auto !important;
           padding-left:calc(60/1920*100vw) !important;
-          border-bottom: 1px solid $border;
-          &:hover{
-            background-color: #f2f9fe !important;
+          border-bottom: 0px;
+          background-color: #f2f9fe !important;
+          color:#a5a5a5 !important;
+          span{
             color:#a5a5a5 !important;
           }
+          &:hover{
+            background-color: #f2f9fe !important;
+          } i{
+            color:#00000000!important;
+          }
         }
+        #childSubItem.submenu-item:hover{
+           i{
+            color:#006ab7!important;;
+          }
+          span{
+            color:#006ab7!important;;
+          }
+        }
+         #childSubItem.submenu-item.is-active{
+           span{
+            color:#006ab7!important;;
+          }
+           span{
+            color:#006ab7!important;;
+          }
+        }
+
+
         #en-childSubItem.submenu-item{
           position: relative;
           min-width: auto !important;
           padding-left: calc(60/1920*100vw) !important;
-          border-bottom: 1px solid $border;
+           color:#a5a5a5 !important;
           span{
+              color:#a5a5a5 !important;
             font-size: calc(14/1920*100vw);
             @media screen and (max-width: 1645px){
               font-size: 12px;
             }
           }
-        }
-        #childSubItem.submenu-item{
-          position: relative;
-          min-width: auto !important;
-          padding-left: calc(60/1920*100vw) !important;
-          border-bottom: 1px solid $border;
-          span{
-            font-size: calc(14/1920*100vw);
-            @media screen and (max-width: 1645px){
-              font-size: 12px;
-            }
+          i{
+            color:#00000000;
           }
         }
+         #en-childSubItem.submenu-item:hover{
+           i{
+            color:#006ab7!important;;
+          }
+            span{
+            color:#006ab7!important;;
+          }
+        }
+         #en-childSubItem.submenu-item.is-active{
+           i{
+            color:#006ab7!important;;
+           }
+             span{
+            color:#006ab7!important;;
+          }
+        }
+        
+
       }
       .content-wrapper-all{
         height: auto;
@@ -1378,14 +1483,54 @@ export default {
     padding-right: 0 !important;
     background-color: #ffffff !important;
     color: #a5a5a5!important;
+    border-bottom:0px;
     /*border-bottom: 1px solid  #393b4c;*/
   }
+
+  .bottomline{
+            height:0px;
+            width:calc(100vw-32);
+            margin-left:16px;
+            margin-right:16px;
+            border-bottom: 1px solid #a5a5a5;
+            background-color:#e4f3fd !important;
+            
+        }
   .el-submenu__title:hover{
     background-color:  #e4f3fd!important;
     color:#006ab7;
   }
+
+  .el-submenu-content{
+    background-color:  #e4f3fd !important;
+  }
+
+  .el-submenu-content.el-submenu{
+    background-color:  #FFFFFF !important;
+    color:#a5a5a5;
+  }
+  .el-submenu-content.el-submenu i{
+    color:#a5a5a5;
+  }
+  .el-submenu-content.el-submenu:hover > .el-submenu__title{
+    background-color:  #e4f3fd !important;
+    color:#006ab7;
+  }
+  .el-submenu-content.el-submenu:hover span{
+    color:#006ab7;
+  }
+  .el-submenu-content.el-submenu:hover i{
+    color:#006ab7;
+  }
+
   .el-submenu-content.el-submenu.is-active.is-opened > .el-submenu__title{
     background-color:  #e4f3fd !important;
+    color:#006ab7;
+  }
+  .el-submenu-content.el-submenu.is-active.is-opened span{
+    color:#006ab7;
+  }
+  .el-submenu-content.el-submenu.is-active.is-opened i{
     color:#006ab7;
   }
   .el-submenu .el-menu-item{
@@ -1393,23 +1538,22 @@ export default {
     line-height: 60px;
   }
   .el-submenu.three-child.el-submenu-group .el-submenu__title{
-    background: #222385;
+    background: #fff;
     color: #a0a4ad !important;
-    border-bottom: 1px solid #393b4c;
   }
   .el-submenu.three-child.el-submenu-group .el-submenu__title:hover{
     background-color: #f2f9fe !important;
     color:#a5a5a5 !important;
   }
   .el-submenu.three-child.el-submenu-group .el-submenu__title:hover .icon-content{
-    color: #a5a5a5;
+    color: #006ab7 !important;
   }
   .el-submenu.three-child.el-submenu-group .el-submenu__title:hover span{
-    color: #a5a5a5;
+    color: #006ab7 !important;
   }
   .el-submenu.three-child.el-submenu-group .el-submenu__title.is-active{
     background-color: #f2f9fe !important;
-    color:#a5a5a5 !important ;
+    color:#006ab7 !important ;
   }
 
   .el-menu--collapse{
@@ -1455,11 +1599,11 @@ export default {
     border-bottom-color: #393b4c !important;
   }
   .el-submenu__title{
-    border-bottom: 1px solid #a5a5a5;
+    border-bottom: 0px solid #a5a5a5;
     background-color: #ffffff !important;
   }
   .submenu-item{
-    border-bottom: 1px solid #393b4c;
+    border-bottom:none;
   }
   .el-menu .submenu-item:last-child{
     border-bottom: none;
@@ -1558,21 +1702,21 @@ export default {
   .el-submenu.zh-three-child .el-submenu__title:hover
   {
     background-color: #f2f9fe !important;
-    color:#a5a5a5 !important;
+    color:#006ab7 !important;
   }
   .el-submenu.zh-three-child .el-submenu__title:hover span
   {
-    color:#a5a5a5 !important;
+    color:#006ab7 !important;
   }
   .el-submenu.zh-three-child .el-submenu__title.is-active{
     background-color: #f2f9fe !important;
-    color:#a5a5a5 !important ;
+    color:#006ab7 !important ;
   }
   .el-submenu.is-active.zh-three-child > .el-submenu__title .icon-content,.el-submenu.is-active.zh-three-child > .el-submenu__title span{
-    color:#a5a5a5 !important ;
+    color:#006ab7 !important ;
   }
   .el-submenu.is-active.three-child > .el-submenu__title .icon-content,.el-submenu.is-active.three-child > .el-submenu__title span{
-    color:#a5a5a5 !important ;
+    color:#006ab7 !important ;
   }
   .el-menu--popup .zh-three-child .el-submenu__title{
     height: 60px;
@@ -1609,14 +1753,14 @@ export default {
     color:#a5a5a5 !important ;
   }
   .el-menu.el-menu--popup.el-menu--popup-right-start #childSubItem.el-menu-item.submenu-item:hover .icon-content{
-    color: #a5a5a5;
+    color: #a5a5a5 !important;
   }
   .el-menu.el-menu--popup.el-menu--popup-right-start #childSubItem.el-menu-item.submenu-item.is-active{
     background-color: #f2f9fe !important;
     color:#a5a5a5 !important ;
   }
   .el-menu.el-menu--popup.el-menu--popup-right-start #childSubItem.el-menu-item.submenu-item.is-active .icon-content{
-    color: #a5a5a5;
+    color: #a5a5a5 !important;
   }
   .zh-three-child .el-menu-item.submenu-item{
     color: #a0a4ad !important;
@@ -1746,8 +1890,8 @@ export default {
     border-bottom: 1px solid #a5a5a5;
   }
   .el-submenu .el-menu-item:first-child{
-    margin-top: 10px;
-    border-top: 1px solid #393b4c;
+    margin-top: 0px;
+    border-top: 0;
   }
   li[class*="three-child"] .el-menu-item:first-child{
     margin-top: 0px;
@@ -1772,4 +1916,5 @@ export default {
   .el-message__content, .el-button, .el-time-panel__btn, .el-time-panel, .el-popper, .el-range-input{
     font-family: Roboto, 'Microsoft YaHei';
   }
+
 </style>
