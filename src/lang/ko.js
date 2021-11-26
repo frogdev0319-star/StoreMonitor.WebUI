@@ -82,7 +82,9 @@ export default {
     "transactionMonitor": "거래 모니터",
     "userAccountDeviceSetting": "엔터프라이즈 계정 장치 설정",
     "onsitePatrol": "현장 검사",
-    "patrolPersonStat": "巡檢人員計統計",
+    "supervisorCalStat": "巡店考评统计",
+    "patrolItemStat": "巡检项统计",
+    "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
   },
 

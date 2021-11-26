@@ -1385,12 +1385,12 @@ export default {
     background-color:#fff;
     color: #484848;
     font-size: calc(24/1920*100vw) !important;
-    font-family: 'Roboto','Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    font-family: 'NotoSansCJKtc','Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
   }
   .options{
     padding-left: 20px;
     font-size: calc(24/1920*100vw) !important;
-    font-family:'Roboto', 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
+    font-family:'NotoSansCJKtc', 'Microsoft YaHei','Microsoft JhengHei',SimHei,Arial;
     height: 60px;
     line-height: 60px;
     color: #484848;
@@ -1428,7 +1428,7 @@ export default {
   }
   @media screen  and (max-width: 1280px){
     .brand-list .el-input__inner{
-      font-size: 14px;
+      font-size: 13px;
     }
   }
   .brand-list .is-disabled .el-input__inner{
@@ -1680,9 +1680,17 @@ export default {
     display: none;
   }
   .el-select .el-input--medium .el-input__inner{
-    height: 30px;
-    color: #484848;
+    height: 25px;
+    font-size: 13px;
+    text-align: left;
+    border: none;
+    background-color: #f7f9fa;
+    color:#2b2b2b;
   }
+  .el-select .el-input--medium .el-input__suffix{
+    top:5px;
+  }
+  
 
   /*中文*/
   #groupSubItem.el-menu-item:hover{
@@ -1857,10 +1865,10 @@ export default {
     margin-right: -4px !important;
   }
   .el-input__inner{
-    font-family:Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+    font-family:NotoSansCJKtc, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
   }
   .el-select-dropdown__item{
-    font-family: Roboto, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
+    font-family: NotoSansCJKtc, Arial, 'Microsoft YaHei','Microsoft JhengHei',SimHei;
   }
   /**
   add style to schedule setting
@@ -1914,7 +1922,7 @@ export default {
     word-break: break-word;
   }
   .el-message__content, .el-button, .el-time-panel__btn, .el-time-panel, .el-popper, .el-range-input{
-    font-family: Roboto, 'Microsoft YaHei';
+    font-family: NotoSansCJKtc, 'Microsoft YaHei';
   }
 
 </style>

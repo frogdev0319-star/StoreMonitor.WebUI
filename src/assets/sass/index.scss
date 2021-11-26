@@ -1,13 +1,14 @@
 @import "./element_ui.scss";
 @import "./util.scss";
 @import "../css/tabsItem.css";
+@import "./stastical.scss";
 
 body {
   height: 100vh;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  font-family: Roboto, Microsoft YaHei,'Microsoft JhengHei', Arial, sans-serif;
+  font-family: NotoSansCJKtc, Microsoft YaHei,'Microsoft JhengHei', Arial, sans-serif;
 }
 
 #app {
