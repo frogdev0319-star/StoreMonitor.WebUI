@@ -80,7 +80,9 @@ export default {
     "titleManage": "職務管理",
     "titleSetting": "職務設置",
     "transactionMonitor": "交易巡視",
-    "userAccountDeviceSetting": "企業賬號設備配置"
+    "userAccountDeviceSetting": "企業賬號設備配置",
+    "patrolPersonStat": "巡檢人員計統計",
+    "patrolCompareStat": "巡檢同比分析",
   },
 
   "overview": {
@@ -1072,5 +1074,13 @@ export default {
     "useAndSave": "選擇並套用",
     "useTemplate": "樣板",
     "yes": "允許"
+  },
+  "statistics":{
+    "patrolAssessemntCompare":"巡检同比分析",
+    "averageCompare":"平均分同比分析",
+    "assessemntCompare":"考評達標同比分析",
+    "dateChoose":"時間自定",
+    "monthCompare":"月同比",
+    "weekCompare":"周同比"
   }
 };

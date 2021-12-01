@@ -17,15 +17,15 @@ Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err);
 }
 export const constantRoutes = [
-  // {
-  //   path: '/login',
-  //   name: 'Login',
-  //   hidden: true,
-  //   component: LoginForm,
-  //   meta: {
-  //     requireAuth: false
-  //   }
-  // },
+   {
+     path: '/login',
+     name: 'Login',
+     hidden: true,
+     component: LoginForm,
+     meta: {
+       requireAuth: false
+     }
+   },
   {
     path: '/:token/:userId/:ezvizAppKey/:ezvizProtocol/:lang/:deviceAuth',
     redirect: '/',
@@ -227,7 +227,42 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolItem');
-
+   statisticsRoute.children.push(
+      {
+        path: '/patrolPersonStat',
+        name: 'patrolPersonStat',
+        component: resolve => require(['@/views/statistical/PatrolPersonStat'], resolve),
+        hidden: false,
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        }
+      }
+    ) && primaryPathesList.push('/PatrolPersonStat');
+    PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
+      {
+        path: '/eventStat',
+        name: 'eventStat',
+        component: resolve => require(['@/views/statistical/EventStatistics'], resolve),
+        hidden: false,
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        }
+      }
+    ) && primaryPathesList.push('/patrolCompareStat');
+    statisticsRoute.children.push(
+      {
+        path: '/patrolCompareStat',
+        name: 'patrolCompareStat',
+        component: resolve => require(['@/views/statistical/patrolCompareStat'], resolve),
+        hidden: false,
+        meta: {
+          requireAuth: true,
+          keepAlive: false
+        }
+      }
+    ) && primaryPathesList.push('/patrolCompareStat');
     PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
         path: '/supervisorStat',
@@ -240,19 +275,6 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/supervisorStat');
-
-    PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
-      {
-        path: '/eventStat',
-        name: 'eventStat',
-        component: resolve => require(['@/views/statistical/EventStatistics'], resolve),
-        hidden: false,
-        meta: {
-          requireAuth: true,
-          keepAlive: false
-        }
-      }
-    ) && primaryPathesList.push('/eventStat');
 
     // PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
     //   {

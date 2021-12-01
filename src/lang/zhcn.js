@@ -81,7 +81,11 @@ export default {
     "titleSetting": "职务设置",
     "transactionMonitor": "交易巡视",
     "userAccountDeviceSetting": "企业账号设备配置",
-    "onsitePatrol": "现场巡检"
+    "onsitePatrol": "现场巡检",
+    "supervisorCalStat": "巡店考评统计",
+    "patrolItemStat": "巡检项统计",
+    "patrolPersonStat": "巡檢人員統計",
+    "patrolCompareStat": "巡檢同比分析",
   },
 
   "overview": {
@@ -1072,5 +1076,12 @@ export default {
     "useAndSave": "选择并套用",
     "useTemplate": "模板",
     "yes": "允许"
+  },
+  "statistics":{
+    "averageCompare":"平均分同比分析",
+    "dateChoose":"時間自定",
+    "weekCompare":"周同比",
+    "monthCompare":"月同比",
+    "areaType":"劃分類型",
   }
 }

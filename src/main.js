@@ -58,6 +58,7 @@ setURL();
 router.beforeEach(async(to, from, next) => {
   if (!to.name) {
     const brandList = await getAccountList();
+    console.log(brandList)
     getBrandList(brandList.data);
     await store.dispatch('GetUserAuthorities');
     const accessRoutes = await store.dispatch('generateRoutes');
@@ -73,11 +74,13 @@ function getBrandList(brandList) {
   brandList.forEach((accountItem) => {
     const res = accountItem['srp'].filter((srpItem) =>
       srpItem.type === 'Custom_Inspection' && srpItem.enable && srpItem.visible);
+     console.log(res)
     if (res && res.length) {
       accountItem['srp'] = res;
       tempAccount.push(accountItem);
     }
   })
+  console.log(tempAccount)
   sessionStorage.setItem('brandList', JSON.stringify(tempAccount));
 }
 
