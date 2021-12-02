@@ -1079,9 +1079,15 @@ export default {
   },
   "statistics":{
     "averageCompare":"平均分同比分析",
+    "assessemntCompare":"考评达标同比分析",
     "dateChoose":"時間自定",
     "weekCompare":"周同比",
     "monthCompare":"月同比",
     "areaType":"劃分類型",
+    "area1":"区域一",
+    "area2":"区域二",
+    "storeGroup":"門店群組",
+    "storeType":"門店類型",
+    "stores":"門店",
   }
 }

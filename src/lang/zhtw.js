@@ -1076,11 +1076,22 @@ export default {
     "yes": "允許"
   },
   "statistics":{
-    "patrolAssessemntCompare":"巡检同比分析",
     "averageCompare":"平均分同比分析",
     "assessemntCompare":"考評達標同比分析",
     "dateChoose":"時間自定",
+    "weekCompare":"周同比",
     "monthCompare":"月同比",
-    "weekCompare":"周同比"
+    "areaType":"劃分類型",
+    "area1":"區域一",
+    "area2":"區域二",
+    "storeGroup":"門店群組",
+    "storeType":"門店類型",
+    "stores":"門店",
+    "pleaseSelect":"請選擇",
+    "averageScore":"平均分數",
+    "score":"分",
+    "standardRate":"平均達標率",
+    "noData":"暫無數據",
+    "standardScore":"達標分數"
   }
 };

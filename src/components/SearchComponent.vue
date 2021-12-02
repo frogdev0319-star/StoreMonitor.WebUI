@@ -223,9 +223,11 @@ export default {
     async searchData() {
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
       this.params.timeMode = this.timeMode;
+      this.params.curCountry= this.storeFilterObj.curCountry;
       const emitParmas = {};
       emitParmas.searchParams = this.params;
       emitParmas.dateRangeList = this.daysRangeList;
+      
       emitParmas.regionI = this.storeFilterObj.curRegionI;
       emitParmas.regionII = this.storeFilterObj.curRegionII;
       emitParmas.regionMode = this.storeFilterObj.regionMode;
@@ -297,6 +299,7 @@ export default {
     },
 
     saveSearchParams(saveParamsObj) {
+      console.log("saveSearchParams:",saveParamsObj);
       const params = saveParamsObj.params;
       params.curCountry = this.storeFilterObj.curCountry;
       params.curProvince = this.storeFilterObj.curProvince;
@@ -339,6 +342,7 @@ export default {
     },
 
     onStoreChange(storeObj) {
+      console.log("*onStoreChange>storeObj:",storeObj);
       this.storeFilterObj = storeObj;
       !this.ifSaveParams && this.searchData();
       this.ifSaveParams = true;

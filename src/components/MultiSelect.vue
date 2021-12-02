@@ -63,10 +63,12 @@ export default {
       this.selectedArray = val;
       this.initData();
     },
-
     options(val){
       this.selectedArray = [...this.selected];
       this.initData();
+    },
+    dropdaownType(val){
+      console.log("dropdaownType:",val);
     }
   },
 

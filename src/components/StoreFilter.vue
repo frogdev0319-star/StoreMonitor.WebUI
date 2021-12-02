@@ -405,6 +405,7 @@ export default {
 
     emitParams() {
       const tempsearchParamsObj = {};
+      console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
       tempsearchParamsObj.curCountry = this.curCountry;
       tempsearchParamsObj.curProvince = this.curProvince;
       tempsearchParamsObj.curCity = this.curCity;
