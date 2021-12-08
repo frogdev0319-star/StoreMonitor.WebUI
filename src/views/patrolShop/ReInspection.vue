@@ -1,6 +1,6 @@
 <template>
-  <el-row class="el-container">
-    <el-col :span="16" :class="{liseAnmiClass:showSpread}" class="lside">
+  <el-row class="el-container" :class="isDefaultViewMode ? 'block' : 'flex'">
+    <el-col :span="16" class="lside" :class="{ liseAnmiClass: showSpread, fullWidth: isDefaultViewMode }" >
       <div class="el-header-title">
         <span v-if="showStoreUp" class="lside-title">
           {{ store.storeTitle }}
@@ -14,6 +14,7 @@
                    :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
           {{ $t('remotePatrol.confirmSum') }}
         </el-button>
+        <el-switch v-model="isDefaultViewMode" ></el-switch>
       </div>
       <el-dialog
         v-if="showCutDialog"
@@ -476,7 +477,7 @@
         </el-row>
       </div>
     </el-col>
-    <el-col v-if="!showSpread" :span="8" class="rside">
+    <el-col v-if="!showSpread" :span="8" class="rside" :class="{ fullWidth: isDefaultViewMode }">
       <div class="el-header-title">
         <span>{{ $t('remotePatrol.selectStrore') }}</span>
       </div>
@@ -794,7 +795,8 @@ export default {
       isCategory: false,
       itemOptionsForType1: [],
       itemOptionsForType3: [],
-      allRemarkItemsFlag: false
+      allRemarkItemsFlag: false,
+      isDefaultViewMode: false
     };
   },
   computed: {
@@ -939,7 +941,6 @@ export default {
   },
 
   methods: {
-
     changeBrand() {
       const self = this;
       !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
@@ -2764,6 +2765,15 @@ export default {
   $background:#f4f5f9;
   $tab:#7d8cad;
   $h1:#292e36;
+  .flex {
+    display: flex;
+  }
+  .block {
+    display: block;
+  }
+  .fullWidth {
+    width: 100%;
+  }
   .fade-enter-active {
     transition: all 1s ease;
     width: 68px;
@@ -3053,9 +3063,10 @@ export default {
     }
     .lside{
       padding-bottom: calc(25/1920*100vw);
-      margin-right: calc(25/1920*100vw);
+      // margin-right: calc(25/1920*100vw);
       border: 1px solid $border;
       background-color: #fff;
+      margin: 0 calc(25/1920*100vw) 0 0;
       .el-header-title{
         text-align: left;
         position: relative;
@@ -3117,7 +3128,6 @@ export default {
           line-height: 18px;
           cursor: pointer;
           position: relative;
-          bottom: 2px;
           span{
             font-size: 12px;
             /*vertical-align: middle;*/
