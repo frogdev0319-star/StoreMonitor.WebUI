@@ -98,3 +98,11 @@ export const getInspectStatsOverviewWithGroup = data => {
     data
   });
 };
+
+export const getInspectStatsOverPersonV3 = data => {
+  return request({
+    url: `v3.0/statistics/inspect/report/person`,
+    method: 'post',
+    data
+  });
+};

@@ -238,7 +238,7 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    ) && primaryPathesList.push('/PatrolPersonStat');
+    ) && primaryPathesList.push('/patrolPersonStat');
     PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
       {
         path: '/eventStat',
@@ -250,8 +250,8 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    ) && primaryPathesList.push('/patrolCompareStat');
-    statisticsRoute.children.push(
+    ) && primaryPathesList.push('/eventStat');
+    PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolCompareStat',
         name: 'patrolCompareStat',

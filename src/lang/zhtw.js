@@ -405,7 +405,7 @@ export default {
     "scoreU": "單位：個",
     "scoreUnit": "評分：",
     "scorecount": "分",
-    "search": "搜索",
+    "search": "查詢",
     "selectDate": "選擇日期",
     "selectInspectListWithStore": "請選擇，{storeName}關聯巡檢表",
     "selectStores": "選擇門店",
@@ -1092,6 +1092,21 @@ export default {
     "score":"分",
     "standardRate":"平均達標率",
     "noData":"暫無數據",
-    "standardScore":"達標分數"
+    "standardScore":"達標分數",
+    "patrolPerson":{
+      "insPerson":"巡檢人",
+      "dutyAll":"全部職務",
+      "insRecordList":"巡檢記錄列表",
+      "supervisorName":"姓名",
+      "department":"所屬部門",
+      "numOfStores":"管轄門店（家）",
+      "numOfTotal":"巡檢次數（次）",
+      "numOfStoresNotPatrolled":"未巡檢門店（家）",
+      "numOfTasked":"巡店排程任務",
+      "completionRate":"巡店任務完成率",
+      "processedRate":"提交事件结案率",
+      "detail":"詳情"
+    }
+    
   }
 };
