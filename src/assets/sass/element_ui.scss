@@ -59,20 +59,23 @@
   border-radius: 2px;
 }
 .header-class{
-  height: 40px !important;
+  height: 62.5px !important;
   font-size: 12px !important;;
   font-weight: bold;
-  color: #7d8cad;
-  background-color: #f4f5f9 !important;
-  border-right: none !important;
+  color: #556679;
+  background-color: #f7f9fa !important;
+  border: none !important;
 }
 .cell-class{
-  padding-left: 20px;
-  font-size: calc(14/1920*100vw);
-  color: #182752;
+  padding-left: 24px;
+  font-size: calc(15/1920*100vw);
+  color: #484848;
+  background-color: #f7f9fa !important;
+  border: none !important;
+  border-bottom:solid 1px #acaeb1 !important;
 }
 .el-table__row.row-class{
-  height: 35px;
+  height: 62.5px;
 }
 body .el-table th.gutter {
   display: table-cell !important

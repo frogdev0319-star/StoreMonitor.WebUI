@@ -45,6 +45,7 @@
           </el-dropdown>
         </div>
       </div>
+      
       <el-col
         :span="24"
         :style="($route.path === '/device' || $route.path === '/storemanage' || $route.path === '/event'
@@ -296,7 +297,8 @@ export default {
 
     showHeader() {
       const showBorderPathArr = ['/report', '/patrolOverview', '/eventOverview', '/patrolEvaluation',
-        '/patrolItem', '/supervisorStat', '/eventStat', '/storedetail', '/storemanage', '/bindroute', '/checkInStatistics'];
+        '/patrolItem', '/supervisorStat', '/eventStat', '/storedetail', '/storemanage', '/bindroute', '/checkInStatistics','/patrolCompareStat',
+        '/patrolPersonStat'];
       return showBorderPathArr.includes(this.$route.path);
     },
 
