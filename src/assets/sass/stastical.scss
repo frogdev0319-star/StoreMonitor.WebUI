@@ -25,9 +25,9 @@ $store: #fccc3f;
 .statistics-header{
   margin-bottom: 30px;
   border-bottom: 1px solid $border;
-  background-color: #fff;
+  background-color: #edf0f2;
   padding-top: 30px;
-  color: $black;
+  color: #484848;
   .header-details{
     text-align: left;
     position: relative;
@@ -89,7 +89,7 @@ $store: #fccc3f;
   margin-left: calc(32/1440*100vw);
   margin-right: calc(32/1440*100vw);
   width: calc(1096px/1440*100vw);
-  margin: 188px 32px 24px;
+  margin: 18px 32px 24px;
   padding: 17px 24px 24px 23.5px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
   background-color: #fff;
@@ -104,7 +104,7 @@ $store: #fccc3f;
     .region-titles{
         margin-top: 20px;
         font-family: NotoSansCJKTC;
-        font-size: calc(18/1440*100vw);
+        font-size: calc(18/1920*100vw);
         font-weight: 500;
         text-align: left;
         color: #2b2b2b;

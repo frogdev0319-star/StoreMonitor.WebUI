@@ -248,3 +248,11 @@ export const bindInspectWithStore = data => {
     data
   });
 }
+
+export const getNotInspectStoresByPerson = data => {
+  return request({
+    url: `v1.0/statistics/inspect/store`,
+    method: 'post',
+    data
+  });
+};

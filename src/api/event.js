@@ -58,3 +58,10 @@ export const GetEventCountByStatus = data => {
     data
   });
 };
+export const GetEventAndCommentList= data => {
+  return request({
+    url: `v1.0/event/list/comment`,
+    method: 'post',
+    data
+  });
+};

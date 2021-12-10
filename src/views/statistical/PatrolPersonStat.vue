@@ -74,7 +74,8 @@
           :is-event = "false"
           :default-sort = "defaultSort"
           :allowRowExpand = "true"
-          :expand-conponent = "expandCompoent"
+          expand-component = "TabInceptionDetail"
+          :expandCompProperties = "componentsProps"
           @handleChange="handlePageAndSizeChange"
           @sortChange="handleSortChange"
         />
@@ -104,6 +105,7 @@ import { titleRESTful } from '@/api/index';
 import { getUserInfo } from '@/api/login';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import MultiSelect from '@/components/MultiSelect2';
+import TabInceptionDetail from '@/components/TabInceptionDetail'
 export default {
   name: 'PatrolPersonStat',
 
@@ -114,6 +116,7 @@ export default {
     'v-chart': ECharts,
     DateTimeSelector,
     RegionMultiSelect,
+    TabInceptionDetail
   },
   mixins: [resize],
   data() {
@@ -222,6 +225,7 @@ export default {
           'isExpand':true
         }
       ],
+      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()}
     }
   },
 
@@ -367,13 +371,15 @@ export default {
     async doSearchInsRecordList(){
       const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
       const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+      this.componentsProps =  {beginTs:start,endTs:end};
       //const daysDiff = this.$moment(end).diff(start, 'days');
       //this.timeMode = daysDiff <= 30 ? 1 : 2;
       /*this.params.beginTs = start;
       this.params.endTs = end;
       this.params.submitters = this.userIds;*/
       this.allInsRecordData = [];
-      let param = {beginTs:start,endTs:end,submitters:this.userIds}
+      let param = {beginTs:start,endTs:end,submitters:this.userIds};
+      
       //console.log("doSearchInsRecordList > params:",this.params);
       let record = await this.getInspectStatsPersonInfo(param);
       this.allInsRecordData = record.data.content;

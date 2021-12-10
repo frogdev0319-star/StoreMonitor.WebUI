@@ -61,9 +61,7 @@
       </el-table-column>
       <el-table-column type="expand">
         <template slot-scope="{row}">
-          <div style="padding:17px 24px 24px 12px;backgroud-color:#f7f9fa;min-height=54px;">
-                {{row.id}}
-          </div>
+          <component :is="expandComponent" v-bind="currentProperties"></component>
         </template>
       </el-table-column>
       <el-table-column
@@ -164,8 +162,12 @@
 <script>
 import util from '@/common/util';
 import filterString from '@/common/filterString'
-
+import TabInceptionDetail from '@/components/TabInceptionDetail'
 export default {
+  name:'TablePagination_V2',
+  components: {
+    TabInceptionDetail
+  },
   props: {
     total: {
       type: Number,
@@ -268,6 +270,14 @@ export default {
     allowRowExpand:{
       type: Boolean,
       default:false
+    },
+    expandComponent:{
+      type: String,
+      require:false
+    },
+    expandCompProperties:{
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -291,6 +301,12 @@ export default {
   computed: {
     tableSelection() {
       return this.$refs.tablePagination.selection;
+    },
+    currentProperties: function() {
+      console.log(this.expandComponent);
+      if (this.expandComponent=== 'TabInceptionDetail') {
+        return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs }
+      }
     }
   },
 
@@ -429,6 +445,16 @@ export default {
       background-color: #f7f9fa;
     }
   }
+  .el-table--mini{
+    font-size: calc(15/1920*100vw);
+    background-color: #f7f9fa;
+  }
+  .el-table__row.row-class .current-row{
+    background-color: #edf0f2;
+  }
+  .el-table__expanded-cell:hover{
+    background-color: #edf0f2 !important;
+  }
   .clearfix{
     content: "";
     display: block;
@@ -451,10 +477,7 @@ export default {
       margin-right: 0px;
     }
   }
-  .el-table--mini{
-    font-size: calc(15/1920*100vw);
-    background-color: #f7f9fa;
-  }
+  
 
   .iconfont{
     font-size: calc(24/1920*100vw);

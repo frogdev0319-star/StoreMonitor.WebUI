@@ -1105,7 +1105,21 @@ export default {
       "numOfTasked":"巡店排程任務",
       "completionRate":"巡店任務完成率",
       "processedRate":"提交事件结案率",
-      "detail":"詳情"
+      "detail":"詳情",
+      "ts":"巡檢時間",
+      "storeName":"巡檢門店",
+      "tagName":"巡檢表",
+      "totalScore":"巡檢得分",
+      "operation":"操作",
+      "seeDetail":"查看詳情",
+      "Detail":"巡檢詳情",
+      "NotInspected":"未巡檢門店",
+      "uploadedEvent":"已提交事件結案率",
+      "Unprocessed":"未處理事件",
+      "Inprocess":"已處理事件",
+      "Rejected":"退回事件",
+      "Processed":"已結案事件",
+      "completedRate":"結案率"
     }
     
   }

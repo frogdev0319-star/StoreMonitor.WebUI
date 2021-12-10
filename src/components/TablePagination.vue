@@ -129,7 +129,8 @@
         </div>
       </div>
     </el-table>
-    <div v-if="showPagination" class="toolbar pagination clearfix">
+    <div v-if="showPagination" class="page-content">
+      <div v-if="showPagination" class="toolbar pagination clearfix">
       <el-pagination
         :current-page="currentPage"
         :page-sizes="[10, 20, 50, 100]"
@@ -142,6 +143,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
+    </div>
     </div>
   </div>
 </template>
@@ -377,10 +379,17 @@ export default {
     clear:both;
     overflow: auto;
   }
+  .page-content{
+    width:100%;
+    background-color: #EFF3F5;
+    display: flex;
+    flex-direction: row-reverse;
+
+  }
   .toolbar{
     float: right;
-    margin: 30px calc(30/1920*100vw);
-    margin-right: 0;
+    margin-top: 0px;
+    margin-right: calc(30/1440*100vw);
     height:13%;
   }
   .iconfont{
