@@ -1692,8 +1692,6 @@ export default {
   .el-select .el-input--medium .el-input__suffix{
     top:5px;
   }
-  
-
   /*中文*/
   #groupSubItem.el-menu-item:hover{
     background-color: #e4f3fd !important;

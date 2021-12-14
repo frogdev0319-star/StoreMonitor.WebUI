@@ -256,6 +256,7 @@ $CTA:#c60957;
   @extend .text-ellipsis;
   .iconfont{
     font-size: calc(16/1920*100vw);
+    font-weight: 700;
   }
   @media screen and (max-width: 1440px){
     width: 100px;

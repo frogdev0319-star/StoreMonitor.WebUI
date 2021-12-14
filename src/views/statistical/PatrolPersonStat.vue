@@ -13,16 +13,16 @@
                   :selected="positionIds"
                   :options="positionsList"
                   :all="$t('statistics.patrolPerson.dutyAll')"
-                  style="display:inline;width:217px;"
+                  class="position"
                   @changeInput="handlePositionsChange"/>
-
+                <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
                 <region-multi-select
                   ref="multiState"
                   :selected="userIds"
                   :all="$t('overview.allUser')"
                   :placeholder="$t('overview.user')"
                   :options="userList"
-                  style="display:inline;width:217px;"
+                  class="person"
                   @changeInput="handleUserChange"/>
                 </div>
             </div>
@@ -37,7 +37,7 @@
           </div>
         </div>
       </el-col>
-      <el-col :span="24" class="statistics-content" style="height: 785px;margin-top:24px;">
+      <el-col :span="24" class="statistics-content" style="height: 785px;">
         <div class="head">
           <el-col :span="17">
             <div class="region-titles">
@@ -353,20 +353,28 @@ export default {
     /*** 取得巡檢人員紀錄***/
     export2Excel() {
       const that = this;
-      if (that.eventTableData.length === 0) {
-        util.notify(that.$t('overview.emptyEventList'), 'warning', 3000);
+      if (that.insRecordTableData.length === 0) {
+        util.notify(that.$t('statistics.emptyInsRecordList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportEventHeader;
-        const filterVal = ['province', 'city', 'storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
-          'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
-        const curData = that.allEventData;
+        const tHeader=[];
+        const filterVal = [];
+        this.insRecordColData.map(item=>{
+          if(item.prop!='detail'){
+            tHeader.push(item.label);
+            filterVal.push(item.prop);
+          }
+        })
+        const curData = that.insRecordTableData;
         const data = that.formatJson(filterVal, curData);
-        const fileName = 'EventList' + '-' + util.getCurDateStr();
+        const fileName = 'Inspection record_' +  util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
     },
     async doSearchInsRecordList(){
       const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
@@ -474,6 +482,14 @@ export default {
           width: calc(440/1440*100vw);
           height:36px;
           align-items: center;
+        }
+        .position{
+          display:inline;
+          width: calc(217/1440*100vw);
+        }
+        .person{
+          display:inline;
+          width: calc(223/1440*100vw);
         }
     }
     

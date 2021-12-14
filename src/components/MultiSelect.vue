@@ -196,7 +196,7 @@ export default {
     text-align: left;
     display: inline-block;
     position: relative;
-    width: calc(160/1920*100vw);
+    width: 100%;
     margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
@@ -207,8 +207,9 @@ export default {
     font-family: "iconfont" !important;
     content: '\e6a2';
     left: 20px;
-    font-size: 14px;
+    font-size: 15px;
     font-style: normal;
+    color: #2c90d9;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -219,12 +220,13 @@ export default {
     content: "\e64a";
     font-weight: 700;
     -webkit-font-smoothing: antialiased;
-    font-size: 14px;
+    font-size: 15px;
     font-style: normal;
+    color: #2c90d9;
     -moz-osx-font-smoothing: grayscale;
   }
   .input-class{
-    width: calc(160/1920*100vw - 30px);
+    width: 100%;
     position: absolute;
     left: 0;
   }
@@ -234,12 +236,11 @@ export default {
   >>> .input-class.el-input--medium .el-input__inner{
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
-    border: 1px solid #E4E7ED;
-    border-right: none;
-    color: #7d8cad;
-    background: #f4f5f9 !important;
+    border: none;
+    color: #2b2b2b;
+    background: #fff !important;
     padding: 0 10px;
-    font-size: 12px;
+    font-size: 15px;
     min-width: 55px;
     min-height: 28px;
   }
@@ -248,7 +249,7 @@ export default {
     z-index: 1;
     background: transparent !important;
     border: none;
-    font-size: 12px;
+    font-size: 15px;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     bottom: calc(2/1920*100vw);
@@ -265,12 +266,12 @@ export default {
     min-height: 28px;
   }
   .el-select.el-select--medium{
-    color: #7d8cad;
-    background: #f4f5f9 !important;
+    color: #2b2b2b;
+    background: #fff !important;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
-    border: 1px solid #E4E7ED !important;
-    width: calc(160/1920*100vw);
+    border:none !important;
+    width: 100%;
     border-radius: 3px;
     min-height: 28px;
     min-width: 85px;

@@ -1,6 +1,6 @@
 <template>
   <div class="statistics-header">
-    <div class="header-details">
+    <div class="store-filter">
       <store-filter
         :cached-params="searchParams"
         :is-patrol="isPatrol"
@@ -355,13 +355,20 @@ export default {
   @import "../assets/sass/stastical.scss";
 
   .statistics-header{
-    background-color: #fff;
+    background-color: #edf0f2;
     color: $black;
     position: relative;
+    .store-filter{
+      display: inline-block;
+    
+    }
     .header-details{
       text-align: left;
-      padding-left: calc(30/1920*100vw);
+      padding-left: calc(32/1440*100vw);
       position: relative;
+      display: flex;
+      flex-direction: row;
+      margin-top: 16px;
       .search-content{
         display: inline-block;
       }
@@ -387,14 +394,15 @@ export default {
         }
       }
       .el-province{
-        width: calc(160/1920*100vw);
-        margin-right: calc(15/1920*100vw);
+        width: calc(116/1440*100vw);
+        margin-right: calc(16/1440*100vw);
         min-width: 85px;
         min-height: 28px;
       }
+      
       .normal-span{
-        font-size: calc(14/1920*100vw);
-        margin-right: calc(20/1920*100vw);
+        font-size: calc(14/1440*100vw);
+        margin-right: calc(20/1440*100vw);
       }
       .inspect-span{
         margin-right: calc(20/1920*100vw);

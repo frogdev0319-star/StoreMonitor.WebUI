@@ -1119,7 +1119,8 @@ export default {
       "Inprocess":"已處理事件",
       "Rejected":"退回事件",
       "Processed":"已結案事件",
-      "completedRate":"結案率"
+      "completedRate":"結案率",
+      "emptyInsRecordList": "巡檢紀錄列表為空，請重新篩選數據",
     }
     
   }

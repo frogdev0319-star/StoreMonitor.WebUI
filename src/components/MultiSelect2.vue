@@ -267,6 +267,7 @@ export default {
   >>> .el-input--medium .el-input__icon {
     height: 30px;
     min-height: 28px;
+    color: #2c90d9;
   }
   .el-select.el-select--medium{
     color: #2b2b2b;
