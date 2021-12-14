@@ -1,4 +1,5 @@
 <template>
+  <div>
   <div class="content">
     <div class="search-label">{{ $t('remotePatrol.storeSelect') }}</div>
     <div class="header-details">
@@ -63,6 +64,16 @@
           @changeInput="onChangeStoreType"/>
     </div>
     
+  </div>
+  <div class="store-div">
+    <multi-select
+        class="store-group-select store"
+        ref="multiSelect"
+        :selected="curStore"
+        :placeholder="$t('remotePatrol.stores')"
+        :options="storeDataList"
+        @changeInput="onChangeStore"/>
+  </div>
   </div>
 </template>
 
@@ -689,21 +700,28 @@ export default {
       padding-right: calc(20/1920*100vw);
     }
   }
-  .width-limit{
-    width: calc(100% - 200px);
-    flex-wrap: wrap;
-  }
   .store-group-type{
     position: relative;
   }
-
-  .first-header{
-    padding-bottom: 20px;
+  .store-div{
+    width: calc(222/1440*100vw);
+    height: 36px;
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    align-items: center;
+    margin-top:16px;
+    margin-left:calc(76/1440*100vw);
+    padding: 0 !important;
+  }
+  .store{
+    display:inline;
+    width: calc(222/1440*100vw);
   }
 </style>
 <style scoped>
   .el-select-dropdown__item{
-    padding: 0 20px 0 50px !important;
+    padding: 0 20px 0 20px !important;
     /*color: #7d8cad;*/
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{

@@ -8,6 +8,7 @@
                 path="inspectEvalutionStatistics"
                 @emitSearch = "emitSearch"/>
             </el-col>
+            <el-col :span="24">
             <div class="statistics-content" style="height: 735px;">
                 <div class="head">
                     <el-col :span="17">
@@ -121,6 +122,7 @@
                   </div>
                 </div>
             </div>
+            </el-col>
         </el-row>
     </div>          
 </template>

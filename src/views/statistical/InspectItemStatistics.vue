@@ -977,7 +977,14 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../assets/sass/stastical.scss";
-
+  .el-select .el-input--medium .el-input__inner{
+    height: 25px;
+    font-size: 15px;
+    text-align: left;
+    border: none;
+    background-color: #f7f9fa;
+    color:#2b2b2b;
+  }
   .item-container{
     padding-bottom: 20px;
     .header-details span{

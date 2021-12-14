@@ -236,10 +236,9 @@ export default {
   >>> .input-class.el-input--medium .el-input__inner{
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
-    border: 1px solid #E4E7ED;
-    border-right: none;
-    color: #7d8cad;
-    background: #f4f5f9 !important;
+    border: none;
+    color: #2b2b2b;
+    background: #fff !important;
     padding: 0 10px;
     font-size: 12px;
     min-height: 28px;
@@ -249,17 +248,17 @@ export default {
     height: 26px;
     line-height: 26px;
     border: none;
-    color: #7d8cad;
+    color: #2b2b2b;
     background: #fff !important;
     padding: 0 10px;
-    font-size: 12px;
+    font-size: 15px;
   }
   >>> .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
     z-index: 1;
     background: transparent !important;
     border: none;
-    font-size: 12px;
+    font-size: 15px;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     bottom: calc(2/1920*100vw);
@@ -271,7 +270,7 @@ export default {
     z-index: 1;
     background: transparent !important;
     border: none;
-    font-size: 12px;
+    font-size: 15px;
     height: 28px;
     line-height: 28px;
   }

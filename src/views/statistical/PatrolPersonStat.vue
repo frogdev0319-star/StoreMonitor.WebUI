@@ -535,5 +535,11 @@ export default {
             height:31px;
           }
         }
+    .ja-export-btn,
+    .en-export-btn,
+    .export-btn{
+      background-color: #fff;
+      color: #006ab7;
+    }
   }
 </style>

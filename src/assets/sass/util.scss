@@ -179,9 +179,16 @@ $CTA:#c60957;
   @extend .storevue-button;
 }
 .export-btn.el-button--primary.el-button--mini{
+  background-color: $primary;
+  border:none;
+  color: #fff;
+  min-height: 36px;
+  min-width: 102px;
+}
+.export-btn.el-button--default.el-button--mini{
   background-color: #fff;
   border:none;
-  color: $mainColor;
+  color: #006ab7;
   min-height: 36px;
   min-width: 102px;
 }
@@ -256,7 +263,6 @@ $CTA:#c60957;
   @extend .text-ellipsis;
   .iconfont{
     font-size: calc(16/1920*100vw);
-    font-weight: 700;
   }
   @media screen and (max-width: 1440px){
     width: 100px;
