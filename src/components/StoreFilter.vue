@@ -65,7 +65,7 @@
     </div>
     
   </div>
-  <div class="store-div">
+  <div v-if="showStoreSelect" class="store-div">
     <multi-select
         class="store-group-select store"
         ref="multiSelect"
@@ -99,6 +99,10 @@ export default {
     isInspectItem: {
       type: Boolean,
       default: false
+    },
+    showStoreSelect: {
+      type: Boolean,
+      default: true
     },
     path: {
       type: String,
@@ -389,6 +393,7 @@ export default {
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
+      this.$emit('emitStoreList', this.filterStoreIds);
     },
 
     getStoreGroupString() {
