@@ -1,74 +1,25 @@
 <template>
   <div>
     <el-row>
-      <div class="paper filters">
-        <el-select v-model="patrolstore" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
-        <hr/>
-        <el-select v-model="patrolstore" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
-        <hr/>
-        <el-select v-model="patrolstore" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
-        <hr/>
-        <el-select v-model="patrolstore" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
-        <hr/>
-        <el-select v-model="patrolstore" placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
-      </div>
+      <store-filter
+        @emitStoreList = "getFilteredStoreList"
+        :show-store-select = false
+      ></store-filter>
     </el-row>
     <el-row>
-      <div class="flex">
-        <div class="paper" style="width: 115px; height: 45px; font-size: 13px; line-height: 45px; user-select: none; cursor: pointer">
+      <div class="flex" style="margin-top: 20px; margin-bottom: 20px">
+        <div class="paper" style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px">
           {{ '關注門店' }}
         </div>
-        <div class="paper filters" style="width: 220px; margin-left: 20px">
-          <el-select  v-model="patrolstore" placeholder="请选择">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-        </div>
+        <el-select class="filters" v-model="store.storeId" placeholder="请选择" @change="changeSelStore">
+          <el-option
+            v-for="item in options"
+            :key="item.storeId"
+            :label="item.label"
+            :value="item.storeId"
+          >
+          </el-option>
+        </el-select>
       </div>
     </el-row>
     <el-row class="el-container" :class="isDefaultViewMode ? 'block' : 'flex'">
@@ -572,7 +523,7 @@
           </div>
         </div>
       </el-col>
-      <el-col v-if="!showSpread" :span="8" class="rside paper" :class="{ fullWidth: isDefaultViewMode }">
+      <!-- <el-col v-if="!showSpread" :span="8" class="rside paper" :class="{ fullWidth: isDefaultViewMode }">
         <el-tabs v-model="activeIndex" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%" @tab-click="handleClick">
           <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
             <el-scrollbar style="height:100%;" class="el-menuscrollbar">
@@ -670,10 +621,10 @@
             </div>
           </div>
         </div>
-      </el-col>
+      </el-col> -->
       <el-col style="width: 700px">
-        <div class="paper" style="display: flex; flex-direction: column; height: 100%;">
-          <div>
+        <div class="paper">
+          <div style="height: 210px">
             <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
               <el-option
                 v-for="item in PatrolList"
@@ -709,7 +660,7 @@
             </div>
           </div>
 
-          <div style="flex: 1; background-color: #edf0f2; padding: calc(25/1920*100vw)">
+          <div style="height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw)">
             <template v-if="showFeedBack" class="item-content">
               <div id="feedback-content">
                 <span class="feedback-info">{{ $t('remotePatrol.methodI') }}</span>
@@ -739,7 +690,7 @@
             <template v-else>
               <template v-if="isCategory">
                 <div>
-                  <el-scrollbar style="height: 600px;">
+                  <el-scrollbar style="height: 550px">
                     <div
                       v-for="(_item,_index) in groupItems" 
                       :key="_index"
@@ -819,7 +770,7 @@
                 </div>
               </template>
               <template v-else>
-                <div class="paper" >
+                <div class="paper">
                   <div v-for="(item,index) in inspectItemList" :key="index" style="margin-bottom: 20px">
                       <span
                         :class="!item.manualIgnore?'noraml-title':'ignore-title'"
@@ -909,6 +860,7 @@ import SkywatchVideo from '@/components/SkywatchVideo';
 import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
+import StoreFilter from '@/components/StoreFilter';
 
 export default {
   name: 'ReInspection',
@@ -919,14 +871,13 @@ export default {
     DashVideo,
     EzvizVideo,
     BeseyeVideo,
+    StoreFilter
   },
   data() {
     return {
-      options: [
-        { value: 'val1', label: 'label1' },
-        { value: 'val2', label: 'label2' },
-        { value: 'val3', label: 'label3' },
-      ],
+      defaultSort: { prop: 'numOfTotal', order: 'ascending' },
+      sel: 'val1',
+      options: [],
       sheetName: [],
       isShowWarn: false,
       notShowAlert: false,
@@ -1111,7 +1062,8 @@ export default {
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
       isDefaultViewMode: false,
-      groupItems: []
+      groupItems: [],
+      storeOptions: []
     };
   },
   computed: {
@@ -1187,7 +1139,6 @@ export default {
   },
 
   async mounted() {
-    console.log(123)
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
     if (PatrolHistory != null) {
@@ -1257,6 +1208,59 @@ export default {
   },
 
   methods: {
+    getFilteredStoreList (stores) {
+      this.options = [...stores]
+    },
+    changeSelStore (storeId) {
+      const tempData = this.tabList[2].storeList.find(data => data.storeList[0].storeId === storeId) || {}
+      const _item = tempData.storeList[0] || {}
+      this.patrolstore = '';
+      this.curSheetIndex = 0;
+      this.inspectItemList = [];
+      this.inspectList = [];
+      this.sheetName = [];
+      this.tempArr = [];
+      this.showChannelBtns = [];
+      this.patrolStoreName = _item.name;
+      this.PatrolList = [];
+      this.hasIgnoretemp = [];
+      this.$store.dispatch('setPatrolHistory', null);
+      this.isShowWarn = false;
+      this.notShowAlert = false;
+      this.showIgnoreItem = false;
+      _item.authorizedInspect.forEach(au_item => {
+        if (au_item.mode === 0) {
+          this.PatrolList.push(au_item);
+        }
+      });
+      _item.isActive = true;
+      this.showStoreUp = true;
+
+      !this.showGuide && (this.$refs.vendorVideo.editCount = 0);
+      !this.showGuide && this.$refs.vendorVideo.stopVideoPlay();
+      this.showError = false;
+      this.curDeviceId = -1;
+      this.showFeedBack = false;
+      this.eventList = [];
+      this.showGuide = true;
+      const obj = {};
+      obj.storeId = _item.storeId;
+      obj.storeName = _item.name;
+      obj.storeTitle = _item.name;
+      obj.storeUp = _item.favorite;
+      this.channel = null;
+      this.getChannelByStore(_item);
+      if (_item.favorite) {
+        obj.storeUpTitle = this.$t('remotePatrol.stared');
+      } else {
+        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
+      }
+      this.store = obj;
+      const storeObj = {
+        storeId
+      };
+      this.saveStoreObj(storeObj);
+    },
     changeBrand() {
       const self = this;
       !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
@@ -3093,20 +3097,21 @@ export default {
     width: 100%;
   }
   .filters {
-    margin-bottom: 20px;
-    padding: 10px;
-    display: flex;
-    >>> .el-select {
-      flex: 1;
+    background-color: #fff !important;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    >>> i {    
+      color: #2c90d9;
+      line-height: calc(36/1920*100vw);
+      height: calc(36/1920*100vw);
+      min-height: 28px;
     }
     >>> input {
-      background-color: #fff !important;
+      height: 100% !important;
+      background-color: transparent !important;
     }
-    >>> hr {
-      height: 25px;
-      margin: 0;
-      width: 1px;
-      border-color: rgba(0, 0, 0, 0.12);
+    >>> .el-input {
+      height: 100%;
     }
   }
   .fade-enter-active {
@@ -4676,4 +4681,7 @@ export default {
   .inspect-item {
 
   }
+</style>
+<style scoped>
+
 </style>
