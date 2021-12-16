@@ -65,7 +65,7 @@
     </div>
     
   </div>
-  <div class="store-div">
+  <div v-if="showStoreSelect" class="store-div">
     <multi-select
         class="store-group-select store"
         ref="multiSelect"
@@ -99,6 +99,10 @@ export default {
     isInspectItem: {
       type: Boolean,
       default: false
+    },
+    showStoreSelect: {
+      type: Boolean,
+      default: true
     },
     path: {
       type: String,
@@ -389,6 +393,7 @@ export default {
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
+      this.$emit('emitStoreList', this.storeDataList);
     },
 
     getStoreGroupString() {
@@ -512,22 +517,28 @@ export default {
     clearStoreInfo() {
       const self = this;
       self.curStore = [];
-      self.$refs.multiSelect.selectedArray = [];
-      self.$refs.multiSelect.input = '';
+      if (this.showStoreSelect) {
+        self.$refs.multiSelect.selectedArray = [];
+        self.$refs.multiSelect.input = '';
+      }
     },
 
     clearProviceInfo() {
       const self = this;
       self.curProvince = [];
-      self.$refs.proviceSelect.selectedArray = [];
-      self.$refs.proviceSelect.input = '';
+      if (this.showStoreSelect) {
+        self.$refs.proviceSelect.selectedArray = [];
+        self.$refs.proviceSelect.input = '';
+      }
     },
 
     clearCityInfo() {
       const self = this;
       self.curCity = [];
-      self.$refs.citySelect.selectedArray = [];
-      self.$refs.citySelect.input = '';
+      if (this.showStoreSelect) {
+        self.$refs.citySelect.selectedArray = [];
+        self.$refs.citySelect.input = '';
+      }
     },
 
     async selectAllProAndCity(val, isFirst) {
