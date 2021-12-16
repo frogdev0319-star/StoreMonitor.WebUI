@@ -523,6 +523,11 @@
           </div>
         </div>
       </el-col>
+      <!-- <el-col>
+        <pre style="text-align: left" v-html="JSON.stringify(sheetName, null, 2)"></pre>
+        
+        
+      </el-col> -->
       <!-- <el-col v-if="!showSpread" :span="8" class="rside paper" :class="{ fullWidth: isDefaultViewMode }">
         <el-tabs v-model="activeIndex" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%" @tab-click="handleClick">
           <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
@@ -624,16 +629,20 @@
       </el-col> -->
       <el-col style="width: 700px">
         <div class="paper">
-          <div style="height: 210px">
-            <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
-              <el-option
-                v-for="item in PatrolList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              >
-              </el-option>
-            </el-select>
+          <div style="padding: 20px">
+            <div style="display: flex">
+              <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
+              <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
+                <el-option
+                  v-for="item in PatrolList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+            </div>
+            <hr />
             <div class="groups">
               <div 
                 v-for="(_item,_index) in sheetName" 
@@ -660,31 +669,32 @@
             </div>
           </div>
 
-          <div style="height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw)">
-            <template v-if="showFeedBack" class="item-content">
-              <div id="feedback-content">
-                <span class="feedback-info">{{ $t('remotePatrol.methodI') }}</span>
-                <span class="feedback-info">{{ $t('remotePatrol.methodII') }}</span>
-              </div>
-              <img :src="arrows2Src" alt="arrow2" class="feed-arrow" height="70">
-              <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack">
-              <div v-for="(item,index) in eventList" :key="index" class="feedbacks-details">
-                <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" />
-                <div @click="editFeedback(item, index)" class="title-description">
-                  <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
-                  <span class="feedback-eventdes">{{ item.eventDes }}</span>
+          <div style="height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto">
+            <template v-if="showFeedBack">
+              <div class="paper" style="height: 100%; position: relative">
+                <div v-if="eventList.length === 0" style="padding: 80px 24px 24px 40px; color: #006ab7; text-align: left; font-size: 24px;">
+                  <div style="margin: 0 76px 30px 0;">{{ $t('remotePatrol.methodI') }}</div>
+                  <div style="margin: 30px 52px 30.9px 0;">{{ $t('remotePatrol.methodII') }}</div>
                 </div>
-                <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                  <el-image
-                    :src="item.sourceObj.src"
-                    :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
-                    :preview-src-list="getImgList(0, [item.sourceObj])"/>
+                <div v-for="(item,index) in eventList" :key="index" style="width: 100%; padding: 20px;" class="flex-center">
+                  <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" />
+                  <div @click="editFeedback(item, index)" class="paper" style="flex: 1; margin-left: 20px; text-align: left; padding: 10px 15px">
+                    <span>{{ `${index+1}. ${item.eventName}` }}</span>
+                    <span>{{ item.eventDes }}</span>
+                  </div>
+                  <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2">
+                    <el-image
+                      :src="item.sourceObj.src"
+                      :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                      :preview-src-list="getImgList(0, [item.sourceObj])"/>
+                  </div>
+                  <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1">
+                    <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(item,index)">
+                    <img class="imgLittle" :src="videoImgSrc" height="100">
+                  </div>
                 </div>
-                <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
-                  <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(item,index)">
-                  <img :src="videoImgSrc" class="imgLittle" height="100">
-                </div>
-                <hr class="feedbacks-hr">
+                <img v-if="eventList.length === 0" :src="arrows2Src" alt="arrow2" height="70" style="position: absolute; right: 125px; bottom: 100px;">
+                <img :src="plusSrc" alt="plusSrc" @click="addFeedBack" style="position: absolute; right: 20px; bottom: 20px;">
               </div>
             </template>
             <template v-else>
@@ -694,61 +704,73 @@
                     <div
                       v-for="(_item,_index) in groupItems" 
                       :key="_index"
-                      class="paper"
-                      style="margin-top: 20px"
+                      class="paper padding"
+                      :class="{'margin-bottom-md': _index !== groupItems.length}"
                     >
-                      <span>{{_item.groupName}}</span>
-                      
-                      <div v-for="(item,index) in _item.items" :key="index" class="paper" >
-                        <span
-                          :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                          :style="item.checked?{'font-weight':'bold'}:{}"
-                          :title="`${index+1}. ${item.subject}`"
-                          class="titles"
-                          @click="clickItem(item,index)">{{ `${index+1}. ${item.subject}` }}</span>
-                        <template v-if="item.itemType === 0">
-                          <div v-if="item.disabled" class="dropdown-model"/>
-                          <div v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
-                            <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
-                              :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
-                              {{ itemDS.scoreTitle }}
-                            </p>
-                          </div>
-                          <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small">
-                          <span class="el-dropdown-link">
-                            {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                            <i class="el-icon-arrow-down el-icon--right"/>
+                      <div class="flex">
+                        <span style="border-left: 4px solid #2c90d9; padding-left: 5px;">{{_item.groupName}}</span>
+                      </div>
+                      <hr/>
+                      <div v-for="(item,index) in _item.items" :key="index" >
+                        <div class="margin-bottom-sm flex-center" :style="index === 0 ? {} : {'margin-top':'20px'}">
+                          <span
+                            style="flex: 1; text-align: left"
+                            :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                            :style="item.checked?{'font-weight':'bold'}:{}"
+                            :title="`${index+1}. ${item.subject}`"
+                            class="font-size-md"
+                            @click="!item.manualIgnore && clickItem(item,index)"
+                          >
+                            {{ `${index+1}. ${item.subject}` }}
                           </span>
-                            <el-dropdown-menu slot="dropdown" class="score-menu">
-                              <el-dropdown-item
-                                v-for="itemDS in item.itemScoreLength"
-                                :key="itemDS"
-                                style="width:70px;text-align:center;"
-                                @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
-                            </el-dropdown-menu>
-                          </el-dropdown>
-                          <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,0)"/>
-                          <img v-if="item.manualIgnore" class="iconfont iconhulve"
-                              src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
-                        </template>
-                        <div v-if="item.checked" class="icon-clicked"/>
-                        <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
-                          <span>{{ item.description }}</span>
-                        </div>
-                        <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
-                          <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                            <div v-if="_item.mediaType==2" class="img-content">
-                              <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                              <el-image
-                                :src="_item.src"
-                                :style="{width: _item.width, height: _item.height}"
-                                :preview-src-list="getImgList(_index, item.sourceList)"/>
+                          <template v-if="item.itemType === 0">
+                            <div v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
+                              <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                                :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
+                                {{ itemDS.scoreTitle }}
+                              </p>
                             </div>
-                            <div v-if="_item.mediaType==1" class="img-content">
-                              <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                              <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
-                              <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
+                            <el-dropdown 
+                              :disabled="item.disabled" 
+                              v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                              trigger="click" 
+                              class="item-score" 
+                              style="margin-right: 20px; margin-left: 20px"
+                              size="small"
+                            >
+                            <span class="el-dropdown-link">
+                              {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
+                              <i class="el-icon-arrow-down el-icon--right"/>
+                            </span>
+                              <el-dropdown-menu slot="dropdown" class="score-menu">
+                                <el-dropdown-item
+                                  v-for="itemDS in item.itemScoreLength"
+                                  :key="itemDS"
+                                  style="width:70px;text-align:center;"
+                                  @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
+                              </el-dropdown-menu>
+                            </el-dropdown>
+                            <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ '略過' }}</span>
+                            <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ '取消' }}</span>
+                          </template>
+                          <div v-if="item.checked" class="icon-clicked"/>
+                          <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
+                            <span>{{ item.description }}</span>
+                          </div>
+                          <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
+                            <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                              <div v-if="_item.mediaType==2" class="img-content">
+                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
+                                <el-image
+                                  :src="_item.src"
+                                  :style="{width: _item.width, height: _item.height}"
+                                  :preview-src-list="getImgList(_index, item.sourceList)"/>
+                              </div>
+                              <div v-if="_item.mediaType==1" class="img-content">
+                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
+                                <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
+                                <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -770,42 +792,61 @@
                 </div>
               </template>
               <template v-else>
-                <div class="paper">
-                  <div v-for="(item,index) in inspectItemList" :key="index" style="margin-bottom: 20px">
-                      <span
-                        :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                        :style="item.checked?{'font-weight':'bold'}:{}"
-                        :title="`${index+1}. ${item.subject}`"
-                        @click="clickItem(item,index)">{{ `${index+1}. ${item.subject}` }}</span>
-                      <template v-if="item.itemType === 0">
-                        <div v-if="item.disabled" class="dropdown-model"/>
-                        <div v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
-                          <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
-                            :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
-                            {{ itemDS.scoreTitle }}
-                          </p>
-                        </div>
-                        <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                    trigger="click" class="item-score" size="small">
-                        <span class="el-dropdown-link">
-                          {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                          <i class="el-icon-arrow-down el-icon--right"/>
+                <!-- 一層 -->
+                <div class="paper padding font-size-md">
+                  <div class="flex">
+                    <span style="border-left: 4px solid #2c90d9; padding-left: 5px;">{{ this.curGroup && this.curGroup.label }}</span>
+                  </div>
+                  <hr/>
+                  <div v-for="(item,index) in inspectItemList" :key="index" style="margin-bottom: 20px;">
+                      <div class="margin-bottom-sm flex-center" >
+                        <span
+                          style="flex: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                          :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                          :style="item.checked?{'font-weight':'bold'}:{}"
+                          :title="`${index+1}. ${item.subject}`"
+                          @click="!item.manualIgnore && clickItem(item,index)">
+                          {{ `${item.subject}` }}
                         </span>
-                          <el-dropdown-menu slot="dropdown" class="score-menu">
-                            <el-dropdown-item
-                              v-for="itemDS in item.itemScoreLength"
-                              :key="itemDS"
-                              style="width:70px;text-align:center;"
-                              @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
-                          </el-dropdown-menu>
-                        </el-dropdown>
-                        <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem(item,index,0)"/>
-                        <img v-if="item.manualIgnore" class="iconfont iconhulve"
-                            src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem(item,index)">
-                      </template>
-                      <div v-if="item.checked" class="icon-clicked"/>
-                      <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
-                        <span>{{ item.description }}</span>
+                        <template v-if="item.itemType === 0">
+                          <div 
+                            v-if="item.groupType !== 1" 
+                            class="check_scoring"
+                            style="margin-right: 20px; margin-left: 20px"
+                            :class="!item.manualIgnore?'noraml-title':'ignore-title'" 
+                          >
+                            <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                              :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
+                              {{ itemDS.scoreTitle }}
+                            </p>
+                          </div>
+                          <el-dropdown 
+                            :disabled="item.disabled" 
+                            v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                            trigger="click" 
+                            class="item-score" 
+                            size="small"
+                            style="margin-right: 20px; margin-left: 20px"
+                          >
+                            <span class="el-dropdown-link">
+                              {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
+                              <i class="el-icon-arrow-down el-icon--right"/>
+                            </span>
+                            <el-dropdown-menu slot="dropdown" class="score-menu">
+                              <el-dropdown-item
+                                v-for="itemDS in item.itemScoreLength"
+                                :key="itemDS"
+                                style="width:70px;text-align:center;"
+                                @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
+                            </el-dropdown-menu>
+                          </el-dropdown>
+                          <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ '略過' }}</span>
+                          <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ '取消' }}</span>
+                        </template>
+                        <div v-if="item.checked" class="icon-clicked"/>
+                      </div>
+                      <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="font-size-sm">
+                        <span style="float: left; margin-bottom: 10px">{{ item.description }}</span>
                       </div>
                       <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                         <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
@@ -1236,7 +1277,7 @@ export default {
       _item.isActive = true;
       this.showStoreUp = true;
 
-      !this.showGuide && (this.$refs.vendorVideo.editCount = 0);
+      !this.showGuide && (this.$refs.vendorVideo.editCount == 0);
       !this.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       this.showError = false;
       this.curDeviceId = -1;
@@ -2006,6 +2047,7 @@ export default {
       self.CancleIgnoreInspectObj.dialogCosed = false;
     },
     ignoreItem(item, index, e) {
+      
       const self = this;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
@@ -2016,19 +2058,19 @@ export default {
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
-      self.$refs.vendorVideo.editCount++;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount++;
       self.curItemIndex = index;
       self.curItem = item;
       if (item.deviceId === -1) {
         self.noBindDeviceObj.dialogCosed = true;
         return false;
       }
-      self.$refs.vendorVideo.stopVideoPlay();
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.stopVideoPlay();
       self.handleIgnore();
     },
     CancleIgnoreItem(item, index) {
       const self = this;
-      self.$refs.vendorVideo.editCount--;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount--;
       self.curItemIndex = index;
       self.curItem = item;
       self.cancleIgnore();
@@ -3087,15 +3129,6 @@ export default {
   $background:#f4f5f9;
   $tab:#7d8cad;
   $h1:#292e36;
-  .flex {
-    display: flex;
-  }
-  .block {
-    display: block;
-  }
-  .fullWidth {
-    width: 100%;
-  }
   .filters {
     background-color: #fff !important;
     border-radius: 5px;
@@ -4519,13 +4552,25 @@ export default {
       background-color: $background !important;
     }
   }
-  .patrol-content >>> .el-select .el-input--medium .el-input__inner{
-    color:#333;
-  }
   .paper {
     border-radius: 5px;
     background-color: #ffffff;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+  }
+  
+  .el-select >>> .el-input__inner{
+    background-color: #edf0f2;
+    border-radius: 5px;
+    height: 36px;
+    &::placeholder{
+      color:#2b2b2b;
+    }
+  }
+  .el-select >>> .el-input__suffix{
+    top: 0px;
+  }
+  .el-select >>> .el-select__caret {
+    color:#2b2b2b;
   }
 </style>
 <style>
@@ -4571,11 +4616,7 @@ export default {
   #storetab-content div#tab-2{
     width:33.33%;
   }
-  .item-score .el-icon--right{
-    position: absolute !important;
-    right: 1px !important;
-    top: 6px !important;
-  }
+  
   #storetab-content .el-tabs__active-bar .is-top{
     width: 115px !important;
   }
@@ -4660,6 +4701,29 @@ export default {
   }
 </style>
 <style lang="scss" scoped>
+  @function rem($val){
+    @return $val/16+rem;
+  }
+  @function checkRem($val){
+    @if($val==0){
+      @return 0;
+    }
+    @else if($val==auto){
+      @return auto;
+    }
+    @else{
+      @return rem($val);
+    }
+  }
+  @mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+  }
+  hr {
+    border: none;
+    height: 1px;
+    color: #acaeb1; /* old IE */
+    background-color: #acaeb1; /* Modern Browsers */
+  }
   .groups {
     display: flex;
     flex-wrap: wrap;
@@ -4678,8 +4742,93 @@ export default {
       color: #fff;
     }
   }
-  .inspect-item {
-
+  .flex {
+    display: flex;
+  }
+  .flex-center {
+    display: flex;
+    align-items: center;
+  }
+  .block {
+    display: block;
+  }
+  .fullWidth {
+    width: 100%;
+  }
+  .padding {
+    padding: 20px
+  }
+  .margin-bottom-sm {
+    margin-bottom: 10px
+  }
+  .margin-bottom-md {
+    margin-bottom: 20px
+  }
+  .font-size-sm {
+    font-size: 12px;
+  }
+  .font-size-md {
+    font-size: 15px;
+  }
+  .el-dropdown-link{
+    text-align: left;
+    display: inline-block;
+    font-size: 12px;
+    width: 90px;
+    height: 26px;
+    background-color: #edf6e8;
+    line-height: 26px;
+    color: #59ab22;
+    border-radius: 5px;
+    cursor: pointer;
+    padding-right: 10px;
+    box-sizing: border-box;
+    padding-left: 10px
+  }
+  .check_scoring{
+    font-size: 12px;
+    width: 120px;
+    height: 25px;
+    line-height: 25px;
+    border:1px solid #dcdcdc;
+    background-color: #f7f8fc;
+    border-radius: 4px;
+    display: flex;
+    p{
+      margin:0;
+      width:58.5px;
+      text-align: center;
+      display: inline-block;
+    }
+    p:nth-child(1){
+      border-radius: 4px 0 0 4px;
+      border-right: 1px solid #dcdcdc;
+    }
+    p:nth-child(2){
+      border-radius: 0 4px 4px 0;
+    }
+    .check_normal{
+      color:#7b8da0;
+      font-size: calc(12/1920*100vw);
+    }
+    .check_isClick{
+      background-color:#fcba3f;
+      font-size: calc(14/1920*100vw);
+      color:#fff;
+    }
+  }
+  .noraml-title{
+    cursor: pointer;
+    opacity: 1;
+  }
+  .ignore-title{
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .el-icon--right{
+    position: absolute;
+    top: 7px;
+    right: 6px;
   }
 </style>
 <style scoped>
