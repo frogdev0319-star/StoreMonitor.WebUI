@@ -14,17 +14,19 @@
       range-separator="-"
       size="mini"
       format="yyyy/MM/dd"
-      class="date-range"
+      class="date-picker global-date-pick"
       unlink-panels
       @change="dateChange"
     />
-    <el-tooltip
-      class="date-time-tooltip"
-      effect="dark"
-      placement="right">
-      <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
-      <i class="iconfont icon-bangzhu iconbangzhu"/>
-    </el-tooltip>
+    <div v-if="showTooltips">
+      <el-tooltip
+        class="date-time-tooltip"
+        effect="dark"
+        placement="right">
+        <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
+        <i class="iconfont icon-bangzhu iconbangzhu"/>
+      </el-tooltip>
+    </div>
   </div>
 </template>
 
@@ -34,6 +36,16 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: 'DateTimePicker',
+  props:{
+    showTooltips:{
+      type: Boolean,
+      default: false
+    },
+    dateRange:{
+      type:Number,
+      required:true
+    }
+  },
   data() {
     return {
       poperClass: 'date-picker-poper',
@@ -48,7 +60,11 @@ export default {
         disabledDate: (time) => {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         },
-        shortcuts: [{
+        onPick:({ maxDate, minDate })=>{
+            console.log("maxDate:"+maxDate+", minDate:"+minDate);
+            this.dateTimeValue = [minDate, maxDate];
+        }
+        /*shortcuts: [{
           text: this.$t('overview.last3Days'),
           onClick(picker) {
             const end = moment();
@@ -97,7 +113,7 @@ export default {
             const start = moment().startOf('quarter').toDate();
             picker.$emit('pick', [start, end]);
           }
-        }]
+        }]*/
       }
     };
   },
@@ -111,6 +127,10 @@ export default {
       if (val !== 0) {
         this.getDefaultTimeList();
       }
+    },
+    dateRange(val){
+      console.log("dateRange changed:",val);
+      this.getDateRange(val);
     }
   },
 
@@ -140,11 +160,65 @@ export default {
       }
       const endTimeStamp = this.$moment(end).endOf('d').valueOf();
       this.$emit('change', [this.dateTimeValue[0], endTimeStamp]);
+    },
+    getDateRange(val){
+        if (this.dateRange == 3) {
+            this.dateTimeValue = [this.$moment().subtract(2, 'days'), this.$moment()];
+            console.log("this.dateTimeValue:",this.dateTimeValue);
+            //this.dateFormat = this.$moment(this.date).startOf('week').format("YYYY/MM/DD");
+            //const paramDate = { start_date: this.$moment(this.date).startOf('week'), end_date: this.$moment(this.date).endOf('week'),range_type:'week' }
+            //this.$emit('emitFilterDateRange', paramDate );
+        } else if (this.dateRange == 7) {
+            this.dateTimeValue = [this.$moment().subtract(6, 'days'), this.$moment()];
+            console.log("this.dateTimeValue:",this.dateTimeValue);
+        }else if (this.dateRange == 30) {
+            this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+            console.log("this.dateTimeValue:",this.dateTimeValue);
+        }else if (this.dateRange == 90) {
+            this.dateTimeValue = [this.$moment().subtract(89, 'days'), this.$moment()];
+            console.log("this.dateTimeValue:",this.dateTimeValue);
+        }else if (this.dateRange == 0) {
+            this.dateTimeValue = [this.$moment(new Date()).startOf('month').toDate(), this.$moment()];
+            console.log("this.dateTimeValue:",this.dateTimeValue);
+        }else if (this.dateRange == 1) {
+            const end = moment().subtract(1, 'month').endOf('month').startOf('d').toDate();
+            const start = moment().subtract(1, 'month').startOf('month').toDate();
+            this.dateTimeValue = [start, end];
+            console.log("this.dateTimeValue:",this.dateTimeValue);
+        }else if (this.dateRange == 2) {
+            const end = moment();
+            const start = moment().startOf('quarter').toDate();
+            this.dateTimeValue = [start, end];
+            console.log("this.dateTimeValue:",this.dateTimeValue);
+        }
+        
     }
   }
 };
 </script>
 
-<style scoped>
-
+<style>
+@import "../assets/sass/stastical.scss";
+.global-date-pick.el-date-editor .el-range-input {
+  font-size:15px;
+}
+.date-picker{
+  width:calc(207/1440*100vw);
+  font-size: 15px;
+  line-height: 36px;
+}
+.global-date-pick.el-range-editor--mini.el-input__inner {
+  border:none;
+}
+.global-date-pick.el-range-editor--mini .el-range__icon, .el-range-editor--mini .el-range__close-icon {
+    line-height: 224px;
+    height: 24px;
+}
+.global-date-pick.el-date-editor .el-range__icon {
+    font-size: 24px;
+    margin-left: -5px;
+    color: #c0c4cc;
+    float: left;
+    line-height: 24px;
+}
 </style>

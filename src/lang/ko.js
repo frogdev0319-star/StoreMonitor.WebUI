@@ -248,7 +248,8 @@ export default {
     "weeks": "週",
     "worstItems": "최저한 검사 항목 (상위 5)",
     "worstPatrol": "최저한 검사 완성 (상위 5)",
-    "worstRegion": "최저한 지역 (상위 5)"
+    "worstRegion": "최저한 지역 (상위 5)",
+    "customDate":"自訂義"
   },
 
   // Patrol page language

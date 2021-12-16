@@ -1682,15 +1682,61 @@ export default {
     display: none;
   }
   .el-select .el-input--medium .el-input__inner{
-    height: 25px;
+    height: 35px;
     font-size: 13px;
     text-align: left;
     border: none;
     background-color: #f7f9fa;
     color:#2b2b2b;
+    border-radius: 0px;
   }
   .el-select .el-input--medium .el-input__suffix{
     top:5px;
+  }
+  >>> .input-class.el-input--medium .el-input__inner{
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    border: none;
+    border-right: none;
+    color: #2b2b2b;
+    background: transparent !important;
+    padding: 0 10px;
+    font-size: 15px;
+    min-width: 55px;
+    min-height: 28px;
+  }
+  >>> .el-select.el-select--medium .el-input .el-input__inner{
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    border: none;
+    font-size: 15px;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    min-height: 28px;
+    min-width: 85px;
+  }
+
+  >>> .el-select.el-select--medium .el-input .el-input__suffix-inner{
+    position: relative;
+    z-index: 1;
+  }
+  >>> .el-input--medium .el-input__icon {
+    line-height: calc(36/1920*100vw);
+    height: calc(36/1920*100vw);
+    min-height: 28px;
+    color: #2c90d9;
+  }
+  .el-select.el-select--medium{
+    color: #2b2b2b;
+    background: #fff !important;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    border: none !important;
+    width: 100%;
+    border-radius: 3px;
+    /*min-height: 28px;
+    min-width: 85px;*/
   }
   /*中文*/
   #groupSubItem.el-menu-item:hover{

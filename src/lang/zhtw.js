@@ -118,7 +118,7 @@ export default {
     "dangerousMore": "立即督導≥60%",
     "dataRangeTips": "* 時間範圍：最短一天，最長一年",
     "dataZoomInfo": "坐標系內滾動鼠標實現數據區域縮放，查看數據細節",
-    "date": "時間自定",
+    "date": "時間範圍",
     "day": "天",
     "daysww": "號",
     "department": "部門",
@@ -245,7 +245,8 @@ export default {
     "weeks": "週",
     "worstItems": "缺失項目TOP5",
     "worstPatrol": "巡檢完成最差TOP5",
-    "worstRegion": "重點關註區域"
+    "worstRegion": "重點關註區域",
+    "customDate":"自訂義"
   },
 
   // Patrol page language

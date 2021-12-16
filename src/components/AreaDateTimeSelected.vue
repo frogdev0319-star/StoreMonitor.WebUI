@@ -64,7 +64,19 @@ export default {
   }
 }
 </script>
-
+<style lang="css" >
+.dropdown-select.el-select.el-input--medium .el-input__inner{
+    height: 25px;
+    font-size: 15px;
+    text-align: left;
+    border: none;
+    background-color: #f7f9fa;
+    color:#2b2b2b;
+  }
+  .dropdown-select.el-select .el-input--medium .el-input__suffix{
+    top:0px;
+  }
+</style>
 <style lang="scss" scoped>
 .content{
     width:307px;
@@ -95,11 +107,10 @@ export default {
         }
         .dropdown-select{
             width:85px;
-            height:25px;
-            border:1px solid #f7f9fa;
+            height:36px;
+            border:none;
             color: #2b2b2b;
             align-self: center;
-            align-items: center;
         }
     }
     .date-picker {

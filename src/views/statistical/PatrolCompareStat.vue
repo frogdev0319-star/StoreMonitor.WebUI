@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-row class="statistics-container">
-            <el-col :span="24">
+            <el-col :span="24" class="aaa">
                 <search-component
                 ref="inspectEvalutionSearch"
                 :is-patrol = "true"
@@ -711,23 +711,6 @@ export default {
   @import "../../assets/sass/stastical.scss";
 
   .statistics-container{
-    .export-header{
-      min-height: 100px;
-      margin: 0 20px 20px 20px;
-      border: 1px solid $border;
-      background-color: #fff;
-      padding: 10px 30px;
-      color: $black;
-      text-align: left;
-      font-size: calc(14/1920*100vw);
-      p{
-        margin:10px 0;
-        display: flex;
-        .content-header{
-          flex:1;
-        }
-      }
-    }
     .average-cahrt{
       margin-left: calc(24/1440*100vw);
       margin-right: calc(24/1440*100vw);
