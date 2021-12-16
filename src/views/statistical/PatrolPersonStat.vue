@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="statistics-container">
+    <el-row  class="statistics-container">
       <el-col :span="24">
         <div class="statistics-header">
           <div class="search-bar">
@@ -81,7 +81,7 @@
         />
       </div>
       </el-col>
-    </div>
+    </el-row>
   </div>
 </template>
 
@@ -454,6 +454,10 @@ export default {
   @import "../../assets/sass/stastical.scss";
 
   .statistics-container{
+    .statistics-content{
+      width:calc(1096/1440*100vw);
+      margin-left: calc(32/1440*100vw);
+    }
     .search-bar{
       display:flex;
       flex-direction:row;

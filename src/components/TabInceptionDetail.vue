@@ -17,6 +17,7 @@
                 :highlight-current-row= "true"
                 :is-event = "false"
                 :showPagination = "false"
+                @emitRowClick="handleEmitDetailRowClick"
             />
         </div>
         <div v-if="currentTab=='NotInspected'" class="not-inspected">
@@ -37,6 +38,7 @@
                 :highlight-current-row= "true"
                 :is-event = "false"
                 :showPagination = "true"
+                @emitRowClick="handleEmitComplitedRowClick"
                 layout = "prev,pager,next"
             />
         </div>
@@ -122,7 +124,8 @@ export default {
                     'isExpand':false,
                     'formatter':function(obj){
                         //console.log(obj);
-                        return (`<a href="https://www.w3schools.com">${obj}</a>`)
+                        const html = `<div style="cursor:pointer;color:#006ab7;font-size:15px" >${obj}</div>`
+                        return html;//(`<a href="https://www.w3schools.com">${obj}</a>`)
                     }
                     }
                 ],
@@ -197,8 +200,8 @@ export default {
                     'pdfwidth': '12%',
                     'isExpand':false,
                     'formatter':function(obj){
-                        //console.log(obj);
-                        return (`<a href="https://www.w3schools.com">${obj}</a>`)
+                        const html = `<div style="cursor:pointer;color:#006ab7;font-size:15px" >${obj}</div>`
+                        return html;
                     }
                     }
                 ],
@@ -253,6 +256,11 @@ export default {
                 console.log('InspectReportList-getReportList: ' + err);
             });
         });
+      },
+      handleEmitDetailRowClick(row){
+          const self = this;
+            sessionStorage.setItem('report_data', JSON.stringify(row));
+            self.$router.push({ name: 'reportDetails', params: { data: row }});
       },
       getNotInspectedStores(){
           const self = this;
@@ -359,7 +367,12 @@ export default {
         });
         });
         
-      }
+      },
+      handleEmitComplitedRowClick(row){
+          const self = this;
+          //sessionStorage.setItem('report_data', JSON.stringify(row));
+        //self.$router.push({ name: 'EventStatistics', params: { data: row }});
+      },
     },
     
     

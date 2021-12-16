@@ -415,7 +415,7 @@ export default {
         }
         .dropdown-select{
             width:85px;
-            height:25px;
+            height:36px;
             border:1px solid #f7f9fa;
             color: #2b2b2b;
             align-self: center;

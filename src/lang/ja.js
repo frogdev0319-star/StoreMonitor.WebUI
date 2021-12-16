@@ -247,7 +247,8 @@ export default {
     "weeks": "週",
     "worstItems": "最悪の検査項目TOP5",
     "worstPatrol": "最悪の検査完了TOP5",
-    "worstRegion": "最悪の地域TOP5"
+    "worstRegion": "最悪の地域TOP5",
+    "customDate":"自訂義"
   },
 
   // Patrol page language
