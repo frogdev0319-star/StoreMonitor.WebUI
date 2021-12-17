@@ -501,19 +501,21 @@
         </div> -->
         <div class="channelbar-content">
           <div class="channel-content">
-            <span>{{ '攝影機列表' }}</span>
+            <span style="float: left; margin: 20px;">{{ '攝影機列表' }}</span>
             <div class="channels-srollbar">
               <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div>
               <div class="btn-content" v-if="!curItem.disabled">
                 <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
-                  <channel-icon-btn
-                    :channel-name="item.name"
-                    :is-online="item.isonline"
-                    :is-click="item.isClick"
-                    class="channelBtn"
-                    @click.native="clickBtn(item,index)"/>
+                  <div 
+                    @click="clickBtn(item,index)"
+                    class="channel"
+                    :class="{'channel-isActive': item.isClick}"
+                  >
+                  <img :src="item.isClick ? channelActiveIcon: channelIcon" height="24" style="margin-right: 20px">
+                  {{ item.name }}
+                  </div>
                 </div>
               </div>
               <div class="arrow-content">
@@ -938,6 +940,8 @@ export default {
       arrows2Src: require('../../../static/img/arrows_right.png'),
       plusSrc: require('../../../static/img/add_icon.png'),
       backicon: require('../../../static/img/back.png'),
+      channelIcon: require('../../../static/img/channel.png'),
+      channelActiveIcon: require('../../../static/img/channel_active.png'),
       showModelContent: false,
       showInfoContent: true,
       activeIndex: '0',
@@ -4829,6 +4833,35 @@ export default {
     position: absolute;
     top: 7px;
     right: 6px;
+  }
+  .channel {
+    width: 246px;
+    height: 40px;
+    margin: 12px 16px 16px;
+    padding: 8px 10px 8px 16px;
+    border-radius: 5px;
+    border: solid 1px #e6e6e6;
+    background-color: #fff;
+    color: #69727c;
+    display: flex;
+    align-items: center;
+  }
+  .channel-isActive {
+    color: #006ab7;
+    border: solid 1px #006ab7;
+    background-color: #e4f3fd;
+  }
+  .btn-content{
+    width: 100%;
+    display: flex;
+    .btn-details{
+      margin-bottom: 5px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      &:last-child{
+      }
+    }
   }
 </style>
 <style scoped>
