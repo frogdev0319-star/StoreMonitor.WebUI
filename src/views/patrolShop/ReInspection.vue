@@ -4561,7 +4561,7 @@ export default {
     background-color: #ffffff;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
   }
-  
+
   .el-select >>> .el-input__inner{
     background-color: #edf0f2;
     border-radius: 5px;
@@ -4575,6 +4575,9 @@ export default {
   }
   .el-select >>> .el-select__caret {
     color:#2b2b2b;
+  }
+  .el-select.el-select--medium{
+    width: unset;
   }
 </style>
 <style>
