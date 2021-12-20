@@ -1,32 +1,35 @@
 <template>
   <div class="statistics-header">
-    <div class="header-details">
+    <div class="store-filter">
       <store-filter
         :cached-params="searchParams"
         :is-patrol="isPatrol"
         @storeChange = "onStoreChange"
       />
     </div>
-    <div class="header-details">
-      <span :class="isInspectItem ? 'inspect-span' : 'normal-span'" >
-        {{ $t('remotePatrol.time') }}</span>
-      <date-time-selector class="time-selector" @change="dateChange"/>
-      <span v-if="isInspectItem || isPatrol">
-        <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('overview.patrolLists') }}</span>
-        <el-select
-          v-model="inspectList"
-          :placeholder="$t('insSettingView.selectPost')"
-          size="mini"
-          class="el-province"
-          @change="onInspectListChange">
-          <el-option
-            v-for="item in inspectTypeList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"/>
-        </el-select>
-      </span>
-      <div class="search-btns">
+    <div class="store-filter">
+    <div class="last-row">
+      <div v-if="isInspectItem || isPatrol" class="inspect-div">
+        <div class="tag-label">{{ $t('overview.patrolLists') }}</div>
+        <div class="tag-select">
+          <el-select
+            v-model="inspectList"
+            :placeholder="$t('insSettingView.selectPost')"
+            size="medium"
+            class="el-province"
+            @change="onInspectListChange">
+            <el-option
+              v-for="item in inspectTypeList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"/>
+          </el-select>
+        </div>
+      </div>
+      <div v-if="showDateSelector">
+        <date-time-selector class="time-selector" @change="dateChange"/>
+      </div>
+      <div>
         <delay-button
           :disabled="storeListLength === 0"
           :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
@@ -36,21 +39,9 @@
         >
           <span>{{ $t('remotePatrol.search') }}</span>
         </delay-button>
-        <delay-button
-          v-if="!isInspectItem"
-          :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-          type="primary"
-          size="mini"
-          style="vertical-align: middle;"
-          @click="handleExportPdf">
-          <div class="button-area">
-            <i class="iconfont icon-pdf"/>
-            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-          </div>
-        </delay-button>
       </div>
     </div>
-    <selected-stores :store-str="storeFilterObj.storeStr"/>
+    </div>
   </div>
 </template>
 
@@ -66,6 +57,7 @@ import DelayButton from '@/components/DelayButton';
 import StoreFilter from './StoreFilter';
 import DateTimeSelector from './DateTimeSelector';
 import SelectedStores from './SelectedStores';
+
 
 export default {
   name: 'SearchComponent',
@@ -93,6 +85,10 @@ export default {
     },
     defaultSort: {
       type: Object
+    },
+    showDateSelector:{
+      type:Boolean,
+      default:true
     }
   },
 
@@ -163,6 +159,7 @@ export default {
 
   methods: {
     dateChange(val) {
+
       this.dateValue = val;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
@@ -171,6 +168,7 @@ export default {
       this.params.beginTs = start;
       this.params.endTs = end;
       this.daysRangeList = util.getDaysRangeList(start, end, this.timeMode);
+      console.log("dateChange:",val);
     },
 
     onInspectListChange() {
@@ -223,9 +221,11 @@ export default {
     async searchData() {
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
       this.params.timeMode = this.timeMode;
+      this.params.curCountry= this.storeFilterObj.curCountry;
       const emitParmas = {};
       emitParmas.searchParams = this.params;
       emitParmas.dateRangeList = this.daysRangeList;
+      
       emitParmas.regionI = this.storeFilterObj.curRegionI;
       emitParmas.regionII = this.storeFilterObj.curRegionII;
       emitParmas.regionMode = this.storeFilterObj.regionMode;
@@ -297,6 +297,7 @@ export default {
     },
 
     saveSearchParams(saveParamsObj) {
+      console.log("saveSearchParams:",saveParamsObj);
       const params = saveParamsObj.params;
       params.curCountry = this.storeFilterObj.curCountry;
       params.curProvince = this.storeFilterObj.curProvince;
@@ -339,6 +340,7 @@ export default {
     },
 
     onStoreChange(storeObj) {
+      console.log("*onStoreChange>storeObj:",storeObj);
       this.storeFilterObj = storeObj;
       !this.ifSaveParams && this.searchData();
       this.ifSaveParams = true;
@@ -351,13 +353,20 @@ export default {
   @import "../assets/sass/stastical.scss";
 
   .statistics-header{
-    background-color: #fff;
+    background-color: #edf0f2;
     color: $black;
     position: relative;
+    .store-filter{
+      display: inline-block;
+    
+    }
     .header-details{
       text-align: left;
-      padding-left: calc(30/1920*100vw);
+      padding-left: calc(32/1440*100vw);
       position: relative;
+      display: flex;
+      flex-direction: row;
+      margin-top: 16px;
       .search-content{
         display: inline-block;
       }
@@ -382,15 +391,11 @@ export default {
           margin-right: 60px;
         }
       }
-      .el-province{
-        width: calc(160/1920*100vw);
-        margin-right: calc(15/1920*100vw);
-        min-width: 85px;
-        min-height: 28px;
-      }
+      
+      
       .normal-span{
-        font-size: calc(14/1920*100vw);
-        margin-right: calc(20/1920*100vw);
+        font-size: calc(14/1440*100vw);
+        margin-right: calc(20/1440*100vw);
       }
       .inspect-span{
         margin-right: calc(20/1920*100vw);
@@ -413,5 +418,110 @@ export default {
     .time-selector{
       margin-right: calc(30/1920*100vw);
     }
+    .last-row{
+      display: flex;
+      flex-direction: row;
+      width:calc(1066/1440*100vw);
+      height: 50px;
+      justify-content: space-between;
+      margin-top: 16px;
+      padding-bottom: 24px;
+      .search-button{
+        margin-left:35px;
+        width: 102px;
+        height: 36px;
+        background-color: #556679;
+        border-color: #556679;
+        color:#fff;
+        font-size: 15px;
+      }
+    }
+    .inspect-div{
+      width:calc(298/1440*100vw);
+      height: 36px;
+      display: flex;
+      flex-direction: row;
+      .tag-label{
+        width: calc(76/1440*100vw);
+        text-align: left;
+        align-self: center;
+        font-family: NotoSansCJKTC;
+        font-size: 15px;
+        font-weight: normal;
+      }
+      .tag-select{
+        width:calc(222/1440*100vw);
+        height: 36px;
+        background-color: #fff;
+      }
+      .el-province{
+        width: calc(222/1440*100vw);
+        height: 36px;
+        background-color: #fff;
+        min-width: 85px;
+        min-height: 28px;
+      }
+    }
+  }
+</style>
+<style scoped>
+  .el-select-dropdown__item{
+    padding: 0 20px 0 20px !important;
+    /*color: #7d8cad;*/
+  }
+  
+  .input-class{
+    width: calc(100% - 30px);
+    position: absolute;
+    left: 0;
+  }
+  >>> .el-select .el-input--medium .el-input__suffix{
+    top:0px !important;
+    
+  }
+  >>> .input-class.el-input--medium .el-input__inner{
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    border: none;
+    border-right: none;
+    color: #2b2b2b;
+    background: transparent !important;
+    padding: 0 10px;
+    font-size: 15px;
+    min-width: 55px;
+    min-height: 28px;
+  }
+  >>> .el-select.el-select--medium .el-input .el-input__inner{
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    border: none;
+    font-size: 15px;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    min-height: 28px;
+    min-width: 85px;
+  }
+
+  >>> .el-select.el-select--medium .el-input .el-input__suffix-inner{
+    position: relative;
+    z-index: 1;
+  }
+  >>> .el-input--medium .el-input__icon {
+    line-height: calc(36/1920*100vw);
+    height: calc(36/1920*100vw);
+    min-height: 28px;
+    color: #2c90d9;
+  }
+  .el-select.el-select--medium{
+    color: #2b2b2b;
+    background: #fff !important;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    border: none !important;
+    width: 100%;
+    border-radius: 3px;
+    min-height: 28px;
+    min-width: 85px;
   }
 </style>

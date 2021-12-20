@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="111.77" height="74.966" viewBox="0 0 111.77 74.966">
+    <defs>
+        <linearGradient id="linear-gradient" x1=".793" y1=".073" x2=".106" y2=".975" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#89a0c3"/>
+            <stop offset="1" stop-color="#eaf1fa"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-2" x1=".873" y1=".184" x2=".105" y2=".981" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#e5ebf5"/>
+            <stop offset="1" stop-color="#fff"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-3" x1=".051" y1="2.441" x2=".556" y2="-1.458" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#e0e9f6"/>
+            <stop offset="1" stop-color="#6b88b4"/>
+        </linearGradient>
+        <linearGradient id="linear-gradient-4" x1="0" y1="1.611" x2=".637" y2="-.236" xlink:href="#linear-gradient-3"/>
+        <linearGradient id="linear-gradient-5" x1=".5" x2=".5" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#8399ba"/>
+            <stop offset="1" stop-color="#d3dbe6"/>
+        </linearGradient>
+        <style>
+            .cls-8{fill:#859ec3;opacity:.194}
+        </style>
+    </defs>
+    <g id="已处理icon" transform="translate(-1 -35.771)">
+        <path id="Path" d="M98 0a13 13 0 0 1-13 13l-22.994-.053C66.7 14.907 71 19.525 71 24.93 71 32.11 61.18 38 54 38l-19.492.34" transform="rotate(-180 73.612 37.537)" style="fill:none;stroke:#707070;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:3"/>
+        <g id="组_40" data-name="组 40" transform="translate(1 48.493)">
+            <g id="组_39" data-name="组 39">
+                <g id="组_38" data-name="组 38">
+                    <g id="组_36" data-name="组 36">
+                        <path id="矩形_20" data-name="矩形 20" transform="matrix(.956 -.292 .292 .956 0 11.911)" style="fill:url(#linear-gradient)" d="M0 0h39.781v52.625H0z"/>
+                        <path id="路径_45" data-name="路径 45" d="m1539.365 302.306.569-.174 33.917-9.222-15.412-47.331-1.426.922z" transform="translate(-1521.823 -243.091)" style="fill:#080a0a;opacity:.26"/>
+                        <path id="矩形_21" data-name="矩形 21" transform="rotate(-16.972 44.531 -1.605)" style="fill:url(#linear-gradient-2)" d="M0 0h35.769v48.688H0z"/>
+                        <path id="路径_46" data-name="路径 46" d="m1472.988 265.219 24.607-7.51-18.378 28.056z" transform="translate(-1470.823 -252.411)" style="fill:#a0b3d2;opacity:.309"/>
+                        <g id="组_35" data-name="组 35" transform="translate(11.428)">
+                            <path id="矩形_22" data-name="矩形 22" transform="rotate(-16.98 32.885 2.927)" style="opacity:.12;fill:url(#linear-gradient-3)" d="M0 0h15.535v1.446H0z"/>
+                            <g id="组_34" data-name="组 34">
+                                <path id="路径_47" data-name="路径 47" d="m1524.086 236.782-.23.07-.047-.154a2.991 2.991 0 0 0-3.848-1.7l-2.215.676a2.99 2.99 0 0 0-2.243 3.558l.047.154-.231.07a2.99 2.99 0 0 0-2.243 3.558l.9 2.936 14.858-4.535-.9-2.936a2.991 2.991 0 0 0-3.848-1.697zm-2.408.8-3.915 1.195a.754.754 0 1 1-.44-1.442l3.915-1.195a.754.754 0 1 1 .44 1.442z" transform="translate(-1512.971 -234.839)" style="fill:url(#linear-gradient-4)"/>
+                            </g>
+                        </g>
+                        <path id="矩形_38" data-name="矩形 38" class="cls-8" transform="rotate(-18.01 71.333 -20.122)" d="M0 0h26.605v2.851H0z"/>
+                        <path id="矩形_39" data-name="矩形 39" class="cls-8" transform="rotate(-18.01 99.755 -24.841)" d="M0 0h26.605v2.851H0z"/>
+                        <path id="矩形_40" data-name="矩形 40" class="cls-8" transform="rotate(-18.01 128.18 -29.56)" d="M0 0h26.605v2.851H0z"/>
+                        <path id="矩形_41" data-name="矩形 41" class="cls-8" transform="rotate(-18.01 156.604 -34.276)" d="M0 0h26.605v2.851H0z"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+        <path id="联合_10" data-name="联合 10" d="M-15597.334 2022a2 2 0 0 1-2-2 2 2 0 0 1 2-2h17.334a2 2 0 0 1 2 2 2 2 0 0 1-2 2zm-7.333 0a2 2 0 0 1-2-2 2 2 0 0 1 2-2h1.332a2 2 0 0 1 2 2 2 2 0 0 1-2 2zm12.332-6a2 2 0 0 1-2-2 2 2 0 0 1 2-2h21.335a2 2 0 0 1 2 2 2 2 0 0 1-2 2zm-14.667 0a2 2 0 0 1-2-2 2 2 0 0 1 2-2h8.336a2 2 0 0 1 2 2 2 2 0 0 1-2 2z" transform="translate(15665.508 -1920.001)" style="fill:url(#linear-gradient-5)"/>
+        <path id="联合_9" data-name="联合 9" d="m-15615.952 2023.087-1.705-3.543a.5.5 0 0 1 .451-.717h3.41a.5.5 0 0 1 .45.717l-1.705 3.543a.491.491 0 0 1-.449.282.5.5 0 0 1-.452-.282zm-2.046-5.3V2002.2h5v15.592zm0-16.631V1999a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v2.16z" transform="rotate(28 -3921.675 32462.612)" style="fill:#6d84a7"/>
+    </g>
+</svg>

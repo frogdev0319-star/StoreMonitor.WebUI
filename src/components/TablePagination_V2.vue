@@ -2,6 +2,7 @@
   <div class="table">
     <el-table
       ref="tablePagination"
+      class="tbl-style"
       :data="tableData"
       v-bind="$attrs"
       :highlight-current-row="true"
@@ -18,6 +19,9 @@
       style="width: 100%"
       size="mini"
       v-on="$listeners"
+      :row-key="getRowKeys"
+      :expand-row-keys="expandRowKeys"
+      @expand-change="expandChange"
       @sort-change="handleSortChange"
       @row-click="handleRowClick"
     >
@@ -40,6 +44,10 @@
           <template v-if="_item.canEdit && row.isEditing">
             <el-input v-model="row.tempDeviceName" class="edit-input" size="small" @input="val => inputDeviceNameChange(val, row)"/>
           </template>
+          <template v-else-if="_item.isExpand">
+            <i v-if="row.id != expands" class="el-icon-arrow-down" style="color:#2c90d9;cursor:pointer;" @click="expandChange(row)"></i>
+            <i v-if="row.id == expands" class="el-icon-arrow-up" style="color:#2c90d9;cursor:pointer;" @click="expandChange(row)"></i>
+          </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row[_item.prop])"/>
           <template v-else>
             <template v-if="isDevice && _index < 3">
@@ -49,6 +57,11 @@
             </template>
             <span v-else>{{ row[_item.prop]}}</span>
           </template>
+        </template>
+      </el-table-column>
+      <el-table-column type="expand">
+        <template slot-scope="{row}">
+          <component :is="expandComponent" v-bind="currentProperties"></component>
         </template>
       </el-table-column>
       <el-table-column
@@ -129,8 +142,7 @@
         </div>
       </div>
     </el-table>
-    <div v-if="showPagination" class="page-content">
-      <div v-if="showPagination" class="toolbar pagination clearfix">
+    <div v-if="showPagination" class="toolbar pagination clearfix">
       <el-pagination
         :current-page="currentPage"
         :page-sizes="[10, 20, 50, 100]"
@@ -144,15 +156,18 @@
         @current-change="handleCurrentChange"
       />
     </div>
-    </div>
   </div>
 </template>
 
 <script>
 import util from '@/common/util';
 import filterString from '@/common/filterString'
-
+import TabInceptionDetail from '@/components/TabInceptionDetail'
 export default {
+  name:'TablePagination_V2',
+  components: {
+    TabInceptionDetail
+  },
   props: {
     total: {
       type: Number,
@@ -235,7 +250,7 @@ export default {
     },
     isStripe: {
       type: Boolean,
-      default: true
+      default: false
     },
     isDevice: {
       type: Boolean,
@@ -251,6 +266,18 @@ export default {
     isexportPDF: {
       type: Boolean,
       default: false
+    },
+    allowRowExpand:{
+      type: Boolean,
+      default:false
+    },
+    expandComponent:{
+      type: String,
+      require:false
+    },
+    expandCompProperties:{
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -259,7 +286,9 @@ export default {
       lang: this.$i18n.locale,
       order: { direction: '', property: '' },
       noData: this.$t('deviceView.noData'),
-      loadingGif: require('../../static/img/loading.gif')
+      loadingGif: require('../../static/img/loading.gif'),
+      expands: "",
+      expandRowKeys: [],
     };
   },
   filters:{
@@ -272,6 +301,12 @@ export default {
   computed: {
     tableSelection() {
       return this.$refs.tablePagination.selection;
+    },
+    currentProperties: function() {
+      console.log(this.expandComponent);
+      if (this.expandComponent=== 'TabInceptionDetail') {
+        return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs }
+      }
     }
   },
 
@@ -285,10 +320,41 @@ export default {
       }
       return obj;
     },
+    getRowKeys(row) {
+      
+      return row.id;
+    },
+    expandChange(row) {
+       console.log("row click:",row);
+        this.currentRow = row;
+        if(this.allowRowExpand){
+          if(row.id == this.expands){
+            this.expands="";
+            this.expandRowKeys=[];
+          }
+          else {
+            this.expands = row.id;
+            this.expandRowKeys.splice(0,1,row.id);
+          }
+          //this.expandChange(row);
+        }
+    },
 
     handleRowClick(row) {
-      this.currentRow = row;
-      this.$emit('emitRowClick', row);
+      /*console.log("row click:",row);
+      if(this.allowRowExpand){
+        if(row.id == this.expands){
+           this.expands="";
+           this.expandRowKeys=[];
+        }
+        else {
+          this.expands = row.id;
+          this.expandRowKeys.splice(0,1,row.id);
+        }
+        //this.expandChange(row);
+      }else{*/
+        this.$emit('emitRowClick', row);
+      //}
     },
 
     handleCurrentChange(currentPage) {
@@ -372,6 +438,23 @@ export default {
 
 <style lang="scss" scoped>
   @import "../assets/sass/stastical.scss";
+  .tbl-style{
+    padding: 0 24px;
+    background-color: #f7f9fa;
+    tbody{
+      background-color: #f7f9fa;
+    }
+  }
+  .el-table--mini{
+    font-size: calc(15/1920*100vw);
+    background-color: #f7f9fa;
+  }
+  .el-table__row.row-class .current-row{
+    background-color: #edf0f2;
+  }
+  .el-table__expanded-cell:hover{
+    background-color: #edf0f2 !important;
+  }
   .clearfix{
     content: "";
     display: block;
@@ -379,18 +462,11 @@ export default {
     clear:both;
     overflow: auto;
   }
-  .page-content{
-    width:100%;
-    background-color: #EFF3F5;
-    display: flex;
-    flex-direction: row-reverse;
-
-  }
   .toolbar{
     float: right;
-    margin-top: 0px;
-    margin-right: calc(30/1440*100vw);
-    height:13%;
+    margin: 24px calc(24/1920*100vw);
+    margin-right: 0;
+    height:31px;
   }
   .iconfont{
     cursor: pointer;
@@ -401,9 +477,7 @@ export default {
       margin-right: 0px;
     }
   }
-  .el-table--mini{
-    font-size: calc(14/1920*100vw);
-  }
+  
 
   .iconfont{
     font-size: calc(24/1920*100vw);
@@ -447,6 +521,10 @@ export default {
   }
   .icon-disabled{
     cursor: not-allowed;
+  }
+  .cell-class.el-table__expand-column .cell{
+    padding:0;
+    width:100px;
   }
 </style>
 

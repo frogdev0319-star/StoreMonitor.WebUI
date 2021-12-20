@@ -1,75 +1,52 @@
 <template>
   <div>
-    <div class="el-overview-content">
+    <el-row  class="statistics-container">
       <el-col :span="24">
-        <search-component
-          ref="eventSearch"
-          :default-sort="defaultSort"
-          path="eventStatistics"
-          @emitSearch = "emitSearch"
-          @exportPdf = "exportPdf"
-          @changeDefaultSort="setDefaultSortAndPage"/>
-      </el-col>
-      <el-col :span="24" class="el-overview">
-        <el-row class="first-row">
-          <el-col :span="24" class="kpi-list">
-            <div class="title">{{ $t('overview.eventGraph') }}</div>
-          </el-col>
-          <el-col :span="3" :class="lang.indexOf('ja') !== -1 ? 'ja-kpi-list' : 'kpi-list'">
-            <div class="kpi-content">
-              <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
-                <div class="event-title">{{ item.eventTitle }}</div>
-                <div class="event-num">{{ item.eventNum }}</div>
-              </div>
-            </div>
-          </el-col>
-          <el-col :span="14" :class="lang.indexOf('ja') !== -1 ? 'ja-store-events' : 'store-events'">
-            <div class="region-result">
-              <div
-                v-loading="isLoading"
-                :element-loading-text="$t('insSettingView.loadingbindstore')"
-                class="charts-content self-loading" v-if="!hasNoData">
-                <v-chart
-                  ref="storeEventRef"
-                  :options="storeEventsOptions"
-                  :auto-resize="true"
-                  class="result-content"/>
-              </div>
-              <div v-else class="charts-content">
-                <span class="no-data-text">
-                  {{ $t('deviceView.noData') }}
-                </span>
-              </div>
-            </div>
-          </el-col>
-          <el-col :span="7" :class="lang.indexOf('ja') !== -1 ? 'ja-source-list' : 'source-list'">
-            <div class="pct-content">
-              <div class="pct-panel">
-                <v-chart
-                  ref="eventSourceRef"
-                  :auto-resize="true"
-                  :options="eventSourceOptions"
-                  class="chart-content"/>
-              </div>
-              <div class="pct-nums">
-                <div
-                  v-for="(item, index) in sourcePerArray"
-                  :class="lang=='en'? 'en-label': ''"
-                  :key="index"
-                  class="content-labels">
-                  <div class="excellent_nums">{{ item.percent }}%</div>
-                  <div class="excellent_labels">
-                    <span :class="`label-` + index" class="labels excellent-label"/>
-                    <span class="label-desc">{{ item.type }}</span>
-                  </div>
+        <div class="statistics-header">
+          <div class="search-bar">
+            <date-time-selector class="time-selector" @change="dateChange"/>
+            <div class="person-title">
+              <span :class="lang === 'en'? 'en-span-class' : ''">{{ $t('statistics.patrolPerson.insPerson') }}</span>
+               <div class="date-range">
+                <region-multi-select
+                  ref="multiState"
+                  :selected="positionIds"
+                  :options="positionsList"
+                  :all="$t('statistics.patrolPerson.dutyAll')"
+                  class="position"
+                  @changeInput="handlePositionsChange"/>
+                <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+                <region-multi-select
+                  ref="multiState"
+                  :selected="userIds"
+                  :all="$t('overview.allUser')"
+                  :placeholder="$t('overview.user')"
+                  :options="userList"
+                  class="person"
+                  @changeInput="handleUserChange"/>
                 </div>
-              </div>
+            </div>
+            <delay-button
+              class="search-button"
+              type="primary"
+              size="mini"
+              @click="doSearchInsRecordList"
+            >
+              <span>{{ $t('remotePatrol.search') }}</span>
+            </delay-button>
+          </div>
+        </div>
+      </el-col>
+      <el-col :span="24" class="statistics-content" style="height: 785px;">
+        <div class="head">
+          <el-col :span="17">
+            <div class="region-titles">
+                <span class="title">
+                    {{ $t('statistics.patrolPerson.insRecordList') }}
+                </span>
             </div>
           </el-col>
-        </el-row>
-        <el-row class="second-row">
-          <el-col :span="24" class="items-title">
-            <span class="title">{{ $t('overview.eventList') }}</span>
+          <el-col :span="7">
             <div class="operation-btns">
               <delay-button
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
@@ -84,186 +61,27 @@
               </delay-button>
             </div>
           </el-col>
-          <el-col :span="24" class="event-table">
-            <table-pagination
-              ref="elTP"
-              :column-data="eventInfoData"
-              :table-data="eventTableData"
-              :total="total"
-              :highlight-current-row= "true"
-              :pagesize="sizeNum"
-              :current-page="page"
-              :is-event = "true"
-              :default-sort = "defaultSort"
-              @handleChange="handlePageAndSizeChange"
-              @sortChange="handleSortChange"
-            />
-          </el-col>
-        </el-row>
-      </el-col>
-    </div>
-    <div v-if="ispdf" class="el-overview-content">
-      <el-col id="pdfDom" ref="printPDF" :span="24" class="el-overview" style="padding:40px 20px;width:1150px;">
-        <div :span="24" class="export-header">
-          <p>
-            <span>{{ $t('remotePatrol.storeSelect') }}：</span>
-            <span class="content-header">{{ storeNameStr }}</span>
-          </p>
-          <p>
-            <span>{{ $t('remotePatrol.storeGroup') }}：</span>
-            <span class="content-header">{{ storeGroupStr }}</span>
-          </p>
-          <p>
-            <span>{{ $t('remotePatrol.storeType') }}：</span>
-            <span class="content-header">{{ storeTypeStr }}</span>
-          </p>
-          <p>
-            <span>{{ $t('remotePatrol.time') }}：</span>
-            <span class="content-header">{{ storeDateValue }}</span>
-          </p>
         </div>
-        <el-row class="first-row">
-          <el-col :span="24">
-            <img :src="pdfSrc">
-          </el-col>
-        </el-row>
-        <div class="no-print">
-          <el-row id="imgTest" class="first-row" style="width:1045px;">
-            <el-col :span="24" class="kpi-list" style="background-color:#ffffff;">
-              <div class="title">{{ $t('overview.eventGraph') }}</div>
-            </el-col>
-            <el-col :span="3" class="kpi-list" style="background-color:#ffffff;">
-              <div class="kpi-content">
-                <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
-                  <div class="event-title">{{ item.eventTitle }}</div>
-                  <div class="event-num">{{ item.eventNum }}</div>
-                </div>
-              </div>
-            </el-col>
-            <el-col :span="14" class="store-events" style="background-color:#ffffff;">
-              <div class="region-result">
-                <div class="charts-content">
-                  <v-chart
-                    ref="storeEventRef"
-                    :options="storeEventsOptions"
-                    :auto-resize="true"
-                    class="result-content"/>
-                </div>
-              </div>
-            </el-col>
-            <el-col :span="7" class="source-list" style="background-color:#ffffff;">
-              <div class="pct-content">
-                <div class="pct-panel">
-                  <v-chart
-                    ref="eventSourceRef"
-                    :auto-resize="true"
-                    :options="eventSourceOptions"
-                    class="chart-content"/>
-                </div>
-                <div class="pct-nums">
-                  <div
-                    v-for="(item, index) in sourcePerArray"
-                    :class="lang === 'en' ? 'en-label' : ''"
-                    :key="index"
-                    class="content-labels">
-                    <div class="excellent_nums">{{ item.percent }}%</div>
-                    <div class="excellent_labels">
-                      <span :class="`label-` + index" class="labels excellent-label"/>
-                      <span class="label-desc">{{ item.type }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </el-col>
-          </el-row>
-        </div>
-        <el-row class="second-row" style="padding-bottom:20px;">
-          <el-col :span="24" class="items-title">
-            <span class="title">{{ $t('overview.eventList') }}</span>
-          </el-col>
-          <el-col :span="24" class="event-table">
-            <div class="table">
-              <div class="event-content">
-                <el-table
-                  :data="allEventData"
-                  :highlight-current-row="true"
-                  :default-sort = "defaultSort"
-                  :header-cell-class-name="headerClass"
-                  :cell-class-name="cellClass"
-                  :row-class-name="rowClass"
-                  empty-text="无数据"
-                  align="left"
-                  stripe
-                  border
-                  style="width: 100%"
-                  size="mini"
-                >
-                  <el-table-column
-                    v-for="(_item,_index) in eventInfoData"
-                    :key="_index"
-                    :prop="_item.prop"
-                    :label="_item.label"
-                    :min-width="_item.pdfwidth"
-                    :sortable="_item.sortable"/>
-                  <el-table-column
-                    :label="$t('overview.remotePatrol')"
-                    :min-width="lang.indexOf('zh') !== -1 ? '8% ': '9%'"
-                    sortable="custom"
-                    prop="RemoteStr">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper remote">
-                        <el-tag size="small" color="#f31d651a">{{ scope.row.RemoteStr }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    :label="$t('overview.onsitePatrol')"
-                    :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
-                    sortable="custom"
-                    prop="OnsiteStr">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper onsite">
-                        <el-tag size="small" color="#fb804f1a">{{ scope.row.OnsiteStr }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    :label="$t('overview.storeMonitor')"
-                    :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
-                    sortable="custom"
-                    prop="VideoStr">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper video">
-                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.VideoStr }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <div slot="empty">
-                    <div>
-                      <i class="iconfont icon-zhengque empty-data-icon"/>
-                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">
-                        {{ $t('overview.noData') }}
-                      </span>
-                    </div>
-                  </div>
-                </el-table>
-              </div>
-            </div>
-          </el-col>
-        </el-row>
+        <div class="event-table">
+        <table-pagination
+          ref="elTP"
+          :column-data="insRecordColData"
+          :table-data="insRecordTableData"
+          :total="total"
+          :highlight-current-row= "true"
+          :pagesize="sizeNum"
+          :current-page="page"
+          :is-event = "false"
+          :default-sort = "defaultSort"
+          :allowRowExpand = "true"
+          expand-component = "TabInceptionDetail"
+          :expandCompProperties = "componentsProps"
+          @handleChange="handlePageAndSizeChange"
+          @sortChange="handleSortChange"
+        />
+      </div>
       </el-col>
-    </div>
-    <dialog-pop
-      :title="$t('insSettingView.export')"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :visible="ispdf"
-      :show-button="false"
-      :show-close="false"
-      class="LoadDialog"
-    >
-      <p>{{ $t('insSettingView.isExportPDF') }}......</p>
-    </dialog-pop>
+    </el-row>
   </div>
 </template>
 
@@ -271,211 +89,143 @@
 import ECharts from 'vue-echarts';
 import { mapGetters } from 'vuex';
 import util from '@/common/util.js';
-import { getEventStatsOverStoreV2, getEventStatsOverStore } from '@/api/eventOverview';
-import html2canvas from 'html2canvas';
-import Lodash from 'lodash';
-import SearchComponent from '@/components/SearchComponent';
+import filterString from '@/common/filterString';
 import resize from '@/components/mixins/echartResize';
-import TablePagination from '@/components/TablePagination';
+
+import {
+  getInspectStatsOverPersonV3
+} from '@/api/inspectOverview';
+import TablePagination from '@/components/TablePagination_V2';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
-
+import DateTimeSelector from '@/components/DateTimeSelector';
+import { getBrifCheckinList, getCheckinReport, getDepartmentList } from '@/api/checkin';
+import { titleRESTful } from '@/api/index';
+import { getUserInfo } from '@/api/login';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
+import MultiSelect from '@/components/MultiSelect2';
+import TabInceptionDetail from '@/components/TabInceptionDetail'
 export default {
-  name: 'EventStatistics',
+  name: 'PatrolPersonStat',
+
   components: {
     DialogPop,
     DelayButton,
+    TablePagination,
     'v-chart': ECharts,
-    SearchComponent,
-    TablePagination
+    DateTimeSelector,
+    RegionMultiSelect,
+    TabInceptionDetail
   },
   mixins: [resize],
   data() {
     return {
-      ispdf: false,
-      pdfSrc: '',
-      storeNameStr: '',
-      storeGroupStr: '',
-      storeTypeStr: '',
-      storeDateValue: '',
-      htmlTitle: this.$t('overview.htmltopdfD'),
-      eventKPIs: [
-        {
-          eventTitle: this.$t('overview.sumEvents'),
-          eventNum: 0
-        },
-        {
-          eventTitle: this.$t('overview.sumUnprocessEvents'),
-          eventNum: 0
-        },
-        {
-          eventTitle: this.$t('overview.sumProcessEvents'),
-          eventNum: 0
-        },
-        {
-          eventTitle: this.$t('overview.sumClosedEvents'),
-          eventNum: 0
-        },
-        {
-          eventTitle: this.$t('overview.sumReturnedEvents'),
-          eventNum: 0
-        }
-      ],
-      sourceLegend: [
-        {
-          'type': this.$t('overview.remotePatrol'),
-          'percent': '0%'
-        },
-        {
-          'type': this.$t('overview.onsitePatrol'),
-          'percent': '0%'
-        },
-        {
-          'type': this.$t('overview.storeMonitor'),
-          'percent': '0%'
-        }
-      ],
-      statusLegend: [
-        {
-          'type': this.$t('overview.pending'),
-          'percent': '0%'
-        },
-        {
-          'type': this.$t('overview.done'),
-          'percent': '0%'
-        },
-        {
-          'type': this.$t('overview.closed'),
-          'percent': '0%'
-        }
-      ],
-      itemsPerArray: [],
-      params: {},
-      poperClass: 'date-picker-poper',
-      selectpoperClass: 'select-poper',
       lang: this.$i18n.locale,
-      timeMode: 1, // weekly mode
-      daysRangeList: [],
-      echartColor: '#7d8cab',
-      regionChartEmpty: true,
-      storeEventsOptions: null,
-      eventSourceOptions: null,
-      sourcePerArray: [],
-      newColor: '#f31d65',
-      pendingColor: '#fea316',
-      doneColor: '#434c5e',
-      closedColor: '#72a1f3',
-      storeEventList: [],
-      storeEventLegend: ['日期', this.$t('overview.createdEvent'), this.$t('overview.processedEvent'), this.$t('overview.closedEvents')],
-      echartAxiasColor: '#e3e9f4',
-      echartBackground: 'rgba(30,34,52,0.75)',
-      exportPng: require('../../../static/img/excel.png'),
-      eventTableData: [],
-      eventInfoData: [
-        {
-          'prop': 'province',
-          'label': this.$t('remotePatrol.regionI'),
-          'sortable': false,
-          'width': '140',
-          'maxWidth': '150',
-          'pdfwidth': '11%'
-        },
-        {
-          'prop': 'city',
-          'label': this.$t('remotePatrol.regionII'),
-          'sortable': false,
-          'width': '140',
-          'maxWidth': '140',
-          'pdfwidth': '11%'
-        },
-        {
-          'prop': 'storeName',
-          'label': this.$t('overview.storeName'),
-          'sortable': false,
-          'width': '140',
-          'maxWidth': '140',
-          'pdfwidth': '11%'
-        },
-        {
-          'prop': 'code',
-          'label': this.$t('remotePatrol.code'),
-          'sortable': false,
-          'width': '140',
-          'maxWidth': '140',
-          'pdfwidth': '11%'
-        },
-        {
-          'prop': 'numOfTotal',
-          'label': this.$t('overview.sumEvents'),
-          'sortable': 'custom',
-          'width': '140',
-          'maxWidth': '140',
-          'pdfwidth': '11%'
-        },
-        {
-          'prop': 'numOfUnprocessed',
-          'label': this.$t('overview.numUnprocessEvents'),
-          'sortable': 'custom',
-          'width': '140',
-          'maxWidth': '150',
-          'pdfwidth': '12%'
-        },
-        {
-          'prop': 'numOfInprocess',
-          'label': this.$t('overview.numProcessEvents'),
-          'sortable': 'custom',
-          'width': '145',
-          'maxWidth': '180',
-          'pdfwidth': '12%'
-        },
-        {
-          'prop': 'numOfProcessed',
-          'label': this.$t('overview.numClosedEvents'),
-          'sortable': 'custom',
-          'width': '140',
-          'maxWidth': '150',
-          'pdfwidth': '12%'
-        },
-        {
-          'prop': 'numOfRejected',
-          'label': this.$t('overview.numReturndEvents'),
-          'sortable': 'custom',
-          'width': '140',
-          'maxWidth': '150',
-          'pdfwidth': '12%'
-        }
-      ],
+      dateValue: [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()],
+      params: {},
+      page: 1,
+      sizeNum: 10,
+      total: 0,
       order: {
         direction: 'asc',
         property: 'numOfTotal'
       },
-      page: 1,
-      sizeNum: 10,
-      total: 0,
-      allEventData: [],
-      headerClass: 'header-class',
-      cellClass: 'cell-class',
-      rowClass: 'row-class',
-      exportEventHeader: [
-        this.$t('remotePatrol.regionI'),
-        this.$t('remotePatrol.regionII'),
-        this.$t('overview.storeName'),
-        this.$t('remotePatrol.code'),
-        this.$t('overview.sumEvents'),
-        this.$t('overview.numUnprocessEvents'),
-        this.$t('overview.numProcessEvents'),
-        this.$t('overview.numClosedEvents'),
-        this.$t('overview.numReturndEvents'),
-        this.$t('overview.remotePatrol'),
-        this.$t('overview.onsitePatrol'),
-        this.$t('overview.storeMonitor')
-      ],
-      hasNoData: false,
-      fontFamily: 'Roboto, Microsoft YaHei',
-      ifSaveParams: false,
+      userPosition:[],
+      origianlUserList:[],
+      userIds: [],
+      userList: [],
+      origianlUserList: [],
+      positionIds: [],
+      positionsList: [],
+      exportPng: require('../../../static/img/excel.png'),
       defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-      isLoading: true
-    };
+      allInsRecordData:[],
+      insRecordTableData:[],
+      insRecordColData:[
+        {
+          'prop': 'supervisorName',
+          'label': this.$t('statistics.patrolPerson.supervisorName'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '150',
+          'pdfwidth': '11%',
+          'isExpand': false
+        },
+        {
+          'prop': 'departs',
+          'label': this.$t('statistics.patrolPerson.department'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%',
+          'isExpand':false
+        },
+        {
+          'prop': 'numOfStores',
+          'label': this.$t('statistics.patrolPerson.numOfStores'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%',
+          'isExpand':false
+        },
+        {
+          'prop': 'numOfTotal',
+          'label': this.$t('statistics.patrolPerson.numOfTotal'),
+          'sortable': 'custom',
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%',
+          'isExpand':false
+        },
+        {
+          'prop': 'numOfStoresNotPatrolled',
+          'label': this.$t('statistics.patrolPerson.numOfStoresNotPatrolled'),
+          'sortable': 'custom',
+          'width': '140',
+          'maxWidth': '140',
+          'pdfwidth': '11%',
+          'isExpand':false
+        },
+        /*{
+          'prop': 'numOfTasked',
+          'label': this.$t('statistics.patrolPerson.numOfTasked'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '150',
+          'pdfwidth': '12%',
+          'isExpand':false
+        },
+        {
+          'prop': 'completionRate',
+          'label': this.$t('statistics.patrolPerson.completionRate'),
+          'sortable': false,
+          'width': '140',
+          'maxWidth': '150',
+          'pdfwidth': '12%',
+          'isExpand':false
+        },*/
+        {
+          'prop': 'processedRate',
+          'label': this.$t('statistics.patrolPerson.processedRate'),
+          'sortable': 'custom',
+          'width': '145',
+          'maxWidth': '180',
+          'pdfwidth': '12%',
+          'isExpand':false
+        },
+        {
+          'prop': 'detail',
+          'label': this.$t('statistics.patrolPerson.detail'),
+          'sortable': false,
+          'width': '100',
+          'maxWidth': '180',
+          'pdfwidth': '12%',
+          'isExpand':true
+        }
+      ],
+      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()}
+    }
   },
 
   computed: {
@@ -484,529 +234,191 @@ export default {
 
   watch: {
     async accountChanged(val) {
+      const self = this;
       if (val !== 0) {
-        this.ifSaveParams = false;
-        this.initData();
+        self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
+        const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
+        const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
+        self.params.beginTs = start;
+        self.params.endTs = end;
+        await self.initData();
+        self.curStoreTag = [];
       }
-    }
+    },
+
   },
 
   created() {
     this.initData();
-  },
-
-  beforeDestroy() {
-    this.$refs.eventSourceRef && this.$refs.eventSourceRef.dispose();
-    this.$refs.storeEventRef && this.$refs.storeEventRef.dispose();
+    this.getSearchCondition();
   },
 
   methods: {
-    handleDown() {
-      const self = this;
-      if (self.eventTableData.length === 0) {
-        util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
-        return false;
+    async initData() {
+      this.params.filter = { page: this.page - 1, size: this.sizeNum };
+      this.params.order = this.order;
+      this.doSearchInsRecordList();
+    },
+    dateChange(val) {
+      this.dateValue = val;
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      const daysDiff = this.$moment(end).diff(start, 'days');
+      this.timeMode = daysDiff <= 30 ? 1 : 2;
+      this.params.beginTs = start;
+      this.params.endTs = end;
+      //this.daysRangeList = util.getDaysRangeList(start, end, this.timeMode);
+    },
+    async getSearchCondition() {
+      const userPosition = getDepartmentList({ type: 1 }); //取得職務
+      const userPromise = getUserInfo();
+      //const titlePromise = titleRESTful.getUserTitleList();
+      try {
+        const result = await Promise.all([userPosition, userPromise]);
+        this.getUserList(result[1].data);
+        //this.getTitleList(result[2].data);
+        this.getUserPositionList(result[0].data);
+        //this.searchCheckInList();
+      } catch (e) {
+        console.log(e);
       }
-      self.ispdf = true;
-      this.$nextTick(() => {
-        const img = document.getElementById('imgTest');
-        setTimeout(() => {
-          html2canvas(img).then(function(canvas) {
-            var oGrayImg = canvas.toDataURL('image/jpeg');
-            self.pdfSrc = oGrayImg;
-          });
-          setTimeout(() => {
-            self.$print(self.$refs.printPDF);
-            self.ispdf = false;
-          }, 1000);
-        }, 5000);
+    },
+
+    getUserPositionList(data) {
+      this.positionsList = [];
+      const userIdList = [];
+      data.map(department => {
+        const departmentJson = {};
+        departmentJson.label = department.defineName;
+        departmentJson.value = department.defineId;
+        departmentJson.contents = department.contents;
+        userIdList.push(department.contents);
+        this.positionsList.push(departmentJson);
       });
-    },
-
-    async getStoreEventStatics() {
-      const self = this;
-      const params = {};
-      params.beginTs = self.params.beginTs;
-      params.endTs = self.params.endTs;
-      params.storeIds = self.params.storeIds;
-      params.timeMode = self.timeMode;
-      const storeEventResult = await self.getStoreEventData(params);
-      const option = self.initStoreEventOption();
-      if (storeEventResult.errCode === 0) {
-        const result = storeEventResult.data;
-        self.storeEventList = result;
-        const soureceList = [];
-        soureceList.push(self.storeEventLegend);
-        let sumOfNewEvents = 0;
-        let sumOfProcessedEvents = 0;
-        let sumOfClosedEvents = 0;
-        result.forEach((item, index) => {
-          const storeList = item.stores;
-          storeList.forEach(_item => {
-            sumOfNewEvents += _item.numOfNewEvents;
-            sumOfProcessedEvents += _item.numOfProcessedEvents;
-            sumOfClosedEvents += _item.numOfClosedEvents;
-          });
-          const itemArray = [];
-          itemArray.push(self.daysRangeList[index]);
-          itemArray.push(sumOfNewEvents);
-          itemArray.push(sumOfProcessedEvents);
-          itemArray.push(sumOfClosedEvents);
-          soureceList.push(itemArray);
-        });
-        option.dataset.source = soureceList;
-      }
-      self.isLoading = false;
-      self.storeEventsOptions = option;
-    },
-
-    initStoreEventOption() {
-      const self = this;
-      const option = {
-        color: [self.newColor, self.doneColor, self.closedColor],
-        legend: {
-          x: 'center',
-          y: 'bottom',
-          itemWidth: 10,
-          itemHeight: 10,
-          itemGap: 20,
-          padding: 0,
-          icon: 'rect',
-          textStyle: {
-            color: self.echartColor,
-            fontSize: 12,
-            padding: [0, 0, 0, 5],
-            height: 12,
-            lineHeight: 12
-          }
-        },
-        grid: {
-          containLabel: true,
-          top: '10',
-          left: '8',
-          right: '0',
-          bottom: '32'
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'none'
-          },
-          padding: 5,
-          textStyle: {
-            align: 'left'
-          },
-          backgroundColor: self.echartBackground
-        },
-        textStyle: {
-          fontFamily: self.fontFamily
-        },
-        dataset: {
-          source: []
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: true,
-          axisTick: {
-            show: false,
-            inside: true,
-            lineStyle: {
-              color: '#7D8CAB',
-              fontSize: 12
-            }
-          },
-          splitLine: {
-            show: false,
-            lineStyle: {
-              type: 'dashed'
-            }
-          },
-          axisLine: {
-            show: false,
-            lineStyle: {
-              color: '#7D8CAB'
-            }
-          },
-          axisLabel: {
-            fontStyle: 12,
-            margin: 10
-          }
-        },
-        yAxis: {
-          type: 'value',
-          // interval: 20,
-          minInterval: 20,
-          splitLine: {
-            show: true,
-            lineStyle: {
-              color: self.echartAxiasColor,
-              width: 1
-            }
-          },
-          axisTick: {
-            show: false,
-            inside: true,
-            lineStyle: {
-              color: '#7D8CAB',
-              fontSize: 12
-            }
-          },
-          axisLine: {
-            onZero: false,
-            show: false,
-            lineStyle: {
-              color: '#7D8CAB'
-            }
-          },
-          axisLabel: {
-            show: true,
-            fontStyle: 12,
-            margin: 10
-          }
-        },
-        series: [
-          { type: 'line', areaStyle: { color: 'rgba(243,29,101, 0.1)' }, symbol: 'none' },
-          { type: 'line', areaStyle: { color: 'rgba(67,76,94, 0.1)' }, symbol: 'none' },
-          { type: 'line', areaStyle: { color: 'rgba(114,161,243, 0.1)' }, symbol: 'none' }
-        ]
-      };
-      return option;
-    },
-
-    getStoreEventData(params) {
-      return new Promise((resolve, reject) => {
-        getEventStatsOverStore(params).then(res => {
-          resolve(res);
-        })
-          .catch(err => {
-            reject(err);
-          });
+      const userList = this.origianlUserList.map(user => user.value);
+      const filterUser = util.getDiffBetweenArrays(userIdList, userList);
+      this.roleId === 1 && this.userPosition.push({
+        label: this.$t('titleView.others'),
+        value: '00',
+        content: filterUser
       });
+      this.positionIds = this.ifCachedParams ? this.departmentIds : this.positionsList.map(depart => depart.value);
     },
 
-    adjustChart() {
-      this.$refs.eventSourceRef && this.$refs.eventSourceRef.resize();
-      this.$refs.storeEventRef && this.$refs.storeEventRef.resize();
+    getUserList(data) {
+      this.userList = [];
+      this.origianlUserList = [];
+      data.map(user => {
+        const userJson = {};
+        userJson.label = user.userName;
+        userJson.value = user.userId;
+        userJson.title = user.title;
+        this.origianlUserList.push(userJson);
+        this.userList.push(userJson);
+      });
+      this.userIds = this.ifCachedParams ? this.userIds : this.userList.map(user => user.value);
     },
 
+    getTitleList(data) {
+      data.map(title => {
+        const titleJson = {};
+        titleJson.label = title.title;
+        titleJson.value = title.titleId;
+        this.positionsList.push(titleJson);
+      });
+      this.positionIds = this.ifCachedParams ? this.positionIds : this.positionsList.map(position => position.value);
+    },
+    handlePositionsChange(positionIds) {
+      this.positionIds = positionIds;
+      this.filterUserIds();
+    },
+
+    filterUserIds() {
+      const filterDepart = this.positionsList.filter(position => this.positionIds.includes(position.value));
+      console.log("filterDepart:",filterDepart);
+      const departUserId = filterDepart.map(user => user.contents).flat();
+      console.log("departUserId:",departUserId);
+      this.userList = this.origianlUserList.filter(item => {
+        return departUserId.includes(item.value);
+      });
+      this.userIds = this.userList.map(user => user.value);
+    },
+
+    handleUserChange(userIds) {
+      this.userIds = userIds;
+      this.params.submitters = userIds;
+    },
+
+    /*** 取得巡檢人員紀錄***/
     export2Excel() {
       const that = this;
-      if (that.eventTableData.length === 0) {
-        util.notify(that.$t('overview.emptyEventList'), 'warning', 3000);
+      if (that.insRecordTableData.length === 0) {
+        util.notify(that.$t('statistics.emptyInsRecordList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportEventHeader;
-        const filterVal = ['province', 'city', 'storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
-          'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
-        const curData = that.allEventData;
+        const tHeader=[];
+        const filterVal = [];
+        this.insRecordColData.map(item=>{
+          if(item.prop!='detail'){
+            tHeader.push(item.label);
+            filterVal.push(item.prop);
+          }
+        })
+        const curData = that.insRecordTableData;
         const data = that.formatJson(filterVal, curData);
-        const fileName = 'EventList' + '-' + util.getCurDateStr();
+        const fileName = 'Inspection record_' +  util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
-
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
+    async doSearchInsRecordList(){
+      const start = typeof (this.dateValue[0]) === 'object' ? this.dateValue[0].getTime() : this.dateValue[0];
+      const end = typeof (this.dateValue[1]) === 'object' ? this.dateValue[1].getTime() : this.dateValue[1];
+      this.componentsProps =  {beginTs:start,endTs:end};
+      //const daysDiff = this.$moment(end).diff(start, 'days');
+      //this.timeMode = daysDiff <= 30 ? 1 : 2;
+      /*this.params.beginTs = start;
+      this.params.endTs = end;
+      this.params.submitters = this.userIds;*/
+      this.allInsRecordData = [];
+      let param = {beginTs:start,endTs:end,submitters:this.userIds};
+      
+      //console.log("doSearchInsRecordList > params:",this.params);
+      let record = await this.getInspectStatsPersonInfo(param);
+      this.allInsRecordData = record.data.content;
+      this.total = this.allInsRecordData.length;
+      this.doCoverDepartmentToString();
+      //console.log("this.total:",this.total);
+      //console.log("this.allInsRecordData:",this.allInsRecordData);
 
-    async getExportData() {
-      const params = {};
-      params.beginTs = this.params.beginTs;
-      params.endTs = this.params.endTs;
-      params.timeMode = this.timeMode;
-      params.storeIds = this.params.storeIds;
-      params.filter = { page: this.page - 1, size: this.total };
-      params.order = this.order;
-      let content = [];
-      try {
-        const eventResult = await this.getEventTableDataInfo(params);
-        const result = eventResult.data;
-        if (result) {
-          content = result.content;
-        }
-      } catch (e) {
-        this.ispdf = false;
-      }
-      return content;
+      this.setRecordTableData();
     },
-
-    async searchData() {
-      const self = this;
-      self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
-      if (self.params.storeIds.length === 0) {
-        self.eventTableData = [];
-        self.total = 0;
-        self.allEventData = [];
-        self.getEventsNum();
-        self.storeEventList = [];
-        self.storeEventsOptions && (self.storeEventsOptions.dataset.source = []);
-        self.getEventBySourcePie();
-        self.isLoading = false;
-        self.params.timeMode = self.timeMode;
-        self.hasNoData = true;
-        const searchParamsObj = {
-          path: 'eventStatistics',
-          params: this.params
-        };
-        this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
-        this.ifSaveParams = true;
-      } else {
-        self.params.filter = { page: self.page - 1, size: self.sizeNum };
-        self.params.order = this.order;
-        self.hasNoData = false;
-
-        /**
-         *firstly, call getEventTableData to get all event num and display the first page of table
-         * secondly, call getAllEventData to get all event and pie chart data
-         */
-
-        await self.getEventTableData();
-        await self.getAllEventData();
-        self.getStoreEventStatics();
-      }
+    doCoverDepartmentToString(){
+      this.allInsRecordData.map(record =>{
+        record.id=record.supervisorId;
+        record.departs = record.departments.toString();
+        record.processedRate = record.processedRate+'%';
+      })
     },
-
-    initDaysRange() {
-      const self = this;
-      const start = self.params.beginTs;
-      const end = self.params.endTs;
-      const startDay = self.$moment(start).format('YYYY-MM-DD');
-      const endDay = self.$moment(end).format('YYYY-MM-DD');
-      const startDayWithoutYear = self.$moment(start).format('MM/DD');
-      const endDayWithoutYear = self.$moment(end).format('MM/DD');
-      if (self.timeMode === 1) {
-        const beginDay = new Date(util.judgeStart(startDay));
-        const weekList = util.getWeek(beginDay, endDay);
-        const arrLength = weekList.length;
-        const firstEndTime = weekList[0].split('-')[1];
-        const firstWeekStr = startDayWithoutYear + '-' + firstEndTime;
-        const lastStartTime = weekList[arrLength - 1].split('-')[0];
-        const lastWeekStr = lastStartTime + '-' + endDayWithoutYear;
-        weekList.splice(0, 1, firstWeekStr);
-        weekList.splice(arrLength - 1, 1, lastWeekStr);
-        self.daysRangeList = weekList;
-      } else if (self.timeMode === 2) {
-        self.daysRangeList = util.getMonthBetween(startDay, endDay);
-      }
-    },
-
-    async initData() {
-      this.params.filter = { page: this.page - 1, size: this.sizeNum };
-      this.params.order = this.order;
-    },
-
-    async getEventTableData() {
-      const self = this;
-      self.params.timeMode = self.timeMode;
-      const searchParamsObj = {
-        path: 'eventStatistics',
-        params: this.params
-      };
-      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
-      this.ifSaveParams = true;
-      const eventResult = await self.getEventTableDataInfo(self.params);
-      const ignorePer = 0;
-      const errCode = eventResult.errCode;
-      if (errCode === 0) {
-        const result = eventResult.data;
-        if (result) {
-          const content = result.content;
-          self.total = result.totalElements;
-        } else {
-          self.eventTableData = 0;
-          self.eventKPIs.forEach(item => {
-            item.eventNum = 0;
-          });
-        }
-      }
-    },
-
-    async getAllEventData() {
-      const self = this;
-      const params = {};
-      params.beginTs = self.params.beginTs;
-      params.endTs = self.params.endTs;
-      params.timeMode = self.timeMode;
-      params.storeIds = self.params.storeIds;
-      params.filter = { page: self.page - 1, size: self.total };
-      params.order = self.order;
-      try {
-        self.allEventData = await self.getExportData();
-        self.allEventData.forEach(item => {
-          const numOfTotal = item.numOfTotal;
-          if (numOfTotal === 0) {
-            item.RemoteStr = 0 + '%';
-            item.OnsiteStr = 0 + '%';
-            item.VideoStr = 0 + '%';
-          } else {
-            item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-            item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-            item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
-          }
-          item.Remote = Number(item.RemoteStr.replace('%', ''));
-          item.Onsite = Number(item.OnsiteStr.replace('%', ''));
-          item.Video = Number(item.VideoStr.replace('%', ''));
-        });
-        self.setEventTableData();
-        self.getEventsNum();
-        self.getEventBySourcePie();
-      } catch (e) {
-        console.log('EventStatistics-getAllEventData:' + e);
-      }
-    },
-
-    setEventTableData(){
-      this.orderAllTableData();
-      this.eventTableData = [];
-      this.eventTableData = [...this.allEventData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
-    },
-
-    orderAllTableData(){
-      let key = this.defaultSort.prop;
-      key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
-      this.defaultSort.order === 'descending' ? this.allEventData.sort((a,b) => { return b[key] - a[key] })
-                                : this.allEventData.sort((a,b) => { return a[key] - b[key] });
-    },
-
-    getEventsNum() {
-      const self = this;
-      let totalEvents = 0;
-      let totalUnprocessed = 0;
-      let totalInprocess = 0;
-      let totalProcessed = 0;
-      let totalRejected = 0;
-      self.allEventData.forEach(item => {
-        totalEvents += item.numOfTotal;
-        totalUnprocessed += item.numOfUnprocessed;
-        totalInprocess += item.numOfInprocess;
-        totalProcessed += item.numOfProcessed;
-        totalRejected += item.numOfRejected;
-      });
-      self.eventKPIs[0].eventNum = totalEvents;
-      self.eventKPIs[1].eventNum = totalUnprocessed;
-      self.eventKPIs[2].eventNum = totalInprocess;
-      self.eventKPIs[3].eventNum = totalProcessed;
-      self.eventKPIs[4].eventNum = totalRejected;
-    },
-
-    getEventBySourcePie() {
-      const self = this;
-      const jsonArray = self.sourceLegend;
-      let allRemoteEventNum = 0;
-      let allOnsiteEventNum = 0;
-      let allStoreEventNum = 0;
-      let sumEvent = 0;
-      self.allEventData.forEach(item => {
-        sumEvent += item.numOfTotal;
-        allRemoteEventNum += item.numOfRemote;
-        allOnsiteEventNum += item.numOfOnsite;
-        allStoreEventNum += item.numOfVideo;
-      });
-      const totalArray = [allRemoteEventNum, allOnsiteEventNum, allStoreEventNum];
-      jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-      jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-      jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-      let seriesData = [];
-      if (sumEvent !== 0) {
-        seriesData = [
-          { value: allRemoteEventNum, name: self.$t('overview.remotePatrol') },
-          { value: allOnsiteEventNum, name: self.$t('overview.onsitePatrol') },
-          { value: allStoreEventNum, name: self.$t('overview.storeMonitor') }
-        ];
-      } else {
-        seriesData = [];
-      }
-      const pieOption = self.getEventBySourcePieOption();
-      pieOption.series[0].data = seriesData;
-      self.eventSourceOptions = pieOption;
-      self.sourcePerArray = jsonArray;
-    },
-
-    getEventBySourcePieOption() {
-      const pieOption = {
-        tooltip: {
-          trigger: 'item',
-          formatter: '{b} : {c} ({d}%)',
-          textStyle: {
-            align: 'left'
-          },
-          backgroundColor: this.echartBackground
-        },
-        textStyle: {
-          fontFamily: this.fontFamily
-        },
-        series: [
-          {
-            name: '事件来源占比',
-            type: 'pie',
-            radius: ['70%', '85%'],
-            center: ['50%', '50%'],
-            hoverOffset: 5,
-            label: {
-              normal: {
-                show: false,
-                position: 'center'
-              }
-            },
-            labelLine: {
-              normal: {
-                show: false
-              }
-            },
-            data: [],
-            itemStyle: {
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              },
-              normal: {
-                color: function(params) {
-                  const colorList = ['#f31d65', '#fb804f', '#fccc3f'];
-                  return colorList[params.dataIndex];
-                }
-              }
-            }
-          }
-        ]
-      };
-      return pieOption;
-    },
-
-    getEventTableDataInfo(params) {
+    getInspectStatsPersonInfo(params) {
       return new Promise((resolve, reject) => {
-        getEventStatsOverStoreV2(params).then(res => {
+        getInspectStatsOverPersonV3(params).then(res => {
           resolve(res);
         }).catch(err => {
           reject(err);
         });
       });
     },
-
-    emitSearch({ searchParams, dateRangeList, timeMode }) {
-      this.params = searchParams;
-      this.params.filter = { page: this.page - 1, size: this.sizeNum };
-      this.params.order = this.order;
-      this.daysRangeList = dateRangeList;
-      this.timeMode = timeMode;
-      this.searchData();
-    },
-
-    exportPdf(storeNameStr, groupStr, typeStr) {
-      this.storeNameStr = storeNameStr;
-      this.storeGroupStr = groupStr;
-      this.storeTypeStr = typeStr;
-      this.handleDown();
-    },
-
     handlePageAndSizeChange(pageObj) {
       const self = this;
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.setEventTableData();
+      self.setRecordTableData();
     },
 
     handleSortChange(order, defaultSort) {
@@ -1016,13 +428,22 @@ export default {
         page: this.page - 1,
         size: this.sizeNum
       };
-      this.setEventTableData();
+      this.setRecordTableData();
     },
 
-    setDefaultSortAndPage(paramsObj) {
-      this.defaultSort = paramsObj.defaultSort;
-      this.order = this.params.order = paramsObj.order;
-    }
+    setRecordTableData(){
+      
+      this.orderAllTableData();
+      this.insRecordTableData = [];
+      this.insRecordTableData = [...this.allInsRecordData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+    },
+
+    orderAllTableData(){
+      let key = this.defaultSort.prop;
+      key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
+      this.defaultSort.order === 'descending' ? this.allInsRecordData.sort((a,b) => { return b[key] - a[key] })
+                                : this.allInsRecordData.sort((a,b) => { return a[key] - b[key] });
+    },
 
   }
 };
@@ -1030,244 +451,78 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../assets/sass/stastical.scss";
-  .el-overview-content {
-    width: 100%;
-    position: relative;
-    height: auto;
-    font-size: calc(14/1920*100vw);
-    padding-bottom: 20px;
-    .el-overview {
-      padding: 0 calc(25/1920*100vw);
-      position: relative;
-      .export-header{
-        min-height: 100px;
-        margin-bottom: 20px;
-        border: 1px solid $border;
-        background-color: #fff;
-        padding: 10px 30px;
-        color: $black;
-        text-align: left;
-        font-size: calc(14/1920*100vw);
-        p{
-          margin:10px 0;
-          display: flex;
-          .content-header{
-            flex:1;
-          }
-        }
-      }
-      .first-row{
-        height: auto;
-        border: 1px solid $border;
-        background-color: #fff;
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-        .title{
-          height: 70px;
-          padding-top: 30px;
-          margin-left: calc(30/1920*100vw);
-          font-size: calc(20/1920*100vw);
-          text-align: left;
-          color: $black;
-        }
-        .kpi-list{
-          height: 100%;
-          border-bottom: 1px solid $border;
-          .kpi-content{
-            height: auto;
-            border-right: 1px solid $border;
-            display: flex;
-            flex-direction: column;
-            .event-list{
-              // height:  106px;
-              height:  85px;
-              padding-top: 15px;
-              padding-left: calc(34/1920*100vw);
-              padding-bottom: 20px;
-              border-bottom: 1px solid $border;
-              &:last-child{
-                border-bottom: none;
-              }
-              .event-title{
-                font-size: calc(16/1920*100vw);
-                height:calc(16/1920*100vw);
-                line-height:calc(16/1920*100vw);
-                color: $tab;
-                text-align: left;
-              }
-              .event-num{
-                font-size: calc(30/1920*100vw);
-                line-height: calc(30/1920*100vw);
-                height: calc(30/1920*100vw);
-                color: $h1;
-                text-align: left;
-                margin-top: 15px;
-                :last-child{
-                  padding-bottom: 20px;
-                }
-              }
-            }
-          }
-        }
-        .store-events{
-          height: auto;
-          @media screen and (max-width: 1536px){
-            width: 57%;
-          }
-          .region-result{
-            border-right: 1px solid $border;
-            height: 424px;
-            padding: 20px calc(30/1920*100vw) 30px calc(30/1920*100vw);
-            .charts-content{
-              height:100%;
-              .result-content{
-                height: 100%;
-                width: 100%;
-              }
-            }
-          }
 
-        }
-        .source-list{
-          @media screen and (max-width: 1536px){
-            width: 30%;
-          }
-          .pct-content{
-            height: 424px;
-            padding-top: 94px;
-            padding-bottom: 30px;
-            width: 100%;
-            text-align: center;
-            .pct-panel{
-              height: 200px;
-              width: 200px;
-              margin: 0 auto;
-              border-radius: 50%;
-              background: -webkit-radial-gradient( circle closest-side,#fff 60%, $background 40%);
-              .chart-content{
-                width: 100%;
-                height: 100%;
-              }
-            }
-            .pct-nums{
-              margin-top: 28px;
-              padding: 0 calc(20/1920*100vw);
-              font-size: 12px;
-              display: flex;
-              justify-content: center;
-              @media screen and (max-width: 1920px){
-                padding: 0;
-              }
-              @media screen and (max-width: 1440px){
-                justify-content: space-around;
-              }
-              .content-labels{
-                padding: 0 calc(10/1920*100vw);
-                @media screen and (max-width: 1280px){
-                  padding: 0;
-                }
-                font-size: 12px;
-                text-align: left;
-                .excellent_nums{
-                  margin-left: calc(20/1920*100vw);
-                  margin-bottom:10px;
-                  font-size: calc(14/1920*100vw);
-                  line-height: calc(14/1920*100vw);
-                }
-                .excellent_labels{
-                  line-height: 12px;
-                  font-size: 0;
-                  .labels{
-                    height: 10px;
-                    width: 10px;
-                    display: inline-block;
-                    margin-right: calc(10/1920*100vw);
-                    @media screen and (min-width: 1280px) and (max-width: 1366px) {
-                      margin-right: calc(2/1920*100vw);
-                    }
-                  }
-                  .label-desc{
-                    color: $tab;
-                    font-size: 12px;
-                  }
-                  .label-0{
-                    background-color: $red;
-                  }
-                  .label-1{
-                    background-color: $onsite;
-                  }
-                  .label-2{
-                    background-color: $store;
-                  }
-                }
-              }
-              .en-label{
-                @media screen and (max-width: 1920px){
-                  padding: 0 calc(5/1920*100vw);
-                }
-                @media screen and (max-width: 1660px){
-                  padding: 0 calc(1/1920*100vw);
-                }
-              }
-            }
-          }
-          .area-title{
-            font-size: calc(20/1920*100vw);
-            display: inline-block;
-            /*margin-right: calc(10/1920*100vw);*/
-          }
-          .empty-content{
-            font-size: calc(14/1920*100vw);
-            color: $tab;
-            padding-top: 140px;
-            border-top: 1px solid $border;
-          }
-        }
-
-        .ja-kpi-list{
-          @extend .kpi-list;
-          width: 16%;
-        }
-        .ja-store-events{
-          @extend .store-events;
-          width: 52%;
-        }
-        .ja-source-list{
-          @extend .source-list;
-          width: 32%;
-        }
-      }
-      .second-row {
-        height: auto;
-        margin-top: 30px;
-        background-color: #fff;
-        border: 1px solid $border;
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-        .items-title{
-          height: 70px;
-          width: 100%;
-          font-size: calc(20 / 1920 * 100vw);
-          text-align: left;
-          color: $black;
-          border-bottom: 1px solid $border;
-          .title {
-            padding-top: 30px;
-            padding-left: calc(30 / 1920 * 100vw);
-            font-size: calc(20 / 1920 * 100vw);
-            text-align: left;
-            color: $black;
-            display: inline-block;
-          }
-          .operation-btns{
-            padding-top: 25px;
-            padding-right: calc(30 / 1920 * 100vw);
-            float: right;
-          }
-        }
-        .event-table {
+  .statistics-container{
+    .statistics-content{
+      width:calc(1096/1440*100vw);
+      margin-left: calc(36/1440*100vw);
+    }
+    .search-bar{
+      display:flex;
+      flex-direction:row;
+      margin-left: calc(36/1440*100vw);
+      margin-right:32px;
+      margin-bottom:24px;
+      height:36px;
+      justify-content: space-between;
+    }
+    .person-title{
+      display:flex;
+        flex-direction:row;
+        width: calc(510/1440*100vw);
+        height:36px;
+        margin-left:72px;
+        font-size: 15px;
+        color: #484848;
+        justify-content: space-between;
+        align-items: center;
+        .date-range{
+          display:flex;
+          flex-direction:row;
+          border-radius: 5px;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
           background-color: #fff;
-          padding-top: calc(30/1920*100vw);
+          width: calc(440/1440*100vw);
+          height:36px;
+          align-items: center;
+        }
+        .position{
+          display:inline;
+          width: calc(217/1440*100vw);
+        }
+        .person{
+          display:inline;
+          width: calc(223/1440*100vw);
+        }
+    }
+    
+    .search-button{
+      margin-left:35px;
+      width: 102px;
+      height: 36px;
+      background-color: #556679;
+      border-color: #556679;
+      color:#fff;
+      font-size: 15px;
+    }
+
+    .operation-btns{
+      padding-top: 20px;
+      padding-right: 0px;
+      float: right;
+    }
+
+    .event-table {
+          overflow-y: auto;
+          height: 717.5px;
+          background-color: fff;
+          padding-top: 16.5px;
+          padding: 16.5 24px ;
           .table{
-            padding: 0 calc(30/1920*100vw)
+            margin: 0 calc(24/1920*100vw);
+            background-color: #f7f9fa;
+            box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+            border: solid 1px #f5f5f5;
           }
           .clearfix{
             content: "";
@@ -1278,13 +533,16 @@ export default {
           }
           .toolbar{
             float: right;
-            margin: 30px calc(30/1920*100vw);
+            margin: 24px calc(24/1920*100vw);
             margin-right: 0;
-            height:13%;
+            height:31px;
           }
         }
-      }
+    .ja-export-btn,
+    .en-export-btn,
+    .export-btn{
+      background-color: #fff;
+      color: #006ab7;
     }
   }
 </style>
-

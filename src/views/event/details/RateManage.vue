@@ -611,10 +611,10 @@ export default {
               self.showWinpBtn = false;
             }
             obj.showContent = index === 0;
+            obj.audioList = [];
+            obj.sourceList = [];
+            obj.descriptionList = [];
             if (item.attachment.length !== 0) {
-              obj.audioList = [];
-              obj.sourceList = [];
-              obj.descriptionList = [];
               item.attachment.forEach((_item, _index) => {
                 if (_item.mediaType === 0) {
                   const audioObj = {};

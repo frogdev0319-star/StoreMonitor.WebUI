@@ -1,73 +1,79 @@
 <template>
   <div>
-    <div :class="setWidthFlag ? 'width-limit' : ''" class="header-details">
-      <div :class="setWidthFlag ? 'first-header' : ''">
-        <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeSelect') }}</span>
+  <div class="content">
+    <div class="search-label">{{ $t('remotePatrol.storeSelect') }}</div>
+    <div class="header-details">
+      <div style="width:116px;">
         <el-select
-          v-model="curCountry"
-          :placeholder="$t('remotePatrol.country')"
-          size="mini"
-          class="el-province"
-          @change="onChangeCountry">
-          <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
-            <el-option
-              v-for="item in group.countryList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"/>
-          </el-option-group>
+            v-model="curCountry"
+            :placeholder="$t('remotePatrol.country')"
+            size="medium"
+            class="el-Country"
+            @change="onChangeCountry">
+            <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
+              <el-option
+                v-for="item in group.countryList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"/>
+            </el-option-group>
         </el-select>
-        <region-multi-select
+        <el-input
+          v-model="input"
+          placeholder=""
+          readonly
+          class="input-class"/>
+      </div>
+      <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+      <region-multi-select
           ref="proviceSelect"
           :selected="curProvince"
           :placeholder="$t('remotePatrol.regionI')"
           :options="provinceList"
           :disabled="curCountry.length === 0 || curCountry === '-1'"
           :all="$t('overview.allZoneI')"
-          style="display: inline"
+          class="region"
           @changeInput="onChangeProvince"/>
-        <region-multi-select
+      <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+      <region-multi-select
           ref="citySelect"
           :selected="curCity"
           :placeholder="$t('remotePatrol.regionII')"
           :options="cityList"
           :disabled="curProvince.length === 0 || curCountry === '-1'"
           :all="$t('overview.allZoneII')"
-          style="display: inline"
+          class="region"
           @changeInput="onChangeCity"/>
-
-        <multi-select
-          ref="multiSelect"
-          :selected="curStore"
-          :placeholder="$t('remotePatrol.stores')"
-          :options="storeDataList"
-          style="display: inline"
-          @changeInput="onChangeStore"/>
-
-      </div>
-      <div :class="setWidthFlag ? 'store-group-type' : ''">
-        <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeGroup') }}</span>
-        <multi-select
-          class="store-group-select"
+      <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+      <multi-select
+          class="store-group-select region"
           :selected="curStoreGroup"
           :prompt-msg="$t('remotePatrol.storeGroup')"
           :all-select="0"
           :alltype="0"
           :options="storeGroupList"
           @changeInput="onChangeStoreGroup"/>
-        <span :class="isInspectItem ? 'inspect-span' : 'normal-span'">{{ $t('remotePatrol.storeType') }}</span>
-        <multi-select
-          class="store-group-select"
+      <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+      <multi-select
+          class="store-group-select region"
           :selected="curStoreType"
           :prompt-msg="$t('remotePatrol.storeType')"
           :all-select="0"
           :alltype="0"
           :options="storeTypeList"
           @changeInput="onChangeStoreType"/>
-      </div>
-
     </div>
-
+    
+  </div>
+  <div v-if="showStoreSelect" class="store-div">
+    <multi-select
+        class="store-group-select store"
+        ref="multiSelect"
+        :selected="curStore"
+        :placeholder="$t('remotePatrol.stores')"
+        :options="storeDataList"
+        @changeInput="onChangeStore"/>
+  </div>
   </div>
 </template>
 
@@ -93,6 +99,10 @@ export default {
     isInspectItem: {
       type: Boolean,
       default: false
+    },
+    showStoreSelect: {
+      type: Boolean,
+      default: true
     },
     path: {
       type: String,
@@ -383,6 +393,7 @@ export default {
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
+      this.$emit('emitStoreList', this.storeDataList);
     },
 
     getStoreGroupString() {
@@ -405,6 +416,7 @@ export default {
 
     emitParams() {
       const tempsearchParamsObj = {};
+      console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
       tempsearchParamsObj.curCountry = this.curCountry;
       tempsearchParamsObj.curProvince = this.curProvince;
       tempsearchParamsObj.curCity = this.curCity;
@@ -505,22 +517,28 @@ export default {
     clearStoreInfo() {
       const self = this;
       self.curStore = [];
-      self.$refs.multiSelect.selectedArray = [];
-      self.$refs.multiSelect.input = '';
+      if (this.showStoreSelect) {
+        self.$refs.multiSelect.selectedArray = [];
+        self.$refs.multiSelect.input = '';
+      }
     },
 
     clearProviceInfo() {
       const self = this;
       self.curProvince = [];
-      self.$refs.proviceSelect.selectedArray = [];
-      self.$refs.proviceSelect.input = '';
+      if (this.showStoreSelect) {
+        self.$refs.proviceSelect.selectedArray = [];
+        self.$refs.proviceSelect.input = '';
+      }
     },
 
     clearCityInfo() {
       const self = this;
       self.curCity = [];
-      self.$refs.citySelect.selectedArray = [];
-      self.$refs.citySelect.input = '';
+      if (this.showStoreSelect) {
+        self.$refs.citySelect.selectedArray = [];
+        self.$refs.citySelect.input = '';
+      }
     },
 
     async selectAllProAndCity(val, isFirst) {
@@ -636,21 +654,44 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import "../assets/sass/stastical.scss";
+  .content{
+    display: flex;
+    flex-direction: row;
+    width:calc(1066/1440*100vw);
+    align-items: center;
+    .search-label{
+      width: calc(76/1440*100vw);
+      text-align: left;
+      align-self: center;
+      font-family: NotoSansCJKTC;
+      font-size: 15px;
+      font-weight: normal;
+    }
+  }
 
   .header-details{
     text-align: left;
-    position: relative;
     display: flex;
-    .search-content{
-      display: inline-block;
-    }
-    .el-province{
-      width: calc(160/1920*100vw);
+    flex-direction: row;
+    width: calc(990/1440*100vw);
+    height: 36px;
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    align-items: center;
+    padding: 0 !important;
+    .el-Country{
+      width: calc(116/1920*100vw);
       margin-right: calc(15/1920*100vw);
       min-width: 85px;
-      min-height: 28px;
+      min-height: 36px;
+      
     }
+    .region{
+      display:inline;
+      width: calc(217/1440*100vw);
+    }
+    
     .normal-span{
       font-size: calc(14/1920*100vw);
       margin-right: calc(20/1920*100vw);
@@ -670,18 +711,110 @@ export default {
       padding-right: calc(20/1920*100vw);
     }
   }
-  .width-limit{
-    width: calc(100% - 200px);
-    flex-wrap: wrap;
-  }
   .store-group-type{
     position: relative;
   }
-  .header-details.width-limit:first-child{
-    padding-bottom: 0px;
+  .store-div{
+    width: calc(222/1440*100vw);
+    height: 36px;
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    align-items: center;
+    margin-top:16px;
+    margin-left:calc(76/1440*100vw);
+    padding: 0 !important;
+  }
+  .store{
+    display:inline;
+    width: calc(222/1440*100vw);
+  }
+</style>
+<style scoped>
+  .el-select-dropdown__item{
+    padding: 0 20px 0 20px !important;
+    /*color: #7d8cad;*/
+  }
+  .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
+    font-family: "iconfont" !important;
+    content: '\e6a2';
+    left: 20px;
+    font-size: 15px;
+    font-style: normal;
+    color: #2c90d9;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .el-select-dropdown.is-multiple .el-select-dropdown__item::after{
+    font-family: "iconfont" !important;
+    position: absolute;
+    left: 20px;
+    content: "\e64a";
+    color: #2c90d9;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    font-size: 15px;
+    font-style: normal;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .input-class{
+    width: calc(100% - 30px);
+    position: absolute;
+    left: 0;
+  }
+  >>> .el-select .el-input--medium .el-input__suffix{
+    top:0px !important;
+    
+  }
+  >>> .el-select__tags{
+    opacity: 0;
+  }
+  >>> .input-class.el-input--medium .el-input__inner{
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    border: none;
+    border-right: none;
+    color: #2b2b2b;
+    background: transparent !important;
+    padding: 0 10px;
+    font-size: 15px;
+    min-width: 55px;
+    min-height: 28px;
+  }
+  >>> .el-select.el-select--medium .el-input .el-input__inner{
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    border: none;
+    font-size: 15px;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    min-height: 28px;
+    min-width: 85px;
   }
 
-  .first-header{
-    padding-bottom: 20px;
+  >>> .el-select.el-select--medium .el-input .el-input__suffix-inner{
+    position: relative;
+    z-index: 1;
+  }
+  >>> .el-input--medium .el-input__icon {
+    line-height: calc(36/1920*100vw);
+    height: calc(36/1920*100vw);
+    min-height: 28px;
+    color: #2c90d9;
+  }
+  .el-select.el-select--medium{
+    color: #2b2b2b;
+    background: #fff !important;
+    height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw);
+    border: none !important;
+    width: 100%;
+    border-radius: 3px;
+    min-height: 28px;
+    min-width: 85px;
+  }
+  >>> .el-select__tags{
+    opacity: 0;
   }
 </style>

@@ -1,23 +1,38 @@
 
 .el-pagination.is-background .el-pager li:not(.disabled).active{
-    background-color:#f31d65 !important;
-    color:#fff !important;
+    background-color:#edf0f2 !important;
+    color:#2b2b2b !important;
+    font-weight: bold;
 }
 .el-pagination.is-background.el-pagination--small .btn-next,
-.el-pagination.is-background.el-pagination--small .btn-prev,
+.el-pagination.is-background.el-pagination--small .btn-prev{
+    background-color:transparent !important;
+    color:#484848 !important;
+    border: none;
+
+} 
+.el-pagination.is-background.el-pagination--small .btn-next:disabled,
+.el-pagination.is-background.el-pagination--small .btn-prev:disabled{
+  color:#acaeb1 !important;
+  }
 .el-pagination.is-background.el-pagination--small .el-pager li{
     margin:0 !important;
-    min-width:32px !important;
-    min-height:28px !important;
+    min-width:48px !important;
+    min-height:31px !important;
     line-height:28px !important;
-    border:1px solid #DBE0E7 !important;
-    border-right:0 !important;
+    border-radius: 5px !important;
+    background-color: #edf0f2 !important;
+    /*border-right:0 !important;*/
 }
 .el-pagination.is-background.el-pagination--small .btn-next{
-  border-right: 1px solid #DBE0E7 !important;
+  border-right: none !important;
+  margin-left: 16px;
 }
-.el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li{
-    background-color:#fff !important;
+.el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev{
+    background-color:transparent !important;
+}
+.el-pagination.is-background .el-pager li{
+  background-color:#edf0f2 !important;
 }
 .el-pagination--small button, .el-pagination--small span:not([class*=suffix]){
     margin-right:15px !important;

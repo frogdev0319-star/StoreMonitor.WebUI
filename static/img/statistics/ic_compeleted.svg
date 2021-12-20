@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="115.498" height="74.555" viewBox="0 0 115.498 74.555">
+    <defs>
+        <linearGradient id="a" y1="1.152" x2=".778" y2="-.187" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#fdfefe"/>
+            <stop offset="1" stop-color="#7c95bd"/>
+        </linearGradient>
+        <linearGradient id="b" x1="-.074" y1="1.319" x2=".778" y2="-.187" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#fdfefe"/>
+            <stop offset="1" stop-color="#ccddf7"/>
+        </linearGradient>
+        <linearGradient id="c" x1=".5" x2=".5" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#e5ebf5"/>
+            <stop offset="1" stop-color="#fdfdfe"/>
+        </linearGradient>
+        <linearGradient id="d" x1=".5" x2=".5" y2="1" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#8399ba"/>
+            <stop offset="1" stop-color="#d3dbe6"/>
+        </linearGradient>
+    </defs>
+    <g transform="translate(-51.336 -75.165)">
+        <path d="M45.146 0A9.244 9.244 0 0 1 35.9 9.244l-16.35-.038c3.338 1.394 6.395 4.677 6.395 8.521 0 5.105-6.982 9.293-12.087 9.293L0 27.262" transform="rotate(-180 83.605 51.149)" style="fill:none;stroke:#707070;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:3"/>
+        <path data-name="联合 7" d="M2.866 46.193A2.593 2.593 0 0 1 0 43.608V3.45C0 2.009 1.24.1 2.866 0h19.793c1.617 0 2.444 1.743 2.954 3.02.562 1.426 1.049 2.88 1.728 4.262l.768 1.537a2.674 2.674 0 0 0 2.585 1.824h27.83a2.809 2.809 0 0 1 2.676 2.97v15.046a20.545 20.545 0 0 0-17.788-10.251h-.192a20.14 20.14 0 0 0-20.274 20.406 15.252 15.252 0 0 0 1.529 7.378zM30.909 8.738a1.84 1.84 0 0 1 0-3.679H58.5a1.84 1.84 0 0 1 0 3.679z" transform="translate(63.721 93.616)" style="fill:url(#a)"/>
+        <path data-name="减去 24" d="M0 36.637V3.452C0 1.966 1.276.1 2.864 0h19.794a2.39 2.39 0 0 1 1.892 1.033 8.076 8.076 0 0 1 1.061 1.989q.09.228.177.456L0 36.635zm61.2-7.976c-.122-.2-.249-.41-.377-.61v-15.99a3.254 3.254 0 0 1 .386 1.553L61.2 28.657z" transform="translate(63.724 93.614)" style="opacity:.556;fill:url(#b)"/>
+        <path data-name="路径 77" d="M17 0A17 17 0 1 1 0 17 17 17 0 0 1 17 0z" transform="translate(90.83 115.72)" style="fill:#99a2af"/>
+        <circle data-name="椭圆 25" cx="17" cy="17" r="17" transform="translate(89.83 114.72)" style="fill:url(#c)"/>
+        <path data-name="路径 68" d="m0 8.57 3.634-1.649L9 12.318 20.412.24 22.793 0 9.592 16.569z" transform="translate(95.754 123.394)" style="fill:#6d84a7"/>
+        <path data-name="联合 6" d="M-15609.333 2022a2 2 0 0 1-2-2 2 2 0 0 1 2-2h17.333a2 2 0 0 1 2 2 2 2 0 0 1-2 2zm-76.669-5a2 2 0 0 1-2-2 2 2 0 0 1 2-2h5.335a2 2 0 0 1 2 2 2 2 0 0 1-2 2zm77-1a2 2 0 0 1-2-2 2 2 0 0 1 2-2h9.335a2 2 0 0 1 2 2 2 2 0 0 1-2 2zm-70-5a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.335a2 2 0 0 1 2 2 2 2 0 0 1-2 2z" transform="translate(15739.338 -1875.281)" style="fill:url(#d)"/>
+    </g>
+</svg>

@@ -1,5 +1,5 @@
 $red:#f31d65;
-$black:#182752;
+$black:#2b2b2b;
 $border:#e3e9f4;
 $background:#f4f5f9;
 $tab:#7d8cad;
@@ -25,9 +25,9 @@ $store: #fccc3f;
 .statistics-header{
   margin-bottom: 30px;
   border-bottom: 1px solid $border;
-  background-color: #fff;
-  padding-top: 30px;
-  color: $black;
+  background-color: #edf0f2;
+  padding-top: 24px;
+  color: #484848;
   .header-details{
     text-align: left;
     position: relative;
@@ -56,7 +56,7 @@ $store: #fccc3f;
       }
     }
     .el-province{
-      width: calc(160/1920*100vw);
+      width: 100%;
       margin-right: calc(15/1920*100vw);
       min-height: 28px;
       min-width: 85px
@@ -103,7 +103,7 @@ $store: #fccc3f;
     align-items: center;
     .region-titles{
         font-family: NotoSansCJKTC;
-        font-size: calc(18/1440*100vw);
+        font-size: calc(18/1920*100vw);
         font-weight: 500;
         text-align: left;
         color: #2b2b2b;
@@ -127,6 +127,9 @@ $store: #fccc3f;
             color:#868FA1;
         }
     }
+    .el-select-dropdown__item:hover{
+      background-color: #aad7f7;
+    }
     .dropdown__item {
         .selected::after {
             color: #E6F3F3
@@ -140,14 +143,14 @@ $store: #fccc3f;
 
 .date-picker {
   width:130px;
-  height: 25px;
+  height: 35px;
   line-height: 25px;
   font-size: 13px;
   margin-left: 0;
   align-self: center;
   .el-input__inner {
         width: 130px;
-        height: 25px;
+        height: 35px;
         border: none;
         background-color:#f7f9fa;
     
@@ -165,7 +168,7 @@ $store: #fccc3f;
   .el-input__icon {
       width: 18px;
       height: 18px;
-      line-height: 32px;
+      line-height: 42px;
       /*content: url(/../../../static/img/statistics/ic_calender.svg);*/
   }
   .el-input--medium .el-input__icon {
@@ -173,6 +176,19 @@ $store: #fccc3f;
   }
   .el-icon-date::before{
     content: url(/../../../static/img/statistics/ic_calender.svg);
+  }
+  .global-date-pick{
+    .el-range-editor--mini .el-range__icon{
+      width: 24px;
+      height: 24px;
+      line-height: 28px;
+    }
+    .el-input__icon {
+      width: 24px;
+      height: 24px;
+      line-height: 36px;
+      /*content: url(/../../../static/img/statistics/ic_calender.svg);*/
+    }
   }
 }
 

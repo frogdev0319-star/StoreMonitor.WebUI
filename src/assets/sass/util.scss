@@ -8,8 +8,10 @@ $dialogTitle: #424151;
 $warning: #ff9803;
 $cancelBtnBackground: #eaedf2;
 $cancelBtnFont: #adb1c0;
-$mainColor: #f31d65;
+$mainColor: #006ab7;
 $black: #182752;
+$primary:#556679;
+$CTA:#c60957;
 
 @import url('../css/pagination.css');
 .clear-float::after{
@@ -147,8 +149,8 @@ $black: #182752;
 }
 
 .storevue-button{
-  width: calc(130/1920*100vw);
-  font-size: calc(14/1920*100vw);
+  width: calc(102/1920*100vw);
+  font-size: calc(15/1920*100vw);
   height: calc(36/1920*100vw);
   padding: 0;
   min-height: 28px;
@@ -177,8 +179,18 @@ $black: #182752;
   @extend .storevue-button;
 }
 .export-btn.el-button--primary.el-button--mini{
-  min-height: 28px;
-  min-width: 120px;
+  background-color: $primary;
+  border:none;
+  color: #fff;
+  min-height: 36px;
+  min-width: 102px;
+}
+.export-btn.el-button--default.el-button--mini{
+  background-color: #fff;
+  border:none;
+  color: #006ab7;
+  min-height: 36px;
+  min-width: 102px;
 }
 .export-btn .iconfont{
   font-size: calc(24/1920*100vw);
@@ -187,7 +199,7 @@ $black: #182752;
 .export-btn .icon-excel{
   height: calc(24/1920*100vw);
   width: calc(24/1920*100vw);
-  margin-right: calc(18/1920*100vw);
+  margin-right: calc(8/1920*100vw);
 }
 .en-export-btn{
   @extend .export-btn;

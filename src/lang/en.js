@@ -245,7 +245,8 @@ export default {
     "visitor": "Interviewer",
     "worstItems": "Unqualified Items TOP5",
     "worstPatrol": "Worst Inspection Completion TOP5",
-    "worstRegion": "Worst Region"
+    "worstRegion": "Worst Region",
+    "customDate":"自訂義"
   },
 
   // Patrol page language

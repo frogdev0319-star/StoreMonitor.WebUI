@@ -12,7 +12,8 @@
                 ></el-option>
             </el-select>
             <div style="width:1px; height:20px;background-color:#556679;align-self: center;"></div>
-            <el-date-picker key="date1" class="date-picker"  :type="dateRange" v-model="date" :format="dateFormat"
+            <el-date-picker key="date1" class="date-picker"  :type="dateRange" v-model="date" :format="dateFormat" 
+                :picker-options="{firstDayOfWeek: 7}"
                 @change="onDateChanged" :clearable="false"></el-date-picker>
         </div>
     </div>
@@ -29,7 +30,7 @@ export default {
             dateRange:'week',
             dateRangeItems:[{value:'week',label:this.$t('statistics.weekCompare')},{value:'month',label:this.$t('statistics.monthCompare')}],
             date:Date.now(),
-            dateFormat:'yyyy/MM/DD',
+            dateFormat:this.$moment(Date.now()).startOf('week').format("YYYY/MM/DD"),
         }
   },
   computed: {
@@ -42,25 +43,40 @@ export default {
                 //this.$store.dispatch("op_log/setControlOPLog", params);
     },
     onDateChanged() {
+        console.log("pick date:",this.date);
         this.getDateRange();
     },
     getDateRange(){
         if (this.dateRange == "week") {
-            let start = this.$moment(this.date).startOf('week').format("yyyy/MM/DD");
-            let end = this.$moment(this.date).endOf('week').format("yyyy/MM/DD");
+            let start = this.$moment(this.date).startOf('week').format("YYYY/MM/DD");
+            let end = this.$moment(this.date).endOf('week').format("YYYYY/MM/DD");
             console.log("start-end:", start + " " + end);
-            this.dateFormat = 'yyyy/MM/DD';
-            const paramDate = { start_date: this.$moment(this.date).startOf('week'), end_date: this.$moment(this.date).endOf('week') }
+            this.dateFormat = this.$moment(this.date).startOf('week').format("YYYY/MM/DD");
+            const paramDate = { start_date: this.$moment(this.date).startOf('week'), end_date: this.$moment(this.date).endOf('week'),range_type:'week' }
+            this.$emit('emitFilterDateRange', paramDate );
         } else if (this.dateRange == "month") {
             this.dateFormat = "yyyy/MM";
-            const paramDate = { start_date: this.$moment(this.date).startOf('month'), end_date: this.$moment(this.date).endOf('month') }
+            const paramDate = { start_date: this.$moment(this.date).startOf('month'), end_date: this.$moment(this.date).endOf('month'),range_type:'month' }
+            this.$emit('emitFilterDateRange', paramDate );
         }
-        this.$emit('emitFilter', paramDate );
+        
     }
   }
 }
 </script>
-
+<style lang="css" >
+.dropdown-select.el-select.el-input--medium .el-input__inner{
+    height: 25px;
+    font-size: 15px;
+    text-align: left;
+    border: none;
+    background-color: #f7f9fa;
+    color:#2b2b2b;
+  }
+  .dropdown-select.el-select .el-input--medium .el-input__suffix{
+    top:0px;
+  }
+</style>
 <style lang="scss" scoped>
 .content{
     width:307px;
@@ -91,11 +107,10 @@ export default {
         }
         .dropdown-select{
             width:85px;
-            height:25px;
-            border:1px solid #f7f9fa;
+            height:36px;
+            border:none;
             color: #2b2b2b;
             align-self: center;
-            align-items: center;
         }
     }
     .date-picker {

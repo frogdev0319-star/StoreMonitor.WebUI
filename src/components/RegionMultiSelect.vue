@@ -7,7 +7,8 @@
       :size="inputSize"
       multiple
       collapse-tags
-      class="el-province"
+      :taggable="false"
+      :style="{width:'Wdith'}"
       @change="changeSelect"
       @visible-change="visibileHandler">
       <el-option v-if="options.length > 0" :label="$t('scheduleView.all')" :disabled="allDisabled"
@@ -53,6 +54,10 @@ export default {
     isPointCheck: {
       type: Boolean,
       default: false
+    },
+    Width:{
+      type:Number,
+      default:160
     }
   },
 
@@ -249,7 +254,7 @@ export default {
     text-align: left;
     display: inline-block;
     position: relative;
-    width: calc(160/1920*100vw);
+    width: 100%;
     margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
@@ -262,6 +267,7 @@ export default {
     left: 20px;
     font-size: 14px;
     font-style: normal;
+    color: #2c90d9;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -270,6 +276,7 @@ export default {
     position: absolute;
     left: 20px;
     content: "\e64a";
+    color: #2c90d9;
     font-weight: 700;
     -webkit-font-smoothing: antialiased;
     font-size: 14px;
@@ -277,9 +284,13 @@ export default {
     -moz-osx-font-smoothing: grayscale;
   }
   .input-class{
-    width: calc(160/1920*100vw - 30px);
+    width: calc(100% - 30px);
     position: absolute;
     left: 0;
+  }
+  >>> .el-select .el-input--medium .el-input__suffix{
+    top:0px !important;
+    
   }
   >>> .el-select__tags{
     opacity: 0;
@@ -287,12 +298,12 @@ export default {
   >>> .input-class.el-input--medium .el-input__inner{
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
-    border: 1px solid #E4E7ED;
+    border: none;
     border-right: none;
-    color: #7d8cad;
-    background: #f4f5f9 !important;
+    color: #2b2b2b;
+    background: transparent !important;
     padding: 0 10px;
-    font-size: 12px;
+    font-size: 15px;
     min-width: 55px;
     min-height: 28px;
   }
@@ -301,7 +312,7 @@ export default {
     z-index: 1;
     background: transparent !important;
     border: none;
-    font-size: 12px;
+    font-size: 15px;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     bottom: calc(2/1920*100vw);
@@ -317,14 +328,15 @@ export default {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
     min-height: 28px;
+    color: #2c90d9;
   }
   .el-select.el-select--medium{
-    color: #7d8cad;
-    background: #f4f5f9 !important;
+    color: #2b2b2b;
+    background: #fff !important;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
-    border: 1px solid #E4E7ED !important;
-    width: calc(160/1920*100vw);
+    border: none !important;
+    width: 100%;
     border-radius: 3px;
     min-height: 28px;
     min-width: 85px;
@@ -339,10 +351,10 @@ export default {
   }
   >>> .input-class.el-input--mini .el-input__inner{
     border: none;
-    color: #7d8cad;
-    background: #fff !important;
+    color: #2b2b2b;
+    background: transparent !important;
     padding: 0 10px;
-    font-size: 12px;
+    font-size: 15px;
   }
 
   >>> .el-select.el-select--mini .el-input .el-input__inner{
@@ -350,14 +362,14 @@ export default {
     z-index: 1;
     background: transparent !important;
     border: none;
-    font-size: 12px;
+    font-size: 15px;
   }
   >>> .el-select.el-select--mini .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
   .el-select.el-select--mini{
-    color: #fff;
+    color: #2b2b2b;
     background: #fff !important;
     width: 200px;
   }
