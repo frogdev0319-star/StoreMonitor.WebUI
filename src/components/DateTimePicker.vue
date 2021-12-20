@@ -191,7 +191,7 @@ export default {
             this.dateTimeValue = [start, end];
             console.log("this.dateTimeValue:",this.dateTimeValue);
         }
-        
+        this.dateChange(this.dateTimeValue)
     }
   }
 };

@@ -26,8 +26,11 @@
           </el-select>
         </div>
       </div>
+      <div v-if="showDateSelector">
+        <date-time-selector class="time-selector" @change="dateChange"/>
+      </div>
       <div>
-      <delay-button
+        <delay-button
           :disabled="storeListLength === 0"
           :class="lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
           type="primary"
@@ -36,7 +39,7 @@
         >
           <span>{{ $t('remotePatrol.search') }}</span>
         </delay-button>
-        </div>
+      </div>
     </div>
     </div>
   </div>
@@ -54,6 +57,7 @@ import DelayButton from '@/components/DelayButton';
 import StoreFilter from './StoreFilter';
 import DateTimeSelector from './DateTimeSelector';
 import SelectedStores from './SelectedStores';
+
 
 export default {
   name: 'SearchComponent',
@@ -81,6 +85,10 @@ export default {
     },
     defaultSort: {
       type: Object
+    },
+    showDateSelector:{
+      type:Boolean,
+      default:true
     }
   },
 
@@ -151,6 +159,7 @@ export default {
 
   methods: {
     dateChange(val) {
+
       this.dateValue = val;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
@@ -159,6 +168,7 @@ export default {
       this.params.beginTs = start;
       this.params.endTs = end;
       this.daysRangeList = util.getDaysRangeList(start, end, this.timeMode);
+      console.log("dateChange:",val);
     },
 
     onInspectListChange() {

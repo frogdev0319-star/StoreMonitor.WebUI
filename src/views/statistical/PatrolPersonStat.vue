@@ -89,7 +89,6 @@
 import ECharts from 'vue-echarts';
 import { mapGetters } from 'vuex';
 import util from '@/common/util.js';
-import SearchComponent from '@/components/SearchComponent';
 import filterString from '@/common/filterString';
 import resize from '@/components/mixins/echartResize';
 
@@ -456,12 +455,12 @@ export default {
   .statistics-container{
     .statistics-content{
       width:calc(1096/1440*100vw);
-      margin-left: calc(32/1440*100vw);
+      margin-left: calc(36/1440*100vw);
     }
     .search-bar{
       display:flex;
       flex-direction:row;
-      margin-left:32px;
+      margin-left: calc(36/1440*100vw);
       margin-right:32px;
       margin-bottom:24px;
       height:36px;

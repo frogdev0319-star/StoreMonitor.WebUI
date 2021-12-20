@@ -11,15 +11,27 @@
                 ></el-option>
             </el-select>
             <div style="width:1px; height:20px;background-color:#556679;align-self: center;"></div>
-            <div>
-            <multi-select
-              ref="multiSelect"
-              :compareType="compareType"
-              :selected="curSelectId"
-              :placeholder="dropdownPlaceholder"
-              :options="curTypeArrary"
-              style="display: inline;border:none;"
-              @changeInput="onChangeCompareType"/>
+            <div v-if="allowAll">
+              <multi-select
+                ref="multiSelect"
+                class="area-muti"
+                :compareType="compareType"
+                :selected="curSelectId"
+                :placeholder="dropdownPlaceholder"
+                :options="curTypeArrary"
+                :all="selAllString"
+                :limit-num="limitNum"
+                style="display: inline;border:none;"
+                @changeInput="onChangeCompareType"/>
+              </div>
+              <div v-else>
+                <limit-select
+                  class="area-muti"
+                  :selected="curSelectId"
+                  :options="curTypeArrary"
+                  :input-size="`mini`"
+                  :limit = "limitNum"
+                  @changeInput="onChangeCompareType" />
               </div>
         </div>
     </div>
@@ -31,11 +43,13 @@ import MultiSelect from '@/components/MultiSelect2';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import { getBriefStoreList, getStoreDefineGroup } from '@/api/store';
+import LimitSelect from '@/components/LimitSelect';
 export default {
     name: 'AreaSelected',
     components: {
       MultiSelect,
-      RegionMultiSelect
+      RegionMultiSelect,
+      LimitSelect
     },
     props: {
         cachedParams: {
@@ -43,6 +57,17 @@ export default {
         },
         curCountry:{
             type:String
+        },
+        path:{
+          type:String
+        },
+        allowAll:{
+          type:Boolean,
+          default:false
+        },
+        limitNum:{
+          type:Number,
+          default:0
         }
     },
     data() {
@@ -70,7 +95,8 @@ export default {
             storeTypeList: [],
             dropdownPlaceholder:this.$t('remotePatrol.stores'),
             curTypeArrary:[],
-            curSelectId:[]
+            curSelectId:[],
+            selAllString:this.$t('overview.all'),
         }
   },
   created() {
@@ -101,8 +127,8 @@ export default {
   methods: {
     getSearchParams() {
       //const searchParams = this.cachedParams;
-      const searchParams = SearchConditionUtil.getSearchCondition('inspectEvalutionStatistics');
-      //console.log("*searchParams.curCountry:",searchParams.curCountry);
+      const searchParams = SearchConditionUtil.getSearchCondition(this.path);
+      console.log("*searchParams.curCountry:",searchParams.curCountry);
       if (Object.keys(searchParams).length > 0) {
         
         if (searchParams.curCountry) {
@@ -203,7 +229,7 @@ export default {
             storeObj = {
               storeId: item.storeId,
               label: item.name,
-              value: item.name,
+              value: item.storeId,
               userId: item.userId,
               userName: item.userName
             };
@@ -296,44 +322,61 @@ export default {
     changeCompareType(val){
       this.compareType = val;
       this.curSelectId = [];
+      this.curTypeArrary = [];
       switch (val){
         case 'area1':
           this.dropdownPlaceholder = this.$t('remotePatrol.regionI');
+          this.selAllString=this.$t('overview.allZoneI');
           this.curTypeArrary =this.provinceList;
           break;
         case 'area2':
           this.dropdownPlaceholder =  this.$t('remotePatrol.regionII');
+          this.selAllString=this.$t('overview.allZoneII');
           this.curTypeArrary =  this.cityList;
           break;
         case 'storeGroup':
           this.dropdownPlaceholder =  this.$t('remotePatrol.storeGroup');
+          this.selAllString=this.$t('storeView.all');
           this.curTypeArrary = this.storeGroupList;
         
           break;
         case 'storeType':
           this.dropdownPlaceholder =  this.$t('remotePatrol.storeType');
+          this.selAllString=this.$t('storeView.all');
           this.curTypeArrary = this.storeTypeList;
           break;
         case 'stores':
           this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
+          this.selAllString=this.$t('overview.all');
           this.curTypeArrary = this.storeDataList;
           break;
         default:
           this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
+          this.selAllString=this.$t('overview.all');
           this.curTypeArrary = this.storeDataList;
           break;
       }
+      /*console.log("allowAll:",this.allowAll);
+      if(this.allowAll){
+
+          this.curTypeArrary.unshift({value:"-1",label:this.$t('remotePatrol.all') })
+      }*/
       if(this.curSelectId.length==0 ){
-            let defaultSel = (this.curTypeArrary.length>2)?2:this.curTypeArrary.length;
-            let selectedLabels = [];
-            let storeIds = [];
-            for(let i=0; i<defaultSel;i++){
-              this.curSelectId.push((this.compareType=="stores")?this.curTypeArrary[i].storeId:this.curTypeArrary[i].value);
-              selectedLabels.push(this.curTypeArrary[i].label);
-            }
-            this.onChangeCompareType({selectedArray:this.curSelectId,storeIds:this.curSelectId,selectedLabels});
-            //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});
+        if(this.allowAll){
+          this.curSelectId.push(-1);
+        }else{
+          let defaultSel = (this.curTypeArrary.length>2)?2:this.curTypeArrary.length;
+          let selectedLabels = [];
+          let storeIds = [];
+          for(let i=0; i<defaultSel;i++){
+            this.curSelectId.push((this.compareType=="stores")?this.curTypeArrary[i].storeId:this.curTypeArrary[i].value);
+            selectedLabels.push(this.curTypeArrary[i].label);
           }
+          this.onChangeCompareType({selectedArray:this.curSelectId,storeIds:this.curSelectId,selectedLabels});
+            //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});
+        }
+            
+      }
         console.log("changeCompareType:",val);
         
     },
@@ -393,9 +436,9 @@ export default {
 
 <style lang="scss" scoped>
 .content{
-    width:307px;
+    width:calc(285/1440*100vw);
     height:35px;
-    margin-top: 16px;
+    border-radius: 5px;
     display:flex;
     flex-direction:row;
     background-color:#f7f9f9;
@@ -404,17 +447,17 @@ export default {
         display:flex;
         flex-direction:row;
         .type-div{
-            width: 52px;
+            width: calc(52/1440*100vw);
             height: 18px;
             margin: 2px 0 4px 4px;
             font-family: NotoSansCJKtc;
             font-size: 13px;
-            text-align: left;
+            text-align: center;
             color: #556679;
             align-self: center;
         }
         .dropdown-select{
-            width:85px;
+            width:calc(85/1440*100vw);
             height:36px;
             border:1px solid #f7f9fa;
             color: #2b2b2b;
@@ -422,5 +465,37 @@ export default {
             align-items: center;
         }
     }
+    .area-muti{
+      width:calc(141.5/1440*100vw);
+      font-size: 15px;
+      ::v-deep.el-select.el-select--medium{
+         background-color: #f7f9f9 !important;
+        }
+    }
+    
 }  
+</style>
+<style>
+.area-muti.el-select.el-select--medium{
+    color: #2b2b2b;
+    background: #f7f9f9 !important;
+    height: 35px;
+    line-height: 35px;
+    border: none !important;
+    width: 100%;
+    min-height: 35px;
+    min-width: 85px;
+  }
+  .area-muti.input-class.el-input--medium .el-input__inner{
+    height: 35px;
+    line-height: 35px;
+    color: #2b2b2b;
+    background-color: #f7f9f9 !important;
+    border:none;
+    padding: 0 10px;
+    font-size: 13px;
+    min-width: 55px;
+    min-height: 28px;
+    text-overflow: ellipsis;
+  }
 </style>
