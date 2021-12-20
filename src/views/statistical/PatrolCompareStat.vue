@@ -5,6 +5,7 @@
                 <search-component
                 ref="inspectEvalutionSearch"
                 :is-patrol = "true"
+                :showDateSelector = "false"
                 path="inspectEvalutionStatistics"
                 @emitSearch = "emitSearch"/>
             </el-col>
@@ -23,10 +24,12 @@
                     </el-col>
                 </div>
                 <div class="average-cahrt">
-                  <div style="height:68px;">
+                  <div style="height:68px;margin-top: 16px;">
                     <AreaSelected
+                      path="inspectEvalutionStatistics"
                       :cached-params="params"
                       :cur-country="curCountry"
+                      limit-num="2"
                       @emitTypeChanged="emitTypeChanged"
                     ></AreaSelected>
                   </div>
@@ -75,10 +78,11 @@
                     </el-col>
                 </div>
                 <div class="average-cahrt">
-                  <div style="height:68px;">
+                  <div style="height:68px;margin-top: 16px;">
                     <AreaSelected
                       :cached-params="params"
                       :cur-country="curCountry"
+                      limit-num="2"
                       @emitTypeChanged="emitTypeChanged2"
                     ></AreaSelected>
                   </div>

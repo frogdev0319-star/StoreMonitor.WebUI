@@ -33,3 +33,11 @@ export const getEventStatsOverStoreV2 = data => {
     data
   });
 };
+
+export const getEventStatsOverWithGroup = data => {
+  return request({
+    url: `v1.0/statistics/event/group`,
+    method: 'post',
+    data
+  });
+};

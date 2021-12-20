@@ -10,6 +10,8 @@
       clearOnSelect="false"
       @change="changeSelect"
       @visible-change="visibileHandler">
+      <el-option v-if="options.length > 0 && all!=''" :label="$t('remotePatrol.all')"
+                 value="-1" @click.native="selectAll"/>
       <el-option v-for="(item, index) in options" :key="index" :label="item.label"
                  :value="compareType === 'stores' ? item.storeId:item.value" :disabled="item.disabled"/>
     </el-select>
@@ -17,7 +19,7 @@
       v-model="input"
       placeholder=""
       readonly
-      class="input-class"/>
+      class="input-class2"/>
   </div>
 </template>
 
@@ -51,6 +53,14 @@ export default {
     promptMsg: {
       type: String,
       default: ''
+    },
+    all: {
+      type: String,
+      default: ''
+    },
+    limitNum:{
+      type:Number,
+      default:-1
     }
   },
 
@@ -69,7 +79,7 @@ export default {
     },
     selected(val, oldVal) {
       console.log("selected > val:",val);
-      this.selectedArray = (val.length>2)?val.slice(0,1):val;
+      this.selectedArray = val;
       this.initData();
     },
 
@@ -109,7 +119,17 @@ export default {
         }
       } else if (this.selectedArray.includes('-1')) {
         this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
-      } else {*/
+      }*/
+      if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
+        if (this.options.length === this.disabledLength) {
+          this.input = '';
+          this.allDisabled = true;
+        } else {
+          this.input = this.all;
+          this.selectedArray.unshift('-1');
+        }
+      } 
+      else {
         this.input = '';
         this.selectedArray.forEach(item => {
           this.options.forEach(_item => {
@@ -122,7 +142,7 @@ export default {
         });
         this.input = this.input.slice(0, this.input.length - 1);
         //console.log("3.this.selectedArray:",this.selectedArray);
-      
+      }
       if (this.options.length === 0) {
         this.input = '';
         this.selectedArray = [];
@@ -131,10 +151,40 @@ export default {
 
     changeSelect(val) {
       this.changed = true;
-      
-      if(this.selectedArray.length>2){ //只能選兩個
-          val.pop();
-      }
+      if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
+        this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
+        this.selectedArray.unshift('-1');
+      } else if (val.includes('-1') && (val.length - 1) < this.options.length) {
+        this.selectedArray = this.selectedArray.filter((item) => {
+          return item !== '-1';
+        });
+        this.input = '';
+        this.selectedArray.forEach(item => {
+          this.options.forEach(_item => {
+            if (this.compareType == 'area1' || this.compareType == 'area2') {
+              if (item === _item.value) {
+                this.input += _item.label + ',';
+              }
+              emitArray = this.selectedArray;
+            } else if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
+              if (item === _item.value) {
+                this.input += _item.label + ',';
+                /*console.log("_item.contents:",_item.storeIds);
+                if(_item.storeIds.length>0)
+                {emitArray = emitArray.concat(_item.storeIds);}
+                console.log("emitArray:",emitArray);*/
+                emitArray = this.selectedArray;
+              }
+            }else {
+              if (item === _item.storeId) {
+                this.input += _item.label + ',';
+              }
+              emitArray = this.selectedArray;
+            }
+          });
+        });
+        this.input = this.input.slice(0, this.input.length - 1);
+      } else {
         this.input = '';
         console.log("!!changeSelect:",val);
         var emitArray=[];
@@ -162,6 +212,8 @@ export default {
             }
           });
         });
+        
+        }
       this.input = this.input.slice(0, this.input.length - 1);
       console.log("this.selectedArray:",this.selectedArray);
       const params = {selectedArray:this.selectedArray,storeIds:emitArray,selectedLabels:(this.input==""?[]:this.input.split(','))};
@@ -175,7 +227,23 @@ export default {
         //this.$emit('changeInput', selectedList);
         this.changed = false;
       }
-    }
+    },
+    selectAll() {
+      if (this.selectedArray.length < this.options.length - this.disabledLength) {
+        this.selectedArray = [];
+        this.options.forEach((item) => {
+          if (!item.disabled) {
+            this.selectedArray.push(this.compareType === 'stores' ? item.storeId:item.value);
+          }
+        });
+        this.input = this.all;
+        const tempArray = [...this.selectedArray];
+        this.selectedArray.unshift('-1');
+      } else {
+        this.selectedArray = [];
+        this.input = '';
+      }
+    },
   }
 };
 </script>
@@ -194,7 +262,7 @@ export default {
     height: 25px;
     margin-left:16px;
   }
-  .dropdown-select{
+  /*.dropdown-select{
             width:134px;
             height:25px;
             border:1px solid #f7f9fa;
@@ -207,6 +275,10 @@ export default {
     
       left:20px;
     
+  }*/
+  .el-select-dropdown__item{
+    padding: 0 20px 0 50px !important;
+    /*color: #7d8cad;*/
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
     font-family: "iconfont" !important;
@@ -214,6 +286,7 @@ export default {
     left: 10px;
     font-size: 13px;
     font-style: normal;
+    color: #2c90d9;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -223,22 +296,23 @@ export default {
     left: 10px;
     content: "\e64a";
     font-weight: normal;
+    color: #2c90d9;
     -webkit-font-smoothing: antialiased;
     font-size: 13px;
     font-style: normal;
     -moz-osx-font-smoothing: grayscale;
   }
-  .input-class{
-    width: 132px;
+  .input-class2{
+    width: 100%;
     position: absolute;
     left: 0;
   }
   >>> .el-select__tags{
     opacity: 0;
   }
-  >>> .input-class.el-input--medium .el-input__inner{
-    height: 35px;
-    line-height: 35px;
+  >>> .input-class2.el-input--medium .el-input__inner{
+    height: calc(35/1920*100vw);
+    line-height: calc(35/1920*100vw);
     color: #2b2b2b;
     background-color: #f7f9f9 !important;
     border:none;
@@ -275,7 +349,7 @@ export default {
     height: 35px;
     line-height: 35px;
     border: none !important;
-    width: 141px;
+    width: 100%;
     min-height: 35px;
     min-width: 85px;
   }

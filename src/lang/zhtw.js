@@ -1122,7 +1122,18 @@ export default {
       "Processed":"已結案事件",
       "completedRate":"結案率",
       "emptyInsRecordList": "巡檢紀錄列表為空，請重新篩選數據",
+    },
+    "event":{
+      "eventProcessStatus":"事件處理狀態",
+      "eventTotal":"總事件項",
+      "inprocessEvent":"未處理事件",
+      "processedEvent":"已處理事件",
+      "completedRate":"結案率",
+      "unit":"個",
+      "eventRank":"事件數量排名",
+      "storeEvent":"門店事件",
+      "tableMode":"表格模式",
+      "imageMode":"圖形模式"
     }
-    
   }
 };
