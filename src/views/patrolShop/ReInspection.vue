@@ -644,7 +644,7 @@
                 </el-option>
               </el-select>
             </div>
-            <hr />
+            <hr v-if="patrolstore!==''"/>
             <div class="groups">
               <div 
                 v-for="(_item,_index) in sheetName" 
@@ -672,7 +672,13 @@
           </div>
 
           <div style="height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto">
-            <template v-if="showFeedBack">
+            <template v-if="patrolstore===''">
+              {{'選擇巡檢表'}}
+            </template>
+            <template v-else-if="curGroup===null">
+              {{'選擇巡檢項'}}
+            </template>
+            <template v-else-if="showFeedBack">
               <div class="paper" style="height: 100%; position: relative">
                 <div v-if="eventList.length === 0" style="padding: 80px 24px 24px 40px; color: #006ab7; text-align: left; font-size: 24px;">
                   <div style="margin: 0 76px 30px 0;">{{ $t('remotePatrol.methodI') }}</div>
@@ -713,69 +719,53 @@
                         <span style="border-left: 4px solid #2c90d9; padding-left: 5px;">{{_item.groupName}}</span>
                       </div>
                       <hr/>
-                      <div v-for="(item,index) in _item.items" :key="index" >
-                        <div class="margin-bottom-sm flex-center" :style="index === 0 ? {} : {'margin-top':'20px'}">
-                          <span
-                            style="flex: 1; text-align: left"
-                            :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                            :style="item.checked?{'font-weight':'bold'}:{}"
-                            :title="`${index+1}. ${item.subject}`"
-                            class="font-size-md"
-                            @click="!item.manualIgnore && clickItem(item,index)"
+                      <div v-for="(item,index) in _item.items" :key="index" style="margin-bottom: 20px;">
+                        <div class="margin-bottom-sm flex-center" >
+                        <span
+                          style="flex: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                          :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                          :style="item.checked?{'font-weight':'bold'}:{}"
+                          :title="`${index+1}. ${item.subject}`"
+                          @click="!item.manualIgnore && clickItem(item,index)">
+                          {{ `${item.subject}` }}
+                        </span>
+                        <template v-if="item.itemType === 0">
+                          <div 
+                            v-if="item.groupType !== 1" 
+                            class="check_scoring"
+                            style="margin-right: 20px; margin-left: 20px"
+                            :class="!item.manualIgnore?'noraml-title':'ignore-title'" 
                           >
-                            {{ `${index+1}. ${item.subject}` }}
-                          </span>
-                          <template v-if="item.itemType === 0">
-                            <div v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
-                              <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
-                                :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
-                                {{ itemDS.scoreTitle }}
-                              </p>
-                            </div>
-                            <el-dropdown 
-                              :disabled="item.disabled" 
-                              v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                              trigger="click" 
-                              class="item-score" 
-                              style="margin-right: 20px; margin-left: 20px"
-                              size="small"
-                            >
+                            <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                              :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
+                              {{ itemDS.scoreTitle }}
+                            </p>
+                          </div>
+                          <el-dropdown 
+                            :disabled="item.disabled" 
+                            v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                            trigger="click" 
+                            class="item-score" 
+                            size="small"
+                            style="margin-right: 20px; margin-left: 20px"
+                          >
                             <span class="el-dropdown-link">
                               {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                               <i class="el-icon-arrow-down el-icon--right"/>
                             </span>
-                              <el-dropdown-menu slot="dropdown" class="score-menu">
-                                <el-dropdown-item
-                                  v-for="itemDS in item.itemScoreLength"
-                                  :key="itemDS"
-                                  style="width:70px;text-align:center;"
-                                  @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
-                              </el-dropdown-menu>
-                            </el-dropdown>
-                            <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ '略過' }}</span>
-                            <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ '取消' }}</span>
-                          </template>
-                          <div v-if="item.checked" class="icon-clicked"/>
-                          <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
-                            <span>{{ item.description }}</span>
-                          </div>
-                          <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
-                            <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                              <div v-if="_item.mediaType==2" class="img-content">
-                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                                <el-image
-                                  :src="_item.src"
-                                  :style="{width: _item.width, height: _item.height}"
-                                  :preview-src-list="getImgList(_index, item.sourceList)"/>
-                              </div>
-                              <div v-if="_item.mediaType==1" class="img-content">
-                                <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                                <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
-                                <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                            <el-dropdown-menu slot="dropdown" class="score-menu">
+                              <el-dropdown-item
+                                v-for="itemDS in item.itemScoreLength"
+                                :key="itemDS"
+                                style="width:70px;text-align:center;"
+                                @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
+                            </el-dropdown-menu>
+                          </el-dropdown>
+                          <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ '略過' }}</span>
+                          <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ '取消' }}</span>
+                        </template>
+                        <div v-if="item.checked" class="icon-clicked"/>
+                      </div>
                         <el-input
                           :autosize="{ minRows: 2, maxRows:7}"
                           v-model="item.inspectInput"
@@ -1888,8 +1878,7 @@ export default {
     },
     getItemByGroup(item, index) {
       const self = this;
-
-      // else{
+      console.log(item)
       self.curGroupIndex = index;
       self.curGroup = item;
       self.curItemIndex = 0;
@@ -1912,6 +1901,7 @@ export default {
     },
 
     getItemOfCategory(item, index){
+      console.log(item)
       this.inspectItemList = [];
       this.curGroupIndex = 0;
       this.curSheetIndex = index;
@@ -2809,6 +2799,7 @@ export default {
           if (self.sheetName.length != 0) {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
+            this.groupItems = self.inspectList
           }
         }
       })
