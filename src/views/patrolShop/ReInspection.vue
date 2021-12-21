@@ -22,8 +22,8 @@
         </el-select>
       </div>
     </el-row>
-    <el-row class="el-container" :class="isDefaultViewMode ? 'block' : 'flex'">
-      <el-col :span="16" class="lside paper" :class="{ liseAnmiClass: showSpread, fullWidth: isDefaultViewMode }" >
+    <el-row class="el-container" :class="isDefaultViewMode ? 'block paper' : 'flex'">
+      <el-col :span="isDefaultViewMode ? 24: 16" class="lside" :class="{ liseAnmiClass: showSpread, paper: !isDefaultViewMode }" >
         <div class="el-header-title">
           <span v-if="showStoreUp" class="lside-title">
             {{ store.storeTitle }}
@@ -284,112 +284,8 @@
           </div>
         </div>
       </el-col>
-      <!-- <el-col>
-        <pre style="text-align: left" v-html="JSON.stringify(sheetName, null, 2)"></pre>
-        
-        
-      </el-col> -->
-      <!-- <el-col v-if="!showSpread" :span="8" class="rside paper" :class="{ fullWidth: isDefaultViewMode }">
-        <el-tabs v-model="activeIndex" :id="lang== 'en'? 'en-storetab-content': 'storetab-content'" style="heigth: 50%" @tab-click="handleClick">
-          <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.label">
-            <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-              <div v-if="index!=2" class="storeList-content">
-                <span v-if="item.storeList.length!=0" class="icon-info">* {{ $t('remotePatrol.cannotSwitch') }}</span>
-                <div
-                  v-for="(_item,_index) in item.storeList"
-                  :key="_index"
-                  :class="_item.isActive?'activeClass':''"
-                  :style="!_item.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
-                  class="storename"
-                  @click="clickStore(item,index,_item,_index)">
-                  <el-tooltip
-                    :content="_item.name"
-                    class="item"
-                    effect="dark"
-                    placement="bottom">
-                    <span>{{ _item.name }}</span>
-                  </el-tooltip>
-                </div>
-              </div>
-              <div v-else class="storeList-content">
-                <el-input
-                  :placeholder="$t('remotePatrol.enterKeywords')"
-                  v-model="serachVale"
-                  size="small"
-                  class="el-search-input"
-                  style="width:240px"
-                  @keyup.enter.native="searchStore">
-                  <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:6px;left:6px;font-size:18px;"/>
-                </el-input>
-                <span v-if="item.storeList.length!=0" class="icon-info" style="margin-bottom:15px">* {{ $t('remotePatrol.cannotSwitch') }}</span>
-                <div v-for="(_item,_index) in item.storeList" :key="_index" class="stores">
-                  <span class="citys">{{ _item.cityName }}</span>
-                  <div
-                    v-for="(itemDs,indexDs) in _item.storeList"
-                    :key="indexDs"
-                    :style="!itemDs.hasInspect?{'background-color':'#f4f5f9','cursor': 'not-allowed'}:{}"
-                    :class="itemDs.isActive?'activeClass':''"
-                    class="store-name"
-                    @click="clickStore(item,index,itemDs,indexDs)">
-                    <el-tooltip
-                      :content="itemDs.name"
-                      class="item"
-                      effect="dark"
-                      placement="bottom">
-                      <span>{{ itemDs.name }}</span>
-                    </el-tooltip>
-                  </div>
-                </div>
-              </div>
-            </el-scrollbar>
-          </el-tab-pane>
-        </el-tabs>
-        <div class="patrol-select">
-          <div class="patrol-content">
-            <p class="patrol-title">
-              {{ $t('remotePatrol.selectInspectListWithStore', {storeName: patrolStoreName}) }}
-            </p>
-            <el-dropdown trigger="click" placement="bottom" class="patrol-dropdown" @command="changeInspect">
-              <span class="el-dropdown-link">
-                <p v-if="patrolstore!=''" class="link-span">{{ patrolstore }}</p>
-                <p v-else class="link-span">{{ $t('storeView.selectPlaceholder') }}</p>
-                <i class="el-icon-arrow-down el-icon--right"/>
-              </span>
-              <el-dropdown-menu slot="dropdown" style="width:calc(264/1920*100vw);">
-                <el-dropdown-item v-if="PatrolList.length===0">{{$t('deviceView.noData')}}</el-dropdown-item>
-                <el-dropdown-item v-else v-for="item in PatrolList" :key="item.id" :command="item.id">{{ item.name }}</el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-
-          </div>
-        </div>
-        
-        <div class="channelbar-content">
-          <div class="channel-content">
-            <span>{{ '攝影機列表' }}</span>
-            <div class="channels-srollbar">
-              <div class="arrow-content">
-                <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
-              </div>
-              <div class="btn-content" v-if="!curItem.disabled">
-                <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
-                  <channel-icon-btn
-                    :channel-name="item.name"
-                    :is-online="item.isonline"
-                    :is-click="item.isClick"
-                    class="channelBtn"
-                    @click.native="clickBtn(item,index)"/>
-                </div>
-              </div>
-              <div class="arrow-content">
-                <i v-if="hideNext" class="el-icon-arrow-right icon-arrow" @click="nextBar"/>
-              </div>
-            </div>
-          </div>
-        </div>
-      </el-col> -->
-      <el-col style="width: 700px">
-        <div class="paper">
+      <el-col :span="isDefaultViewMode ? 24: 16">
+        <div :class="{paper: !isDefaultViewMode, flex: isDefaultViewMode}" :style="isDefaultViewMode ? {'margin': '0 auto 20px 0'}: {}">
           <div style="padding: 20px">
             <div style="display: flex">
               <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
@@ -404,33 +300,60 @@
               </el-select>
             </div>
             <hr v-if="patrolstore!==''"/>
-            <div class="groups">
-              <div 
-                v-for="(_item,_index) in sheetName" 
-                :key="_index" 
-              >
-              <template v-if="_item.isCategory">
-                <div
-                  class="group"
-                  @click="changeSheet(_item,_index)"
-                  :class="{ group__active: _item.isClick }">
-                  {{ _item.label}}
+            <template v-if="isDefaultViewMode">
+              <div v-for="(_item,_index) in sheetName" :key="_index">
+                  <template v-if="_item.isCategory">
+                    <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
+                    class="margin-bottom-top-sm"
+                    style="text-align: left; cursor: pointer"
+                         @click="changeSheet(_item,_index)">
+                      <span>{{ _item.label }}</span>
+                      <!-- <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span> -->
+                      <i class="el-icon-arrow-right icon"/>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
+                    class="margin-bottom-top-sm"
+                    style="text-align: left; cursor: pointer"
+                         @click="getItemOfCategory(_item, _index)" >
+                      <span>{{ _item.label }}</span>
+                      <!-- <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span> -->
+                      <i class="el-icon-arrow-right icon"/>
+                    </div>
+                  </template>
                 </div>
-              </template>
-              <template v-else>
+
+            </template>
+            <template v-else>
+              <div class="groups">
                 <div 
-                  class="group"
-                  :class="{ group__active: _item.isClick }"
-                  @click="getItemOfCategory(_item, _index)"
+                  v-for="(_item,_index) in sheetName" 
+                  :key="_index" 
                 >
-                  {{ _item.label}}
+                <template v-if="_item.isCategory">
+                  <div
+                    class="group"
+                    @click="changeSheet(_item,_index)"
+                    :class="{ group__active: _item.isClick }">
+                    {{ _item.label}}
+                  </div>
+                </template>
+                <template v-else>
+                  <div 
+                    class="group"
+                    :class="{ group__active: _item.isClick }"
+                    @click="getItemOfCategory(_item, _index)"
+                  >
+                    {{ _item.label}}
+                  </div>
+                </template>
                 </div>
-              </template>
               </div>
-            </div>
+            </template>
           </div>
 
-          <div style="height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto">
+          <div style="width: 700px; height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto">
             <template v-if="patrolstore===''">
               {{'選擇巡檢表'}}
             </template>
@@ -938,7 +861,7 @@ export default {
       itemOptionsForType1: [],
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
-      isDefaultViewMode: false,
+      isDefaultViewMode: true,
       groupItems: [],
       storeOptions: []
     };
