@@ -47,7 +47,10 @@ export default {
     selectLimit: {
       type: Number,
       default: 0
-    }
+    },
+    compareType:{
+      type: String,
+    },
   },
 
   data() {
@@ -129,6 +132,7 @@ export default {
     },
 
     changeSelect(val) {
+      console.log("changeSelect:",val);
       const self = this;
       self.changed = true;
       if (this.limit > 0) {
@@ -137,14 +141,25 @@ export default {
         }
       }
       self.input = '';
+      var emitArray = [];
       self.options.forEach(_item => {
         self.selectedArray.forEach(item => {
           if (item === _item.value) {
-            this.input += _item.label + ',';
+            self.input += _item.label + ',';
+            if (self.compareType == 'storeGroup' || self.compareType == 'storeType') {
+                console.log("_item.contents:",_item.storeIds);
+                if(_item.storeIds.length>0)
+                {emitArray = emitArray.concat(_item.storeIds);}
+                console.log("emitArray:",emitArray);
+                //emitArray = this.selectedArray;
+            }else {
+              emitArray.push(item);
+            }
           }
         });
       });
-      self.input = this.input.slice(0, this.input.length - 1);
+      console.log("input:",self.input);
+      self.input = self.input.slice(0, this.input.length - 1);
       if (this.limit > 0) {
         if (this.selectedArray.length === 1) {
           self.options.forEach(item => {
@@ -162,9 +177,13 @@ export default {
           item.disabled = false;
         });
       }
+      console.log("this.selectedArray:",this.selectedArray);
+      const params = {selectedArray:self.selectedArray,storeIds:emitArray,selectedLabels:(self.input==""?[]:self.input.split(','))};
+      this.$emit('changeInput', params);
     },
 
     visibileHandler(val) {
+      console.log("visibileHandler",val);
       if (!val && this.changed) {
         let selectedList = [];
         selectedList = this.selectedArray;
