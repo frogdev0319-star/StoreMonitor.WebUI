@@ -22,22 +22,18 @@
         </el-select>
       </div>
     </el-row>
-    <el-row class="el-container" :class="isDefaultViewMode ? 'block paper' : 'flex'">
-      <el-col :span="isDefaultViewMode ? 24: 16" class="lside" :class="{ liseAnmiClass: showSpread, paper: !isDefaultViewMode }" >
-        <div class="el-header-title">
+    <el-row class="el-container" :class="isFullScreenMode ? 'block paper' : 'flex'">
+      <el-col :span="isFullScreenMode ? 24: 16" class="lside" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" >
+        <div class="el-header-title flex-center">
+          <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
           <span v-if="showStoreUp" class="lside-title">
             {{ store.storeTitle }}
           </span>
-          <div v-if="showStoreUp" :class="storeUpClass" @click="addStoreUp">
-            <i :class="store.storeUp?'coll-icon':'nocoll-icon'" class="iconfont icon-iconfontstart" style="vertical-align: middle;"/>
-            <span :class="store.storeUp?'coll-font':'nocoll-font'">{{ store.storeUpTitle }}</span>
-          </div>
-          <el-button v-if="sheetName.length!=0" :disabled="!allRemarkItemsFlag && !isDisabled"
-                    :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
-                    :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
-            {{ $t('remotePatrol.confirmSum') }}
-          </el-button>
-          <el-switch v-model="isDefaultViewMode" ></el-switch>
+          <div style="flex: 1"></div>
+          <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
+            <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon"  style="margin-right: 10px">
+            {{isFullScreenMode? '預設模式':'寬螢幕模式'}}
+            </div>
         </div>
         <el-dialog
           v-if="showCutDialog"
@@ -260,7 +256,25 @@
         </div>
         <div class="channelbar-content">
           <div class="channel-content">
-            <span style="float: left; margin: 20px;">{{ '攝影機列表' }}</span>
+            <div v-if="isFullScreenMode" class="padding flex-center">
+              <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
+              <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
+                <el-option
+                  v-for="item in PatrolList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+              <div style="flex: 1"></div>
+              <el-button v-if="sheetName.length!=0" :disabled="!allRemarkItemsFlag && !isDisabled"
+                        :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
+                        :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
+                {{ $t('remotePatrol.confirmSum') }}
+              </el-button>
+            </div>
+            <span style="float: left; margin: 16px;">{{ '攝影機列表' }}</span>
             <div class="channels-srollbar">
               <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
@@ -284,10 +298,10 @@
           </div>
         </div>
       </el-col>
-      <el-col :span="isDefaultViewMode ? 24: 16">
-        <div :class="{paper: !isDefaultViewMode, flex: isDefaultViewMode}" :style="isDefaultViewMode ? {'margin': '0 auto 20px 0'}: {}">
-          <div style="padding: 20px">
-            <div style="display: flex">
+      <el-col :span="isFullScreenMode ? 24: 16">
+        <div :class="{paper: !isFullScreenMode, flex: isFullScreenMode}" :style="isFullScreenMode ? {'margin': '0 auto 20px 0'}: {}">
+          <div v-if="sheetName.length!=0" style="padding: 20px">
+            <div v-if="!isFullScreenMode" class="flex-center">
               <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
               <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
                 <el-option
@@ -298,9 +312,15 @@
                 >
                 </el-option>
               </el-select>
+              <div style="flex: 1"></div>
+              <el-button v-if="sheetName.length!=0" :disabled="!allRemarkItemsFlag && !isDisabled"
+                        :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
+                        :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
+                {{ $t('remotePatrol.confirmSum') }}
+              </el-button>
             </div>
-            <hr v-if="patrolstore!==''"/>
-            <template v-if="isDefaultViewMode">
+            <hr v-if="patrolstore!=='' && !isFullScreenMode"/>
+            <template v-if="isFullScreenMode">
               <div v-for="(_item,_index) in sheetName" :key="_index">
                   <template v-if="_item.isCategory">
                     <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
@@ -353,7 +373,7 @@
             </template>
           </div>
 
-          <div style="width: 700px; height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto">
+          <div :style="isFullScreenMode?{'margin-right': '20px', 'margin-left': '20px'}:{'margin': 'auto'}" style="flex: 1; height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto;">
             <template v-if="patrolstore===''">
               {{'選擇巡檢表'}}
             </template>
@@ -431,7 +451,7 @@
                               size="small"
                               style="margin-right: 20px; margin-left: 20px"
                             >
-                              <span class="el-dropdown-link">
+                              <span class="el-dropdown-link" :class="item.isQualified ? 'color-qualified' : 'color-unqualified'">
                                 {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                                 <i class="el-icon-arrow-down el-icon--right"/>
                               </span>
@@ -697,6 +717,10 @@ export default {
       channelActiveIcon: require('../../../static/img/channel_active.png'),
       deleteInspectIcon: require('../../../static/img/cross.png'),
       editInspectIcon: require('../../../static/img/pen.png'),
+      starYellowIcon: require('../../../static/img/star-yellow.png'),
+      starGreyIcon: require('../../../static/img/star-grey.png'),
+      defaultModeIcon: require('../../../static/img/default-mode.png'),
+      fullScreenModeIcon: require('../../../static/img/full-screen.png'),
       showModelContent: false,
       showInfoContent: true,
       activeIndex: '0',
@@ -861,7 +885,7 @@ export default {
       itemOptionsForType1: [],
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
-      isDefaultViewMode: true,
+      isFullScreenMode: true,
       groupItems: [],
       storeOptions: []
     };
@@ -3245,8 +3269,8 @@ export default {
       .el-header-title{
         text-align: left;
         position: relative;
-        height: 80px;
-        line-height: 80px;
+        height: 60px;
+        line-height: 60px;
         border-bottom: 1px solid $border;
         padding-left: calc(25/1920*100vw);
         padding-right: calc(25/1920*100vw);
@@ -4594,15 +4618,23 @@ export default {
     -ms-flex-item-align: stretch;
     align-self: stretch;
   }
+  .color-qualified {
+    background-color: #edf6e8;
+    color: #59ab22;
+  }
+  .color-unqualified {
+    background-color: #f57949;
+    color: #fdf6f4;
+  }
   .el-dropdown-link{
     text-align: left;
     display: inline-block;
     font-size: 12px;
     width: 90px;
     height: 26px;
-    background-color: #edf6e8;
+    background-color: #edf8f9;
     line-height: 26px;
-    color: #59ab22;
+    color: #006ab7;
     border-radius: 5px;
     cursor: pointer;
     padding-right: 10px;
