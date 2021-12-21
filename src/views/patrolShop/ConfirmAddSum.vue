@@ -133,12 +133,12 @@
                       </div>
                       <div
                         v-if="categoryItem.sourceList!= null && categoryItem.sourceList.length !== 0
-                        || categoryItem.inspectInput != null&&categoryItem.inspectInput !== ''"
+                        || categoryItem.inspectText != null&&categoryItem.inspectText !== ''"
                         class="content-detail-main"
                         style="padding-bottom: 20px;">
                         <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                        <div v-if="categoryItem.inspectInput!=null&&categoryItem.inspectInput!=''" class="cdm-word">
-                          <span>{{ categoryItem.inspectInput }}</span>
+                        <div v-if="categoryItem.inspectText!=null&&categoryItem.inspectText!=''" class="cdm-word">
+                          <span>{{ categoryItem.inspectText }}</span>
                         </div>
                         <div v-if="categoryItem.sourceList!=null&&categoryItem.sourceList.length!=0" class="cdm-pic">
                           <div
@@ -198,12 +198,12 @@
                         </div>
                         <div
                           v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
-                          || childItem.inspectInput != null&&childItem.inspectInput !== ''"
+                          || childItem.inspectText != null&&childItem.inspectText !== ''"
                           class="content-detail-main"
                           style="padding-bottom: 20px;">
                           <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                          <div v-if="childItem.inspectInput!=null&&childItem.inspectInput!=''" class="cdm-word">
-                            <span>{{ childItem.inspectInput }}</span>
+                          <div v-if="childItem.inspectText!=null&&childItem.inspectText!=''" class="cdm-word">
+                            <span>{{ childItem.inspectText }}</span>
                           </div>
                           <div v-if="childItem.sourceList!=null&&childItem.sourceList.length!=0" class="cdm-pic">
                             <div
@@ -575,7 +575,7 @@ export default {
           for (const j in inspect[i].inspectList[g].items) {
             const objItem = {};
             objItem.ts = new Date().getTime();
-            objItem.description = inspect[i].inspectList[g].items[j].inspectInput.trim();
+            objItem.description = inspect[i].inspectList[g].items[j].inspectText.trim();
             if (inspect[i].inspectList[g].items[j].itemType === 1) {
               objItem.grade = Math.pow(-2, 31);
             } else {
