@@ -4,11 +4,15 @@
       <store-filter
         @emitStoreList = "getFilteredStoreList"
         :show-store-select = false
+        :show-favorite = showFavorite
       ></store-filter>
     </el-row>
     <el-row>
       <div class="flex" style="margin-top: 20px; margin-bottom: 20px">
-        <div class="paper" style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px">
+        <div class="paper" 
+        @click="showFavorite = !showFavorite"
+        :style="showFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}"
+        style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px">
           {{ '關注門店' }}
         </div>
         <el-select class="filters paper" v-model="store.storeId" placeholder="请选择" @change="changeSelStore">
@@ -701,6 +705,7 @@ export default {
       PatrolList: [],
       showControls: false,
       showGuide: true,
+      showFavorite: false,
       sourceList: [],
       isDisabled: false,
       penBtnSrc: require('../../../static/img/edit_btn.png'),
