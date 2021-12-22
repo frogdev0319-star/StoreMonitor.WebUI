@@ -506,15 +506,7 @@ export default {
       console.log("onChangeCompareType > selectedLabels:",selectedLabels);
       this.curSelectId = selectedArray;
       let storeId = storeIds;
-      if(this.compareType== 'area1'){
-        storeId=this.doGetStoreIdsByProvince(selectedArray);
-        //("storeId:",storeId);
-        
-      }else if(this.compareType=='area2'){
-        storeId=this.doGetStoreIdsByCity(selectedArray);
-        //console.log("storeId:",storeId);
-      }
-      this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeId,selectedLabels});
+      this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:selectedArray,selectedLabels});
       //this.changeStoreNew(arr);
     },
     doGetStoreIdsByProvince(provinceArrary){

@@ -87,14 +87,18 @@
               <el-col :span="12" class="evalution-pct">
                 <div class="pct-content">
                   <div class="pct-panel">
-                    <v-chart ref="itemsPie" :auto-resize="true" :options="regionsOptions" class="chart-content"/>
+                    <div class="inner"/>
+                    <v-chart ref="itemsPie" 
+                    @click="clickPart1Bar"
+                    :auto-resize="true" :options="part1.pieOption" class="chart-content"/>
                   </div>
                   <div class="pct-nums">
                     <div
                       v-for="(item, index) in regionsPerArray"
-                      :class="lang=='en'? 'en-labels': ''"
+                      :class="index==part1.indexType? 'selected-labels': 'content-labels'"
                       :key="index"
-                      class="content-labels">
+                      @click="setPart1Type(index)"
+                      >
                       <div class="excellent_labels">
                         <span :class="`label-` + index" class="labels excellent-label"/>
                         <span class="label-desc">{{ item.type }}</span>
@@ -105,7 +109,7 @@
                 </div>
               </el-col>
               <el-col  :span="12"  style="height:290px;padding-top:32px">
-                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                    <v-chart @click='clickPart1Bar' ref="storeChart" :options="part1.barRegionOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
               </el-col>
            </el-col>      
@@ -116,7 +120,7 @@
           </span>
         </div>
          <el-col  style="height:350px;padding-top:32px;margin-left:20px;margin-right:30px">
-                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                    <v-chart ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
         </el-col>   
       </div>
@@ -761,6 +765,11 @@ export default {
       defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' },
       overviewCount:{store:-1,items:-1,avgScore:-1},
       curCountry:"-1",
+      part1:{ compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],indexType:0,
+              pieOption:{},barRegionOption:{},barStoreOption:{}},
+      part2:{},
+      part3:{},
     };
   },
 
@@ -859,9 +868,6 @@ export default {
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
       if (this.params.storeIds.length > 0) {
         await this.dataGetOverview();
-        await this.getInspectStatsOverviewOfRegion();
-       // await this.getInspectStatsOverviewOfStore();
-       // await this.getInspectStatsLine();
       } else {
         this.totalRegion = 0;
         this.regionTableData = [];
@@ -870,6 +876,9 @@ export default {
         this.regionsList = [];
         this.curRegion = [];
         this.regionsChartsOptions = null;
+        this.part1.pieOption = null;
+        this.part1.barRegionOption = null;
+        this.part1.barStoreOption = null;
       }
     },
 
@@ -1071,14 +1080,15 @@ export default {
     emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
       console.log("Part1 Emit Type Change="+compareType)
       console.log(compareArr)
-      this.compareType = compareType;
-      this.compareIds = compareArr;
-      this.comapareLabels = selectedLabels;
+      this.part1.compareType = compareType;
+      this.part1.compareIds = compareArr;
+      this.part1.comapareLabels = selectedLabels;
+      this.dataGetPart1();
 
     },
     getInspectLineOption() {
       const option = {
-        color: ['#f31d65', '#6097f4'],
+        color: ['#f11e66'],
         legend: {
           x: 'center',
           y: 'bottom',
@@ -1117,7 +1127,6 @@ export default {
           textStyle: {
             align: 'left'
           },
-          backgroundColor: this.echartBackground
         },
         xAxis: {
           type: 'category',
@@ -1146,12 +1155,12 @@ export default {
             fontStyle: 12,
             margin: 10
           },
-          data: this.daysRangeList
+          data: []
         },
         yAxis: [
           {
             type: 'value',
-            name: this.$t('overview.passRate') + '(%)',
+            name: '(%)',
             minInterval: 10,
             max: 100,
             nameLocation: 'end',
@@ -1274,19 +1283,29 @@ export default {
         util.notify(self.$t('overview.queryFail'), 'warning', 3000);
       }
     },
-    async getInspectStatsOverviewOfRegion() {
+    async dataGetPart1() {
     
       const self = this;
       const params = {};
+      this.part1.pieOption = null;
+      this.part1.barRegionOption = null;
+      this.part1.barStoreOption = null;
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
-      params.regionMode = self.regionMode;
+      params.regionMode = 3;
       params.storeIds = self.params.storeIds;
+      if(this.part1.compareType=='stores'){
+         params.storeIds  = this.part1.compareIds;
+         console.log("To use compare ids");
+      }
       params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
         if (result) {
+          console.log("Data Get Part1")
+          this.part1.indexType = 0;
+          console.log(result)
           self.totalRegion = result.totalElements;
           result.content.forEach(item => {
             item.qualifiedRateStr = item.qualifiedRate + '%';
@@ -1298,25 +1317,8 @@ export default {
         self.totalRegion = 0;
         self.regionTableData = [];
       }
-      const overviewResult = await self.getInspectReulstStatsOverview(params);
-      if (overviewResult.errCode === 0) {
-        const result = overviewResult.data;
-        if (result) {
-          console.log(result)
-          this.overviewCount.store = result.numOfStores;
-          this.overviewCount.items = result.numOfInspects;
-          if(result.overallByAverageScore){
-            this.overviewCount.avgScore = result.overallByAverageScore.average;
-          }
-          else{
-            this.overviewCount.avgScore = -1;
-          }
-          
-        }
-      } else {
-        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
-      }
       self.getRegionPie();
+      //self.getInspectStatsLine();
     },
 
     async getInspectStatsOverviewOfRegionTable() {
@@ -1328,6 +1330,7 @@ export default {
       params.order = self.regionOrder;
       params.regionMode = self.regionMode;
       params.storeIds = self.params.storeIds;
+
       params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
@@ -1370,7 +1373,138 @@ export default {
         self.totalStore = 0;
       }
     },
+    getPart1RegionLine(){
+      console.log("Region Line")
+      const option = this.getInspectLineOption();
+      const regionData =[];
+      const regionLabel =[];
+      console.log(this.part1)
+   
+      if(this.part1.content){
+        this.part1.content.map((item,index) => {
+          let value = 0;
+          var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
+          if(this.part1.indexType==0){
+              value = util.getPercentValue(arr, 0, 2)
+          }
+          else if(this.part1.indexType==1){
+              value = util.getPercentValue(arr, 1, 2)
+          }
+          else if(this.part1.indexType==2){
+              value =  util.getPercentValue(arr, 2, 2)
+          }
+          if(this.part1.indexRegion<0 && value>0){
+            this.part1.indexRegion = index;
+          }
+          
+          if( this.part1.indexRegion == index){   
+            regionData.push({value:value,itemStyle: {
+                color: '#f11e66',
+                emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(1, 0, 0, 0.0)'
+                    }
+            }});
+          }else{
+            regionData.push({value,itemStyle: {
+            color: 'rgba(250, 30, 102, 0.6)',
+            emphasis: {
+                            shadowBlur: 0,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.0)'
+                    }
+          }})
+          }
+  
+          regionLabel.push(item.region)
+        });
+      }
 
+      option.series[0].name = "";
+      option.series[0].data = regionData;
+      option.xAxis.data = regionLabel;
+      console.log(option)
+      this.regionsChartsOptions = option;
+      this.part1.barRegionOption = option;
+      this.getPart1StoreLine();
+    },
+    getPart1StoreLine(){
+      const option = this.getInspectLineOption();
+      const regionData =[];
+      const regionLabel =[];
+      console.log(this.part1)
+      let content = [];
+      if(this.part1.content && this.part1.content[this.part1.indexRegion]){
+        content =this.part1.content[this.part1.indexRegion].list;
+        content.map((item,index) => {
+          let value = 0;
+          var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
+          if(this.part1.indexType==0){
+              value = util.getPercentValue(arr, 0, 2)
+          }
+          else if(this.part1.indexType==1){
+              value = util.getPercentValue(arr, 1, 2)
+          }
+          else if(this.part1.indexType==2){
+              value =  util.getPercentValue(arr, 2, 2)
+          }
+          regionData.push({value,itemStyle: {
+            color: '#7bd8eb',
+          }})
+          regionLabel.push(item.region)
+        });
+      }
+
+      option.series[0].name = "";
+      option.series[0].data = regionData;
+      option.xAxis.data = regionLabel;
+      console.log("Get Part1 Store Bar")
+      console.log(option);
+      this.part1.barStoreOption = option;
+    },
+    filterContent(content,type,ids,labels){
+      console.log("get comare data");
+      console.log(ids)
+      let output = [];
+      if(type == 'stores'){
+        content.map(function(item,i){
+          item.list = [];
+          item.list.push(JSON.parse(JSON.stringify(item)))
+          output.push(item)
+        });;
+      }
+      else if(type == 'area1'){
+        ids.forEach(function(id){
+          if(id!='-1'){
+          var item = {
+            numOfDangerous: 0,
+            numOfExcellent: 0,
+            numOfImproved: 0,
+            numOfQualified: 0,
+            numOfReport: 0,
+            region: id,
+            list:[],
+          }
+          content.map(function(store,i){
+             if(store.province == id){
+                item.numOfDangerous +=  store.numOfDangerous
+                item.numOfExcellent+=store.numOfExcellent
+                item.numOfImproved+=store.numOfImproved
+                item.numOfQualified+=store.numOfQualified
+                item.numOfReport+=store.numOfReport
+                item.list.push(store)
+             }
+          });;
+          output.push(item);
+          }
+
+        })
+  
+      }
+      console.log(output);
+      return output;
+    },
     async getRegionPie() {
       const self = this;
       let totalDargerous = 0;
@@ -1382,10 +1516,12 @@ export default {
       const params = {};
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
-      params.regionMode = self.regionMode;
-
+      params.regionMode = 3;
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
+      if(this.part1.compareType=='stores'){
+         params.storeIds  = this.part1.compareIds;
+      }
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: self.totalRegion };
         const storeResult = await self.getInspectStatsOverviewWithRegion(params);
@@ -1393,6 +1529,11 @@ export default {
           const result = storeResult.data;
           if (result) {
             console.log(result)
+            this.part1.content = this.filterContent(result.content, 
+            this.part1.compareType,
+            this.part1.compareIds,
+            this.part1.comapareLabels);
+            this.part1.indexRegion = -1;
             result.content.forEach(item => {
               totalDargerous += item.numOfDangerous;
               totalImproved += item.numOfImproved;
@@ -1425,7 +1566,9 @@ export default {
       const pieOption = self.getRegionPieOption();
       pieOption.series[0].data = seriesData;
       self.regionsOptions = pieOption;
+      this.part1.pieOption  = pieOption
       self.regionsPerArray = jsonArray;
+      this.getPart1RegionLine();
     },
 
     getRegionPieOption() {
@@ -1441,6 +1584,7 @@ export default {
         textStyle: {
           fontFamily: this.fontFamily
         },
+        color:['#f11e66', '#f57848', '#8fd92e'],
         series: [
           {
             name: this.$t('overview.itemsAssessment'),
@@ -1461,24 +1605,21 @@ export default {
             },
             data: [],
             itemStyle: {
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              },
-              normal: {
-                color: function(params) {
-                  var colorList = ['#f31d65', '#ffd035', '#72a1f3'];
-                  return colorList[params.dataIndex];
-                }
-              }
+              borderWidth:5,
+              borderColor:'#fff'
             }
           }
         ]
       };
       return pieOption;
     },
-
+    clickPart1Bar(event){
+      console.log("clickPart1Bar");
+      console.log(event)
+      this.part1.indexRegion = event.dataIndex;
+      this.getPart1RegionLine();
+      this.getPart1StoreLine();
+    },
     handleRegionsChange(val) {
       const self = this;
       self.curRegion = val;
@@ -1615,7 +1756,12 @@ export default {
       this.order = this.params.order = paramsObj.order;
       this.sizeNum = paramsObj.filter.size;
       this.page = paramsObj.filter.page + 1;
-    }
+    },
+    setPart1Type(index){
+      this.part1.indexType = index;
+      this.part1.indexRegion =  -1;
+      this.getPart1RegionLine();
+    },
   }
 };
 </script>
@@ -1680,7 +1826,23 @@ export default {
             height: 220px;
             width: 220px;
             border-radius: 50%;
-            background: -webkit-radial-gradient(circle closest-side, #fff 60%, $background 40%);
+            border-color:#dae4eb;
+            border-style:dashed dashed dashed dashed; 
+            display:flex;
+            justify-content:center;
+            align-items: center;
+            .inner{
+              width: 100%;
+              height: 100%;
+                position:absolute;
+                height: 120px;
+                width: 120px;
+                left:55px;
+                right:55px;
+                border-radius: 50%;
+                border-color:#dae4eb;
+                border-style:dashed dashed dashed dashed; 
+            }
             .chart-content {
               width: 100%;
               height: 100%;
@@ -1689,7 +1851,7 @@ export default {
           .pct-nums {
             margin-left:32.5px;
             /*margin-left: calc(75 / 1920 * 100vw);*/
-            font-size: calc(12 / 1920 * 100vw);
+            font-size: calc(15 / 1920 * 100vw);
             display: flex;
             width:45%;
             flex-direction:column;
@@ -1697,23 +1859,28 @@ export default {
             @media screen and (max-width: 1280px) {
               padding: 0 0;
             }
-            .content-labels {
-              display: flex;
+             .selected-labels {
+               background-color:#f2f9fe;
+               display: flex;
               flex-direction:row;
-              padding: 0 calc(10 / 1920 * 100vw);
-              font-size: calc(12 / 1920 * 100vw);
+              padding-left:10px;
+              padding-right:10px;
+              height:40px;
+              font-size: calc(15 / 1920 * 100vw);
               text-align: left;
+              align-items:center;
               .excellent_nums {
+                   color: #006ab7;
                 flex-grow:1;
                 text-align:right;
-                margin-left: calc(20 / 1920 * 100vw);
-                margin-bottom: 10px;
-                font-size: calc(14 / 1920 * 100vw);
+                margin-left: calc(20 / 1920 * 10vw);
+                font-size: calc(15 / 1920 * 100vw);
                 line-height: calc(14 / 1920 * 100vw);
               }
               .excellent_labels {
+                color: #006ab7;
                 line-height: 12px;
-                font-size: 0;
+                font-size: 15px;
                 .labels {
                   height: 10px;
                   width: 10px;
@@ -1721,8 +1888,50 @@ export default {
                   margin-right: calc(10 / 1920 * 100vw);
                 }
                 .label-desc {
-                  color: $tab;
-                  font-size: 12px;
+                  color: #006ab7;
+                  font-weight: 500;
+                  font-size: 15px;
+                }
+                .label-0 {
+                  background-color: $dangerous;
+                }
+                .label-1 {
+                  background-color: $improved;
+                }
+                .label-2 {
+                  background-color: $pass;
+                }
+              }
+            }
+            .content-labels {
+              display: flex;
+              flex-direction:row;
+              padding-left:10px;
+              padding-right:10px;
+              height:40px;
+               align-items:center;
+              font-size: calc(15 / 1920 * 100vw);
+              text-align: left;
+              .excellent_nums {
+                flex-grow:1;
+                text-align:right;
+                margin-left: calc(20 / 1920 * 10vw);
+                font-size: calc(15 / 1920 * 100vw);
+                line-height: calc(14 / 1920 * 100vw);
+              }
+              .excellent_labels {
+                line-height: 12px;
+                font-size: 15px;
+                .labels {
+                  height: 10px;
+                  width: 10px;
+                  display: inline-block;
+                  margin-right: calc(10 / 1920 * 100vw);
+                }
+                .label-desc {
+                  color: #484848;
+                  font-weight: 500;
+                  font-size: 15px;
                 }
                 .label-0 {
                   background-color: $dangerous;
