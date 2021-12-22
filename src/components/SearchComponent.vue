@@ -219,9 +219,14 @@ export default {
     },
 
     async searchData() {
+      console.log("Search Data")
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
       this.params.timeMode = this.timeMode;
       this.params.curCountry= this.storeFilterObj.curCountry;
+      this.params.curStore= this.storeFilterObj.curStore;
+      this.params.curStoreGroup= this.storeFilterObj.curStoreGroup;
+      this.params.curStoreType= this.storeFilterObj.curStoreType;
+  
       const emitParmas = {};
       emitParmas.searchParams = this.params;
       emitParmas.dateRangeList = this.daysRangeList;
@@ -328,6 +333,7 @@ export default {
       } else {
         this.searchParams = {};
       }
+      console.log("Get Search Component")
       const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;
     },

@@ -76,7 +76,7 @@
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
                               :cur-store-type="params.curStoreType"
-                              :cur-store="params.curStore"
+                              :cur-stores="params.curStore"
                               :cached-params="params"
                               :cur-country="curCountry"
                               @emitTypeChanged="emitTypeChanged"
@@ -855,15 +855,17 @@ export default {
     },
 
     async searchData() {
+    
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
       if (this.params.storeIds.length > 0) {
+        await this.dataGetOverview();
         await this.getInspectStatsOverviewOfRegion();
-        await this.getInspectStatsOverviewOfStore();
-        await this.getInspectStatsLine();
+       // await this.getInspectStatsOverviewOfStore();
+       // await this.getInspectStatsLine();
       } else {
         this.totalRegion = 0;
         this.regionTableData = [];
-        this.getRegionPie();
+      //  this.getRegionPie();
         this.storeTableData = [];
         this.regionsList = [];
         this.curRegion = [];
@@ -1072,8 +1074,7 @@ export default {
       this.compareType = compareType;
       this.compareIds = compareArr;
       this.comapareLabels = selectedLabels;
-      //this.getEventTableData();
-      //this.getAllEventData();
+
     },
     getInspectLineOption() {
       const option = {
@@ -1245,7 +1246,34 @@ export default {
       });
       return tempData;
     },
-  
+  async dataGetOverview() {
+    
+      const self = this;
+      const params = {};
+      params.beginTs = self.params.beginTs;
+      params.endTs = self.params.endTs;
+      params.regionMode = self.regionMode;
+      params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
+      const overviewResult = await self.getInspectReulstStatsOverview(params);
+      if (overviewResult.errCode === 0) {
+        const result = overviewResult.data;
+        if (result) {
+          console.log(result)
+          this.overviewCount.store = result.numOfStores;
+          this.overviewCount.items = result.numOfInspects;
+          if(result.overallByAverageScore){
+            this.overviewCount.avgScore = result.overallByAverageScore.average;
+          }
+          else{
+            this.overviewCount.avgScore = -1;
+          }
+          
+        }
+      } else {
+        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
+      }
+    },
     async getInspectStatsOverviewOfRegion() {
     
       const self = this;
@@ -1490,6 +1518,7 @@ export default {
     },
 
     initData() {
+      this.params = SearchConditionUtil.getSearchCondition(this.path);
       this.params.filter = { page: 0, size: this.sizeNumStore };
     },
 
