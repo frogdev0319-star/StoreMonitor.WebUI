@@ -11,7 +11,7 @@
         <div class="paper" style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px">
           {{ '關注門店' }}
         </div>
-        <el-select class="filters" v-model="store.storeId" placeholder="请选择" @change="changeSelStore">
+        <el-select class="filters paper" v-model="store.storeId" placeholder="请选择" @change="changeSelStore">
           <el-option
             v-for="item in options"
             :key="item.storeId"
@@ -2956,21 +2956,19 @@ export default {
   $tab:#7d8cad;
   $h1:#292e36;
   .filters {
-    background-color: #fff !important;
     border-radius: 5px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    height: 36px;
     >>> i {    
       color: #2c90d9;
-      line-height: calc(36/1920*100vw);
-      height: calc(36/1920*100vw);
-      min-height: 28px;
+      line-height: 36px;
+      height: 36px;
     }
     >>> input {
-      height: 100% !important;
+      height: 36px !important;
       background-color: transparent !important;
     }
-    >>> .el-input {
-      height: 100%;
+    >>> span {
+      top: 0px !important;
     }
   }
   .fade-enter-active {
@@ -4384,20 +4382,20 @@ export default {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
   }
 
-  .el-select >>> .el-input__inner{
-    background-color: #edf0f2;
-    border-radius: 5px;
-    height: 36px;
-    &::placeholder{
-      color:#2b2b2b;
-    }
-  }
-  .el-select >>> .el-input__suffix{
-    top: 0px;
-  }
-  .el-select >>> .el-select__caret {
-    color:#2b2b2b;
-  }
+  // .el-select >>> .el-input__inner{
+  //   background-color: #edf0f2;
+  //   border-radius: 5px;
+  //   height: 36px;
+  //   &::placeholder{
+  //     color:#2b2b2b;
+  //   }
+  // }
+  // .el-select >>> .el-input__suffix{
+  //   top: 0px;
+  // }
+  // .el-select >>> .el-select__caret {
+  //   color:#2b2b2b;
+  // }
   .el-select.el-select--medium{
     width: unset;
   }
