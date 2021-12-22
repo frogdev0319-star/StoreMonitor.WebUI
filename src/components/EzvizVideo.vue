@@ -13,16 +13,17 @@
       @mousemove="showModel">
       <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.channelName }}</span>
       <div v-if="showInfoContent || playBackState" class="icon-footer">
-        <div class="iconlside">
+        <div class="iconlside flex-center" style="margin-left: 60px">
           <i v-if="playState" class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
           <i v-else class="iconfont icon-bofang1 iconplay" @click="realTime"/>
         </div>
-        <div class="iconlside">
-          <i :class="muted ? 'icon-jingyin' : 'icon-shengyin1'" class= "iconfont icon-auido" @click="onMuted"/>
-        </div>
-        <div class="footer-right">
-          <div v-if="playBackState" class="iconrside">
-            <div class="speed-content">
+        <div style="flex: 1;"></div>
+        <div class="footer-right flex-center">
+          <div 
+            v-if="playBackState" 
+            class="iconrside"
+          >
+            <div class="speed-content flex-center">
               <span>{{ $t('remotePatrol.back') }}</span>
               <el-select
                 :value="curBack"
@@ -42,13 +43,15 @@
             </div>
           </div>
           <div class="iconrside">
-            <div class="speed-content">
+            <div class="speed-content flex-center">
               <div
                 v-if="!playBackState"
-                class="video-quality">
+                class="video-quality"
+                style="margin-right: 20px"
+              >
                 <el-popover
                   v-model="qualityVisible"
-                  placement="top"
+                  placement="bottom"
                   popper-class="quality-tooltip">
                   <div
                     v-for="(item, index) in videoQualityList"
@@ -63,8 +66,9 @@
                   </el-button>
                 </el-popover>
               </div>
-              <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+              <span style="margin-right: 20px">{{ $t('remotePatrol.ezuikitwidth') }}</span>
               <el-select
+                style="margin-right: 20px"
                 :value="proportion"
                 :popper-class="popperClass"
                 :popper-append-to-body="false"
@@ -81,12 +85,14 @@
               </el-select>
             </div>
           </div>
-          <div class="screen-content">
-            <i
-              :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
-              class="iconfont iconscreen"
-              @click="controlScreen"/>
-            <i v-if="false" class="iconfont icon-gongge iconscreen" @click="gonggeScreen"/>
+          <div class="flex-center" style="margin-right: 20px">
+            <img :src="snapshotIcon"  @click="cutPicture" v-if="!isEvent">
+          </div>
+          <div class="iconlside flex-center" style="margin-right: 20px">
+            <img :src="muted? voiceOffIcon : voiceONIcon"  @click="onMuted">
+          </div>
+          <div class="screen-content flex-center" style="margin-right: 40px">
+            <img :src="screenExpIcon"  @click="controlScreen">
           </div>
         </div>
       </div>
@@ -99,10 +105,7 @@
           height="0.2rem"/>
       </div>
       <transition name="fade">
-        <div v-if="showModelContent && !isEvent" :class="lang== 'en'? 'en-iconright' : 'iconright'" @click="cutPicture">
-          <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-          <span>{{ $t('remotePatrol.snapshot') }}</span>
-        </div>
+        
       </transition>
       <div v-if="showError" ref="errorModel" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
         <span>{{ errorMsg }}</span>
@@ -120,19 +123,18 @@
       @mouseleave="hiddenModel"
       @mouseenter="showModel"
       @mousemove="showModel">
+      
       <div class="video-model">
         <span v-if="showInfoContent" id="channelName">{{ channelInfo.name }}</span>
         <div v-if="showInfoContent" class="icon-footer">
-          <div class="iconlside">
-            <i v-if="!playState" class="iconfont icon-bofang1 iconplay" @click="realTime"/>
-            <i v-else class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
+          <div class="iconlside flex-center" style="margin-left: 60px">
+            <i v-if="playState" class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
+            <i v-else class="iconfont icon-bofang1 iconplay" @click="realTime"/>
           </div>
-          <div class="iconlside">
-            <i :class="muted ? 'icon-jingyin' : 'icon-shengyin1'" class= "iconfont icon-auido" @click="onMuted"/>
-          </div>
-          <div class="footer-right">
+          <div style="flex: 1;"></div>
+          <div class="footer-right flex-center">
             <div v-if="playBackState" class="iconrside">
-              <div class="speed-content">
+              <div class="speed-content flex-center">
                 <span>{{ $t('remotePatrol.back') }}</span>
                 <el-select
                   :value="curBack"
@@ -152,16 +154,16 @@
               </div>
             </div>
             <div class="iconrside">
-              <div class="speed-content">
+              <div class="speed-content flex-center">
                 <div
                   v-if="!playBackState"
-                  class="video-quality">
+                  class="video-quality"
+                  style="margin-right: 20px"
+                >
                   <el-popover
                     v-model="qualityVisible"
-                    :append-to-body="false"
-                    placement="top"
-                    popper-class="quality-tooltip"
-                  >
+                    placement="bottom"
+                    popper-class="quality-tooltip">
                     <div
                       v-for="(item, index) in videoQualityList"
                       :key="index"
@@ -175,8 +177,9 @@
                     </el-button>
                   </el-popover>
                 </div>
-                <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+                <span style="margin-right: 20px">{{ $t('remotePatrol.ezuikitwidth') }}</span>
                 <el-select
+                  style="margin-right: 20px"
                   :value="proportion"
                   :popper-class="popperClass"
                   :popper-append-to-body="false"
@@ -193,11 +196,11 @@
                 </el-select>
               </div>
             </div>
-            <div class="screen-content">
-              <i
-                :class="fullWindow ? 'icon-tuichuquanping':'icon-quanping'"
-                class="iconfont iconscreen"
-                @click="controlScreen"/>
+            <div class="iconlside flex-center" style="margin-right: 20px">
+              <img :src="muted? voiceOffIcon : voiceONIcon"  @click="onMuted">
+            </div>
+            <div class="screen-content flex-center" style="margin-right: 40px">
+              <img :src="screenColIcon"  @click="controlScreen">
             </div>
           </div>
         </div>
@@ -450,6 +453,11 @@ export default {
       clearIconSrc: require('../../static/img/clear.png'),
       removeIconSrc: require('../../static/img/cancel.png'),
       penBtnSrc: require('../../static/img/edit_btn.png'),
+      voiceOffIcon: require('../../static/img/voiceoff.png'),
+      voiceONIcon: require('../../static/img/voiceon.png'),
+      screenColIcon: require('../../static/img/screen-collapse.png'),
+      screenExpIcon: require('../../static/img/screen-expand.png'),
+      snapshotIcon: require('../../static/img/snapshot.png'),
       videoUrl: '',
       accessToken: '',
       showError: false,
@@ -539,6 +547,7 @@ export default {
       eventDesRuletip: false,
       paused: true,
       qualityVisible: false,
+      sizeVisible: false,
       curQualityIndex: 1,
       videoQualityList: [
         {
@@ -2091,6 +2100,10 @@ export default {
         }
       }
     }
+    .flex-center {
+      display: flex;
+      align-items: center;
+    }
     #myPlayer{
       min-height: 420px;
       margin: auto;
@@ -2111,11 +2124,11 @@ export default {
     }
     .icon-footer{
       width: 100%;
-      height: 46px;
-      line-height: 46px;
+      height: 44px;
       position: absolute;
       bottom: 0px;
       color: #fff;
+      display: flex;
       /*overflow: hidden;*/
       -webkit-user-select: none;
       -moz-user-select: none;
@@ -2124,31 +2137,22 @@ export default {
       z-index: 10;
       background-color: rgba($color: #24293d, $alpha: 0.6);
       .iconlside{
-        float: left;
         text-align: left;
-        margin-left: 30px;
         .iconplay{
           font-size: 18px;
           cursor: pointer;
-          float: left;
         }
         .icon-auido{
           font-size: 18px;
           cursor: pointer;
-          float: left;
         }
       }
       .footer-right{
-        float:right;
       }
       .iconrside{
-        // max-width: 230px;
-        display: inline-flex;
-        margin-right: 20px;
         font-size: 13px;
         .quality-content{
           width: 48px;
-          height: 44px;
           margin-right: calc(30/1920*100vw);
         }
         .quality-label{
@@ -2158,28 +2162,32 @@ export default {
         }
         span{
           font-size: 13px;
-          margin-right:6px;
           // margin-left: 20px;
         }
         .speed-content{
-          height: 46px;
-          bottom: 3px;
-          position: relative;
-          display: inline-block;
           .el-test{
-            width: 85px;
+            width: 45px;
+            >>> span.el-input__suffix {
+              display: none;
+            }
+            >>> .el-select-dropdown__item {
+              padding: 0px;
+            }
+            >>> .el-input.is-focus .el-input__inner {
+              border-color: #fff;
+              // background-color: rgba(0, 106, 183, 0.4);
+            }
           }
           .video-quality{
-            display: inline-block;
-            margin-right: 30px;
           }
           .quality-button{
             width: 45px;
-            height: 30px;
+            height: 20px;
             padding: 0;
             color: #C8C9CA;
             background-color: transparent;
             border: 1px solid #fff;
+            font-size: 12px;
           }
           .quality-button.el-button:hover, .quality-button.el-button:focus{
             border: 1px solid #5E5F61;
@@ -2189,10 +2197,7 @@ export default {
       }
     }
     .screen-content{
-      display: inline-block;
-      height: 46px;
       .iconscreen{
-        margin-right: 20px;
         font-size: 18px;
         // position: relative;
         cursor: pointer;
@@ -2516,18 +2521,14 @@ export default {
     color:#fff;
     text-align:center;
   }
-  .select-popClass .el-select-dropdown__item.hover{
-    color:#f31d65 !important;
-    background-color:#34374A !important;
+  .el-select-dropdown__wrap .el-select-dropdown__item:hover{
+    /* color:#006ab7 !important; */
+    background-color:#34374A;
   }
-  .select-popClass .el-select-dropdown__item:hover{
-    color:#f31d65 !important;
-    background-color:#34374A !important;
-  }
-  .select-popClass .el-select-dropdown{
+  /* .select-popClass .el-select-dropdown{
     border:0px !important;
     background-color:#34374A !important;
-  }
+  } */
   .select-popClass .el-select-dropdown__item.selected{
     color:#fff;
     font-weight:500 !important;
@@ -2535,9 +2536,11 @@ export default {
   .select-popClass .el-select-dropdown__list{
     padding:0;
   }
+  
   .el-select-dropdown.el-popper.select-popClass{
     border:0px;
     margin-top:-5px;
+    top: 25px!important;
   }
   .select-popClass.el-popper[x-placement^=bottom] .popper__arrow{
     border-bottom-color:#34374A !important;
@@ -2555,27 +2558,25 @@ export default {
 
   .el-popover.quality-tooltip{
     min-width: 48px;
-    height: 60px;
     padding: 0;
     text-align: center;
-    background-color: black;
-    border: 1px solid #5E5F61;
+    background-color: #34374A;
     border-radius: 0;
     margin-bottom: 2px;
+    border: none;
+    margin-top: 0px;
   }
   .quality-tooltip .popper__arrow{
     display: none;
   }
   .quaility-label{
-    height: 30px;
-    line-height: 30px;
+    height: 24px;
+    line-height: 24px;
     cursor: pointer;
     color: #C8C9CA;
-  }
-  .quaility-label:first-child{
-    border-bottom:1px solid  #5E5F61;
+    font-size: 12px;
   }
   .checked-label{
-    color: #f31d65;
+    color: #006ab7;
   }
 </style>

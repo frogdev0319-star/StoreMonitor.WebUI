@@ -224,29 +224,8 @@
         <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
         <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
         <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
-        <div v-if="showGuide && inspectList.length > 0" class="guide-content">
-          <div class="guide-rside">
-            <div class="num-content">
-              <span class="guide-num">2</span>
-              <span class="guide-title">
-                {{ $t('remotePatrol.takeSnapshot') }}
-              </span>
-            </div>
-            <img :src="arrows2Src" alt="arrow2">
-            <div class="iconright-content">
-              <div :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'">
-                <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-                <span>{{ $t('remotePatrol.snapshot') }}</span>
-              </div>
-              <div :class="lang.indexOf('zh') === -1? 'en-iconright' : 'iconright'" style="display: none">
-                <i v-if="lang.indexOf('zh') === -1 " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
-                <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
-                <span>{{ $t('remotePatrol.record') }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else>
+        
+        <div>
           <component
             :is="currentVideoComponent"
             ref="vendorVideo"
@@ -256,7 +235,8 @@
             :store-id="store.storeId"
             :video-authority="videoAuthority"
             @confirmEzvizCanvas="editEzvizCanvas"
-            @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
+            @ezvizCutPictureFeedback="ezvizPictureFeedback"
+          />
         </div>
         <div class="channelbar-content">
           <div class="channel-content">
@@ -4471,14 +4451,16 @@ export default {
   @import '../../assets/css/tabsItem.css';
   @import '../../assets/css/pagination.css';
   .el-test .el-input__inner{
-    height: 24px;
-    line-height: 24px;
-    border-radius: 0px;
-    background-color: #34374A;
-    color: #fff;
-    padding:0 10px;
-    border: 0px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 4px;
+    border: 1px solid #fff;
+    background-color: transparent;
+    color: #C8C9CA;
+    padding: 0px;
+    text-align: center;
   }
+  
   .el-test .el-input__icon{
     line-height: 24px;
   }
