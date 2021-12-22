@@ -98,9 +98,13 @@ $store: #fccc3f;
     width: calc(1048px/1440*100vw);
     margin-left:20px;
     margin-right:20px; 
+    padding-right:23px;
     height: 42px;
     border-bottom: solid 1px #acaeb1;
     align-items: center;
+    display: flex;
+    flex-direction:row;
+    justify-content:space-between;
     .region-titles{
         font-family: NotoSansCJKTC;
         font-size: calc(18/1920*100vw);

@@ -25,7 +25,7 @@
                     <el-col :span="8" class="division">
                       <el-col class="text-area">        
                         <el-row class="top">
-                           <span class="mainTitle">345</span>
+                           <span class="mainTitle">{{overviewCount.store>0?overviewCount.store:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.store_unit') }}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -38,7 +38,7 @@
                      <el-col :span="8" class="division">
                       <el-col class="text-area">
                            <el-row class="top">
-                           <span class="mainTitle">1234</span>
+                           <span class="mainTitle">{{overviewCount.items>=0?overviewCount.items:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.count_unit') }}</span>
                         </el-row >
                         <el-row class="subtitle">
@@ -51,26 +51,36 @@
                     <el-col :span="8" class="division">
                     <el-col class="text-area">   
                        <el-row class="top">
-                           <span class="mainTitle">65</span>
+                           <span class="mainTitle">{{overviewCount.avgScore>=0?overviewCount.avgScore:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
                         </el-row >
                         <el-row class="subtitle">
                             <span>{{ $t('statistics.overview.avg_subtitle') }}</span>
                         </el-row>      
                       </el-col>
-                      <img class="image-area" :src="overviewAvgSrc" />   
+                      <img class="image-area" :src="overviewAvgSrc" />  
                     </el-col>
                 </el-row>
       </div>
        <div class="statistics-content" style="height:810px;margin-top:18px">
                 <div class="head">
-                    <el-col :span="17">
                         <div class="region-titles">
                             <span class="title">
                                 {{ $t('statistics.titles.distribution') }}
                             </span>
                         </div>
-                    </el-col>
+                            <TypeSelectArea
+                              path="inspectEvalutionStatistics"
+                              :allow-all=true
+                              :region-array1="params.curProvince"
+                              :region-array2="params.curCity"
+                              :cur-store-group="params.curStoreGroup"
+                              :cur-store-type="params.curStoreType"
+                              :cur-store="params.curStore"
+                              :cached-params="params"
+                              :cur-country="curCountry"
+                              @emitTypeChanged="emitTypeChanged"
+                          ></TypeSelectArea>
                 </div>
         <el-row  :span="24" class="partition" style="height:320px">
             <el-col  :span="24" style="height:100%">
@@ -462,6 +472,7 @@ import LimitSelect from '@/components/LimitSelect';
 import ECharts from 'vue-echarts';
 import util from '@/common/util.js';
 import {
+  getInspectStatsOverviewV2,
   getInspectStatsOverRegion,
   getInspectStatsOverviewWithRegionV2
 } from '@/api/inspectOverview';
@@ -470,6 +481,7 @@ import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination';
 import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
+import TypeSelectArea from '@/components/TypeSelectArea';
 
 export default {
   name: 'PatrolEvaluationSta',
@@ -480,7 +492,8 @@ export default {
     'v-chart': ECharts,
     LimitSelect,
     SearchComponent,
-    TablePagination
+    TablePagination,
+    TypeSelectArea
   },
   mixins: [resize],
   data() {
@@ -745,7 +758,9 @@ export default {
       ifSaveParams: false,
       defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' },
       defaultStoreSort: { prop: 'qualifiedRateStr', order: 'ascending' },
-      defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' }
+      defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' },
+      overviewCount:{store:-1,items:-1,avgScore:-1},
+      curCountry:"-1",
     };
   },
 
@@ -758,7 +773,7 @@ export default {
       if (val !== 0) {
         await this.initData();
       }
-    }
+    },
   },
 
   async created() {
@@ -952,7 +967,17 @@ export default {
           });
       });
     },
-
+    
+   getInspectReulstStatsOverview(params) {
+      return new Promise((resolve, reject) => {
+        getInspectStatsOverviewV2(params).then(res => {
+          resolve(res);
+        })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    },
     getInspectResultOverRegion(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsOverRegion(params).then(res => {
@@ -1041,7 +1066,15 @@ export default {
         console.log('PatrolEvaluationStatistics-getInspectStatsLine:' + e);
       }
     },
-
+    emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
+      console.log("Part1 Emit Type Change="+compareType)
+      console.log(compareArr)
+      this.compareType = compareType;
+      this.compareIds = compareArr;
+      this.comapareLabels = selectedLabels;
+      //this.getEventTableData();
+      //this.getAllEventData();
+    },
     getInspectLineOption() {
       const option = {
         color: ['#f31d65', '#6097f4'],
@@ -1212,8 +1245,9 @@ export default {
       });
       return tempData;
     },
-
+  
     async getInspectStatsOverviewOfRegion() {
+    
       const self = this;
       const params = {};
       params.beginTs = self.params.beginTs;
@@ -1235,6 +1269,24 @@ export default {
         util.notify(self.$t('overview.queryFail'), 'warning', 3000);
         self.totalRegion = 0;
         self.regionTableData = [];
+      }
+      const overviewResult = await self.getInspectReulstStatsOverview(params);
+      if (overviewResult.errCode === 0) {
+        const result = overviewResult.data;
+        if (result) {
+          console.log(result)
+          this.overviewCount.store = result.numOfStores;
+          this.overviewCount.items = result.numOfInspects;
+          if(result.overallByAverageScore){
+            this.overviewCount.avgScore = result.overallByAverageScore.average;
+          }
+          else{
+            this.overviewCount.avgScore = -1;
+          }
+          
+        }
+      } else {
+        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
       }
       self.getRegionPie();
     },
@@ -1312,6 +1364,7 @@ export default {
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           if (result) {
+            console.log(result)
             result.content.forEach(item => {
               totalDargerous += item.numOfDangerous;
               totalImproved += item.numOfImproved;
@@ -1446,13 +1499,16 @@ export default {
     },
 
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
+      console.log("Emit Search");
       this.params = searchParams;
+      console.log(this.params)
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
       this.regionMode = regionMode;
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
+      this.curCountry = this.params.curCountry;
       const searchParamsObj = {
         path: 'inspectEvalutionStatistics',
         params: this.params
