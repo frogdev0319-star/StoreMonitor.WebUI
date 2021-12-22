@@ -235,19 +235,7 @@
       :width="860*percentHeight+'px'"
       height="300px"
       top="5%">
-      <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel" @mouseup="mouseUpHandler" >
-        <hr class="dialog-hr">
-        <div v-if="showPenBtn" id="iconR" class="icon-right">
-          <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-          <transition name="fadepen">
-            <div v-if="showPen" class="pen-content">
-              <div v-for="(item,index) in penList" :key="index" class="content">
-                <div :class="{colorActive:item.showContent}"/>
-                <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-              </div>
-            </div>
-          </transition>
-        </div>
+      <div class="canvas-content" style="display: inline-block" @mouseenter="showCancel" @mouseleave="hiddenCancel" @mouseup="mouseUpHandler" >
         <canvas
           id="icanvas"
           :width="767*percentHeight"
@@ -258,16 +246,18 @@
         <img id="imgTest" :src="imgSrc" style="display: none">
         <div
           v-if="showCancelContent"
-          :style="{'width':767*percentHeight+'px',
-                   'margin-left':47*percentHeight+'px'}"
           class="cancel-content">
-          <div class="content" @click="cancelEditCanvas">
-            <img :src="clearIconSrc" class="icon-clear" height="22px">
-            <span>{{ $t('remotePatrol.clear') }}</span>
+          <div id="iconR" class="icon-right">
+            <img :src="penBtnSrc" class="pen-btn" @click="showPenList" style="margin-right: 40px">
+            <div class="pen-content">
+              <div v-for="(item,index) in penList"  style="margin-right: 15px" :style="{'background-color': item.id, 'border': item.showContent ? item.border : '3px solid transparent'}" :key="index" class="content" @click="checkPen(item,index)">
+              </div>
+            </div>
           </div>
-          <div class="content" @click="confirmEditCanvas">
-            <img :src="removeIconSrc" class="icon-clear" height="22px">
-            <span>{{ $t('remotePatrol.cancel') }}</span>
+          <div style="flex: 1"></div>
+          <div style="display: flex">
+            <img :src="clearIconSrc" class="icon-clear" height="36px" @click="cancelEditCanvas" style="margin-right: 80px">
+            <img :src="removeIconSrc" class="icon-clear" height="36px" @click="confirmEditCanvas">
           </div>
         </div>
       </div>
@@ -286,19 +276,7 @@
       height="300px"
       top="5%">
       <div class="canvas-content" style="overflow:hidden;">
-        <hr class="dialog-hr">
         <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-          <div v-if="showPenBtn" id="iconR" class="icon-right">
-            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-            <transition name="fadepen">
-              <div v-if="showPen" class="pen-content">
-                <div v-for="(item,index) in penList" :key="index" class="content">
-                  <div :class="{colorActive:item.showContent}"/>
-                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-                </div>
-              </div>
-            </transition>
-          </div>
           <canvas
             id="icanvas"
             :width="520*percentHeight"
@@ -308,18 +286,18 @@
             @mousemove="mouseMoveAction($event)"
             @mouseleave="mouseLeaveAction($event)"/>
           <img id="imgTest" :src="imgSrc" style="display: none">
-          <div
-            v-if="showCancelContent"
-            :style="{'width':520*percentHeight+'px',
-                     'margin-left':47*percentHeight+'px'}"
-            class="cancel-content">
-            <div class="content" @click="cancelEditCanvas">
-              <img :src="clearIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.clear') }}</span>
+          <div class="cancel-content" :style="{'width': 520*percentHeight + 'px'}">
+            <div id="iconR" class="icon-right">
+              <img :src="penBtnSrc" class="pen-btn" @click="showPenList" style="margin-right: 40px">
+              <div class="pen-content">
+                <div v-for="(item,index) in penList"  style="margin-right: 15px" :style="{'background-color': item.id, 'border': item.showContent ? item.border : '3px solid transparent'}" :key="index" class="content" @click="checkPen(item,index)">
+                </div>
+              </div>
             </div>
-            <div class="content" @click="confirmEditCanvas">
-              <img :src="removeIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.cancel') }}</span>
+            <div style="flex: 1"></div>
+            <div style="display: flex">
+              <img :src="clearIconSrc" class="icon-clear" height="36px" @click="cancelEditCanvas" style="margin-right: 80px">
+              <img :src="removeIconSrc" class="icon-clear" height="36px" @click="confirmEditCanvas">
             </div>
           </div>
         </div>
@@ -480,19 +458,22 @@ export default {
       imageCanvasList: [],
       penList: [
         {
-          id: 'white',
-          showContent: false
+          id: '#FFFFFF',
+          showContent: true,
+          border: '3px solid rgb(159,159,159)'
         },
         {
-          id: 'red',
-          showContent: true
+          id: '#f11e66',
+          showContent: false,
+          border: '3px solid rgb(181,100,128)'
         },
         {
-          id: 'yellow',
-          showContent: false
+          id: '#ffc136',
+          showContent: false,
+          border: '3px solid rgb(137,122,88)'
         }
       ],
-      penChecked: 'red',
+      penChecked: '#FFFFFF',
       showCancelContent: false,
       showPen: false,
       showPenBtn: false,
@@ -1643,8 +1624,8 @@ export default {
 
     hiddenCancel() {
       const self = this;
-      self.showCancelContent = false;
-      self.showPenBtn = false;
+      self.showCancelContent = true;
+      self.showPenBtn = true;
     },
 
     confirmFeedBackOnSnapshot() {
@@ -2387,12 +2368,11 @@ export default {
       text-align: left;
       margin-left: 1%;
       #icanvas{
-        margin-left: 20px;
       }
       .cancel-content{
-        margin-left: 20px !important;
-        height:30px;
-        line-height: 30px;
+        position: absolute;
+        bottom: 5px;
+        width: 100%;
       }
     }
     .event-content{
@@ -2431,83 +2411,34 @@ export default {
     }
     .cancel-content{
       position: absolute;
-      bottom: 2px;
-      @include point(height,30);
-      @include point(line-height,30);
-      background-color: rgba($color: $black, $alpha: 0.5);
+      bottom: 5px;
+      width: 100%;
+      padding: 0 90px;
+      display: flex;
+      align-items: center;
+      background-color: rgba(72, 72, 72, .65);
       z-index: 10;
-      overflow: hidden;
+      height: 50px;
+      // overflow: hidden;
       .content{
-        text-align: center;
-        float: left;
-        color: #fff;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
         cursor: pointer;
-        width: 49%;
-        &:first-child{
-          border-right: 1px solid #fff;
-        }
-        .icon-clear{
-          position: relative;
-          @include point(top,3);
-          margin-right: 15px;
-        }
-        @media screen and(max-width: 1366px){
-          span{
-            position: relative;
-            @include point(bottom, 4)
-          }
-        }
 
       }
     }
     .icon-right{
-      width: 120px;
-      height: auto;
-      position: absolute;
-      right: 30px;
-      top: 5%;
-      text-align: center;
+      display: flex;
+
       .pen-btn{
-        width: 40px;
-        margin-right: 20px;
-        margin-bottom: 20px;
+        width: 36px;
+        height: 36px;
         cursor: pointer;
       }
-      .content{
-        width: 100%;
-        height: 40px;
-        position: relative;
-        .color{
-          width: 16px;
-          height: 16px;
-          border-radius: 8px;
-          position: absolute;
-          margin: auto 0;
-          top: 4px;
-          left: 34%;
-          margin-left: 4px;
-          z-index: 3;
-          cursor: pointer;
-        }
-        .colorActive{
-          background-color: #ddd;
-          border-radius: 50%;
-          width: 24px;
-          height: 24px;
-          position: absolute;
-          margin: auto 0;
-          left: 34%;
-          z-index: 3;
-        }
-        #white{
-          background-color: white;
-        }
-        #yellow{
-          background-color: yellow;
-        }
-        #red{
-          background-color: red;
-        }
+      .pen-content {
+        display: flex;
+        align-items: center;
       }
     }
   }
