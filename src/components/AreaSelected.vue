@@ -31,6 +31,7 @@
                   :options="curTypeArrary"
                   :input-size="`mini`"
                   :limit = "limitNum"
+                  :compareType="compareType"
                   @changeInput="onChangeCompareType" />
               </div>
         </div>

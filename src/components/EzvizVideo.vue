@@ -604,7 +604,7 @@ export default {
 
     realTimeSpeed(val) {
       const self = this;
-      console.log(val);
+      // console.log(val);
       if (val >= 300) {
         if (self.fullWindow) {
           !self.muted && self.fullDecoder.closeSound();

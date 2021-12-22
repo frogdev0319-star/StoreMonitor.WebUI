@@ -202,11 +202,13 @@ export default {
             } else if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
               if (item === _item.value) {
                 this.input += _item.label + ',';
-                /*console.log("_item.contents:",_item.storeIds);
+                console.log("_item.contents:",_item.storeIds);
                 if(_item.storeIds.length>0)
-                {emitArray = emitArray.concat(_item.storeIds);}
-                console.log("emitArray:",emitArray);*/
-                emitArray = this.selectedArray;
+                {
+                  emitArray = emitArray.concat(_item.storeIds);
+                }
+                console.log("emitArray:",emitArray);
+                //emitArray = this.selectedArray;
               }
             }else {
               if (item === _item.storeId) {

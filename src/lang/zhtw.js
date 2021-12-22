@@ -1133,7 +1133,30 @@ export default {
       "eventRank":"事件數量排名",
       "storeEvent":"門店事件",
       "tableMode":"表格模式",
-      "imageMode":"圖形模式"
+      "imageMode":"圖形模式",
+      "sumEvents":"事件總數",
+      "numUnprocessEvents":"待處理",
+      "numProcessEvents":"已處理",
+      "numClosedEvents":"已結案",
+      "numReturndEvents":"已退回",
+      "commonEvent":"常見巡檢事件項",
+      "storeGroup":"門店群組",
+      "storeType":"門店類型",
+      "detail":"詳情",
+      "top5":"常見巡檢項是件TOP5",
+      "topEventItem":"事件項名稱",
+      "inceptionTag":"巡檢表",
+      "happenAmount":"發生次數",
+      "happenRate":"占比",
+      "incepItemEvent":"巡檢項事件",
+      "envirmentRate":" 事件占比",
+      "eventItemGroup":"巡檢類別",
+      "eventItemName":"巡檢項名稱",
+      "numOfUnqualified":"不合格 (次)",
+      "UnqualifiedpPercentage":"不合格佔比",
+      "numOfStores":"涉及門店",
+      "seeAllIncepEvent":"查看所有巡检事件",
+      "seeAll":"全部"
     }
   }
 };

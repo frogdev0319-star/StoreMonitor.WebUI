@@ -584,7 +584,9 @@ export default {
   sortArrayByKeyAsc(sortedArray, key){
     sortedArray.sort((a, b) => { return a[key] - b[key]; })
   },
-
+  sortArrayByKeyDesc(sortedArray, key){
+    sortedArray.sort((a, b) => { return b[key] - a[key]; })
+  },
 
   handleInspctionCatergyTree(arr, key='id') {
     let cloneData = JSON.parse(JSON.stringify(arr));

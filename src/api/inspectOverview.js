@@ -113,3 +113,27 @@ export const getInspectStatsOverPersonV3 = data => {
     data
   });
 };
+
+/*巡檢事件項 */
+export const getInspectItemStatsOverview = data => {
+  return request({
+    url: `v3.0/statistics/inspect/item/overview`,
+    method: 'post',
+    data
+  });
+};
+export const getInspectItemStatsOverGroup= data => {
+  return request({
+    url: `v1.0/statistics/inspect/item/group`,
+    method: 'post',
+    data
+  });
+};
+
+export const getInspectStatsItemOverStore= data => {
+  return request({
+    url: `v1.0/statistics/inspect/item/store`,
+    method: 'post',
+    data
+  });
+};
