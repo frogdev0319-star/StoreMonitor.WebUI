@@ -2521,14 +2521,14 @@ export default {
     color:#fff;
     text-align:center;
   }
-  .el-select-dropdown__wrap .el-select-dropdown__item:hover{
-    /* color:#006ab7 !important; */
-    background-color:#34374A;
-  }
-  /* .select-popClass .el-select-dropdown{
-    border:0px !important;
+  .select-popClass .el-select-dropdown__item.hover{
+    color:#006ab7 !important;
     background-color:#34374A !important;
-  } */
+  }
+  .select-popClass .el-select-dropdown__item:hover{
+    color:#006ab7 !important;
+    background-color:#34374A !important;
+  }
   .select-popClass .el-select-dropdown__item.selected{
     color:#fff;
     font-weight:500 !important;
@@ -2579,4 +2579,20 @@ export default {
   .checked-label{
     color: #006ab7;
   }
+</style>
+
+<style lang="scss" scoped>
+  .select-popClass .el-select-dropdown__item.hover{
+    color:#006ab7 !important;
+    background-color:#34374A !important;
+  }
+  .select-popClass .el-select-dropdown__item:hover{
+    color:#006ab7 !important;
+    background-color:#34374A;
+  }
+  .el-select-dropdown__wrap .el-select-dropdown__item:hover{
+    /* color:#006ab7 !important; */
+    background-color:#34374A;
+  }
+
 </style>
