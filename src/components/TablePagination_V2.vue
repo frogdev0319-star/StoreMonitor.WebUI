@@ -45,6 +45,7 @@
             <el-input v-model="row.tempDeviceName" class="edit-input" size="small" @input="val => inputDeviceNameChange(val, row)"/>
           </template>
           <template v-else-if="_item.isExpand">
+            <span style="margin-right:13.5px;">{{ row[_item.prop]}}</span>
             <i v-if="row.id != expands" class="el-icon-arrow-down" style="color:#2c90d9;cursor:pointer;" @click="expandChange(row)"></i>
             <i v-if="row.id == expands" class="el-icon-arrow-up" style="color:#2c90d9;cursor:pointer;" @click="expandChange(row)"></i>
           </template>
@@ -163,10 +164,12 @@
 import util from '@/common/util';
 import filterString from '@/common/filterString'
 import TabInceptionDetail from '@/components/TabInceptionDetail'
+import IncepItemTop5 from '@/components/IncepItemTop5'
 export default {
   name:'TablePagination_V2',
   components: {
-    TabInceptionDetail
+    TabInceptionDetail,
+    IncepItemTop5
   },
   props: {
     total: {
@@ -306,6 +309,9 @@ export default {
       console.log(this.expandComponent);
       if (this.expandComponent=== 'TabInceptionDetail') {
         return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs }
+      }else if(this.expandComponent=== 'IncepItemTop5'){
+        //console.log("this.expands:",this.expands);
+        return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs }
       }
     }
   },

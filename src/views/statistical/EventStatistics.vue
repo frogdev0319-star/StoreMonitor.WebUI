@@ -56,18 +56,21 @@
               <div class="sec-head">
                 <div class="title">{{ $t('statistics.event.storeEvent') }}</div>
                 <div class="operation-btns">
-                  <div style="width:202px;display:flex;flex-direction:row;">
+                  <div class="switch-btn">
                     <el-button
-                      class="mode-btn"
-                      
+                    class="mode-btn"
+                    :class="{'active-mode-btn' :viewMode==0}"
+                    @click="onSwitchMode(0)"
                     >{{ $t('statistics.event.tableMode')}}</el-button>
                     <el-button
                       class="mode-btn"
-                      style="background-color:#fff;margin-right:32px;"
+                      :class="{'active-mode-btn' :viewMode==1}"
+                      @click="onSwitchMode(1)"
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                   <delay-button
                     :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;"
                     type="primary"
                     size="mini"
                     @click="export2Excel"
@@ -79,40 +82,106 @@
                   </delay-button>
                 </div>
               </div>
+              <div style="margin-top:20.5px;">
+                <table-pagination
+                  ref="elTP"
+                  :column-data="eventInfoData"
+                  :table-data="eventTableData"
+                  :total="total"
+                  :highlight-current-row= "true"
+                  :pagesize="sizeNum"
+                  :current-page="page"
+                  :is-event = "false"
+                  :default-sort = "defaultSort"
+                  :allowRowExpand = "true"
+                  layout = "prev,pager,next,sizes"
+                  expand-component = "IncepItemTop5"
+                  :expandCompProperties = "componentsProps"
+                  @handleChange="handlePageAndSizeChange"
+                  @sortChange="handleSortChange"
+                />
+              </div>
             </div>
           </el-col>
         </el-row>
         <el-row class="second-row">
-          <el-col :span="24" class="items-title">
-            <span class="title">{{ $t('overview.eventList') }}</span>
-            <div class="operation-btns">
-              <delay-button
-                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                type="primary"
-                size="mini"
-                @click="export2Excel"
-              >
-                <div class="button-area">
-                  <img :src="exportPng" class="icon-excel">
-                  <span>{{ $t('eventView.exportReport') }}</span>
-                </div>
-              </delay-button>
+          <el-col :span="24" class="kpi-list">
+            <div class="head">
+              <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
+              <AreaSelected
+                path="eventStatistics"
+                allow-all="true"
+                :cached-params="params"
+                :cur-country="curCountry"
+                @emitTypeChanged="emitTypeChanged2"
+              ></AreaSelected>
             </div>
-          </el-col>
-          <el-col :span="24" class="event-table">
-            <table-pagination
-              ref="elTP"
-              :column-data="eventInfoData"
-              :table-data="eventTableData"
-              :total="total"
-              :highlight-current-row= "true"
-              :pagesize="sizeNum"
-              :current-page="page"
-              :is-event = "true"
-              :default-sort = "defaultSort"
-              @handleChange="handlePageAndSizeChange"
-              @sortChange="handleSortChange"
-            />
+            <div class="pie-area">
+              <v-chart
+                  ref="pieChartRef"
+                  :auto-resize="true"
+                  :options="eventSourceOptions"
+                  class="chart-content"
+              />
+              <div style="margin-top: 40px;">
+              <div v-for="(item,index) in sourcePerArray" :key="index">
+                <div :class="(index==selEventItem) ? 'pie-label-area-active':'pie-label-area'" @click="onClickEventItem(item,index)">
+                    <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
+                    <div class="pei-item-name">{{item.itemName}}</div>
+                    <div class="pei-item-num">{{item.percentage}}%</div>
+                    <div class="pei-item-num">{{item.amount}}次</div>
+                </div>
+              </div> 
+              </div>
+            </div>
+            <div class="table-area">
+              <div class="sec-head">
+                <div class="title">{{ selEventItemName+$t('statistics.event.envirmentRate') }}</div>
+                <div class="operation-btns">
+                  <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;width:152px;"
+                    type="primary"
+                    size="mini"
+                    @click="onSeeAllIncepEventClick"
+                  >
+                    <div class="button-area">
+                      <img :src="seeAllsvg" class="icon-excel">
+                      <span>{{ $t('statistics.event.seeAllIncepEvent') }}</span>
+                    </div>
+                  </delay-button>
+                  <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;"
+                    type="primary"
+                    size="mini"
+                    @click="export2Excel_eventItem"
+                  >
+                    <div class="button-area">
+                      <img :src="exportPng" class="icon-excel">
+                      <span>{{ $t('eventView.exportReport') }}</span>
+                    </div>
+                  </delay-button>
+                </div>
+              </div>
+              <div style="margin-top:20.5px;">
+                <table-pagination
+                  ref="elTP"
+                  :column-data="eventItemTable.column_data"
+                  :table-data="eventItemTable.table_data"
+                  :total="eventItemTable.total"
+                  :highlight-current-row= "true"
+                  :pagesize="eventItemTable.sizeNum"
+                  :current-page="eventItemTable.page"
+                  :is-event = "false"
+                  :default-sort = "eventItemTable.defaultSort"
+                  :allowRowExpand = "false"
+                  layout = "prev,pager,next,sizes"
+                  @handleChange="handlePageAndSizeChange_eventItem"
+                  @sortChange="handleSortChange_eventItem"
+                />
+              </div>
+            </div>
           </el-col>
         </el-row>
       </el-col>
@@ -170,7 +239,7 @@
               <div class="pct-content">
                 <div class="pct-panel">
                   <v-chart
-                    ref="eventSourceRef"
+                    ref="pieChartRef"
                     :auto-resize="true"
                     :options="eventSourceOptions"
                     class="chart-content"/>
@@ -287,11 +356,12 @@ import ECharts from 'vue-echarts';
 import { mapGetters } from 'vuex';
 import util from '@/common/util.js';
 import { getEventStatsOverStoreV2, getEventStatsOverStore,getEventStatsOverWithGroup } from '@/api/eventOverview';
+import { getInspectItemStatsOverview, getInspectItemStatsOverGroup, getInspectStatsItemOverStore} from '@/api/inspectOverview';
 import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
-import TablePagination from '@/components/TablePagination';
+import TablePagination from '@/components/TablePagination_V2';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import AreaSelected from '@/components/AreaSelected';
@@ -317,6 +387,7 @@ export default {
       compareType:'stores',
       areaMode:[{key:'area1',value:1},{key:'area2',value:2},{key:'stores',value:0},{key:'storeGroup',value:4},{key:'storeType',value:3}],
       barchartOption:null,
+      viewMode:0,
       storeNameStr: '',
       storeGroupStr: '',
       storeTypeStr: '',
@@ -340,20 +411,7 @@ export default {
           eventNum: 0
         }
       ],
-      sourceLegend: [
-        {
-          'type': this.$t('overview.remotePatrol'),
-          'percent': '0%'
-        },
-        {
-          'type': this.$t('overview.onsitePatrol'),
-          'percent': '0%'
-        },
-        {
-          'type': this.$t('overview.storeMonitor'),
-          'percent': '0%'
-        }
-      ],
+      sourceLegend: [],
       statusLegend: [
         {
           'type': this.$t('overview.pending'),
@@ -387,85 +445,119 @@ export default {
       storeEventList: [],
       storeEventLegend: ['日期', this.$t('overview.createdEvent'), this.$t('overview.processedEvent'), this.$t('overview.closedEvents')],
       echartAxiasColor: '#e3e9f4',
-      echartBackground: 'rgba(30,34,52,0.75)',
+      echartBackground: '#FFF',
       exportPng: require('../../../static/img/excel.png'),
+      allEventTableData:[],
       eventTableData: [],
       eventInfoData: [
         {
           'prop': 'province',
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
-          'width': '140',
-          'maxWidth': '150',
+          'width': '70',
+          'maxWidth': '100',
           'pdfwidth': '11%'
         },
         {
           'prop': 'city',
           'label': this.$t('remotePatrol.regionII'),
           'sortable': false,
-          'width': '140',
-          'maxWidth': '140',
+          'width': '70',
+          'maxWidth': '100',
           'pdfwidth': '11%'
         },
         {
-          'prop': 'storeName',
+          'prop': 'groupName',
           'label': this.$t('overview.storeName'),
           'sortable': false,
-          'width': '140',
-          'maxWidth': '140',
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeGroup',
+          'label': this.$t('statistics.event.storeGroup'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeType',
+          'label': this.$t('statistics.event.storeType'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
           'pdfwidth': '11%'
         },
         {
           'prop': 'code',
           'label': this.$t('remotePatrol.code'),
           'sortable': false,
-          'width': '140',
-          'maxWidth': '140',
+          'width': '70',
+          'maxWidth': '100',
           'pdfwidth': '11%'
         },
         {
           'prop': 'numOfTotal',
-          'label': this.$t('overview.sumEvents'),
+          'label': this.$t('statistics.event.sumEvents'),
           'sortable': 'custom',
-          'width': '140',
-          'maxWidth': '140',
+          'width': '65',
+          'maxWidth': '100',
           'pdfwidth': '11%'
         },
         {
           'prop': 'numOfUnprocessed',
-          'label': this.$t('overview.numUnprocessEvents'),
+          'label': this.$t('statistics.event.numUnprocessEvents'),
           'sortable': 'custom',
-          'width': '140',
-          'maxWidth': '150',
+          'width': '55',
+          'maxWidth': '100',
           'pdfwidth': '12%'
         },
         {
           'prop': 'numOfInprocess',
-          'label': this.$t('overview.numProcessEvents'),
+          'label': this.$t('statistics.event.numProcessEvents'),
           'sortable': 'custom',
-          'width': '145',
-          'maxWidth': '180',
+          'width': '55',
+          'maxWidth': '100',
           'pdfwidth': '12%'
         },
         {
           'prop': 'numOfProcessed',
-          'label': this.$t('overview.numClosedEvents'),
+          'label': this.$t('statistics.event.numClosedEvents'),
           'sortable': 'custom',
-          'width': '140',
-          'maxWidth': '150',
+          'width': '55',
+          'maxWidth': '100',
           'pdfwidth': '12%'
         },
         {
           'prop': 'numOfRejected',
-          'label': this.$t('overview.numReturndEvents'),
+          'label': this.$t('statistics.event.numReturndEvents'),
           'sortable': 'custom',
-          'width': '140',
-          'maxWidth': '150',
+          'width': '55',
+          'maxWidth': '100',
           'pdfwidth': '12%'
+        },
+        {
+          'prop': 'completedRateStr',
+          'label': this.$t('statistics.event.completedRate'),
+          'sortable': 'custom',
+          'width': '60',
+          'maxWidth': '100',
+          'pdfwidth': '12%'
+        },
+        {
+          'prop': 'detail',
+          'label': this.$t('statistics.event.commonEvent'),
+          'sortable': 'false',
+          'width': '90',
+          'maxWidth': '140',
+          'pdfwidth': '12%',
+          'isExpand':true
         }
       ],
       order: {
-        direction: 'asc',
+        direction: 'descending',
         property: 'numOfTotal'
       },
       page: 1,
@@ -475,25 +567,124 @@ export default {
       headerClass: 'header-class',
       cellClass: 'cell-class',
       rowClass: 'row-class',
-      exportEventHeader: [
-        this.$t('remotePatrol.regionI'),
-        this.$t('remotePatrol.regionII'),
-        this.$t('overview.storeName'),
-        this.$t('remotePatrol.code'),
-        this.$t('overview.sumEvents'),
-        this.$t('overview.numUnprocessEvents'),
-        this.$t('overview.numProcessEvents'),
-        this.$t('overview.numClosedEvents'),
-        this.$t('overview.numReturndEvents'),
-        this.$t('overview.remotePatrol'),
-        this.$t('overview.onsitePatrol'),
-        this.$t('overview.storeMonitor')
-      ],
       hasNoData: false,
       fontFamily: 'NotoSansCJKTC-Medium, Roboto, Microsoft YaHei',
       ifSaveParams: false,
       defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-      isLoading: true
+      isLoading: true,
+      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()},
+      eventItemTable:{
+        order:{direction: 'descending',property: 'numOfTotal'},
+        column_data:[
+          {
+            'prop': 'groupName',
+            'label': this.$t('statistics.event.eventItemGroup'),
+            'sortable': false,
+            'width': '100',
+            'maxWidth': '100',
+            'pdfwidth': '11%'
+          },
+          {
+            'prop': 'itemName',
+            'label': this.$t('statistics.event.eventItemName'),
+            'sortable': false,
+            'width': '200',
+            'maxWidth': '200',
+            'pdfwidth': '11%'
+          },
+          {
+            'prop': 'numOfUnqualified',
+            'label': this.$t('statistics.event.numOfUnqualified'),
+            'sortable': true,
+            'width': '70',
+            'maxWidth': '70',
+            'pdfwidth': '11%'
+          },
+          {
+            'prop': 'percentage',
+            'label': this.$t('statistics.event.UnqualifiedpPercentage'),
+            'sortable':true,
+            'width': '70',
+            'maxWidth': '70',
+            'pdfwidth': '11%'
+          },
+          {
+            'prop': 'numOfStores',
+            'label': this.$t('statistics.event.numOfStores'),
+            'sortable': true,
+            'width': '70',
+            'maxWidth': '70',
+            'pdfwidth': '11%'
+          }
+        ],
+        table_data:[],
+        itemAllData:[],
+        page:1,
+        sizeNum:10,
+        total:0,
+        defaultSort: { prop: 'numOfTotal', order: 'ascending' },
+      },
+      pieColorList : ['#5274bb', '#7b9feb', '#7bd8eb','#4de197','#99ee3a'],
+      peiDataSource:[],
+      compareIds2:[],
+      comapareLabels2:[],
+      compareType2:'stores',
+      selEventItem:0,
+      selEventItemName:0,
+      selEventItemIds:[],
+      allEventItemIds:[],
+      seeAllsvg:require('../../../static/img/statistics/ic_viewAll.svg'),
+      eventInvolveTable:{
+        order:{direction: 'acsending',property: 'numOfTotal'},
+        column_data:[
+          {
+            'prop': 'groupName',
+            'label': this.$t('statistics.event.eventItemGroup'),
+            'sortable': false,
+            'width': '100',
+            'maxWidth': '100',
+            'pdfwidth': '11%'
+          },
+          {
+            'prop': 'itemName',
+            'label': this.$t('statistics.event.eventItemName'),
+            'sortable': false,
+            'width': '200',
+            'maxWidth': '200',
+            'pdfwidth': '11%'
+          },
+          {
+            'prop': 'numOfUnqualified',
+            'label': this.$t('statistics.event.numOfUnqualified'),
+            'sortable': true,
+            'width': '70',
+            'maxWidth': '70',
+            'pdfwidth': '11%'
+          },
+          {
+            'prop': 'percentage',
+            'label': this.$t('statistics.event.UnqualifiedpPercentage'),
+            'sortable':true,
+            'width': '70',
+            'maxWidth': '70',
+            'pdfwidth': '11%'
+          },
+          {
+            'prop': 'numOfStores',
+            'label': this.$t('statistics.event.numOfStores'),
+            'sortable': true,
+            'width': '70',
+            'maxWidth': '70',
+            'pdfwidth': '11%'
+          }
+        ],
+        table_data:[],
+        itemAllData:[],
+        page:1,
+        sizeNum:10,
+        total:0,
+        defaultSort: { prop: 'numOfTotal', order: 'ascending' },
+      }
     };
   },
 
@@ -515,7 +706,7 @@ export default {
   },
 
   beforeDestroy() {
-    this.$refs.eventSourceRef && this.$refs.eventSourceRef.dispose();
+    this.$refs.pieChartRef && this.$refs.pieChartRef.dispose();
     this.$refs.storeEventRef && this.$refs.storeEventRef.dispose();
   },
 
@@ -526,8 +717,10 @@ export default {
       //this.getSearchParams();
     },
     emitSearch({ searchParams, dateRangeList, timeMode }) {
+      console.log("searchParams:",searchParams);
       this.params = searchParams;
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
+      this.params.inspectId = searchParams.inspectId;
       this.params.order = this.order;
       this.daysRangeList = dateRangeList;
       this.curCountry = this.params.curCountry;
@@ -537,6 +730,8 @@ export default {
     async searchData() {
       const self = this;
       self.storeDateValue = util.getDates(self.params.beginTs) + '-' + util.getDates(self.params.endTs);
+      self.componentsProps.beginTs = self.params.beginTs;
+      self.componentsProps.endTs = self.params.endTs;
       if (self.params.storeIds.length === 0) {
         self.eventTableData = [];
         self.total = 0;
@@ -563,20 +758,39 @@ export default {
          *firstly, call getEventTableData to get all event num and display the first page of table
          * secondly, call getAllEventData to get all event and pie chart data
          */
-
+      }
         await self.getEventTableData();
         await self.getAllEventData();
-        self.getStoreEventStatics();
-      }
+        self.doGetInspecEvenItems();
+      
     },
     emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
       this.compareType = compareType;
       this.compareIds = compareArr;
       this.comapareLabels = selectedLabels;
-      this.getEventTableData();
       this.getAllEventData();
+      this.getEventTableData();
     },
-    /**事件數量排名**/
+    getEventsNum() {
+      const self = this;
+      let totalEvents = 0;
+      let totalUnprocessed = 0;
+      let totalInprocess = 0;
+      let totalProcessed = 0;
+      let totalRejected = 0;
+      self.allEventData.forEach(item => {
+        totalEvents += item.numOfTotal;
+        totalUnprocessed += item.numOfUnprocessed;
+        totalInprocess += item.numOfInprocess;
+        totalProcessed += item.numOfProcessed;
+        totalRejected += item.numOfRejected;
+      });
+      self.eventKPIs[0].eventNum = totalEvents;
+      self.eventKPIs[1].eventNum = totalUnprocessed+totalRejected;
+      self.eventKPIs[2].eventNum = totalInprocess;
+      self.eventKPIs[3].eventNum = (totalEvents==0)? 0 : ((totalProcessed/totalEvents)*100).toFixed(0);
+    },
+    /**事件數量barchart排名**/
     getEventTableDataInfo(params) { 
       return new Promise((resolve, reject) => {
         getEventStatsOverWithGroup(params).then(res => {
@@ -585,40 +799,6 @@ export default {
           reject(err);
         });
       });
-    },
-    async getEventTableData() {
-      const self = this;
-      let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
-      self.params.groupMode = region[0].value;
-      let searchCondition = {}
-      if(region[0].value<3){ //store, area1, area2
-        self.params.storeIds=this.compareIds
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds};
-      }else{ //groupType, storeGroup
-        self.params.groupIds=this.compareIds
-        searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
-      }
-      const searchParamsObj = {
-        path: 'eventStatistics',
-        params: this.params
-      };
-      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
-      this.ifSaveParams = true;
-      const eventResult = await self.getEventTableDataInfo(searchCondition);
-      const ignorePer = 0;
-      const errCode = eventResult.errCode;
-      if (errCode === 0) {
-        const result = eventResult.data;
-        if (result) {
-          const content = result.content;
-          self.total = result.totalElements;
-        } else {
-          self.eventTableData = 0;
-          self.eventKPIs.forEach(item => {
-            item.eventNum = 0;
-          });
-        }
-      }
     },
     async getExportData() {
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
@@ -635,8 +815,10 @@ export default {
         this.params.groupIds=this.compareIds;
         params.groupIds = this.params.storeIds;
       }
-      params.filter = { page: this.page - 1, size: this.total };
-      params.order = this.order;
+      params.order = {
+        direction: 'desc',
+        property: 'numOfTotal'
+      };
       
       let content = [];
       try {
@@ -659,34 +841,22 @@ export default {
     },
     async getAllEventData() {
       const self = this;
-      const params = {};
-      params.beginTs = self.params.beginTs;
-      params.endTs = self.params.endTs;
-      params.timeMode = self.timeMode;
-      params.storeIds = self.params.storeIds;
-      params.filter = { page: self.page - 1, size: self.total };
-      params.order = self.order;
       try {
         self.allEventData = await self.getExportData();
         self.allEventData.forEach(item => {
           const numOfTotal = item.numOfTotal;
           if (numOfTotal === 0) {
-            item.RemoteStr = 0 + '%';
-            item.OnsiteStr = 0 + '%';
-            item.VideoStr = 0 + '%';
+            item.completedRateStr = 0 + '%';
           } else {
-            item.RemoteStr = (item.numOfRemote / numOfTotal * 100).toFixed(0) + '%';
-            item.OnsiteStr = (item.numOfOnsite / numOfTotal * 100).toFixed(0) + '%';
-            item.VideoStr = (item.numOfVideo / numOfTotal * 100).toFixed(0) + '%';
+            item.completedRateStr = (item.numOfProcessed / numOfTotal * 100).toFixed(0) + '%';
           }
-          item.Remote = Number(item.RemoteStr.replace('%', ''));
-          item.Onsite = Number(item.OnsiteStr.replace('%', ''));
-          item.Video = Number(item.VideoStr.replace('%', ''));
+          item.completedRate = Number(item.completedRateStr.replace('%', ''));
+          item.detail = this.$t("statistics.event.detail");
         });
         self.setBarchartData();
-        self.setEventTableData();
+        //self.setEventTableData();
         self.getEventsNum();
-        self.getEventBySourcePie();
+        //self.getEventBySourcePie();
       } catch (e) {
         console.log('EventStatistics-getAllEventData:' + e);
       }
@@ -824,195 +994,70 @@ export default {
       console.log("chart_dataset:",chart_dataset);
       this.barchartOption.series[0].data = chart_dataset;
     },
-    
-    handleDown() {
-      const self = this;
-      if (self.eventTableData.length === 0) {
-        util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
-        return false;
-      }
-      self.ispdf = true;
-      this.$nextTick(() => {
-        const img = document.getElementById('imgTest');
-        setTimeout(() => {
-          html2canvas(img).then(function(canvas) {
-            var oGrayImg = canvas.toDataURL('image/jpeg');
-            self.pdfSrc = oGrayImg;
-          });
-          setTimeout(() => {
-            self.$print(self.$refs.printPDF);
-            self.ispdf = false;
-          }, 1000);
-        }, 5000);
-      });
+    /*end 畫barChart */
+    onSwitchMode(val){
+      this.viewMode=val;
     },
-
-    async getStoreEventStatics() {
+    /*取得門店事件表 */
+    async getEventTableData() {
       const self = this;
-      const params = {};
-      params.beginTs = self.params.beginTs;
-      params.endTs = self.params.endTs;
-      params.storeIds = self.params.storeIds;
-      params.timeMode = self.timeMode;
-      const storeEventResult = await self.getStoreEventData(params);
-      const option = self.initStoreEventOption();
-      if (storeEventResult.errCode === 0) {
-        const result = storeEventResult.data;
-        self.storeEventList = result;
-        const soureceList = [];
-        soureceList.push(self.storeEventLegend);
-        let sumOfNewEvents = 0;
-        let sumOfProcessedEvents = 0;
-        let sumOfClosedEvents = 0;
-        result.forEach((item, index) => {
-          const storeList = item.stores;
-          storeList.forEach(_item => {
-            sumOfNewEvents += _item.numOfNewEvents;
-            sumOfProcessedEvents += _item.numOfProcessedEvents;
-            sumOfClosedEvents += _item.numOfClosedEvents;
-          });
-          const itemArray = [];
-          itemArray.push(self.daysRangeList[index]);
-          itemArray.push(sumOfNewEvents);
-          itemArray.push(sumOfProcessedEvents);
-          itemArray.push(sumOfClosedEvents);
-          soureceList.push(itemArray);
-        });
-        option.dataset.source = soureceList;
-      }
-      self.isLoading = false;
-      self.storeEventsOptions = option;
-    },
-
-    initStoreEventOption() {
-      const self = this;
-      const option = {
-        color: [self.newColor, self.doneColor, self.closedColor],
-        legend: {
-          x: 'center',
-          y: 'bottom',
-          itemWidth: 10,
-          itemHeight: 10,
-          itemGap: 20,
-          padding: 0,
-          icon: 'rect',
-          textStyle: {
-            color: self.echartColor,
-            fontSize: 12,
-            padding: [0, 0, 0, 5],
-            height: 12,
-            lineHeight: 12
-          }
-        },
-        grid: {
-          containLabel: true,
-          top: '10',
-          left: '8',
-          right: '0',
-          bottom: '32'
-        },
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'none'
-          },
-          padding: 5,
-          textStyle: {
-            align: 'left'
-          },
-          backgroundColor: self.echartBackground
-        },
-        textStyle: {
-          fontFamily: self.fontFamily
-        },
-        dataset: {
-          source: []
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: true,
-          axisTick: {
-            show: false,
-            inside: true,
-            lineStyle: {
-              color: '#7D8CAB',
-              fontSize: 12
-            }
-          },
-          splitLine: {
-            show: false,
-            lineStyle: {
-              type: 'dashed'
-            }
-          },
-          axisLine: {
-            show: false,
-            lineStyle: {
-              color: '#7D8CAB'
-            }
-          },
-          axisLabel: {
-            fontStyle: 12,
-            margin: 10
-          }
-        },
-        yAxis: {
-          type: 'value',
-          // interval: 20,
-          minInterval: 20,
-          splitLine: {
-            show: true,
-            lineStyle: {
-              color: self.echartAxiasColor,
-              width: 1
-            }
-          },
-          axisTick: {
-            show: false,
-            inside: true,
-            lineStyle: {
-              color: '#7D8CAB',
-              fontSize: 12
-            }
-          },
-          axisLine: {
-            onZero: false,
-            show: false,
-            lineStyle: {
-              color: '#7D8CAB'
-            }
-          },
-          axisLabel: {
-            show: true,
-            fontStyle: 12,
-            margin: 10
-          }
-        },
-        series: [
-          { type: 'line', areaStyle: { color: 'rgba(243,29,101, 0.1)' }, symbol: 'none' },
-          { type: 'line', areaStyle: { color: 'rgba(67,76,94, 0.1)' }, symbol: 'none' },
-          { type: 'line', areaStyle: { color: 'rgba(114,161,243, 0.1)' }, symbol: 'none' }
-        ]
+      self.componentsProps.beginTs = self.params.beginTs;
+      self.componentsProps.endTs = self.params.endTs;
+      let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
+      self.params.groupMode = region[0].value;
+      let searchCondition = {}
+      //if(region[0].value<3){ //store, area1, area2
+        self.params.storeIds=this.compareIds
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:this.compareIds};
+      /*}else{ //groupType, storeGroup
+        self.params.groupIds=this.compareIds
+        searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
+      }*/
+      const searchParamsObj = {
+        path: 'eventStatistics',
+        params: this.params
       };
-      return option;
-    },
-
-    getStoreEventData(params) {
-      return new Promise((resolve, reject) => {
-        getEventStatsOverStore(params).then(res => {
-          resolve(res);
-        })
-          .catch(err => {
-            reject(err);
+      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
+      const eventResult = await self.getEventTableDataInfo(searchCondition);
+      const ignorePer = 0;
+      const errCode = eventResult.errCode;
+      if (errCode === 0) {
+        const result = eventResult.data;
+        if (result) {
+          self.allEventTableData = result.content;
+          self.total = result.totalElements;
+          self.allEventTableData.forEach(item => {
+            const numOfTotal = item.numOfTotal;
+            if (numOfTotal === 0) {
+              item.completedRateStr = 0 + '%';
+            } else {
+              item.completedRateStr = (item.numOfProcessed / numOfTotal * 100).toFixed(0) + '%';
+            }
+            item.id = item.innerId;
+            item.completedRate = Number(item.completedRateStr.replace('%', ''));
+            item.storeGroup = item.storeRegion.toString();
+            item.storeType = item.storeBranchType.toString();
+            item.detail = this.$t("statistics.event.detail");
           });
-      });
+        } else {
+          self.eventTableData = 0;
+        }
+        self.setEventTableData();
+      }
+    },
+    setEventTableData(){
+      this.orderAllTableData();
+      this.eventTableData = [];
+      this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
     },
 
-    adjustChart() {
-      this.$refs.eventSourceRef && this.$refs.eventSourceRef.resize();
-      this.$refs.storeEventRef && this.$refs.storeEventRef.resize();
+    orderAllTableData(){
+      let key = this.defaultSort.prop;
+      key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
+      this.defaultSort.order === 'descending' ? this.allEventTableData.sort((a,b) => { return b[key] - a[key] })
+                                : this.allEventTableData.sort((a,b) => { return a[key] - b[key] });
     },
-
     export2Excel() {
       const that = this;
       if (that.eventTableData.length === 0) {
@@ -1021,86 +1066,87 @@ export default {
       }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportEventHeader;
-        const filterVal = ['province', 'city', 'storeName', 'code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
-          'numOfProcessed', 'numOfRejected', 'RemoteStr', 'OnsiteStr', 'VideoStr'];
-        const curData = that.allEventData;
+        const tHeader = [];
+        this.eventInfoData.forEach(item=>{
+          tHeader.push(item.label);
+        });
+        const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType','code', 'numOfTotal', 'numOfUnprocessed', 'numOfInprocess',
+          'numOfProcessed', 'numOfRejected','completedRate'];
+        const curData = that.allEventTableData;
         const data = that.formatJson(filterVal, curData);
-        const fileName = 'EventList' + '-' + util.getCurDateStr();
+        const fileName = this.compareType+'_Inspection event' + '_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
-
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => v[j]));
-    },
-
     
-
-    setEventTableData(){
-      this.orderAllTableData();
-      this.eventTableData = [];
-      this.eventTableData = [...this.allEventData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
-    },
-
-    orderAllTableData(){
-      let key = this.defaultSort.prop;
-      key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
-      this.defaultSort.order === 'descending' ? this.allEventData.sort((a,b) => { return b[key] - a[key] })
-                                : this.allEventData.sort((a,b) => { return a[key] - b[key] });
-    },
-
-    getEventsNum() {
+    handlePageAndSizeChange(pageObj) {
       const self = this;
-      let totalEvents = 0;
-      let totalUnprocessed = 0;
-      let totalInprocess = 0;
-      let totalProcessed = 0;
-      let totalRejected = 0;
-      self.allEventData.forEach(item => {
-        totalEvents += item.numOfTotal;
-        totalUnprocessed += item.numOfUnprocessed;
-        totalInprocess += item.numOfInprocess;
-        totalProcessed += item.numOfProcessed;
-        totalRejected += item.numOfRejected;
-      });
-      self.eventKPIs[0].eventNum = totalEvents;
-      self.eventKPIs[1].eventNum = totalUnprocessed+totalRejected;
-      self.eventKPIs[2].eventNum = totalInprocess;
-      self.eventKPIs[3].eventNum = (totalEvents==0)? 0 : ((totalProcessed/totalEvents)*100).toFixed(0);
+      self.page = pageObj.page;
+      self.sizeNum = pageObj.size;
+      self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      self.setEventTableData();
     },
 
+    handleSortChange(order, defaultSort) {
+      this.defaultSort = { ...defaultSort };
+      this.order = this.params.order = order;
+      this.params.filter = {
+        page: this.page - 1,
+        size: this.sizeNum
+      };
+      this.setEventTableData();
+    },
+    /*巡檢項事件 sec-row*/
+    emitTypeChanged2({compareType,compareArr,selectedLabels}){ //劃分類型選擇
+    
+      this.compareType2 = compareType;
+      this.compareIds2 = compareArr;
+      this.comapareLabels2 = selectedLabels;
+      this.doGetInspecEvenItems();
+    },
+    getInspecEvenItems(params) {
+      return new Promise((resolve, reject) => {
+        getInspectItemStatsOverGroup(params).then(res => {
+          resolve(res);
+        })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    },
+    async doGetInspecEvenItems(){
+      const self = this;
+      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,inspectTagId:self.params.inspectId,storeIds:self.compareIds2 };
+      //console.log("doGetInspecEvenItems:",params);
+      const result = await this.getInspecEvenItems(params);
+      
+      self.peiDataSource = result.data;
+      self.getEventBySourcePie();
+    },
     getEventBySourcePie() {
       const self = this;
-      const jsonArray = self.sourceLegend;
-      let allRemoteEventNum = 0;
-      let allOnsiteEventNum = 0;
-      let allStoreEventNum = 0;
-      let sumEvent = 0;
-      self.allEventData.forEach(item => {
-        sumEvent += item.numOfTotal;
-        allRemoteEventNum += item.numOfRemote;
-        allOnsiteEventNum += item.numOfOnsite;
-        allStoreEventNum += item.numOfVideo;
-      });
-      const totalArray = [allRemoteEventNum, allOnsiteEventNum, allStoreEventNum];
-      jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-      jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-      jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+      let jsonArray = [];
       let seriesData = [];
-      if (sumEvent !== 0) {
-        seriesData = [
-          { value: allRemoteEventNum, name: self.$t('overview.remotePatrol') },
-          { value: allOnsiteEventNum, name: self.$t('overview.onsitePatrol') },
-          { value: allStoreEventNum, name: self.$t('overview.storeMonitor') }
-        ];
-      } else {
-        seriesData = [];
-      }
+      let allItemIds = [];
+      util.sortArrayByKeyDesc(self.peiDataSource,'numOfUnqualified');
+      self.peiDataSource.forEach(item => {
+        if(item.numOfUnqualified!=0){
+          seriesData.push({value:item.numOfUnqualified,name:item.groupName});
+          jsonArray.push({itemName:item.groupName,amount:item.numOfUnqualified,percentage:item.percentage,itemIds:item.itemIds});
+          allItemIds.concat(item.itemIds);
+        }
+      });
+      this.allEventItemIds=[];
+      allItemIds.forEach(id=>{
+        if(!this.allEventItemIds.includes(id)) this.allEventItemIds.push(id);
+      });
+      this.selEventItemIds = self.peiDataSource[0].itemIds;
+      this.selEventItemName = self.peiDataSource[0].groupName;
       const pieOption = self.getEventBySourcePieOption();
       pieOption.series[0].data = seriesData;
       self.eventSourceOptions = pieOption;
       self.sourcePerArray = jsonArray;
+      self.getItemDetail();
     },
 
     getEventBySourcePieOption() {
@@ -1111,7 +1157,8 @@ export default {
           textStyle: {
             align: 'left'
           },
-          backgroundColor: this.echartBackground
+          backgroundColor: '#f2f9fe',
+          color:'#006ab7'
         },
         textStyle: {
           fontFamily: this.fontFamily
@@ -1143,7 +1190,7 @@ export default {
               },
               normal: {
                 color: function(params) {
-                  const colorList = ['#f31d65', '#fb804f', '#fccc3f'];
+                  const colorList = ['#5274bb', '#7b9feb', '#7bd8eb','#4de197','#99ee3a'];
                   return colorList[params.dataIndex];
                 }
               }
@@ -1154,10 +1201,152 @@ export default {
       return pieOption;
     },
 
+    onClickEventItem(item,index){
+        this.selEventItem = index;
+        this.selEventItemIds = item.itemIds;
+        this.selEventItemName = item.itemName;
+        console.log("click item>item.itemIds",item.itemIds)
+        this.getItemDetail();
+    },
+    getInspecItemStatsOverview(params) {
+      return new Promise((resolve, reject) => {
+        getInspectItemStatsOverview(params).then(res => {
+          resolve(res);
+        })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    },
+    async getItemDetail(){
+      const self = this;
+      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2 };
+      let result = await this.getInspecItemStatsOverview(params);
+      self.eventItemTable.itemAllData = result.data;
+      self.eventItemTable.total = self.eventItemTable.itemAllData.length;
+      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+    },
+    async onSeeAllIncepEventClick(){
+      const self = this;
+      self.selEventItemName = self.$t('statistics.event.seeAll');
+      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.allEventItemIds,storeIds:self.compareIds2 };
+      let result = await this.getInspecItemStatsOverview(params);
+      self.eventItemTable.itemAllData = result.data;
+      self.eventItemTable.total = self.eventItemTable.length;
+      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+    },
+    export2Excel_eventItem() {
+      const self = this;
+      if (self.eventItemTable.itemAllData.length === 0) {
+        util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+        return false;
+      }
+      require.ensure([], async() => {
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = [];
+        self.eventItemTable.colum_data.forEach(item=>{
+          tHeader.push(item.label);
+        });
+        const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStores'];
+        const curData = self.eventItemTable.itemAllData;
+        const data = self.formatJson(filterVal, curData);
+        const fileName = this.selEventItemName+'_Inspection item event' + '_' + util.getCurDateStr();
+        export_json_to_excel(tHeader, data, fileName);
+      });
+    },
     
+    handlePageAndSizeChange_eventItem(pageObj) {
+      const self = this;
+      self.eventItemTable.page = pageObj.page;
+      self.eventItemTable.sizeNum = pageObj.size;
+      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+    },
 
+    handleSortChange_eventItem(order, defaultSort) {
+      this.eventItemTable.defaultSort = { ...defaultSort };
+      this.eventItemTable.order = this.params.order = order;
+      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+    },
+    /*End巡檢項事件 sec-row*/
+
+    /*事件涉及門店 */
+    getInspecStatsItemOverStore(params) {
+      return new Promise((resolve, reject) => {
+        getInspectStatsItemOverStore(params).then(res => {
+          resolve(res);
+        })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    },
+    async doGetEventInvolveStores(){
+      const self = this;
+      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2 };
+      let result = await this.getInspecItemStatsOverview(params);
+      self.eventInvolveTable.itemAllData = result.data;
+      self.eventInvolveTable.total = self.eventInvolveTable.itemAllData.length;
+      self.eventInvolveTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+    },
+    export2Excel_eventStores() {
+      const self = this;
+      if (self.eventItemTable.itemAllData.length === 0) {
+        util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+        return false;
+      }
+      require.ensure([], async() => {
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = [];
+        self.eventItemTable.colum_data.forEach(item=>{
+          tHeader.push(item.label);
+        });
+        const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStores'];
+        const curData = self.eventItemTable.itemAllData;
+        const data = self.formatJson(filterVal, curData);
+        const fileName = this.selEventItemName+'_Inspection item event' + '_' + util.getCurDateStr();
+        export_json_to_excel(tHeader, data, fileName);
+      });
+    },
     
+    handlePageAndSizeChange_eventStores(pageObj) {
+      const self = this;
+      self.eventItemTable.page = pageObj.page;
+      self.eventItemTable.sizeNum = pageObj.size;
+      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+    },
 
+    handleSortChange_eventStores(order, defaultSort) {
+      this.eventItemTable.defaultSort = { ...defaultSort };
+      this.eventItemTable.order = this.params.order = order;
+      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+    },
+    /*End 事件涉及門店 */
+    handleDown() {
+      const self = this;
+      if (self.eventTableData.length === 0) {
+        util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+        return false;
+      }
+      self.ispdf = true;
+      this.$nextTick(() => {
+        const img = document.getElementById('imgTest');
+        setTimeout(() => {
+          html2canvas(img).then(function(canvas) {
+            var oGrayImg = canvas.toDataURL('image/jpeg');
+            self.pdfSrc = oGrayImg;
+          });
+          setTimeout(() => {
+            self.$print(self.$refs.printPDF);
+            self.ispdf = false;
+          }, 1000);
+        }, 5000);
+      });
+    },
+
+    adjustChart() {
+      this.$refs.pieChartRef && this.$refs.pieChartRef.resize();
+      this.$refs.storeEventRef && this.$refs.storeEventRef.resize();
+    },
     exportPdf(storeNameStr, groupStr, typeStr) {
       this.storeNameStr = storeNameStr;
       this.storeGroupStr = groupStr;
@@ -1165,22 +1354,8 @@ export default {
       this.handleDown();
     },
 
-    handlePageAndSizeChange(pageObj) {
-      const self = this;
-      self.page = pageObj.page;
-      self.sizeNum = pageObj.size;
-      self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.setEventTableData();
-    },
-
-    handleSortChange(order, defaultSort) {
-      this.defaultSort = { ...defaultSort };
-      this.order = this.params.order = order;
-      this.params.filter = {
-        page: this.page - 1,
-        size: this.sizeNum
-      };
-      this.setEventTableData();
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
     },
 
     setDefaultSortAndPage(paramsObj) {
@@ -1338,10 +1513,24 @@ export default {
               align-self: center;
               display: flex;
               flex-direction: row;
-              width:calc(335/1440*100vw);
+              width:calc(295/1440*100vw);
               height: 30px;
               align-items: center;
               padding:0;
+              justify-content: space-between;
+            }
+          }
+          .event-table {
+            overflow-y: auto;
+            height: 717.5px;
+            background-color: fff;
+            padding-top: 16.5px;
+            padding: 16.5 24px ;
+            .table{
+              margin: 0 calc(24/1920*100vw);
+              background-color: #f7f9fa;
+              box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+              border: solid 1px #f5f5f5;
             }
           }
         }
@@ -1349,218 +1538,152 @@ export default {
         .kpi-list{
           height: 100%;
           border-bottom: 1px solid $border;
-          .kpi-content{
-            height: auto;
-            border-right: 1px solid $border;
-            display: flex;
-            flex-direction: column;
-            .event-list{
-              // height:  106px;
-              height:  85px;
-              padding-top: 15px;
-              padding-left: calc(34/1920*100vw);
-              padding-bottom: 20px;
-              border-bottom: 1px solid $border;
-              &:last-child{
-                border-bottom: none;
-              }
-              .event-title{
-                font-size: calc(16/1920*100vw);
-                height:calc(16/1920*100vw);
-                line-height:calc(16/1920*100vw);
-                color: $tab;
-                text-align: left;
-              }
-              .event-num{
-                font-size: calc(30/1920*100vw);
-                line-height: calc(30/1920*100vw);
-                height: calc(30/1920*100vw);
-                color: $h1;
-                text-align: left;
-                margin-top: 15px;
-                :last-child{
-                  padding-bottom: 20px;
-                }
-              }
-            }
-          }
         }
-        .store-events{
-          height: auto;
-          @media screen and (max-width: 1536px){
-            width: 57%;
-          }
-          .region-result{
-            border-right: 1px solid $border;
-            height: 424px;
-            padding: 20px calc(30/1920*100vw) 30px calc(30/1920*100vw);
-            .charts-content{
-              height:100%;
-              .result-content{
-                height: 100%;
-                width: 100%;
-              }
-            }
-          }
-
-        }
-        .source-list{
-          @media screen and (max-width: 1536px){
-            width: 30%;
-          }
-          .pct-content{
-            height: 424px;
-            padding-top: 94px;
-            padding-bottom: 30px;
-            width: 100%;
-            text-align: center;
-            .pct-panel{
-              height: 200px;
-              width: 200px;
-              margin: 0 auto;
-              border-radius: 50%;
-              background: -webkit-radial-gradient( circle closest-side,#fff 60%, $background 40%);
-              .chart-content{
-                width: 100%;
-                height: 100%;
-              }
-            }
-            .pct-nums{
-              margin-top: 28px;
-              padding: 0 calc(20/1920*100vw);
-              font-size: 12px;
-              display: flex;
-              justify-content: center;
-              @media screen and (max-width: 1920px){
-                padding: 0;
-              }
-              @media screen and (max-width: 1440px){
-                justify-content: space-around;
-              }
-              .content-labels{
-                padding: 0 calc(10/1920*100vw);
-                @media screen and (max-width: 1280px){
-                  padding: 0;
-                }
-                font-size: 12px;
-                text-align: left;
-                .excellent_nums{
-                  margin-left: calc(20/1920*100vw);
-                  margin-bottom:10px;
-                  font-size: calc(14/1920*100vw);
-                  line-height: calc(14/1920*100vw);
-                }
-                .excellent_labels{
-                  line-height: 12px;
-                  font-size: 0;
-                  .labels{
-                    height: 10px;
-                    width: 10px;
-                    display: inline-block;
-                    margin-right: calc(10/1920*100vw);
-                    @media screen and (min-width: 1280px) and (max-width: 1366px) {
-                      margin-right: calc(2/1920*100vw);
-                    }
-                  }
-                  .label-desc{
-                    color: $tab;
-                    font-size: 12px;
-                  }
-                  .label-0{
-                    background-color: $red;
-                  }
-                  .label-1{
-                    background-color: $onsite;
-                  }
-                  .label-2{
-                    background-color: $store;
-                  }
-                }
-              }
-              .en-label{
-                @media screen and (max-width: 1920px){
-                  padding: 0 calc(5/1920*100vw);
-                }
-                @media screen and (max-width: 1660px){
-                  padding: 0 calc(1/1920*100vw);
-                }
-              }
-            }
-          }
-          .area-title{
-            font-size: calc(20/1920*100vw);
-            display: inline-block;
-            /*margin-right: calc(10/1920*100vw);*/
-          }
-          .empty-content{
-            font-size: calc(14/1920*100vw);
-            color: $tab;
-            padding-top: 140px;
-            border-top: 1px solid $border;
-          }
-        }
-
-        .ja-kpi-list{
-          @extend .kpi-list;
-          width: 16%;
-        }
-        .ja-store-events{
-          @extend .store-events;
-          width: 52%;
-        }
-        .ja-source-list{
-          @extend .source-list;
-          width: 32%;
-        }
+        
       }
       .second-row {
         height: auto;
-        margin-top: 30px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
         background-color: #fff;
         border-radius: 5px;
-        .items-title{
-          height: 70px;
-          width: 100%;
-          font-size: calc(20 / 1920 * 100vw);
+        margin-top: 24px;
+        .head{
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          height: 67.5px;
+          padding-top: 22px;
+          margin-left: calc(24/1440*100vw);
           margin-right: calc(24/1440*100vw);
-          text-align: left;
-          color: $black;
-          border-bottom: 1px solid $border;
-          .title {
+          border-bottom: solid 1px #acaeb1;
+          .title{
             height: 67.5px;
-            padding-top: 22px;
-            margin-left: calc(24/1440*100vw);
             font-size: 18px;
             text-align: left;
             color: $black;
-            border-bottom: solid 1px #acaeb1;
-          }
-          .operation-btns{
-            padding-top: 25px;
-            padding-right: calc(30 / 1920 * 100vw);
-            float: right;
           }
         }
-        .event-table {
-          background-color: #fff;
-          padding-top: calc(30/1920*100vw);
-          .table{
-            padding: 0 calc(30/1920*100vw)
+        .pie-area{
+          height:271px;
+          margin-left: calc(36/1440*100vw);
+          margin-right: calc(24/1440*100vw);
+          border-bottom: solid 1px #acaeb1;
+          display:flex;
+          flex-direction: row;
+          justify-content: center;
+          .chart-content {
+            width: 271px;/*calc(276/1440*100vw);*/
+            height: 271px;/*calc(276/1440*100vw);*/
           }
-          .clearfix{
-            content: "";
-            display: block;
-            height: 0;
-            clear:both;
-            overflow: auto;
+          .pie-label-area{
+            cursor: pointer;
+            width: calc(300/1440*100vw);
+            height: 40px;
+            margin-left:calc(152/1440*100vw);
+            display:flex;
+            flex-direction: row;
+            align-items: center;
+            text-align: left;
+            .pie-color{
+              width:18px;
+              height: 18px;
+              margin-left: 12px;
+            }
+            .pei-item-name{
+              margin-left:calc(12/1440*100vw);
+              color: #484848;
+              width:calc(167/1440*100vw);
+              height: 18px;
+              font-size: 15px;
+              
+            }
+            .pei-item-num{
+              color: #484848;
+              width:calc(40/1440*100vw);
+              height: 18px;
+              font-size: 15px;
+              font-family: Roboto;
+              font-weight: bold;
+              line-height:18px;
+            }
           }
-          .toolbar{
-            float: right;
-            margin: 30px calc(30/1920*100vw);
-            margin-right: 0;
-            height:13%;
+          .pie-label-area-active{
+            width: calc(280/1440*100vw);
+            height: 40px;
+            margin-left:calc(152/1440*100vw);
+            display:flex;
+            flex-direction: row;
+            align-items: center;
+            background-color: #f2f9fe;
+            text-align: left;
+            .pie-color{
+              width:18px;
+              height: 18px;
+              margin-left: 12px;
+            }
+            .pei-item-name{
+              margin-left:calc(12/1440*100vw);
+              color: #006ab7;
+              width:calc(167/1440*100vw);
+              height: 18px;
+              font-size: 15px;
+            }
+            .pei-item-num{
+              color: #006ab7;;
+              width:calc(40/1440*100vw);
+              height: 18px;
+              font-size: 15px;
+              font-family: Roboto;
+              font-weight: bold;
+              line-height:18px;
+            }
           }
+        }
+        .table-area{
+          height:auto;
+          margin-top: 20.5px;
+          margin-left: calc(24/1440*100vw);
+          margin-right: calc(24/1440*100vw);
+          .sec-head{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            height: 30px;
+            .title{
+              height: 30px;
+              font-size: 15px;
+              text-align: left;
+              color: $black;
+            }
+            .operation-btns{
+              align-self: center;
+              display: flex;
+              flex-direction: row;
+              width:calc(250/1440*100vw);
+              height: 30px;
+              align-items: center;
+              padding:0;
+              justify-content: space-between;
+            }
+          }
+          .event-table {
+            overflow-y: auto;
+            height: 717.5px;
+            background-color: #f7f9fa;
+            padding-top: 16.5px;
+            padding: 16.5 24px ;
+            .table{
+              margin: 0 calc(24/1920*100vw);
+              background-color: #f7f9fa;
+              box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+              border: solid 1px #f5f5f5;
+            }
+          }
+        }
+        
+        .kpi-list{
+          height: 100%;
+          border-bottom: 1px solid $border;
         }
       }
     }
@@ -1570,17 +1693,39 @@ export default {
       background-color: #fff;
       color: #006ab7;
     }
-    .mode-btn{
-      color:#fff;
-      background-color: #006ab7;
-      width:calc(101/1440*100vw);
-      height:30px;
-      font-size: 15px;
-      border:0;
-      text-align: center;
-      line-height: 10px;
-      margin-left:0px;
+    .switch-btn{
+      width:calc(202/1440*100vw);
+      height:32px;
+      display:flex;
+      flex-direction:row;
+      justify-content: stretch;
+      border-radius: 5px;
+      border: 1px solid #e6e6e6;
+      .mode-btn{
+        color: #556679;
+        background-color: #fff;
+        width:calc(101/1440*100vw);
+        height:30px;
+        font-size: 15px;
+        border:none;
+        text-align: center;
+        line-height: 10px;
+        margin-left:0px;
+      }
+      .active-mode-btn{
+        color:#fff;
+        background-color: #006ab7;
+        width:calc(101/1440*100vw);
+        height:30px;
+        font-size: 15px;
+        border:none;
+        text-align: center;
+        line-height: 10px;
+        margin-left:0px;
+        
+      }
     }
+    
   }
 </style>
 

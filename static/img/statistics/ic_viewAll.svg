@@ -1,0 +1,13 @@
+<svg id="ic_btn_link_all" data-name="ic/btn/link/all" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <defs>
+        <style>
+            .cls-2{fill:#006ab7}
+        </style>
+    </defs>
+    <path id="Rectangle" style="fill:none" d="M0 0h24v24H0z"/>
+    <path id="Path" class="cls-2" d="M12.75 0a2.75 2.75 0 0 1 2.745 2.582l.005.168v10a2.75 2.75 0 0 1-2.582 2.745l-.168.005H8.365V14h4.385a1.25 1.25 0 0 0 1.244-1.122L14 12.75v-10a1.25 1.25 0 0 0-1.122-1.244L12.75 1.5h-10a1.25 1.25 0 0 0-1.244 1.122L1.5 2.75v5.718H0V2.75A2.75 2.75 0 0 1 2.582.005L2.75 0z" transform="translate(4.25 4.25)"/>
+    <g id="Group_36" data-name="Group 36" transform="translate(5.009 12.003)">
+        <path id="Path_8" data-name="Path 8" class="cls-2" d="m5.955 0 1.061 1.061-5.955 5.955L0 5.955z" transform="translate(-.53 1.634)"/>
+        <path id="Path_28" data-name="Path 28" class="cls-2" d="m.893 0 2.782 2.063L6.348.288l.83 1.25-3.551 2.357L0 1.2z" transform="rotate(-135 4.583 2.285)"/>
+    </g>
+</svg>

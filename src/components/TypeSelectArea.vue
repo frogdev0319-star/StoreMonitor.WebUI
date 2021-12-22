@@ -31,7 +31,6 @@
                   :options="curTypeArrary"
                   :input-size="`mini`"
                   :limit = "limitNum"
-                  :compareType="compareType"
                   @changeInput="onChangeCompareType" />
               </div>
         </div>
@@ -46,7 +45,7 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import { getBriefStoreList, getStoreDefineGroup } from '@/api/store';
 import LimitSelect from '@/components/LimitSelect';
 export default {
-    name: 'AreaSelected',
+    name: 'TypeSelectArea',
     components: {
       MultiSelect,
       RegionMultiSelect,
@@ -69,7 +68,27 @@ export default {
         limitNum:{
           type:Number,
           default:0
-        }
+        },
+        regionArray1:{
+          type:Array,
+          default:[]
+        },
+        regionArray2:{
+          type:Array,
+          default:[]
+        },
+        curStoreGroup:{
+          type:Array,
+          default:[]
+        },
+        curStoreType:{
+          type:Array,
+          default:[]
+        },
+        curStore:{
+          type:Array,
+          default:[]
+        },
     },
     data() {
         return {
@@ -81,7 +100,7 @@ export default {
             {value:'stores',label:this.$t('statistics.stores')}],
             date:Date.now(),
             dateFormat:'yyyy/MM/DD',
-            //curCountry: -1,
+            //curCountry: -1, 
             countryList: [],
             ifGetParamsFromCash: false,
             curProvince: [],
@@ -90,6 +109,9 @@ export default {
             cityList: [],
             curStore: [],
             storeList: [],
+            curStoreTypeList:[],
+            curStoreGroupList:[],
+            curStoreList:[],
             curStoreGroup: [],
             curStoreType: [],
             storeGroupList: [],
@@ -113,10 +135,109 @@ export default {
         await this.getSearchParams();
       }
     },
-    cachedParams() {
-      console.log("*cachedParams:");
-      //this.getSearchParams();
-      //this.getStoreListAndGroupAndType();
+    regionArray1: {
+        immediate: true, 
+        deep: true,
+        handler (val,old ) {
+          this.provinceList  = [];
+          val.map(item => {
+            if(item!='-1'){
+              this.provinceList.push({value:item,label:item});
+            }
+          });
+        
+          console.log(this.provinceList)
+          console.log("CompareType="+this.compareType)
+           if(this.compareType== 'area1'){
+            this.curSelectId=[];
+            this.changeCompareType(this.compareType);
+          }
+
+        }
+    },
+    regionArray2: {
+        immediate: true, 
+        deep: true,
+        handler (val,old ) {
+          this.cityList = [];
+          val.map(item => {
+            if(item!='-1'){
+              this.cityList.push({value:item,label:item});
+            }
+          });
+          if(this.compareType== 'area2'){
+            this.curSelectId=[];
+            this.changeCompareType(this.compareType);
+          }
+
+        }
+    },
+    curStoreGroup: {
+        immediate: false, 
+        deep: true,
+        handler (val,old ) {
+          this.curStoreGroupList = [];
+          val.map(item => {
+            if(item!='-1'){
+              this.storeGroupList.map(store=>{
+                  if(item == store.value)
+                    this.curStoreGroupList.push(store);
+              });
+              
+            }
+          });
+    
+          if(this.compareGroup== 'storeGroup'){
+            this.curSelectId=[];
+            this.changeCompareType(this.compareType);
+          }
+
+        }
+    },
+  curStoreType: {
+        immediate: false, 
+        deep: true,
+        handler (val,old ) {
+          this.curStoreTypeList = [];
+          val.map(item => {
+            if(item!='-1'){
+              this.storeTypeList.map(store=>{
+                  if(item == store.value)
+                    this.curStoreTypeList.push(store);
+              });
+              
+            }
+          });
+    
+          if(this.compareType== 'storeType'){
+            this.curSelectId=[];
+            this.changeCompareType(this.compareType);
+          }
+
+        }
+    },
+    curStore: {
+        immediate: true, 
+        deep: true,
+        handler (val,old ) {
+          console.log("Change Cur Store   ")
+          console.log(val)
+          this.curStoreList = [];
+          val.map(item => {
+            if(item!='-1'){
+              this.storeList.map(store=>{
+                  if(item == store.storeId)
+                    this.curStoreList.push({value:store.storeId,storeId:store.storeId,label:store.name});
+              });
+              
+            }
+          });
+          if(this.compareType== 'stores'){
+            this.curSelectId=[];
+            this.changeCompareType(this.compareType);
+          }
+
+        }
     },
     async curCountry(val){
       console.log("!!curCountry:",val);
@@ -124,6 +245,10 @@ export default {
     }
   },
   computed: {
+     cachedParamsInfo() {
+      console.log(this.cachedParams)
+      return this.cachedParams
+    }
   },
   methods: {
     getSearchParams() {
@@ -321,6 +446,7 @@ export default {
       });
     },
     changeCompareType(val){
+      console.log("Change Compare Type")
       this.compareType = val;
       this.curSelectId = [];
       this.curTypeArrary = [];
@@ -338,23 +464,22 @@ export default {
         case 'storeGroup':
           this.dropdownPlaceholder =  this.$t('remotePatrol.storeGroup');
           this.selAllString=this.$t('storeView.all');
-          this.curTypeArrary = this.storeGroupList;
-        
+          this.curTypeArrary = this.curStoreGroupList;
           break;
         case 'storeType':
           this.dropdownPlaceholder =  this.$t('remotePatrol.storeType');
           this.selAllString=this.$t('storeView.all');
-          this.curTypeArrary = this.storeTypeList;
+          this.curTypeArrary = this.curStoreTypeList;
           break;
         case 'stores':
           this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
           this.selAllString=this.$t('overview.all');
-          this.curTypeArrary = this.storeDataList;
+          this.curTypeArrary = this.curStoreList;
           break;
         default:
           this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
           this.selAllString=this.$t('overview.all');
-          this.curTypeArrary = this.storeDataList;
+          this.curTypeArrary = this.curStoreList;
           break;
       }
       /*console.log("allowAll:",this.allowAll);
@@ -363,22 +488,19 @@ export default {
           this.curTypeArrary.unshift({value:"-1",label:this.$t('remotePatrol.all') })
       }*/
       if(this.curSelectId.length==0 ){
-        if(this.allowAll){
-          this.curSelectId.push(-1);
-        }else{
-          let defaultSel = (this.curTypeArrary.length>2)?2:this.curTypeArrary.length;
+          let defaultSel = this.curTypeArrary.length;
           let selectedLabels = [];
           let storeIds = [];
+          this.curSelectId.push('-1');
           for(let i=0; i<defaultSel;i++){
-            this.curSelectId.push((this.compareType=="stores")?this.curTypeArrary[i].storeId:this.curTypeArrary[i].value);
+            this.curSelectId.push(this.compareType=='stores'?this.curTypeArrary[i].storeId: this.curTypeArrary[i].value);
             selectedLabels.push(this.curTypeArrary[i].label);
           }
           this.onChangeCompareType({selectedArray:this.curSelectId,storeIds:this.curSelectId,selectedLabels});
             //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});
-        }
+        
             
       }
-        console.log("changeCompareType:",val);
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
