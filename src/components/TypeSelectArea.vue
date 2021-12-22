@@ -71,23 +71,33 @@ export default {
         },
         regionArray1:{
           type:Array,
-          default:[]
+          default() {
+            return []
+          }
         },
         regionArray2:{
           type:Array,
-          default:[]
+            default() {
+            return []
+          }
         },
         curStoreGroup:{
           type:Array,
-          default:[]
+            default() {
+            return []
+          }
         },
         curStoreType:{
           type:Array,
-          default:[]
+           default() {
+            return []
+          }
         },
-        curStore:{
+        curStores:{
           type:Array,
-          default:[]
+            default() {
+            return []
+          }
         },
     },
     data() {
@@ -112,8 +122,6 @@ export default {
             curStoreTypeList:[],
             curStoreGroupList:[],
             curStoreList:[],
-            curStoreGroup: [],
-            curStoreType: [],
             storeGroupList: [],
             storeTypeList: [],
             dropdownPlaceholder:this.$t('remotePatrol.stores'),
@@ -123,7 +131,6 @@ export default {
         }
   },
   created() {
-    this.getSearchParams();
     this.getStoreListAndGroupAndType();
   },
   watch: {
@@ -132,7 +139,6 @@ export default {
       if (val !== 0) {
         self.ifGetParamsFromCash = false;
         this.getStoreListAndGroupAndType();
-        await this.getSearchParams();
       }
     },
     regionArray1: {
@@ -216,13 +222,15 @@ export default {
 
         }
     },
-    curStore: {
-        immediate: true, 
+    curStores: {
+        immediate: false, 
         deep: true,
         handler (val,old ) {
-          console.log("Change Cur Store   ")
-          console.log(val)
+          /*
           this.curStoreList = [];
+          if(this.storeList.length==0){
+            this.getStoreListAndGroupAndType()
+          }
           val.map(item => {
             if(item!='-1'){
               this.storeList.map(store=>{
@@ -232,6 +240,8 @@ export default {
               
             }
           });
+          */
+          console.log(this.curStoreList)
           if(this.compareType== 'stores'){
             this.curSelectId=[];
             this.changeCompareType(this.compareType);
@@ -251,26 +261,8 @@ export default {
     }
   },
   methods: {
-    getSearchParams() {
-      //const searchParams = this.cachedParams;
-      const searchParams = SearchConditionUtil.getSearchCondition(this.path);
-      console.log("*searchParams.curCountry:",searchParams.curCountry);
-      if (Object.keys(searchParams).length > 0) {
-        
-        if (searchParams.curCountry) {
-          this.curCountry = searchParams.curCountry;
-          this.curProvince = searchParams.curProvince;
-          this.curCity = searchParams.curCity;
-          this.curStore = searchParams.curStore;
-          this.curStoreGroup = searchParams.curStoreGroup;
-          this.curStoreType = searchParams.curStoreType;
-          this.ifGetParamsFromCash = true;
-        } else {
-          this.ifGetParamsFromCash = false;
-        }
-      }
-    },
     getStoreListAndGroupAndType() {
+      console.log("getStoreListAndGroupAndType")
       const storeListPromise = this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
@@ -446,7 +438,7 @@ export default {
       });
     },
     changeCompareType(val){
-      console.log("Change Compare Type")
+      console.log("Change Compare Type=" +val)
       this.compareType = val;
       this.curSelectId = [];
       this.curTypeArrary = [];
@@ -472,6 +464,17 @@ export default {
           this.curTypeArrary = this.curStoreTypeList;
           break;
         case 'stores':
+          console.log(this.curStores)
+          this.curStoreList = [];
+          this.curStores.map(item => {
+            if(item!='-1'){
+              this.storeList.map(store=>{
+                  if(item == store.storeId)
+                    this.curStoreList.push({value:store.storeId,storeId:store.storeId,label:store.name});
+              });
+              
+            }
+          });
           this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
           this.selAllString=this.$t('overview.all');
           this.curTypeArrary = this.curStoreList;
@@ -482,11 +485,6 @@ export default {
           this.curTypeArrary = this.curStoreList;
           break;
       }
-      /*console.log("allowAll:",this.allowAll);
-      if(this.allowAll){
-
-          this.curTypeArrary.unshift({value:"-1",label:this.$t('remotePatrol.all') })
-      }*/
       if(this.curSelectId.length==0 ){
           let defaultSel = this.curTypeArrary.length;
           let selectedLabels = [];
