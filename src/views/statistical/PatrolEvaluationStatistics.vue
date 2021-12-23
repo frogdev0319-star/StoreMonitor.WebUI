@@ -194,7 +194,7 @@
                     <el-col :span="10" class="division">
                       <el-col class="text-area">        
                         <el-row class="top">
-                           <span class="mainTitle">{{overviewCount.store>0?overviewCount.store:'N/A'}}</span>
+                           <span class="mainTitle">{{part2.standardScore>0?part2.standardScore:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.score') }}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -207,7 +207,7 @@
                      <el-col :span="8" class="division">
                       <el-col class="text-area">
                         <el-row class="top">
-                           <span class="mainTitle">{{overviewCount.items>=0?overviewCount.items:'N/A'}}</span>
+                           <span class="mainTitle">{{part2.averageScore>=0?part2.averageScore:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.score') }}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -276,7 +276,7 @@
                 </div>
            </el-col>  
       </div> 
-        <div class="statistics-content" style="height:810px;margin-top:18px">
+      <div v-if="part3.standardScore>0" class="statistics-content" style="height:810px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -296,6 +296,19 @@
                               @emitTypeChanged="emitTypeChangedPart3"
                           ></TypeSelectArea>
                 </div>
+          <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
+                    <el-col :span="10" class="division">
+                      <el-col class="text-area">        
+                        <el-row class="top">
+                           <span class="mainTitle">{{part3.averageScore>0?part3.averageScore:'N/A'}}</span>
+                           <span class="unit">{{  "%" }}</span>
+                        </el-row >
+                        <el-row class="subtitlehead">
+                            <span>{{ $t('statistics.totalStandardRate') }}</span>
+                        </el-row>
+                      </el-col>
+                     </el-col>
+          </el-row>
         <el-row  :span="24" class="partition" style="height:320px">
             <el-col  :span="24" style="height:100%">
                <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption" :auto-resize="true"
@@ -383,6 +396,7 @@ import {
   getInspectStatsOverviewWithRegionV2,
   getInspectStatsOverviewWithGroup
 } from '@/api/inspectOverview';
+import { GetInspectTagList } from '@/api/inspect';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination_V2';
@@ -825,8 +839,24 @@ export default {
           'maxWidth': '180'
         },
         {
-          'prop': 'numOfQualified',
-          'label': this.$t('overview.echartGood'),
+          'prop': 'averageScore',
+          'label': this.$t('overview.averageScore'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '100'
+        },
+          {
+          'prop': 'rank',
+          'label': this.$t('statistics.rank'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '100'
+        },
+        {
+          'prop': 'compareTrend',
+          'label': this.$t('statistics.compareTrend'),
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
@@ -886,11 +916,11 @@ export default {
           'prop': 'storeSubmitters',
           'label': this.$t('statistics.submitter'),
           'sortable': false,
-          'width': '170',
+          'width': '130',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
-        {
+         {
           'prop': 'numOfReport',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
@@ -898,45 +928,37 @@ export default {
           'width': '80',
           'maxWidth': '180'
         },
+          {
+          'prop': 'numOfStandard',
+          'label': this.$t('statistics.numOfStandard'),
+          'sortable': 'custom',
+          'pdfwidth': '14%',
+          'width': '80',
+          'maxWidth': '180'
+        },
         {
-          'prop': 'numOfQualified',
-          'label': this.$t('overview.echartGood'),
+          'prop': 'standardRate',
+          'label': this.$t('statistics.sRate'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '100'
+        },
+          {
+          'prop': 'rank',
+          'label': this.$t('statistics.rank'),
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
           'maxWidth': '100'
         },
         {
-          'prop': 'numOfImproved',
-          'label': this.$t('overview.improve'),
+          'prop': 'compareTrend',
+          'label': this.$t('statistics.compareTrend'),
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
-          'maxWidth': '120'
-        },
-        {
-          'prop': 'numOfDangerous',
-          'label': this.$t('overview.danger'),
-          'sortable': 'custom',
-          'pdfwidth': '12%',
-          'width': '80',
-          'maxWidth': '130'
-        },
-        {
-          'prop': 'numOfImproved',
-          'label': this.$t('overview.improve'),
-          'sortable': 'custom',
-          'pdfwidth': '12%',
-          'width': '80',
-          'maxWidth': '120'
-        },
-        {
-          'prop': 'numOfDangerous',
-          'label': this.$t('overview.danger'),
-          'sortable': 'custom',
-          'pdfwidth': '12%',
-          'width': '80',
-          'maxWidth': '130'
+          'maxWidth': '100'
         }
     
       ],
@@ -946,13 +968,15 @@ export default {
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
-      part2:{ compareType:'stores', indexRegion:0, content:[],
+      part2:{ standardScore:-1,averageScore:-1,
+              compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
-      part3:{ compareType:'stores', indexRegion:0, content:[],
+      part3:{ standardScore:-1,averageScore:-1,
+              compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,
               storeMode:0, barRegionSort:1,barStoreStore:1,
@@ -1487,7 +1511,7 @@ export default {
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.regionMode = self.regionMode;
-      params.storeIds = self.params.storeIds;
+      params.storeIds = self.params.curStore;
       params.inspectTagId = self.params.inspectId;
       const overviewResult = await self.getInspectReulstStatsOverview(params);
       if (overviewResult.errCode === 0) {
@@ -1857,6 +1881,8 @@ export default {
          params.groupIds  = this.part2.compareIds;
          params.groupMode = 3;
       }
+      let totalReport = 0;
+      let totalStandard = 0;
       params.filter = { page: 0, size: 20 };
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
@@ -1867,6 +1893,11 @@ export default {
                                   this.part2.compareIds,
                                   this.part2.comapareLabels,
                                   this.part2.originArray);
+            this.part2.content.forEach(function(item){
+                  totalReport += item.numOfReport;
+                  totalStandard +=  item.averageScore * item.numOfReport;
+            })       
+            this.part2.averageScore =  totalStandard>0? Math.round( (totalStandard) /totalReport):-1;
             console.log("Leave FIlterContent")
             console.log(this.part2.content)
             this.part2.indexRegion = -1;
@@ -1877,7 +1908,6 @@ export default {
     },
     async drawPart2RegionBar(){
       console.log("drawPart2RegionBar")
-     
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
@@ -1916,6 +1946,7 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barRegionOption = option;
       console.log(option)
       await this.getPart2StoreBar();
@@ -1950,23 +1981,15 @@ export default {
         
 
         content.map((item,index) => {
+          item.rank = parseInt(index)+1;
+          item.compareTrend = this.$t('statistics.check'),
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
           item.storeSubmitters = item.submitters.toString();
           if(item.code=='')item.code='- -'
           if(item.storeGroup=='')item.storeGroup='- -'
           if(item.storeType=='')item.storeType='- -'
-          let value = 0;
-          var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
-          if(this.part2.indexType==0){
-              value = util.getPercentValue(arr, 0, 2)
-          }
-          else if(this.part2.indexType==1){
-              value = util.getPercentValue(arr, 1, 2)
-          }
-          else if(this.part2.indexType==2){
-              value =  util.getPercentValue(arr, 2, 2)
-          }
+          let value = item.averageScore;
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
@@ -1977,9 +2000,11 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barStoreOption = option;
     },
-    async getPart3RegionBar() {
+     async getPart3RegionBar() {
+      console.log("getPart3RegionBar")
       const self = this;
       const params = {};
       params.beginTs = self.params.beginTs;
@@ -1988,6 +2013,10 @@ export default {
       params.groupMode = 0;
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
+      params.order={
+         direction: "desc",
+         property:"standardRate"
+      }
       if(this.part3.compareType=='stores'){
          params.storeIds  = this.part3.compareIds;
          params.groupMode = 0;
@@ -2008,34 +2037,47 @@ export default {
          params.groupIds  = this.part3.compareIds;
          params.groupMode = 3;
       }
+      let totalReport = 0;
+      let totalStandard = 0;
       params.filter = { page: 0, size: 20 };
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           if (result) {
             this.part3.content = this.filterContent(result.content, 
-            this.part3.compareType,
-            this.part3.compareIds,
-            this.part3.comapareLabels,
-            this.part3.originArray);
+                                  this.part3.compareType,
+                                  this.part3.compareIds,
+                                  this.part3.comapareLabels,
+                                  this.part3.originArray);
+            this.part3.content.forEach(function(item){
+                  totalReport += item.numOfReport;
+                  totalStandard +=  item.numOfStandard;
+            })       
+            this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
+            console.log("Leave FIlterContent")
+            console.log(this.part3.content)
             this.part3.indexRegion = -1;
-            this.drawPart2RegionBar();
+            this.drawPart3RegionBar();
           }
         }
 
     },
     async drawPart3RegionBar(){
-      console.log("Region Line")
+      console.log("drawPart2RegionBar")
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
       if(this.part3.content){
+        console.log(this.part3.content)
         this.part3.content.map((item,index) => {
-          let value = item.averageScore;
+          let value = item.standardRate;
+          if(this.part3.indexRegion<0 && value>0){
+            this.part3.indexRegion = index;
+          }
           
           if( this.part3.indexRegion == index){   
             regionData.push({value:value,itemStyle: {
-                color: '#f11e66',
+                color: '#7bd8eb',
                 emphasis: {
                             shadowBlur: 10,
                             shadowOffsetX: 0,
@@ -2044,7 +2086,7 @@ export default {
             }});
           }else{
             regionData.push({value,itemStyle: {
-            color: 'rgba(250, 30, 102, 0.6)',
+            color: 'rgba(123 ,216, 235, 0.5)',
             emphasis: {
                             shadowBlur: 0,
                             shadowOffsetX: 0,
@@ -2060,10 +2102,10 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-      console.log(option)
-      this.regionsChartsOptions = option;
+      option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part3.barRegionOption = option;
-      await this.getPart1StoreBar();
+      console.log(option)
+      await this.getPart3StoreBar();
     },
     async getPart3StoreBar(){
       const self = this;
@@ -2095,23 +2137,15 @@ export default {
         
 
         content.map((item,index) => {
+          item.rank = parseInt(index)+1;
+          item.compareTrend = this.$t('statistics.check'),
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
           item.storeSubmitters = item.submitters.toString();
           if(item.code=='')item.code='- -'
           if(item.storeGroup=='')item.storeGroup='- -'
           if(item.storeType=='')item.storeType='- -'
-          let value = 0;
-          var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
-          if(this.part3.indexType==0){
-              value = util.getPercentValue(arr, 0, 2)
-          }
-          else if(this.part3.indexType==1){
-              value = util.getPercentValue(arr, 1, 2)
-          }
-          else if(this.part3.indexType==2){
-              value =  util.getPercentValue(arr, 2, 2)
-          }
+          let value = item.standardRate;
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
@@ -2122,6 +2156,7 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part3.barStoreOption = option;
     },
     getRegionPieOption() {
@@ -2229,6 +2264,9 @@ export default {
 
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
+      this.part2.standardScore=-1;
+      this.part2.standardScore=-1;
+      this.doGetAssessmentStandardScore();
       this.params = searchParams;
       console.log(this.params)
       this.daysRangeList = dateRangeList;
@@ -2320,6 +2358,41 @@ export default {
       this.part1.indexType = index;
       this.part1.indexRegion =  -1;
       await this.drawPart1RegionBar();
+    },
+    getInspectTagStandardScore(){//取得巡檢表達標分數
+      const self = this;
+      return new Promise((resolve, reject) => {
+         GetInspectTagList({includeRule:true}).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+    async doGetAssessmentStandardScore(){
+      console.log("tag-doGetAssessmentStandardScore")
+      let tagList = await this.getInspectTagStandardScore();
+      console.log("tagList:",tagList);
+      let filterTag = tagList.data.filter((tag)=>{
+        return tag.id == this.params.inspectId;
+      });
+      console.log("@@filterTag:",filterTag);
+      if(filterTag.length>0){
+        let inspectSet=filterTag[0].inspectSettings.filter((setting)=>{
+          return setting.name == "standardScore";
+        });
+
+        if(inspectSet.length>0){
+          console.log("@@inspectSettings:",inspectSet[0]);
+          if(inspectSet[0].value!=null){
+            this.part3.standardScore =inspectSet[0].value
+            this.part2.standardScore =inspectSet[0].value
+           // this.standardRate =inspectSet[0].value;
+          }else{
+            this.standardRate = "- -";
+          }
+        }
+      }
     },
   }
 };
