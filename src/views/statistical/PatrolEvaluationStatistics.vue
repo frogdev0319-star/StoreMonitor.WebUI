@@ -276,11 +276,20 @@
                 </div>
            </el-col>  
       </div> 
-      <div v-if="part3.standardScore>0" class="statistics-content" style="height:810px;margin-top:18px">
+      <div v-if="part3.standardScore>0" class="statistics-content" style="height:930px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
                                 {{ $t('statistics.titles.rateDistribution') }}
+                            </span>
+                             <span class="title" style="font-size:13px;margin-left:8px">
+                                {{ "("+$t('statistics.standardLine')+": " }}
+                            </span>
+                            <span class="title" style="font-size:13px;color:#f00;">
+                                {{ part3.standardScore }}
+                            </span>
+                            <span class="title" style="font-size:13px">
+                                {{ $t('statistics.score')+")" }}
                             </span>
                         </div>
                             <TypeSelectArea

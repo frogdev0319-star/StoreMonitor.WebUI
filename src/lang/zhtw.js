@@ -1100,6 +1100,7 @@ export default {
     "compareTrend":"同比趨勢",
     "check":"查看",
     "sRate":"達標率",
+    "standardLine":"達標分數線",
     "numOfStandard":"達標次數",
     "titles":{
       "overview":"概要",
