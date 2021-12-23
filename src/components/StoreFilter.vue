@@ -230,7 +230,7 @@ export default {
             userId: store.userId,
           }))
         }
-        console.log(storeList)
+        // console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {

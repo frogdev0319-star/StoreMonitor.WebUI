@@ -284,7 +284,7 @@
       </el-col>
       <el-col :span="isFullScreenMode ? 24: 16">
         <div :class="{paper: !isFullScreenMode, flex: isFullScreenMode}" :style="isFullScreenMode ? {'margin': '0 auto 20px 0'}: {}">
-          <div v-if="sheetName.length!=0" style="padding: 20px">
+          <div style="padding: 20px">
             <div v-if="!isFullScreenMode" class="flex-center">
               <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
               <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
@@ -870,7 +870,7 @@ export default {
       itemOptionsForType1: [],
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
-      isFullScreenMode: true,
+      isFullScreenMode: false,
       groupItems: [],
       storeOptions: []
     };
@@ -950,6 +950,7 @@ export default {
   async mounted() {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
+    console.log(PatrolHistory)
     if (PatrolHistory != null) {
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
@@ -1020,6 +1021,96 @@ export default {
     getFilteredStoreList (stores) {
       this.options = [...stores]
     },
+    clickStore(item, index, _item, _index) {
+      const self = this;
+      if (!_item.hasInspect && _item.hasInspect != undefined) {
+        return false;
+      }
+      if (!util.validateLicense(_item.status)) {
+        return false;
+      }
+      self.curTabIndex = index;
+      self.curTabItem = item;
+      self.curStoreIndex = _index;
+      self.curStoreItem = _item;
+      self.deviceList = _item.device;
+      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
+          || (self.$store.getters.PatrolHistory != null) ) {
+        self.changeStoreObj.dialogCosed = true;
+      } else {
+        self.changeStore(item, index, _item, _index);
+      }
+    },
+
+    changeStore(item, index, _item, _index) {
+      const self = this;
+      self.patrolstore = '';
+      self.curSheetIndex = 0;
+      self.inspectItemList = [];
+      self.inspectList = [];
+      self.sheetName = [];
+      self.tempArr = [];
+      self.showChannelBtns = [];
+      self.patrolStoreName = _item.name;
+      self.PatrolList = [];
+      self.hasIgnoretemp = [];
+      self.$store.dispatch('setPatrolHistory', null);
+      self.isShowWarn = false;
+      self.notShowAlert = false;
+      self.showIgnoreItem = false;
+      _item.authorizedInspect.forEach(au_item => {
+        if (au_item.mode === 0) {
+          self.PatrolList.push(au_item);
+        }
+      });
+      _item.isActive = true;
+      self.showStoreUp = true;
+
+      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
+      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
+      self.showError = false;
+      self.curDeviceId = -1;
+      self.showFeedBack = false;
+      self.eventList = [];
+      self.showGuide = true;
+      const obj = {};
+      obj.storeId = _item.storeId;
+      obj.storeName = _item.name;
+      obj.storeTitle = _item.name;
+      obj.storeUp = _item.favorite;
+      self.channel = null;
+      self.getChannelByStore(_item);
+      if (_item.favorite) {
+        obj.storeUpTitle = this.$t('remotePatrol.stared');
+      } else {
+        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
+      }
+      self.store = obj;
+      let curStoreId = '';
+      const tabIndex = Number(self.activeIndex);
+      if (tabIndex != 2) {
+        item.storeList.forEach((itemS, indexS) => {
+          if (_index != indexS) {
+            itemS.isActive = false;
+          }
+        });
+        curStoreId = _item.storeId;
+      } else {
+        item.storeList.forEach((itemS, indexS) => {
+          itemS.storeList.forEach((itemChild, indexChild) => {
+            if (itemChild.storeId != _item.storeId) {
+              itemChild.isActive = false;
+            } else {
+              curStoreId = itemChild.storeId;
+            }
+          });
+        });
+      }
+      const storeObj = {
+        storeId: curStoreId
+      };
+      self.saveStoreObj(storeObj);
+    },
     changeSelStore (storeId) {
       const tempData = this.tabList[2].storeList.find(data => data.storeList[0].storeId === storeId) || {}
       const _item = tempData.storeList[0] || {}
@@ -1044,7 +1135,7 @@ export default {
       });
       _item.isActive = true;
       this.showStoreUp = true;
-
+      this.deviceList = _item.device;
       !this.showGuide && (this.$refs.vendorVideo.editCount == 0);
       !this.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       this.showError = false;
@@ -1478,7 +1569,8 @@ export default {
       const allStoreData = await self.getAllStoreList();
       if (allStoreData.errCode === 0) {
         self.getInitStoreData(allStoreData);
-        const storeData = allStoreData.data.content.filter(store => store.favorite === true);
+        const storeData = allStoreData.data.content
+        // console.log(storeData)
         self.tabList[0].storeList = getStoreTemp(storeData);
         if (storeData.length === 0) {
           self.showStoreUp = false;
@@ -1652,7 +1744,7 @@ export default {
     },
     getItemByGroup(item, index) {
       const self = this;
-      console.log(item)
+      // console.log(item)
       self.curGroupIndex = index;
       self.curGroup = item;
       self.curItemIndex = 0;
@@ -1702,9 +1794,8 @@ export default {
     },
 
     getDeviceById(deviceId) {
-      const self = this;
       const device = [];
-      self.deviceList.forEach(item => {
+      this.deviceList.forEach(item => {
         deviceId.forEach(_item => {
           if (_item == item.id) {
             device.push(item);
@@ -1899,7 +1990,7 @@ export default {
           self.channelBtns = [];
           self.showError = false;
           self.showGuide = false;
-          device.forEach(item => {
+          item.deviceId.forEach(item => {
             self.allChannelBtns.forEach(_item => {
               if (item.id === _item.id) {
                 self.channelBtns.push(_item);
@@ -2206,75 +2297,6 @@ export default {
       self.tabList[2].storeList = getStore2Temp(tempArray);
     },
 
-    changeStore(item, index, _item, _index) {
-      const self = this;
-      self.patrolstore = '';
-      self.curSheetIndex = 0;
-      self.inspectItemList = [];
-      self.inspectList = [];
-      self.sheetName = [];
-      self.tempArr = [];
-      self.showChannelBtns = [];
-      self.patrolStoreName = _item.name;
-      self.PatrolList = [];
-      self.hasIgnoretemp = [];
-      self.$store.dispatch('setPatrolHistory', null);
-      self.isShowWarn = false;
-      self.notShowAlert = false;
-      self.showIgnoreItem = false;
-      _item.authorizedInspect.forEach(au_item => {
-        if (au_item.mode === 0) {
-          self.PatrolList.push(au_item);
-        }
-      });
-      _item.isActive = true;
-      self.showStoreUp = true;
-
-      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
-      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
-      self.showError = false;
-      self.curDeviceId = -1;
-      self.showFeedBack = false;
-      self.eventList = [];
-      self.showGuide = true;
-      const obj = {};
-      obj.storeId = _item.storeId;
-      obj.storeName = _item.name;
-      obj.storeTitle = _item.name;
-      obj.storeUp = _item.favorite;
-      self.channel = null;
-      self.getChannelByStore(_item);
-      if (_item.favorite) {
-        obj.storeUpTitle = this.$t('remotePatrol.stared');
-      } else {
-        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
-      }
-      self.store = obj;
-      let curStoreId = '';
-      const tabIndex = Number(self.activeIndex);
-      if (tabIndex != 2) {
-        item.storeList.forEach((itemS, indexS) => {
-          if (_index != indexS) {
-            itemS.isActive = false;
-          }
-        });
-        curStoreId = _item.storeId;
-      } else {
-        item.storeList.forEach((itemS, indexS) => {
-          itemS.storeList.forEach((itemChild, indexChild) => {
-            if (itemChild.storeId != _item.storeId) {
-              itemChild.isActive = false;
-            } else {
-              curStoreId = itemChild.storeId;
-            }
-          });
-        });
-      }
-      const storeObj = {
-        storeId: curStoreId
-      };
-      self.saveStoreObj(storeObj);
-    },
     changeBrandDialog() {
       const self = this;
     },
@@ -2710,27 +2732,6 @@ export default {
       });
       this.groupItems = this.inspectList
     },
-    clickStore(item, index, _item, _index) {
-      const self = this;
-      if (!_item.hasInspect && _item.hasInspect != undefined) {
-        return false;
-      }
-      if (!util.validateLicense(_item.status)) {
-        return false;
-      }
-      self.curTabIndex = index;
-      self.curTabItem = item;
-      self.curStoreIndex = _index;
-      self.curStoreItem = _item;
-      self.deviceList = _item.device;
-      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
-          || (self.$store.getters.PatrolHistory != null) ) {
-        self.changeStoreObj.dialogCosed = true;
-      } else {
-        self.changeStore(item, index, _item, _index);
-      }
-    },
-
     checkFull() {
       var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
       if (isFull === undefined) {
