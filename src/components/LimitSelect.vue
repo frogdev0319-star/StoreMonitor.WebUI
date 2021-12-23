@@ -7,9 +7,9 @@
       :multiple-limit="selectLimit"
       multiple
       collapse-tags
+      clearOnSelect="false"
       @change="changeSelect"
-      @visible-change="visibileHandler"
-      @focus="clickSelect">
+      @visible-change="visibileHandler">
       <el-option v-for="(item, index) in options" :key="index" :label="item.label" :value="item.value" :disabled="item.disabled"/>
     </el-select>
     <el-input
@@ -63,11 +63,11 @@ export default {
   },
 
   watch: {
-    selected(val) {
-      console.log(val);
+    selected(val, oldVal) {
+      console.log("selected > val:",val);
       this.selectedArray = val;
       this.initData();
-    }
+    },
   },
 
   mounted() {
@@ -79,13 +79,18 @@ export default {
       }
     });
     this.input = '';
-    this.options.forEach(_item => {
+      console.log("this.limit:",this.limit)
+      for(var i=0; i<this.limit;i++){
+        this.selectedArray.push(this.options[i].value);
+        this.input += this.options[i].label + ',';
+      }
+    /*this.options.forEach(_item => {
       this.selectedArray.forEach(item => {
         if (item === _item.value) {
           this.input += _item.label + ',';
         }
       });
-    });
+    });*/
     this.input = this.input.slice(0, this.input.length - 1);
     if (this.limit > 0) {
       if (this.selectedArray.length === 1) {
@@ -108,6 +113,11 @@ export default {
         }
       });
       this.input = '';
+      console.log("this.limit:",this.limit)
+      /*for(var i=0; i<this.limit;i++){
+        this.selectedArray.push(this.options[i]);
+        this.input += this.options[i].label + ',';
+      }*/
       this.options.forEach(_item => {
         this.selectedArray.forEach(item => {
           if (item === _item.value) {
@@ -141,20 +151,10 @@ export default {
         }
       }
       self.input = '';
-      var emitArray = [];
       self.options.forEach(_item => {
         self.selectedArray.forEach(item => {
           if (item === _item.value) {
             self.input += _item.label + ',';
-            if (self.compareType == 'storeGroup' || self.compareType == 'storeType') {
-                console.log("_item.contents:",_item.storeIds);
-                if(_item.storeIds.length>0)
-                {emitArray = emitArray.concat(_item.storeIds);}
-                console.log("emitArray:",emitArray);
-                //emitArray = this.selectedArray;
-            }else {
-              emitArray.push(item);
-            }
           }
         });
       });
@@ -177,21 +177,43 @@ export default {
           item.disabled = false;
         });
       }
-      console.log("this.selectedArray:",this.selectedArray);
-      const params = {selectedArray:self.selectedArray,storeIds:emitArray,selectedLabels:(self.input==""?[]:self.input.split(','))};
-      this.$emit('changeInput', params);
+      //console.log("this.selectedArray:",this.selectedArray);
+      
     },
 
     visibileHandler(val) {
       console.log("visibileHandler",val);
+      console.log("visibileHandler",this.changed);
+      const self = this;
       if (!val && this.changed) {
         let selectedList = [];
         selectedList = this.selectedArray;
-        this.$emit('changeInput', selectedList);
+        var emitArray = [];
+        self.options.forEach(_item => {
+          self.selectedArray.forEach(item => {
+            if (item === _item.value) {
+              console.log("*item:",item);
+              if (self.compareType == 'storeGroup' || self.compareType == 'storeType') {
+                  console.log("_item.contents:",_item.storeIds);
+                  if(_item.storeIds.length>0)
+                  {emitArray = emitArray.concat(_item.storeIds);}
+                  console.log("emitArray:",emitArray);
+                  //emitArray = this.selectedArray;
+              }else {
+                emitArray.push(item);
+              }
+            }
+          });
+        });
+        const params = {selectedArray:selectedList,storeIds:emitArray,selectedLabels:(self.input==""?[]:self.input.split(','))};
+        console.log("params",params);
+        this.$emit('changeInput', params);
+        this.changed = false;
       }
     },
 
     clickSelect() {
+      console.log("clickSelect");
       this.$emit('changeIfSelect');
     }
 
@@ -222,6 +244,7 @@ export default {
     content: '\e6a2';
     left: 20px;
     font-size: 14px;
+    color: #2c90d9;
     font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -234,6 +257,7 @@ export default {
     font-weight: 700;
     -webkit-font-smoothing: antialiased;
     font-size: 14px;
+    color: #2c90d9;
     font-style: normal;
     -moz-osx-font-smoothing: grayscale;
   }

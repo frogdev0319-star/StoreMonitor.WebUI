@@ -117,13 +117,16 @@
               ></AreaSelected>
             </div>
             <div class="pie-area">
-              <v-chart
-                  ref="pieChartRef"
-                  :auto-resize="true"
-                  :options="eventSourceOptions"
-                  class="chart-content"
-              />
-              <div style="margin-top: 40px;">
+              <div class="pct-panel">
+                <div class="inner"/>
+                  <v-chart
+                      ref="pieChartRef"
+                      :auto-resize="true"
+                      :options="eventSourceOptions"
+                      class="chart-content"
+                  />
+              </div>
+              <div style="margin-top: 40px;width: calc(300/1440*100vw);margin-left:calc(152/1440*100vw);">
               <div v-for="(item,index) in sourcePerArray" :key="index">
                 <div :class="(index==selEventItem) ? 'pie-label-area-active':'pie-label-area'" @click="onClickEventItem(item,index)">
                     <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
@@ -499,7 +502,7 @@ export default {
       storeEventList: [],
       storeEventLegend: ['日期', this.$t('overview.createdEvent'), this.$t('overview.processedEvent'), this.$t('overview.closedEvents')],
       echartAxiasColor: '#e3e9f4',
-      echartBackground: '#FFF',
+      echartBackground: 'rgba(30,34,52,0.75)',
       exportPng: require('../../../static/img/excel.png'),
       allEventTableData:[],
       eventTableData: [],
@@ -820,6 +823,7 @@ export default {
       //this.getSearchParams();
     },
     emitSearch({ searchParams, dateRangeList, timeMode }) {
+      this.showInvolveTableArea = false;
       console.log("searchParams:",searchParams);
       this.params = searchParams;
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
@@ -1201,7 +1205,7 @@ export default {
     },
     /*巡檢項事件 sec-row*/
     emitTypeChanged2({compareType,compareArr,selectedLabels}){ //劃分類型選擇
-    
+      this.showInvolveTableArea = false;
       this.compareType2 = compareType;
       this.compareIds2 = compareArr;
       this.comapareLabels2 = selectedLabels;
@@ -1260,8 +1264,7 @@ export default {
           textStyle: {
             align: 'left'
           },
-          backgroundColor: '#f2f9fe',
-          color:'#006ab7'
+          backgroundColor: this.echartBackground,
         },
         textStyle: {
           fontFamily: this.fontFamily
@@ -1287,12 +1290,13 @@ export default {
             data: [],
             itemStyle: {
               emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                borderWidth:10,
+                borderColor:'#f7f9fa'
               },
               normal: {
-                color: function(params) {
+                borderWidth:5,
+                borderColor:'#fff',
+                  color: function(params) {
                   const colorList = ['#5274bb', '#7b9feb', '#7bd8eb','#4de197','#99ee3a'];
                   return colorList[params.dataIndex];
                 }
@@ -1305,10 +1309,11 @@ export default {
     },
 
     onClickEventItem(item,index){
+        this.showInvolveTableArea = false;
         this.selEventItem = index;
         this.selEventItemIds = item.itemIds;
         this.selEventItemName = item.itemName;
-        console.log("click item>item.itemIds",item.itemIds)
+        //console.log("click item>item.itemIds",item.itemIds)
         this.getItemDetail();
     },
     getInspecItemStatsOverview(params) {
@@ -1331,6 +1336,7 @@ export default {
     },
     async onSeeAllIncepEventClick(){
       const self = this;
+      self.showInvolveTableArea = false;
       self.selEventItemName = self.$t('statistics.event.seeAll');
       let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.allEventItemIds,storeIds:self.compareIds2 };
       let result = await this.getInspecItemStatsOverview(params);
@@ -1704,17 +1710,37 @@ export default {
             color: $black;
           }
         }
+        
         .pie-area{
-          height:271px;
+          width: calc(((300/1440))*100vw)+276;
+          height:300px;
           margin-left: calc(36/1440*100vw);
           margin-right: calc(24/1440*100vw);
           border-bottom: solid 1px #acaeb1;
           display:flex;
           flex-direction: row;
           justify-content: center;
-          .chart-content {
-            width: 271px;/*calc(276/1440*100vw);*/
-            height: 271px;/*calc(276/1440*100vw);*/
+          align-items: center;
+          .pct-panel{
+            width: 276px;/*calc(276/1440*100vw);*/
+            height: 276px;/*calc(276/1440*100vw);*/
+            border-radius: 50%;
+            border-color:#dae4eb;
+            border-style:dashed dashed dashed dashed; 
+            .inner{
+                position:absolute;
+                height: 150px;
+                width: 150px;
+                left:382px;
+                top:143px;
+                border-radius: 50%;
+                border-color:#dae4eb;
+                border-style:dashed dashed dashed dashed; 
+            }
+            .chart-content {
+              width:100%;
+              height:100%;
+            }
           }
           .pie-label-area{
             cursor: pointer;
@@ -1736,7 +1762,7 @@ export default {
               width:calc(167/1440*100vw);
               height: 18px;
               font-size: 15px;
-              
+
             }
             .pei-item-num{
               color: #484848;
@@ -1780,6 +1806,7 @@ export default {
             }
           }
         }
+        
         .table-area{
           height:auto;
           margin-top: 20.5px;

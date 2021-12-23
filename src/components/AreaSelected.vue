@@ -11,7 +11,7 @@
                 ></el-option>
             </el-select>
             <div style="width:1px; height:20px;background-color:#556679;align-self: center;"></div>
-            <div v-if="allowAll">
+            <div v-if="allowAll" >
               <multi-select
                 ref="multiSelect"
                 class="area-muti"
@@ -21,7 +21,6 @@
                 :options="curTypeArrary"
                 :all="selAllString"
                 :limit-num="limitNum"
-                style=""
                 @changeInput="onChangeCompareType"/>
               </div>
               <div v-else>
@@ -220,7 +219,7 @@ export default {
                 storeObj = {
                   storeId: item.storeId,
                   label: item.name,
-                  value: item.name,
+                  value: item.storeId,
                   userId: item.userId,
                   userName: item.userName
                 };
@@ -362,29 +361,34 @@ export default {
 
           this.curTypeArrary.unshift({value:"-1",label:this.$t('remotePatrol.all') })
       }*/
+      let selectedLabels=[];
       if(this.curSelectId.length==0 ){
         if(this.allowAll){
-          this.curSelectId.push(-1);
+          for(let i=0; i<this.curTypeArrary.length;i++){
+            this.curSelectId.push((this.compareType=="stores")?this.curTypeArrary[i].storeId:this.curTypeArrary[i].value);
+            selectedLabels.push(this.curTypeArrary[i].label);
+          }
         }else{
-          let defaultSel = (this.curTypeArrary.length>2)?2:this.curTypeArrary.length;
+          console.log("this.limitNum:",this.limitNum);
+          let defaultSel = (this.curTypeArrary.length>this.limitNum)?this.limitNum:this.curTypeArrary.length;
           let selectedLabels = [];
-          let storeIds = [];
           for(let i=0; i<defaultSel;i++){
             this.curSelectId.push((this.compareType=="stores")?this.curTypeArrary[i].storeId:this.curTypeArrary[i].value);
             selectedLabels.push(this.curTypeArrary[i].label);
           }
-          this.onChangeCompareType({selectedArray:this.curSelectId,storeIds:this.curSelectId,selectedLabels});
+          
             //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});
         }
             
       }
-        console.log("changeCompareType:",val);
+      this.onChangeCompareType({selectedArray:this.curTypeArrary,storeIds:this.curSelectId,selectedLabels});
+      console.log("changeCompareType:",val);
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
       console.log("onChangeCompareType > selectedArray:",selectedArray);
       console.log("onChangeCompareType > selectedLabels:",selectedLabels);
-      this.curSelectId = selectedArray;
+      this.curSelectId = storeIds;
       let storeId = storeIds;
       if(this.compareType== 'area1'){
         storeId=this.doGetStoreIdsByProvince(selectedArray);
