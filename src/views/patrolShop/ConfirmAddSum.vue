@@ -575,7 +575,7 @@ export default {
           for (const j in inspect[i].inspectList[g].items) {
             const objItem = {};
             objItem.ts = new Date().getTime();
-            objItem.description = inspect[i].inspectList[g].items[j].inspectText.trim();
+            // objItem.description = inspect[i].inspectList[g].items[j].inspectText.trim();
             if (inspect[i].inspectList[g].items[j].itemType === 1) {
               objItem.grade = Math.pow(-2, 31);
             } else {
@@ -591,6 +591,15 @@ export default {
             objItem.storeId = self.store.storeId;
             objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
             const tempFileUrl = [];
+            if (inspect[i].inspectList[g].items[j].inspectText.trim().length > 0) {
+              let arr = inspect[i].inspectList[g].items[j].inspectText.trim().split('|')
+              arr.forEach(item => {
+                let obj = {};
+                obj.mediaType = 3;
+                obj.url = item;
+                tempFileUrl.push(obj);
+              })
+            }
             if (!inspect[i].inspectList[g].items[j].isIgnore) {
               for (const k in inspect[i].inspectList[g].items[j].sourceList) {
                 const obj = {};

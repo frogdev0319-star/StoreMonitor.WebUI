@@ -114,24 +114,60 @@
           :width="480*percentHeight+'px'"
           top="12%">
           <div class="canvas-content" style="overflow:hidden;">
-            <hr class="dialog-hr">
             <div class="dialog-event-content">
               <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
               <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
               <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-              <el-input
-                :autosize="{ minRows: 2, maxRows: 7}"
-                v-model="eventDes"
-                :placeholder="$t('remotePatrol.descPlaceholder')"
-                size="mini"
-                class="des-input"
-                type="textarea"
-                resize="none"
-                @input="eventDesChanged"
-                @blur="notShowInputRuleTips('eventDes')"/>
-              <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+              <div style="padding: 0 20px">
+                <div v-if="eventDes.trim().length > 0">
+                  <div v-for="(text, index) in eventDes.split('|')" :key="index" class="flex-center">
+                    <img :src="deleteInspectIcon" alt="delete" />
+                    <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
+                      <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
+                      <hr class="vertical-hr"/>
+                      <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="isEditEventDes" style="position: relative; margin-top: 10px">
+                  <el-input
+                    :autosize="{ minRows: 4, maxRows: 7}"
+                    v-model="eventDesEdit.val"
+                    :placeholder="$t('remotePatrol.descPlaceholder')"
+                    size="mini"
+                    class="des-input"
+                    type="textarea"
+                    resize="none"
+                    @input="eventDesChanged"
+                    @blur="notShowInputRuleTips('eventDes')"/>
+                  <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+                  <el-button 
+                    size="mini" 
+                    style="position: absolute; right: 5px; bottom: 5px;"
+                    @click="itemSubmitEventDescription()"
+                  >確認</el-button>
+                </div>
+                <div v-else style="position: relative; margin-top: 10px">
+                  <el-input
+                    :autosize="{ minRows: 4, maxRows: 7}"
+                    v-model="eventDesInfo"
+                    :placeholder="$t('remotePatrol.descPlaceholder')"
+                    size="mini"
+                    class="des-input"
+                    type="textarea"
+                    resize="none"
+                    @input="eventDesChanged"
+                    @blur="notShowInputRuleTips('eventDes')"/>
+                  <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+                  <el-button 
+                    size="mini" 
+                    style="position: absolute; right: 5px; bottom: 5px;"
+                    @click="itemSubmitEventDescription()"
+                  >確認</el-button>
+                </div>
+              </div>
             </div>
           </div>
           <div slot="footer">
@@ -197,17 +233,52 @@
               <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-              <el-input
-                :autosize="{ minRows: 4, maxRows: 7}"
-                v-model="eventDes"
-                :placeholder="$t('remotePatrol.descPlaceholder')"
-                size="mini"
-                class="des-input"
-                type="textarea"
-                resize="none"
-                @input="eventDesChanged"
-                @blur="notShowInputRuleTips('eventDes')"/>
-              <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+              <div v-if="eventDes.trim().length > 0">
+                <div v-for="(text, index) in eventDes.split('|')" :key="index" class="flex-center">
+                  <img :src="deleteInspectIcon" alt="delete" />
+                  <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
+                    <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
+                    <hr class="vertical-hr"/>
+                    <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
+                  </div>
+                </div>
+              </div>
+              <div v-if="isEditEventDes" style="position: relative; margin-top: 10px">
+                <el-input
+                  :autosize="{ minRows: 4, maxRows: 7}"
+                  v-model="eventDesEdit.val"
+                  :placeholder="$t('remotePatrol.descPlaceholder')"
+                  size="mini"
+                  class="des-input"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"/>
+                <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+                <el-button 
+                  size="mini" 
+                  style="position: absolute; right: 5px; bottom: 5px;"
+                  @click="itemSubmitEventDescription()"
+                >確認</el-button>
+              </div>
+              <div v-else style="position: relative; margin-top: 10px">
+                <el-input
+                  :autosize="{ minRows: 4, maxRows: 7}"
+                  v-model="eventDesInfo"
+                  :placeholder="$t('remotePatrol.descPlaceholder')"
+                  size="mini"
+                  class="des-input"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"/>
+                <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+                <el-button 
+                  size="mini" 
+                  style="position: absolute; right: 5px; bottom: 5px;"
+                  @click="itemSubmitEventDescription()"
+                >確認</el-button>
+              </div>
             </div>
           </div>
           <div slot="footer">
@@ -284,7 +355,7 @@
       </el-col>
       <el-col :span="isFullScreenMode ? 24: 16">
         <div :class="{paper: !isFullScreenMode, flex: isFullScreenMode}" :style="isFullScreenMode ? {'margin': '0 auto 20px 0'}: {}">
-          <div v-if="sheetName.length!=0" style="padding: 20px">
+          <div style="padding: 20px">
             <div v-if="!isFullScreenMode" class="flex-center">
               <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
               <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
@@ -365,16 +436,16 @@
               {{'選擇巡檢項'}}
             </template>
             <template v-else-if="showFeedBack">
-              <div class="paper" style="height: 100%; position: relative">
+              <div class="paper" style="height: 100%; position: relative; padding: 20px 0; oveflow: auto">
                 <div v-if="eventList.length === 0" style="padding: 80px 24px 24px 40px; color: #006ab7; text-align: left; font-size: 24px;">
                   <div style="margin: 0 76px 30px 0;">{{ $t('remotePatrol.methodI') }}</div>
                   <div style="margin: 30px 52px 30.9px 0;">{{ $t('remotePatrol.methodII') }}</div>
                 </div>
-                <div v-for="(item,index) in eventList" :key="index" style="width: 100%; padding: 20px;" class="flex-center">
-                  <i class="el-icon-close icon-delete-event" @click="deleteEvent(item,index)" />
-                  <div @click="editFeedback(item, index)" class="paper" style="flex: 1; margin-left: 20px; text-align: left; padding: 10px 15px">
+                <div v-for="(item,index) in eventList" :key="index" style="width: 100%; padding: 0 20px;">
+                  <div class="flex-center margin-bottom-sm">
                     <span>{{ `${index+1}. ${item.eventName}` }}</span>
-                    <span>{{ item.eventDes }}</span>
+                    <div style="flex: 1"></div>
+                    <div class="font-size-sm" style="border: 1px solid #c60957; padding: 3px 9px; border-radius: 5px; color: #c60957" @click="deleteEvent(item,index)">{{'刪除'}}</div>
                   </div>
                   <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2">
                     <el-image
@@ -386,6 +457,19 @@
                     <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(item,index)">
                     <img class="imgLittle" :src="videoImgSrc" height="100">
                   </div>
+                  <div style="flex: 1; text-align: left;">
+                    <div v-if="item.eventDes.trim().length > 0">
+                      <div v-for="(text, _index) in item.eventDes.split('|')" :key="_index" class="flex-center">
+                        <img :src="deleteInspectIcon" alt="delete" @click="editFeedback(item, index)"/>
+                        <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px">
+                          <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
+                          <hr class="vertical-hr"/>
+                          <img :src="editInspectIcon" @click="editFeedback(item, index)" alt="edit" style="margin: 5px"/>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr v-if="index !== eventList.length -1" style="margin: 20px 0"/>
                 </div>
                 <img v-if="eventList.length === 0" :src="arrows2Src" alt="arrow2" height="70" style="position: absolute; right: 125px; bottom: 100px;">
                 <img :src="plusSrc" alt="plusSrc" @click="addFeedBack" style="position: absolute; right: 20px; bottom: 20px;">
@@ -844,6 +928,9 @@ export default {
       hideNext: false,
       eventName: '',
       eventDes: '',
+      eventDesInfo: '',
+      eventDesEdit: {index: -1, val: ''},
+      isEditEventDes: false,
       showFeedBackInfo: true,
       showAddFeedBackBtn: true,
       timerPlayReal: null,
@@ -870,7 +957,7 @@ export default {
       itemOptionsForType1: [],
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
-      isFullScreenMode: true,
+      isFullScreenMode: false,
       groupItems: [],
       storeOptions: []
     };
@@ -950,6 +1037,7 @@ export default {
   async mounted() {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
+    console.log(PatrolHistory)
     if (PatrolHistory != null) {
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
@@ -1020,6 +1108,96 @@ export default {
     getFilteredStoreList (stores) {
       this.options = [...stores]
     },
+    clickStore(item, index, _item, _index) {
+      const self = this;
+      if (!_item.hasInspect && _item.hasInspect != undefined) {
+        return false;
+      }
+      if (!util.validateLicense(_item.status)) {
+        return false;
+      }
+      self.curTabIndex = index;
+      self.curTabItem = item;
+      self.curStoreIndex = _index;
+      self.curStoreItem = _item;
+      self.deviceList = _item.device;
+      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
+          || (self.$store.getters.PatrolHistory != null) ) {
+        self.changeStoreObj.dialogCosed = true;
+      } else {
+        self.changeStore(item, index, _item, _index);
+      }
+    },
+
+    changeStore(item, index, _item, _index) {
+      const self = this;
+      self.patrolstore = '';
+      self.curSheetIndex = 0;
+      self.inspectItemList = [];
+      self.inspectList = [];
+      self.sheetName = [];
+      self.tempArr = [];
+      self.showChannelBtns = [];
+      self.patrolStoreName = _item.name;
+      self.PatrolList = [];
+      self.hasIgnoretemp = [];
+      self.$store.dispatch('setPatrolHistory', null);
+      self.isShowWarn = false;
+      self.notShowAlert = false;
+      self.showIgnoreItem = false;
+      _item.authorizedInspect.forEach(au_item => {
+        if (au_item.mode === 0) {
+          self.PatrolList.push(au_item);
+        }
+      });
+      _item.isActive = true;
+      self.showStoreUp = true;
+
+      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
+      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
+      self.showError = false;
+      self.curDeviceId = -1;
+      self.showFeedBack = false;
+      self.eventList = [];
+      self.showGuide = true;
+      const obj = {};
+      obj.storeId = _item.storeId;
+      obj.storeName = _item.name;
+      obj.storeTitle = _item.name;
+      obj.storeUp = _item.favorite;
+      self.channel = null;
+      self.getChannelByStore(_item);
+      if (_item.favorite) {
+        obj.storeUpTitle = this.$t('remotePatrol.stared');
+      } else {
+        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
+      }
+      self.store = obj;
+      let curStoreId = '';
+      const tabIndex = Number(self.activeIndex);
+      if (tabIndex != 2) {
+        item.storeList.forEach((itemS, indexS) => {
+          if (_index != indexS) {
+            itemS.isActive = false;
+          }
+        });
+        curStoreId = _item.storeId;
+      } else {
+        item.storeList.forEach((itemS, indexS) => {
+          itemS.storeList.forEach((itemChild, indexChild) => {
+            if (itemChild.storeId != _item.storeId) {
+              itemChild.isActive = false;
+            } else {
+              curStoreId = itemChild.storeId;
+            }
+          });
+        });
+      }
+      const storeObj = {
+        storeId: curStoreId
+      };
+      self.saveStoreObj(storeObj);
+    },
     changeSelStore (storeId) {
       const tempData = this.tabList[2].storeList.find(data => data.storeList[0].storeId === storeId) || {}
       const _item = tempData.storeList[0] || {}
@@ -1044,7 +1222,7 @@ export default {
       });
       _item.isActive = true;
       this.showStoreUp = true;
-
+      this.deviceList = _item.device;
       !this.showGuide && (this.$refs.vendorVideo.editCount == 0);
       !this.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       this.showError = false;
@@ -1478,7 +1656,8 @@ export default {
       const allStoreData = await self.getAllStoreList();
       if (allStoreData.errCode === 0) {
         self.getInitStoreData(allStoreData);
-        const storeData = allStoreData.data.content.filter(store => store.favorite === true);
+        const storeData = allStoreData.data.content
+        // console.log(storeData)
         self.tabList[0].storeList = getStoreTemp(storeData);
         if (storeData.length === 0) {
           self.showStoreUp = false;
@@ -1652,7 +1831,7 @@ export default {
     },
     getItemByGroup(item, index) {
       const self = this;
-      console.log(item)
+      // console.log(item)
       self.curGroupIndex = index;
       self.curGroup = item;
       self.curItemIndex = 0;
@@ -1702,9 +1881,8 @@ export default {
     },
 
     getDeviceById(deviceId) {
-      const self = this;
       const device = [];
-      self.deviceList.forEach(item => {
+      this.deviceList.forEach(item => {
         deviceId.forEach(_item => {
           if (_item == item.id) {
             device.push(item);
@@ -1899,7 +2077,7 @@ export default {
           self.channelBtns = [];
           self.showError = false;
           self.showGuide = false;
-          device.forEach(item => {
+          item.deviceId.forEach(item => {
             self.allChannelBtns.forEach(_item => {
               if (item.id === _item.id) {
                 self.channelBtns.push(_item);
@@ -2206,75 +2384,6 @@ export default {
       self.tabList[2].storeList = getStore2Temp(tempArray);
     },
 
-    changeStore(item, index, _item, _index) {
-      const self = this;
-      self.patrolstore = '';
-      self.curSheetIndex = 0;
-      self.inspectItemList = [];
-      self.inspectList = [];
-      self.sheetName = [];
-      self.tempArr = [];
-      self.showChannelBtns = [];
-      self.patrolStoreName = _item.name;
-      self.PatrolList = [];
-      self.hasIgnoretemp = [];
-      self.$store.dispatch('setPatrolHistory', null);
-      self.isShowWarn = false;
-      self.notShowAlert = false;
-      self.showIgnoreItem = false;
-      _item.authorizedInspect.forEach(au_item => {
-        if (au_item.mode === 0) {
-          self.PatrolList.push(au_item);
-        }
-      });
-      _item.isActive = true;
-      self.showStoreUp = true;
-
-      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
-      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
-      self.showError = false;
-      self.curDeviceId = -1;
-      self.showFeedBack = false;
-      self.eventList = [];
-      self.showGuide = true;
-      const obj = {};
-      obj.storeId = _item.storeId;
-      obj.storeName = _item.name;
-      obj.storeTitle = _item.name;
-      obj.storeUp = _item.favorite;
-      self.channel = null;
-      self.getChannelByStore(_item);
-      if (_item.favorite) {
-        obj.storeUpTitle = this.$t('remotePatrol.stared');
-      } else {
-        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
-      }
-      self.store = obj;
-      let curStoreId = '';
-      const tabIndex = Number(self.activeIndex);
-      if (tabIndex != 2) {
-        item.storeList.forEach((itemS, indexS) => {
-          if (_index != indexS) {
-            itemS.isActive = false;
-          }
-        });
-        curStoreId = _item.storeId;
-      } else {
-        item.storeList.forEach((itemS, indexS) => {
-          itemS.storeList.forEach((itemChild, indexChild) => {
-            if (itemChild.storeId != _item.storeId) {
-              itemChild.isActive = false;
-            } else {
-              curStoreId = itemChild.storeId;
-            }
-          });
-        });
-      }
-      const storeObj = {
-        storeId: curStoreId
-      };
-      self.saveStoreObj(storeObj);
-    },
     changeBrandDialog() {
       const self = this;
     },
@@ -2710,27 +2819,6 @@ export default {
       });
       this.groupItems = this.inspectList
     },
-    clickStore(item, index, _item, _index) {
-      const self = this;
-      if (!_item.hasInspect && _item.hasInspect != undefined) {
-        return false;
-      }
-      if (!util.validateLicense(_item.status)) {
-        return false;
-      }
-      self.curTabIndex = index;
-      self.curTabItem = item;
-      self.curStoreIndex = _index;
-      self.curStoreItem = _item;
-      self.deviceList = _item.device;
-      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
-          || (self.$store.getters.PatrolHistory != null) ) {
-        self.changeStoreObj.dialogCosed = true;
-      } else {
-        self.changeStore(item, index, _item, _index);
-      }
-    },
-
     checkFull() {
       var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
       if (isFull === undefined) {
@@ -2816,6 +2904,36 @@ export default {
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
     },
+    
+    itemSubmitEventDescription () {
+      if (this.isEditEventDes) {
+        var arr = this.eventDes.split("|");
+          arr[this.eventDesEdit.index] = this.eventDesEdit.val;
+          this.eventDes = arr.join('|');
+          this.eventDesEdit.index = -1;
+          this.eventDesEdit.val = '';
+          this.isEditEventDes = false;
+      } else {
+        if (this.eventDes === '') {
+          this.eventDes = this.eventDesInfo
+        } else {
+          var arr = this.eventDes.split('|');
+          arr.push(this.eventDesInfo)
+          this.eventDes = arr.join('|');
+        }
+        this.eventDesInfo = ''
+      }
+    },
+    editEventDes(index) {
+      if (this.isEditEventDes) {
+        this.isEditEventDes = false;
+        this.eventDesEdit = {index: -1, val: ''}
+      } else {
+        var arr = this.eventDes.split("|");
+        this.eventDesEdit = {index: index, val: arr[index]}
+        this.isEditEventDes = true
+      }
+    },
     itemSubmitDescription (item) {
       if (item.isEditingInspect) {
         var arr = item.inspectText.split('|');
@@ -2897,7 +3015,7 @@ export default {
     eventDesChanged(val) {
       const self = this;
       const content = filterString.all(val, 200);
-      self.eventDes = content;
+      self.eventDesInfo = content;
       const length = filterString.getContentLength(val);
       if (length > 200) {
         this.eventDesRuletip = true;
@@ -3088,8 +3206,8 @@ export default {
         .des-input{
           display: block;
           width: auto;
-          @include point(margin-left,20);
-          @include point(margin-right,20);
+          // @include point(margin-left,20);
+          // @include point(margin-right,20);
         }
       }
       .feed-canvas-content{
@@ -4383,6 +4501,11 @@ export default {
   // }
   .el-select.el-select--medium{
     width: unset;
+    height: 36px;
+    line-height: 36px;
+    >>> span {
+      top: 0px;
+    }
   }
 </style>
 <style>

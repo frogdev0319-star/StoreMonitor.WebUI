@@ -301,7 +301,7 @@
             </div>
           </div>
         </div>
-        <div class="event-content">
+        <div class="event-content" style="padding-right: 20px">
           <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
           <el-input
             v-model="eventName"
@@ -312,17 +312,36 @@
           <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
           <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
           <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-          <el-input
-            :autosize="{ minRows: 4, maxRows:7}"
-            v-model="eventDes"
-            :placeholder="$t('remotePatrol.descPlaceholder')"
-            size="mini"
-            class="des-input"
-            type="textarea"
-            resize="none"
-            @input="eventDesChanged"
-            @blur="notShowInputRuleTips('eventDes')"/>
-          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+          <div v-if="eventDes.trim().length > 0">
+            <div v-for="(text, index) in eventDes.split('|')" :key="index" class="flex-center">
+              <img :src="deleteInspectIcon" alt="delete" @click="deleteEventDes(index)"/>
+              <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
+                <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
+                <hr class="vertical-hr"/>
+                <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
+              </div>
+            </div>
+          </div>
+          <div style="position: relative;">
+            <el-input
+              :autosize="{ minRows: 4, maxRows: 7}"
+              v-model="eventDesEdit.val"
+              :placeholder="$t('remotePatrol.descPlaceholder')"
+              size="mini"
+              class="des-input"
+              type="textarea"
+              resize="none"
+              @input="eventDesChanged"
+              @blur="notShowInputRuleTips('eventDes')"/>
+            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+            <el-button 
+              size="mini" 
+              style="position: absolute; right: 5px; bottom: 5px;"
+              @click="itemSubmitDescription"
+            >
+              確認
+            </el-button>
+          </div>
         </div>
       </div>
       <div slot="footer">
@@ -428,6 +447,7 @@ export default {
         { label: '4:3' },
         { label: '16:9' }
       ],
+      eventDesEdit: {index: -1, val: ''},
       clearIconSrc: require('../../static/img/clear.png'),
       removeIconSrc: require('../../static/img/cancel.png'),
       penBtnSrc: require('../../static/img/edit_btn.png'),
@@ -436,6 +456,8 @@ export default {
       screenColIcon: require('../../static/img/screen-collapse.png'),
       screenExpIcon: require('../../static/img/screen-expand.png'),
       snapshotIcon: require('../../static/img/snapshot.png'),
+      deleteInspectIcon: require('../../static/img/cross.png'),
+      editInspectIcon: require('../../static/img/pen.png'),
       videoUrl: '',
       accessToken: '',
       showError: false,
@@ -671,13 +693,39 @@ export default {
   },
 
   methods: {
+    itemSubmitDescription () {
+      if (this.eventDes === '') {
+        this.eventDes = this.eventDesEdit.val;
+      } else {
+        var arr = this.eventDes.split('|');
+        arr.push(this.eventDesEdit.val);
+        this.eventDes = arr.join('|');
+      }
+      this.eventDesEdit.val = '';
+      this.eventDesEdit.index = -1;
+    },
     onClickQualityLabel(index){
       this.curQualityIndex = index;
       this.qualityVisible = false;
       this.saveVideoQuality();
       this.stopPlayingVideoAndPlay();
     },
-
+    deleteEventDes(index) {
+      var arr = this.eventDes.split("|");
+      arr = arr.filter((item, i) => i === index)
+      this.eventDes = arr.join('|');
+      this.eventDesEdit = {index: -1, val: ''}
+    },
+    editEventDes(index) {
+      if (this.isEditEventDes) {
+        this.isEditEventDes = false;
+        this.eventDesEdit = {index: -1, val: ''}
+      } else {
+        var arr = this.eventDes.split("|");
+        this.eventDesEdit = {index: index, val: arr[index]}
+        this.isEditEventDes = true
+      }
+    },
     saveVideoQuality() {
       const params = {
         videoQualityIndex: this.curQualityIndex
@@ -1840,8 +1888,7 @@ export default {
     eventDesChanged(val) {
       const self = this;
       const content = filterString.all(val, 200);
-      console.log(content);
-      self.eventDes = content;
+      self.eventDesEdit.val = content;
       const length = filterString.getContentLength(val);
       if (length > 200) {
         this.eventDesRuletip = true;
@@ -1959,6 +2006,46 @@ export default {
   }
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
+  }
+  .margin-bottom-top-sm {
+    margin-top: 10px;
+    margin-bottom: 10px
+  }
+  .margin-bottom-sm {
+    margin-bottom: 10px
+  }
+  .margin-bottom-md {
+    margin-bottom: 20px
+  }
+  .font-size-sm {
+    font-size: 12px;
+  }
+  .font-size-md {
+    font-size: 15px;
+  }
+  .flex-center {
+    display: flex;
+    align-items: center;
+  }
+  .vertical-hr {    
+    margin: 0;
+    -webkit-flex-shrink: 0;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    border-width: 0;
+    border-style: solid;
+    border-color: #e6e6e6;
+    border-bottom-width: 0;
+    height: auto;
+    border-right-width: thin;
+    -webkit-align-self: stretch;
+    -ms-flex-item-align: stretch;
+    align-self: stretch;
+  }
+  .paper {
+    border-radius: 5px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
   }
   .errorVideo-model{
     margin-bottom: 0;
@@ -2402,7 +2489,7 @@ export default {
         //@include point(margin-bottom,15);
       }
       .des-input{
-        width: 80%;
+        // width: 80%;
       }
     }
     #previewCutVideo{
