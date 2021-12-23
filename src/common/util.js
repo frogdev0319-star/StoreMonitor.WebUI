@@ -674,6 +674,15 @@ export default {
     if (value === -1) return '';
     return value === 0 ? i18n.t('remotePatrol.farBehind')
       : i18n.t('remotePatrol.goalAchieved');
+  },
+  data() {
+    return {
+      callbackEventItemValue:null,
+    };
+  },
+  setcallbackEventItemValue(val){
+    this.callbackEventItemValue = val;
+    console.log("setcallbackEventItemValue:",this.callbackEventItemValue)
   }
 
 };

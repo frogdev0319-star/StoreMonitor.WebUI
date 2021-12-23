@@ -179,7 +179,61 @@
                   layout = "prev,pager,next,sizes"
                   @handleChange="handlePageAndSizeChange_eventItem"
                   @sortChange="handleSortChange_eventItem"
+                  @onCellClick = "onEvenInvolveStoreClick"
                 />
+              </div>
+            </div>
+            <div v-if="showInvolveTableArea" style="margin-top:100px;height: auto;">
+              <div style="height: 1px;margin-left:calc(36/1440*100vw);margin-right: calc(24/1440*100vw);border-bottom: solid 1px #acaeb1;"></div>
+              <div class="table-area" style="">
+                <div class="sec-head">
+                  <div class="title">{{ selEventItemName+$t('statistics.event.eventInvolveStores') }}</div>
+                  <div class="operation-btns" style="width:calc(300/1440*100vw)">
+                    <div class="switch-btn">
+                      <el-button
+                      class="mode-btn"
+                      :class="{'active-mode-btn' :viewMode_eventStores==0}"
+                      @click="onSwitchMode_eventStores(0)"
+                      >{{ $t('statistics.event.tableMode')}}</el-button>
+                      <el-button
+                        class="mode-btn"
+                        :class="{'active-mode-btn' :viewMode_eventStores==1}"
+                        @click="onSwitchMode_eventStores(1)"
+                      >{{ $t('statistics.event.imageMode')}}</el-button>
+                    </div>
+                    <delay-button
+                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                      style="margin-left:32px;"
+                      type="primary"
+                      size="mini"
+                      @click="export2Excel_eventStores"
+                    >
+                      <div class="button-area">
+                        <img :src="exportPng" class="icon-excel">
+                        <span>{{ $t('eventView.exportReport') }}</span>
+                      </div>
+                    </delay-button>
+                  </div>
+                </div>
+                <div style="margin-top:20.5px;">
+                  <table-pagination
+                    ref="elTP"
+                    :column-data="eventInvolveTable.column_data"
+                    :table-data="eventInvolveTable.table_data"
+                    :total="eventInvolveTable.total"
+                    :highlight-current-row= "true"
+                    :pagesize="eventInvolveTable.sizeNum"
+                    :current-page="eventInvolveTable.page"
+                    :is-event = "false"
+                    :default-sort = "eventInvolveTable.defaultSort"
+                    :allowRowExpand = "true"
+                    layout = "prev,pager,next,sizes"
+                    expand-component = "EventCommentList"
+                    :expandCompProperties = "componentsProps_EventCommentList"
+                    @handleChange="handlePageAndSizeChange_eventStores"
+                    @sortChange="handleSortChange_eventStores"
+                  />
+                </div>
               </div>
             </div>
           </el-col>
@@ -365,7 +419,7 @@ import TablePagination from '@/components/TablePagination_V2';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import AreaSelected from '@/components/AreaSelected';
-
+import vm from '@/main.js';
 export default {
   name: 'EventStatistics',
   components: {
@@ -609,12 +663,13 @@ export default {
             'pdfwidth': '11%'
           },
           {
-            'prop': 'numOfStores',
+            'prop': 'numOfStore',
             'label': this.$t('statistics.event.numOfStores'),
             'sortable': true,
             'width': '70',
             'maxWidth': '70',
-            'pdfwidth': '11%'
+            'pdfwidth': '11%',
+            'isCellClick':true
           }
         ],
         table_data:[],
@@ -622,7 +677,7 @@ export default {
         page:1,
         sizeNum:10,
         total:0,
-        defaultSort: { prop: 'numOfTotal', order: 'ascending' },
+        defaultSort: { prop: 'numOfUnqualified', order: 'ascending' },
       },
       pieColorList : ['#5274bb', '#7b9feb', '#7bd8eb','#4de197','#99ee3a'],
       peiDataSource:[],
@@ -630,7 +685,7 @@ export default {
       comapareLabels2:[],
       compareType2:'stores',
       selEventItem:0,
-      selEventItemName:0,
+      selEventItemName:'',
       selEventItemIds:[],
       allEventItemIds:[],
       seeAllsvg:require('../../../static/img/statistics/ic_viewAll.svg'),
@@ -638,53 +693,98 @@ export default {
         order:{direction: 'acsending',property: 'numOfTotal'},
         column_data:[
           {
-            'prop': 'groupName',
-            'label': this.$t('statistics.event.eventItemGroup'),
-            'sortable': false,
-            'width': '100',
-            'maxWidth': '100',
-            'pdfwidth': '11%'
-          },
-          {
-            'prop': 'itemName',
-            'label': this.$t('statistics.event.eventItemName'),
-            'sortable': false,
-            'width': '200',
-            'maxWidth': '200',
-            'pdfwidth': '11%'
-          },
-          {
-            'prop': 'numOfUnqualified',
-            'label': this.$t('statistics.event.numOfUnqualified'),
-            'sortable': true,
-            'width': '70',
-            'maxWidth': '70',
-            'pdfwidth': '11%'
-          },
-          {
-            'prop': 'percentage',
-            'label': this.$t('statistics.event.UnqualifiedpPercentage'),
-            'sortable':true,
-            'width': '70',
-            'maxWidth': '70',
-            'pdfwidth': '11%'
-          },
-          {
-            'prop': 'numOfStores',
-            'label': this.$t('statistics.event.numOfStores'),
-            'sortable': true,
-            'width': '70',
-            'maxWidth': '70',
-            'pdfwidth': '11%'
-          }
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'name',
+          'label': this.$t('overview.storeName'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeRegionStr',
+          'label': this.$t('statistics.event.storeGroup'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeBranchTypeStr',
+          'label': this.$t('statistics.event.storeType'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'submitter',
+          'label': this.$t('statistics.event.submitter'),
+          'sortable': 'custom',
+          'width': '65',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'rankByNumOfUnqualified',
+          'label': this.$t('statistics.event.rankByNumOfUnqualified'),
+          'sortable': 'custom',
+          'width': '55',
+          'maxWidth': '100',
+          'pdfwidth': '12%'
+        },
+        {
+          'prop': 'percentageStr',
+          'label': this.$t('statistics.event.UnqualifiedpPercentage'),
+          'sortable': 'custom',
+          'width': '55',
+          'maxWidth': '100',
+          'pdfwidth': '12%'
+        },
+        {
+          'prop': 'numOfUnqualified',
+          'label': this.$t('statistics.event.numOfUnqualified'),
+          'sortable': 'custom',
+          'width': '55',
+          'maxWidth': '100',
+          'pdfwidth': '12%',
+          'isExpand':true
+        }
         ],
         table_data:[],
         itemAllData:[],
         page:1,
         sizeNum:10,
         total:0,
-        defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-      }
+        defaultSort: { prop: 'rankByNumOfUnqualified', order: 'ascending' },
+      },
+      viewMode_eventStores:0,
+      eventInvolveItemId:null,
+      showInvolveTableArea:false,
+      componentsProps_EventCommentList:{},
     };
   },
 
@@ -711,6 +811,9 @@ export default {
   },
 
   methods: {
+    cellCallbackFuc(){
+
+    },
     async initData() {
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
       this.params.order = this.order;
@@ -1267,6 +1370,12 @@ export default {
       this.eventItemTable.order = this.params.order = order;
       self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
     },
+    onEvenInvolveStoreClick(row){
+      //console.log("clcick row:",row);
+      this.eventInvolveItemId = row.itemId;
+      this.showInvolveTableArea = true;
+      this.doGetEventInvolveStores();
+    },
     /*End巡檢項事件 sec-row*/
 
     /*事件涉及門店 */
@@ -1282,45 +1391,77 @@ export default {
     },
     async doGetEventInvolveStores(){
       const self = this;
-      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2 };
-      let result = await this.getInspecItemStatsOverview(params);
-      self.eventInvolveTable.itemAllData = result.data;
+      self.componentsProps_EventCommentList.beginTs = self.params.beginTs;
+      self.componentsProps_EventCommentList.endTs = self.params.endTs;
+      self.componentsProps_EventCommentList.itemId = self.eventInvolveItemId;
+      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemId:self.eventInvolveItemId,storeIds:self.compareIds2 };
+      let result = await this.getInspecStatsItemOverStore(params);
+      self.eventInvolveTable.itemAllData = [];
+      result.data.content.forEach(item=>{
+        var obj = {...item};
+        obj.id = item.storeId;
+        obj.submitter=item.submitters.toString();
+        obj.storeRegionStr = item.storeRegion.toString();
+        obj.storeBranchTypeStr = item.storeBranchType.toString();
+        obj.percentageStr = item.percentage+'%';
+        self.eventInvolveTable.itemAllData.push(obj);
+      });
       self.eventInvolveTable.total = self.eventInvolveTable.itemAllData.length;
-      self.eventInvolveTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+      this.setEventInvolveTable();
+    },
+    setEventInvolveTable(){
+      this.orderAllTableData_eventStores();
+      this.eventInvolveTable.table_data = [];
+      let page = this.eventInvolveTable.page;
+      let sizeNum = this.eventInvolveTable.sizeNum;
+      this.eventInvolveTable.table_data = [...this.eventInvolveTable.itemAllData.slice( (page - 1)* sizeNum, page* sizeNum)];
+    },
+    orderAllTableData_eventStores(){
+      let key = this.eventInvolveTable.defaultSort.prop;
+      key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
+      this.eventInvolveTable.defaultSort.order === 'descending' ? this.eventInvolveTable.table_data.sort((a,b) => { return b[key] - a[key] })
+                                : this.eventInvolveTable.table_data.sort((a,b) => { return a[key] - b[key] });
     },
     export2Excel_eventStores() {
       const self = this;
-      if (self.eventItemTable.itemAllData.length === 0) {
+      if (self.eventInvolveTable.itemAllData.length === 0) {
         util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = [];
-        self.eventItemTable.colum_data.forEach(item=>{
+        const filterVal =[];
+        self.eventInvolveTable.column_data.forEach(item=>{
           tHeader.push(item.label);
+          filterVal.push(item.prop);
         });
-        const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStores'];
-        const curData = self.eventItemTable.itemAllData;
+        //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
+        const curData = self.eventInvolveTable.itemAllData;
         const data = self.formatJson(filterVal, curData);
-        const fileName = this.selEventItemName+'_Inspection item event' + '_' + util.getCurDateStr();
+        const fileName = 'Store_Inspection item event' + '_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
     
     handlePageAndSizeChange_eventStores(pageObj) {
       const self = this;
-      self.eventItemTable.page = pageObj.page;
-      self.eventItemTable.sizeNum = pageObj.size;
-      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+      self.eventInvolveTable.page = pageObj.page;
+      self.eventInvolveTable.sizeNum = pageObj.size;
+      this.setEventInvolveTable()
     },
 
     handleSortChange_eventStores(order, defaultSort) {
-      this.eventItemTable.defaultSort = { ...defaultSort };
-      this.eventItemTable.order = this.params.order = order;
-      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+      this.eventInvolveTable.defaultSort = { ...defaultSort };
+      this.eventInvolveTable.order = order;
+      this.setEventInvolveTable()
+    },
+    onSwitchMode_eventStores(val){
+      this.viewMode_eventStores=val;
+      
     },
     /*End 事件涉及門店 */
+    
     handleDown() {
       const self = this;
       if (self.eventTableData.length === 0) {

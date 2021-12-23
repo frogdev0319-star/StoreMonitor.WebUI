@@ -1156,7 +1156,11 @@ export default {
       "UnqualifiedpPercentage":"不合格佔比",
       "numOfStores":"涉及門店",
       "seeAllIncepEvent":"查看所有巡检事件",
-      "seeAll":"全部"
+      "seeAll":"全部",
+      "eventInvolveStores":"事件涉及門店",
+      "rankByNumOfUnqualified":"排名",
+      "submitter":"評估人",
+      "eventCommand":"事件詳情"
     }
   }
 };
