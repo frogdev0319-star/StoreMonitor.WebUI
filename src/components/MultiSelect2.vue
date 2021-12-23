@@ -120,7 +120,11 @@ export default {
       } else if (this.selectedArray.includes('-1')) {
         this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
       }*/
-      if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
+      if(this.selectedArray.includes('-1')){
+           this.input = this.all;
+          this.allDisabled = false;
+      }
+      else if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
         if (this.options.length === this.disabledLength) {
           this.input = '';
           this.allDisabled = true;

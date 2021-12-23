@@ -4,14 +4,18 @@
       <store-filter
         @emitStoreList = "getFilteredStoreList"
         :show-store-select = false
+        :show-favorite = showFavorite
       ></store-filter>
     </el-row>
     <el-row>
       <div class="flex" style="margin-top: 20px; margin-bottom: 20px">
-        <div class="paper" style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px">
+        <div class="paper" 
+        @click="showFavorite = !showFavorite"
+        :style="showFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}"
+        style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px">
           {{ '關注門店' }}
         </div>
-        <el-select class="filters" v-model="store.storeId" placeholder="请选择" @change="changeSelStore">
+        <el-select class="filters paper" v-model="store.storeId" placeholder="请选择" @change="changeSelStore">
           <el-option
             v-for="item in options"
             :key="item.storeId"
@@ -220,29 +224,8 @@
         <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
         <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
         <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
-        <div v-if="showGuide && inspectList.length > 0" class="guide-content">
-          <div class="guide-rside">
-            <div class="num-content">
-              <span class="guide-num">2</span>
-              <span class="guide-title">
-                {{ $t('remotePatrol.takeSnapshot') }}
-              </span>
-            </div>
-            <img :src="arrows2Src" alt="arrow2">
-            <div class="iconright-content">
-              <div :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'">
-                <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-                <span>{{ $t('remotePatrol.snapshot') }}</span>
-              </div>
-              <div :class="lang.indexOf('zh') === -1? 'en-iconright' : 'iconright'" style="display: none">
-                <i v-if="lang.indexOf('zh') === -1 " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
-                <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
-                <span>{{ $t('remotePatrol.record') }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else>
+        
+        <div>
           <component
             :is="currentVideoComponent"
             ref="vendorVideo"
@@ -252,7 +235,8 @@
             :store-id="store.storeId"
             :video-authority="videoAuthority"
             @confirmEzvizCanvas="editEzvizCanvas"
-            @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
+            @ezvizCutPictureFeedback="ezvizPictureFeedback"
+          />
         </div>
         <div class="channelbar-content">
           <div class="channel-content">
@@ -300,7 +284,7 @@
       </el-col>
       <el-col :span="isFullScreenMode ? 24: 16">
         <div :class="{paper: !isFullScreenMode, flex: isFullScreenMode}" :style="isFullScreenMode ? {'margin': '0 auto 20px 0'}: {}">
-          <div v-if="sheetName.length!=0" style="padding: 20px">
+          <div style="padding: 20px">
             <div v-if="!isFullScreenMode" class="flex-center">
               <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
               <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
@@ -701,6 +685,7 @@ export default {
       PatrolList: [],
       showControls: false,
       showGuide: true,
+      showFavorite: false,
       sourceList: [],
       isDisabled: false,
       penBtnSrc: require('../../../static/img/edit_btn.png'),
@@ -885,7 +870,7 @@ export default {
       itemOptionsForType1: [],
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
-      isFullScreenMode: true,
+      isFullScreenMode: false,
       groupItems: [],
       storeOptions: []
     };
@@ -965,6 +950,7 @@ export default {
   async mounted() {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
+    console.log(PatrolHistory)
     if (PatrolHistory != null) {
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
@@ -1035,6 +1021,96 @@ export default {
     getFilteredStoreList (stores) {
       this.options = [...stores]
     },
+    clickStore(item, index, _item, _index) {
+      const self = this;
+      if (!_item.hasInspect && _item.hasInspect != undefined) {
+        return false;
+      }
+      if (!util.validateLicense(_item.status)) {
+        return false;
+      }
+      self.curTabIndex = index;
+      self.curTabItem = item;
+      self.curStoreIndex = _index;
+      self.curStoreItem = _item;
+      self.deviceList = _item.device;
+      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
+          || (self.$store.getters.PatrolHistory != null) ) {
+        self.changeStoreObj.dialogCosed = true;
+      } else {
+        self.changeStore(item, index, _item, _index);
+      }
+    },
+
+    changeStore(item, index, _item, _index) {
+      const self = this;
+      self.patrolstore = '';
+      self.curSheetIndex = 0;
+      self.inspectItemList = [];
+      self.inspectList = [];
+      self.sheetName = [];
+      self.tempArr = [];
+      self.showChannelBtns = [];
+      self.patrolStoreName = _item.name;
+      self.PatrolList = [];
+      self.hasIgnoretemp = [];
+      self.$store.dispatch('setPatrolHistory', null);
+      self.isShowWarn = false;
+      self.notShowAlert = false;
+      self.showIgnoreItem = false;
+      _item.authorizedInspect.forEach(au_item => {
+        if (au_item.mode === 0) {
+          self.PatrolList.push(au_item);
+        }
+      });
+      _item.isActive = true;
+      self.showStoreUp = true;
+
+      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
+      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
+      self.showError = false;
+      self.curDeviceId = -1;
+      self.showFeedBack = false;
+      self.eventList = [];
+      self.showGuide = true;
+      const obj = {};
+      obj.storeId = _item.storeId;
+      obj.storeName = _item.name;
+      obj.storeTitle = _item.name;
+      obj.storeUp = _item.favorite;
+      self.channel = null;
+      self.getChannelByStore(_item);
+      if (_item.favorite) {
+        obj.storeUpTitle = this.$t('remotePatrol.stared');
+      } else {
+        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
+      }
+      self.store = obj;
+      let curStoreId = '';
+      const tabIndex = Number(self.activeIndex);
+      if (tabIndex != 2) {
+        item.storeList.forEach((itemS, indexS) => {
+          if (_index != indexS) {
+            itemS.isActive = false;
+          }
+        });
+        curStoreId = _item.storeId;
+      } else {
+        item.storeList.forEach((itemS, indexS) => {
+          itemS.storeList.forEach((itemChild, indexChild) => {
+            if (itemChild.storeId != _item.storeId) {
+              itemChild.isActive = false;
+            } else {
+              curStoreId = itemChild.storeId;
+            }
+          });
+        });
+      }
+      const storeObj = {
+        storeId: curStoreId
+      };
+      self.saveStoreObj(storeObj);
+    },
     changeSelStore (storeId) {
       const tempData = this.tabList[2].storeList.find(data => data.storeList[0].storeId === storeId) || {}
       const _item = tempData.storeList[0] || {}
@@ -1059,7 +1135,7 @@ export default {
       });
       _item.isActive = true;
       this.showStoreUp = true;
-
+      this.deviceList = _item.device;
       !this.showGuide && (this.$refs.vendorVideo.editCount == 0);
       !this.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       this.showError = false;
@@ -1493,7 +1569,8 @@ export default {
       const allStoreData = await self.getAllStoreList();
       if (allStoreData.errCode === 0) {
         self.getInitStoreData(allStoreData);
-        const storeData = allStoreData.data.content.filter(store => store.favorite === true);
+        const storeData = allStoreData.data.content
+        // console.log(storeData)
         self.tabList[0].storeList = getStoreTemp(storeData);
         if (storeData.length === 0) {
           self.showStoreUp = false;
@@ -1667,7 +1744,7 @@ export default {
     },
     getItemByGroup(item, index) {
       const self = this;
-      console.log(item)
+      // console.log(item)
       self.curGroupIndex = index;
       self.curGroup = item;
       self.curItemIndex = 0;
@@ -1717,9 +1794,8 @@ export default {
     },
 
     getDeviceById(deviceId) {
-      const self = this;
       const device = [];
-      self.deviceList.forEach(item => {
+      this.deviceList.forEach(item => {
         deviceId.forEach(_item => {
           if (_item == item.id) {
             device.push(item);
@@ -1914,7 +1990,7 @@ export default {
           self.channelBtns = [];
           self.showError = false;
           self.showGuide = false;
-          device.forEach(item => {
+          item.deviceId.forEach(item => {
             self.allChannelBtns.forEach(_item => {
               if (item.id === _item.id) {
                 self.channelBtns.push(_item);
@@ -2221,75 +2297,6 @@ export default {
       self.tabList[2].storeList = getStore2Temp(tempArray);
     },
 
-    changeStore(item, index, _item, _index) {
-      const self = this;
-      self.patrolstore = '';
-      self.curSheetIndex = 0;
-      self.inspectItemList = [];
-      self.inspectList = [];
-      self.sheetName = [];
-      self.tempArr = [];
-      self.showChannelBtns = [];
-      self.patrolStoreName = _item.name;
-      self.PatrolList = [];
-      self.hasIgnoretemp = [];
-      self.$store.dispatch('setPatrolHistory', null);
-      self.isShowWarn = false;
-      self.notShowAlert = false;
-      self.showIgnoreItem = false;
-      _item.authorizedInspect.forEach(au_item => {
-        if (au_item.mode === 0) {
-          self.PatrolList.push(au_item);
-        }
-      });
-      _item.isActive = true;
-      self.showStoreUp = true;
-
-      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
-      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
-      self.showError = false;
-      self.curDeviceId = -1;
-      self.showFeedBack = false;
-      self.eventList = [];
-      self.showGuide = true;
-      const obj = {};
-      obj.storeId = _item.storeId;
-      obj.storeName = _item.name;
-      obj.storeTitle = _item.name;
-      obj.storeUp = _item.favorite;
-      self.channel = null;
-      self.getChannelByStore(_item);
-      if (_item.favorite) {
-        obj.storeUpTitle = this.$t('remotePatrol.stared');
-      } else {
-        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
-      }
-      self.store = obj;
-      let curStoreId = '';
-      const tabIndex = Number(self.activeIndex);
-      if (tabIndex != 2) {
-        item.storeList.forEach((itemS, indexS) => {
-          if (_index != indexS) {
-            itemS.isActive = false;
-          }
-        });
-        curStoreId = _item.storeId;
-      } else {
-        item.storeList.forEach((itemS, indexS) => {
-          itemS.storeList.forEach((itemChild, indexChild) => {
-            if (itemChild.storeId != _item.storeId) {
-              itemChild.isActive = false;
-            } else {
-              curStoreId = itemChild.storeId;
-            }
-          });
-        });
-      }
-      const storeObj = {
-        storeId: curStoreId
-      };
-      self.saveStoreObj(storeObj);
-    },
     changeBrandDialog() {
       const self = this;
     },
@@ -2725,27 +2732,6 @@ export default {
       });
       this.groupItems = this.inspectList
     },
-    clickStore(item, index, _item, _index) {
-      const self = this;
-      if (!_item.hasInspect && _item.hasInspect != undefined) {
-        return false;
-      }
-      if (!util.validateLicense(_item.status)) {
-        return false;
-      }
-      self.curTabIndex = index;
-      self.curTabItem = item;
-      self.curStoreIndex = _index;
-      self.curStoreItem = _item;
-      self.deviceList = _item.device;
-      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
-          || (self.$store.getters.PatrolHistory != null) ) {
-        self.changeStoreObj.dialogCosed = true;
-      } else {
-        self.changeStore(item, index, _item, _index);
-      }
-    },
-
     checkFull() {
       var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
       if (isFull === undefined) {
@@ -2956,21 +2942,19 @@ export default {
   $tab:#7d8cad;
   $h1:#292e36;
   .filters {
-    background-color: #fff !important;
     border-radius: 5px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    height: 36px;
     >>> i {    
       color: #2c90d9;
-      line-height: calc(36/1920*100vw);
-      height: calc(36/1920*100vw);
-      min-height: 28px;
+      line-height: 36px;
+      height: 36px;
     }
     >>> input {
-      height: 100% !important;
+      height: 36px !important;
       background-color: transparent !important;
     }
-    >>> .el-input {
-      height: 100%;
+    >>> span {
+      top: 0px !important;
     }
   }
   .fade-enter-active {
@@ -4384,20 +4368,20 @@ export default {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
   }
 
-  .el-select >>> .el-input__inner{
-    background-color: #edf0f2;
-    border-radius: 5px;
-    height: 36px;
-    &::placeholder{
-      color:#2b2b2b;
-    }
-  }
-  .el-select >>> .el-input__suffix{
-    top: 0px;
-  }
-  .el-select >>> .el-select__caret {
-    color:#2b2b2b;
-  }
+  // .el-select >>> .el-input__inner{
+  //   background-color: #edf0f2;
+  //   border-radius: 5px;
+  //   height: 36px;
+  //   &::placeholder{
+  //     color:#2b2b2b;
+  //   }
+  // }
+  // .el-select >>> .el-input__suffix{
+  //   top: 0px;
+  // }
+  // .el-select >>> .el-select__caret {
+  //   color:#2b2b2b;
+  // }
   .el-select.el-select--medium{
     width: unset;
   }
@@ -4468,14 +4452,16 @@ export default {
   @import '../../assets/css/tabsItem.css';
   @import '../../assets/css/pagination.css';
   .el-test .el-input__inner{
-    height: 24px;
-    line-height: 24px;
-    border-radius: 0px;
-    background-color: #34374A;
-    color: #fff;
-    padding:0 10px;
-    border: 0px;
+    height: 20px;
+    line-height: 20px;
+    border-radius: 4px;
+    border: 1px solid #fff;
+    background-color: transparent;
+    color: #C8C9CA;
+    padding: 0px;
+    text-align: center;
   }
+  
   .el-test .el-input__icon{
     line-height: 24px;
   }

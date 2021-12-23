@@ -11,8 +11,201 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
+      <div class="statistics-content" style="height:194px;">
+                <div class="head">
+                    <el-col :span="17">
+                        <div class="region-titles">
+                            <span class="title">
+                                {{ $t('statistics.titles.overview') }}
+                            </span>
+                        </div>
+                    </el-col>
+                </div>
+                <el-row :span="24" class="region-overview">
+                    <el-col :span="8" class="division">
+                      <el-col class="text-area">        
+                        <el-row class="top">
+                           <span class="mainTitle">{{overviewCount.store>0?overviewCount.store:'N/A'}}</span>
+                           <span class="unit">{{ $t('statistics.overview.store_unit') }}</span>
+                        </el-row >
+                        <el-row class="subtitlehead">
+                            <span>{{ $t('statistics.overview.store_subtitle') }}</span>
+                        </el-row>
+                      </el-col>
+                      <img class="image-area" :src="overviewStoreSrc" />   
+                      <el-col class="line"/>
+                     </el-col>
+                     <el-col :span="8" class="division">
+                      <el-col class="text-area">
+                           <el-row class="top">
+                           <span class="mainTitle">{{overviewCount.items>=0?overviewCount.items:'N/A'}}</span>
+                           <span class="unit">{{ $t('statistics.overview.count_unit') }}</span>
+                        </el-row >
+                        <el-row class="subtitle">
+                            <span>{{ $t('statistics.overview.count_subtitle') }}</span>
+                        </el-row>
+                      </el-col>
+                      <img class="image-area" :src="overviewCountSrc" />      
+                      <el-col class="line"/>
+                    </el-col>
+                    <el-col :span="8" class="division">
+                    <el-col class="text-area">   
+                       <el-row class="top">
+                           <span class="mainTitle">{{overviewCount.avgScore>=0?overviewCount.avgScore:'N/A'}}</span>
+                           <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
+                        </el-row >
+                        <el-row class="subtitle">
+                            <span>{{ $t('statistics.overview.avg_subtitle') }}</span>
+                        </el-row>      
+                      </el-col>
+                      <img class="image-area" :src="overviewAvgSrc" />  
+                    </el-col>
+                </el-row>
+      </div>
+       <div class="statistics-content" style="height:810px;margin-top:18px">
+                <div class="head">
+                        <div class="region-titles">
+                            <span class="title">
+                                {{ $t('statistics.titles.distribution') }}
+                            </span>
+                        </div>
+                            <TypeSelectArea
+                              path="inspectEvalutionStatistics"
+                              :allow-all=true
+                              :region-array1="params.curProvince"
+                              :region-array2="params.curCity"
+                              :cur-store-group="params.curStoreGroup"
+                              :cur-store-type="params.curStoreType"
+                              :cur-stores="params.curStore"
+                              :cached-params="params"
+                              :cur-country="curCountry"
+                              @emitTypeChanged="emitTypeChanged"
+                          ></TypeSelectArea>
+                </div>
+        <el-row  :span="24" class="partition" style="height:320px">
+            <el-col  :span="24" style="height:100%">
+              <el-col :span="12" class="evalution-pct">
+                <div class="pct-content">
+                  <div class="pct-panel">
+                    <div class="inner"/>
+                    <v-chart ref="itemsPie" 
+                    @click="clickPart1Bar"
+                    :auto-resize="true" :options="part1.pieOption" class="chart-content"/>
+                  </div>
+                  <div class="pct-nums">
+                    <div
+                      v-for="(item, index) in regionsPerArray"
+                      :class="index==part1.indexType? 'selected-labels': 'content-labels'"
+                      :key="index"
+                      @click="setPart1Type(index)"
+                      >
+                      <div class="excellent_labels">
+                        <span :class="`label-` + index" class="labels excellent-label"/>
+                        <span class="label-desc">{{ item.type }}</span>
+                      </div>
+                      <div class="excellent_nums">{{ item.percent }}%</div>
+                    </div>
+                  </div>
+                </div>
+              </el-col>
+              <el-col  :span="12"  style="height:290px;padding-top:32px">
+                    <v-chart @click='clickPart1Bar' ref="storeChart" :options="part1.barRegionOption" :auto-resize="true"
+                            style="width:100%;height:100%"/>
+              </el-col>
+           </el-col>      
+        </el-row > 
+        <div class="subtitle-head">
+          <span class="title">
+            {{ $t('statistics.titles.storeEvalDetail') }}
+          </span>
+        </div>
+         <el-col  style="height:350px;padding-top:32px;margin-left:20px;margin-right:30px">
+                    <v-chart ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" :auto-resize="true"
+                            style="width:100%;height:100%"/>
+        </el-col>   
+      </div>
+             <div class="statistics-content" style="height:810px;margin-top:18px">
+                <div class="head">
+                    <el-col :span="17">
+                        <div class="region-titles">
+                            <span class="title">
+                                {{ $t('statistics.titles.distribution') }}
+                            </span>
+                        </div>
+                    </el-col>
+                </div>
+        <el-col  style="height:350px;padding-top:32px;margin-left:20px;margin-right:30px">
+          <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                            style="width:100%;height:100%"/>
+        </el-col>
+        <div class="subtitle-head">
+          <span class="title">
+            {{ $t('statistics.titles.storeEvalDetail') }}
+          </span>
+        </div>
+         <el-col  style="height:350px;padding-top:32px;margin-left:20px;margin-right:30px">
+                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                            style="width:100%;height:100%"/>
+        </el-col>   
+      </div>
       <div class="statistics-content content">
         <el-col :span="24" class="region-chart">
+          <el-col :span="24" class="region-header header">
+            <div class="region-titles">
+              <span class="title">
+                {{ $t('overview.regionalAssessment') }}
+              </span>
+            </div>
+          </el-col>
+          <el-col :span="9" class="evalution-pct">
+            <div class="pct-content">
+              <div class="pct-panel">
+                <v-chart ref="itemsPie" :auto-resize="true" :options="regionsOptions" class="chart-content"/>
+              </div>
+              <div class="pct-nums">
+                <div
+                  v-for="(item, index) in regionsPerArray"
+                  :class="lang=='en'? 'en-labels': ''"
+                  :key="index"
+                  class="content-labels">
+                  <div class="excellent_nums">{{ item.percent }}%</div>
+                  <div class="excellent_labels">
+                    <span :class="`label-` + index" class="labels excellent-label"/>
+                    <span class="label-desc">{{ item.type }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-col>
+          <el-col :span="15" class="charts-content">
+            <div class="title">
+              <limit-select
+                ref="multiRegionsSelect"
+                :selected="curRegion"
+                :options="regionsList"
+                :limit="2"
+                :input-size="'mini'"
+                style="display: inline"
+                @changeInput="handleRegionsChange"/>
+            </div>
+            <div class="region-result">
+              <div class="region-content">
+                <div class="region-content">
+                  <div class="region-result-panel" v-if="regionsChartsOptions">
+                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+                             class="result-content"/>
+                  </div>
+                  <div v-else class="region-result-panel">
+                    <span class="no-data-text">
+                      {{ $t('deviceView.noData') }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-col>
+        </el-col>
+        <el-col :span="24" class="region-chart" style="margin-top: 30px;">
           <el-col :span="24" class="region-header header">
             <div class="region-titles">
               <span class="title">
@@ -174,7 +367,7 @@
               </span>
             </div>
           </el-col>
-          <el-col :span="9" class="evalution-pct">
+          <el-col :span="24" class="evalution-pct">
             <div class="pct-content">
               <div class="pct-panel">
                 <v-chart ref="itemsPie" :auto-resize="true" :options="regionsOptions" class="chart-content"/>
@@ -185,11 +378,11 @@
                   :class="lang=='en'? 'en-labels': ''"
                   :key="index"
                   class="content-labels">
-                  <div class="excellent_nums">{{ item.percent }}%</div>
                   <div class="excellent_labels">
                     <span :class="`label-` + index" class="labels excellent-label"/>
                     <span class="label-desc">{{ item.type }}</span>
                   </div>
+                  <div class="excellent_nums">{{ item.percent }}%</div>
                 </div>
               </div>
             </div>
@@ -283,6 +476,7 @@ import LimitSelect from '@/components/LimitSelect';
 import ECharts from 'vue-echarts';
 import util from '@/common/util.js';
 import {
+  getInspectStatsOverviewV2,
   getInspectStatsOverRegion,
   getInspectStatsOverviewWithRegionV2
 } from '@/api/inspectOverview';
@@ -291,6 +485,7 @@ import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination';
 import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
+import TypeSelectArea from '@/components/TypeSelectArea';
 
 export default {
   name: 'PatrolEvaluationSta',
@@ -301,7 +496,8 @@ export default {
     'v-chart': ECharts,
     LimitSelect,
     SearchComponent,
-    TablePagination
+    TablePagination,
+    TypeSelectArea
   },
   mixins: [resize],
   data() {
@@ -322,6 +518,9 @@ export default {
       lang: this.$i18n.locale,
       storeDataList: [],
       exportPng: require('../../../static/img/excel.png'),
+      overviewStoreSrc: require('../../../static/img/statistics/overview_store.png'),
+      overviewCountSrc: require('../../../static/img/statistics/overview_count.png'),
+      overviewAvgSrc: require('../../../static/img/statistics/overview_avg.png'),
       regionsOptions: null,
       regionsPerArray: [],
       resultLegend: [
@@ -563,7 +762,14 @@ export default {
       ifSaveParams: false,
       defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' },
       defaultStoreSort: { prop: 'qualifiedRateStr', order: 'ascending' },
-      defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' }
+      defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' },
+      overviewCount:{store:-1,items:-1,avgScore:-1},
+      curCountry:"-1",
+      part1:{ compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],indexType:0,
+              pieOption:{},barRegionOption:{},barStoreOption:{}},
+      part2:{},
+      part3:{},
     };
   },
 
@@ -576,7 +782,7 @@ export default {
       if (val !== 0) {
         await this.initData();
       }
-    }
+    },
   },
 
   async created() {
@@ -658,19 +864,21 @@ export default {
     },
 
     async searchData() {
+    
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
       if (this.params.storeIds.length > 0) {
-        await this.getInspectStatsOverviewOfRegion();
-        await this.getInspectStatsOverviewOfStore();
-        await this.getInspectStatsLine();
+        await this.dataGetOverview();
       } else {
         this.totalRegion = 0;
         this.regionTableData = [];
-        this.getRegionPie();
+      //  this.getRegionPie();
         this.storeTableData = [];
         this.regionsList = [];
         this.curRegion = [];
         this.regionsChartsOptions = null;
+        this.part1.pieOption = null;
+        this.part1.barRegionOption = null;
+        this.part1.barStoreOption = null;
       }
     },
 
@@ -770,7 +978,17 @@ export default {
           });
       });
     },
-
+    
+   getInspectReulstStatsOverview(params) {
+      return new Promise((resolve, reject) => {
+        getInspectStatsOverviewV2(params).then(res => {
+          resolve(res);
+        })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    },
     getInspectResultOverRegion(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsOverRegion(params).then(res => {
@@ -838,22 +1056,39 @@ export default {
                 option.series[0].name = _item.region;
               } else {
                 regionData2.push(percentRegion);
-                option.series[1].name = _item.region;
+                //option.series[1].name = _item.region;
               }
             });
           });
+          if(regionData1.length>0){
+            var item = {
+              value:46,
+              itemStyle: {
+                color: '#a90000'
+              }
+            };
+            regionData1[0] =item;
+          }
           option.series[0].data = regionData1;
-          option.series[1].data = regionData2;
+        //  option.series[1].data = regionData2;
         }
         self.regionsChartsOptions = option;
       } catch (e) {
         console.log('PatrolEvaluationStatistics-getInspectStatsLine:' + e);
       }
     },
+    emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
+      console.log("Part1 Emit Type Change="+compareType)
+      console.log(compareArr)
+      this.part1.compareType = compareType;
+      this.part1.compareIds = compareArr;
+      this.part1.comapareLabels = selectedLabels;
+      this.dataGetPart1();
 
+    },
     getInspectLineOption() {
       const option = {
-        color: ['#f31d65', '#6097f4'],
+        color: ['#f11e66'],
         legend: {
           x: 'center',
           y: 'bottom',
@@ -892,7 +1127,6 @@ export default {
           textStyle: {
             align: 'left'
           },
-          backgroundColor: this.echartBackground
         },
         xAxis: {
           type: 'category',
@@ -921,12 +1155,12 @@ export default {
             fontStyle: 12,
             margin: 10
           },
-          data: this.daysRangeList
+          data: []
         },
         yAxis: [
           {
             type: 'value',
-            name: this.$t('overview.passRate') + '(%)',
+            name: '(%)',
             minInterval: 10,
             max: 100,
             nameLocation: 'end',
@@ -985,21 +1219,15 @@ export default {
         ],
         series: [
           {
-            type: 'line',
+            type: 'bar',
+            barWidth: 15,
             symbol: 'none',
+            
             yAxisIndex: 0,
             smooth: true,
             name: '',
             data: []
           },
-          {
-            type: 'line',
-            symbol: 'none',
-            yAxisIndex: 1,
-            smooth: true,
-            name: '',
-            data: []
-          }
         ]
       };
       return option;
@@ -1027,8 +1255,8 @@ export default {
       });
       return tempData;
     },
-
-    async getInspectStatsOverviewOfRegion() {
+  async dataGetOverview() {
+    
       const self = this;
       const params = {};
       params.beginTs = self.params.beginTs;
@@ -1036,10 +1264,48 @@ export default {
       params.regionMode = self.regionMode;
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
+      const overviewResult = await self.getInspectReulstStatsOverview(params);
+      if (overviewResult.errCode === 0) {
+        const result = overviewResult.data;
+        if (result) {
+          console.log(result)
+          this.overviewCount.store = result.numOfStores;
+          this.overviewCount.items = result.numOfInspects;
+          if(result.overallByAverageScore){
+            this.overviewCount.avgScore = result.overallByAverageScore.average;
+          }
+          else{
+            this.overviewCount.avgScore = -1;
+          }
+          
+        }
+      } else {
+        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
+      }
+    },
+    async dataGetPart1() {
+    
+      const self = this;
+      const params = {};
+      this.part1.pieOption = null;
+      this.part1.barRegionOption = null;
+      this.part1.barStoreOption = null;
+      params.beginTs = self.params.beginTs;
+      params.endTs = self.params.endTs;
+      params.regionMode = 3;
+      params.storeIds = self.params.storeIds;
+      if(this.part1.compareType=='stores'){
+         params.storeIds  = this.part1.compareIds;
+         console.log("To use compare ids");
+      }
+      params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
         if (result) {
+          console.log("Data Get Part1")
+          this.part1.indexType = 0;
+          console.log(result)
           self.totalRegion = result.totalElements;
           result.content.forEach(item => {
             item.qualifiedRateStr = item.qualifiedRate + '%';
@@ -1052,6 +1318,7 @@ export default {
         self.regionTableData = [];
       }
       self.getRegionPie();
+      //self.getInspectStatsLine();
     },
 
     async getInspectStatsOverviewOfRegionTable() {
@@ -1063,6 +1330,7 @@ export default {
       params.order = self.regionOrder;
       params.regionMode = self.regionMode;
       params.storeIds = self.params.storeIds;
+
       params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
@@ -1105,7 +1373,138 @@ export default {
         self.totalStore = 0;
       }
     },
+    getPart1RegionLine(){
+      console.log("Region Line")
+      const option = this.getInspectLineOption();
+      const regionData =[];
+      const regionLabel =[];
+      console.log(this.part1)
+   
+      if(this.part1.content){
+        this.part1.content.map((item,index) => {
+          let value = 0;
+          var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
+          if(this.part1.indexType==0){
+              value = util.getPercentValue(arr, 0, 2)
+          }
+          else if(this.part1.indexType==1){
+              value = util.getPercentValue(arr, 1, 2)
+          }
+          else if(this.part1.indexType==2){
+              value =  util.getPercentValue(arr, 2, 2)
+          }
+          if(this.part1.indexRegion<0 && value>0){
+            this.part1.indexRegion = index;
+          }
+          
+          if( this.part1.indexRegion == index){   
+            regionData.push({value:value,itemStyle: {
+                color: '#f11e66',
+                emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(1, 0, 0, 0.0)'
+                    }
+            }});
+          }else{
+            regionData.push({value,itemStyle: {
+            color: 'rgba(250, 30, 102, 0.6)',
+            emphasis: {
+                            shadowBlur: 0,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.0)'
+                    }
+          }})
+          }
+  
+          regionLabel.push(item.region)
+        });
+      }
 
+      option.series[0].name = "";
+      option.series[0].data = regionData;
+      option.xAxis.data = regionLabel;
+      console.log(option)
+      this.regionsChartsOptions = option;
+      this.part1.barRegionOption = option;
+      this.getPart1StoreLine();
+    },
+    getPart1StoreLine(){
+      const option = this.getInspectLineOption();
+      const regionData =[];
+      const regionLabel =[];
+      console.log(this.part1)
+      let content = [];
+      if(this.part1.content && this.part1.content[this.part1.indexRegion]){
+        content =this.part1.content[this.part1.indexRegion].list;
+        content.map((item,index) => {
+          let value = 0;
+          var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
+          if(this.part1.indexType==0){
+              value = util.getPercentValue(arr, 0, 2)
+          }
+          else if(this.part1.indexType==1){
+              value = util.getPercentValue(arr, 1, 2)
+          }
+          else if(this.part1.indexType==2){
+              value =  util.getPercentValue(arr, 2, 2)
+          }
+          regionData.push({value,itemStyle: {
+            color: '#7bd8eb',
+          }})
+          regionLabel.push(item.region)
+        });
+      }
+
+      option.series[0].name = "";
+      option.series[0].data = regionData;
+      option.xAxis.data = regionLabel;
+      console.log("Get Part1 Store Bar")
+      console.log(option);
+      this.part1.barStoreOption = option;
+    },
+    filterContent(content,type,ids,labels){
+      console.log("get comare data");
+      console.log(ids)
+      let output = [];
+      if(type == 'stores'){
+        content.map(function(item,i){
+          item.list = [];
+          item.list.push(JSON.parse(JSON.stringify(item)))
+          output.push(item)
+        });;
+      }
+      else if(type == 'area1'){
+        ids.forEach(function(id){
+          if(id!='-1'){
+          var item = {
+            numOfDangerous: 0,
+            numOfExcellent: 0,
+            numOfImproved: 0,
+            numOfQualified: 0,
+            numOfReport: 0,
+            region: id,
+            list:[],
+          }
+          content.map(function(store,i){
+             if(store.province == id){
+                item.numOfDangerous +=  store.numOfDangerous
+                item.numOfExcellent+=store.numOfExcellent
+                item.numOfImproved+=store.numOfImproved
+                item.numOfQualified+=store.numOfQualified
+                item.numOfReport+=store.numOfReport
+                item.list.push(store)
+             }
+          });;
+          output.push(item);
+          }
+
+        })
+  
+      }
+      console.log(output);
+      return output;
+    },
     async getRegionPie() {
       const self = this;
       let totalDargerous = 0;
@@ -1117,16 +1516,24 @@ export default {
       const params = {};
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
-      params.regionMode = self.regionMode;
-
+      params.regionMode = 3;
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
+      if(this.part1.compareType=='stores'){
+         params.storeIds  = this.part1.compareIds;
+      }
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: self.totalRegion };
         const storeResult = await self.getInspectStatsOverviewWithRegion(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           if (result) {
+            console.log(result)
+            this.part1.content = this.filterContent(result.content, 
+            this.part1.compareType,
+            this.part1.compareIds,
+            this.part1.comapareLabels);
+            this.part1.indexRegion = -1;
             result.content.forEach(item => {
               totalDargerous += item.numOfDangerous;
               totalImproved += item.numOfImproved;
@@ -1159,7 +1566,9 @@ export default {
       const pieOption = self.getRegionPieOption();
       pieOption.series[0].data = seriesData;
       self.regionsOptions = pieOption;
+      this.part1.pieOption  = pieOption
       self.regionsPerArray = jsonArray;
+      this.getPart1RegionLine();
     },
 
     getRegionPieOption() {
@@ -1175,6 +1584,7 @@ export default {
         textStyle: {
           fontFamily: this.fontFamily
         },
+        color:['#f11e66', '#f57848', '#8fd92e'],
         series: [
           {
             name: this.$t('overview.itemsAssessment'),
@@ -1195,24 +1605,21 @@ export default {
             },
             data: [],
             itemStyle: {
-              emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              },
-              normal: {
-                color: function(params) {
-                  var colorList = ['#f31d65', '#ffd035', '#72a1f3'];
-                  return colorList[params.dataIndex];
-                }
-              }
+              borderWidth:5,
+              borderColor:'#fff'
             }
           }
         ]
       };
       return pieOption;
     },
-
+    clickPart1Bar(event){
+      console.log("clickPart1Bar");
+      console.log(event)
+      this.part1.indexRegion = event.dataIndex;
+      this.getPart1RegionLine();
+      this.getPart1StoreLine();
+    },
     handleRegionsChange(val) {
       const self = this;
       self.curRegion = val;
@@ -1242,16 +1649,17 @@ export default {
             option.series[0].name = _item.region;
           } else {
             regionData2.push(percentRegion);
-            option.series[1].name = _item.region;
+           // option.series[1].name = _item.region;
           }
         });
       });
       option.series[0].data = regionData1;
-      option.series[1].data = regionData2;
+      //option.series[1].data = regionData2;
       self.regionsChartsOptions = option;
     },
 
     initData() {
+      this.params = SearchConditionUtil.getSearchCondition(this.path);
       this.params.filter = { page: 0, size: this.sizeNumStore };
     },
 
@@ -1261,13 +1669,16 @@ export default {
     },
 
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
+      console.log("Emit Search");
       this.params = searchParams;
+      console.log(this.params)
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
       this.regionMode = regionMode;
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
+      this.curCountry = this.params.curCountry;
       const searchParamsObj = {
         path: 'inspectEvalutionStatistics',
         params: this.params
@@ -1345,7 +1756,12 @@ export default {
       this.order = this.params.order = paramsObj.order;
       this.sizeNum = paramsObj.filter.size;
       this.page = paramsObj.filter.page + 1;
-    }
+    },
+    setPart1Type(index){
+      this.part1.indexType = index;
+      this.part1.indexRegion =  -1;
+      this.getPart1RegionLine();
+    },
   }
 };
 </script>
@@ -1375,14 +1791,234 @@ export default {
     .statistics-content{
       margin-left: calc(30/1920*100vw);
       margin-right: calc(30/1920*100vw);
+      padding-left:0px;
+      padding-right:0px;
+    }
+    .subtitle-head{
+        margin-left:20px;
+        margin-top:20px;
+        height: 22px;
+        border-left: solid 4px #2c90d9;
+        display:flex;
+        flex-direction:row;
+        justify-content: flex-start;
+        padding-left:12px;
+        span{
+           
+            font-family: NotoSansCJKTC;
+            font-size: 15px;
+            text-align: left;
+            color: #484848;
+        }
+    
+     }
+    .evalution-pct {
+        .pct-content {
+          display:flex;
+          flex-direction:row;
+          margin-left:5px;
+          padding-top: 50px;
+          padding-bottom: 5px;
+          width: 100%;
+          justify-content:flex-start;
+          text-align: center;
+          .pct-panel {
+            height: 220px;
+            width: 220px;
+            border-radius: 50%;
+            border-color:#dae4eb;
+            border-style:dashed dashed dashed dashed; 
+            display:flex;
+            justify-content:center;
+            align-items: center;
+            .inner{
+              width: 100%;
+              height: 100%;
+                position:absolute;
+                height: 120px;
+                width: 120px;
+                left:55px;
+                right:55px;
+                border-radius: 50%;
+                border-color:#dae4eb;
+                border-style:dashed dashed dashed dashed; 
+            }
+            .chart-content {
+              width: 100%;
+              height: 100%;
+            }
+          }
+          .pct-nums {
+            margin-left:32.5px;
+            /*margin-left: calc(75 / 1920 * 100vw);*/
+            font-size: calc(15 / 1920 * 100vw);
+            display: flex;
+            width:45%;
+            flex-direction:column;
+            justify-content: center;
+            @media screen and (max-width: 1280px) {
+              padding: 0 0;
+            }
+             .selected-labels {
+               background-color:#f2f9fe;
+               display: flex;
+              flex-direction:row;
+              padding-left:10px;
+              padding-right:10px;
+              height:40px;
+              font-size: calc(15 / 1920 * 100vw);
+              text-align: left;
+              align-items:center;
+              .excellent_nums {
+                   color: #006ab7;
+                flex-grow:1;
+                text-align:right;
+                margin-left: calc(20 / 1920 * 10vw);
+                font-size: calc(15 / 1920 * 100vw);
+                line-height: calc(14 / 1920 * 100vw);
+              }
+              .excellent_labels {
+                color: #006ab7;
+                line-height: 12px;
+                font-size: 15px;
+                .labels {
+                  height: 10px;
+                  width: 10px;
+                  display: inline-block;
+                  margin-right: calc(10 / 1920 * 100vw);
+                }
+                .label-desc {
+                  color: #006ab7;
+                  font-weight: 500;
+                  font-size: 15px;
+                }
+                .label-0 {
+                  background-color: $dangerous;
+                }
+                .label-1 {
+                  background-color: $improved;
+                }
+                .label-2 {
+                  background-color: $pass;
+                }
+              }
+            }
+            .content-labels {
+              display: flex;
+              flex-direction:row;
+              padding-left:10px;
+              padding-right:10px;
+              height:40px;
+               align-items:center;
+              font-size: calc(15 / 1920 * 100vw);
+              text-align: left;
+              .excellent_nums {
+                flex-grow:1;
+                text-align:right;
+                margin-left: calc(20 / 1920 * 10vw);
+                font-size: calc(15 / 1920 * 100vw);
+                line-height: calc(14 / 1920 * 100vw);
+              }
+              .excellent_labels {
+                line-height: 12px;
+                font-size: 15px;
+                .labels {
+                  height: 10px;
+                  width: 10px;
+                  display: inline-block;
+                  margin-right: calc(10 / 1920 * 100vw);
+                }
+                .label-desc {
+                  color: #484848;
+                  font-weight: 500;
+                  font-size: 15px;
+                }
+                .label-0 {
+                  background-color: $dangerous;
+                }
+                .label-1 {
+                  background-color: $improved;
+                }
+                .label-2 {
+                  background-color: $pass;
+                }
+              }
+            }
+            .en-labels {
+              @media screen and (max-width: 1280px) {
+                padding: 0 calc(5 / 1920 * 100vw);
+              }
+            }
+          }
+        }
+      }
+
+    .region-overview{
+     
+      .division{
+        display: flex;
+        align-items:flex-end;
+        height:135px;
+        .text-area{
+          height:100%;
+          display:flex;
+          margin-left:20px;
+          padding-top:20px;
+          flex-direction:column;
+          align-items:flex-start;
+          flex-grow:1;
+          .top{
+            span{
+              font-size:48px;
+              color:#484848;
+            }
+            .unit{
+              font-size:15px;
+              color:#484848;
+            }
+          }
+          .subtitle{
+            margin-top:10px;
+          }
+          .subtitle span{
+            font-size:15px;
+            color:#484848;
+          }
+        }
+        .image-area{
+          width: 115px;
+          height:115px;
+          margin-bottom:5px;
+          margin-right:10px;
+        }
+         .line{
+          background-color:#00000030;
+          width: 1px;
+          height: 94px;
+          margin-bottom:20px;
+          
+      }
+
+      }
     }
 
     .region-chart{
       background-color: #fff;
+      padding-left:24px;
+      padding-right:24px;
       margin-right: calc(30/1920*100vw);
       border: 1px solid $border;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      .region-header{
+        border-bottom: 1px solid $border;
+        padding-top:22px;
+        padding-bottom:22px;
+        margin-bottom: 30px;
+        padding-right: 0;
+      }
       .evalution-pct {
+        width:100%;
+        background-color: hotpink;
         .pct-content {
           padding-top: 90px;
           padding-bottom: 25px;

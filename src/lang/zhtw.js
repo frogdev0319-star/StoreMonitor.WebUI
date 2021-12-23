@@ -1094,6 +1094,19 @@ export default {
     "standardRate":"平均達標率",
     "noData":"暫無數據",
     "standardScore":"達標分數",
+    "titles":{
+      "overview":"概要",
+      'distribution':'考評結果分布',
+      'storeEvalDetail':'門店評估詳情',
+    },
+    'overview':{
+      'store_unit':'家',
+      'store_subtitle':'總巡檢門店',
+      'count_unit':'次',
+      'count_subtitle':'總巡檢次數',
+      'avg_unit':'分',
+      'avg_subtitle':'巡檢平均得分',
+    },
     "patrolPerson":{
       "insPerson":"巡檢人",
       "dutyAll":"全部職務",

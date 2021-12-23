@@ -81,7 +81,7 @@
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
-import { getBriefStoreList, getStoreDefineGroup } from '@/api/store';
+import { getBriefStoreList, getStoreDefineGroup, getStoreList } from '@/api/store';
 import util from '@/common/util.js';
 
 export default {
@@ -103,6 +103,10 @@ export default {
     showStoreSelect: {
       type: Boolean,
       default: true
+    },
+    showFavorite: {
+      type: Boolean,
+      default: false
     },
     path: {
       type: String,
@@ -171,6 +175,9 @@ export default {
     },
     cachedParams() {
       this.getSearchParams();
+    },
+    showFavorite () {
+      this.getStoreListAndGroupAndType();
     }
   },
 
@@ -204,11 +211,26 @@ export default {
     },
 
     getStoreListAndGroupAndType() {
-      const storeListPromise = this.getBriefStoreData();
+      const storeListPromise = this.showFavorite ? this.getComplexStoreData() : this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
-        const storeList = results[0];
+        var storeList = results[0];
+        if (this.showFavorite) {
+          storeList = storeList.content
+          storeList = storeList
+          .filter(store => store.favorite)
+          .map(store => ({
+            city: store.city,
+            country: store.country,
+            name: store.name,
+            province: store.province,
+            storeId: store.storeId,
+            tagIds: store.tagIds,
+            userId: store.userId,
+          }))
+        }
+        // console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -322,6 +344,25 @@ export default {
 
       self.curStore = storeArr;
       self.changeStoreNew(self.curStore);
+    },
+
+    getComplexStoreData() {
+      const params = {
+        'filter': {
+          'page': 0,
+          'size': 2000
+        }
+      };
+      return new Promise((resolve, reject) => {
+        getStoreList(params).then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg && errMsg === 'Success') {
+            resolve(res.data);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
     },
 
     getBriefStoreData() {

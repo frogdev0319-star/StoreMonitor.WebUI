@@ -3,10 +3,18 @@ import Environment from '@/common/environment';
 const version = Environment.VERSION;
 
 export const getInspectStatsOverview = params => {
+  console.log(`${version}/statistics/inspect/report/overview`)
   return request({
     url: `${version}/statistics/inspect/report/overview`,
     method: 'get',
     params
+  });
+};
+export const getInspectStatsOverviewV2 = data => {
+  return request({
+    url: `v2.0/statistics/inspect/report/overview`,
+    method: 'post',
+    data
   });
 };
 
@@ -67,7 +75,6 @@ export const getInspectStatsOverviewWithRegionV2 = data => {
 };
 
 export const getInspectStatsItemOverviewV2 = data => {
-  console.log('getInspectStatsItemOverviewV2 data:',data);
   return request({
     url: `v2.0/statistics/inspect/item/overview`,
     method: 'post',
