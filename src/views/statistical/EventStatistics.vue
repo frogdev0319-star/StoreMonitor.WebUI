@@ -1861,38 +1861,7 @@ export default {
       background-color: #fff;
       color: #006ab7;
     }
-    .switch-btn{
-      width:calc(202/1440*100vw);
-      height:32px;
-      display:flex;
-      flex-direction:row;
-      justify-content: stretch;
-      border-radius: 5px;
-      border: 1px solid #e6e6e6;
-      .mode-btn{
-        color: #556679;
-        background-color: #fff;
-        width:calc(101/1440*100vw);
-        height:30px;
-        font-size: 15px;
-        border:none;
-        text-align: center;
-        line-height: 10px;
-        margin-left:0px;
-      }
-      .active-mode-btn{
-        color:#fff;
-        background-color: #006ab7;
-        width:calc(101/1440*100vw);
-        height:30px;
-        font-size: 15px;
-        border:none;
-        text-align: center;
-        line-height: 10px;
-        margin-left:0px;
-        
-      }
-    }
+    
     
   }
 </style>
