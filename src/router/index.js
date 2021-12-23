@@ -263,6 +263,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolCompareStat');
+    /*
     PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
         path: '/supervisorStat',
@@ -275,7 +276,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/supervisorStat');
-
+     */
     // PermissionHelper.enableCheckinStatistics() && statisticsRoute.children.push(
     //   {
     //     path: '/checkInStatistics',

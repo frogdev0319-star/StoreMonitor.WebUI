@@ -41,7 +41,7 @@
                            <span class="mainTitle">{{overviewCount.items>=0?overviewCount.items:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.count_unit') }}</span>
                         </el-row >
-                        <el-row class="subtitle">
+                        <el-row class="subtitlehead">
                             <span>{{ $t('statistics.overview.count_subtitle') }}</span>
                         </el-row>
                       </el-col>
@@ -54,7 +54,7 @@
                            <span class="mainTitle">{{overviewCount.avgScore>=0?overviewCount.avgScore:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
                         </el-row >
-                        <el-row class="subtitle">
+                        <el-row class="subtitlehead">
                             <span>{{ $t('statistics.overview.avg_subtitle') }}</span>
                         </el-row>      
                       </el-col>
@@ -79,7 +79,7 @@
                               :cur-stores="params.curStore"
                               :cached-params="params"
                               :cur-country="curCountry"
-                              @emitTypeChanged="emitTypeChanged"
+                              @emitTypeChanged="emitTypeChangedPart1"
                           ></TypeSelectArea>
                 </div>
         <el-row  :span="24" class="partition" style="height:320px">
@@ -109,353 +109,255 @@
                 </div>
               </el-col>
               <el-col  :span="12"  style="height:290px;padding-top:32px">
-                    <v-chart @click='clickPart1Bar' ref="storeChart" :options="part1.barRegionOption" :auto-resize="true"
+                    <v-chart @click='clickPart2Bar' ref="storeChart" :options="part1.barRegionOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
               </el-col>
            </el-col>      
         </el-row > 
         <div class="subtitle-head">
-          <span class="title">
+          <span class="title" >
             {{ $t('statistics.titles.storeEvalDetail') }}
           </span>
+           <div class="operation-btns">
+                  <div class="switch-btn">
+                    <el-button
+                    class="mode-btn"
+                    :class="{'active-mode-btn' :part1.storeMode==0}"
+                    @click="onSwitchPart1Mode(0)"
+                    >{{ $t('statistics.event.tableMode')}}</el-button>
+                    <el-button
+                      class="mode-btn"
+                      :class="{'active-mode-btn' :part1.storeMode==1}"
+                      @click="onSwitchPart1Mode(1)"
+                    >{{ $t('statistics.event.imageMode')}}</el-button>
+                  </div>
+                  <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;background-color:#fff;"
+                    type="primary"
+                    size="mini"
+                    @click="export2Excel"
+                  >
+                    <div class="button-area">
+                      <img :src="exportPng" class="icon-excel">
+                      <span style="color:#006ab7">{{ $t('eventView.exportReport') }}</span>
+                    </div>
+                  </delay-button>
+            </div>
         </div>
-         <el-col  style="height:350px;padding-top:32px;margin-left:20px;margin-right:30px">
-                    <v-chart ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" :auto-resize="true"
+         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px">
+                  <v-chart  v-if="part1.storeMode==1" 
+                            ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
-        </el-col>   
-      </div>
-             <div class="statistics-content" style="height:810px;margin-top:18px">
+                  <div v-else style="margin-top:20.5px">
+                    <table-pagination
+                      ref="elTP"
+                      :column-data="part1StoreInfoTableCol"
+                      :table-data="part1.storeTableData"
+                      :total="total"
+                      :highlight-current-row= "true"
+                      :pagesize="sizeNum"
+                      :current-page="page"
+                      :is-event = "false"
+                      :default-sort = "defaultSort"
+                      :allowRowExpand = "true"
+                      layout = "prev,pager,next,sizes"
+                      expand-component = "IncepItemTop5"
+                      :expandCompProperties = "componentsProps"
+                      @handleChange="handlePageAndSizeChange"
+                      @sortChange="handleSortChange"
+                  />
+                </div>
+           </el-col>  
+      </div> 
+       <div class="statistics-content" style="height:930px;margin-top:18px">
                 <div class="head">
-                    <el-col :span="17">
                         <div class="region-titles">
                             <span class="title">
-                                {{ $t('statistics.titles.distribution') }}
+                                {{ $t('statistics.titles.scoreDistribution') }}
                             </span>
                         </div>
-                    </el-col>
+                            <TypeSelectArea
+                              path="inspectEvalutionStatistics"
+                              :allow-all=true
+                              :region-array1="params.curProvince"
+                              :region-array2="params.curCity"
+                              :cur-store-group="params.curStoreGroup"
+                              :cur-store-type="params.curStoreType"
+                              :cur-stores="params.curStore"
+                              :cached-params="params"
+                              :cur-country="curCountry"
+                              @emitTypeChanged="emitTypeChangedPart2"
+                          ></TypeSelectArea>
                 </div>
-        <el-col  style="height:350px;padding-top:32px;margin-left:20px;margin-right:30px">
-          <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
-                            style="width:100%;height:100%"/>
-        </el-col>
+         <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
+                    <el-col :span="10" class="division">
+                      <el-col class="text-area">        
+                        <el-row class="top">
+                           <span class="mainTitle">{{overviewCount.store>0?overviewCount.store:'N/A'}}</span>
+                           <span class="unit">{{ $t('statistics.score') }}</span>
+                        </el-row >
+                        <el-row class="subtitlehead">
+                            <span>{{ $t('statistics.standardScore') }}</span>
+                        </el-row>
+                      </el-col>
+                      <el-col class="line"/>
+                     </el-col>
+                     <el-col :span="4" class="division"/>
+                     <el-col :span="8" class="division">
+                      <el-col class="text-area">
+                        <el-row class="top">
+                           <span class="mainTitle">{{overviewCount.items>=0?overviewCount.items:'N/A'}}</span>
+                           <span class="unit">{{ $t('statistics.score') }}</span>
+                        </el-row >
+                        <el-row class="subtitlehead">
+                            <span>{{ $t('statistics.averageScore') }}</span>
+                        </el-row>
+                      </el-col> 
+                    </el-col>
+                </el-row>
+        <el-row  :span="24" class="partition" style="height:320px">
+          <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption" :auto-resize="true"
+                            style="width:100%;height:100%"/>   
+        </el-row > 
         <div class="subtitle-head">
-          <span class="title">
+          <span class="title" >
             {{ $t('statistics.titles.storeEvalDetail') }}
           </span>
+           <div class="operation-btns">
+                  <div class="switch-btn">
+                    <el-button
+                    class="mode-btn"
+                    :class="{'active-mode-btn' :part2.storeMode==0}"
+                    @click="onSwitchPart2Mode(0)"
+                    >{{ $t('statistics.event.tableMode')}}</el-button>
+                    <el-button
+                      class="mode-btn"
+                      :class="{'active-mode-btn' :part2.storeMode==1}"
+                      @click="onSwitchPart2Mode(1)"
+                    >{{ $t('statistics.event.imageMode')}}</el-button>
+                  </div>
+                  <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;background-color:#fff;"
+                    type="primary"
+                    size="mini"
+                    @click="export2Excel"
+                  >
+                    <div class="button-area">
+                      <img :src="exportPng" class="icon-excel">
+                      <span style="color:#006ab7">{{ $t('eventView.exportReport') }}</span>
+                    </div>
+                  </delay-button>
+            </div>
         </div>
-         <el-col  style="height:350px;padding-top:32px;margin-left:20px;margin-right:30px">
-                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
+         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px">
+                  <v-chart  v-if="part2.storeMode==1" 
+                            ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
-        </el-col>   
-      </div>
-      <div class="statistics-content content">
-        <el-col :span="24" class="region-chart">
-          <el-col :span="24" class="region-header header">
-            <div class="region-titles">
-              <span class="title">
-                {{ $t('overview.regionalAssessment') }}
-              </span>
-            </div>
-          </el-col>
-          <el-col :span="9" class="evalution-pct">
-            <div class="pct-content">
-              <div class="pct-panel">
-                <v-chart ref="itemsPie" :auto-resize="true" :options="regionsOptions" class="chart-content"/>
-              </div>
-              <div class="pct-nums">
-                <div
-                  v-for="(item, index) in regionsPerArray"
-                  :class="lang=='en'? 'en-labels': ''"
-                  :key="index"
-                  class="content-labels">
-                  <div class="excellent_nums">{{ item.percent }}%</div>
-                  <div class="excellent_labels">
-                    <span :class="`label-` + index" class="labels excellent-label"/>
-                    <span class="label-desc">{{ item.type }}</span>
-                  </div>
+                  <div v-else style="margin-top:20.5px">
+                    <table-pagination
+                      ref="elTP"
+                      :column-data="part2StoreInfoTableCol"
+                      :table-data="part2.storeTableData"
+                      :total="total"
+                      :highlight-current-row= "true"
+                      :pagesize="sizeNum"
+                      :current-page="page"
+                      :is-event = "false"
+                      :default-sort = "defaultSort"
+                      :allowRowExpand = "true"
+                      layout = "prev,pager,next,sizes"
+                      expand-component = "IncepItemTop5"
+                      :expandCompProperties = "componentsProps"
+                      @handleChange="handlePageAndSizeChange"
+                      @sortChange="handleSortChange"
+                  />
                 </div>
-              </div>
-            </div>
-          </el-col>
-          <el-col :span="15" class="charts-content">
-            <div class="title">
-              <limit-select
-                ref="multiRegionsSelect"
-                :selected="curRegion"
-                :options="regionsList"
-                :limit="2"
-                :input-size="'mini'"
-                style="display: inline"
-                @changeInput="handleRegionsChange"/>
-            </div>
-            <div class="region-result">
-              <div class="region-content">
-                <div class="region-content">
-                  <div class="region-result-panel" v-if="regionsChartsOptions">
-                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
-                             class="result-content"/>
-                  </div>
-                  <div v-else class="region-result-panel">
-                    <span class="no-data-text">
-                      {{ $t('deviceView.noData') }}
-                    </span>
-                  </div>
+           </el-col>  
+      </div> 
+        <div class="statistics-content" style="height:810px;margin-top:18px">
+                <div class="head">
+                        <div class="region-titles">
+                            <span class="title">
+                                {{ $t('statistics.titles.rateDistribution') }}
+                            </span>
+                        </div>
+                            <TypeSelectArea
+                              path="inspectEvalutionStatistics"
+                              :allow-all=true
+                              :region-array1="params.curProvince"
+                              :region-array2="params.curCity"
+                              :cur-store-group="params.curStoreGroup"
+                              :cur-store-type="params.curStoreType"
+                              :cur-stores="params.curStore"
+                              :cached-params="params"
+                              :cur-country="curCountry"
+                              @emitTypeChanged="emitTypeChangedPart3"
+                          ></TypeSelectArea>
                 </div>
-              </div>
-            </div>
-          </el-col>
-        </el-col>
-        <el-col :span="24" class="region-chart" style="margin-top: 30px;">
-          <el-col :span="24" class="region-header header">
-            <div class="region-titles">
-              <span class="title">
-                {{ $t('overview.regionalAssessment') }}
-              </span>
-            </div>
-          </el-col>
-          <el-col :span="9" class="evalution-pct">
-            <div class="pct-content">
-              <div class="pct-panel">
-                <v-chart ref="itemsPie" :auto-resize="true" :options="regionsOptions" class="chart-content"/>
-              </div>
-              <div class="pct-nums">
-                <div
-                  v-for="(item, index) in regionsPerArray"
-                  :class="lang=='en'? 'en-labels': ''"
-                  :key="index"
-                  class="content-labels">
-                  <div class="excellent_nums">{{ item.percent }}%</div>
-                  <div class="excellent_labels">
-                    <span :class="`label-` + index" class="labels excellent-label"/>
-                    <span class="label-desc">{{ item.type }}</span>
+        <el-row  :span="24" class="partition" style="height:320px">
+            <el-col  :span="24" style="height:100%">
+               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption" :auto-resize="true"
+                            style="width:100%;height:100%"/>
+           </el-col>      
+        </el-row > 
+        <div class="subtitle-head">
+          <span class="title" >
+            {{ $t('statistics.titles.storeEvalDetail') }}
+          </span>
+           <div class="operation-btns">
+                  <div class="switch-btn">
+                    <el-button
+                    class="mode-btn"
+                    :class="{'active-mode-btn' :part3.storeMode==0}"
+                    @click="onSwitchPart3Mode(0)"
+                    >{{ $t('statistics.event.tableMode')}}</el-button>
+                    <el-button
+                      class="mode-btn"
+                      :class="{'active-mode-btn' :part3.storeMode==1}"
+                      @click="onSwitchPart3Mode(1)"
+                    >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
+                  <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;background-color:#fff;"
+                    type="primary"
+                    size="mini"
+                    @click="export2Excel"
+                  >
+                    <div class="button-area">
+                      <img :src="exportPng" class="icon-excel">
+                      <span style="color:#006ab7">{{ $t('eventView.exportReport') }}</span>
+                    </div>
+                  </delay-button>
+            </div>
+        </div>
+         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px">
+                  <v-chart  v-if="part3.storeMode==1" 
+                            ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" :auto-resize="true"
+                            style="width:100%;height:100%"/>
+                  <div v-else style="margin-top:20.5px">
+                    <table-pagination
+                      ref="elTP"
+                      :column-data="part3StoreInfoTableCol"
+                      :table-data="part3.storeTableData"
+                      :total="total"
+                      :highlight-current-row= "true"
+                      :pagesize="sizeNum"
+                      :current-page="page"
+                      :is-event = "false"
+                      :default-sort = "defaultSort"
+                      :allowRowExpand = "true"
+                      layout = "prev,pager,next,sizes"
+                      expand-component = "IncepItemTop5"
+                      :expandCompProperties = "componentsProps"
+                      @handleChange="handlePageAndSizeChange"
+                      @sortChange="handleSortChange"
+                  />
                 </div>
-              </div>
-            </div>
-          </el-col>
-          <el-col :span="15" class="charts-content">
-            <div class="title">
-              <limit-select
-                ref="multiRegionsSelect"
-                :selected="curRegion"
-                :options="regionsList"
-                :limit="2"
-                :input-size="'mini'"
-                style="display: inline"
-                @changeInput="handleRegionsChange"/>
-            </div>
-            <div class="region-result">
-              <div class="region-content">
-                <div class="region-content">
-                  <div class="region-result-panel" v-if="regionsChartsOptions">
-                    <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
-                             class="result-content"/>
-                  </div>
-                  <div v-else class="region-result-panel">
-                    <span class="no-data-text">
-                      {{ $t('deviceView.noData') }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </el-col>
-        </el-col>
-        <el-col :sapn="24" class="region-list">
-          <el-col :span="24" class="region-header header">
-            <div class="region-titles">
-              <span class="title">
-                {{ $t('overview.regionalList') }}
-              </span>
-              <div class="operation-btns">
-                <delay-button
-                  :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                  type="primary"
-                  size="mini"
-                  @click="export2Excel"
-                >
-                  <div class="button-area">
-                    <img :src="exportPng" class="icon-excel">
-                    <span>{{ $t('eventView.exportReport') }}</span>
-                  </div>
-                </delay-button>
-              </div>
-            </div>
-          </el-col>
-          <div class="el-table-panel">
-            <table-pagination
-              :column-data="regionInfoData"
-              :table-data="regionTableData"
-              :total="totalRegion"
-              :highlight-current-row= "true"
-              :pagesize="sizeNumRegion"
-              :current-page="pageRegion"
-              :default-sort = "defaultRegionSort"
-              @handleChange="handleRegionPageAndSizeChange"
-              @sortChange="handleRegionSortChange"/>
-          </div>
-        </el-col>
-
-        <el-col :sapn="24" class="store-list">
-          <el-col :span="24" class="region-header header">
-            <div class="region-titles">
-              <span class="title">
-                {{ $t('overview.storeList') }}
-              </span>
-              <div class="operation-btns">
-                <delay-button
-                  :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                  type="primary"
-                  size="mini"
-                  @click="exportStore2Excel"
-                >
-                  <div class="button-area">
-                    <img :src="exportPng" class="icon-excel">
-                    <span>{{ $t('eventView.exportReport') }}</span>
-                  </div>
-                </delay-button>
-              </div>
-            </div>
-          </el-col>
-          <el-col :span="24">
-            <div class="el-table-panel">
-              <table-pagination
-                :column-data="storeInfoData"
-                :table-data="storeTableData"
-                :total="totalStore"
-                :highlight-current-row= "true"
-                :pagesize="sizeNumStore"
-                :current-page="pageStore"
-                :default-sort = "defaultStoreSort"
-                @handleChange="handleStorePageAndSizeChange"
-                @sortChange="handleStoreSortChange"/>
-            </div>
-          </el-col>
-        </el-col>
-      </div>
-    </el-row>
-
-    <el-row v-if="ispdf" id="pdfDom" class="statistics-container" style="padding:40px 20px;">
-      <div :span="24" class="export-header">
-        <p>
-          <span>{{ $t('remotePatrol.storeSelect') }}：</span>
-          <span class="content-header">{{ storeNameStr }}</span>
-        </p>
-        <p>
-          <span>{{ $t('remotePatrol.storeGroup') }}：</span>
-          <span class="content-header">{{ storeGroupStr }}</span>
-        </p>
-        <p>
-          <span>{{ $t('remotePatrol.storeType') }}：</span>
-          <span class="content-header">{{ storeTypeStr }}</span>
-        </p>
-        <p>
-          <span>{{ $t('overview.patrolLists') }}：</span>
-          <span class="content-header">{{ storePatrolLists }}</span>
-        </p>
-        <p>
-          <span>{{ $t('remotePatrol.time') }}：</span>
-          <span class="content-header">{{ storeDateValue }}</span>
-        </p>
-      </div>
-      <div class="statistics-content content">
-        <el-col :span="24" class="region-chart">
-          <el-col :span="24" class="region-header header">
-            <div class="region-titles">
-              <span class="title">
-                {{ $t('overview.regionalAssessment') }}
-              </span>
-            </div>
-          </el-col>
-          <el-col :span="24" class="evalution-pct">
-            <div class="pct-content">
-              <div class="pct-panel">
-                <v-chart ref="itemsPie" :auto-resize="true" :options="regionsOptions" class="chart-content"/>
-              </div>
-              <div class="pct-nums">
-                <div
-                  v-for="(item, index) in regionsPerArray"
-                  :class="lang=='en'? 'en-labels': ''"
-                  :key="index"
-                  class="content-labels">
-                  <div class="excellent_labels">
-                    <span :class="`label-` + index" class="labels excellent-label"/>
-                    <span class="label-desc">{{ item.type }}</span>
-                  </div>
-                  <div class="excellent_nums">{{ item.percent }}%</div>
-                </div>
-              </div>
-            </div>
-          </el-col>
-          <el-col :span="15" class="charts-content">
-            <div class="title">
-              <limit-select
-                ref="multiRegionsSelect"
-                :selected="curRegion"
-                :options="regionsList"
-                :limit="2"
-                :input-size="'mini'"
-                style="display: inline"
-                @changeInput="handleRegionsChange"/>
-            </div>
-            <div class="region-result">
-              <div class="region-content">
-                <div class="region-result-panel" v-if="regionsChartsOptions">
-                  <v-chart ref="storeChart" :options="regionsChartsOptions" :auto-resize="true"
-                           class="result-content"/>
-                </div>
-                <div v-else class="region-result-panel">
-                  <span class="no-data-text">
-                    {{ $t('deviceView.noData') }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </el-col>
-        </el-col>
-        <el-col :sapn="24" class="region-list" style="padding-bottom:20px;">
-          <el-col :span="24" class="region-header header">
-            <div class="region-titles">
-              <span class="title">
-                {{ $t('overview.regionalList') }}
-              </span>
-
-            </div>
-          </el-col>
-          <div class="el-table-panel">
-            <table-pagination
-              :column-data="regionInfoData"
-              :table-data="regionPDFData"
-              :highlight-current-row= "true"
-              :show-pagination="false"
-              :is-pdf-column="true"
-              :default-sort = "defaultRegionSort"/>
-          </div>
-        </el-col>
-        <el-col :sapn="24" class="store-list" style="padding-bottom:20px;">
-          <el-col :span="24" class="region-header header">
-            <div class="region-titles">
-              <span class="title">
-                {{ $t('overview.storeList') }}
-              </span>
-
-            </div>
-          </el-col>
-          <el-col :span="24">
-            <div class="el-table-panel">
-              <table-pagination
-                :isexportPDF="isexportPDF"
-                :column-data="storeInfoData"
-                :table-data="storePDFData"
-                :highlight-current-row= "true"
-                :show-pagination="false"
-                :is-pdf-column="true"
-                :default-sort = "defaultStoreSort"
-              />
-            </div>
-          </el-col>
-        </el-col>
-      </div>
+           </el-col>  
+      </div> 
     </el-row>
     <dialog-pop
       :title="$t('insSettingView.export')"
@@ -478,11 +380,12 @@ import util from '@/common/util.js';
 import {
   getInspectStatsOverviewV2,
   getInspectStatsOverRegion,
-  getInspectStatsOverviewWithRegionV2
+  getInspectStatsOverviewWithRegionV2,
+  getInspectStatsOverviewWithGroup
 } from '@/api/inspectOverview';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
-import TablePagination from '@/components/TablePagination';
+import TablePagination from '@/components/TablePagination_V2';
 import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import TypeSelectArea from '@/components/TypeSelectArea';
@@ -765,11 +668,296 @@ export default {
       defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' },
       overviewCount:{store:-1,items:-1,avgScore:-1},
       curCountry:"-1",
+      part1StoreInfoTableCol: [
+        {
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'groupName',
+          'label': this.$t('overview.storeName'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeGroup',
+          'label': this.$t('statistics.event.storeGroup'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeType',
+          'label': this.$t('statistics.event.storeType'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+          {
+          'prop': 'storeSubmitters',
+          'label': this.$t('statistics.submitter'),
+          'sortable': false,
+          'width': '170',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'numOfReport',
+          'label': this.$t('overview.numOfEvaluations'),
+          'sortable': 'custom',
+          'pdfwidth': '14%',
+          'width': '80',
+          'maxWidth': '180'
+        },
+        {
+          'prop': 'numOfQualified',
+          'label': this.$t('overview.echartGood'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '100'
+        },
+        {
+          'prop': 'numOfImproved',
+          'label': this.$t('overview.improve'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '120'
+        },
+        {
+          'prop': 'numOfDangerous',
+          'label': this.$t('overview.danger'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '130'
+        },
+    
+      ],
+      part2StoreInfoTableCol: [
+        {
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'groupName',
+          'label': this.$t('overview.storeName'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeGroup',
+          'label': this.$t('statistics.event.storeGroup'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeType',
+          'label': this.$t('statistics.event.storeType'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+          {
+          'prop': 'storeSubmitters',
+          'label': this.$t('statistics.submitter'),
+          'sortable': false,
+          'width': '170',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'numOfReport',
+          'label': this.$t('overview.numOfEvaluations'),
+          'sortable': 'custom',
+          'pdfwidth': '14%',
+          'width': '80',
+          'maxWidth': '180'
+        },
+        {
+          'prop': 'numOfQualified',
+          'label': this.$t('overview.echartGood'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '100'
+        }
+        ],
+        part3StoreInfoTableCol: [
+        {
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'groupName',
+          'label': this.$t('overview.storeName'),
+          'sortable': false,
+          'width': '80',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeGroup',
+          'label': this.$t('statistics.event.storeGroup'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'storeType',
+          'label': this.$t('statistics.event.storeType'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
+          'sortable': false,
+          'width': '70',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+          {
+          'prop': 'storeSubmitters',
+          'label': this.$t('statistics.submitter'),
+          'sortable': false,
+          'width': '170',
+          'maxWidth': '100',
+          'pdfwidth': '11%'
+        },
+        {
+          'prop': 'numOfReport',
+          'label': this.$t('overview.numOfEvaluations'),
+          'sortable': 'custom',
+          'pdfwidth': '14%',
+          'width': '80',
+          'maxWidth': '180'
+        },
+        {
+          'prop': 'numOfQualified',
+          'label': this.$t('overview.echartGood'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '100'
+        },
+        {
+          'prop': 'numOfImproved',
+          'label': this.$t('overview.improve'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '120'
+        },
+        {
+          'prop': 'numOfDangerous',
+          'label': this.$t('overview.danger'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '130'
+        },
+        {
+          'prop': 'numOfImproved',
+          'label': this.$t('overview.improve'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '120'
+        },
+        {
+          'prop': 'numOfDangerous',
+          'label': this.$t('overview.danger'),
+          'sortable': 'custom',
+          'pdfwidth': '12%',
+          'width': '80',
+          'maxWidth': '130'
+        }
+    
+      ],
       part1:{ compareType:'stores', indexRegion:0, content:[],
-              compareIds :[],comapareLabels:[],indexType:0,
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
-      part2:{},
-      part3:{},
+      part2:{ compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
+              pieOption:{},barRegionOption:{},barStoreOption:{}},
+      part3:{ compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
+              pieOption:{},barRegionOption:{},barStoreOption:{}},
     };
   },
 
@@ -795,6 +983,15 @@ export default {
   },
 
   methods: {
+    onSwitchPart1Mode(mode){
+      this.part1.storeMode = mode;
+    },
+    onSwitchPart2Mode(mode){
+      this.part2.storeMode = mode;
+    },
+    onSwitchPart3Mode(mode){
+      this.part3.storeMode = mode;
+    },
     async handleExportReport() {
       const self = this;
       self.ispdf = true;
@@ -871,7 +1068,7 @@ export default {
       } else {
         this.totalRegion = 0;
         this.regionTableData = [];
-      //  this.getRegionPie();
+      //  this.getPart1RegionBar();
         this.storeTableData = [];
         this.regionsList = [];
         this.curRegion = [];
@@ -979,6 +1176,16 @@ export default {
       });
     },
     
+       getInspectStatsOverviewWithGroup(params) {
+      return new Promise((resolve, reject) => {
+        getInspectStatsOverviewWithGroup(params).then(res => {
+          resolve(res);
+        })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    },
    getInspectReulstStatsOverview(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewV2(params).then(res => {
@@ -1077,13 +1284,31 @@ export default {
         console.log('PatrolEvaluationStatistics-getInspectStatsLine:' + e);
       }
     },
-    emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
+    emitTypeChangedPart1({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
       console.log("Part1 Emit Type Change="+compareType)
-      console.log(compareArr)
       this.part1.compareType = compareType;
       this.part1.compareIds = compareArr;
       this.part1.comapareLabels = selectedLabels;
+      this.part1.originArray = originArray;
       this.dataGetPart1();
+
+    },
+    emitTypeChangedPart2({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
+      console.log("Part2 Emit Type Change="+compareType)
+      this.part2.compareType = compareType;
+      this.part2.compareIds = compareArr;
+      this.part2.comapareLabels = selectedLabels;
+      this.part2.originArray = originArray;
+      this.dataGetPart2();
+
+    },
+    emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
+      console.log("Part3 Emit Type Change="+compareType)
+      this.part3.compareType = compareType;
+      this.part3.compareIds = compareArr;
+      this.part3.comapareLabels = selectedLabels;
+      this.part3.originArray = originArray;
+      this.dataGetPart3();
 
     },
     getInspectLineOption() {
@@ -1283,6 +1508,7 @@ export default {
         util.notify(self.$t('overview.queryFail'), 'warning', 3000);
       }
     },
+
     async dataGetPart1() {
     
       const self = this;
@@ -1296,16 +1522,13 @@ export default {
       params.storeIds = self.params.storeIds;
       if(this.part1.compareType=='stores'){
          params.storeIds  = this.part1.compareIds;
-         console.log("To use compare ids");
       }
       params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
         if (result) {
-          console.log("Data Get Part1")
           this.part1.indexType = 0;
-          console.log(result)
           self.totalRegion = result.totalElements;
           result.content.forEach(item => {
             item.qualifiedRateStr = item.qualifiedRate + '%';
@@ -1317,10 +1540,15 @@ export default {
         self.totalRegion = 0;
         self.regionTableData = [];
       }
-      self.getRegionPie();
+      await self.getPart1RegionBar();
       //self.getInspectStatsLine();
     },
-
+    async dataGetPart2(){
+      await this.getPart2RegionBar();
+    },
+    async dataGetPart3(){
+      await this.getPart3RegionBar();
+    },
     async getInspectStatsOverviewOfRegionTable() {
       const self = this;
       const params = {};
@@ -1373,12 +1601,119 @@ export default {
         self.totalStore = 0;
       }
     },
-    getPart1RegionLine(){
+    filterContent(content,type,ids,labels,originArray){
+      let output = [];
+      if(type == 'stores'){
+        content.map(function(item,i){
+          item.list = [];
+          item.list.push(JSON.parse(JSON.stringify(item)))
+          output.push(item)
+        });;
+      }
+      else{
+        content.map(function(item,i){
+          originArray.map(function(d){
+            if(d.label == item.groupName){
+              item.list = d.contents;
+            }
+          })
+          output.push(item)
+        });;
+      }
+     
+      console.log("Filter content")
+      console.log(output);
+      return output;
+    },
+    async getPart1RegionBar() {
+      const self = this;
+      let totalDargerous = 0;
+      let totalImproved = 0;
+      let totalQualified = 0;
+      let totalReport = 0;
+      const jsonArray = self.resultLegend.slice(0, 3);
+      let seriesData = [];
+      const params = {};
+      params.beginTs = self.params.beginTs;
+      params.endTs = self.params.endTs;
+      params.regionMode = 3;
+      params.groupMode = 0;
+      params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
+      if(this.part1.compareType=='stores'){
+         params.storeIds  = this.part1.compareIds;
+         params.groupMode = 0;
+      }
+      else if(this.part1.compareType=='area1'){
+         params.groupIds  = this.part1.compareIds;
+         params.groupMode = 1;
+      }
+      else if(this.part1.compareType=='area2'){
+         params.groupIds  = this.part1.compareIds;
+         params.groupMode = 2;
+      }
+      else if(this.part1.compareType=='storeType'){
+         params.groupIds  = this.part1.compareIds;
+         params.groupMode = 3;
+      }
+      else if(this.part1.compareType=='storeGroup'){
+         params.groupIds  = this.part1.compareIds;
+         params.groupMode = 3;
+      }
+      if (self.totalRegion > 0) {
+        params.filter = { page: 0, size: 20 };
+        const storeResult = await self.getInspectStatsOverviewWithGroup(params);
+        if (storeResult.errCode === 0) {
+          const result = storeResult.data;
+          if (result) {
+            this.part1.content = this.filterContent(result.content, 
+            this.part1.compareType,
+            this.part1.compareIds,
+            this.part1.comapareLabels,
+            this.part1.originArray);
+            this.part1.indexRegion = -1;
+            result.content.forEach(item => {
+              totalDargerous += item.numOfDangerous;
+              totalImproved += item.numOfImproved;
+              totalQualified += item.numOfQualified;
+              totalReport += item.numOfReport;
+            });
+          }
+          seriesData = [
+            { value: totalDargerous, name: self.$t('overview.danger') },
+            { value: totalImproved, name: self.$t('overview.improve') },
+            { value: totalQualified, name: self.$t('overview.echartGood') }
+          ];
+          const totalArray = [totalDargerous, totalImproved, totalQualified];
+          jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
+          jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
+          jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+        } else {
+          util.notify(self.$t('overview.queryFail'), 'warning', 3000);
+          const totalArray = [0, 0, 0, 0];
+          jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
+          jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
+          jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+        }
+      } else {
+        const totalArray = [0, 0, 0, 0];
+        jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
+        jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
+        jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+      }
+      const pieOption = self.getRegionPieOption();
+      pieOption.series[0].data = seriesData;
+      self.regionsOptions = pieOption;
+      this.part1.pieOption  = pieOption
+      self.regionsPerArray = jsonArray;
+      this.drawPart1RegionBar();
+    },
+    async drawPart1RegionBar(){
       console.log("Region Line")
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log(this.part1)
+      
    
       if(this.part1.content){
         this.part1.content.map((item,index) => {
@@ -1417,7 +1752,7 @@ export default {
           }})
           }
   
-          regionLabel.push(item.region)
+          regionLabel.push(item.groupName)
         });
       }
 
@@ -1427,17 +1762,44 @@ export default {
       console.log(option)
       this.regionsChartsOptions = option;
       this.part1.barRegionOption = option;
-      this.getPart1StoreLine();
+      await this.getPart1StoreBar();
     },
-    getPart1StoreLine(){
+    async getPart1StoreBar(){
+      const self = this;
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log(this.part1)
+      console.log("getPart1StoreBar")
       let content = [];
       if(this.part1.content && this.part1.content[this.part1.indexRegion]){
-        content =this.part1.content[this.part1.indexRegion].list;
+        if(this.part1.compareType == 'stores'){
+            content =[this.part1.content[this.part1.indexRegion]];
+        }
+        else{
+            const params = {};
+            params.beginTs = self.params.beginTs;
+            params.endTs = self.params.endTs;
+            params.groupMode = 0;
+            params.storeIds = this.part1.content[this.part1.indexRegion].list;
+            params.inspectTagId = self.params.inspectId;
+            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            if (storeResult.errCode === 0) {
+              const result = storeResult.data;
+              if (result) {
+                  content = result.content
+                  console.log(result)
+              }
+            }
+        }
+        
+
         content.map((item,index) => {
+          item.storeGroup = item.storeRegion.toString();
+          item.storeType = item.storeBranchType.toString();
+          item.storeSubmitters = item.submitters.toString();
+          if(item.code=='')item.code='- -'
+          if(item.storeGroup=='')item.storeGroup='- -'
+          if(item.storeType=='')item.storeType='- -'
           let value = 0;
           var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
           if(this.part1.indexType==0){
@@ -1452,125 +1814,316 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-          regionLabel.push(item.region)
+          regionLabel.push(item.groupName)
+        });
+      }
+      this.part1.storeTableData = content;
+      option.series[0].name = "";
+      option.series[0].data = regionData;
+      option.xAxis.data = regionLabel;
+      this.part1.barStoreOption = option;
+    },
+    async getPart2RegionBar() {
+      console.log("getPart2RegionBar")
+      const self = this;
+      const params = {};
+      params.beginTs = self.params.beginTs;
+      params.endTs = self.params.endTs;
+      params.regionMode = 3;
+      params.groupMode = 0;
+      params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
+      params.order={
+         direction: "desc",
+         property:"averageScore"
+      }
+      if(this.part2.compareType=='stores'){
+         params.storeIds  = this.part2.compareIds;
+         params.groupMode = 0;
+      }
+      else if(this.part2.compareType=='area1'){
+         params.groupIds  = this.part2.compareIds;
+         params.groupMode = 1;
+      }
+      else if(this.part2.compareType=='area2'){
+         params.groupIds  = this.part2.compareIds;
+         params.groupMode = 2;
+      }
+      else if(this.part2.compareType=='storeType'){
+         params.groupIds  = this.part2.compareIds;
+         params.groupMode = 3;
+      }
+      else if(this.part2.compareType=='storeGroup'){
+         params.groupIds  = this.part2.compareIds;
+         params.groupMode = 3;
+      }
+      params.filter = { page: 0, size: 20 };
+        const storeResult = await self.getInspectStatsOverviewWithGroup(params);
+        if (storeResult.errCode === 0) {
+          const result = storeResult.data;
+          if (result) {
+            this.part2.content = this.filterContent(result.content, 
+                                  this.part2.compareType,
+                                  this.part2.compareIds,
+                                  this.part2.comapareLabels,
+                                  this.part2.originArray);
+            console.log("Leave FIlterContent")
+            console.log(this.part2.content)
+            this.part2.indexRegion = -1;
+            this.drawPart2RegionBar();
+          }
+        }
+
+    },
+    async drawPart2RegionBar(){
+      console.log("drawPart2RegionBar")
+     
+      const option = this.getInspectLineOption();
+      const regionData =[];
+      const regionLabel =[];
+      if(this.part2.content){
+        console.log(this.part2.content)
+        this.part2.content.map((item,index) => {
+          let value = item.averageScore;
+          if(this.part2.indexRegion<0 && value>0){
+            this.part2.indexRegion = index;
+          }
+          
+          if( this.part2.indexRegion == index){   
+            regionData.push({value:value,itemStyle: {
+                color: '#7bd8eb',
+                emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(1, 0, 0, 0.0)'
+                    }
+            }});
+          }else{
+            regionData.push({value,itemStyle: {
+            color: 'rgba(123 ,216, 235, 0.5)',
+            emphasis: {
+                            shadowBlur: 0,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.0)'
+                    }
+          }})
+          }
+  
+          regionLabel.push(item.groupName)
         });
       }
 
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-      console.log("Get Part1 Store Bar")
-      console.log(option);
-      this.part1.barStoreOption = option;
+      this.part2.barRegionOption = option;
+      console.log(option)
+      await this.getPart2StoreBar();
     },
-    filterContent(content,type,ids,labels){
-      console.log("get comare data");
-      console.log(ids)
-      let output = [];
-      if(type == 'stores'){
-        content.map(function(item,i){
-          item.list = [];
-          item.list.push(JSON.parse(JSON.stringify(item)))
-          output.push(item)
-        });;
-      }
-      else if(type == 'area1'){
-        ids.forEach(function(id){
-          if(id!='-1'){
-          var item = {
-            numOfDangerous: 0,
-            numOfExcellent: 0,
-            numOfImproved: 0,
-            numOfQualified: 0,
-            numOfReport: 0,
-            region: id,
-            list:[],
-          }
-          content.map(function(store,i){
-             if(store.province == id){
-                item.numOfDangerous +=  store.numOfDangerous
-                item.numOfExcellent+=store.numOfExcellent
-                item.numOfImproved+=store.numOfImproved
-                item.numOfQualified+=store.numOfQualified
-                item.numOfReport+=store.numOfReport
-                item.list.push(store)
-             }
-          });;
-          output.push(item);
-          }
-
-        })
-  
-      }
-      console.log(output);
-      return output;
-    },
-    async getRegionPie() {
+    async getPart2StoreBar(){
       const self = this;
-      let totalDargerous = 0;
-      let totalImproved = 0;
-      let totalQualified = 0;
-      let totalReport = 0;
-      const jsonArray = self.resultLegend.slice(0, 3);
-      let seriesData = [];
+      const option = this.getInspectLineOption();
+      const regionData =[];
+      const regionLabel =[];
+      console.log("getPart1StoreBar")
+      let content = [];
+      if(this.part2.content && this.part2.content[this.part2.indexRegion]){
+        if(this.part2.compareType == 'stores'){
+            content =[this.part2.content[this.part2.indexRegion]];
+        }
+        else{
+            const params = {};
+            params.beginTs = self.params.beginTs;
+            params.endTs = self.params.endTs;
+            params.groupMode = 0;
+            params.storeIds = this.part2.content[this.part2.indexRegion].list;
+            params.inspectTagId = self.params.inspectId;
+            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            if (storeResult.errCode === 0) {
+              const result = storeResult.data;
+              if (result) {
+                  content = result.content
+                  console.log(result)
+              }
+            }
+        }
+        
+
+        content.map((item,index) => {
+          item.storeGroup = item.storeRegion.toString();
+          item.storeType = item.storeBranchType.toString();
+          item.storeSubmitters = item.submitters.toString();
+          if(item.code=='')item.code='- -'
+          if(item.storeGroup=='')item.storeGroup='- -'
+          if(item.storeType=='')item.storeType='- -'
+          let value = 0;
+          var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
+          if(this.part2.indexType==0){
+              value = util.getPercentValue(arr, 0, 2)
+          }
+          else if(this.part2.indexType==1){
+              value = util.getPercentValue(arr, 1, 2)
+          }
+          else if(this.part2.indexType==2){
+              value =  util.getPercentValue(arr, 2, 2)
+          }
+          regionData.push({value,itemStyle: {
+            color: '#7bd8eb',
+          }})
+          regionLabel.push(item.groupName)
+        });
+      }
+      this.part2.storeTableData = content;
+      option.series[0].name = "";
+      option.series[0].data = regionData;
+      option.xAxis.data = regionLabel;
+      this.part2.barStoreOption = option;
+    },
+    async getPart3RegionBar() {
+      const self = this;
       const params = {};
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.regionMode = 3;
+      params.groupMode = 0;
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
-      if(this.part1.compareType=='stores'){
-         params.storeIds  = this.part1.compareIds;
+      if(this.part3.compareType=='stores'){
+         params.storeIds  = this.part3.compareIds;
+         params.groupMode = 0;
       }
-      if (self.totalRegion > 0) {
-        params.filter = { page: 0, size: self.totalRegion };
-        const storeResult = await self.getInspectStatsOverviewWithRegion(params);
+      else if(this.part3.compareType=='area1'){
+         params.groupIds  = this.part3.compareIds;
+         params.groupMode = 1;
+      }
+      else if(this.part3.compareType=='area2'){
+         params.groupIds  = this.part3.compareIds;
+         params.groupMode = 2;
+      }
+      else if(this.part3.compareType=='storeType'){
+         params.groupIds  = this.part3.compareIds;
+         params.groupMode = 3;
+      }
+      else if(this.part3.compareType=='storeGroup'){
+         params.groupIds  = this.part3.compareIds;
+         params.groupMode = 3;
+      }
+      params.filter = { page: 0, size: 20 };
+        const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           if (result) {
-            console.log(result)
-            this.part1.content = this.filterContent(result.content, 
-            this.part1.compareType,
-            this.part1.compareIds,
-            this.part1.comapareLabels);
-            this.part1.indexRegion = -1;
-            result.content.forEach(item => {
-              totalDargerous += item.numOfDangerous;
-              totalImproved += item.numOfImproved;
-              totalQualified += item.numOfQualified;
-              totalReport += item.numOfReport;
-            });
+            this.part3.content = this.filterContent(result.content, 
+            this.part3.compareType,
+            this.part3.compareIds,
+            this.part3.comapareLabels,
+            this.part3.originArray);
+            this.part3.indexRegion = -1;
+            this.drawPart2RegionBar();
           }
-          seriesData = [
-            { value: totalDargerous, name: self.$t('overview.danger') },
-            { value: totalImproved, name: self.$t('overview.improve') },
-            { value: totalQualified, name: self.$t('overview.echartGood') }
-          ];
-          const totalArray = [totalDargerous, totalImproved, totalQualified];
-          jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-          jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-          jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-        } else {
-          util.notify(self.$t('overview.queryFail'), 'warning', 3000);
-          const totalArray = [0, 0, 0, 0];
-          jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-          jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-          jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
         }
-      } else {
-        const totalArray = [0, 0, 0, 0];
-        jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-        jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-        jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-      }
-      const pieOption = self.getRegionPieOption();
-      pieOption.series[0].data = seriesData;
-      self.regionsOptions = pieOption;
-      this.part1.pieOption  = pieOption
-      self.regionsPerArray = jsonArray;
-      this.getPart1RegionLine();
-    },
 
+    },
+    async drawPart3RegionBar(){
+      console.log("Region Line")
+      const option = this.getInspectLineOption();
+      const regionData =[];
+      const regionLabel =[];
+      if(this.part3.content){
+        this.part3.content.map((item,index) => {
+          let value = item.averageScore;
+          
+          if( this.part3.indexRegion == index){   
+            regionData.push({value:value,itemStyle: {
+                color: '#f11e66',
+                emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(1, 0, 0, 0.0)'
+                    }
+            }});
+          }else{
+            regionData.push({value,itemStyle: {
+            color: 'rgba(250, 30, 102, 0.6)',
+            emphasis: {
+                            shadowBlur: 0,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.0)'
+                    }
+          }})
+          }
+  
+          regionLabel.push(item.groupName)
+        });
+      }
+
+      option.series[0].name = "";
+      option.series[0].data = regionData;
+      option.xAxis.data = regionLabel;
+      console.log(option)
+      this.regionsChartsOptions = option;
+      this.part3.barRegionOption = option;
+      await this.getPart1StoreBar();
+    },
+    async getPart3StoreBar(){
+      const self = this;
+      const option = this.getInspectLineOption();
+      const regionData =[];
+      const regionLabel =[];
+      console.log("getPart1StoreBar")
+      let content = [];
+      if(this.part3.content && this.part3.content[this.part3.indexRegion]){
+        if(this.part3.compareType == 'stores'){
+            content =[this.part3.content[this.part3.indexRegion]];
+        }
+        else{
+            const params = {};
+            params.beginTs = self.params.beginTs;
+            params.endTs = self.params.endTs;
+            params.groupMode = 0;
+            params.storeIds = this.part3.content[this.part3.indexRegion].list;
+            params.inspectTagId = self.params.inspectId;
+            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            if (storeResult.errCode === 0) {
+              const result = storeResult.data;
+              if (result) {
+                  content = result.content
+                  console.log(result)
+              }
+            }
+        }
+        
+
+        content.map((item,index) => {
+          item.storeGroup = item.storeRegion.toString();
+          item.storeType = item.storeBranchType.toString();
+          item.storeSubmitters = item.submitters.toString();
+          if(item.code=='')item.code='- -'
+          if(item.storeGroup=='')item.storeGroup='- -'
+          if(item.storeType=='')item.storeType='- -'
+          let value = 0;
+          var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
+          if(this.part3.indexType==0){
+              value = util.getPercentValue(arr, 0, 2)
+          }
+          else if(this.part3.indexType==1){
+              value = util.getPercentValue(arr, 1, 2)
+          }
+          else if(this.part3.indexType==2){
+              value =  util.getPercentValue(arr, 2, 2)
+          }
+          regionData.push({value,itemStyle: {
+            color: '#7bd8eb',
+          }})
+          regionLabel.push(item.groupName)
+        });
+      }
+      this.part3.storeTableData = content;
+      option.series[0].name = "";
+      option.series[0].data = regionData;
+      option.xAxis.data = regionLabel;
+      this.part3.barStoreOption = option;
+    },
     getRegionPieOption() {
       const pieOption = {
         tooltip: {
@@ -1613,13 +2166,19 @@ export default {
       };
       return pieOption;
     },
-    clickPart1Bar(event){
-      console.log("clickPart1Bar");
-      console.log(event)
+    async clickPart1Bar(event){
       this.part1.indexRegion = event.dataIndex;
-      this.getPart1RegionLine();
-      this.getPart1StoreLine();
+      await this.drawPart1RegionBar();
     },
+      async clickPart2Bar(event){
+      this.part2.indexRegion = event.dataIndex;
+      await this.drawPart2RegionBar();
+    },
+      async clickPart3Bar(event){
+      this.part3.indexRegion = event.dataIndex;
+      await this.drawPart3RegionBar();
+    },
+
     handleRegionsChange(val) {
       const self = this;
       self.curRegion = val;
@@ -1757,10 +2316,10 @@ export default {
       this.sizeNum = paramsObj.filter.size;
       this.page = paramsObj.filter.page + 1;
     },
-    setPart1Type(index){
+    async setPart1Type(index){
       this.part1.indexType = index;
       this.part1.indexRegion =  -1;
-      this.getPart1RegionLine();
+      await this.drawPart1RegionBar();
     },
   }
 };
@@ -1798,13 +2357,14 @@ export default {
         margin-left:20px;
         margin-top:20px;
         height: 22px;
+        padding-right:100px;
         border-left: solid 4px #2c90d9;
         display:flex;
         flex-direction:row;
-        justify-content: flex-start;
+        justify-content: space-between;
         padding-left:12px;
         span{
-           
+            width:150px;  
             font-family: NotoSansCJKTC;
             font-size: 15px;
             text-align: left;

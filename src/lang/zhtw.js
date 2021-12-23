@@ -1094,10 +1094,13 @@ export default {
     "standardRate":"平均達標率",
     "noData":"暫無數據",
     "standardScore":"達標分數",
+    "submitter":"評估人",
     "titles":{
       "overview":"概要",
       'distribution':'考評結果分布',
       'storeEvalDetail':'門店評估詳情',
+      'scoreDistribution':'考评得分分布',
+      'rateDistribution':'考评达标率',
     },
     'overview':{
       'store_unit':'家',
@@ -1170,6 +1173,6 @@ export default {
       "numOfStores":"涉及門店",
       "seeAllIncepEvent":"查看所有巡检事件",
       "seeAll":"全部"
-    }
+    },
   }
 };

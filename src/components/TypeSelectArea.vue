@@ -142,18 +142,14 @@ export default {
       }
     },
     regionArray1: {
-        immediate: true, 
-        deep: true,
         handler (val,old ) {
+          console.log("RegionArray1 changed")
           this.provinceList  = [];
           val.map(item => {
             if(item!='-1'){
               this.provinceList.push({value:item,label:item});
             }
           });
-        
-          console.log(this.provinceList)
-          console.log("CompareType="+this.compareType)
            if(this.compareType== 'area1'){
             this.curSelectId=[];
             this.changeCompareType(this.compareType);
@@ -162,9 +158,8 @@ export default {
         }
     },
     regionArray2: {
-        immediate: true, 
-        deep: true,
         handler (val,old ) {
+          console.log("RegionArray2 changed")
           this.cityList = [];
           val.map(item => {
             if(item!='-1'){
@@ -439,6 +434,7 @@ export default {
     },
     changeCompareType(val){
       console.log("Change Compare Type=" +val)
+      const self = this;
       this.compareType = val;
       this.curSelectId = [];
       this.curTypeArrary = [];
@@ -447,11 +443,27 @@ export default {
           this.dropdownPlaceholder = this.$t('remotePatrol.regionI');
           this.selAllString=this.$t('overview.allZoneI');
           this.curTypeArrary =this.provinceList;
+          this.curTypeArrary.forEach(function(item){
+            item.contents =[];
+            self.storeList.forEach(function(store){
+               if(self.curStores.indexOf(store.storeId)>=0 && store.province == item.label){
+                 item.contents.push(store.storeId);
+               }
+            });
+          })
           break;
         case 'area2':
           this.dropdownPlaceholder =  this.$t('remotePatrol.regionII');
           this.selAllString=this.$t('overview.allZoneII');
           this.curTypeArrary =  this.cityList;
+          this.curTypeArrary.forEach(function(item){
+            item.contents =[];
+            self.storeList.forEach(function(store){
+               if(self.curStores.indexOf(store.storeId)>=0 && store.city == item.label){
+                 item.contents.push(store.storeId);
+               }
+            });
+          })
           break;
         case 'storeGroup':
           this.dropdownPlaceholder =  this.$t('remotePatrol.storeGroup');
@@ -493,8 +505,9 @@ export default {
           for(let i=0; i<defaultSel;i++){
             this.curSelectId.push(this.compareType=='stores'?this.curTypeArrary[i].storeId: this.curTypeArrary[i].value);
             selectedLabels.push(this.curTypeArrary[i].label);
+            storeIds.push(this.curTypeArrary[i].storeIds)
           }
-          this.onChangeCompareType({selectedArray:this.curSelectId,storeIds:this.curSelectId,selectedLabels});
+          this.onChangeCompareType({selectedArray:this.curSelectId,storeIds,selectedLabels});
             //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});
         
             
@@ -502,11 +515,16 @@ export default {
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
-      console.log("onChangeCompareType > selectedArray:",selectedArray);
-      console.log("onChangeCompareType > selectedLabels:",selectedLabels);
+     // console.log("onChangeCompareType > selectedArray:",selectedArray);
+      //console.log("onChangeCompareType > selectedLabels:",selectedLabels);
       this.curSelectId = selectedArray;
-      let storeId = storeIds;
-      this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:selectedArray,selectedLabels});
+      let originArray = [];
+      this.curTypeArrary.forEach(function(item){
+        if(item.value !='-1' && selectedArray.indexOf(item.value) ){
+          originArray.push(item)
+        }
+      })
+      this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:selectedArray,selectedLabels,originArray});
       //this.changeStoreNew(arr);
     },
     doGetStoreIdsByProvince(provinceArrary){
