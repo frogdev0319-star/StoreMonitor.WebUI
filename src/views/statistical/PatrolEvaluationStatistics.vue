@@ -11,7 +11,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-      <div class="statistics-content" style="height:194px;">
+      <div class="statistics-content" style="height:194px;margin-top:200px">
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">

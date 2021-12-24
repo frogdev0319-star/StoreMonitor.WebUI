@@ -140,6 +140,19 @@ export default {
         }
 
     },
+    getScore(item){
+       const self =this;
+        if(item.items){
+           let qualifiedScore = 0;
+           item.items.forEach(function(d){
+             qualifiedScore += self.getScore(d);
+           })
+           return qualifiedScore;
+        }
+        else{
+          return item.qualifiedScore;
+        }
+    },
     changeLayer1(e){
       console.log("Change Layer1 to="+e)
       this.curLayer1=null;
@@ -210,6 +223,7 @@ export default {
        let ids = this.getIds(item)
        console.log(ids)
        item.ids = ids;
+       item.qualifiedScore = this.getScore(item);
        this.$emit("emitItemChanged",{item});
     }
   }

@@ -37,15 +37,20 @@
                     @emitItemChanged="emitItemChanged"
                  />
               </div>
+              <div class="subtitle-head">
+                  <span class="title" style="width:80%" >
+                    {{inspectSubTitle}}
+                  </span>
+              </div>
           <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
                     <el-col :span="10" class="division">
                       <el-col class="text-area">        
                         <el-row class="top">
-                           <span class="mainTitle">{{part3.averageScore>0?part3.averageScore:'N/A'}}</span>
-                           <span class="unit">{{  "%" }}</span>
+                           <span class="mainTitle">{{totalAvgScore>0?totalAvgScore:'N/A'}}</span>
+                           <span class="unit">{{$t('statistics.score')}}</span>
                         </el-row >
                         <el-row class="subtitlehead">
-                            <span>{{ $t('statistics.totalStandardRate') }}</span>
+                            <span>{{ $t('statistics.titleAvgScore') }}</span>
                         </el-row>
                       </el-col>
                      </el-col>
@@ -57,8 +62,8 @@
            </el-col>      
         </el-row > 
         <div class="subtitle-head">
-          <span class="title" >
-            {{ $t('statistics.titles.storeEvalDetail') }}
+          <span class="title" style="width:80%"  >
+            {{ inspectDetailSubTitle }}
           </span>
            <div class="operation-btns">
                   <div class="switch-btn">
@@ -161,6 +166,9 @@ export default {
   mixins: [resize],
   data() {
     return {
+      inspectSubTitle: this.$t('statistics.itemAverageScore'),
+      inspectDetailSubTitle: this.$t('statistics.evalDetail'),
+      totalAvgScore:-1,
       htmlTitle: this.$t('overview.htmltopdfA'),
       inspectItemList:[],
       inspectItem:null,
@@ -1758,6 +1766,7 @@ export default {
       console.log("getPart3RegionBar")
       const self = this;
       const params = {};
+      this.totalAvgScore =-1;
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.groupMode = 0;
@@ -1826,9 +1835,10 @@ export default {
       const regionData =[];
       const regionLabel =[];
       if(this.part3.content){
-        console.log(this.part3.content)
+        let totalAvgScore = 0;
         this.part3.content.map((item,index) => {
           let value = item.averageScore;
+          totalAvgScore += value;
           if(this.part3.indexRegion<0 && value>0){
             this.part3.indexRegion = index;
           }
@@ -1855,6 +1865,10 @@ export default {
   
           regionLabel.push(item.groupName)
         });
+        if(this.part3.content.length>0){
+          totalAvgScore = totalAvgScore/this.part3.content.length;
+          this.totalAvgScore =totalAvgScore;
+        }
       }
 
       option.series[0].name = "";
@@ -2178,6 +2192,7 @@ export default {
        console.log("Emit Item Changed")
        console.log(item);
        this.inspectItem = item;
+       this.getItemSubtitle();
        this.getPart3RegionBar();
     },
     async doGetAssessmentStandardScore(){
@@ -2205,6 +2220,14 @@ export default {
         }
       }
     },
+    getItemSubtitle(){
+      if(this.inspectItem && this.inspectItem.item){
+        let item = this.inspectItem.item;
+        let name = item.subject?item.subject:item.name
+        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + " ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
+        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')
+      }
+    }
   }
 };
 </script>
