@@ -3,10 +3,10 @@
     <el-row class="statistics-container">
       <el-col :span="24">
         <search-component
-          ref="inspectEvalutionSearch"
+          ref="inspectItemSearch"
           :is-patrol = "true"
           :default-sort="defaultSort"
-          path="inspectEvalutionStatistics"
+          path="inspectItemStatistics"
           @emitSearch = "emitSearch"
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
@@ -19,7 +19,7 @@
                             </span>
                         </div>
                             <TypeSelectArea
-                              path="inspectEvalutionStatistics"
+                              path="inspectItemStatistics"
                               :allow-all=true
                               :region-array1="params.curProvince"
                               :region-array2="params.curCity"
@@ -31,6 +31,12 @@
                               @emitTypeChanged="emitTypeChangedPart3"
                           ></TypeSelectArea>
                 </div>
+              <div style="padding:20px">
+                <InspectItemSelect 
+                    :inspect-item-list="inspectItemList"
+                    @emitItemChanged="emitItemChanged"
+                 />
+              </div>
           <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
                     <el-col :span="10" class="division">
                       <el-col class="text-area">        
@@ -129,16 +135,16 @@ import {
   getInspectStatsOverviewV2,
   getInspectStatsOverRegion,
   getInspectStatsOverviewWithRegionV2,
-  getInspectStatsOverviewWithGroup
+  getInspectStatsItemOverGroup
 } from '@/api/inspectOverview';
-import { GetInspectTagList } from '@/api/inspect';
+import { GetInspectTagList,getInspectItemList  } from '@/api/inspect';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination_V2';
 import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import TypeSelectArea from '@/components/TypeSelectArea';
-
+import InspectItemSelect from '@/components/InspectItemSelect';
 export default {
   name: 'PatrolEvaluationSta',
 
@@ -149,12 +155,16 @@ export default {
     LimitSelect,
     SearchComponent,
     TablePagination,
-    TypeSelectArea
+    InspectItemSelect,
+     TypeSelectArea
   },
   mixins: [resize],
   data() {
     return {
       htmlTitle: this.$t('overview.htmltopdfA'),
+      inspectItemList:[],
+      inspectItem:null,
+      curInspectId:'',
       isexportPDF: false,
       storeNameStr: '',
       storeGroupStr: '',
@@ -935,9 +945,9 @@ export default {
       });
     },
     
-       getInspectStatsOverviewWithGroup(params) {
+       getInspectStatsItemOverGroup(params) {
       return new Promise((resolve, reject) => {
-        getInspectStatsOverviewWithGroup(params).then(res => {
+        getInspectStatsItemOverGroup(params).then(res => {
           resolve(res);
         })
           .catch(err => {
@@ -1397,6 +1407,9 @@ export default {
       params.endTs = self.params.endTs;
       params.regionMode = 3;
       params.groupMode = 0;
+      if(this.inspectItem){
+        params.itemIds = [this.inspectItem.id]
+      }
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       if(this.part1.compareType=='stores'){
@@ -1421,9 +1434,10 @@ export default {
       }
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: 20 };
-        const storeResult = await self.getInspectStatsOverviewWithGroup(params);
+        const storeResult = await self.getInspectStatsItemOverGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
+          console.log(result)
           if (result) {
             this.part1.content = this.filterContent(result.content, 
             this.part1.compareType,
@@ -1536,12 +1550,13 @@ export default {
         }
         else{
             const params = {};
+
             params.beginTs = self.params.beginTs;
             params.endTs = self.params.endTs;
             params.groupMode = 0;
             params.storeIds = this.part1.content[this.part1.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
-            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
@@ -1598,6 +1613,7 @@ export default {
       }
       if(this.part2.compareType=='stores'){
          params.storeIds  = this.part2.compareIds;
+         params.groupIds= this.part2.compareIds;
          params.groupMode = 0;
       }
       else if(this.part2.compareType=='area1'){
@@ -1619,7 +1635,7 @@ export default {
       let totalReport = 0;
       let totalStandard = 0;
       params.filter = { page: 0, size: 20 };
-        const storeResult = await self.getInspectStatsOverviewWithGroup(params);
+        const storeResult = await self.getInspectStatsItemOverGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           if (result) {
@@ -1704,7 +1720,7 @@ export default {
             params.groupMode = 0;
             params.storeIds = this.part2.content[this.part2.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
-            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
@@ -1744,15 +1760,15 @@ export default {
       const params = {};
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
-      params.regionMode = 3;
       params.groupMode = 0;
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       params.order={
          direction: "desc",
-         property:"standardRate"
+         property:"averageScore"
       }
       if(this.part3.compareType=='stores'){
+         params.groupIds  = this.part3.compareIds;
          params.storeIds  = this.part3.compareIds;
          params.groupMode = 0;
       }
@@ -1772,12 +1788,19 @@ export default {
          params.groupIds  = this.part3.compareIds;
          params.groupMode = 3;
       }
+      if(this.inspectItem){
+        params.itemIds = [this.inspectItem.item.id]
+      }
       let totalReport = 0;
       let totalStandard = 0;
-      params.filter = { page: 0, size: 20 };
-        const storeResult = await self.getInspectStatsOverviewWithGroup(params);
+         params.filter = { page: 0, size: 100 };
+        console.log(JSON.stringify(params))
+
+        const storeResult = await self.getInspectStatsItemOverGroup(params);
+        console.log(storeResult)
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
+          console.log(result)
           if (result) {
             this.part3.content = this.filterContent(result.content, 
                                   this.part3.compareType,
@@ -1847,7 +1870,7 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log("getPart1StoreBar")
+      console.log("getPart3StoreBar")
       let content = [];
       if(this.part3.content && this.part3.content[this.part3.indexRegion]){
         if(this.part3.compareType == 'stores'){
@@ -1860,7 +1883,10 @@ export default {
             params.groupMode = 0;
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
-            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            if(this.inspectItem){
+              params.itemIds = [this.inspectItem.item.id]
+            }
+            const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
@@ -1997,13 +2023,33 @@ export default {
       this.$refs.storeChart && this.$refs.storeChart.resize();
     },
 
-    emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
+    async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
-      this.part2.standardScore=-1;
-      this.part2.standardScore=-1;
-      this.doGetAssessmentStandardScore();
+     // this.part2.standardScore=-1;
+     // this.part2.standardScore=-1;
+     // this.doGetAssessmentStandardScore();
+      console.log(searchParams)
+             
+      const searchParamsObj = {
+          path: 'inspectItemStatistics',
+          params: this.params
+      };
+      this.ifSaveParams && this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
+      this.ifSaveParams = true;
+      if(searchParams.inspectId && searchParams.inspectId!=''){
+        console.log(searchParams.inspectId,this.curInspectId)
+        if(searchParams.inspectId !=this.curInspectId){
+          console.log("Change ")
+          let result  = await  this.getInspectItemList(searchParams.inspectId)
+          if(result.errCode==0 && result.data){
+            this.inspectItemList = result.data;
+            this.curInspectId = searchParams.inspectId
+            console.log(this.inspectItemList);
+          }
+        }
+
+      }
       this.params = searchParams;
-      console.log(this.params)
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
@@ -2011,13 +2057,7 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
-      const searchParamsObj = {
-        path: 'inspectEvalutionStatistics',
-        params: this.params
-      };
-      this.ifSaveParams && this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
-      this.ifSaveParams = true;
-      this.searchData();
+
     },
 
     exportPdf(storeNameStr, storeGroupStr, storeTypeStr) {
@@ -2035,10 +2075,10 @@ export default {
       self.regionFilter = { page: self.pageRegion - 1, size: self.sizeNumRegion };
       self.getInspectStatsOverviewOfRegionTable();
       const searchParamsObj = {
-        path: 'inspectEvalutionStatistics',
+        path: 'inspectItemStatistics',
         params: this.params
       };
-      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleRegionSortChange(order, defaultSort) {
@@ -2050,10 +2090,10 @@ export default {
       };
       this.getInspectStatsOverviewOfRegionTable();
       const searchParamsObj = {
-        path: 'inspectEvalutionStatistics',
+        path: 'inspectItemStatistics',
         params: this.params
       };
-      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStorePageAndSizeChange(pageObj) {
@@ -2062,10 +2102,10 @@ export default {
       this.storeFilter = { page: this.pageStore - 1, size: this.sizeNumStore };
       this.getInspectStatsOverviewOfStore();
       const searchParamsObj = {
-        path: 'inspectEvalutionStatistics',
+        path: 'inspectItemStatistics',
         params: this.params
       };
-      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     handleStoreSortChange(order, defaultSort) {
@@ -2077,10 +2117,10 @@ export default {
       };
       this.getInspectStatsOverviewOfStore();
       const searchParamsObj = {
-        path: 'inspectEvalutionStatistics',
+        path: 'inspectItemStatistics',
         params: this.params
       };
-      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
     },
 
     setDefaultSortAndPage(paramsObj) {
@@ -2103,6 +2143,22 @@ export default {
           reject(err);
         });
       });
+    },
+    getInspectItemList(inspectId){
+      const self = this;
+      return new Promise((resolve, reject) => {
+         getInspectItemList({inspectId}).then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+    emitItemChanged(item){
+       console.log("Emit Item Changed")
+       console.log(item);
+       this.inspectItem = item;
+       this.getPart3RegionBar();
     },
     async doGetAssessmentStandardScore(){
       console.log("tag-doGetAssessmentStandardScore")
