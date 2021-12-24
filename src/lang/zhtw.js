@@ -1092,12 +1092,22 @@ export default {
     "averageScore":"平均分數",
     "score":"分",
     "standardRate":"平均達標率",
+    "totalStandardRate":"所有達標率",
     "noData":"暫無數據",
     "standardScore":"達標分數",
+    "submitter":"評估人",
+    "rank":"排名",
+    "compareTrend":"同比趨勢",
+    "check":"查看",
+    "sRate":"達標率",
+    "standardLine":"達標分數線",
+    "numOfStandard":"達標次數",
     "titles":{
       "overview":"概要",
       'distribution':'考評結果分布',
       'storeEvalDetail':'門店評估詳情',
+      'scoreDistribution':'考评得分分布',
+      'rateDistribution':'考评达标率',
     },
     'overview':{
       'store_unit':'家',
@@ -1169,7 +1179,11 @@ export default {
       "UnqualifiedpPercentage":"不合格佔比",
       "numOfStores":"涉及門店",
       "seeAllIncepEvent":"查看所有巡检事件",
-      "seeAll":"全部"
-    }
+      "seeAll":"全部",
+      "eventInvolveStores":"事件涉及門店",
+      "rankByNumOfUnqualified":"排名",
+      "submitter":"評估人",
+      "eventCommand":"事件詳情"
+    },
   }
 };

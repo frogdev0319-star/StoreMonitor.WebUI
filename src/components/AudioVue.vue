@@ -4,7 +4,21 @@
       v-for="(audioItem, audioIndex) of audioList"
       :key="audioItem.audioRef"
       class="item">
-      <div :class="isExportPdf ? 'pdf_speech_info' : 'speech-info'" @click="startAudio(audioItem, audioIndex)">
+      <div class="container">
+        <audio :ref="`ref${audioIndex}`" @canplay="getDuration(audioItem, audioIndex)" @ended="onEndAudio(audioItem)">
+          <source :src="audioItem.audioSrc" type="audio/mpeg" >
+        </audio>
+        <div class="duration">{{ audioItem.audioOftenText }}</div>
+        <div class="img-area">
+          <img v-show="!audioItem.isPlaying" :src="audioPng" class="audio-img">
+          <img v-show="audioItem.isPlaying" :src="audioPlayGif" class="audio-img">
+        </div>
+        <div class="btnPlay">
+          <img v-show="!audioItem.isPlaying" :src="imgPlay" style="width:14px;height:14px;" @click="startAudio(audioItem, audioIndex)">
+          <img v-show="audioItem.isPlaying" :src="imgPause" class="width:10px;height:13px;">
+        </div>
+      </div>
+      <!--<div :class="isExportPdf ? 'pdf_speech_info' : 'speech-info'" @click="startAudio(audioItem, audioIndex)">
         <i v-show="!audioItem.isPlaying" class="iconfont icon-yuyin icon-speech"/>
         <img v-show="audioItem.isPlaying" :src="audioPlayGif" class="audio-gif icon-speech">
       </div>
@@ -14,7 +28,7 @@
       <span v-show="audioItem.hasNotPlayAudio" class="not-play-audio"/>
       <span :class="audioItem.hasNotPlayAudio ? 'time-text' : 'has-play-time-text'">
         {{ audioItem.audioOftenText }}
-      </span>
+      </span>-->
     </div>
   </div>
 </template>
@@ -39,7 +53,10 @@ export default {
 
   data() {
     return {
-      audioPlayGif: require('../../static/img/audio-play.gif')
+      audioPlayGif: require('../../static/img/audio-play.gif'),
+      audioPng: require('../../static/img/audio.png'),
+      imgPlay:require('../../static/img/audio_play.svg'),
+      imgPause:require('../../static/img/audio_pause.svg'),
     };
   },
 
@@ -74,7 +91,9 @@ export default {
         if (duration === 0) {
           du = 1;
         }
-        audioItem.audioOftenText = parseInt(du) + '"';
+        let min = (du/60).toFixed(0).padStart(2, '0');
+        let sec = (du%60).toFixed(0).padStart(2, '0');
+        audioItem.audioOftenText = min+":"+sec;
       }
     }
   }
@@ -91,6 +110,45 @@ export default {
   }
   @mixin point($poi,$val){
       #{$poi}:checkRem($val);
+  }
+  .container{
+    width: 226px;
+    height: 30px;
+    padding: 1px 0px 1px 12px;
+    border-radius: 5px;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    .duration{
+      width: 30px;
+      height: 14px;
+      margin: 7px 12.4px 7px 0;
+      font-family: Roboto;
+      font-size: 12px;
+      text-align: left;
+      color: #6e6e6e;
+    }
+    .img-area{
+      width: 148px;
+      height: 14px;
+      
+      .audio-img{
+        width: 128px;
+        height: 8.6px;
+      }
+    }
+    .btnPlay{
+      width: 33px;
+      height: 28px;
+      border-left:solid 1.5px #f2f2f2;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
   }
   .cdm-voice{
     display: flex;

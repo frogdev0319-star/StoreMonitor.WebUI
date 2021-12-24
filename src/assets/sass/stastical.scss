@@ -89,7 +89,7 @@ $store: #fccc3f;
   margin-left: calc(32/1440*100vw);
   margin-right: calc(32/1440*100vw);
   width: calc(1096px/1440*100vw);
-  margin: 188px 32px 24px;
+  margin: 0px 32px 24px;
   padding: 17px 24px 24px 22px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
   background-color: #fff;
@@ -194,5 +194,47 @@ $store: #fccc3f;
       /*content: url(/../../../static/img/statistics/ic_calender.svg);*/
     }
   }
+  
 }
-
+.switch-btn{
+  width:calc(202/1440*100vw);
+  height:32px;
+  display:flex;
+  flex-direction:row;
+  justify-content: stretch;
+  border-radius: 5px;
+  border: 1px solid #e6e6e6;
+  .mode-btn{
+    color: #556679;
+    background-color: #fff;
+    width:calc(101/1440*100vw);
+    height:30px;
+    font-size: 15px;
+    border:none;
+    text-align: center;
+    line-height: 10px;
+    margin-left:0px;
+  }
+  .active-mode-btn{
+    color:#fff;
+    background-color: #006ab7;
+    width:calc(101/1440*100vw);
+    height:30px;
+    font-size: 15px;
+    border:none;
+    text-align: center;
+    line-height: 10px;
+    margin-left:0px;
+    
+  }
+}
+.operation-btns{
+  align-self: center;
+  display: flex;
+  flex-direction: row;
+  width:calc(250/1440*100vw);
+  height: 30px;
+  align-items: center;
+  padding:0;
+  justify-content: space-between;
+}

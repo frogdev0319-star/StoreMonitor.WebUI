@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="9.8" height="13.125" viewBox="0 0 9.8 13.125">
+    <defs>
+        <style>
+            .cls-1{fill:#006ab7}
+        </style>
+    </defs>
+    <g id="ic_16_16_play" data-name="ic/16*16/play" transform="translate(-2.1 -.438)">
+        <g id="icon_pause_copy" data-name="icon_pause copy">
+            <g id="icon_pause" transform="rotate(90 5.731 6.169)">
+                <rect id="Rectangle" class="cls-1" width="13.125" height="3.539" rx="1"/>
+                <rect id="Rectangle_Copy_6" data-name="Rectangle Copy 6" class="cls-1" width="13.125" height="3.539" rx="1" transform="translate(0 6.261)"/>
+            </g>
+        </g>
+    </g>
+</svg>
