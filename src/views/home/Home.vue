@@ -158,7 +158,7 @@
             </el-menu>
           </el-scrollbar>
           
-        <div class="headUrl-content flex-center" style="justify-content: center">
+        <div class="headUrl-content flex-center" style="justify-content: center; padding: 20px">
           <!-- <div class="system-name">{{ $t('route.mgt') }}</div> -->
           <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
             <span class="username">
