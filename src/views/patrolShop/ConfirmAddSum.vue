@@ -1,14 +1,15 @@
 <template>
   <el-row class="sum-content">
-    <el-col :span="24" class="sum-submit">
-      <div class="submit-header">
+    <el-col :span="24" class="sum-submit paper">
+      <div class="submit-header flex-center margin-bottom-md">
         <span>{{ $t('remotePatrol.summary') }}</span>
+        <div class="spacer"></div>
         <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="sum-btn" type="primary" @click="submit">
           {{ $t('remotePatrol.submit') }}
         </el-button>
       </div>
       <div class="submit-content">
-        <div class="submit-radio">
+        <div class="submit-radio margin-bottom-md">
           <span v-for="(item,index) in resultList" :key="index">
             <span
               v-if="item.isShow"
@@ -31,183 +32,112 @@
       </div>
     </el-col>
     <el-col v-if="!allRemarkItemsFlag" :span="24" class="sum-data">
-      <el-row class="divider-content">
-        <el-col :span="11">
-          <hr class="divider-hr">
-        </el-col>
-        <el-col :span="2">
-          <span class="divider-text">{{ $t('remotePatrol.preview') }}</span>
-        </el-col>
-        <el-col :span="11">
-          <hr class="divider-hr">
-        </el-col>
-      </el-row>
-      <div class="table-content">
-        <div class="table-header">
-          <div class="header-store-name">
-            <span v-if="lang=='en' " class="en-store-name">{{ $t('remotePatrol.storeName') }}: </span>
-            <span v-else class="store-name">{{ $t('remotePatrol.storeName') }}：</span>
-            {{ store.storeName }}
+      <span style="font-size: 18px; font-weight: bold">{{ $t('remotePatrol.preview') }}</span>
+      <div class="paper" style="margin-top: 15px; padding: 0 15px">
+        <div class="table-content">
+          <div class="table-header flex-center">
+            <div class="header-store-name">
+              <span v-if="lang=='en' " class="en-store-name">{{ $t('remotePatrol.storeName') }}: </span>
+              <span v-else class="store-name">{{ $t('remotePatrol.storeName') }}：</span>
+              {{ store.storeName }}
+            </div>
+            <div class="spacer"></div>
+            <div class="header-score">
+              <span class="span-1">{{ $t('remotePatrol.getscore') }}：</span>
+              <span class="span-2">{{ scorecount }} <span>{{ $t('remotePatrol.scorecount') }}</span></span>
+            </div>
           </div>
-          <div class="header-score">
-            <span class="span-1">{{ $t('remotePatrol.getscore') }}：</span>
-            <span class="span-2">{{ scorecount }} <span>{{ $t('remotePatrol.scorecount') }}</span></span>
-          </div>
+          <hr class="horizontal-hr"/>
+          <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered">
+            <thead>
+              <tr>
+                <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
+                  {{ t_item.name }}
+                </th>
+              </tr>
+            </thead>
+            <template v-for="(inspectItem, inspectIndex) in s_item.data">
+              <tbody :key="inspectIndex">
+                <tr style="vertical-align:middle;">
+                  <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
+                    <span class="sheet_title">{{ inspectItem.label }}</span>
+                  </td>
+                </tr>
+                <tr
+                  v-for="(item,index) in inspectItem.inspectList"
+                  :key="index">
+                  <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span><span class="count-blag">
+                    {{ item.items.length }}</span>
+                  </td>
+                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
+                  <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
+                  <td v-if="inspectItem.type === 1"><span>{{ item.itemScore }}</span></td>
+                  <td><span>{{ item.itemgetScore }}</span></td>
+                </tr>
+              </tbody>
+            </template>
+          </table>
         </div>
-        <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered">
-          <thead>
-            <tr>
-              <th v-for="(t_item ,t_index) in s_item.data[0].tHeader" :key="t_index" :style="t_item.width" scope="col">
-                {{ t_item.name }}
-              </th>
-            </tr>
-          </thead>
-          <template v-for="(inspectItem, inspectIndex) in s_item.data">
-            <tbody :key="inspectIndex">
-              <tr style="vertical-align:middle;">
-                <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
-                  <span class="sheet_title">{{ inspectItem.label }}</span>
-                </td>
-              </tr>
-              <tr
-                v-for="(item,index) in inspectItem.inspectList"
-                :key="index"
-                :style=" index%2 != 0?{'background-color':'#F7F8FC'}:{}">
-                <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span><span class="count-blag">
-                  {{ item.items.length }}</span>
-                </td>
-                <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
-                <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
-                <td v-if="inspectItem.type === 1"><span>{{ item.itemScore }}</span></td>
-                <td><span>{{ item.itemgetScore }}</span></td>
-              </tr>
-            </tbody>
-          </template>
-        </table>
-      </div>
-      <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
-        <el-col v-if="item.data.length!=0">
-          <div class="item-header">
-            <i :class="item.iconSrc" class="iconfont icontemp"/>
-            <span class="title-lable">{{ item.itemTitleName }}</span>
-            <span style="float:right;" class="count-content"><span class="count">{{ item.itemCount }}</span>
-            <span class="blag">{{ $t('remotePatrol.unit') }}</span></span>
-          </div>
-          <div class="item-content">
-            <div style="margin-bottom:20px;">
-              <div v-for="(_item,_index) in item.data" :key="_index" class="content-detail">
-                <template v-if="index !== 2" >
-                  <div class="content-title">{{ _item.groupName }}</div>
-                  <template v-if="!_item.children">
-                    <div v-for="(categoryItem,categoryIndex) in _item.cateryItems" :key="categoryIndex" class="content-detail">
-                      <div class="content-detail-title">
-                        <div class="detail-title">
-                          <p class="title1">{{ categoryIndex+1 }}.{{ categoryItem.subject }}</p>
-                          <p class="title2">{{ categoryItem.description }}</p>
-                        </div>
-                        <div v-if="categoryItem.itemType === 0" class="score-title">
-                          <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                          <template v-if="item.detailType !== 1">
-                            <div
-                              v-if="categoryItem.type === 0"
-                              class="title-btn">
-                              {{ $t('remotePatrol.scoreUnit') }}<span>{{ tab1BtnArr[1] }}</span>
-                            </div>
-                            <div
-                              v-if="categoryItem.type === 2"
-                              class="title-btn">
-                              {{ $t('remotePatrol.scoreUnit') }}<span>{{ tab3BtnArr[1] }}</span>
-                            </div>
-                            <div v-if="categoryItem.type === 1" class="title-btn">
-                              {{ $t('remotePatrol.scoreUnit') }}
-                              <span>
-                                <span>{{ categoryItem.itemgetScore }}</span>
-                                <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
-                              </span>
-                            </div>
-                          </template>
-                          <div v-if="categoryItem.showTotalScore" class="total-score">
-                            {{ $t('remotePatrol.totalScoreUnit') }}{{ categoryItem.itemScore }}
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        v-if="categoryItem.sourceList!= null && categoryItem.sourceList.length !== 0
-                        || categoryItem.inspectText != null&&categoryItem.inspectText !== ''"
-                        class="content-detail-main"
-                        style="padding-bottom: 20px;">
-                        <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                        <div v-if="categoryItem.inspectText!=null&&categoryItem.inspectText!=''" class="cdm-word">
-                          <span>{{ categoryItem.inspectText }}</span>
-                        </div>
-                        <div v-if="categoryItem.sourceList!=null&&categoryItem.sourceList.length!=0" class="cdm-pic">
-                          <div
-                            v-for="(sourceitem,sourceindex) in categoryItem.sourceList"
-                            :key="sourceindex"
-                            :height="imgHeight+'px'"
-                            class="source-details">
-                            <div v-if="sourceitem.mediaType==2" class="img-content">
-                              <el-image
-                                :src="sourceitem.src"
-                                :style="imageStyle"
-                                :preview-src-list="getImgList(sourceindex, categoryItem.sourceList)"
-                                class="imgLittle imgInner"/>
-                            </div>
-                            <div
-                              v-if="sourceitem.mediaType==1"
-                              class="img-content "
-                              @click="playCommentVideo(sourceitem,sourceindex)">
-                              <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                              <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div v-for="(child, childIndex) in _item.children" :key="childIndex">
-                      <div class="subcatergy-title">
-                        {{ child.groupName }}
-                      </div>
-                      <div v-for="(childItem, childIndex) in child.cateryItems" :key="childIndex" class="content-detail">
+        <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
+          <el-col v-if="item.data.length!=0">
+            <div class="item-header">
+              <!-- <i :class="item.iconSrc" class="iconfont icontemp"/> -->
+              <span class="title-lable">{{ item.itemTitleName }}</span>
+              <span style="float:right;" class="count-content"><span class="count">{{ item.itemCount }}</span>
+              <span class="blag">{{ $t('remotePatrol.unit') }}</span></span>
+            </div>
+            <div class="item-content">
+              <div style="margin-bottom:20px;">
+                <div v-for="(_item,_index) in item.data" :key="_index" class="content-detail">
+                  <template v-if="index !== 2" >
+                    <div class="content-title">{{ _item.groupName }}</div>
+                    <template v-if="!_item.children">
+                      <div v-for="(categoryItem,categoryIndex) in _item.cateryItems" :key="categoryIndex" class="content-detail">
                         <div class="content-detail-title">
                           <div class="detail-title">
-                            <p class="title1">{{ childIndex+1 }}.{{ childItem.subject }}</p>
-                            <p class="title2">{{ childItem.description }}</p>
+                            <p class="title1">{{ categoryIndex+1 }}.{{ categoryItem.subject }}</p>
+                            <p class="title2">{{ categoryItem.description }}</p>
                           </div>
-                          <div v-if="childItem.itemType === 0" class="score-title">
+                          <div v-if="categoryItem.itemType === 0" class="score-title">
                             <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
-                            <div
-                              v-if="(childItem.type === 0 ||childItem.type === 2)&&item.detailType !== 1"
-                              class="title-btn">
-                              {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
-                            </div>
-                            <div v-if="childItem.type==1&&item.detailType!=1" class="title-btn">
-                              {{ $t('remotePatrol.scoreUnit') }}
-                              <span>
-                                <span>{{ childItem.itemgetScore }}</span>
-                                <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}
+                            <template v-if="item.detailType !== 1">
+                              <div
+                                v-if="categoryItem.type === 0"
+                                class="title-btn">
+                                {{ $t('remotePatrol.scoreUnit') }}<span>{{ tab1BtnArr[1] }}</span>
+                              </div>
+                              <div
+                                v-if="categoryItem.type === 2"
+                                class="title-btn">
+                                {{ $t('remotePatrol.scoreUnit') }}<span>{{ tab3BtnArr[1] }}</span>
+                              </div>
+                              <div v-if="categoryItem.type === 1" class="title-btn">
+                                {{ $t('remotePatrol.scoreUnit') }}
+                                <span>
+                                  <span>{{ categoryItem.itemgetScore }}</span>
+                                  <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}</span>
                                 </span>
-                              </span>
-                            </div>
-                            <div v-if="childItem.showTotalScore" class="total-score">
-                              {{ $t('remotePatrol.totalScoreUnit') }}{{ childItem.itemScore }}
+                              </div>
+                            </template>
+                            <div v-if="categoryItem.showTotalScore" class="total-score">
+                              {{ $t('remotePatrol.totalScoreUnit') }}{{ categoryItem.itemScore }}
                             </div>
                           </div>
                         </div>
                         <div
-                          v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
-                          || childItem.inspectText != null&&childItem.inspectText !== ''"
+                          v-if="categoryItem.sourceList!= null && categoryItem.sourceList.length !== 0
+                          || categoryItem.inspectText != null&&categoryItem.inspectText !== ''"
                           class="content-detail-main"
                           style="padding-bottom: 20px;">
                           <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                          <div v-if="childItem.inspectText!=null&&childItem.inspectText!=''" class="cdm-word">
-                            <span>{{ childItem.inspectText }}</span>
+                          <div v-if="categoryItem.inspectText!=null&&categoryItem.inspectText!=''">
+                            <div class="cdm-word" v-for="(text, index) in categoryItem.inspectText.split('|')" :key="index">
+                              <span>{{ `${index+1}. ${text}` }}</span>
+                            </div>
                           </div>
-                          <div v-if="childItem.sourceList!=null&&childItem.sourceList.length!=0" class="cdm-pic">
+                          <div v-if="categoryItem.sourceList!=null&&categoryItem.sourceList.length!=0" class="cdm-pic">
                             <div
-                              v-for="(sourceitem,sourceindex) in childItem.sourceList"
+                              v-for="(sourceitem,sourceindex) in categoryItem.sourceList"
                               :key="sourceindex"
                               :height="imgHeight+'px'"
                               class="source-details">
@@ -215,44 +145,7 @@
                                 <el-image
                                   :src="sourceitem.src"
                                   :style="imageStyle"
-                                  :preview-src-list="getImgList(sourceindex, childItem.sourceList)"
-                                  class="imgLittle imgInner"/>
-                              </div>
-                              <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
-                                <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                                <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div
-                          v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
-                          class="content-detail-main"
-                          style="padding-bottom: 20px;">
-                          <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
-                          <div v-if="_item.showAudio" class="cdm-voice">
-                            <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
-                              <i class="iconfont icon-yuyin icon-speech"/>
-                            </div>
-                            <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
-                              <source :src="_item.audio.audioSrc" type="audio/mpeg" >
-                            </audio>
-                            <span class="often-text">{{ _item.audio.audioOftenText }}</span>
-                          </div>
-                          <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
-                            <span class="pdf_font_24">{{ _item.comment }}</span>
-                          </div>
-                          <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
-                            <div
-                              v-for="(sourceitem,sourceindex) in _item.sourceList"
-                              :key="sourceindex"
-                              :height="imgHeight+'px'"
-                              class="source-details">
-                              <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
-                                <el-image
-                                  :src="sourceitem.src"
-                                  :style="imageStyle"
-                                  :preview-src-list="getImgList(sourceindex, _item.sourceList)"
+                                  :preview-src-list="getImgList(sourceindex, categoryItem.sourceList)"
                                   class="imgLittle imgInner"/>
                               </div>
                               <div
@@ -260,74 +153,181 @@
                                 class="img-content "
                                 @click="playCommentVideo(sourceitem,sourceindex)">
                                 <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                                <img
-                                  :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
-                                  :src="videoImgSrc"
-                                  :height="imgHeight+'px'"
-                                  class="imgLittle">
+                                <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </template>
-                </template>
-                <template v-else>
-                  <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
-                    <div class="detail-title">
-                      <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
-                    </div>
-                  </div>
-                  <div v-if="_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
-                    <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
-                    <div v-if="_item.description!=null&&_item.description!=''" class="cdm-word">
-                      <span>{{ _item.description }}</span>
-                    </div>
-                    <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
-                      <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
-                        <div v-if="sourceitem.mediaType==2" class="img-content">
-                          <el-image
-                            :src="sourceitem.src"
-                            :style="imageStyle"
-                            :preview-src-list="getImgList(index, _item.sourceList)"
-                            class="imgLittle imgInner"/>
+                    </template>
+                    <template v-else>
+                      <div v-for="(child, childIndex) in _item.children" :key="childIndex">
+                        <div class="subcatergy-title">
+                          {{ child.groupName }}
                         </div>
-                        <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
-                          <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-                          <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                        <div v-for="(childItem, childIndex) in child.cateryItems" :key="childIndex" class="content-detail">
+                          <div class="content-detail-title">
+                            <div class="detail-title">
+                              <p class="title1">{{ childIndex+1 }}.{{ childItem.subject }}</p>
+                              <p class="title2">{{ childItem.description }}</p>
+                            </div>
+                            <div v-if="childItem.itemType === 0" class="score-title">
+                              <div v-if="item.detailType === 1" class="ignore-btn">{{ $t('remotePatrol.ignored') }}</div>
+                              <div
+                                v-if="(childItem.type === 0 ||childItem.type === 2)&&item.detailType !== 1"
+                                class="title-btn">
+                                {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                              </div>
+                              <div v-if="childItem.type==1&&item.detailType!=1" class="title-btn">
+                                {{ $t('remotePatrol.scoreUnit') }}
+                                <span>
+                                  <span>{{ childItem.itemgetScore }}</span>
+                                  <span v-if="lang !== 'en'">{{ $t('remotePatrol.scorecount') }}
+                                  </span>
+                                </span>
+                              </div>
+                              <div v-if="childItem.showTotalScore" class="total-score">
+                                {{ $t('remotePatrol.totalScoreUnit') }}{{ childItem.itemScore }}
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
+                            || childItem.inspectText != null&&childItem.inspectText !== ''"
+                            class="content-detail-main"
+                            style="padding-bottom: 20px;">
+                            <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
+                            <div v-if="childItem.inspectText!=null&&childItem.inspectText!=''">
+                              <div class="cdm-word" v-for="(text, index) in childItem.inspectText.split('|')" :key="index">
+                                <span>{{ `${index+1}. ${text}` }}</span>
+                              </div>
+                            </div>
+                            <div v-if="childItem.sourceList!=null&&childItem.sourceList.length!=0" class="cdm-pic">
+                              <div
+                                v-for="(sourceitem,sourceindex) in childItem.sourceList"
+                                :key="sourceindex"
+                                :height="imgHeight+'px'"
+                                class="source-details">
+                                <div v-if="sourceitem.mediaType==2" class="img-content">
+                                  <el-image
+                                    :src="sourceitem.src"
+                                    :style="imageStyle"
+                                    :preview-src-list="getImgList(sourceindex, childItem.sourceList)"
+                                    class="imgLittle imgInner"/>
+                                </div>
+                                <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,sourceindex)">
+                                  <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                                  <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            v-if="_item.showAttachment || _item.comment != null && _item.comment !== ''"
+                            class="content-detail-main"
+                            style="padding-bottom: 20px;">
+                            <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
+                            <div v-if="_item.showAudio" class="cdm-voice">
+                              <div :class="isexportPDF ? 'pdf_speech_info' : 'speech-info'" @click="startSpeechItem(_item,_index)">
+                                <i class="iconfont icon-yuyin icon-speech"/>
+                              </div>
+                              <audio :ref="_item.audio.audioRef" @canplay="getGroupsDuration(_item)">
+                                <source :src="_item.audio.audioSrc" type="audio/mpeg" >
+                              </audio>
+                              <span class="often-text">{{ _item.audio.audioOftenText }}</span>
+                            </div>
+                            <div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">
+                              <span class="pdf_font_24">{{ _item.comment }}</span>
+                            </div>
+                            <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
+                              <div
+                                v-for="(sourceitem,sourceindex) in _item.sourceList"
+                                :key="sourceindex"
+                                :height="imgHeight+'px'"
+                                class="source-details">
+                                <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
+                                  <el-image
+                                    :src="sourceitem.src"
+                                    :style="imageStyle"
+                                    :preview-src-list="getImgList(sourceindex, _item.sourceList)"
+                                    class="imgLittle imgInner"/>
+                                </div>
+                                <div
+                                  v-if="sourceitem.mediaType==1"
+                                  class="img-content "
+                                  @click="playCommentVideo(sourceitem,sourceindex)">
+                                  <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                                  <img
+                                    :style="isexportPDF ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                                    :src="videoImgSrc"
+                                    :height="imgHeight+'px'"
+                                    class="imgLittle">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </template>
+                  <template v-else>
+                    <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
+                      <div class="detail-title">
+                        <p class="title1">{{ _index+1 }}.{{ _item.subject }}</p>
+                      </div>
+                    </div>
+                    <div v-if="_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
+                      <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
+                      <div v-if="_item.description!=null&&_item.description!=''" >
+                        <div v-for="(text, index) in _item.description.split('|')" :key="index" class="cdm-word">
+                          <span>{{ `${index+1}. ${text}` }}</span>
+                        </div>
+                      </div>
+                      <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
+                        <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
+                          <div v-if="sourceitem.mediaType==2" class="img-content">
+                            <el-image
+                              :src="sourceitem.src"
+                              :style="imageStyle"
+                              :preview-src-list="getImgList(index, _item.sourceList)"
+                              class="imgLittle imgInner"/>
+                          </div>
+                          <div v-if="sourceitem.mediaType==1" class="img-content " @click="playCommentVideo(sourceitem,index)">
+                            <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                            <img :src="videoImgSrc" :height="imgHeight+'px'" class="imgLittle">
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </template>
-              </div>
-            </div>
-            <el-dialog
-              v-if="dialogCommentVideo"
-              :title="$t('eventView.view')"
-              :visible.sync="dialogCommentVideo"
-              :close-on-click-modal="false"
-              width="850px"
-              top="12%"
-              class="rate-video-dialog"
-              @close="stopCommentVideo">
-              <div class="video-dialog-content" style="overflow:hidden;">
-                <hr class="dialog-hr">
-                <div class="video-content" >
-                  <video
-                    id="previewVideo"
-                    height="83%"
-                    width="90%"
-                    prload
-                    controls
-                    class="video-js vjs-fill"/>
+                  </template>
                 </div>
               </div>
-            </el-dialog>
-          </div>
-        </el-col>
-      </el-row>
+              <el-dialog
+                v-if="dialogCommentVideo"
+                :title="$t('eventView.view')"
+                :visible.sync="dialogCommentVideo"
+                :close-on-click-modal="false"
+                width="850px"
+                top="12%"
+                class="rate-video-dialog"
+                @close="stopCommentVideo">
+                <div class="video-dialog-content" style="overflow:hidden;">
+                  <hr class="dialog-hr">
+                  <div class="video-content" >
+                    <video
+                      id="previewVideo"
+                      height="83%"
+                      width="90%"
+                      prload
+                      controls
+                      class="video-js vjs-fill"/>
+                  </div>
+                </div>
+              </el-dialog>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
     </el-col>
     <el-dialog :visible.sync="uploadProgress" :close-on-click-modal="false" width="510px" top="35vh" left="40vh" class="AddSumupLoad">
       <div class="body-content">
@@ -639,9 +639,17 @@ export default {
         obj.storeId = self.store.storeId;
 
         obj.subject = self.eventList[i].eventName;
-        obj.description = self.eventList[i].eventDes;
-
+        // obj.description = self.eventList[i].eventDes;
         const commentTemp = [];
+        if (self.eventList[i].eventDes.trim().length > 0) {
+          let arr = self.eventList[i].eventDes.trim().split('|')
+          arr.forEach(item => {
+            let obj = {};
+            obj.mediaType = 3;
+            obj.url = item;
+            commentTemp.push(obj);
+          })
+        }
         if (self.eventList[i].sourceObj != null) { // 通过通道创建的反馈问题
           await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
             self.uploadingnumOfPic++;
@@ -1301,24 +1309,18 @@ export default {
     @include point(min-height,360);
   }
   .activeClass{
-    background-color: #FDE8EF !important;
-    color: $red;
-    border-color: $red !important;
+    background-color: #006ab7 !important;
+    color: #fff;
+    border-color: #fff !important;
   }
   .sum-content{
     color: $black;
     .sum-submit{
       margin-bottom: 30px;
       text-align: left;
-      padding-left: calc(30/1920*100vw);
-      padding-right: calc(40/1920*100vw);
-      border: 1px solid $border;
-      padding-bottom: 30px;
-      background-color: #fff;
+      padding: 20px;;
       .submit-header{
         text-align: left;
-        height: 60px;
-        line-height: 60px;
         overflow: hidden;
         span{
           font-size: calc(20/1920*100vw);
@@ -1327,7 +1329,6 @@ export default {
         }
         .sum-btn{
           float: right;
-          margin-top: 18px;
           height: calc(36/1920*100vw);
           width: calc(130/1920*100vw);
           line-height: calc(36/1920*100vw);
@@ -1338,7 +1339,6 @@ export default {
         }
       }
       .submit-content{
-        padding-left: calc(10/1920*100vw);
         .submit-radio{
           text-align: left;
           margin-bottom: calc(20/1920*100vw);
@@ -1369,16 +1369,17 @@ export default {
         }
         .sug-input{
           width: 99.5%;
+          >>> textarea {
+            background-color: #f4f6f7;
+            border: none;
+          }
         }
       }
 
     }
     .sum-data{
-      padding: calc(40/1920*100vw);
-      border: 1px solid $border;
-      padding-top: 20px;
-      padding-bottom: 20px;
-      background-color: #fff;
+      padding: 20px;
+      background-color:#edf0f2;
       min-height: calc(500/1920*100vw);
       .divider-content{
         height: 40px;
@@ -1396,10 +1397,8 @@ export default {
       }
       .table-content{
         .table-header{
-          padding-bottom: 20px;
           font-weight: bold;
           .header-store-name{
-            float: left;
             font-size: calc(16/1920*100vw);
             color: $tab;
             .store-name{
@@ -1411,7 +1410,6 @@ export default {
             }
           }
           .header-score{
-            float: right;
             .span-1{
               font-size: calc(16/1920*100vw);
               color: $black;
@@ -1453,13 +1451,11 @@ export default {
           }
           .count-blag{
             padding: 2px 12px;
-            width: auto;
-            height: auto;
             border-radius: 10px;
-            background-color: #D4DBE5;
-            color: $tab;
+            background-color: #edf8f9;
+            color: #006ab7;
             font-size: 12px;
-            margin-right: calc(20/1920*100vw);
+            margin-right: 20px;
             float:right;
           }
           .icon-blag{
@@ -1726,7 +1722,7 @@ export default {
     color: $black;
     margin-top: 4px;
   }
-
+  
 </style>
 <style>
   .AddSumupLoad .el-dialog__header{

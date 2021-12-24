@@ -3115,7 +3115,7 @@ export default {
     pointer-events: none;
   }
   .el-container{
-    background-color: $background;
+    // background-color: $background;
     .spreadLsideClass{
       width: 98%;
     }
@@ -4479,11 +4479,6 @@ export default {
       background-color: $background !important;
     }
   }
-  .paper {
-    border-radius: 5px;
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-  }
 
   // .el-select >>> .el-input__inner{
   //   background-color: #edf0f2;
@@ -4678,53 +4673,6 @@ export default {
       background-color: #006ab7;
       color: #fff;
     }
-  }
-  .flex {
-    display: flex;
-  }
-  .flex-center {
-    display: flex;
-    align-items: center;
-  }
-  .block {
-    display: block;
-  }
-  .fullWidth {
-    width: 100%;
-  }
-  .padding {
-    padding: 20px
-  }
-  .margin-bottom-top-sm {
-    margin-top: 10px;
-    margin-bottom: 10px
-  }
-  .margin-bottom-sm {
-    margin-bottom: 10px
-  }
-  .margin-bottom-md {
-    margin-bottom: 20px
-  }
-  .font-size-sm {
-    font-size: 12px;
-  }
-  .font-size-md {
-    font-size: 15px;
-  }
-  .vertical-hr {    
-    margin: 0;
-    -webkit-flex-shrink: 0;
-    -ms-flex-negative: 0;
-    flex-shrink: 0;
-    border-width: 0;
-    border-style: solid;
-    border-color: #e6e6e6;
-    border-bottom-width: 0;
-    height: auto;
-    border-right-width: thin;
-    -webkit-align-self: stretch;
-    -ms-flex-item-align: stretch;
-    align-self: stretch;
   }
   .color-qualified {
     background-color: #edf6e8;

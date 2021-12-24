@@ -12,10 +12,21 @@
             </el-select>
         </div>
           <div class="type-pick">
-            <el-select v-bind:disabled='layer1=="all"' style="width:300px"
+            <el-select v-bind:disabled='layer1=="all"' style="width:250px"
              class="dropdown-select" v-model="layer2" value-key="value"  @change="changeLayer2">
                 <el-option 
                   v-for="item in layer2List"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+            </el-select>
+        </div>
+          <div v-if="showItems" class="type-pick">
+            <el-select v-bind:disabled='layer2=="all"' style="width:250px"
+             class="dropdown-select" v-model="selectedItem" value-key="value"  @change="changeItem">
+                <el-option 
+                  v-for="item in itemList"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -59,7 +70,9 @@ export default {
             layer2List:[{value:'all',label:this.$t('eventView.all')}],
             itemList:[{value:'all',label:this.$t('eventView.all')}],
             selectedItem:'',
+            curItem:null,
             selAllString:this.$t('eventView.all'),
+            showItems:false,
         }
   },
   created() {
@@ -83,6 +96,7 @@ export default {
     getLayer1List(list){
       let layer1List =[];
       let layer2List =[{value:'all',label:this.$t('eventView.all')}];
+      let showItems = false;
       if(list){
 
         list.forEach(item => {
@@ -92,42 +106,87 @@ export default {
           this.curLayer1=list[0];
           this.layer1 = list[0].id;
           this.curLayer1.items.forEach(subitem => {
-              layer2List.push({label:subitem.subject,value:subitem.id})
+              if(subitem.subject){
+                layer2List.push({label:subitem.subject,value:subitem.id})
+              }
+              else{
+                showItems = true;
+                layer2List.push({label:subitem.name,value:subitem.id})
+              }   
           });
         }
       }
-
+      this.showItems= showItems;
       this.layer2 = 'all'
-      this.curLayer2 = null;
       this.selectedItem = 'all'
-      this.layer2List =layer2List;
+      this.layer2List = layer2List;
+      this.itemList =[{value:'all',label:this.$t('eventView.all')}];
       this.layer1List = layer1List;
       this.notifyItemChanged();
+    },
+    getIds(item){
+        const self =this;
+        let list = [];
+        if(item.items){
+           item.items.forEach(function(d){
+             let o =  self.getIds(d);
+             list = list.concat(o);
+           })
+           return list;
+        }
+        else{
+          
+          return [item.id]
+        }
+
+    },
+    getScore(item){
+       const self =this;
+        if(item.items){
+           let qualifiedScore = 0;
+           item.items.forEach(function(d){
+             qualifiedScore += self.getScore(d);
+           })
+           return qualifiedScore;
+        }
+        else{
+          return item.qualifiedScore;
+        }
     },
     changeLayer1(e){
       console.log("Change Layer1 to="+e)
       this.curLayer1=null;
       let layer2List =[{value:'all',label:this.$t('eventView.all')}];
+      let showItems = false;
       if(this.inspectItemList){
         this.inspectItemList.forEach(item => {
           if(item.id == e){
             this.curLayer1 = item;
             item.items.forEach(subitem => {
-              layer2List.push({label:subitem.subject,value:subitem.id})
+              if(subitem.subject){
+                layer2List.push({label:subitem.subject,value:subitem.id})
+              }
+              else{
+                showItems = true;
+                layer2List.push({label:subitem.name,value:subitem.id})
+              }   
             });
           }
               
         });
       
       }
+      this.showItems= showItems;
       this.layer1 =e;
       this.layer2 = 'all'
       this.selectedItem = 'all'
       this.layer2List = layer2List;
+      this.itemList =[{value:'all',label:this.$t('eventView.all')}];
       this.notifyItemChanged();
     },
     changeLayer2(e){
       this.layer2 = e;
+      let itemList =[{value:'all',label:this.$t('eventView.all')}];
       if(e=='all'){
           this.curLayer2 =null;
       }
@@ -136,11 +195,22 @@ export default {
         this.curLayer1.items.forEach(subitem => {
           if(subitem.id == e){
             this.curLayer2 = subitem;
-            console.log("Change layer2");
-            console.log(this.curLayer2)
+              if(this.curLayer2 && this.curLayer2.items){
+               this.showItems= true;
+               this.curLayer2.items.forEach(subitem => {
+                itemList.push({label:subitem.subject,value:subitem.id})
+              });
+
+            }
+            else{
+              this.showItems=false;
+            }
           }
         });
       }
+      this.itemList=itemList;
+      this.curItem =null;
+      this.selectedItem = 'all'
       this.notifyItemChanged();
 
     },
@@ -150,6 +220,10 @@ export default {
     notifyItemChanged(){
        console.log("NOtify changed")
        let item = this.curLayer2?this.curLayer2:this.curLayer1;
+       let ids = this.getIds(item)
+       console.log(ids)
+       item.ids = ids;
+       item.qualifiedScore = this.getScore(item);
        this.$emit("emitItemChanged",{item});
     }
   }
