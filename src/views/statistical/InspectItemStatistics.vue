@@ -1818,10 +1818,12 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
+      let max = 0;
       if(this.part3.content){
         let totalAvgScore = 0;
         this.part3.content.map((item,index) => {
           let value = item.averageScore;
+          if(value>max)max = value;
           totalAvgScore += value;
           if(this.part3.indexRegion<0 && value>0){
             this.part3.indexRegion = index;
@@ -1858,7 +1860,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-      option.yAxis[0].name  =  this.$t('statistics.score'),
+      option.yAxis[0].name  =  this.$t('statistics.score')
+      if( this.inspectItem.item.qualifiedScore && this.inspectItem.item.qualifiedScore>0){
+          option.yAxis[0].max = this.inspectItem.item.qualifiedScore;
+      }
+      else{
+        option.yAxis[0].max = max
+      }
+    
       this.part3.barRegionOption = option;
       console.log(option)
       await this.getPart3StoreBar();
@@ -1871,7 +1880,7 @@ export default {
       console.log("getPart3StoreBarXX")
       console.log(this.part3.content[this.part3.indexRegion])
       let content = [];
-      
+      let max =0 ;
       if(this.part3.content && this.part3.content[this.part3.indexRegion]){
         if(this.part3.compareType == 'stores'){
             console.log("To Store Type")
@@ -1909,6 +1918,7 @@ export default {
           item.compareTrend = this.$t('statistics.check');
           if(item.code=='')item.code='- -'
           let value = item.averageScore;
+          if(value>max)max=value;
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
@@ -1919,7 +1929,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-      option.yAxis[0].name  =  this.$t('statistics.score'),
+      option.yAxis[0].name  =  this.$t('statistics.score');
+      if( this.inspectItem.item.qualifiedScore && this.inspectItem.item.qualifiedScore>0){
+          option.yAxis[0].max = this.inspectItem.item.qualifiedScore;
+      }
+      else{
+        option.yAxis[0].max = max
+      }
+      
       this.part3.barStoreOption = option;
       console.log(this.part3.barStoreOption)
     },
