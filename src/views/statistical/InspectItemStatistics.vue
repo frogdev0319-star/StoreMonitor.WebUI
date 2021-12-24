@@ -682,7 +682,7 @@ export default {
           'maxWidth': '180'
         },
         {
-          'prop': 'standardRate',
+          'prop': 'averageScore',
           'label': this.$t('statistics.sRate'),
           'sortable': 'custom',
           'pdfwidth': '12%',
@@ -1789,7 +1789,7 @@ export default {
          params.groupMode = 3;
       }
       if(this.inspectItem){
-        params.itemIds = [this.inspectItem.item.id]
+        params.itemIds = this.inspectItem.item.ids
       }
       let totalReport = 0;
       let totalStandard = 0;
@@ -1828,7 +1828,7 @@ export default {
       if(this.part3.content){
         console.log(this.part3.content)
         this.part3.content.map((item,index) => {
-          let value = item.standardRate;
+          let value = item.averageScore;
           if(this.part3.indexRegion<0 && value>0){
             this.part3.indexRegion = index;
           }
@@ -1870,23 +1870,32 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log("getPart3StoreBar")
+      console.log("getPart3StoreBarXX")
+      console.log(this.part3.content[this.part3.indexRegion])
       let content = [];
+      
       if(this.part3.content && this.part3.content[this.part3.indexRegion]){
         if(this.part3.compareType == 'stores'){
+            console.log("To Store Type")
             content =[this.part3.content[this.part3.indexRegion]];
         }
         else{
+            console.log("To Get Data")
             const params = {};
             params.beginTs = self.params.beginTs;
             params.endTs = self.params.endTs;
             params.groupMode = 0;
+            console.log("To Get Data")
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
+            params.groupIds = this.part3.content[this.part3.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
+            
             if(this.inspectItem){
-              params.itemIds = [this.inspectItem.item.id]
+              params.itemIds =this.inspectItem.item.ids
             }
+            console.log(params)
             const storeResult = await this.getInspectStatsItemOverGroup(params);
+            console.log(storeResult)
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
@@ -1897,16 +1906,11 @@ export default {
         }
         
 
-        content.map((item,index) => {
-          item.rank = parseInt(index)+1;
-          item.compareTrend = this.$t('statistics.check'),
-          item.storeGroup = item.storeRegion.toString();
-          item.storeType = item.storeBranchType.toString();
-          item.storeSubmitters = item.submitters.toString();
+      content.map((item,index) => {
+          item.rank = this.rankByAverageScore;
+          item.compareTrend = this.$t('statistics.check');
           if(item.code=='')item.code='- -'
-          if(item.storeGroup=='')item.storeGroup='- -'
-          if(item.storeType=='')item.storeType='- -'
-          let value = item.standardRate;
+          let value = item.averageScore;
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
@@ -1919,6 +1923,7 @@ export default {
       option.xAxis.data = regionLabel;
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part3.barStoreOption = option;
+      console.log(this.part3.barStoreOption)
     },
     getRegionPieOption() {
       const pieOption = {
@@ -2042,7 +2047,22 @@ export default {
           console.log("Change ")
           let result  = await  this.getInspectItemList(searchParams.inspectId)
           if(result.errCode==0 && result.data){
-            this.inspectItemList = result.data;
+            let tempList = [];
+            result.data.forEach(function(item){
+                if(item.parentId == -1){
+                  tempList.push(item);
+                }
+            })
+            result.data.forEach(function(item){
+                tempList.forEach(function(subitem){
+                    if(item.parentId == subitem.id){
+                      subitem.items.push(item);
+                    }
+                });
+
+            })
+            this.inspectItemList = tempList ;
+
             this.curInspectId = searchParams.inspectId
             console.log(this.inspectItemList);
           }
@@ -2178,9 +2198,9 @@ export default {
           if(inspectSet[0].value!=null){
             this.part3.standardScore =inspectSet[0].value
             this.part2.standardScore =inspectSet[0].value
-           // this.standardRate =inspectSet[0].value;
+           // this.averageScore =inspectSet[0].value;
           }else{
-            this.standardRate = "- -";
+            this.averageScore = "- -";
           }
         }
       }
