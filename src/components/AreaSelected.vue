@@ -398,6 +398,7 @@ export default {
         storeId=this.doGetStoreIdsByCity(selectedArray);
         //console.log("storeId:",storeId);
       }
+      
       this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeId,selectedLabels});
       //this.changeStoreNew(arr);
     },
