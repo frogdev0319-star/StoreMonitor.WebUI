@@ -205,7 +205,7 @@ export default {
 .date-picker{
   width:calc(207/1440*100vw);
   font-size: 15px;
-  line-height: 36px;
+  line-height: 35px;
 }
 .global-date-pick.el-range-editor--mini.el-input__inner {
   border:none;

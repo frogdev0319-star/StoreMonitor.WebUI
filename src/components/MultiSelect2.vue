@@ -1,16 +1,15 @@
 <template>
-  <div class="muti-select-content">
+  <div class="content">
     <el-select
       v-model="selectedArray"
       :placeholder="placeholder"
       :disabled="disabled"
       multiple
       :taggable="false"
-      class="dropdown-select" 
       clearOnSelect="false"
       @change="changeSelect"
       @visible-change="visibileHandler">
-      <el-option v-if="options.length > 0 && all!=''" :label="$t('remotePatrol.all')"
+      <el-option v-if="options.length > 0 && all!=''" :label="all"
                  value="-1" @click.native="selectAll"/>
       <el-option v-for="(item, index) in options" :key="index" :label="item.label"
                  :value="compareType === 'stores' ? item.storeId:item.value" :disabled="item.disabled"/>
@@ -110,53 +109,42 @@ export default {
           self.disabledLength++;
         }
       });
-      //console.log("this.alltype:",this.alltype);
-      //console.log("this.selectedArray:",this.selectedArray);
-      /*if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
-        this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
+      if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
+        this.input = this.all;
         if (this.allSelect != 0) {
           this.selectedArray.unshift('-1');
         }
       } else if (this.selectedArray.includes('-1')) {
-        this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
-      }*/
-      if(this.selectedArray.includes('-1')){
-           this.input = this.all;
-          this.allDisabled = false;
-      }
-      else if (!this.selectedArray.includes('-1') && this.selectedArray.length === this.options.length - this.disabledLength) {
-        if (this.options.length === this.disabledLength) {
-          this.input = '';
-          this.allDisabled = true;
-        } else {
-          this.input = this.all;
-          this.selectedArray.unshift('-1');
-        }
-      } 
-      else {
+        this.input = this.all;
+      } else {
         this.input = '';
         this.selectedArray.forEach(item => {
           this.options.forEach(_item => {
-            
-              if (item === _item.storeId || item==_item.value) {
+            if (this.alltype == 0) {
+              if (item === _item.value) {
                 this.input += _item.label + ',';
               }
-            
+            } else {
+              if (item === _item.storeId) {
+                this.input += _item.label + ',';
+              }
+            }
           });
         });
         this.input = this.input.slice(0, this.input.length - 1);
-        //console.log("3.this.selectedArray:",this.selectedArray);
       }
       if (this.options.length === 0) {
         this.input = '';
         this.selectedArray = [];
       }
     },
-
+    
     changeSelect(val) {
       this.changed = true;
+      var emitArray = [];
+      //console.log("val:",val);
       if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
-        this.input = this.alltype == 0 ? this.$t('remotePatrol.all') : this.$t('overview.all');
+        this.input = this.all;
         this.selectedArray.unshift('-1');
       } else if (val.includes('-1') && (val.length - 1) < this.options.length) {
         this.selectedArray = this.selectedArray.filter((item) => {
@@ -165,41 +153,7 @@ export default {
         this.input = '';
         this.selectedArray.forEach(item => {
           this.options.forEach(_item => {
-            if (this.compareType == 'area1' || this.compareType == 'area2') {
-              if (item === _item.value) {
-                this.input += _item.label + ',';
-              }
-              emitArray = this.selectedArray;
-            } else if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
-              if (item === _item.value) {
-                this.input += _item.label + ',';
-                /*console.log("_item.contents:",_item.storeIds);
-                if(_item.storeIds.length>0)
-                {emitArray = emitArray.concat(_item.storeIds);}
-                console.log("emitArray:",emitArray);*/
-                emitArray = this.selectedArray;
-              }
-            }else {
-              if (item === _item.storeId) {
-                this.input += _item.label + ',';
-              }
-              emitArray = this.selectedArray;
-            }
-          });
-        });
-        this.input = this.input.slice(0, this.input.length - 1);
-      } else {
-        this.input = '';
-        console.log("!!changeSelect:",val);
-        var emitArray=[];
-        this.selectedArray.forEach(item => {
-          this.options.forEach(_item => {
-            if (this.compareType == 'area1' || this.compareType == 'area2') {
-              if (item === _item.value) {
-                this.input += _item.label + ',';
-              }
-              emitArray = this.selectedArray;
-            } else if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
+            if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
               if (item === _item.value) {
                 this.input += _item.label + ',';
                 console.log("_item.contents:",_item.storeIds);
@@ -207,7 +161,7 @@ export default {
                 {
                   emitArray = emitArray.concat(_item.storeIds);
                 }
-                console.log("emitArray:",emitArray);
+                //console.log("emitArray:",emitArray);
                 //emitArray = this.selectedArray;
               }
             }else {
@@ -218,19 +172,63 @@ export default {
             }
           });
         });
-        
-        }
-      this.input = this.input.slice(0, this.input.length - 1);
-      console.log("this.selectedArray:",this.selectedArray);
-      const params = {selectedArray:this.selectedArray,storeIds:emitArray,selectedLabels:(this.input==""?[]:this.input.split(','))};
-      this.$emit('changeInput', params);
+        this.input = this.input.slice(0, this.input.length - 1);
+        /*const params = {selectedArray:this.selectedArray,storeIds:emitArray,selectedLabels:(this.input==""?[]:this.input.split(','))};
+        this.$emit('changeInput', params);*/
+      } else {
+        this.input = '';
+        this.selectedArray.forEach(item => {
+          this.options.forEach(_item => {
+            if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
+              if (item === _item.value) {
+                this.input += _item.label + ',';
+                console.log("_item.contents:",_item.storeIds);
+                if(_item.storeIds.length>0)
+                {
+                  emitArray = emitArray.concat(_item.storeIds);
+                }
+                //console.log("emitArray:",emitArray);
+                //emitArray = this.selectedArray;
+              }
+            }else {
+              if (item === _item.value) {
+                this.input += _item.label + ',';
+              }
+              emitArray = this.selectedArray;
+            }
+          });
+        });
+        this.input = this.input.slice(0, this.input.length - 1);
+        /*console.log("**input:",this.input);
+        const params = {selectedArray:this.selectedArray,storeIds:emitArray,selectedLabels:(this.input==""?[]:this.input.split(','))};
+        this.$emit('changeInput', params);*/
+      }
+      
     },
-
     visibileHandler(val) {
       if (!val && this.changed) {
+        //console.log("visibileHandler");
         let selectedList = [];
+        let emitStoreIds = []
+        this.selectedArray.forEach(item => {
+          this.options.forEach(_item => {
+            if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
+              if (item === _item.value) {
+                //console.log("_item.contents:",_item.storeIds);
+                if(_item.storeIds.length>0)
+                {
+                  emitStoreIds = emitArray.concat(_item.storeIds);
+                }
+                //console.log("emitStoreIds:",emitStoreIds);
+              }
+            }else {
+              emitStoreIds = this.selectedArray;
+            }
+          });
+        });
         selectedList = this.selectedArray;
-        //this.$emit('changeInput', selectedList);
+        const params = {selectedArray:selectedList,storeIds:emitStoreIds,selectedLabels:(this.input==""?[]:this.input.split(','))};
+        this.$emit('changeInput', params);
         this.changed = false;
       }
     },
@@ -260,28 +258,14 @@ export default {
     margin: 0;
     box-sizing: border-box;
   }
-  .muti-select-content{
+  .content{
     text-align: left;
     display: inline-block;
     position: relative;
-    width: calc(160/1920*100vw);
-    height: 25px;
-    margin-left:16px;
+    /*top: calc(2/1920*100vw);*/
+    width: 100%;
+    margin-right: calc(15/1920*100vw);
   }
-  /*.dropdown-select{
-            width:134px;
-            height:25px;
-            border:1px solid #f7f9fa;
-            color: #2b2b2b;
-            align-self: center;
-            align-items: center;
-            margin-left:7px;
-        }
-  .el-select-dropdown.is-multiple .el-select-dropdown__item span{
-    
-      left:20px;
-    
-  }*/
   .el-select-dropdown__item{
     padding: 0 20px 0 50px !important;
     /*color: #7d8cad;*/
@@ -289,44 +273,60 @@ export default {
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
     font-family: "iconfont" !important;
     content: '\e6a2';
-    left: 10px;
-    font-size: 13px;
-    font-style: normal;
+    left: 20px;
+    font-size: 14px;
     color: #2c90d9;
+    font-style: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item::after{
     font-family: "iconfont" !important;
     position: absolute;
-    left: 10px;
+    left: 20px;
     content: "\e64a";
-    font-weight: normal;
-    color: #2c90d9;
+    font-weight: 700;
     -webkit-font-smoothing: antialiased;
-    font-size: 13px;
+    font-size: 14px;
+    color: #2c90d9;
     font-style: normal;
     -moz-osx-font-smoothing: grayscale;
   }
   .input-class2{
-    width: 100%;
+    height:35px;
+    width: calc(160/1920*100vw - 30px);
     position: absolute;
+    top: 0;
     left: 0;
   }
   >>> .el-select__tags{
     opacity: 0;
   }
+  .el-province >>> .el-input--mini .el-input__inner{
+    height: 28px;
+    line-height: 27px;
+    border-radius: 0 !important;
+  }
   >>> .input-class2.el-input--medium .el-input__inner{
-    height: calc(35/1920*100vw);
-    line-height: calc(35/1920*100vw);
+    height: 35px;
+    line-height: 28px;
+    border: none;
     color: #2b2b2b;
-    background-color: #f7f9f9 !important;
-    border:none;
+    background: #f7f9f9;
+    padding: 0 10px;
+    font-size: 12px;
+    min-height: 28px;
+    min-width: 55px;
+    text-overflow: ellipsis;
+  }
+  >>> .input-class2.el-input--mini .el-input__inner{
+    height: 35px;
+    line-height: 28px;
+    border: none;
+    color: #2b2b2b;
+    background: #f7f9f9 ;
     padding: 0 10px;
     font-size: 13px;
-    min-width: 55px;
-    min-height: 28px;
-    text-overflow: ellipsis;
   }
   >>> .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
@@ -334,44 +334,58 @@ export default {
     background: transparent !important;
     border: none;
     font-size: 13px;
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
+    height: 35px;
+    line-height: 28px;
     bottom: calc(2/1920*100vw);
     min-height: 28px;
     min-width: 85px;
   }
-  >>> .el-select.el-select--medium .el-input .el-input__suffix-inner{
+  >>> .el-select.el-select--mini .el-input .el-input__inner{
+    position: relative;
+    z-index: 1;
+    background: transparent !important;
+    border: none;
+    font-size: 13px;
+    height: 35px;
+    line-height: 28px;
+  }
+  >>> .el-select.el-select--mini .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
   >>> .el-input--medium .el-input__icon {
-    height: 30px;
-    min-height: 28px;
-    color: #2c90d9;
+    line-height: 28px;
+    height: 28px;
+  }
+  .el-province >>> .el-input--mini .el-input__icon {
+    line-height: 28px;
+    height: 28px;
   }
   .el-select.el-select--medium{
-    color: #2b2b2b;
-    background: #f7f9f9 !important;
+    color: #7d8cad;
+    background-color: #f7f9f9 !important;
     height: 35px;
-    line-height: 35px;
+    line-height: 28px;
     border: none !important;
     width: 100%;
-    min-height: 35px;
+    border-radius: 3px;
+    min-height: 28px;
     min-width: 85px;
   }
-  
+  .el-select.el-select--mini{
+    color: #fff;
+    background: #f7f9f9 !important;
+    height: 35px;
+    line-height: 28px;
+    width: 100%;
+    border-radius: 0;
+  }
 </style>
 <style>
   @import '../assets/css/pagination.css';
-    .el-select-dropdown.is-multiple .el-select-dropdown__item span{
-        padding-left:30px;
-    }
-   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{
-      color: #7d8cad;
-      font-weight: normal;
-   }
-  el-select-dropdown__item.hover, .el-select-dropdown__item:hover {
-    background-color: #FEE4E7;
+  .el-select-dropdown.is-multiple .el-select-dropdown__item.selected span{
+    color: #7d8cad;
+    font-weight: normal;
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected.hover {
     background-color: #FEE4E7;

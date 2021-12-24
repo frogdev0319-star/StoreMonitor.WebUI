@@ -81,7 +81,6 @@ export default {
 .content{
     width:307px;
     height:35px;
-    margin-top: 17px;
     display:flex;
     flex-direction:row;
     background-color:#f7f9fa;

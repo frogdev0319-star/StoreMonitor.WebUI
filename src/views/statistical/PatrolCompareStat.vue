@@ -29,7 +29,8 @@
                       path="inspectEvalutionStatistics"
                       :cached-params="params"
                       :cur-country="curCountry"
-                      limit-num="2"
+                      :limit-num="2"
+                      :allow-all="false"
                       @emitTypeChanged="emitTypeChanged"
                     ></AreaSelected>
                   </div>
@@ -82,7 +83,8 @@
                     <AreaSelected
                       :cached-params="params"
                       :cur-country="curCountry"
-                      limit-num="2"
+                      :limit-num="2"
+                      :allow-all="false"
                       @emitTypeChanged="emitTypeChanged2"
                     ></AreaSelected>
                   </div>
@@ -321,7 +323,7 @@ export default {
       this.avgChartOption = this.getAverageBarchartOption();
       //console.log("this.comapareLabels:",this.comapareLabels);
       //console.log("this.compareIds:",this.compareIds);
-      
+      console.log("this.compareIds:",this.compareIds);
       if(this.comapareLabels.length>0 && this.inspectId!=-1){
         let Average12;
         if(region[0].value<3){ //store, area1, area2
@@ -434,7 +436,7 @@ export default {
       this.Ass12Num = [];
       this.AssChartOption = this.getAverageBarchartOption();
       //console.log("this.comapareLabels2:",this.comapareLabels2);
-      //console.log("this.compareIds2:",this.compareIds2);
+      
       
       if(this.comapareLabels2.length>0 && this.inspectId!=-1){
         let Assessment;
