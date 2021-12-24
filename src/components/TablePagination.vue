@@ -40,6 +40,9 @@
           <template v-if="_item.canEdit && row.isEditing">
             <el-input v-model="row.tempDeviceName" class="edit-input" size="small" @input="val => inputDeviceNameChange(val, row)"/>
           </template>
+          <template v-else-if="_item.isCellClick">
+            <span style="cursor:pointer;color:#006ab7;font-size:15px;" @click="cellClick(row)">{{ row[_item.prop]}}</span>
+          </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row[_item.prop])"/>
           <template v-else>
             <template v-if="isDevice && _index < 3">
@@ -364,6 +367,9 @@ export default {
     inputDeviceNameChange(val, row) {
       const comment = filterString.all(val, 30);
       row.tempDeviceName = comment;
+    },
+    cellClick(row){
+      this.$emit('onCellClick',row);
     }
 
   }

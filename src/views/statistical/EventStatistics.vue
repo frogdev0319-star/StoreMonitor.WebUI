@@ -774,7 +774,7 @@ export default {
           'width': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
-          'isExpand':true
+          'isExpand':true,
         }
         ],
         table_data:[],
@@ -873,7 +873,12 @@ export default {
     },
     emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
       this.compareType = compareType;
-      this.compareIds = compareArr;
+      //this.compareIds = compareArr;
+      console.log("compareArr :",compareArr);
+      console.log("compareArr.includ :",compareArr.includes('-1'));
+      if(compareArr.includes("-1")){
+        this.compareIds2 = compareArr.shift();
+        }
       this.comapareLabels = selectedLabels;
       this.getAllEventData();
       this.getEventTableData();
@@ -1207,7 +1212,12 @@ export default {
     emitTypeChanged2({compareType,compareArr,selectedLabels}){ //劃分類型選擇
       this.showInvolveTableArea = false;
       this.compareType2 = compareType;
-      this.compareIds2 = compareArr;
+      //this.compareIds2 = compareArr;
+      console.log("compareArr :",compareArr);
+      console.log("compareArr.includ :",compareArr.includes('-1'));
+      if(compareArr.includes("-1")){
+        this.compareIds2 = compareArr.shift();
+        }
       this.comapareLabels2 = selectedLabels;
       this.doGetInspecEvenItems();
     },

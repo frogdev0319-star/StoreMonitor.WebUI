@@ -37,15 +37,20 @@
                     @emitItemChanged="emitItemChanged"
                  />
               </div>
+              <div class="subtitle-head">
+                  <span class="title" style="width:80%" >
+                    {{inspectSubTitle}}
+                  </span>
+              </div>
           <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
                     <el-col :span="10" class="division">
                       <el-col class="text-area">        
                         <el-row class="top">
-                           <span class="mainTitle">{{part3.averageScore>0?part3.averageScore:'N/A'}}</span>
-                           <span class="unit">{{  "%" }}</span>
+                           <span class="mainTitle">{{totalAvgScore>0?totalAvgScore:'N/A'}}</span>
+                           <span class="unit">{{$t('statistics.score')}}</span>
                         </el-row >
                         <el-row class="subtitlehead">
-                            <span>{{ $t('statistics.totalStandardRate') }}</span>
+                            <span>{{ $t('statistics.titleAvgScore') }}</span>
                         </el-row>
                       </el-col>
                      </el-col>
@@ -57,8 +62,8 @@
            </el-col>      
         </el-row > 
         <div class="subtitle-head">
-          <span class="title" >
-            {{ $t('statistics.titles.storeEvalDetail') }}
+          <span class="title" style="width:80%"  >
+            {{ inspectDetailSubTitle }}
           </span>
            <div class="operation-btns">
                   <div class="switch-btn">
@@ -161,6 +166,9 @@ export default {
   mixins: [resize],
   data() {
     return {
+      inspectSubTitle: this.$t('statistics.itemAverageScore'),
+      inspectDetailSubTitle: this.$t('statistics.evalDetail'),
+      totalAvgScore:-1,
       htmlTitle: this.$t('overview.htmltopdfA'),
       inspectItemList:[],
       inspectItem:null,
@@ -682,7 +690,7 @@ export default {
           'maxWidth': '180'
         },
         {
-          'prop': 'standardRate',
+          'prop': 'averageScore',
           'label': this.$t('statistics.sRate'),
           'sortable': 'custom',
           'pdfwidth': '12%',
@@ -1758,6 +1766,7 @@ export default {
       console.log("getPart3RegionBar")
       const self = this;
       const params = {};
+      this.totalAvgScore =-1;
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.groupMode = 0;
@@ -1789,7 +1798,7 @@ export default {
          params.groupMode = 3;
       }
       if(this.inspectItem){
-        params.itemIds = [this.inspectItem.item.id]
+        params.itemIds = this.inspectItem.item.ids
       }
       let totalReport = 0;
       let totalStandard = 0;
@@ -1826,9 +1835,10 @@ export default {
       const regionData =[];
       const regionLabel =[];
       if(this.part3.content){
-        console.log(this.part3.content)
+        let totalAvgScore = 0;
         this.part3.content.map((item,index) => {
-          let value = item.standardRate;
+          let value = item.averageScore;
+          totalAvgScore += value;
           if(this.part3.indexRegion<0 && value>0){
             this.part3.indexRegion = index;
           }
@@ -1855,6 +1865,10 @@ export default {
   
           regionLabel.push(item.groupName)
         });
+        if(this.part3.content.length>0){
+          totalAvgScore = totalAvgScore/this.part3.content.length;
+          this.totalAvgScore =totalAvgScore;
+        }
       }
 
       option.series[0].name = "";
@@ -1870,23 +1884,32 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log("getPart3StoreBar")
+      console.log("getPart3StoreBarXX")
+      console.log(this.part3.content[this.part3.indexRegion])
       let content = [];
+      
       if(this.part3.content && this.part3.content[this.part3.indexRegion]){
         if(this.part3.compareType == 'stores'){
+            console.log("To Store Type")
             content =[this.part3.content[this.part3.indexRegion]];
         }
         else{
+            console.log("To Get Data")
             const params = {};
             params.beginTs = self.params.beginTs;
             params.endTs = self.params.endTs;
             params.groupMode = 0;
+            console.log("To Get Data")
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
+            params.groupIds = this.part3.content[this.part3.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
+            
             if(this.inspectItem){
-              params.itemIds = [this.inspectItem.item.id]
+              params.itemIds =this.inspectItem.item.ids
             }
+            console.log(params)
             const storeResult = await this.getInspectStatsItemOverGroup(params);
+            console.log(storeResult)
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
@@ -1897,16 +1920,11 @@ export default {
         }
         
 
-        content.map((item,index) => {
-          item.rank = parseInt(index)+1;
-          item.compareTrend = this.$t('statistics.check'),
-          item.storeGroup = item.storeRegion.toString();
-          item.storeType = item.storeBranchType.toString();
-          item.storeSubmitters = item.submitters.toString();
+      content.map((item,index) => {
+          item.rank = this.rankByAverageScore;
+          item.compareTrend = this.$t('statistics.check');
           if(item.code=='')item.code='- -'
-          if(item.storeGroup=='')item.storeGroup='- -'
-          if(item.storeType=='')item.storeType='- -'
-          let value = item.standardRate;
+          let value = item.averageScore;
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
@@ -1919,6 +1937,7 @@ export default {
       option.xAxis.data = regionLabel;
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part3.barStoreOption = option;
+      console.log(this.part3.barStoreOption)
     },
     getRegionPieOption() {
       const pieOption = {
@@ -2042,7 +2061,22 @@ export default {
           console.log("Change ")
           let result  = await  this.getInspectItemList(searchParams.inspectId)
           if(result.errCode==0 && result.data){
-            this.inspectItemList = result.data;
+            let tempList = [];
+            result.data.forEach(function(item){
+                if(item.parentId == -1){
+                  tempList.push(item);
+                }
+            })
+            result.data.forEach(function(item){
+                tempList.forEach(function(subitem){
+                    if(item.parentId == subitem.id){
+                      subitem.items.push(item);
+                    }
+                });
+
+            })
+            this.inspectItemList = tempList ;
+
             this.curInspectId = searchParams.inspectId
             console.log(this.inspectItemList);
           }
@@ -2158,6 +2192,7 @@ export default {
        console.log("Emit Item Changed")
        console.log(item);
        this.inspectItem = item;
+       this.getItemSubtitle();
        this.getPart3RegionBar();
     },
     async doGetAssessmentStandardScore(){
@@ -2178,13 +2213,21 @@ export default {
           if(inspectSet[0].value!=null){
             this.part3.standardScore =inspectSet[0].value
             this.part2.standardScore =inspectSet[0].value
-           // this.standardRate =inspectSet[0].value;
+           // this.averageScore =inspectSet[0].value;
           }else{
-            this.standardRate = "- -";
+            this.averageScore = "- -";
           }
         }
       }
     },
+    getItemSubtitle(){
+      if(this.inspectItem && this.inspectItem.item){
+        let item = this.inspectItem.item;
+        let name = item.subject?item.subject:item.name
+        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + " ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
+        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')
+      }
+    }
   }
 };
 </script>
