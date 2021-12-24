@@ -39,29 +39,22 @@
       </el-col>
       <el-col :span="24" class="statistics-content" style="height: 785px;">
         <div class="head">
-          <el-col :span="17">
-            <div class="region-titles">
-                <span class="title">
-                    {{ $t('statistics.patrolPerson.insRecordList') }}
-                </span>
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <div class="operation-btns">
-              <delay-button
+          <div class="title">{{ $t('statistics.patrolPerson.insRecordList') }}</div>
+          <div class="operation-btns">
+            <delay-button
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
-              >
-                <div class="button-area">
-                  <img :src="exportPng" class="icon-excel">
+            >
+              <div class="button-area">
+                <img :src="exportPng" class="icon-excel">
                   <span>{{ $t('eventView.exportReport') }}</span>
-                </div>
-              </delay-button>
-            </div>
-          </el-col>
+              </div>
+            </delay-button>
+          </div>
         </div>
+        
         <div class="event-table">
         <table-pagination
           ref="elTP"
@@ -466,6 +459,29 @@ export default {
       height:36px;
       justify-content: space-between;
     }
+    .head{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      height: 67.5px;
+      .title{
+        height: 30px;
+        font-size: 18px;
+        text-align: left;
+        color: $black;
+      }
+      .operation-btns{
+        align-self: center;
+        display: flex;
+        flex-direction: row;
+        width:101px;
+        height: 30px;
+        align-items: center;
+        padding:0;
+        justify-content: space-between;
+      }
+    }
+      
     .person-title{
       display:flex;
         flex-direction:row;

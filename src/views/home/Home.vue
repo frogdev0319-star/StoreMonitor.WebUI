@@ -6,8 +6,7 @@
           <img id="imgLogo" :src="imgSrc" alt="logo" @click="routerHome">
         </div>
         <div class="el-traggle-content">
-          <i v-if="collapsed" class="iconfont icon-indent" @click="clickCollapse"/>
-          <i v-else class="iconfont icon-outdent" @click="clickCollapse"/>
+          <img :src="collapsed ? arrowRightIcon: arrowLeftIcon" @click="clickCollapse" width="28px">
         </div>
         <div>
           <el-breadcrumb separator="|" class="breadcrumb-inner" >
@@ -21,28 +20,6 @@
                 {{ $t(`route.${item.name}`) }}</span>
             </el-breadcrumb-item>
           </el-breadcrumb>
-        </div>
-        <div class="headUrl-content">
-          <div class="system-name">{{ $t('route.mgt') }}</div>
-          <el-dropdown class="el-user-drop" >
-            <span class="username">
-              {{ userName }}
-              <i class="el-icon-arrow-down el-icon--right"/>
-            </span>
-            <img :src="headUrl" alt="" class="headImg">
-            <el-dropdown-menu slot="dropdown" class="dropdown">
-              <el-dropdown-item
-                :disabeled="true"
-                class="dropdown-item"
-                style="width:120px;
-              padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
-              <el-dropdown-item
-                class="dropdown-item"
-                style=" width:120px;
-              padding-left:20px;"
-                @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
         </div>
       </div>
       
@@ -180,6 +157,29 @@
 
             </el-menu>
           </el-scrollbar>
+          
+        <div class="headUrl-content flex-center" style="justify-content: center">
+          <!-- <div class="system-name">{{ $t('route.mgt') }}</div> -->
+          <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
+            <span class="username">
+              {{ userName }}
+              <i class="el-icon-arrow-down el-icon--right"/>
+            </span>
+            <img :src="headUrl" alt="" class="headImg" style="margin-right: 16px">
+            <el-dropdown-menu slot="dropdown" class="dropdown">
+              <el-dropdown-item
+                :disabeled="true"
+                class="dropdown-item"
+                style="width:120px;
+              padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
+              <el-dropdown-item
+                class="dropdown-item"
+                style=" width:120px;
+              padding-left:20px;"
+                @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
         </aside>
         <section :class="secClass">
           <el-col
@@ -219,6 +219,8 @@ export default {
     return {
       showTag: false,
       imgSrc: require('../../../static/img/logo_title.png'),
+      arrowRightIcon: require('../../../static/img/arrow-right.png'),
+      arrowLeftIcon: require('../../../static/img/arrow-left.png'),
       userName: 'Admin',
       headUrl: '',
       breadList: [],
@@ -739,8 +741,8 @@ export default {
         #imgLogo{
           width: calc(158/1920*100vw);
           height: calc(24/1920*100vw);
-          min-width: 165px;
-          min-height: 28px;
+          min-width: 158px;
+          min-height: 24px;
         }
         .sys-name{
           font-weight: bold;
@@ -827,7 +829,8 @@ export default {
         }
         .el-user-drop{
           .username{
-            color:#4b5262;
+            font-weight: bold;
+            color: #006ab7;
             margin: auto 10px;
             max-width: 90px;
             overflow: hidden;
@@ -884,7 +887,7 @@ export default {
         margin-right:32px;
         margin-bottom:30px;
         border-bottom: 1px solid $border;
-        border-top: 1px solid #393b4c;
+        // border-top: 1px solid #393b4c;
         .brand-label{
           display: block;
           color: #484848;
@@ -1406,7 +1409,7 @@ export default {
     color: #484848 !important;
   }
   #el-menuscrollbar{
-    height: calc(100% - 125px);
+    height: calc(100% - 225px);
   }
   .aside-collapse-width #el-menuscrollbar{
     height: calc(100% - 40px);

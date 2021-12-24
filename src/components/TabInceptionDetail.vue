@@ -1,12 +1,27 @@
 <template>
     <div>
-        <div class="names">
-            <div v-for="item in tabs"
-            class="template-name"
-            :class="{'active-name-btn' : currentTab === item.value}"
-            :key="item.value"
-            @click="onClickBtn(item.value)">
-            {{ item.name }}
+        <div class="tab-area">
+            <div class="names">
+                <div v-for="item in tabs"
+                    class="template-name"
+                    :class="{'active-name-btn' : currentTab === item.value}"
+                    :key="item.value"
+                    @click="onClickBtn(item.value)">
+                    {{ item.name }}
+                </div>
+            </div>
+            <div v-show="currentTab != 'NotInspected'" class="operation-btns">
+                <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    type="primary"
+                    size="mini"
+                    @click="export2Excel"
+                >
+                <div class="button-area">
+                    <img :src="exportPng" class="icon-excel">
+                    <span>{{ $t('eventView.exportReport') }}</span>
+                </div>
+                </delay-button>
             </div>
         </div>
         <div v-if="currentTab=='Detail'" class="insep-detail-tbl">
@@ -17,7 +32,7 @@
                 :highlight-current-row= "true"
                 :is-event = "false"
                 :showPagination = "false"
-                @emitRowClick="handleEmitDetailRowClick"
+                @onCellClick ="handleEmitDetailRowClick"
             />
         </div>
         <div v-if="currentTab=='NotInspected'" class="not-inspected">
@@ -38,7 +53,7 @@
                 :highlight-current-row= "true"
                 :is-event = "false"
                 :showPagination = "true"
-                @emitRowClick="handleEmitComplitedRowClick"
+                @onCellClick ="handleEmitPersonEventRowClick"
                 layout = "prev,pager,next"
             />
         </div>
@@ -71,6 +86,8 @@ export default {
     },
     data(){
         return{
+            lang: this.$i18n.locale,
+            exportPng: require('../../static/img/excel.png'),
             currentTab:'Detail',
             tabs:[{value:'Detail',name:this.$t('statistics.patrolPerson.Detail')},
                     {value:'NotInspected',name:this.$t('statistics.patrolPerson.NotInspected')},
@@ -122,11 +139,7 @@ export default {
                     'maxWidth': '200',
                     'pdfwidth': '12%',
                     'isExpand':false,
-                    'formatter':function(obj){
-                        //console.log(obj);
-                        const html = `<div style="cursor:pointer;color:#006ab7;font-size:15px" >${obj}</div>`
-                        return html;//(`<a href="https://www.w3schools.com">${obj}</a>`)
-                    }
+                    'isCellClick':true
                     }
                 ],
                 table_data:[],
@@ -199,15 +212,13 @@ export default {
                     'maxWidth': '200',
                     'pdfwidth': '12%',
                     'isExpand':false,
-                    'formatter':function(obj){
-                        const html = `<div style="cursor:pointer;color:#006ab7;font-size:15px" >${obj}</div>`
-                        return html;
-                    }
+                    'isCellClick':true
                     }
                 ],
                 table_data:[],
                 defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-            }
+            },
+            submitterName:""
         };
     },
     created(){
@@ -227,6 +238,7 @@ export default {
       },
       getReportList() {
         const self = this;
+        self.submitterName = "";
         let params = {beginTs:this.beginTs,endTs:this.endTs,clause:{"submitter":this.submitter}};
         //console.log("params:",params);
         return new Promise((resolve) => {
@@ -250,6 +262,7 @@ export default {
                         reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
                         temp.push(reportObj);
                     });
+                    self.submitterName = temp[0].submitterName;
                     self.detailTbl.table_data = temp;
                     resolve(temp);
                 }).catch(err => {
@@ -257,10 +270,50 @@ export default {
             });
         });
       },
+      formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
+      export2Excel(){
+        const self = this;
+        let table = "", fileName="";
+        if(this.currentTab == "Detail"){
+            table = self.detailTbl;
+            fileName =  table.table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
+        }else if(this.currentTab == "Event"){
+            table = self.eventTbl;
+            fileName =  self.submitterName+ '_Inspection event_' + util.getCurDateStr();
+        }
+
+        if (table.table_data.length === 0) {
+            util.notify(self.$t('overview.emptyEventList'), 'warning', 3000);
+            return false;
+        }
+        require.ensure([], async() => {
+            const { export_json_to_excel } = require('@/excel/Export2Excel');
+            const tHeader = [];
+            const filterVal =[];
+            table.column_data.forEach(item=>{
+                if(item.prop != 'detail'){
+                    tHeader.push(item.label);
+                    filterVal.push(item.prop);
+                }
+            });
+            //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
+            const curData = table.table_data;
+            const data = self.formatJson(filterVal, curData);
+            //const fileName =  table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
+            export_json_to_excel(tHeader, data, fileName);
+        });
+      },
       handleEmitDetailRowClick(row){
           const self = this;
             sessionStorage.setItem('report_data', JSON.stringify(row));
             self.$router.push({ name: 'reportDetails', params: { data: row }});
+      },
+      handleEmitPersonEventRowClick(row){
+            const self = this;
+            sessionStorage.setItem('report_data', JSON.stringify(row));
+            self.$router.push({ name: 'eventManage', params: { data: row }});
       },
       getNotInspectedStores(){
           const self = this;
@@ -310,6 +363,7 @@ export default {
                         const reportObj = {
                             id:tempStorId,
                             storeName:tempStorName,
+                            assignerName:item.assignerName,
                             Unprocessed,
                             Inprocess,
                             Processed,
@@ -380,10 +434,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .names{
+  .tab-area{
     display: flex;
     flex-direction: row;
-    padding: 0;
+    justify-content: space-between;
+    margin-right: 32px;
+    .names{
+        display: flex;
+        flex-direction: row;
+        padding: 0;
+    }
+    .operation-btns{
+        align-self: center;
+        display: flex;
+        flex-direction: row;
+        width:101px;
+        height: 30px;
+        align-items: center;
+        padding:0;
+        justify-content: space-between;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    .ja-export-btn,
+    .en-export-btn,
+    .export-btn{
+      background-color: #edf0f2;
+      color: #006ab7;
+    }
   }
   .template-name{
     cursor: pointer;
@@ -397,14 +475,14 @@ export default {
     font-family: NotoSansCJKTC;
     font-size: 13px;
     font-weight: 500;
-    background-color: #EFF3F5;
+    background-color: #edf0f2;
   }
   .active-name-btn{
     color: #006ab7;
     background-color: #fff;
   }
   .insep-detail-tbl{
-    background-color: #EFF3F5;
+    background-color: #edf0f2;
     padding-top: 16.5px;
     padding-bottom: 16.5px;
     .table{
@@ -413,7 +491,7 @@ export default {
     }
   }
   .not-inspected{
-    background-color: #EFF3F5;
+    background-color: #edf0f2;
     padding: 16.5px 24px;
     .store-div{
         width: calc(220/1440*100vw);
