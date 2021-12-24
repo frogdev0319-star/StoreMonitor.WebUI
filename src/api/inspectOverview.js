@@ -137,3 +137,12 @@ export const getInspectStatsItemOverStore= data => {
     data
   });
 };
+
+export const getInspectStatsItemOverGroup= data => {
+  return request({
+    url: `v1.0/statistics/inspect/item/group/overview`,
+    method: 'post',
+    data
+  });
+};
+

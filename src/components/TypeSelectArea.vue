@@ -524,7 +524,11 @@ export default {
           originArray.push(item)
         }
       })
-      this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:selectedArray,selectedLabels,originArray});
+      const compareArr= [];
+      selectedArray.forEach(function(item){
+          if(item!='-1')compareArr.push(item)
+      })
+      this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:compareArr,selectedLabels,originArray});
       //this.changeStoreNew(arr);
     },
     doGetStoreIdsByProvince(provinceArrary){
