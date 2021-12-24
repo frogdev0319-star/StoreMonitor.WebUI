@@ -669,7 +669,7 @@ export default {
           'prop': 'storeSubmitters',
           'label': this.$t('statistics.submitter'),
           'sortable': false,
-          'width': '130',
+          'width': '200',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -681,17 +681,9 @@ export default {
           'width': '80',
           'maxWidth': '180'
         },
-          {
-          'prop': 'numOfStandard',
-          'label': this.$t('statistics.numOfStandard'),
-          'sortable': 'custom',
-          'pdfwidth': '14%',
-          'width': '80',
-          'maxWidth': '180'
-        },
         {
           'prop': 'averageScore',
-          'label': this.$t('statistics.sRate'),
+          'label': this.$t('overview.averageScore'),
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
@@ -705,14 +697,6 @@ export default {
           'width': '80',
           'maxWidth': '100'
         },
-        {
-          'prop': 'compareTrend',
-          'label': this.$t('statistics.compareTrend'),
-          'sortable': 'custom',
-          'pdfwidth': '12%',
-          'width': '80',
-          'maxWidth': '100'
-        }
     
       ],
       part1:{ compareType:'stores', indexRegion:0, content:[],
@@ -1921,7 +1905,7 @@ export default {
         
 
       content.map((item,index) => {
-          item.rank = this.rankByAverageScore;
+          item.rank = item.rankByAverageScore;
           item.compareTrend = this.$t('statistics.check');
           if(item.code=='')item.code='- -'
           let value = item.averageScore;
