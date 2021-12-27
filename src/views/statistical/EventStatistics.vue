@@ -41,13 +41,25 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
-              <AreaSelected
+              <TypeSelectArea
+                              path="eventStatistics"
+                              :allow-all=true
+                              :region-array1="params.curProvince"
+                              :region-array2="params.curCity"
+                              :cur-store-group="params.curStoreGroup"
+                              :cur-store-type="params.curStoreType"
+                              :cur-stores="params.curStore"
+                              :cached-params="params"
+                              :cur-country="curCountry"
+                              @emitTypeChanged="emitTypeChanged"
+                          ></TypeSelectArea>
+              <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
                 :cached-params="params"
                 :cur-country="curCountry"
                 @emitTypeChanged="emitTypeChanged"
-              ></AreaSelected>
+              ></AreaSelected>-->
             </div>
             <div class="barchart-area">
               <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content"/>
@@ -108,13 +120,25 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
-              <AreaSelected
+              <TypeSelectArea
+                  path="eventStatistics"
+                  :allow-all=true
+                  :region-array1="params.curProvince"
+                  :region-array2="params.curCity"
+                  :cur-store-group="params.curStoreGroup"
+                  :cur-store-type="params.curStoreType"
+                  :cur-stores="params.curStore"
+                  :cached-params="params"
+                  :cur-country="curCountry"
+                  @emitTypeChanged="emitTypeChanged2"
+              ></TypeSelectArea>
+              <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
                 :cached-params="params"
                 :cur-country="curCountry"
                 @emitTypeChanged="emitTypeChanged2"
-              ></AreaSelected>
+              ></AreaSelected>-->
             </div>
             <div class="pie-area">
               <div class="pct-panel">
@@ -422,6 +446,7 @@ import TablePagination from '@/components/TablePagination_V2';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import AreaSelected from '@/components/AreaSelected';
+import TypeSelectArea from '@/components/TypeSelectArea';
 import vm from '@/main.js';
 export default {
   name: 'EventStatistics',
@@ -431,7 +456,7 @@ export default {
     'v-chart': ECharts,
     SearchComponent,
     TablePagination,
-    AreaSelected
+    AreaSelected,TypeSelectArea
   },
   mixins: [resize],
   data() {
@@ -788,6 +813,7 @@ export default {
       eventInvolveItemId:null,
       showInvolveTableArea:false,
       componentsProps_EventCommentList:{},
+      gloableEventData:[],
     };
   },
 
@@ -822,7 +848,7 @@ export default {
       this.params.order = this.order;
       //this.getSearchParams();
     },
-    emitSearch({ searchParams, dateRangeList, timeMode }) {
+    /*emitSearch({ searchParams, dateRangeList, timeMode }) {
       this.showInvolveTableArea = false;
       console.log("searchParams:",searchParams);
       this.params = searchParams;
@@ -832,6 +858,60 @@ export default {
       this.daysRangeList = dateRangeList;
       this.curCountry = this.params.curCountry;
       this.timeMode = timeMode;
+      this.searchData();
+    },*/
+    async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
+      console.log("Emit Search");
+     // this.part2.standardScore=-1;
+     // this.part2.standardScore=-1;
+     // this.doGetAssessmentStandardScore();
+      console.log(searchParams)
+             
+      const searchParamsObj = {
+          path: 'eventStatistics',
+          params: this.params
+      };
+      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
+        this.ifSaveParams = true;
+      /*if(searchParams.inspectId && searchParams.inspectId!=''){
+        console.log(searchParams.inspectId,this.curInspectId)
+        if(searchParams.inspectId !=this.curInspectId){
+          console.log("Change ")
+          let result  = await  this.getInspectItemList(searchParams.inspectId)
+          if(result.errCode==0 && result.data){
+            let tempList = [];
+            result.data.forEach(function(item){
+                if(item.parentId == -1){
+                  tempList.push(item);
+                }
+            })
+            result.data.forEach(function(item){
+                tempList.forEach(function(subitem){
+                    if(item.parentId == subitem.id){
+                      subitem.items.push(item);
+                    }
+                });
+
+            })
+            this.inspectItemList = tempList ;
+
+            this.curInspectId = searchParams.inspectId
+            console.log(this.inspectItemList);
+          }
+        }
+
+      }*/
+      this.params = searchParams;
+      console.log('**emit search params:',this.params);
+      this.compareIds = this.compareIds2 = this.params.storeIds;
+      console.log('@@this.compareIds:',this.compareIds);
+      this.daysRangeList = dateRangeList;
+      this.curRegionI = regionI;
+      this.curRegionII = regionII;
+      this.regionMode = regionMode;
+      this.timeMode = timeMode;
+      this.storePatrolLists = storePatrolLists;
+      this.curCountry = this.params.curCountry;
       this.searchData();
     },
     async searchData() {
@@ -866,6 +946,7 @@ export default {
          * secondly, call getAllEventData to get all event and pie chart data
          */
       }
+        await self.getUpperGloableEventData();
         await self.getEventTableData();
         await self.getAllEventData();
         self.doGetInspecEvenItems();
@@ -874,14 +955,44 @@ export default {
     emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
       this.compareType = compareType;
       //this.compareIds = compareArr;
-      console.log("compareArr :",compareArr);
-      console.log("compareArr.includ :",compareArr.includes('-1'));
-      if(compareArr.includes("-1")){
-        this.compareIds2 = compareArr.shift();
-        }
+      //console.log("compareArr :",compareArr);
+      //console.log("compareArr.includ :",compareArr.includes('-1'));
+      if(compareArr.includes('-1')){
+        this.compareIds = compareArr.shift();
+      }
+      else{
+          this.compareIds = compareArr
+      }
+      //console.log("emitTypeChanged > this.compareIds:",this.compareIds);
       this.comapareLabels = selectedLabels;
       this.getAllEventData();
       this.getEventTableData();
+    },
+    /**取得上方狀態 */
+    async getUpperGloableEventData() {
+      const params = {};
+      params.beginTs = this.params.beginTs;
+      params.endTs = this.params.endTs;
+      params.storeIds = this.params.storeIds;
+      params.regionMode = 0;
+      console.log('getUpperGloableEventData > search:',params);
+    
+      try {
+        //console.log('params:',params);
+        const eventResult = await this.getEventTableDataInfo(params);
+        const result = eventResult.data;
+        if (result) {
+          this.gloableEventData = result.content;
+          this.getEventsNum();
+        }else{
+          self.eventTableData = 0;
+          self.eventKPIs.forEach(item => {
+            item.eventNum = 0;
+          });
+        }
+      } catch (e) {
+        this.ispdf = false;
+      }
     },
     getEventsNum() {
       const self = this;
@@ -890,7 +1001,7 @@ export default {
       let totalInprocess = 0;
       let totalProcessed = 0;
       let totalRejected = 0;
-      self.allEventData.forEach(item => {
+      self.gloableEventData.forEach(item => {
         totalEvents += item.numOfTotal;
         totalUnprocessed += item.numOfUnprocessed;
         totalInprocess += item.numOfInprocess;
@@ -902,6 +1013,8 @@ export default {
       self.eventKPIs[2].eventNum = totalInprocess;
       self.eventKPIs[3].eventNum = (totalEvents==0)? 0 : ((totalProcessed/totalEvents)*100).toFixed(0);
     },
+    /**end 取得上方狀態 */
+    
     /**事件數量barchart排名**/
     getEventTableDataInfo(params) { 
       return new Promise((resolve, reject) => {
@@ -920,13 +1033,16 @@ export default {
       params.endTs = this.params.endTs;
       params.groupMode = region[0].value;
       this.params.groupMode = region[0].value;
+      params.storeIds = this.compareIds;
+      console.log('getExportData > this.compareIds:',this.compareIds);
       if(region[0].value<3){ //store, area1, area2
         this.params.storeIds=this.compareIds
-        params.storeIds = this.params.storeIds;
+        params.storeIds = this.compareIds;
       }else{ //groupType, storeGroup
         this.params.groupIds=this.compareIds;
         params.groupIds = this.params.storeIds;
       }
+      console.log("search params:",params);
       params.order = {
         direction: 'desc',
         property: 'numOfTotal'
@@ -934,9 +1050,8 @@ export default {
       
       let content = [];
       try {
-        console.log('params:',params);
+        //console.log('params:',params);
         const eventResult = await this.getEventTableDataInfo(params);
-        console.log('eventResult:',eventResult);
         const result = eventResult.data;
         if (result) {
           content = result.content;
@@ -967,7 +1082,7 @@ export default {
         });
         self.setBarchartData();
         //self.setEventTableData();
-        self.getEventsNum();
+        //self.getEventsNum();
         //self.getEventBySourcePie();
       } catch (e) {
         console.log('EventStatistics-getAllEventData:' + e);
@@ -1213,11 +1328,13 @@ export default {
       this.showInvolveTableArea = false;
       this.compareType2 = compareType;
       //this.compareIds2 = compareArr;
-      console.log("compareArr :",compareArr);
-      console.log("compareArr.includ :",compareArr.includes('-1'));
+      //console.log("compareArr :",compareArr);
+      //console.log("compareArr.includ :",compareArr.includes('-1'));
       if(compareArr.includes("-1")){
         this.compareIds2 = compareArr.shift();
-        }
+      }else{
+        this.compareIds2 = compareArr
+      }
       this.comapareLabels2 = selectedLabels;
       this.doGetInspecEvenItems();
     },
