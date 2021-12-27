@@ -428,6 +428,11 @@ export default {
   mixins: [resize],
   data() {
     return {
+      page:null,
+      total:null,
+      componentsProps:"",
+      sizeNum:null,
+      expandCompProperties:"",
       htmlTitle: this.$t('overview.htmltopdfA'),
       isexportPDF: false,
       storeNameStr: '',
@@ -1016,6 +1021,11 @@ export default {
   },
 
   methods: {
+    handlePageAndSizeChange(){
+
+    },
+    handleSortChange(){
+    },
     onSwitchPart1Mode(mode){
       this.part1.storeMode = mode;
     },
@@ -1096,20 +1106,30 @@ export default {
     async searchData() {
     
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+            this.part1 = { compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
+              pieOption:{},barRegionOption:{},barStoreOption:{}};
+      this.part2={ standardScore:-1,averageScore:-1,
+              compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
+              pieOption:{},barRegionOption:{},barStoreOption:{}};
+      this.part3 ={ standardScore:-1,averageScore:-1,
+              compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
+              pieOption:{},barRegionOption:{},barStoreOption:{}};
+      this.overviewCount={store:-1,items:-1,avgScore:-1};
       if (this.params.storeIds.length > 0) {
         await this.dataGetOverview();
-      } else {
-        this.totalRegion = 0;
-        this.regionTableData = [];
-      //  this.getPart1RegionBar();
-        this.storeTableData = [];
-        this.regionsList = [];
-        this.curRegion = [];
-        this.regionsChartsOptions = null;
-        this.part1.pieOption = null;
-        this.part1.barRegionOption = null;
-        this.part1.barStoreOption = null;
-      }
+      } 
     },
 
     async export2Excel() {
@@ -1319,11 +1339,11 @@ export default {
     },
     emitTypeChangedPart1({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
       console.log("Part1 Emit Type Change="+compareType)
-      this.part1.compareType = compareType;
-      this.part1.compareIds = compareArr;
-      this.part1.comapareLabels = selectedLabels;
-      this.part1.originArray = originArray;
-      this.dataGetPart1();
+      //this.part1.compareType = compareType;
+     // this.part1.compareIds = compareArr;
+      //this.part1.comapareLabels = selectedLabels;
+      //this.part1.originArray = originArray;
+     // this.dataGetPart1();
 
     },
     emitTypeChangedPart2({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
@@ -1332,7 +1352,7 @@ export default {
       this.part2.compareIds = compareArr;
       this.part2.comapareLabels = selectedLabels;
       this.part2.originArray = originArray;
-      this.dataGetPart2();
+      //this.dataGetPart2();
 
     },
     emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
@@ -1341,7 +1361,7 @@ export default {
       this.part3.compareIds = compareArr;
       this.part3.comapareLabels = selectedLabels;
       this.part3.originArray = originArray;
-      this.dataGetPart3();
+      //this.dataGetPart3();
 
     },
     getInspectLineOption() {
@@ -1520,8 +1540,8 @@ export default {
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.regionMode = self.regionMode;
-      params.storeIds = self.params.curStore;
-      params.inspectTagId = self.params.inspectId;
+      params.storeIds = self.params.storeId;
+      params.inspectTagId = self.params.inspectTagId ;
       const overviewResult = await self.getInspectReulstStatsOverview(params);
       if (overviewResult.errCode === 0) {
         const result = overviewResult.data;
@@ -1543,7 +1563,7 @@ export default {
     },
 
     async dataGetPart1() {
-    
+      console.log("dataGetPart1")
       const self = this;
       const params = {};
       this.part1.pieOption = null;
@@ -1560,6 +1580,7 @@ export default {
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
+        console.log(result)
         if (result) {
           this.part1.indexType = 0;
           self.totalRegion = result.totalElements;
@@ -1574,7 +1595,7 @@ export default {
         self.regionTableData = [];
       }
       await self.getPart1RegionBar();
-      //self.getInspectStatsLine();
+      //self.getInspectStatsLine();:
     },
     async dataGetPart2(){
       await this.getPart2RegionBar();
@@ -1639,7 +1660,7 @@ export default {
       if(type == 'stores'){
         content.map(function(item,i){
           item.list = [];
-          item.list.push(JSON.parse(JSON.stringify(item)))
+         //item.list.push(JSON.parse(JSON.stringify(item)))
           output.push(item)
         });;
       }
@@ -1693,12 +1714,19 @@ export default {
          params.groupIds  = this.part1.compareIds;
          params.groupMode = 3;
       }
+      else if(this.part1.compareType=='users'){
+         params.submitters  = this.part1.compareIds;
+         params.groupMode = 5;
+      }
+      
+
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: 20 };
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           if (result) {
+            console.log(result)
             this.part1.content = this.filterContent(result.content, 
             this.part1.compareType,
             this.part1.compareIds,

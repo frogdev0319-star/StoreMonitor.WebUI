@@ -37,11 +37,11 @@
     </div>
 </template>
 <script>
-import moment from 'moment';
-import { mapGetters } from 'vuex';
+import util from '@/common/util.js';
 import MultiSelect from '@/components/MultiSelect2';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
-import SearchConditionUtil from '@/common/SearchConditionUtil';
+import { getDepartmentList } from '@/api/checkin';
+import { getUserInfo } from '@/api/login';
 import { getBriefStoreList, getStoreDefineGroup } from '@/api/store';
 import LimitSelect from '@/components/LimitSelect';
 export default {
@@ -107,7 +107,7 @@ export default {
             compareType:'stores',
             compareTypeItems:[{value:'area1',label:this.$t('statistics.area1')},{value:'area2',label:this.$t('statistics.area2')},
             {value:'storeGroup',label:this.$t('statistics.storeGroup')},{value:'storeType',label:this.$t('statistics.storeType')},
-            {value:'stores',label:this.$t('statistics.stores')}],
+            {value:'stores',label:this.$t('statistics.stores')},{value:'position',label:this.$t('overview.position')},{value:'users',label:this.$t('overview.user')}],
             date:Date.now(),
             dateFormat:'yyyy/MM/DD',
             //curCountry: -1, 
@@ -119,6 +119,7 @@ export default {
             cityList: [],
             curStore: [],
             storeList: [],
+            orginStoreList:{},
             curStoreTypeList:[],
             curStoreGroupList:[],
             curStoreList:[],
@@ -128,10 +129,18 @@ export default {
             curTypeArrary:[],
             curSelectId:[],
             selAllString:this.$t('overview.all'),
+            userPosition:[],
+            origianlUserList:[],
+            userIds: [],
+            userList: [],
+            origianlUserList: [],
+            positionIds: [],
+            positionsList: [],
         }
   },
   created() {
     this.getStoreListAndGroupAndType();
+    this.getSearchCondition();
   },
   watch: {
     async accountChanged(val) {
@@ -143,7 +152,7 @@ export default {
     },
     regionArray1: {
         handler (val,old ) {
-          console.log("RegionArray1 changed")
+          //console.log("RegionArray1 changed")
           this.provinceList  = [];
           val.map(item => {
             if(item!='-1'){
@@ -159,7 +168,7 @@ export default {
     },
     regionArray2: {
         handler (val,old ) {
-          console.log("RegionArray2 changed")
+       //   console.log("RegionArray2 changed")
           this.cityList = [];
           val.map(item => {
             if(item!='-1'){
@@ -221,22 +230,18 @@ export default {
         immediate: false, 
         deep: true,
         handler (val,old ) {
-          /*
-          this.curStoreList = [];
-          if(this.storeList.length==0){
-            this.getStoreListAndGroupAndType()
-          }
+          const self = this;
+          let curStoreList = [];      
+        //  console.log(val)
+        //  console.log( this.orginStoreList) 
           val.map(item => {
-            if(item!='-1'){
-              this.storeList.map(store=>{
-                  if(item == store.storeId)
-                    this.curStoreList.push({value:store.storeId,storeId:store.storeId,label:store.name});
-              });
-              
+            //console.log(item)
+          //  console.log(self.orginStoreList[item])
+            if(item!='-1' && self.orginStoreList[item]){
+              curStoreList.push(self.orginStoreList[item]);
             }
           });
-          */
-          console.log(this.curStoreList)
+          this.curStoreList = curStoreList;
           if(this.compareType== 'stores'){
             this.curSelectId=[];
             this.changeCompareType(this.compareType);
@@ -245,19 +250,19 @@ export default {
         }
     },
     async curCountry(val){
-      console.log("!!curCountry:",val);
+     // console.log("!!curCountry:",val);
       this.getStoreListAndGroupAndType();
     }
   },
   computed: {
      cachedParamsInfo() {
-      console.log(this.cachedParams)
+     // console.log(this.cachedParams)
       return this.cachedParams
     }
   },
   methods: {
     getStoreListAndGroupAndType() {
-      console.log("getStoreListAndGroupAndType")
+     // console.log("getStoreListAndGroupAndType")
       const storeListPromise = this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
@@ -276,7 +281,12 @@ export default {
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
+        const orginStoreList ={};
         this.storeList = storeList;
+        storeList.forEach(item=>{
+          orginStoreList[item.storeId] = {value:item.storeId,label:item.name,storeId:item.storeId};
+        })
+        this.orginStoreList = orginStoreList;
         this.getCountryStore();
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
@@ -285,29 +295,6 @@ export default {
       });
     },
     getCountryStore() {
-      /*let temp = [];
-      if (this.storeList.length !== 0) {
-        this.storeList.forEach(item => {
-          
-          const country = item.country;
-          if (temp.map(x => x.label).indexOf(country) === -1) {
-            const obj = {
-              value: country,
-              label: country
-            };
-            temp.push(obj);
-          }
-        });
-      }
-      
-      const countryList = temp;
-      this.countryList[0] = {};
-      this.countryList[0].label = this.$t('remotePatrol.country');
-      this.countryList[0].countryList = countryList;
-      //this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
-      
-      this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;*/
-      console.log("this.curCountry",this.curCountry);
       this.selectAllProAndCity(this.curCountry, true);
     },
     async selectAllProAndCity(val, isFirst) {
@@ -318,7 +305,7 @@ export default {
       storeList.forEach(item => {
         if (item.country === val || val === '-1') {
           if (temp.map(x => x.value).indexOf(item.province) === -1) {
-            console.log("province > item",item);
+     //       console.log("province > item",item);
             const obj = {
               label: item.province,
               value: item.province
@@ -360,7 +347,7 @@ export default {
               if (self.curCity.length > 0 && self.curCity !== '-1') {
                 if (self.curProvince.includes(item.province)) {
                   if (cityTemp.map(x => x.value).indexOf(item.city) === -1) {
-                    console.log("city > item",item);
+                //    console.log("city > item",item);
                     citObj = {
                       label: item.city,
                       value: item.city
@@ -420,6 +407,54 @@ export default {
         });
       });
     },
+     async getSearchCondition() {
+      const userPosition = getDepartmentList({ type: 1 }); //取得職務
+      const userPromise = getUserInfo();
+      try {
+        const result = await Promise.all([userPosition, userPromise]);
+        this.getUserList(result[1].data);
+        this.getUserPositionList(result[0].data);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    getUserPositionList(data) {
+      console.log(data)
+      this.positionsList = [];
+      const userIdList = [];
+      data.map(department => {
+        const departmentJson = {};
+        departmentJson.label = department.defineName;
+        departmentJson.value = department.defineId;
+        departmentJson.contents = department.contents;
+        userIdList.push(department.contents);
+        this.positionsList.push(departmentJson);
+      });
+      const userList = this.origianlUserList.map(user => user.value);
+      const filterUser = util.getDiffBetweenArrays(userIdList, userList);
+      this.roleId === 1 && this.userPosition.push({
+        label: this.$t('titleView.others'),
+        value: '00',
+        content: filterUser
+      });
+      this.positionIds = this.ifCachedParams ? this.departmentIds : this.positionsList.map(depart => depart.value);
+    },
+
+    getUserList(data) {
+     // console.log(data)
+      this.userList = [];
+      this.origianlUserList = [];
+      data.map(user => {
+        const userJson = {};
+        userJson.label = user.userName;
+        userJson.value = user.userId;
+        userJson.title = user.title;
+        this.origianlUserList.push(userJson);
+        this.userList.push(userJson);
+      });
+      this.userIds = this.ifCachedParams ? this.userIds : this.userList.map(user => user.value);
+    },
     getStoreDefineList(type) {
       return new Promise((resolve, reject) => {
         const params = {
@@ -475,18 +510,18 @@ export default {
           this.selAllString=this.$t('storeView.all');
           this.curTypeArrary = this.curStoreTypeList;
           break;
+        case 'users':
+          this.dropdownPlaceholder =  this.$t('overview.user');
+          this.selAllString=this.$t('overview.allUser');
+          this.curTypeArrary = this.userList;
+          break;
+        case 'position':
+          this.dropdownPlaceholder =  this.$t('overview.position');
+          this.selAllString=this.$t('overview.allPosition');
+          this.curTypeArrary = this.positionsList ;
+          break;
         case 'stores':
-          console.log(this.curStores)
-          this.curStoreList = [];
-          this.curStores.map(item => {
-            if(item!='-1'){
-              this.storeList.map(store=>{
-                  if(item == store.storeId)
-                    this.curStoreList.push({value:store.storeId,storeId:store.storeId,label:store.name});
-              });
-              
-            }
-          });
+      //    console.log(this.curStores)
           this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
           this.selAllString=this.$t('overview.all');
           this.curTypeArrary = this.curStoreList;
@@ -497,6 +532,7 @@ export default {
           this.curTypeArrary = this.curStoreList;
           break;
       }
+      console.log(this.curTypeArrary )
       if(this.curSelectId.length==0 ){
           let defaultSel = this.curTypeArrary.length;
           let selectedLabels = [];
@@ -515,8 +551,9 @@ export default {
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
-     // console.log("onChangeCompareType > selectedArray:",selectedArray);
-      //console.log("onChangeCompareType > selectedLabels:",selectedLabels);
+      console.log("onChangeCompareType > selectedArray:",selectedArray);
+      console.log("onChangeCompareType > selectedLabels:",selectedLabels);
+      /*
       this.curSelectId = selectedArray;
       let originArray = [];
       this.curTypeArrary.forEach(function(item){
@@ -529,6 +566,7 @@ export default {
           if(item!='-1')compareArr.push(item)
       })
       this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:compareArr,selectedLabels,originArray});
+      */
       //this.changeStoreNew(arr);
     },
     doGetStoreIdsByProvince(provinceArrary){

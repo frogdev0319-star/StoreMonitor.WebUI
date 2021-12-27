@@ -5,6 +5,7 @@
       :placeholder="placeholder"
       :disabled="disabled"
       multiple
+      value-key="value"
       :taggable="false"
       clearOnSelect="false"
       @change="changeSelect"
