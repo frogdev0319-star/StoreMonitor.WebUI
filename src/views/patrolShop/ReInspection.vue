@@ -332,7 +332,7 @@
             <div class="flex-center" style="margin: 15px">
               <span style="text-align: left">{{ '攝影機列表' }}</span>
               <div class="spacer"/>
-              <el-input style="width: 156px" v-model="channelFilterStr"/>
+              <search-text style="width: 156px" v-model="channelFilterStr"/>
             </div>
             <div class="channels-srollbar" style="flex: 1; overflow: auto">
               <div class="arrow-content">
@@ -406,7 +406,7 @@
             </template>
             <template v-else>
               <div class="groups">
-                <el-input style="width: 100%; margin: 5px 0;" v-model="groupFilterStr"/>
+                <search-text style="width: 100%; margin: 5px 0;" v-model="groupFilterStr"/>
                 <div 
                   v-for="(_item,_index) in sheetName.filter(sheet => sheet.label.indexOf(groupFilterStr) > -1)" 
                   :key="_index" 
@@ -752,6 +752,7 @@ import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
 import StoreFilter from '@/components/StoreFilter';
+import SearchText from '@/components/SearchText';
 
 export default {
   name: 'ReInspection',
@@ -762,7 +763,8 @@ export default {
     DashVideo,
     EzvizVideo,
     BeseyeVideo,
-    StoreFilter
+    StoreFilter,
+    SearchText
   },
   data() {
     return {
