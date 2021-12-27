@@ -2017,7 +2017,7 @@ export default {
   .spacer {
     flex: 1
   }
-  .vertical-hr {    
+  .hr-vertical {    
     margin: 0;
     -webkit-flex-shrink: 0;
     -ms-flex-negative: 0;
@@ -2032,7 +2032,7 @@ export default {
     -ms-flex-item-align: stretch;
     align-self: stretch;
   }
-  .horizontal-hr {
+  .hr-horizontal {
     margin: 0;
     -webkit-flex-shrink: 0;
     -ms-flex-negative: 0;

@@ -126,7 +126,7 @@
                     <img :src="deleteInspectIcon" alt="delete" />
                     <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
                       <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                      <hr class="vertical-hr"/>
+                      <hr class="hr-vertical"/>
                       <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
                     </div>
                   </div>
@@ -238,7 +238,7 @@
                   <img :src="deleteInspectIcon" alt="delete" />
                   <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
                     <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                    <hr class="vertical-hr"/>
+                    <hr class="hr-vertical"/>
                     <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
                   </div>
                 </div>
@@ -463,7 +463,7 @@
                         <img :src="deleteInspectIcon" alt="delete" @click="editFeedback(item, index)"/>
                         <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px">
                           <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                          <hr class="vertical-hr"/>
+                          <hr class="hr-vertical"/>
                           <img :src="editInspectIcon" @click="editFeedback(item, index)" alt="edit" style="margin: 5px"/>
                         </div>
                       </div>
@@ -545,7 +545,7 @@
                             <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
                             <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${item.inspectEdit.index === index ? '#006ab7': 'transparent'}` }">
                               <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                              <hr class="vertical-hr"/>
+                              <hr class="hr-vertical"/>
                               <img @click="editDescription(index, item)" :src="editInspectIcon" alt="edit" style="margin: 5px"/>
                             </div>
                           </div>
@@ -674,7 +674,7 @@
                             <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
                             <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${item.inspectEdit.index === index ? '#006ab7': 'transparent'}` }">
                               <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                              <hr class="vertical-hr"/>
+                              <hr class="hr-vertical"/>
                               <img @click="editDescription(index, item)" :src="editInspectIcon" alt="edit" style="margin: 5px"/>
                             </div>
                           </div>
