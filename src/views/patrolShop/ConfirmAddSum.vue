@@ -503,8 +503,8 @@ export default {
         const OSS = require('ali-oss');
         const client = new OSS({
           region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-          accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
-          accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
+          accessKeyId: self.oss.ossAccessKeyId,
+          accessKeySecret: self.oss.ossAccessKeySecret,
           // bucket: 'viumo-'+self.accountId,
           bucket: self.oss.ossBucketName
         });
@@ -516,7 +516,6 @@ export default {
             }
           })
             .then((results) => {
-              // 上传完成
               const url = self.getFileUrl(results.name);
               resolve(url);
             })
@@ -531,7 +530,6 @@ export default {
         return new Promise((resolve, reject) => {
           azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
             .then((results) => {
-              // 上传完成
               const url = self.getFileUrl(fileItem.fileName);
               resolve(url);
             })
@@ -657,7 +655,7 @@ export default {
             commentTemp.push(obj);
           })
         }
-        if (self.eventList[i].sourceObj != null) { // 通过通道创建的反馈问题
+        if (self.eventList[i].sourceObj != null) { 
           await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
             self.uploadingnumOfPic++;
             const commentObj = {
@@ -676,7 +674,7 @@ export default {
           }
 
           obj.deviceId = self.eventList[i].sourceObj.deviceId;
-        } else { // 通过加号创建的问题反馈
+        } else {
           // obj.diviceId=-1;
         }
         obj.attachment = commentTemp;
