@@ -406,27 +406,30 @@
             </template>
             <template v-else>
               <div class="groups">
+                <el-input style="width: 100%; margin: 5px 0;" v-model="groupFilterStr"/>
                 <div 
-                  v-for="(_item,_index) in sheetName" 
+                  v-for="(_item,_index) in sheetName.filter(sheet => sheet.label.indexOf(groupFilterStr) > -1)" 
                   :key="_index" 
                 >
-                <template v-if="_item.isCategory">
-                  <div
-                    class="group"
-                    @click="changeSheet(_item,_index)"
-                    :class="{ group__active: _item.isClick }">
-                    {{ _item.label}}
-                  </div>
-                </template>
-                <template v-else>
-                  <div 
-                    class="group"
-                    :class="{ group__active: _item.isClick }"
-                    @click="getItemOfCategory(_item, _index)"
-                  >
-                    {{ _item.label}}
-                  </div>
-                </template>
+                  <template v-if="_item.isCategory">
+                    <div
+                      class="group"
+                      @click="changeSheet(_item,_index)"
+                      :style="_index === 0 ? {'margin-left': 0}:{}"
+                      :class="{ group__active: _item.isClick }">
+                      {{ _item.label}}
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div 
+                      class="group"
+                      :class="{ group__active: _item.isClick }"
+                      :style="_index === 0 ? {'margin-left': 0}:{}"
+                      @click="getItemOfCategory(_item, _index)"
+                    >
+                      {{ _item.label}}
+                    </div>
+                  </template>
                 </div>
               </div>
             </template>
@@ -964,7 +967,8 @@ export default {
       isFullScreenMode: false,
       groupItems: [],
       storeOptions: [],
-      channelFilterStr: ''
+      channelFilterStr: '',
+      groupFilterStr: ''
     };
   },
   computed: {
