@@ -47,7 +47,7 @@
               <span class="span-2">{{ scorecount }} <span>{{ $t('remotePatrol.scorecount') }}</span></span>
             </div>
           </div>
-          <hr class="horizontal-hr"/>
+          <hr class="hr-horizontal"/>
           <table v-for="(s_item,s_index) in summary" :key="s_index" class="table table-bordered">
             <thead>
               <tr>
@@ -90,8 +90,8 @@
               <div style="margin-bottom:20px;">
                 <div v-for="(_item,_index) in item.data" :key="_index" class="content-detail">
                   <template v-if="index !== 2" >
-                    <div class="content-title">{{ _item.groupName }}</div>
                     <template v-if="!_item.children">
+                      <div class="content-title">{{ _item.groupName }}</div>
                       <div v-for="(categoryItem,categoryIndex) in _item.cateryItems" :key="categoryIndex" class="content-detail">
                         <div class="content-detail-title">
                           <div class="detail-title">
@@ -162,9 +162,13 @@
                     </template>
                     <template v-else>
                       <div v-for="(child, childIndex) in _item.children" :key="childIndex">
-                        <div class="subcatergy-title">
-                          {{ child.groupName }}
+                        <div class="flex-center" style="border-left:4px solid #2c90d9;"> 
+                          <div class="content-title">{{ `【${_item.groupName}】 — ` }}</div>
+                          <div style="color: #7d8cad">
+                            {{ ` 【${child.groupName}】` }}
+                          </div>
                         </div>
+                        <hr class="hr-horizontal" style="margin-top: 10px"/>
                         <div v-for="(childItem, childIndex) in child.cateryItems" :key="childIndex" class="content-detail">
                           <div class="content-detail-title">
                             <div class="detail-title">
@@ -191,12 +195,15 @@
                               </div>
                             </div>
                           </div>
+                          <p 
+                            v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
+                            || childItem.inspectText != null&&childItem.inspectText !== ''"
+                          class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
                           <div
                             v-if="childItem.sourceList!= null && childItem.sourceList.length !== 0
                             || childItem.inspectText != null&&childItem.inspectText !== ''"
                             class="content-detail-main"
                             style="padding-bottom: 20px;">
-                            <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
                             <div v-if="childItem.inspectText!=null&&childItem.inspectText!=''">
                               <div class="cdm-word" v-for="(text, index) in childItem.inspectText.split('|')" :key="index">
                                 <span>{{ `${index+1}. ${text}` }}</span>
@@ -496,8 +503,8 @@ export default {
         const OSS = require('ali-oss');
         const client = new OSS({
           region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
-          accessKeyId: self.oss.ossAccessKeyId, // 填入自己的id
-          accessKeySecret: self.oss.ossAccessKeySecret, // 填入自己的id
+          accessKeyId: self.oss.ossAccessKeyId,
+          accessKeySecret: self.oss.ossAccessKeySecret,
           // bucket: 'viumo-'+self.accountId,
           bucket: self.oss.ossBucketName
         });
@@ -509,7 +516,6 @@ export default {
             }
           })
             .then((results) => {
-              // 上传完成
               const url = self.getFileUrl(results.name);
               resolve(url);
             })
@@ -524,7 +530,6 @@ export default {
         return new Promise((resolve, reject) => {
           azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
             .then((results) => {
-              // 上传完成
               const url = self.getFileUrl(fileItem.fileName);
               resolve(url);
             })
@@ -650,7 +655,7 @@ export default {
             commentTemp.push(obj);
           })
         }
-        if (self.eventList[i].sourceObj != null) { // 通过通道创建的反馈问题
+        if (self.eventList[i].sourceObj != null) { 
           await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
             self.uploadingnumOfPic++;
             const commentObj = {
@@ -669,7 +674,7 @@ export default {
           }
 
           obj.deviceId = self.eventList[i].sourceObj.deviceId;
-        } else { // 通过加号创建的问题反馈
+        } else {
           // obj.diviceId=-1;
         }
         obj.attachment = commentTemp;
@@ -1168,7 +1173,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  $red:#f31d65;
+  $red:#c60957;
   $black:#182752;
   $border:#e3e9f4;
   $background:#f4f5f9;
@@ -1359,7 +1364,7 @@ export default {
         .sug-label{
           font-size: calc(12/1920*100vw);
           display: block;
-          margin-bottom: 10px;
+          margin-bottom: 16px;
         }
         .rules{
           font-size: 10px;
@@ -1400,9 +1405,9 @@ export default {
           font-weight: bold;
           .header-store-name{
             font-size: calc(16/1920*100vw);
-            color: $tab;
+            color: #484848;
             .store-name{
-              color: $black;
+              // color: $black;
             }
             .en-store-name{
               margin-right: 20px;
@@ -1509,10 +1514,9 @@ export default {
           border: 1px solid $border;
           border-top:0;
           .content-title{
-            border-left:4px solid #eb1d63;
             font-size: calc(14 / 1920 * 100vw);
             color:#7d8cad;
-            padding-left:calc(20 / 1920 * 100vw);
+            padding-left:calc(10 / 1920 * 100vw);
             font-weight: bold;
           }
           .content-detail{
@@ -1520,18 +1524,18 @@ export default {
             .content-detail-title{
               margin-top: 10px;
               min-height:70px;
-              background-color:$background;
+              background-color: #fff;
               padding-left:calc(20 / 1920 * 100vw);
               padding-right: calc(20 / 1920 * 100vw);
               padding-top:10px;
               padding-bottom: 10px;
               display: flex;
               .ignore-btn{
-                width:50px;
+                width:90px;
                 height:24px;
-                background-color: #434c5e;
+                background-color: #f7f9fa;
                 font-size: 12px;
-                color:#ffffff;
+                color:#556679;
                 font-weight: bold;
                 line-height: 25px;
                 text-align: center;
@@ -1540,9 +1544,9 @@ export default {
               .title-btn{
                 width:100px;
                 height:25px;
-                background-color: #fcba3f;
+                background-color: #edf8f9;
                 font-size:12px;
-                color:#ffffff;
+                color:#006ab7;
                 font-weight: bold;
                 line-height: 25px;
                 text-align: center;
@@ -1570,9 +1574,8 @@ export default {
               }
             }
             .content-detail-main{
-              padding-top: 10px;
-              padding-left:calc(20 / 1920 * 100vw);
-              padding-right: calc(20 / 1920 * 100vw);
+              padding: 10px;
+              background-color:$background;
               .cdm-title{
                 font-size:calc(12 / 1920 * 100vw);
                 color:#94a4b4;

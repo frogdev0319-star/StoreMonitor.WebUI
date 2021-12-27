@@ -317,7 +317,7 @@
               <img :src="deleteInspectIcon" alt="delete" @click="deleteEventDes(index)"/>
               <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
                 <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                <hr class="vertical-hr"/>
+                <hr class="hr-vertical"/>
                 <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
               </div>
             </div>
@@ -2027,7 +2027,7 @@ export default {
     display: flex;
     align-items: center;
   }
-  .vertical-hr {    
+  .hr-vertical {    
     margin: 0;
     -webkit-flex-shrink: 0;
     -ms-flex-negative: 0;

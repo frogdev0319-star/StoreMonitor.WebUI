@@ -13,9 +13,9 @@
         @click="showFavorite = !showFavorite"
         :style="showFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}"
         style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px">
-          {{ '關注門店' }}
+          {{ $t('remotePatrol.favoriteStore') }}
         </div>
-        <el-select class="filters paper" v-model="store.storeId" placeholder="请选择" @change="changeSelStore">
+        <el-select class="filters paper" v-model="store.storeId" :placeholder="$t('remotePatrol.selectStores')" @change="changeSelStore">
           <el-option
             v-for="item in options"
             :key="item.storeId"
@@ -36,7 +36,7 @@
           <div style="flex: 1"></div>
           <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
             <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon"  style="margin-right: 10px">
-            {{isFullScreenMode? '預設模式':'寬螢幕模式'}}
+            {{isFullScreenMode? $t('remotePatrol.defaulteMode'):$t('remotePatrol.fullScreenMode')}}
             </div>
         </div>
         <el-dialog
@@ -126,7 +126,7 @@
                     <img :src="deleteInspectIcon" alt="delete" />
                     <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
                       <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                      <hr class="vertical-hr"/>
+                      <hr class="hr-vertical"/>
                       <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
                     </div>
                   </div>
@@ -147,7 +147,7 @@
                     size="mini" 
                     style="position: absolute; right: 5px; bottom: 5px;"
                     @click="itemSubmitEventDescription()"
-                  >確認</el-button>
+                  >{{$t('remotePatrol.confirm')}}</el-button>
                 </div>
                 <div v-else style="position: relative; margin-top: 10px">
                   <el-input
@@ -165,7 +165,7 @@
                     size="mini" 
                     style="position: absolute; right: 5px; bottom: 5px;"
                     @click="itemSubmitEventDescription()"
-                  >確認</el-button>
+                  >{{$t('remotePatrol.confirm')}}</el-button>
                 </div>
               </div>
             </div>
@@ -238,7 +238,7 @@
                   <img :src="deleteInspectIcon" alt="delete" />
                   <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
                     <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                    <hr class="vertical-hr"/>
+                    <hr class="hr-vertical"/>
                     <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
                   </div>
                 </div>
@@ -259,7 +259,7 @@
                   size="mini" 
                   style="position: absolute; right: 5px; bottom: 5px;"
                   @click="itemSubmitEventDescription()"
-                >確認</el-button>
+                >{{$t('remotePatrol.confirm')}}</el-button>
               </div>
               <div v-else style="position: relative; margin-top: 10px">
                 <el-input
@@ -277,7 +277,7 @@
                   size="mini" 
                   style="position: absolute; right: 5px; bottom: 5px;"
                   @click="itemSubmitEventDescription()"
-                >確認</el-button>
+                >{{$t('remotePatrol.confirm')}}</el-button>
               </div>
             </div>
           </div>
@@ -309,11 +309,11 @@
             @ezvizCutPictureFeedback="ezvizPictureFeedback"
           />
         </div>
-        <div class="channelbar-content">
-          <div class="channel-content">
+        <div class="channelbar-content" style="flex: 1">
+          <div class="channel-content" style="height: 100%; display: flex; flex-direction: column;">
             <div v-if="isFullScreenMode" class="padding flex-center">
-              <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
-              <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
+              <span style="margin-right: 20px; line-height: 36px">{{ $t('remotePatrol.selectInspect') }}</span>
+              <el-select v-model="patrolstore" :laceholder="$t('remotePatrol.selectInspect')" @change="changeInspect">
                 <el-option
                   v-for="item in PatrolList"
                   :key="item.id"
@@ -329,13 +329,17 @@
                 {{ $t('remotePatrol.confirmSum') }}
               </el-button>
             </div>
-            <span style="float: left; margin: 16px;">{{ '攝影機列表' }}</span>
-            <div class="channels-srollbar">
+            <div class="flex-center" style="margin: 15px">
+              <span style="text-align: left">{{ $t('remotePatrol.channelList') }}</span>
+              <div class="spacer"/>
+              <search-text style="width: 156px" v-model="channelFilterStr"/>
+            </div>
+            <div class="channels-srollbar" style="flex: 1; overflow: auto">
               <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div>
               <div class="btn-content" v-if="!curItem.disabled">
-                <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
+                <div v-for="(item,index) in showChannelBtns.filter(channel => channel.name.indexOf(channelFilterStr) > -1)" :key="index" class="btn-details">
                   <div 
                     @click="clickBtn(item,index)"
                     class="channel"
@@ -357,8 +361,8 @@
         <div :class="{paper: !isFullScreenMode, flex: isFullScreenMode}" :style="isFullScreenMode ? {'margin': '0 auto 20px 0'}: {}">
           <div style="padding: 20px">
             <div v-if="!isFullScreenMode" class="flex-center">
-              <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
-              <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
+              <span style="margin-right: 20px; line-height: 36px;">{{ $t('remotePatrol.selectInspect') }}</span>
+              <el-select v-model="patrolstore" :placeholder="$t('remotePatrol.selectInspect')" @change="changeInspect">
                 <el-option
                   v-for="item in PatrolList"
                   :key="item.id"
@@ -402,27 +406,30 @@
             </template>
             <template v-else>
               <div class="groups">
+                <search-text style="width: 100%; margin: 5px 0;" v-model="groupFilterStr"/>
                 <div 
-                  v-for="(_item,_index) in sheetName" 
+                  v-for="(_item,_index) in sheetName.filter(sheet => sheet.label.indexOf(groupFilterStr) > -1)" 
                   :key="_index" 
                 >
-                <template v-if="_item.isCategory">
-                  <div
-                    class="group"
-                    @click="changeSheet(_item,_index)"
-                    :class="{ group__active: _item.isClick }">
-                    {{ _item.label}}
-                  </div>
-                </template>
-                <template v-else>
-                  <div 
-                    class="group"
-                    :class="{ group__active: _item.isClick }"
-                    @click="getItemOfCategory(_item, _index)"
-                  >
-                    {{ _item.label}}
-                  </div>
-                </template>
+                  <template v-if="_item.isCategory">
+                    <div
+                      class="group"
+                      @click="changeSheet(_item,_index)"
+                      :style="_index === 0 ? {'margin-left': 0}:{}"
+                      :class="{ group__active: _item.isClick }">
+                      {{ _item.label}}
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div 
+                      class="group"
+                      :class="{ group__active: _item.isClick }"
+                      :style="_index === 0 ? {'margin-left': 0}:{}"
+                      @click="getItemOfCategory(_item, _index)"
+                    >
+                      {{ _item.label}}
+                    </div>
+                  </template>
                 </div>
               </div>
             </template>
@@ -430,10 +437,7 @@
 
           <div :style="isFullScreenMode?{'margin-right': '20px', 'margin-left': '20px'}:{'margin': 'auto'}" style="flex: 1; height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto;">
             <template v-if="patrolstore===''">
-              {{'選擇巡檢表'}}
-            </template>
-            <template v-else-if="curGroup===null">
-              {{'選擇巡檢項'}}
+              {{$t('remotePatrol.selectInspect')}}
             </template>
             <template v-else-if="showFeedBack">
               <div class="paper" style="height: 100%; position: relative; padding: 20px 0; oveflow: auto">
@@ -445,7 +449,7 @@
                   <div class="flex-center margin-bottom-sm">
                     <span>{{ `${index+1}. ${item.eventName}` }}</span>
                     <div style="flex: 1"></div>
-                    <div class="font-size-sm" style="border: 1px solid #c60957; padding: 3px 9px; border-radius: 5px; color: #c60957" @click="deleteEvent(item,index)">{{'刪除'}}</div>
+                    <div class="font-size-sm" style="border: 1px solid #c60957; padding: 3px 9px; border-radius: 5px; color: #c60957" @click="deleteEvent(item,index)">{{$t('titleView.delete')}}</div>
                   </div>
                   <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2">
                     <el-image
@@ -460,10 +464,10 @@
                   <div style="flex: 1; text-align: left;">
                     <div v-if="item.eventDes.trim().length > 0">
                       <div v-for="(text, _index) in item.eventDes.split('|')" :key="_index" class="flex-center">
-                        <img :src="deleteInspectIcon" alt="delete" @click="editFeedback(item, index)"/>
+                        <img :src="deleteInspectIcon" :alt="$t('titleView.delete')" @click="editFeedback(item, index)"/>
                         <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px">
                           <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                          <hr class="vertical-hr"/>
+                          <hr class="hr-vertical"/>
                           <img :src="editInspectIcon" @click="editFeedback(item, index)" alt="edit" style="margin: 5px"/>
                         </div>
                       </div>
@@ -531,21 +535,21 @@
                                   @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
                               </el-dropdown-menu>
                             </el-dropdown>
-                            <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ '略過' }}</span>
-                            <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ '取消' }}</span>
+                            <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ $t('remotePatrol.ignore') }}</span>
+                            <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ $t('remotePatrol.cancel') }}</span>
                           </template>
                           <div v-if="item.checked" class="icon-clicked"/>
                         </div>
                         <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="font-size-sm" style="text-align: left">
                           {{ item.description }}
                         </div>
-                        <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{'缺失紀錄:' + item.lastUnqualifiedNumber}} </div>
+                        <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{$t('remotePatrol.missingRecord') + item.lastUnqualifiedNumber}} </div>
                         <div v-if="item.inspectText.trim().length > 0">
                           <div v-for="(text, index) in item.inspectText.split('|')" :key="index" class="flex-center">
                             <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
                             <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${item.inspectEdit.index === index ? '#006ab7': 'transparent'}` }">
                               <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                              <hr class="vertical-hr"/>
+                              <hr class="hr-vertical"/>
                               <img @click="editDescription(index, item)" :src="editInspectIcon" alt="edit" style="margin: 5px"/>
                             </div>
                           </div>
@@ -568,7 +572,7 @@
                             :disabled="item.disabled"
                             style="position: absolute; right: 5px; bottom: 5px;"
                             @click="itemSubmitDescription(item)"
-                          >確認</el-button>
+                          >{{$t('remotePatrol.confirm')}}</el-button>
                         </div>
                         <div v-else style="position: relative">
                           <el-input
@@ -588,7 +592,7 @@
                             :disabled="item.disabled"
                             style="position: absolute; right: 5px; bottom: 5px;"
                             @click="itemSubmitDescription(item)"
-                          >確認</el-button>
+                          >{{$t('remotePatrol.confirm')}}</el-button>
                         </div>
                       </div>
                     </div>
@@ -596,7 +600,6 @@
                 </div>
               </template>
               <template v-else>
-                <!-- 一層 -->
                 <div class="paper padding font-size-md">
                   <div class="flex">
                     <span style="border-left: 4px solid #2c90d9; padding-left: 5px;">{{ this.curGroup && this.curGroup.label }}</span>
@@ -644,8 +647,8 @@
                                 @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
                             </el-dropdown-menu>
                           </el-dropdown>
-                          <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ '略過' }}</span>
-                          <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ '取消' }}</span>
+                          <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{$t('remotePatrol.ignore')}}</span>
+                          <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{$t('remotePatrol.cancel')}}</span>
                         </template>
                         <div v-if="item.checked" class="icon-clicked"/>
                       </div>
@@ -668,13 +671,13 @@
                           </div>
                         </div>
                       </div>
-                      <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{'缺失紀錄:' + item.lastUnqualifiedNumber}} </div>
+                      <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{$t('remotePatrol.missingRecord') + item.lastUnqualifiedNumber}} </div>
                         <div v-if="item.inspectText.trim().length > 0">
                           <div v-for="(text, index) in item.inspectText.split('|')" :key="index" class="flex-center">
                             <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
                             <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${item.inspectEdit.index === index ? '#006ab7': 'transparent'}` }">
                               <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                              <hr class="vertical-hr"/>
+                              <hr class="hr-vertical"/>
                               <img @click="editDescription(index, item)" :src="editInspectIcon" alt="edit" style="margin: 5px"/>
                             </div>
                           </div>
@@ -697,7 +700,7 @@
                             :disabled="item.disabled"
                             style="position: absolute; right: 5px; bottom: 5px;"
                             @click="itemSubmitDescription(item)"
-                          >確認</el-button>
+                          >{{$t('remotePatrol.confirm')}}</el-button>
                         </div>
                         <div v-else style="position: relative">
                           <el-input
@@ -717,7 +720,7 @@
                             :disabled="item.disabled"
                             style="position: absolute; right: 5px; bottom: 5px;"
                             @click="itemSubmitDescription(item)"
-                          >確認</el-button>
+                          >{{$t('remotePatrol.confirm')}}</el-button>
                         </div>
                   </div>
                 </div>
@@ -745,6 +748,7 @@ import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
 import StoreFilter from '@/components/StoreFilter';
+import SearchText from '@/components/SearchText';
 
 export default {
   name: 'ReInspection',
@@ -755,7 +759,8 @@ export default {
     DashVideo,
     EzvizVideo,
     BeseyeVideo,
-    StoreFilter
+    StoreFilter,
+    SearchText
   },
   data() {
     return {
@@ -959,7 +964,9 @@ export default {
       allRemarkItemsFlag: false,
       isFullScreenMode: false,
       groupItems: [],
-      storeOptions: []
+      storeOptions: [],
+      channelFilterStr: '',
+      groupFilterStr: ''
     };
   },
   computed: {
@@ -3047,7 +3054,8 @@ export default {
       this.eventName = feedbackObj.eventName;
       this.eventDes = feedbackObj.eventDes;
       this.showEventNameInfo = false;
-    }
+    },
+
   }
 };
 </script>
@@ -3363,9 +3371,8 @@ export default {
     }
     .lside{
       padding-bottom: calc(25/1920*100vw);
-      // margin-right: calc(25/1920*100vw);
-      // border: 1px solid $border;
-      // background-color: #fff;
+      display: flex;
+      flex-direction: column;
       margin: 0 calc(25/1920*100vw) 0 0;
       .el-header-title{
         text-align: left;
@@ -3917,9 +3924,9 @@ export default {
             span{
               width: 100%;
               display: block;
-              white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-              overflow: hidden; //隐藏超出单元格的部分。
-              text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+              white-space: nowrap; 
+              overflow: hidden; 
+              text-overflow: ellipsis; 
             }
           }
           .guide-lside{
@@ -4044,9 +4051,9 @@ export default {
             span{
               width: 100%;
               display: block;
-              white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-              overflow: hidden; //隐藏超出单元格的部分。
-              text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
           }
           .noraml-title{
@@ -4350,9 +4357,9 @@ export default {
             cursor: pointer;
             @include point(width,76);
             @include point(padding,6);
-            white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-            overflow: hidden; //隐藏超出单元格的部分。
-            text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           .store-name{
             display: inline-block;
@@ -4369,9 +4376,9 @@ export default {
             span{
               width: 100%;
               display: block;
-              white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
-              overflow: hidden; //隐藏超出单元格的部分。
-              text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
           }
 
@@ -4418,6 +4425,7 @@ export default {
         }
       }
       .channelbar-content{
+        flex: 1;
         .rside-hr{
           width: 100%;
           border: 0.5px solid $border;
