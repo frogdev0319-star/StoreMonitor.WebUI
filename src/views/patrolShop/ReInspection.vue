@@ -309,10 +309,10 @@
             @ezvizCutPictureFeedback="ezvizPictureFeedback"
           />
         </div>
-        <div class="channelbar-content">
-          <div class="channel-content">
+        <div class="channelbar-content" style="flex: 1">
+          <div class="channel-content" style="height: 100%; display: flex; flex-direction: column;">
             <div v-if="isFullScreenMode" class="padding flex-center">
-              <span style="margin-right: 20px; line-height: 36px;">{{ '選擇巡檢表' }}</span>
+              <span style="margin-right: 20px; line-height: 36px">{{ '選擇巡檢表' }}</span>
               <el-select v-model="patrolstore" placeholder="请选择" @change="changeInspect">
                 <el-option
                   v-for="item in PatrolList"
@@ -329,13 +329,17 @@
                 {{ $t('remotePatrol.confirmSum') }}
               </el-button>
             </div>
-            <span style="float: left; margin: 16px;">{{ '攝影機列表' }}</span>
-            <div class="channels-srollbar">
+            <div class="flex-center" style="margin: 15px">
+              <span style="text-align: left">{{ '攝影機列表' }}</span>
+              <div class="spacer"/>
+              <el-input style="width: 156px" v-model="channelFilterStr"/>
+            </div>
+            <div class="channels-srollbar" style="flex: 1; overflow: auto">
               <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div>
               <div class="btn-content" v-if="!curItem.disabled">
-                <div v-for="(item,index) in showChannelBtns" :key="index" class="btn-details">
+                <div v-for="(item,index) in showChannelBtns.filter(channel => channel.name.indexOf(channelFilterStr) > -1)" :key="index" class="btn-details">
                   <div 
                     @click="clickBtn(item,index)"
                     class="channel"
@@ -959,7 +963,8 @@ export default {
       allRemarkItemsFlag: false,
       isFullScreenMode: false,
       groupItems: [],
-      storeOptions: []
+      storeOptions: [],
+      channelFilterStr: ''
     };
   },
   computed: {
@@ -3047,7 +3052,8 @@ export default {
       this.eventName = feedbackObj.eventName;
       this.eventDes = feedbackObj.eventDes;
       this.showEventNameInfo = false;
-    }
+    },
+
   }
 };
 </script>
@@ -3363,9 +3369,8 @@ export default {
     }
     .lside{
       padding-bottom: calc(25/1920*100vw);
-      // margin-right: calc(25/1920*100vw);
-      // border: 1px solid $border;
-      // background-color: #fff;
+      display: flex;
+      flex-direction: column;
       margin: 0 calc(25/1920*100vw) 0 0;
       .el-header-title{
         text-align: left;
@@ -4418,6 +4423,7 @@ export default {
         }
       }
       .channelbar-content{
+        flex: 1;
         .rside-hr{
           width: 100%;
           border: 0.5px solid $border;
