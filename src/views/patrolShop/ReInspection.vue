@@ -27,7 +27,7 @@
       </div>
     </el-row>
     <el-row class="el-container" :class="isFullScreenMode ? 'block paper' : 'flex'">
-      <el-col :span="isFullScreenMode ? 24: 16" class="lside" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" >
+      <el-col :span="isFullScreenMode ? 24: 12" class="lside" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" >
         <div class="el-header-title flex-center">
           <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
           <span v-if="showStoreUp" class="lside-title">
@@ -329,7 +329,7 @@
                 {{ $t('remotePatrol.confirmSum') }}
               </el-button>
             </div>
-            <div class="flex-center" style="margin: 15px">
+            <div class="flex-center" style="margin: 20px">
               <span style="text-align: left">{{ $t('remotePatrol.channelList') }}</span>
               <div class="spacer"/>
               <search-text style="width: 156px" v-model="channelFilterStr"/>
@@ -338,8 +338,18 @@
               <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div>
-              <div class="btn-content" v-if="!curItem.disabled">
-                <div v-for="(item,index) in showChannelBtns.filter(channel => channel.name.indexOf(channelFilterStr) > -1)" :key="index" class="btn-details">
+              <div 
+                class="btn-content" 
+                v-if="!curItem.disabled"
+                :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
+              >
+                <div 
+                  v-for="(item,index) in showChannelBtns.filter(channel => channel.name.indexOf(channelFilterStr) > -1)" 
+                  :key="index" 
+                  class="btn-details"
+                  :class="{'not-first-margin': isFullScreenMode}"
+                  :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
+                >
                   <div 
                     @click="clickBtn(item,index)"
                     class="channel"
@@ -357,7 +367,7 @@
           </div>
         </div>
       </el-col>
-      <el-col :span="isFullScreenMode ? 24: 16">
+      <el-col :span="isFullScreenMode ? 24: 12">
         <div :class="{paper: !isFullScreenMode, flex: isFullScreenMode}" :style="isFullScreenMode ? {'margin': '0 auto 20px 0'}: {}">
           <div style="padding: 20px">
             <div v-if="!isFullScreenMode" class="flex-center">
@@ -435,7 +445,10 @@
             </template>
           </div>
 
-          <div :style="isFullScreenMode?{'margin-right': '20px', 'margin-left': '20px'}:{'margin': 'auto'}" style="flex: 1; height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto;">
+          <div 
+            :class="{'flex-wrap':$store.getters.collapsed && isFullScreenMode}"
+            :style="isFullScreenMode?{'margin-right': '20px', 'margin-left': '20px'}:{'margin': 'auto'}" 
+            style="flex: 1; height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto;">
             <template v-if="patrolstore===''">
               {{$t('remotePatrol.selectInspect')}}
             </template>
@@ -481,123 +494,120 @@
             </template>
             <template v-else>
               <template v-if="isCategory">
-                <div>
-                  <el-scrollbar style="height: 550px">
-                    <div
-                      v-for="(_item,_index) in groupItems" 
-                      :key="_index"
-                      class="paper padding font-size-md"
-                      :class="{'margin-bottom-md': _index !== groupItems.length}"
-                    >
-                      <div class="flex">
-                        <span style="border-left: 4px solid #2c90d9; padding-left: 5px;">{{_item.groupName}}</span>
+                  <div
+                    v-for="(_item,_index) in groupItems" 
+                    :key="_index"
+                    class="paper padding font-size-md"
+                    :class="{'margin-bottom-md': _index !== groupItems.length, 'margin-right-md': _index % 2 === 0 && $store.getters.collapsed}"
+                    :style="$store.getters.collapsed && isFullScreenMode ? {'width': 'calc(50% - 10px)'}: {}"
+                  >
+                    <div class="flex">
+                      <span style="border-left: 4px solid #2c90d9; padding-left: 5px;">{{_item.groupName}}</span>
+                    </div>
+                    <hr/>
+                    <div v-for="(item,index) in _item.items" :key="index" style="margin-bottom: 20px;">
+                      <div class="margin-bottom-sm flex-center" >
+                        <span
+                          style="flex: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                          :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                          :style="item.checked?{'font-weight':'bold'}:{}"
+                          :title="`${index+1}. ${item.subject}`"
+                          @click="!item.manualIgnore && clickItem(item,index)">
+                          {{ `${item.subject}` }}
+                        </span>
+                        <template v-if="item.itemType === 0">
+                          <div 
+                            v-if="item.groupType !== 1" 
+                            class="check_scoring"
+                            style="margin-right: 20px; margin-left: 20px"
+                            :class="!item.manualIgnore?'noraml-title':'ignore-title'" 
+                          >
+                            <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                              :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
+                              {{ itemDS.scoreTitle }}
+                            </p>
+                          </div>
+                          <el-dropdown 
+                            :disabled="item.disabled" 
+                            v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                            trigger="click" 
+                            class="item-score" 
+                            size="small"
+                            style="margin-right: 20px; margin-left: 20px"
+                          >
+                            <span class="el-dropdown-link" :class="item.isQualified ? 'color-qualified' : 'color-unqualified'">
+                              {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
+                              <i class="el-icon-arrow-down el-icon--right"/>
+                            </span>
+                            <el-dropdown-menu slot="dropdown" class="score-menu">
+                              <el-dropdown-item
+                                v-for="itemDS in item.itemScoreLength"
+                                :key="itemDS"
+                                style="width:70px;text-align:center;"
+                                @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
+                            </el-dropdown-menu>
+                          </el-dropdown>
+                          <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ $t('remotePatrol.ignore') }}</span>
+                          <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ $t('remotePatrol.cancel') }}</span>
+                        </template>
+                        <div v-if="item.checked" class="icon-clicked"/>
                       </div>
-                      <hr/>
-                      <div v-for="(item,index) in _item.items" :key="index" style="margin-bottom: 20px;">
-                        <div class="margin-bottom-sm flex-center" >
-                          <span
-                            style="flex: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-                            :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                            :style="item.checked?{'font-weight':'bold'}:{}"
-                            :title="`${index+1}. ${item.subject}`"
-                            @click="!item.manualIgnore && clickItem(item,index)">
-                            {{ `${item.subject}` }}
-                          </span>
-                          <template v-if="item.itemType === 0">
-                            <div 
-                              v-if="item.groupType !== 1" 
-                              class="check_scoring"
-                              style="margin-right: 20px; margin-left: 20px"
-                              :class="!item.manualIgnore?'noraml-title':'ignore-title'" 
-                            >
-                              <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
-                                :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
-                                {{ itemDS.scoreTitle }}
-                              </p>
-                            </div>
-                            <el-dropdown 
-                              :disabled="item.disabled" 
-                              v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                              trigger="click" 
-                              class="item-score" 
-                              size="small"
-                              style="margin-right: 20px; margin-left: 20px"
-                            >
-                              <span class="el-dropdown-link" :class="item.isQualified ? 'color-qualified' : 'color-unqualified'">
-                                {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                                <i class="el-icon-arrow-down el-icon--right"/>
-                              </span>
-                              <el-dropdown-menu slot="dropdown" class="score-menu">
-                                <el-dropdown-item
-                                  v-for="itemDS in item.itemScoreLength"
-                                  :key="itemDS"
-                                  style="width:70px;text-align:center;"
-                                  @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
-                              </el-dropdown-menu>
-                            </el-dropdown>
-                            <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ $t('remotePatrol.ignore') }}</span>
-                            <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ $t('remotePatrol.cancel') }}</span>
-                          </template>
-                          <div v-if="item.checked" class="icon-clicked"/>
-                        </div>
-                        <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="font-size-sm" style="text-align: left">
-                          {{ item.description }}
-                        </div>
-                        <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{$t('remotePatrol.missingRecord') + item.lastUnqualifiedNumber}} </div>
-                        <div v-if="item.inspectText.trim().length > 0">
-                          <div v-for="(text, index) in item.inspectText.split('|')" :key="index" class="flex-center">
-                            <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
-                            <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${item.inspectEdit.index === index ? '#006ab7': 'transparent'}` }">
-                              <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                              <hr class="hr-vertical"/>
-                              <img @click="editDescription(index, item)" :src="editInspectIcon" alt="edit" style="margin: 5px"/>
-                            </div>
+                      <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="font-size-sm" style="text-align: left">
+                        {{ item.description }}
+                      </div>
+                      <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{$t('remotePatrol.failedRecord') + item.lastUnqualifiedNumber}} </div>
+                      <div v-if="item.inspectText.trim().length > 0">
+                        <div v-for="(text, index) in item.inspectText.split('|')" :key="index" class="flex-center">
+                          <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
+                          <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${item.inspectEdit.index === index ? '#006ab7': 'transparent'}` }">
+                            <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
+                            <hr class="hr-vertical"/>
+                            <img @click="editDescription(index, item)" :src="editInspectIcon" alt="edit" style="margin: 5px"/>
                           </div>
                         </div>
-                        <div v-if="item.isEditingInspect" style="position: relative; margin-top: 10px">
-                          <el-input
-                            :autosize="{ minRows: 2, maxRows:7}"
-                            v-model="item.inspectEdit.val"
-                            :placeholder="$t('remotePatrol.coment')"
-                            :disabled="item.disabled"
-                            size="mini"
-                            class="des-input"
-                            type="textarea"
-                            resize="none"
-                            @input="(val)=>itemDescriptionChanged(val,item)"
-                            @blur="notShowInputRuleTips('item',item)"/>
-                          <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-                          <el-button 
-                            size="mini" 
-                            :disabled="item.disabled"
-                            style="position: absolute; right: 5px; bottom: 5px;"
-                            @click="itemSubmitDescription(item)"
-                          >{{$t('remotePatrol.confirm')}}</el-button>
-                        </div>
-                        <div v-else style="position: relative">
-                          <el-input
-                            :autosize="{ minRows: 2, maxRows:7}"
-                            v-model="item.inspectInput"
-                            :placeholder="$t('remotePatrol.coment')"
-                            :disabled="item.disabled"
-                            size="mini"
-                            class="des-input"
-                            type="textarea"
-                            resize="none"
-                            @input="(val)=>itemDescriptionChanged(val,item)"
-                            @blur="notShowInputRuleTips('item',item)"/>
-                          <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-                          <el-button 
-                            size="mini" 
-                            :disabled="item.disabled"
-                            style="position: absolute; right: 5px; bottom: 5px;"
-                            @click="itemSubmitDescription(item)"
-                          >{{$t('remotePatrol.confirm')}}</el-button>
-                        </div>
+                      </div>
+                      <div v-if="item.isEditingInspect" style="position: relative; margin-top: 10px">
+                        <el-input
+                          :autosize="{ minRows: 2, maxRows:7}"
+                          v-model="item.inspectEdit.val"
+                          :placeholder="$t('remotePatrol.coment')"
+                          :disabled="item.disabled"
+                          size="mini"
+                          class="des-input"
+                          type="textarea"
+                          resize="none"
+                          @input="(val)=>itemDescriptionChanged(val,item)"
+                          @blur="notShowInputRuleTips('item',item)"/>
+                        <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                        <el-button 
+                          size="mini" 
+                          :disabled="item.disabled"
+                          style="position: absolute; right: 5px; bottom: 5px;"
+                          @click="itemSubmitDescription(item)"
+                        >{{$t('remotePatrol.confirm')}}</el-button>
+                      </div>
+                      <div v-else style="position: relative">
+                        <el-input
+                          :autosize="{ minRows: 2, maxRows:7}"
+                          v-model="item.inspectInput"
+                          :placeholder="$t('remotePatrol.coment')"
+                          :disabled="item.disabled"
+                          size="mini"
+                          class="des-input"
+                          type="textarea"
+                          resize="none"
+                          @input="(val)=>itemDescriptionChanged(val,item)"
+                          @blur="notShowInputRuleTips('item',item)"/>
+                        <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                        <el-button 
+                          size="mini" 
+                          :disabled="item.disabled"
+                          style="position: absolute; right: 5px; bottom: 5px;"
+                          @click="itemSubmitDescription(item)"
+                        >{{$t('remotePatrol.confirm')}}</el-button>
                       </div>
                     </div>
-                  </el-scrollbar>
-                </div>
+                  </div>
               </template>
               <template v-else>
                 <div class="paper padding font-size-md">
@@ -671,7 +681,7 @@
                           </div>
                         </div>
                       </div>
-                      <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{$t('remotePatrol.missingRecord') + item.lastUnqualifiedNumber}} </div>
+                      <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{$t('remotePatrol.failedRecord') + item.lastUnqualifiedNumber}} </div>
                         <div v-if="item.inspectText.trim().length > 0">
                           <div v-for="(text, index) in item.inspectText.split('|')" :key="index" class="flex-center">
                             <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
@@ -4459,22 +4469,6 @@ export default {
           .icon-arrow{
             cursor: pointer;
           }
-          .btn-content{
-            width: 86%;
-            float: left;
-            display: flex;
-            .btn-details{
-              display: inline-block;
-              margin-bottom: 5px;
-              margin-left: calc(20/1920*100vw);
-              overflow: hidden;
-              white-space: nowrap;
-              text-overflow: ellipsis;
-              &:last-child{
-                margin-right: calc(20/1920*100vw);
-              }
-            }
-          }
         }
       }
     }
@@ -4751,9 +4745,8 @@ export default {
     right: 6px;
   }
   .channel {
-    width: 246px;
+    width: 100%;
     height: 40px;
-    margin: 12px 16px 16px;
     padding: 8px 10px 8px 16px;
     border-radius: 5px;
     border: solid 1px #e6e6e6;
@@ -4770,13 +4763,14 @@ export default {
   .btn-content{
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
+    padding: 0 20px;
     .btn-details{
+      cursor: pointer;
       margin-bottom: 5px;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      &:last-child{
-      }
     }
   }
 </style>
