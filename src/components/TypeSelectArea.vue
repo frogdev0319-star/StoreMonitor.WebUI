@@ -13,7 +13,7 @@
             <div style="width:1px; height:20px;background-color:#556679;align-self: center;"></div>
             <div v-if="allowAll">
               <multi-select
-                ref="multiSelect"
+                ref="multiSelectTypeSelected"
                 class="area-muti"
                 :compareType="compareType"
                 :selected="curSelectId"
@@ -231,6 +231,7 @@ export default {
         deep: true,
         handler (val,old ) {
           const self = this;
+          console.log("Change curStoes")
           let curStoreList = [];      
         //  console.log(val)
         //  console.log( this.orginStoreList) 
@@ -532,7 +533,6 @@ export default {
           this.curTypeArrary = this.curStoreList;
           break;
       }
-      console.log(this.curTypeArrary )
       if(this.curSelectId.length==0 ){
           let defaultSel = this.curTypeArrary.length;
           let selectedLabels = [];
@@ -544,16 +544,14 @@ export default {
             storeIds.push(this.curTypeArrary[i].storeIds)
           }
           this.onChangeCompareType({selectedArray:this.curSelectId,storeIds,selectedLabels});
-            //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});
-        
-            
+            //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});    
       }
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
       console.log("onChangeCompareType > selectedArray:",selectedArray);
       console.log("onChangeCompareType > selectedLabels:",selectedLabels);
-      /*
+      
       this.curSelectId = selectedArray;
       let originArray = [];
       this.curTypeArrary.forEach(function(item){
@@ -566,8 +564,6 @@ export default {
           if(item!='-1')compareArr.push(item)
       })
       this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:compareArr,selectedLabels,originArray});
-      */
-      //this.changeStoreNew(arr);
     },
     doGetStoreIdsByProvince(provinceArrary){
       //console.log("provinceArrary:",provinceArrary);

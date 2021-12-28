@@ -5,9 +5,8 @@
       :placeholder="placeholder"
       :disabled="disabled"
       multiple
-      value-key="value"
-      :taggable="false"
-      clearOnSelect="false"
+      collapse-tags
+      class="el-province"
       @change="changeSelect"
       @visible-change="visibileHandler">
       <el-option v-if="options.length > 0 && all!=''" :label="all"
@@ -295,6 +294,7 @@ export default {
   }
   .input-class2{
     height:35px;
+    background-color:#ff0;
     width: calc(160/1920*100vw - 30px);
     position: absolute;
     top: 0;

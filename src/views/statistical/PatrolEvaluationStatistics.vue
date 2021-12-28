@@ -1339,11 +1339,11 @@ export default {
     },
     emitTypeChangedPart1({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
       console.log("Part1 Emit Type Change="+compareType)
-      //this.part1.compareType = compareType;
-     // this.part1.compareIds = compareArr;
-      //this.part1.comapareLabels = selectedLabels;
-      //this.part1.originArray = originArray;
-     // this.dataGetPart1();
+      this.part1.compareType = compareType;
+      this.part1.compareIds = compareArr;
+      this.part1.comapareLabels = selectedLabels;
+      this.part1.originArray = originArray;
+      this.dataGetPart1();
 
     },
     emitTypeChangedPart2({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
@@ -1352,7 +1352,7 @@ export default {
       this.part2.compareIds = compareArr;
       this.part2.comapareLabels = selectedLabels;
       this.part2.originArray = originArray;
-      //this.dataGetPart2();
+      this.dataGetPart2();
 
     },
     emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
@@ -1361,7 +1361,7 @@ export default {
       this.part3.compareIds = compareArr;
       this.part3.comapareLabels = selectedLabels;
       this.part3.originArray = originArray;
-      //this.dataGetPart3();
+      this.dataGetPart3();
 
     },
     getInspectLineOption() {
@@ -1537,29 +1537,29 @@ export default {
     
       const self = this;
       const params = {};
+
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
-      params.regionMode = self.regionMode;
-      params.storeIds = self.params.storeId;
-      params.inspectTagId = self.params.inspectTagId ;
-      const overviewResult = await self.getInspectReulstStatsOverview(params);
-      if (overviewResult.errCode === 0) {
-        const result = overviewResult.data;
+      params.regionMode = 3;
+      params.storeIds = self.params.storeIds;
+      params.inspectTagId = self.params.inspectId;
+      const storeResult = await self.getInspectStatsOverviewWithRegion(params);
+      if (storeResult.errCode === 0) {
+        const result = storeResult.data;
         if (result) {
+          let total = 0;
+          let nums = 0;
           console.log(result)
-          this.overviewCount.store = result.numOfStores;
-          this.overviewCount.items = result.numOfInspects;
-          if(result.overallByAverageScore){
-            this.overviewCount.avgScore = result.overallByAverageScore.average;
-          }
-          else{
-            this.overviewCount.avgScore = -1;
-          }
-          
+          result.content.forEach(function(item){
+            total += item.averageScore * item.numOfReport;
+            nums +=item.numOfReport;
+          })
+          this.overviewCount.avgScore= -1;
+          this.overviewCount.store = result.content.length;
+          this.overviewCount.items = result.content.nums;
+          if(nums>0) this.overviewCount.avgScore=Math.round(total/nums)
         }
-      } else {
-        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
-      }
+      } 
     },
 
     async dataGetPart1() {
@@ -1567,6 +1567,7 @@ export default {
       const self = this;
       const params = {};
       this.part1.pieOption = null;
+      this.part1.storeTableData = null;
       this.part1.barRegionOption = null;
       this.part1.barStoreOption = null;
       params.beginTs = self.params.beginTs;
@@ -1598,9 +1599,17 @@ export default {
       //self.getInspectStatsLine();:
     },
     async dataGetPart2(){
+      this.part2.pieOption = null;
+      this.part2.storeTableData = null;
+      this.part2.barRegionOption = null;
+      this.part2.barStoreOption = null;
       await this.getPart2RegionBar();
     },
     async dataGetPart3(){
+      this.part3.pieOption = null;
+      this.part3.storeTableData = null;
+      this.part3.barRegionOption = null;
+      this.part3.barStoreOption = null;
       await this.getPart3RegionBar();
     },
     async getInspectStatsOverviewOfRegionTable() {
