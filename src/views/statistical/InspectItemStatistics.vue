@@ -4,7 +4,7 @@
       <el-col :span="24">
         <search-component
           ref="inspectItemSearch"
-          :is-patrol = "true"
+          isInspectItem="true"
           :default-sort="defaultSort"
           path="inspectItemStatistics"
           @emitSearch = "emitSearch"
@@ -83,7 +83,7 @@
                     style="margin-left:32px;background-color:#fff;"
                     type="primary"
                     size="mini"
-                    @click="export2Excel"
+                    @click="exportStore2Excel"
                   >
                     <div class="button-area">
                       <img :src="exportPng" class="icon-excel">
@@ -285,6 +285,17 @@ export default {
           'width': '217',
           'maxWidth': '180'
         }
+      ],
+      exportPart3DataHeader:
+      [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('overview.storeName'),
+        this.$t('remotePatrol.code'),
+        this.$t('statistics.submitter'),
+        this.$t('overview.numOfEvaluations'),
+        this.$t('overview.averageScore'),
+        this.$t('statistics.rank'),
       ],
       regionTableData: [],
       regionPDFData: [],
@@ -881,43 +892,18 @@ export default {
 
     async exportStore2Excel() {
       const that = this;
-      if (that.storeTableData.length === 0) {
+      if (that.part3.storeTableData.length === 0) {
         util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportDataHeader;
-        const filterVal = ['province', 'city', 'region', 'code', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
-          'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
+        const tHeader = that.exportPart3DataHeader;
+        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'averageScore', 'rank'];
         const self = this;
-        const size = self.totalStore;
-        const params = {};
-        params.beginTs = self.params.beginTs;
-        params.endTs = self.params.endTs;
-        params.regionMode = 3;
-        params.storeIds = self.params.storeIds;
-        params.inspectTagId = self.params.inspectId;
-        params.filter = {
-          'page': 0,
-          'size': size
-        };
-        params.order = self.storeOrder;
-
-        const storeResult = await that.getInspectStatsOverviewWithRegion(params);
-        let curData = [];
-        if (storeResult.errCode === 0) {
-          const result = storeResult.data;
-          if (result) {
-            result.content.forEach(item => {
-              item.qualifiedRateStr = item.qualifiedRate + '%';
-            });
-            curData = result.content;
-          }
-        }
-        const data = that.formatJson(filterVal, curData);
-        const name = self.params.inspectId==='' ? 'Store' : self.storePatrolLists;
-        const fileName = name + '-' + util.getCurDateStr();
+        const data = that.formatJson(filterVal, that.part3.storeTableData);
+        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
+        const fileName = name + '_Inspection item score_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1423,6 +1409,10 @@ export default {
       else if(this.part1.compareType=='storeGroup'){
          params.groupIds  = this.part1.compareIds;
          params.groupMode = 3;
+      }
+         else if(this.part1.compareType=='users'){
+         params.submitters  = this.part1.compareIds;
+         params.groupMode = 5;
       }
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: 20 };

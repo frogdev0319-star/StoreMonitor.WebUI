@@ -69,6 +69,10 @@ export default {
           type:Number,
           default:0
         },
+        inspectId:{
+          type:String,
+          default:''
+        },
         regionArray1:{
           type:Array,
           default() {
@@ -100,14 +104,14 @@ export default {
           }
         },
     },
-    data() {
+    data() {//,{value:'position',label:this.$t('overview.position')},{value:'users',label:this.$t('overview.user')}
         return {
             DatePickIconSrc: require('../../static/img/statistics/ic_edit.svg'),
             CalenderIconSrc: require('../../static/img/statistics/ic_calender.svg'),
             compareType:'stores',
             compareTypeItems:[{value:'area1',label:this.$t('statistics.area1')},{value:'area2',label:this.$t('statistics.area2')},
             {value:'storeGroup',label:this.$t('statistics.storeGroup')},{value:'storeType',label:this.$t('statistics.storeType')},
-            {value:'stores',label:this.$t('statistics.stores')},{value:'position',label:this.$t('overview.position')},{value:'users',label:this.$t('overview.user')}],
+            {value:'stores',label:this.$t('statistics.stores')}],
             date:Date.now(),
             dateFormat:'yyyy/MM/DD',
             //curCountry: -1, 
@@ -138,19 +142,40 @@ export default {
             positionsList: [],
         }
   },
-  created() {
-    this.getStoreListAndGroupAndType();
-    this.getSearchCondition();
+  async created() {
+    console.log("On Created")
+    await this.getStoreListAndGroupAndType();
+    //this.getSearchCondition();
   },
   watch: {
     async accountChanged(val) {
+      console.log("Get Account Changed")
       const self = this;
       if (val !== 0) {
         self.ifGetParamsFromCash = false;
         this.getStoreListAndGroupAndType();
       }
     },
+    inspectId:{
+              immediate: false, 
+        deep: true,
+       handler (val,old ) {
+          console.log("Inspect ID Changed")
+          let selectedLabels = [];
+          let storeIds = [];
+          this.curSelectId.push('-1');
+          for(let i=0; i<this.curTypeArrary.length;i++){
+            this.curSelectId.push(this.compareType=='stores'?this.curTypeArrary[i].storeId: this.curTypeArrary[i].value);
+            selectedLabels.push(this.curTypeArrary[i].label);
+            storeIds.push(this.curTypeArrary[i].storeIds)
+          }
+          this.onChangeCompareType({selectedArray:this.curSelectId,storeIds,selectedLabels});
+
+        }
+    },
     regionArray1: {
+              immediate: false, 
+        deep: true,
         handler (val,old ) {
           //console.log("RegionArray1 changed")
           this.provinceList  = [];
@@ -167,6 +192,8 @@ export default {
         }
     },
     regionArray2: {
+              immediate: false, 
+        deep: true,
         handler (val,old ) {
        //   console.log("RegionArray2 changed")
           this.cityList = [];
@@ -232,12 +259,10 @@ export default {
         handler (val,old ) {
           const self = this;
           console.log("Change curStoes")
+          console.log(val);
+          console.log(self.orginStoreList)
           let curStoreList = [];      
-        //  console.log(val)
-        //  console.log( this.orginStoreList) 
           val.map(item => {
-            //console.log(item)
-          //  console.log(self.orginStoreList[item])
             if(item!='-1' && self.orginStoreList[item]){
               curStoreList.push(self.orginStoreList[item]);
             }
@@ -251,8 +276,8 @@ export default {
         }
     },
     async curCountry(val){
-     // console.log("!!curCountry:",val);
-      this.getStoreListAndGroupAndType();
+     //console.log("!!curCountry:",val);
+    //  await this.getStoreListAndGroupAndType();
     }
   },
   computed: {
@@ -262,13 +287,14 @@ export default {
     }
   },
   methods: {
-    getStoreListAndGroupAndType() {
-     // console.log("getStoreListAndGroupAndType")
-      const storeListPromise = this.getBriefStoreData();
-      const storeGroupPromise = this.getStoreDefineList(1);
-      const storeTypePromise = this.getStoreDefineList(0);
-      Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
-        //console.log("getStoreListAndGroupAndType:",results);
+    async getStoreListAndGroupAndType() {
+      console.log("getStoreListAndGroupAndType")
+      const self = this;  
+      let results = [[],[],[]];
+      results[0] =await  this.getBriefStoreData();
+      results[1] =await this.getStoreDefineList(1);
+      results[2] =await  this.getStoreDefineList(0);
+    //  Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         const storeList = results[0];
         const groupList = results[1];
         const typeList = results[2];
@@ -288,12 +314,42 @@ export default {
           orginStoreList[item.storeId] = {value:item.storeId,label:item.name,storeId:item.storeId};
         })
         this.orginStoreList = orginStoreList;
+   
         this.getCountryStore();
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
-      }).catch(err => {
-        console.log('StoreFilter - getStoreGroupAndType: ' + err);
-      });
+
+         this.curStoreGroup.map(item => {
+            if(item!='-1'){
+              this.storeGroupList.map(store=>{
+                  if(item == store.value)
+                    this.curStoreGroupList.push(store);
+              });
+              
+            }
+          });
+          this.curStoreType.map(item => {
+            if(item!='-1'){
+              this.storeTypeList.map(store=>{
+                  if(item == store.value)
+                    this.curStoreTypeList.push(store);
+              });
+              
+            }
+          });
+          let curStoreList = [];      
+          this.curStores.map(item => {
+            if(item!='-1' && self.orginStoreList[item]){
+              curStoreList.push(self.orginStoreList[item]);
+            }
+          });
+          this.curStoreList = curStoreList;
+          console.log(this.orginStoreList)
+          console.log(this.curStoreList)
+          console.log("StoreListAndGroupAndType Leave")
+     /// }).catch(err => {
+      //  console.log('StoreFilter - getStoreGroupAndType: ' + err);
+      //});
     },
     getCountryStore() {
       this.selectAllProAndCity(this.curCountry, true);
@@ -605,7 +661,7 @@ export default {
 
 <style lang="scss" scoped>
 .content{
-    width:calc(285/1440*100vw);
+    width:calc(355/1440*100vw);
     height:35px;
     border-radius: 5px;
     display:flex;
@@ -626,7 +682,7 @@ export default {
             align-self: center;
         }
         .dropdown-select{
-            width:calc(85/1440*100vw);
+            width:calc(105/1440*100vw);
             height:36px;
             border:1px solid #f7f9fa;
             color: #2b2b2b;
@@ -635,7 +691,7 @@ export default {
         }
     }
     .area-muti{
-      width:calc(141.5/1440*100vw);
+      width:calc(180/1440*100vw);
       font-size: 15px;
       ::v-deep.el-select.el-select--medium{
          background-color: #f7f9f9 !important;
