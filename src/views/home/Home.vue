@@ -185,7 +185,7 @@
           <el-col
             v-if="!showHeader"
             :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"
-            :style="showBorder ? {'border-width':'0.5px'} : {}">
+            :style="[showBorder ? {'border-width':'0.5px'} : {}, $route.path === '/reinspection' ? {'background': '#f7f9fa url(../../static/img/reinspection_bg.png) no-repeat 100% 0'}: {'background-color': '#f4f5f9'}]">
             <keep-alive :max = "1">
               <router-view v-if="$route.meta.keepAlive"/>
             </keep-alive>
@@ -1257,7 +1257,7 @@ export default {
         /*border-width: 0;*/
         width:100%;
         //@include point(margin-right,50);
-        background-color: #f4f5f9;
+        
         min-height: calc(100vh - 80px - 45px);
       }
       .content-wrapper{
@@ -1265,7 +1265,6 @@ export default {
         padding: 30px calc(30/1920*100vw);
         /*border-width: 0;*/
         width: 100%;
-        background: #f4f5f9;
         min-height: calc(100vh - 80px - 45px);
         //@include point(margin-right,50);
       }
