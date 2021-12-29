@@ -2055,4 +2055,15 @@ export default {
       margin-left: 20px;
     }
   }
+  .el-button--primary {
+    background-color: #006ab7;
+    border-color: #006ab7;
+    &:hover {
+      background-color: #2c5a7d;
+      border-color: #2c5a7d;
+    }
+  }
+  .el-dialog__headerbtn {
+    display: none;
+  }
 </style>

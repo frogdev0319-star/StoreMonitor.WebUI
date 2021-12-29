@@ -8,15 +8,9 @@
     width="28%"
     top="35vh"
     @close="cancle">
+    <div slot="title" style="font-size: 24px; font-weight: 500" class="flex-center">{{dialogTitle}}<div class="spacer"></div><img v-if="isWarning":src="headerIcon" height="40px"></div>
     <div class="dialog-content">
-      <hr style="border: 0.5px solid #dfe2e9;">
-      <p style="margin:20px;">
-        <i
-          class="el-icon-warning"
-          style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block;
-    vertical-align: middle;"/>
-        <span style="display: inline-block; vertical-align: middle">{{ showInfo }}</span>
-      </p>
+      <span style="display: inline-block; vertical-align: middle; margin: 20px">{{ showInfo }}</span>
     </div>
     <div slot="footer" class="dialog-footer">
       <el-button v-if="isWarning" class="cancel-btn" size="mini" @click="cancle">{{ $t('remotePatrol.cancel') }}</el-button>
@@ -37,6 +31,7 @@ export default {
 
   data() {
     return {
+      headerIcon: require('../../static/img/dialog-icon.png'),
     };
   },
 
