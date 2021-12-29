@@ -8,7 +8,7 @@
     width="28%"
     top="35vh"
     @close="cancle">
-    <div slot="title" style="font-size: 24px; font-weight: 500" class="flex-center">{{dialogTitle}}<div class="spacer"></div><img v-if="isWarning":src="headerIcon" height="40px"></div>
+    <div slot="title" style="font-size: 24px; font-weight: 500" class="flex-center">{{dialogTitle}}<div class="spacer"></div><img v-if="isWarning" :src="headerIcon" height="40px"></div>
     <div class="dialog-content">
       <span style="display: inline-block; vertical-align: middle; margin: 20px">{{ showInfo }}</span>
     </div>
