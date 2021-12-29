@@ -224,7 +224,7 @@ export default {
       userName: 'Admin',
       headUrl: '',
       breadList: [],
-      collapsed: false,
+      collapsed: this.$store.getters.collapsed,
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       route: this.$route,
@@ -397,6 +397,7 @@ export default {
     },
 
     clickCollapse() {
+      this.$store.dispatch('setCollapsed', !this.collapsed)
       this.collapsed = !this.collapsed;
     },
 
@@ -1976,7 +1977,7 @@ export default {
 
 </style>
 
-<style>
+<style lang="scss">
   .paper {
     border-radius: 5px;
     background-color: #ffffff;
@@ -1984,6 +1985,10 @@ export default {
   }
   .flex {
     display: flex;
+  }
+  .flex-wrap {
+    display: flex;
+    flex-wrap: wrap;
   }
   .flex-center {
     display: flex;
@@ -2004,6 +2009,9 @@ export default {
   }
   .margin-bottom-sm {
     margin-bottom: 10px
+  }
+  .margin-right-md {
+    margin-right: 20px
   }
   .margin-bottom-md {
     margin-bottom: 20px
@@ -2041,5 +2049,10 @@ export default {
     border-style: solid;
     border-color: #e6e6e6;
     border-bottom-width: thin;
+  }
+  .not-first-margin {
+    &:not(:first-child){
+      margin-left: 20px;
+    }
   }
 </style>

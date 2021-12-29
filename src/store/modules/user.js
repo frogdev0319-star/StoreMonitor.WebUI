@@ -31,10 +31,14 @@ const user = {
     PatrolComment: '',
     videoAuthority: false,
     roleId: 0,
-    availabePathList: []
+    availabePathList: [],
+    collapsed: false
   },
 
   mutations: {
+    SET_COLLAPSED: (state, collapsed) => {
+      state.collapsed = collapsed
+    },
     SET_CODE: (state, code) => {
       state.code = code;
     },
@@ -132,7 +136,9 @@ const user = {
     setInspectHistory({ commit }, InspectHistory) {
       commit('SET_InspectHistory', InspectHistory);
     },
-
+    setCollapsed({ commit }, collapsed) {
+      commit('SET_COLLAPSED', collapsed);
+    },
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
         getDashServerInfo().then(res => {

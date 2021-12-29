@@ -15,6 +15,7 @@ const getters = {
   PatrolComment: state => state.user.PatrolComment,
   videoAuthority: state => state.user.videoAuthority,
   roleId: state => state.user.roleId,
-  availabePathList: state => state.user.availabePathList
+  availabePathList: state => state.user.availabePathList,
+  collapsed: state => state.user.collapsed
 };
 export default getters;
