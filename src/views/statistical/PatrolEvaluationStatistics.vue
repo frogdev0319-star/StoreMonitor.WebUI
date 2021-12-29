@@ -1166,9 +1166,11 @@ export default {
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}};
       this.overviewCount={store:-1,items:-1,avgScore:-1};
-      if (this.params.storeIds.length > 0) {
-        await this.dataGetOverview();
-      } 
+      await this.dataGetOverview();
+      await this.dataGetPart1() ;
+      await this.dataGetPart2() ;
+      await this.dataGetPart3() ;
+
     },
 
     async export2Excel() {

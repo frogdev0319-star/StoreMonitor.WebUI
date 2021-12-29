@@ -1741,6 +1741,10 @@ export default {
       const self = this;
       const params = {};
       this.totalAvgScore =-1;
+      this.part3.pieOption = null;
+      this.part3.storeTableData = null;
+      this.part3.barRegionOption = null;
+      this.part3.barStoreOption = null;
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.groupMode = 0;
@@ -2082,6 +2086,7 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
+      await this.dataGetPart3();
 
     },
 

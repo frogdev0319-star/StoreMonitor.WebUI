@@ -50,7 +50,7 @@ export default {
     flex-direction:row;
     position: relative;
     text-align: left;
-    width: calc(378/1440*100vw);;
+    width: calc(500/1440*100vw);;
     height: 36px;
     min-height: 28px;
     line-height: 36px;
@@ -69,7 +69,7 @@ export default {
       border-radius: 5px;
       box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
       background-color: #fff;
-      width: calc(302/1440*100vw);
+      width: calc(432/1440*100vw);
       height:36px;
       align-items:center;
     }
