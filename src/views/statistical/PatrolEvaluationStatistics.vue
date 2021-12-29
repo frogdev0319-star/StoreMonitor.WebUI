@@ -77,6 +77,7 @@
                               :cur-store-group="params.curStoreGroup"
                               :cur-store-type="params.curStoreType"
                               :cur-stores="params.curStore"
+                              :inspect-id="params.inspectId"
                               :cached-params="params"
                               :cur-country="curCountry"
                               @emitTypeChanged="emitTypeChangedPart1"
@@ -109,7 +110,7 @@
                 </div>
               </el-col>
               <el-col  :span="12"  style="height:290px;padding-top:32px">
-                    <v-chart @click='clickPart2Bar' ref="storeChart" :options="part1.barRegionOption" :auto-resize="true"
+                    <v-chart @click='clickPart1Bar' ref="storeChart" :options="part1.barRegionOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
               </el-col>
            </el-col>      
@@ -136,7 +137,7 @@
                     style="margin-left:32px;background-color:#fff;"
                     type="primary"
                     size="mini"
-                    @click="export2Excel"
+                    @click="exportStore2ExcelPart1"
                   >
                     <div class="button-area">
                       <img :src="exportPng" class="icon-excel">
@@ -186,6 +187,7 @@
                               :cur-store-type="params.curStoreType"
                               :cur-stores="params.curStore"
                               :cached-params="params"
+                              :inspect-id="params.inspectId"
                               :cur-country="curCountry"
                               @emitTypeChanged="emitTypeChangedPart2"
                           ></TypeSelectArea>
@@ -242,7 +244,7 @@
                     style="margin-left:32px;background-color:#fff;"
                     type="primary"
                     size="mini"
-                    @click="export2Excel"
+                    @click="exportStore2ExcelPart2"
                   >
                     <div class="button-area">
                       <img :src="exportPng" class="icon-excel">
@@ -300,6 +302,7 @@
                               :cur-store-group="params.curStoreGroup"
                               :cur-store-type="params.curStoreType"
                               :cur-stores="params.curStore"
+                              :inspect-id="params.inspectId"
                               :cached-params="params"
                               :cur-country="curCountry"
                               @emitTypeChanged="emitTypeChangedPart3"
@@ -346,7 +349,7 @@
                     style="margin-left:32px;background-color:#fff;"
                     type="primary"
                     size="mini"
-                    @click="export2Excel"
+                    @click="exportStore2ExcelPart3"
                   >
                     <div class="button-area">
                       <img :src="exportPng" class="icon-excel">
@@ -412,6 +415,7 @@ import TablePagination from '@/components/TablePagination_V2';
 import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import TypeSelectArea from '@/components/TypeSelectArea';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 
 export default {
   name: 'PatrolEvaluationSta',
@@ -428,6 +432,11 @@ export default {
   mixins: [resize],
   data() {
     return {
+      page:null,
+      total:null,
+      componentsProps:"",
+      sizeNum:null,
+      expandCompProperties:"",
       htmlTitle: this.$t('overview.htmltopdfA'),
       isexportPDF: false,
       storeNameStr: '',
@@ -667,6 +676,41 @@ export default {
         this.$t('overview.danger'),
         this.$t('overview.passRate'),
         this.$t('overview.averageScore')
+      ],
+      exportPart1DataHeader:
+      [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('overview.storeName'),
+        this.$t('remotePatrol.code'),
+        this.$t('statistics.submitter'),
+        this.$t('overview.numOfEvaluations'),
+        this.$t('overview.echartGood'),
+        this.$t('overview.improve'),
+        this.$t('overview.danger'),
+      ],
+      exportPart2DataHeader:
+      [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('overview.storeName'),
+        this.$t('remotePatrol.code'),
+        this.$t('statistics.submitter'),
+        this.$t('overview.numOfEvaluations'),
+        this.$t('overview.averageScore'),
+        this.$t('statistics.rank'),
+      ],
+      exportPart3DataHeader:
+      [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('overview.storeName'),
+        this.$t('remotePatrol.code'),
+        this.$t('statistics.submitter'),
+        this.$t('overview.numOfEvaluations'),
+        this.$t('statistics.numOfStandard'),
+        this.$t('statistics.sRate'),
+        this.$t('statistics.rank'),
       ],
       regionParams: {},
       chartParams: {},
@@ -1016,6 +1060,11 @@ export default {
   },
 
   methods: {
+    handlePageAndSizeChange(){
+
+    },
+    handleSortChange(){
+    },
     onSwitchPart1Mode(mode){
       this.part1.storeMode = mode;
     },
@@ -1096,25 +1145,37 @@ export default {
     async searchData() {
     
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
-      if (this.params.storeIds.length > 0) {
-        await this.dataGetOverview();
-      } else {
-        this.totalRegion = 0;
-        this.regionTableData = [];
-      //  this.getPart1RegionBar();
-        this.storeTableData = [];
-        this.regionsList = [];
-        this.curRegion = [];
-        this.regionsChartsOptions = null;
-        this.part1.pieOption = null;
-        this.part1.barRegionOption = null;
-        this.part1.barStoreOption = null;
-      }
+            this.part1 = { compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
+              pieOption:{},barRegionOption:{},barStoreOption:{}};
+      this.part2={ standardScore:-1,averageScore:-1,
+              compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
+              pieOption:{},barRegionOption:{},barStoreOption:{}};
+      this.part3 ={ standardScore:-1,averageScore:-1,
+              compareType:'stores', indexRegion:0, content:[],
+              compareIds :[],comapareLabels:[],originArray:[],
+              indexType:0,
+              storeMode:0, barRegionSort:1,barStoreStore:1,
+              pageIndex:0,pargeSize:10,storeTableData:[],
+              pieOption:{},barRegionOption:{},barStoreOption:{}};
+      this.overviewCount={store:-1,items:-1,avgScore:-1};
+      await this.dataGetOverview();
+      await this.dataGetPart1() ;
+      await this.dataGetPart2() ;
+      await this.dataGetPart3() ;
+
     },
 
     async export2Excel() {
       const that = this;
-      if (that.regionTableData.length === 0) {
+      if (this.part1.storeTableData.length === 0) {
         util.notify(that.$t('overview.emptyRegionList'), 'warning', 3000);
         return false;
       }
@@ -1124,72 +1185,62 @@ export default {
         const filterVal = ['region', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
           'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
         const self = this;
-        const size = self.totalRegion;
-        const params = {};
-        params.beginTs = self.params.beginTs;
-        params.endTs = self.params.endTs;
-        params.filter = { 'page': 0, 'size': size };
-        params.order = self.regionOrder;
-        params.storeIds = self.params.storeIds;
-        params.regionMode = self.regionMode;
-        params.inspectTagId = self.params.inspectId;
-        const regionResult = await that.getInspectStatsOverviewWithRegion(params);
-        let curData = [];
-        if (regionResult.errCode === 0) {
-          const result = regionResult.data;
-          if (result) {
-            result.content.forEach(item => {
-              item.qualifiedRateStr = item.qualifiedRate + '%';
-            });
-            curData = result.content;
-          }
-        }
-
-        const data = that.formatJson(filterVal, curData);
+        const data = that.formatJson(filterVal, this.part1.storeTableData);
         const fileName = 'Area' + '-' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
 
-    async exportStore2Excel() {
+    async exportStore2ExcelPart1() {
       const that = this;
-      if (that.storeTableData.length === 0) {
+      if (that.part1.storeTableData.length === 0) {
         util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportDataHeader;
-        const filterVal = ['province', 'city', 'region', 'code', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
-          'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
+        const tHeader = that.exportPart1DataHeader;
+        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'numOfQualified', 'numOfImproved',
+          'numOfDangerous'];
         const self = this;
-        const size = self.totalStore;
-        const params = {};
-        params.beginTs = self.params.beginTs;
-        params.endTs = self.params.endTs;
-        params.regionMode = 3;
-        params.storeIds = self.params.storeIds;
-        params.inspectTagId = self.params.inspectId;
-        params.filter = {
-          'page': 0,
-          'size': size
-        };
-        params.order = self.storeOrder;
-
-        const storeResult = await that.getInspectStatsOverviewWithRegion(params);
-        let curData = [];
-        if (storeResult.errCode === 0) {
-          const result = storeResult.data;
-          if (result) {
-            result.content.forEach(item => {
-              item.qualifiedRateStr = item.qualifiedRate + '%';
-            });
-            curData = result.content;
-          }
-        }
-        const data = that.formatJson(filterVal, curData);
-        const name = self.params.inspectId==='' ? 'Store' : self.storePatrolLists;
-        const fileName = name + '-' + util.getCurDateStr();
+        const data = that.formatJson(filterVal, that.part1.storeTableData);
+        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
+        const fileName = name + '_Inspection evaluation result_' + util.getCurDateStr();
+        export_json_to_excel(tHeader, data, fileName);
+      });
+    },
+    async exportStore2ExcelPart2() {
+      const that = this;
+      if (that.part2.storeTableData.length === 0) {
+        util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
+        return false;
+      }
+      require.ensure([], async() => {
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = that.exportPart2DataHeader;
+        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'averageScore', 'rank'];
+        const self = this;
+        const data = that.formatJson(filterVal, that.part2.storeTableData);
+        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
+        const fileName = name + '_Inspection score_' + util.getCurDateStr();
+        export_json_to_excel(tHeader, data, fileName);
+      });
+    },
+    async exportStore2ExcelPart3() {
+      const that = this;
+      if (that.part3.storeTableData.length === 0) {
+        util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
+        return false;
+      }
+      require.ensure([], async() => {
+        const { export_json_to_excel } = require('@/excel/Export2Excel');
+        const tHeader = that.exportPart3DataHeader;
+        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport','numOfStandard',
+        'qualifiedRate','rank'];
+        const self = this;
+        const data = that.formatJson(filterVal, that.part3.storeTableData);
+        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
+        const fileName = name + '_Inspection compliance_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1517,69 +1568,52 @@ export default {
     
       const self = this;
       const params = {};
-      params.beginTs = self.params.beginTs;
-      params.endTs = self.params.endTs;
-      params.regionMode = self.regionMode;
-      params.storeIds = self.params.curStore;
-      params.inspectTagId = self.params.inspectId;
-      const overviewResult = await self.getInspectReulstStatsOverview(params);
-      if (overviewResult.errCode === 0) {
-        const result = overviewResult.data;
-        if (result) {
-          console.log(result)
-          this.overviewCount.store = result.numOfStores;
-          this.overviewCount.items = result.numOfInspects;
-          if(result.overallByAverageScore){
-            this.overviewCount.avgScore = result.overallByAverageScore.average;
-          }
-          else{
-            this.overviewCount.avgScore = -1;
-          }
-          
-        }
-      } else {
-        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
-      }
-    },
 
-    async dataGetPart1() {
-    
-      const self = this;
-      const params = {};
-      this.part1.pieOption = null;
-      this.part1.barRegionOption = null;
-      this.part1.barStoreOption = null;
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.regionMode = 3;
       params.storeIds = self.params.storeIds;
-      if(this.part1.compareType=='stores'){
-         params.storeIds  = this.part1.compareIds;
-      }
       params.inspectTagId = self.params.inspectId;
       const storeResult = await self.getInspectStatsOverviewWithRegion(params);
       if (storeResult.errCode === 0) {
         const result = storeResult.data;
         if (result) {
-          this.part1.indexType = 0;
-          self.totalRegion = result.totalElements;
-          result.content.forEach(item => {
-            item.qualifiedRateStr = item.qualifiedRate + '%';
-          });
-          self.regionTableData = result.content;
+          let total = 0;
+          let nums = 0;
+          console.log(result)
+          result.content.forEach(function(item){
+            total += item.averageScore * item.numOfReport;
+            nums +=item.numOfReport;
+          })
+          this.overviewCount.avgScore= -1;
+          this.overviewCount.store = result.content.length;
+          this.overviewCount.items = nums;
+          if(nums>0) this.overviewCount.avgScore=Math.round(total/nums)
         }
-      } else {
-        util.notify(self.$t('overview.queryFail'), 'warning', 3000);
-        self.totalRegion = 0;
-        self.regionTableData = [];
-      }
-      await self.getPart1RegionBar();
-      //self.getInspectStatsLine();
+      } 
+    },
+
+    async dataGetPart1() {
+      console.log("dataGetPart1")
+      this.part1.pieOption = null;
+      this.part1.storeTableData = null;
+      this.part1.barRegionOption = null;
+      this.part1.barStoreOption = null;
+      await this.getPart1RegionBar();
+      //self.getInspectStatsLine();:
     },
     async dataGetPart2(){
+      this.part2.pieOption = null;
+      this.part2.storeTableData = null;
+      this.part2.barRegionOption = null;
+      this.part2.barStoreOption = null;
       await this.getPart2RegionBar();
     },
     async dataGetPart3(){
+      this.part3.pieOption = null;
+      this.part3.storeTableData = null;
+      this.part3.barRegionOption = null;
+      this.part3.barStoreOption = null;
       await this.getPart3RegionBar();
     },
     async getInspectStatsOverviewOfRegionTable() {
@@ -1639,7 +1673,7 @@ export default {
       if(type == 'stores'){
         content.map(function(item,i){
           item.list = [];
-          item.list.push(JSON.parse(JSON.stringify(item)))
+         //item.list.push(JSON.parse(JSON.stringify(item)))
           output.push(item)
         });;
       }
@@ -1693,12 +1727,17 @@ export default {
          params.groupIds  = this.part1.compareIds;
          params.groupMode = 3;
       }
-      if (self.totalRegion > 0) {
+      else if(this.part1.compareType=='users'){
+         params.submitters  = this.part1.compareIds;
+         params.groupMode = 5;
+      }
+      
         params.filter = { page: 0, size: 20 };
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
           if (result) {
+            console.log(result)
             this.part1.content = this.filterContent(result.content, 
             this.part1.compareType,
             this.part1.compareIds,
@@ -1728,12 +1767,6 @@ export default {
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
           jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
         }
-      } else {
-        const totalArray = [0, 0, 0, 0];
-        jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
-        jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
-        jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
-      }
       const pieOption = self.getRegionPieOption();
       pieOption.series[0].data = seriesData;
       self.regionsOptions = pieOption;
@@ -1890,6 +1923,10 @@ export default {
          params.groupIds  = this.part2.compareIds;
          params.groupMode = 3;
       }
+      else if(this.part2.compareType=='users'){
+         params.submitters  = this.part1.compareIds;
+         params.groupMode = 5;
+      }
       let totalReport = 0;
       let totalStandard = 0;
       params.filter = { page: 0, size: 20 };
@@ -2045,6 +2082,10 @@ export default {
       else if(this.part3.compareType=='storeGroup'){
          params.groupIds  = this.part3.compareIds;
          params.groupMode = 3;
+      }
+      else if(this.part3.compareType=='users'){
+         params.submitters  = this.part1.compareIds;
+         params.groupMode = 5;
       }
       let totalReport = 0;
       let totalStandard = 0;
@@ -2211,6 +2252,8 @@ export default {
       return pieOption;
     },
     async clickPart1Bar(event){
+      console.log("Click Bar")
+      console.log(event)
       this.part1.indexRegion = event.dataIndex;
       await this.drawPart1RegionBar();
     },

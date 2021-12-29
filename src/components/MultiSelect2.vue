@@ -5,8 +5,8 @@
       :placeholder="placeholder"
       :disabled="disabled"
       multiple
-      :taggable="false"
-      clearOnSelect="false"
+      collapse-tags
+      class="el-province"
       @change="changeSelect"
       @visible-change="visibileHandler">
       <el-option v-if="options.length > 0 && all!=''" :label="all"
@@ -172,7 +172,7 @@ export default {
             }
           });
         });
-        this.input = this.input.slice(0, this.input.length - 1);
+       // this.input = this.input.slice(0, this.input.length - 1);
         /*const params = {selectedArray:this.selectedArray,storeIds:emitArray,selectedLabels:(this.input==""?[]:this.input.split(','))};
         this.$emit('changeInput', params);*/
       } else {
@@ -198,7 +198,7 @@ export default {
             }
           });
         });
-        this.input = this.input.slice(0, this.input.length - 1);
+        //this.input = this.input.slice(0, this.input.length - 1);
         /*console.log("**input:",this.input);
         const params = {selectedArray:this.selectedArray,storeIds:emitArray,selectedLabels:(this.input==""?[]:this.input.split(','))};
         this.$emit('changeInput', params);*/
@@ -294,7 +294,8 @@ export default {
   }
   .input-class2{
     height:35px;
-    width: calc(160/1920*100vw - 30px);
+    background-color:#ff0;
+    width: calc(100% - 30px);
     position: absolute;
     top: 0;
     left: 0;

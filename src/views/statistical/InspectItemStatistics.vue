@@ -4,7 +4,7 @@
       <el-col :span="24">
         <search-component
           ref="inspectItemSearch"
-          :is-patrol = "true"
+          isInspectItem="true"
           :default-sort="defaultSort"
           path="inspectItemStatistics"
           @emitSearch = "emitSearch"
@@ -83,7 +83,7 @@
                     style="margin-left:32px;background-color:#fff;"
                     type="primary"
                     size="mini"
-                    @click="export2Excel"
+                    @click="exportStore2Excel"
                   >
                     <div class="button-area">
                       <img :src="exportPng" class="icon-excel">
@@ -285,6 +285,17 @@ export default {
           'width': '217',
           'maxWidth': '180'
         }
+      ],
+      exportPart3DataHeader:
+      [
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('overview.storeName'),
+        this.$t('remotePatrol.code'),
+        this.$t('statistics.submitter'),
+        this.$t('overview.numOfEvaluations'),
+        this.$t('overview.averageScore'),
+        this.$t('statistics.rank'),
       ],
       regionTableData: [],
       regionPDFData: [],
@@ -669,7 +680,7 @@ export default {
           'prop': 'storeSubmitters',
           'label': this.$t('statistics.submitter'),
           'sortable': false,
-          'width': '130',
+          'width': '200',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -681,17 +692,9 @@ export default {
           'width': '80',
           'maxWidth': '180'
         },
-          {
-          'prop': 'numOfStandard',
-          'label': this.$t('statistics.numOfStandard'),
-          'sortable': 'custom',
-          'pdfwidth': '14%',
-          'width': '80',
-          'maxWidth': '180'
-        },
         {
           'prop': 'averageScore',
-          'label': this.$t('statistics.sRate'),
+          'label': this.$t('overview.averageScore'),
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
@@ -705,14 +708,6 @@ export default {
           'width': '80',
           'maxWidth': '100'
         },
-        {
-          'prop': 'compareTrend',
-          'label': this.$t('statistics.compareTrend'),
-          'sortable': 'custom',
-          'pdfwidth': '12%',
-          'width': '80',
-          'maxWidth': '100'
-        }
     
       ],
       part1:{ compareType:'stores', indexRegion:0, content:[],
@@ -897,43 +892,18 @@ export default {
 
     async exportStore2Excel() {
       const that = this;
-      if (that.storeTableData.length === 0) {
+      if (that.part3.storeTableData.length === 0) {
         util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
         return false;
       }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportDataHeader;
-        const filterVal = ['province', 'city', 'region', 'code', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
-          'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
+        const tHeader = that.exportPart3DataHeader;
+        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'averageScore', 'rank'];
         const self = this;
-        const size = self.totalStore;
-        const params = {};
-        params.beginTs = self.params.beginTs;
-        params.endTs = self.params.endTs;
-        params.regionMode = 3;
-        params.storeIds = self.params.storeIds;
-        params.inspectTagId = self.params.inspectId;
-        params.filter = {
-          'page': 0,
-          'size': size
-        };
-        params.order = self.storeOrder;
-
-        const storeResult = await that.getInspectStatsOverviewWithRegion(params);
-        let curData = [];
-        if (storeResult.errCode === 0) {
-          const result = storeResult.data;
-          if (result) {
-            result.content.forEach(item => {
-              item.qualifiedRateStr = item.qualifiedRate + '%';
-            });
-            curData = result.content;
-          }
-        }
-        const data = that.formatJson(filterVal, curData);
-        const name = self.params.inspectId==='' ? 'Store' : self.storePatrolLists;
-        const fileName = name + '-' + util.getCurDateStr();
+        const data = that.formatJson(filterVal, that.part3.storeTableData);
+        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
+        const fileName = name + '_Inspection item score_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1440,6 +1410,10 @@ export default {
          params.groupIds  = this.part1.compareIds;
          params.groupMode = 3;
       }
+         else if(this.part1.compareType=='users'){
+         params.submitters  = this.part1.compareIds;
+         params.groupMode = 5;
+      }
       if (self.totalRegion > 0) {
         params.filter = { page: 0, size: 20 };
         const storeResult = await self.getInspectStatsItemOverGroup(params);
@@ -1767,6 +1741,10 @@ export default {
       const self = this;
       const params = {};
       this.totalAvgScore =-1;
+      this.part3.pieOption = null;
+      this.part3.storeTableData = null;
+      this.part3.barRegionOption = null;
+      this.part3.barStoreOption = null;
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.groupMode = 0;
@@ -1834,10 +1812,12 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
+      let max = 0;
       if(this.part3.content){
         let totalAvgScore = 0;
         this.part3.content.map((item,index) => {
           let value = item.averageScore;
+          if(value>max)max = value;
           totalAvgScore += value;
           if(this.part3.indexRegion<0 && value>0){
             this.part3.indexRegion = index;
@@ -1874,7 +1854,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-      option.yAxis[0].name  =  this.$t('statistics.score'),
+      option.yAxis[0].name  =  this.$t('statistics.score')
+      if( this.inspectItem.item.qualifiedScore && this.inspectItem.item.qualifiedScore>0){
+          option.yAxis[0].max = this.inspectItem.item.qualifiedScore;
+      }
+      else{
+        option.yAxis[0].max = max
+      }
+    
       this.part3.barRegionOption = option;
       console.log(option)
       await this.getPart3StoreBar();
@@ -1887,7 +1874,7 @@ export default {
       console.log("getPart3StoreBarXX")
       console.log(this.part3.content[this.part3.indexRegion])
       let content = [];
-      
+      let max =0 ;
       if(this.part3.content && this.part3.content[this.part3.indexRegion]){
         if(this.part3.compareType == 'stores'){
             console.log("To Store Type")
@@ -1921,10 +1908,11 @@ export default {
         
 
       content.map((item,index) => {
-          item.rank = this.rankByAverageScore;
+          item.rank = item.rankByAverageScore;
           item.compareTrend = this.$t('statistics.check');
           if(item.code=='')item.code='- -'
           let value = item.averageScore;
+          if(value>max)max=value;
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
@@ -1935,7 +1923,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-      option.yAxis[0].name  =  this.$t('statistics.score'),
+      option.yAxis[0].name  =  this.$t('statistics.score');
+      if( this.inspectItem.item.qualifiedScore && this.inspectItem.item.qualifiedScore>0){
+          option.yAxis[0].max = this.inspectItem.item.qualifiedScore;
+      }
+      else{
+        option.yAxis[0].max = max
+      }
+      
       this.part3.barStoreOption = option;
       console.log(this.part3.barStoreOption)
     },
@@ -2091,6 +2086,7 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
+      await this.dataGetPart3();
 
     },
 
