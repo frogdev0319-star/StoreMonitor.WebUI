@@ -583,6 +583,8 @@ export default {
     "editTitleItem": "編輯巡檢項",
     "emptyInfo": "當前巡檢表為空，請新增巡檢項後進行操作！",
     "enterBtnAttr": "請輸入",
+    "enterChannelNameFilter": "請輸入關鍵字搜索通道",
+    "enterInspectFilter": "請輸入關鍵字搜索巡檢項",
     "enterItemName": "請輸入巡檢項名稱",
     "enterListName": "請輸入巡檢表名稱",
     "enterListNameRuletip": "最多可輸入250個字元",
