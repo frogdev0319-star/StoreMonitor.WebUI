@@ -583,6 +583,8 @@ export default {
     "editTitleItem": "Edit Inspection Items",
     "emptyInfo": "List is empty, please add inspection items!",
     "enterBtnAttr": "Please enter value",
+    "enterChannelNameFilter": "Please enter a keyword to search the channel",
+    "enterInspectFilter": "Please enter a keyword to search the inspect",
     "enterItemName": "Enter Item Name",
     "enterListName": "Enter List Name",
     "enterListNameRuletip": "Enter up to 250 characters",

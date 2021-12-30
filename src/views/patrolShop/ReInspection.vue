@@ -332,7 +332,7 @@
             <div class="flex-center" style="margin: 20px">
               <span style="text-align: left">{{ $t('remotePatrol.channelList') }}</span>
               <div class="spacer"/>
-              <search-text style="width: 156px" v-model="channelFilterStr"/>
+              <search-text style="width: 170px" v-model="channelFilterStr" :placeholder="$t('insSettingView.enterChannelNameFilter')"/>
             </div>
             <div class="channels-srollbar" style="flex: 1; overflow: auto">
               <div class="arrow-content">
@@ -382,13 +382,12 @@
                 </el-option>
               </el-select>
               <div style="flex: 1"></div>
-              <el-button v-if="sheetName.length!=0" :disabled="!allRemarkItemsFlag && !isDisabled"
+              <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
                         :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
                         :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
                 {{ $t('remotePatrol.confirmSum') }}
               </el-button>
             </div>
-            <hr v-if="patrolstore!=='' && !isFullScreenMode"/>
             <template v-if="isFullScreenMode">
               <div v-for="(_item,_index) in sheetName" :key="_index">
                   <template v-if="_item.isCategory">
@@ -415,8 +414,9 @@
 
             </template>
             <template v-else>
+              <hr class="hr-horizontal" style="margin: 15px 0;"/>
               <div class="groups">
-                <search-text style="width: 100%; margin: 5px 0;" v-model="groupFilterStr"/>
+                <search-text style="width: 100%;" v-model="groupFilterStr" :placeholder="$t('insSettingView.enterInspectFilter')"/>
                 <div 
                   v-for="(_item,_index) in sheetName.filter(sheet => sheet.label.indexOf(groupFilterStr) > -1)" 
                   :key="_index" 

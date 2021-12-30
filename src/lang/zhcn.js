@@ -586,6 +586,8 @@ export default {
     "editTitleItem": "编辑巡检项",
     "emptyInfo": "当前巡检表为空，请新增巡检项后进行操作！",
     "enterBtnAttr": "请输入",
+    "enterChannelNameFilter": "请输入关键字搜索通道",
+    "enterInspectFilter": "请输入关键字搜索巡检项",
     "enterItemName": "请输入巡检项名称",
     "enterListName": "请输入巡检表名称",
     "enterListNameRuletip": "最多可输入250个字符",

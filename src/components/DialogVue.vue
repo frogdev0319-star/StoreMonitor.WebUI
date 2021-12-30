@@ -91,5 +91,11 @@ export default {
     .confirm-btn{
         @include point(width,76);
         font-size: 12px;
+        background-color: #006ab7;
+        border-color: #006ab7;
+        &:hover {
+          background-color: #2c5a7d;
+          border-color: #2c5a7d;
+        }
     }
 </style>

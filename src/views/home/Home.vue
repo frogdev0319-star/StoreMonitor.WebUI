@@ -2055,11 +2055,11 @@ export default {
     }
   }
   .el-button--primary {
-    background-color: #006ab7;
-    border-color: #006ab7;
+    background-color: #c60957;
+    border-color: #c60957;
     &:hover {
-      background-color: #2c5a7d;
-      border-color: #2c5a7d;
+      background-color: #ae0048;
+      border-color: #ae0048;
     }
   }
   .el-dialog__headerbtn {

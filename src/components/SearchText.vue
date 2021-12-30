@@ -20,7 +20,7 @@ export default {
   border-radius: 4px;
   border: 1px solid transparent;
   color: #606266;
-  font-size: inherit;
+  font-size: 13px;
   height: 30px;
   line-height: 30px;
   outline: 0;
