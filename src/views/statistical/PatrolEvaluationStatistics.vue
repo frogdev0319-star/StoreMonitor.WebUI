@@ -90,7 +90,7 @@
                   <div class="pct-panel">
                     <div class="inner"/>
                     <v-chart ref="itemsPie" 
-                    @click="clickPart1Bar"
+                    @click="clickPart1Pie"
                     :auto-resize="true" :options="part1.pieOption" class="chart-content"/>
                   </div>
                   <div class="pct-nums">
@@ -1017,21 +1017,21 @@ export default {
       ],
       part1:{ compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,
+              indexType:0, regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
       part2:{ standardScore:-1,averageScore:-1,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,
+              indexType:0,regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
       part3:{ standardScore:-1,averageScore:-1,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,
+              indexType:0,regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
@@ -1147,21 +1147,21 @@ export default {
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
             this.part1 = { compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,
+              indexType:0,regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}};
       this.part2={ standardScore:-1,averageScore:-1,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,
+              indexType:0,regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}};
       this.part3 ={ standardScore:-1,averageScore:-1,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,
+              indexType:0,regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}};
@@ -1766,7 +1766,15 @@ export default {
           jsonArray[0].percent = util.getPercentValue(totalArray, 0, 2);
           jsonArray[1].percent = util.getPercentValue(totalArray, 1, 2);
           jsonArray[2].percent = util.getPercentValue(totalArray, 2, 2);
+        } 
+
+      for(var k in seriesData){
+        if(seriesData[k].value>0){
+          this.part1.indexType = parseInt(k);
+          console.log("Init RegionIndex="+this.part1.indexType )
+          break;
         }
+      }
       const pieOption = self.getRegionPieOption();
       pieOption.series[0].data = seriesData;
       self.regionsOptions = pieOption;
@@ -1776,13 +1784,14 @@ export default {
     },
     async drawPart1RegionBar(){
       console.log("Region Line")
+      const self = this;
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
       
    
       if(this.part1.content){
-        this.part1.content.map((item,index) => {
+          this.part1.content.map((item,index) => {
           let value = 0;
           var arr  = [item.numOfDangerous,item.numOfImproved,item.numOfQualified]
           if(this.part1.indexType==0){
@@ -1794,12 +1803,21 @@ export default {
           else if(this.part1.indexType==2){
               value =  util.getPercentValue(arr, 2, 2)
           }
-          if(this.part1.indexRegion<0 && value>0){
+          item.value = value;
+        });
+        this.part1.content = this.part1.content.sort(function(a,b){
+          if(self.part1.regionOrder == "desc")
+             return b.value -a.value; 
+          else
+             return a.value -b.value; 
+        })
+        this.part1.content.map((item,index) => {
+          if(this.part1.indexRegion<0 && item.value>0){
             this.part1.indexRegion = index;
           }
           
           if( this.part1.indexRegion == index){   
-            regionData.push({value:value,itemStyle: {
+            regionData.push({value:item.value,itemStyle: {
                 color: '#f11e66',
                 emphasis: {
                             shadowBlur: 10,
@@ -1808,7 +1826,7 @@ export default {
                     }
             }});
           }else{
-            regionData.push({value,itemStyle: {
+            regionData.push({value:item.value,itemStyle: {
             color: 'rgba(250, 30, 102, 0.6)',
             emphasis: {
                             shadowBlur: 0,
@@ -1848,6 +1866,10 @@ export default {
             params.groupMode = 0;
             params.storeIds = this.part1.content[this.part1.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
+            params.order={
+              direction: this.part1.storeOrder,
+              property:this.part1.indexRegion==0?"numOfDangerous":this.part1.indexRegion==1?"numOfImproved":"numOfQualified",
+            }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -1900,7 +1922,7 @@ export default {
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       params.order={
-         direction: "desc",
+         direction: this.part2.regionOrder,
          property:"averageScore"
       }
       if(this.part2.compareType=='stores'){
@@ -1958,7 +1980,6 @@ export default {
       const regionData =[];
       const regionLabel =[];
       if(this.part2.content){
-        console.log(this.part2.content)
         this.part2.content.map((item,index) => {
           let value = item.averageScore;
           if(this.part2.indexRegion<0 && value>0){
@@ -2015,6 +2036,10 @@ export default {
             params.groupMode = 0;
             params.storeIds = this.part2.content[this.part2.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
+            params.order={
+              direction: this.part2.storeOrder,
+              property:"averageScore"
+            }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -2060,7 +2085,7 @@ export default {
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       params.order={
-         direction: "desc",
+         direction: this.part3.regionOrder,
          property:"standardRate"
       }
       if(this.part3.compareType=='stores'){
@@ -2175,6 +2200,10 @@ export default {
             params.groupMode = 0;
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
+            params.order={
+              direction: this.part3.storeOrder,
+              property:"standardRate"
+            }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -2251,9 +2280,14 @@ export default {
       };
       return pieOption;
     },
+    async clickPart1Pie(event){
+      if(this.part1.pieOption.series[0].data[event.dataIndex].value>0){
+       this.part1.indexType =event.dataIndex
+       this.part1.indexRegion =  -1;
+        await this.drawPart1RegionBar();
+      }
+    },
     async clickPart1Bar(event){
-      console.log("Click Bar")
-      console.log(event)
       this.part1.indexRegion = event.dataIndex;
       await this.drawPart1RegionBar();
     },
@@ -2407,9 +2441,11 @@ export default {
       this.page = paramsObj.filter.page + 1;
     },
     async setPart1Type(index){
-      this.part1.indexType = index;
-      this.part1.indexRegion =  -1;
-      await this.drawPart1RegionBar();
+      if(this.part1.pieOption.series[0].data[index].value>0){
+        this.part1.indexType = index;
+        this.part1.indexRegion =  -1;
+        await this.drawPart1RegionBar();
+      }
     },
     getInspectTagStandardScore(){//取得巡檢表達標分數
       const self = this;

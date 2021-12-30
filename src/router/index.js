@@ -361,20 +361,6 @@ export const navbarRoute = {
 
     ) && primaryPathesList.push('/routeinspection', '/addroute', '/setroute', '/bindroute');
 
-    PermissionHelper.enableStoreSetting() && inspectionRoute.children.push(
-      {
-        path: '/storemanage',
-        name: 'storeManage',
-        component: resolve => require(['@/views/setting/store/StoreManage'], resolve)
-      },
-      {
-        path: '/storedetail',
-        name: 'storeDetail',
-        component: resolve => require(['@/views/setting/store/EditStoreVue'], resolve),
-        hidden: true
-      }
-    ) && primaryPathesList.push('/storemanage', '/storedetail');
-
     PermissionHelper.enableScheduleSetting() && inspectionRoute.children.push({
       path: '/patrolSchedule',
       name: 'scheduleManage',
