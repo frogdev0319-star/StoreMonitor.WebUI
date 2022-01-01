@@ -76,7 +76,7 @@ export default {
         }
   },
   created() {
-    console.log("InspectItemSelect Created")
+   // console.log("InspectItemSelect Created")
     this. getLayer1List(this.inspectItemList);
   },
   watch: {
@@ -94,6 +94,7 @@ export default {
   },
   methods: {
     getLayer1List(list){
+      console.log(list)
       let layer1List =[];
       let layer2List =[{value:'all',label:this.$t('eventView.all')}];
       let showItems = false;
@@ -150,7 +151,7 @@ export default {
            return qualifiedScore;
         }
         else{
-          return item.qualifiedScore;
+          return item.itemScore;
         }
     },
     changeLayer1(e){
@@ -219,7 +220,7 @@ export default {
     },
     notifyItemChanged(){
        console.log("NOtify changed")
-       let item = this.curLayer2?this.curLayer2:this.curLayer1;
+       let item = this.selectedItem!='all' && this.curItem ? this.curItem: this.layer2!='all'&& this.curLayer2 ?this.curLayer2:this.curLayer1;
        let ids = this.getIds(item)
        console.log(ids)
        item.ids = ids;

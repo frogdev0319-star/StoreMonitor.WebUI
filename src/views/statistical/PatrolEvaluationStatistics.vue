@@ -22,10 +22,10 @@
                     </el-col>
                 </div>
                 <el-row :span="24" class="region-overview">
-                    <el-col :span="8" class="division">
+                    <el-col :span="8" class="division" @click="routeToInspectionReport">
                       <el-col class="text-area">        
                         <el-row class="top">
-                           <span class="mainTitle">{{overviewCount.store>0?overviewCount.store:'N/A'}}</span>
+                           <span class="mainTitle">{{overviewCount.store!=-9999?overviewCount.store:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.store_unit') }}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -36,7 +36,7 @@
                       <el-col class="line"/>
                      </el-col>
                      <el-col :span="8" class="division">
-                      <el-col class="text-area">
+                      <el-col class="text-area"   @click.native="routeToInspectionReport">
                            <el-row class="top">
                            <span class="mainTitle">{{overviewCount.items>=0?overviewCount.items:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.count_unit') }}</span>
@@ -49,7 +49,7 @@
                       <el-col class="line"/>
                     </el-col>
                     <el-col :span="8" class="division">
-                    <el-col class="text-area">   
+                    <el-col class="text-area"   @click.native="routeToInspectionReport">   
                        <el-row class="top">
                            <span class="mainTitle">{{overviewCount.avgScore>=0?overviewCount.avgScore:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
@@ -196,7 +196,7 @@
                     <el-col :span="10" class="division">
                       <el-col class="text-area">        
                         <el-row class="top">
-                           <span class="mainTitle">{{part2.standardScore>0?part2.standardScore:'N/A'}}</span>
+                           <span class="mainTitle">{{part2.standardScore!=-9999?part2.standardScore:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.score') }}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -733,7 +733,7 @@ export default {
       defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' },
       defaultStoreSort: { prop: 'qualifiedRateStr', order: 'ascending' },
       defaultRegionSort: { prop: 'qualifiedRateStr', order: 'ascending' },
-      overviewCount:{store:-1,items:-1,avgScore:-1},
+      overviewCount:{store:-9999,items:-9999,avgScore:-9999},
       curCountry:"-1",
       part1StoreInfoTableCol: [
         {
@@ -1021,14 +1021,14 @@ export default {
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
-      part2:{ standardScore:-1,averageScore:-1,
+      part2:{ standardScore:-9999,averageScore:-9999,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
-      part3:{ standardScore:-1,averageScore:-1,
+      part3:{ standardScore:-9999,averageScore:-9999,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,regionOrder:"desc",storeOrder:"desc",
@@ -1060,6 +1060,17 @@ export default {
   },
 
   methods: {
+    routeToInspectionReport(){
+      const searchParamsObj = {
+        path: 'inspectReport',
+        params: this.params
+      };
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+       this.$router.push({
+         path: '/report',
+      });
+
+    },
     handlePageAndSizeChange(){
 
     },
@@ -1145,31 +1156,27 @@ export default {
     async searchData() {
     
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
-            this.part1 = { compareType:'stores', indexRegion:0, content:[],
-              compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,regionOrder:"desc",storeOrder:"desc",
-              storeMode:0, barRegionSort:1,barStoreStore:1,
-              pageIndex:0,pargeSize:10,storeTableData:[],
-              pieOption:{},barRegionOption:{},barStoreOption:{}};
-      this.part2={ standardScore:-1,averageScore:-1,
-              compareType:'stores', indexRegion:0, content:[],
-              compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,regionOrder:"desc",storeOrder:"desc",
-              storeMode:0, barRegionSort:1,barStoreStore:1,
-              pageIndex:0,pargeSize:10,storeTableData:[],
-              pieOption:{},barRegionOption:{},barStoreOption:{}};
-      this.part3 ={ standardScore:-1,averageScore:-1,
-              compareType:'stores', indexRegion:0, content:[],
-              compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,regionOrder:"desc",storeOrder:"desc",
-              storeMode:0, barRegionSort:1,barStoreStore:1,
-              pageIndex:0,pargeSize:10,storeTableData:[],
-              pieOption:{},barRegionOption:{},barStoreOption:{}};
-      this.overviewCount={store:-1,items:-1,avgScore:-1};
-      await this.dataGetOverview();
-      await this.dataGetPart1() ;
-      await this.dataGetPart2() ;
-      await this.dataGetPart3() ;
+      this.part1.pieOption = null;
+      this.part1.storeTableData = null;
+      this.part1.barRegionOption = null;
+      this.part1.barStoreOption = null;
+      this.part2.pieOption = null;
+      this.part2.storeTableData = null;
+      this.part2.barRegionOption = null;
+      this.part2.barStoreOption = null;
+      this.part3.pieOption = null;
+      this.part3.storeTableData = null;
+      this.part3.barRegionOption = null;
+      this.part3.barStoreOption = null;
+      await this.getPart3RegionBar();
+      this.overviewCount={store:-9999,items:-9999,avgScore:-9999};
+      if(this.params.storeIds.length>0){
+        await this.dataGetOverview();
+        await this.dataGetPart1() ;
+        await this.dataGetPart2() ;
+        await this.dataGetPart3() ;
+
+      }
 
     },
 
@@ -1585,7 +1592,7 @@ export default {
             total += item.averageScore * item.numOfReport;
             nums +=item.numOfReport;
           })
-          this.overviewCount.avgScore= -1;
+          this.overviewCount.avgScore= -9999;
           this.overviewCount.store = result.content.length;
           this.overviewCount.items = nums;
           if(nums>0) this.overviewCount.avgScore=Math.round(total/nums)
@@ -1965,7 +1972,7 @@ export default {
                   totalReport += item.numOfReport;
                   totalStandard +=  item.averageScore * item.numOfReport;
             })       
-            this.part2.averageScore =  totalStandard>0? Math.round( (totalStandard) /totalReport):-1;
+            this.part2.averageScore =  totalStandard>0? Math.round( (totalStandard) /totalReport):-9999;
             console.log("Leave FIlterContent")
             console.log(this.part2.content)
             this.part2.indexRegion = -1;
@@ -2129,8 +2136,6 @@ export default {
                   totalStandard +=  item.numOfStandard;
             })       
             this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
-            console.log("Leave FIlterContent")
-            console.log(this.part3.content)
             this.part3.indexRegion = -1;
             this.drawPart3RegionBar();
           }
@@ -2350,8 +2355,7 @@ export default {
 
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
-      this.part2.standardScore=-1;
-      this.part2.standardScore=-1;
+      this.part2.standardScore=-9999;
       this.doGetAssessmentStandardScore();
       this.params = searchParams;
       console.log(this.params)

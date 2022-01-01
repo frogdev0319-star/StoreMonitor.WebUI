@@ -46,7 +46,7 @@
                     <el-col :span="10" class="division">
                       <el-col class="text-area">        
                         <el-row class="top">
-                           <span class="mainTitle">{{totalAvgScore>0?totalAvgScore:'N/A'}}</span>
+                           <span class="mainTitle">{{totalAvgScore!=-9999?totalAvgScore:'N/A'}}</span>
                            <span class="unit">{{$t('statistics.score')}}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -495,14 +495,6 @@ export default {
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
-          {
-          'prop': 'storeSubmitters',
-          'label': this.$t('statistics.submitter'),
-          'sortable': false,
-          'width': '170',
-          'maxWidth': '100',
-          'pdfwidth': '11%'
-        },
         {
           'prop': 'numOfReport',
           'label': this.$t('overview.numOfEvaluations'),
@@ -586,14 +578,6 @@ export default {
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
-          {
-          'prop': 'storeSubmitters',
-          'label': this.$t('statistics.submitter'),
-          'sortable': false,
-          'width': '170',
-          'maxWidth': '100',
-          'pdfwidth': '11%'
-        },
         {
           'prop': 'numOfReport',
           'label': this.$t('overview.numOfEvaluations'),
@@ -673,14 +657,6 @@ export default {
           'label': this.$t('remotePatrol.code'),
           'sortable': false,
           'width': '70',
-          'maxWidth': '100',
-          'pdfwidth': '11%'
-        },
-          {
-          'prop': 'storeSubmitters',
-          'label': this.$t('statistics.submitter'),
-          'sortable': false,
-          'width': '200',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -1194,7 +1170,7 @@ export default {
             type: 'bar',
             barWidth: 15,
             symbol: 'none',
-            
+            barGap:20,
             yAxisIndex: 0,
             smooth: true,
             name: '',
@@ -1294,6 +1270,9 @@ export default {
       await this.getPart2RegionBar();
     },
     async dataGetPart3(){
+      this.part3.storeTableData = null;
+      this.part3.barRegionOption = null;
+      this.part3.barStoreOption = null;
       await this.getPart3RegionBar();
     },
     async getInspectStatsOverviewOfRegionTable() {
@@ -1740,7 +1719,7 @@ export default {
       console.log("getPart3RegionBar")
       const self = this;
       const params = {};
-      this.totalAvgScore =-1;
+      this.totalAvgScore =-9999;
       this.part3.pieOption = null;
       this.part3.storeTableData = null;
       this.part3.barRegionOption = null;
@@ -1799,7 +1778,7 @@ export default {
                   totalStandard +=  item.numOfStandard;
             })       
             this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
-            console.log("Leave FIlterContent")
+            console.log("Leave FIlterContent"+Math.round( (100*totalStandard) /totalReport)+ " " + ( (100*totalStandard) /totalReport))
             console.log(this.part3.content)
             this.part3.indexRegion = -1;
             this.drawPart3RegionBar();
@@ -1813,12 +1792,16 @@ export default {
       const regionData =[];
       const regionLabel =[];
       let max = 0;
+      this.totalAvgScore= -1;
       if(this.part3.content){
         let totalAvgScore = 0;
+        let count = 0;
         this.part3.content.map((item,index) => {
           let value = item.averageScore;
           if(value>max)max = value;
-          totalAvgScore += value;
+          totalAvgScore += value *item.numOfTotal ;
+          count += item.numOfTotal;
+
           if(this.part3.indexRegion<0 && value>0){
             this.part3.indexRegion = index;
           }
@@ -1845,8 +1828,8 @@ export default {
   
           regionLabel.push(item.groupName)
         });
-        if(this.part3.content.length>0){
-          totalAvgScore = totalAvgScore/this.part3.content.length;
+        if(count>0){
+          totalAvgScore = Math.round(totalAvgScore/count);
           this.totalAvgScore =totalAvgScore;
         }
       }
@@ -2053,8 +2036,9 @@ export default {
       if(searchParams.inspectId && searchParams.inspectId!=''){
         console.log(searchParams.inspectId,this.curInspectId)
         if(searchParams.inspectId !=this.curInspectId){
-          console.log("Change ")
+          this.inspectItemList =[];
           let result  = await  this.getInspectItemList(searchParams.inspectId)
+          console.log(result)
           if(result.errCode==0 && result.data){
             let tempList = [];
             result.data.forEach(function(item){
@@ -2071,7 +2055,6 @@ export default {
 
             })
             this.inspectItemList = tempList ;
-
             this.curInspectId = searchParams.inspectId
             console.log(this.inspectItemList);
           }
@@ -2086,7 +2069,13 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
-      await this.dataGetPart3();
+      this.part3.storeTableData = null;
+      this.part3.barRegionOption = null;
+      this.part3.barStoreOption = null;
+      if(this.params.storeIds.length>0){
+        await this.dataGetPart3();
+      }
+
 
     },
 

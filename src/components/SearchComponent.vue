@@ -313,6 +313,7 @@ export default {
       params.timeMode = this.timeMode;
       params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
       params.storeIds = this.storeFilterObj.filterStoreIds;
+      console.log("Save Comdition="+saveParamsObj.path)
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
 
