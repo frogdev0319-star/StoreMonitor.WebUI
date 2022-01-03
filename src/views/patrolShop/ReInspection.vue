@@ -347,7 +347,7 @@
                   v-for="(item,index) in showChannelBtns.filter(channel => channel.name.indexOf(channelFilterStr) > -1)" 
                   :key="index" 
                   class="btn-details"
-                  :class="{'not-first-margin': isFullScreenMode}"
+                  :class="{'child-space': isFullScreenMode}"
                   :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
                 >
                   <div 

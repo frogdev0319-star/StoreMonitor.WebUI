@@ -65,14 +65,17 @@
     </div>
     
   </div>
-  <div v-if="showStoreSelect" class="store-div">
+  <div class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
     <multi-select
-        class="store-group-select store"
+        v-if="showStoreSelect"
+        class="store-group-select store shadow-light"
         ref="multiSelect"
         :selected="curStore"
         :placeholder="$t('remotePatrol.stores')"
         :options="storeDataList"
         @changeInput="onChangeStore"/>
+        
+    <slot name="report"></slot>
   </div>
   </div>
 </template>
@@ -698,7 +701,7 @@ export default {
   .content{
     display: flex;
     flex-direction: row;
-    width:calc(1066/1440*100vw);
+    width: 100%;
     align-items: center;
     .search-label{
       width: calc(76/1440*100vw);
@@ -709,12 +712,14 @@ export default {
       font-weight: normal;
     }
   }
-
+  .padding-left {
+    padding-left: calc(71/1440*100vw);
+  }
   .header-details{
     text-align: left;
     display: flex;
     flex-direction: row;
-    width: calc(990/1440*100vw);
+    width: 100%;
     height: calc(36/1920*100vw);
     background-color: #FFF;
     border-radius: 5px;
@@ -767,7 +772,7 @@ export default {
     padding: 0 !important;
   }
   .store{
-    display:inline;
+    // display:inline;
     width: calc(222/1440*100vw);
   }
 </style>

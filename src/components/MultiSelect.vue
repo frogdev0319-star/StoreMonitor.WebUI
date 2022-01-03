@@ -196,7 +196,6 @@ export default {
     text-align: left;
     display: inline-block;
     position: relative;
-    width: 100%;
     margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{

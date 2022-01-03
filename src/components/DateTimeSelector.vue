@@ -1,5 +1,5 @@
 <template>
-  <div class="date-selector-container">
+  <div class="date-selector-container paper shadow-light">
       <el-select class="bDateSel" v-model="dateRange" value-key="value" @change="changeDateRange">
           <el-option 
             v-for="item in dateRangeItems"
@@ -45,8 +45,8 @@ export default {
     display: flex;
     align-items: center;
     height: 36px;
-    background-color: #fff;
-    border-radius: 5px;
+    // background-color: #fff;
+    // border-radius: 5px;
     .time-title{
       width:cacl(76/1440*100vw);
       align-self:center;
