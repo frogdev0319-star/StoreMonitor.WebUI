@@ -2,66 +2,76 @@
   <el-row id="el-containter">
     <div class="report-header">
       <store-filter
+        style="padding: 20px"
         :cached-params="searchParams"
-        class="header-details"
         @storeChange = "onStoreChange"
-      />
-      <div class="header-details">
-        <span :class="lang === 'en' ? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
-        <date-time-selector @change="dateChange"/>
-        <span>{{ $t('remotePatrol.resultType') }}</span>
-        <el-select
-          v-model="curAppraise"
-          :placeholder="$t('remotePatrol.all')"
-          size="mini"
-          class="el-province "
-        >
-          <el-option
-            v-for="item in appraiseList"
-            :key="item.status"
-            :label="item.label"
-            :value="item.status"/>
-        </el-select>
-        <span>{{ $t('remotePatrol.reportType') }}</span>
-        <el-select
-          v-model="curReportType"
-          :placeholder="$t('remotePatrol.all')"
-          size="mini"
-          class="el-province"
-          @change="getInspectList"
-        >
-          <el-option
-            v-for="item in reportTypeList"
-            :key="item.mode"
-            :label="item.label"
-            :value="item.mode"/>
-        </el-select>
-        <span>{{ $t('overview.patrolLists') }}</span>
-        <el-select
-          v-model="inspectId"
-          :placeholder="$t('insSettingView.selectPost')"
-          size="mini"
-          class="el-province">
-          <el-option
-            v-for="item in inspectTableList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"/>
-        </el-select>
-      </div>
-      <div class="header-details">
-        <div class="search-content">
-          <span>{{ $t('remotePatrol.keywords') }}</span>
-          <el-input v-model="searchInput" size="mini" class="search-input" clearable/>
+      >
+        <template v-slot:report>
+          <div>
+            <span style="margin-right: 10px">{{ $t('remotePatrol.resultType') }}</span>
+            <el-select
+              v-model="curAppraise"
+              :placeholder="$t('remotePatrol.all')"
+              size="mini"
+              class="el-province "
+            >
+              <el-option
+                v-for="item in appraiseList"
+                :key="item.status"
+                :label="item.label"
+                :value="item.status"/>
+            </el-select>
+          </div>
+          <div>
+            <span style="margin-right: 10px">{{ $t('remotePatrol.reportType') }}</span>
+            <el-select
+              v-model="curReportType"
+              :placeholder="$t('remotePatrol.all')"
+              size="mini"
+              class="el-province"
+              @change="getInspectList"
+            >
+              <el-option
+                v-for="item in reportTypeList"
+                :key="item.mode"
+                :label="item.label"
+                :value="item.mode"/>
+            </el-select>
+          </div>
+          <div>
+            <span style="margin-right: 10px">{{ $t('overview.patrolLists') }}</span>
+            <el-select
+              v-model="inspectId"
+              :placeholder="$t('insSettingView.selectPost')"
+              size="mini"
+              class="el-province">
+              <el-option
+                v-for="item in inspectTableList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"/>
+            </el-select>
+          </div>
+        </template>
+      </store-filter>
+      <div class="flex-center padding" style="padding-top: 0">
+        <span class="search-label" :class="lang === 'en' ? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
+        <date-time-selector @change="dateChange"/> 
+        <div class="spacer"></div>
+        <div class="flex-center">
+          <div class="search-content flex-center" style="margin-right: 20px">
+            <span class="search-label">{{ $t('remotePatrol.keywords') }}</span>
+            <el-input v-model="searchInput" size="mini" class="search-input shadow-light" clearable/>
+          </div>
+          <delay-button
+            class="search-button"
+            type="primary"
+            size="mini"
+            @click="searchData"
+          >
+            <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
+          </delay-button>
         </div>
-        <delay-button
-          class="search-button"
-          type="primary"
-          size="mini"
-          @click="searchData"
-        >
-          <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
-        </delay-button>
       </div>
       <selected-stores :store-str="storeStr"/>
     </div>
@@ -840,13 +850,18 @@ $h1:#292e36;
 $qualified:#6097F3;
 $noqualied:#FDBA40;
 $suggestBack:#F1F6FE;
+
+.search-label{
+  width: 82.5px;
+  text-align: left;
+  align-self: center;
+  font-family: NotoSansCJKTC;
+  font-size: 15px;
+  font-weight: normal;
+}
 #el-containter{
     .report-header{
         margin-bottom: 20px;
-        border-bottom: 1px solid $border;
-        background-color: #fff;
-        padding-top: 30px;
-        color: $black;
         .header-details{
             text-align: left;
             padding-left: calc(30/1920*100vw);
@@ -1082,10 +1097,7 @@ $suggestBack:#F1F6FE;
 }
 </style>
 <style scoped>
-    .el-select >>> .el-input__inner{
-      background: #f4f5f9 !important;
-      border: 1px solid #E4E7ED  !important;
-    }
+
     #el-menuscrollbar .el-scrollbar__wrap {
       overflow-x: hidden;
     }

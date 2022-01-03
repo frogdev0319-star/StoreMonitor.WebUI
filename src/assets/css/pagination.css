@@ -96,10 +96,12 @@
   line-height: calc(36/1920*100vw);
   color: #7d8cad;
   border-radius: 3px !important;
-  background: #f4f5f9 !important;
-  border: 1px solid #E4E7ED !important;
+  background: #fff !important;
+  border: none;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
   min-height: 28px;
   min-width: 85px;
+  font-size: 15px;
 }
 .el-province .el-input--mini .el-input__icon {
   line-height: calc(36/1920*100vw);
@@ -110,6 +112,7 @@
   color: #7d8cad;
   min-height: 28px;
   min-width: 85px;
+  border: none;
 }
 .el-date-editor .el-range-input{
   color: #7d8cad;

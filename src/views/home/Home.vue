@@ -1980,6 +1980,9 @@ export default {
     background-color: #ffffff;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
   }
+  .shadow-light {
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  }
   .flex {
     display: flex;
   }
@@ -2047,7 +2050,7 @@ export default {
     border-color: #e6e6e6;
     border-bottom-width: thin;
   }
-  .not-first-margin {
+  .child-space {
     &:not(:first-child){
       margin-left: 20px;
     }
