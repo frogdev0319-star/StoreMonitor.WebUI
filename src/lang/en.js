@@ -1110,6 +1110,8 @@ export default {
     'evalDetail':'Detail',
     'titleAvgScore':'Average Score',
     "compareTrend":"Compare Trend",
+    'descOrder':"Desc.",
+    'ascOrder':"Asc.",
     "titles":{
       "overview":"Overview",
       'distribution':'Result Distribution',

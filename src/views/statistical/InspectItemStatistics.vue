@@ -59,6 +59,12 @@
             <el-col  :span="24" style="height:100%">
                <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
+               <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
+                      <div class="button-area" >
+                          <span style="color:#acaeb1">{{ part3.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                          <img :src='part3.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+               </div>    
+              </div>
            </el-col>      
         </el-row > 
         <div class="subtitle-head">
@@ -92,7 +98,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px">
+         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
                   <v-chart  v-if="part3.storeMode==1" 
                             ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
@@ -115,6 +121,13 @@
                       @sortChange="handleSortChange"
                   />
                 </div>
+                 <div  v-if="part2.storeMode==1"  
+                      style="position:absolute;right:40px;top:30px;height:40px" @click='changePart3StoreOrder'>
+                    <div class="button-area" >
+                      <span style="color:#acaeb1">{{ part3.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='part3.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                    </div>    
+                  </div>
            </el-col>  
       </div> 
     </el-row>
@@ -168,7 +181,7 @@ export default {
     return {
       inspectSubTitle: this.$t('statistics.itemAverageScore'),
       inspectDetailSubTitle: this.$t('statistics.evalDetail'),
-      totalAvgScore:-1,
+      totalAvgScore:-9999,
       htmlTitle: this.$t('overview.htmltopdfA'),
       inspectItemList:[],
       inspectItem:null,
@@ -188,6 +201,8 @@ export default {
       lang: this.$i18n.locale,
       storeDataList: [],
       exportPng: require('../../../static/img/excel.png'),
+      descPng: require('../../../static/img/statistics/orderDesc.png'),
+      incPng: require('../../../static/img/statistics/orderInc.png'),
       overviewStoreSrc: require('../../../static/img/statistics/overview_store.png'),
       overviewCountSrc: require('../../../static/img/statistics/overview_count.png'),
       overviewAvgSrc: require('../../../static/img/statistics/overview_avg.png'),
@@ -702,7 +717,7 @@ export default {
       part3:{ standardScore:-1,averageScore:-1,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
-              indexType:0,
+              indexType:0, storeOrder:'desc',regionOrder:'desc',
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
@@ -739,6 +754,24 @@ export default {
     },
     onSwitchPart3Mode(mode){
       this.part3.storeMode = mode;
+    },
+    changePart3RegionOrder(){
+      if(this.part3.regionOrder == 'desc'){
+          this.part3.regionOrder = 'asc'
+      }
+      else{
+        this.part3.regionOrder = 'desc'
+      }
+      this.dataGetPart3();
+    },
+    changePart3StoreOrder(){
+      if(this.part3.storeOrder == 'desc'){
+          this.part3.storeOrder = 'asc'
+      }
+      else{
+        this.part3.storeOrder = 'desc'
+      }
+      this.getPart3StoreBar();
     },
     async handleExportReport() {
       const self = this;
@@ -1730,7 +1763,7 @@ export default {
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       params.order={
-         direction: "desc",
+         direction: this.part3.regionOrder,
          property:"averageScore"
       }
       if(this.part3.compareType=='stores'){
@@ -1792,7 +1825,7 @@ export default {
       const regionData =[];
       const regionLabel =[];
       let max = 0;
-      this.totalAvgScore= -1;
+      this.totalAvgScore= -9999;
       if(this.part3.content){
         let totalAvgScore = 0;
         let count = 0;
@@ -1854,7 +1887,7 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log("getPart3StoreBarXX")
+
       console.log(this.part3.content[this.part3.indexRegion])
       let content = [];
       let max =0 ;
@@ -1873,7 +1906,10 @@ export default {
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.content[this.part3.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
-            
+            params.order={
+              direction: this.part3.storeOrder,
+              property:"averageScore"
+            }   
             if(this.inspectItem){
               params.itemIds =this.inspectItem.item.ids
             }

@@ -1115,6 +1115,8 @@ export default {
     'evalDetail':'評估詳情',
     'titleAvgScore':'平均分數',
     "compareTrend":"同比趨勢",
+    'descOrder':"降序",
+    'ascOrder':"升序",
     "titles":{
       "overview":"概要",
       'distribution':'考評結果分佈',
