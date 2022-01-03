@@ -50,7 +50,7 @@
             <i v-if="row.id == expands" class="el-icon-arrow-up" style="color:#2c90d9;cursor:pointer;" @click="expandChange(row)"></i>
           </template>
           <template v-else-if="_item.isCellClick">
-            <span style="cursor:pointer;color:#006ab7;font-size:15px;" @click="cellClick(row)">{{ row[_item.prop]}}</span>
+            <span style="cursor:pointer;color:#006ab7;font-size:15px;" @click="cellClick(row,_item.prop)">{{ row[_item.prop]}}</span>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
           <template v-else>
@@ -445,8 +445,8 @@ export default {
       const comment = filterString.all(val, 30);
       row.tempDeviceName = comment;
     },
-    cellClick(row){
-      this.$emit('onCellClick',row);
+    cellClick(row,prop){
+      this.$emit('onCellClick',{row,prop});
     }
   }
 };
@@ -547,14 +547,15 @@ export default {
 <style>
   @import "../assets/css/pagination.css";
   .el-table__expanded-cell{
-    background-color: #edf0f2 !important;
+    background-color: #EFF3F5 !important;
   }
   .el-table__expanded-cell:hover {
-    background-color: #edf0f2 !important;
+    background-color: #EFF3F5 !important;
   }
   .el-table{
     box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
     border: solid 1px #f5f5f5;
   }
+  
 </style>
 

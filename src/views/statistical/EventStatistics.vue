@@ -1495,7 +1495,7 @@ export default {
     },
     onEvenInvolveStoreClick(row){
       //console.log("clcick row:",row);
-      this.eventInvolveItemId = row.itemId;
+      this.eventInvolveItemId = row.row.itemId;
       this.showInvolveTableArea = true;
       this.doGetEventInvolveStores();
     },
