@@ -42,17 +42,17 @@
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
               <TypeSelectArea
-                              path="eventStatistics"
-                              :allow-all=true
-                              :region-array1="params.curProvince"
-                              :region-array2="params.curCity"
-                              :cur-store-group="params.curStoreGroup"
-                              :cur-store-type="params.curStoreType"
-                              :cur-stores="params.curStore"
-                              :cached-params="params"
-                              :cur-country="curCountry"
-                              @emitTypeChanged="emitTypeChanged"
-                          ></TypeSelectArea>
+                  path="eventStatistics"
+                  :allow-all=true
+                  :region-array1="params.curProvince"
+                  :region-array2="params.curCity"
+                  :cur-store-group="params.curStoreGroup"
+                  :cur-store-type="params.curStoreType"
+                  :cur-stores="params.curStore"
+                  :cached-params="params"
+                  :cur-country="curCountry"
+                  @emitTypeChanged="emitTypeChanged"
+              ></TypeSelectArea>
               <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
@@ -62,7 +62,7 @@
               ></AreaSelected>-->
             </div>
             <div class="barchart-area">
-              <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content"/>
+              <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
             </div>
             <div class="table-area">
               <div class="sec-head">
@@ -848,25 +848,7 @@ export default {
       this.params.order = this.order;
       //this.getSearchParams();
     },
-    /*emitSearch({ searchParams, dateRangeList, timeMode }) {
-      this.showInvolveTableArea = false;
-      console.log("searchParams:",searchParams);
-      this.params = searchParams;
-      this.params.filter = { page: this.page - 1, size: this.sizeNum };
-      this.params.inspectId = searchParams.inspectId;
-      this.params.order = this.order;
-      this.daysRangeList = dateRangeList;
-      this.curCountry = this.params.curCountry;
-      this.timeMode = timeMode;
-      this.searchData();
-    },*/
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      console.log("Emit Search");
-     // this.part2.standardScore=-1;
-     // this.part2.standardScore=-1;
-     // this.doGetAssessmentStandardScore();
-      console.log(searchParams)
-             
       const searchParamsObj = {
           path: 'eventStatistics',
           params: this.params
@@ -902,9 +884,8 @@ export default {
 
       }*/
       this.params = searchParams;
-      console.log('**emit search params:',this.params);
+      //console.log('**emit search params:',this.params);
       this.compareIds = this.compareIds2 = this.params.storeIds;
-      console.log('@@this.compareIds:',this.compareIds);
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
@@ -975,7 +956,6 @@ export default {
       params.endTs = this.params.endTs;
       params.storeIds = this.params.storeIds;
       params.regionMode = 0;
-      console.log('getUpperGloableEventData > search:',params);
     
       try {
         //console.log('params:',params);
@@ -1034,7 +1014,6 @@ export default {
       params.groupMode = region[0].value;
       this.params.groupMode = region[0].value;
       params.storeIds = this.compareIds;
-      console.log('getExportData > this.compareIds:',this.compareIds);
       if(region[0].value<3){ //store, area1, area2
         this.params.storeIds=this.compareIds
         params.storeIds = this.compareIds;
@@ -1042,7 +1021,6 @@ export default {
         this.params.groupIds=this.compareIds;
         params.groupIds = this.params.storeIds;
       }
-      console.log("search params:",params);
       params.order = {
         direction: 'desc',
         property: 'numOfTotal'
@@ -1050,7 +1028,6 @@ export default {
       
       let content = [];
       try {
-        //console.log('params:',params);
         const eventResult = await this.getEventTableDataInfo(params);
         const result = eventResult.data;
         if (result) {
@@ -1186,21 +1163,16 @@ export default {
             barWidth: "16px",
             smooth: true,
             data: [0,0,0,0,0,0,0,0,0,0,0,0],
-            color:'#7bd8eb',
+            color:'#D7F3F9',
             barGap:0,
           }
         ],
         itemStyle: {
               emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                color:'#7bd8eb'
               },
               normal: {
-                color: function(params) {
-                  const colorList = ['#7bd8eb', '#b9c6d2'];
-                  return colorList[params.dataIndex];
-                }
+                color: '#D7F3F9'
               }
             }
         
@@ -1213,12 +1185,12 @@ export default {
       let chart_dataset=[];
       this.allEventData.forEach(item => {
         date_xAxis.push(item.groupName);
-        chart_dataset.push(item.numOfTotal);
+        chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
       });
       this.barchartOption.xAxis.data = date_xAxis;
       //this.barchartOption.yAxis.splitLine.show = true;
       //this.barchartOption.series.name= this.Avg12Num[0].name;
-      console.log("chart_dataset:",chart_dataset);
+      //console.log("chart_dataset:",chart_dataset);
       this.barchartOption.series[0].data = chart_dataset;
     },
     /*end 畫barChart */
@@ -1635,6 +1607,10 @@ export default {
     setDefaultSortAndPage(paramsObj) {
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
+    },
+
+    barchartClick(bar){
+      console.log("barchartClick:",bar);
     }
 
   }

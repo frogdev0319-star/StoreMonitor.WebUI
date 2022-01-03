@@ -62,6 +62,9 @@ export default {
         },
         onPick:({ maxDate, minDate })=>{
             console.log("maxDate:"+maxDate+", minDate:"+minDate);
+            if(maxDate==null){
+              maxDate = moment();
+            }
             this.dateTimeValue = [minDate, maxDate];
         }
         /*shortcuts: [{
@@ -144,6 +147,7 @@ export default {
     },
 
     dateChange(val) {
+      console.log("dateChange:",val)
       let start = this.$moment(val[0]).valueOf();
       const end = this.$moment(val[1]).valueOf();
       const daysDiff = this.$moment(end).diff(start, 'days');
@@ -153,7 +157,7 @@ export default {
           type: 'warning'
         });
         start = end - 3600 * 24 * 364 * 1000;
-        start = this.$moment(start).startOf('d').toDate().valueOf();
+        start  = this.$moment(start).startOf('d').toDate().valueOf();
         this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
       } else {
         this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
@@ -220,5 +224,8 @@ export default {
     color: #c0c4cc;
     float: left;
     line-height: 24px;
+}
+.el-range-editor--mini.el-input__inner {
+    width: calc(335/1440*100vw);
 }
 </style>
