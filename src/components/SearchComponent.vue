@@ -380,7 +380,7 @@ export default {
       .date-range {
         border: 1px solid #ccc;
         width: 200px;
-        height: calc(35 / 1920 * 100vw);
+        height: calc(36/1920*100vw);
         min-height: 28px;
       }
       .item {
@@ -445,7 +445,7 @@ export default {
     }
     .inspect-div{
       width:calc(298/1440*100vw);
-      height: 36px;
+      height: calc(36/1920*100vw);
       display: flex;
       flex-direction: row;
       .tag-label{
@@ -463,7 +463,7 @@ export default {
       }
       .el-province{
         width: calc(222/1440*100vw);
-        height: 36px;
+        height: calc(36/1920*100vw);
         background-color: #fff;
         min-width: 85px;
         min-height: 28px;

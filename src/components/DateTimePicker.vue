@@ -1,5 +1,5 @@
 <template>
-  <div style="display: inline-flex">
+  <div style="display: flex; align-items: center">
     <el-date-picker
       ref="datePicker"
       v-bind="$attrs"
@@ -18,15 +18,14 @@
       unlink-panels
       @change="dateChange"
     />
-    <div v-if="showTooltips">
-      <el-tooltip
-        class="date-time-tooltip"
-        effect="dark"
-        placement="right">
-        <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
-        <i class="iconfont icon-bangzhu iconbangzhu"/>
-      </el-tooltip>
-    </div>
+    <el-tooltip
+      v-if="showTooltips"
+      class="date-time-tooltip"
+      effect="dark"
+      placement="right">
+      <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
+      <i class="iconfont icon-bangzhu iconbangzhu"/>
+    </el-tooltip>
   </div>
 </template>
 
@@ -62,6 +61,9 @@ export default {
         },
         onPick:({ maxDate, minDate })=>{
             console.log("maxDate:"+maxDate+", minDate:"+minDate);
+            if(maxDate==null){
+              maxDate = moment();
+            }
             this.dateTimeValue = [minDate, maxDate];
         }
         /*shortcuts: [{
@@ -144,6 +146,7 @@ export default {
     },
 
     dateChange(val) {
+      console.log("dateChange:",val)
       let start = this.$moment(val[0]).valueOf();
       const end = this.$moment(val[1]).valueOf();
       const daysDiff = this.$moment(end).diff(start, 'days');
@@ -153,7 +156,7 @@ export default {
           type: 'warning'
         });
         start = end - 3600 * 24 * 364 * 1000;
-        start = this.$moment(start).startOf('d').toDate().valueOf();
+        start  = this.$moment(start).startOf('d').toDate().valueOf();
         this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
       } else {
         this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
@@ -197,7 +200,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
 @import "../assets/sass/stastical.scss";
 .global-date-pick.el-date-editor .el-range-input {
   font-size:15px;
@@ -209,6 +212,8 @@ export default {
 }
 .global-date-pick.el-range-editor--mini.el-input__inner {
   border:none;
+  height: 35px;
+  background-color: transparent;
 }
 .global-date-pick.el-range-editor--mini .el-range__icon, .el-range-editor--mini .el-range__close-icon {
     line-height: 224px;
@@ -220,5 +225,8 @@ export default {
     color: #c0c4cc;
     float: left;
     line-height: 24px;
+}
+.el-range-editor--mini.el-input__inner {
+    width: calc(335/1440*100vw);
 }
 </style>

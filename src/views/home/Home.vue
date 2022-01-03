@@ -1689,7 +1689,7 @@ export default {
     font-size: 13px;
     text-align: left;
     border: none;
-    background-color: #f7f9fa;
+    /* background-color: #f7f9fa; */
     color:#2b2b2b;
     border-radius: 0px;
   }
@@ -1731,15 +1731,13 @@ export default {
     color: #2c90d9;
   }
   .el-select.el-select--medium{
-    color: #2b2b2b;
-    background: #fff !important;
+    /* color: #2b2b2b;
     height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
+    line-height: calc(36/1920*100vw); */
+    /* background: transparent; */
     border: none !important;
     width: 100%;
     border-radius: 3px;
-    /*min-height: 28px;
-    min-width: 85px;*/
   }
   /*中文*/
   #groupSubItem.el-menu-item:hover{

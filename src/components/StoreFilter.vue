@@ -715,7 +715,7 @@ export default {
     display: flex;
     flex-direction: row;
     width: calc(990/1440*100vw);
-    height: 36px;
+    height: calc(36/1920*100vw);
     background-color: #FFF;
     border-radius: 5px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
