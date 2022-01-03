@@ -346,11 +346,8 @@ $CTA:#c60957;
   height: 80px;
   line-height: 80px;
   text-align: left;
-  margin-bottom: 30px;
-  border-bottom: 1px solid $border;
-  position: relative;
-  background: #fff;
-
+  display: flex;
+  align-items: center;
   .date-title {
     margin-left: calc(60 / 1920 * 100vw);
     margin-right: calc(40 / 1920 * 100vw);
