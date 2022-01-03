@@ -1117,6 +1117,8 @@ export default {
     'evalDetail':'评估详情',
     'titleAvgScore':'平均分数',
     "compareTrend":"同比趋势",
+    'descOrder':"降序",
+    'ascOrder':"升序",
     "titles":{
       "overview":"概要",
       'distribution':'考评结果分布',
