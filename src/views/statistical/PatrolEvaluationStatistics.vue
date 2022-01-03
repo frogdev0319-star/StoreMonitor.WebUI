@@ -110,9 +110,18 @@
                 </div>
               </el-col>
               <el-col  :span="12"  style="height:290px;padding-top:32px">
+                    <div style="width:100%;height:100%">
                     <v-chart @click='clickPart1Bar' ref="storeChart" :options="part1.barRegionOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
+                    
+                    </div>
               </el-col>
+              <div style="position:absolute;right:0px;top:32px" @click='changePart1RegionOrder'>
+                  <div class="button-area" >
+                      <span style="color:#acaeb1">{{ part1.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='part1.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                  </div>    
+              </div>
            </el-col>      
         </el-row > 
         <div class="subtitle-head">
@@ -133,7 +142,7 @@
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                   <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                     style="margin-left:32px;background-color:#fff;"
                     type="primary"
                     size="mini"
@@ -146,7 +155,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px">
+         <el-col  style="position:absolute;height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
                   <v-chart  v-if="part1.storeMode==1" 
                             ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
@@ -169,6 +178,13 @@
                       @sortChange="handleSortChange"
                   />
                 </div>
+                  <div  v-if="part1.storeMode==1"  
+                      style="position:absolute;right:40px;top:30px;height:40px" @click='changePart1StoreOrder'>
+                    <div class="button-area" >
+                      <span style="color:#acaeb1">{{ part1.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='part1.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                    </div>    
+                  </div>
            </el-col>  
       </div> 
        <div class="statistics-content" style="height:930px;margin-top:18px">
@@ -221,6 +237,12 @@
         <el-row  :span="24" class="partition" style="height:320px">
           <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption" :auto-resize="true"
                             style="width:100%;height:100%"/>   
+          <div style="position:absolute;right:0px;top:0px" @click='changePart2RegionOrder'>
+                  <div class="button-area" >
+                      <span style="color:#acaeb1">{{ part2.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='part2.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                  </div>    
+          </div>
         </el-row > 
         <div class="subtitle-head">
           <span class="title" >
@@ -253,11 +275,11 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px">
+         <el-col  class="partition"  style="position:absolute;height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
                   <v-chart  v-if="part2.storeMode==1" 
                             ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
-                  <div v-else style="margin-top:20.5px">
+                  <div v-else style="main-rgtop:20.5px">
                     <table-pagination
                       ref="elTP"
                       :column-data="part2StoreInfoTableCol"
@@ -276,6 +298,13 @@
                       @sortChange="handleSortChange"
                   />
                 </div>
+                <div  v-if="part2.storeMode==1"  
+                      style="position:absolute;right:40px;top:30px;height:40px" @click='changePart2StoreOrder'>
+                    <div class="button-area" >
+                      <span style="color:#acaeb1">{{ part2.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='part2.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                    </div>    
+                  </div>
            </el-col>  
       </div> 
       <div v-if="part3.standardScore>0" class="statistics-content" style="height:930px;margin-top:18px">
@@ -325,6 +354,12 @@
             <el-col  :span="24" style="height:100%">
                <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
+            <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
+                      <div class="button-area" >
+                          <span style="color:#acaeb1">{{ part3.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                          <img :src='part3.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                      </div>    
+              </div>
            </el-col>      
         </el-row > 
         <div class="subtitle-head">
@@ -358,7 +393,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px">
+         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
                   <v-chart  v-if="part3.storeMode==1" 
                             ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
@@ -381,6 +416,13 @@
                       @sortChange="handleSortChange"
                   />
                 </div>
+                <div  v-if="part2.storeMode==1"  
+                      style="position:absolute;right:40px;top:30px;height:40px" @click='changePart3StoreOrder'>
+                    <div class="button-area" >
+                      <span style="color:#acaeb1">{{ part3.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='part3.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                    </div>    
+                  </div>
            </el-col>  
       </div> 
     </el-row>
@@ -416,7 +458,7 @@ import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import TypeSelectArea from '@/components/TypeSelectArea';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
-
+import "../../assets/sass/util.scss";
 export default {
   name: 'PatrolEvaluationSta',
 
@@ -453,6 +495,8 @@ export default {
       lang: this.$i18n.locale,
       storeDataList: [],
       exportPng: require('../../../static/img/excel.png'),
+      descPng: require('../../../static/img/statistics/orderDesc.png'),
+      incPng: require('../../../static/img/statistics/orderInc.png'),
       overviewStoreSrc: require('../../../static/img/statistics/overview_store.png'),
       overviewCountSrc: require('../../../static/img/statistics/overview_count.png'),
       overviewAvgSrc: require('../../../static/img/statistics/overview_avg.png'),
@@ -1875,7 +1919,7 @@ export default {
             params.inspectTagId = self.params.inspectId;
             params.order={
               direction: this.part1.storeOrder,
-              property:this.part1.indexRegion==0?"numOfDangerous":this.part1.indexRegion==1?"numOfImproved":"numOfQualified",
+              property:this.part1.indexType==0?"numOfDangerous":this.part1.indexType==1?"numOfImproved":"numOfQualified",
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
@@ -2461,6 +2505,62 @@ export default {
         });
       });
     },
+    changePart1RegionOrder(){
+      
+      if(this.part1.regionOrder == 'desc'){
+          this.part1.regionOrder = 'asc'
+      }
+      else{
+        this.part1.regionOrder = 'desc'
+      }
+      console.log("changePart1RegionOrder "+  this.part1.regionOrder )
+      this.dataGetPart1();
+    },
+    changePart1StoreOrder(){
+      if(this.part1.storeOrder == 'desc'){
+          this.part1.storeOrder = 'asc'
+      }
+      else{
+        this.part1.storeOrder = 'desc'
+      }
+      this.getPart1StoreBar();
+    },
+    changePart2RegionOrder(){
+      if(this.part2.regionOrder == 'desc'){
+          this.part2.regionOrder = 'asc'
+      }
+      else{
+        this.part2.regionOrder = 'desc'
+      }
+      this.dataGetPart2();
+    },
+    changePart2StoreOrder(){
+      if(this.part2.storeOrder == 'desc'){
+          this.part2.storeOrder= 'asc'
+      }
+      else{
+        this.part2.storeOrder = 'desc'
+      }
+      this.getPart2StoreBar();
+    },
+     changePart3RegionOrder(){
+      if(this.part3.regionOrder == 'desc'){
+          this.part3.regionOrder = 'asc'
+      }
+      else{
+        this.part3.regionOrder = 'desc'
+      }
+      this.dataGetPart3();
+    },
+    changePart3StoreOrder(){
+      if(this.part3.storeOrder == 'desc'){
+          this.part3.storeOrder = 'asc'
+      }
+      else{
+        this.part3.storeOrder = 'desc'
+      }
+      this.getPart3StoreBar();
+    },
     async doGetAssessmentStandardScore(){
       console.log("tag-doGetAssessmentStandardScore")
       let tagList = await this.getInspectTagStandardScore();
@@ -2492,7 +2592,6 @@ export default {
 
 <style lang="scss" scoped>
   @import "../../assets/sass/stastical.scss";
-
   .statistics-container{
     .export-header{
       min-height: 100px;
