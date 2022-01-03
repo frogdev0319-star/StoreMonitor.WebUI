@@ -82,8 +82,8 @@
                   </div>
                   <delay-button
                     :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;"
-                    type="primary"
+                    style="margin-left:32px;background-color:#FFF;color:#006ab7;"
+                    type="default"
                     size="mini"
                     @click="export2Excel"
                   >
@@ -111,6 +111,7 @@
                   :expandCompProperties = "componentsProps"
                   @handleChange="handlePageAndSizeChange"
                   @sortChange="handleSortChange"
+                  @onCellClick = "onEvenListNumClick"
                 />
               </div>
             </div>
@@ -179,8 +180,8 @@
                   </delay-button>
                   <delay-button
                     :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;"
-                    type="primary"
+                    style="margin-left:32px;background-color:#FFF;color:#006ab7;"
+                    type="default"
                     size="mini"
                     @click="export2Excel_eventItem"
                   >
@@ -230,8 +231,8 @@
                     </div>
                     <delay-button
                       :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                      style="margin-left:32px;"
-                      type="primary"
+                      style="margin-left:32px;background-color:#FFF;color:#006ab7;"
+                      type="default"
                       size="mini"
                       @click="export2Excel_eventStores"
                     >
@@ -586,7 +587,8 @@ export default {
           'sortable': 'custom',
           'width': '65',
           'maxWidth': '100',
-          'pdfwidth': '11%'
+          'pdfwidth': '11%',
+          'isCellClick':true
         },
         {
           'prop': 'numOfUnprocessed',
@@ -594,7 +596,8 @@ export default {
           'sortable': 'custom',
           'width': '55',
           'maxWidth': '100',
-          'pdfwidth': '12%'
+          'pdfwidth': '12%',
+          'isCellClick':true
         },
         {
           'prop': 'numOfInprocess',
@@ -602,7 +605,8 @@ export default {
           'sortable': 'custom',
           'width': '55',
           'maxWidth': '100',
-          'pdfwidth': '12%'
+          'pdfwidth': '12%',
+          'isCellClick':true
         },
         {
           'prop': 'numOfProcessed',
@@ -610,7 +614,8 @@ export default {
           'sortable': 'custom',
           'width': '55',
           'maxWidth': '100',
-          'pdfwidth': '12%'
+          'pdfwidth': '12%',
+          'isCellClick':true
         },
         {
           'prop': 'numOfRejected',
@@ -618,7 +623,8 @@ export default {
           'sortable': 'custom',
           'width': '55',
           'maxWidth': '100',
-          'pdfwidth': '12%'
+          'pdfwidth': '12%',
+          'isCellClick':true
         },
         {
           'prop': 'completedRateStr',
@@ -626,7 +632,8 @@ export default {
           'sortable': 'custom',
           'width': '60',
           'maxWidth': '100',
-          'pdfwidth': '12%'
+          'pdfwidth': '12%',
+          'isCellClick':true
         },
         {
           'prop': 'detail',
@@ -1295,6 +1302,17 @@ export default {
       };
       this.setEventTableData();
     },
+    onEvenListNumClick(row){
+      console.log("clcick row:",row);
+      const self = this;
+      const searchParamsObj = {
+        path: 'inspectReport',
+        params: this.params
+      };
+      self.$refs.eventSearch.saveSearchParams(searchParamsObj);
+      //sessionStorage.setItem('report_data', JSON.stringify(row));
+      self.$router.push({ name: 'eventManage', params: { data: row }});
+    },
     /*巡檢項事件 sec-row*/
     emitTypeChanged2({compareType,compareArr,selectedLabels}){ //劃分類型選擇
       this.showInvolveTableArea = false;
@@ -1481,6 +1499,7 @@ export default {
       this.showInvolveTableArea = true;
       this.doGetEventInvolveStores();
     },
+    
     /*End巡檢項事件 sec-row*/
 
     /*事件涉及門店 */
