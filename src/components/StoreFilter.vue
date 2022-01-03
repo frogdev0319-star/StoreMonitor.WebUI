@@ -75,7 +75,7 @@
         :options="storeDataList"
         @changeInput="onChangeStore"/>
         
-    <slot name="report"></slot>
+    <slot name="others"></slot>
   </div>
   </div>
 </template>

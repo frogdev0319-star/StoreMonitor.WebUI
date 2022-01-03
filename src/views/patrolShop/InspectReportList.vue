@@ -6,7 +6,7 @@
         :cached-params="searchParams"
         @storeChange = "onStoreChange"
       >
-        <template v-slot:report>
+        <template v-slot:others>
           <div>
             <span style="margin-right: 10px">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
@@ -850,7 +850,6 @@ $h1:#292e36;
 $qualified:#6097F3;
 $noqualied:#FDBA40;
 $suggestBack:#F1F6FE;
-
 .search-label{
   width: 82.5px;
   text-align: left;
