@@ -139,5 +139,47 @@
 .el-picker-panel{
   font-family: Roboto, 'Microsoft YaHei'
 }
+.el-table .caret-wrapper {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 16px;
+  width: 16px;
+  vertical-align: middle;
+  cursor: pointer;
+  overflow: initial;
+  position: relative;
+}
+.el-table .sort-caret {
+  height: 16px;
+  width: 16px;
+  border: none !important;
+  /*content: url(/../../../static/img/tbl_sort.svg);*/
+  left: 0px !important; 
+}
 
-
+.el-table .ascending .sort-caret.ascending {
+  content: url(/../../../static/img/tbl_sort_ascending.svg);
+    border-bottom-color: #f31d65;
+}
+.el-table .sort-caret.ascending {
+  content: url(/../../../static/img/tbl_sort.svg);
+  border-bottom-color: #c0c4cc;
+  top: 0px;
+}
+.el-table .descending .sort-caret.descending {
+  content: url(/../../../static/img/tbl_sort_descending.svg);
+  border-top-color: #f31d65;
+}
+.el-table .sort-caret.descending {
+  /*content: url(/../../../static/img/tbl_sort.svg);*/
+  border-top-color: #c0c4cc;
+  bottom: 0px;
+}

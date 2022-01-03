@@ -1,0 +1,18 @@
+<svg id="ic_sorting_copy_3" data-name="ic/sorting copy 3" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <defs>
+        <style>
+            .cls-2,.cls-3{fill:none;stroke:#acaeb1;stroke-miterlimit:10}.cls-3{stroke:#006ab7}
+        </style>
+    </defs>
+    <g id="Group">
+        <path id="Rectangle" style="fill:none" d="M0 0h16v16H0z"/>
+        <g id="Group_15_Copy" data-name="Group 15 Copy" transform="translate(7 7)">
+            <path id="Path_27_Copy" data-name="Path 27 Copy" class="cls-2" d="M.5 0v7" transform="translate(3)"/>
+            <path id="Path_28_Copy" data-name="Path 28 Copy" class="cls-2" d="m0 0 3.5 3L7 0" transform="translate(0 4)"/>
+        </g>
+        <g id="Group_15_Copy_2" data-name="Group 15 Copy 2" transform="rotate(180 4.5 4.5)">
+            <path id="Path_27_Copy-2" data-name="Path 27 Copy" class="cls-3" d="M.5 0v7" transform="translate(3)"/>
+            <path id="Path_28_Copy-2" data-name="Path 28 Copy" class="cls-3" d="m0 0 3.5 3L7 0" transform="translate(0 4)"/>
+        </g>
+    </g>
+</svg>
