@@ -186,3 +186,16 @@
   border-top-color: #c0c4cc;
   bottom: 0px;
 }
+.el-table__expanded-cell{
+  background-color: #EFF3F5 !important;
+}
+.el-table__expanded-cell:hover {
+  background-color: #EFF3F5 !important;
+}
+.el-table{
+  box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+  border: solid 1px #f5f5f5;
+}
+.el-table__body tr:hover>td{
+  background-color: #EFF3F5 !important;
+}

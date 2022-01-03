@@ -701,6 +701,15 @@ export default {
 }  
 </style>
 <style>
+.dropdown-select.el-select .el-input--medium .el-input__inner{
+    height: 35px;
+    font-size: 13px;
+    text-align: left;
+    border: none;
+    background-color: #f7f9fa;
+    color:#2b2b2b;
+    border-radius: 0px;
+  }
 .area-muti.el-select.el-select--medium{
     color: #2b2b2b;
     background: #f7f9f9 !important;

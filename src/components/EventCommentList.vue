@@ -141,7 +141,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .content{
-    background-color: #edf0f2;
+    background-color: #EFF3F5;
     margin-right: 16px;
     .head{
         width: calc(125/1440*100vw);
