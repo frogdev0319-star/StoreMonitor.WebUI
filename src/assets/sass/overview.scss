@@ -4,11 +4,12 @@ $border: #e3e9f4;
 $background: #f4f5f9;
 $tab: #7d8cad;
 $h1: #292e36;
-$pending: #fea316;
-$done: #434c5e;
+$pending: #f57848;
+$done: #8fd92e;
 $closed: #72a1f3;
-$onsite: #fb804f;
-$store: #fccc3f;
+$remote: #7bd8eb;
+$onsite: #7b9feb;
+$store: #5274bb;
 $excellent: #57e78f;
 $pass: #8fd92e;
 $failed: #f59249;
@@ -24,9 +25,10 @@ $ignored: #b9c6d2;
   text-overflow: ellipsis;
 }
 .title{
-  height: 70px;
-  padding-top: 30px;
-  padding-left: calc(30/1920*100vw);
+  // height: 70px;
+  padding-bottom: calc(20/1920*100vw);
+  // padding-left: calc(30/1920*100vw);
+  font-weight: 500;
   font-size: calc(20/1920*100vw);
   text-align: left;
   color: $black;
@@ -42,7 +44,9 @@ $ignored: #b9c6d2;
     position: relative;
     padding: 0 calc(25/1920*100vw);
     .zone-row {
-      height: 400px;
+      // height: 400px;
+      padding: calc(20/1920*100vw);
+      padding-bottom: 0px;
       border: 1px solid $border;
       background-color: #fff;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -57,12 +61,12 @@ $ignored: #b9c6d2;
           flex-direction: column;
           .total-store {
             height: 50%;
-            border-bottom: 1px solid $border;
+            // border-bottom: 1px solid $border;
             padding-top: 40px;
-            :last-child {
-              border-bottom: none;
+            &:first-child {
+              border-bottom: 1px solid $border;
             }
-            padding-left: calc(34/1920*100vw);
+            // padding-left: calc(34/1920*100vw);
             .total-title {
               @extend .text-ellipsis;
               font-size: calc(15/1920*100vw);
@@ -70,19 +74,20 @@ $ignored: #b9c6d2;
               text-align: left;
             }
             .total-num {
-              font-size: calc(30/1920*100vw);
+              font-size: calc(48/1920*100vw);
               color: $h1;
               text-align: left;
               margin-top: 20px;
               .day {
                 padding-left: calc(10/1920*100vw);
+                font-size: calc(15/1920*100vw);
               }
             }
           }
         }
       }
       .store-list {
-        height: 400px;
+        // height: 400px;
         .region-result {
           border-top: 1px solid $border;
           border-right: 1px solid $border;
@@ -735,6 +740,7 @@ $ignored: #b9c6d2;
 
     .first-row{
       height: auto;
+      padding: calc(20/1920*100vw);
       border: 1px solid $border;
       background-color: #fff;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -748,7 +754,7 @@ $ignored: #b9c6d2;
           flex-direction: column;
           .event-list{
             padding-top: 25px;
-            padding-left: calc(34/1920*100vw);
+            // padding-left: calc(34/1920*100vw);
             padding-bottom: 20px;
             border-bottom: 1px solid $border;
             &:last-child{
@@ -763,7 +769,7 @@ $ignored: #b9c6d2;
               text-align: left;
             }
             .event-num{
-              font-size: calc(30/1920*100vw);
+              font-size: calc(48/1920*100vw);
               line-height: calc(30/1920*100vw);
               height: 28px;
               color: $h1;
@@ -870,7 +876,7 @@ $ignored: #b9c6d2;
                   font-size: 12px;
                 }
                 .label-0{
-                  background-color: $red;
+                  background-color: $remote;
                 }
                 .label-1{
                   background-color: $onsite;

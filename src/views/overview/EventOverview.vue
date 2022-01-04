@@ -246,9 +246,9 @@ export default {
       sourcePerArray: [],
       eventStatusOptions: null,
       statusPerArray: [],
-      newColor: '#f31d65',
-      pendingColor: '#fea316',
-      doneColor: '#434c5e',
+      newColor: '#f57848',
+      pendingColor: '#f57848',
+      doneColor: '#8fd92e',
       closedColor: '#72a1f3',
       rankType: 3,
       rankTypeArr: [
@@ -490,7 +490,7 @@ export default {
               },
               normal: {
                 color: function(params) {
-                  const colorList = ['#f31d65', '#fb804f', '#fccc3f'];
+                  const colorList = ['#7bd8eb', '#7b9feb', '#5274bb'];
                   return colorList[params.dataIndex];
                 }
               }

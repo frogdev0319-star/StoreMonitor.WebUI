@@ -46,7 +46,7 @@
 
         </el-col>
         <el-col :span="6" class="focus-list">
-          <div class="title">
+          <div class="title flex-center">
             <span v-if="isWorstArea" class="area-title">{{ $t('overview.worstRegion') }}</span>
             <span v-else class="area-title">{{ $t('overview.bestRegion') }}</span>
             <span class="arrows" @click="changBestAndWorst">
