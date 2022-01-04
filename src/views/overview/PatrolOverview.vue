@@ -8,7 +8,7 @@
       </span>
     </div>
     <div class="el-overview">
-      <el-row class="zone-row">
+      <el-row class="zone-row paper">
         <el-col :span="4" class="kpi-list">
           <div class="title">{{ $t('overview.kpiIndex') }}</div>
           <div class="kpi-content">
@@ -93,7 +93,7 @@
           </div>
         </el-col>
       </el-row>
-      <el-row class="task-row">
+      <el-row class="task-row paper">
         <div class="top">
           <div class="titles">
             <span class="title">{{ $t('overview.patrolRanking') }}</span>
@@ -129,7 +129,7 @@
         </div>
       </el-row>
       <el-row class="items-row">
-        <el-col :span="6" class="evalution-pct">
+        <el-col :span="6" class="evalution-pct paper">
           <div class="title">{{ $t('overview.itemsAssessment') }}</div>
           <div class="pct-content">
             <div class="pct-panel">
@@ -151,7 +151,7 @@
           </div>
         </el-col>
         <el-col :span="18">
-          <div class="focus-items">
+          <div class="focus-items paper">
             <div class="title">{{ $t('overview.worstItems') }}</div>
             <el-row class="items-panel">
               <el-col :span="16" class="top-five-items">
@@ -195,7 +195,7 @@
         </el-col>
       </el-row>
       <el-row class="star-row">
-        <el-col :span="6" class="stores-list">
+        <el-col :span="6" class="stores-list paper">
           <div v-for="(item, index) in bestAndWorstStore" :key="index" class="best-store">
             <div class="best-icon">
               <img :src="item.iconSrc" class="store-icon">
@@ -211,7 +211,7 @@
           </div>
         </el-col>
         <el-col :span="18">
-          <div class="inspect-cycle">
+          <div class="inspect-cycle paper">
             <div class="cycle-title">{{ $t('overview.avgPatrlCycle') }}</div>
             <div class="cycle-panel">
               <div class="panel-info">*{{ $t('overview.dataZoomInfo') }}</div>

@@ -8,7 +8,7 @@
       </span>
     </div>
     <div class="el-overview">
-      <el-row class="first-row">
+      <el-row class="first-row paper">
         <el-col :span="4" class="kpi-list">
           <div class="title">{{ $t('overview.kpiIndex') }}</div>
           <div class="kpi-content">
@@ -70,8 +70,8 @@
           </div>
         </el-col>
       </el-row>
-      <el-row class="second-row">
-        <el-col :span="isEnSpan? 7: 6" class="status-list">
+      <el-row class="second-row ">
+        <el-col :span="isEnSpan? 7: 6" class="status-list paper">
           <div class="status-title">
             {{ $t('overview.eventStatus') }}
           </div>
@@ -95,7 +95,7 @@
           </div>
         </el-col>
         <el-col :span="isEnSpan ? 17 : 18">
-          <div class="store-status-panel" >
+          <div class="store-status-panel paper" >
             <div class="store-statul-title">{{ $t('overview.eventHading') }}</div>
             <div class="store-panel">
               <div class="store-list">
