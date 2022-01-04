@@ -1278,7 +1278,11 @@ export default {
         // border:1px solid #e3e9f4;
         // width: 96.5%;
         padding-bottom: 30px;
-        background-color: #f4f5f9;
+        // background-color: #f4f5f9;
+        background-image: linear-gradient(#f7f9fa, #f7f9fa 100%);
+        background-size: 100% calc(100% - 115px);
+        background-repeat: no-repeat;
+        background-position: center bottom;
         min-height: calc(100vh - 80px - 45px);
       }
       .footercontent{

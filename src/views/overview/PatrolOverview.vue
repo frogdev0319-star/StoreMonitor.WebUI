@@ -114,7 +114,7 @@
                   :show-text="false"
                   class="process-panel"
                   type="dashboard"
-                  color="#72a1f3"/>
+                  color="#8fd92e"/>
                 <div class="percent-num">
                   <span v-if="!item.appended" class="num">{{ item.completionRate }}</span>
                   <span v-if="!item.appended" class="percent">%</span>
@@ -172,7 +172,7 @@
                         :stroke-width="10"
                         :show-text="false"
                         :class="item.isClick?'item-process':'inactive-item-process'"
-                        color="#ff5353"/>
+                        color="#f59249"/>
                     </div>
                     <div class="ranking-num">{{ item.numOfUnqualified }}</div>
                   </div>
@@ -646,7 +646,7 @@ export default {
             itemStyle: {
               normal: {
                 lineStyle: {
-                  color: '#f31d65',
+                  color: '#f11e66',
                   width: 1
                 },
                 areaStyle: {
@@ -742,8 +742,8 @@ export default {
       let maxValue = 0;
       const items = [];
       if (self.isWorstArea) {
-        firstColor = '#f31d65';
-        secondColor = '#ffd035';
+        firstColor = '#f11e66';
+        secondColor = '#f59249';
         firstName = self.$t('overview.danger');
         secondName = self.$t('overview.improve');
         try {
@@ -754,7 +754,7 @@ export default {
         }
       } else {
         firstColor = '#57e78f';
-        secondColor = '#72a1f3';
+        secondColor = '#8fd92e';
         firstName = self.$t('overview.excellent');
         secondName = self.$t('overview.echartGood');
         try {
@@ -975,7 +975,7 @@ export default {
                 },
                 normal: {
                   color: function(params) {
-                    var colorList = ['#72a1f3', '#ffd035', '#cad1db'];
+                    var colorList = ['#8fd92e', '#f59249', '#cad1db'];
                     return colorList[params.dataIndex];
                   }
                 }
@@ -1116,7 +1116,7 @@ export default {
           opacity: 0.8,
           shadowOffsetX: 0,
           shadowOffsetY: 0,
-          borderColor: '#72a1f3'
+          borderColor: '#8fd92e'
         }
       };
 
@@ -1125,7 +1125,7 @@ export default {
           opacity: 0.8,
           shadowOffsetX: 0,
           shadowOffsetY: 0,
-          borderColor: '#f31d65'
+          borderColor: '#f11e66'
         }
       };
 
@@ -1450,7 +1450,7 @@ export default {
     getRegionInspectOption() {
       const regionOption = {
         baseOption: {
-          color: ['#f31d65', '#ffd035', '#72a1f3'],
+          color: ['#f11e66', '#f59249', '#8fd92e'],
           timeline: {
             axisType: 'category',
             currentIndex: this.currentIndex,
@@ -1475,21 +1475,21 @@ export default {
               itemSize: 12
             },
             checkpointStyle: {
-              color: '#f31d65',
+              color: '#f11e66',
               symbolSize: 5
             },
             emphasis: {
               label: {
-                color: '#f31d65'
+                color: '#f11e66'
               },
               itemStyle: {
-                color: '#f31d65'
+                color: '#f11e66'
               },
               checkpointStyle: {
-                color: '#f31d65'
+                color: '#f11e66'
               },
               controlStyle: {
-                color: '#f31d65'
+                color: '#f11e66'
               }
             }
           },
