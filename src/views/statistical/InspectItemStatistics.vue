@@ -102,7 +102,7 @@
                   <v-chart  v-if="part3.storeMode==1" 
                             ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
-                  <div v-else style="margin-top:20.5px">
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-y: scroll">
                     <table-pagination
                       ref="elTP"
                       :column-data="part3StoreInfoTableCol"
