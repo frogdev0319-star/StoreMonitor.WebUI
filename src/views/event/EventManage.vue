@@ -5,30 +5,32 @@
         <store-filter
           :cached-params="searchParams"
           @storeChange = "onStoreChange"
-        />
+        >
+        </store-filter>
       </div>
-      <div class="el-date">
-        <span class="date-title">{{ $t('eventView.time') }}</span>
-        <date-time-selector @change="dateChange"/>
-        <span
-          class="date-title"
-          style="margin-left:30px;">{{ $t('eventView.status') }}</span>
-        <multi-select
-          ref="multiState"
-          :selected="curState"
-          :alltype="0"
-          :options="eventStatesList"
-          :disabled="activeName!=='4'"
-          style="display:inline;"
-          @changeInput="handleStateChange"/>
-        <span
-          class="date-title"
-          style="margin-left:30px;">{{ $t('remotePatrol.keywords') }}</span>
-        <el-input
-          v-model="inputSearchValue"
-          size="small"
-          class="el-search"
-          clearable/>
+      <div class="flex-center" style="justify-content: space-between; margin: 20px 0">
+        <div class="flex-center">
+          <span class="search-label">{{ $t('eventView.time') }}</span>
+          <date-time-selector @change="dateChange"/>
+        </div>
+        <div class="flex-center">
+          <span style="margin-right: 10px; white-space:nowrap;">{{ $t('eventView.status') }}</span>
+          <multi-select
+            ref="multiState"
+            :selected="curState"
+            :alltype="0"
+            :options="eventStatesList"
+            :disabled="activeName!=='4'"
+            @changeInput="handleStateChange"/>
+        </div>
+        <div class="flex-center">
+          <span style="margin-right: 10px; white-space:nowrap;">{{ $t('remotePatrol.keywords') }}</span>
+          <el-input
+            v-model="inputSearchValue"
+            size="small"
+            class="search-input shadow-light"
+            clearable/>
+        </div>
         <delay-button
           class="search-button"
           type="primary"
@@ -889,7 +891,7 @@ $h1:#292e36;
 .el-event-content{
     width: 100%;
     position: relative;
-    border: 1px solid #e3e9f4;
+    // border: 1px solid #e3e9f4;
     /*overflow: hidden;*/
     .sourceType-icon{
         margin-right: calc(20/1920*100vw);
@@ -920,15 +922,23 @@ $h1:#292e36;
       cursor: pointer;
       color: #7d8cad;
     }
+    .search-label {
+      width: calc(76/1440*100vw);
+      text-align: left;
+      align-self: center;
+      font-family: NotoSansCJKTC;
+      font-size: 15px;
+      font-weight: normal;
+    }
     .el-event-header{
-        text-align: left;
-        position: relative;
-        background-color: #fff;
-        border-bottom: 1px solid #e3e9f4;
-        font-size: calc(14/1920*100vw);
-        color: $black;
+        // text-align: left;
+        // position: relative;
+        // background-color: #fff;
+        // border-bottom: 1px solid #e3e9f4;
+        // font-size: calc(14/1920*100vw);
+        // color: $black;
         .el-area{
-          padding: 30px calc(20/1920*100vw) 0 calc(30/1920*100vw);
+          // padding: 30px calc(20/1920*100vw) 0 calc(30/1920*100vw);
             overflow: hidden;
         }
         .el-date >>> .el-select-dropdown__item{

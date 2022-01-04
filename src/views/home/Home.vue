@@ -1689,7 +1689,7 @@ export default {
     font-size: 13px;
     text-align: left;
     border: none;
-    /* background-color: #f7f9fa; */
+    background-color: #f7f9fa;
     color:#2b2b2b;
     border-radius: 0px;
   }

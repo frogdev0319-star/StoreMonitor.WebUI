@@ -43,6 +43,7 @@
           <div class="operation-btns">
             <delay-button
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                style="background-color:#FFF;color:#006ab7;"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
