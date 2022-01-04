@@ -1119,7 +1119,30 @@ export default {
 
     },
     handlePageAndSizeChangePart1(e){
+        this.part1.table.page = e.page;
+        this.part1.table.sizeNum = e.size;
+        this.getPart1StoreBar();
+    },
+    handleSortChangePart1(e){
         console.log(e)
+    },
+    handlePageAndSizeChangePart2(e){
+        this.part2.table.page = e.page;
+        this.part2.table.sizeNum = e.size;
+        this.getPart2StoreBar();
+    },
+    handleSortChangePart2(e){
+        console.log(e)
+    },
+    handlePageAndSizeChangePart3(e){
+        this.part3.table.page = e.page;
+        this.part3.table.sizeNum = e.size;
+        this.getPart3StoreBar();
+    },
+    handleSortChangePart3(e){
+        console.log(e)
+    },
+    handlePageAndSizeChangePart1(e){
         this.part1.table.page = e.page;
         this.part1.table.sizeNum = e.size;
         this.getPart1StoreBar();
@@ -2106,6 +2129,10 @@ export default {
               direction: this.part2.storeOrder,
               property:"averageScore"
             }
+            params.filter={
+              page:this.part2.table.page-1,
+              size:this.part2.table.sizeNum
+            }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -2267,6 +2294,10 @@ export default {
             params.order={
               direction: this.part3.storeOrder,
               property:"standardRate"
+            }
+            params.filter={
+              page:this.part3.table.page-1,
+              size:this.part3.table.sizeNum
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
