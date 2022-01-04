@@ -159,23 +159,23 @@
                   <v-chart  v-if="part1.storeMode==1" 
                             ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
-                  <div v-else style="margin-top:20.5px">
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-y: scroll;">
                     <table-pagination
-                      ref="elTP"
+                      ref="tablePart1"
                       :column-data="part1StoreInfoTableCol"
                       :table-data="part1.storeTableData"
-                      :total="total"
+                      :total="part1.table.total"
                       :highlight-current-row= "true"
-                      :pagesize="sizeNum"
-                      :current-page="page"
+                      :pagesize="part1.table.sizeNum"
+                      :current-page="part1.table.page"
                       :is-event = "false"
                       :default-sort = "defaultSort"
                       :allowRowExpand = "true"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
-                      @handleChange="handlePageAndSizeChange"
-                      @sortChange="handleSortChange"
+                      @handleChange="handlePageAndSizeChangePart1"
+                      @sortChange="handleSortChangePart1"
                   />
                 </div>
                   <div  v-if="part1.storeMode==1"  
@@ -279,23 +279,23 @@
                   <v-chart  v-if="part2.storeMode==1" 
                             ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
-                  <div v-else style="main-rgtop:20.5px">
+                  <div v-else style="main-rgtop:20.5px;height:100%;overflow-y: scroll;">
                     <table-pagination
                       ref="elTP"
                       :column-data="part2StoreInfoTableCol"
                       :table-data="part2.storeTableData"
-                      :total="total"
+                      :total="part2.table.total"
                       :highlight-current-row= "true"
-                      :pagesize="sizeNum"
-                      :current-page="page"
+                      :pagesize="part2.table.sizeNum"
+                      :current-page="part2.table.page"
                       :is-event = "false"
                       :default-sort = "defaultSort"
                       :allowRowExpand = "true"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
-                      @handleChange="handlePageAndSizeChange"
-                      @sortChange="handleSortChange"
+                      @handleChange="handlePageAndSizeChangePart2"
+                      @sortChange="handleSortChangePart2"
                   />
                 </div>
                 <div  v-if="part2.storeMode==1"  
@@ -397,23 +397,23 @@
                   <v-chart  v-if="part3.storeMode==1" 
                             ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
-                  <div v-else style="margin-top:20.5px">
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-y: scroll;">
                     <table-pagination
                       ref="elTP"
                       :column-data="part3StoreInfoTableCol"
                       :table-data="part3.storeTableData"
-                      :total="total"
+                      :total="part2.table.total"
                       :highlight-current-row= "true"
-                      :pagesize="sizeNum"
-                      :current-page="page"
+                      :pagesize="part2.table.sizeNum"
+                      :current-page="part2.table.page"
                       :is-event = "false"
                       :default-sort = "defaultSort"
                       :allowRowExpand = "true"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
-                      @handleChange="handlePageAndSizeChange"
-                      @sortChange="handleSortChange"
+                      @handleChange="handlePageAndSizeChangePart3"
+                      @sortChange="handleSortChangePart3"
                   />
                 </div>
                 <div  v-if="part2.storeMode==1"  
@@ -784,7 +784,7 @@ export default {
           'prop': 'province',
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
-          'width': '80',
+          'width': '90',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -792,7 +792,7 @@ export default {
           'prop': 'city',
           'label': this.$t('remotePatrol.regionII'),
           'sortable': false,
-          'width': '80',
+          'width': '90',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -832,8 +832,8 @@ export default {
           'prop': 'storeSubmitters',
           'label': this.$t('statistics.submitter'),
           'sortable': false,
-          'width': '170',
-          'maxWidth': '100',
+          'width': '140',
+          'maxWidth': '140',
           'pdfwidth': '11%'
         },
         {
@@ -875,7 +875,7 @@ export default {
           'prop': 'province',
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
-          'width': '80',
+          'width': '90',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -883,7 +883,7 @@ export default {
           'prop': 'city',
           'label': this.$t('remotePatrol.regionII'),
           'sortable': false,
-          'width': '80',
+          'width': '90',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -923,8 +923,8 @@ export default {
           'prop': 'storeSubmitters',
           'label': this.$t('statistics.submitter'),
           'sortable': false,
-          'width': '170',
-          'maxWidth': '100',
+          'width': '140',
+          'maxWidth': '140',
           'pdfwidth': '11%'
         },
         {
@@ -965,7 +965,7 @@ export default {
           'prop': 'province',
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
-          'width': '80',
+          'width': '90',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -973,7 +973,7 @@ export default {
           'prop': 'city',
           'label': this.$t('remotePatrol.regionII'),
           'sortable': false,
-          'width': '80',
+          'width': '90',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -1013,8 +1013,8 @@ export default {
           'prop': 'storeSubmitters',
           'label': this.$t('statistics.submitter'),
           'sortable': false,
-          'width': '130',
-          'maxWidth': '100',
+          'width': '110',
+          'maxWidth': '110',
           'pdfwidth': '11%'
         },
          {
@@ -1064,21 +1064,24 @@ export default {
               indexType:0, regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
-              pieOption:{},barRegionOption:{},barStoreOption:{}},
+              pieOption:{},barRegionOption:{},barStoreOption:{},
+              table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfReport'}},
       part2:{ standardScore:-9999,averageScore:-9999,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
-              pieOption:{},barRegionOption:{},barStoreOption:{}},
+              pieOption:{},barRegionOption:{},barStoreOption:{},
+              table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfReport'}},
       part3:{ standardScore:-9999,averageScore:-9999,
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,regionOrder:"desc",storeOrder:"desc",
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
-              pieOption:{},barRegionOption:{},barStoreOption:{}},
+              pieOption:{},barRegionOption:{},barStoreOption:{},
+              table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfReport'}},
     };
   },
 
@@ -1115,10 +1118,37 @@ export default {
       });
 
     },
-    handlePageAndSizeChange(){
-
+    handlePageAndSizeChangePart1(e){
+        this.part1.table.page = e.page;
+        this.part1.table.sizeNum = e.size;
+        this.getPart1StoreBar();
     },
-    handleSortChange(){
+    handleSortChangePart1(e){
+        console.log(e)
+    },
+    handlePageAndSizeChangePart2(e){
+        this.part2.table.page = e.page;
+        this.part2.table.sizeNum = e.size;
+        this.getPart2StoreBar();
+    },
+    handleSortChangePart2(e){
+        console.log(e)
+    },
+    handlePageAndSizeChangePart3(e){
+        this.part3.table.page = e.page;
+        this.part3.table.sizeNum = e.size;
+        this.getPart3StoreBar();
+    },
+    handleSortChangePart3(e){
+        console.log(e)
+    },
+    handlePageAndSizeChangePart1(e){
+        this.part1.table.page = e.page;
+        this.part1.table.sizeNum = e.size;
+        this.getPart1StoreBar();
+    },
+    handleSortChangePart1(e){
+        console.log(e)
     },
     onSwitchPart1Mode(mode){
       this.part1.storeMode = mode;
@@ -1904,7 +1934,7 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log("getPart1StoreBar")
+
       let content = [];
       if(this.part1.content && this.part1.content[this.part1.indexRegion]){
         if(this.part1.compareType == 'stores'){
@@ -1921,12 +1951,20 @@ export default {
               direction: this.part1.storeOrder,
               property:this.part1.indexType==0?"numOfDangerous":this.part1.indexType==1?"numOfImproved":"numOfQualified",
             }
+            params.filter={
+              page:this.part1.table.page-1,
+              size:this.part1.table.sizeNum
+            }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
+                  console.log("getPart1StoreBar---")
                   content = result.content
+                  this.part1.table.total = result.totalElements;
                   console.log(result)
+                  console.log(this.part1.table)
+               //   console.log(result)
               }
             }
         }
@@ -2091,6 +2129,10 @@ export default {
               direction: this.part2.storeOrder,
               property:"averageScore"
             }
+            params.filter={
+              page:this.part2.table.page-1,
+              size:this.part2.table.sizeNum
+            }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -2252,6 +2294,10 @@ export default {
             params.order={
               direction: this.part3.storeOrder,
               property:"standardRate"
+            }
+            params.filter={
+              page:this.part3.table.page-1,
+              size:this.part3.table.sizeNum
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {

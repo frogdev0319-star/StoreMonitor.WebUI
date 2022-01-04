@@ -11,7 +11,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-     <div class="statistics-content" style="height:1000px;margin-top:200px">
+     <div class="statistics-content" style="height:1080px;margin-top:200px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -102,7 +102,7 @@
                   <v-chart  v-if="part3.storeMode==1" 
                             ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" :auto-resize="true"
                             style="width:100%;height:100%"/>
-                  <div v-else style="margin-top:20.5px">
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-y: scroll">
                     <table-pagination
                       ref="elTP"
                       :column-data="part3StoreInfoTableCol"
@@ -454,6 +454,9 @@ export default {
       storeOrder: { 'direction': 'asc', 'property': 'qualifiedRate' },
       fontFamily: 'Roboto, Microsoft YaHei',
       ispdf: false,
+      page:1,
+      total:0,
+      sizeNum:10,
       regionMode: 2,
       ifSaveParams: false,
       defaultSort: { prop: 'qualifiedRateStr', order: 'ascending' },
@@ -772,6 +775,14 @@ export default {
         this.part3.storeOrder = 'desc'
       }
       this.getPart3StoreBar();
+    },
+    handlePageAndSizeChange(e){
+        this.page = e.page;
+        this.sizeNum = e.size;
+        this.getPart1StoreBar();
+    },
+    handleSortChange(e){
+        console.log(e)
     },
     async handleExportReport() {
       const self = this;
