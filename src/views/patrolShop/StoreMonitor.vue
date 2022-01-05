@@ -1,334 +1,235 @@
 <template>
-  <el-row class="el-container">
-    <el-col :span="16" :class="{ liseAnmiClass: showSpread }" class="lside">
-      <div class="el-header-title">
-        <span v-if="showStoreUp" class="lside-title">
-          {{ store.storeTitle }}
-        </span>
-        <div
-          v-if="showStoreUp"
-          :class="storeUpClass"
-          class="storeUp-content"
-          @click="addStoreUp"
-        >
-          <i
-            :class="store.storeUp ? 'coll-icon' : 'nocoll-icon'"
-            class="iconfont icon-iconfontstart"
-            style="vertical-align: middle"
-          />
-          <span :class="store.storeUp ? 'coll-font' : 'nocoll-font'">
-            {{ store.storeUpTitle }}</span>
+  <div>
+    <el-row>
+      <store-filter
+        @emitSelectedStore = "getCurStore"
+      ></store-filter>
+      
+    </el-row>
+    <el-row class="el-container" :class="isFullScreenMode ? 'block paper' : 'flex'">
+      <el-col :span="isFullScreenMode ? 24: 12" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" class="lside">
+        <div class="el-header-title flex-center">
+          <img :src="showStoreUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
+          <span> {{ activeStore.name }} </span>
+          <div style="flex: 1"></div>
+          <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
+            <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon"  style="margin-right: 10px">
+            {{isFullScreenMode? $t('remotePatrol.defaulteMode'):$t('remotePatrol.fullScreenMode')}}
+          </div>
         </div>
-        <el-button
-          v-loading.fullscreen.lock="fullscreenLoading"
-          v-if="showStoreUp"
-          :disabled="sourceList.length === 0"
-          :size="varyWindowWidth > 1680 ? 'small' : 'mini'"
-          class="el-submit"
-          type="primary"
-          @click="submit"
-        >{{ $t("remotePatrol.submit") }}
-        </el-button>
-      </div>
-      <dialog-vue
-        :dialog-title="changeStoreObj.title"
-        :show-info="changeStoreObj.showInfo"
-        :is-warning="changeStoreObj.isWarning"
-        :dialog-closed="changeStoreObj.dialogCosed"
-        @confirmed="changeStoreDialog"
-        @canceled="canceldChangeStore"
-      />
-      <dialog-vue
-        :dialog-title="changeChannelObj.title"
-        :show-info="changeChannelObj.showInfo"
-        :is-warning="changeChannelObj.isWarning"
-        :dialog-closed="changeChannelObj.dialogCosed"
-        @confirmed="changeChannelDialog"
-        @canceled="cancelchangeChannel"
-      />
-      <dialog-vue
-        :dialog-title="noBindDeviceObj.title"
-        :show-info="noBindDeviceObj.showInfo"
-        :is-warning="noBindDeviceObj.isWarning"
-        :dialog-closed="noBindDeviceObj.dialogCosed"
-        @confirmed="noBindDeviceDialog"
-        @canceled="canceldNoBind"
-      />
-      <component
-        :is="currentVideoComponent"
-        ref="vendorVideo"
-        :store-id="store.storeId"
-        :channel-info="channel"
-        :source-list-length= "sourceList.length"
-        :is-store-monitor="true"
-        :play-back="playBackState"
-        :is-event="false"
-        :cur-time="playBackTime"
-        :video-authority="videoAuthority"
-        @confirmEzvizCanvas="editEzvizCanvas"/>
+        <dialog-vue
+          :dialog-title="changeStoreObj.title"
+          :show-info="changeStoreObj.showInfo"
+          :is-warning="changeStoreObj.isWarning"
+          :dialog-closed="changeStoreObj.dialogCosed"
+          @confirmed="changeStoreDialog"
+          @canceled="canceldChangeStore"
+        />
+        <dialog-vue
+          :dialog-title="changeChannelObj.title"
+          :show-info="changeChannelObj.showInfo"
+          :is-warning="changeChannelObj.isWarning"
+          :dialog-closed="changeChannelObj.dialogCosed"
+          @confirmed="changeChannelDialog"
+          @canceled="cancelchangeChannel"
+        />
+        <dialog-vue
+          :dialog-title="noBindDeviceObj.title"
+          :show-info="noBindDeviceObj.showInfo"
+          :is-warning="noBindDeviceObj.isWarning"
+          :dialog-closed="noBindDeviceObj.dialogCosed"
+          @confirmed="noBindDeviceDialog"
+          @canceled="canceldNoBind"
+        />
+        <component
+          :is="currentVideoComponent"
+          ref="vendorVideo"
+          :store-id="store.storeId"
+          :channel-info="channel"
+          :source-list-length= "sourceList.length"
+          :is-store-monitor="true"
+          :play-back="playBackState"
+          :is-event="false"
+          :cur-time="playBackTime"
+          :video-authority="videoAuthority"
+          @confirmEzvizCanvas="editEzvizCanvas"/>
 
-      <div class="el-event">
-        <div :class="corEvent ? 'event-lside' : ''">
+        <div class="channel-content">
+          <div class="flex-center padding" style="justify-content: space-between;">
+            <span>{{ $t("remotePatrol.zoneList") }}</span>
+            <el-input
+              :placeholder="$t('remotePatrol.channelPlaceholder')"
+              v-model="serachChannelValue"
+              size="small"
+              class="el-search-input el-channel-search-input"
+              @keyup.enter.native="searchChannel"
+            >
+              <i
+                slot="prefix"
+                class="iconfont icon-sousuo"
+                style="position: relative; top: 6px; left: 6px; font-size: 18px"
+              />
+            </el-input>
+          </div>
+          <div class="btn-content" :style="{'justify-content':isFullScreenMode?'unset':'space-between'}">
+            <div
+              v-for="(item, index) in activeStore.device"
+              :key="index"
+              class="btn-details"
+              :class="{'child-space': isFullScreenMode}"
+              :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
+            >
+              <div 
+                @click="clickBtn(item,index)"
+                class="channel"
+                :class="{'channel-isActive': item.isClick}"
+              >
+              <img :src="item.isClick ? channelActiveIcon: channelIcon" height="24" style="margin-right: 20px">
+              {{ item.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="time-content">
+          <div class="time-title">
+            <span class="date-title">{{ $t("remotePatrol.selectDate") }}</span>
+            <div @click="backCurDate" 
+            style="
+            width: 120px; 
+            height: 30px; 
+            line-height: 30px;
+            border-radius: 5px;
+            border: solid 1px #c60957; 
+            font-size: 15px;
+            color: #c60957;
+            background-color: #fff;">{{ $t("remotePatrol.backToNow")}}</div>
+          </div>
+          <div style="padding: 20px; display: flex; justify-content: space-between; padding-top: 0">
+            <el-date-picker
+              v-model="dateValue"
+              :picker-options="pickerOptions"
+              :clearable="false"
+              class="date-picker"
+              type="date"
+              placeholder="日期"
+              size="mini"
+            />
+            <el-time-picker
+              v-model="curTime"
+              :clearable="false"
+              :placeholder="$t('remotePatrol.playTime')"
+              class="time-picker"
+              size="mini"
+            />
+          </div>
+        </div>
+      </el-col>
+      <el-col :span="isFullScreenMode ? 24: 12" class="rside">
+        <div class="paper padding" style="text-align: left">
           <span class="event-title">{{ $t("remotePatrol.createMothod") }}</span>
-          <div class="el-radio-content">
+          <hr class="hr-horizontal">
+          <div class="flex-center">
             <div
               v-for="(item, index) in evBtns"
               :key="index"
-              :class="item.isActive ? 'activeClass' : ''"
+              :style="item.isActive ? {'background-color': '#006ab7', 'color': '#fff', 'border-color': '#006ab7'} : {}"
               class="el-radio-details"
               @click="clickEventBtn(item, index)"
             >
               <span>{{ item.name }}</span>
             </div>
           </div>
-          <div class="lside-scrollbar">
-            <el-scrollbar style="height: 100%" class="el-menuscrollbar">
-              <span class="event-title"><span class="is-required">* </span>{{ $t("remotePatrol.title") }}</span>
-              <el-input
-                :disabled="corEvent"
-                v-model="eventName"
-                size="mini"
-                class="name-input"
-                @input="eventNameChanged"
-                @blur="notShowInputRuleTips('eventName')"
-              />
-              <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
-              <span v-if="showEventNameInfo" class="error-class">{{
-              $t("remotePatrol.emptyEventTitle") }}</span>
-              <span v-if="!corEvent" class="event-title">{{ $t("remotePatrol.description") }}</span>
-              <span v-else class="event-title"><span class="is-required">* </span>
-                {{ $t("remotePatrol.description") }}
-              </span>
-              <el-input
-                :autosize="{ minRows: 2, maxRows: 7 }"
-                v-model="eventDes"
-                :placeholder="$t('remotePatrol.descPlaceholder')"
-                size="mini"
-                class="des-input"
-                type="textarea"
-                resize="none"
-                @input="eventDesChanged"
-                @blur="notShowInputRuleTips('eventDes')"
-              />
-              <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
-              <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
-
-              <div class="source-content">
-                <div
-                  v-for="(item, index) in sourceList"
-                  :key="index"
-                  class="source-details"
-                >
-                  <div v-if="item.mediaType === 2" class="img-content">
-                    <i
-                      class="el-icon-close icondelete"
-                      @click="deleteImg(item, index)"
-                    />
-                    <el-image
-                      :src="item.src"
-                      :style="{width: item.width, height: item.height}"
-                      :preview-src-list="getImgList(index, sourceList)"/>
+        </div>
+        <div class="el-event" style="flex: 1">
+          <div class="paper" style="height: calc(100% - 80px); margin: 20px; margin-top: 60px; position: relative" >
+            <div v-if="corEvent" style="position: absolute; top: -34px; left: 20px; font-size: 12px" class="flex-center">
+              <div class="problemTab" :style="problemTab===0?{'background-color': '#f7f9fa'}:{}" @click="problemTab = 0">問題描述</div>
+              <div class="problemTab" :style="problemTab===1?{'background-color': '#f7f9fa'}:{}" @click="problemTab = 1">{{$t("remotePatrol.relevantEvent")}}</div>
+            </div>
+            <div v-else>
+              <div class="problemTab" style="position: absolute; top: -34px; left: 20px; font-size: 12px; background-color: #f7f9fa">問題描述</div>
+            </div>
+            <div v-if="problemTab == 0" class="padding" style="height: 100%; text-align: left">
+                  <div class="event-title margin-bottom-sm"><span class="is-required">* </span>{{ $t("remotePatrol.title") }}</div>
+                  <el-input
+                    :disabled="corEvent"
+                    v-model="eventName"
+                    size="mini"
+                    class="fullWidth margin-bottom-md"
+                    @input="eventNameChanged"
+                    @blur="notShowInputRuleTips('eventName')"
+                  />
+                  <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
+                  <span v-if="showEventNameInfo" class="error-class">{{
+                  $t("remotePatrol.emptyEventTitle") }}</span>
+                  <div v-if="!corEvent" class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
+                  <div v-else class="event-title margin-bottom-sm"><div class="is-required">* </div>
+                    {{ $t("remotePatrol.description") }}
                   </div>
-                </div>
-                <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
-              </div>
-            </el-scrollbar>
-          </div>
-        </div>
-        <div v-if="corEvent" id="rightLine" class="right-line" />
-        <div v-if="corEvent" class="event-rside">
-          <el-scrollbar style="height: 100%" class="el-menuscrollbar">
-            <span class="event-title cor-des">{{
-              $t("remotePatrol.relevantEvent")
-            }}</span>
-            <div class="event-content">
-              <div
-                v-for="(item, index) in eventList"
-                :key="index"
-                class="event-details"
-              >
-                <el-radio
-                  v-model="curEvent"
-                  :label="item.id"
-                  class="store-radio-class"
-                  @change="checkEvent"
-                >
-                  <span :title="item.name" class="event-name">{{
-                    item.name
-                  }}</span></el-radio
-                  >
-                <div class="event-date">
-                  <span class="date-year">{{ item.dateYear }}</span>
-                  <span class="date-day">{{ item.dateDay }}</span>
-                </div>
-                <p :title="item.descrition" class="event-des">
-                  {{ item.descrition }}
-                </p>
-              </div>
-            </div>
-          </el-scrollbar>
-        </div>
-      </div>
-    </el-col>
-    <el-col :span="8" class="rside">
-      <div class="el-header-title">
-        <span>{{ $t("remotePatrol.selectStores") }}</span>
-      </div>
-      <el-tabs
-        v-model="activeIndex"
-        :id="lang === 'en' ? 'en-storetab-content' : 'storetab-content'"
-        @tab-click="handleClick"
-      >
-        <el-tab-pane
-          v-for="(item, index) in tabList"
-          :key="index"
-          :label="item.label"
-        >
-          <el-scrollbar style="height: 100%" class="el-menuscrollbar">
-            <div v-if="index !== 2" class="storeList-content">
-              <div
-                v-for="(_item, _index) in item.storeList"
-                :key="_index"
-                :class="_item.isActive ? 'activeClass' : ''"
-                class="store-name"
-                @click="clickStore(item, index, _item, _index)"
-              >
-                <el-tooltip
-                  :content="_item.name"
-                  class="item"
-                  effect="dark"
-                  placement="bottom"
-                >
-                  <span>{{ _item.name }}</span>
-                </el-tooltip>
-              </div>
-            </div>
+                  <el-input
+                    :autosize="{ minRows: 2, maxRows: 7 }"
+                    v-model="eventDes"
+                    :placeholder="$t('remotePatrol.descPlaceholder')"
+                    size="mini"
+                    class="des-input fullWidth"
+                    type="textarea"
+                    resize="none"
+                    @input="eventDesChanged"
+                    @blur="notShowInputRuleTips('eventDes')"
+                  />
+                  <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
+                  <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
 
-            <div v-else class="storeList-content">
-              <el-input
-                :placeholder="$t('remotePatrol.enterKeywords')"
-                v-model="serachVale"
-                size="small"
-                class="el-search-input"
-                @keyup.enter.native="searchStore"
-              >
-                <i
-                  slot="prefix"
-                  class="iconfont icon-sousuo"
-                  style="
-                    position: relative;
-                    top: 6px;
-                    left: 6px;
-                    font-size: 18px;
-                  "
-                />
-              </el-input>
-              <div
-                v-for="(_item, _index) in item.storeList"
-                :key="_index"
-                class="stores"
-              >
-                <span class="citys">{{ _item.cityName }}</span>
+                  <div class="source-content">
+                    <div
+                      v-for="(item, index) in sourceList"
+                      :key="index"
+                      class="source-details"
+                    >
+                      <div v-if="item.mediaType === 2" class="img-content">
+                        <i
+                          class="el-icon-close icondelete"
+                          @click="deleteImg(item, index)"
+                        />
+                        <el-image
+                          :src="item.src"
+                          :style="{width: item.width, height: item.height}"
+                          :preview-src-list="getImgList(index, sourceList)"/>
+                      </div>
+                    </div>
+                    <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
+                  </div>
+            </div>
+            <div v-if="corEvent && problemTab == 1">
                 <div
-                  v-for="(itemDs, indexDs) in _item.storeList"
-                  :key="indexDs"
-                  :class="itemDs.isActive ? 'activeClass' : ''"
-                  class="store-name"
-                  @click="clickStore(item, index, itemDs, indexDs)"
+                  v-for="(item, index) in eventList"
+                  :key="index"
+                  class="flex-center padding"
                 >
-                  <el-tooltip
-                    :content="itemDs.name"
-                    class="item"
-                    effect="dark"
-                    placement="bottom"
+                  <el-radio
+                    v-model="curEvent"
+                    :label="item.id"
+                    style="flex: 1; text-align: left; margin: 0"
+                    @change="checkEvent"
                   >
-                    <span>{{ itemDs.name }}</span>
-                  </el-tooltip>
+                    <span :title="item.name">{{
+                      item.name
+                    }}</span></el-radio
+                    >
+                  <div style="width: 125px; font-size: 13px">
+                    <span class="date-year">{{ item.dateYear }}</span>
+                    <span class="date-day">{{ item.dateDay }}</span>
+                  </div>
+                  <p :title="item.descrition">
+                    {{ item.descrition }}
+                  </p>
                 </div>
-              </div>
-            </div>
-          </el-scrollbar>
-        </el-tab-pane>
-      </el-tabs>
-      <hr class="rside-hr" >
-      <div class="channel-content">
-        <span>{{ $t("remotePatrol.zoneList") }}</span>
-        <el-input
-          :placeholder="$t('remotePatrol.channelPlaceholder')"
-          v-model="serachChannelValue"
-          size="small"
-          class="el-search-input el-channel-search-input"
-          @keyup.enter.native="searchChannel"
-        >
-          <i
-            slot="prefix"
-            class="iconfont icon-sousuo"
-            style="position: relative; top: 6px; left: 6px; font-size: 18px"
-          />
-        </el-input>
-        <div class="channels-srollbar">
-          <div class="arrow-content">
-            <i
-              v-if="hideLast"
-              class="el-icon-arrow-left icon-arrow"
-              @click="lastBar"/>
-          </div>
-          <div class="btn-content">
-            <div
-              v-for="(item, index) in showChannelBtns"
-              :key="index"
-              class="btn-details"
-            >
-              <channel-icon-btn
-                :channel-name="item.name"
-                :is-online="item.isonline"
-                :is-click="item.isClick"
-                class="channelBtn"
-                @click.native="clickBtn(item, index)"
-              />
             </div>
           </div>
-          <div class="arrow-content">
-            <i
-              v-if="hideNext"
-              class="el-icon-arrow-right icon-arrow"
-              @click="nextBar"
-            />
-          </div>
         </div>
-      </div>
-      <hr class="rside-hr" style="margin-top: 0" >
-      <div class="time-content">
-        <div class="time-title">
-          <span class="date-title">{{ $t("remotePatrol.selectDate") }}</span>
-          <el-button
-            size="mini"
-            class="backTime-btn"
-            type="primary"
-            @click="backCurDate"
-          > {{ $t("remotePatrol.backToNow") }}</el-button>
-        </div>
-        <div class="date-picker-content">
-          <el-date-picker
-            v-model="dateValue"
-            :picker-options="pickerOptions"
-            :clearable="false"
-            class="date-picker"
-            type="date"
-            placeholder="日期"
-            size="mini"
-          />
-          <el-time-picker
-            v-model="curTime"
-            :clearable="false"
-            :placeholder="$t('remotePatrol.playTime')"
-            class="time-picker"
-            size="mini"
-          />
-        </div>
-      </div>
-    </el-col>
-  </el-row>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 <script>
 import {
@@ -352,6 +253,7 @@ import SkywatchVideo from '@/components/SkywatchVideo';
 import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
+import StoreFilter from '@/components/StoreFilter_';
 
 export default {
   name: 'StoreMoinitor',
@@ -362,7 +264,8 @@ export default {
     SkywatchVideo,
     DashVideo,
     EzvizVideo,
-    BeseyeVideo
+    BeseyeVideo,
+    StoreFilter,
   },
 
   data() {
@@ -421,6 +324,12 @@ export default {
       removeIconSrc: require('../../../static/img/cancel.png'),
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
+      channelIcon: require('../../../static/img/channel.png'),
+      channelActiveIcon: require('../../../static/img/channel_active.png'),
+      starYellowIcon: require('../../../static/img/star-yellow.png'),
+      starGreyIcon: require('../../../static/img/star-grey.png'),
+      defaultModeIcon: require('../../../static/img/default-mode.png'),
+      fullScreenModeIcon: require('../../../static/img/full-screen.png'),
       showPenBtn: false,
       penList: [
         {
@@ -541,7 +450,11 @@ export default {
       eventNameRuletip: false,
       eventDesRuletip: false,
       vendor: 1,
-      currentVideoComponent: 'EzvizVideo'
+      currentVideoComponent: 'EzvizVideo',
+      showFavorite: false,
+      isFullScreenMode: false,
+      activeStore: {},
+      problemTab: 0
     };
   },
 
@@ -636,7 +549,7 @@ export default {
     self.myDivHeight();
     self.getOssInfo();
     self.getUpLoadBucketInfo();
-    self.getInitStoreData();
+    // self.getInitStoreData();
   },
 
   beforeDestroy() {
@@ -647,6 +560,12 @@ export default {
   },
 
   methods: {
+    getCurStore(storeArr) {
+      const key = 'activeStore';
+      this.activeStore = {...storeArr[0]}
+      this.getChannelByStore()
+      localStorage.setItem(key, storeArr[0].storeId)
+    },
     changeBrand() {
       const self = this;
       self.clearEvent();
@@ -989,6 +908,7 @@ export default {
         });
         self.eventList = temp;
       } else {
+        this.problemTab = 0;
         item.isActive = true;
         self.evBtns[1].isActive = false;
       }
@@ -1536,14 +1456,14 @@ export default {
       }
     },
 
-    getChannelByStore(storeItem) {
+    getChannelByStore() {
       const self = this;
       const temp = [];
       self.hideLast = false;
       self.hideNext = false;
       self.showCutContent = false;
       self.$refs.vendorVideo.playState && self.$refs.vendorVideo.stopVideoPlay();
-      storeItem.device.forEach((item, index) => {
+      this.activeStore.device.forEach((item, index) => {
         const obj = {};
         obj.id = item.id;
         obj.name = item.name;
@@ -1566,7 +1486,10 @@ export default {
         }
         item.status === 1 && temp.push(obj);
       });
-
+      this.activeStore = { 
+        ...this.activeStore,
+        device: [...temp]
+      }
       self.channelBtns = temp;
       self.allChannelBtns = temp;
       self.getshowBtns(temp);
@@ -1839,6 +1762,45 @@ $background: #f4f5f9;
 $tab: #7d8cad;
 $h1: #292e36;
 
+.event-title {
+  color: $black;
+  font-size: calc(14 / 1920 * 100vw);
+}
+.btn-content{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 20px;
+  .btn-details{
+    cursor: pointer;
+    margin-bottom: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+.channel {
+  width: 100%;
+  height: 40px;
+  padding: 8px 10px 8px 16px;
+  border-radius: 5px;
+  border: solid 1px #e6e6e6;
+  background-color: #fff;
+  color: #69727c;
+  display: flex;
+  align-items: center;
+}
+.channel-isActive {
+  color: #006ab7;
+  border: solid 1px #006ab7;
+  background-color: #e4f3fd;
+}
+.time-title {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  align-items: center;
+}
 @function rem($val) {
   @return $val/16 + rem;
 }
@@ -1882,6 +1844,7 @@ $h1: #292e36;
 }
 
 .el-container {
+  margin-top: 20px;
   background-color: $background;
   .spreadLsideClass {
     width: 98%;
@@ -2111,210 +2074,13 @@ $h1: #292e36;
         }
       }
     }
-    .el-event {
-      text-align: left;
-      border: 1px solid $border;
-      overflow: hidden;
-      margin: calc(25 / 1920 * 100vw);
-      padding-left: calc(20 / 1920 * 100vw);
-      margin-top: 0;
-      @media screen and(max-width: 1366px) {
-        .cor-des {
-          font-weight: bold;
-          margin-left: 10px !important;
-        }
-        .event-content {
-          padding-left: 10px;
-        }
-        .event-name {
-          margin-left: 10px;
-          font-size: 14px;
-          width: 75%;
-          display: inline-block !important;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
-      }
-      @media screen and(min-width: 1366px) {
-        .cor-des {
-          font-weight: bold;
-          margin-left: 0px !important;
-        }
-        .event-content {
-          padding-left: 0px;
-        }
-        .event-name {
-          margin-left: 0px;
-          font-size: 12px;
-          width: 75%;
-          display: inline-block !important;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
-      }
-      .event-title {
-        color: $black;
-        display: block;
-        margin: 15px;
-        margin-left: 20px;
-        font-size: calc(14 / 1920 * 100vw);
-      }
-      .is-required {
-        color: $red;
-      }
-      .cor-des {
-        font-weight: bold;
-      }
-      .el-radio-content {
-        margin-top: 10px;
-        .el-radio-details {
-          display: inline-block;
-          margin-left: calc(15 / 1920 * 100vw);
-          border: 1px solid #ddd;
-          padding: 6px;
-          font-size: 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          padding: 8px;
-          text-align: center;
-          width: 120px;
-        }
-        .activeClass {
-          background-color: #fde8ef !important;
-          color: $red;
-          border-color: $red !important;
-        }
-      }
-      .event-lside {
-        width: 60%;
-        float: left;
-        height: 460px;
-      }
-      .right-line {
-        width: 1px;
-        min-height: 340px;
-        position: relative;
-        top: 50px;
-        background-color: #e3e9f4;
-        float: left;
-        margin-right: 15px;
-      }
-      .lside-scrollbar {
-        height: 360px;
-        .rules {
-          margin-left: 20px;
-          font-size: 10px;
-          margin-top: 5px;
-          color: #ff2400;
-          display: block;
-        }
-      }
-      .event-rside {
-        position: relative;
-        top: 50px;
-        width: -webkit-calc(40% - 16px);
-        width: -moz-calc(40% - 16px);
-        width: calc(40% - 16px);
-        height: 360px;
-        float: right;
-        .event-content {
-          padding-bottom: 20px;
-          .event-details {
-            position: relative;
-            .store-radio-class {
-              width: calc(100% - 70px);
-            }
-            .event-name {
-              display: inline;
-            }
-            .event-date {
-              color: #94a4b4;
-              margin-left: 35px;
-              position: absolute;
-              right: 0px;
-              top: 0px;
-              width: 70px;
-              text-align: left;
-              line-height: 14px;
-              span {
-                margin: 0;
-                font-size: 12px;
-              }
-            }
-            .event-des {
-              font-size: 12px;
-              margin-left: 35px;
-              color: #94a4b4;
-              text-overflow: ellipsis;
-              overflow: hidden;
-              white-space: nowrap;
-              width: 80%;
-            }
-          }
-        }
-      }
-      .name-input {
-        @include point(width, 260);
-        margin-left: 20px;
-      }
-      .error-class {
-        margin-left: 20px;
-        font-size: 10px;
-        margin-top: 5px;
-        color: #ff2400;
-        display: block;
-      }
-      .des-input {
-        width: 90%;
-        margin: auto 20px;
-        font-size: 12px;
-      }
-      .source-content {
-        min-height: 120px;
-        width: 90%;
-        margin: auto 20px;
-        span {
-          font-size: 12px;
-          color: #fcb83b;
-          margin: 15px 0;
-          display: block;
-        }
-        .source-details {
-          display: inline-block;
-          margin-right: 15px;
-          padding-top: 15px;
-          .img-content {
-            width: 100%;
-            height: 100%;
-            position: relative;
-          }
-          .icondelete {
-            position: absolute;
-            font-size: 14px;
-            right: 5px;
-            margin-top: 8px;
-            z-index: 2;
-            color: #fff;
-            cursor: pointer;
-            background-color: rgba($color: $black, $alpha: 0.8);
-            border-radius: 50%;
-          }
-          .start-icon {
-            position: absolute;
-            left: 35%;
-            top: 30%;
-            cursor: pointer;
-          }
-        }
-      }
-    }
   }
   /*右侧区域css*/
   .rside {
+    display: flex;
+    flex-direction: column;
     border: 1px solid $border;
-    background-color: #fff;
+    background-color: #edf0f2;
     //@include point(margin-right,20);
     @media screen and(max-width: 1366px) {
       .el-header-title {
@@ -2443,53 +2209,9 @@ $h1: #292e36;
         cursor: pointer;
       }
 
-      .btn-content {
-        width: 86%;
-        float: left;
-        display: flex;
-        .btn-details {
-          // width: 100px;
-          display: inline-block;
-          margin-bottom: 5px;
-          @include point(margin-left, 15);
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-          &:last-child {
-            @include point(margin-right, 15);
-          }
-        }
-      }
+      
     }
     .time-content {
-      .time-title {
-        display: flex;
-        justify-content: space-between;
-        margin: 20px;
-        @include point(margin-left, 30);
-        align-items: center;
-        .date-title {
-          display: block;
-          text-align: left;
-          color: $black;
-          @media screen and(max-width: 1366px) {
-            font-size: 14px;
-          }
-          @media screen and(min-width: 1366px) {
-            font-size: 16px;
-          }
-        }
-        .backTime-btn {
-          @include point(right, 20);
-          font-size: 12px;
-          line-height: 12px;
-          border-radius: 3px !important;
-          width: 120px;
-          padding: 6px 0;
-          height: 28px;
-          outline: none;
-        }
-      }
       .date-picker-content {
         margin: 0 auto;
         .date-picker.el-date-editor.el-input {
@@ -2503,13 +2225,192 @@ $h1: #292e36;
       }
     }
   }
+  .el-radio-details {  
+    width: 160px;
+    height: 40px;
+    margin: 0 0 0 16px;
+    line-height: 40px;
+    border: solid 1px #e6e6e6;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+  }
+    .el-event {
+      @media screen and(max-width: 1366px) {
+        .cor-des {
+          font-weight: bold;
+          margin-left: 10px !important;
+        }
+        .event-content {
+          padding-left: 10px;
+        }
+        .event-name {
+          margin-left: 10px;
+          font-size: 14px;
+          width: 75%;
+          display: inline-block !important;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+      @media screen and(min-width: 1366px) {
+        .cor-des {
+          font-weight: bold;
+          margin-left: 0px !important;
+        }
+        .event-content {
+          padding-left: 0px;
+        }
+        .event-name {
+          margin-left: 0px;
+          font-size: 12px;
+          width: 75%;
+          display: inline-block !important;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+      .is-required {
+        color: $red;
+      }
+      .cor-des {
+        font-weight: bold;
+      }
+      .el-radio-content {
+        margin-top: 10px;
+        .activeClass {
+          background-color: #fde8ef !important;
+          color: $red;
+          border-color: $red !important;
+        }
+      }
+      .event-lside {
+        width: 60%;
+        float: left;
+        height: 460px;
+      }
+      .right-line {
+        width: 1px;
+        min-height: 340px;
+        position: relative;
+        top: 50px;
+        background-color: #e3e9f4;
+        float: left;
+        margin-right: 15px;
+      }
+      .lside-scrollbar {
+        height: 360px;
+        .rules {
+          margin-left: 20px;
+          font-size: 10px;
+          margin-top: 5px;
+          color: #ff2400;
+          display: block;
+        }
+      }
+      .event-rside {
+        // position: relative;
+        // top: 50px;
+        // width: -webkit-calc(40% - 16px);
+        // width: -moz-calc(40% - 16px);
+        // width: calc(40% - 16px);
+        // height: 360px;
+        // float: right;
+        .event-content {
+          padding-bottom: 20px;
+          .event-details {
+            position: relative;
+            .store-radio-class {
+              width: calc(100% - 70px);
+            }
+            .event-name {
+              display: inline;
+            }
+            .event-date {
+              width: 125px;
+              span {
+                margin: 0;
+                font-size: 12px;
+              }
+            }
+            .event-des {
+              font-size: 12px;
+              margin-left: 35px;
+              color: #94a4b4;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              white-space: nowrap;
+              width: 80%;
+            }
+          }
+        }
+      }
+      .error-class {
+        margin-left: 20px;
+        font-size: 10px;
+        margin-top: 5px;
+        color: #ff2400;
+        display: block;
+      }
+      .source-content {
+        min-height: 120px;
+        width: 90%;
+        margin: auto 20px;
+        span {
+          font-size: 12px;
+          color: #fcb83b;
+          margin: 15px 0;
+          display: block;
+        }
+        .source-details {
+          display: inline-block;
+          margin-right: 15px;
+          padding-top: 15px;
+          .img-content {
+            width: 100%;
+            height: 100%;
+            position: relative;
+          }
+          .icondelete {
+            position: absolute;
+            font-size: 14px;
+            right: 5px;
+            margin-top: 8px;
+            z-index: 2;
+            color: #fff;
+            cursor: pointer;
+            background-color: rgba($color: $black, $alpha: 0.8);
+            border-radius: 50%;
+          }
+          .start-icon {
+            position: absolute;
+            left: 35%;
+            top: 30%;
+            cursor: pointer;
+          }
+        }
+      }
+    }
 }
 </style>
 <style scoped>
+.problemTab {
+  width: 120px; 
+  height: 34px; 
+  line-height: 34px; 
+  cursor: pointer; 
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
 .el-test {
   width: 70px;
   position: relative;
   bottom: 5px;
+}
+.des-input {
+  font-size: 12px;
 }
 </style>
 <style>
