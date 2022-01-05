@@ -37,7 +37,7 @@
           <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
             <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon"  style="margin-right: 10px">
             {{isFullScreenMode? $t('remotePatrol.defaulteMode'):$t('remotePatrol.fullScreenMode')}}
-            </div>
+          </div>
         </div>
         <el-dialog
           v-if="showCutDialog"
