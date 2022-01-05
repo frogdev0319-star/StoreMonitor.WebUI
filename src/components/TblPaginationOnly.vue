@@ -8,7 +8,7 @@
           <el-select
             v-model="pagesize"
             size="medium"
-            class="el-province"
+            class="el-pagesize"
             @change="handleSizeChange">
             <el-option
               v-for="item in pageSizeOption"
@@ -141,7 +141,14 @@ export default {
     border-radius: 5px;
     background-color: #edf0f2;
     margin-left: 16px;
+    
   }
+  .el-pagesize{
+    ::v-deep.el-input__icon{
+      line-height: 31px;
+    }
+  } 
+  
 </style>
 <style>
   @import "../assets/css/pagination.css";
@@ -160,7 +167,17 @@ export default {
     border: none;
     outline: 0;
 }
-.el-province.el-select .el-input--medium .el-input__suffix{
-  top:0px;
+.el-pagesize.el-select .el-input--medium .el-input__suffix{
+  top:0px !important;
 }
+.el-pagesize.el-select .el-input--medium .el-input__inner {
+    height: 31px;
+    font-size: 13px;
+    text-align: left;
+    border: none;
+    background-color: #edf0f2;
+    color: #2b2b2b;
+    border-radius: 5px;
+}
+
 </style>

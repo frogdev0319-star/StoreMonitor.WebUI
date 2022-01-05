@@ -66,7 +66,7 @@
               :data="item.tableData"
               :highlight-current-row="true"
               :height="553"
-              :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+              :header-cell-style="{fontSize:'#12px',color:'red',height: '47px'}"
               :cell-style="cellStyle"
               empty-text="没有事件数据"
               align="left"

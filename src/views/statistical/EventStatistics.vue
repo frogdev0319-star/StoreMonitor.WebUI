@@ -106,6 +106,8 @@
                   :is-event = "false"
                   :default-sort = "defaultSort"
                   :allowRowExpand = "true"
+                  :headerStyle="{height:'75px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                  :tableHeight = "769"
                   layout = "prev,pager,next,sizes"
                   expand-component = "IncepItemTop5"
                   :expandCompProperties = "componentsProps"
@@ -653,7 +655,12 @@ export default {
       sizeNum: 10,
       total: 0,
       allEventData: [],
-      headerClass: 'header-class',
+      headerClass: {
+      fontSize:'#12px',
+      backgroundColor:'#f7f9fa',
+      height: '75px',
+      border: 'none'
+    },
       cellClass: 'cell-class',
       rowClass: 'row-class',
       hasNoData: false,
@@ -1983,7 +1990,12 @@ export default {
       background-color: #fff;
       color: #006ab7;
     }
-    
+    .tbl-header{
+      font-size:'#12px';
+      background-color:'#f7f9fa';
+      height: '75px';
+      border: none;
+    }
     
   }
 </style>

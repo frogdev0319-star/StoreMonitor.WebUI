@@ -8,6 +8,7 @@
       :highlight-current-row="true"
       :default-sort = "defaultSort"
       :header-cell-class-name="headerClass"
+      :header-cell-style="headerStyle"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
       :cell-style="ifSetCellStyle ? setCellStyle : {}"
@@ -233,9 +234,9 @@ export default {
         return {};
       }
     },
-    headerClass: {
-      type: String,
-      default: 'header-class'
+    headerStyle: {
+      type: Object,
+      default: {height:'75px',backgroundColor: 'transparent',border:'none',fontSize:'12px'}
     },
     cellClass: {
       type: String,
