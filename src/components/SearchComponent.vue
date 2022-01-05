@@ -433,6 +433,7 @@ export default {
       justify-content: space-between;
       margin-top: 16px;
       padding-bottom: 24px;
+      margin-left: -33px;
       .search-button{
         margin-left:35px;
         width: 102px;

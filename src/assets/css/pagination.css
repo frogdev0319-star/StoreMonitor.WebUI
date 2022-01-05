@@ -76,6 +76,7 @@
   line-height: calc(36/1920*100vw);
   border-color: #ddd;
   min-height: 28px;
+  border: none;
 }
 
 .el-select-content.el-select .el-input__inner{
