@@ -14,6 +14,7 @@
       :border="showBorder"
       :stripe="isStripe"
       :height="tableHeight"
+      :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
       :empty-text="$t('deviceView.noData')"
       align="left"
       style="width: 100%"
@@ -146,21 +147,6 @@
         </div>
       </div>
     </el-table>
-    <div v-if="showPagination" class="toolbar pagination clearfix">
-      <el-pagination
-        :current-page="currentPage"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size="pagesize"
-        :pager-count="1"
-        :total="total"
-        :layout="layout"
-        background
-        small
-        class="pagination"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
-    </div>
   </div>
 </template>
 
@@ -178,21 +164,6 @@ export default {
     EventCommentList
   },
   props: {
-    total: {
-      type: Number,
-      default: 0,
-      required: false
-    },
-    pagesize: {
-      type: Number,
-      default: 10,
-      required: false
-    },
-    currentPage: {
-      type: Number,
-      default: 1,
-      required: false
-    },
     tableData: {
       type: Array,
       default: () => [],
@@ -212,10 +183,6 @@ export default {
       default: 'jumper,total, prev,pager, next,sizes'
     },
     canSortable: {
-      type: Boolean,
-      default: true
-    },
-    showPagination: {
       type: Boolean,
       default: true
     },
@@ -370,22 +337,6 @@ export default {
       }else{*/
         this.$emit('emitRowClick', row);
       //}
-    },
-
-    handleCurrentChange(currentPage) {
-      const pageObj = {
-        page: currentPage,
-        size: this.pagesize
-      };
-      this.$emit('handleChange', pageObj);
-    },
-
-    handleSizeChange(pageSize) {
-      const pageObj = {
-        page: this.currentPage,
-        size: pageSize
-      };
-      this.$emit('handleChange', pageObj);
     },
 
     handleSortChange(col) {

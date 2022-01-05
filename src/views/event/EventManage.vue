@@ -10,10 +10,10 @@
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0">
         <div class="flex-center">
-          <span class="search-label">{{ $t('eventView.time') }}</span>
+          <div class="search-label">{{ $t('eventView.time') }}</div>
           <date-time-selector @change="dateChange"/>
         </div>
-        <div class="flex-center">
+        <!--<div class="flex-center">
           <span style="margin-right: 10px; white-space:nowrap;">{{ $t('eventView.status') }}</span>
           <multi-select
             ref="multiState"
@@ -22,7 +22,7 @@
             :options="eventStatesList"
             :disabled="activeName!=='4'"
             @changeInput="handleStateChange"/>
-        </div>
+        </div>-->
         <div class="flex-center">
           <span style="margin-right: 10px; white-space:nowrap;">{{ $t('remotePatrol.keywords') }}</span>
           <el-input
@@ -46,6 +46,7 @@
       <delay-button
         :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
         class="absolute-btn"
+        style="background-color:#FFF;color:#006ab7;"
         type="primary"
         size="mini"
         @click="export2Excel"
@@ -64,7 +65,7 @@
             <el-table
               :data="item.tableData"
               :highlight-current-row="true"
-              :height="windowHeight-260"
+              :height="553"
               :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
               :cell-style="cellStyle"
               empty-text="没有事件数据"
@@ -83,25 +84,26 @@
                   <span
                     v-if="scope.row.status === 0"
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
-                    style="background-color:#FDBA40;" >
+                    style="background-color:#fff2ef;color:#f57848;" 
+                    >
                     {{ $t('eventView.pending') }}
                   </span>
                   <span
                     v-else-if="scope.row.status === 1"
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
-                    style="background-color:#434C5E;" >
+                    style="background-color:#edf6e8;color:#59ab22;" >
                     {{ $t('eventView.handled') }}
                   </span>
                   <span
                     v-else-if="scope.row.status === 2"
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
-                    style="background-color:#6097F3;" >
+                    style="background-color:#efefef;color:#6e6e6e;" >
                     {{ $t('eventView.closed') }}
                   </span>
                   <span
                     v-else-if="scope.row.status === 3"
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
-                    style="background-color:#FDBA40;" >
+                    style="background-color:#ffeff5;color:#e22472;" >
                     {{ $t('eventView.returnStatus') }}
                   </span>
                 </template>
@@ -151,18 +153,15 @@
               </div>
             </el-table>
           </div>
-          <div class="toolbar pagination clearfix" style="width:100%; margin:10px 15px 0px 0px;height:13%;">
-            <el-pagination
-              :page-sizes="[10, 20, 50, 100]"
+          <div style="width:100%; margin:10px 15px 0px 0px;height:13%;">
+            <tbl-pagination-only
+              :total="item.total"
               :current-page="item.page"
               :page-size="item.sizeNum"
-              :total="item.total"
-              background
-              small
-              layout="jumper,total, prev, pager, next,sizes"
-              style="float:right;margin-top:10px;margin-bottom:10px;margin-right: 10px;"
-              @size-change="sizeChange"
-              @current-change="currentChange"/>
+              layout = "prev,pager, next,sizes,slot"
+              @sizeChange="sizeChange"
+              @currentChange="currentChange"
+            />
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -186,6 +185,7 @@ import DelayButton from '@/components/DelayButton';
 import StoreFilter from '@/components/StoreFilter';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from '@/components/SelectedStores';
+import TblPaginationOnly from '@/components/TblPaginationOnly';
 
 export default {
   name: 'EventManage',
@@ -196,7 +196,8 @@ export default {
     DelayButton,
     LimitSelect,
     MultiSelect,
-    RegionMultiSelect
+    RegionMultiSelect,
+    TblPaginationOnly
   },
 
   data() {
@@ -531,10 +532,11 @@ export default {
           temp.push(obj);
         });
         self.tableDataList[tabIndex].tableData = temp;
-        self.tableDataList[tabIndex].total = res.data.totalElements;
+        self.tableDataList[tabIndex].total = res.data.totalPages;
         self.tableDataList[tabIndex].eventCount = res.data.totalElements;
         self.totalElements = res.data.totalElements;
         self.numberOfElements = res.data.numberOfElements;
+        console.log("*",this.tableDataList[tabIndex].page);
       }).catch(err => {
         console.log('EventManagement-getEventList:' + err);
       });
@@ -572,6 +574,7 @@ export default {
       }
       let page = 0;
       if (val === 'currentChange') {
+        console.log(this.tableDataList[tabIndex].page);
         page = this.tableDataList[tabIndex].page - 1;
       }
       if (val === 'Back') {
@@ -619,14 +622,15 @@ export default {
 
     sizeChange(val) {
       const self = this;
-      self.tableDataList[Number(self.activeName)].sizeNum = val;
+      self.tableDataList[Number(self.activeName)].sizeNum = val.size;
       self.tableDataList[Number(self.activeName)].page = 1;
       self.getEventList();
     },
 
     currentChange(val) {
       const self = this;
-      self.tableDataList[Number(self.activeName)].page = val;
+      console.log("currentChange val:",val);
+      self.tableDataList[Number(self.activeName)].page = val.page;
       self.getEventList('currentChange');
 
       const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
@@ -907,10 +911,10 @@ $h1:#292e36;
     }
     .icon-span{
         display:inline-block;
-        width:60px;
-        height:22px;
-        color:white;
+        width:68px;
+        height:24px;
         font-size: 12px;
+        border-radius: 5px;
     }
     .ja-icon{
       @extend .icon-span;
@@ -929,6 +933,7 @@ $h1:#292e36;
       font-family: NotoSansCJKTC;
       font-size: 15px;
       font-weight: normal;
+      margin-left:-10px;
     }
     .el-event-header{
         // text-align: left;
@@ -1011,6 +1016,8 @@ $h1:#292e36;
     .el-table-content{
       width: 100%;
       background-color: #fff;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+      border-radius: 5px;
       position: relative;
       padding-top: calc(30/1920*100vw);
       .table-content{
@@ -1019,7 +1026,7 @@ $h1:#292e36;
             /*height:300px;*/
             /*float:left;*/
           &.el-table{
-            font-size: calc(14/1920*100vw);
+            font-size: 15px;
           }
         }
     }

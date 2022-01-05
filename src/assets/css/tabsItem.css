@@ -35,16 +35,36 @@
 
 #en-tabs-content  .el-tabs__nav-scroll{
   margin-left:20px !important;
+  border-bottom-color: #acaeb1  !important;
 }
 #en-tabs-content .el-tabs__nav.is-top{
   margin-left: 0;
 }
 #en-tabs-content .el-tabs__item {
   padding: 0 0;
-  font-size: 14px;
+  font-size: 13px;
   width: 180px;
 }
 
 #en-tabs-content .el-tabs__active-bar{
   height: 4px;
+}
+.el-tabs__item {
+  font-family: NotoSansCJKTC;
+  font-size: 13px;
+  color: #a5a5a5;
+}
+.el-tabs__item:hover {
+  color: #006ab7;
+  cursor: pointer;
+}
+.el-tabs__item.is-active {
+  color: #006ab7;
+  background-color: #f7f9fa;
+  border-radius: 2px;
+  font-size: 15px;
+  border:none !important;
+}
+.el-tabs__active-bar{
+  display: none;
 }
