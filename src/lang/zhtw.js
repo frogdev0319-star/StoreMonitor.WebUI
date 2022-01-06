@@ -273,7 +273,7 @@ export default {
     "cancel": "取 消",
     "cancleIgnore": "確認是否取消忽略當前巡檢項",
     "cannotSwitch": "未綁定巡檢項的門店，無法點擊切換",
-    "cardStyle": "縮略圖模式",
+    "cardStyle": "縮圖模式",
     "category": "巡檢類別",
     "changPageInfo": "當前巡檢尚未完成，確認是否離開頁面？",
     "changeTimeRange": "當前選擇時間範圍最大為三個月，已調整！",

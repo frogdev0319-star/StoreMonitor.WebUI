@@ -274,7 +274,7 @@ export default {
     "cancel": "取 消",
     "cancleIgnore": "确认是否取消忽略当前巡检项",
     "cannotSwitch": "未绑定巡检项的门店，无法点击切换",
-    "cardStyle": "缩略图模式",
+    "cardStyle": "缩图模式",
     "category": "巡检类别",
     "changPageInfo": "当前巡检尚未完成，确认是否离开页面？",
     "changeTimeRange": "当前选择时间范围最大为三个月，已调整！",
