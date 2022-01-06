@@ -4,12 +4,11 @@
       <store-filter
         @emitSelectedStore = "getCurStore"
       ></store-filter>
-      
     </el-row>
     <el-row class="el-container" :class="isFullScreenMode ? 'block paper' : 'flex'">
       <el-col :span="isFullScreenMode ? 24: 12" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" class="lside">
         <div class="el-header-title flex-center">
-          <img :src="showStoreUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
+          <img :src="activeStore.favorite? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
           <span> {{ activeStore.name }} </span>
           <div style="flex: 1"></div>
           <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
@@ -846,7 +845,7 @@ export default {
     addStoreUp() {
       const self = this;
       const temp = [];
-      temp.push(self.store.storeId);
+      temp.push(self.activeStore.storeId);
       const params = {
         storeIds: temp
       };
