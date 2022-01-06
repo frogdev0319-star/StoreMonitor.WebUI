@@ -7,14 +7,13 @@
       v-bind="$attrs"
       :highlight-current-row="true"
       :default-sort = "defaultSort"
-      :header-cell-class-name="headerClass"
+      :header-cell-style="headerStyle"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
       :cell-style="ifSetCellStyle ? setCellStyle : {}"
       :border="showBorder"
       :stripe="isStripe"
       :height="tableHeight"
-      :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
       :empty-text="$t('deviceView.noData')"
       align="left"
       style="width: 100%"
@@ -200,9 +199,9 @@ export default {
         return {};
       }
     },
-    headerClass: {
-      type: String,
-      default: 'header-class'
+    headerStyle: {
+      type: Object,
+      default: {height:'75px',backgroundColor: 'transparent',border:'none',fontSize:'12px'}
     },
     cellClass: {
       type: String,
