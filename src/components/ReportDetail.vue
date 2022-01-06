@@ -9,38 +9,33 @@
         <div v-if="_item.type === 0" class="score-title">
           <div
             v-if="_item.grade === Math.pow(-2,31)"
-            :style="isExportPdf ? 'width:110px;height:40px;line-height:40px;' : 'width:50px;'"
             class="ignore-btn">
           <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
           <div
             v-if="groupType === 0 && _item.grade === 0"
-            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'"
             class="title-btn-failed">
-            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }} {{ tab1BtnArr[1] }} </span>
+            <span class="pdf_font_18">{{ tab1BtnArr[1] }} </span>
           </div>
           <div
             v-if="groupType === 2 && _item.grade === 0"
-            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'"
             class="title-btn-failed">
-            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ tab3BtnArr[1] }} </span>
+            <span class="pdf_font_18">{{ tab3BtnArr[1] }} </span>
           </div>
           <div
             v-if="groupType === 0 && _item.grade === 1"
-            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'"
             class="title-btn-pass">
-            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ tab1BtnArr[0] }} </span>
+            <span class="pdf_font_18">{{ tab1BtnArr[0] }} </span>
           </div>
           <div
             v-if="groupType === 2 && _item.grade === 1"
-            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'"
             class="title-btn-pass">
-            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ tab3BtnArr[0] }} </span>
+            <span class="pdf_font_18">{{ tab3BtnArr[0] }} </span>
           </div>
           <div
             v-if="groupType === 1 &&_item.grade!=Math.pow(-2,31)"
             :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
-            :style="isExportPdf ? 'width:170px;height:40px;line-height:40px;' : 'width:100px;'">
-            <span class="pdf_font_18">{{ $t('remotePatrol.scoreUnit') }}{{ _item.grade }}</span>
+            >
+            <span class="pdf_font_18">{{ _item.grade }}</span>
           </div>
           <div
             v-if="_item.itemScore !== Number.MAX_VALUE"
@@ -253,55 +248,53 @@ export default {
     margin-top: 10px;
     .content-detail-title{
       min-height:70px;
-      background-color:$background;
+      // background-color:$background;
       padding-left:calc(20 / 1920 * 100vw);
       padding-right: calc(20 / 1920 * 100vw);
       padding-top:10px;
       padding-bottom: 10px;
       display: flex;
       .ignore-btn{
-        width:50px;
-        height:24px;
-        background-color: #434c5e;
-        font-size: 12px;
-        color:#ffffff;
+        width: 110px;
+        padding: 5px 20px;
+        background-color: #f7f9fa;
+        font-size: calc(15 / 1920 * 100vw);
+        color:#556679;
         font-weight: bold;
-        line-height: 25px;
-        text-align: center;
         border-radius: 5px;
       }
       .title-btn-failed{
-        height:25px;
-        background-color: #fcba3f;
-        font-size:12px;
-        color:#ffffff;
+        width: 110px;
+        padding: 5px 20px;
+        background-color: #ffefeb;
+        font-size: calc(15 / 1920 * 100vw);
+        color:#f57949;
         font-weight: bold;
-        line-height: 25px;
-        text-align: center;
-        border-radius: 20px;
+        border-radius: 5px;
       }
       .title-btn-pass{
-        height:25px;
-        background-color: #2AC25D;
-        font-size:12px;
-        color:#ffffff;
+        width: 110px;
+        padding: 5px 20px;
+        background-color: #e8f6de;
+        font-size: calc(15 / 1920 * 100vw);
+        color:#59ab22;
         font-weight: bold;
-        line-height: 25px;
-        text-align: center;
-        border-radius: 20px;
+        border-radius: 5px;
       }
       .detail-title{
         flex: 1;
         .title1{
-          font-size: calc(14 / 1920 * 100vw);
+          font-size: 15px;
           color:#182752;
           font-weight: bold;
           margin:0 0 5px 0;
+          text-align: left;
         }
         .title2{
           font-size: calc(12 / 1920 * 100vw);
           color:#7d8cad;
           margin: 15px 0 0 10px;
+          text-align: left;
         }
       }
       .score-title{

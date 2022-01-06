@@ -21,6 +21,29 @@
             </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
+        <div style="float: right">
+          <el-select
+            v-if="$route.path === '/reportdetails'"
+            class="report-input"
+            v-model="curTemplateIndex"
+            :placeholder="$t('remotePatrol.stores')"
+            size="mini">
+            <el-option
+              v-for="(item, index) in templateOptions"
+              :key="index"
+              :label="item.name"
+              :value="index"/>
+          </el-select>
+          <el-button 
+            v-if="$route.path === '/reportdetails'"
+            style="background-color: transparent; color: #fff; border: none" 
+            @click="handleDownload">
+            <div>
+                <i class="iconfont icon-pdf export"/>
+                <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+              </div>
+          </el-button>
+        </div>
       </div>
       
       <el-col
@@ -225,6 +248,8 @@ export default {
       headUrl: '',
       breadList: [],
       collapsed: this.$store.getters.collapsed,
+      templateOptions: [],
+      curTemplateIndex: 0,
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       route: this.$route,
@@ -355,7 +380,16 @@ export default {
         this.wrapperAll = false;
       }
     },
-
+    
+    curTemplateIndex () {
+      this.$store.dispatch('setCurTemplateIndex', this.curTemplateIndex)
+    },
+    '$store.getters.curTemplateIndex': function() {
+      this.curTemplateIndex = this.$store.getters.curTemplateIndex
+    },
+    '$store.getters.templateOptions': function() {
+      this.templateOptions = this.$store.getters.templateOptions
+    },
     $route() {
       this.getBread();
     }
@@ -388,6 +422,9 @@ export default {
   },
 
   methods: {
+    handleDownload () {
+      document.getElementById('downloadPdf').click()
+    },
     setBrandListDisabled(booleanFlag) {
       this.brandDisabled = booleanFlag;
     },
@@ -677,6 +714,14 @@ export default {
   }
   *{
     margin: 0px;
+  }
+  .report-input {
+    >>> .el-input__inner {
+      background-color: rgba(255,255,255, 0.2);
+      height: 36px;
+      color: #fff;
+      border: none;
+    }
   }
   .navIcon{
     display:inline-block;
