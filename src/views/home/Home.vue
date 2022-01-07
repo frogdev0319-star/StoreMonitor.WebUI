@@ -6,7 +6,8 @@
           :style="collapsed?{'width':'90px'}:{'width':'290px'}"
           :class="logoClass" 
           class="logo-content">
-          <img id="imgLogo" :src="imgSrc" alt="logo" @click="routerHome" />
+          <img style="position: absolute;left:32px;top:38px" id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
+          <div v-if="!collapsed" style="position: absolute;left:32px;top:68px; font-size: 15px">{{$t(`route.meta`)}}</div>
           <img
             style="position: absolute; right:0; top: 15px"
             :src="collapsed ? arrowRightIcon : arrowLeftIcon"
@@ -82,8 +83,11 @@
           class="drawer-bg"
           @click="handleClickOutside"
         />
-        <aside class="sider">
-          <div v-if="!collapsed" style="width: 215px; margin-left: auto; margin-right: auto; margin-bottom: 45px">
+        <aside 
+          class="sider"
+          :style="collapsed?{'width':'90px'}:{'width':'290px'}"
+        >
+          <div v-if="!collapsed" style="width: 215px; margin-left: auto; margin-right: auto; margin-bottom: 45px; margin-top: 50px">
             <el-select
               ref="fieldSelect"
               class="store-select"
@@ -110,6 +114,7 @@
             router
             @open="handleopen"
             @select="handleselect"
+            :style="collapsed?{'margin-top':'60px'}:{}"
           >
             <div v-for="(item, index) in routerList" :key="index">
               <el-menu-item
@@ -132,7 +137,7 @@
                 <template slot="title">
                   <img class="menu_img" :src="`../../../static/img/menu/${index}.png`" height="26px" />
                   <img class="menu_img-active" :src="`../../../static/img/menu/${index}-active.png`" height="26px" />
-                  <span>{{ $t(`route.${item.name}`) }}</span>
+                  <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                 </template>
                 <div v-for="child in item.children" :key="child.path">
                   <el-menu-item
@@ -171,10 +176,32 @@
                 </div>
               </el-submenu>
               
-              <hr v-if="index!==routerList.length-1" class="hr-horizontal" style="width: calc(100% - 40px); margin: auto;"/>
+              <hr class="hr-horizontal" style="width: calc(100% - 40px); margin: auto;"/>
             </div>
           </el-menu>
-          <hr class="hr-horizontal" style="width: calc(100% - 40px); margin: auto;"/>
+          <div class="spacer"></div>
+          <div class="headUrl-content flex-center" style="justify-content: center; padding: 20px">
+            <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
+              <span v-if="!collapsed" class="username">
+                {{ userName }}
+                <i class="el-icon-arrow-down el-icon--right"/>
+              </span>
+              <img :src="headUrl" alt="" class="headImg" :style="collapsed?{}:{'margin-right':'16px'}">
+              <el-dropdown-menu slot="dropdown" class="dropdown">
+                <el-dropdown-item
+                  :disabeled="true"
+                  class="dropdown-item"
+                  style="width:120px;
+                padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
+                <el-dropdown-item
+                  class="dropdown-item"
+                  style=" width:120px;
+                padding-left:20px;"
+                  @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+
         </aside>
         <section :class="secClass">
           <el-col
@@ -225,6 +252,7 @@ export default {
     return {
       showTag: false,
       imgSrc: require("../../../static/img/logo_title.png"),
+      miniImgSrc: require("../../../static/img/logo_title-mini.png"),
       arrowRightIcon: require("../../../static/img/arrow-right.png"),
       arrowLeftIcon: require("../../../static/img/arrow-left.png"),
       userName: "Admin",
@@ -747,20 +775,28 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+.el-menu--collapse {
+  width: unset;
+}
 .store-select {
   >>> .el-input__inner {
     border: none;
+    padding-left: 0;
     font-size: 22px;
   }
 }
 .sider {
-  position: absolute;
-  width: 290px;
+  position: fixed;
   display: flex;
   height: calc(100vh - 80px);
   flex-direction: column;
   background-color: #fff;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
+  >>> .el-menu--collapse {
+    i {
+      display: none;
+    }
+  }
   >>> .el-menu {
     border-right: none;
   }
@@ -903,10 +939,7 @@ $collapseWidth: 5.5%;
     z-index: 999;
     display: flex;
     position: fixed;
-    background-color: #fff;
-    height: 80px;
     background-color: #1375bc;
-    line-height: 80px;
     min-width: 1000px;
     .logo-width {
       width: calc(318 / 1920 * 100vw);
@@ -933,15 +966,12 @@ $collapseWidth: 5.5%;
       background-color: #ffffff;
       @include borderColor;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       position: relative;
       #imgLogo {
-        width: calc(158 / 1920 * 100vw);
-        height: calc(24 / 1920 * 100vw);
-        min-width: 158px;
-        min-height: 24px;
+        // width: calc(158 / 1920 * 100vw);
+        // height: calc(24 / 1920 * 100vw);
+        // min-width: 158px;
+        // min-height: 24px;
       }
       .sys-name {
         font-weight: bold;
@@ -950,10 +980,10 @@ $collapseWidth: 5.5%;
       }
     }
     .logo-collapse-width #imgLogo {
-      width: calc(54 / 1920 * 100vw);
-      height: calc(16 / 1920 * 100vw);
-      min-width: calc(54 / 1920 * 100vw);
-      min-height: 14px;
+      // width: calc(54 / 1920 * 100vw);
+      // height: calc(16 / 1920 * 100vw);
+      // min-width: calc(54 / 1920 * 100vw);
+      // min-height: 14px;
     }
     .el-traggle-content {
       height: 100%;
@@ -1084,7 +1114,6 @@ $collapseWidth: 5.5%;
       margin-right: 32px;
       margin-bottom: 30px;
       border-bottom: 1px solid $border;
-      // border-top: 1px solid #393b4c;
       .brand-label {
         display: block;
         color: #484848;
@@ -1157,8 +1186,6 @@ $collapseWidth: 5.5%;
     .content-wrapper-all {
       height: auto;
       padding: 30px calc(30 / 1920 * 100vw);
-      /*border: solid #e3e9f4;*/
-      /*border-width: 0;*/
       width: 100%;
       //@include point(margin-right,50);
 
@@ -1167,20 +1194,12 @@ $collapseWidth: 5.5%;
     .content-wrapper {
       height: auto;
       padding: 30px calc(30 / 1920 * 100vw);
-      /*border-width: 0;*/
       width: 100%;
       min-height: calc(100vh - 80px - 45px);
       //@include point(margin-right,50);
     }
-    // .wrapper-all-header{
-    //     height: 93%;
-    //     border:1px solid #e3e9f4;
-    //     width:auto;
-    // }
     .wrapper-header {
       height: auto;
-      // border:1px solid #e3e9f4;
-      // width: 96.5%;
       padding-bottom: 30px;
       // background-color: #f4f5f9;
       background-image: linear-gradient(#f7f9fa, #f7f9fa 100%);
