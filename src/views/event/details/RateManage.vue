@@ -1,21 +1,36 @@
 <template>
   <el-row class="el-rate-container">
-    <el-col :span="16" :style="{'min-height':windowHeight*0.82+'px'}" class="lside">
+    <el-col :span="12" :style="{'height':windowHeight*0.82+'px','overflow-y': 'auto'}" class="lside">
       <div class="title-content">
-        <img :src="sourceSrc" :height="varyWindowWidth>1366?'40px':'32px'" class="title-img" >
-        <span class="event-title">{{ event.eventTitle }}</span>
-        <span v-if="event.score!==Math.pow(-2,31)" class="event-score">
-          {{ $t('eventView.scores') }} {{ event.score }}
-        </span>
-        <delay-button
-          v-if="showWinpBtn"
-          type="primary"
-          size="mini"
-          class="absolute-btn"
-          @click="submit"
-        >
-          {{ $t('eventView.submit') }}
-        </delay-button>
+        <div>
+          <img  :src="sourceSrc"  :class="(event.sourceType!=2)?'title-img':'title-img-inside'" >
+          <span class="event-title">{{ event.eventTitle }}</span>
+        </div>
+        <span
+            v-if="event.status === 0"
+            class="event-status"
+            style="background-color:#fff2ef;color:#f57848;" 
+            >
+            {{ $t('eventView.pending') }}
+          </span>
+          <span
+            v-else-if="event.status === 1"
+            class="event-status"
+            style="background-color:#edf6e8;color:#59ab22;" >
+            {{ $t('eventView.handled') }}
+          </span>
+          <div
+            v-else-if="event.status === 2"
+            class="event-status"
+            style="background-color:#efefef;color:#6e6e6e;" >
+            {{ $t('eventView.closed') }}
+          </div>
+          <span
+            v-else-if="event.status === 3"
+            class="event-status"
+            style="background-color:#ffeff5;color:#e22472;" >
+            {{ $t('eventView.returnStatus') }}
+          </span>
       </div>
       <el-dialog
         v-if="dialogFormVisible"
@@ -99,13 +114,14 @@
         <div class="storeInfo-details">
           <div :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
             <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w3': 'w3'">{{ $t('eventView.submitter') }}：</span></dd>
-            <el-tooltip
+            <span class="details-info">{{ event.createor }}</span>
+            <!--<el-tooltip
               :popper-class="tooltipClass"
               :content="event.createor"
               effect="dark"
               placement="bottom-start">
               <span class="details-info">{{ event.createor }}</span>
-            </el-tooltip>
+            </el-tooltip>-->
           </div>
         </div>
         <div class="storeInfo-details">
@@ -113,7 +129,7 @@
             <dd><span :class="lang.indexOf('zh') === -1 ? 'en-w4' : 'w4'">{{ $t('eventView.submitTime') }}：</span></dd>
             <span class="details-info">{{ event.createDate }}</span>
           </div>
-          <div
+          <!--<div
             v-if="event.sourceType === 1 && relatedChannels.length > 0"
             :class="lang.indexOf('zh') === -1 ? 'en-w3-content' : 'w3-content'">
             <dd :class="lang.indexOf('zh') === -1 ? 'en-w3' : 'w3'" >
@@ -124,16 +140,16 @@
                 <span class="related-span">{{ $t('eventView.associatedChannel') }}</span>
               </div>
             </dd>
-          </div>
+          </div>-->
         </div>
       </div>
       <div class="eventInfo-content">
         <strong v-if="lang.indexOf('zh') === -1" style="margin-right: 28px">{{ $t('eventView.eventDetails') }}:</strong>
         <strong v-else>{{ $t('eventView.eventDetails') }}：</strong>
         <div class="content">
-          <audio-vue
-            v-if="showAudio"
-            :audio-list="audioList"/>
+            <audio-vue
+              v-if="showAudio"
+              :audio-list="audioList"/>
           <description-text
             v-if="descriptionList.length > 0"
             :discription-list = "descriptionList"
@@ -151,6 +167,10 @@
                   <span class="ahref">{{ item.name+'区域' }}</span>
                 </div>
               </div>
+              <div v-if="item.deviceId!=-1" class="imgLittle">
+                <img :src="cameraImg" style="width:14px;height:14px;" />
+                <span style="color:#2c90d9;font-family: Roboto;font-size: 12px;margin-left:4px;">{{item.name}}</span>
+              </div>
             </div>
             <div v-for="(item,index) in imgsourceList" :key="'img-' + index" class="source-content">
               <div v-if="item.mediaType===2" class="img-content">
@@ -161,75 +181,34 @@
                   :preview-src-list="getImgList(index, imgsourceList)"
                   class="imgLittle imgInner"/>
               </div>
+              <div v-if="item.deviceId!=-1" class="imgLittle">
+                <img :src="cameraImg" style="width:14px;height:14px;" />
+                <span style="color:#2c90d9;font-family: Roboto;font-size: 12px;margin-left:4px;">{{item.name}}</span>
+              </div>
             </div>
           </div>
-          <div v-if="event.sourceType !== 1" class="viedo-info">
-            <div v-if="showCheckVideo" @click="checkVideo">
-              <i class="iconfont icon-bofang icon-video"/>
-              <span class="ahref">{{ curChannel.name+'区域' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-show="showWinpBtn" :style="{'height':windowHeight*0.34+'px'}" class="submit-content">
-        <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-          <span class="dealInfo-label">{{ $t('eventView.events') }}</span>
-          <span>{{ $t('eventView.methods') }}</span><br>
-          <div class="btn-content">
-            <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
-              <span
-                v-if="item.isShow"
-                :class="{'activeClass': item.isActive, 'ja-span': lang.indexOf('ja') !== -1}"
-                @click="clickSubBtn(item,index)">
-                {{ item.name }}
-              </span>
-            </div>
-          </div>
-          <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
-          <el-input
-            :autosize="{ minRows: 2}"
-            v-model="eventDes"
-            :placeholder="$t('eventView.describe')"
-            size="mini"
-            class="des-input"
-            type="textarea"
-            resize="none"
-            @input="(val)=>ivsIdChange(val)"
-            @blur="notShowInputRuleTips"/>
-          <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
-        </el-scrollbar>
-      </div>
-    </el-col>
-    <el-col :span="8" class="rside" :style="{'min-height':windowHeight*0.82+'px'}">
-      <div id="rside-title" class="title-content">
-        <span>{{ $t('eventView.details') }}</span>
-      </div>
-      <div id="dealcontent" class="deal-content">
-        <el-scrollbar style="height:100%;" class="el-menuscrollbar">
-          <div v-if="commentList.length !== 0" id="rightLine"/>
-          <div v-for="(item,index) in commentList" :key="index" class="deal-details">
-            <div
-              :style="item.showContent?{'background-color':'#FBC7CC'}:{'background-color':'#FAFAFA'}"
-              class="circle-content">
-              <div class="circle"/>
-            </div>
-            <div class="deal-lside">
-              <span v-if="item.showLabel" :style="item.spanStyle">{{ item.process }}</span>
-            </div>
-            <div class="deal-rside">
-              <div class="audio">
-                <span class="creator">{{ item.createOr }}</span>
+          <div class="process-detail">
+            <div style="font-family: NotoSansCJKTC;font-size: 13px;font-weight: 500;color: #556679;">{{$t('eventView.details')}}</div>
+            <div v-for="(item,index) in commentList" :key="index" class="deal-details">
+              <div class="creator-area">
+                <div style="display:flex;flex-direction:row;align-item:center;">
+                  <div class="account-area" >{{item.accountTitle}}</div>
+                  <div class="account-area" style="margin-left:3px">{{item.createOr}}</div>
+                  <div class="account-area" style="margin-left:3px">{{'('+item.createDate+')'}}</div>
+                </div>
+                <div class="process-area" :style="item.spanStyle">{{item.process}}</div>
+              </div>
+              <div class="comment-area" >
                 <audio-vue
                   v-if="item.showAudio"
                   :audio-list="item.audioList"
                   :if-show-margin="false"
                   class="deal-speech"/>
-              </div>
-              <description-text
-                v-if="item.descriptionList.length > 0"
-                :discription-list = "item.descriptionList"
-                class="description"/>
-              <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="source-content">
+                <description-text
+                  v-if="item.descriptionList.length > 0"
+                  :discription-list = "item.descriptionList"
+                  class="description"/>
+                <div v-if="item.sourceList != null && item.sourceList.length !== 0" class="source-content">
                 <div
                   v-for="(_item,_index) in item.sourceList"
                   :key="_index"
@@ -248,12 +227,58 @@
                   </div>
                 </div>
               </div>
-              <div class="viedo-info">
-                <span>{{ item.createDate }}</span>
               </div>
             </div>
+            
           </div>
-        </el-scrollbar>
+          <!--<div v-if="event.sourceType !== 1" class="viedo-info">
+            <div v-if="showCheckVideo" @click="checkVideo">
+              <i class="iconfont icon-bofang icon-video"/>
+              <span class="ahref">{{ curChannel.name+'区域' }}</span>
+            </div>
+          </div>-->
+        </div>
+      </div>
+      
+    </el-col>
+    <el-col :span="12" class="rside" :style="{'height':windowHeight*0.82+'px','background-color':'#edf0f2'}">
+      <div class="title">
+        <div id="rside-title" class="title-content">
+          <span>{{ $t('eventView.events') }}</span>
+          <delay-button
+            v-if="showWinpBtn"
+            type="primary"
+            size="mini"
+            class="btn-submit"
+            @click="submit"
+          >
+            {{ $t('eventView.submit') }}
+        </delay-button>
+        </div>
+        <div class="line"></div>
+        <div class="btn-content">
+          <div v-for="(item,index) in subBtnList" :key="index" class="btn_List">
+            <div
+              v-if="item.isShow"
+              :class="{'activeClass': item.isActive, 'ja-span': lang.indexOf('ja') !== -1}"
+              @click="clickSubBtn(item,index)">
+              {{ item.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="submit-content">
+        <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
+          <el-input
+            :autosize="{ minRows: 2}"
+            v-model="eventDes"
+            :placeholder="$t('eventView.describe')"
+            size="mini"
+            class="des-input"
+            type="textarea"
+            resize="none"
+            @input="(val)=>ivsIdChange(val)"
+            @blur="notShowInputRuleTips"/>
       </div>
     </el-col>
   </el-row>
@@ -316,6 +341,7 @@ export default {
       insiteInspectSrc: require('../../../../static/img/onsite_patrol.png'),
       startIcon: require('../../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
+      cameraImg: require('../../../../static/img/icon_camera.png'),
       curStatus: null,
       showControlInfo: true,
       lang: this.$i18n.locale,
@@ -323,7 +349,6 @@ export default {
       channelInfo: {},
       subBtnList: [],
       tooltipClass: 'event-tooltip-class',
-      cameraImg: require('../../../../static/img/camera.png'),
       showRelatedChannelFlag: false,
       relatedChannels: [],
       channelRadio: '',
@@ -532,6 +557,7 @@ export default {
         }
       });
       self.sourceList = temp;
+      console.log("sourceList:",self.sourceList);
       self.videosourceList = temp.filter(x => x.mediaType === 1);
       self.imgsourceList = temp.filter(x => x.mediaType === 2);
       const relatedDeviceIds = event.relatedDeviceIds.sort();
@@ -593,28 +619,32 @@ export default {
           });
           dataComments.forEach((item, index) => {
             const obj = {};
+            obj.accountTitle = (typeof item.accountTitle=='undefined'||item.accountTitle==null)?'':item.accountTitle;
             obj.createOr = item.accountName;
             obj.createDate = util.getDateTime(item.ts);
             obj.status = item.status;
             obj.description = item.description;
             switch (item.status) {
-              case 0: obj.showLabel = true; obj.spanStyle = { 'background-color': '#FCB83B' };
+              case 0: obj.showLabel = true; obj.spanStyle = { 'color': '#f57848' };
                 obj.process = this.$t('eventView.pending'); break;
-              case 1: obj.showLabel = true; obj.spanStyle = { 'background-color': '#434B5E' };
+              case 1: obj.showLabel = true; obj.spanStyle = { 'color': '#59ab22' };
                 obj.process = this.$t('eventView.handled'); break;
-              case 2: obj.showLabel = true; obj.spanStyle = { 'background-color': '#6097F4' };
+              case 2: obj.showLabel = true; obj.spanStyle = { 'color': '#6e6e6e' };
                 obj.process = this.$t('eventView.closed'); break;
-              case 3: obj.showLabel = true; obj.spanStyle = { 'background-color': '#FCB83B' };
+              case 3: obj.showLabel = true; obj.spanStyle = { 'color': '#e22472' };
                 obj.process = this.$t('eventView.returnStatus'); break;
             }
             if (item.status === 2) {
               self.showWinpBtn = false;
             }
+            
             obj.showContent = index === 0;
             obj.audioList = [];
             obj.sourceList = [];
             obj.descriptionList = [];
+            obj.attachment = [];
             if (item.attachment.length !== 0) {
+              obj.attachment = item.attachment;
               item.attachment.forEach((_item, _index) => {
                 if (_item.mediaType === 0) {
                   const audioObj = {};
@@ -634,6 +664,7 @@ export default {
             temp.push(obj);
           });
           self.commentList = temp.slice(0, temp.length - 1);
+          console.log("commentList:",self.commentList);
         }
       });
     },
@@ -809,9 +840,9 @@ export default {
 @import '../../../assets/css/textstyle.css';
 @import '../../../assets/css/importfile.css';
 $red:#f31d65;
-$black:#182752;
-$border:#e3e9f4;
-$background:#f4f5f9;
+$black:#484848;
+$border:rgba(172, 174, 177,0.3);
+$background:#f7f9fa;
 $tab:#7d8cad;
 $h1:#292e36;
 @function rem($val){
@@ -854,7 +885,6 @@ $h1:#292e36;
     opacity: 0
 }
 .el-rate-container{
-    background-color: #f7f8fa;
     @media screen and(min-width: 1366px){
         .storeInfo-details{
             height: 50px;
@@ -890,15 +920,28 @@ $h1:#292e36;
     .lside{
         @include point(padding-bottom,20);
         @include point(margin-right,20);
-        border: 1px solid $border;
+        border-radius: 5px;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.06);
         background-color: #fff;
-        width: 63.5%;
+        width: calc(540/1440*100vw);
         .title-content{
             @include title-content;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
             .title-img{
                 position: relative;
                 //@include point(top,8);
                 @include point(margin-left,20);
+                width:20px;
+                height:20px;
+            }
+            .title-img-inside{
+                position: relative;
+                //@include point(top,8);
+                @include point(margin-left,20);
+                width:15px;
+                height:20px;
             }
             .event-title{
                 @include point(padding-right,20);
@@ -910,15 +953,15 @@ $h1:#292e36;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
-            .event-score{
-                background-color: #FCBA3F;
-                padding:4px 12px;
-                color: #fff;
+            .event-status{
+                display:inline-block;
                 font-size: 12px;
-                font-weight: bold;
-                border-radius: 12px;
-                height: 12px;
-                line-height: 12px;
+                border-radius: 5px;
+                height: 24px;
+                line-height: 24px;
+                width:68px;
+                text-align: center;
+                
             }
             .el-submit{
                 position: absolute;
@@ -1104,10 +1147,10 @@ $h1:#292e36;
             text-align: left;
             @include point(padding-top,15);
             padding-left: 10px;
-            color: #424151;
-            font-size: 14px;
+            color: #556679;
+            font-size: 13px;
             .storeInfo-details{
-                font-size: 14px;
+                font-size: 13px;
                 color: $black;
             }
             dd{
@@ -1207,62 +1250,7 @@ $h1:#292e36;
               }
             }
         }
-        .submit-content{
-            background-color: $background;
-            margin-left: 25px;
-            text-align: left;
-            font-size: 14px;
-            margin-top: 15px;
-            padding-bottom:15px;
-            padding-left: 25px;
-            color: $black;
-            width: 92%;
-            @include point(padding-top,20);
-            .dealInfo-label{
-                font-weight: bold;
-                margin-bottom: 25px;
-                display: block;
-            }
-            .btn-content{
-                margin-top: 10px;
-                margin-bottom: 25px;
-                .btn_List{
-                    display: inline-block;
-                    span{
-                        display: inline-block;
-                        @include point(margin-right,20);
-                        border: 1px solid #ddd;
-                        padding:6px;
-                        font-size: 12px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        @include point(width,80);
-                        @include point(padding,6);
-                        text-align: center;
-                        background-color: #fff;
-                    }
-                    .ja-span{
-                      width: 90px;
-                    }
-                    .activeClass{
-                        background-color: #FDE8EF !important;
-                        color: $red;
-                        border-color: $red !important;
-                    }
-                }
-            }
-            .des-input{
-                @include point(margin-right,20);
-                margin-top: 15px;
-                width: 80%;
-            }
-            .rules{
-                font-size: 10px;
-                color:#ff2400;
-                margin-top: 3px;
-                display: block;
-            }
-        }
+        
         .eventInfo-content{
             text-align: left;
             @include point(margin-top,15);
@@ -1279,7 +1267,9 @@ $h1:#292e36;
                 float: left;
                 position: relative;
                 @include point(min-height,50);
-                @include point(min-width,260);
+                /*@include point(min-width,260);*/
+                width:calc(492/1440*100vw);
+                
             }
             .description{
                 text-align: left;
@@ -1363,19 +1353,219 @@ $h1:#292e36;
                     }
                 }
             }
+            .process-detail{
+              width: calc(492/1440*100vw);
+              padding: 16px 16px 30px;
+              border: solid 1px #f5f5f5;
+              background-color:#f7f9fa;
+              border-radius: 5px;
+              .deal-details{
+                width:calc(460/1440*100vw);
+                border-bottom: solid 2px #006ab7;
+                .creator-area{
+                  width:100%;
+                  height:20px;
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: space-between;
+                  font-family: Roboto;
+                  font-size: 12px;
+                  color: #69727c;
+                  margin-top:16px;
+                  align-items: center;
+                  .account-area{
+                    height:17px;
+                    align-items: center;
+                  }
+                  .process-area{
+                    font-family: PingFangTC;
+                    font-size: 12px;
+                    font-weight: 500;
+                  }
+                }
+                .comment-area{
+                  display: inline-block;
+                  font-family: NotoSansCJKtc;
+                  font-size: 14px;
+                  color:#484848;
+                  width:100%;
+                  .att-content{
+                      width: calc(460/1440*100vw);
+                      font-family: NotoSansCJKtc;
+                      font-size: 14px;
+                      color:#484848;
+                      word-break:keep-all;
+                      
+                  }
+                  .description{
+                      float: left;
+                      text-align: left;
+                      @include point(margin-top,6);
+                      font-family: Roboto,Arial, 'Microsoft YaHei';
+                      font-size: 14px;
+                      white-space:pre-wrap; /* css3.0 */
+                      white-space:-moz-pre-wrap; /* Firefox */
+                      white-space:-pre-wrap; /* Opera 4-6 */
+                      white-space:-o-pre-wrap; /* Opera 7 */
+                      word-wrap:break-word; /* Internet Explorer 5.5+ */
+                      .description-content{
+                        font-size: 14px;
+                      }
+                  }
+                  /deep/
+                  .description-content{
+                        font-size: 14px;
+                  }
+                  .source-content{
+                    overflow: hidden;
+                    min-width: 90%;
+                    display: flex;
+                    justify-content: flex-start;
+                    overflow: hidden;
+                    flex-wrap: wrap;
+                      @include point(margin-top,6);
+                      .source-details{
+                          @include point(max-width,104);
+                          margin-right: calc(10/1920*100vw);
+                          width: 104px;
+                          .img-content{
+                              position: relative;
+                              cursor: pointer;
+                              .start-icon{
+                                  position: absolute;
+                                  left: 35%;
+                                  top: 30%;
+                              }
+                            .imgLittle{
+                              width: 104px;
+                              border-radius: 5px;
+                            }
+                          }
+                      }
+                  }
+                  .viedo-info{
+                      color: $tab;
+                      font-size: 12px;
+                      float: left;
+                      @include point(margin-left,22);
+                      padding-bottom: 15px;
+                  }
+
+                }
+              }
+            }
         }
     }
     .rside{
-        border: 1px solid $border;
+        border-radius: 5px;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.06);
         background-color: #fff;
+        width: calc(540/1440*100vw);
         // @include point(margin-right,20);
         color: $black;
         height: 100%;
-        .title-content{
+        .title{
+          width: calc(540/1440*100vw);
+          height:170px;
+          box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.06);
+          background-color: #fff;
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
+          .title-content{
             @include title-content;
-            font-size: 14px;
-            border-bottom: 1px solid $border;
+            font-size: 15px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            .line{
+              margin-left: 16px;
+              width:calc(508/1440*100vw);
+              height:0;
+              opacity: 0.34;
+              border: solid 1px $border;
+            }
+            .btn-submit{
+              background-color:#c60957;border:none;float:left;margin-left:24px;
+              &:hover{
+                background-color:#ae0048;
+                color: #fff;
+              }
+            }
+          }
+        
+          .btn-content{
+            background-color: #FFF;
+            display: flex;
+            flex-direction: row;
+            align-content:flex-start;
+            margin-left: 16px;
+            .btn_List{
+              margin-top:16px;
+                  div{
+                      display: flex;
+                      flex-direction: row;
+                      align-items: center;
+                      align-self: center;
+                      @include point(margin-right,20);
+                      font-size: 15px;
+                      border-radius: 5px;
+                      cursor: pointer;
+                      @include point(width,120);
+                      @include point(height,40);
+                      text-align: center;
+                      background-color: #FFF;
+                      color:#556679;
+                      border: solid 1px #e6e6e6;
+                      justify-content: center;
+                  }
+                  .ja-span{
+                    width: 90px;
+                  }
+                  .activeClass{
+                      background-color: #006ab7 !important;
+                      color: #FFF;
+                  }
+              }
+            }
         }
+        
+        .submit-content{
+            background-color: #FFF;
+            border: solid 1px #f0f0f0;
+            background-color: #fff;
+            border-radius: 5px;
+            margin-left: 10px;
+            text-align: left;
+            font-size: 15px;
+            margin-top: 23px;
+            padding-bottom:15px;
+            padding-left: 16px;
+            color: $black;
+            width: calc(520/1440*100vw);
+            @include point(height,535);
+            @include point(padding-top,20);
+            .dealInfo-label{
+                font-weight: bold;
+                margin-bottom: 25px;
+                display: block;
+            }
+            .des-input{
+                @include point(margin-right,20);
+                margin-top: 16px;
+                width: calc(488/1440*100vw);
+                min-height:64px;
+                background-color: #f4f6f7;
+                border-radius: 5px;
+            }
+            
+            .rules{
+                font-size: 10px;
+                color:#ff2400;
+                margin-top: 3px;
+                display: block;
+            }
+        }
+        
         .deal-content{
             position: relative;
             .circle-content{
@@ -1500,6 +1690,15 @@ $h1:#292e36;
             }
         }
     }
+    /deep/
+    .el-input--mini
+    .el-textarea__inner {
+          background-color: #f4f6f7;
+          border:none;
+          color:#acaeb1;
+          font-size: 15px;
+          font-family: NotoSansCJKtc;
+        }
 }
 </style>
 <style>
@@ -1511,4 +1710,8 @@ $h1:#292e36;
   .event-tooltip-class{
     max-width: calc(200/1920*100vw);
   }
+  .el-image-viewer__close {
+    color: white;
+    background-color: black;
+}
 </style>

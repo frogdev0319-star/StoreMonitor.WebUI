@@ -162,6 +162,10 @@ $CTA:#c60957;
 .search-button{
   @extend .storevue-button;
   float: right;
+  &:hover{
+    background-color: #3d4854;
+    color:#FFF;
+  }
 }
 .schedule-btn{
   @extend .storevue-button;

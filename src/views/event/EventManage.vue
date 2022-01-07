@@ -33,6 +33,7 @@
         </div>
         <delay-button
           class="search-button"
+          style="background-color:#556679;border:none;"
           type="primary"
           size="mini"
           @click="searchEventList"
@@ -40,7 +41,7 @@
           <span>{{ $t('remotePatrol.search') }}</span>
         </delay-button>
       </div>
-      <selected-stores :store-str="storeFilterObj.storeStr"/>
+      <!--<selected-stores :store-str="storeFilterObj.storeStr"/>-->
     </div>
     <div class="el-table-content">
       <delay-button
@@ -66,16 +67,23 @@
               :data="item.tableData"
               :highlight-current-row="true"
               :height="553"
-              :header-cell-style="{fontSize:'#12px',color:'red',height: '47px'}"
+              :header-cell-style="{fontSize:'12px',color:'#7d8cad',height: '47px'}"
               :cell-style="cellStyle"
               empty-text="没有事件数据"
               align="left"
-              stripe
               style=""
-              class="table-content"
+              class="table-content tbl-checkbox"
               @sort-change="sortChange"
               @row-click="rowClickItem"
+              @selection-change="handleSelectionChange"
             >
+              <el-table-column
+                v-if="((activeName=='0' || activeName=='1' || activeName=='4'))"
+                class="tbl-checkbox"
+                type="selection"
+                :selectable="handleDisable"
+                width="55">
+              </el-table-column>
               <el-table-column
                 min-width="100"
                 header-align="center"
@@ -118,7 +126,7 @@
                 <template slot-scope="scope">
                   <img v-if="scope.row.sourceType === 0" :src="videoSrc" class="sourceType-icon">
                   <img v-else-if="scope.row.sourceType === 1" :src="inspectSrc" class="sourceType-icon">
-                  <img v-else :src="insiteInspectSrc" class="sourceType-icon">
+                  <img v-else :src="insiteInspectSrc" class="sourceType-icon" style="width:15px;">
                   <span class="event-subject">{{ scope.row.subject }}</span>
                 </template>
               </el-table-column>
@@ -139,10 +147,10 @@
               <el-table-column
                 :label="$t('eventView.operation')"
                 prop="option"
-                min-width="80"
+                min-width="50"
                 align="left">
                 <template slot-scope="scope">
-                  <i class="iconfont icon-gengduo" @click="toEventDetail(scope.row)"/>
+                  <img :src="penSrc" class="iconfont icon-gengduo" @click="toEventDetail(scope.row)">
                 </template>
               </el-table-column>
               <div slot="empty">
@@ -153,7 +161,15 @@
               </div>
             </el-table>
           </div>
-          <div style="width:100%; margin:10px 15px 0px 0px;height:13%;">
+          <div style="width:100%; margin-top:12px;height:31px;">
+            <delay-button v-if="showCloseBtn"
+              class="btn-close"
+              type="primary"
+              size="mini"
+              @click="doBachCloseEvent"
+            >
+              <span>{{ $t('eventView.closing') }}</span>
+            </delay-button>
             <tbl-pagination-only
               :total="item.total"
               :current-page="item.page"
@@ -260,9 +276,10 @@ export default {
       videoSrc: require('../../../static/img/monitor.png'),
       inspectSrc: require('../../../static/img/remote_patrol.png'),
       insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
-      attachmentVideo: require('../../../static/img/video.png'),
+      attachmentVideo: require('../../../static/img/photo.png'),
       attachmentImg: require('../../../static/img/photo.png'),
-      attachmentAudio: require('../../../static/img/audio.png'),
+      attachmentAudio: require('../../../static/img/voice.png'),
+      penSrc:require('../../../static/img/icon_pen.png'),
       total: 0,
       page: 1,
       sizeNum: 10,
@@ -298,7 +315,9 @@ export default {
       ifSaveParams: false,
       storeFilterObj: {},
       searchParams: {},
-      ifSearchData: true
+      ifSearchData: true,
+      showCloseBtn:false,
+      closingEventId:[]
     };
   },
 
@@ -370,12 +389,12 @@ export default {
 
   methods: {
     cellStyle({ row, column, rowIndex, columnIndex }) {
-      let obj = {};
-      if (columnIndex === 0) {
-        obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
+      let obj = {'border-bottom': '1px solid #acaeb1'};
+      /*if (columnIndex === 0) {
+        obj = { 'border-bottom': '1px solid #acaeb1', 'border-right': '1px solid #e3e9f4' };
       } else {
         obj = { 'border-right': '1px solid #e3e9f4' };
-      }
+      }*/
       return obj;
     },
 
@@ -640,6 +659,27 @@ export default {
       }
     },
 
+    handleSelectionChange(val){
+      console.log("handleSelectionChange:",val);
+      this.closingEventId = [];
+      if(val.length>0){
+        this.showCloseBtn = true;
+        val.map((item)=>{
+          this.closingEventId.push(item.id);
+        })
+      }else{
+        this.showCloseBtn = false;
+      }
+    },
+
+    handleDisable(row, index){
+      if (row.status == 2 || row.status==3) {
+        return false
+      } else {
+        return true
+      }
+    },
+
     getEventCount() {
       const self = this;
       const start = this.$moment(self.dateValue[0]).valueOf();
@@ -845,6 +885,38 @@ export default {
       this.storeFilterObj = storeObj;
       this.ifSearchData && this.searchData();
       this.ifSearchData = false;
+    },
+    doBachCloseEvent(){
+      const self = this;
+      //const eventIds = [];
+      //eventIds.push(self.event.id);
+      console.log("this.closingEventId:",this.closingEventId);
+      const comments = {
+        ts: new Date().getTime(),
+        description: this.$t('eventView.closing'),
+        status: 2
+      };
+      const params = {
+        eventIds: this.closingEventId,
+        comment: comments
+      };
+      eventRESTful.addComment(params).then(res => {
+        const errMsg = res.errMsg;
+        if (errMsg === 'Success') {
+          util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
+          setTimeout(() => {
+            self.searchData();
+            /*self.commentList.forEach((_item, _index) => {
+              self.getCommentDuration(_item);
+            });*/
+          }, 3000);
+        } else {
+          util.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
+          return false;
+        }
+      }).catch(err => {
+        console.log('EventDetail-addComment:' + err);
+      });
     }
   },
 
@@ -900,14 +972,14 @@ $h1:#292e36;
     .sourceType-icon{
         margin-right: calc(20/1920*100vw);
         float: left;
-        height: 28px;
-        width: 24px;
+        height: 20px;
+        width: 20px;
     }
     .enclosure-icon{
         margin-right: calc(8/1920*100vw);
         float: left;
-        height: 28px;
-        width: 24px;
+        height: 16px;
+        width: 16px;
     }
     .icon-span{
         display:inline-block;
@@ -921,10 +993,10 @@ $h1:#292e36;
       width: 80px;
     }
     .icon-gengduo{
-      font-size: calc(24/1920*100vw);
+      width: 24px;
+      height: 24px;
       vertical-align: middle;
       cursor: pointer;
-      color: #7d8cad;
     }
     .search-label {
       width: calc(76/1440*100vw);
@@ -1005,6 +1077,13 @@ $h1:#292e36;
                 }
             }
         }
+        .search-button{
+          float: right;
+          &:hover{
+            background-color: #3d4854;
+            color:#FFF;
+          }
+        }
     }
     .dialog-footer{
         @include point(margin-top,20);
@@ -1016,19 +1095,27 @@ $h1:#292e36;
     .el-table-content{
       width: 100%;
       background-color: #fff;
-      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
       border-radius: 5px;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
       position: relative;
       padding-top: calc(30/1920*100vw);
       .table-content{
             width:100%;
             text-align: center;
+            border: none;
             /*height:300px;*/
             /*float:left;*/
           &.el-table{
             font-size: 15px;
           }
         }
+      .btn-close{
+        background-color:#c60957;border:none;float:left;margin-left:24px;
+        &:hover{
+          background-color:#ae0048;
+          color: #fff;
+        }
+      }
     }
     #tabs-content  .el-tabs__item {
       padding: 0 0;
@@ -1042,8 +1129,10 @@ $h1:#292e36;
       height: 4px;
     }
   .el-table-panel{
-    @include point(margin-left,15);
-    @include point(margin-right,15);
+    /*@include point(margin-left,15);
+    @include point(margin-right,15);*/
+    margin-left:24px;
+    margin-right:24px;
   }
   .clearfix{
     content: "";
@@ -1070,6 +1159,55 @@ $h1:#292e36;
     @include point(margin-right,20);
     width: calc(160/1920*100vw);
   }
+   /deep/
+    .el-table
+    .el-table__header-wrapper
+    .el-table-column--selection
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #acaeb1;
+      background-color: #edf0f2;
+      &::before{
+        display:none;
+      }
+    }
+    /deep/
+    .el-table
+    .el-table__header-wrapper
+    .el-table-column--selection
+    .is-checked
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #2c90d9;
+      background-color: #2c90d9;
+    }
+    /deep/
+    .el-table
+    .el-table__body-wrapper
+    .el-table-column--selection
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #acaeb1;
+      background-color: #fff;
+    }
+    /deep/
+    .el-table
+    .el-table__body-wrapper
+    .el-table-column--selection
+    .is-checked
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #2c90d9;
+      background-color: #e0f2ff;
+      color:#2c90d9;
+      &::after{
+       border-color:#2c90d9;
+      }
+    }
 
 </style>
 <style scoped>
@@ -1100,5 +1238,16 @@ $h1:#292e36;
      display: flex ;
      align-items: center;
    }
+   .table-content.el-table__body tr:hover>td{
+    background-color: #f2f9fe !important;
+  }
+  .tbl-checkbox.el-checkbox__input.is-checked .el-checkbox__inner{
+    background-color: #edf0f2;
+    border-color: #acaeb1;
+  }
+  .tbl-checkbox.el-checkbox__input.is-checked .el-checkbox__inner {
+    background-color: #e0f2ff;
+    border-color: #2c90d9;
+}
 </style>
 

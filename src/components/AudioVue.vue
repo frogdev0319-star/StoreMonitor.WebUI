@@ -156,6 +156,7 @@ export default {
     margin-top: 10px;
     align-items: center;
     font-size: 14px;
+    display: inline-block;
     .speech-info{
       @include point(width,80);
       @include point(height,26);
@@ -210,6 +211,7 @@ export default {
     margin-right: calc(30/1920*100vw);
     display: inline-flex;
     align-items: center;
+    margin-top:10px;
   }
   .noPadding .item{
     margin-bottom: 10px;

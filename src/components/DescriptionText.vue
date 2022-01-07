@@ -1,7 +1,7 @@
 <template>
   <div class="description-container">
     <div v-for="(text, index) in discriptionList" :key="`${text}-${index}`" class="description-content">
-      <span class="item-circle"></span>
+      <!--<span class="item-circle"></span>-->
       <span class="pdf_font_24">{{ text.description }}</span>
     </div>
   </div>
@@ -27,12 +27,13 @@ export default {
     margin-top: 10px;
   }
   .description-content{
-    font-weight: bold;
-    color: #7d8cad;
+    color: #484848;
     font-size: calc(14 / 1920 * 100vw);
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    font-family: NotoSansCJKtc;
+    font-size: 12px;
   }
   .item-circle{
     height: 6px;
@@ -48,7 +49,7 @@ export default {
     padding-right: calc(20 / 1920 * 100vw);
 
     .cdm-title {
-      font-size: calc(12 / 1920 * 100vw);
+      font-size: 12px;
       color: #7d8cad;
       font-weight: bold;
       margin: 0;

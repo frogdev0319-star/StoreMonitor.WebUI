@@ -65,3 +65,11 @@ export const GetEventAndCommentList= data => {
     data
   });
 };
+
+export const doBatchCloseEventByStore= data => {
+  return request({
+    url: `v1.0/event/batch/close/store`,
+    method: 'post',
+    data
+  });
+};
