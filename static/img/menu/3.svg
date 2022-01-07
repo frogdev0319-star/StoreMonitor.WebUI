@@ -1,0 +1,12 @@
+<svg id="menu_cell_ic_shop" data-name="menu/cell/ic/shop" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+    <defs>
+        <style>
+            .cls-2{fill:none;stroke:#a5a5a5;stroke-linejoin:round;stroke-miterlimit:10;stroke-width:1.5px}
+        </style>
+    </defs>
+    <g id="Group_5" data-name="Group 5">
+        <path id="Rectangle_Copy_5" data-name="Rectangle Copy 5" style="fill:none" d="M0 0h26v26H0z"/>
+        <circle id="Oval" class="cls-2" cx="9" cy="9" r="9" transform="translate(4 4)"/>
+        <path id="Path_4" data-name="Path 4" class="cls-2" d="M0 0v9l8-4.5" transform="translate(13 4)"/>
+    </g>
+</svg>

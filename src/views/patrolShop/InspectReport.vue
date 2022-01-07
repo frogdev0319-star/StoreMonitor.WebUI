@@ -1422,7 +1422,7 @@ export default {
   $red: #f31d65;
   $black: #182752;
   $border: #e3e9f4;
-  $background: #f4f5f9;
+  $background: #f7f9fa;
   $tab: #7d8cad;
   $h1: #292e36;
   $qualified: #6097F3;
