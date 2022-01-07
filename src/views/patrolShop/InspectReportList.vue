@@ -80,7 +80,7 @@
         v-loading="isLoading"
         v-if="reportList.length !== 0"
         :element-loading-text="$t('insSettingView.loadingbindstore')"
-        class="card-content self-loading">
+        class="card-content self-loading paper">
         <el-col v-if="reportList.length !== 0" :span="24" class="card-header">
           <el-radio
             v-for="(item,index) in sortTypeList"
@@ -125,42 +125,34 @@
             </delay-button>
           </div>
         </el-col>
-        <div v-if="ShowCard" :style="{'height':varyWindowHeight*0.54+'px'}" class="showCardHeight">
-          <el-scrollbar id="el-menuscrollbar" style="height:100%;width:100%">
+        <div v-if="ShowCard" class="showCardHeight">
             <el-col v-for="(item,index) in reportList" :span="4" :key="index" class="report-card">
-              <div class="cards" @click="clickReport(item,index)">
-                <div class="standard-btn">
-                  <div
-                    :class="{'up-to-standard': item.standard === 1, 'not-up-to-standard': item.standard === 0}"
-                    class="standard-name"> {{ item.standardMsg }}</div>
+              <div class="cards shadow-light" @click="clickReport(item,index)">
+                <div class="flex-center" style="margin-bottom: 5px">
+                  <div style="font-size: 15px; flex: 1; min-width: 0; margin-right: 10px">{{ item.storeName }}</div>
+                  <img :src="item.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" >
                 </div>
-                <img :src="item.iconSrc" :height="iconSrcHeight" alt="" class="item-img">
-                <div class="item-flex">
-                  <div class="item-header">
-                    <div class="store-name">
-                      <span class="name">{{ item.storeName }}</span>
-                      <span class="inspect">{{ item.tagName }}</span>
-                    </div>
-                  </div>
-                  <div class="item-icon">
-                    <i
-                      :class="item.mode === 0 ? 'icon-yuanchengxunjian' : 'icon-xianchangxunjian'"
-                      class="iconfont inspectIcon"/>
-                    <div class="item-score">
-                      <span class="score-num">{{ item.totalScore }}</span>
-                      <span v-if="lang.indexOf('zh') !== -1" class="score-unit">
-                        {{ $t('insSettingView.scores') }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="item-content">
-                    <span class="assigner">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</span>
-                    <span class="datestr">{{ item.datestr }}</span>
+                <div style="margin-bottom: 5px">{{ item.tagName }}</div>
+                <div style="margin-bottom: 12px">
+                  <div style="border-radius: 5px; padding: 2px 15px"
+                    :style="{
+                      0: {'color':'#e22472','background-color':'#ffecf4'},
+                      1: {'color':'#f57848','background-color':'#ffefeb'},
+                      2: {'color':'#59ab22','background-color':'#e8f6de'}
+                    }[item.statusCode]"
+                  >{{item.status}}</div>
+                </div>
+                <!-- //0: danger,1: improve,2: pass -->
+                <div class="flex-center">
+                  <div style="font-size: 32px; margin-right: 5px; margin-bottom: 30px">{{ item.totalScore }}</div>
+                  <div v-if="lang.indexOf('zh') !== -1" class="score-unit">
+                    {{ $t('insSettingView.scores') }}
                   </div>
                 </div>
+                <div style="margin-bottom: 5px">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
+                <div>{{ item.datestr }}</div>
               </div>
             </el-col>
-          </el-scrollbar>
         </div>
         <div v-else class="list-table">
           <el-table
@@ -172,7 +164,6 @@
             :header-cell-class-name="headerClass"
             align="left"
             stripe
-            height="calc(500/1920*100vw)"
             style=""
             class="table-content"
             @row-click="clickReport"
@@ -250,8 +241,8 @@ export default {
       varyWindowWidth: window.innerWidth,
       varyWindowHeight: window.innerHeight,
       videoSrc: require('../../../static/img/monitor.png'),
-      inspectSrc: require('../../../static/img/remote_patrol.png'),
-      insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
+      remoteIcon: require('../../../static/img/remote.png'),
+      onsiteIcon: require('../../../static/img/onsite.png'),
       searchContent: false,
       exportPng: require('../../../static/img/excel.png'),
       reportList: [],
@@ -264,10 +255,10 @@ export default {
           id: 0,
           name: this.$t('remotePatrol.rankTime')
         },
-        {
-          id: 1,
-          name: this.$t('remotePatrol.rankScore')
-        },
+        // {
+        //   id: 1,
+        //   name: this.$t('remotePatrol.rankScore')
+        // },
         {
           id: 2,
           name: this.$t('remotePatrol.rankStore')
@@ -525,6 +516,7 @@ export default {
             reportObj.code = item.code !== null ? item.code : '--';
             reportObj.standard = item.standard;
             reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
+            reportObj.statusCode = item.status; 
             if (item.mode === 0) {
               reportObj.modeText = self.$t('overview.remotePatrol');
             } else if (item.mode === 1) {
@@ -850,6 +842,30 @@ $h1:#292e36;
 $qualified:#6097F3;
 $noqualied:#FDBA40;
 $suggestBack:#F1F6FE;
+.el-radio {
+  >>> .el-radio__inner {
+    border-color: #d9dde1;
+    background: #fff;
+    width: calc(16/1920*100vw);
+    height: calc(16/1920*100vw);
+  }
+  &.is-checked {
+    >>> .el-radio__inner {
+      border-color: #2c90d9;
+      background: #e0f2ff;
+      width: calc(16/1920*100vw);
+      height: calc(16/1920*100vw);
+    }
+    >>> .el-radio__inner::after {
+      width: 8px;
+      height: 8px;
+      background: #2c90d9;
+    }
+  }
+  >>> span {
+    font-size: calc(15/1920*100vw);
+  }
+}
 .search-label{
   width: 82.5px;
   text-align: left;
@@ -926,15 +942,7 @@ $suggestBack:#F1F6FE;
         padding-right: calc(20/1920*100vw);
         padding-left: calc(20/1920*100vw);
         .card-content{
-            box-sizing: content-box;
-            border: 1px solid $border;
-            background-color: #fff;
-            padding-top: 20px;
-            padding-right: calc(20/1920*100vw);
-            min-height: calc(100vh - 125px - 230px);
-            /*margin-bottom: calc(20/1920*100vw);*/
-            padding-bottom: 20px;
-            //height: calc(730/1080*100vh);
+          padding: calc(20/1920*100vw);
         }
         .empty-content{
           font-size: 16px;
@@ -957,7 +965,7 @@ $suggestBack:#F1F6FE;
                 display: inline-block;
                 height: calc(36/1920*100vw);
                 line-height: calc(36/1920*100vw);
-                color:'#7d8cad';
+                color:#7d8cad;
                 cursor: pointer;
                 vertical-align: middle;
                 .iconCard{
@@ -966,12 +974,15 @@ $suggestBack:#F1F6FE;
                   vertical-align: middle;
                 }
                 .text-pattern{
-                  font-size: calc(12/1920*100vw);
+                  font-size: calc(15/1920*100vw);
                   vertical-align: middle;
                 }
               }
               .export-report-btn{
-                margin-left: calc(20/1920*100vw);
+                background-color: #fff;
+                color: #006ab7;
+                font-size: calc(15/1920*100vw);
+                margin-left: calc(30/1920*100vw);
               }
             }
         }
@@ -992,14 +1003,25 @@ $suggestBack:#F1F6FE;
     .report-card{
         margin-bottom: 20px;
         .cards{
+          >>> div {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            overflow:hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+          padding: calc(20/1920*100vw);
             cursor: pointer;
-            margin-left: calc(20/1920*100vw);
-            border: 1px solid $border;
+            margin-left: calc(10/1920*100vw);
+            margin-right: calc(10/1920*100vw);
+            border: 1px solid #e3e9f4;
+            font-size: 12px;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
             // width: calc(200/1920*100vw);
             height: calc(240/1920*100vw);
-            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
             position: relative;
-            background-color: #fff;
+            color: #69727c;
             min-height: 160px;
             .item-img{
                 position: absolute;
@@ -1011,7 +1033,6 @@ $suggestBack:#F1F6FE;
             flex-direction: column;
             padding-top: calc(40/1920*100vw);
             justify-content: space-around;
-            height: calc(100% - 40/1920*100vw);
           }
             .item-header{
                 width: 100%;

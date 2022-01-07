@@ -1,76 +1,73 @@
 <template>
   <div ref="printPDF" class="report-container">
-    <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
-    <div class="el-header">
-      <div class="left-header">
-        <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
-        <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
+    <div style="display: none">
+      <div class="no-print">
+        <delay-button
+          id="downloadPdf"
+          :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+          class="exportbtn"
+          type="primary"
+          size="mini"
+          @click="handleDown"
+        >
+          <div class="button-area">
+            <i class="iconfont icon-pdf export"/>
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+          </div>
+        </delay-button>
+      </div>
+    </div>
+    <div class="el-acticle paper">
+      <div class="flex-center margin-bottom-md">
+        <img :src="report.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" style="margin-right: 10px">
+        <div style="color: #2b2b2b; font-size: 18px; font-weight: bold">
           {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
           <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
-        </p>
-      </div>
-      <div class="info-content">
-        <div class="pdf_font_24 right-header">
-          <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
-          <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
-          <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
-          <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-          <div style="display:inline-block;">
-            <div class="no-print">
-              <delay-button
-                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                class="exportbtn"
-                type="primary"
-                size="mini"
-                @click="handleDown"
-              >
-                <div class="button-area">
-                  <i class="iconfont icon-pdf export"/>
-                  <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-                </div>
-              </delay-button>
-            </div>
-          </div>
+        </div>
+        <div style="flex: 1"></div>
+        <div class="flex-center">
+          <div>{{ $t('remotePatrol.getscore') }}:</div>
+          <div>{{ totalScore }} <span>{{ $t('remotePatrol.scorecount') }}</span></div>
         </div>
       </div>
-    </div>
-    <div class="template-titles">
-      <div v-if="templateList.length > 1" class="names">
-        <div
-          v-for="(item,index) in templateList"
-          :class="{'click-btn' : curTemplateIndex === index}"
-          :key="index"
-          class="template-name no-print"
-          @click="getTemplateConfig(index)">
-          {{ item.name }}
-        </div>
+      <div class="flex-center" style="color: #69727c; font-size: 12px; margin-left: 30px">
+        <div v-if="!isexportPDF">{{ $t('remotePatrol.submitter') }}</div>
+        <div style="margin-right: 20px">{{ report.submitterName }}</div>
+        <div v-if="!isexportPDF">{{ $t('remotePatrol.generateTime') }}</div>
+        <div style="margin-right: 20px">{{ report.dateStr }}</div>
+        <img style="height: 20px; margin-right: 20px" :src="weatherImg">
+        <div style="border-radius: 5px; padding: 2px 15px"
+          :style="{
+            0: {'color':'#e22472','background-color':'#ffecf4'},
+            1: {'color':'#f57848','background-color':'#ffefeb'},
+            2: {'color':'#59ab22','background-color':'#e8f6de'}
+          }[report.status]"
+        >
+        {{{
+          0 : $t('remotePatrol.dangerous'),
+          1 : $t('remotePatrol.improve'),
+          2 : $t('remotePatrol.echartGood'),
+        }[report.status]}}</div>
       </div>
-    </div>
-    <div class="el-acticle">
-      <el-row class="report-content">
+      <!-- <el-row class="report-content">
         <el-col :span="24" class="">
           <div class="header-score">
-            <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
+            <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}:</span></span>
             <span class="span-2">
               <span class="pdf_font_26">
                 {{ totalScore }}
                 <span>{{ $t('remotePatrol.scorecount') }}</span>
               </span>
             </span>
-            <div class="standard-btn">
-              <div
-                :class="{'up-to-standard': standard === 1, 'not-up-to-standard': standard === 0}"
-                class="standard-name"> {{ standardMsg }}</div>
+            <div>
+              <div>{{standard}}</div>
+              <div>{{standardMsg}}</div>
             </div>
-            <div class="checkin-content">
-              <div class="checkin-info-content"> {{ checkinInfo }}</div>
-            </div>
-            <div class="weather-content">
-              <img class="weather-info-content" :src="weatherImg">
-            </div>
+            <div> {{ checkinInfo }}</div>
+            <img :src="weatherImg">
           </div>
         </el-col>
-      </el-row>
+      </el-row> -->
       <el-row v-for="(pageItem, pageIndex) in pageData" :class="pageItem.class" :key="pageIndex">
         <el-col>
           <div v-if="pageItem.class === 'row-detail'">
@@ -94,8 +91,9 @@
             </div>
             <div v-if="pageItem.ifExpand" class="item-content">
               <div class="pdf_font_20">
-                <div v-for="(item,index) in pageItem.data" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
-                  <div class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
+                <div v-for="(item,index) in pageItem.data" :key="index">
+                  <div class="content-title">{{ item.groupName }}</div>
+                  <hr style="margin: 5px 0" class="hr-horizontal">
                   <template v-if="!item.children">
                     <report-detail
                       :report-detail-data="item.cateryItems"
@@ -121,19 +119,18 @@
                   </template>
                 </div>
                 <div v-if="showFeedBacks && showAllDetailsEnable" style="margin-bottom:20px;">
-                  <div class="content-title"><span class="pdf_font_20">
-                    {{ $t('remotePatrol.feedbacks') }}</span></div>
+                  <div class="content-title">{{ $t('remotePatrol.feedbacks') }}</div>
                   <div v-for="(item,index) in feedbacks" :key="index" class="content-detail">
-                    <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
+                    <div class="content-detail-title">
                       <div class="detail-title">
-                        <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }}</span></p>
+                        <p class="title1">{{ index+1 }}.{{ item.subject }}</p>
                       </div>
                     </div>
                     <div
                       v-if="item.showAttachment || item.description != null&&item.description !== ''"
                       class="content-detail-main">
                       <p class="cdm-title">
-                        <span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span>
+                        {{ $t('remotePatrol.description') }}:
                       </p>
                       <audio-vue
                         v-if="item.showAudio"
@@ -203,13 +200,13 @@
               <div v-for="(item,index) in feedbacks" :key="index" class="content-detail" style="margin-bottom: 20px">
                 <div class="content-detail-title" style="background-color:#fff;min-height:30px;">
                   <div class="detail-title">
-                    <p class="title1"><span class="pdf_font_20">{{ index+1 }}.{{ item.subject }}</span></p>
+                    <p class="title1">{{ index+1 }}.{{ item.subject }}</p>
                   </div>
                 </div>
                 <div
                   v-if="item.showAttachment"
                   class="content-detail-main">
-                  <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.description') }}：</span></p>
+                  <p class="cdm-title">{{ $t('remotePatrol.description') }}:</p>
                   <audio-vue
                     v-if="item.showAudio"
                     :is-export-pdf="isexportPDF"
@@ -332,8 +329,8 @@
 
         <el-col v-if="pageItem.class === 'suggest'">
           <div v-if="pageItem.data !== null && pageItem.data.length !== 0" class="suggest-content">
-            <span class="pdf_font_20">{{ $t('remotePatrol.advice') }}</span>
-            <span class="pdf_font_20" v-html="turnSuggest(pageItem.data)"/>
+            <div>{{ $t('remotePatrol.advice') }}</div>
+            <div v-html="turnSuggest(pageItem.data)"/>
           </div>
         </el-col>
         <el-col>
@@ -443,12 +440,18 @@ export default {
   },
 
   mixins: [echartResize],
-
+  watch:{
+    '$store.getters.curTemplateIndex': function() {
+      this.curTemplateIndex = this.$store.getters.curTemplateIndex;
+      this.getTemplateConfig(this.curTemplateIndex);
+    },
+  },
   data() {
     return {
       templateList: [],
+      templateOptions: [],
       templateConfig: [],
-      curTemplateIndex: 0,
+      curTemplateIndex: this.$store.getters.curTemplateIndex,
       accountName: '',
       reportId: 0,
       downloadProgress: false,
@@ -486,6 +489,8 @@ export default {
       previewplayer: '',
       startIcon: require('../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../static/img/video_thumbnail.png'),
+      remoteIcon: require('../../../static/img/remote.png'),
+      onsiteIcon: require('../../../static/img/onsite.png'),
       deafultImg: 'this.src="' + require('../../../static/img/picture_failed.png') + '"',
       theaderPassFail: [],
       theaderScore: [],
@@ -565,8 +570,11 @@ export default {
     getInspectTemplateList(res) {
       if (res.errCode === 0 && res.data.length > 0) {
         this.templateList = res.data;
+        
+        this.templateOptions = res.data;
         const savedTemplateIndex = this.templateList.findIndex(item => { return item.id === this.cachedTemplateId; });
-        this.curTemplateIndex = savedTemplateIndex !== -1 ? savedTemplateIndex : 0;
+        this.$store.dispatch('setTemplateOptions', res.data)
+        this.$store.dispatch('setCurTemplateIndex', savedTemplateIndex !== -1 ? savedTemplateIndex : 0)
         this.setTemplateAndStaticalConfig();
       } else {
         this.templateList = [];
@@ -583,7 +591,7 @@ export default {
     },
 
     getTemplateConfig(index) {
-      this.curTemplateIndex = index;
+      this.$store.dispatch('setCurTemplateIndex', index)
       this.hasChart = false;
       this.setTemplateAndStaticalConfig();
       this.getPageDataBasedOnTemplate(this.reportData);
@@ -629,6 +637,8 @@ export default {
       obj.dateStr = util.getDateStr(routeData.ts);
       obj.submitterName = routeData.submitterName;
       obj.tagName = routeData.tagName;
+      obj.status = routeData.status;
+      obj.mode = routeData.mode;
       obj.iconSrc = this.getIconSrc(routeData.status);
       switch (routeData.mode) {
         case 0:
@@ -1412,7 +1422,7 @@ export default {
   $red: #f31d65;
   $black: #182752;
   $border: #e3e9f4;
-  $background: #f4f5f9;
+  $background: #f7f9fa;
   $tab: #7d8cad;
   $h1: #292e36;
   $qualified: #6097F3;
@@ -1438,11 +1448,11 @@ export default {
   .report-container {
     width: 100%;
     height: 100%;
-    color: $black;
-    position: relative;
+    // color: $black;
+    // position: relative;
     // border: 1px solid $border;
-    border: 1px solid #fff;
-    background-color: #fff;
+    // border: 1px solid #fff;
+    // background-color: #fff;
     .report-img {
       position: absolute;
       right: 2px;
@@ -1523,9 +1533,7 @@ export default {
       }
     }
     .el-acticle {
-      text-align: left;
-      padding-left: calc(40 / 1920 * 100vw);
-      padding-right: calc(40 / 1920 * 100vw);
+      padding: calc(30 / 1920 * 100vw) calc(25 / 1920 * 100vw);
       .template-list{
         display: flex;
         justify-content: flex-end;
@@ -1535,15 +1543,13 @@ export default {
         margin-top: 20px;
         font-size: calc(14 / 1920 * 100vw);
         font-weight: bold;
-        background-color: $suggestBack;
-        color: $qualified;
-        height: auto;
-        overflow-y: auto;
-        border: 1px solid #a0c1f8;
+        background-color: #f5f5f5;
+        color: #69727c;
+        border-radius: 5px;
         .suggest-content {
           max-height: 180px;
           display: flex;
-          padding-left: calc(30 / 1920 * 100vw);
+          padding: calc(20 / 1920 * 100vw);
         }
         span:first-child {
           padding-right: 20px;
@@ -1771,17 +1777,20 @@ export default {
           border: 1px solid $border;
           border-top:0;
           .content-title{
-            border-left:4px solid #eb1d63;
+            border-left:4px solid #2c90d9;
             font-size: calc(14 / 1920 * 100vw);
             color:#7d8cad;
             padding-left:calc(20 / 1920 * 100vw);
             font-weight: bold;
+            text-align: left;
           }
           .content-detail{
             margin-top: 10px;
+            background-color:$background;
+            padding: 20px;
             .content-detail-title{
               min-height:70px;
-              background-color:$background;
+              // background-color:$background;
               padding-left:calc(20 / 1920 * 100vw);
               padding-right: calc(20 / 1920 * 100vw);
               padding-top:10px;
@@ -1821,15 +1830,17 @@ export default {
               }
               .detail-title{
                 .title1{
-                font-size: calc(14 / 1920 * 100vw);
-                color:#182752;
-                font-weight: bold;
-                margin:0 0 5px 0;
+                  font-size: calc(14 / 1920 * 100vw);
+                  color:#182752;
+                  font-weight: bold;
+                  margin:0 0 5px 0;
+                  text-align: left;
                 }
                 .title2{
                   font-size: calc(12 / 1920 * 100vw);
                   color:#7d8cad;
                   margin: 15px 0 0 10px;
+                  text-align: left;
                 }
               }
               .score-title{
@@ -1854,6 +1865,7 @@ export default {
                 color:#94a4b4;
                 font-weight: bold;
                 margin: 0;
+                text-align: left;
               }
               .cdm-voice{
                 margin-top: 10px;
@@ -2076,7 +2088,7 @@ export default {
     border-bottom: 4px solid $red;
   }
   .icon-zhedie1{
-    color: $red;
+    color: #2c90d9;
   }
   .icon-zhankai1{
     color: $tab;

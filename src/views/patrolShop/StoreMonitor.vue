@@ -4,12 +4,11 @@
       <store-filter
         @emitSelectedStore = "getCurStore"
       ></store-filter>
-      
     </el-row>
     <el-row class="el-container" :class="isFullScreenMode ? 'block paper' : 'flex'">
       <el-col :span="isFullScreenMode ? 24: 12" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" class="lside">
         <div class="el-header-title flex-center">
-          <img :src="showStoreUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
+          <img :src="activeStore.favorite? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
           <span> {{ activeStore.name }} </span>
           <div style="flex: 1"></div>
           <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
@@ -102,6 +101,7 @@
             border: solid 1px #c60957; 
             font-size: 15px;
             color: #c60957;
+            cursor: pointer;
             background-color: #fff;">{{ $t("remotePatrol.backToNow")}}</div>
           </div>
           <div style="padding: 20px; display: flex; justify-content: space-between; padding-top: 0">
@@ -845,7 +845,7 @@ export default {
     addStoreUp() {
       const self = this;
       const temp = [];
-      temp.push(self.store.storeId);
+      temp.push(self.activeStore.storeId);
       const params = {
         storeIds: temp
       };
@@ -2486,7 +2486,7 @@ $h1: #292e36;
 <style scoped>
 .el-search-input.el-input--small >>> .el-input__inner {
   background: #f4f5f9 !important;
-  border-radius: 15px !important;
+  border-radius: 5px !important;
   height: 32px !important;
   line-height: 32px !important;
   padding-left: 30px;

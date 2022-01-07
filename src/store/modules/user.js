@@ -32,10 +32,18 @@ const user = {
     videoAuthority: false,
     roleId: 0,
     availabePathList: [],
-    collapsed: false
+    collapsed: false,
+    templateOptions: [],
+    curTemplateIndex: -1
   },
 
   mutations: {
+    SET_CUR_TEMPLATE_INDEX: (state, index) => {
+      state.curTemplateIndex = index
+    },
+    SET_TEMPLATE_OPTIONS: (state, options) => {
+      state.templateOptions = options
+    },
     SET_COLLAPSED: (state, collapsed) => {
       state.collapsed = collapsed
     },
@@ -138,6 +146,12 @@ const user = {
     },
     setCollapsed({ commit }, collapsed) {
       commit('SET_COLLAPSED', collapsed);
+    },
+    setTemplateOptions({ commit }, options) {
+      commit('SET_TEMPLATE_OPTIONS', options);
+    },
+    setCurTemplateIndex({ commit }, index) {
+      commit('SET_CUR_TEMPLATE_INDEX', index);
     },
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {

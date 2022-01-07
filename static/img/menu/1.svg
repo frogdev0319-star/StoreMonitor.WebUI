@@ -1,0 +1,19 @@
+<svg id="menu_cell_ic_shop" data-name="menu/cell/ic/shop" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+    <defs>
+        <style>
+            .cls-5,.cls-6{stroke:none}.cls-6{fill:#a5a5a5}
+        </style>
+    </defs>
+    <g id="Group_5" data-name="Group 5">
+        <path id="Rectangle_Copy_5" data-name="Rectangle Copy 5" style="fill:none" d="M0 0h26v26H0z"/>
+        <path id="Path" d="M6 6H0V0" transform="translate(6 15)" style="stroke-linejoin:round;stroke-miterlimit:10;stroke:#a5a5a5;stroke-width:1.5px;fill:none"/>
+        <g id="Combined_Shape" data-name="Combined Shape" style="fill:#fff;stroke-linejoin:round;stroke-miterlimit:10">
+            <path class="cls-5" d="M8.576 9.25H3.424L.874 5 3.425.75h5.152L11.126 5l-2.55 4.25zM6 3.25c-.964 0-1.75.785-1.75 1.75S5.037 6.75 6 6.75c.965 0 1.75-.785 1.75-1.75S6.965 3.25 6 3.25z" transform="translate(13 15)"/>
+            <path class="cls-6" d="m8.15 8.5 2.1-3.5-2.1-3.5h-4.3L1.75 5l2.1 3.5h4.3M6 2.5C7.38 2.5 8.5 3.622 8.5 5 8.5 6.38 7.38 7.5 6 7.5A2.503 2.503 0 0 1 3.5 5c0-1.378 1.122-2.5 2.5-2.5M9 10H3L0 5l3-5h6l3 5-3 5zM6 4a1.002 1.002 0 0 0 0 2 1.001 1.001 0 0 0 0-2z" transform="translate(13 15)"/>
+        </g>
+        <g id="Combined_Shape-2" data-name="Combined Shape" style="stroke-linejoin:round;stroke-miterlimit:10;fill:none">
+            <path class="cls-5" d="M13.75 10.332a4 4 0 0 1-6.5 0 4 4 0 1 1-5.521-5.626L4.2 0h12.6l2.471 4.707a4 4 0 1 1-5.521 5.626z" transform="translate(2 2)"/>
+            <path class="cls-6" d="M17 10.5c1.379 0 2.5-1.121 2.5-2.5 0-.821-.404-1.591-1.082-2.06a1.5 1.5 0 0 1-.475-.536L15.893 1.5H5.108l-2.05 3.904a1.5 1.5 0 0 1-.475.536A2.505 2.505 0 0 0 1.5 8c0 1.379 1.121 2.5 2.5 2.5a2.51 2.51 0 0 0 2.032-1.043 1.5 1.5 0 0 1 2.436 0A2.51 2.51 0 0 0 10.5 10.5c.803 0 1.562-.39 2.032-1.043a1.5 1.5 0 0 1 2.436 0A2.51 2.51 0 0 0 17 10.5m0 1.5a3.995 3.995 0 0 1-3.25-1.668A3.995 3.995 0 0 1 10.5 12a3.996 3.996 0 0 1-3.25-1.668 4 4 0 1 1-5.52-5.626L4.2 0h12.6l2.471 4.707A4 4 0 0 1 17.001 12z" transform="translate(2 2)"/>
+        </g>
+    </g>
+</svg>

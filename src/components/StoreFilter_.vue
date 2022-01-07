@@ -73,6 +73,7 @@
           {{ $t('remotePatrol.favoriteStore') }}
       </div>
       <el-select
+      class="input"
           v-model="selectedStore"
           :placeholder="$t('remotePatrol.stores')"
           size="mini">
@@ -172,8 +173,6 @@ export default {
   mounted() {
     if (localStorage.getItem('activeStore')) {
       this.selectedStore = localStorage.getItem('activeStore');
-      // var temp = this.allInitStoreList.filter(store=> store.storeId === this.selectedStore)
-      // this.$emit('emitSelectedStore', temp);
     }
   },
 
@@ -199,6 +198,12 @@ export default {
     selectedStore () {
       var temp = this.allInitStoreList.filter(store=> store.storeId === this.selectedStore)
       this.$emit('emitSelectedStore', temp);
+    },
+    showFavorite () {
+      this.storeOptions = this.allInitStoreList.filter(store => store.favorite).map(store =>({
+        value: store.storeId,
+        label: store.name
+      }))      
     }
   },
 
@@ -784,7 +789,16 @@ export default {
     width: calc(222/1440*100vw);
   }
 </style>
-<style scoped>
+<style lang="scss" scoped>
+  .input {
+    >>> .el-input__inner {
+      height: 36px;
+      line-height: 36px;
+      border: none;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    }
+  }
+  
   .el-select-dropdown__item{
     padding: 0 20px 0 20px !important;
     /*color: #7d8cad;*/

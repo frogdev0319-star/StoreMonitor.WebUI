@@ -16,6 +16,8 @@ const getters = {
   videoAuthority: state => state.user.videoAuthority,
   roleId: state => state.user.roleId,
   availabePathList: state => state.user.availabePathList,
-  collapsed: state => state.user.collapsed
+  collapsed: state => state.user.collapsed,
+  templateOptions: state => state.user.templateOptions,
+  curTemplateIndex: state => state.user.curTemplateIndex,
 };
 export default getters;
