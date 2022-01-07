@@ -85,7 +85,7 @@
         />
         <aside 
           class="sider"
-          :style="collapsed?{'width':'90px'}:{'width':'290px'}"
+          :class="collapsed?'sider-collapsed':'sider-expand'"
         >
           <div v-if="!collapsed" style="width: 215px; margin-left: auto; margin-right: auto; margin-bottom: 45px; margin-top: 50px">
             <el-select
@@ -785,7 +785,14 @@ export default {
     font-size: 22px;
   }
 }
+.sider-collapsed {
+  width: 90px;
+}
+.sider-expand {
+  width: 290px;
+}
 .sider {
+  transition: width .3s;
   position: fixed;
   display: flex;
   height: calc(100vh - 80px);
@@ -890,19 +897,19 @@ $collapseWidth: 5.5%;
   #{$poi}: checkRem($val);
 }
 @mixin borderColor {
-  & {
-    :after {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 0.55px;
-      background-color: #a9a9a9;
-      content: " ";
-      display: block;
-      transform: scaley(0.1);
-    }
-  }
+  // & {
+  //   :after {
+  //     position: absolute;
+  //     bottom: 0;
+  //     left: 0;
+  //     width: 100%;
+  //     height: 0.55px;
+  //     background-color: #a9a9a9;
+  //     content: " ";
+  //     display: block;
+  //     transform: scaley(0.1);
+  //   }
+  // }
 }
 * {
   margin: 0px;
