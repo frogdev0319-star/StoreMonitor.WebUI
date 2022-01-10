@@ -429,10 +429,10 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :isWarning="true"
-      :visible="showEditChannelDialog"
+      :visible="showEditDeviceDialog"
       :confirm-context="$t('deviceView.confirm')"
       dialog-width="510px"
-      @cancelHandler="showEditChannelDialog = false"
+      @cancelHandler="showEditDeviceDialog = false"
       @confirmHandler="confirmEditDialog">
       <div class="form-slot">
         <el-form>
@@ -470,6 +470,28 @@
         </el-form>
       </div>
     </dialog-pop>
+    <dialog-pop
+      :is-form="true"
+      :title="$t('deviceView.editDevice')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :isWarning="true"
+      :visible="showEditChannelDialog"
+      :confirm-context="$t('deviceView.confirm')"
+      dialog-width="510px"
+      @cancelHandler="showEditChannelDialog = false"
+      @confirmHandler="confirmEditDialog">
+      <div class="form-slot">
+        <el-form>
+          <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom: 20px;">
+            <el-input
+              v-model="curChannelItem.tempName"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+    </dialog-pop>
+    
     <el-dialog
       v-if="showDeleteDialog"
       :title="$t('titleView.confirmInfo')"
@@ -631,6 +653,7 @@ export default {
         ]
       },
       showAddChannelDialog: false,
+      showEditDeviceDialog: false,
       showEditChannelDialog: false,
       file: '',
       deleteChannelId: 0,
@@ -775,7 +798,7 @@ export default {
           self.setDeviceListParams()
           self.getChannelListByDevice(self.curEzvizItem.serialNumber);
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-          if (this.showEditChannelDialog) this.showEditChannelDialog = false
+          if (this.showEditDeviceDialog) this.showEditDeviceDialog = false
         } else {
           deviceInfo.tempDeviceName = deviceInfo.name;
           util.setErrorMsg(res.errMsg, false);
@@ -800,7 +823,7 @@ export default {
       
       this.curChannelItem = {...row};
       this.editingDevice = {...row}
-      this.showEditChannelDialog = true
+      this.showEditDeviceDialog = true
     },
     handleEmitOperation(methodsAndRowObj) {
       const method = methodsAndRowObj.method;
@@ -948,13 +971,14 @@ export default {
 
     handleEdit(index, item) {
       const self = this;
-      item.isClick = true;
-      self.curChannelItem = item;
-      self.channelList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isClick = false;
-        }
-      });
+      // item.isClick = true;
+      self.curChannelItem = {...item};
+      this.showEditChannelDialog = true
+      // self.channelList.forEach((_item, _index) => {
+      //   if (index !== _index) {
+      //     _item.isClick = false;
+      //   }
+      // });
     },
 
     cancelEditEzvizChannle(index, item) {
@@ -1001,7 +1025,7 @@ export default {
       }
     },
 
-    async updateEzvizChannel(item) {
+    async updateEzvizChannel() {
       const self = this;
       if (self.curChannelItem.tempName.trim().length === 0) {
         util.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
@@ -1015,7 +1039,7 @@ export default {
       try {
         const promiseArr = [];
         self.curChannelItem.name !== self.curChannelItem.tempName && promiseArr.push(ezvizRESTful.updateEzvizChannel(params));
-        item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateAttachImage());
+        // item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateAttachImage());
 
         const results = await Promise.all(promiseArr);
         results.forEach(result => {
@@ -1023,10 +1047,11 @@ export default {
             throw Error(result.errMsg);
           }
         });
+        this.showEditChannelDialog = false
         self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
       } catch (e) {
-        item.isClick = false;
+        // item.isClick = false;
         util.setErrorMsg(e.message, false);
         this.showAddDeviceDialog = false;
       }
@@ -1544,7 +1569,11 @@ export default {
       self.setDeviceListParams();
     },
     confirmEditDialog () {
-      this.confirmUpdateDevice({...this.editingDevice, tempDeviceName: this.editingDevice.name })
+      if (this.showEditDeviceDialog) {
+        this.confirmUpdateDevice({...this.editingDevice, tempDeviceName: this.editingDevice.name })
+      } else {
+        this.updateEzvizChannel()
+      }
     }
   }
 };
