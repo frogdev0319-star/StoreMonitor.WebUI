@@ -7,9 +7,9 @@ $background:#f4f5f9;
 $tab:#7d8cad;
 
 .device-container{
-  border: 1px solid $border;
-  background-color: #fff;
-  min-height: calc(100vh - 80px - 46px - calc(60/1920*100vw));
+  // border: 1px solid $border;
+  // background-color: #fff;
+  // min-height: calc(100vh - 80px - 46px - calc(60/1920*100vw));
 }
 .operation-btns{
   float: right;
@@ -55,8 +55,6 @@ $tab:#7d8cad;
 }
 
 .table-container{
-  min-height: calc(100% - 75px);
-  margin: 20px calc(20/1920*100vw);
   .iconfont{
     font-size: calc(24/1920*100vw);
     color: $tab;
@@ -91,20 +89,12 @@ $tab:#7d8cad;
 }
 
 .account-title-btn{
-  height: 70px;
-  line-height: inherit;
-  border-bottom: 1px solid #e3e9f4;
-  overflow: hidden;
 }
 .operation-title{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 28px;
-  margin-right: calc(20/1920*100vw);
   font-size: calc(14/1920*100vw);
   font-weight: bold;
   color: #7d8cad;
+  margin-bottom: 20px;
   text-align: left;
 }
 .prompt-info{

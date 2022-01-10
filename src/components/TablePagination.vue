@@ -1,16 +1,16 @@
 <template>
-  <div class="table">
+  <div class="table paper padding">
     <el-table
       ref="tablePagination"
       :data="tableData"
       v-bind="$attrs"
       :highlight-current-row="true"
       :default-sort = "defaultSort"
-      :header-cell-class-name="headerClass"
+      :header-cell-style="{borderColor: 'transparent'}"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
-      :cell-style="ifSetCellStyle ? setCellStyle : {}"
-      :border="showBorder"
+      :cell-style="{borderColor: 'transparent'}"
+      :border="false"
       :stripe="isStripe"
       :height="tableHeight"
       :empty-text="$t('deviceView.noData')"
@@ -69,17 +69,15 @@
               <i class="el-icon-close"/>
             </div>
           </div>
-          <div v-else>
-            <i
-              v-for="(item,index) in tableOperation.operation"
+          <div class="flex-center" v-else>
+            <img 
               :key="index"
-              :type="item.type"
+              class="child-space"
               :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
-              class="iconfont"
-              size="mini"
-              @click="handleOperationButton(item.methods, scope.row, scope.$index)">
-              {{ item.label }}
-            </i>
+              v-for="(item,index) in tableOperation.operation" 
+              :src="`../../static/img/table-${item.methods}.png`" 
+              @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+              height="26px" />
           </div>
         </template>
       </el-table-column>
@@ -464,9 +462,11 @@ export default {
   .el-table__expanded-cell:hover {
     background-color: #EFF3F5 !important;
   }
-  .el-table{
-    box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-  border: solid 1px #f5f5f5;
+  .el-table::before{
+    display: none;
+  }
+  .el-table__header-wrapper {
+    margin-bottom: 20px;
   }
 </style>
 

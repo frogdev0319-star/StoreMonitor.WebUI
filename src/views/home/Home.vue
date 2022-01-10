@@ -1426,14 +1426,6 @@ $collapseWidth: 5.5%;
     margin-left: 20px;
   }
 }
-.el-button--primary {
-  background-color: #c60957;
-  border-color: #c60957;
-  &:hover {
-    background-color: #ae0048;
-    border-color: #ae0048;
-  }
-}
 .el-dialog__headerbtn {
   display: none;
 }
