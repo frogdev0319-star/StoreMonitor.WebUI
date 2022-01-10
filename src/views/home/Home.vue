@@ -779,7 +779,7 @@ export default {
   width: unset;
 }
 .store-select {
-  >>> .el-input__inner {
+  /deep/ .el-input__inner {
     border: none;
     padding-left: 0;
     font-size: 22px;
@@ -799,15 +799,15 @@ export default {
   flex-direction: column;
   background-color: #fff;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
-  >>> .el-menu--collapse {
+  /deep/ .el-menu--collapse {
     i {
       display: none;
     }
   }
-  >>> .el-menu {
+  /deep/ .el-menu {
     border-right: none;
   }
-  >>> .el-menu-item {
+  /deep/ .el-menu-item {
     text-align: left;
     padding-left: 32px !important;
     .menu_img {
@@ -837,7 +837,7 @@ export default {
       color: #006ab7;
     }
   }
-  >>> .el-submenu {
+  /deep/ .el-submenu {
     text-align: left;
     .menu_img {
       display: inline-block;
@@ -915,7 +915,7 @@ $collapseWidth: 5.5%;
   margin: 0px;
 }
 .report-input {
-  >>> .el-input__inner {
+  /deep/ .el-input__inner {
     background-color: rgba(255, 255, 255, 0.2);
     height: 36px;
     color: #fff;
@@ -1132,7 +1132,7 @@ $collapseWidth: 5.5%;
         text-align: center;
         min-width: 180px;
       }
-      >>> .el-input--suffix .el-input__inner {
+      /deep/ .el-input--suffix .el-input__inner {
         padding-left: 0;
       }
     }
@@ -1313,10 +1313,10 @@ $collapseWidth: 5.5%;
 .aside-collapse-width #el-menuscrollbar {
   height: calc(100% - 40px);
 }
->>> #el-menuscrollbar .el-scrollbar__wrap {
+/deep/ #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;
 }
->>> #el-menuscrollbar .el-scrollbar__wrap .el-scrollbar__bar.is-horizontal {
+/deep/ #el-menuscrollbar .el-scrollbar__wrap .el-scrollbar__bar.is-horizontal {
   display: none !important;
 }
 </style>
