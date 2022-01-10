@@ -413,9 +413,6 @@ export default {
       margin-right: 0px;
     }
   }
-  .el-table--mini{
-    font-size: calc(14/1920*100vw);
-  }
 
   .iconfont{
     font-size: calc(24/1920*100vw);
