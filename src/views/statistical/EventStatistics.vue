@@ -5,7 +5,7 @@
         <search-component
           ref="eventSearch"
           :default-sort="defaultSort"
-          isInspectItem="true"
+          isInspectItem=true
           path="eventStatistics"
           @emitSearch = "emitSearch"
           @exportPdf = "exportPdf"
@@ -94,8 +94,8 @@
                   </delay-button>
                 </div>
               </div>
-              <div style="margin-top:20.5px;">
-                <table-pagination
+              <div style="margin-top:20.5px;height:769px">
+                <table-only
                   ref="elTP"
                   :column-data="eventInfoData"
                   :table-data="eventTableData"
@@ -106,8 +106,8 @@
                   :is-event = "false"
                   :default-sort = "defaultSort"
                   :allowRowExpand = "true"
-                  :headerStyle="{height:'75px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
-                  :tableHeight = "769"
+                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                  :tableHeight = "726"
                   layout = "prev,pager,next,sizes"
                   expand-component = "IncepItemTop5"
                   :expandCompProperties = "componentsProps"
@@ -115,6 +115,16 @@
                   @sortChange="handleSortChange"
                   @onCellClick = "onEvenListNumClick"
                 />
+              </div>
+              <div style="width:100%; margin-top:12px;height:31px;">
+              <tbl-pagination-only
+                :total="total"
+                :current-page="page"
+                :page-size="sizeNum"
+                layout = "prev,pager, next,sizes,slot"
+                @sizeChange="handlePageAndSizeChange"
+                @currentChange="handleCurrentChange"
+              />
               </div>
             </div>
           </el-col>
@@ -446,6 +456,8 @@ import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
 import TablePagination from '@/components/TablePagination_V2';
+import TableOnly from '@/components/TableOnly';
+import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import AreaSelected from '@/components/AreaSelected';
@@ -459,7 +471,9 @@ export default {
     'v-chart': ECharts,
     SearchComponent,
     TablePagination,
-    AreaSelected,TypeSelectArea
+    AreaSelected,TypeSelectArea,
+    TableOnly,
+    TblPaginationOnly
   },
   mixins: [resize],
   data() {
@@ -947,16 +961,16 @@ export default {
         self.doGetInspecEvenItems();
       
     },
-    emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
+    emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.compareType = compareType;
       //this.compareIds = compareArr;
       //console.log("compareArr :",compareArr);
       //console.log("compareArr.includ :",compareArr.includes('-1'));
-      if(compareArr.includes('-1')){
-        this.compareIds = compareArr.shift();
+      if(selStoreIdArr.includes('-1')){
+        this.compareIds = selStoreIdArr.shift();
       }
       else{
-          this.compareIds = compareArr
+          this.compareIds = selStoreIdArr
       }
       //console.log("emitTypeChanged > this.compareIds:",this.compareIds);
       this.comapareLabels = selectedLabels;
@@ -1197,7 +1211,7 @@ export default {
       this.barchartOption = this.getBarchartOption();
       let date_xAxis=[];
       let chart_dataset=[];
-      this.allEventData.forEach(item => {
+      this.allEventTableData.forEach(item => {
         date_xAxis.push(item.groupName);
         chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
       });
@@ -1212,6 +1226,7 @@ export default {
       this.viewMode=val;
     },
     /*取得門店事件表 */
+    
     async getEventTableData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
@@ -1221,43 +1236,51 @@ export default {
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
         self.params.storeIds=this.compareIds
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:this.compareIds};
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds};
+        console.log("*getEventTableData>searchCondition:",searchCondition);
       /*}else{ //groupType, storeGroup
         self.params.groupIds=this.compareIds
         searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
       }*/
       const searchParamsObj = {
         path: 'eventStatistics',
-        params: this.params
+        params: self.params
       };
-      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
-      this.ifSaveParams = true;
-      const eventResult = await self.getEventTableDataInfo(searchCondition);
-      const ignorePer = 0;
-      const errCode = eventResult.errCode;
-      if (errCode === 0) {
-        const result = eventResult.data;
-        if (result) {
-          self.allEventTableData = result.content;
-          self.total = result.totalElements;
-          self.allEventTableData.forEach(item => {
-            const numOfTotal = item.numOfTotal;
-            if (numOfTotal === 0) {
-              item.completedRateStr = 0 + '%';
-            } else {
-              item.completedRateStr = (item.numOfProcessed / numOfTotal * 100).toFixed(0) + '%';
-            }
-            item.id = item.innerId;
-            item.completedRate = Number(item.completedRateStr.replace('%', ''));
-            item.storeGroup = item.storeRegion.toString();
-            item.storeType = item.storeBranchType.toString();
-            item.detail = this.$t("statistics.event.detail");
-          });
-        } else {
-          self.eventTableData = 0;
+      self.ifSaveParams && self.$refs.eventSearch.saveSearchParams(searchParamsObj);
+     self.ifSaveParams = true;
+     if(this.compareIds.length>0){
+        const eventResult = await self.getEventTableDataInfo(searchCondition);
+        console.log("*getEventTableData>eventResult:",eventResult);
+        const ignorePer = 0;
+        const errCode = eventResult.errCode;
+        if (errCode === 0) {
+          const result = eventResult.data;
+          if (result) {
+            self.allEventTableData = result.content;
+            self.total = result.totalElements;
+            self.allEventTableData.forEach(item => {
+              const numOfTotal = item.numOfTotal;
+              if (numOfTotal === 0) {
+                item.completedRateStr = 0 + '%';
+              } else {
+                item.completedRateStr = (item.numOfProcessed / numOfTotal * 100).toFixed(0) + '%';
+              }
+              item.id = item.innerId;
+              item.completedRate = Number(item.completedRateStr.replace('%', ''));
+              item.storeGroup = item.storeRegion.toString();
+              item.storeType = item.storeBranchType.toString();
+              item.detail = this.$t("statistics.event.detail");
+            });
+          } else {
+            self.eventTableData = 0;
+          }
+          
         }
-        self.setEventTableData();
+      }else{
+        self.allEventTableData = [];
       }
+      self.setEventTableData();
+      self.setBarchartData()
     },
     setEventTableData(){
       this.orderAllTableData();
@@ -1292,7 +1315,14 @@ export default {
       });
     },
     
-    handlePageAndSizeChange(pageObj) {
+    handlePageAndSizeChange(pageObj) { //改變一頁顯示
+      const self = this;
+      self.page = pageObj.page;
+      self.sizeNum = pageObj.size;
+      self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      self.setEventTableData();
+    },
+    handleCurrentChange(pageObj){ //翻頁
       const self = this;
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
@@ -1321,16 +1351,16 @@ export default {
       self.$router.push({ name: 'eventManage', params: { data: row }});
     },
     /*巡檢項事件 sec-row*/
-    emitTypeChanged2({compareType,compareArr,selectedLabels}){ //劃分類型選擇
+    emitTypeChanged2({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.showInvolveTableArea = false;
       this.compareType2 = compareType;
       //this.compareIds2 = compareArr;
       //console.log("compareArr :",compareArr);
       //console.log("compareArr.includ :",compareArr.includes('-1'));
       if(compareArr.includes("-1")){
-        this.compareIds2 = compareArr.shift();
+        this.compareIds2 = selStoreIdArr.shift();
       }else{
-        this.compareIds2 = compareArr
+        this.compareIds2 = selStoreIdArr
       }
       this.comapareLabels2 = selectedLabels;
       this.doGetInspecEvenItems();
@@ -1789,7 +1819,7 @@ export default {
               align-self: center;
               display: flex;
               flex-direction: row;
-              width:calc(295/1440*100vw);
+              width:calc(355/1440*100vw);
               height: 30px;
               align-items: center;
               padding:0;

@@ -10,7 +10,7 @@
                   :value="item.value"
                 ></el-option>
             </el-select>
-            <div style="width:1px; height:20px;background-color:#556679;align-self: center;"></div>
+            <div style="width:1px; height:20px;border:1px solid rgba(172, 174, 177,0.3);align-self: center;"></div>
             <div v-if="allowAll">
               <multi-select
                 ref="multiSelectTypeSelected"
@@ -177,7 +177,7 @@ export default {
               immediate: false, 
         deep: true,
         handler (val,old ) {
-          //console.log("RegionArray1 changed")
+          console.log("RegionArray1 changed")
           this.provinceList  = [];
           val.map(item => {
             if(item!='-1'){
@@ -589,6 +589,7 @@ export default {
           this.curTypeArrary = this.curStoreList;
           break;
       }
+      
       if(this.curSelectId.length==0 ){
           let defaultSel = this.curTypeArrary.length;
           let selectedLabels = [];
@@ -597,8 +598,15 @@ export default {
           for(let i=0; i<defaultSel;i++){
             this.curSelectId.push(this.compareType=='stores'?this.curTypeArrary[i].storeId: this.curTypeArrary[i].value);
             selectedLabels.push(this.curTypeArrary[i].label);
-            storeIds.push(this.curTypeArrary[i].storeIds)
+            if(this.compareType=='stores'){
+              storeIds.push(this.curTypeArrary[i].storeId);
+            }else if(this.compareType=='storeGroup' || this.compareType=='storeType' ){
+              console.log("**",this.curTypeArrary[i].storeIds);
+              storeIds = storeIds.concat(this.curTypeArrary[i].storeIds);
+            }
+            
           }
+          console.log("storeIds:",storeIds);
           this.onChangeCompareType({selectedArray:this.curSelectId,storeIds,selectedLabels});
             //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});    
       }
@@ -619,7 +627,16 @@ export default {
       selectedArray.forEach(function(item){
           if(item!='-1')compareArr.push(item)
       })
-      this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:compareArr,selectedLabels,originArray});
+      let storeId = storeIds;
+      if(this.compareType== 'area1'){
+        storeId=this.doGetStoreIdsByProvince(selectedArray);
+        //("storeId:",storeId);
+        
+      }else if(this.compareType=='area2'){
+        storeId=this.doGetStoreIdsByCity(selectedArray);
+        //console.log("storeId:",storeId);
+      }
+      this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:compareArr,selectedLabels,originArray,selStoreIdArr:storeId});
     },
     doGetStoreIdsByProvince(provinceArrary){
       //console.log("provinceArrary:",provinceArrary);
