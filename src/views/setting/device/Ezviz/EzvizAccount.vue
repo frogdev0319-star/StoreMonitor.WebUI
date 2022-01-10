@@ -9,7 +9,7 @@
         <span>{{ $t('deviceView.addEzvizAccount') }}</span>
       </div>
     </account-header>
-    <div class="table-container">
+    <div class="paper padding">
       <table-pagination
         ref="ezvizAccoutTable"
         :column-data="columnData"
@@ -84,7 +84,7 @@
           </div>
           <div v-else>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-form-item :label="`${this.$t('deviceView.mobilePhone')}`"
                               :error="errorAccount" prop="ezvizAccount">
                   <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />

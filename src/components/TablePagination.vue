@@ -1,15 +1,15 @@
 <template>
-  <div class="table paper padding">
+  <div style="position:relative">
     <el-table
       ref="tablePagination"
       :data="tableData"
       v-bind="$attrs"
       :highlight-current-row="true"
       :default-sort = "defaultSort"
-      :header-cell-style="{borderColor: 'transparent'}"
+      :header-cell-style="{borderColor: headerBorder, 'height': '25px'}"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
-      :cell-style="{borderColor: 'transparent'}"
+      :cell-style="{borderColor: bodyBorder}"
       :border="false"
       :stripe="isStripe"
       :height="tableHeight"
@@ -252,6 +252,14 @@ export default {
     isexportPDF: {
       type: Boolean,
       default: false
+    },
+    bodyBorder: {
+      type: String,
+      default: 'transparent'
+    },
+    headerBorder: {
+      type: String,
+      default: 'transparent'
     }
   },
   data() {
@@ -466,7 +474,7 @@ export default {
     display: none;
   }
   .el-table__header-wrapper {
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
   }
 </style>
 

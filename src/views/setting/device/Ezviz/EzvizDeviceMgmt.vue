@@ -1,90 +1,93 @@
 <template>
-  <div class="el-device">
+  <div class="el-device paper">
     <div class="account-title">
       <span>{{ accountSettingMsg }}—{{ ezvizAccount }}</span>
     </div>
     <div class="device-content">
       <el-col :span="lang === 'en' && varWindowWidth < 1920 ? 11 : 11" class="lisde">
-        <div class="device-info">
-          <span class="info-title">{{ $t('deviceView.deviceInfo') }}</span>
-          <div class="operation-btns">
-            <el-button
-              :class=" lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
-              class="btn-class"
-              size="mini"
-              type="primary"
-              @click="showAddDialog"
-            >
-              <div class="btn-area">
-                <i class="iconfont el-icon-plus"/>
-                <span>{{ $t('deviceView.addDevice') }}</span>
-              </div>
-            </el-button>
-            <el-button
-              :disabled="tableData.length === 0"
-              class="el-delete-btn btn-class"
-              size="mini"
-              type="primary"
-              @click="showDeleteDialogMethod(0)"
-            >
-              <div class="btn-area">
-                <i class="iconfont icon-shanchu"/>
-                <span>{{ $t('deviceView.deleteDevice') }}</span>
-              </div>
-            </el-button>
-          </div>
+        <div class="flex-center padding" style="border-top: 1px solid rgba(172, 174, 177, .34);border-bottom: 1px solid rgba(172, 174, 177, .34);">
+          <span>{{ $t('deviceView.deviceInfo') }}</span>
+          <div class="spacer"></div>
+          <el-button
+            :class=" lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
+            class="storevue-button"
+            size="mini"
+            type="primary"
+            @click="showAddDialog"
+          >
+            <div class="btn-area">
+              <i class="iconfont el-icon-plus"/>
+              <span>{{ $t('deviceView.addDevice') }}</span>
+            </div>
+          </el-button>
+          <el-button
+            :disabled="tableData.length === 0"
+            class="storevue-button"
+            size="mini"
+            type="primary"
+            @click="showDeleteDialogMethod(0)"
+          >
+            <div class="btn-area">
+              <i class="iconfont icon-shanchu"/>
+              <span>{{ $t('deviceView.deleteDevice') }}</span>
+            </div>
+          </el-button>
         </div>
-        <table-pagination
-          ref="ezvizDeviceTable"
-          :column-data="columnData"
-          :table-data="tableData"
-          :table-operation ="columnOperationData"
-          :if-set-cell-style="false"
-          :header-class="accountHead"
-          :cell-class="accountCell"
-          :row-class="accountRow"
-          :show-border="false"
-          :show-selection-column="true"
-          :is-stripe = "false"
-          :is-device="true"
-          :total="total"
-          :table-height="varyDivHeight"
-          :is-loading-data="isLoadingData"
-          layout="jumper,total, prev,pager, next"
-          class="device-table"
-          @handleOperation="handleEmitOperation"
-          @emitRowClick="handleEmitRowClick"
-          @handleEdit="handleEmitEdit"
-          @handleChange="handlePageAndSizeChange"
-        />
+        <div class="spacer">
+          <table-pagination
+            ref="ezvizDeviceTable"
+            :column-data="columnData"
+            :table-data="tableData"
+            :table-operation ="columnOperationData"
+            :if-set-cell-style="false"
+            :header-class="accountHead"
+            :cell-class="accountCell"
+            :row-class="accountRow"
+            :show-border="false"
+            :show-selection-column="true"
+            :is-stripe = "false"
+            :is-device="true"
+            :total="total"
+            :table-height="varyDivHeight"
+            :is-loading-data="isLoadingData"
+            layout="jumper,total, prev,pager, next"
+            class="device-table"
+            headerBorder="rgba(172, 174, 177, .34)"
+            bodyBorder="rgba(172, 174, 177, .34)"
+            @handleOperation="handleEmitOperation"
+            @emitRowClick="handleEmitRowClick"
+            @handleEdit="handleEmitEdit"
+            @handleChange="handlePageAndSizeChange"
+          />
+      </div>
       </el-col>
       <el-col :span="lang === 'en' && varWindowWidth < 1920? 13: 13" class="risde">
-        <div class="device-info">
-          <span class="info-title">{{ $t('deviceView.deviceDetail') }}</span>
+        <div class="flex-center padding" style="border-top: 1px solid rgba(172, 174, 177, .34);border-bottom: 1px solid rgba(172, 174, 177, .34);">
+          <span>{{ $t('deviceView.deviceDetail') }}</span>
+          <div class="spacer"></div>
           <el-button
             :disabled="channelBtnDisabled"
             type="primary"
             size="mini"
-            class="add-btn btn-class"
+            class="storevue-button"
             @click="addNewChannel">
             <i class="iconfont el-icon-plus"/><span>{{ $t('deviceView.addChannel') }}</span>
           </el-button>
         </div>
-        <div :class="lang === 'en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
-          <div class="nape-dep-title titles">
-            <span>{{ $t('deviceView.devChannelNum') }}</span>
+        <div class="flex-center" style="color: #7d8cad;font-weight: 600;font-size: calc(14/1920*100vw);height:25px;border-bottom:1px solid rgba(172, 174, 177, .34)">
+          <div class="spacer">
+            {{ $t('deviceView.devChannelNum') }}
           </div>
-          <div class="nape-name-title titles">
-            <span>{{ $t('deviceView.channelName') }}</span>
+          <div class="spacer">
+            {{ $t('deviceView.channelName') }}
           </div>
-          <div class="nape-picture-title titles">
-            <span>{{ $t('deviceView.thumbnail') }}</span>
+          <div class="spacer">
+            {{ $t('deviceView.thumbnail') }}
           </div>
-          <div class="nape-enable-title titles">
-            <span>{{ $t('deviceView.enableStatus') }}</span>
+          <div class="spacer">
+            {{ $t('deviceView.enableStatus') }}
           </div>
-          <div class="nape-handle-title titles">
-            <span/>
+          <div class="spacer">
           </div>
         </div>
         <el-scrollbar id="el-menuscrollbar">
@@ -167,10 +170,10 @@
                   </div>
                 </div>
                 <div v-if="!item.isClick" class="icon-list">
-                  <i
-                    class="iconfont icon-bianji"
-                    style="cursor:pointer;margin-right:10px;"
-                    @click="handleEdit(index,item)"/>
+                  <img 
+                    :src="`../../static/img/table-edit.png`" 
+                    @click="handleEdit(index,item)"
+                    height="26px" />
                   <i
                     v-if="curEzvizItem.addedMethod === 2"
                     class="iconfont icon-shanchu"
@@ -1530,15 +1533,12 @@ export default {
     #{$poi}:checkRem($val);
   }
   @mixin titleStyle{
-    height: 60px;
-    line-height: 60px;
     text-align: left;
   }
   *{
     font-family: Roboto,Arial, Microsoft YaHei;
   }
   .operation-btns{
-    float: right;
     @include point(margin-right,15);
     .iconfont{
       font-size: calc(16/1920*100vw);
@@ -1580,32 +1580,17 @@ export default {
   }
 
   .el-device {
-    height: calc(100vh - 170px);
-    border: 1px solid $border;
-    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     .account-title {
       text-align: left;
-      position: relative;
       height: 70px;
       line-height: 70px;
       padding-right: calc(30 / 1920 * 100vw);
       padding-left: calc(30 / 1920 * 100vw);
       font-size: calc(20 / 1920 * 100vw);
       color: #182752;
-      border-bottom: 1px solid $border;
-      .btns {
-        position: absolute;
-        @include point(right, 25);
-        z-index: 979;
-        @include point(width, 90);
-      }
-      .device-btns {
-        position: absolute;
-        z-index: 979;
-        right: 30px;
-        top: 23px;
-        float: right;
-      }
     }
     .table-container {
       min-height: calc(100% - 75px);
@@ -1616,8 +1601,7 @@ export default {
       background: $tab;
     }
     .device-content {
-      padding: 25px calc(25 / 1920 * 100vw) 0 0;
-      height: calc(100% - 95px);
+      height: 100%;
       bottom: calc(30/1920*100vw);
       .dialog-content{
         width: 100%;
@@ -1674,55 +1658,14 @@ export default {
         }
       }
       .lisde{
-        background-color: $background;
-        height: calc(100% - 1px);
-        position: relative;
-        .icon-filter{
-          position: relative;
-          left: 20%;
-          cursor: pointer;
-        }
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
       }
       .risde{
         background-color: #ffffff;
         height: 100%;
-        .iconcontent{
-          .iconlised{
-            float: left;
-            position: relative;
-            background-color: $mainColor;
-            padding: 1px 6px;
-            color: #fff;
-            border-width: 1px 1px 1px 1px;
-            border-style: solid;
-            border-color: #ddd;
-            @include point(line-height,21);
-            @include point(height,21);
-          }
-          .iconrised{
-            float: left;
-            position: relative;
-            padding: 1px 6px;
-            border-width: 1px 1px 1px 0px;
-            border-style: solid;
-            border-color: #ddd;
-            background-color: #fff;
-            @include point(line-height,21);
-            @include point(height,21);
-          }
-        }
-        padding:0 15px;
-        .tabTitle{
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 1px solid $border;
-          @include titleStyle;
-        }
-        .nape-items-title{
-          border-bottom: 1px solid $border;
-          @include titleStyle;
-          font-size: calc(14/1920*100vw);
-        }
         .nape-dep-title{
           width: 23%;
         }
@@ -1747,13 +1690,10 @@ export default {
         }
         .nape-items-data{
           overflow: hidden;
-          position: relative;
-          padding-left: 1%;
           font-size: 14px;
           height: 90px;
           line-height: 90px;
           display: flex;
-          text-align: left;
           .nape-input{
             width: calc(160/1920*100vw);
             margin-left: calc(20/1920*100vw);
@@ -1761,9 +1701,7 @@ export default {
             bottom: 2px;
           }
           .nape-name-data{
-            width: 28%;
-            display: inline-block;
-            position: relative;
+            flex: 1;
             /*margin-right: 6%;*/
             span{
               margin-left: 10%;
@@ -1775,18 +1713,14 @@ export default {
             }
           }
           .nape-dep-data{
-            width: 23%;
-            display: inline-block;
-            position: relative;
+            flex: 1;
             span{
               margin-left: calc(25/1920*100vw);
             }
           }
           .nape-picture-data{
-            width: 20%;
+            flex: 1;
             height: 100%;
-            display: inline-block;
-            position: relative;
             .img-class{
               height: 90%;
               width: calc(100/1920*100vw);
@@ -1827,24 +1761,18 @@ export default {
             width: 20%;
           }
           .nape-enable-handle{
-            width: 20%;
-            margin-left: calc(20/1920*100vw);
+            flex: 1;
           }
           .nape-items-handle{
-            width: 9%;
-            display: inline-block;
-            position: relative;
+            
+            flex: 1;
             .iconcontent{
-              position: absolute;
-              top: 50%;
-              transform: translateY(-50%);
             }
             .iconfont{
               font-size: calc(24/1920*100vw);
               color: #7d8cad !important;
             }
             .icon-list{
-              display: flex;
             }
           }
         }
@@ -1959,8 +1887,8 @@ export default {
     padding: 20px calc(20/1920*100vw) 0;
   }
   .el-switch.is-checked .el-switch__core{
-    border-color: #00FF00;
-    background-color: #00FF00;
+    border-color: #c60957;
+    background-color: #c60957;
   }
   .avatar-uploader .picture-tips{
     display: inline;
@@ -1999,11 +1927,10 @@ export default {
     font-size: 16px;
   }
   .device-table{
-    height: calc(100% - 60px);
-    position: relative;
+    height: 100%;
   }
   .device-table .el-table--mini{
-    height: calc(100% - 92px);
+    height: 100%;
     background: #f5f7fa;
   }
   .device-table .el-table__row{
@@ -2021,13 +1948,13 @@ export default {
     background-color: #fff;
   }
   .device-table .el-table__body tr.current-row > td{
-    background-color: #fff;
-    color: #f31d65;
+    background-color: #f2f9fe;
+    color: #006ab7;
   }
   .device-table .el-table__body tr.current-row .el-table-column--selection .cell {
     color: #fff;
-    border-left: 4px solid #f31d65;
-    line-height: 40px;
+    border-left: 4px solid #006ab7;
+    line-height: 20px;
   }
   .device-table .el-table__body tr .el-table-column--selection .cell {
     color: #fff;
@@ -2052,15 +1979,5 @@ export default {
     height: auto;
     position: absolute;
     margin-right: calc(15/1920*100vw);
-  }
-  .el-table th.is-leaf:first-child{
-    border-left: 4px solid  rgba(255,255,255,0);
-  }
-</style>
-<style scoped>
-  .el-input--small >>>.el-input__inner{
-    background: #f0f5f8 !important;
-    border-radius: 15px !important;
-    line-height: 50% !important;
   }
 </style>
