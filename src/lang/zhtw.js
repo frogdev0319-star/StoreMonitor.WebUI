@@ -81,7 +81,7 @@ export default {
     "titleSetting": "職務設置",
     "transactionMonitor": "交易巡視",
     "userAccountDeviceSetting": "企業賬號設備配置",
-    "patrolPersonStat": "巡檢人員計統計",
+    "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
   },
 
