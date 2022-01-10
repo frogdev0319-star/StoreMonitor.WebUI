@@ -123,8 +123,8 @@
                 :index="item.children[0].path"
                 :disabled="item.isReadOnly"
               >
-                <img class="menu_img" :src="`../../../static/img/menu/${index}.png`" height="26px" />
-                <img class="menu_img-active" :src="`../../../static/img/menu/${index}-active.png`" height="26px" />
+                <img class="menu_img" :src="`../../static/img/menu/${index}.png`" height="26px" />
+                <img class="menu_img-active" :src="`../../static/img/menu/${index}-active.png`" height="26px" />
                 <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
               </el-menu-item>
 
@@ -135,8 +135,8 @@
                 :index="index+''"
                 :style="groupHeight+'px'">
                 <template slot="title">
-                  <img class="menu_img" :src="`../../../static/img/menu/${index}.png`" height="26px" />
-                  <img class="menu_img-active" :src="`../../../static/img/menu/${index}-active.png`" height="26px" />
+                  <img class="menu_img" :src="`../../static/img/menu/${index}.png`" height="26px" />
+                  <img class="menu_img-active" :src="`../../static/img/menu/${index}-active.png`" height="26px" />
                   <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                 </template>
                 <div v-for="child in item.children" :key="child.path">
