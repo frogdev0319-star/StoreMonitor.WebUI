@@ -352,7 +352,7 @@ export default {
 
     handleOperationButton(methods, row, index) {
       this.tableData.map(item => { item.isEditing = false; });
-      row.isEditing = this.isDevice && methods === 'edit';
+      // row.isEditing = this.isDevice && methods === 'edit';
       this.$emit('handleOperation', { method: methods, row: row, index: index });
     },
 

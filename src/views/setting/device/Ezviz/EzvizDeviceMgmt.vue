@@ -184,46 +184,18 @@
             </div>
           </div>
         </el-scrollbar>
-        <el-dialog
-          v-if="showDeleteChannel"
-          :title="$t('deviceView.prompt')"
-          :visible.sync="showDeleteChannel"
+        <dialog-pop
+          :is-form="true"
+          :title="$t('deviceView.addDevice')"
           :append-to-body="true"
           :close-on-click-modal="false"
-          width="610px"
-          top="35vh"
-          left="40vh">
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-
-            <p style="margin-left:25px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-              <i
-                class="el-icon-warning"
-                style="font-size:26px;margin-right:20px;
-              color:#FF9803;display: inline-block; vertical-align: middle"/>
-              <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteChannel') }}</span>
-            </p>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteChannel = false">
-              {{ $t('deviceView.cancle') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteSingleChannel()">
-              {{ $t('deviceView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
-        <el-dialog
-          v-if="showAddChannelDialog"
-          :title="$t('deviceView.addChannel')"
-          :visible.sync="showAddChannelDialog"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="510px"
-          top="35vh"
-          left="40vh"
-          custom-class="addDevice"
-        >
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
+          :isWarning="true"
+          :visible="showAddChannelDialog"
+          :confirm-context="$t('deviceView.addChannel')"
+          dialog-width="510px"
+          @cancelHandler="showAddChannelDialog = false"
+          @confirmHandler="addSingleChannel">
+          <div class="form-slot">
             <el-form
               ref="channelForm"
               :model="addChannelData"
@@ -231,7 +203,7 @@
               class="deviceForm"
               label-position="top"
               size="mini">
-              <el-form-item style="height: 57px;">
+              <el-form-item style="margin-bottom: 20px;">
                 <el-col :span="12">
                   <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
                     <el-input
@@ -270,8 +242,7 @@
                       action=""
                       accept="image/png,image/jpg,image/jpeg"
                       list-type="picture">
-                      <el-button size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
-                        <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/>
+                      <el-button size="mini" type="primary" class="confirm-btn" style="margin-bottom: 20px">
                         <span>{{ $t('deviceView.selectPicture') }}</span>
                       </el-button>
                       <el-image :src="addChannelData.pictureUrl" class="image-class">
@@ -289,11 +260,31 @@
 
             </el-form>
           </div>
+        </dialog-pop>
+        <el-dialog
+          v-if="showDeleteChannel"
+          :title="$t('deviceView.prompt')"
+          :visible.sync="showDeleteChannel"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="610px"
+          top="35vh"
+          left="40vh">
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+
+            <p style="margin-left:25px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+              <i
+                class="el-icon-warning"
+                style="font-size:26px;margin-right:20px;
+              color:#FF9803;display: inline-block; vertical-align: middle"/>
+              <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteChannel') }}</span>
+            </p>
+          </div>
           <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showAddChannelDialog = false">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteChannel = false">
               {{ $t('deviceView.cancle') }}
             </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleChannel">
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteSingleChannel()">
               {{ $t('deviceView.confirm') }}
             </el-button>
           </div>
@@ -312,7 +303,6 @@
       @cancelHandler="showAddDeviceDialog = false"
       @confirmHandler="addEzvizDeviceBasedForm">
       <div class="form-slot">
-        
         <el-form
           ref="deviceForm"
           :model="addDeviceData"
@@ -365,7 +355,7 @@
               </template>
             </div>
           </div>
-          <div v-else class="main-device-info">
+          <div v-else>
             <el-form-item style="margin-bottom: 20px;">
               <el-col :span="13">
                 <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
@@ -429,6 +419,54 @@
               </span>
             </el-form-item>
           </div>
+        </el-form>
+      </div>
+    </dialog-pop>
+    
+    <dialog-pop
+      :is-form="true"
+      :title="$t('deviceView.editDevice')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :isWarning="true"
+      :visible="showEditChannelDialog"
+      :confirm-context="$t('deviceView.confirm')"
+      dialog-width="510px"
+      @cancelHandler="showEditChannelDialog = false"
+      @confirmHandler="confirmEditDialog">
+      <div class="form-slot">
+        <el-form>
+          <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
+            <el-input
+              v-model="editingDevice.serialNumber"
+              disabled
+              @input="(val)=>serialNumberChange(val)"
+              @blur="notShowInputRuleTips('serialNum')"/>
+            <span v-if="serialRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
+            <el-input
+              v-model="editingDevice.name"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('deviceView.store')" prop="storeId">
+            <el-select
+              v-model="editingDevice.storeId"
+              :filter-method="filterStoreOption"
+              filterable
+              disabled
+              style="width: 100%;">
+              <el-option
+                v-for="item in storeDataList"
+                :key="item.storeId"
+                :label="item.label"
+                :value="item.storeId"/>
+            </el-select>
+            <span class="add-label" style="color: #f7d057; display: block">
+              <span style="margin-right: 10px;font-size: 12px;">*</span>
+              {{ $t('deviceView.selectStoreInfo') }}
+            </span>
+          </el-form-item>
         </el-form>
       </div>
     </dialog-pop>
@@ -593,6 +631,7 @@ export default {
         ]
       },
       showAddChannelDialog: false,
+      showEditChannelDialog: false,
       file: '',
       deleteChannelId: 0,
       isUpdate: false,
@@ -648,7 +687,8 @@ export default {
       deviceType: 0,
       deviceSource: 0,
       avilableDeviceList: [],
-      isLoadingData: true
+      isLoadingData: true,
+      editingDevice: {}
     };
   },
 
@@ -732,9 +772,10 @@ export default {
       ezvizRESTful.updateEzvizDevice(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
-          deviceInfo.name = deviceInfo.tempDeviceName;
+          self.setDeviceListParams()
           self.getChannelListByDevice(self.curEzvizItem.serialNumber);
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          if (this.showEditChannelDialog) this.showEditChannelDialog = false
         } else {
           deviceInfo.tempDeviceName = deviceInfo.name;
           util.setErrorMsg(res.errMsg, false);
@@ -755,11 +796,17 @@ export default {
       const breadcrumbsName = this.accountScope === 0 ? 'storeViuAccountDeviceSetting' : 'userAccountDeviceSetting';
       this.$route.matched[2].name = breadcrumbsName;
     },
-
+    handleUpdateDevice (row) {
+      
+      this.curChannelItem = {...row};
+      this.editingDevice = {...row}
+      this.showEditChannelDialog = true
+    },
     handleEmitOperation(methodsAndRowObj) {
       const method = methodsAndRowObj.method;
       switch (method) {
         case 'edit': {
+          this.handleUpdateDevice(methodsAndRowObj.row)
           break;
         }
         case 'delete': {
@@ -1495,6 +1542,9 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.setDeviceListParams();
+    },
+    confirmEditDialog () {
+      this.confirmUpdateDevice({...this.editingDevice, tempDeviceName: this.editingDevice.name })
     }
   }
 };

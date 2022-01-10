@@ -792,6 +792,7 @@ export default {
     "deviceNameEmpty": "設備名稱不能為空",
     "deviceSeriNum": "設備SN",
     "duplicateSeriNum": "重復的設備序列號",
+    "editDevice": "編輯設備",
     "editFail": "修改失敗!",
     "editImage": "編輯圖片",
     "editSuss": "修改成功!",

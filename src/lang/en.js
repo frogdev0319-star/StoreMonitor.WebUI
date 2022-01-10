@@ -786,6 +786,7 @@ export default {
     "deviceNameEmpty": "Please enter device name",
     "deviceSeriNum": "Device SN",
     "duplicateSeriNum": "Duplicate device serial number",
+    "editDevice": "Edit Device",
     "editFail": "Failed to edit!",
     "editImage": "Edit Image",
     "editSuss": "Successfully Edited!",
