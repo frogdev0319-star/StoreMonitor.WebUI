@@ -61,8 +61,8 @@ $tab:#7d8cad;
   }
 }
 .get-button.el-button{
-  background-color: $mainColor;
-  border-color:  $mainColor;
+  background-color: #c60957;
+  border-color:  #c60957;
   color: #fff;
   font-size: 12px;
 }
@@ -71,10 +71,17 @@ $tab:#7d8cad;
   color: #fccc3f;
 }
 .account-list{
-  padding: 20px calc(20/1920*100vw);
-  border: 1px solid $border ;
+  background-color: #fff;
+  padding: 20px calc(20/1920*100vw) 20px 0;
+  border: 1px solid #c3c4c5;
   height: auto;
   position: relative;
+  border-radius: 5px;
+  margin-bottom: calc(20/1920*100vw);
+  .el-input__inner {
+    background-color: #f4f6f7;
+    border: none;
+  }
   .buttom-div{
     position: absolute;
     right: 0;

@@ -84,7 +84,7 @@
           </div>
           <div v-else>
             <el-row>
-              <el-col :span="12">
+              <el-col :span="24">
                 <el-form-item :label="`${this.$t('deviceView.mobilePhone')}`"
                               :error="errorAccount" prop="ezvizAccount">
                   <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />
