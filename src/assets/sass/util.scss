@@ -48,7 +48,11 @@ $CTA:#c60957;
     margin-right: 0px;
   }
 }
-
+.main-device-info{
+  .el-input__inner{
+    height: 46px;
+  }
+}
 .dialog-body{
   overflow: hidden;
   width: 100%;
