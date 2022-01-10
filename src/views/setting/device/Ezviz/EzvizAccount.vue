@@ -9,7 +9,7 @@
         <span>{{ $t('deviceView.addEzvizAccount') }}</span>
       </div>
     </account-header>
-    <div class="table-container">
+    <div class="paper padding">
       <table-pagination
         ref="ezvizAccoutTable"
         :column-data="columnData"

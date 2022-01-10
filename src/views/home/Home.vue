@@ -1191,7 +1191,7 @@ $collapseWidth: 5.5%;
       margin-top: -3px;
     }
     .content-wrapper-all {
-      height: auto;
+      height: 100%;
       padding: 30px calc(30 / 1920 * 100vw);
       width: 100%;
       //@include point(margin-right,50);
