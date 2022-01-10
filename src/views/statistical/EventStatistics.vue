@@ -94,7 +94,7 @@
                   </delay-button>
                 </div>
               </div>
-              <div style="margin-top:20.5px;height:769px">
+              <div style="margin-top:20.5px;">
                 <table-only
                   ref="elTP"
                   :column-data="eventInfoData"
@@ -547,6 +547,7 @@ export default {
       echartBackground: 'rgba(30,34,52,0.75)',
       exportPng: require('../../../static/img/excel.png'),
       allEventTableData:[],
+      eventBarChartData: [],
       eventTableData: [],
       eventInfoData: [
         {
@@ -958,6 +959,7 @@ export default {
         await self.getUpperGloableEventData();
         await self.getEventTableData();
         await self.getAllEventData();
+        await self.getEventBarChartData();
         self.doGetInspecEvenItems();
       
     },
@@ -976,6 +978,7 @@ export default {
       this.comapareLabels = selectedLabels;
       this.getAllEventData();
       this.getEventTableData();
+      this.getEventBarChartData();
     },
     /**取得上方狀態 */
     async getUpperGloableEventData() {
@@ -1094,6 +1097,40 @@ export default {
       }
     },
     /*畫barChart*/
+    async getEventBarChartData() {
+      const self = this;
+      self.componentsProps.beginTs = self.params.beginTs;
+      self.componentsProps.endTs = self.params.endTs;
+      let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
+      self.params.groupMode = region[0].value;
+      let searchCondition = {}
+      //if(region[0].value<3){ //store, area1, area2
+        self.params.storeIds=this.compareIds
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds};
+        //console.log("*getEventTableData>searchCondition:",searchCondition);
+      /*}else{ //groupType, storeGroup
+        self.params.groupIds=this.compareIds
+        searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
+      }*/
+     if(this.compareIds.length>0){
+        const eventResult = await self.getEventTableDataInfo(searchCondition);
+        //console.log("*getEventTableData>eventResult:",eventResult);
+        const ignorePer = 0;
+        const errCode = eventResult.errCode;
+        if (errCode === 0) {
+          const result = eventResult.data;
+          if (result) {
+            self.eventBarChartData = result.content;
+          } else {
+            self.eventBarChartData =[];
+          }
+          
+        }
+      }else{
+        self.eventBarChartData = [];
+      }
+      self.setBarchartData()
+    },
     getBarchartOption(){
       const self = this;
       const chartOption = {
@@ -1131,12 +1168,15 @@ export default {
           axisTick:{
             show:false,
           },
+          axisLabel:{
+            interval:0,
+            rotate:30
+          },
           data:[],
         },
         yAxis:[{
           type: 'value',
           min:0,
-          max:100,
           axisLine:{
             show:false,
           },
@@ -1152,8 +1192,9 @@ export default {
           axisLabel: {
             color:'#556679',
             fontSize:12,
+            
           },
-          name:'(分)',
+          name:'('+this.$t('remotePatrol.unit')+')',
            nameTextStyle:{
              fontSize:12,
              color:'#556679',
@@ -1211,15 +1252,17 @@ export default {
       this.barchartOption = this.getBarchartOption();
       let date_xAxis=[];
       let chart_dataset=[];
-      this.allEventTableData.forEach(item => {
-        date_xAxis.push(item.groupName);
-        chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
-      });
-      this.barchartOption.xAxis.data = date_xAxis;
-      //this.barchartOption.yAxis.splitLine.show = true;
-      //this.barchartOption.series.name= this.Avg12Num[0].name;
-      //console.log("chart_dataset:",chart_dataset);
-      this.barchartOption.series[0].data = chart_dataset;
+      if(this.eventBarChartData.length>0){
+        this.eventBarChartData.forEach(item => {
+          date_xAxis.push(item.groupName);
+          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
+        });
+        this.barchartOption.xAxis.data = date_xAxis;
+        //this.barchartOption.yAxis.splitLine.show = true;
+        //this.barchartOption.series.name= this.Avg12Num[0].name;
+        //console.log("chart_dataset:",chart_dataset);
+        this.barchartOption.series[0].data = chart_dataset;
+      }
     },
     /*end 畫barChart */
     onSwitchMode(val){
@@ -1236,7 +1279,10 @@ export default {
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
         self.params.storeIds=this.compareIds
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds};
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds,
+          filter:{"page":this.page-1,"size":this.sizeNum},
+          order:this.order
+        };
         console.log("*getEventTableData>searchCondition:",searchCondition);
       /*}else{ //groupType, storeGroup
         self.params.groupIds=this.compareIds
@@ -1250,14 +1296,15 @@ export default {
      self.ifSaveParams = true;
      if(this.compareIds.length>0){
         const eventResult = await self.getEventTableDataInfo(searchCondition);
-        console.log("*getEventTableData>eventResult:",eventResult);
+        //console.log("*getEventTableData>eventResult:",eventResult);
         const ignorePer = 0;
         const errCode = eventResult.errCode;
         if (errCode === 0) {
           const result = eventResult.data;
           if (result) {
             self.allEventTableData = result.content;
-            self.total = result.totalElements;
+            self.total = result.totalPages;
+            
             self.allEventTableData.forEach(item => {
               const numOfTotal = item.numOfTotal;
               if (numOfTotal === 0) {
@@ -1284,8 +1331,9 @@ export default {
     },
     setEventTableData(){
       this.orderAllTableData();
-      this.eventTableData = [];
-      this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      this.eventTableData = this.allEventTableData;
+      //this.getEventTableData();
+      //this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
     },
 
     orderAllTableData(){
@@ -1320,14 +1368,14 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.setEventTableData();
+      self.getEventTableData();
     },
     handleCurrentChange(pageObj){ //翻頁
       const self = this;
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.setEventTableData();
+      self.getEventTableData();
     },
 
     handleSortChange(order, defaultSort) {
@@ -1337,7 +1385,7 @@ export default {
         page: this.page - 1,
         size: this.sizeNum
       };
-      this.setEventTableData();
+      this.getEventTableData();
     },
     onEvenListNumClick(row){
       console.log("clcick row:",row);
