@@ -1257,13 +1257,13 @@ $collapseWidth: 5.5%;
     width: 100%;
   }
   .sec-uncoll {
-    margin-left: calc(350 / 1920 * 100vw);
+    margin-left: calc(290 / 1920 * 100vw);
     height: auto;
-    width: calc(100% - calc(350 / 1920 * 100vw));
-    min-width: calc(1000px - 280px);
+    width: calc(100% - calc(290 / 1920 * 100vw));
+    min-width: calc(1000px - 290px);
     @media screen and (max-width: 1590px) {
-      margin-left: 280px;
-      width: calc(100% - 280px);
+      margin-left: 290px;
+      width: calc(100% - 290px);
     }
   }
   .sec-uncoll.mobile-sec {
