@@ -82,6 +82,10 @@ $tab:#7d8cad;
     background-color: #f4f6f7;
     border: none;
   }
+  .el-form-item__content {
+    margin-left: 20px !important;
+    flex: 1;
+  }
   .buttom-div{
     position: absolute;
     right: 0;

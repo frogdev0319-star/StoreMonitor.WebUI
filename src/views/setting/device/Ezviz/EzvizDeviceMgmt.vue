@@ -194,7 +194,6 @@
           top="35vh"
           left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
 
             <p style="margin-left:25px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
               <i
@@ -225,7 +224,6 @@
           custom-class="addDevice"
         >
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
             <el-form
               ref="channelForm"
               :model="addChannelData"
@@ -302,19 +300,19 @@
         </el-dialog>
       </el-col>
     </div>
-    <el-dialog
-      v-if="showAddDeviceDialog"
+    <dialog-pop
+      :is-form="true"
       :title="$t('deviceView.addDevice')"
-      :visible.sync="showAddDeviceDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
-      width="610px"
-      top="35vh"
-      left="40vh"
-      custom-class="addDevice"
-    >
-      <div class="dialog-content" style="overflow:hidden;width:100%;">
-        <hr style="border: 0.5px solid #dfe2e9;">
+      :isWarning="true"
+      :visible="showAddDeviceDialog"
+      :confirm-context="$t('deviceView.confirm')"
+      dialog-width="510px"
+      @cancelHandler="showAddDeviceDialog = false"
+      @confirmHandler="addEzvizDeviceBasedForm">
+      <div class="form-slot">
+        
         <el-form
           ref="deviceForm"
           :model="addDeviceData"
@@ -368,7 +366,7 @@
             </div>
           </div>
           <div v-else class="main-device-info">
-            <el-form-item style="height: 57px;">
+            <el-form-item style="margin-bottom: 20px;">
               <el-col :span="13">
                 <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
                   <el-input
@@ -390,7 +388,7 @@
                 </el-form-item>
               </el-col>
             </el-form-item>
-            <el-form-item style="height: 57px;">
+            <el-form-item style="margin-bottom: 20px;">
               <el-col :span="deviceType === 0 || accountScope === 0 ? 24: 13">
                 <el-form-item :label="$t('deviceView.deviceName')" prop="name" style="margin-bottom:0;">
                   <el-input
@@ -425,7 +423,7 @@
                   :label="item.label"
                   :value="item.storeId"/>
               </el-select>
-              <span class="add-label" style="color: rgb(254, 163, 22); display: block">
+              <span class="add-label" style="color: #f7d057; display: block">
                 <span style="margin-right: 10px;font-size: 12px;">*</span>
                 {{ $t('deviceView.selectStoreInfo') }}
               </span>
@@ -433,19 +431,7 @@
           </div>
         </el-form>
       </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button
-          class="file-cancel-btn"
-          size="mini"
-          style=""
-          @click="showAddDeviceDialog = false">{{ $t('deviceView.cancle') }}</el-button>
-        <el-button
-          class="file-confirm-btn"
-          size="mini"
-          type="primary"
-          @click="addEzvizDeviceBasedForm">{{ $t('deviceView.confirm') }}</el-button>
-      </div>
-    </el-dialog>
+    </dialog-pop>
     <el-dialog
       v-if="showDeleteDialog"
       :title="$t('titleView.confirmInfo')"
@@ -456,7 +442,6 @@
       top="35vh"
       left="40vh">
       <div class="dialog-content" style="overflow:hidden;width:100%;">
-        <hr style="border: 0.5px solid #dfe2e9;">
         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
           <i
             class="el-icon-warning"
@@ -483,11 +468,12 @@ import filterString from '@/common/filterString';
 import util from '@/common/util';
 import lodash from 'lodash';
 import TablePagination from '@/components/TablePagination';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'EzvizDeviceMgmt',
   components: {
-    TablePagination
+    TablePagination, DialogPop
   },
   data() {
     return {
@@ -1813,7 +1799,6 @@ export default {
   }
   .el-dialog__body .dialog-content .deviceForm{
     box-sizing: border-box;
-    padding: 32px calc(40/1920*100vw) 0px calc(40/1920*100vw);
   }
   .el-dialog__body .dialog-content .deviceForm .picture-tips{
     display: inline;
