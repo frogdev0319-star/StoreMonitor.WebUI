@@ -4,7 +4,7 @@ $background: #fff;
 $borderStyle: 1px solid $border;
 $tab:#7d8cad;
 $dialogBorder: 1px solid #dfe2e9;
-$dialogTitle: #424151;
+$dialogTitle: #484848;
 $warning: #ff9803;
 $cancelBtnBackground: #eaedf2;
 $cancelBtnFont: #adb1c0;
@@ -50,9 +50,9 @@ $CTA:#c60957;
 }
 
 .dialog-body{
-  border-top: $dialogBorder;
   overflow: hidden;
   width: 100%;
+  background-color: #f7f9fa;
 }
 .dialog-slot{
   margin: 40px 30px 40px 40px;
@@ -85,6 +85,7 @@ $CTA:#c60957;
 
 .storevue-dialog .el-dialog{
   position: absolute;
+  border-radius: 5px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -93,20 +94,21 @@ $CTA:#c60957;
 
 .storevue-dialog .el-dialog__header{
   padding: 20px 20px 20px 40px;
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .storevue-dialog .el-dialog__title{
-  font-size: 16px;
+  font-size: 24px;
   color: $dialogTitle;
 }
 .dialog-content{
   color: $dialogTitle;
 }
 .storevue-dialog .el-dialog__footer{
-  padding: 0 20px 20px 30px;
+  padding: 20px 20px 20px 30px;
 }
 
 .storevue-form-dialog {
@@ -115,9 +117,12 @@ $CTA:#c60957;
 
 .storevue-form-dialog .el-dialog__header{
   padding: 20px;
+  font-size: 24px;
+  color: $dialogTitle;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: #f7f9fa;
 }
 
 .confirm-btn{

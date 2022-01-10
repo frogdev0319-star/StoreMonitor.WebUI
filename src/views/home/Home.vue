@@ -1429,4 +1429,7 @@ $collapseWidth: 5.5%;
 .el-dialog__headerbtn {
   display: none;
 }
+.el-form-item--mini.el-form-item {
+  margin-bottom: 0;
+}
 </style>

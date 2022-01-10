@@ -6,6 +6,7 @@
     :height="dialogHeight"
     :class="isForm ? 'storevue-form-dialog' : 'storevue-dialog'"
   >
+    <template slot="title">{{title}}<img v-if="isWarning" src="../../static/img/dialog-icon.png" height="40px"> </template>
     <div class="dialog-body">
       <slot/>
     </div>
@@ -24,6 +25,14 @@
 export default {
   name: 'DialogPop',
   props: {
+    title: {
+      type: String,
+      default: ''
+    },
+    isWarning: {
+      type: Boolean,
+      default: false
+    },
     visible: {
       type: Boolean,
       default: false
