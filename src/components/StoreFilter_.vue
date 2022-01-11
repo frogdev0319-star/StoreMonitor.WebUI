@@ -66,22 +66,22 @@
 
     </div>
     <div class="flex-center padding-left" style="text-align: left; margin-top: 20px">
-      <div class="paper"
+      <div class="paper shadow-light"
         @click="showFavorite = !showFavorite"
         :style="showFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}"
         style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px; text-align: center">
           {{ $t('remotePatrol.favoriteStore') }}
       </div>
       <el-select
-      class="input"
-          v-model="selectedStore"
-          :placeholder="$t('remotePatrol.stores')"
-          size="mini">
-          <el-option
-            v-for="item in storeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"/>
+        class="filter-select"
+        v-model="selectedStore"
+        :placeholder="$t('remotePatrol.stores')"
+        size="mini">
+        <el-option
+          v-for="item in storeOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"/>
       </el-select>
       <slot name="others"></slot>
     </div>
@@ -94,7 +94,6 @@ import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import { getBriefStoreList, getStoreDefineGroup, getStoreList } from '@/api/store';
 import util from '@/common/util.js';
-import { getCookie } from '@/common/auth';
 
 export default {
   name: 'StoreFilter',
@@ -711,6 +710,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .filter-select {
+    /deep/ .el-input__inner {
+      border: none;
+      height: 36px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    }
+    .is-focus {
+      .el-input__inner {
+        border: none;
+      }
+    }
+  }
   .content{
     display: flex;
     flex-direction: row;

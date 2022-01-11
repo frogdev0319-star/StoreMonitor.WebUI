@@ -313,7 +313,7 @@
           <div class="channel-content" style="height: 100%; display: flex; flex-direction: column;">
             <div v-if="isFullScreenMode" class="padding flex-center">
               <span style="margin-right: 20px; line-height: 36px">{{ $t('remotePatrol.selectInspect') }}</span>
-              <el-select v-model="patrolstore" :laceholder="$t('remotePatrol.selectInspect')" @change="changeInspect">
+              <el-select class="storevue-select" v-model="patrolstore" :laceholder="$t('remotePatrol.selectInspect')" @change="changeInspect">
                 <el-option
                   v-for="item in PatrolList"
                   :key="item.id"
@@ -372,7 +372,7 @@
           <div style="padding: 20px">
             <div v-if="!isFullScreenMode" class="flex-center">
               <span style="margin-right: 20px; line-height: 36px;">{{ $t('remotePatrol.selectInspect') }}</span>
-              <el-select v-model="patrolstore" :placeholder="$t('remotePatrol.selectInspect')" @change="changeInspect">
+              <el-select class="storevue-select" v-model="patrolstore" :placeholder="$t('remotePatrol.selectInspect')" @change="changeInspect">
                 <el-option
                   v-for="item in PatrolList"
                   :key="item.id"
@@ -4482,28 +4482,6 @@ export default {
     }
   }
 
-  // .el-select >>> .el-input__inner{
-  //   background-color: #edf0f2;
-  //   border-radius: 5px;
-  //   height: 36px;
-  //   &::placeholder{
-  //     color:#2b2b2b;
-  //   }
-  // }
-  // .el-select >>> .el-input__suffix{
-  //   top: 0px;
-  // }
-  // .el-select >>> .el-select__caret {
-  //   color:#2b2b2b;
-  // }
-  .el-select.el-select--medium{
-    width: unset;
-    height: 36px;
-    line-height: 36px;
-    >>> span {
-      top: 0px;
-    }
-  }
 </style>
 <style>
   #storetab-content .el-tabs__nav-scroll{
@@ -4651,12 +4629,6 @@ export default {
   }
   @mixin point($poi,$val){
     #{$poi}:checkRem($val);
-  }
-  hr {
-    border: none;
-    height: 1px;
-    color: #acaeb1; /* old IE */
-    background-color: #acaeb1; /* Modern Browsers */
   }
   .groups {
     display: flex;
