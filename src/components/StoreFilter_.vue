@@ -2,51 +2,44 @@
   <div>
     <div class="content">
       <div class="search-label">{{ $t('remotePatrol.storeSelect') }}</div>
-      <div class="header-details">
-        <div style="width:8.125vw;">
-          <el-select
-              v-model="curCountry"
-              :placeholder="$t('remotePatrol.country')"
-              size="medium"
-              class="el-Country"
-              @change="onChangeCountry">
-              <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
-                <el-option
-                  v-for="item in group.countryList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"/>
-              </el-option-group>
-          </el-select>
-          <el-input
-            v-model="input"
-            placeholder=""
-            readonly
-            class="input-class"/>
-        </div>
+      <div class="filter-group flex-center paper shadow-light" style="flex: 1; padding: 5.5px 0">
+        <el-select
+            style="flex: 1"
+            v-model="curCountry"
+            :placeholder="$t('remotePatrol.country')"
+            size="medium"
+            @change="onChangeCountry">
+            <el-option-group v-for="group in countryList" :key="group.label" :label="group.label">
+              <el-option
+                v-for="item in group.countryList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"/>
+            </el-option-group>
+        </el-select>
         <hr class="hr-vertical">
         <region-multi-select
+            style="flex: 1"
             ref="proviceSelect"
             :selected="curProvince"
             :placeholder="$t('remotePatrol.regionI')"
             :options="provinceList"
             :disabled="curCountry.length === 0 || curCountry === '-1'"
             :all="$t('overview.allZoneI')"
-            class="region"
             @changeInput="onChangeProvince"/>
         <hr class="hr-vertical">
         <region-multi-select
+            style="flex: 1"
             ref="citySelect"
             :selected="curCity"
             :placeholder="$t('remotePatrol.regionII')"
             :options="cityList"
             :disabled="curProvince.length === 0 || curCountry === '-1'"
             :all="$t('overview.allZoneII')"
-            class="region"
             @changeInput="onChangeCity"/>
         <hr class="hr-vertical">
         <multi-select
-            class="store-group-select region"
+            style="flex: 1"
             :selected="curStoreGroup"
             :prompt-msg="$t('remotePatrol.storeGroup')"
             :all-select="0"
@@ -55,7 +48,7 @@
             @changeInput="onChangeStoreGroup"/>
         <hr class="hr-vertical">
         <multi-select
-            class="store-group-select region"
+            style="flex: 1"
             :selected="curStoreType"
             :prompt-msg="$t('remotePatrol.storeType')"
             :all-select="0"
@@ -710,6 +703,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .filter-group {
+    height: calc(36/1920*100vw);
+    
+    /deep/ .el-input__inner {
+      border: none;
+      font-size: 15px;
+      height: calc(36/1920*100vw);
+      line-height: calc(36/1920*100vw);
+    }
+  }
   .filter-select {
     /deep/ .el-input__inner {
       border: none;
@@ -723,9 +726,8 @@ export default {
       }
     }
   }
-  .content{
+  .content {
     display: flex;
-    flex-direction: row;
     width: 100%;
     align-items: center;
     .search-label{
@@ -738,7 +740,7 @@ export default {
     }
   }
   .padding-left {
-    padding-left: calc(71/1440*100vw);
+    padding-left: calc(75/1440*100vw);
   }
   .header-details{
     text-align: left;
@@ -837,42 +839,6 @@ export default {
     font-style: normal;
     -moz-osx-font-smoothing: grayscale;
   }
-  .input-class{
-    width: calc(100% - 30px);
-    position: absolute;
-    left: 0;
-  }
-  /deep/ .el-select .el-input--medium .el-input__suffix{
-    top:0px !important;
-
-  }
-  /deep/ .el-select__tags{
-    opacity: 0;
-  }
-  /deep/ .input-class.el-input--medium .el-input__inner{
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
-    border: none;
-    border-right: none;
-    color: #2b2b2b;
-    background: transparent !important;
-    padding: 0 10px;
-    font-size: 15px;
-    min-width: 55px;
-    min-height: 28px;
-  }
-  /deep/ .el-select.el-select--medium .el-input .el-input__inner{
-    position: relative;
-    z-index: 1;
-    background: transparent !important;
-    border: none;
-    font-size: 15px;
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
-    min-height: 28px;
-    min-width: 85px;
-  }
-
   /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
@@ -880,21 +846,7 @@ export default {
   /deep/ .el-input--medium .el-input__icon {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
-    min-height: 28px;
+    min-height: 36px;
     color: #2c90d9;
-  }
-  .el-select.el-select--medium{
-    color: #2b2b2b;
-    background: #fff !important;
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
-    border: none !important;
-    width: 100%;
-    border-radius: 3px;
-    min-height: 28px;
-    min-width: 85px;
-  }
-  /deep/ .el-select__tags{
-    opacity: 0;
   }
 </style>
