@@ -12,7 +12,6 @@ $tab:#7d8cad;
   // min-height: calc(100vh - 80px - 46px - calc(60/1920*100vw));
 }
 .operation-btns{
-  float: right;
   @include point(margin-right,15);
   .el-add-btn{
     background-color: $mainColor;
@@ -48,10 +47,7 @@ $tab:#7d8cad;
   }
 }
 .btn-col{
-  border-bottom:  1px solid $border;
   overflow: hidden;
-  height: 70px;
-  line-height: 70px;
 }
 
 .table-container{
