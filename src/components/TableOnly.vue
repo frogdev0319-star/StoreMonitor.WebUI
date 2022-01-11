@@ -13,7 +13,7 @@
       :cell-style="ifSetCellStyle ? setCellStyle : {}"
       :border="showBorder"
       :stripe="isStripe"
-      :height="tableHeight"
+      :max-height="tableHeight"
       :empty-text="$t('deviceView.noData')"
       align="left"
       style="width: 100%"

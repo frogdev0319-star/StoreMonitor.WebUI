@@ -1486,6 +1486,7 @@ $h1:#292e36;
             }
             .btn-submit{
               background-color:#c60957;border:none;float:left;margin-left:24px;
+              color: #fff;
               &:hover{
                 background-color:#ae0048;
                 color: #fff;

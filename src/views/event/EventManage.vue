@@ -76,9 +76,10 @@
               @sort-change="sortChange"
               @row-click="rowClickItem"
               @selection-change="handleSelectionChange"
+              @cell-click="cellClickItem"
             >
               <el-table-column
-                v-if="((activeName=='0' || activeName=='1' || activeName=='4'))"
+                v-if="((activeName!='2'))"
                 class="tbl-checkbox"
                 type="selection"
                 :selectable="handleDisable"
@@ -317,7 +318,8 @@ export default {
       searchParams: {},
       ifSearchData: true,
       showCloseBtn:false,
-      closingEventId:[]
+      closingEventId:[],
+      stopRowClick:false,
     };
   },
 
@@ -459,10 +461,22 @@ export default {
     },
 
     rowClickItem(row) {
-      this.event = row;
-      sessionStorage.setItem('event', JSON.stringify(this.event));
-      sessionStorage.setItem('queryparams', JSON.stringify(this.params));
-      this.$router.push({ name: 'eventDetails', params: { event: this.event }});
+      //console.log("rowClickItem",row);
+      if(!this.stopRowClick){
+        this.event = row;
+        sessionStorage.setItem('event', JSON.stringify(this.event));
+        sessionStorage.setItem('queryparams', JSON.stringify(this.params));
+        this.$router.push({ name: 'eventDetails', params: { event: this.event }});
+      }else{
+        this.stopRowClick = false;
+      }
+    },
+    cellClickItem(row, column, cell, event){
+      //console.log("column:",column);
+      if(column.type == "selection"){
+        //console.log("cell in");
+        this.stopRowClick = true;
+      }
     },
 
     toEventDetail(row) {
@@ -673,7 +687,7 @@ export default {
     },
 
     handleDisable(row, index){
-      if (row.status == 2 || row.status==3) {
+      if (row.status==3) {
         return false
       } else {
         return true
@@ -1079,6 +1093,7 @@ $h1:#292e36;
         }
         .search-button{
           float: right;
+          color:#FFF;
           &:hover{
             background-color: #3d4854;
             color:#FFF;
