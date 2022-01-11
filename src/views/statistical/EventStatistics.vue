@@ -117,8 +117,7 @@
                   layout = "prev,pager,next,sizes"
                   expand-component = "IncepItemTop5"
                   :expandCompProperties = "componentsProps"
-                  @handleChange="handlePageAndSizeChange"
-                  @sortChange="handleSortChange"
+                   @sortChange="handleSortChange"
                   @onCellClick = "onEvenListNumClick"
                 />
               </div>
@@ -169,7 +168,7 @@
                       class="chart-content"
                   />
               </div>
-              <div style="margin-top: 40px;width: calc(300/1440*100vw);margin-left:calc(152/1440*100vw);">
+              <div style="margin-top: 10px;width: calc(300/1440*100vw);margin-left:calc(152/1440*100vw);height:206px;overflow-y:auto;overflow-x:hidden;">
               <div v-for="(item,index) in sourcePerArray" :key="index">
                 <div :class="(index==selEventItem) ? 'pie-label-area-active':'pie-label-area'" @click="onClickEventItem(item,index)">
                     <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
@@ -186,7 +185,7 @@
                 <div class="operation-btns">
                   <delay-button
                     :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;width:152px;"
+                    style="margin-left:32px;width:210px;background-color:#FFF;color:#006ab7;"
                     type="primary"
                     size="mini"
                     @click="onSeeAllIncepEventClick"
@@ -211,21 +210,29 @@
                 </div>
               </div>
               <div style="margin-top:20.5px;">
-                <table-pagination
+                <table-only
                   ref="elTP"
                   :column-data="eventItemTable.column_data"
                   :table-data="eventItemTable.table_data"
-                  :total="eventItemTable.total"
                   :highlight-current-row= "true"
-                  :pagesize="eventItemTable.sizeNum"
-                  :current-page="eventItemTable.page"
                   :is-event = "false"
-                  :default-sort = "eventItemTable.defaultSort"
+                  :default-sort = "defaultSort"
                   :allowRowExpand = "false"
-                  layout = "prev,pager,next,sizes"
+                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                  :tableHeight = "726"
                   @handleChange="handlePageAndSizeChange_eventItem"
                   @sortChange="handleSortChange_eventItem"
                   @onCellClick = "onEvenInvolveStoreClick"
+                />
+              </div>
+              <div style="width:100%; margin-top:12px;height:31px;">
+                <tbl-pagination-only
+                  :total="eventItemTable.total"
+                  :current-page="eventItemTable.page"
+                  :page-size="eventItemTable.sizeNum"
+                  layout = "prev,pager, next,sizes,slot"
+                  @sizeChange="handlePageAndSizeChange_eventItem"
+                  @currentChange="handlePageAndSizeChange_eventItem"
                 />
               </div>
             </div>
@@ -234,7 +241,7 @@
               <div class="table-area" style="">
                 <div class="sec-head">
                   <div class="title">{{ selEventItemName+$t('statistics.event.eventInvolveStores') }}</div>
-                  <div class="operation-btns" style="width:calc(300/1440*100vw)">
+                  <div class="operation-btns" style="width:calc(344/1440*100vw)">
                     <div class="switch-btn">
                       <el-button
                       class="mode-btn"
@@ -262,22 +269,28 @@
                   </div>
                 </div>
                 <div style="margin-top:20.5px;">
-                  <table-pagination
+                  <table-only
                     ref="elTP"
                     :column-data="eventInvolveTable.column_data"
                     :table-data="eventInvolveTable.table_data"
-                    :total="eventInvolveTable.total"
                     :highlight-current-row= "true"
-                    :pagesize="eventInvolveTable.sizeNum"
-                    :current-page="eventInvolveTable.page"
                     :is-event = "false"
                     :default-sort = "eventInvolveTable.defaultSort"
                     :allowRowExpand = "true"
-                    layout = "prev,pager,next,sizes"
+                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                    :tableHeight = "726"
                     expand-component = "EventCommentList"
                     :expandCompProperties = "componentsProps_EventCommentList"
-                    @handleChange="handlePageAndSizeChange_eventStores"
-                    @sortChange="handleSortChange_eventStores"
+                  />
+                </div>
+                <div style="width:100%; margin-top:12px;height:31px;">
+                  <tbl-pagination-only
+                    :total="eventInvolveTable.total"
+                    :current-page="eventInvolveTable.page"
+                    :page-size="eventInvolveTable.sizeNum"
+                    layout = "prev,pager, next,sizes,slot"
+                    @sizeChange="handlePageAndSizeChange_eventStores"
+                    @currentChange="handlePageAndSizeChange_eventStores"
                   />
                 </div>
               </div>
@@ -461,7 +474,6 @@ import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
-import TablePagination from '@/components/TablePagination_V2';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
@@ -476,7 +488,6 @@ export default {
     DelayButton,
     'v-chart': ECharts,
     SearchComponent,
-    TablePagination,
     AreaSelected,TypeSelectArea,
     TableOnly,
     TblPaginationOnly
@@ -745,7 +756,7 @@ export default {
         total:0,
         defaultSort: { prop: 'numOfUnqualified', order: 'ascending' },
       },
-      pieColorList : ['#5274bb', '#7b9feb', '#7bd8eb','#4de197','#99ee3a'],
+      pieColorList : util.getChartColorArray(),
       peiDataSource:[],
       compareIds2:[],
       comapareLabels2:[],
@@ -1319,8 +1330,8 @@ export default {
           const result = eventResult.data;
           if (result) {
             self.allEventTableData = result.content;
-            self.total = result.totalPages;
-            
+            self.total = Math.ceil(result.totalElements/this.sizeNum);
+            console.log("total page:",self.total)
             self.allEventTableData.forEach(item => {
               const numOfTotal = item.numOfTotal;
               if (numOfTotal === 0) {
@@ -1349,6 +1360,7 @@ export default {
       this.orderAllTableData();
       //this.eventTableData = this.allEventTableData;
       //this.getEventTableData();
+      this.eventTableData = [];
       this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
     },
     barchartClick(bar){
@@ -1411,14 +1423,14 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.getEventTableData();
+      self.setEventTableData();
     },
     handleCurrentChange(pageObj){ //翻頁
       const self = this;
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.getEventTableData();
+      self.setEventTableData();
     },
 
     handleSortChange(order, defaultSort) {
@@ -1428,7 +1440,7 @@ export default {
         page: this.page - 1,
         size: this.sizeNum
       };
-      this.getEventTableData();
+      this.setEventTableData();
     },
     onEvenListNumClick(row){
       console.log("clcick row:",row);
@@ -1448,8 +1460,8 @@ export default {
       //this.compareIds2 = compareArr;
       //console.log("compareArr :",compareArr);
       //console.log("compareArr.includ :",compareArr.includes('-1'));
-      if(compareArr.includes("-1")){
-        this.compareIds2 = selStoreIdArr.shift();
+      if(selStoreIdArr.includes("-1")){
+        selStoreIdArr.shift();
       }else{
         this.compareIds2 = selStoreIdArr
       }
@@ -1483,9 +1495,10 @@ export default {
       util.sortArrayByKeyDesc(self.peiDataSource,'numOfUnqualified');
       self.peiDataSource.forEach(item => {
         if(item.numOfUnqualified!=0){
+          
           seriesData.push({value:item.numOfUnqualified,name:item.groupName});
           jsonArray.push({itemName:item.groupName,amount:item.numOfUnqualified,percentage:item.percentage,itemIds:item.itemIds});
-          allItemIds.concat(item.itemIds);
+          allItemIds = allItemIds.concat(item.itemIds);
         }
       });
       this.allEventItemIds=[];
@@ -1542,7 +1555,7 @@ export default {
                 borderWidth:5,
                 borderColor:'#fff',
                   color: function(params) {
-                  const colorList = ['#5274bb', '#7b9feb', '#7bd8eb','#4de197','#99ee3a'];
+                  const colorList = util.getChartColorArray();
                   return colorList[params.dataIndex];
                 }
               }
@@ -1573,20 +1586,21 @@ export default {
     },
     async getItemDetail(){
       const self = this;
-      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2 };
+      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2};
       let result = await this.getInspecItemStatsOverview(params);
       self.eventItemTable.itemAllData = result.data;
-      self.eventItemTable.total = self.eventItemTable.itemAllData.length;
+      self.eventItemTable.total = Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
       self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
     },
     async onSeeAllIncepEventClick(){
       const self = this;
       self.showInvolveTableArea = false;
+      this.selEventItem =-1;
       self.selEventItemName = self.$t('statistics.event.seeAll');
       let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.allEventItemIds,storeIds:self.compareIds2 };
       let result = await this.getInspecItemStatsOverview(params);
       self.eventItemTable.itemAllData = result.data;
-      self.eventItemTable.total = self.eventItemTable.length;
+      self.eventItemTable.total =Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
       self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
     },
     export2Excel_eventItem() {
@@ -1658,7 +1672,7 @@ export default {
         obj.percentageStr = item.percentage+'%';
         self.eventInvolveTable.itemAllData.push(obj);
       });
-      self.eventInvolveTable.total = self.eventInvolveTable.itemAllData.length;
+      self.eventInvolveTable.total =Math.ceil( self.eventInvolveTable.itemAllData.length/self.eventInvolveTable.sizeNum);
       this.setEventInvolveTable();
     },
     setEventInvolveTable(){
@@ -1966,6 +1980,7 @@ export default {
           flex-direction: row;
           justify-content: center;
           align-items: center;
+          
           .pct-panel{
             width: 276px;/*calc(276/1440*100vw);*/
             height: 276px;/*calc(276/1440*100vw);*/
@@ -1976,7 +1991,7 @@ export default {
                 position:absolute;
                 height: 150px;
                 width: 150px;
-                left:382px;
+                left:405px;
                 top:143px;
                 border-radius: 50%;
                 border-color:#dae4eb;
@@ -2072,7 +2087,7 @@ export default {
               align-self: center;
               display: flex;
               flex-direction: row;
-              width:calc(250/1440*100vw);
+              width:calc(344/1440*100vw);
               height: 30px;
               align-items: center;
               padding:0;
