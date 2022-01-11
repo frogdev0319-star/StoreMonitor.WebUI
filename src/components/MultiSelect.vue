@@ -199,7 +199,7 @@ export default {
     margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
-    padding: 0 20px 0 50px !important;
+    /* padding: 0 20px 0 50px !important; */
     /*color: #7d8cad;*/
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{

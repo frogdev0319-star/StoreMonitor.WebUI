@@ -23,7 +23,7 @@
           <div class="region-result">
             <div class="store-list">
               <span class="store-name">{{ $t('overview.selectStores') }}</span>
-              <el-select v-model="curStore" style="width: 200px" size="mini" @change="changeStore">
+              <el-select class="storevue-select" v-model="curStore" style="width: 200px" size="mini" @change="changeStore">
                 <el-option
                   v-for="item in storeDataList"
                   :key="item.storeId"
@@ -100,7 +100,7 @@
             <div class="store-panel">
               <div class="store-list">
                 <span class="store-name">{{ $t('overview.rankType') }}</span>
-                <el-select v-model="rankType" style="width: 200px" size="mini" @change="changeRankType">
+                <el-select class="storevue-select" v-model="rankType" style="width: 200px" size="mini" @change="changeRankType">
                   <el-option
                     v-for="item in rankTypeArr"
                     :key="item.value"
