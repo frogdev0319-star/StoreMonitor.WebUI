@@ -82,108 +82,122 @@
             {{ $t('deviceView.channelName') }}
           </div>
           <div class="spacer">
-            {{ $t('deviceView.thumbnail') }}
-          </div>
-          <div class="spacer">
             {{ $t('deviceView.enableStatus') }}
           </div>
           <div class="spacer">
           </div>
         </div>
-        <el-scrollbar id="el-menuscrollbar">
-          <div class="channel-content">
-            <div
-              v-for="(item,index) in channelList"
-              :style="item.isClick ? {'background-color':'#FEE4E7'} : {}"
-              :key="index"
-              class="nape-items-data">
-              <div class="nape-dep-data">
-                <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
-                <el-select
-                  v-if="item.id === 0"
-                  v-model="item.channelId"
-                  :placeholder="$t('deviceView.selectDeviceChannel')"
-                  size="mini"
-                  class="nvr-select"
-                  style="margin-left: 10%">
-                  <el-option
-                    v-for="numList in newChannelNumList"
-                    :key="numList.value"
-                    :label="numList.label"
-                    :value="numList.value"
-                    :disabled="numList.disabled"/>
-                </el-select>
-              </div>
-              <div class="nape-name-data">
-                <span v-if="!item.isClick" class="nape-name">
-                  {{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}
-                </span>
-                <el-input
-                  v-if="item.isClick"
-                  v-model="item.tempName"
-                  :placeholder="$t('deviceView.inputInspectName')"
-                  size="mini"
-                  class="nape-input input-details"
-                  @input="(val)=>channelNameChange(val,item)"/>
-              </div>
-              <div :class="lang === 'en' ? 'en-nape-picture-data' : ''" class="nape-picture-data">
-                <span v-if="item.tempUrl">
-                  <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
-                    <div slot="error" class="image-slot">
-                      <i class="el-icon-picture-outline"/>
-                    </div>
-                  </el-image>
-                  <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
-                    <div slot="error" class="image-slot">
-                      <i class="el-icon-picture-outline"/>
-                    </div>
-                  </el-image>
-                </span>
-                <span v-else class="img-class" style="display: inline-block;background: #cccc;">
-                  <span style="color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
-                </span>
-                <el-upload
-                  v-if="item.isClick"
-                  :before-upload="beforeAvatarUpload"
-                  :on-change="handleEditChange"
-                  class="upload-demo"
-                  action=""
-                  list-type="picture">
-                  <el-button size="mini" type="primary">
-                    <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
-                  </el-button>
-                </el-upload >
-              </div>
-              <div class="nape-enable-handle">
-                <el-switch
-                  v-model="item.checkedStatus"
-                  @change="updateChannelImage(item)"
-                />
-              </div>
-              <div class="nape-items-handle">
-                <div v-if="item.isClick" class="iconcontent">
-                  <div class="iconlised" @click="confrimEditEzvizChannle(index,item)">
-                    <i class="el-icon-check"/>
-                  </div>
-                  <div class="iconrised" @click="cancelEditEzvizChannle(index,item)">
-                    <i class="el-icon-close"/>
-                  </div>
+        <div style="height: calc(100vh - 350px); overflow: auto;">
+          <div
+            v-for="(item,index) in channelList"
+            :style="item.isClick ? {'background-color':'#FEE4E7'} : {}"
+            :key="index"
+            class="nape-items-data">
+            <div class="nape-dep-data">
+              <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
+              <el-select
+                v-if="item.id === 0"
+                v-model="item.channelId"
+                :placeholder="$t('deviceView.selectDeviceChannel')"
+                size="mini"
+                class="nvr-select"
+                style="margin-left: 10%">
+                <el-option
+                  v-for="numList in newChannelNumList"
+                  :key="numList.value"
+                  :label="numList.label"
+                  :value="numList.value"
+                  :disabled="numList.disabled"/>
+              </el-select>
+            </div>
+            <div class="nape-name-data">
+              <span v-if="!item.isClick" class="nape-name">
+                {{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}
+              </span>
+              <el-input
+                v-if="item.isClick"
+                v-model="item.tempName"
+                :placeholder="$t('deviceView.inputInspectName')"
+                size="mini"
+                class="nape-input input-details"
+                @input="(val)=>channelNameChange(val,item)"/>
+            </div>
+            <div class="nape-enable-handle">
+              <el-switch
+                v-model="item.checkedStatus"
+                @change="updateChannelImage(item)"
+              />
+            </div>
+            <div class="nape-items-handle">
+              <div v-if="item.isClick" class="iconcontent">
+                <div class="iconlised" @click="confrimEditEzvizChannle(index,item)">
+                  <i class="el-icon-check"/>
                 </div>
-                <div v-if="!item.isClick" class="icon-list">
-                  <img 
-                    :src="`../../static/img/table-edit.png`" 
-                    @click="handleEdit(index,item)"
-                    height="26px" />
-                  <i
-                    v-if="curEzvizItem.addedMethod === 2"
-                    class="iconfont icon-shanchu"
-                    style="cursor:pointer;margin-right:10px;"
-                    @click="handleDelete(index, item)"/>
+                <div class="iconrised" @click="cancelEditEzvizChannle(index,item)">
+                  <i class="el-icon-close"/>
                 </div>
+              </div>
+              <div v-if="!item.isClick" class="icon-list">
+                <img 
+                  :src="`../../static/img/table-edit.png`" 
+                  @click="handleEdit(index,item)"
+                  height="26px" />
+                <i
+                  v-if="curEzvizItem.addedMethod === 2"
+                  class="iconfont icon-shanchu"
+                  style="cursor:pointer;margin-right:10px;"
+                  @click="handleDelete(index, item)"/>
               </div>
             </div>
           </div>
-        </el-scrollbar>
+        </div>
+        <dialog-pop
+          :is-form="true"
+          :title="$t('deviceView.addDevice')"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          :isWarning="true"
+          :visible="showAddChannelDialog"
+          :confirm-context="$t('deviceView.addChannel')"
+          dialog-width="510px"
+          @cancelHandler="showAddChannelDialog = false"
+          @confirmHandler="addSingleChannel">
+          <div class="form-slot">
+            <el-form
+              ref="channelForm"
+              :model="addChannelData"
+              :rules="channelRules"
+              class="deviceForm"
+              label-position="top"
+              size="mini">
+              <el-form-item style="margin-bottom: 20px;">
+                <el-col :span="24">
+                  <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
+                    <el-input
+                      v-model="addChannelData.name"
+                      style="width: 100%;"
+                      @input="(val)=>channelNameChange(val,{})"
+                      @blur="notShowInputRuleTips('channelName')"/>
+                    <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item :label="$t('deviceView.devChannelNum')" prop="channelId">
+                    <el-select v-model="addChannelData.channelId" size="mini">
+                      <el-option
+                        v-for="numList in newChannelNumList"
+                        :key="numList.value"
+                        :label="numList.label"
+                        :value="numList.value"
+                        :disabled="numList.disabled"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-form-item>
+            </el-form>
+          </div>
+        </dialog-pop>
         <el-dialog
           v-if="showDeleteChannel"
           :title="$t('deviceView.prompt')"
@@ -212,92 +226,6 @@
             </el-button>
           </div>
         </el-dialog>
-        <el-dialog
-          v-if="showAddChannelDialog"
-          :title="$t('deviceView.addChannel')"
-          :visible.sync="showAddChannelDialog"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="510px"
-          top="35vh"
-          left="40vh"
-          custom-class="addDevice"
-        >
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <el-form
-              ref="channelForm"
-              :model="addChannelData"
-              :rules="channelRules"
-              class="deviceForm"
-              label-position="top"
-              size="mini">
-              <el-form-item style="height: 57px;">
-                <el-col :span="12">
-                  <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
-                    <el-input
-                      v-model="addChannelData.name"
-                      style="width: 100%;"
-                      @input="(val)=>channelNameChange(val,{})"
-                      @blur="notShowInputRuleTips('channelName')"/>
-                    <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="10" :offset="2">
-                  <el-form-item :label="$t('deviceView.devChannelNum')" prop="channelId">
-                    <el-select v-model="addChannelData.channelId" size="mini">
-                      <el-option
-                        v-for="numList in newChannelNumList"
-                        :key="numList.value"
-                        :label="numList.label"
-                        :value="numList.value"
-                        :disabled="numList.disabled"
-                      />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-              </el-form-item>
-              <el-from-item>
-                <el-col :span="6">
-                  <el-form-item ref="uploadElement" :label="$t('deviceView.thumbnail')" prop="pictureUrl">
-                    <el-input v-if="false" v-model="addChannelData.pictureUrl"/>
-                    <el-upload
-                      ref="upload"
-                      :show-file-list="false"
-                      :before-upload="beforeAvatarUpload"
-                      :on-change="handleChange"
-                      :data="addChannelData"
-                      class="avatar-uploader"
-                      action=""
-                      accept="image/png,image/jpg,image/jpeg"
-                      list-type="picture">
-                      <el-button size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
-                        <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/>
-                        <span>{{ $t('deviceView.selectPicture') }}</span>
-                      </el-button>
-                      <el-image :src="addChannelData.pictureUrl" class="image-class">
-                        <div slot="error" class="image-slot">
-                          <span class="image-span">{{ $t('deviceView.preview') }}</span>
-                        </div>
-                      </el-image>
-                    </el-upload>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="varWindowWidth<1440? 14: 16" :offset="varWindowWidth<1440? 3: 1">
-                  <span class="picture-tips">*{{ $t('deviceView.thumbnailInfo') }}</span>
-                </el-col>
-              </el-from-item>
-
-            </el-form>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showAddChannelDialog = false">
-              {{ $t('deviceView.cancle') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleChannel">
-              {{ $t('deviceView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
       </el-col>
     </div>
     <dialog-pop
@@ -312,7 +240,6 @@
       @cancelHandler="showAddDeviceDialog = false"
       @confirmHandler="addEzvizDeviceBasedForm">
       <div class="form-slot">
-        
         <el-form
           ref="deviceForm"
           :model="addDeviceData"
@@ -365,7 +292,7 @@
               </template>
             </div>
           </div>
-          <div v-else class="main-device-info">
+          <div v-else>
             <el-form-item style="margin-bottom: 20px;">
               <el-col :span="13">
                 <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
@@ -432,6 +359,76 @@
         </el-form>
       </div>
     </dialog-pop>
+    
+    <dialog-pop
+      :is-form="true"
+      :title="$t('deviceView.editDevice')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :isWarning="true"
+      :visible="showEditDeviceDialog"
+      :confirm-context="$t('deviceView.confirm')"
+      dialog-width="510px"
+      @cancelHandler="showEditDeviceDialog = false"
+      @confirmHandler="confirmEditDialog">
+      <div class="form-slot">
+        <el-form>
+          <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
+            <el-input
+              v-model="editingDevice.serialNumber"
+              disabled
+              @input="(val)=>serialNumberChange(val)"
+              @blur="notShowInputRuleTips('serialNum')"/>
+            <span v-if="serialRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
+            <el-input
+              v-model="editingDevice.name"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('deviceView.store')" prop="storeId">
+            <el-select
+              v-model="editingDevice.storeId"
+              :filter-method="filterStoreOption"
+              filterable
+              disabled
+              style="width: 100%;">
+              <el-option
+                v-for="item in storeDataList"
+                :key="item.storeId"
+                :label="item.label"
+                :value="item.storeId"/>
+            </el-select>
+            <span class="add-label" style="color: #f7d057; display: block">
+              <span style="margin-right: 10px;font-size: 12px;">*</span>
+              {{ $t('deviceView.selectStoreInfo') }}
+            </span>
+          </el-form-item>
+        </el-form>
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :is-form="true"
+      :title="$t('deviceView.editDevice')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :isWarning="true"
+      :visible="showEditChannelDialog"
+      :confirm-context="$t('deviceView.confirm')"
+      dialog-width="510px"
+      @cancelHandler="showEditChannelDialog = false"
+      @confirmHandler="confirmEditDialog">
+      <div class="form-slot">
+        <el-form>
+          <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom: 20px;">
+            <el-input
+              v-model="curChannelItem.tempName"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+    </dialog-pop>
+    
     <el-dialog
       v-if="showDeleteDialog"
       :title="$t('titleView.confirmInfo')"
@@ -593,6 +590,8 @@ export default {
         ]
       },
       showAddChannelDialog: false,
+      showEditDeviceDialog: false,
+      showEditChannelDialog: false,
       file: '',
       deleteChannelId: 0,
       isUpdate: false,
@@ -648,7 +647,8 @@ export default {
       deviceType: 0,
       deviceSource: 0,
       avilableDeviceList: [],
-      isLoadingData: true
+      isLoadingData: true,
+      editingDevice: {}
     };
   },
 
@@ -732,9 +732,10 @@ export default {
       ezvizRESTful.updateEzvizDevice(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
-          deviceInfo.name = deviceInfo.tempDeviceName;
+          self.setDeviceListParams()
           self.getChannelListByDevice(self.curEzvizItem.serialNumber);
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          if (this.showEditDeviceDialog) this.showEditDeviceDialog = false
         } else {
           deviceInfo.tempDeviceName = deviceInfo.name;
           util.setErrorMsg(res.errMsg, false);
@@ -755,11 +756,17 @@ export default {
       const breadcrumbsName = this.accountScope === 0 ? 'storeViuAccountDeviceSetting' : 'userAccountDeviceSetting';
       this.$route.matched[2].name = breadcrumbsName;
     },
-
+    handleUpdateDevice (row) {
+      
+      this.curChannelItem = {...row};
+      this.editingDevice = {...row}
+      this.showEditDeviceDialog = true
+    },
     handleEmitOperation(methodsAndRowObj) {
       const method = methodsAndRowObj.method;
       switch (method) {
         case 'edit': {
+          this.handleUpdateDevice(methodsAndRowObj.row)
           break;
         }
         case 'delete': {
@@ -901,13 +908,14 @@ export default {
 
     handleEdit(index, item) {
       const self = this;
-      item.isClick = true;
-      self.curChannelItem = item;
-      self.channelList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isClick = false;
-        }
-      });
+      // item.isClick = true;
+      self.curChannelItem = {...item};
+      this.showEditChannelDialog = true
+      // self.channelList.forEach((_item, _index) => {
+      //   if (index !== _index) {
+      //     _item.isClick = false;
+      //   }
+      // });
     },
 
     cancelEditEzvizChannle(index, item) {
@@ -954,7 +962,7 @@ export default {
       }
     },
 
-    async updateEzvizChannel(item) {
+    async updateEzvizChannel() {
       const self = this;
       if (self.curChannelItem.tempName.trim().length === 0) {
         util.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
@@ -968,7 +976,7 @@ export default {
       try {
         const promiseArr = [];
         self.curChannelItem.name !== self.curChannelItem.tempName && promiseArr.push(ezvizRESTful.updateEzvizChannel(params));
-        item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateAttachImage());
+        // item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateAttachImage());
 
         const results = await Promise.all(promiseArr);
         results.forEach(result => {
@@ -976,10 +984,11 @@ export default {
             throw Error(result.errMsg);
           }
         });
+        this.showEditChannelDialog = false
         self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
       } catch (e) {
-        item.isClick = false;
+        // item.isClick = false;
         util.setErrorMsg(e.message, false);
         this.showAddDeviceDialog = false;
       }
@@ -1495,6 +1504,13 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.setDeviceListParams();
+    },
+    confirmEditDialog () {
+      if (this.showEditDeviceDialog) {
+        this.confirmUpdateDevice({...this.editingDevice, tempDeviceName: this.editingDevice.name })
+      } else {
+        this.updateEzvizChannel()
+      }
     }
   }
 };
@@ -1651,28 +1667,12 @@ export default {
       }
       .risde{
         background-color: #ffffff;
-        height: 100%;
-        .nape-dep-title{
-          width: 23%;
-        }
-        .nape-name-title{
-          width: 28%;
-        }
-        .nape-picture-title{
-          width: 20%;
-        }
-        .nape-enable-title{
-          width: 20%;
-        }
-        .nape-handle-title{
-          width: 9%;
-        }
         .nape-items-title .titles, .en-nape-items-title .titles{
           color: $tab;
           text-align: left;
         }
         .channel-content{
-          height: calc(100% - 160px);
+          overflow: auto;
         }
         .nape-items-data{
           overflow: hidden;
@@ -1789,7 +1789,6 @@ export default {
   @import '../../../../assets/css/pagination.css';
   @import '../../../../assets/css/tabsItem.css';
   #el-menuscrollbar{
-    height: calc(100% - 120px);
   }
   #el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
@@ -1913,6 +1912,7 @@ export default {
   }
   .device-table{
     height: 100%;
+    background: #f5f7fa;
   }
   .device-table .el-table--mini{
     height: 100%;

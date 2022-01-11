@@ -38,6 +38,12 @@ $CTA:#c60957;
   border: $borderStyle;
 }
 
+.el-table--mini{
+  font-size: calc(14/1920*100vw);
+  .el-table__row {
+    height: calc(60/1920*100vw);
+  }
+}
 .table-iconfont{
   font-size: calc(24/1920*100vw);
   color: $tab;
@@ -48,7 +54,8 @@ $CTA:#c60957;
     margin-right: 0px;
   }
 }
-.main-device-info{
+.main-dialog-body {
+  background-color: #f7f9fa;
   .el-input__inner{
     height: 46px;
   }
@@ -317,7 +324,7 @@ $CTA:#c60957;
 .picture-tips{
   display: inline;
   font-size: 12px;
-  color: $warning;
+  color: #f7d057;
   position: relative;
   top: 30px;
   left: 30px;
@@ -459,7 +466,6 @@ $CTA:#c60957;
 .image-class{
   @extend .el-image__inner;
   border: 1px dashed #7d8cad;
-  float: left;
   height: 70px;
   width: calc(100/1920*100vw);
   min-width: 85px;

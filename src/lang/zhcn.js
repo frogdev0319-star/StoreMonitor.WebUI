@@ -793,6 +793,7 @@ export default {
     "deviceNameEmpty": "设备名称不能为空",
     "deviceSeriNum": "设备SN",
     "duplicateSeriNum": "重复的设备序列号",
+    "editDevice": "编辑设备",
     "editFail": "修改失败!",
     "editImage": "编辑图片",
     "editSuss": "修改成功!",

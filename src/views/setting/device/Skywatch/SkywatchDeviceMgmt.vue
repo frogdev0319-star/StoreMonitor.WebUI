@@ -10,7 +10,7 @@
       @addDeviceHandler="confirmAddSkywatchDevice"
       @deleteDeviceHandler="confirmDeleteSkywatchDevice"/>
 
-    <div class="table-container">
+    <div class="table-container paper padding">
       <div class="device-title">
         <div class="header-sn">
           <el-checkbox v-model="checkAllDevice" class="header-checkbox" @change="changeIfCheckAllDevices"/>
@@ -25,91 +25,87 @@
         <div class="header-operation">{{ $t('deviceView.operation') }}</div>
       </div>
       <div v-if="beseyeDevicesList.length > 0">
-        <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-          <div :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
-            <div
-              v-for="(item,index) in beseyeDevicesList"
-              :key="index"
-              :class="!item.isClick ? 'noraml-color' : 'active-color'"
-              class="device-data group-title"
-              @click="clickSkywatchDevice(index,item)">
-              <div class="data-sn titles">
-                <el-checkbox v-model="item.isChecked" class="data-checkbox" @change="changeIfCheckDevice(item, index)"/>
-                <div class="data-sn-name titles">
-                  <span>{{ item.serialNumber }}</span>
+        <div
+          v-for="(item,index) in beseyeDevicesList"
+          :key="index"
+          :class="!item.isClick ? 'noraml-color' : 'active-color'"
+          class="device-data group-title"
+          @click="clickSkywatchDevice(index,item)">
+          <div class="data-sn titles">
+            <el-checkbox v-model="item.isChecked" class="data-checkbox" @change="changeIfCheckDevice(item, index)"/>
+            <div class="data-sn-name titles">
+              <span>{{ item.serialNumber }}</span>
+            </div>
+          </div>
+          <div class="data-name titles">
+            <span v-if="!item.isEditing">{{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}</span>
+            <el-input
+              v-if="item.isEditing"
+              v-model="item.tempDeviceName"
+              size="mini"
+              class="device-name-input"
+              @input="(val)=>deviceNameChange(val,item)"/>
+          </div>
+          <div class="data-store titles">
+            <span>{{ item.store }}</span>
+          </div>
+          <div class="data-picture titles">
+            <span v-if="item.tempUrl">
+              <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
+                <div slot="error" class="image-slot">
+                  <i class="el-icon-picture-outline"/>
                 </div>
-              </div>
-              <div class="data-name titles">
-                <span v-if="!item.isEditing">{{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}</span>
-                <el-input
-                  v-if="item.isEditing"
-                  v-model="item.tempDeviceName"
-                  size="mini"
-                  class="device-name-input"
-                  @input="(val)=>deviceNameChange(val,item)"/>
-              </div>
-              <div class="data-store titles">
-                <span>{{ item.store }}</span>
-              </div>
-              <div class="data-picture titles">
-                <span v-if="item.tempUrl">
-                  <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
-                    <div slot="error" class="image-slot">
-                      <i class="el-icon-picture-outline"/>
-                    </div>
-                  </el-image>
-                  <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
-                    <div slot="error" class="image-slot">
-                      <i class="el-icon-picture-outline"/>
-                    </div>
-                  </el-image>
-                </span>
-                <span v-else class="img-class" style="display: inline-block;background: #cccc;">
-                  <span style="color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
-                </span>
-                <el-upload
-                  v-if="item.isEditing"
-                  :before-upload="beforeAvatarUpload"
-                  :on-change="handleEditChange"
-                  class="upload-demo"
-                  action=""
-                  list-type="picture">
-                  <el-button size="mini" type="primary">
-                    <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
-                  </el-button>
-                </el-upload >
-              </div>
-              <div class="data-status titles">
-                <el-switch
-                  v-model="item.checkedStatus"
-                  @change="updateChannelImage(item)"
-                />
-              </div>
-              <div class="data-operation titles">
-                <div v-if="item.isEditing" class="iconcontent">
-                  <div class="iconlised" @click="confirmEditSkywatch(index,item)">
-                    <i class="el-icon-check"/>
-                  </div>
-                  <div class="iconrised" @click="cancelEditSkywatch(index,item)">
-                    <i class="el-icon-close"/>
-                  </div>
+              </el-image>
+              <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
+                <div slot="error" class="image-slot">
+                  <i class="el-icon-picture-outline"/>
                 </div>
-                <div v-if="!item.isEditing" class="iconcontent">
-                  <div
-                    class="iconlised normal-left-icon"
-                    @click="editSkywatchDevice(index,item)">
-                    <i class="iconfont icon-bianji"/>
-                  </div>
-                  <div
-                    class="iconrised normal-right-icon"
-                    @click="showDeleteSkywatchDeviceDialog(index,item)">
-                    <i class="iconfont icon-shanchu"/>
-                  </div>
-                </div>
+              </el-image>
+            </span>
+            <span v-else class="img-class" style="display: inline-block;background: #cccc;">
+              <span style="color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
+            </span>
+            <el-upload
+              v-if="item.isEditing"
+              :before-upload="beforeAvatarUpload"
+              :on-change="handleEditChange"
+              class="upload-demo"
+              action=""
+              list-type="picture">
+              <el-button size="mini" type="primary">
+                <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
+              </el-button>
+            </el-upload >
+          </div>
+          <div class="data-status titles">
+            <el-switch
+              v-model="item.checkedStatus"
+              @change="updateChannelImage(item)"
+            />
+          </div>
+          <div class="data-operation titles">
+            <div v-if="item.isEditing" class="iconcontent">
+              <div class="iconlised" @click="confirmEditSkywatch(index,item)">
+                <i class="el-icon-check"/>
+              </div>
+              <div class="iconrised" @click="cancelEditSkywatch(index,item)">
+                <i class="el-icon-close"/>
+              </div>
+            </div>
+            <div v-if="!item.isEditing" class="iconcontent">
+              <div
+                class="iconlised normal-left-icon"
+                @click="editSkywatchDevice(index,item)">
+                <i class="iconfont icon-bianji"/>
+              </div>
+              <div
+                class="iconrised normal-right-icon"
+                @click="showDeleteSkywatchDeviceDialog(index,item)">
+                <i class="iconfont icon-shanchu"/>
               </div>
             </div>
           </div>
-        </el-scrollbar>
+        </div>
         <div class="toolbar pagination" style="width:100%; margin-top:10px;">
           <el-pagination
             :page-size="sizeNum"

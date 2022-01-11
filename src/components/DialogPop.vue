@@ -7,7 +7,7 @@
     :class="isForm ? 'storevue-form-dialog' : 'storevue-dialog'"
   >
     <template slot="title">{{title}}<img v-if="isWarning" src="../../static/img/dialog-icon.png" height="40px"> </template>
-    <div class="dialog-body">
+    <div class="main-dialog-body">
       <slot/>
     </div>
     <div v-if="showButton" slot="footer">

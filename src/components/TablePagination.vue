@@ -352,7 +352,7 @@ export default {
 
     handleOperationButton(methods, row, index) {
       this.tableData.map(item => { item.isEditing = false; });
-      row.isEditing = this.isDevice && methods === 'edit';
+      // row.isEditing = this.isDevice && methods === 'edit';
       this.$emit('handleOperation', { method: methods, row: row, index: index });
     },
 
@@ -412,9 +412,6 @@ export default {
     &:last-child{
       margin-right: 0px;
     }
-  }
-  .el-table--mini{
-    font-size: calc(14/1920*100vw);
   }
 
   .iconfont{
