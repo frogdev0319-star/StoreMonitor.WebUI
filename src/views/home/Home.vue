@@ -146,6 +146,7 @@
                     :style="groupHeight+'px'"
                     :index="child.path"
                     :disabled="child.isReadOnly">
+                    <div class="item-icon"></div>
                     <span >{{ $t(`route.${child.name}`) }}</span>
                   </el-menu-item>
                   <el-submenu
@@ -156,7 +157,7 @@
                     :disabled="child.isReadOnly"
                     :key="child.path">
                     <template slot="title">
-                      <i class="iconfont icon-yuandian icon-content"/>
+                      <div class="item-icon"></div>
                       <span>{{ $t(`route.${child.name}`) }}</span>
                     </template>
                     <div v-for="grandChild in child.children" :key="grandChild.path">
@@ -791,6 +792,14 @@ export default {
 .sider-expand {
   width: 290px;
 }
+.item-icon {
+  display:inline-block;
+  height:5px;
+  width: 5px;
+  border-radius:50%;
+  background-color:#a5a5a5;
+  margin-right: calc(12 / 1920 * 100vw);;
+}
 .sider {
   transition: width .3s;
   position: fixed;
@@ -799,6 +808,16 @@ export default {
   flex-direction: column;
   background-color: #fff;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
+  .is-active {
+    span {
+      color:#006ab7;
+    }
+  }
+  span {
+    font-size: 0.83333vw;
+    color:#a5a5a5;
+    margin-left: 10px;
+  }
   /deep/ .el-menu--collapse {
     i {
       display: none;
@@ -809,7 +828,6 @@ export default {
   }
   /deep/ .el-menu-item {
     text-align: left;
-    padding-left: 32px !important;
     .menu_img {
       display: inline-block;
     }
@@ -818,7 +836,12 @@ export default {
     }
     &.is-active {
       background-color: #e4f3fd;
-      color: #006ab7;
+      .item-icon {
+        background-color:#006ab7;
+      }
+      span {
+        color: #006ab7;
+      }
       .menu_img {
         display: none;
       }
@@ -827,14 +850,19 @@ export default {
       }
     }
     &:hover {
+      .item-icon {
+        background-color:#006ab7;
+      }
       .menu_img {
         display: none;
       }
       .menu_img-active {
         display: inline-block;
       }
-      background-color: #e4f3fd;
-      color: #006ab7;
+      background-color: #f2f9fe;
+      span {
+        color: #006ab7;
+      }
     }
   }
   /deep/ .el-submenu {
@@ -845,9 +873,19 @@ export default {
     .menu_img-active {
       display: none;
     }
-    &.is-active, &.is-opened {
+    span {
+      color:#a5a5a5;
+    }
+    &.is-opened {
       background-color: #e4f3fd;
-      color: #006ab7;
+      // .el-submenu__title {
+      //   span {
+      //     color: #006ab7;
+      //   }
+      // }
+      .item-icon {
+        background-color:#006ab7;
+      }
       .menu_img {
         display: none;
       }
@@ -855,17 +893,42 @@ export default {
         display: inline-block;
       }
       ul {
+        span {
+          font-size: calc(12 / 1920 * 100vw);
+        }
+        background-color: #f2f9fe;
+      }
+    }
+    &.is-active {
+      background-color: #e4f3fd;
+      .el-submenu__title {
+        span {
+          color: #006ab7;
+        }
+      }
+      .menu_img {
+        display: none;
+      }
+      .menu_img-active {
+        display: inline-block;
+      }
+      ul {
+        span {
+          font-size: calc(12 / 1920 * 100vw);
+        }
         background-color: #f2f9fe;
       }
     }
     .el-submenu__title {
-      padding-left: 32px !important;
+      padding: 0 calc(30 / 1920 * 100vw);
       i {
         right: 32px;
       }
       &:hover {
         background-color: #e4f3fd;
-        color: #006ab7;
+        span {
+          color: #006ab7;
+        }
         .menu_img {
           display: none;
         }
@@ -1158,16 +1221,6 @@ $collapseWidth: 5.5%;
         @include point(font-size, 18);
         color: #fff !important;
       }
-    }
-    .icon-content {
-      float: left;
-      margin-right: calc(48 / 1920 * 100vw);
-      width: 10px;
-      position: relative;
-      height: 100%;
-      font-size: calc(20 / 1920 * 100vw);
-      transform: scale(0.5);
-      color: #a0a4ad;
     }
     .en-icon-content {
       float: left;
