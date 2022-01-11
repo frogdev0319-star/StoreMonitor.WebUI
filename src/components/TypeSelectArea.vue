@@ -530,6 +530,7 @@ export default {
       this.compareType = val;
       this.curSelectId = [];
       this.curTypeArrary = [];
+      let storeIds = [];
       switch (val){
         case 'area1':
           this.dropdownPlaceholder = this.$t('remotePatrol.regionI');
@@ -561,11 +562,17 @@ export default {
           this.dropdownPlaceholder =  this.$t('remotePatrol.storeGroup');
           this.selAllString=this.$t('storeView.all');
           this.curTypeArrary = this.curStoreGroupList;
+          for(let i=0; i<this.curTypeArrary ;i++){
+            storeIds = storeIds.concat(this.curTypeArrary[i].storeIds);
+          }
           break;
         case 'storeType':
           this.dropdownPlaceholder =  this.$t('remotePatrol.storeType');
           this.selAllString=this.$t('storeView.all');
           this.curTypeArrary = this.curStoreTypeList;
+          for(let i=0; i<this.curTypeArrary ;i++){
+            storeIds = storeIds.concat(this.curTypeArrary[i].storeIds);
+          }
           break;
         case 'users':
           this.dropdownPlaceholder =  this.$t('overview.user');
@@ -582,6 +589,9 @@ export default {
           this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
           this.selAllString=this.$t('overview.all');
           this.curTypeArrary = this.curStoreList;
+          for(let i=0; i<this.curTypeArrary ;i++){
+            storeIds.push(this.curTypeArrary[i].storeId);
+          }
           break;
         default:
           this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
@@ -589,11 +599,11 @@ export default {
           this.curTypeArrary = this.curStoreList;
           break;
       }
-      
-      if(this.curSelectId.length==0 ){
+       
+      if(this.curSelectId.length==0){
           let defaultSel = this.curTypeArrary.length;
           let selectedLabels = [];
-          let storeIds = [];
+          
           this.curSelectId.push('-1');
           for(let i=0; i<defaultSel;i++){
             this.curSelectId.push(this.compareType=='stores'?this.curTypeArrary[i].storeId: this.curTypeArrary[i].value);

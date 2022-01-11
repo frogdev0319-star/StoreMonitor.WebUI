@@ -62,6 +62,12 @@
               ></AreaSelected>-->
             </div>
             <div class="barchart-area">
+              <div style="position:absolute;right:24px;top:94px;z-index:10;" @click='changeBarchartSorOrder'>
+                  <div class="button-area" >
+                      <span style="color:#acaeb1">{{ barchartOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                  </div>    
+              </div>
               <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
             </div>
             <div class="table-area">
@@ -548,6 +554,9 @@ export default {
       exportPng: require('../../../static/img/excel.png'),
       allEventTableData:[],
       eventBarChartData: [],
+      barchartOrder:'desc',
+      descPng: require('../../../static/img/statistics/orderDesc.png'),
+      incPng: require('../../../static/img/statistics/orderInc.png'),
       eventTableData: [],
       eventInfoData: [
         {
@@ -843,6 +852,7 @@ export default {
       showInvolveTableArea:false,
       componentsProps_EventCommentList:{},
       gloableEventData:[],
+      barActiveinnerId:'-1'
     };
   },
 
@@ -965,16 +975,14 @@ export default {
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.compareType = compareType;
-      //this.compareIds = compareArr;
-      //console.log("compareArr :",compareArr);
+      console.log("emitTypeChanged > selStoreIdArr :",selStoreIdArr);
       //console.log("compareArr.includ :",compareArr.includes('-1'));
       if(selStoreIdArr.includes('-1')){
-        this.compareIds = selStoreIdArr.shift();
+        selStoreIdArr.shift();
       }
-      else{
-          this.compareIds = selStoreIdArr
-      }
-      //console.log("emitTypeChanged > this.compareIds:",this.compareIds);
+      this.compareIds = selStoreIdArr;
+      console.log("1.emitTypeChanged > this.compareIds:",this.compareIds); 
+      
       this.comapareLabels = selectedLabels;
       this.getAllEventData();
       this.getEventTableData();
@@ -1056,7 +1064,6 @@ export default {
         direction: 'desc',
         property: 'numOfTotal'
       };
-      
       let content = [];
       try {
         const eventResult = await this.getEventTableDataInfo(params);
@@ -1097,6 +1104,15 @@ export default {
       }
     },
     /*畫barChart*/
+    changeBarchartSorOrder(){
+      if(this.barchartOrder == 'desc'){
+          this.barchartOrder = 'asc'
+      }
+      else{
+        this.barchartOrder = 'desc'
+      }
+      this. getEventBarChartData();
+    },
     async getEventBarChartData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
@@ -1105,8 +1121,9 @@ export default {
       self.params.groupMode = region[0].value;
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
-        self.params.storeIds=this.compareIds
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds};
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds,
+          order:{"direction":this.barchartOrder,"property":"numOfTotal"}
+        };
         //console.log("*getEventTableData>searchCondition:",searchCondition);
       /*}else{ //groupType, storeGroup
         self.params.groupIds=this.compareIds
@@ -1232,18 +1249,16 @@ export default {
             barWidth: "16px",
             smooth: true,
             data: [0,0,0,0,0,0,0,0,0,0,0,0],
-            color:'#D7F3F9',
+            color:(context)=>{
+                if(this.barActiveinnerId==context.innerId){
+                  return '#7bd8eb';
+                }else{
+                  return '#D7F3F9';
+                }
+              },
             barGap:0,
           }
         ],
-        itemStyle: {
-              emphasis: {
-                color:'#7bd8eb'
-              },
-              normal: {
-                color: '#D7F3F9'
-              }
-            }
         
       };
       return chartOption;
@@ -1255,7 +1270,7 @@ export default {
       if(this.eventBarChartData.length>0){
         this.eventBarChartData.forEach(item => {
           date_xAxis.push(item.groupName);
-          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
+          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId,itemStyle:{color:(item.innerId==this.barActiveinnerId)?"#7bd8eb":"#D7F3F9"}});
         });
         this.barchartOption.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
@@ -1265,25 +1280,25 @@ export default {
       }
     },
     /*end 畫barChart */
+    
+    /*取得門店事件表 */
     onSwitchMode(val){
       this.viewMode=val;
     },
-    /*取得門店事件表 */
-    
     async getEventTableData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
+      self.params.storeIds = self.compareIds;
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
-        self.params.storeIds=this.compareIds
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds,
-          filter:{"page":this.page-1,"size":this.sizeNum},
-          order:this.order
-        };
-        console.log("*getEventTableData>searchCondition:",searchCondition);
+      searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds};
+          //filter:{"page":this.page-1,"size":this.sizeNum},
+          //order:this.order
+        //};
+      console.log("*getEventTableData>searchCondition:",searchCondition);
       /*}else{ //groupType, storeGroup
         self.params.groupIds=this.compareIds
         searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
@@ -1292,6 +1307,7 @@ export default {
         path: 'eventStatistics',
         params: self.params
       };
+      console.log("*getEventTableData>searchParamsObj:",searchParamsObj);
       self.ifSaveParams && self.$refs.eventSearch.saveSearchParams(searchParamsObj);
      self.ifSaveParams = true;
      if(this.compareIds.length>0){
@@ -1331,11 +1347,38 @@ export default {
     },
     setEventTableData(){
       this.orderAllTableData();
-      this.eventTableData = this.allEventTableData;
+      //this.eventTableData = this.allEventTableData;
       //this.getEventTableData();
-      //this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
     },
-
+    barchartClick(bar){
+      console.log("barchartClick:",bar);
+      if(this.barActiveinnerId == bar.data.innerId){
+        this.barActiveinnerId = '-1';
+        this.setEventTableData();
+      }else{
+        this.barActiveinnerId = bar.data.innerId;
+        this.eventTableData = this.allEventTableData.filter(item=>{
+        if(this.compareType=="area1"){
+          return (item.province == bar.data.name);
+        }else if(this.compareType=="area2"){
+          return (item.city == bar.data.name);
+        }else if(this.compareType=="storeGroup"){
+          return (item.groupName == bar.data.name);
+        }else if(this.compareType=="storeType"){
+          return (item.groupName == bar.data.name);
+        }else if(this.compareType=="stores"){
+          return (item.groupName == bar.data.name);
+        }
+        //return item.groupName == bar.data.name;
+      });
+      }
+      this.setBarchartData();
+      
+      
+      
+      //console.log("***filterResult",filterResult);
+    },
     orderAllTableData(){
       let key = this.defaultSort.prop;
       key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
@@ -1712,11 +1755,6 @@ export default {
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
     },
-
-    barchartClick(bar){
-      console.log("barchartClick:",bar);
-    }
-
   }
 };
 </script>
@@ -1867,7 +1905,7 @@ export default {
               align-self: center;
               display: flex;
               flex-direction: row;
-              width:calc(355/1440*100vw);
+              width:calc(344/1440*100vw);
               height: 30px;
               align-items: center;
               padding:0;
