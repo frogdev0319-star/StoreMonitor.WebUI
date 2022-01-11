@@ -123,8 +123,8 @@
                 :index="item.children[0].path"
                 :disabled="item.isReadOnly"
               >
-                <img class="menu_img" :src="`../../../static/img/menu/${index}.png`" height="26px" />
-                <img class="menu_img-active" :src="`../../../static/img/menu/${index}-active.png`" height="26px" />
+                <img class="menu_img" :src="`../../static/img/menu/${index}.png`" height="26px" />
+                <img class="menu_img-active" :src="`../../static/img/menu/${index}-active.png`" height="26px" />
                 <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
               </el-menu-item>
 
@@ -135,8 +135,8 @@
                 :index="index+''"
                 :style="groupHeight+'px'">
                 <template slot="title">
-                  <img class="menu_img" :src="`../../../static/img/menu/${index}.png`" height="26px" />
-                  <img class="menu_img-active" :src="`../../../static/img/menu/${index}-active.png`" height="26px" />
+                  <img class="menu_img" :src="`../../static/img/menu/${index}.png`" height="26px" />
+                  <img class="menu_img-active" :src="`../../static/img/menu/${index}-active.png`" height="26px" />
                   <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                 </template>
                 <div v-for="child in item.children" :key="child.path">
@@ -1191,7 +1191,7 @@ $collapseWidth: 5.5%;
       margin-top: -3px;
     }
     .content-wrapper-all {
-      height: auto;
+      height: 100%;
       padding: 30px calc(30 / 1920 * 100vw);
       width: 100%;
       //@include point(margin-right,50);
@@ -1257,13 +1257,13 @@ $collapseWidth: 5.5%;
     width: 100%;
   }
   .sec-uncoll {
-    margin-left: calc(350 / 1920 * 100vw);
+    margin-left: calc(290 / 1920 * 100vw);
     height: auto;
-    width: calc(100% - calc(350 / 1920 * 100vw));
-    min-width: calc(1000px - 280px);
+    width: calc(100% - calc(290 / 1920 * 100vw));
+    min-width: calc(1000px - 290px);
     @media screen and (max-width: 1590px) {
-      margin-left: 280px;
-      width: calc(100% - 280px);
+      margin-left: 290px;
+      width: calc(100% - 290px);
     }
   }
   .sec-uncoll.mobile-sec {
@@ -1297,15 +1297,6 @@ $collapseWidth: 5.5%;
   height: 60px;
   line-height: 60px;
   color: #484848;
-}
-.el-select-dropdown__item.hover,
-.el-select-dropdown__item:hover {
-  background-color: #f2f9fe !important;
-  color: #484848 !important;
-}
-.el-select-dropdown__item.selected {
-  background-color: #f2f9fe !important;
-  color: #484848 !important;
 }
 #el-menuscrollbar {
   height: calc(100% - 225px);
@@ -1426,15 +1417,10 @@ $collapseWidth: 5.5%;
     margin-left: 20px;
   }
 }
-.el-button--primary {
-  background-color: #c60957;
-  border-color: #c60957;
-  &:hover {
-    background-color: #ae0048;
-    border-color: #ae0048;
-  }
-}
 .el-dialog__headerbtn {
   display: none;
+}
+.el-form-item--mini.el-form-item {
+  margin-bottom: 0;
 }
 </style>

@@ -11,7 +11,7 @@ $remote: #7bd8eb;
 $onsite: #7b9feb;
 $store: #5274bb;
 $excellent: #57e78f;
-$pass: #8fd92e;
+$pass: #6a98ee;
 $failed: #f59249;
 $ignored: #b9c6d2;
 
@@ -156,7 +156,7 @@ $ignored: #b9c6d2;
               color: #fd8a51;
             }
             .item-ranking-2 {
-              color: $failed;
+              color: #f7b500;
             }
             .item-ranking-3 {
               color: $pass;
@@ -451,7 +451,7 @@ $ignored: #b9c6d2;
                   color: #fd8a51;
                 }
                 .item-ranking-2 {
-                  color: $failed;
+                  color: #f7b500;
                 }
                 .item-ranking-3 {
                   color: $pass;
@@ -564,6 +564,7 @@ $ignored: #b9c6d2;
           &:first-child {
             border-bottom: 1px solid $border;
             margin-bottom: calc(20 / 1920 * 100vw);
+            padding-bottom: calc(10 / 1920 * 100vw);
           }
           .empty-store {
             position: absolute;
@@ -604,6 +605,7 @@ $ignored: #b9c6d2;
       }
       .inspect-cycle {
         background-color: #fff;
+        height: 100%;
         margin-left: calc(20 / 1920 * 100vw);
         // border: 1px solid $border;
         // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -804,7 +806,7 @@ $ignored: #b9c6d2;
         .region-result{
           border-top: 1px solid $border;
           border-right: 1px solid $border;
-          height: 330px;
+          height: 340px;
           padding: 20px calc(30/1920*100vw) 15px calc(20/1920*100vw);
           .store-list{
             text-align: left;

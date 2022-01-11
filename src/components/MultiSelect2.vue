@@ -40,7 +40,8 @@ export default {
       type: String,
     },
     alltype: {
-      type: Number
+      type: Number,
+      default:0
     },
     allSelect: {
       type: Number
@@ -142,7 +143,7 @@ export default {
     changeSelect(val) {
       this.changed = true;
       var emitArray = [];
-      //console.log("val:",val);
+      console.log("val:",val);
       if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
         this.input = this.all;
         this.selectedArray.unshift('-1');
@@ -156,7 +157,7 @@ export default {
             if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
               if (item === _item.value) {
                 this.input += _item.label + ',';
-                console.log("_item.contents:",_item.storeIds);
+                console.log("this.input:",this.input);
                 if(_item.storeIds.length>0)
                 {
                   emitArray = emitArray.concat(_item.storeIds);
@@ -165,7 +166,7 @@ export default {
                 //emitArray = this.selectedArray;
               }
             }else {
-              if (item === _item.storeId) {
+              if (item === _item.value) {
                 this.input += _item.label + ',';
               }
               emitArray = this.selectedArray;
@@ -209,7 +210,8 @@ export default {
       if (!val && this.changed) {
         //console.log("visibileHandler");
         let selectedList = [];
-        let emitStoreIds = []
+        let emitStoreIds = [];
+        let emitArray = [];
         this.selectedArray.forEach(item => {
           this.options.forEach(_item => {
             if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {

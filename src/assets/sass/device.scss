@@ -7,12 +7,11 @@ $background:#f4f5f9;
 $tab:#7d8cad;
 
 .device-container{
-  border: 1px solid $border;
-  background-color: #fff;
-  min-height: calc(100vh - 80px - 46px - calc(60/1920*100vw));
+  // border: 1px solid $border;
+  // background-color: #fff;
+  // min-height: calc(100vh - 80px - 46px - calc(60/1920*100vw));
 }
 .operation-btns{
-  float: right;
   @include point(margin-right,15);
   .el-add-btn{
     background-color: $mainColor;
@@ -48,23 +47,18 @@ $tab:#7d8cad;
   }
 }
 .btn-col{
-  border-bottom:  1px solid $border;
   overflow: hidden;
-  height: 70px;
-  line-height: 70px;
 }
 
 .table-container{
-  min-height: calc(100% - 75px);
-  margin: 20px calc(20/1920*100vw);
   .iconfont{
     font-size: calc(24/1920*100vw);
     color: $tab;
   }
 }
 .get-button.el-button{
-  background-color: $mainColor;
-  border-color:  $mainColor;
+  background-color: #c60957;
+  border-color:  #c60957;
   color: #fff;
   font-size: 12px;
 }
@@ -73,10 +67,21 @@ $tab:#7d8cad;
   color: #fccc3f;
 }
 .account-list{
-  padding: 20px calc(20/1920*100vw);
-  border: 1px solid $border ;
+  background-color: #fff;
+  padding: 20px calc(20/1920*100vw) 20px 0;
+  border: 1px solid #c3c4c5;
   height: auto;
   position: relative;
+  border-radius: 5px;
+  margin-bottom: calc(20/1920*100vw);
+  .el-input__inner {
+    background-color: #f4f6f7;
+    border: none;
+  }
+  .el-form-item__content {
+    margin-left: 20px !important;
+    flex: 1;
+  }
   .buttom-div{
     position: absolute;
     right: 0;
@@ -91,20 +96,12 @@ $tab:#7d8cad;
 }
 
 .account-title-btn{
-  height: 70px;
-  line-height: inherit;
-  border-bottom: 1px solid #e3e9f4;
-  overflow: hidden;
 }
 .operation-title{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 28px;
-  margin-right: calc(20/1920*100vw);
   font-size: calc(14/1920*100vw);
   font-weight: bold;
   color: #7d8cad;
+  margin-bottom: 20px;
   text-align: left;
 }
 .prompt-info{

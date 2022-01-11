@@ -1,8 +1,9 @@
 <template>
   <div class="btn-col">
-    <div class="operation-btns">
+    <div class="flex-center margin-bottom-md">
+      <div class="spacer"></div>
       <el-button
-        class="el-add-btn btn-class"
+        class="storevue-button"
         size="mini"
         type="primary"
         @click="onShowAddBeseyeDeviceDialog"
@@ -13,9 +14,9 @@
         </div>
       </el-button>
       <el-button
-        class="el-add-btn btn-class"
         size="mini"
         type="primary"
+        class="storevue-button"
         @click="onShowDeleteDialogMethod"
       >
         <div class="btn-area">

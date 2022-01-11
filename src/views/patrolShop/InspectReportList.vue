@@ -255,10 +255,10 @@ export default {
           id: 0,
           name: this.$t('remotePatrol.rankTime')
         },
-        // {
-        //   id: 1,
-        //   name: this.$t('remotePatrol.rankScore')
-        // },
+        {
+          id: 1,
+          name: this.$t('remotePatrol.rankScore')
+        },
         {
           id: 2,
           name: this.$t('remotePatrol.rankStore')

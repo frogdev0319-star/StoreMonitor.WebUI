@@ -123,28 +123,6 @@ $store: #fccc3f;
   }
 }
 
-.el-select-dropdown__wrap {
-    .el-select-dropdown__item {
-        font-family: NotoSansCJKtc;
-        background-color: #fff;
-        .selected {
-            color:#868FA1;
-        }
-    }
-    .el-select-dropdown__item:hover{
-      background-color: #aad7f7;
-    }
-    .dropdown__item {
-        .selected::after {
-            color: #E6F3F3
-        }
-    }
-}
-.el-select-dropdown__item.selected {
-  color: #1375bc;
-  font-weight: 700;
-}
-
 .date-picker {
   width:130px;
   height: 35px;

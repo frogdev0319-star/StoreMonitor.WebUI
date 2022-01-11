@@ -1,186 +1,203 @@
 <template>
-  <div class="el-device">
+  <div class="el-device paper">
     <div class="account-title">
       <span>{{ accountSettingMsg }}—{{ ezvizAccount }}</span>
     </div>
     <div class="device-content">
       <el-col :span="lang === 'en' && varWindowWidth < 1920 ? 11 : 11" class="lisde">
-        <div class="device-info">
-          <span class="info-title">{{ $t('deviceView.deviceInfo') }}</span>
-          <div class="operation-btns">
-            <el-button
-              :class=" lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
-              class="btn-class"
-              size="mini"
-              type="primary"
-              @click="showAddDialog"
-            >
-              <div class="btn-area">
-                <i class="iconfont el-icon-plus"/>
-                <span>{{ $t('deviceView.addDevice') }}</span>
-              </div>
-            </el-button>
-            <el-button
-              :disabled="tableData.length === 0"
-              class="el-delete-btn btn-class"
-              size="mini"
-              type="primary"
-              @click="showDeleteDialogMethod(0)"
-            >
-              <div class="btn-area">
-                <i class="iconfont icon-shanchu"/>
-                <span>{{ $t('deviceView.deleteDevice') }}</span>
-              </div>
-            </el-button>
-          </div>
+        <div class="flex-center padding" style="border-top: 1px solid rgba(172, 174, 177, .34);border-bottom: 1px solid rgba(172, 174, 177, .34);">
+          <span>{{ $t('deviceView.deviceInfo') }}</span>
+          <div class="spacer"></div>
+          <el-button
+            :class=" lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
+            class="storevue-button"
+            size="mini"
+            type="primary"
+            @click="showAddDialog"
+          >
+            <div class="btn-area">
+              <i class="iconfont el-icon-plus"/>
+              <span>{{ $t('deviceView.addDevice') }}</span>
+            </div>
+          </el-button>
+          <el-button
+            :disabled="tableData.length === 0"
+            class="storevue-button"
+            size="mini"
+            type="primary"
+            @click="showDeleteDialogMethod(0)"
+          >
+            <div class="btn-area">
+              <i class="iconfont icon-shanchu"/>
+              <span>{{ $t('deviceView.deleteDevice') }}</span>
+            </div>
+          </el-button>
         </div>
-        <table-pagination
-          ref="ezvizDeviceTable"
-          :column-data="columnData"
-          :table-data="tableData"
-          :table-operation ="columnOperationData"
-          :if-set-cell-style="false"
-          :header-class="accountHead"
-          :cell-class="accountCell"
-          :row-class="accountRow"
-          :show-border="false"
-          :show-selection-column="true"
-          :is-stripe = "false"
-          :is-device="true"
-          :total="total"
-          :table-height="varyDivHeight"
-          :is-loading-data="isLoadingData"
-          layout="jumper,total, prev,pager, next"
-          class="device-table"
-          @handleOperation="handleEmitOperation"
-          @emitRowClick="handleEmitRowClick"
-          @handleEdit="handleEmitEdit"
-          @handleChange="handlePageAndSizeChange"
-        />
+        <div class="spacer">
+          <table-pagination
+            ref="ezvizDeviceTable"
+            :column-data="columnData"
+            :table-data="tableData"
+            :table-operation ="columnOperationData"
+            :if-set-cell-style="false"
+            :header-class="accountHead"
+            :cell-class="accountCell"
+            :row-class="accountRow"
+            :show-border="false"
+            :show-selection-column="true"
+            :is-stripe = "false"
+            :is-device="true"
+            :total="total"
+            :table-height="varyDivHeight"
+            :is-loading-data="isLoadingData"
+            layout="jumper,total, prev,pager, next"
+            class="device-table"
+            headerBorder="rgba(172, 174, 177, .34)"
+            bodyBorder="rgba(172, 174, 177, .34)"
+            @handleOperation="handleEmitOperation"
+            @emitRowClick="handleEmitRowClick"
+            @handleEdit="handleEmitEdit"
+            @handleChange="handlePageAndSizeChange"
+          />
+      </div>
       </el-col>
       <el-col :span="lang === 'en' && varWindowWidth < 1920? 13: 13" class="risde">
-        <div class="device-info">
-          <span class="info-title">{{ $t('deviceView.deviceDetail') }}</span>
+        <div class="flex-center padding" style="border-top: 1px solid rgba(172, 174, 177, .34);border-bottom: 1px solid rgba(172, 174, 177, .34);">
+          <span>{{ $t('deviceView.deviceDetail') }}</span>
+          <div class="spacer"></div>
           <el-button
             :disabled="channelBtnDisabled"
             type="primary"
             size="mini"
-            class="add-btn btn-class"
+            class="storevue-button"
             @click="addNewChannel">
             <i class="iconfont el-icon-plus"/><span>{{ $t('deviceView.addChannel') }}</span>
           </el-button>
         </div>
-        <div :class="lang === 'en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
-          <div class="nape-dep-title titles">
-            <span>{{ $t('deviceView.devChannelNum') }}</span>
+        <div class="flex-center" style="color: #7d8cad;font-weight: 600;font-size: calc(14/1920*100vw);height:25px;border-bottom:1px solid rgba(172, 174, 177, .34)">
+          <div class="spacer">
+            {{ $t('deviceView.devChannelNum') }}
           </div>
-          <div class="nape-name-title titles">
-            <span>{{ $t('deviceView.channelName') }}</span>
+          <div class="spacer">
+            {{ $t('deviceView.channelName') }}
           </div>
-          <div class="nape-picture-title titles">
-            <span>{{ $t('deviceView.thumbnail') }}</span>
+          <div class="spacer">
+            {{ $t('deviceView.enableStatus') }}
           </div>
-          <div class="nape-enable-title titles">
-            <span>{{ $t('deviceView.enableStatus') }}</span>
-          </div>
-          <div class="nape-handle-title titles">
-            <span/>
+          <div class="spacer">
           </div>
         </div>
-        <el-scrollbar id="el-menuscrollbar">
-          <div class="channel-content">
-            <div
-              v-for="(item,index) in channelList"
-              :style="item.isClick ? {'background-color':'#FEE4E7'} : {}"
-              :key="index"
-              class="nape-items-data">
-              <div class="nape-dep-data">
-                <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
-                <el-select
-                  v-if="item.id === 0"
-                  v-model="item.channelId"
-                  :placeholder="$t('deviceView.selectDeviceChannel')"
-                  size="mini"
-                  class="nvr-select"
-                  style="margin-left: 10%">
-                  <el-option
-                    v-for="numList in newChannelNumList"
-                    :key="numList.value"
-                    :label="numList.label"
-                    :value="numList.value"
-                    :disabled="numList.disabled"/>
-                </el-select>
-              </div>
-              <div class="nape-name-data">
-                <span v-if="!item.isClick" class="nape-name">
-                  {{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}
-                </span>
-                <el-input
-                  v-if="item.isClick"
-                  v-model="item.tempName"
-                  :placeholder="$t('deviceView.inputInspectName')"
-                  size="mini"
-                  class="nape-input input-details"
-                  @input="(val)=>channelNameChange(val,item)"/>
-              </div>
-              <div :class="lang === 'en' ? 'en-nape-picture-data' : ''" class="nape-picture-data">
-                <span v-if="item.tempUrl">
-                  <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
-                    <div slot="error" class="image-slot">
-                      <i class="el-icon-picture-outline"/>
-                    </div>
-                  </el-image>
-                  <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
-                    <div slot="error" class="image-slot">
-                      <i class="el-icon-picture-outline"/>
-                    </div>
-                  </el-image>
-                </span>
-                <span v-else class="img-class" style="display: inline-block;background: #cccc;">
-                  <span style="color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
-                </span>
-                <el-upload
-                  v-if="item.isClick"
-                  :before-upload="beforeAvatarUpload"
-                  :on-change="handleEditChange"
-                  class="upload-demo"
-                  action=""
-                  list-type="picture">
-                  <el-button size="mini" type="primary">
-                    <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
-                  </el-button>
-                </el-upload >
-              </div>
-              <div class="nape-enable-handle">
-                <el-switch
-                  v-model="item.checkedStatus"
-                  @change="updateChannelImage(item)"
-                />
-              </div>
-              <div class="nape-items-handle">
-                <div v-if="item.isClick" class="iconcontent">
-                  <div class="iconlised" @click="confrimEditEzvizChannle(index,item)">
-                    <i class="el-icon-check"/>
-                  </div>
-                  <div class="iconrised" @click="cancelEditEzvizChannle(index,item)">
-                    <i class="el-icon-close"/>
-                  </div>
+        <div style="height: calc(100vh - 350px); overflow: auto;">
+          <div
+            v-for="(item,index) in channelList"
+            :style="item.isClick ? {'background-color':'#FEE4E7'} : {}"
+            :key="index"
+            class="nape-items-data">
+            <div class="nape-dep-data">
+              <span v-if="item.id !== 0 " class="nape-dep">{{ item.channelId }}</span>
+              <el-select
+                v-if="item.id === 0"
+                v-model="item.channelId"
+                :placeholder="$t('deviceView.selectDeviceChannel')"
+                size="mini"
+                class="nvr-select"
+                style="margin-left: 10%">
+                <el-option
+                  v-for="numList in newChannelNumList"
+                  :key="numList.value"
+                  :label="numList.label"
+                  :value="numList.value"
+                  :disabled="numList.disabled"/>
+              </el-select>
+            </div>
+            <div class="nape-name-data">
+              <span v-if="!item.isClick" class="nape-name">
+                {{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}
+              </span>
+              <el-input
+                v-if="item.isClick"
+                v-model="item.tempName"
+                :placeholder="$t('deviceView.inputInspectName')"
+                size="mini"
+                class="nape-input input-details"
+                @input="(val)=>channelNameChange(val,item)"/>
+            </div>
+            <div class="nape-enable-handle">
+              <el-switch
+                v-model="item.checkedStatus"
+                @change="updateChannelImage(item)"
+              />
+            </div>
+            <div class="nape-items-handle">
+              <div v-if="item.isClick" class="iconcontent">
+                <div class="iconlised" @click="confrimEditEzvizChannle(index,item)">
+                  <i class="el-icon-check"/>
                 </div>
-                <div v-if="!item.isClick" class="icon-list">
-                  <i
-                    class="iconfont icon-bianji"
-                    style="cursor:pointer;margin-right:10px;"
-                    @click="handleEdit(index,item)"/>
-                  <i
-                    v-if="curEzvizItem.addedMethod === 2"
-                    class="iconfont icon-shanchu"
-                    style="cursor:pointer;margin-right:10px;"
-                    @click="handleDelete(index, item)"/>
+                <div class="iconrised" @click="cancelEditEzvizChannle(index,item)">
+                  <i class="el-icon-close"/>
                 </div>
+              </div>
+              <div v-if="!item.isClick" class="icon-list">
+                <img 
+                  :src="`../../static/img/table-edit.png`" 
+                  @click="handleEdit(index,item)"
+                  height="26px" />
+                <i
+                  v-if="curEzvizItem.addedMethod === 2"
+                  class="iconfont icon-shanchu"
+                  style="cursor:pointer;margin-right:10px;"
+                  @click="handleDelete(index, item)"/>
               </div>
             </div>
           </div>
-        </el-scrollbar>
+        </div>
+        <dialog-pop
+          :is-form="true"
+          :title="$t('deviceView.addDevice')"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          :isWarning="true"
+          :visible="showAddChannelDialog"
+          :confirm-context="$t('deviceView.addChannel')"
+          dialog-width="510px"
+          @cancelHandler="showAddChannelDialog = false"
+          @confirmHandler="addSingleChannel">
+          <div class="form-slot">
+            <el-form
+              ref="channelForm"
+              :model="addChannelData"
+              :rules="channelRules"
+              class="deviceForm"
+              label-position="top"
+              size="mini">
+              <el-form-item style="margin-bottom: 20px;">
+                <el-col :span="24">
+                  <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
+                    <el-input
+                      v-model="addChannelData.name"
+                      style="width: 100%;"
+                      @input="(val)=>channelNameChange(val,{})"
+                      @blur="notShowInputRuleTips('channelName')"/>
+                    <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="24">
+                  <el-form-item :label="$t('deviceView.devChannelNum')" prop="channelId">
+                    <el-select v-model="addChannelData.channelId" size="mini">
+                      <el-option
+                        v-for="numList in newChannelNumList"
+                        :key="numList.value"
+                        :label="numList.label"
+                        :value="numList.value"
+                        :disabled="numList.disabled"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-form-item>
+            </el-form>
+          </div>
+        </dialog-pop>
         <el-dialog
           v-if="showDeleteChannel"
           :title="$t('deviceView.prompt')"
@@ -191,7 +208,6 @@
           top="35vh"
           left="40vh">
           <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
 
             <p style="margin-left:25px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
               <i
@@ -210,108 +226,20 @@
             </el-button>
           </div>
         </el-dialog>
-        <el-dialog
-          v-if="showAddChannelDialog"
-          :title="$t('deviceView.addChannel')"
-          :visible.sync="showAddChannelDialog"
-          :append-to-body="true"
-          :close-on-click-modal="false"
-          width="510px"
-          top="35vh"
-          left="40vh"
-          custom-class="addDevice"
-        >
-          <div class="dialog-content" style="overflow:hidden;width:100%;">
-            <hr style="border: 0.5px solid #dfe2e9;">
-            <el-form
-              ref="channelForm"
-              :model="addChannelData"
-              :rules="channelRules"
-              class="deviceForm"
-              label-position="top"
-              size="mini">
-              <el-form-item style="height: 57px;">
-                <el-col :span="12">
-                  <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
-                    <el-input
-                      v-model="addChannelData.name"
-                      style="width: 100%;"
-                      @input="(val)=>channelNameChange(val,{})"
-                      @blur="notShowInputRuleTips('channelName')"/>
-                    <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="10" :offset="2">
-                  <el-form-item :label="$t('deviceView.devChannelNum')" prop="channelId">
-                    <el-select v-model="addChannelData.channelId" size="mini">
-                      <el-option
-                        v-for="numList in newChannelNumList"
-                        :key="numList.value"
-                        :label="numList.label"
-                        :value="numList.value"
-                        :disabled="numList.disabled"
-                      />
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-              </el-form-item>
-              <el-from-item>
-                <el-col :span="6">
-                  <el-form-item ref="uploadElement" :label="$t('deviceView.thumbnail')" prop="pictureUrl">
-                    <el-input v-if="false" v-model="addChannelData.pictureUrl"/>
-                    <el-upload
-                      ref="upload"
-                      :show-file-list="false"
-                      :before-upload="beforeAvatarUpload"
-                      :on-change="handleChange"
-                      :data="addChannelData"
-                      class="avatar-uploader"
-                      action=""
-                      accept="image/png,image/jpg,image/jpeg"
-                      list-type="picture">
-                      <el-button size="mini" type="primary" style=" margin-bottom: 20px;position: relative;margin-right: 45px;">
-                        <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/>
-                        <span>{{ $t('deviceView.selectPicture') }}</span>
-                      </el-button>
-                      <el-image :src="addChannelData.pictureUrl" class="image-class">
-                        <div slot="error" class="image-slot">
-                          <span class="image-span">{{ $t('deviceView.preview') }}</span>
-                        </div>
-                      </el-image>
-                    </el-upload>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="varWindowWidth<1440? 14: 16" :offset="varWindowWidth<1440? 3: 1">
-                  <span class="picture-tips">*{{ $t('deviceView.thumbnailInfo') }}</span>
-                </el-col>
-              </el-from-item>
-
-            </el-form>
-          </div>
-          <div slot="footer" class="dialog-footer">
-            <el-button class="file-cancel-btn" size="mini" style="" @click="showAddChannelDialog = false">
-              {{ $t('deviceView.cancle') }}
-            </el-button>
-            <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleChannel">
-              {{ $t('deviceView.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
       </el-col>
     </div>
-    <el-dialog
-      v-if="showAddDeviceDialog"
+    <dialog-pop
+      :is-form="true"
       :title="$t('deviceView.addDevice')"
-      :visible.sync="showAddDeviceDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
-      width="610px"
-      top="35vh"
-      left="40vh"
-      custom-class="addDevice"
-    >
-      <div class="dialog-content" style="overflow:hidden;width:100%;">
-        <hr style="border: 0.5px solid #dfe2e9;">
+      :isWarning="true"
+      :visible="showAddDeviceDialog"
+      :confirm-context="$t('deviceView.confirm')"
+      dialog-width="510px"
+      @cancelHandler="showAddDeviceDialog = false"
+      @confirmHandler="addEzvizDeviceBasedForm">
+      <div class="form-slot">
         <el-form
           ref="deviceForm"
           :model="addDeviceData"
@@ -364,8 +292,8 @@
               </template>
             </div>
           </div>
-          <div v-else class="main-device-info">
-            <el-form-item style="height: 57px;">
+          <div v-else>
+            <el-form-item style="margin-bottom: 20px;">
               <el-col :span="13">
                 <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
                   <el-input
@@ -387,7 +315,7 @@
                 </el-form-item>
               </el-col>
             </el-form-item>
-            <el-form-item style="height: 57px;">
+            <el-form-item style="margin-bottom: 20px;">
               <el-col :span="deviceType === 0 || accountScope === 0 ? 24: 13">
                 <el-form-item :label="$t('deviceView.deviceName')" prop="name" style="margin-bottom:0;">
                   <el-input
@@ -422,7 +350,7 @@
                   :label="item.label"
                   :value="item.storeId"/>
               </el-select>
-              <span class="add-label" style="color: rgb(254, 163, 22); display: block">
+              <span class="add-label" style="color: #f7d057; display: block">
                 <span style="margin-right: 10px;font-size: 12px;">*</span>
                 {{ $t('deviceView.selectStoreInfo') }}
               </span>
@@ -430,19 +358,77 @@
           </div>
         </el-form>
       </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button
-          class="file-cancel-btn"
-          size="mini"
-          style=""
-          @click="showAddDeviceDialog = false">{{ $t('deviceView.cancle') }}</el-button>
-        <el-button
-          class="file-confirm-btn"
-          size="mini"
-          type="primary"
-          @click="addEzvizDeviceBasedForm">{{ $t('deviceView.confirm') }}</el-button>
+    </dialog-pop>
+    
+    <dialog-pop
+      :is-form="true"
+      :title="$t('deviceView.editDevice')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :isWarning="true"
+      :visible="showEditDeviceDialog"
+      :confirm-context="$t('deviceView.confirm')"
+      dialog-width="510px"
+      @cancelHandler="showEditDeviceDialog = false"
+      @confirmHandler="confirmEditDialog">
+      <div class="form-slot">
+        <el-form>
+          <el-form-item :label="$t('deviceView.serialNum')" prop="serialNumber" style="margin-bottom:0;">
+            <el-input
+              v-model="editingDevice.serialNumber"
+              disabled
+              @input="(val)=>serialNumberChange(val)"
+              @blur="notShowInputRuleTips('serialNum')"/>
+            <span v-if="serialRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
+            <el-input
+              v-model="editingDevice.name"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('deviceView.store')" prop="storeId">
+            <el-select
+              v-model="editingDevice.storeId"
+              :filter-method="filterStoreOption"
+              filterable
+              disabled
+              style="width: 100%;">
+              <el-option
+                v-for="item in storeDataList"
+                :key="item.storeId"
+                :label="item.label"
+                :value="item.storeId"/>
+            </el-select>
+            <span class="add-label" style="color: #f7d057; display: block">
+              <span style="margin-right: 10px;font-size: 12px;">*</span>
+              {{ $t('deviceView.selectStoreInfo') }}
+            </span>
+          </el-form-item>
+        </el-form>
       </div>
-    </el-dialog>
+    </dialog-pop>
+    <dialog-pop
+      :is-form="true"
+      :title="$t('deviceView.editDevice')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :isWarning="true"
+      :visible="showEditChannelDialog"
+      :confirm-context="$t('deviceView.confirm')"
+      dialog-width="510px"
+      @cancelHandler="showEditChannelDialog = false"
+      @confirmHandler="confirmEditDialog">
+      <div class="form-slot">
+        <el-form>
+          <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom: 20px;">
+            <el-input
+              v-model="curChannelItem.tempName"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+    </dialog-pop>
+    
     <el-dialog
       v-if="showDeleteDialog"
       :title="$t('titleView.confirmInfo')"
@@ -453,7 +439,6 @@
       top="35vh"
       left="40vh">
       <div class="dialog-content" style="overflow:hidden;width:100%;">
-        <hr style="border: 0.5px solid #dfe2e9;">
         <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
           <i
             class="el-icon-warning"
@@ -480,11 +465,12 @@ import filterString from '@/common/filterString';
 import util from '@/common/util';
 import lodash from 'lodash';
 import TablePagination from '@/components/TablePagination';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'EzvizDeviceMgmt',
   components: {
-    TablePagination
+    TablePagination, DialogPop
   },
   data() {
     return {
@@ -604,6 +590,8 @@ export default {
         ]
       },
       showAddChannelDialog: false,
+      showEditDeviceDialog: false,
+      showEditChannelDialog: false,
       file: '',
       deleteChannelId: 0,
       isUpdate: false,
@@ -659,7 +647,8 @@ export default {
       deviceType: 0,
       deviceSource: 0,
       avilableDeviceList: [],
-      isLoadingData: true
+      isLoadingData: true,
+      editingDevice: {}
     };
   },
 
@@ -743,9 +732,10 @@ export default {
       ezvizRESTful.updateEzvizDevice(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg && errMsg === 'Success') {
-          deviceInfo.name = deviceInfo.tempDeviceName;
+          self.setDeviceListParams()
           self.getChannelListByDevice(self.curEzvizItem.serialNumber);
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          if (this.showEditDeviceDialog) this.showEditDeviceDialog = false
         } else {
           deviceInfo.tempDeviceName = deviceInfo.name;
           util.setErrorMsg(res.errMsg, false);
@@ -766,11 +756,17 @@ export default {
       const breadcrumbsName = this.accountScope === 0 ? 'storeViuAccountDeviceSetting' : 'userAccountDeviceSetting';
       this.$route.matched[2].name = breadcrumbsName;
     },
-
+    handleUpdateDevice (row) {
+      
+      this.curChannelItem = {...row};
+      this.editingDevice = {...row}
+      this.showEditDeviceDialog = true
+    },
     handleEmitOperation(methodsAndRowObj) {
       const method = methodsAndRowObj.method;
       switch (method) {
         case 'edit': {
+          this.handleUpdateDevice(methodsAndRowObj.row)
           break;
         }
         case 'delete': {
@@ -912,13 +908,14 @@ export default {
 
     handleEdit(index, item) {
       const self = this;
-      item.isClick = true;
-      self.curChannelItem = item;
-      self.channelList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isClick = false;
-        }
-      });
+      // item.isClick = true;
+      self.curChannelItem = {...item};
+      this.showEditChannelDialog = true
+      // self.channelList.forEach((_item, _index) => {
+      //   if (index !== _index) {
+      //     _item.isClick = false;
+      //   }
+      // });
     },
 
     cancelEditEzvizChannle(index, item) {
@@ -965,7 +962,7 @@ export default {
       }
     },
 
-    async updateEzvizChannel(item) {
+    async updateEzvizChannel() {
       const self = this;
       if (self.curChannelItem.tempName.trim().length === 0) {
         util.notify(self.$t('deviceView.channelNameEmpty'), 'warning', 3000);
@@ -979,7 +976,7 @@ export default {
       try {
         const promiseArr = [];
         self.curChannelItem.name !== self.curChannelItem.tempName && promiseArr.push(ezvizRESTful.updateEzvizChannel(params));
-        item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateAttachImage());
+        // item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateAttachImage());
 
         const results = await Promise.all(promiseArr);
         results.forEach(result => {
@@ -987,10 +984,11 @@ export default {
             throw Error(result.errMsg);
           }
         });
+        this.showEditChannelDialog = false
         self.getChannelListByDevice(self.curEzvizItem.serialNumber);
         util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
       } catch (e) {
-        item.isClick = false;
+        // item.isClick = false;
         util.setErrorMsg(e.message, false);
         this.showAddDeviceDialog = false;
       }
@@ -1506,6 +1504,13 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.setDeviceListParams();
+    },
+    confirmEditDialog () {
+      if (this.showEditDeviceDialog) {
+        this.confirmUpdateDevice({...this.editingDevice, tempDeviceName: this.editingDevice.name })
+      } else {
+        this.updateEzvizChannel()
+      }
     }
   }
 };
@@ -1530,15 +1535,12 @@ export default {
     #{$poi}:checkRem($val);
   }
   @mixin titleStyle{
-    height: 60px;
-    line-height: 60px;
     text-align: left;
   }
   *{
     font-family: Roboto,Arial, Microsoft YaHei;
   }
   .operation-btns{
-    float: right;
     @include point(margin-right,15);
     .iconfont{
       font-size: calc(16/1920*100vw);
@@ -1580,32 +1582,17 @@ export default {
   }
 
   .el-device {
-    height: calc(100vh - 170px);
-    border: 1px solid $border;
-    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     .account-title {
       text-align: left;
-      position: relative;
       height: 70px;
       line-height: 70px;
       padding-right: calc(30 / 1920 * 100vw);
       padding-left: calc(30 / 1920 * 100vw);
       font-size: calc(20 / 1920 * 100vw);
       color: #182752;
-      border-bottom: 1px solid $border;
-      .btns {
-        position: absolute;
-        @include point(right, 25);
-        z-index: 979;
-        @include point(width, 90);
-      }
-      .device-btns {
-        position: absolute;
-        z-index: 979;
-        right: 30px;
-        top: 23px;
-        float: right;
-      }
     }
     .table-container {
       min-height: calc(100% - 75px);
@@ -1616,8 +1603,7 @@ export default {
       background: $tab;
     }
     .device-content {
-      padding: 25px calc(25 / 1920 * 100vw) 0 0;
-      height: calc(100% - 95px);
+      height: 100%;
       bottom: calc(30/1920*100vw);
       .dialog-content{
         width: 100%;
@@ -1674,86 +1660,26 @@ export default {
         }
       }
       .lisde{
-        background-color: $background;
-        height: calc(100% - 1px);
-        position: relative;
-        .icon-filter{
-          position: relative;
-          left: 20%;
-          cursor: pointer;
-        }
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
       }
       .risde{
         background-color: #ffffff;
-        height: 100%;
-        .iconcontent{
-          .iconlised{
-            float: left;
-            position: relative;
-            background-color: $mainColor;
-            padding: 1px 6px;
-            color: #fff;
-            border-width: 1px 1px 1px 1px;
-            border-style: solid;
-            border-color: #ddd;
-            @include point(line-height,21);
-            @include point(height,21);
-          }
-          .iconrised{
-            float: left;
-            position: relative;
-            padding: 1px 6px;
-            border-width: 1px 1px 1px 0px;
-            border-style: solid;
-            border-color: #ddd;
-            background-color: #fff;
-            @include point(line-height,21);
-            @include point(height,21);
-          }
-        }
-        padding:0 15px;
-        .tabTitle{
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 1px solid $border;
-          @include titleStyle;
-        }
-        .nape-items-title{
-          border-bottom: 1px solid $border;
-          @include titleStyle;
-          font-size: calc(14/1920*100vw);
-        }
-        .nape-dep-title{
-          width: 23%;
-        }
-        .nape-name-title{
-          width: 28%;
-        }
-        .nape-picture-title{
-          width: 20%;
-        }
-        .nape-enable-title{
-          width: 20%;
-        }
-        .nape-handle-title{
-          width: 9%;
-        }
         .nape-items-title .titles, .en-nape-items-title .titles{
           color: $tab;
           text-align: left;
         }
         .channel-content{
-          height: calc(100% - 160px);
+          overflow: auto;
         }
         .nape-items-data{
           overflow: hidden;
-          position: relative;
-          padding-left: 1%;
           font-size: 14px;
           height: 90px;
           line-height: 90px;
           display: flex;
-          text-align: left;
           .nape-input{
             width: calc(160/1920*100vw);
             margin-left: calc(20/1920*100vw);
@@ -1761,9 +1687,7 @@ export default {
             bottom: 2px;
           }
           .nape-name-data{
-            width: 28%;
-            display: inline-block;
-            position: relative;
+            flex: 1;
             /*margin-right: 6%;*/
             span{
               margin-left: 10%;
@@ -1775,18 +1699,14 @@ export default {
             }
           }
           .nape-dep-data{
-            width: 23%;
-            display: inline-block;
-            position: relative;
+            flex: 1;
             span{
               margin-left: calc(25/1920*100vw);
             }
           }
           .nape-picture-data{
-            width: 20%;
+            flex: 1;
             height: 100%;
-            display: inline-block;
-            position: relative;
             .img-class{
               height: 90%;
               width: calc(100/1920*100vw);
@@ -1827,24 +1747,18 @@ export default {
             width: 20%;
           }
           .nape-enable-handle{
-            width: 20%;
-            margin-left: calc(20/1920*100vw);
+            flex: 1;
           }
           .nape-items-handle{
-            width: 9%;
-            display: inline-block;
-            position: relative;
+            
+            flex: 1;
             .iconcontent{
-              position: absolute;
-              top: 50%;
-              transform: translateY(-50%);
             }
             .iconfont{
               font-size: calc(24/1920*100vw);
               color: #7d8cad !important;
             }
             .icon-list{
-              display: flex;
             }
           }
         }
@@ -1875,7 +1789,6 @@ export default {
   @import '../../../../assets/css/pagination.css';
   @import '../../../../assets/css/tabsItem.css';
   #el-menuscrollbar{
-    height: calc(100% - 120px);
   }
   #el-menuscrollbar .el-scrollbar__wrap {
     overflow-x: hidden;
@@ -1885,7 +1798,6 @@ export default {
   }
   .el-dialog__body .dialog-content .deviceForm{
     box-sizing: border-box;
-    padding: 32px calc(40/1920*100vw) 0px calc(40/1920*100vw);
   }
   .el-dialog__body .dialog-content .deviceForm .picture-tips{
     display: inline;
@@ -1959,8 +1871,8 @@ export default {
     padding: 20px calc(20/1920*100vw) 0;
   }
   .el-switch.is-checked .el-switch__core{
-    border-color: #00FF00;
-    background-color: #00FF00;
+    border-color: #c60957;
+    background-color: #c60957;
   }
   .avatar-uploader .picture-tips{
     display: inline;
@@ -1999,11 +1911,11 @@ export default {
     font-size: 16px;
   }
   .device-table{
-    height: calc(100% - 60px);
-    position: relative;
+    height: 100%;
+    background: #f5f7fa;
   }
   .device-table .el-table--mini{
-    height: calc(100% - 92px);
+    height: 100%;
     background: #f5f7fa;
   }
   .device-table .el-table__row{
@@ -2021,13 +1933,13 @@ export default {
     background-color: #fff;
   }
   .device-table .el-table__body tr.current-row > td{
-    background-color: #fff;
-    color: #f31d65;
+    background-color: #f2f9fe;
+    color: #006ab7;
   }
   .device-table .el-table__body tr.current-row .el-table-column--selection .cell {
     color: #fff;
-    border-left: 4px solid #f31d65;
-    line-height: 40px;
+    border-left: 4px solid #006ab7;
+    line-height: 20px;
   }
   .device-table .el-table__body tr .el-table-column--selection .cell {
     color: #fff;
@@ -2052,15 +1964,5 @@ export default {
     height: auto;
     position: absolute;
     margin-right: calc(15/1920*100vw);
-  }
-  .el-table th.is-leaf:first-child{
-    border-left: 4px solid  rgba(255,255,255,0);
-  }
-</style>
-<style scoped>
-  .el-input--small >>>.el-input__inner{
-    background: #f0f5f8 !important;
-    border-radius: 15px !important;
-    line-height: 50% !important;
   }
 </style>

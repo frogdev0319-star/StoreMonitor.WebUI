@@ -783,6 +783,7 @@ export default {
     "deviceNameEmpty": "장치 이름 입력",
     "deviceSeriNum": "장치 SN",
     "duplicateSeriNum": "중복된 장치 일련 번호",
+    "editDevice": "Edit Device",
     "editFail": "편집할 수 없습니다.",
     "editImage": "이미지 편집",
     "editSuss": "편집했습니다!",

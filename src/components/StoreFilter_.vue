@@ -3,7 +3,7 @@
     <div class="content">
       <div class="search-label">{{ $t('remotePatrol.storeSelect') }}</div>
       <div class="header-details">
-        <div style="width:116px;">
+        <div style="width:8.125vw;">
           <el-select
               v-model="curCountry"
               :placeholder="$t('remotePatrol.country')"
@@ -24,7 +24,7 @@
             readonly
             class="input-class"/>
         </div>
-        <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+        <hr class="hr-vertical">
         <region-multi-select
             ref="proviceSelect"
             :selected="curProvince"
@@ -34,7 +34,7 @@
             :all="$t('overview.allZoneI')"
             class="region"
             @changeInput="onChangeProvince"/>
-        <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+        <hr class="hr-vertical">
         <region-multi-select
             ref="citySelect"
             :selected="curCity"
@@ -44,7 +44,7 @@
             :all="$t('overview.allZoneII')"
             class="region"
             @changeInput="onChangeCity"/>
-        <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+        <hr class="hr-vertical">
         <multi-select
             class="store-group-select region"
             :selected="curStoreGroup"
@@ -53,7 +53,7 @@
             :alltype="0"
             :options="storeGroupList"
             @changeInput="onChangeStoreGroup"/>
-        <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+        <hr class="hr-vertical">
         <multi-select
             class="store-group-select region"
             :selected="curStoreType"

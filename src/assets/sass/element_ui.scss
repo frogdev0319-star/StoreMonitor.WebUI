@@ -123,7 +123,7 @@ body .el-table th.gutter {
   padding-left: calc(20/1920*100vw) !important;
 }
 .cell-class:first-child .cell{
-  padding-left: calc(70/1920*100vw) !important;
+  padding-left: calc(0/1920*100vw) !important;
 }
 .el-table__empty-block{
   border-bottom: 1px solid #e3e9f4;
@@ -153,11 +153,10 @@ body .el-table th.gutter {
 }
 .ezviz-account .el-form-item__content{
   display: inline-block;
-  margin-left: 0 !important;
-  width: 70%;
+  width: 100%;
 }
 .access-token .el-form-item__content{
-  width: 70%;
+  width: 100%;
   display: inline-block;
   align-items: center;
 }
@@ -176,6 +175,7 @@ body .el-table th.gutter {
 }
 .ezviz-account .el-form-item , .accountForm .el-form-item {
   margin-bottom: 15px;
+  display: flex;
 }
 .el-dialog__body .dialog-content .accountForm label {
   padding: 0
@@ -273,7 +273,3 @@ body .el-table th.gutter {
   display: none;
 }
 
-.el-switch.is-checked .el-switch__core {
-  border-color: #00FF00;
-  background-color: #00FF00;
-}

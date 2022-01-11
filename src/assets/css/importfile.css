@@ -75,9 +75,9 @@ input:disabled{
     padding: 0px !important;
 }
 .el-dialog__title{
-    font-size: 14px !important;
+    /* font-size: 14px !important;
     color: #303133 !important;
-    float:left !important;
+    float:left !important; */
 }
 
 /*远程巡店及门店监控tab页样式*/

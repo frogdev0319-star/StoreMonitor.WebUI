@@ -93,41 +93,6 @@
           </div>
         </el-col>
       </el-row>
-      <el-row class="task-row paper">
-        <div class="top">
-          <div class="titles">
-            <span class="title">{{ $t('overview.patrolRanking') }}</span>
-            <span class="arrows" @click="changWorkerRanking">
-              <span v-if="isWorstWork" class="order-span">{{ $t('overview.descendingOrder') }}</span>
-              <span v-else class="order-span">{{ $t('overview.ascendingOrder') }}</span>
-              <img v-if="isWorstWork" :src="descending" class="img-class">
-              <img v-else :src="ascending" class="img-class">
-            </span>
-          </div>
-        </div>
-        <div class="task-dashboard">
-          <div v-if="taskList.length > 0" :class="taskList.length < 5 ? 'space-task': ''" class="task-board">
-            <div v-for="(item,index) in taskList" :key="index" class="task-item">
-              <div class="task-panel">
-                <el-progress
-                  :percentage="item.percent"
-                  :show-text="false"
-                  class="process-panel"
-                  type="dashboard"
-                  color="#8fd92e"/>
-                <div class="percent-num">
-                  <span v-if="!item.appended" class="num">{{ item.completionRate }}</span>
-                  <span v-if="!item.appended" class="percent">%</span>
-                </div>
-              </div>
-              <div class="task-supervisor-name">{{ item.supervisorName }}</div>
-            </div>
-          </div>
-          <div v-else class="task-empty">
-            {{ $t('overview.noData') }}
-          </div>
-        </div>
-      </el-row>
       <el-row class="items-row">
         <el-col :span="6" class="evalution-pct paper">
           <div class="title">{{ $t('overview.itemsAssessment') }}</div>
@@ -545,6 +510,7 @@ export default {
         options.series[1].data = temp;
         options.radar.splitNumber = 5;
         self.itemsRadarOption = options;
+        console.log(options)
       } catch (e) {
         self.itemsRadarOption = options;
         console.log('PatrolOverview-showItemRadar:' + e);
@@ -636,22 +602,33 @@ export default {
         series: [
           {
             type: 'radar',
-            data: []
+            data: [],
+            symbol: 'none',
           },
           {
             type: 'radar',
             data: [],
+            symbol: 'none',
             name: this.$t('remotePatrol.inspectionItems'),
             radarIndex: 1,
             itemStyle: {
               normal: {
                 lineStyle: {
-                  color: '#f11e66',
+                  color: 'rgba(245, 146, 73, 1)',
                   width: 1
                 },
                 areaStyle: {
-                  color: 'rgba(243, 29, 101, 0.5)'
-                }
+                color: new ECharts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: 'rgba(245, 146, 73, 0.4)'
+                  },
+                  {
+                    offset: 1,
+                    color: 'rgba(245, 146, 73, 0.01)'
+                  }
+                ])
+              }
               }
             },
             tooltip: {
@@ -1532,9 +1509,6 @@ export default {
           xAxis: [
             {
               'type': 'category',
-              'axisLabel': {
-                'interval': 0
-              },
               'data': [],
               padding: 0,
               axisLine: {
@@ -1557,6 +1531,7 @@ export default {
           yAxis: [
             {
               type: 'value',
+              name: '次',
               axisLine: {
                 show: false
               },

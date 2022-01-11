@@ -782,6 +782,7 @@ export default {
     "deviceNameEmpty": "デバイス名を入力してください",
     "deviceSeriNum": "デバイスSN",
     "duplicateSeriNum": "デバイスシリアル番号が重複しています",
+    "editDevice": "Edit Device",
     "editFail": "編集できませんでした！",
     "editImage": "イメージの編集",
     "editSuss": "正常に編集されました！",

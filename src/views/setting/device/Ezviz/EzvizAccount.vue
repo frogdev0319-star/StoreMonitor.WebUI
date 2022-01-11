@@ -9,7 +9,7 @@
         <span>{{ $t('deviceView.addEzvizAccount') }}</span>
       </div>
     </account-header>
-    <div class="table-container">
+    <div class="paper padding">
       <table-pagination
         ref="ezvizAccoutTable"
         :column-data="columnData"
@@ -28,6 +28,7 @@
       :title="$t('deviceView.deleteAccount')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :isWarning="true"
       :visible="showDeleteAccount"
       @visibleChangeHandler="updateDeleteAccountDialogFlag($event, 1)"
       @cancelHandler="hideDeleteAccountDialog(1)"
@@ -44,6 +45,7 @@
       :title="accountTitle"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :isWarning="true"
       :visible="showAddAccount"
       :confirm-context="isAdd ? $t('deviceView.confirmAdd') : $t('deviceView.confirm')"
       :confirm-btn-disabled="!isAccessTokenValid"
@@ -73,18 +75,20 @@
           </el-form-item>
           <div v-if="ezvizAccountInfo.scope === 0 && !isAdd">
             <el-col :span="24">
-              <el-form-item :label="`${this.$t('deviceView.mobilePhone')}${this.$t('deviceView.charterSize')}`"
+              <el-form-item :label="`${this.$t('deviceView.mobilePhone')}`"
                             :error="errorAccount" prop="ezvizAccount">
                 <el-input v-model="ezvizAccountInfo.ezvizAccount" style="width: 100%;" readonly/>
+                <p style="margin: 0;text-align: right;color: rgb(144, 147, 153);">{{this.$t('deviceView.charterSize')}}</p>
               </el-form-item>
             </el-col>
           </div>
           <div v-else>
             <el-row>
-              <el-col :span="12">
-                <el-form-item :label="`${this.$t('deviceView.mobilePhone')}${this.$t('deviceView.charterSize')}`"
+              <el-col :span="24">
+                <el-form-item :label="`${this.$t('deviceView.mobilePhone')}`"
                               :error="errorAccount" prop="ezvizAccount">
                   <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />
+                  <p style="margin: 0;text-align: right;color: rgb(144, 147, 153);">{{this.$t('deviceView.charterSize')}}</p>
                 </el-form-item>
               </el-col>
             </el-row>

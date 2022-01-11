@@ -1,24 +1,22 @@
 <template>
   <div class="account-title-btn">
-    <div class="operation-title">
-      <div>
-        <div v-show="authorizedDevicesNum < addedDeviceNumber" class="prompt-info">
-          <img :src="errorImgSource" class="error-img">
-          <span class="error-msg">
-            {{ $t('deviceView.deviceLimitation') }}
-          </span>
-        </div>
+    <div class="operation-title flex-center">
+      <div v-show="authorizedDevicesNum < addedDeviceNumber" class="prompt-info">
+        <img :src="errorImgSource" class="error-img">
+        <span class="error-msg">
+          {{ $t('deviceView.deviceLimitation') }}
+        </span>
       </div>
-      <div class="device-num-btn">
+      <div class="device-num-btn spacer">
         <div>
           {{ $t('deviceView.authorizedDevicesNum') }} {{ authorizedDevicesNum }}
         </div>
         <div class="available-device">
           {{ $t('deviceView.addedDeviceNumber') }} {{ addedDeviceNumber }}
         </div>
+        <div class="spacer"></div>
         <delay-button
           :disabled="authorizedDevicesNum === 0"
-          class="inspction-btn"
           @click="onClick">
           <slot class="button"/>
         </delay-button>
