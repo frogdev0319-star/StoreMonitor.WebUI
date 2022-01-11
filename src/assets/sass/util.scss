@@ -181,6 +181,30 @@ $CTA:#c60957;
 .required-name{
   color: $mainColor;
 }
+.storevue-select {
+  .el-input__inner {
+    border-color: #c9cdd5 !important;
+  }
+  .is-focus {
+    .el-input__inner {
+      border-color: #adadad !important;
+    }
+  }
+}
+.el-select-dropdown__wrap {
+    .el-select-dropdown__item {
+        background-color: #fff;
+    }
+    .el-select-dropdown__item:hover{
+      color: #1375bc;
+    }
+}
+.el-select-dropdown__item.selected {
+  color: #1375bc;
+  font-weight: 400;
+  background: url("~@/../static/img/select-checked.svg") no-repeat;
+  background-position: center right 10px;
+}
 
 .storevue-button {
   background-color: #fff;

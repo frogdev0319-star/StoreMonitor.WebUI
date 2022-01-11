@@ -1298,15 +1298,6 @@ $collapseWidth: 5.5%;
   line-height: 60px;
   color: #484848;
 }
-.el-select-dropdown__item.hover,
-.el-select-dropdown__item:hover {
-  background-color: #f2f9fe !important;
-  color: #484848 !important;
-}
-.el-select-dropdown__item.selected {
-  background-color: #f2f9fe !important;
-  color: #484848 !important;
-}
 #el-menuscrollbar {
   height: calc(100% - 225px);
 }
