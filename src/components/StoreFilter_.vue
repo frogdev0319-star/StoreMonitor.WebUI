@@ -63,10 +63,10 @@
             :options="storeTypeList"
             @changeInput="onChangeStoreType"/>
       </div>
-      
+
     </div>
     <div class="flex-center padding-left" style="text-align: left; margin-top: 20px">
-      <div class="paper" 
+      <div class="paper"
         @click="showFavorite = !showFavorite"
         :style="showFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}"
         style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px; text-align: center">
@@ -193,7 +193,7 @@ export default {
       this.storeOptions = this.allInitStoreList.filter(store => selected.includes(store.storeId)).map(store =>({
         value: store.storeId,
         label: store.name
-      }))      
+      }))
     },
     selectedStore () {
       var temp = this.allInitStoreList.filter(store=> store.storeId === this.selectedStore)
@@ -203,7 +203,7 @@ export default {
       this.storeOptions = this.allInitStoreList.filter(store => store.favorite).map(store =>({
         value: store.storeId,
         label: store.name
-      }))      
+      }))
     }
   },
 
@@ -691,7 +691,7 @@ export default {
 
     getSearchParams() {
       const searchParams = this.cachedParams;
-      
+
       if (Object.keys(searchParams).length > 0) {
         if (searchParams.curCountry) {
           this.curCountry = searchParams.curCountry;
@@ -744,13 +744,13 @@ export default {
       margin-right: calc(15/1920*100vw);
       min-width: 85px;
       min-height: 36px;
-      
+
     }
     .region{
       display:inline;
       width: calc(217/1440*100vw);
     }
-    
+
     .normal-span{
       font-size: calc(14/1920*100vw);
       margin-right: calc(20/1920*100vw);
@@ -791,14 +791,14 @@ export default {
 </style>
 <style lang="scss" scoped>
   .input {
-    \deep\ .el-input__inner {
+    /deep/ .el-input__inner {
       height: 36px;
       line-height: 36px;
       border: none;
       box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
     }
   }
-  
+
   .el-select-dropdown__item{
     padding: 0 20px 0 20px !important;
     /*color: #7d8cad;*/
@@ -830,14 +830,14 @@ export default {
     position: absolute;
     left: 0;
   }
-  \deep\ .el-select .el-input--medium .el-input__suffix{
+  /deep/ .el-select .el-input--medium .el-input__suffix{
     top:0px !important;
-    
+
   }
-  \deep\ .el-select__tags{
+  /deep/ .el-select__tags{
     opacity: 0;
   }
-  \deep\ .input-class.el-input--medium .el-input__inner{
+  /deep/ .input-class.el-input--medium .el-input__inner{
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     border: none;
@@ -849,7 +849,7 @@ export default {
     min-width: 55px;
     min-height: 28px;
   }
-  \deep\ .el-select.el-select--medium .el-input .el-input__inner{
+  /deep/ .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
     z-index: 1;
     background: transparent !important;
@@ -861,11 +861,11 @@ export default {
     min-width: 85px;
   }
 
-  \deep\ .el-select.el-select--medium .el-input .el-input__suffix-inner{
+  /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
-  \deep\ .el-input--medium .el-input__icon {
+  /deep/ .el-input--medium .el-input__icon {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
     min-height: 28px;
@@ -882,7 +882,7 @@ export default {
     min-height: 28px;
     min-width: 85px;
   }
-  \deep\ .el-select__tags{
+  /deep/ .el-select__tags{
     opacity: 0;
   }
 </style>

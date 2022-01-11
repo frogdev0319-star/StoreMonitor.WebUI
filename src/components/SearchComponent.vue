@@ -226,11 +226,11 @@ export default {
       this.params.curStore= this.storeFilterObj.curStore;
       this.params.curStoreGroup= this.storeFilterObj.curStoreGroup;
       this.params.curStoreType= this.storeFilterObj.curStoreType;
-  
+
       const emitParmas = {};
       emitParmas.searchParams = this.params;
       emitParmas.dateRangeList = this.daysRangeList;
-      
+
       emitParmas.regionI = this.storeFilterObj.curRegionI;
       emitParmas.regionII = this.storeFilterObj.curRegionII;
       emitParmas.regionMode = this.storeFilterObj.regionMode;
@@ -365,7 +365,7 @@ export default {
     position: relative;
     .store-filter{
       display: inline-block;
-    
+
     }
     .header-details{
       text-align: left;
@@ -398,8 +398,8 @@ export default {
           margin-right: 60px;
         }
       }
-      
-      
+
+
       .normal-span{
         font-size: calc(14/1440*100vw);
         margin-right: calc(20/1440*100vw);
@@ -477,17 +477,17 @@ export default {
     padding: 0 20px 0 20px !important;
     /*color: #7d8cad;*/
   }
-  
+
   .input-class{
     width: calc(100% - 30px);
     position: absolute;
     left: 0;
   }
-  >>> .el-select .el-input--medium .el-input__suffix{
+  /deep/ .el-select .el-input--medium .el-input__suffix{
     top:0px !important;
-    
+
   }
-  >>> .input-class.el-input--medium .el-input__inner{
+  /deep/ .input-class.el-input--medium .el-input__inner{
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     border: none;
@@ -499,7 +499,7 @@ export default {
     min-width: 55px;
     min-height: 28px;
   }
-  >>> .el-select.el-select--medium .el-input .el-input__inner{
+  /deep/ .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
     z-index: 1;
     background: transparent !important;
@@ -511,11 +511,11 @@ export default {
     min-width: 85px;
   }
 
-  >>> .el-select.el-select--medium .el-input .el-input__suffix-inner{
+  /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
-  >>> .el-input--medium .el-input__icon {
+  /deep/ .el-input--medium .el-input__icon {
     line-height: calc(36/1920*100vw);
     height: calc(36/1920*100vw);
     min-height: 28px;
