@@ -878,14 +878,14 @@ export default {
     }
     &.is-opened {
       background-color: #e4f3fd;
-      // .el-submenu__title {
-      //   span {
-      //     color: #006ab7;
-      //   }
-      // }
-      .item-icon {
-        background-color:#006ab7;
+      .el-submenu__title {
+        span {
+          color: #006ab7;
+        }
       }
+      // .item-icon {
+      //   background-color:#006ab7;
+      // }
       .menu_img {
         display: none;
       }
