@@ -2483,23 +2483,7 @@ $h1: #292e36;
   border-bottom-color: #34374a !important;
 }
 </style>
-<style scoped>
-.el-search-input.el-input--small >>> .el-input__inner {
-  background: #f4f5f9 !important;
-  border-radius: 5px !important;
-  height: 32px !important;
-  line-height: 32px !important;
-  padding-left: 30px;
-  color: #425262;
-  letter-spacing: 0px;
-  width: 235px;
-  font-size: calc(14 / 1920 * 100vw);
-}
 
-.el-channel-search-input.el-search-input.el-input--small >>> .el-input__inner {
-  width: 100%;
-}
-</style>
 
 <style>
 @import "../../assets/css/importfile.css";
