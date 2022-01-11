@@ -4,7 +4,7 @@
       <div class="header">
         <div
           :style="collapsed?{'width':'90px'}:{'width':'290px'}"
-          :class="logoClass" 
+          :class="logoClass"
           class="logo-content">
           <img style="position: absolute;left:32px;top:38px" id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
           <div v-if="!collapsed" style="position: absolute;left:32px;top:68px; font-size: 15px">{{$t(`route.meta`)}}</div>
@@ -83,7 +83,7 @@
           class="drawer-bg"
           @click="handleClickOutside"
         />
-        <aside 
+        <aside
           class="sider"
           :class="collapsed?'sider-collapsed':'sider-expand'"
         >
@@ -123,8 +123,8 @@
                 :index="item.children[0].path"
                 :disabled="item.isReadOnly"
               >
-                <img class="menu_img" :src="`../../static/img/menu/${index}.png`" height="26px" />
-                <img class="menu_img-active" :src="`../../static/img/menu/${index}-active.png`" height="26px" />
+                <img class="menu_img" :src="`./static/img/menu/${index}.png`" height="26px" />
+                <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" height="26px" />
                 <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
               </el-menu-item>
 
@@ -135,8 +135,8 @@
                 :index="index+''"
                 :style="groupHeight+'px'">
                 <template slot="title">
-                  <img class="menu_img" :src="`../../static/img/menu/${index}.png`" height="26px" />
-                  <img class="menu_img-active" :src="`../../static/img/menu/${index}-active.png`" height="26px" />
+                  <img class="menu_img" :src="`./static/img/menu/${index}.png`" height="26px" />
+                  <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" height="26px" />
                   <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                 </template>
                 <div v-for="child in item.children" :key="child.path">
@@ -166,7 +166,7 @@
                         :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
                         :index="grandChild.path"
                         :disabled="grandChild.isReadOnly"
-                        
+
                         class="submenu-item">
                         <template>
                           <span>{{ $t(`route.${grandChild.name}`) }}</span>
@@ -176,7 +176,7 @@
                   </el-submenu>
                 </div>
               </el-submenu>
-              
+
               <hr class="hr-horizontal" style="width: calc(100% - 40px); margin: auto;"/>
             </div>
           </el-menu>
@@ -232,7 +232,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.0.4 &copy; {{ getFullYear }} Advantech Intelligent City
+                v3.0.0.5 &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>
