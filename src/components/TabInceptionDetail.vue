@@ -32,10 +32,15 @@
                 :table-data="detailTbl.table_data"
                 :highlight-current-row= "true"
                 :tableHeight = "300"
+                :pagesize = "detailTbl.sizeNum"
+                :total = "detailTbl.total"
+                :current-page = "detailTbl.page"
+                layout = "prev,pager,next"
                 :headerStyle="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
                 :is-event = "false"
-                :showPagination = "false"
+                :showPagination = "true"
                 @onCellClick ="handleEmitDetailRowClick"
+                @handleChange="handlePageAndSizeChange_detail"
             />
         </div>
         <div v-if="currentTab=='NotInspected'" class="not-inspected">
@@ -54,12 +59,16 @@
                 class="tbl-TabInspecDetail"
                 :column-data="eventTbl.column_data"
                 :table-data="eventTbl.table_data"
+                :pagesize = "eventTbl.sizeNum"
+                :total = "eventTbl.total"
+                :current-page="eventTbl.page"
                 :headerStyle="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
                 :highlight-current-row= "true"
                 :is-event = "false"
                 :showPagination = "true"
                 @onCellClick ="handleEmitPersonEventRowClick"
                 layout = "prev,pager,next"
+                @handleChange="handlePageAndSizeChange_event"
             />
         </div>
     </div>
@@ -147,9 +156,12 @@ export default {
                     'isCellClick':true
                     }
                 ],
+                all_data:[],
                 table_data:[],
                 defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-                
+                total:0,
+                sizeNum:5,
+                page:1,
             },
             notInspectedStores:[],
             shopImg: require('../../static/img/statistics/ic_shop.svg'),
@@ -220,8 +232,12 @@ export default {
                     'isCellClick':true
                     }
                 ],
+                all_data:[],
                 table_data:[],
                 defaultSort: { prop: 'numOfTotal', order: 'ascending' },
+                total:0,
+                sizeNum:5,
+                page:1
             },
             submitterName:""
         };
@@ -267,17 +283,33 @@ export default {
                         reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
                         temp.push(reportObj);
                     });
-                    self.submitterName = temp[0].submitterName;
-                    self.detailTbl.table_data = temp;
+                    if(temp.length>0){
+                        self.submitterName = temp[0].submitterName;
+                        self.detailTbl.all_data = temp;
+                        self.detailTbl.total = temp.length;
+                        this.setDetailTableData();
+                    }
                     resolve(temp);
                 }).catch(err => {
                 console.log('InspectReportList-getReportList: ' + err);
             });
         });
       },
+      setDetailTableData(){
+        this.detailTbl.table_data = [];
+        this.detailTbl.table_data = [...this.detailTbl.all_data.slice( (this.detailTbl.page - 1)* this.detailTbl.sizeNum, this.detailTbl.page* this.detailTbl.sizeNum)];
+
+      },
+      handlePageAndSizeChange_detail(pageObj){
+        console.log("handlePageAndSizeChange_detail:",pageObj)
+        const self = this;
+        self.detailTbl.page = pageObj.page;
+        self.detailTbl.sizeNum = pageObj.size;
+        self.setDetailTableData();
+      },
       formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => v[j]));
-    },
+        return jsonData.map(v => filterVal.map(j => v[j]));
+      },
       export2Excel(){
         const self = this;
         let table = "", fileName="";
@@ -419,7 +451,9 @@ export default {
                         
                 });
                 //console.log("temp:",temp);
-                this.eventTbl.table_data = temp;
+                this.eventTbl.all_data = temp;
+                this.eventTbl.total = temp.length;
+                this.setEventTableData();
                 resolve(temp);
             }).catch(err => {
             console.log('InspectReportList-getReportList: ' + err);
@@ -432,6 +466,16 @@ export default {
           //sessionStorage.setItem('report_data', JSON.stringify(row));
         //self.$router.push({ name: 'EventStatistics', params: { data: row }});
       },
+      setEventTableData(){
+        this.eventTbl.table_data = [];
+        this.eventTbl.table_data = [...this.eventTbl.all_data.slice( (this.eventTbl.page - 1)* this.eventTbl.sizeNum, this.eventTbl.page* this.eventTbl.sizeNum)];
+      },
+      handlePageAndSizeChange_event(pageObj){
+        const self = this;
+        self.eventTbl.page = pageObj.page;
+        self.eventTbl.sizeNum = pageObj.size;
+        self.setEventTableData();
+      }
     },
     
     

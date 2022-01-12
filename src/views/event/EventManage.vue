@@ -904,10 +904,10 @@ export default {
       const self = this;
       //const eventIds = [];
       //eventIds.push(self.event.id);
-      console.log("this.closingEventId:",this.closingEventId);
+      //console.log("this.closingEventId:",this.closingEventId);
       const comments = {
         ts: new Date().getTime(),
-        description: this.$t('eventView.closing'),
+        //description: this.$t('eventView.closing'),
         status: 2
       };
       const params = {
