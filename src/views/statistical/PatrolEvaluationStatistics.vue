@@ -154,10 +154,10 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
+         <el-col  style="overflow-x:auto;position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
                   <v-chart  v-if="part1.storeMode==1" 
                             ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
-                      autoresize
+                                autoresize
                             :style="{width:part1.barStoreOption?part1.barStoreOption.width :'100%',height:'100%'}" />
                   <div v-else style="margin-top:20.5px;height:100%;">
                   <div style="margin-top:20.5px;">
@@ -202,7 +202,7 @@
                   </div>
            </el-col>  
       </div> 
-       <div class="statistics-content" style="height:930px;margin-top:18px">
+       <div class="statistics-content" style="height:980px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -249,9 +249,11 @@
                       </el-col> 
                     </el-col>
                 </el-row>
-        <el-row  :span="24" class="partition" style="height:320px">
-          <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption"        autoresize
-                            :style="{width:part2.barRegionOption?part2.barRegionOption.width :'100%',height:'100%'}" />
+        <el-row  :span="24" class="partition" style="height:320px;width:95%">
+          <div  style="overflow-x:auto;height:320px;overflow-y:hidden">
+            <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption"   auto-resize 
+                              :style="{width:part2.barRegionOption?part2.barRegionOption.width :'100%',height:'100%'}" />
+            </div>
           <div style="position:absolute;right:0px;top:0px" @click='changePart2RegionOrder'>
                   <div class="button-area" >
                       <span style="color:#acaeb1">{{ part2.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
@@ -290,28 +292,46 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  class="partition"  style="position:absolute;height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
-                  <v-chart  v-if="part2.storeMode==1" 
-                            ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize
-                            :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
-                  <div v-else style="main-rgtop:20.5px;height:100%;overflow-y: scroll;">
-                    <table-pagination
+         <el-col  class="partition"  style="position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
+                  <div v-if="part2.storeMode==1"  style="overflow-x:auto;height:100%">
+                    <v-chart  
+                              ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" 
+                               autoresize
+                              :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
+                  </div>
+                  <div v-else style="main-rgtop:20.5px;height:100%;overflow-x:auto;">
+                    <div style="margin-top:20.5px;">
+                    <table-oly
                       ref="elTP"
-                      :column-data="part2StoreInfoTableCol"
+                     :column-data="part2StoreInfoTableCol"
                       :table-data="part2.storeTableData"
                       :total="part2.table.total"
                       :highlight-current-row= "true"
-                      :pagesize="part2.table.sizeNum"
-                      :current-page="part2.table.page"
+                      :pagesize="sizeNum"
+                      :current-page="page"
                       :is-event = "false"
                       :default-sort = "defaultSort"
                       :allowRowExpand = "true"
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :tableHeight = "300"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
                       @handleChange="handlePageAndSizeChangePart2"
                       @sortChange="handleSortChangePart2"
+                      @onCellClick = "onEvenListNumClick"
+                    />
+                  </div>
+                  <div style="width:100%; margin-top:12px;height:31px;">
+                  <tbl-pagination-only
+                    :total="part2.table.total"
+                    :pagesize="part2.table.sizeNum"
+                    :current-page="part2.table.page"
+                    layout = "prev,pager, next,sizes,slot"
+                    @sizeChange="handlePageAndSizeChangePart2"
+                    @currentChange="handlePageAndSizeChangePart2"
                   />
+                </div>
                 </div>
                 <div  v-if="part2.storeMode==1"  
                       style="position:absolute;right:40px;top:30px;height:40px" @click='changePart2StoreOrder'>
@@ -365,8 +385,8 @@
                       </el-col>
                      </el-col>
           </el-row>
-        <el-row  :span="24" class="partition" style="height:320px">
-            <el-col  :span="24" style="height:100%">
+        <el-row  :span="24" class="partition" style="overflow-x:auto;height:370px">
+            <el-col  :span="24" style="height:100%;overflow-x:auto;">
                <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
                             :style="{width:part3.barRegionOption?part3.barRegionOption.width :'100%',height:'100%'}" />
             <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
@@ -412,7 +432,7 @@
                   <v-chart  v-if="part3.storeMode==1" 
                             ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
                             :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
-                  <div v-else style="margin-top:20.5px;height:100%;overflow-y: scroll;">
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;">
                     <table-pagination
                       ref="elTP"
                       :column-data="part3StoreInfoTableCol"
@@ -1142,37 +1162,32 @@ export default {
         this.part1.table.sizeNum = e.size;
         this.getPart1StoreBar();
     },
-    handleCurrentChangePart1(e){
-        this.part1.table.page = e.page;
-        this.part1.table.sizeNum = e.size;
-        this.getPart1StoreBar();
-    },
     handleSortChangePart1(e){
-        console.log(e)
         this.part1.table.order = e.direction;
         this.part1.table.property = e.property;
         this.getPart1StoreBar();
     },
     handlePageAndSizeChangePart2(e){
+        console.log(e)
         this.part2.table.page = e.page;
         this.part2.table.sizeNum = e.size;
         this.getPart2StoreBar();
     },
     handleSortChangePart2(e){
-        console.log(e)
+        this.part2.table.order = e.direction;
+        this.part2.table.property = e.property;
+        this.getPart2StoreBar();
     },
     handlePageAndSizeChangePart3(e){
+        console.log(e)
         this.part3.table.page = e.page;
         this.part3.table.sizeNum = e.size;
         this.getPart3StoreBar();
     },
     handleSortChangePart3(e){
-        console.log(e)
-    },
-    handlePageAndSizeChangePart1(e){
-        this.part1.table.page = e.page;
-        this.part1.table.sizeNum = e.size;
-        this.getPart1StoreBar();
+       this.part3.table.order = e.direction;
+        this.part3.table.property = e.property;
+        this.getPart3StoreBar();
     },
 
     onSwitchPart1Mode(mode){
@@ -1846,7 +1861,7 @@ export default {
          params.groupMode = 5;
       }
       
-        params.filter = { page: 0, size: params.groupIds.length };
+        params.filter = { page: 0, size: params.groupIds.length>0?params.groupIds.length:1 };
         console.log("Get Part1 Region bar")
         console.log(params)
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
@@ -1997,8 +2012,8 @@ export default {
               property: (this.part1.storeMode==1) ? (this.part1.indexType==0?"numOfDangerous":this.part1.indexType==1?"numOfImproved":"numOfQualified"): this.part1.table.property,
             }
             params.filter={
-              page:this.part1.table.page-1,
-              size:this.part1.table.sizeNum
+              page:(this.part1.storeMode==1) ? 0:this.part1.table.page-1,
+              size:(this.part1.storeMode==1) ?params.storeIds.length: this.part1.table.sizeNum
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
@@ -2040,10 +2055,9 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-
+      regionData.push(0)
+      regionLabel.push("")
       if(regionLabel.length>20){
-        regionData.push(0)
-        regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
       }
       else{
@@ -2094,7 +2108,8 @@ export default {
       }
       let totalReport = 0;
       let totalStandard = 0;
-      params.filter = { page: 0, size: params.groupIds.length };
+        params.filter = { page: 0, size: params.groupIds.length>0?params.groupIds.length:1 };
+        console.log(params)
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2109,8 +2124,7 @@ export default {
                   totalStandard +=  item.averageScore * item.numOfReport;
             })       
             this.part2.averageScore =  totalStandard>0? Math.round( (totalStandard) /totalReport):-9999;
-            console.log("Leave FIlterContent")
-            console.log(this.part2.content)
+         
             this.part2.indexRegion = -1;
             this.drawPart2RegionBar();
           }
@@ -2156,9 +2170,9 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      regionData.push(0)
+      regionLabel.push("")
       if(regionLabel.length>20){
-        regionData.push(0)
-        regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
       }
       else{
@@ -2188,18 +2202,19 @@ export default {
             params.storeIds = this.part2.content[this.part2.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
             params.order={
-              direction: this.part2.storeOrder,
-              property:"averageScore"
+              direction: (this.part2.storeMode==1) ? this.part2.storeOrder : this.part2.table.order,
+              property: (this.part2.storeMode==1) ? "averageScore": this.part2.table.property,
             }
             params.filter={
-              page:this.part2.table.page-1,
-              size:this.part2.table.sizeNum
+              page:(this.part2.storeMode==1) ? 0:this.part2.table.page-1,
+              size:(this.part2.storeMode==1) ?params.storeIds.length: this.part2.table.sizeNum
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
                   content = result.content
+                 this.part2.table.total = result.totalPages;
                   console.log(result)
               }
             }
@@ -2226,9 +2241,9 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      regionData.push(0)
+      regionLabel.push("")
       if(regionLabel.length>20){
-        regionData.push(0)
-        regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
       }
       else{
@@ -2281,7 +2296,7 @@ export default {
       
       let totalReport = 0;
       let totalStandard = 0;
-      params.filter = { page: 0, size: params.groupIds.length };
+      params.filter = { page: 0, size: params.groupIds.length>0?params.groupIds.length:1 };
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2377,9 +2392,13 @@ export default {
               direction: this.part3.storeOrder,
               property:"standardRate"
             }
+            params.order={
+              direction: (this.part3.storeMode==1) ? this.part3.storeOrder : this.part3.table.order,
+              property: (this.part3.storeMode==1) ? "standardRate": this.part3.table.property,
+            }
             params.filter={
-              page:this.part3.table.page-1,
-              size:this.part3.table.sizeNum
+              page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
+              size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
@@ -2387,6 +2406,7 @@ export default {
               if (result) {
                   content = result.content
                   console.log(result)
+                  this.part3.table.total = result.totalPages;
               }
             }
         }
