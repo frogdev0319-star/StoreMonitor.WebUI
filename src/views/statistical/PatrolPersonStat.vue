@@ -2,7 +2,7 @@
   <div>
     <el-row  class="statistics-container">
       <el-col :span="24">
-        <div class="statistics-header">
+        <div class="statistics-header" style="margin-bottom:0px;">
           <div class="search-bar">
             <date-time-selector class="time-selector" @change="dateChange"/>
             <div class="person-title">
@@ -55,25 +55,32 @@
             </delay-button>
           </div>
         </div>
-        
-        <div class="event-table">
-        <table-pagination
-          ref="elTP"
-          :column-data="insRecordColData"
-          :table-data="insRecordTableData"
-          :total="total"
-          :highlight-current-row= "true"
-          :pagesize="sizeNum"
-          :current-page="page"
-          :is-event = "false"
-          :default-sort = "defaultSort"
-          :allowRowExpand = "true"
-          expand-component = "TabInceptionDetail"
-          :expandCompProperties = "componentsProps"
-          @handleChange="handlePageAndSizeChange"
-          @sortChange="handleSortChange"
-        />
-      </div>
+        <div style="margin-top:20.5px;">
+          <table-only
+            ref="elTP"
+            :column-data="insRecordColData"
+            :table-data="insRecordTableData"
+            :highlight-current-row= "true"
+            :is-event = "false"
+            :default-sort = "defaultSort"
+            :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+            :tableHeight = "610"
+            :allowRowExpand = "true"
+            expand-component = "TabInceptionDetail"
+            :expandCompProperties = "componentsProps"
+            @sortChange="handleSortChange"
+          />
+        </div>
+        <div style="width:100%; margin-top:12px;height:31px;">
+          <tbl-pagination-only
+            :total="total"
+            :current-page="page"
+            :page-size="sizeNum"
+            layout = "prev,pager, next,sizes,slot"
+            @sizeChange="handlePageAndSizeChange"
+            @currentChange="handlePageAndSizeChange"
+          />
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -89,7 +96,8 @@ import resize from '@/components/mixins/echartResize';
 import {
   getInspectStatsOverPersonV3
 } from '@/api/inspectOverview';
-import TablePagination from '@/components/TablePagination_V2';
+import TableOnly from '@/components/TableOnly';
+import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import DateTimeSelector from '@/components/DateTimeSelector';
@@ -105,11 +113,12 @@ export default {
   components: {
     DialogPop,
     DelayButton,
-    TablePagination,
+    TableOnly,
     'v-chart': ECharts,
     DateTimeSelector,
     RegionMultiSelect,
-    TabInceptionDetail
+    TabInceptionDetail,
+    TblPaginationOnly
   },
   mixins: [resize],
   data() {
@@ -200,7 +209,7 @@ export default {
           'isExpand':false
         },*/
         {
-          'prop': 'processedRate',
+          'prop': 'processedRateStr',
           'label': this.$t('statistics.patrolPerson.processedRate'),
           'sortable': 'custom',
           'width': '145',
@@ -384,7 +393,7 @@ export default {
       //console.log("doSearchInsRecordList > params:",this.params);
       let record = await this.getInspectStatsPersonInfo(param);
       this.allInsRecordData = record.data.content;
-      this.total = this.allInsRecordData.length;
+      this.total = Math.ceil(this.allInsRecordData.length/this.sizeNum);
       this.doCoverDepartmentToString();
       //console.log("this.total:",this.total);
       //console.log("this.allInsRecordData:",this.allInsRecordData);
@@ -395,7 +404,7 @@ export default {
       this.allInsRecordData.map(record =>{
         record.id=record.supervisorId;
         record.departs = record.departments.toString();
-        record.processedRate = record.processedRate+'%';
+        record.processedRateStr = record.processedRate+'%';
       })
     },
     getInspectStatsPersonInfo(params) {

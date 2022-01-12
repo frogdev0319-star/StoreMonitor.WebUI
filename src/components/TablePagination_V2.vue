@@ -478,7 +478,7 @@ export default {
     display: block;
     height: 0;
     clear:both;
-    overflow: auto;
+    overflow: hidden;
   }
   .toolbar{
     float: right;
