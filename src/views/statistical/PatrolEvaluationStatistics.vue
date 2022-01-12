@@ -249,9 +249,9 @@
                       </el-col> 
                     </el-col>
                 </el-row>
-        <el-row  :span="24" class="partition" style="height:320px;width:95%">
-          <div  style="overflow-x:auto;height:320px;overflow-y:hidden">
-            <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption"   auto-resize 
+        <el-row  :span="24" class="partition" style="height:320px;width:100%">
+          <div  style="overflow-x:auto;height:320px">
+            <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption"     
                               :style="{width:part2.barRegionOption?part2.barRegionOption.width :'100%',height:'100%'}" />
             </div>
           <div style="position:absolute;right:0px;top:0px" @click='changePart2RegionOrder'>
@@ -292,16 +292,13 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  class="partition"  style="position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
-                  <div v-if="part2.storeMode==1"  style="overflow-x:auto;height:100%">
-                    <v-chart  
-                              ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" 
-                               autoresize
-                              :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
-                  </div>
+         <el-col  class="partition"  style="overflow-x:auto;position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
+                  <v-chart  v-if="part2.storeMode==1" 
+                            ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize
+                            :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
                   <div v-else style="main-rgtop:20.5px;height:100%;overflow-x:auto;">
                     <div style="margin-top:20.5px;">
-                    <table-oly
+                    <table-only
                       ref="elTP"
                      :column-data="part2StoreInfoTableCol"
                       :table-data="part2.storeTableData"
@@ -1861,7 +1858,7 @@ export default {
          params.groupMode = 5;
       }
       
-        params.filter = { page: 0, size: params.groupIds.length>0?params.groupIds.length:1 };
+        params.filter = { page: 0, size: params.groupIds.length };
         console.log("Get Part1 Region bar")
         console.log(params)
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
@@ -2108,8 +2105,7 @@ export default {
       }
       let totalReport = 0;
       let totalStandard = 0;
-        params.filter = { page: 0, size: params.groupIds.length>0?params.groupIds.length:1 };
-        console.log(params)
+      params.filter = { page: 0, size: params.groupIds.length };
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2296,7 +2292,7 @@ export default {
       
       let totalReport = 0;
       let totalStandard = 0;
-      params.filter = { page: 0, size: params.groupIds.length>0?params.groupIds.length:1 };
+      params.filter = { page: 0, size: params.groupIds.length };
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
