@@ -1870,10 +1870,6 @@ export default {
     border: 1px solid  #dfe3e9;
     padding: 20px calc(20/1920*100vw) 0;
   }
-  .el-switch.is-checked .el-switch__core{
-    border-color: #c60957;
-    background-color: #c60957;
-  }
   .avatar-uploader .picture-tips{
     display: inline;
     font-size: 12px;

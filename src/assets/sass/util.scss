@@ -12,7 +12,7 @@ $mainColor: #006ab7;
 $black: #182752;
 $primary:#556679;
 $CTA:#c60957;
-
+$sv_red: #c60957;
 @import url('../css/pagination.css');
 .clear-float::after{
   content: '';
@@ -125,7 +125,30 @@ $CTA:#c60957;
 .storevue-form-dialog {
   @extend .storevue-dialog;
 }
-
+.storevue-checkbox {
+  // &.el-checkbox {
+  //   font-size: calc(18/1920*100vw);
+  // }
+  .is-checked, .is-focus {
+    .el-checkbox__inner {
+      background-color: #e0f2ff;
+      border-color: #2c90d9;
+    }
+  }
+  .el-checkbox__inner {
+    &::after {
+      border: 1px solid #2c90d9;
+      height: 8px;
+      left: 6px;
+      top: 2px;
+      border-left: 0;
+      border-top: 0;
+    }
+    border: 1px solid #acaeb1;
+    height: calc(18/1920*100vw);
+    width: calc(18/1920*100vw);
+  }
+}
 .storevue-form-dialog .el-dialog__header{
   padding: 20px;
   font-size: 24px;
@@ -136,6 +159,11 @@ $CTA:#c60957;
   background-color: #f7f9fa;    
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
+}
+
+.el-switch.is-checked .el-switch__core{
+  border-color: $sv_red;
+  background-color: $sv_red;
 }
 
 .confirm-btn{
@@ -188,6 +216,21 @@ $CTA:#c60957;
   .is-focus {
     .el-input__inner {
       border-color: #adadad !important;
+    }
+  }
+}
+.device-select {
+  .el-input__inner {
+    border-color: #f4f6f7 !important;
+    background-color: #f4f6f7;
+    height: calc(30/1920*100vw);
+  }
+  .el-input__icon {
+    line-height: calc(30/1920*100vw);
+  }
+  .is-focus {
+    .el-input__inner {
+      border-color: #f4f6f7 !important;
     }
   }
 }

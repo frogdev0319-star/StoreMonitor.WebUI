@@ -1,32 +1,15 @@
 <template>
   <div class="device-container">
-    <div class="btn-col">
-      <div class="operation-btns">
-        <el-button
-          class="el-add-btn btn-class"
-          size="mini"
-          type="primary"
-          @click="addBeseyeDeviceDialog"
-        >
-          <div class="btn-area">
-            <i class="iconfont el-icon-plus"/>
-            <span>{{ $t('deviceView.addDevice') }}</span>
-          </div>
-        </el-button>
-        <el-button
-          class="el-add-btn btn-class"
-          size="mini"
-          type="primary"
-          @click="showDeleteDialogMethod"
-        >
-          <div class="btn-area">
-            <i class="iconfont icon-shanchu"/>
-            <span>{{ $t('deviceView.deleteDevice') }}</span>
-          </div>
-        </el-button>
-      </div>
-    </div>
-    <div class="table-container">
+    <device-header
+      ref="deviceHeader"
+      :vendor="3"
+      :account="skywatchAccount"
+      :device-list="beseyeDevicesList"
+      :serial-nums="deleteSerialNums"
+      :channel-ids="deleteChannelIds"
+      @addDeviceHandler="addBeseyeDeviceDialog"
+      @deleteDeviceHandler="showDeleteDialogMethod"/>
+    <div class="table-container paper padding">
       <div class="device-title">
         <div class="header-sn">
           <el-checkbox v-model="checkAllDevice" class="header-checkbox" @change="changeIfCheckAllDevices"/>
@@ -34,98 +17,84 @@
         </div>
         <div class="header-name">{{ $t('deviceView.deviceName') }}</div>
         <div class="header-store">{{ $t('deviceView.store') }}</div>
-        <div class="header-picture">
-          <span>{{ $t('deviceView.thumbnail') }}</span>
-        </div>
         <div class="header-status">{{ $t('deviceView.enableStatus') }}</div>
         <div class="header-operation">{{ $t('deviceView.operation') }}</div>
       </div>
       <div v-if="beseyeDevicesList.length > 0">
-        <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-          <div :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
-            <div
-              v-for="(item,index) in beseyeDevicesList"
-              :key="index"
-              :class="!item.isClick ? 'noraml-color' : 'active-color'"
-              class="device-data group-title"
-              @click="clickBeseyeDevice(index,item)">
-              <div class="data-sn titles">
-                <el-checkbox v-model="item.isChecked" class="data-checkbox" @change="changeIfCheckDevice(item, index)"/>
-                <div class="data-sn-name titles">
-                  <span>{{ item.serialNumber }}</span>
-                </div>
-              </div>
-              <div class="data-name titles">
-                <span v-if="!item.isEditing">{{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}</span>
-                <el-input
-                  v-if="item.isEditing"
-                  v-model="item.tempDeviceName"
-                  size="mini"
-                  class="device-name-input"
-                  @input="(val)=>deviceNameChange(val,item)"/>
-              </div>
-              <div class="data-store titles">
-                <span>{{ item.store }}</span>
-              </div>
-              <div class="data-picture titles">
-                <span v-if="item.tempUrl">
-                  <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
-                    <div slot="error" class="image-slot">
-                      <i class="el-icon-picture-outline"/>
-                    </div>
-                  </el-image>
-                  <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
-                    <div slot="error" class="image-slot">
-                      <i class="el-icon-picture-outline"/>
-                    </div>
-                  </el-image>
-                </span>
-                <span v-else class="img-class" style="display: inline-block;background: #cccc;">
-                  <span style="color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
-                </span>
-                <el-upload
-                  v-if="item.isEditing"
-                  :before-upload="beforeAvatarUpload"
-                  :on-change="handleEditChange"
-                  class="upload-demo"
-                  action=""
-                  list-type="picture">
-                  <el-button size="mini" type="primary">
-                    <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
-                  </el-button>
-                </el-upload >
-              </div>
-              <div class="data-status titles">
-                <el-switch
-                  v-model="item.checkedStatus"
-                  @change="changeBeseyeChannelImage(item)"
-                />
-              </div>
-              <div class="data-operation titles">
-                <div v-if="item.isEditing" class="iconcontent">
-                  <div class="iconlised" @click="confirmEditBeseye(index,item)">
-                    <i class="el-icon-check"/>
-                  </div>
-                  <div class="iconrised" @click="cancelEditBeseye(index,item)">
-                    <i class="el-icon-close"/>
-                  </div>
-                </div>
-                <div v-if="!item.isEditing" class="iconcontent">
-                  <div
-                    class="iconlised normal-left-icon"
-                    @click="editBeseyeDevice(index,item)">
-                    <i class="iconfont icon-bianji"/>
-                  </div>
-                  <div
-                    class="iconrised normal-right-icon"
-                    @click="showDeleteBeseyeDeviceDialog(index,item)">
-                    <i class="iconfont icon-shanchu"/>
-                  </div>
-                </div>
-              </div>
+        <div
+          v-for="(item,index) in beseyeDevicesList"
+          :key="index"
+          :class="!item.isClick ? 'noraml-color' : 'active-color'"
+          class="device-data group-title"
+          @click="clickBeseyeDevice(index,item)">
+          <div class="data-sn titles">
+            <el-checkbox v-model="item.isChecked" class="data-checkbox" @change="changeIfCheckDevice(item, index)"/>
+            <div class="data-sn-name titles">
+              <span>{{ item.serialNumber }}</span>
             </div>
           </div>
-        </el-scrollbar>
+          <div class="data-name titles">
+            <span v-if="!item.isEditing">{{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}</span>
+            <el-input
+              v-if="item.isEditing"
+              v-model="item.tempDeviceName"
+              size="mini"
+              class="device-name-input"
+              @input="(val)=>deviceNameChange(val,item)"/>
+          </div>
+          <div class="data-store titles">
+            <span>{{ item.store }}</span>
+          </div>
+          <div class="data-status titles">
+            <el-switch
+              v-model="item.checkedStatus"
+              @change="changeBeseyeChannelImage(item)"
+            />
+          </div>
+          <div class="data-operation flex-center">
+            <!-- <div v-if="item.isEditing" class="flex-center">
+              <div class="iconlised" @click="confirmEditBeseye(index,item)">
+                <i class="el-icon-check"/>
+              </div>
+              <div class="iconrised" @click="cancelEditBeseye(index,item)">
+                <i class="el-icon-close"/>
+              </div>
+            </div> -->
+            <div class="flex-center" style="justify-content: center; width: 100%">
+              <img 
+                class="child-space"
+                :src="`./static/img/table-edit.png`" 
+                @click="editBeseyeDevice(index,item)"
+                height="26px" />
+              <img 
+                class="child-space"
+                :src="`./static/img/table-delete.png`" 
+                @click="showDeleteBeseyeDeviceDialog(index,item)"
+                height="26px" />
+            </div>
+          </div>
+        </div>
+        <dialog-pop
+          :is-form="true"
+          :title="$t('deviceView.editDevice')"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          :isWarning="true"
+          :visible="showEditDeviceDialog"
+          :confirm-context="$t('deviceView.confirm')"
+          dialogWidth="520"
+          @cancelHandler="showEditDeviceDialog = false"
+          @confirmHandler="confirmEditBeseye">
+          <div class="form-slot">
+            <el-form>
+              <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom: 20px;">
+                <el-input
+                  v-model="editingDevice.name"
+                />
+              </el-form-item>
+            </el-form>
+          </div>
+        </dialog-pop>
         <div class="toolbar pagination" style="width:100%; margin-top:10px;">
           <el-pagination
             :page-size="sizeNum"
@@ -236,9 +205,12 @@ import { getBriefStoreList } from '@/api/store';
 import filterString from '@/common/filterString';
 import util from '@/common/util';
 import lodash from 'lodash';
+import DeviceHeader from '../DeviceHeader';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'BeseyeDeviceMgmt',
+  components: { DeviceHeader, DialogPop },
   data() {
     return {
       total: 0,
@@ -261,7 +233,12 @@ export default {
       deleteSerialNums: [],
       deleteChannelIds: [],
       loadingData: true,
-      deleteInfo: ''
+      deleteInfo: '',
+      showEditDeviceDialog: false,
+      editingDevice: {
+        name: '',
+        serialNumber: ''
+      }
     };
   },
 
@@ -426,22 +403,17 @@ export default {
       self.getBeseyeDeviceList(this.setParams());
     },
 
-    async confirmUpdateChannle(index, item) {
+    async confirmUpdateChannle(item) {
       const self = this;
-      self.isUpdate = false;
-      const params = {};
-      params.id = item.id;
-      params.name = item.name;
       const promiseArr = [];
-      item.name !== item.tempDeviceName && promiseArr.push(beseyeRESTful.updateBeseyeDevice(
-        {serialNumber: item.serialNumber, name: item.tempDeviceName}));
-
-      item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateImage(item.id));
-      item.name = item.tempDeviceName;
+      this.editingDevice.name && promiseArr.push(beseyeRESTful.updateBeseyeDevice(
+        {serialNumber: this.editingDevice.serialNumber, name: this.editingDevice.name}));
       const results = await Promise.all(promiseArr);
       results.forEach(result => {
         if (result.errCode !== 0) {
           throw Error(result.errMsg);
+        } else {
+          self.showEditDeviceDialog = false
         }
       });
     },
@@ -540,12 +512,8 @@ export default {
     },
 
     editBeseyeDevice(index, item) {
-      item.isEditing = true;
-      this.beseyeDevicesList.forEach((_item, _index) => {
-        if (index !== _index) {
-          _item.isEditing = false;
-        }
-      });
+      this.editingDevice = {...item};
+      this.showEditDeviceDialog = true;
     },
 
     async changeBeseyeChannelImage(item){
@@ -569,20 +537,18 @@ export default {
       }
     },
 
-    async confirmEditBeseye(index, item) {
-      if (item.tempDeviceName.trim().length === 0) {
+    async confirmEditBeseye() {
+      if (this.editingDevice.name.trim().length === 0) {
         util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
         return false;
       }
       try {
-        await this.confirmUpdateChannle(index, item);
+        await this.confirmUpdateChannle();
 
         util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
         this.isEditing = false;
         this.getBeseyeDeviceList(this.setParams());
       } catch (error) {
-        item.isEditing = false;
-        item.checkedStatus = item.status === 1;
         util.setErrorMsg(error.message, false);
       }
     },
@@ -774,13 +740,10 @@ export default {
         width: 20%;
       }
       .header-status{
-        width: 10%;
-      }
-      .header-picture{
-        width: 20%;
+        flex: 1;
       }
       .header-operation{
-        width: 10%;
+        flex: 1;
       }
     }
     .device-data{
@@ -820,13 +783,10 @@ export default {
         width: 20%;
       }
       .data-status{
-        width: 10%;
-      }
-      .data-picture{
-        width: 20%;
+        flex: 1;
       }
       .data-operation{
-        width: 10%;
+        flex: 1;
       }
       .data-picture{
         height: 100%;
@@ -1100,10 +1060,6 @@ export default {
     border: 1px solid  #dfe3e9;
     padding: 20px calc(20/1920*100vw) 0;
   }
-  .el-switch.is-checked .el-switch__core{
-    border-color: #00FF00;
-    background-color: #00FF00;
-  }
   .avatar-uploader .picture-tips{
     display: inline;
     font-size: 12px;
@@ -1269,10 +1225,6 @@ export default {
     background-color: #f6fbf9;
     border: 1px solid  #dfe3e9;
     padding: 20px calc(20/1920*100vw) 0;
-  }
-  .el-switch.is-checked .el-switch__core{
-    border-color: #00FF00;
-    background-color: #00FF00;
   }
   .avatar-uploader .picture-tips{
     display: inline;

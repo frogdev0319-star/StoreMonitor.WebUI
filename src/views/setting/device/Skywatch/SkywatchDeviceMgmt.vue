@@ -18,9 +18,6 @@
         </div>
         <div class="header-name">{{ $t('deviceView.deviceName') }}</div>
         <div class="header-store">{{ $t('deviceView.store') }}</div>
-        <div class="header-picture">
-          <span>{{ $t('deviceView.thumbnail') }}</span>
-        </div>
         <div class="header-status">{{ $t('deviceView.enableStatus') }}</div>
         <div class="header-operation">{{ $t('deviceView.operation') }}</div>
       </div>
@@ -38,44 +35,16 @@
             </div>
           </div>
           <div class="data-name titles">
-            <span v-if="!item.isEditing">{{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}</span>
-            <el-input
+            <span >{{ item.name.length > 15 ? item.name.substr(0,15) + '...' : item.name }}</span>
+            <!-- <el-input
               v-if="item.isEditing"
               v-model="item.tempDeviceName"
               size="mini"
               class="device-name-input"
-              @input="(val)=>deviceNameChange(val,item)"/>
+              @input="(val)=>deviceNameChange(val,item)"/> -->
           </div>
           <div class="data-store titles">
             <span>{{ item.store }}</span>
-          </div>
-          <div class="data-picture titles">
-            <span v-if="item.tempUrl">
-              <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
-                <div slot="error" class="image-slot">
-                  <i class="el-icon-picture-outline"/>
-                </div>
-              </el-image>
-              <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
-                <div slot="error" class="image-slot">
-                  <i class="el-icon-picture-outline"/>
-                </div>
-              </el-image>
-            </span>
-            <span v-else class="img-class" style="display: inline-block;background: #cccc;">
-              <span style="color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
-            </span>
-            <el-upload
-              v-if="item.isEditing"
-              :before-upload="beforeAvatarUpload"
-              :on-change="handleEditChange"
-              class="upload-demo"
-              action=""
-              list-type="picture">
-              <el-button size="mini" type="primary">
-                <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
-              </el-button>
-            </el-upload >
           </div>
           <div class="data-status titles">
             <el-switch
@@ -83,29 +52,50 @@
               @change="updateChannelImage(item)"
             />
           </div>
-          <div class="data-operation titles">
-            <div v-if="item.isEditing" class="iconcontent">
+          <div class="data-operation flex-center">
+            <!-- <div v-if="item.isEditing" class="flex-center">
               <div class="iconlised" @click="confirmEditSkywatch(index,item)">
                 <i class="el-icon-check"/>
               </div>
               <div class="iconrised" @click="cancelEditSkywatch(index,item)">
                 <i class="el-icon-close"/>
               </div>
-            </div>
-            <div v-if="!item.isEditing" class="iconcontent">
-              <div
-                class="iconlised normal-left-icon"
-                @click="editSkywatchDevice(index,item)">
-                <i class="iconfont icon-bianji"/>
-              </div>
-              <div
-                class="iconrised normal-right-icon"
-                @click="showDeleteSkywatchDeviceDialog(index,item)">
-                <i class="iconfont icon-shanchu"/>
-              </div>
+            </div> -->
+            <div class="flex-center" style="justify-content: center; width: 100%">
+              <img 
+                class="child-space"
+                :src="`./static/img/table-edit.png`" 
+                @click="editSkywatchDevice(index,item)"
+                height="26px" />
+              <img 
+                class="child-space"
+                :src="`./static/img/table-delete.png`" 
+                @click="showDeleteSkywatchDeviceDialog(index,item)"
+                height="26px" />
             </div>
           </div>
         </div>
+        <dialog-pop
+          :is-form="true"
+          :title="$t('deviceView.editDevice')"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          :isWarning="true"
+          :visible="showEditDeviceDialog"
+          :confirm-context="$t('deviceView.confirm')"
+          dialog-width="510px"
+          @cancelHandler="showEditDeviceDialog = false"
+          @confirmHandler="confirmEditSkywatch">
+          <div class="form-slot">
+            <el-form>
+              <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom: 20px;">
+                <el-input
+                  v-model="editingDevice.name"
+                />
+              </el-form-item>
+            </el-form>
+          </div>
+        </dialog-pop>
         <div class="toolbar pagination" style="width:100%; margin-top:10px;">
           <el-pagination
             :page-size="sizeNum"
@@ -130,10 +120,11 @@
   import util from '@/common/util';
   import lodash from 'lodash';
   import DeviceHeader from '../DeviceHeader';
+  import DialogPop from '@/components/DialogPop';
 
   export default {
     name: 'SkywatchDeviceMgmt',
-    components: { DeviceHeader },
+    components: { DeviceHeader, DialogPop },
     data() {
       return {
         total: 0,
@@ -155,7 +146,12 @@
         deleteChannelIds: [],
         loadingData: true,
         deleteInfo: '',
-        skywatchAccount: ''
+        skywatchAccount: '',
+        showEditDeviceDialog: false,
+        editingDevice: {
+          name: '',
+          serialNumber: ''
+        }
       };
     },
 
@@ -279,19 +275,19 @@
       },
 
 
-      async confirmUpdateChannle(index, item) {
+      async confirmUpdateChannle() {
         const self = this;
         self.isUpdate = false;
         const promiseArr = [];
-        item.name !== item.tempDeviceName && promiseArr.push(skywatchRESTful.updateSkywatchDevice(
-          {serialNumber: item.serialNumber, name: item.tempDeviceName}
+        this.editingDevice.name && promiseArr.push(skywatchRESTful.updateSkywatchDevice(
+          {serialNumber: this.editingDevice.serialNumber, name: this.editingDevice.name}
           ));
-        item.name = item.tempDeviceName;
-        item.tempUrl !== item.pictureUrl && promiseArr.push(this.updateImage(item.id));
         const results = await Promise.all(promiseArr);
         results.forEach(result => {
           if (result.errCode !== 0) {
             throw Error(result.errMsg);
+          } else {
+            self.showEditDeviceDialog = false
           }
         });
       },
@@ -396,27 +392,27 @@
       },
 
       editSkywatchDevice(index, item) {
-        item.isEditing = true;
-        this.beseyeDevicesList.forEach((_item, _index) => {
-          if (index !== _index) {
-            _item.isEditing = false;
-          }
-        });
+        this.editingDevice = {...item};
+        this.showEditDeviceDialog = true;
+        // item.isEditing = true;
+        // this.beseyeDevicesList.forEach((_item, _index) => {
+        //   if (index !== _index) {
+        //     _item.isEditing = false;
+        //   }
+        // });
       },
 
-      async confirmEditSkywatch(index, item) {
-        if (item.tempDeviceName.trim().length === 0) {
+      async confirmEditSkywatch() {
+        if (this.editingDevice.name.trim().length === 0) {
           util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
           return false;
         }
         try {
-          await this.confirmUpdateChannle(index, item);
+          await this.confirmUpdateChannle();
 
           util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
-          this.isEditing = false;
           this.getSkywatchDeviceList(this.setParams());
         }catch (error) {
-          item.isEditing = false;
           util.setErrorMsg(error.message, false);
         }
       },
@@ -572,13 +568,10 @@
         width: 20%;
       }
       .header-status{
-        width: 10%;
-      }
-      .header-picture{
-        width: 20%;
+        flex: 1;
       }
       .header-operation{
-        width: 10%;
+        flex: 1;
       }
     }
     .device-data{
@@ -618,58 +611,10 @@
         width: 20%;
       }
       .data-status{
-        width: 10%;
-      }
-      .data-picture{
-        width: 20%;
+        flex: 1;
       }
       .data-operation{
-        width: 10%;
-      }
-      .data-picture{
-        height: 100%;
-        display: inline-block;
-        position: relative;
-        .img-class{
-          vertical-align: middle;
-          text-align: center;
-          line-height: 70px;
-          height: 70px;
-          width: calc(100/1920*100vw);
-          display: inline-block;
-          min-width: 85px;
-          .no-image{
-            display: inline-block;
-            background: #cccc;
-          }
-          .no-image-span{
-            font-size: calc(14/1920*100vw);
-            color: #94a4b4;
-          }
-        }
-        .upload-demo{
-          position: absolute;
-          bottom: 0;
-          width: calc(100/1920*100vw);
-          min-width: 85px;
-          left: 50%;
-          transform: translateX(-50%);
-          /deep/ .el-upload{
-            width: 100%;
-          }
-          /deep/ .el-button{
-            width: calc(100/1920*100vw);
-            height: 28px;
-            opacity: 0.5;
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-          }
-          /deep/ .el-button--mini{
-            padding: 2px;
-          }
-        }
+        flex: 1;
       }
     }
     .device-name-input{
@@ -885,10 +830,6 @@
     border: 1px solid  #dfe3e9;
     padding: 20px calc(20/1920*100vw) 0;
   }
-  .el-switch.is-checked .el-switch__core{
-    border-color: #00FF00;
-    background-color: #00FF00;
-  }
   .avatar-uploader .picture-tips{
     display: inline;
     font-size: 12px;
@@ -1039,10 +980,6 @@
     background-color: #f6fbf9;
     border: 1px solid  #dfe3e9;
     padding: 20px calc(20/1920*100vw) 0;
-  }
-  .el-switch.is-checked .el-switch__core{
-    border-color: #00FF00;
-    background-color: #00FF00;
   }
   .avatar-uploader .picture-tips{
     display: inline;
