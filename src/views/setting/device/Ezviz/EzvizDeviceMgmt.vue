@@ -10,7 +10,7 @@
           <div class="spacer"></div>
           <el-button
             :class=" lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
-            class="storevue-button"
+            class="storevue-button-outlined"
             size="mini"
             type="primary"
             @click="showAddDialog"
@@ -22,7 +22,7 @@
           </el-button>
           <el-button
             :disabled="tableData.length === 0"
-            class="storevue-button"
+            class="storevue-button-outlined"
             size="mini"
             type="primary"
             @click="showDeleteDialogMethod(0)"
@@ -69,7 +69,7 @@
             :disabled="channelBtnDisabled"
             type="primary"
             size="mini"
-            class="storevue-button"
+            class="storevue-button-outlined"
             @click="addNewChannel">
             <i class="iconfont el-icon-plus"/><span>{{ $t('deviceView.addChannel') }}</span>
           </el-button>
@@ -1869,10 +1869,6 @@ export default {
     background-color: #f6fbf9;
     border: 1px solid  #dfe3e9;
     padding: 20px calc(20/1920*100vw) 0;
-  }
-  .el-switch.is-checked .el-switch__core{
-    border-color: #c60957;
-    background-color: #c60957;
   }
   .avatar-uploader .picture-tips{
     display: inline;

@@ -15,7 +15,7 @@
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
-                                {{ $t('statistics.titles.rateDistribution') }}
+                                {{ $t('statistics.titles.inspectItemScore') }}
                             </span>
                         </div>
                             <TypeSelectArea
@@ -57,8 +57,8 @@
           </el-row>
         <el-row  :span="24" class="partition" style="height:320px">
             <el-col  :span="24" style="height:100%">
-               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption" :auto-resize="true"
-                            style="width:100%;height:100%"/>
+               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
+                            :style="{width:part3.barRegionOption?part3.barRegionOption.width :'100%',height:'100%'}" />
                <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
                       <div class="button-area" >
                           <span style="color:#acaeb1">{{ part3.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
@@ -100,8 +100,8 @@
         </div>
          <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
                   <v-chart  v-if="part3.storeMode==1" 
-                            ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" :auto-resize="true"
-                            style="width:100%;height:100%"/>
+                            ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" autoresize
+                            :style="{width:part3.barStoreOptionn?part3.barStoreOption.width :'100%',height:'100%'}" />
                   <div v-else style="margin-top:20.5px;height:100%;overflow-y: scroll">
                     <table-pagination
                       ref="elTP"
@@ -1537,6 +1537,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       console.log(option)
       this.regionsChartsOptions = option;
       this.part1.barRegionOption = option;
@@ -1600,6 +1608,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       this.part1.barStoreOption = option;
     },
     async getPart2RegionBar() {
@@ -1702,6 +1718,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barRegionOption = option;
       console.log(option)
@@ -1756,6 +1780,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barStoreOption = option;
     },
@@ -1881,6 +1913,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       option.yAxis[0].name  =  this.$t('statistics.score')
       if( this.inspectItem.item.qualifiedScore && this.inspectItem.item.qualifiedScore>0){
           option.yAxis[0].max = this.inspectItem.item.qualifiedScore;
@@ -1953,6 +1993,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+     if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       option.yAxis[0].name  =  this.$t('statistics.score');
       if( this.inspectItem.item.qualifiedScore && this.inspectItem.item.qualifiedScore>0){
           option.yAxis[0].max = this.inspectItem.item.qualifiedScore;
