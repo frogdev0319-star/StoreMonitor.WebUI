@@ -754,7 +754,7 @@ export default {
       height: 90px;
       line-height: 90px;
       text-align: center;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #acaeb1;
       .proper-flag{
         height: 70%;
         width: 4px;
