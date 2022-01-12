@@ -683,6 +683,31 @@ export default {
   setcallbackEventItemValue(val){
     this.callbackEventItemValue = val;
     console.log("setcallbackEventItemValue:",this.callbackEventItemValue)
+  },
+  getChartColorArray(){
+    var colorArr = ['#FCC2A3',
+    "#FCC2A3",
+    "#FF986E",
+    "#EC5F55",
+    "#FA4B3F",
+    "#BA3329",
+    "#A156C5",
+    "#5274BB",
+    "#779AE3",
+    "#7BD8EB",
+    "#B9F2FD",
+    "#A1F8C6",
+    "#72F7B4",
+    "#70BF58",
+    "#48D91C",
+    "#ACF757",
+    "#D8FF6E",
+    "#F7F157",
+    "#F7D057",
+    "#FCBC45",
+    "#FC9741"
+    ];
+    return colorArr;
   }
 
 };

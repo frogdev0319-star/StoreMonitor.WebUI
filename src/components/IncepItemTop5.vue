@@ -4,8 +4,10 @@
         <div class="table-area">
         <table-pagination
                 ref="detail"
+                class="tbl-IncepItemTop5"
                 :column-data="column_data"
                 :table-data="table_data"
+                :headerStyle="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
                 :highlight-current-row= "false"
                 :is-event = "false"
                 :showPagination = "false"
@@ -15,12 +17,12 @@
 </template>
 <script>
 import {getEventList} from '@/api/event';
-import TablePagination from '@/components/TablePagination';
+import TablePagination_V2 from '@/components/TablePagination_V2';
 import util from '@/common/util';
 export default {
     name:'IncepItemTop5',
     components: {
-        'table-pagination':TablePagination,
+        'table-pagination':TablePagination_V2,
     },
     props:{
         storeId:{
@@ -38,6 +40,7 @@ export default {
     },
     data(){
         return{
+            rowClass:()=>{return {'backgroundColor': '#EFF3F5'}},
             order:{direction:"desc",property:"subject"},
             clause:{storeId:this.storeId},
             column_data:[
@@ -155,8 +158,37 @@ export default {
         color: #556679;
     }
     .table-area{
+        margin-top:10px;
         width:calc(984/1440*100vw);
     }
+    .tbl-IncepItemTop5{
+        background-color: #EFF3F5;
+            tbody{
+                background-color: #EFF3F5;
+            }
+        /deep/
+        .el-table{
+            border: none !important;
+            box-shadow: none !important;
+            &::before{
+                 background-color: transparent;
+            }
+            &::after{
+                 background-color: transparent;
+            }
+        }
+        /deep/
+        .el-table--mini{
+            background-color: #EFF3F5;
+            border-radius: 5px;
+        }
+        /deep/
+        .cell-class{
+            background-color: #EFF3F5 !important;
+        }
+        
+    }
+    
 }
     
 </style>
