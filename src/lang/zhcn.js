@@ -1126,6 +1126,7 @@ export default {
       'storeEvalDetail':'门店评估详情',
       'scoreDistribution':'考评得分分布',
       'rateDistribution':'考评达标率',
+      'inspectItemScore':'巡检项目得分',
     },
     'overview':{
       'store_unit':'家',

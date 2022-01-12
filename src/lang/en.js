@@ -1119,6 +1119,7 @@ export default {
       'storeEvalDetail':'Store Detail',
       'scoreDistribution':'Score Distribution',
       'rateDistribution':'Standard Rate',
+      'inspectItemScore':'Inspection Item Score',
     },
     'overview':{
       'store_unit':'',
