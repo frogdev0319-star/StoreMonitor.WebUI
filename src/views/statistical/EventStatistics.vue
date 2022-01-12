@@ -1168,9 +1168,6 @@ export default {
         },
         tooltip: {
           trigger: "axis",
-          axisPointer: {
-            type: "shadow"
-          },
           textStyle: {
             align: 'left'
           },
@@ -1268,6 +1265,13 @@ export default {
                 }
               },
             barGap:0,
+            emphasis: {
+              focus:'none',
+              itemStyle:{
+                  color:'#7bd8eb',
+                  borderWidth:'0',
+              }
+            }
           }
         ],
         
