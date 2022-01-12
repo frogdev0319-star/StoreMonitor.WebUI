@@ -122,14 +122,14 @@
                 />
               </div>
               <div style="width:100%; margin-top:12px;height:31px;">
-              <tbl-pagination-only
-                :total="total"
-                :current-page="page"
-                :page-size="sizeNum"
-                layout = "prev,pager, next,sizes,slot"
-                @sizeChange="handlePageAndSizeChange"
-                @currentChange="handleCurrentChange"
-              />
+                <tbl-pagination-only
+                  :total="total"
+                  :current-page="page"
+                  :page-size="sizeNum"
+                  layout = "prev,pager, next,sizes,slot"
+                  @sizeChange="handlePageAndSizeChange"
+                  @currentChange="handleCurrentChange"
+                />
               </div>
             </div>
           </el-col>

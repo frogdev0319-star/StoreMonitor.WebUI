@@ -27,16 +27,19 @@
         <div v-if="currentTab=='Detail'" class="insep-detail-tbl">
             <table-pagination
                 ref="detail"
+                class="tbl-TabInspecDetail"
                 :column-data="detailTbl.column_data"
                 :table-data="detailTbl.table_data"
                 :highlight-current-row= "true"
+                :tableHeight = "300"
+                :headerStyle="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
                 :is-event = "false"
                 :showPagination = "false"
                 @onCellClick ="handleEmitDetailRowClick"
             />
         </div>
         <div v-if="currentTab=='NotInspected'" class="not-inspected">
-            <el-row :gutter="20" type="flex" style=" flex-wrap: wrap" >
+            <el-row :gutter="20" type="flex" style=" flex-wrap: wrap;overflow-y:auto;" >
                 <el-col :span="6" v-for="(store) in notInspectedStores" :key="store.id"> 
                     <div class="store-div">
                         <img :src="shopImg" />
@@ -48,8 +51,10 @@
         <div v-if="currentTab=='Event'" class="insep-detail-tbl">
             <table-pagination
                 ref="detail"
+                class="tbl-TabInspecDetail"
                 :column-data="eventTbl.column_data"
                 :table-data="eventTbl.table_data"
+                :headerStyle="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
                 :highlight-current-row= "true"
                 :is-event = "false"
                 :showPagination = "true"
@@ -61,7 +66,7 @@
 </template>
 
 <script>
-import TablePagination from '@/components/TablePagination';
+import TablePagination from '@/components/TablePagination_V2';
 import { getInspectReportList,getNotInspectStoresByPerson } from '@/api/inspect';
 import {GetEventAndCommentList} from '@/api/event';
 import util from '@/common/util';
@@ -475,24 +480,55 @@ export default {
     font-family: NotoSansCJKTC;
     font-size: 13px;
     font-weight: 500;
-    background-color: #edf0f2;
+    background-color: EFF3F5;
+
   }
   .active-name-btn{
     color: #006ab7;
-    background-color: #fff;
+    background-color: #f7f9fa;
+    border-radius: 4px;
   }
   .insep-detail-tbl{
-    background-color: #edf0f2;
+    background-color: #EFF3F5;
     padding-top: 16.5px;
     padding-bottom: 16.5px;
     .table{
       margin: 0 calc(24/1920*100vw);
-      background-color: #f7f9fa;
+      background-color: #EFF3F5;
+    }
+    .tbl-TabInspecDetail{
+        background-color: #EFF3F5;
+            tbody{
+                background-color: #EFF3F5;
+            }
+        /deep/
+        .el-table{
+            border: none !important;
+            box-shadow: none !important;
+            &::before{
+                 background-color: transparent;
+            }
+            &::after{
+                 background-color: transparent;
+            }
+        }
+        /deep/
+        .el-table--mini{
+            background-color: #EFF3F5;
+            border-radius: 5px;
+        }
+        /deep/
+        .cell-class{
+            background-color: #EFF3F5 !important;
+        }
+        
     }
   }
   .not-inspected{
-    background-color: #edf0f2;
+    background-color: #EFF3F5;
     padding: 16.5px 24px;
+    max-height:300px;
+    overflow-y:auto;
     .store-div{
         width: calc(220/1440*100vw);
         height:40px;
