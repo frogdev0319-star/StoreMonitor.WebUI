@@ -43,7 +43,7 @@
           <div class="operation-btns">
             <delay-button
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                style="background-color:#FFF;color:#006ab7;"
+                style="background-color:#FFF;color:#006ab7;padding:0px;"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
@@ -506,10 +506,18 @@ export default {
         .position{
           display:inline;
           width: calc(217/1440*100vw);
+          /deep/
+          .el-input--medium .el-input__inner{
+            border:none;
+          }
         }
         .person{
           display:inline;
           width: calc(223/1440*100vw);
+          /deep/
+          .el-input--medium .el-input__inner{
+            border:none;
+          }
         }
     }
     

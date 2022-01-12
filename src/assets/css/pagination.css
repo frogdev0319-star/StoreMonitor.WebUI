@@ -170,16 +170,16 @@
 }
 
 .el-table .ascending .sort-caret.ascending {
-  content: url(/../../../static/img/tbl_sort_ascending.svg);
+  content: url(/../../static/img/tbl_sort_ascending.svg);
     border-bottom-color: #f31d65;
 }
 .el-table .sort-caret.ascending {
-  content: url(/../../../static/img/tbl_sort.svg);
+  content: url(/../../static/img/tbl_sort.svg);
   border-bottom-color: #c0c4cc;
   top: 0px;
 }
 .el-table .descending .sort-caret.descending {
-  content: url(/../../../static/img/tbl_sort_descending.svg);
+  content: url(/../../static/img/tbl_sort_descending.svg);
   border-top-color: #f31d65;
 }
 .el-table .sort-caret.descending {
