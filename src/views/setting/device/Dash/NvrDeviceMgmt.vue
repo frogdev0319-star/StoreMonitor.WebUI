@@ -1,256 +1,437 @@
 <template>
-  <el-row :style="{'min-height':varyWindowHeight - 139+'px'}" class="el-device">
-    <el-col :span="24" class="el-btns">
-      <div v-if="activeName === 'dash'" style="display:inline-block;">
-        <el-button
-          :size="varWindowWidth > 1680 ? 'small' : 'mini'"
-          class="btns"
-          type="primary"
-          @click="connectServer">
-          {{ $t('deviceView.submit') }}
-        </el-button>
-      </div>
-      <div v-else class="device-btns">
-        <el-input
-          v-if="false"
-          v-model="serachVale"
-          :placeholder="$t('deviceView.searchInfo')"
-          size="small"
-          class="el-search-input"
-          @keyup.enter.native="searchNVRList">
-          <i slot="prefix" class="iconfont icon-sousuo" style="position:relative;top:7px;left:6px;" @click="searchNVRList"/>
-        </el-input>
-        <el-button
-          v-for="(item,index) in btnList"
-          :key="index"
-          :class="lang.indexOf('zh') === -1 ? 'en-el-handle-btn': 'el-handle-btn'"
-          :disabled="index === 2"
-          size="mini"
-          @click="handleNVR(index,item)">
-          <div class="btn-area">
-            <i :class="item.iconClass" style="font-size: 24px;"/>
-            <span>{{ item.btnTitle }}</span>
+<div class="paper padding" style="height: 100%; position: relative; padding-top: 30px">
+    <template v-if="activeName==='dash'">
+      <el-button
+        :size="varWindowWidth > 1680 ? 'small' : 'mini'"
+        type="primary"
+        style="position: absolute; z-index: 999; right: 20px; top: 20px"
+        class="storevue-button-filled"
+        @click="connectServer">
+        {{ $t('deviceView.submit') }}
+      </el-button>
+    </template>
+    <template v-else>
+      <el-button
+        v-for="(item,index) in btnList"
+        style="position: absolute"
+        :key="index"
+        :disabled="index === 2"
+        size="mini"
+        @click="handleNVR(index,item)">
+        <div class="btn-area">
+          <i :class="item.iconClass" style="font-size: 24px;"/>
+          <span>{{ item.btnTitle }}</span>
+        </div>
+      </el-button>
+    </template>
+    <el-tabs
+      :id="lang.indexOf('ja') !== -1 ? 'ja-devicetabs-content' : 'en-devicetabs-content'"
+      v-model="activeName"
+      @tab-click="handleClick">
+      <el-tab-pane :label="$t('deviceView.mediaService')" name="dash">
+        <div class="details-content">
+          <div class="details flex-center"> 
+            <span class="dash-label">{{ $t('deviceView.serverIp') }}</span>
+            <el-input v-model="dash.url" class="dash-input" size="mini"/>
           </div>
-        </el-button>
-      </div>
-    </el-col>
-    <el-col :span="24" class="el-tabPanels">
-      <el-tabs
-        :id="lang.indexOf('ja') !== -1 ? 'ja-devicetabs-content' : 'en-devicetabs-content'"
-        v-model="activeName"
-        @tab-click="handleClick">
-        <el-tab-pane :label="$t('deviceView.mediaService')" name="dash">
-          <el-col
-            :span="varWindowWidth < 1540 ? 12 : 10"
-            :style="varWindowWidth < 1366 ? {'font-size':'12px'}:{'font-size':'14px'}"
-            class="dash-content">
-            <div class="details">
-              <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{ $t('deviceView.serverIp') }}</span>
-              <el-input v-model="dash.url" class="dash-input" size="mini"/>
+          <div class="details flex-center"> 
+            <span class="dash-label">{{ $t('deviceView.port') }}</span>
+            <el-input v-model="dash.httpCmdPort" class="dash-input" size="mini"/>
+          </div>
+          <div class="details flex-center"> 
+            <span class="dash-label">{{ $t('deviceView.httpsPort') }}</span>
+            <el-input v-model="dash.httpsCmdPort" class="dash-input" size="mini"/>
+          </div>
+          <div class="details flex-center"> 
+            <span class="dash-label">{{ $t('deviceView.dataPort') }}</span>
+            <el-input v-model="dash.dataPort" class="dash-input" size="mini"/>
+          </div>
+          <el-dialog
+            v-if="showImportContent"
+            id="importId"
+            :title="$t('deviceView.import')"
+            :visible.sync="showImportContent"
+            :close-on-click-modal="false"
+            :append-to-body="true"
+            width="510px"
+            top="35vh"
+            left="40vh">
+            <div class="dialog-content" style="overflow:hidden;width:100%;">
+              <hr style="border: 0.5px solid #dfe2e9;">
+              <p style="margin-left:26px;margin-bottom:0px;">{{ $t('deviceView.selectFilePos') }}</p>
             </div>
-            <div class="details">
-              <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{ $t('deviceView.port') }}</span>
-              <el-input v-model="dash.httpCmdPort" class="dash-input" size="mini"/>
+            <div slot="footer" class="dialog-footer">
+              <el-button class="file-cancel-btn" size="mini" style="" @click="showImportContent = false">
+                {{ $t('deviceView.cancle') }}
+              </el-button>
+              <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{ $t('deviceView.selectFile') }}
+                <input
+                  id="upload"
+                  type="file"
+                  accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                  @change="importfxx(this)" >
+              </a>
             </div>
-            <div class="details">
-              <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{ $t('deviceView.httpsPort') }}</span>
-              <el-input v-model="dash.httpsCmdPort" class="dash-input" size="mini"/>
+          </el-dialog>
+          <el-dialog
+            v-if="showConfirmImport"
+            :title="$t('deviceView.prompt')"
+            :visible.sync="showConfirmImport"
+            :append-to-body="true"
+            :close-on-click-modal="false"
+            width="510px"
+            top="35vh"
+            left="40vh">
+            <div class="dialog-content" style="overflow:hidden;width:100%;">
+              <hr style="border: 0.5px solid #dfe2e9;">
+              <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"/>
+                <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.clearInfo') }}</span>
+              </p>
             </div>
-            <div class="details">
-              <span class="dash-label"><span style="color:red;margin-right:10px;">*</span>{{ $t('deviceView.dataPort') }}</span>
-              <el-input v-model="dash.dataPort" class="dash-input" size="mini"/>
-            </div>
-            <el-dialog
-              v-if="showImportContent"
-              id="importId"
-              :title="$t('deviceView.import')"
-              :visible.sync="showImportContent"
-              :close-on-click-modal="false"
-              :append-to-body="true"
-              width="510px"
-              top="35vh"
-              left="40vh">
-              <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #dfe2e9;">
-                <p style="margin-left:26px;margin-bottom:0px;">{{ $t('deviceView.selectFilePos') }}</p>
-              </div>
-              <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showImportContent = false">
-                  {{ $t('deviceView.cancle') }}
-                </el-button>
-                <a href="javascript:;" class="a-upload" @click="checkBeforeImport">{{ $t('deviceView.selectFile') }}
-                  <input
-                    id="upload"
-                    type="file"
-                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                    @change="importfxx(this)" >
-                </a>
-              </div>
-            </el-dialog>
-            <el-dialog
-              v-if="showConfirmImport"
-              :title="$t('deviceView.prompt')"
-              :visible.sync="showConfirmImport"
-              :append-to-body="true"
-              :close-on-click-modal="false"
-              width="510px"
-              top="35vh"
-              left="40vh">
-              <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #dfe2e9;">
-                <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"/>
-                  <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.clearInfo') }}</span>
-                </p>
-              </div>
-              <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showConfirmImport = false">
-                  {{ $t('deviceView.cancle') }}
-                </el-button>
-                <el-button
-                  class="file-confirm-btn"
-                  size="mini"
-                  type="primary"
-                  @click="showImportContent=true;showConfirmImport=false">
-                  {{ $t('deviceView.confirm') }}
-                </el-button>
-              </div>
-            </el-dialog>
-          </el-col>
-        </el-tab-pane>
-        <el-tab-pane :label="$t('deviceView.videoMangement')" name="video">
-          <el-col :span="lang.indexOf('zh') === -1 && varWindowWidth < 1920 ? 9 : 10" class="lisde">
-            <div class="nvr-info">
-              <span class="info-title">{{ $t('deviceView.deviceInfo') }}</span>
+            <div slot="footer" class="dialog-footer">
+              <el-button class="file-cancel-btn" size="mini" style="" @click="showConfirmImport = false">
+                {{ $t('deviceView.cancle') }}
+              </el-button>
               <el-button
-                type="primary"
+                class="file-confirm-btn"
                 size="mini"
-                class="add-btn"
-                @click="showAddDialog">
-                <i style="margin-right:8px;" class="iconfont el-icon-plus"/><span>{{ $t('deviceView.addNvr') }}</span>
+                type="primary"
+                @click="showImportContent=true;showConfirmImport=false">
+                {{ $t('deviceView.confirm') }}
               </el-button>
             </div>
-            <div class="nvr-title tabTitle">
-              <div :class="lang.indexOf('zh') === -1 ? 'en-name-title titles': 'name-title titles'">
-                <span>{{ $t('deviceView.nvr') }}</span>
-                <i
-                  :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}"
-                  class="icon-filter"
-                  @click="filterNVR"/>
-              </div>
-              <div :class="lang.indexOf('zh') === -1 ? 'en-store-title titles': 'store-title titles'" >
-                <span>{{ $t('deviceView.store') }}</span>
-                <i
-                  :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}"
-                  class="icon-filter"
-                  @click="filterStore"/>
-              </div>
-              <div :class="lang.indexOf('zh') === -1 ? 'en-count-title titles': 'count-title titles'" >
-                <span>{{ $t('deviceView.channelNum') }}</span>
-              </div>
+          </el-dialog>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane :label="$t('deviceView.videoMangement')" name="video">
+        <el-col :span="lang.indexOf('zh') === -1 && varWindowWidth < 1920 ? 9 : 10" class="lisde">
+          <div class="nvr-info">
+            <span class="info-title">{{ $t('deviceView.deviceInfo') }}</span>
+            <el-button
+              type="primary"
+              size="mini"
+              class="add-btn"
+              @click="showAddDialog">
+              <i style="margin-right:8px;" class="iconfont el-icon-plus"/><span>{{ $t('deviceView.addNvr') }}</span>
+            </el-button>
+          </div>
+          <div class="nvr-title tabTitle">
+            <div :class="lang.indexOf('zh') === -1 ? 'en-name-title titles': 'name-title titles'">
+              <span>{{ $t('deviceView.nvr') }}</span>
+              <i
+                :class="{'el-icon-arrow-up':nvrFilter,'el-icon-arrow-down':!nvrFilter}"
+                class="icon-filter"
+                @click="filterNVR"/>
             </div>
-            <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-              <div :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
-                <div
-                  v-for="(item,index) in nvrData"
-                  :key="index"
-                  :class="!item.isClick ? 'noraml-color' : 'active-color'"
-                  class="nvr-data group-title"
-                  @click="clickNVR(index,item)">
-                  <div v-if="item.isClick" class="proper-flag"/>
-                  <div class="name-data titles">
-                    <span v-if="!item.isEditing">
-                      {{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}</span>
-                    <el-input
-                      v-if="item.isEditing"
-                      v-model="item.tempDeviceName"
-                      :placeholder="$t('deviceView.inputNvrName')"
-                      size="mini"
-                      class="nvr-input"
-                      @input="(val)=>nvrNameChange(val,item)"/>
-                  </div>
-                  <div class="store-data titles">
-                    <span>{{ item.store }}</span>
-                  </div>
-                  <div class="count-data titles">
-                    <span v-if="!item.isEditing">{{ item.tempChannelCount }}{{ $t('deviceView.unit') }}</span>
-                    <el-select
-                      v-if="item.isEditing"
-                      v-model="item.tempChannelCount"
-                      :placeholder="$t('deviceView.inputNvrNumber')"
-                      size="mini"
-                      class="nvr-select">
-                      <el-option
-                        v-for="numList in editNvrChannelNumList"
-                        :key="numList.value"
-                        :label="numList.label"
-                        :value="numList.value"
-                        :disabled="numList.disabled"
-                      />
-                    </el-select>
-                  </div>
-                  <div class="operation-data titles">
-                    <div v-if="item.isEditing" class="iconcontent" style="top:15px;">
-                      <div class="iconlised" @click="confirmEditNvr(index,item)">
-                        <i class="el-icon-check"/>
-                      </div>
-                      <div class="iconrised" @click="cancelEditNvr(index,item)">
-                        <i class="el-icon-close"/>
-                      </div>
+            <div :class="lang.indexOf('zh') === -1 ? 'en-store-title titles': 'store-title titles'" >
+              <span>{{ $t('deviceView.store') }}</span>
+              <i
+                :class="{'el-icon-arrow-up':storeFilter,'el-icon-arrow-down':!storeFilter}"
+                class="icon-filter"
+                @click="filterStore"/>
+            </div>
+            <div :class="lang.indexOf('zh') === -1 ? 'en-count-title titles': 'count-title titles'" >
+              <span>{{ $t('deviceView.channelNum') }}</span>
+            </div>
+          </div>
+          <el-scrollbar id="el-menuscrollbar" style="height:100%;">
+            <div :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
+              <div
+                v-for="(item,index) in nvrData"
+                :key="index"
+                :class="!item.isClick ? 'noraml-color' : 'active-color'"
+                class="nvr-data group-title"
+                @click="clickNVR(index,item)">
+                <div v-if="item.isClick" class="proper-flag"/>
+                <div class="name-data titles">
+                  <span v-if="!item.isEditing">
+                    {{ item.name.length>15?item.name.substr(0,15)+'...':item.name }}</span>
+                  <el-input
+                    v-if="item.isEditing"
+                    v-model="item.tempDeviceName"
+                    :placeholder="$t('deviceView.inputNvrName')"
+                    size="mini"
+                    class="nvr-input"
+                    @input="(val)=>nvrNameChange(val,item)"/>
+                </div>
+                <div class="store-data titles">
+                  <span>{{ item.store }}</span>
+                </div>
+                <div class="count-data titles">
+                  <span v-if="!item.isEditing">{{ item.tempChannelCount }}{{ $t('deviceView.unit') }}</span>
+                  <el-select
+                    v-if="item.isEditing"
+                    v-model="item.tempChannelCount"
+                    :placeholder="$t('deviceView.inputNvrNumber')"
+                    size="mini"
+                    class="nvr-select">
+                    <el-option
+                      v-for="numList in editNvrChannelNumList"
+                      :key="numList.value"
+                      :label="numList.label"
+                      :value="numList.value"
+                      :disabled="numList.disabled"
+                    />
+                  </el-select>
+                </div>
+                <div class="operation-data titles">
+                  <div v-if="item.isEditing" class="iconcontent" style="top:15px;">
+                    <div class="iconlised" @click="confirmEditNvr(index,item)">
+                      <i class="el-icon-check"/>
                     </div>
-                    <div v-if="!item.isEditing" class="iconcontent" style="top:15px;">
-                      <div class="iconlised" style=" border: none; background-color: rgba(255, 255, 255, 0); color:#2c3e50; font-weight: normal" @click="editSingleNvr(index,item)">
-                        <i class="iconfont icon-bianji"/>
-                      </div>
-                      <div class="iconrised" style="border: none; color:#2c3e50;font-weight: normal" @click="showConfirmDelete=true">
-                        <i class="iconfont icon-shanchu"/>
-                      </div>
+                    <div class="iconrised" @click="cancelEditNvr(index,item)">
+                      <i class="el-icon-close"/>
+                    </div>
+                  </div>
+                  <div v-if="!item.isEditing" class="iconcontent" style="top:15px;">
+                    <div class="iconlised" style=" border: none; background-color: rgba(255, 255, 255, 0); color:#2c3e50; font-weight: normal" @click="editSingleNvr(index,item)">
+                      <i class="iconfont icon-bianji"/>
+                    </div>
+                    <div class="iconrised" style="border: none; color:#2c3e50;font-weight: normal" @click="showConfirmDelete=true">
+                      <i class="iconfont icon-shanchu"/>
                     </div>
                   </div>
                 </div>
-                <el-dialog
-                  v-if="showConfirmDelete"
-                  :title="$t('deviceView.prompt')"
-                  :visible.sync="showConfirmDelete"
-                  :append-to-body="true"
-                  :close-on-click-modal="false"
-                  width="510px"
-                  top="35vh"
-                  left="40vh">
-                  <div class="dialog-content" style="overflow:hidden;width:100%;">
-                    <hr style="border: 0.5px solid #dfe2e9;">
-
-                    <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                      <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;;display: inline-block; vertical-align: middle"/>
-                      <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteNvrInfo') }}</span>
-                    </p>
-                  </div>
-                  <div slot="footer" class="dialog-footer">
-                    <el-button class="file-cancel-btn" size="mini" style="" @click="showConfirmDelete = false">
-                      {{ $t('deviceView.cancle') }}</el-button>
-                    <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteSingleNVR()">
-                      {{ $t('deviceView.confirm') }}</el-button>
-                  </div>
-                </el-dialog>
               </div>
-            </el-scrollbar>
-            <div class="toolbar pagination" style="width:100%; margin-top:10px;">
-              <el-pagination
-                :page-size="sizeNum"
-                :total="total"
-                :current-page="page"
-                style="text-align:right;margin-right:15px;"
-                background
-                small
-                layout="jumper,total,prev,pager,next"
-                @size-change="sizeChange"
-                @current-change="currentChange"/>
+              <el-dialog
+                v-if="showConfirmDelete"
+                :title="$t('deviceView.prompt')"
+                :visible.sync="showConfirmDelete"
+                :append-to-body="true"
+                :close-on-click-modal="false"
+                width="510px"
+                top="35vh"
+                left="40vh">
+                <div class="dialog-content" style="overflow:hidden;width:100%;">
+                  <hr style="border: 0.5px solid #dfe2e9;">
+
+                  <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+                    <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;;display: inline-block; vertical-align: middle"/>
+                    <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteNvrInfo') }}</span>
+                  </p>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                  <el-button class="file-cancel-btn" size="mini" style="" @click="showConfirmDelete = false">
+                    {{ $t('deviceView.cancle') }}</el-button>
+                  <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteSingleNVR()">
+                    {{ $t('deviceView.confirm') }}</el-button>
+                </div>
+              </el-dialog>
             </div>
-          </el-col>
+          </el-scrollbar>
+          <div class="toolbar pagination" style="width:100%; margin-top:10px;">
+            <el-pagination
+              :page-size="sizeNum"
+              :total="total"
+              :current-page="page"
+              style="text-align:right;margin-right:15px;"
+              background
+              small
+              layout="jumper,total,prev,pager,next"
+              @size-change="sizeChange"
+              @current-change="currentChange"/>
+          </div>
+        </el-col>
+        <el-dialog
+          v-if="showAddNvrDialog"
+          :title="$t('deviceView.addNvr')"
+          :visible.sync="showAddNvrDialog"
+          :append-to-body="true"
+          :close-on-click-modal="false"
+          width="510px"
+          top="35vh"
+          left="40vh"
+          custom-class="addNvr"
+        >
+          <div class="dialog-content" style="overflow:hidden;width:100%;">
+            <hr style="border: 0.5px solid #dfe2e9;">
+            <el-form
+              ref="nvrForm"
+              :model="addNvrData"
+              :rules="rules"
+              class="nvrForm"
+              label-position="top"
+              size="mini">
+              <el-form-item label="IVS ID" prop="ivsId">
+                <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)"
+                          @blur="notShowInputRuleTips('ivsId')"/>
+                <span v-if="ivsIdRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+              </el-form-item>
+              <el-form-item style="height: 57px;">
+                <el-col :span="13">
+                  <el-form-item :label="$t('deviceView.nvr')" prop="name" style="margin-bottom:0;">
+                    <el-input
+                      v-model="addNvrData.name"
+                      style="width: 100%;"
+                      @input="(val)=>nvrNameChange(val, {})"
+                      @blur="notShowInputRuleTips('Nvrname')"/>
+                    <span v-if="NvrnameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="9" :offset="2">
+                  <el-form-item :label="$t('deviceView.channelNum')" prop="channelCount">
+                    <el-select v-model="addNvrData.channelCount" size="mini">
+                      <el-option
+                        v-for="numList in channelNumList"
+                        :key="numList.value"
+                        :label="numList.label"
+                        :value="numList.value"/>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-form-item>
+              <el-form-item :label="$t('deviceView.store')" prop="storeId">
+                <el-select v-model="addNvrData.storeId" style="width: 100%;">
+                  <el-option
+                    v-for="item in storeDataList"
+                    :key="item.storeId"
+                    :label="item.label"
+                    :value="item.storeId"/>
+                </el-select>
+                <span class="add-label" style="color: rgb(254, 163, 22); display: block">
+                  <span style="margin-right: 10px;font-size: 10px;">*</span>{{ $t('deviceView.selectStoreInfo') }}
+                </span>
+              </el-form-item>
+            </el-form>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <el-button class="file-cancel-btn" size="mini" style="" @click="cancelAddNvr">
+              {{ $t('deviceView.cancle') }}
+            </el-button>
+            <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleNvr">
+              {{ $t('deviceView.confirm') }}
+            </el-button>
+          </div>
+        </el-dialog>
+        <el-col :span="lang.indexOf('zh') === -1 && varWindowWidth < 1920 ? 15 : 14" class="risde">
+          <div class="nvr-info">
+            <span class="info-title">{{ $t('deviceView.nvrChannelSetting') }}</span>
+            <el-button
+              :disabled="curNVRItem && channelList.length === curNVRItem.channelCount"
+              type="primary"
+              size="mini"
+              class="add-btn"
+              @click="addNewChannel">
+              <i style="margin-right:8px;" class="iconfont el-icon-plus"/><span>{{ $t('deviceView.addChannel') }}</span>
+            </el-button>
+          </div>
+          <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
+            <div class="nape-name-title titles">
+              <span>{{ $t('deviceView.channelName') }}</span>
+            </div>
+            <div class="nape-dep-title titles">
+              <span>{{ $t('deviceView.nvrChannelNum') }}</span>
+            </div>
+            <div class="nape-picture-title titles">
+              <span>{{ $t('deviceView.thumbnail') }}</span>
+            </div>
+            <div class="nape-handle-title titles">
+              <span>{{ $t('deviceView.operation') }}</span>
+            </div>
+          </div>
+          <el-scrollbar id="el-menuscrollbar" style="height:100%;">
+            <div :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
+              <div
+                v-for="(item,index) in channelList"
+                :style="item.isClick?{'background-color':'#FEE4E7'}:{}"
+                :key="index"
+                class="nape-items-data">
+                <div class="nape-name-data">
+                  <span v-if="!item.isClick" class="nape-name">
+                    {{ item.name.length > 15 ? item.name.substr(0,15)+'...' : item.name }}
+                  </span>
+                  <el-input
+                    v-if="item.isClick"
+                    v-model="item.tempName"
+                    size="mini"
+                    class="nape-input input-details"
+                    @input="(val)=>channelNameChange(val,item)"/>
+                </div>
+                <div class="nape-dep-data">
+                  <span class="nape-dep">{{ item.channelId }}</span>
+                </div>
+                <div class="nape-picture-data">
+                  <span v-if="item.tempUrl">
+                    <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
+                      <div slot="error" class="image-slot">
+                        <i class="el-icon-picture-outline"/>
+                      </div>
+                    </el-image>
+                    <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
+                      <div slot="error" class="image-slot">
+                        <i class="el-icon-picture-outline"/>
+                      </div>
+                    </el-image>
+                  </span>
+                  <span v-else class="img-class" style="display: inline-block;background: #cccc;">
+                    <span style="font-size: 14px;color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
+                  </span>
+                  <el-upload
+                    v-if="item.isClick"
+                    :before-upload="beforeAvatarUpload"
+                    :on-change="handleEditChange"
+                    class="upload-demo"
+                    action=""
+                    list-type="picture">
+                    <el-button size="mini" type="primary">
+                      <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
+                    </el-button>
+                  </el-upload >
+                </div>
+                <div class="nape-items-handle">
+                  <div v-if="item.isClick" class="iconcontent">
+                    <div class="iconlised" @click="confrimEdit(index,item)">
+                      <i class="el-icon-check"/>
+                    </div>
+                    <div class="iconrised" @click="cancelEdit(index,item)">
+                      <i class="el-icon-close"/>
+                    </div>
+                  </div>
+                  <div v-if="!item.isClick">
+                    <i
+                      class="iconfont icon-bianji"
+                      style="cursor:pointer;margin-right:10px;color:#2c3e50; "
+                      @click="handleEdit(index,item)"/>
+                    <i
+                      class="iconfont icon-shanchu"
+                      style="cursor:pointer;margin-right:10px;color:#2c3e50;"
+                      @click="handleDelete(index, item)"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </el-scrollbar>
           <el-dialog
-            v-if="showAddNvrDialog"
-            :title="$t('deviceView.addNvr')"
-            :visible.sync="showAddNvrDialog"
+            v-if="showDeleteChannel"
+            :title="$t('deviceView.prompt')"
+            :visible.sync="showDeleteChannel"
+            :append-to-body="true"
+            :close-on-click-modal="false"
+            width="510px"
+            top="35vh"
+            left="40vh">
+            <div class="dialog-content" style="overflow:hidden;width:100%;">
+              <hr style="border: 0.5px solid #dfe2e9;;">
+
+              <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
+                <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"/>
+                <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteChannel') }}</span>
+              </p>
+            </div>
+            <div slot="footer" class="dialog-footer">
+              <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteChannel = false">
+                {{ $t('deviceView.cancle') }}
+              </el-button>
+              <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteSingleChannel()">
+                {{ $t('deviceView.confirm') }}
+              </el-button>
+            </div>
+          </el-dialog>
+          <el-dialog
+            v-if="showAddChannelDialog"
+            :title="$t('deviceView.addChannel')"
+            :visible.sync="showAddChannelDialog"
             :append-to-body="true"
             :close-on-click-modal="false"
             width="510px"
@@ -261,283 +442,87 @@
             <div class="dialog-content" style="overflow:hidden;width:100%;">
               <hr style="border: 0.5px solid #dfe2e9;">
               <el-form
-                ref="nvrForm"
-                :model="addNvrData"
-                :rules="rules"
+                ref="channelForm"
+                :model="addChannelData"
+                :rules="channelRules"
                 class="nvrForm"
                 label-position="top"
                 size="mini">
-                <el-form-item label="IVS ID" prop="ivsId">
-                  <el-input v-model="addNvrData.ivsId" @input="(val)=>ivsIdChange(val)"
-                            @blur="notShowInputRuleTips('ivsId')"/>
-                  <span v-if="ivsIdRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
-                </el-form-item>
                 <el-form-item style="height: 57px;">
-                  <el-col :span="13">
-                    <el-form-item :label="$t('deviceView.nvr')" prop="name" style="margin-bottom:0;">
+                  <el-col :span="12">
+                    <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
                       <el-input
-                        v-model="addNvrData.name"
+                        :placeholder="$t('deviceView.inputChannelName')"
+                        v-model="addChannelData.name"
                         style="width: 100%;"
-                        @input="(val)=>nvrNameChange(val, {})"
-                        @blur="notShowInputRuleTips('Nvrname')"/>
-                      <span v-if="NvrnameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
+                        @input="(val)=>channelNameChange(val,{})"
+                        @blur="notShowInputRuleTips('tempName')"/>
+                      <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="9" :offset="2">
-                    <el-form-item :label="$t('deviceView.channelNum')" prop="channelCount">
-                      <el-select v-model="addNvrData.channelCount" size="mini">
+                  <el-col :span="10" :offset="2">
+                    <el-form-item :label="$t('deviceView.channelOrder')" prop="channelId">
+                      <el-select v-model="addChannelData.channelId"
+                                  :placeholder="$t('deviceView.selectNvrChannel')" size="mini" filterable>
                         <el-option
-                          v-for="numList in channelNumList"
+                          v-for="numList in newChannelNumList"
                           :key="numList.value"
                           :label="numList.label"
-                          :value="numList.value"/>
+                          :value="numList.value"
+                          :disabled="numList.disabled"
+                        />
                       </el-select>
                     </el-form-item>
                   </el-col>
                 </el-form-item>
-                <el-form-item :label="$t('deviceView.store')" prop="storeId">
-                  <el-select v-model="addNvrData.storeId" style="width: 100%;">
-                    <el-option
-                      v-for="item in storeDataList"
-                      :key="item.storeId"
-                      :label="item.label"
-                      :value="item.storeId"/>
-                  </el-select>
-                  <span class="add-label" style="color: rgb(254, 163, 22); display: block">
-                    <span style="margin-right: 10px;font-size: 10px;">*</span>{{ $t('deviceView.selectStoreInfo') }}
-                  </span>
+                <el-form-item>
+                  <el-col :span="8">
+                    <el-form-item ref="uploadElement" :label="$t('deviceView.thumbnail')" prop="pictureUrl">
+                      <el-input v-if="false" v-model="addChannelData.pictureUrl"/>
+                      <el-upload
+                        ref="upload"
+                        :show-file-list="false"
+                        :before-upload="beforeAvatarUpload"
+                        :on-change="handleChange"
+                        :data="addChannelData"
+                        class="avatar-uploader"
+                        action=""
+                        accept="image/png,image/jpg,image/jpeg"
+                        list-type="picture">
+                        <el-button size="mini" type="primary" style=" margin-bottom: 0px;position: relative;margin-right: 0px;">
+                          <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/>
+                          <span>{{ $t('deviceView.selectPicture') }}</span>
+                        </el-button>
+                      </el-upload>
+                      <el-image :src="addChannelData.pictureUrl" class="image-class">
+                        <div slot="error" class="image-slot">
+                          <span class="image-span">{{ $t('deviceView.preview') }}</span>
+                        </div>
+                      </el-image>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="16" :offset="varWindowWidth<1440? 3: 0">
+                    <el-form-item label="">
+                      <span class="picture-tips">*{{ $t('deviceView.thumbnailInfo') }}</span>
+                    </el-form-item>
+                  </el-col>
                 </el-form-item>
+
               </el-form>
             </div>
             <div slot="footer" class="dialog-footer">
-              <el-button class="file-cancel-btn" size="mini" style="" @click="cancelAddNvr">
+              <el-button class="file-cancel-btn" size="mini" style="" @click="cancelAddSingleChannel">
                 {{ $t('deviceView.cancle') }}
               </el-button>
-              <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleNvr">
+              <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleChannel">
                 {{ $t('deviceView.confirm') }}
               </el-button>
             </div>
           </el-dialog>
-          <el-col :span="lang.indexOf('zh') === -1 && varWindowWidth < 1920 ? 15 : 14" class="risde">
-            <div class="nvr-info">
-              <span class="info-title">{{ $t('deviceView.nvrChannelSetting') }}</span>
-              <el-button
-                :disabled="curNVRItem && channelList.length === curNVRItem.channelCount"
-                type="primary"
-                size="mini"
-                class="add-btn"
-                @click="addNewChannel">
-                <i style="margin-right:8px;" class="iconfont el-icon-plus"/><span>{{ $t('deviceView.addChannel') }}</span>
-              </el-button>
-            </div>
-            <div :class="lang=='en'? 'en-nape-items-title tabTitle':'nape-items-title tabTitle'">
-              <div class="nape-name-title titles">
-                <span>{{ $t('deviceView.channelName') }}</span>
-              </div>
-              <div class="nape-dep-title titles">
-                <span>{{ $t('deviceView.nvrChannelNum') }}</span>
-              </div>
-              <div class="nape-picture-title titles">
-                <span>{{ $t('deviceView.thumbnail') }}</span>
-              </div>
-              <div class="nape-handle-title titles">
-                <span>{{ $t('deviceView.operation') }}</span>
-              </div>
-            </div>
-            <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-              <div :style="{'max-height':varyDivHeight+'px','min-height':varyDivHeight+'px'}">
-                <div
-                  v-for="(item,index) in channelList"
-                  :style="item.isClick?{'background-color':'#FEE4E7'}:{}"
-                  :key="index"
-                  class="nape-items-data">
-                  <div class="nape-name-data">
-                    <span v-if="!item.isClick" class="nape-name">
-                      {{ item.name.length > 15 ? item.name.substr(0,15)+'...' : item.name }}
-                    </span>
-                    <el-input
-                      v-if="item.isClick"
-                      v-model="item.tempName"
-                      size="mini"
-                      class="nape-input input-details"
-                      @input="(val)=>channelNameChange(val,item)"/>
-                  </div>
-                  <div class="nape-dep-data">
-                    <span class="nape-dep">{{ item.channelId }}</span>
-                  </div>
-                  <div class="nape-picture-data">
-                    <span v-if="item.tempUrl">
-                      <el-image v-if="!isUpdate" :src="item.tempUrl" class="img-class">
-                        <div slot="error" class="image-slot">
-                          <i class="el-icon-picture-outline"/>
-                        </div>
-                      </el-image>
-                      <el-image v-else :src="`${item.tempUrl +'?'+Math.random()}`" class="img-class">
-                        <div slot="error" class="image-slot">
-                          <i class="el-icon-picture-outline"/>
-                        </div>
-                      </el-image>
-                    </span>
-                    <span v-else class="img-class" style="display: inline-block;background: #cccc;">
-                      <span style="font-size: 14px;color: #94a4b4;">{{ $t('deviceView.noImage') }}</span>
-                    </span>
-                    <el-upload
-                      v-if="item.isClick"
-                      :before-upload="beforeAvatarUpload"
-                      :on-change="handleEditChange"
-                      class="upload-demo"
-                      action=""
-                      list-type="picture">
-                      <el-button size="mini" type="primary">
-                        <span class="edit-picture">{{ $t('deviceView.editImage') }}</span>
-                      </el-button>
-                    </el-upload >
-                  </div>
-                  <div class="nape-items-handle">
-                    <div v-if="item.isClick" class="iconcontent">
-                      <div class="iconlised" @click="confrimEdit(index,item)">
-                        <i class="el-icon-check"/>
-                      </div>
-                      <div class="iconrised" @click="cancelEdit(index,item)">
-                        <i class="el-icon-close"/>
-                      </div>
-                    </div>
-                    <div v-if="!item.isClick">
-                      <i
-                        class="iconfont icon-bianji"
-                        style="cursor:pointer;margin-right:10px;color:#2c3e50; "
-                        @click="handleEdit(index,item)"/>
-                      <i
-                        class="iconfont icon-shanchu"
-                        style="cursor:pointer;margin-right:10px;color:#2c3e50;"
-                        @click="handleDelete(index, item)"/>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </el-scrollbar>
-            <el-dialog
-              v-if="showDeleteChannel"
-              :title="$t('deviceView.prompt')"
-              :visible.sync="showDeleteChannel"
-              :append-to-body="true"
-              :close-on-click-modal="false"
-              width="510px"
-              top="35vh"
-              left="40vh">
-              <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #dfe2e9;;">
-
-                <p style="margin-left:26px;margin-bottom:20px;margin-top:20px;margin-right:20px;">
-                  <i class="el-icon-warning" style="font-size:26px;margin-right:20px;color:#FF9803;display: inline-block; vertical-align: middle"/>
-                  <span style="display: inline-block; vertical-align: middle">{{ $t('deviceView.deleteChannel') }}</span>
-                </p>
-              </div>
-              <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteChannel = false">
-                  {{ $t('deviceView.cancle') }}
-                </el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary" @click="deleteSingleChannel()">
-                  {{ $t('deviceView.confirm') }}
-                </el-button>
-              </div>
-            </el-dialog>
-            <el-dialog
-              v-if="showAddChannelDialog"
-              :title="$t('deviceView.addChannel')"
-              :visible.sync="showAddChannelDialog"
-              :append-to-body="true"
-              :close-on-click-modal="false"
-              width="510px"
-              top="35vh"
-              left="40vh"
-              custom-class="addNvr"
-            >
-              <div class="dialog-content" style="overflow:hidden;width:100%;">
-                <hr style="border: 0.5px solid #dfe2e9;">
-                <el-form
-                  ref="channelForm"
-                  :model="addChannelData"
-                  :rules="channelRules"
-                  class="nvrForm"
-                  label-position="top"
-                  size="mini">
-                  <el-form-item style="height: 57px;">
-                    <el-col :span="12">
-                      <el-form-item :label="$t('deviceView.channelName')" prop="name" style="margin-bottom:0;">
-                        <el-input
-                          :placeholder="$t('deviceView.inputChannelName')"
-                          v-model="addChannelData.name"
-                          style="width: 100%;"
-                          @input="(val)=>channelNameChange(val,{})"
-                          @blur="notShowInputRuleTips('tempName')"/>
-                        <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="10" :offset="2">
-                      <el-form-item :label="$t('deviceView.channelOrder')" prop="channelId">
-                        <el-select v-model="addChannelData.channelId"
-                                   :placeholder="$t('deviceView.selectNvrChannel')" size="mini" filterable>
-                          <el-option
-                            v-for="numList in newChannelNumList"
-                            :key="numList.value"
-                            :label="numList.label"
-                            :value="numList.value"
-                            :disabled="numList.disabled"
-                          />
-                        </el-select>
-                      </el-form-item>
-                    </el-col>
-                  </el-form-item>
-                  <el-form-item>
-                    <el-col :span="8">
-                      <el-form-item ref="uploadElement" :label="$t('deviceView.thumbnail')" prop="pictureUrl">
-                        <el-input v-if="false" v-model="addChannelData.pictureUrl"/>
-                        <el-upload
-                          ref="upload"
-                          :show-file-list="false"
-                          :before-upload="beforeAvatarUpload"
-                          :on-change="handleChange"
-                          :data="addChannelData"
-                          class="avatar-uploader"
-                          action=""
-                          accept="image/png,image/jpg,image/jpeg"
-                          list-type="picture">
-                          <el-button size="mini" type="primary" style=" margin-bottom: 0px;position: relative;margin-right: 0px;">
-                            <i style="margin-right:10px;font-size:16px;" class="iconfont el-icon-plus"/>
-                            <span>{{ $t('deviceView.selectPicture') }}</span>
-                          </el-button>
-                        </el-upload>
-                        <el-image :src="addChannelData.pictureUrl" class="image-class">
-                          <div slot="error" class="image-slot">
-                            <span class="image-span">{{ $t('deviceView.preview') }}</span>
-                          </div>
-                        </el-image>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="16" :offset="varWindowWidth<1440? 3: 0">
-                      <el-form-item label="">
-                        <span class="picture-tips">*{{ $t('deviceView.thumbnailInfo') }}</span>
-                      </el-form-item>
-                    </el-col>
-                  </el-form-item>
-
-                </el-form>
-              </div>
-              <div slot="footer" class="dialog-footer">
-                <el-button class="file-cancel-btn" size="mini" style="" @click="cancelAddSingleChannel">
-                  {{ $t('deviceView.cancle') }}
-                </el-button>
-                <el-button class="file-confirm-btn" size="mini" type="primary" @click="addSingleChannel">
-                  {{ $t('deviceView.confirm') }}
-                </el-button>
-              </div>
-            </el-dialog>
-          </el-col>
-        </el-tab-pane>
-      </el-tabs>
-    </el-col>
-  </el-row>
+        </el-col>
+      </el-tab-pane>
+    </el-tabs>
+</div>
 </template>
 <script>
 import { validateInput, validateURL, validatePort } from '@/common/validate';
@@ -553,6 +538,10 @@ export default {
   data() {
     return {
       dash: {},
+      tabData: [
+        { name: 'dash' },
+        { name: 'normal' },
+      ],
       activeName: 'dash',
       total: 0,
       page: 1,
@@ -1893,6 +1882,25 @@ export default {
   *{
     font-family: Roboto, Arial, Microsoft YaHei;
   }
+  .details-content {
+    border-radius: 5px;
+    background-color: #f7f9fa;
+    padding: 0 calc(20/1920*100vw);
+    .details {
+      padding: calc(20/1920*100vw) 0;
+      &:not(:last-child){
+        border-bottom: 1px solid rgba(172,174,177,.34);
+      }
+      display: flex;
+      .dash-label{
+        text-align: left;
+        width: calc(210/1920*100vw);
+      }
+      .dash-input{
+        width: calc(140/1920*100vw);
+      }
+    }
+  }
   .noraml-color{
     color: #4b5262 !important;
     background-color: #FAFAFA;
@@ -2003,20 +2011,6 @@ export default {
         text-align: left;
         position: relative;
         overflow: hidden;
-        .details{
-          @include point(height,50);
-          @include point(line-height,50);
-          @include point(padding-left,10);
-          .dash-label{
-            width: 30%;
-            float: left;
-            min-width: 140px;
-          }
-          .dash-input{
-            width: 50%;
-            margin-left: 5%;
-          }
-        }
       }
       .nvr-info{
         @include titleStyle;

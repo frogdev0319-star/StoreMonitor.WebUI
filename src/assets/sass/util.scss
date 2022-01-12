@@ -288,22 +288,55 @@ $sv_red: #c60957;
   background-position: center right 20px;
 }
 
-.storevue-button {
+.storevue-button-outlined {
   background-color: #fff;
   border-color: #c60957;
   color: #c60957;
   font-size: calc(15/1920*100vw);
   padding: calc(8 / 1920 * 100vw) calc(25 / 1920 * 100vw);
   &:hover {
+    background-color: #fef4fc;
+    border-color: #c60957;
+    color: #c60957;
+  }
+  &:focus {
+    background-color: rgba(254,244,252,.34);
+    border-color: #c60957;
+    color: rgba(198,9,87,.34);
+  }
+  &:active {
+    background-color: rgba(254,244,252,.34);
+    border-color: #c60957;
+    color: rgba(198,9,87,.34);
+  }
+}
+
+.storevue-button-filled {
+  background-color: #c60957;
+  border-color: #c60957;
+  color: #fff;
+  font-size: calc(15/1920*100vw);
+  padding: calc(8 / 1920 * 100vw) calc(25 / 1920 * 100vw);
+  &:hover {
     background-color: #ae0048;
     border-color: #ae0048;
   }
+  &:focus {
+    background-color: #ae0048;
+    border-color: #ae0048;
+    color: rgba(255,255,255,.4);
+  }
+  &:active {
+    background-color: #ae0048;
+    border-color: #ae0048;
+    color: rgba(255,255,255,.4);
+  }
 }
-.storevue-button .iconfont{
+.storevue-button-outlined .iconfont{
   margin-right: calc(8/1920*100vw);
 }
 .search-button{
-  @extend .storevue-button;
+  @extend .storevue-button-outlined;
   float: right;
   &:hover{
     background-color: #3d4854;
@@ -311,7 +344,7 @@ $sv_red: #c60957;
   }
 }
 .schedule-btn{
-  @extend .storevue-button;
+  @extend .storevue-button-outlined;
   @media screen and (max-width: 1680px){
     width: 110px !important;
   }
@@ -323,7 +356,7 @@ $sv_red: #c60957;
   display: flex;
 }
 .export-btn{
-  @extend .storevue-button;
+  @extend .storevue-button-outlined;
 }
 .export-btn.el-button--primary.el-button--mini{
   background-color: $primary;
@@ -384,14 +417,14 @@ $sv_red: #c60957;
 
 }
 .bind-btn{
-  @extend .storevue-button;
+  @extend .storevue-button-outlined;
   @extend .en-bind-btn;
   @media screen and (max-width: 1440px){
     width: 100px;
   }
 }
 .ja-bind-btn{
-  @extend .storevue-button;
+  @extend .storevue-button-outlined;
   @extend .en-bind-btn;
   width: calc(180/1920*100vw);
   overflow: hidden;
@@ -406,7 +439,7 @@ $sv_red: #c60957;
 }
 
 .inspction-btn{
-  @extend .storevue-button;
+  @extend .storevue-button-outlined;
   @extend .text-ellipsis;
   .iconfont{
     font-size: calc(16/1920*100vw);

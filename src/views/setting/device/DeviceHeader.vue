@@ -3,7 +3,7 @@
     <div class="flex-center margin-bottom-md">
       <div class="spacer"></div>
       <el-button
-        class="storevue-button"
+        class="storevue-button-outlined"
         size="mini"
         type="primary"
         @click="onShowAddBeseyeDeviceDialog"
@@ -16,7 +16,7 @@
       <el-button
         size="mini"
         type="primary"
-        class="storevue-button"
+        class="storevue-button-outlined"
         @click="onShowDeleteDialogMethod"
       >
         <div class="btn-area">
