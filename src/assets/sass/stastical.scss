@@ -1,6 +1,6 @@
 $red:#f31d65;
 $black:#2b2b2b;
-$border:#e3e9f4;
+$border:rgba(172,174,177,0.3);
 $background:#f4f5f9;
 $tab:#7d8cad;
 $h1:#292e36;
@@ -100,7 +100,7 @@ $store: #fccc3f;
     margin-right:20px; 
     padding-right:23px;
     height: 42px;
-    border-bottom: solid 1px #acaeb1;
+    border-bottom: solid 1px $border;
     align-items: center;
     display: flex;
     flex-direction:row;
@@ -157,7 +157,7 @@ $store: #fccc3f;
     line-height: 32px;
   }
   .el-icon-date::before{
-    content: url(/../../../static/img/statistics/ic_calender.svg);
+    content: url(/../../static/img/statistics/ic_calender.svg);
   }
   .global-date-pick{
     .el-range-editor--mini .el-range__icon{

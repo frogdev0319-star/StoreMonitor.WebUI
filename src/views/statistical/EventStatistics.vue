@@ -62,6 +62,12 @@
               ></AreaSelected>-->
             </div>
             <div class="barchart-area">
+              <div style="position:absolute;right:24px;top:94px;z-index:10;" @click='changeBarchartSorOrder'>
+                  <div class="button-area" >
+                      <span style="color:#acaeb1">{{ barchartOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                  </div>    
+              </div>
               <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
             </div>
             <div class="table-area">
@@ -111,20 +117,19 @@
                   layout = "prev,pager,next,sizes"
                   expand-component = "IncepItemTop5"
                   :expandCompProperties = "componentsProps"
-                  @handleChange="handlePageAndSizeChange"
-                  @sortChange="handleSortChange"
+                   @sortChange="handleSortChange"
                   @onCellClick = "onEvenListNumClick"
                 />
               </div>
               <div style="width:100%; margin-top:12px;height:31px;">
-              <tbl-pagination-only
-                :total="total"
-                :current-page="page"
-                :page-size="sizeNum"
-                layout = "prev,pager, next,sizes,slot"
-                @sizeChange="handlePageAndSizeChange"
-                @currentChange="handleCurrentChange"
-              />
+                <tbl-pagination-only
+                  :total="total"
+                  :current-page="page"
+                  :page-size="sizeNum"
+                  layout = "prev,pager, next,sizes,slot"
+                  @sizeChange="handlePageAndSizeChange"
+                  @currentChange="handleCurrentChange"
+                />
               </div>
             </div>
           </el-col>
@@ -163,7 +168,7 @@
                       class="chart-content"
                   />
               </div>
-              <div style="margin-top: 40px;width: calc(300/1440*100vw);margin-left:calc(152/1440*100vw);">
+              <div style="margin-top: 10px;width: calc(300/1440*100vw);margin-left:calc(152/1440*100vw);height:206px;overflow-y:auto;overflow-x:hidden;">
               <div v-for="(item,index) in sourcePerArray" :key="index">
                 <div :class="(index==selEventItem) ? 'pie-label-area-active':'pie-label-area'" @click="onClickEventItem(item,index)">
                     <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
@@ -180,7 +185,7 @@
                 <div class="operation-btns">
                   <delay-button
                     :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;width:152px;"
+                    style="margin-left:32px;width:210px;background-color:#FFF;color:#006ab7;"
                     type="primary"
                     size="mini"
                     @click="onSeeAllIncepEventClick"
@@ -205,21 +210,29 @@
                 </div>
               </div>
               <div style="margin-top:20.5px;">
-                <table-pagination
+                <table-only
                   ref="elTP"
                   :column-data="eventItemTable.column_data"
                   :table-data="eventItemTable.table_data"
-                  :total="eventItemTable.total"
                   :highlight-current-row= "true"
-                  :pagesize="eventItemTable.sizeNum"
-                  :current-page="eventItemTable.page"
                   :is-event = "false"
-                  :default-sort = "eventItemTable.defaultSort"
+                  :default-sort = "defaultSort"
                   :allowRowExpand = "false"
-                  layout = "prev,pager,next,sizes"
+                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                  :tableHeight = "726"
                   @handleChange="handlePageAndSizeChange_eventItem"
                   @sortChange="handleSortChange_eventItem"
                   @onCellClick = "onEvenInvolveStoreClick"
+                />
+              </div>
+              <div style="width:100%; margin-top:12px;height:31px;">
+                <tbl-pagination-only
+                  :total="eventItemTable.total"
+                  :current-page="eventItemTable.page"
+                  :page-size="eventItemTable.sizeNum"
+                  layout = "prev,pager, next,sizes,slot"
+                  @sizeChange="handlePageAndSizeChange_eventItem"
+                  @currentChange="handlePageAndSizeChange_eventItem"
                 />
               </div>
             </div>
@@ -228,7 +241,7 @@
               <div class="table-area" style="">
                 <div class="sec-head">
                   <div class="title">{{ selEventItemName+$t('statistics.event.eventInvolveStores') }}</div>
-                  <div class="operation-btns" style="width:calc(300/1440*100vw)">
+                  <div class="operation-btns" style="width:calc(344/1440*100vw)">
                     <div class="switch-btn">
                       <el-button
                       class="mode-btn"
@@ -256,22 +269,28 @@
                   </div>
                 </div>
                 <div style="margin-top:20.5px;">
-                  <table-pagination
+                  <table-only
                     ref="elTP"
                     :column-data="eventInvolveTable.column_data"
                     :table-data="eventInvolveTable.table_data"
-                    :total="eventInvolveTable.total"
                     :highlight-current-row= "true"
-                    :pagesize="eventInvolveTable.sizeNum"
-                    :current-page="eventInvolveTable.page"
                     :is-event = "false"
                     :default-sort = "eventInvolveTable.defaultSort"
                     :allowRowExpand = "true"
-                    layout = "prev,pager,next,sizes"
+                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                    :tableHeight = "726"
                     expand-component = "EventCommentList"
                     :expandCompProperties = "componentsProps_EventCommentList"
-                    @handleChange="handlePageAndSizeChange_eventStores"
-                    @sortChange="handleSortChange_eventStores"
+                  />
+                </div>
+                <div style="width:100%; margin-top:12px;height:31px;">
+                  <tbl-pagination-only
+                    :total="eventInvolveTable.total"
+                    :current-page="eventInvolveTable.page"
+                    :page-size="eventInvolveTable.sizeNum"
+                    layout = "prev,pager, next,sizes,slot"
+                    @sizeChange="handlePageAndSizeChange_eventStores"
+                    @currentChange="handlePageAndSizeChange_eventStores"
                   />
                 </div>
               </div>
@@ -455,7 +474,6 @@ import html2canvas from 'html2canvas';
 import Lodash from 'lodash';
 import SearchComponent from '@/components/SearchComponent';
 import resize from '@/components/mixins/echartResize';
-import TablePagination from '@/components/TablePagination_V2';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DelayButton from '@/components/DelayButton';
@@ -470,7 +488,6 @@ export default {
     DelayButton,
     'v-chart': ECharts,
     SearchComponent,
-    TablePagination,
     AreaSelected,TypeSelectArea,
     TableOnly,
     TblPaginationOnly
@@ -548,6 +565,9 @@ export default {
       exportPng: require('../../../static/img/excel.png'),
       allEventTableData:[],
       eventBarChartData: [],
+      barchartOrder:'desc',
+      descPng: require('../../../static/img/statistics/orderDesc.png'),
+      incPng: require('../../../static/img/statistics/orderInc.png'),
       eventTableData: [],
       eventInfoData: [
         {
@@ -736,7 +756,7 @@ export default {
         total:0,
         defaultSort: { prop: 'numOfUnqualified', order: 'ascending' },
       },
-      pieColorList : ['#5274bb', '#7b9feb', '#7bd8eb','#4de197','#99ee3a'],
+      pieColorList : util.getChartColorArray(),
       peiDataSource:[],
       compareIds2:[],
       comapareLabels2:[],
@@ -843,6 +863,7 @@ export default {
       showInvolveTableArea:false,
       componentsProps_EventCommentList:{},
       gloableEventData:[],
+      barActiveinnerId:'-1'
     };
   },
 
@@ -965,16 +986,14 @@ export default {
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.compareType = compareType;
-      //this.compareIds = compareArr;
-      //console.log("compareArr :",compareArr);
+      console.log("emitTypeChanged > selStoreIdArr :",selStoreIdArr);
       //console.log("compareArr.includ :",compareArr.includes('-1'));
       if(selStoreIdArr.includes('-1')){
-        this.compareIds = selStoreIdArr.shift();
+        selStoreIdArr.shift();
       }
-      else{
-          this.compareIds = selStoreIdArr
-      }
-      //console.log("emitTypeChanged > this.compareIds:",this.compareIds);
+      this.compareIds = selStoreIdArr;
+      console.log("1.emitTypeChanged > this.compareIds:",this.compareIds); 
+      
       this.comapareLabels = selectedLabels;
       this.getAllEventData();
       this.getEventTableData();
@@ -1056,7 +1075,6 @@ export default {
         direction: 'desc',
         property: 'numOfTotal'
       };
-      
       let content = [];
       try {
         const eventResult = await this.getEventTableDataInfo(params);
@@ -1097,6 +1115,15 @@ export default {
       }
     },
     /*畫barChart*/
+    changeBarchartSorOrder(){
+      if(this.barchartOrder == 'desc'){
+          this.barchartOrder = 'asc'
+      }
+      else{
+        this.barchartOrder = 'desc'
+      }
+      this. getEventBarChartData();
+    },
     async getEventBarChartData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
@@ -1105,8 +1132,9 @@ export default {
       self.params.groupMode = region[0].value;
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
-        self.params.storeIds=this.compareIds
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds};
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds,
+          order:{"direction":this.barchartOrder,"property":"numOfTotal"}
+        };
         //console.log("*getEventTableData>searchCondition:",searchCondition);
       /*}else{ //groupType, storeGroup
         self.params.groupIds=this.compareIds
@@ -1232,18 +1260,16 @@ export default {
             barWidth: "16px",
             smooth: true,
             data: [0,0,0,0,0,0,0,0,0,0,0,0],
-            color:'#D7F3F9',
+            color:(context)=>{
+                if(this.barActiveinnerId==context.innerId){
+                  return '#7bd8eb';
+                }else{
+                  return '#D7F3F9';
+                }
+              },
             barGap:0,
           }
         ],
-        itemStyle: {
-              emphasis: {
-                color:'#7bd8eb'
-              },
-              normal: {
-                color: '#D7F3F9'
-              }
-            }
         
       };
       return chartOption;
@@ -1255,7 +1281,7 @@ export default {
       if(this.eventBarChartData.length>0){
         this.eventBarChartData.forEach(item => {
           date_xAxis.push(item.groupName);
-          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
+          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId,itemStyle:{color:(item.innerId==this.barActiveinnerId)?"#7bd8eb":"#D7F3F9"}});
         });
         this.barchartOption.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
@@ -1265,25 +1291,25 @@ export default {
       }
     },
     /*end 畫barChart */
+    
+    /*取得門店事件表 */
     onSwitchMode(val){
       this.viewMode=val;
     },
-    /*取得門店事件表 */
-    
     async getEventTableData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
       self.componentsProps.endTs = self.params.endTs;
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
+      self.params.storeIds = self.compareIds;
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
-        self.params.storeIds=this.compareIds
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds,
-          filter:{"page":this.page-1,"size":this.sizeNum},
-          order:this.order
-        };
-        console.log("*getEventTableData>searchCondition:",searchCondition);
+      searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds};
+          //filter:{"page":this.page-1,"size":this.sizeNum},
+          //order:this.order
+        //};
+      console.log("*getEventTableData>searchCondition:",searchCondition);
       /*}else{ //groupType, storeGroup
         self.params.groupIds=this.compareIds
         searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
@@ -1292,6 +1318,7 @@ export default {
         path: 'eventStatistics',
         params: self.params
       };
+      console.log("*getEventTableData>searchParamsObj:",searchParamsObj);
       self.ifSaveParams && self.$refs.eventSearch.saveSearchParams(searchParamsObj);
      self.ifSaveParams = true;
      if(this.compareIds.length>0){
@@ -1303,8 +1330,8 @@ export default {
           const result = eventResult.data;
           if (result) {
             self.allEventTableData = result.content;
-            self.total = result.totalPages;
-            
+            self.total = Math.ceil(result.totalElements/this.sizeNum);
+            console.log("total page:",self.total)
             self.allEventTableData.forEach(item => {
               const numOfTotal = item.numOfTotal;
               if (numOfTotal === 0) {
@@ -1331,11 +1358,39 @@ export default {
     },
     setEventTableData(){
       this.orderAllTableData();
-      this.eventTableData = this.allEventTableData;
+      //this.eventTableData = this.allEventTableData;
       //this.getEventTableData();
-      //this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      this.eventTableData = [];
+      this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
     },
-
+    barchartClick(bar){
+      console.log("barchartClick:",bar);
+      if(this.barActiveinnerId == bar.data.innerId){
+        this.barActiveinnerId = '-1';
+        this.setEventTableData();
+      }else{
+        this.barActiveinnerId = bar.data.innerId;
+        this.eventTableData = this.allEventTableData.filter(item=>{
+        if(this.compareType=="area1"){
+          return (item.province == bar.data.name);
+        }else if(this.compareType=="area2"){
+          return (item.city == bar.data.name);
+        }else if(this.compareType=="storeGroup"){
+          return (item.groupName == bar.data.name);
+        }else if(this.compareType=="storeType"){
+          return (item.groupName == bar.data.name);
+        }else if(this.compareType=="stores"){
+          return (item.groupName == bar.data.name);
+        }
+        //return item.groupName == bar.data.name;
+      });
+      }
+      this.setBarchartData();
+      
+      
+      
+      //console.log("***filterResult",filterResult);
+    },
     orderAllTableData(){
       let key = this.defaultSort.prop;
       key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
@@ -1368,14 +1423,14 @@ export default {
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.getEventTableData();
+      self.setEventTableData();
     },
     handleCurrentChange(pageObj){ //翻頁
       const self = this;
       self.page = pageObj.page;
       self.sizeNum = pageObj.size;
       self.params.filter = { page: self.page - 1, size: self.sizeNum };
-      self.getEventTableData();
+      self.setEventTableData();
     },
 
     handleSortChange(order, defaultSort) {
@@ -1385,7 +1440,7 @@ export default {
         page: this.page - 1,
         size: this.sizeNum
       };
-      this.getEventTableData();
+      this.setEventTableData();
     },
     onEvenListNumClick(row){
       console.log("clcick row:",row);
@@ -1405,8 +1460,8 @@ export default {
       //this.compareIds2 = compareArr;
       //console.log("compareArr :",compareArr);
       //console.log("compareArr.includ :",compareArr.includes('-1'));
-      if(compareArr.includes("-1")){
-        this.compareIds2 = selStoreIdArr.shift();
+      if(selStoreIdArr.includes("-1")){
+        selStoreIdArr.shift();
       }else{
         this.compareIds2 = selStoreIdArr
       }
@@ -1440,9 +1495,10 @@ export default {
       util.sortArrayByKeyDesc(self.peiDataSource,'numOfUnqualified');
       self.peiDataSource.forEach(item => {
         if(item.numOfUnqualified!=0){
+          
           seriesData.push({value:item.numOfUnqualified,name:item.groupName});
           jsonArray.push({itemName:item.groupName,amount:item.numOfUnqualified,percentage:item.percentage,itemIds:item.itemIds});
-          allItemIds.concat(item.itemIds);
+          allItemIds = allItemIds.concat(item.itemIds);
         }
       });
       this.allEventItemIds=[];
@@ -1499,7 +1555,7 @@ export default {
                 borderWidth:5,
                 borderColor:'#fff',
                   color: function(params) {
-                  const colorList = ['#5274bb', '#7b9feb', '#7bd8eb','#4de197','#99ee3a'];
+                  const colorList = util.getChartColorArray();
                   return colorList[params.dataIndex];
                 }
               }
@@ -1530,20 +1586,21 @@ export default {
     },
     async getItemDetail(){
       const self = this;
-      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2 };
+      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2};
       let result = await this.getInspecItemStatsOverview(params);
       self.eventItemTable.itemAllData = result.data;
-      self.eventItemTable.total = self.eventItemTable.itemAllData.length;
+      self.eventItemTable.total = Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
       self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
     },
     async onSeeAllIncepEventClick(){
       const self = this;
       self.showInvolveTableArea = false;
+      this.selEventItem =-1;
       self.selEventItemName = self.$t('statistics.event.seeAll');
       let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.allEventItemIds,storeIds:self.compareIds2 };
       let result = await this.getInspecItemStatsOverview(params);
       self.eventItemTable.itemAllData = result.data;
-      self.eventItemTable.total = self.eventItemTable.length;
+      self.eventItemTable.total =Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
       self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
     },
     export2Excel_eventItem() {
@@ -1615,7 +1672,7 @@ export default {
         obj.percentageStr = item.percentage+'%';
         self.eventInvolveTable.itemAllData.push(obj);
       });
-      self.eventInvolveTable.total = self.eventInvolveTable.itemAllData.length;
+      self.eventInvolveTable.total =Math.ceil( self.eventInvolveTable.itemAllData.length/self.eventInvolveTable.sizeNum);
       this.setEventInvolveTable();
     },
     setEventInvolveTable(){
@@ -1712,11 +1769,6 @@ export default {
       this.defaultSort = paramsObj.defaultSort;
       this.order = this.params.order = paramsObj.order;
     },
-
-    barchartClick(bar){
-      console.log("barchartClick:",bar);
-    }
-
   }
 };
 </script>
@@ -1867,7 +1919,7 @@ export default {
               align-self: center;
               display: flex;
               flex-direction: row;
-              width:calc(355/1440*100vw);
+              width:calc(344/1440*100vw);
               height: 30px;
               align-items: center;
               padding:0;
@@ -1928,6 +1980,7 @@ export default {
           flex-direction: row;
           justify-content: center;
           align-items: center;
+          
           .pct-panel{
             width: 276px;/*calc(276/1440*100vw);*/
             height: 276px;/*calc(276/1440*100vw);*/
@@ -1938,7 +1991,7 @@ export default {
                 position:absolute;
                 height: 150px;
                 width: 150px;
-                left:382px;
+                left:405px;
                 top:143px;
                 border-radius: 50%;
                 border-color:#dae4eb;
@@ -2034,7 +2087,7 @@ export default {
               align-self: center;
               display: flex;
               flex-direction: row;
-              width:calc(250/1440*100vw);
+              width:calc(344/1440*100vw);
               height: 30px;
               align-items: center;
               padding:0;

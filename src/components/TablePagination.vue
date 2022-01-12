@@ -75,7 +75,7 @@
               class="child-space"
               :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
               v-for="(item,index) in tableOperation.operation" 
-              :src="`../../static/img/table-${item.methods}.png`" 
+              :src="`./static/img/table-${item.methods}.png`" 
               @click="handleOperationButton(item.methods, scope.row, scope.$index)"
               height="26px" />
           </div>

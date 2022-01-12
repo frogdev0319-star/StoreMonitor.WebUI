@@ -16,7 +16,6 @@
     </el-select>
     <el-input
       v-model="input"
-      placeholder=""
       readonly
       class="input-class"/>
   </div>
@@ -192,11 +191,15 @@ export default {
     margin: 0;
     box-sizing: border-box;
   }
+  .input-class{
+    width: calc(100% - 30px);
+    position: absolute;
+    left: 0;
+  }
   .content{
     text-align: left;
     display: inline-block;
     position: relative;
-    margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
     /* padding: 0 20px 0 50px !important; */
@@ -224,24 +227,8 @@ export default {
     color: #2c90d9;
     -moz-osx-font-smoothing: grayscale;
   }
-  .input-class{
-    width: 100%;
-    position: absolute;
-    left: 0;
-  }
   >>> .el-select__tags{
     opacity: 0;
-  }
-  >>> .input-class.el-input--medium .el-input__inner{
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
-    border: none;
-    color: #2b2b2b;
-    background: #fff !important;
-    padding: 0 10px;
-    font-size: 15px;
-    min-width: 55px;
-    min-height: 28px;
   }
   >>> .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
@@ -251,7 +238,6 @@ export default {
     font-size: 15px;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
-    bottom: calc(2/1920*100vw);
     min-height: 28px;
     min-width: 85px;
   }
@@ -275,11 +261,6 @@ export default {
     min-height: 28px;
     min-width: 85px;
   }
-
-  .store-group-select .input-class{
-    bottom: 0;
-  }
-
 </style>
 <style>
   @import '../assets/css/pagination.css';

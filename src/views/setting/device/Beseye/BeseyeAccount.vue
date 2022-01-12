@@ -6,11 +6,11 @@
       @click="getBeseyeGrantCode"
     >
       <div class="button-area">
-        <i class="iconfont icon-authorize"/>
+        <img :src="`../../static/img/icon-authorize.png`" height="26px" />
         <span>{{ $t('deviceView.beseyeAuthorize') }}</span>
       </div>
     </account-header>
-    <div v-loading="isAuthorizing" :text="$t('deviceView.isAuthorizing')" class="table-container">
+    <div v-loading="isAuthorizing" :text="$t('deviceView.isAuthorizing')" class="paper padding">
       <table-pagination
         ref="ezvizAccoutTable"
         :column-data="columnData"

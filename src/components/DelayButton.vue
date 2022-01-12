@@ -4,7 +4,7 @@
     :loading="loadingStatus"
     size="mini"
     :type="buttonType"
-    class="storevue-button"
+    class="storevue-button-outlined"
     @click="handleClick"
   >
     <slot/>

@@ -1569,7 +1569,6 @@ export default {
   .video-content {
     height: auto;
     position: relative;
-    margin: calc(25 / 1920 * 100vw);
     min-height: 420px;
     background-color: #000;
     z-index: 100;

@@ -18,8 +18,6 @@
     </el-select>
     <el-input
       v-model="input"
-      :size="inputSize"
-      placeholder=""
       readonly
       class="input-class"/>
   </div>
@@ -255,7 +253,6 @@ export default {
     display: inline-block;
     position: relative;
     width: 100%;
-    margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
     /*color: #7d8cad;*/
@@ -294,18 +291,6 @@ export default {
   >>> .el-select__tags{
     opacity: 0;
   }
-  >>> .input-class.el-input--medium .el-input__inner{
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
-    border: none;
-    border-right: none;
-    color: #2b2b2b;
-    background: transparent !important;
-    padding: 0 10px;
-    font-size: 15px;
-    min-width: 55px;
-    min-height: 28px;
-  }
   >>> .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
     z-index: 1;
@@ -314,7 +299,6 @@ export default {
     font-size: 15px;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
-    bottom: calc(2/1920*100vw);
     min-height: 28px;
     min-width: 85px;
   }
@@ -340,22 +324,9 @@ export default {
     min-height: 28px;
     min-width: 85px;
   }
-  .input-class.el-input--mini{
-    width: calc(200px - 30px);
-    position: absolute;
-    top: 0;
-  }
   >>> .el-select__tags{
     opacity: 0;
   }
-  >>> .input-class.el-input--mini .el-input__inner{
-    border: none;
-    color: #2b2b2b;
-    background: transparent !important;
-    padding: 0 10px;
-    font-size: 15px;
-  }
-
   >>> .el-select.el-select--mini .el-input .el-input__inner{
     position: relative;
     z-index: 1;

@@ -3,7 +3,7 @@
     <div class="flex-center margin-bottom-md">
       <div class="spacer"></div>
       <el-button
-        class="storevue-button"
+        class="storevue-button-outlined"
         size="mini"
         type="primary"
         @click="onShowAddBeseyeDeviceDialog"
@@ -16,7 +16,7 @@
       <el-button
         size="mini"
         type="primary"
-        class="storevue-button"
+        class="storevue-button-outlined"
         @click="onShowDeleteDialogMethod"
       >
         <div class="btn-area">
@@ -25,78 +25,53 @@
         </div>
       </el-button>
     </div>
-    <el-dialog
+    <dialog-pop
+      :is-form="true"
       v-if="showAddDeviceDialog"
       :title="$t('deviceView.addDevice')"
       :visible.sync="showAddDeviceDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
-      width="610px"
-      top="35vh"
-      left="40vh"
-      custom-class="addDevice"
-    >
-      <div class="dialog-content">
-        <hr class="dialog-hr">
-        <div class="deviceForm">
-          <span class="available-span">{{ $t('deviceView.availableDevice') }}</span>
-          <div class="available-device-info self-loading" v-loading="isLoadingAvailableDevice">
-            <template v-if="avilableDeviceList.length > 0">
-              <div v-for="(item, index) of avilableDeviceList" :key="index" class="available-devices">
-                <div class="available-checkbox">
-                  <el-checkbox v-model="item.checked"/>
-                </div>
-                <div class="available-sn">
-                  <span>{{ item.serialNumber }}</span>
-                </div>
-                <div class="available-name">
-                  <span>{{ item.name }}</span>
-                </div>
-                <div class="available-store">
-                  <el-select
-                    v-model="item.storeId"
-                    :filter-method="filterStoreOption"
-                    :placeholder="$t('deviceView.selectStore')"
-                    style="width: 100%;"
-                    filterable
-                  >
-                    <el-option
-                      v-for="item in storeDataList"
-                      :key="item.storeId"
-                      :label="item.label"
-                      :value="item.storeId"/>
-                  </el-select>
-                </div>
-              </div>
-            </template>
-            <template v-else>
-              <div class="no-data-container">{{ $t('deviceView.noData') }}</div>
-            </template>
-          </div>
+      dialogWidth="520px"
+      @cancelHandler="showAddDeviceDialog = false"
+      @confirmHandler="confirmAddDevice">
+      <div class="fullWidth padding">
+        <div class="margin-bottom-sm">{{ $t('deviceView.availableDevice') }}</div>
+        <div class="self-loading margin-bottom-sm" style="background-color: #fff;border: solid 1px #c3c4c5; padding: 16px; border-radius: 5px" v-loading="isLoadingAvailableDevice">
+          <template v-if="avilableDeviceList.length > 0">
+            <div class="flex-center" style="justify-content: space-between" v-for="(item, index) of avilableDeviceList" :key="index">
+              <el-checkbox class="storevue-checkbox" v-model="item.checked"/>
+              <span>{{ item.serialNumber }}</span>
+              <span>{{ item.name }}</span>
+              <el-select
+                class="device-select"
+                v-model="item.storeId"
+                :filter-method="filterStoreOption"
+                :placeholder="$t('deviceView.selectStore')"
+                filterable
+              >
+                <el-option
+                  v-for="item in storeDataList"
+                  :key="item.storeId"
+                  :label="item.label"
+                  :value="item.storeId"/>
+              </el-select>
+            </div>
+          </template>
+          <template v-else>
+            <div class="no-data-container">{{ $t('deviceView.noData') }}</div>
+          </template>
         </div>
       </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button
-          class="file-cancel-btn"
-          size="mini"
-          style=""
-          @click="showAddDeviceDialog = false">{{ $t('deviceView.cancle') }}</el-button>
-        <el-button
-          class="file-confirm-btn"
-          size="mini"
-          type="primary"
-          @click="confirmAddDevice">{{ $t('deviceView.confirm') }}</el-button>
-      </div>
-    </el-dialog>
-    <el-dialog
+    </dialog-pop>
+    <dialog-pop
       v-if="showDeleteDialog"
       :visible.sync="showDeleteDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
       :title="$t('deviceView.deleteDevice')"
-      width="510px"
-      top="35vh"
-      left="40vh">
+      @cancelHandler="showDeleteDialog = false"
+      @confirmHandler="confirmDeleteDevice">
       <div class="dialog-content">
         <hr class="dialog-hr">
 
@@ -105,13 +80,7 @@
           <span class="warning-content">{{ $t('deviceView.deleteDevice') }}</span>
         </p>
       </div>
-      <div slot="footer" class="dialog-footer">
-        <el-button class="file-cancel-btn" size="mini" style="" @click="showDeleteDialog = false">
-          {{ $t('deviceView.cancle') }}</el-button>
-        <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteDevice()">
-          {{ $t('deviceView.confirm') }}</el-button>
-      </div>
-    </el-dialog>
+    </dialog-pop>
   </div>
 </template>
 
@@ -119,9 +88,13 @@
   import { getBriefStoreList } from '@/api/store';
   import { deviceRESTful, beseyeRESTful, skywatchRESTful} from '@/api/index';
   import util from '@/common/util';
+import DialogPop from '@/components/DialogPop';
 
   export default {
     name: 'DeviceHeader',
+    components: {
+      DialogPop
+    },
     props: {
       vendor: {
         type: Number,
@@ -351,6 +324,5 @@
   };
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
 </style>

@@ -16,8 +16,11 @@
 
 #en-devicetabs-content .el-tabs__item {
   padding: 0 0;
-  font-size: 14px;
+  font-size: calc(15/1920*100vw);
   width: 180px;
+  font-weight: 600;
+  height: calc(34/1920*100vw);
+  line-height: calc(34/1920*100vw);
 }
 
 #en-devicetabs-content .el-tabs__active-bar{
@@ -63,7 +66,7 @@
   background-color: #f7f9fa;
   border-radius: 2px;
   font-size: 15px;
-  border:none !important;
+  border-bottom: 1px solid rgba(172,174,177,.34);
 }
 .el-tabs__active-bar{
   display: none;
