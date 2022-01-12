@@ -1344,7 +1344,6 @@ export default {
     #{$poi}:checkRem($val);
   }
   .errorVideo-model{
-    margin: calc(25/1920*100vw);
     margin-bottom: 0;
     height: 100%;
     position: relative;
