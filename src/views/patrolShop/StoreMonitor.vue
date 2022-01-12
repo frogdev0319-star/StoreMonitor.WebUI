@@ -1878,9 +1878,8 @@ $h1: #292e36;
     .el-header-title {
       text-align: left;
       position: relative;
-      height: 80px;
-      line-height: 80px;
-      border-bottom: 1px solid $border;
+      height: 60px;
+      line-height: 60px;
       padding-left: calc(25 / 1920 * 100vw);
       padding-right: calc(25 / 1920 * 100vw);
       .lside-title {
