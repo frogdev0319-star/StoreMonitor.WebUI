@@ -1,6 +1,6 @@
 <template>
   <div class="page-container report-setting">
-    <div class="setting-titles">
+    <div class="setting-titles padding flex-center">
       {{this.$t('titleView.reportTemplate')}}
       <div class="spacer"></div>
       <div class="buttons">
@@ -115,8 +115,8 @@
                   <el-radio :label="0">{{ $t('titleView.showPartsDetails') }}</el-radio>
                 </el-radio-group>
                 <div class="spacer"></div>
-                <div v-if="ifShowAllDetails === 0" >
-                  <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
+                <div v-if="ifShowAllDetails === 0" style="font-size: 12px; color: #acaeb1">
+                  <i class="iconfont icon-tishi1" style="font-size: 14px; margin-right:10px"/>
                   {{ $t('titleView.draggableInfo') }}
                 </div>
               </div>
@@ -519,18 +519,15 @@ export default {
 
 <style scoped>
   .report-setting{
-    padding: 20px 0;
     height: 100%;
     position: relative;
-    font-size: calc(14/1920*100vw);
+    font-size: calc(18/1920*100vw);
     box-sizing: border-box;
   }
   .setting-titles{
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid #e3e9f4;
-    height: 47px;
-    padding: 0 30px;
   }
   .setting-tabs{
     display: flex;
@@ -579,6 +576,7 @@ export default {
     font-size: 12px;
   }
   .span-font{
+    font-size: 14px;
     color:#424151;
     /* width: 200px; */
     text-align: left;

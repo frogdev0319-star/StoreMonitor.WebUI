@@ -28,13 +28,14 @@
     /* padding-bottom: 20px; */
   }
   .setting-header{
+    font-size: calc(15/1920*100vw);
     display: flex;
     justify-content: flex-start;
     align-items: center;
     height: 40px;
     color: #2C3E50;
     font-weight: bolder;
-    background-color: #e9eff8;
+    background-color: #eef0f4;
     padding-left: calc(20/1920*100vw);
   }
   .setting-content{
