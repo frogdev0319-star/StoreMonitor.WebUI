@@ -863,7 +863,8 @@ export default {
       showInvolveTableArea:false,
       componentsProps_EventCommentList:{},
       gloableEventData:[],
-      barActiveinnerId:'-1'
+      barActiveinnerId:'-1',
+      inspectId:null,
     };
   },
 
@@ -934,7 +935,7 @@ export default {
 
       }*/
       this.params = searchParams;
-      //console.log('**emit search params:',this.params);
+      console.log('**emit search params:',this.params);
       this.compareIds = this.compareIds2 = this.params.storeIds;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
@@ -943,6 +944,7 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
+      this.inspectId = this.params.inspectId
       this.searchData();
     },
     async searchData() {
@@ -1322,7 +1324,7 @@ export default {
         path: 'eventStatistics',
         params: self.params
       };
-      console.log("*getEventTableData>searchParamsObj:",searchParamsObj);
+      //console.log("*getEventTableData>searchParamsObj:",searchParamsObj);
       self.ifSaveParams && self.$refs.eventSearch.saveSearchParams(searchParamsObj);
      self.ifSaveParams = true;
      if(this.compareIds.length>0){
@@ -1335,7 +1337,7 @@ export default {
           if (result) {
             self.allEventTableData = result.content;
             self.total = Math.ceil(result.totalElements/this.sizeNum);
-            console.log("total page:",self.total)
+            //console.log("total page:",self.total)
             self.allEventTableData.forEach(item => {
               const numOfTotal = item.numOfTotal;
               if (numOfTotal === 0) {
@@ -1368,7 +1370,7 @@ export default {
       this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
     },
     barchartClick(bar){
-      console.log("barchartClick:",bar);
+      //console.log("barchartClick:",bar);
       if(this.barActiveinnerId == bar.data.innerId){
         this.barActiveinnerId = '-1';
         this.setEventTableData();
@@ -1447,7 +1449,7 @@ export default {
       this.setEventTableData();
     },
     onEvenListNumClick(row){
-      console.log("clcick row:",row);
+      //console.log("clcick row:",row);
       const self = this;
       const searchParamsObj = {
         path: 'inspectReport',
@@ -1484,7 +1486,7 @@ export default {
     },
     async doGetInspecEvenItems(){
       const self = this;
-      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,inspectTagId:self.params.inspectId,storeIds:self.compareIds2 };
+      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,inspectTagId:self.inspectId,storeIds:self.compareIds2 };
       //console.log("doGetInspecEvenItems:",params);
       const result = await this.getInspecEvenItems(params);
       
