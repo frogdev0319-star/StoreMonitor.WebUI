@@ -25,14 +25,19 @@
                 </div>
                 <div class="average-cahrt">
                   <div style="height:68px;margin-top: 16px;">
-                    <AreaSelected
+                    <TypeSelectArea
                       path="inspectEvalutionStatistics"
+                      :allow-all=false
+                      :limit-num=2
+                      :region-array1="params.curProvince"
+                      :region-array2="params.curCity"
+                      :cur-store-group="params.curStoreGroup"
+                      :cur-store-type="params.curStoreType"
+                      :cur-stores="params.curStore"
                       :cached-params="params"
                       :cur-country="curCountry"
-                      :limit-num="2"
-                      :allow-all="false"
                       @emitTypeChanged="emitTypeChanged"
-                    ></AreaSelected>
+                    ></TypeSelectArea>
                   </div>
                   <div v-if="Avg12Num.length>0" class="avg-score" style="background-color:#fdf6f4;justify-content:space-between;">
                     <div class="avg12item" style="width:170px;">
@@ -146,6 +151,7 @@ import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import AreaDateTimeSelected from '@/components/AreaDateTimeSelected';
 import AreaSelected from '@/components/AreaSelected';
+import TypeSelectArea from '@/components/TypeSelectArea';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import moment from 'moment';
 import { left } from '../../../static/video';
@@ -160,7 +166,8 @@ export default {
     SearchComponent,
     TablePagination,
     AreaDateTimeSelected,
-    AreaSelected
+    AreaSelected,
+    TypeSelectArea
   },
   mixins: [resize],
   data() {
@@ -311,9 +318,9 @@ export default {
       //console.log("DateRangeFilter:",DateRangeFilter);
       this.doGetAverageScore(this.filterDateRange);
     },
-    emitTypeChanged({compareType,compareArr,selectedLabels}){ //劃分類型選擇
+    emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.compareType = compareType;
-      this.compareIds = compareArr;
+      this.compareIds = selStoreIdArr;//compareArr;
       this.comapareLabels = selectedLabels;
       this.doGetAverageScore(this.filterDateRange);
     },
@@ -757,6 +764,9 @@ export default {
 
       
     }
-    
+  .date-picker .el-input__inner{
+    font-size:13px;
   }
+  }
+  
 </style>

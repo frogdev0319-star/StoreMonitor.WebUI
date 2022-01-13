@@ -119,5 +119,10 @@ export default {
             content: url(../../static/img/statistics/ic_calender.svg);
             }
         }
+    /deep/
+    .el-input--medium .el-input__inner{
+        border:none;
+        background-color: #f7f9fa;
+    }
 }  
 </style>
