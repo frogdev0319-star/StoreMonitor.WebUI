@@ -249,7 +249,9 @@ export default {
     "worstItems": "不合格项目TOP5",
     "worstPatrol": "巡检完成最差TOP5",
     "worstRegion": "重点关注区域",
-    "customDate":"自定义"
+    "customDate":"自定义",
+    "pageSize":"每頁顯示",
+    "pageSizeUnit":"筆"
   },
 
   // Patrol page language
