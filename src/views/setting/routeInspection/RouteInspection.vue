@@ -1,18 +1,7 @@
 <template>
   <el-row id="inspectSetting" class="el-route-container">
     <el-col :span="24" class="el-route-header">
-      <el-col :span="7" class="el-route-btns">
-        <span :class="lang.indexOf('zh') === -1 ? 'en-bind-title': 'bind-title'">
-          {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
-        </span>
-        <delay-button
-          :class="lang.indexOf('zh') === -1 ? 'en-bind-btn' : 'bind-btn' "
-          :disabled="elTableData[Number(activeName)].data.length === 0"
-          @click="bindStore"
-        >
-          <i class="iconfont icon-quxiaolianjie"/>
-          <span>{{ $t('insSettingView.bindList') }}</span>
-        </delay-button>
+      <el-col class="flex el-route-btns" style="height: 36px">
         <input
           id="loadFileEx"
           ref="loadFileEx"
@@ -24,14 +13,22 @@
           v-for="(item,index) in btnList"
           :key="index"
           :disabled="item.enabled"
-          :class="lang.indexOf('zh') === -1 ? 'en-el-handle-btn' : 'el-handle-btn' "
+          style="margin-right: 20px; line-height: 24px"
+          class="storevue-button-empty"
           size="mini"
           @click="handleNape(index,item)">
-          <div class="btn-area">
-            <i :class="item.iconClass" :style="item.style"/>
-            <span>{{ item.btnTitle }}</span>
-          </div>
+          <i :class="item.iconClass" :style="item.style"/>
+          {{ item.btnTitle }}
         </el-button>
+          <el-button
+            type="primary"
+            size="small"
+            class="storevue-button-outlined"
+            :disabled="elTableData[Number(activeName)].data.length === 0"
+            @click="bindStore"
+          >
+            {{ $t('insSettingView.bindList') }}
+          </el-button>
       </el-col>
       <el-col
         v-loading="isLoading"
@@ -50,6 +47,7 @@
             :label="index < 2 ? getLang(index) : item.label"
             :name="index.toString()"
             :closable ="index !== 0 && index !== 1 ? true : false">
+            
             <el-tabs
               v-if="item.data.length !== 0 && !isLoading"
               id="patrltabs-content"
@@ -57,9 +55,30 @@
               :style="{'min-height':varyWindowWidth*0.70+'px'}"
               @tab-click="handleClickPatrol" >
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
-                <el-tooltip popper-class="item-tabs" effect="dark" :content="_item.name" placement="top"  slot="label">
-                  <span>{{ _item.name }}</span>
-                </el-tooltip>
+                <div class="flex-center" style="color: #acaeb1; font-size: 15px; margin: 15px 0">
+                  <el-select
+                    v-model="patrolActive"
+                    class="device-select"
+                    size="mini"
+                    @change="handleClickPatrol"
+                    placeholder="">
+                    <el-option
+                      v-for="(_item, _index) in item.data"
+                      :key="_index"
+                      :label="_item.name"
+                      :value="String(_index)"
+                    />
+                  </el-select>
+                  <span style="margin-left: 20px" :class="lang.indexOf('zh') === -1 ? 'en-bind-title': 'bind-title'">
+                    {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
+                  </span> 
+                  <div class="spacer"></div>
+                  <div style="font-size: 13px" @click="setItem(_item.routeData, _item.name, '', _item.name)">
+                    <i class="iconfont icon-quxiaolianjie"/>
+                    <span style="color: #006ab7;border-bottom:1px solid #006ab7; margin-right: 5px">{{ $t('insSettingView.relationDuty') }}:</span>
+                    <span>{{ _item.routeData[0].ModelPost }}</span>
+                  </div>
+                </div>
                 <div v-if="_item.routeData && !loading">
                   <route-detail
                     :ref="curIndex"
@@ -365,6 +384,19 @@ export default {
   },
 
   methods: {
+
+    setItem(routeData, tabName, tabNameLang, routeName) {
+      const self = this;
+      sessionStorage.setItem('NapeItem', JSON.stringify(routeData));
+      sessionStorage.setItem('GroupName', tabName);
+      const params = {
+        routeData: routeData,
+        tabNameLang: tabNameLang,
+        routeName: routeName
+      };
+      sessionStorage.setItem('itemSettingData', JSON.stringify(params));
+      self.$router.push({ name: 'itemSetting', params: params });
+    },
     notShowDragInfo() {
       this.showDragInfo = false;
       document.getElementById('inspectSetting')
@@ -2415,6 +2447,7 @@ export default {
                 }
             }
             .el-route-btns{
+              height: 36px;
                 position: absolute;
                 right: calc(40/1920*100vw);
                 z-index: 10;
