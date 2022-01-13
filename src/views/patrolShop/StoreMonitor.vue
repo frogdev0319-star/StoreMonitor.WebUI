@@ -2,6 +2,7 @@
   <div>
     <el-row>
       <store-filter
+        type="patrol"
         @emitSelectedStore = "getCurStore"
       ></store-filter>
     </el-row>

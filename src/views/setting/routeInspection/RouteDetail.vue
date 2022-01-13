@@ -50,12 +50,12 @@
           <div class="dragable-table-header" v-if="index === 0">
             <div class="table-header-item" v-for="(headerItem, headerIndex) in tableHeader" :key="headerIndex"
                   :style="headerItem.headerStyle">
-              <el-checkbox v-model="allchecked" class="storevue-checkbox" @change="checkAllItems" v-if="headerIndex === 0"/>
+              <el-checkbox v-model="allchecked" class="storevue-checkbox-outlined" @change="checkAllItems" v-if="headerIndex === 0"/>
               {{ headerItem.name }}
             </div>
           </div>
           <div class="catergy-title">
-            <el-checkbox v-model="item.checked" class="storevue-checkbox" @change="checkItemsOfCatergy(item)"/>
+            <el-checkbox v-model="item.checked" class="storevue-checkbox-outlined" @change="checkItemsOfCatergy(item)"/>
             <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
           </div>
           <template v-if="!item.children">
@@ -75,7 +75,7 @@
           <template v-else>
             <template v-for="(child,childIndex) in item.children">
               <div class="catergy-title subcatergy" :key="childIndex">
-                <el-checkbox v-model="child.checked" class="storevue-checkbox" @change="checkSubcatergy(child, item)"/>
+                <el-checkbox v-model="child.checked" class="storevue-checkbox-outlined" @change="checkSubcatergy(child, item)"/>
                 <span class="table-title">{{ child.groupName }}</span>
               </div>
               <div v-if="child.itemData.length !== 0" class="table-class">

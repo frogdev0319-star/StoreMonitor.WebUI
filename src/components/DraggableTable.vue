@@ -17,7 +17,7 @@
             <div class="table-checkbox">
               <el-checkbox
                 v-model="contentItem.checked"
-                class="storevue-checkbox"
+                class="storevue-checkbox-outlined"
                 @change="onCheckItem(sortableTableData)"/>
             </div>
             <div class="table-name">{{ contentItem.name }}</div>

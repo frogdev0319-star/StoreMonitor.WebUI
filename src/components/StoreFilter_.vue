@@ -58,7 +58,7 @@
       </div>
 
     </div>
-    <div class="flex-center padding-left" style="text-align: left; margin-top: 20px">
+    <div v-if="type === 'patrol'" class="flex-center padding-left" style="text-align: left; margin-top: 20px">
       <div class="paper shadow-light"
         @click="showFavorite = !showFavorite"
         :style="showFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}"
@@ -77,6 +77,23 @@
           :value="item.value"/>
       </el-select>
       <slot name="others"></slot>
+    </div>
+    <div v-if="type === 'bindroute'" class="flex-center padding-left" style="text-align: left; margin-top: 20px">
+      <el-input
+        :placeholder= "$t('insSettingView.searchPlaceholder')"
+        v-model="searchStr"
+        style="width: 200px"
+        size="mini"
+        clearable
+        class="storevue-input paper"
+        @keyup.enter.native="searchStoreInput"
+        @clear="searchStoreInput">
+        <i
+          slot="prefix"
+          class="iconfont icon-sousuo"
+          style="position:relative;top:6px;left:6px;font-size:18px;"
+          @click="searchStoreInput"/>
+      </el-input>
     </div>
   </div>
 </template>
@@ -115,6 +132,10 @@ export default {
     cachedParams: {
       type: Object,
       default: () => { return {}; }
+    },
+    type: {
+      type: String,
+      default: ''
     }
   },
 
@@ -127,6 +148,7 @@ export default {
       curCity: [],
       cityList: [],
       curStore: [],
+      curStoreData: [],
       storeList: [],
       storeDataList: [],
       lang: this.$i18n.locale,
@@ -155,7 +177,8 @@ export default {
       cities: [],
       showFavorite: false,
       selectedStore: '',
-      storeOptions: []
+      storeOptions: [],
+      searchStr: '',
     };
   },
 
@@ -292,6 +315,9 @@ export default {
       this.filterStore();
     },
 
+    searchStoreInput () {
+      this.filterStore();
+    },
     onChangeProvince(arr) {
       this.curProvince = arr;
       this.changePro(arr);
@@ -354,12 +380,13 @@ export default {
       }
       self.storeDataList = tempStore;
       self.storeListLength = this.storeDataList.length;
-      let storeArr = [], arr = [];
+      let storeArr = [], arr = [], arr_ = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
         arr.push(item.value);
+        arr_.push({ id: item.storeId, name: item.name })
       });
-
+      self.curStoreData = arr_;
       self.curStore = storeArr;
       self.changeStoreNew(self.curStore);
     },
@@ -427,6 +454,7 @@ export default {
 
     filterStore() {
       let filterStoreId = [];
+      let self = this;
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
         filterStoreId = this.curStore;
       } else {
@@ -447,7 +475,8 @@ export default {
       });
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-
+      this.curStore = this.curStoreData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
+      this.filterStoreIds = this.curStoreData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
@@ -478,6 +507,7 @@ export default {
       tempsearchParamsObj.curProvince = this.curProvince;
       tempsearchParamsObj.curCity = this.curCity;
       tempsearchParamsObj.curStore = this.curStore;
+      tempsearchParamsObj.curStoreData = this.curStoreData;
       tempsearchParamsObj.curStoreGroup = this.curStoreGroup;
       tempsearchParamsObj.curStoreType = this.curStoreType;
       tempsearchParamsObj.storeStr = this.storeStr;
@@ -488,6 +518,9 @@ export default {
       tempsearchParamsObj.curRegionI = this.curRegionI;
       tempsearchParamsObj.curRegionII = this.curRegionII;
       tempsearchParamsObj.regionMode = this.regionMode;
+      
+      console.log(tempsearchParamsObj)
+      this.$emit('storeChange', tempsearchParamsObj);
     },
 
     getStoreIdsOfGroupAndType(groupArr, typeArr) {
@@ -559,11 +592,16 @@ export default {
       }
       self.storeDataList = tempStore;
       self.storeListLength = this.storeDataList.length;
-      let storeArr = [], arr = [];
+      let storeArr = [], arr = [], arr_ = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
         arr.push(item.value);
+        arr_.push({
+          id: item.storeId,
+          name: item.name
+        })
       });
+      self.curStoreData = arr_;
       self.curStore = storeArr;
       self.changeStoreNew(self.curStore);
     },
@@ -571,6 +609,7 @@ export default {
     clearStoreInfo() {
       const self = this;
       self.curStore = [];
+      self.curStoreData = [];
       // self.$refs.multiSelect.selectedArray = [];
       // self.$refs.multiSelect.input = '';
     },
@@ -671,11 +710,17 @@ export default {
       self.curCity = (self.ifGetParamsFromCash && self.curCity.indexOf('-1') === -1) ? self.curCity : cityArr;
       self.storeDataList = tempStore;
       const storeArr = [];
+      let dataArr = [];
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
+        dataArr.push({
+          id: item.storeId,
+          name: item.label
+        })
       });
       setTimeout(async() => {
         self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
+        self.curStoreData = (self.ifGetParamsFromCash && self.curStoreData.indexOf('-1') === -1) ? self.curStoreData : dataArr;
         self.ifGetParamsFromCash = false;
         self.changeStoreNew(self.curStore);
       }, 100);
@@ -690,6 +735,7 @@ export default {
           this.curProvince = searchParams.curProvince;
           this.curCity = searchParams.curCity;
           this.curStore = searchParams.curStore;
+          this.curStoreData = searchParams.curStoreData;
           this.curStoreGroup = searchParams.curStoreGroup;
           this.curStoreType = searchParams.curStoreType;
           this.ifGetParamsFromCash = true;
