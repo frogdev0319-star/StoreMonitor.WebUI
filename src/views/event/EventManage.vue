@@ -165,6 +165,7 @@
           <div style="width:100%; margin-top:12px;height:31px;">
             <delay-button v-if="showCloseBtn"
               class="btn-close"
+              style="color:#FFF;"
               type="primary"
               size="mini"
               @click="doBachCloseEvent"
@@ -687,7 +688,7 @@ export default {
     },
 
     handleDisable(row, index){
-      if (row.status==3) {
+      if (row.status==2) {
         return false
       } else {
         return true
