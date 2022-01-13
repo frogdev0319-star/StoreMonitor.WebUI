@@ -190,10 +190,12 @@ export default {
         deep: true,
         handler (val,old ) {
           console.log("RegionArray1 changed")
+          console.log("this.storeList:",this.storeList);
           this.provinceList  = [];
           val.map(item => {
             if(item!='-1'){
               this.provinceList.push({value:item,label:item});
+            
             }
           });
            if(this.compareType== 'area1'){
@@ -537,18 +539,18 @@ export default {
       });
     },
     changeCompareType(val){
-      console.log("Change Compare Type=" +val)
-      const self = this;
-      this.compareType = val;
-      this.curSelectId = [];
-      this.curTypeArrary = [];
+      console.log("Change Compare Type=" +val);
+      let self = this;
+      self.compareType = val;
+      self.curSelectId = [];
+      self.curTypeArrary = [];
       let storeIds = [];
       switch (val){
         case 'area1':
-          this.dropdownPlaceholder = this.$t('remotePatrol.regionI');
-          this.selAllString=this.$t('overview.allZoneI');
-          this.curTypeArrary =this.provinceList;
-          this.curTypeArrary.forEach(function(item){
+          self.dropdownPlaceholder = self.$t('remotePatrol.regionI');
+          self.selAllString=self.$t('overview.allZoneI');
+          self.curTypeArrary =self.provinceList;
+          self.curTypeArrary.forEach(function(item){
             item.contents =[];
             self.storeList.forEach(function(store){
                if(self.curStores.indexOf(store.storeId)>=0 && store.province == item.label){
@@ -558,10 +560,10 @@ export default {
           })
           break;
         case 'area2':
-          this.dropdownPlaceholder =  this.$t('remotePatrol.regionII');
-          this.selAllString=this.$t('overview.allZoneII');
-          this.curTypeArrary =  this.cityList;
-          this.curTypeArrary.forEach(function(item){
+          self.dropdownPlaceholder =  self.$t('remotePatrol.regionII');
+          self.selAllString=self.$t('overview.allZoneII');
+          self.curTypeArrary =  self.cityList;
+          self.curTypeArrary.forEach(function(item){
             item.contents =[];
             self.storeList.forEach(function(store){
                if(self.curStores.indexOf(store.storeId)>=0 && store.city == item.label){
@@ -571,67 +573,90 @@ export default {
           })
           break;
         case 'storeGroup':
-          this.dropdownPlaceholder =  this.$t('remotePatrol.storeGroup');
-          this.selAllString=this.$t('storeView.all');
-          this.curTypeArrary = this.curStoreGroupList;
-          for(let i=0; i<this.curTypeArrary ;i++){
-            storeIds = storeIds.concat(this.curTypeArrary[i].storeIds);
+          self.dropdownPlaceholder =  self.$t('remotePatrol.storeGroup');
+          self.selAllString=self.$t('storeView.all');
+          self.curTypeArrary = self.curStoreGroupList;
+          for(let i=0; i<self.curTypeArrary ;i++){
+            storeIds = storeIds.concat(self.curTypeArrary[i].storeIds);
           }
           break;
         case 'storeType':
-          this.dropdownPlaceholder =  this.$t('remotePatrol.storeType');
-          this.selAllString=this.$t('storeView.all');
-          this.curTypeArrary = this.curStoreTypeList;
-          for(let i=0; i<this.curTypeArrary ;i++){
-            storeIds = storeIds.concat(this.curTypeArrary[i].storeIds);
+          self.dropdownPlaceholder =  self.$t('remotePatrol.storeType');
+          self.selAllString=self.$t('storeView.all');
+          self.curTypeArrary = self.curStoreTypeList;
+          for(let i=0; i<self.curTypeArrary ;i++){
+            storeIds = storeIds.concat(self.curTypeArrary[i].storeIds);
           }
           break;
         case 'users':
-          this.dropdownPlaceholder =  this.$t('overview.user');
-          this.selAllString=this.$t('overview.allUser');
-          this.curTypeArrary = this.userList;
+          self.dropdownPlaceholder =  self.$t('overview.user');
+          self.selAllString=self.$t('overview.allUser');
+          self.curTypeArrary = self.userList;
           break;
         case 'position':
-          this.dropdownPlaceholder =  this.$t('overview.position');
-          this.selAllString=this.$t('overview.allPosition');
-          this.curTypeArrary = this.positionsList ;
+          self.dropdownPlaceholder =  self.$t('overview.position');
+          self.selAllString=self.$t('overview.allPosition');
+          self.curTypeArrary = self.positionsList ;
           break;
         case 'stores':
-      //    console.log(this.curStores)
-          this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
-          this.selAllString=this.$t('overview.all');
-          this.curTypeArrary = this.curStoreList;
-          for(let i=0; i<this.curTypeArrary ;i++){
-            storeIds.push(this.curTypeArrary[i].storeId);
+      //    console.log(self.curStores)
+          self.dropdownPlaceholder =  self.$t('remotePatrol.stores');
+          self.selAllString=self.$t('overview.all');
+          self.curTypeArrary = self.curStoreList;
+          for(let i=0; i<self.curTypeArrary ;i++){
+            storeIds.push(self.curTypeArrary[i].storeId);
           }
           break;
         default:
-          this.dropdownPlaceholder =  this.$t('remotePatrol.stores');
-          this.selAllString=this.$t('overview.all');
-          this.curTypeArrary = this.curStoreList;
+          self.dropdownPlaceholder =  self.$t('remotePatrol.stores');
+          self.selAllString=self.$t('overview.all');
+          self.curTypeArrary = self.curStoreList;
           break;
       }
-       
-      if(this.curSelectId.length==0){
-          let defaultSel = this.curTypeArrary.length;
+      console.log("curSelectId:",self.curSelectId);
+      //if(self.curSelectId.length==0){
+        let selectedLabels = [];
+        /*if(!self.allowAll){
+          console.log("self.limitNum:",self.limitNum);
+          let defaultSel = (self.curTypeArrary.length>self.limitNum)?self.limitNum:self.curTypeArrary.length;
           let selectedLabels = [];
-          
-          this.curSelectId.push('-1');
           for(let i=0; i<defaultSel;i++){
-            this.curSelectId.push(this.compareType=='stores'?this.curTypeArrary[i].storeId: this.curTypeArrary[i].value);
-            selectedLabels.push(this.curTypeArrary[i].label);
-            if(this.compareType=='stores'){
-              storeIds.push(this.curTypeArrary[i].storeId);
-            }else if(this.compareType=='storeGroup' || this.compareType=='storeType' ){
-              console.log("**",this.curTypeArrary[i].storeIds);
-              storeIds = storeIds.concat(this.curTypeArrary[i].storeIds);
+            if(self.curSelectId.length==0){
+              self.curSelectId.push((self.compareType=="stores")?self.curTypeArrary[i].storeId:self.curTypeArrary[i].value);
+            }
+            selectedLabels.push(self.curTypeArrary[i].label);
+            if(self.compareType=='stores'){
+              storeIds.push(self.curTypeArrary[i].storeId);
+            }else if(self.compareType=='storeGroup' || self.compareType=='storeType' ){
+              console.log("**",self.curTypeArrary[i].storeIds);
+              storeIds = storeIds.concat(self.curTypeArrary[i].storeIds);
+            }
+          }
+        }else{*/
+          let defaultSel = self.curTypeArrary.length;
+          if(!self.allowAll){
+             defaultSel = (self.curTypeArrary.length>self.limitNum)?self.limitNum:self.curTypeArrary.length;
+          }
+          let selIdLength = self.curSelectId.length;
+          for(let i=0; i<defaultSel;i++){
+            if(selIdLength==0){
+              if(self.allowAll) self.curSelectId.push('-1');
+              self.curSelectId.push((self.compareType=="stores")?self.curTypeArrary[i].storeId:self.curTypeArrary[i].value);
+            }
+            selectedLabels.push(self.curTypeArrary[i].label);
+            if(self.compareType=='stores'){
+              storeIds.push(self.curTypeArrary[i].storeId);
+            }else if(self.compareType=='storeGroup' || self.compareType=='storeType' ){
+              console.log("**",self.curTypeArrary[i].storeIds);
+              storeIds = storeIds.concat(self.curTypeArrary[i].storeIds);
             }
             
           }
+        //}
           console.log("storeIds:",storeIds);
-          this.onChangeCompareType({selectedArray:this.curSelectId,storeIds,selectedLabels});
-            //this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:storeIds,selectedLabels});    
-      }
+          self.onChangeCompareType({selectedArray:self.curSelectId,storeIds,selectedLabels});
+            //self.$emit("emitTypeChanged",{compareType:self.compareType,compareArr:storeIds,selectedLabels});    
+      //}
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {

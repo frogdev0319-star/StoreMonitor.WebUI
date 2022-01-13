@@ -218,9 +218,34 @@ export default {
     }
 
   }
+  
 };
 </script>
-
+<style lang="scss" scoped>
+  .is-multiple {
+    .el-select-dropdown__item{
+      &:first-child {
+        background: none;
+        border-left: solid 1px rgba(172, 174, 177, 0.34);
+      }
+      &:not(:first-child) {
+        padding-left: 10px !important;
+        border-left: solid 1px rgba(44, 144, 217, 0.34);
+      }
+    }
+    .el-select-dropdown__item.selected {
+      &:first-child {
+        background: url("~@/../static/img/select-checked.svg") no-repeat;
+        background-position: center right 20px;
+        border-left: solid 1px rgba(44, 144, 217, 0.34);
+      }
+      &:not(:first-child) {
+        padding-left: 10px !important;
+        border-left: solid 1px rgba(44, 144, 217, 0.34);
+      }
+    }
+  }
+</style>
 <style scoped>
   *{
     padding: 0;
@@ -236,7 +261,7 @@ export default {
     margin-right: calc(15/1920*100vw);
   }
   .el-select-dropdown__item{
-    padding: 0 20px 0 50px !important;
+    padding: 0 20px 0 10px !important;
     /*color: #7d8cad;*/
   }
   .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
@@ -263,11 +288,13 @@ export default {
   }
   .input-class{
     height:35px;
-    width: calc(160/1920*100vw - 30px);
+    /*width: calc(160/1920*100vw - 30px);*/
     position: absolute;
     top: 0;
     left: 0;
+    text-overflow:ellipsis;
   }
+  
   >>> .el-select__tags{
     opacity: 0;
   }

@@ -443,7 +443,7 @@ export default {
 <style lang="scss" scoped>
 .content{
     width:calc(285/1440*100vw);
-    height:35px;
+    height:36px;
     border-radius: 5px;
     display:flex;
     flex-direction:row;
@@ -464,8 +464,7 @@ export default {
         }
         .dropdown-select{
             width:calc(85/1440*100vw);
-            height:36px;
-            border:1px solid #f7f9fa;
+            height:35px;
             color: #2b2b2b;
             align-self: center;
             align-items: center;
@@ -477,8 +476,43 @@ export default {
       ::v-deep.el-select.el-select--medium{
          background-color: #f7f9f9 !important;
         }
+        .is-multiple {
+  .el-select-dropdown__item {
+    margin-left: 20px;
+    &:first-child {
+      background: url("~@/../static/img/select-multi-unchecked.svg") no-repeat;
+      background-position: center right 20px;
     }
-    
+    &:not(:first-child) {
+      padding-left: 10px !important;
+      border-left: solid 1px rgba(172, 174, 177, 0.34);
+    }
+  }
+  /deep/
+  .el-select-dropdown__item.selected {
+    &:first-child {
+      background: url("~@/../static/img/select-checked.svg") no-repeat;
+      background-position: center right 20px;
+    }
+    &:not(:first-child) {
+      padding-left: 10px !important;
+      border-left: solid 1px rgba(44, 144, 217, 0.34);
+    }
+  }
+}
+    }
+    /deep/
+    .el-input--medium .el-input__inner{
+        border:none;
+        background-color: #f7f9fa;
+    }
+    /deep/
+    .el-select-dropdown.is-multiple .el-select-dropdown__item.selected{
+      &:first-child {
+      background: url("~@/../static/img/select-checked.svg") no-repeat;
+      background-position: center right 20px;
+    }
+    }
 }  
 </style>
 <style>
