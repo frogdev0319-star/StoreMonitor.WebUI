@@ -4,7 +4,7 @@
     :loading="loadingStatus"
     size="mini"
     :type="buttonType"
-    class="storevue-button-outlined"
+    :class="`storevue-button-${type}`"
     @click="handleClick"
   >
     <slot/>
@@ -22,6 +22,10 @@ export default {
     buttonType: {
       type: String,
       default: 'primary'
+    },
+    type: {
+      type: String,
+      default: 'outlined'
     }
   },
   data() {

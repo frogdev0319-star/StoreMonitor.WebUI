@@ -24,7 +24,8 @@
 <style scoped>
   .setting-table-container{
     border: 1px solid #e3e9f4;
-    padding-bottom: 20px;
+    border-radius: 3px;
+    /* padding-bottom: 20px; */
   }
   .setting-header{
     display: flex;

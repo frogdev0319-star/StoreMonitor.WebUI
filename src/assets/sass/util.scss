@@ -197,7 +197,30 @@ $sv_red: #c60957;
   border-color: $sv_red;
   background-color: $sv_red;
 }
-
+.storevue-radio {
+  label{
+    width: unset !important;
+    height: 18px;
+  }
+  &.el-radio-group {
+    display: flex;
+  }
+  .el-radio__inner {
+    border-width: 4px;
+    &::after {
+      width: 10px;
+      height: 10px;
+    }
+    height: 18px;
+    width: 18px;
+  }
+  .is-checked {
+    .el-radio__inner {
+      border-color: #c60957;
+      background: #c60957;
+    }
+  }
+}
 .confirm-btn{
   width: calc(100/1920*100vw);
   font-size: calc(14/1920*100vw);
@@ -643,7 +666,7 @@ $sv_red: #c60957;
 }
 
 .setting-config{
-  border-bottom: 1px solid #e3e9f4;
+  // border-bottom: 1px solid #e3e9f4;
   display: flex;
   justify-content: flex-start;
   align-items: center;

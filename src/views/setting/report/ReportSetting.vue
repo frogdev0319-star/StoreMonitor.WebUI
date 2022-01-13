@@ -1,74 +1,106 @@
 <template>
   <div class="page-container report-setting">
     <div class="setting-titles">
-      <div class="setting-tabs">
-        <div
-          v-for="(item,index) in settingTitleList"
-          :class="{'click-setting-btn' : curSettingIndex === index}"
-          :key="index"
-          class="setting-name">
-          {{ item.name }}
-        </div>
+      {{this.$t('titleView.reportTemplate')}}
+      <div class="spacer"></div>
+      <div class="buttons">
+        <delay-button
+          class="schedule-btn"
+          @click="addReportTemplate">
+          <div class="button-area">
+            <i class="iconfont el-icon-plus"/>
+            <span>{{ $t('titleView.add') }}</span>
+          </div>
+        </delay-button>
+        <delay-button
+          :disabled="templateList.length === 0"
+          class="schedule-btn"
+          @click="deleteReportTemplate">
+          <div class="button-area">
+            <i class="iconfont icon-shanchu"/>
+            <span>{{ $t('titleView.delete') }}</span>
+          </div>
+        </delay-button>
       </div>
     </div>
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="content-titles">
-        <button-list :name-list="templateList" :cur-template-index="curTemplateIndex" @click="displayTemplateInfo"/>
-        <div class="buttons">
-          <delay-button
-            class="schedule-btn"
-            @click="addReportTemplate">
-            <div class="button-area">
-              <i class="iconfont el-icon-plus"/>
-              <span>{{ $t('titleView.add') }}</span>
-            </div>
-          </delay-button>
-          <delay-button
-            :disabled="templateList.length === 0"
-            class="schedule-btn"
-            @click="deleteReportTemplate">
-            <div class="button-area">
-              <i class="iconfont icon-shanchu"/>
-              <span>{{ $t('titleView.delete') }}</span>
-            </div>
-          </delay-button>
+        <el-select
+          v-model="curTemplateIndex"
+          class="device-select"
+          size="mini"
+          style="margin-right: 20px"
+          @change="displayTemplateInfo"
+          placeholder="">
+          <el-option
+            v-for="(item, index) in templateList"
+            :key="index"
+            :label="item.name"
+            :value="index"
+          />
+        </el-select>
+        <div>
+          <span class="enable-font">{{ $t('scheduleView.enable') }}</span>
+          <el-switch v-model="curTemplate.enable" @change="changTemplateEnableStatus">{{ curTemplate.enable }}</el-switch>
         </div>
+        <div class="spacer"></div>
+        <delay-button
+          type="filled"
+          @click="saveTemplateInfo">
+          <div class="button-area">
+            <span>{{ $t('titleView.save') }}</span>
+          </div>
+        </delay-button>
       </div>
       <div class="template-info">
-        <div class="title-info" >
-          <div class="left-item">
-            <span class="required-name">*</span>
-            <span class="name-font">{{ $t('titleView.templateName') }}</span>
-            <div class="name-tips">
-              <el-input
-                v-model="curTemplate.name"
-                :placeholder="$t('titleView.enterTemplateName')"
-                class="input-name"
-                @input="onTemplateNameChange"
-                @blur="showTemplateTip = false"/>
-              <span v-if="showTemplateTip" class="error-text"><span>
-                {{ templateNameTip }}
-              </span></span>
-            </div>
-          </div>
-          <div class="right-item">
-            <span class="enable-font">{{ $t('scheduleView.enable') }}</span>
-            <el-switch v-model="curTemplate.enable" @change="changTemplateEnableStatus">{{ curTemplate.enable }}</el-switch>
-          </div>
-        </div>
         <div class="inspect-basic">
           <setting-table :table-name="$t('titleView.basicInfo')">
             <template slot="tableDetail">
-              <div class="table-header basic-header">
-                <div class="title-name">{{ $t('titleView.componentName') }}</div>
-                <div class="title-status">{{ $t('titleView.componentStatus') }}</div>
-                <div class="title-operation">{{ $t('titleView.operation') }}</div>
+              <div class="setting-config basic-config">
+                <div class="title-name">{{ $t('titleView.templateName') }}</div>
+                <div class="title-status">
+                  <div class="name-tips">
+                    <el-input
+                    v-model="curTemplate.name"
+                    :placeholder="$t('titleView.enterTemplateName')"
+                    class="input-name"
+                    @input="onTemplateNameChange"
+                    @blur="showTemplateTip = false"/>
+                    <span v-if="showTemplateTip" class="error-text">
+                      <span>
+                      {{ templateNameTip }}
+                      </span>
+                    </span>
+                  </div>
+                </div>
               </div>
               <div v-for="item in basicList" :key="item.position" class="setting-config basic-config">
                 <div class="title-name">{{ $t(`titleView.${item.name}`) }}</div>
-                <div class="title-status"><el-switch v-model="item.enable"/></div>
+                <div class="title-status">
+                  <el-radio-group class="storevue-radio" v-model="item.enable">
+                    <el-radio :label="true">{{ $t('titleView.qualified') }}</el-radio>
+                    <el-radio :label="false">{{ $t('titleView.unqualified') }}</el-radio>
+                  </el-radio-group>
+                </div>
                 <div class="title-operation">
-                  <span v-if="item.name === 'statistics'" class="iconfont icon-gengduo" @click="setStatusDetail(item)"/>
+                  <div class="flex-center" style="background-color: #f7f9fa; padding: 12px" v-if="item.name === 'statistics'">
+                    <div class="flex-center">
+                      <span class="span-font" style="margin-right: 20px">{{ $t('titleView.statisIndex') }}</span>
+                      <div>
+                        <el-radio-group class="storevue-radio" v-model="statisticSettingDetail.qualified">
+                          <el-radio :label="0">{{ $t('titleView.qualified') }}</el-radio>
+                          <el-radio :label="1">{{ $t('titleView.unqualified') }}</el-radio>
+                        </el-radio-group>
+                      </div>
+                    </div>
+                    <div class="flex-center">
+                      <span class="span-font" style="margin-right: 20px;margin-left: 60px">{{ $t('titleView.displayofStatisticalResults') }}</span>
+                      <el-radio-group class="storevue-radio" v-model="statisticSettingDetail.chart">
+                        <el-radio :label="0">{{ $t('titleView.radar') }}</el-radio>
+                        <el-radio :label="1">{{ $t('titleView.pie') }}</el-radio>
+                      </el-radio-group>
+                    </div>
+                  </div>
                 </div>
               </div>
             </template>
@@ -77,26 +109,29 @@
         <setting-table :table-name="$t('remotePatrol.detailInfo')">
           <template slot="tableDetail">
             <div class="detail-setting">
-              <div style="position: relative">
-                <el-radio-group v-model="ifShowAllDetails" class="radio-setting" text-color="#7d8cad">
+              <div class="padding flex-center">
+                <el-radio-group v-model="ifShowAllDetails" class="storevue-radio">
                   <el-radio :label="1">{{ $t('titleView.showAllDetails') }}</el-radio>
                   <el-radio :label="0">{{ $t('titleView.showPartsDetails') }}</el-radio>
                 </el-radio-group>
-                <div v-if="ifShowAllDetails === 0" class="promot-info">
+                <div class="spacer"></div>
+                <div v-if="ifShowAllDetails === 0" >
                   <i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
                   {{ $t('titleView.draggableInfo') }}
                 </div>
               </div>
+              <hr v-if="ifShowAllDetails === 0" class="hr-horizontal" style="margin-bottom: 15px;"/>
               <template v-if="ifShowAllDetails === 0">
-                <div class="table-header">
-                  <div class="title-name">{{ $t('titleView.componentName') }}</div>
-                  <div class="title-status">{{ $t('titleView.componentStatus') }}</div>
-                </div>
                 <draggable v-model="list" class="detail-table">
                   <div v-for="item in list" :key="item.position" class="setting-config">
                     <template>
                       <div class="title-name">{{ $t(`titleView.${item.name}`) }}</div>
-                      <div class="title-status"><el-switch v-model="item.enable"/></div>
+                      <div class="title-status">
+                        <el-radio-group class="storevue-radio" v-model="item.enable">
+                          <el-radio :label="true">{{ $t('titleView.qualified') }}</el-radio>
+                          <el-radio :label="false">{{ $t('titleView.unqualified') }}</el-radio>
+                        </el-radio-group>
+                      </div>
                     </template>
                   </div>
                 </draggable>
@@ -104,15 +139,6 @@
             </div>
           </template>
         </setting-table>
-      </div>
-      <div class="save-btn">
-        <delay-button
-          class="schedule-btn"
-          @click="saveTemplateInfo">
-          <div class="button-area">
-            <span>{{ $t('titleView.save') }}</span>
-          </div>
-        </delay-button>
       </div>
     </div>
     <dialog-pop
@@ -168,12 +194,13 @@ export default {
   components: { SettingTable, ButtonList, DialogPop, DelayButton, draggable },
   data() {
     return {
-      curTemplate: 0,
+      curTemplate: {},
       templateList: [],
       showTemplateTip: false,
       isLoadingData: true,
       list: [],
       curTemplateIndex: 0,
+      curTemplateName: '',
       templateNameTip: '',
       showStaticDetailSetting: false,
       statisticSettingDetail: { chart: 0, qualified: 0 },
@@ -210,10 +237,11 @@ export default {
             template.originalEnable = template.enable;
           });
           this.curTemplate = JSON.parse(JSON.stringify(this.templateList[this.curTemplateIndex]));
+          this.curTemplateName = this.curTemplate.name;
           this.setBasicAndDetailList();
         } else {
           this.templateList = [];
-          this.curTemplate = [];
+          this.curTemplate = {};
           this.list = [];
           this.basicList = [];
           this.curTemplateIndex = 0;
@@ -552,7 +580,7 @@ export default {
   }
   .span-font{
     color:#424151;
-    width: 200px;
+    /* width: 200px; */
     text-align: left;
   }
   .name-font{
@@ -591,7 +619,7 @@ export default {
   }
 
   .detail-setting{
-    padding: 0 calc(30/1920*100vw);
+    /* padding: 0 calc(30/1920*100vw); */
   }
   .radio-setting{
     display: flex;
@@ -604,7 +632,7 @@ export default {
     height: 30px;
   }
   .setting-config{
-    border-bottom: 1px solid #e3e9f4;
+    /* border-bottom: 1px solid #e3e9f4; */
   }
 
   .setting-config:hover{
@@ -628,7 +656,7 @@ export default {
   }
 
   .title-operation{
-    width: 20%;
+    /* width: 20%; */
   }
 
   .sortable-ghost{
@@ -651,7 +679,6 @@ export default {
   }
   .content-titles{
     display: flex;
-    justify-content: space-between;
     align-items: center;
     height: 60px;
     font-size: 12px;
@@ -667,13 +694,10 @@ export default {
     color: #424151;
   }
   .detail-table{
-    border: 1px solid #e3e9f4;
-    padding-bottom: 20px;
+    /* border: 1px solid #e3e9f4;
+    padding-bottom: 20px; */
+    background-color: #f7f9fa
   }
-  .detail-table .setting-config{
-    padding-left: 0;
-  }
-
   .promot-info{
     position: absolute;
     right: 0;
