@@ -495,7 +495,7 @@ export default {
   }
 </style>
 
-<style>
+<style lang="scss">
   @import "../assets/css/pagination.css";
   .el-table__expanded-cell{
     background-color: #EFF3F5 !important;
@@ -503,9 +503,11 @@ export default {
   .el-table__expanded-cell:hover {
     background-color: #EFF3F5 !important;
   }
-  .el-table{
-    box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
-    border: solid 1px #f5f5f5;
+  .table {
+    .el-table{
+      box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
+      border: solid 1px #f5f5f5;
+    }
   }
   
 </style>

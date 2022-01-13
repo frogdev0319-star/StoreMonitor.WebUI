@@ -157,7 +157,7 @@ export default {
     border: none;
     outline: 0;
 }
-.btnArrow.el-button:focus, .el-button:hover {
+.btnArrow.el-button:focus, .btnArrow.el-button:hover {
     color: #006ab7;
     border: none;
     background-color: #FFF;
