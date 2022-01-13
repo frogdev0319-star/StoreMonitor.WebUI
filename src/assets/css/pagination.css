@@ -132,10 +132,6 @@
 .el-date-editor .el-range-input{
   width: 50%;
 }
-.el-button--primary.el-button--small{
-  min-height: 28px;
-  min-width: 85px;
-}
 .el-button--primary.el-button--mini{
   min-height: 28px;
   min-width: 85px;

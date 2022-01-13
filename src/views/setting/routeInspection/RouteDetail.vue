@@ -1,104 +1,100 @@
 <template>
   <div class="detail-container">
-    <el-row>
-      <el-col :span="24" class="detail-title">
-        <div class="table-right-post" @click="setItem">
-          <i class="iconfont icon-quxiaolianjie"/>
-          <span class="post-label">{{ $t('insSettingView.relationDuty') }}:</span>
-          <span class="post-concent">{{ routeData[0].ModelPost }}</span>
+    <div>
+      <div class="data-box flex-center">
+        <div v-for="(item, sheetIndex) in sheetName" :key="item.id" class="sheet_title" @click="changeSheet(item.id, sheetIndex)">
+          <p :style="item.isClick?'background-color: #fff;color:#006ab7;':''" class="item_title">{{ item.label }}</p>
         </div>
-        <div class="route-btns">
-          <delay-button
+        <div class="spacer"></div>
+        <div 
+          class="flex-center"
+          style="margin-right: 20px">
+          <el-button
             :disabled="routeData.length === 0"
-            class="inspction-btn"
-            button-type="default"
+            class="storevue-button-empty"
+            size="mini"
             @click="deleteNapes"
           >
             <i class="iconfont icon-shanchu"/>
             <span>{{ $t('insSettingView.deleteItem') }}</span>
-          </delay-button>
-          <delay-button
+          </el-button>
+          <el-button
             :disabled="routeData.length === 0"
-            class="inspction-btn"
+            class="storevue-button-empty"
+            size="mini"
+            style="margin-left: 16px"
             @click="setRule">
             <i class="iconfont icon-guize1"/>
             <span>{{ $t('insSettingView.ruleInspect') }}</span>
-          </delay-button>
-          <delay-button
+          </el-button>
+          <el-button
             :disabled="routeData.length === 0"
-            class="inspction-btn"
+            class="storevue-button-empty"
+            size="mini"
+            style="margin-left: 16px"
             @click="setItem"
           >
             <i class="iconfont icon-button"/>
             <span>{{ $t('insSettingView.setItem') }}</span>
-          </delay-button>
+          </el-button>
         </div>
-      </el-col>
-      <el-col :span="24">
-        <div class="data-box">
-          <div v-for="(item, sheetIndex) in sheetName" :key="item.id" class="sheet_title" @click="changeSheet(item.id, sheetIndex)">
-            <p :style="item.isClick?'background-color: #f31b65;color:#fff;':''" class="item_title">{{ item.label }}</p>
-          </div>
-        </div>
-        <el-scrollbar id="el-menuscrollbar">
-          <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
-            <div v-for="(item,index) in inspectCategoryList" :key="index" class="data-content">
-              <div class="prompt-content" v-if="sheetIndex === 0 && index === 0 && showDragInfo">
-                <div class="prompt-info">
-                  <img :src="dragImgSrc" class="prompt-image" alt="">
-                  <div class="prompt-msg">{{ $t('titleView.draggableInfo') }}</div>
-                </div>
-              </div>
-              <div class="dragable-table-header" v-if="index === 0">
-                <div class="table-header-item" v-for="(headerItem, headerIndex) in tableHeader" :key="headerIndex"
-                     :style="headerItem.headerStyle">
-                  <el-checkbox v-model="allchecked" class="allcheckBox" @change="checkAllItems" v-if="headerIndex === 0"/>
-                  {{ headerItem.name }}
-                </div>
-              </div>
-              <div class="catergy-title">
-                <el-checkbox v-model="item.checked" class="all-checkBox" @change="checkItemsOfCatergy(item)"/>
-                <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
-              </div>
-              <template v-if="!item.children">
-                <div v-if="item.itemData.length !== 0" class="table-class">
-                  <draggable-table
-                    :is-score-sheet= "isScoreItemActive"
-                    :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
-                    :table-data="item.itemData"
-                    :show-edit-btn="false"
-                    :show-table-header="false"
-                    @handleDeleteItem="contentItem => handleDelete(contentItem, index, -1)"
-                    @handleCheckItem="tableData => handleCheckCategoryItem(tableData, index)"
-                    @updateTableData = "sortableTableData => changeTableData(sortableTableData, index)"
-                  />
-                </div>
-              </template>
-              <template v-else>
-                <template v-for="(child,childIndex) in item.children">
-                  <div class="catergy-title subcatergy" :key="childIndex">
-                    <el-checkbox v-model="child.checked" class="all-checkBox" @change="checkSubcatergy(child, item)"/>
-                    <span class="table-title">{{ child.groupName }}</span>
-                  </div>
-                  <div v-if="child.itemData.length !== 0" class="table-class">
-                    <draggable-table
-                      :is-score-sheet= "isScoreItemActive"
-                      :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
-                      :table-data="child.itemData"
-                      :show-edit-btn="false"
-                      :show-table-header="false"
-                      @handleDeleteItem="contentItem => handleDelete(contentItem, index, childIndex)"
-                      @handleCheckItem="(tableData) => handleCheckSubcategoryItem(tableData, index, childIndex)"
-                      @updateTableData = "sortableTableData => changeTableData(sortableTableData,index, childIndex)"
-                    />
-                  </div>
-                </template>
-              </template>
+      </div>
+      <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
+        <div v-for="(item,index) in inspectCategoryList" :key="index" class="data-content">
+          <div class="prompt-content" v-if="sheetIndex === 0 && index === 0 && showDragInfo">
+            <div class="prompt-info">
+              <img :src="dragImgSrc" class="prompt-image" alt="">
+              <div class="prompt-msg">{{ $t('titleView.draggableInfo') }}</div>
             </div>
           </div>
-        </el-scrollbar>
-      </el-col>
-    </el-row>
+          <div class="dragable-table-header" v-if="index === 0">
+            <div class="table-header-item" v-for="(headerItem, headerIndex) in tableHeader" :key="headerIndex"
+                  :style="headerItem.headerStyle">
+              <el-checkbox v-model="allchecked" class="storevue-checkbox" @change="checkAllItems" v-if="headerIndex === 0"/>
+              {{ headerItem.name }}
+            </div>
+          </div>
+          <div class="catergy-title">
+            <el-checkbox v-model="item.checked" class="storevue-checkbox" @change="checkItemsOfCatergy(item)"/>
+            <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
+          </div>
+          <template v-if="!item.children">
+            <div v-if="item.itemData.length !== 0" class="table-class">
+              <draggable-table
+                :is-score-sheet= "isScoreItemActive"
+                :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
+                :table-data="item.itemData"
+                :show-edit-btn="false"
+                :show-table-header="false"
+                @handleDeleteItem="contentItem => handleDelete(contentItem, index, -1)"
+                @handleCheckItem="tableData => handleCheckCategoryItem(tableData, index)"
+                @updateTableData = "sortableTableData => changeTableData(sortableTableData, index)"
+              />
+            </div>
+          </template>
+          <template v-else>
+            <template v-for="(child,childIndex) in item.children">
+              <div class="catergy-title subcatergy" :key="childIndex">
+                <el-checkbox v-model="child.checked" class="storevue-checkbox" @change="checkSubcatergy(child, item)"/>
+                <span class="table-title">{{ child.groupName }}</span>
+              </div>
+              <div v-if="child.itemData.length !== 0" class="table-class">
+                <draggable-table
+                  :is-score-sheet= "isScoreItemActive"
+                  :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
+                  :table-data="child.itemData"
+                  :show-edit-btn="false"
+                  :show-table-header="false"
+                  @handleDeleteItem="contentItem => handleDelete(contentItem, index, childIndex)"
+                  @handleCheckItem="(tableData) => handleCheckSubcategoryItem(tableData, index, childIndex)"
+                  @updateTableData = "sortableTableData => changeTableData(sortableTableData,index, childIndex)"
+                />
+              </div>
+            </template>
+          </template>
+        </div>
+      </div>
+    </div>
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -797,10 +793,9 @@ export default {
         position: relative;
     }
     .data-box{
-        background-color: #e9eff8;
-        height:36px;
-        border:1px solid #e3e9f4;
-        border-bottom: 0px;
+        background-color: #f7f9f9;
+        height: 40px;
+        border-bottom:1px solid rgba(172, 174, 177, 0.34);
         margin-top:10px;
         padding-left:60px;
         .item_title{
@@ -817,8 +812,6 @@ export default {
             cursor: pointer;
         }
         .sheet_title{
-            float: left;
-            margin-top: 2px;
         }
     }
     .data-content{
