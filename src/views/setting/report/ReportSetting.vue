@@ -122,7 +122,7 @@
               </div>
               <hr v-if="ifShowAllDetails === 0" class="hr-horizontal" style="margin-bottom: 15px;"/>
               <template v-if="ifShowAllDetails === 0">
-                <draggable v-model="list" class="detail-table">
+                <draggable v-model="list" class="detail-table" style="margin: 20px">
                   <div v-for="item in list" :key="item.position" class="setting-config">
                     <template>
                       <div class="title-name">{{ $t(`titleView.${item.name}`) }}</div>
