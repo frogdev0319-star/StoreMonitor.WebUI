@@ -6,7 +6,7 @@
       :disabled="disabled"
       multiple
       collapse-tags
-      class="el-province"
+      class="el-province device-select"
       @change="changeSelect"
       @visible-change="visibileHandler">
       <el-option v-if="options.length > 0" :label="alltype ===0 ? $t('remotePatrol.all'):$t('overview.all')"
@@ -185,14 +185,14 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   *{
     padding: 0;
     margin: 0;
     box-sizing: border-box;
   }
   .input-class{
-    width: calc(100% - 30px);
+    /* width: calc(100% - 30px); */
     position: absolute;
     left: 0;
   }
@@ -200,6 +200,11 @@ export default {
     text-align: left;
     display: inline-block;
     position: relative;
+    cursor: pointer;
+    /deep/ * {
+      background-color: transparent !important;
+      border: none !important;
+    }
   }
   .el-select-dropdown__item{
     /* padding: 0 20px 0 50px !important; */
@@ -230,7 +235,7 @@ export default {
   >>> .el-select__tags{
     opacity: 0;
   }
-  >>> .el-select.el-select--medium .el-input .el-input__inner{
+  /* >>> .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;
     z-index: 1;
     background: transparent !important;
@@ -240,7 +245,7 @@ export default {
     line-height: calc(36/1920*100vw);
     min-height: 28px;
     min-width: 85px;
-  }
+  } */
   >>> .el-select.el-select--medium .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
@@ -252,10 +257,9 @@ export default {
   }
   .el-select.el-select--medium{
     color: #2b2b2b;
-    background: #fff !important;
+    background-color: #f7f9fa;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
-    border:none !important;
     width: 100%;
     border-radius: 3px;
     min-height: 28px;

@@ -55,7 +55,6 @@ $sv_red: #c60957;
   }
 }
 .main-dialog-body {
-  background-color: #f7f9fa;
   .el-input__inner{
     height: 46px;
   }
@@ -66,7 +65,7 @@ $sv_red: #c60957;
   background-color: #f7f9fa;
 }
 .dialog-slot{
-  margin: 40px 30px 40px 40px;
+  margin: 0 30px;
   display: flex;
   align-items: center;
 }
@@ -96,15 +95,24 @@ $sv_red: #c60957;
 
 .storevue-dialog .el-dialog{
   position: absolute;
+  display: flex;
+  flex-direction: column;
   border-radius: 5px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0 !important;
+  .el-dialog__header {
+    background-color: #f7f9fa;
+  }
+  .el-dialog__body {
+    flex: 1;
+    background-color: #f7f9fa;
+  }
 }
 
 .storevue-dialog .el-dialog__header{
-  padding: 20px 20px 20px 40px;
+  padding: 20px;
   
   display: flex;
   align-items: center;
@@ -222,7 +230,7 @@ $sv_red: #c60957;
 .device-select {
   .el-input__inner {
     border-color: #f4f6f7 !important;
-    background-color: #f4f6f7;
+    background-color: #f4f6f7 !important;
     height: calc(30/1920*100vw);
   }
   .el-input__icon {
@@ -690,7 +698,6 @@ $sv_red: #c60957;
 
 .dialog-form-item{
   width: 100%;
-  height: 56px;
   margin-bottom: 18px;
 }
 

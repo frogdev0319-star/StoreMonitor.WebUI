@@ -41,12 +41,15 @@
             </div>
           </template>
           <div class="table-operation">
-            <i
+            <img 
               v-if="showEditBtn"
-              class="iconfont icon-bianji"
-              style="cursor:pointer;margin-right:10px;"
-              @click="handleEdit(contentIndex,contentItem)"/>
-            <i class="iconfont icon-shanchu" style="cursor:pointer;" @click="handleDelete(contentItem)"/>
+              :src="`./static/img/table-edit.png`" 
+              @click="handleEdit(contentIndex,contentItem)"
+              height="26px" />
+            <img 
+              :src="`./static/img/table-delete.png`" 
+              @click="handleDelete(contentItem)"
+              height="26px" />
           </div>
         </div>
       </draggable>
