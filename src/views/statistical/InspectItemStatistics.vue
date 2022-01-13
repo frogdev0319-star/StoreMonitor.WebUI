@@ -21,6 +21,7 @@
                             <TypeSelectArea
                               path="inspectItemStatistics"
                               :allow-all=true
+                              :allow-person=true
                               :region-array1="params.curProvince"
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
@@ -1452,6 +1453,57 @@ export default {
           output.push(item)
         });;
       }
+      else if(type == 'position'){
+          
+          originArray.map(function(d){
+             var  pos = null;
+             var totalScore =0;
+             var totalStandard = 0;
+             content.map(function(item,i){
+               
+                if(d.contents.indexOf(item.innerId)>=0){
+                  if(!pos){
+                    pos = JSON.parse(JSON.stringify(item))
+                    if(item.averageScore){
+                        totalScore += item.averageScore * item.numOfReport;
+                        console.log("X Total Score="+totalScore)
+                    }
+                    if(item.standardRate){
+                        totalStandard+= item.standardRate * item.numOfReport;
+                    }
+                    pos.submitters =[item.groupName]
+                    pos.groupName = d.label;
+                  }
+                  else{
+                    pos.numOfDargerous += item.numOfDargerous;
+                    pos.numOfQualified += item.numOfQualified;
+                    pos.numOfImproved += item.numOfImproved;
+                    pos.numOfReport  += item.numOfReport;
+                    pos.numOfStandard += item.numOfStandard;
+                    pos.submitters.push(item.groupName)
+                    if(item.averageScore){
+                        totalScore += parseFloat(item.averageScore) * item.numOfReport;
+                        console.log("X Total Score="+totalScore)
+                    }
+                    if(item.standardRate){
+                        totalStandard+= item.standardRate * item.numOfReport;
+                    }
+                  }
+                
+                }
+              })
+
+        
+              if(pos){
+                if(totalScore>0) totalScore = (totalScore/pos.numOfReport).toFixed(1)
+                if(totalStandard>0)totalStandard=(totalStandard/pos.numOfReport).toFixed(1)
+                pos.averageScore = totalScore;
+                pos.standardRate = totalStandard;
+                console.log(pos)
+                output.push(pos)
+              }
+        });;
+      }
       else{
         content.map(function(item,i){
           originArray.map(function(d){
@@ -1864,7 +1916,7 @@ export default {
       this.part2.barStoreOption = option;
     },
      async getPart3RegionBar() {
-      console.log("getPart3RegionBar")
+      console.log("getPart3RegionBar888")
       const self = this;
       const params = {};
       this.totalAvgScore =-9999;
@@ -1904,12 +1956,32 @@ export default {
          params.groupIds  = this.part3.compareIds;
          params.groupMode = 4;
       }
+       else if(this.part3.compareType=='users'){
+         params.submitters  = this.part3.compareIds;
+         params.groupIds  = this.part3.compareIds;
+         params.groupMode = 5;
+      }
+      else if(this.part3.compareType=='position'){
+         let users = [];
+         this.part3.originArray.forEach(function(item){
+           users =  users.concat(item.contents);
+         })
+         params.submitters  = users;
+         params.groupIds  = users;
+         params.groupMode = 5;
+      }
+       console.log(params)
       if(this.inspectItem){
         params.itemIds = this.inspectItem.item.ids
       }
       let totalReport = 0;
       let totalStandard = 0;
-      params.filter = { page: 0, size: params.groupIds.length };
+      if(params.groupIds.length==0){
+        console.log("No group");
+        return;
+      }
+        params.filter = { page: 0, size: params.groupIds.length };
+       
         const storeResult = await self.getInspectStatsItemOverGroup(params);
         console.log(storeResult)
         if (storeResult.errCode === 0) {
@@ -2035,6 +2107,9 @@ export default {
             console.log("To Get Data")
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.content[this.part3.indexRegion].list;
+            if(this.part3.compareType=='users' || this.part3.compareType=='position'){
+              params.storeIds = self.params.storeIds;
+            }
             params.inspectTagId = self.params.inspectId;
             if(this.inspectItem){
               params.itemIds = this.inspectItem.item.ids
@@ -2053,7 +2128,28 @@ export default {
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
-                  content = result.content
+                    if(this.part3.compareType=='users' ){
+                      let sel = this.part3.content[this.part3.indexRegion];
+                      result.content.forEach(function(item){
+                        if(item.submitters && item.submitters.indexOf(sel.groupName)>=0){
+                          content.push(item);
+                        }
+                      })
+                  }
+                  else if(this.part3.compareType=='position'){
+                      let sel = this.part3.content[this.part3.indexRegion];
+                      sel.submitters.forEach(function(sub){
+                          result.content.forEach(function(item){
+                            if(item.submitters && item.submitters.indexOf(sub)>=0){
+                              content.push(item);
+                            }
+                          })
+
+                      })
+                   
+                  }
+                  else 
+                    content = result.content
                   this.part3.table.total = result.totalPages;
               }
             }

@@ -63,7 +63,7 @@
                     </el-col>
                 </el-row>
       </div>
-       <div class="statistics-content" style="height:860px;margin-top:18px">
+       <div class="statistics-content" style="height:900px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -73,6 +73,7 @@
                             <TypeSelectArea
                               path="inspectEvalutionStatistics"
                               :allow-all=true
+                              :allow-person=true
                               :region-array1="params.curProvince"
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
@@ -155,7 +156,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="overflow-x:auto;position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
+         <el-col  style="overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
                   <v-chart  v-if="part1.storeMode==1" 
                             ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
                                 autoresize
@@ -203,7 +204,7 @@
                   </div>
            </el-col>  
       </div> 
-       <div class="statistics-content" style="height:980px;margin-top:18px">
+       <div class="statistics-content" style="height:1010px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -213,6 +214,7 @@
                             <TypeSelectArea
                               path="inspectEvalutionStatistics"
                               :allow-all=true
+                              :allow-person=true
                               :region-array1="params.curProvince"
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
@@ -293,7 +295,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  class="partition"  style="overflow-x:auto;position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
+         <el-col  class="partition"  style="overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
                   <v-chart  v-if="part2.storeMode==1" 
                             ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize
                             :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
@@ -340,7 +342,7 @@
                   </div>
            </el-col>  
       </div> 
-      <div v-if="part3.standardScore!=-9999" class="statistics-content" style="height:970px;margin-top:18px">
+      <div v-if="part3.standardScore!=-9999" class="statistics-content" style="height:1000px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -359,6 +361,7 @@
                             <TypeSelectArea
                               path="inspectEvalutionStatistics"
                               :allow-all=true
+                              :allow-person=true
                               :region-array1="params.curProvince"
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
@@ -426,7 +429,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
+         <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
                   <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
                       <v-chart 
                                 ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
@@ -1433,7 +1436,7 @@ export default {
                   content = result.content
                   content.forEach((item,i)=>{
                     item.rank= i+1;
-                    if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+                    if(item.submitters)item.storeSubmitters = item.submitters.toString();
                   });
               }
             }
@@ -1478,7 +1481,7 @@ export default {
                   content = result.content
                   content.forEach((item,i)=>{
                     item.rank= i+1;
-                    if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+                    if(item.submitters)item.storeSubmitters = item.submitters.toString();
                   });
               }
             }
@@ -1522,7 +1525,7 @@ export default {
                   content = result.content
                   content.forEach((item,i)=>{
                     item.rank= i+1;
-                    if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+                    if(item.submitters)item.storeSubmitters = item.submitters.toString();
                   });
               }
             }
@@ -1970,11 +1973,64 @@ export default {
     },
     filterContent(content,type,ids,labels,originArray){
       let output = [];
+      console.log("Filter POST="+type)
+      console.log(content)
       if(type == 'stores'){
         content.map(function(item,i){
           item.list = [];
          //item.list.push(JSON.parse(JSON.stringify(item)))
           output.push(item)
+        });;
+      }
+      else if(type == 'position'){
+          
+          originArray.map(function(d){
+             var  pos = null;
+             var totalScore =0;
+             var totalStandard = 0;
+             content.map(function(item,i){
+               
+                if(d.contents.indexOf(item.innerId)>=0){
+                  if(!pos){
+                    pos = JSON.parse(JSON.stringify(item))
+                    if(item.averageScore){
+                        totalScore += item.averageScore * item.numOfReport;
+                        console.log("X Total Score="+totalScore)
+                    }
+                    if(item.standardRate){
+                        totalStandard+= item.standardRate * item.numOfReport;
+                    }
+                    pos.submitters =[item.groupName]
+                    pos.groupName = d.label;
+                  }
+                  else{
+                    pos.numOfDargerous += item.numOfDargerous;
+                    pos.numOfQualified += item.numOfQualified;
+                    pos.numOfImproved += item.numOfImproved;
+                    pos.numOfReport  += item.numOfReport;
+                    pos.numOfStandard += item.numOfStandard;
+                    pos.submitters.push(item.groupName)
+                    if(item.averageScore){
+                        totalScore += parseFloat(item.averageScore) * item.numOfReport;
+                        console.log("X Total Score="+totalScore)
+                    }
+                    if(item.standardRate){
+                        totalStandard+= item.standardRate * item.numOfReport;
+                    }
+                  }
+                
+                }
+              })
+
+        
+              if(pos){
+                if(totalScore>0) totalScore = (totalScore/pos.numOfReport).toFixed(1)
+                if(totalStandard>0)totalStandard=(totalStandard/pos.numOfReport).toFixed(1)
+                pos.averageScore = totalScore;
+                pos.standardRate = totalStandard;
+                console.log(pos)
+                output.push(pos)
+              }
         });;
       }
       else{
@@ -2032,6 +2088,16 @@ export default {
       }
       else if(this.part1.compareType=='users'){
          params.submitters  = this.part1.compareIds;
+         params.groupIds  = this.part1.compareIds;
+         params.groupMode = 5;
+      }
+      else if(this.part1.compareType=='position'){
+        let users = [];
+         this.part1.originArray.forEach(function(item){
+           users =  users.concat(item.contents);
+         })
+         params.submitters  = users;
+         params.groupIds  = users;
          params.groupMode = 5;
       }
       
@@ -2180,6 +2246,9 @@ export default {
             params.endTs = self.params.endTs;
             params.groupMode = 0;
             params.storeIds = this.part1.content[this.part1.indexRegion].list;
+            if(this.part1.compareType=='users' || this.part1.compareType=='position'){
+              params.storeIds = self.params.storeIds;
+            }
             params.inspectTagId = self.params.inspectId;
             params.order={
               direction: (this.part1.storeMode==1) ? this.part1.storeOrder : this.part1.table.order,
@@ -2193,7 +2262,29 @@ export default {
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
-                  content = result.content
+                  if(this.part1.compareType=='users' ){
+                      let sel = this.part1.content[this.part1.indexRegion];
+                      result.content.forEach(function(item){
+                        if(item.submitters.indexOf(sel.groupName)>=0){
+                          content.push(item);
+                        }
+                      })
+                  }
+                  else if(this.part1.compareType=='position'){
+                      let sel = this.part1.content[this.part1.indexRegion];
+                      sel.submitters.forEach(function(sub){
+                          result.content.forEach(function(item){
+                            if(item.submitters.indexOf(sub)>=0){
+                              content.push(item);
+                            }
+                          })
+
+                      })
+                   
+                  }
+                  else 
+                    content = result.content
+
                   this.part1.table.total = result.totalPages;
                //   console.log(result)
               }
@@ -2204,7 +2295,7 @@ export default {
         content.map((item,index) => {
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
-          if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+          if(item.submitters)item.storeSubmitters = item.submitters.toString();
           if(item.code=='')item.code='- -'
           if(item.storeGroup=='')item.storeGroup='- -'
           if(item.storeType=='')item.storeType='- -'
@@ -2276,10 +2367,21 @@ export default {
          params.groupIds  = this.part2.compareIds;
          params.groupMode = 4;
       }
-      else if(this.part2.compareType=='users'){
-         params.submitters  = this.part1.compareIds;
+    else if(this.part2.compareType=='users'){
+         params.submitters  = this.part2.compareIds;
+         params.groupIds  = this.part2.compareIds;
          params.groupMode = 5;
       }
+      else if(this.part2.compareType=='position'){
+         let users = [];
+         this.part2.originArray.forEach(function(item){
+           users =  users.concat(item.contents);
+         })
+         params.submitters  = users;
+         params.groupIds  = users;
+         params.groupMode = 5;
+      }
+      
       let totalReport = 0;
       let totalStandard = 0;
       params.filter = { page: 0, size: params.groupIds.length };
@@ -2373,6 +2475,9 @@ export default {
             params.endTs = self.params.endTs;
             params.groupMode = 0;
             params.storeIds = this.part2.content[this.part2.indexRegion].list;
+            if(this.part2.compareType=='users' || this.part2.compareType=='position'){
+              params.storeIds = self.params.storeIds;
+            }
             params.inspectTagId = self.params.inspectId;
             params.order={
               direction: (this.part2.storeMode==1) ? this.part2.storeOrder : this.part2.table.order,
@@ -2385,8 +2490,30 @@ export default {
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
-              if (result) {
-                  content = result.content
+                 if (result) {
+                  if(this.part2.compareType=='users' ){
+                      let sel = this.part2.content[this.part2.indexRegion];
+                      result.content.forEach(function(item){
+                        if(item.submitters.indexOf(sel.groupName)>=0){
+                          content.push(item);
+                        }
+                      })
+                  }
+                  else if(this.part2.compareType=='position'){
+                      let sel = this.part2.content[this.part2.indexRegion];
+                      sel.submitters.forEach(function(sub){
+                          result.content.forEach(function(item){
+                            if(item.submitters.indexOf(sub)>=0){
+                              content.push(item);
+                            }
+                          })
+
+                      })
+                   
+                  }
+                  else 
+                    content = result.content
+
                  this.part2.table.total = result.totalPages;
                   console.log(result)
               }
@@ -2399,7 +2526,7 @@ export default {
           item.compareTrend = this.$t('statistics.check'),
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
-          if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+          if(item.submitters)item.storeSubmitters = item.submitters.toString();
           if(item.code=='')item.code='- -'
           if(item.storeGroup=='')item.storeGroup='- -'
           if(item.storeType=='')item.storeType='- -'
@@ -2463,7 +2590,17 @@ export default {
          params.groupMode = 4;
       }
       else if(this.part3.compareType=='users'){
-         params.submitters  = this.part1.compareIds;
+         params.submitters  = this.part3.compareIds;
+         params.groupIds  = this.part3.compareIds;
+         params.groupMode = 5;
+      }
+      else if(this.part3.compareType=='position'){
+         let users = [];
+         this.part3.originArray.forEach(function(item){
+           users =  users.concat(item.contents);
+         })
+         params.submitters  = users;
+         params.groupIds  = users;
          params.groupMode = 5;
       }
       
@@ -2560,6 +2697,9 @@ export default {
             params.endTs = self.params.endTs;
             params.groupMode = 0;
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
+            if(this.part3.compareType=='users' || this.part3.compareType=='position'){
+              params.storeIds = self.params.storeIds;
+            }
             params.inspectTagId = self.params.inspectId;
             params.order={
               direction: this.part3.storeOrder,
@@ -2575,10 +2715,30 @@ export default {
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
-              const result = storeResult.data;
-              if (result) {
-                  content = result.content
-                  console.log(result)
+               const result = storeResult.data;
+               if (result) {
+                  if(this.part3.compareType=='users' ){
+                      let sel = this.part3.content[this.part3.indexRegion];
+                      result.content.forEach(function(item){
+                        if(item.submitters.indexOf(sel.groupName)>=0){
+                          content.push(item);
+                        }
+                      })
+                  }
+                  else if(this.part3.compareType=='position'){
+                      let sel = this.part3.content[this.part3.indexRegion];
+                      sel.submitters.forEach(function(sub){
+                          result.content.forEach(function(item){
+                            if(item.submitters.indexOf(sub)>=0){
+                              content.push(item);
+                            }
+                          })
+
+                      })
+                   
+                  }
+                  else 
+                    content = result.content
                   this.part3.table.total = result.totalPages;
               }
             }
@@ -2590,7 +2750,7 @@ export default {
           item.compareTrend = this.$t('statistics.check'),
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
-          if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+          if(item.submitters)item.storeSubmitters = item.submitters.toString();
           if(item.code=='')item.code='- -'
           if(item.storeGroup=='')item.storeGroup='- -'
           if(item.storeType=='')item.storeType='- -'
