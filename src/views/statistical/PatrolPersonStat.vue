@@ -15,7 +15,7 @@
                   :all="$t('statistics.patrolPerson.dutyAll')"
                   class="position"
                   @changeInput="handlePositionsChange"/>
-                <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+                <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.34;" />
                 <region-multi-select
                   ref="multiState"
                   :selected="userIds"
