@@ -4,7 +4,8 @@
       <el-col :span="24">
         <search-component
           ref="inspectEvalutionSearch"
-          :is-patrol = "true"
+          :is-patrol = "false"
+          isInspectItem="true"
           :default-sort="defaultSort"
           path="inspectEvalutionStatistics"
           @emitSearch = "emitSearch"
@@ -25,7 +26,7 @@
                     <el-col :span="8" class="division" @click="routeToInspectionReport">
                       <el-col class="text-area">        
                         <el-row class="top">
-                           <span class="mainTitle">{{overviewCount.store!=-9999?overviewCount.store:'N/A'}}</span>
+                           <span class="mainTitle">{{overviewCount.store>0?overviewCount.store:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.store_unit') }}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -38,7 +39,7 @@
                      <el-col :span="8" class="division">
                       <el-col class="text-area"   @click.native="routeToInspectionReport">
                            <el-row class="top">
-                           <span class="mainTitle">{{overviewCount.items>=0?overviewCount.items:'N/A'}}</span>
+                           <span class="mainTitle">{{overviewCount.items>0?overviewCount.items:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.count_unit') }}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -51,7 +52,7 @@
                     <el-col :span="8" class="division">
                     <el-col class="text-area"   @click.native="routeToInspectionReport">   
                        <el-row class="top">
-                           <span class="mainTitle">{{overviewCount.avgScore>=0?overviewCount.avgScore:'N/A'}}</span>
+                           <span class="mainTitle">{{overviewCount.avgScore!=-9999?overviewCount.avgScore:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
                         </el-row >
                         <el-row class="subtitlehead">
@@ -142,22 +143,22 @@
                   </div>
                   <delay-button
                       :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;background-color:#fff;"
-                    type="primary"
-                    size="mini"
-                    @click="exportStore2ExcelPart1"
+                      style="background-color:#FFF;color:#006ab7;padding:0px;"
+                      type="primary"
+                      size="mini"
+                      @click="exportStore2ExcelPart1"
                   >
-                    <div class="button-area">
+                    <div class="button-area" style="margin-left:15px">
                       <img :src="exportPng" class="icon-excel">
-                      <span style="color:#006ab7">{{ $t('eventView.exportReport') }}</span>
+                        <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
                   </delay-button>
             </div>
         </div>
-         <el-col  style="position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
+         <el-col  style="overflow-x:auto;position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
                   <v-chart  v-if="part1.storeMode==1" 
                             ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
-                      autoresize
+                                autoresize
                             :style="{width:part1.barStoreOption?part1.barStoreOption.width :'100%',height:'100%'}" />
                   <div v-else style="margin-top:20.5px;height:100%;">
                   <div style="margin-top:20.5px;">
@@ -179,7 +180,7 @@
                       :expandCompProperties = "componentsProps"
                       @handleChange="handlePageAndSizeChangePart1"
                       @sortChange="handleSortChangePart1"
-                      @onCellClick = "onEvenListNumClick"
+                      @onCellClick = "onEvenListNumClickPart1"
                     />
                   </div>
                   <div style="width:100%; margin-top:12px;height:31px;">
@@ -202,7 +203,7 @@
                   </div>
            </el-col>  
       </div> 
-       <div class="statistics-content" style="height:930px;margin-top:18px">
+       <div class="statistics-content" style="height:980px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -249,9 +250,11 @@
                       </el-col> 
                     </el-col>
                 </el-row>
-        <el-row  :span="24" class="partition" style="height:320px">
-          <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption"        autoresize
-                            :style="{width:part2.barRegionOption?part2.barRegionOption.width :'100%',height:'100%'}" />
+        <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
+          <div  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
+            <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption"    autoresize
+                              :style="{width:part2.barRegionOption?part2.barRegionOption.width :'100%',height:'100%'}" />
+            </div>
           <div style="position:absolute;right:0px;top:0px" @click='changePart2RegionOrder'>
                   <div class="button-area" >
                       <span style="color:#acaeb1">{{ part2.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
@@ -276,42 +279,57 @@
                       @click="onSwitchPart2Mode(1)"
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
-                  <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;background-color:#fff;"
-                    type="primary"
-                    size="mini"
-                    @click="exportStore2ExcelPart2"
+                   <delay-button
+                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                      style="background-color:#FFF;color:#006ab7;padding:0px;"
+                      type="primary"
+                      size="mini"
+                      @click="exportStore2ExcelPart2"
                   >
-                    <div class="button-area">
+                    <div class="button-area" style="margin-left:15px">
                       <img :src="exportPng" class="icon-excel">
-                      <span style="color:#006ab7">{{ $t('eventView.exportReport') }}</span>
+                        <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
                   </delay-button>
             </div>
         </div>
-         <el-col  class="partition"  style="position:absolute;height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
+         <el-col  class="partition"  style="overflow-x:auto;position:absolute;height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
                   <v-chart  v-if="part2.storeMode==1" 
                             ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize
                             :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
-                  <div v-else style="main-rgtop:20.5px;height:100%;overflow-y: scroll;">
-                    <table-pagination
+                  <div v-else style="main-rgtop:20.5px;height:100%;overflow-x:auto;">
+                    <div style="margin-top:20.5px;">
+                    <table-only
                       ref="elTP"
-                      :column-data="part2StoreInfoTableCol"
+                     :column-data="part2StoreInfoTableCol"
                       :table-data="part2.storeTableData"
                       :total="part2.table.total"
                       :highlight-current-row= "true"
-                      :pagesize="part2.table.sizeNum"
-                      :current-page="part2.table.page"
+                      :pagesize="sizeNum"
+                      :current-page="page"
                       :is-event = "false"
                       :default-sort = "defaultSort"
                       :allowRowExpand = "true"
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :tableHeight = "300"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
                       @handleChange="handlePageAndSizeChangePart2"
                       @sortChange="handleSortChangePart2"
+                      @onCellClick = "onEvenListNumClickPart2"
+                    />
+                  </div>
+                  <div style="width:100%; margin-top:12px;height:31px;">
+                  <tbl-pagination-only
+                    :total="part2.table.total"
+                    :pagesize="part2.table.sizeNum"
+                    :current-page="part2.table.page"
+                    layout = "prev,pager, next,sizes,slot"
+                    @sizeChange="handlePageAndSizeChangePart2"
+                    @currentChange="handlePageAndSizeChangePart2"
                   />
+                </div>
                 </div>
                 <div  v-if="part2.storeMode==1"  
                       style="position:absolute;right:40px;top:30px;height:40px" @click='changePart2StoreOrder'>
@@ -322,7 +340,7 @@
                   </div>
            </el-col>  
       </div> 
-      <div v-if="part3.standardScore!=-9999" class="statistics-content" style="height:930px;margin-top:18px">
+      <div v-if="part3.standardScore!=-9999" class="statistics-content" style="height:970px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -365,8 +383,8 @@
                       </el-col>
                      </el-col>
           </el-row>
-        <el-row  :span="24" class="partition" style="height:320px">
-            <el-col  :span="24" style="height:100%">
+              <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
+            <el-col  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
                <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
                             :style="{width:part3.barRegionOption?part3.barRegionOption.width :'100%',height:'100%'}" />
             <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
@@ -394,44 +412,61 @@
                       @click="onSwitchPart3Mode(1)"
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
-                  <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;background-color:#fff;"
-                    type="primary"
-                    size="mini"
-                    @click="exportStore2ExcelPart3"
+                    <delay-button
+                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                      style="background-color:#FFF;color:#006ab7;padding:0px;"
+                      type="primary"
+                      size="mini"
+                      @click="exportStore2ExcelPart3"
                   >
-                    <div class="button-area">
+                    <div class="button-area" style="margin-left:15px">
                       <img :src="exportPng" class="icon-excel">
-                      <span style="color:#006ab7">{{ $t('eventView.exportReport') }}</span>
+                        <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
                   </delay-button>
             </div>
         </div>
-         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
-                  <v-chart  v-if="part3.storeMode==1" 
-                            ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
-                            :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
-                  <div v-else style="margin-top:20.5px;height:100%;overflow-y: scroll;">
-                    <table-pagination
+         <el-col  style="height:400px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
+                  <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
+                      <v-chart 
+                                ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
+                                :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
+                  </div>
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;">
+                    <div style="margin-top:20.5px;">
+                    <table-only
                       ref="elTP"
-                      :column-data="part3StoreInfoTableCol"
+                     :column-data="part3StoreInfoTableCol"
                       :table-data="part3.storeTableData"
-                      :total="part2.table.total"
+                      :total="part3.table.total"
                       :highlight-current-row= "true"
-                      :pagesize="part2.table.sizeNum"
-                      :current-page="part2.table.page"
+                      :pagesize="sizeNum"
+                      :current-page="page"
                       :is-event = "false"
                       :default-sort = "defaultSort"
                       :allowRowExpand = "true"
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :tableHeight = "300"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
-                      @handleChange="handlePageAndSizeChangePart3"
+                      @handleChange="handlePageAndSizeChange3"
                       @sortChange="handleSortChangePart3"
+                      @onCellClick = "onEvenListNumClickPart3"
+                    />
+                  </div>
+                  <div style="width:100%; margin-top:12px;height:31px;">
+                  <tbl-pagination-only
+                    :total="part3.table.total"
+                    :pagesize="part3.table.sizeNum"
+                    :current-page="part3.table.page"
+                    layout = "prev,pager, next,sizes,slot"
+                    @sizeChange="handlePageAndSizeChange3"
+                    @currentChange="handlePageAndSizeChangePart3"
                   />
                 </div>
-                <div  v-if="part2.storeMode==1"  
+                </div>
+                <div  v-if="part3.storeMode==1"  
                       style="position:absolute;right:40px;top:30px;height:40px" @click='changePart3StoreOrder'>
                     <div class="button-area" >
                       <span style="color:#acaeb1">{{ part3.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
@@ -861,6 +896,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '14%',
           'width': '80',
+          'isCellClick':true,
           'maxWidth': '180'
         },
         {
@@ -869,6 +905,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
+            'isCellClick':true,
           'maxWidth': '100'
         },
         {
@@ -877,6 +914,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
+          'isCellClick':true,
           'maxWidth': '120'
         },
         {
@@ -885,6 +923,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
+          'isCellClick':true,
           'maxWidth': '130'
         },
     
@@ -952,6 +991,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '14%',
           'width': '80',
+          'isCellClick':true,
           'maxWidth': '180'
         },
         {
@@ -976,6 +1016,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
+          'isCellClick':true,
           'maxWidth': '100'
         }
         ],
@@ -1042,6 +1083,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '14%',
           'width': '80',
+            'isCellClick':true,
           'maxWidth': '180'
         },
           {
@@ -1050,6 +1092,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '14%',
           'width': '80',
+            'isCellClick':true,
           'maxWidth': '180'
         },
         {
@@ -1074,6 +1117,7 @@ export default {
           'sortable': 'custom',
           'pdfwidth': '12%',
           'width': '80',
+            'isCellClick':true,
           'maxWidth': '100'
         }
     
@@ -1126,6 +1170,77 @@ export default {
   },
 
   methods: {
+    onEvenListNumClickPart1(e){
+      console.log(e)
+      let params = JSON.parse(JSON.stringify(this.params))
+      params.storeIds = [e.row.innerId]
+      console.log(params)
+      const searchParamsObj = {
+        path: 'inspectReport',
+        params: params
+      };
+      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+       this.$router.push({
+         path: '/report',
+      });
+      
+
+    },
+     onEvenListNumClickPart2(e){
+      if(e.prop == 'compareTrend'){
+          let params = JSON.parse(JSON.stringify(this.params))
+          params.storeIds = [e.row.innerId]
+          const searchParamsObj = {
+            path: 'inspectEvalutionStatistics',
+            params: params
+          };
+          this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+          this.$router.push({
+            path: '/patrolCompareStat',
+          });
+      }
+      else{
+        let params = JSON.parse(JSON.stringify(this.params))
+        params.storeIds = [e.row.innerId]
+        const searchParamsObj = {
+          path: 'inspectReport',
+          params: params
+        };
+        this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+        this.$router.push({
+          path: '/report',
+        });
+      }
+      
+
+    },
+    onEvenListNumClickPart3(e){
+       if(e.prop == 'compareTrend'){
+          let params = JSON.parse(JSON.stringify(this.params))
+          params.storeIds = [e.row.innerId]
+          const searchParamsObj = {
+            path: 'inspectEvalutionStatistics',
+            params: params
+          };
+          this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+          this.$router.push({
+            path: '/patrolCompareStat',
+          });
+      }
+      else{
+        let params = JSON.parse(JSON.stringify(this.params))
+        params.storeIds = [e.row.innerId]
+        const searchParamsObj = {
+          path: 'inspectReport',
+          params: params
+        };
+        this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+        this.$router.push({
+          path: '/report',
+        });
+      }
+
+    },
     routeToInspectionReport(){
       const searchParamsObj = {
         path: 'inspectReport',
@@ -1142,37 +1257,32 @@ export default {
         this.part1.table.sizeNum = e.size;
         this.getPart1StoreBar();
     },
-    handleCurrentChangePart1(e){
-        this.part1.table.page = e.page;
-        this.part1.table.sizeNum = e.size;
-        this.getPart1StoreBar();
-    },
     handleSortChangePart1(e){
-        console.log(e)
         this.part1.table.order = e.direction;
         this.part1.table.property = e.property;
         this.getPart1StoreBar();
     },
     handlePageAndSizeChangePart2(e){
+        console.log(e)
         this.part2.table.page = e.page;
         this.part2.table.sizeNum = e.size;
         this.getPart2StoreBar();
     },
     handleSortChangePart2(e){
-        console.log(e)
+        this.part2.table.order = e.direction;
+        this.part2.table.property = e.property;
+        this.getPart2StoreBar();
     },
     handlePageAndSizeChangePart3(e){
+        console.log(e)
         this.part3.table.page = e.page;
         this.part3.table.sizeNum = e.size;
         this.getPart3StoreBar();
     },
     handleSortChangePart3(e){
-        console.log(e)
-    },
-    handlePageAndSizeChangePart1(e){
-        this.part1.table.page = e.page;
-        this.part1.table.sizeNum = e.size;
-        this.getPart1StoreBar();
+       this.part3.table.order = e.direction;
+        this.part3.table.property = e.property;
+        this.getPart3StoreBar();
     },
 
     onSwitchPart1Mode(mode){
@@ -1297,53 +1407,132 @@ export default {
     },
 
     async exportStore2ExcelPart1() {
-      const that = this;
-      if (that.part1.storeTableData.length === 0) {
-        util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
-        return false;
-      }
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportPart1DataHeader;
-        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'numOfQualified', 'numOfImproved',
-          'numOfDangerous'];
-        const self = this;
-        const data = that.formatJson(filterVal, that.part1.storeTableData);
-        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = name + '_Inspection evaluation result_' + util.getCurDateStr();
-        export_json_to_excel(tHeader, data, fileName);
+      const self = this;
+      const that = this;  
+      let content =[];
+       const params = {};
+       params.beginTs = self.params.beginTs;
+       params.endTs = self.params.endTs;
+       params.groupMode = 0;
+       //this.part2.compareType == 'stores'
+       console.log(this.part1.content[this.part1.indexRegion])
+       params.storeIds = this.part1.compareType == 'stores' ? [this.part1.content[this.part1.indexRegion].innerId]: this.part1.content[this.part1.indexRegion].list;
+       params.inspectTagId = self.params.inspectId;
+            params.filter={
+              page:0,
+              size:params.storeIds.length
+            }
+             if (params.storeIds.length === 0) {
+              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              return false;
+            }
+            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            if (storeResult.errCode === 0) {
+              const result = storeResult.data;
+              if (result) {
+                  content = result.content
+                  content.forEach((item,i)=>{
+                    item.rank= i+1;
+                    if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+                  });
+              }
+            }
+            require.ensure([], async() => {
+              const { export_json_to_excel } = require('@/excel/Export2Excel');
+              const tHeader = self.exportPart1DataHeader;
+              const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'numOfQualified', 'numOfImproved',
+                'numOfDangerous'];
+              const data = that.formatJson(filterVal, content);
+              const name = that.params.inspectId==='' ? 'All' : that.storePatrolLists;
+              const fileName = name + '_Inspection evaluation result_' + util.getCurDateStr();
+              export_json_to_excel(tHeader, data, fileName);
       });
     },
     async exportStore2ExcelPart2() {
-      const that = this;
-      if (that.part2.storeTableData.length === 0) {
-        util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
-        return false;
-      }
+      const self = this;
+      const that = this;  
+      let content =[];
+       const params = {};
+       params.beginTs = self.params.beginTs;
+       params.endTs = self.params.endTs;
+       params.groupMode = 0;
+       params.order={
+              direction:"desc",
+              property: "averageScore",
+            }
+       console.log(this.part2.content[this.part2.indexRegion])
+       params.storeIds = this.part2.compareType == 'stores' ? [this.part2.content[this.part2.indexRegion].innerId]: this.part2.content[this.part2.indexRegion].list;
+       params.inspectTagId = self.params.inspectId;
+            params.filter={
+              page:0,
+              size:params.storeIds.length
+            }
+             if (params.storeIds.length === 0) {
+              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              return false;
+            }
+            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            if (storeResult.errCode === 0) {
+              const result = storeResult.data;
+              if (result) {
+                  content = result.content
+                  content.forEach((item,i)=>{
+                    item.rank= i+1;
+                    if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+                  });
+              }
+            }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart2DataHeader;
         const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'averageScore', 'rank'];
-        const self = this;
-        const data = that.formatJson(filterVal, that.part2.storeTableData);
+        const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
         const fileName = name + '_Inspection score_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
     async exportStore2ExcelPart3() {
-      const that = this;
-      if (that.part3.storeTableData.length === 0) {
-        util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
-        return false;
-      }
+      const self = this;
+      const that = this;  
+      let content =[];
+       const params = {};
+       params.beginTs = self.params.beginTs;
+       params.endTs = self.params.endTs;
+       params.groupMode = 0;
+       params.order={
+              direction:"desc",
+              property: "standardScore",
+            }
+       console.log(this.part3.content[this.part3.indexRegion])
+       params.storeIds = this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId]: this.part3.content[this.part3.indexRegion].list;
+       params.inspectTagId = self.params.inspectId;
+            params.filter={
+              page:0,
+              size:params.storeIds.length
+            }
+             if (params.storeIds.length === 0) {
+              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              return false;
+            }
+            const storeResult = await this.getInspectStatsOverviewWithGroup(params);
+            if (storeResult.errCode === 0) {
+              const result = storeResult.data;
+              if (result) {
+                  content = result.content
+                  content.forEach((item,i)=>{
+                    item.rank= i+1;
+                    if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+                  });
+              }
+            }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
         const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport','numOfStandard',
         'qualifiedRate','rank'];
         const self = this;
-        const data = that.formatJson(filterVal, that.part3.storeTableData);
+        const data = that.formatJson(filterVal,content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
         const fileName = name + '_Inspection compliance_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
@@ -1839,7 +2028,7 @@ export default {
       }
       else if(this.part1.compareType=='storeGroup'){
          params.groupIds  = this.part1.compareIds;
-         params.groupMode = 3;
+         params.groupMode = 4;
       }
       else if(this.part1.compareType=='users'){
          params.submitters  = this.part1.compareIds;
@@ -1959,10 +2148,10 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-
+      regionData.push(0)
+      regionLabel.push("")
       if(regionLabel.length>10){
-        regionData.push(0)
-        regionLabel.push("")
+      
         option.width =( regionLabel.length*50) +'px'
       }
       else{
@@ -1997,8 +2186,8 @@ export default {
               property: (this.part1.storeMode==1) ? (this.part1.indexType==0?"numOfDangerous":this.part1.indexType==1?"numOfImproved":"numOfQualified"): this.part1.table.property,
             }
             params.filter={
-              page:this.part1.table.page-1,
-              size:this.part1.table.sizeNum
+              page:(this.part1.storeMode==1) ? 0:this.part1.table.page-1,
+              size:(this.part1.storeMode==1) ?params.storeIds.length: this.part1.table.sizeNum
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
@@ -2015,7 +2204,7 @@ export default {
         content.map((item,index) => {
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
-          item.storeSubmitters = item.submitters.toString();
+          if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
           if(item.code=='')item.code='- -'
           if(item.storeGroup=='')item.storeGroup='- -'
           if(item.storeType=='')item.storeType='- -'
@@ -2040,10 +2229,9 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-
+      regionData.push(0)
+      regionLabel.push("")
       if(regionLabel.length>20){
-        regionData.push(0)
-        regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
       }
       else{
@@ -2086,7 +2274,7 @@ export default {
       }
       else if(this.part2.compareType=='storeGroup'){
          params.groupIds  = this.part2.compareIds;
-         params.groupMode = 3;
+         params.groupMode = 4;
       }
       else if(this.part2.compareType=='users'){
          params.submitters  = this.part1.compareIds;
@@ -2109,8 +2297,7 @@ export default {
                   totalStandard +=  item.averageScore * item.numOfReport;
             })       
             this.part2.averageScore =  totalStandard>0? Math.round( (totalStandard) /totalReport):-9999;
-            console.log("Leave FIlterContent")
-            console.log(this.part2.content)
+         
             this.part2.indexRegion = -1;
             this.drawPart2RegionBar();
           }
@@ -2156,9 +2343,9 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      regionData.push(0)
+      regionLabel.push("")
       if(regionLabel.length>20){
-        regionData.push(0)
-        regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
       }
       else{
@@ -2188,18 +2375,19 @@ export default {
             params.storeIds = this.part2.content[this.part2.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
             params.order={
-              direction: this.part2.storeOrder,
-              property:"averageScore"
+              direction: (this.part2.storeMode==1) ? this.part2.storeOrder : this.part2.table.order,
+              property: (this.part2.storeMode==1) ? "averageScore": this.part2.table.property,
             }
             params.filter={
-              page:this.part2.table.page-1,
-              size:this.part2.table.sizeNum
+              page:(this.part2.storeMode==1) ? 0:this.part2.table.page-1,
+              size:(this.part2.storeMode==1) ?params.storeIds.length: this.part2.table.sizeNum
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
                   content = result.content
+                 this.part2.table.total = result.totalPages;
                   console.log(result)
               }
             }
@@ -2211,7 +2399,7 @@ export default {
           item.compareTrend = this.$t('statistics.check'),
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
-          item.storeSubmitters = item.submitters.toString();
+          if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
           if(item.code=='')item.code='- -'
           if(item.storeGroup=='')item.storeGroup='- -'
           if(item.storeType=='')item.storeType='- -'
@@ -2226,9 +2414,9 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      regionData.push(0)
+      regionLabel.push("")
       if(regionLabel.length>20){
-        regionData.push(0)
-        regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
       }
       else{
@@ -2272,7 +2460,7 @@ export default {
       }
       else if(this.part3.compareType=='storeGroup'){
          params.groupIds  = this.part3.compareIds;
-         params.groupMode = 3;
+         params.groupMode = 4;
       }
       else if(this.part3.compareType=='users'){
          params.submitters  = this.part1.compareIds;
@@ -2377,9 +2565,13 @@ export default {
               direction: this.part3.storeOrder,
               property:"standardRate"
             }
+            params.order={
+              direction: (this.part3.storeMode==1) ? this.part3.storeOrder : this.part3.table.order,
+              property: (this.part3.storeMode==1) ? "standardRate": this.part3.table.property,
+            }
             params.filter={
-              page:this.part3.table.page-1,
-              size:this.part3.table.sizeNum
+              page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
+              size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
@@ -2387,6 +2579,7 @@ export default {
               if (result) {
                   content = result.content
                   console.log(result)
+                  this.part3.table.total = result.totalPages;
               }
             }
         }
@@ -2397,7 +2590,7 @@ export default {
           item.compareTrend = this.$t('statistics.check'),
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
-          item.storeSubmitters = item.submitters.toString();
+          if (item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
           if(item.code=='')item.code='- -'
           if(item.storeGroup=='')item.storeGroup='- -'
           if(item.storeType=='')item.storeType='- -'
@@ -2771,6 +2964,7 @@ export default {
             text-align: left;
             color: #484848;
         }
+        
     
      }
     .evalution-pct {
@@ -3102,4 +3296,11 @@ export default {
       height:13%;
     }
   }
+      .ja-export-btn,
+    .en-export-btn,
+    .export-btn{
+      background-color: #fff;
+      color: #006ab7;
+    }
+
 </style>
