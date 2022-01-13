@@ -14,7 +14,7 @@
       :cell-style="ifSetCellStyle ? setCellStyle : {}"
       :border="showBorder"
       :stripe="isStripe"
-      :height="tableHeight"
+      :max-height="tableHeight"
       :empty-text="$t('deviceView.noData')"
       align="left"
       style="width: 100%"
@@ -150,9 +150,8 @@
     <div v-if="showPagination" class="toolbar pagination clearfix">
       <el-pagination
         :current-page="currentPage"
-        :page-sizes="[10, 20, 50, 100]"
+        :page-sizes="[5,10, 20, 50, 100]"
         :page-size="pagesize"
-        :pager-count="1"
         :total="total"
         :layout="layout"
         background

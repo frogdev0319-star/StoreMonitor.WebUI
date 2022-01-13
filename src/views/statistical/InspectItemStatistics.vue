@@ -11,11 +11,11 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-     <div class="statistics-content" style="height:1080px;margin-top:200px">
+     <div class="statistics-content" style="height:1110px;margin-top:200px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
-                                {{ $t('statistics.titles.rateDistribution') }}
+                                {{ $t('statistics.titles.inspectItemScore') }}
                             </span>
                         </div>
                             <TypeSelectArea
@@ -55,17 +55,17 @@
                       </el-col>
                      </el-col>
           </el-row>
-        <el-row  :span="24" class="partition" style="height:320px">
-            <el-col  :span="24" style="height:100%">
-               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption" :auto-resize="true"
-                            style="width:100%;height:100%"/>
-               <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
+                     <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
+            <el-col  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
+               <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
+                            :style="{width:part3.barRegionOption?part3.barRegionOption.width :'100%',height:'100%'}" />
+            <div style="position:absolute;right:0px;top:0px" @click='changePart3RegionOrder'>
                       <div class="button-area" >
                           <span style="color:#acaeb1">{{ part3.regionOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
                           <img :src='part3.regionOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
-               </div>    
+                      </div>    
               </div>
-           </el-col>      
+           </el-col>   
         </el-row > 
         <div class="subtitle-head">
           <span class="title" style="width:80%"  >
@@ -84,42 +84,59 @@
                       @click="onSwitchPart3Mode(1)"
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
-                  <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;background-color:#fff;"
-                    type="primary"
-                    size="mini"
-                    @click="exportStore2Excel"
+               <delay-button
+                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                      style="background-color:#FFF;color:#006ab7;padding:0px;"
+                      type="primary"
+                      size="mini"
+                      @click="exportStore2Excel"
                   >
-                    <div class="button-area">
+                    <div class="button-area" style="margin-left:15px">
                       <img :src="exportPng" class="icon-excel">
-                      <span style="color:#006ab7">{{ $t('eventView.exportReport') }}</span>
+                        <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
                   </delay-button>
             </div>
         </div>
-         <el-col  style="height:350px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
-                  <v-chart  v-if="part3.storeMode==1" 
-                            ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption" :auto-resize="true"
-                            style="width:100%;height:100%"/>
-                  <div v-else style="margin-top:20.5px;height:100%;overflow-y: scroll">
-                    <table-pagination
+       <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
+                  <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
+                      <v-chart 
+                                ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
+                                :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
+                  </div>
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-y:hidden;">
+                    <div style="margin-top:20.5px;">
+                    <table-only
                       ref="elTP"
-                      :column-data="part3StoreInfoTableCol"
+                     :column-data="part3StoreInfoTableCol"
                       :table-data="part3.storeTableData"
-                      :total="total"
+                      :total="part3.table.total"
                       :highlight-current-row= "true"
                       :pagesize="sizeNum"
                       :current-page="page"
                       :is-event = "false"
                       :default-sort = "defaultSort"
                       :allowRowExpand = "true"
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :tableHeight = "300"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
-                      @handleChange="handlePageAndSizeChange"
-                      @sortChange="handleSortChange"
+                      @handleChange="handlePageAndSizeChangePart3"
+                      @sortChange="handleSortChangePart3"
+                      @onCellClick = "onEvenListNumClick"
+                    />
+                  </div>
+                  <div style="width:100%; margin-top:12px;height:31px;">
+                  <tbl-pagination-only
+                    :total="part3.table.total"
+                    :pagesize="part3.table.sizeNum"
+                    :current-page="part3.table.page"
+                    layout = "prev,pager, next,sizes,slot"
+                    @sizeChange="handlePageAndSizeChangePart3"
+                    @currentChange="handlePageAndSizeChangePart3"
                   />
+                </div>
                 </div>
                  <div  v-if="part2.storeMode==1"  
                       style="position:absolute;right:40px;top:30px;height:40px" @click='changePart3StoreOrder'>
@@ -163,6 +180,9 @@ import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import TypeSelectArea from '@/components/TypeSelectArea';
 import InspectItemSelect from '@/components/InspectItemSelect';
+import TableOnly from '@/components/TableOnly';
+import TblPaginationOnly from '@/components/TblPaginationOnly';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 export default {
   name: 'PatrolEvaluationSta',
 
@@ -174,7 +194,9 @@ export default {
     SearchComponent,
     TablePagination,
     InspectItemSelect,
-     TypeSelectArea
+    TypeSelectArea,
+    TableOnly,
+    TblPaginationOnly
   },
   mixins: [resize],
   data() {
@@ -695,7 +717,7 @@ export default {
           'maxWidth': '100'
         },
           {
-          'prop': 'rank',
+          'prop': 'rankByAverageScore',
           'label': this.$t('statistics.rank'),
           'sortable': 'custom',
           'pdfwidth': '12%',
@@ -704,26 +726,27 @@ export default {
         },
     
       ],
-      part1:{ compareType:'stores', indexRegion:0, content:[],
+      part1:{ compareType:'stores', indexRegion:0, content:[],selStoreIdArr:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
-      part2:{ standardScore:-1,averageScore:-1,
+      part2:{ standardScore:-1,averageScore:-1,selStoreIdArr:[],
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0,
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{}},
-      part3:{ standardScore:-1,averageScore:-1,
+      part3:{ standardScore:-1,averageScore:-1,selStoreIdArr:[],
               compareType:'stores', indexRegion:0, content:[],
               compareIds :[],comapareLabels:[],originArray:[],
               indexType:0, storeOrder:'desc',regionOrder:'desc',
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
-              pieOption:{},barRegionOption:{},barStoreOption:{}},
+              pieOption:{},barRegionOption:{},barStoreOption:{},
+              table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfReport'}},
     };
   },
 
@@ -749,6 +772,18 @@ export default {
   },
 
   methods: {
+    handlePageAndSizeChangePart3(e){
+        console.log(e)
+        this.part3.table.page = e.page;
+        this.part3.table.sizeNum = e.size;
+        this.getPart3StoreBar();
+    },
+    handleSortChangePart3(e){
+       console.log(e)
+       this.part3.table.order = e.direction;
+        this.part3.table.property = e.property;
+        this.getPart3StoreBar();
+    },
     onSwitchPart1Mode(mode){
       this.part1.storeMode = mode;
     },
@@ -911,17 +946,50 @@ export default {
     },
 
     async exportStore2Excel() {
-      const that = this;
-      if (that.part3.storeTableData.length === 0) {
-        util.notify(that.$t('overview.emptyStoreList'), 'warning', 3000);
-        return false;
-      }
+ const self = this;
+      const that = this;  
+      let content =[];
+       const params = {};
+       params.beginTs = self.params.beginTs;
+       params.endTs = self.params.endTs;
+       params.groupMode = 0;
+       params.order={
+              direction:"desc",
+              property: "averageScore",
+            }
+       console.log(this.part3.content[this.part3.indexRegion])
+       params.storeIds = this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId]: this.part3.content[this.part3.indexRegion].list;
+       params.inspectTagId = self.params.inspectId;
+            params.filter={
+              page:0,
+              size:params.storeIds.length
+            }
+             if (params.storeIds.length === 0) {
+              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              return false;
+            }
+            if(this.inspectItem){
+              params.itemIds = this.inspectItem.item.ids
+            }
+            console.log(params)
+            const storeResult = await this.getInspectStatsItemOverGroup(params);
+            if (storeResult.errCode === 0) {
+              const result = storeResult.data;
+              if (result) {
+                   
+                  content = result.content
+                  content.forEach((item,i)=>{
+                    item.rank= i+1;
+                    if(item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+                  });
+              }
+            }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
         const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'averageScore', 'rank'];
         const self = this;
-        const data = that.formatJson(filterVal, that.part3.storeTableData);
+        const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
         const fileName = name + '_Inspection item score_' + util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
@@ -1051,35 +1119,39 @@ export default {
         console.log('PatrolEvaluationStatistics-getInspectStatsLine:' + e);
       }
     },
-    emitTypeChangedPart1({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
+    emitTypeChangedPart1({compareType,compareArr,selectedLabels,originArray,selStoreIdArr}){ //劃分類型選擇
       console.log("Part1 Emit Type Change="+compareType)
       this.part1.compareType = compareType;
       this.part1.compareIds = compareArr;
       this.part1.comapareLabels = selectedLabels;
       this.part1.originArray = originArray;
+      this.part1.selStoreIdArr = selStoreIdArr;
       this.dataGetPart1();
 
     },
-    emitTypeChangedPart2({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
+    emitTypeChangedPart2({compareType,compareArr,selectedLabels,originArray,selStoreIdArr}){ //劃分類型選擇
       console.log("Part2 Emit Type Change="+compareType)
       this.part2.compareType = compareType;
       this.part2.compareIds = compareArr;
       this.part2.comapareLabels = selectedLabels;
       this.part2.originArray = originArray;
+      this.part2.selStoreIdArr = selStoreIdArr;
       this.dataGetPart2();
 
     },
-    emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray}){ //劃分類型選擇
+    emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray,selStoreIdArr}){ //劃分類型選擇
       console.log("Part3 Emit Type Change="+compareType)
       this.part3.compareType = compareType;
       this.part3.compareIds = compareArr;
       this.part3.comapareLabels = selectedLabels;
       this.part3.originArray = originArray;
+      this.part3.selStoreIdArr = selStoreIdArr;
       this.dataGetPart3();
 
     },
-    getInspectLineOption() {
+   getInspectLineOption() {
       const option = {
+        width:'100%',
         color: ['#f11e66'],
         legend: {
           x: 'center',
@@ -1145,7 +1217,8 @@ export default {
           },
           axisLabel: {
             fontStyle: 12,
-            margin: 10
+            margin: 10,
+            rotate:45,
           },
           data: []
         },
@@ -1154,7 +1227,6 @@ export default {
             type: 'value',
             name: '(%)',
             minInterval: 10,
-            max: 100,
             nameLocation: 'end',
             nameTextStyle: {
               align: 'left',
@@ -1214,7 +1286,7 @@ export default {
             type: 'bar',
             barWidth: 15,
             symbol: 'none',
-            barGap:20,
+            
             yAxisIndex: 0,
             smooth: true,
             name: '',
@@ -1431,7 +1503,7 @@ export default {
       }
       else if(this.part1.compareType=='storeGroup'){
          params.groupIds  = this.part1.compareIds;
-         params.groupMode = 3;
+         params.groupMode = 4;
       }
          else if(this.part1.compareType=='users'){
          params.submitters  = this.part1.compareIds;
@@ -1537,6 +1609,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       console.log(option)
       this.regionsChartsOptions = option;
       this.part1.barRegionOption = option;
@@ -1600,6 +1680,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       this.part1.barStoreOption = option;
     },
     async getPart2RegionBar() {
@@ -1635,7 +1723,7 @@ export default {
       }
       else if(this.part2.compareType=='storeGroup'){
          params.groupIds  = this.part2.compareIds;
-         params.groupMode = 3;
+         params.groupMode = 4;
       }
       let totalReport = 0;
       let totalStandard = 0;
@@ -1702,6 +1790,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barRegionOption = option;
       console.log(option)
@@ -1756,6 +1852,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       option.yAxis[0].name  =  this.$t('statistics.score'),
       this.part2.barStoreOption = option;
     },
@@ -1782,11 +1886,13 @@ export default {
          params.storeIds  = this.part3.compareIds;
          params.groupMode = 0;
       }
-      else if(this.part3.compareType=='area1'){
+  else if(this.part3.compareType=='area1'){
+         params.storeIds =  this.part3.selStoreIdArr;
          params.groupIds  = this.part3.compareIds;
          params.groupMode = 1;
       }
       else if(this.part3.compareType=='area2'){
+         params.storeIds =  this.part3.selStoreIdArr;
          params.groupIds  = this.part3.compareIds;
          params.groupMode = 2;
       }
@@ -1796,16 +1902,14 @@ export default {
       }
       else if(this.part3.compareType=='storeGroup'){
          params.groupIds  = this.part3.compareIds;
-         params.groupMode = 3;
+         params.groupMode = 4;
       }
       if(this.inspectItem){
         params.itemIds = this.inspectItem.item.ids
       }
       let totalReport = 0;
       let totalStandard = 0;
-         params.filter = { page: 0, size: 100 };
-        console.log(JSON.stringify(params))
-
+      params.filter = { page: 0, size: params.groupIds.length };
         const storeResult = await self.getInspectStatsItemOverGroup(params);
         console.log(storeResult)
         if (storeResult.errCode === 0) {
@@ -1881,6 +1985,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+      if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       option.yAxis[0].name  =  this.$t('statistics.score')
       if( this.inspectItem.item.qualifiedScore && this.inspectItem.item.qualifiedScore>0){
           option.yAxis[0].max = this.inspectItem.item.qualifiedScore;
@@ -1888,7 +2000,14 @@ export default {
       else{
         option.yAxis[0].max = max
       }
-    
+      regionData.push(0)
+      regionLabel.push("")
+      if(regionLabel.length>20){
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       this.part3.barRegionOption = option;
       console.log(option)
       await this.getPart3StoreBar();
@@ -1917,12 +2036,16 @@ export default {
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.content[this.part3.indexRegion].list;
             params.inspectTagId = self.params.inspectId;
-            params.order={
-              direction: this.part3.storeOrder,
-              property:"averageScore"
-            }   
             if(this.inspectItem){
-              params.itemIds =this.inspectItem.item.ids
+              params.itemIds = this.inspectItem.item.ids
+            }
+            params.order={
+              direction: (this.part3.storeMode==1) ? this.part3.storeOrder : this.part3.table.order,
+              property: (this.part3.storeMode==1) ? "averageScore": this.part3.table.property,
+            }
+            params.filter={
+              page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
+              size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
             console.log(params)
             const storeResult = await this.getInspectStatsItemOverGroup(params);
@@ -1931,7 +2054,7 @@ export default {
               const result = storeResult.data;
               if (result) {
                   content = result.content
-                  console.log(result)
+                  this.part3.table.total = result.totalPages;
               }
             }
         }
@@ -1953,6 +2076,14 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
+     if(regionLabel.length>20){
+        regionData.push(0)
+        regionLabel.push("")
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       option.yAxis[0].name  =  this.$t('statistics.score');
       if( this.inspectItem.item.qualifiedScore && this.inspectItem.item.qualifiedScore>0){
           option.yAxis[0].max = this.inspectItem.item.qualifiedScore;
@@ -1960,7 +2091,14 @@ export default {
       else{
         option.yAxis[0].max = max
       }
-      
+      regionData.push(0)
+      regionLabel.push("")
+      if(regionLabel.length>20){
+        option.width =( regionLabel.length*50) +'px'
+      }
+      else{
+        option.width = '100%'
+      }
       this.part3.barStoreOption = option;
       console.log(this.part3.barStoreOption)
     },
