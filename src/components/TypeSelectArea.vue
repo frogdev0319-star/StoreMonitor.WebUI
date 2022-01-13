@@ -61,6 +61,10 @@ export default {
         path:{
           type:String
         },
+        allowPerson:{
+          type:Boolean,
+          default:false
+        },
         allowAll:{
           type:Boolean,
           default:false
@@ -145,7 +149,12 @@ export default {
   async created() {
     console.log("On Created")
     await this.getStoreListAndGroupAndType();
-    //this.getSearchCondition();
+    if(this.allowPerson){
+     this.compareTypeItems.push({value:'position',label:this.$t('overview.position')})
+     this.compareTypeItems.push({value:'users',label:this.$t('overview.user')})
+     this.getSearchCondition();
+    }
+
   },
   watch: {
     async accountChanged(val) {
@@ -154,6 +163,9 @@ export default {
       if (val !== 0) {
         self.ifGetParamsFromCash = false;
         this.getStoreListAndGroupAndType();
+        if(allowPerson){
+            this.getSearchCondition();
+         }
       }
     },
     inspectId:{

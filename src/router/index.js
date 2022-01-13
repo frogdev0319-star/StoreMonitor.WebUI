@@ -366,7 +366,7 @@ export const navbarRoute = {
       name: 'scheduleManage',
       isReadOnly: false,
       component: resolve => require(['@/views/setting/schedule/PatrolSechedule'], resolve),
-      hidden: false,
+      hidden: true,
       meta: {
         keepAlive: false, // the component is't to be cache.
         requireAuth: true

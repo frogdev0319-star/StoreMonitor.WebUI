@@ -632,33 +632,3 @@ $h1:#292e36;
     }
 }
 </style>
-<style>
-  @import '../../../assets/css/pagination.css';
-  .el-button--mini, .el-button--mini.is-round{
-    /*padding:7px 15px !important;*/
-}
-.el-province .el-input__inner{
-    border-radius: 3px !important;
-    background-color: #F4F5F9 !important;
-    border :0 !important;
-}
-.el-select-dropdown__item{
-    padding: 0 20px !important;
-}
-.el-select-dropdown__item.hover{
-    background-color:#FEE4E7 !important;
-}
-
-.el-select-dropdown__item.selected{
-    color:#f31d65 !important;
-}
-#el-menuscrollbar .el-scrollbar__wrap {
-  overflow-x: hidden;
-}
-</style>
-<style scoped>
-.el-input--small >>>.el-input__inner{
-    background: #F4F5F9 !important;
-    border-radius: 15px !important;
-}
-</style>
