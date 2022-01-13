@@ -15,7 +15,7 @@
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
-                                {{ $t('statistics.titles.inspectItemScore') }}
+                                 {{ $t('statistics.titles.inspectItemScores') }}
                             </span>
                         </div>
                             <TypeSelectArea

@@ -1126,6 +1126,7 @@ export default {
       'storeEvalDetail':'門店評估詳情',
       'scoreDistribution':'考評得分分佈',
       'rateDistribution':'考評達標率',
+      'inspectItemScores':'巡檢項目得分',
     },
     'overview':{
       'store_unit':'家',
