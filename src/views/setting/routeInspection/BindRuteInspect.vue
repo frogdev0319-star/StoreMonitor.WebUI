@@ -1,39 +1,31 @@
 <template>
-  <div class="el-bind-device">
-    <div class="el-bind-header">
-      <div class="seacrh-content">
-        <store-filter
-          :is-patrol = "true"
-          :set-width-flag="true"
-          class="store-filter"
-          @storeChange = "onStoreChange"
-        />
-        <el-input
-          :placeholder= "$t('insSettingView.searchPlaceholder')"
-          v-model="serachVale"
-          size="small"
-          class="el-search-input"
-          clearable
-          @keyup.enter.native="searchStoreInput"
-          @clear="searchStoreInput">
-          <i
-            slot="prefix"
-            class="iconfont icon-sousuo"
-            style="position:relative;top:6px;left:6px;font-size:18px;"
-            @click="searchStoreInput"/>
-        </el-input>
-      </div>
-    </div>
+  <div class="el-bind-device padding">
+    <store-filter
+      type="bindroute"
+      @storeChange = "onStoreChange"
+    />
     <div
       v-loading="loading"
-      class="el-bind-content-box"
+      class="paper padding"
+      style="margin-top: 20px"
       element-loading-background="rgba(255, 255, 255, 0.6)">
-      <p class="el-header-title">{{ $t('insSettingView.selectStoreToBind', {tableName: tabName}) }}</p>
-      <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
-        {{ $t('insSettingView.hasBoundStoreNum', {tableName: tabName, allStoreNum: totalCount, boundStoreNum: storeCount}) }}
-      </p>
-      <div :style="{'height' : varyWindowHeight*0.56+'px'}" class="el-bind-content">
-        <div v-if="storeList.length === 0" :style="{'line-height': varyWindowHeight*0.56+'px'}">
+      <div class="el-header-title flex-center">
+        {{ $t('insSettingView.selectStoreToBind', {tableName: tabName}) }}
+        <div class="spacer"></div>
+        <el-button
+          :disabled="storeList.length === 0"
+          class="storevue-button-filled"
+          size="mini"
+          type="primary"
+          @click="applyNape">
+          <div class="btn-area">
+            <i class="iconfont icon-quxiaolianjie"/>
+            <span>{{ $t('insSettingView.confirm') }}</span>
+          </div>
+        </el-button>
+      </div>
+      <div :style="{'height' : varyWindowHeight*0.63+'px'}" class="el-bind-content">
+        <div v-if="storeList.length === 0" :style="{'line-height': varyWindowHeight*0.63+'px'}">
           <div v-if="Havestore === 0|| resultHavestore && Havestore !== 0" class="bind-empty">
             <img :src="loadingGif">
             <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
@@ -41,37 +33,25 @@
         </div>
         <el-scrollbar id="el-menuscrollbar" style="height:100%;">
           <div v-if="storeList.length !== 0" class="el-all-checkbox">
-            <el-checkbox v-model="allData" @change="choiceAll"/>
+            <el-checkbox v-model="allData" @change="choiceAll" class="storevue-checkbox-filled"/>
             <span class="all-device-title">{{ $t('insSettingView.relateAllStores') }}</span>
+            <p class="choice-device"><i class="iconfont icon-tishi1" style="margin-right:10px;color:#93A2B6;"/>
+              {{ $t('insSettingView.hasBoundStoreNum', {tableName: tabName, allStoreNum: totalCount, boundStoreNum: storeCount}) }}
+            </p>
           </div>
           <div v-for="(item,index) in storeList" :key="index" class="device-group">
             <div class="device-all-checkbox">
-              <el-checkbox v-model="item.checked" @change="choiceAllGroup(item)"/>
+              <el-checkbox v-model="item.checked" @change="choiceAllGroup(item)" class="storevue-checkbox-filled"/>
               <span class="group-name">{{ item.cityName }}</span>
             </div>
             <div class="device-content">
               <div v-for="(_item,_index) in item.itemData" :key="_index" class="device-detail">
-                <el-checkbox v-model="_item.checked" @change="choiceAllDevice(index,item,_index,_item)"/>
+                <el-checkbox v-model="_item.checked" @change="choiceAllDevice(index,item,_index,_item)" class="storevue-checkbox-outlined"/>
                 <span class="device-name">{{ _item.name }}</span>
               </div>
             </div>
           </div>
         </el-scrollbar>
-      </div>
-      <div class="el-bind-footer">
-        <div class="el-btn-content">
-          <el-button
-            :disabled="storeList.length === 0"
-            :class="lang === 'en' ? 'en-btn' : 'btn'"
-            size="mini"
-            type="primary"
-            @click="applyNape">
-            <div class="btn-area">
-              <i class="iconfont icon-quxiaolianjie"/>
-              <span>{{ $t('insSettingView.confirm') }}</span>
-            </div>
-          </el-button>
-        </div>
       </div>
     </div>
   </div>
@@ -82,7 +62,7 @@ import { getInspectBindList, bindInspectWithStore } from '@/api/inspect';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import util from '@/common/util';
-import StoreFilter from '@/components/StoreFilter';
+import StoreFilter from '@/components/StoreFilter_';
 
 export default {
   name: 'BindRuteInspect',
@@ -423,10 +403,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 *{
-    padding: 0;
-    margin:0;
-    text-align: left;
     font-family: Roboto, Arial, Microsoft YaHei;
+    text-align: left;
 }
 $red:#f31d65;
 $black:#182752;
@@ -475,6 +453,7 @@ $h1:#292e36;
     }
 }
 .el-bind-device{
+
   .el-bind-header{
     background-color: #fff;
     padding:30px;
@@ -498,15 +477,12 @@ $h1:#292e36;
     }
     @media screen and (min-width: 1920px){
       .store-filter{
-        width: 90%;
+        // width: 90%;
       }
     }
     .el-header-title{
         font-size: 18px;
         font-weight: bold;
-        position: relative;
-        top: 5px;
-        display: inline;
         color: $black;
     }
     .el-header-hr{
@@ -525,18 +501,9 @@ $h1:#292e36;
         font-size: calc(16/1920*100vw);
       }
     }
-    .el-bind-content-box{
-        float: left;
-        background-color: #fff;
-        margin: 30px calc(30/1920*100vw);
-        padding: 30px 30px 0 30px;
-        width:92.5%;
-        border: 1px solid $border;
-    }
+    
     .el-bind-content{
         margin-top: 15px;
-        background-color: #F6F7FB;
-        border:0.5px solid #e3e9f4;
         color: $black;
         .bind-empty{
             text-align: center;
@@ -566,14 +533,17 @@ $h1:#292e36;
                 }
             }
             .device-content{
-                margin-left: calc(55/1920*100vw);
+                margin-left: calc(200/1920*100vw);
                 overflow: hidden;
+                background-color: #f7f9fa;
+                display: flex;
+                flex-wrap: wrap;
+                padding: calc(10/1920*100vw) calc(20/1920*100vw);
                 .device-detail{
                     width: auto;
+                    margin-top: calc(10/1920*100vw);
+                    margin-bottom: calc(10/1920*100vw);
                     min-width: calc(215/1920*100vw);
-                    margin-top: 10px;
-                    margin-left: calc(15/1920*100vw);
-                    float: left;
                     .device-name{
                         margin-left: calc(20/1920*100vw);
                         font-size: 14px;

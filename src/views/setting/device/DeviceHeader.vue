@@ -40,7 +40,7 @@
         <div class="self-loading margin-bottom-sm" style="background-color: #fff;border: solid 1px #c3c4c5; padding: 16px; border-radius: 5px" v-loading="isLoadingAvailableDevice">
           <template v-if="avilableDeviceList.length > 0">
             <div class="flex-center" style="justify-content: space-between" v-for="(item, index) of avilableDeviceList" :key="index">
-              <el-checkbox class="storevue-checkbox" v-model="item.checked"/>
+              <el-checkbox class="storevue-checkbox-outlined" v-model="item.checked"/>
               <span>{{ item.serialNumber }}</span>
               <span>{{ item.name }}</span>
               <el-select

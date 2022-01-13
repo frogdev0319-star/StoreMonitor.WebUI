@@ -1,11 +1,11 @@
 <template>
-  <el-row class="el-addrute" id="addInspection">
-    <el-col :span="24" class="el-rute-title">
-      <span v-if="!showEditTab" class="tab-name">{{ routeName }}<i class="iconfont icon-bianji icon-tabname" @click="editTabName"/></span>
+  <div class="el-addrute paper flex" id="addInspection" style="flex-direction: column">
+    <div class="flex-center padding">
+      <span v-if="!showEditTab" class="tab-name" style="margin-right: 20px">{{ routeName }}<i class="iconfont icon-bianji icon-tabname" @click="editTabName"/></span>
       <el-input v-if="showEditTab" :size="varyWindowWidth>1600?'small':'mini'"
                 :placeholder="$t('insSettingView.enterListName')" v-model="editRouteName" class="tabName-input"
                 @input="RouteNameLength"/>
-      <div v-if="showEditTab" class="iconcontent" style="margin-top:28px;">
+      <div v-if="showEditTab" class="flex-center">
         <div class="iconlised" @click="confirmEditTab">
           <i class="el-icon-check"/>
         </div>
@@ -13,28 +13,30 @@
           <i class="el-icon-close"/>
         </div>
       </div>
+      <div class="spacer"></div>
+      <el-button
+        class="storevue-button-filled"
+        @click="submitBindTitle">
+        {{ $t('remotePatrol.submit') }}
+      </el-button>
       <span v-if="showLengthNameWarning" class="warningtips">{{ $t('insSettingView.enterNameRuletip') }}</span>
-    </el-col>
-    <el-col :span="24" class="el-rute-post">
-      <div class="post-left">
-        <span><i class="iconfont icon-quxiaolianjie"/>{{ $t('insSettingView.selecttitle') }}</span>
-        <region-multi-select
+    </div>
+    <hr class="hr-horizontal">
+    <div class="flex padding">
+      <div style="background-color: #f7f9f9; color: #556679; font-size: 13px; padding-left: 10px;border-radius: 3px; line-height: 36px">
+        <span>{{ $t('insSettingView.selecttitle') }}</span>
+        <multi-select
+          style="flex: 1"
           :options="titleList"
           :placeholder="$t('insSettingView.selectPost')"
-          :disabled="false"
-          :input-size="`mini`"
           :selected="ModelPost"
-          :all="$t('remotePatrol.all')"
+          :prompt-msg="$t('remotePatrol.all')"
+          :all-select="0"
+          :alltype="0"
           @changeInput="changeSelect(arguments)"/>
       </div>
-      <div class="post-right">
-        <delay-button
-          class="inspction-btn"
-          @click="submitBindTitle">
-          {{ $t('remotePatrol.submit') }}
-        </delay-button>
-      </div>
-    </el-col>
+    </div>
+    <hr class="hr-horizontal">
     <div class="prompt-content" v-if="showDragInfo && groupList.length > 0">
       <div class="prompt-info">
         <img :src="dragTopImgSrc" class="prompt-image image-top" alt="">
@@ -42,158 +44,151 @@
         <img :src="dragLeftImgSrc" class="prompt-image image-left" alt="">
       </div>
     </div>
-    <el-col :span="7" class="el-rute-group">
-      <div class="group-content">
-        <div class="title-content">
-          <span class="level2"><i class="iconfont icon-wenjian icontitle"/><span class="level2-name">{{ groupTitle }}</span></span>
-          <div class="btn-content">
-            <delay-button
-              class="inspction-btn"
-              @click="addInspectCatergory"
-            >
-              <i class="el-icon-plus"/>
-              <span>{{ $t('insSettingView.addCategory') }}</span>
-            </delay-button>
-          </div>
-        </div>
-        <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-          <div :style="{'max-height':varyDivHeight+'px'}" class="group-items group-title">
-            <div class="top-group-title">
-              <div class="group-name-title">
-                <el-tabs id="group-content" v-model="activeSheetName" @tab-click="handleSheetClick">
-                  <el-tab-pane v-for="(item,index) in sheetName" :key="index" :label="item.label" :name="item.id"/>
-                </el-tabs>
-              </div>
+    <div class="flex spacer">
+      <div class="el-rute-group">
+        <div class="group-content" style="height: 100%; display: flex; flex-direction: column;">
+          <div class="title-content">
+            <span class="level2"><i class="iconfont icon-wenjian icontitle"/><span class="level2-name">{{ groupTitle }}</span></span>
+            <div class="btn-content">
+              <delay-button
+                class="inspction-btn"
+                @click="addInspectCatergory"
+              >
+                <i class="el-icon-plus"/>
+                <span>{{ $t('insSettingView.addCategory') }}</span>
+              </delay-button>
             </div>
-            <draggable v-model="groupList" @update="handleUpdateCategorySequence">
-              <template v-for="(item,index) in groupList">
-                <div :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
-                     class="groupItem" @click="clickCategory(index,item)"
-                     @mouseenter="onShowCategoryEditBtn(index,item)">
-                  <div class="category-list">
-                    <div class="category-name">
-                      <div class="group-left">
-                        <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
-                        <div>
-                          <span :style="activeParentId === item.id?{'color':'#f31d65'}:{}">
-                            {{ item.name }}（{{ item.groupNum }}）
-                          </span>
+          </div>
+          <div id="el-menuscrollbar" class="spacer">
+            <div class="group-items group-title" style="height: 100%; display: flex; flex-direction: column;">
+              <div class="top-group-title">
+                <div class="group-name-title">
+                  <el-tabs id="group-content" v-model="activeSheetName" @tab-click="handleSheetClick">
+                    <el-tab-pane v-for="(item,index) in sheetName" :key="index" :label="item.label" :name="item.id"/>
+                  </el-tabs>
+                </div>
+              </div>
+              <draggable class="spacer" style="background-color: #f7f9fa" v-model="groupList" @update="handleUpdateCategorySequence">
+                <template v-for="(item,index) in groupList">
+                  <div :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
+                      class="groupItem" @click="clickCategory(index,item)"
+                      @mouseenter="onShowCategoryEditBtn(index,item)">
+                    <div class="category-list">
+                      <div class="category-name">
+                        <div class="group-left">
+                          <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
+                          <div>
+                            <span :style="activeParentId === item.id?{'color':'#006ab7'}:{}">
+                              {{ item.name }}（{{ item.groupNum }}）
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      <div class="group-right">
-                        <div class="show-edit">
-                          <div class="nape-items-handle" v-if="hoverId === item.id">
-                            <i
-                              class="iconfont icon-bianji"
-                              style="cursor:pointer;"
-                              @click="editCategory(index,item)"/>
-                            <i
-                              class="iconfont icon-shanchu"
-                              style="cursor:pointer;"
-                              @click="deleteGroup(index, item)"/>
+                        <div class="group-right">
+                          <div class="show-edit">
+                            <div class="nape-items-handle" v-if="hoverId === item.id">
+                              <img style="margin-top:15px" :src="`./static/img/table-edit.png`" height="26px" @click="editCategory(index,item)"/>
+                              <img style="margin-top:15px" :src="`./static/img/table-delete.png`" height="26px" @click="deleteGroup(index, item)"/>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div v-if="activeParentId === item.id">
-                      <draggable v-model="item.children" :group="{name: 'children'}"
-                                 @start="getSubCategorySequence(item.children)"
-                                 @update="handleUpdateSubCategorySequence(item.children)">
-                        <div v-for="(childItem, childIndex) in item.children" :key='`child-${childIndex}`' class="groupItem">
-                          <div :key="index" :class="childItem.isClick ? 'noraml-color':'noraml-groupColor'"
-                               class="groupItem" @click.stop="clickSubCategory(index, item.id, childIndex,childItem)"
-                               @mouseenter="onShowSubcategoryEditBtn(childIndex, childItem)">
-                            <div v-if="activeChildId === childItem.id" class="proper-flag"/>
-                            <div class="category-name">
-                              <div class="group-left">
-                                <div class="subcatergy-item">
-                                  <span :style="activeChildId === childItem.id?{'color':'#f31d65'}:{}">
-                                    {{ childItem.name }}
-                                  </span>
+                      <div v-if="activeParentId === item.id">
+                        <draggable v-model="item.children" :group="{name: 'children'}"
+                                  @start="getSubCategorySequence(item.children)"
+                                  @update="handleUpdateSubCategorySequence(item.children)">
+                          <div v-for="(childItem, childIndex) in item.children" :key='`child-${childIndex}`' class="groupItem">
+                            <div :key="index" :class="childItem.isClick ? 'noraml-color':'noraml-groupColor'"
+                                class="groupItem" @click.stop="clickSubCategory(index, item.id, childIndex,childItem)"
+                                @mouseenter="onShowSubcategoryEditBtn(childIndex, childItem)">
+                              <div v-if="activeChildId === childItem.id" class="proper-flag"/>
+                              <div class="category-name">
+                                <div class="group-left">
+                                  <div class="subcatergy-item">
+                                    <span :style="activeChildId === childItem.id?{'color':'#006ab7'}:{}">
+                                      {{ childItem.name }}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                              <div class="group-right">
-                                <div class="show-edit">
-                                  <div v-if="hoverId === childItem.id" class="nape-items-handle">
-                                    <i
-                                      class="iconfont icon-bianji"
-                                      style="cursor:pointer;"
-                                      @click="editCategory(childIndex,childItem)"/>
-                                    <i
-                                      class="iconfont icon-shanchu"
-                                      style="cursor:pointer;"
-                                      @click="deleteGroup(childIndex, childItem, item)"/>
+                                <div class="group-right">
+                                  <div class="show-edit">
+                                    <div v-if="hoverId === childItem.id" class="nape-items-handle">
+                                      <i
+                                        class="iconfont icon-bianji"
+                                        style="cursor:pointer;"
+                                        @click="editCategory(childIndex,childItem)"/>
+                                      <i
+                                        class="iconfont icon-shanchu"
+                                        style="cursor:pointer;"
+                                        @click="deleteGroup(childIndex, childItem, item)"/>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </draggable>
+                        </draggable>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </template>
-            </draggable>
-          </div>
-        </el-scrollbar>
-      </div>
-    </el-col>
-    <el-col :span="17" class="el-rute-nape">
-      <div class="nape-content">
-        <div class="title-content">
-          <span :class="lang.indexOf('zh') === -1 ? 'en-item-title': 'item-title'" class="level2">
-            <i class="iconfont icon-icon-test icontitle"/>
-          <span class="level2-name">{{ napeTitle }}</span></span>
-          <div class="btn-content">
-            <delay-button
-              :disabled="groupList.length === 0"
-              class="inspction-btn"
-              @click="addNape"
-            >
-              <i class="el-icon-plus"/>
-              <span>{{ $t('insSettingView.addInsItem') }}</span>
-            </delay-button>
-            <delay-button
-              :disabled="groupList.length === 0"
-              class="inspction-btn"
-              @click="deleteNape"
-            >
-              <i class="iconfont icon-shanchu"/>
-              <span>{{ $t('insSettingView.deleteInsItem') }}</span>
-            </delay-button>
+                </template>
+              </draggable>
+            </div>
           </div>
         </div>
-        <el-scrollbar id="el-menuscrollbar" style="height:100%;">
-          <div :style="{'max-height':varyDivHeight+'px'}" class="nape-items">
-            <draggable-table
-              :is-score-sheet= "activeSheetName === '1'"
-              :table-header="activeSheetName === '1' ? scoreTableHeader:passFailTableHeader"
-              :table-data="napeList"
-              @handleEditItem="handleEdit"
-              @handleDeleteItem="handleDelete"/>
-          </div>
-        </el-scrollbar>
       </div>
-    </el-col>
-    <el-dialog
+      <div class="el-rute-nape spacer">
+        <div class="nape-content">
+          <div class="title-content">
+            <span :class="lang.indexOf('zh') === -1 ? 'en-item-title': 'item-title'" class="level2">
+              <i class="iconfont icon-icon-test icontitle"/>
+            <span class="level2-name">{{ napeTitle }}</span></span>
+            <div class="btn-content">
+              <delay-button
+                :disabled="groupList.length === 0"
+                class="inspction-btn"
+                @click="addNape"
+              >
+                <i class="el-icon-plus"/>
+                <span>{{ $t('insSettingView.addInsItem') }}</span>
+              </delay-button>
+              <delay-button
+                :disabled="groupList.length === 0"
+                class="inspction-btn"
+                @click="deleteNape"
+              >
+                <i class="iconfont icon-shanchu"/>
+                <span>{{ $t('insSettingView.deleteInsItem') }}</span>
+              </delay-button>
+            </div>
+          </div>
+          <div id="el-menuscrollbar" style="height:100%;">
+            <div class="nape-items">
+              <draggable-table
+                :is-score-sheet= "activeSheetName === '1'"
+                :table-header="activeSheetName === '1' ? scoreTableHeader:passFailTableHeader"
+                :table-data="napeList"
+                @handleEditItem="handleEdit"
+                @handleDeleteItem="handleDelete"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dialog-pop
       v-if="showAddNape"
       :title="updateType.type===0?$t('insSettingView.addTitleItem'):$t('insSettingView.editTitleItem')"
       :visible.sync="showAddNape"
       :append-to-body="true"
       :close-on-click-modal="false"
-      width="510px"
-      top="35vh"
-      left="40vh"
-      custom-class="addNape">
-      <div class="dialog-content" style="overflow:hidden;">
-        <hr style="border: 0.5px solid #dfe2e9;;">
+      @cancelHandler="showAddNape = false"
+      @confirmHandler="confirmUpdateNape">
+      <div class="dialog-content padding">
         <el-form class="NapeForm" label-position="top" size="mini">
-          <el-form-item>
-            <p class="score_item">
+          <el-form-item style="margin-bottom: 20px">
+            <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">{{$t('insSettingView.inspectName')}}</span>
-            </p>
+            </div>
             <el-input v-model="ItemName"
                       :placeholder="$t('insSettingView.enterItemName')"
                       @input="napeNameChange"></el-input>
@@ -201,10 +196,10 @@
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
           <el-form-item>
-            <p class="score_item">
+            <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">{{$t('insSettingView.inspectItemType')}}</span>
-            </p>
+            </div>
             <el-radio-group class="attribute-group" v-model="itemType">
               <div v-for="(typeItem, typeIndex) in itemsTypeList"style="display: inline-flex">
                 <el-radio :label="typeItem.value" :key="typeIndex">{{typeItem.label}}</el-radio>
@@ -212,25 +207,25 @@
             </el-radio-group>
           </el-form-item>
           <div v-if="itemType === 0" class="score-content">
-            <el-form-item v-if="activeSheetName==='1'">
-              <p class="score_item">
+            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 20px">
+              <div class="score_item">
                 <span class="sign">*</span>
                 <span class="item_label">{{$t('insSettingView.sheetscore3')}}</span>
                 <span class="item_des">{{$t('insSettingView.sheetscore3_des')}}</span>
-              </p>
+              </div>
               <el-input v-model="ItemScoreOption"
                         :placeholder="$t('insSettingView.enterScore')"
                         @input="napeScoreOptionsChange"></el-input>
               <span v-if="ScoreOptionsTips0" class="rules">{{ $t('insSettingView.excelScoreItemEmpty') }}</span>
               <span v-if="ScoreOptionsTips1" class="rules">{{ $t('insSettingView.setScoreItemRange') }}</span>
             </el-form-item>
-            <el-form-item v-if="activeSheetName==='1'" style="height: 57px;">
+            <el-form-item v-if="activeSheetName==='1'" style="margin-bottom: 20px">
               <el-col :span="10">
-                <el-form-item style="margin-bottom:0;">
-                  <p class="score_item">
+                <el-form-item style="margin-bottom: 20px;">
+                  <div class="score_item">
                     <span class="sign">*</span>
                     <span class="item_label">{{$t('insSettingView.sheetscore0')}}</span>
-                  </p>
+                  </div>
                   <el-input v-model.number="ItemTotalScore" disabled
                             :placeholder="$t('insSettingView.enterScore')"
                             @input="napeTotalScoreChange"/>
@@ -239,7 +234,7 @@
                 </el-form-item>
               </el-col>
               <el-col :span="12" :offset="2">
-                <el-form-item :label="$t('insSettingView.sheetscore1')">
+                <el-form-item :label="$t('insSettingView.sheetscore1')" style="margin-bottom: 20px;">
                   <el-input v-model.number="ItemMinScore"
                             :placeholder="$t('insSettingView.enterScore')"
                             @input="napeMinScoreChange"/>
@@ -248,10 +243,10 @@
               </el-col>
             </el-form-item>
             <el-form-item v-if="activeSheetName!=='1'">
-              <p class="score_item">
+              <div class="score_item">
                 <span v-if="activeSheetName==='2'" class="sign">*</span>
                 <span class="item_label">{{$t('insSettingView.score')}}</span>
-              </p>
+              </div>
               <el-input v-model.number="ItemSheetScore"
                         :placeholder="$t('insSettingView.enterScore')"
                         @input="napeSheetScoreChange"/>
@@ -272,7 +267,7 @@
         <el-button class="file-cancel-btn" size="mini" style="" @click="showAddNape = false">{{ $t('insSettingView.cancel') }}</el-button>
         <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmUpdateNape">{{ $t('insSettingView.confirm') }}</el-button>
       </div>
-    </el-dialog>
+    </dialog-pop>
     <dialog-pop
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
@@ -310,7 +305,7 @@
       @visibleChangeHandler="hideAddGroupDialog"
       @cancelHandler="hideAddGroupDialog"
       @confirmHandler="confirmHandleCategory">
-      <div class="dialog-slot input-form-slot">
+      <div class="padding">
         <validate-input
           :placeholder="$t('insSettingView.enterName')"
           :input-limit-length="30"
@@ -339,7 +334,7 @@
         </div>
       </div>
     </dialog-pop>
-  </el-row>
+  </div>
 </template>
 
 <script>
@@ -347,6 +342,7 @@ import util from '@/common/util';
 import { inpectRESTful, titleRESTful } from '@/api/index';
 import PubSub from 'pubsub-js';
 import filterString from '@/common/filterString';
+import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { getScheduleListService } from '@/api/schedule';
 import DelayButton from '@/components/DelayButton';
@@ -365,6 +361,7 @@ export default {
     ValidateInput,
     DialogPop,
     DelayButton,
+    MultiSelect,
     RegionMultiSelect,
     draggable
   },
@@ -1809,6 +1806,7 @@ export default {
         color:#424151;
       }
       .score_item{
+        display: inline;
         margin:0;
         .item_label{
           font-size: 14px;
@@ -1838,10 +1836,12 @@ export default {
         height: 100%;
         min-height: calc(100vh - 125px - 60/1920*100vw);
         color: $black;
-        border: 1px solid $border;
-        background-color: #fff;
         font-size: calc(18/1920*100vw);
         position: relative;
+        
+        .tabName-input{
+            width: 210px;
+        }
         @media screen and (min-width:1366px){
             .tab-name{
                 font-size: 18px;
@@ -1915,19 +1915,12 @@ export default {
             text-align: left;
             position: relative;
             .tab-name{
-                text-align: left ;
-                margin-left:calc(15/1920*100vw);
                 font-weight: bold;
             }
             .icon-tabname{
                 margin-left:calc(25/1920*100vw);
                 color: #ddd;
                 cursor: pointer;
-            }
-            .tabName-input{
-                @include point(width,180);
-                float: left;
-                @include point(margin-left,5);
             }
             .warningtips{
                 font-size:12px;
@@ -2010,11 +2003,7 @@ export default {
             }
         }
         .el-rute-group{
-            height: auto;
-            min-height:calc(100% - 60px);
-            min-height: -webkit-calc(100% - 60px);
-            min-height: -moz-calc(100% - 60px);
-            background-color: #FAFAFA;
+            // background-color: #FAFAFA;
             .group-items{
                 font-size: 14px;
                 .top-group-title{
@@ -2041,7 +2030,7 @@ export default {
                             padding:0;
                         }
                         #group-content >>> .el-tabs__item.is-active{
-                            color: #f31d65;
+                            color: rgb(0, 106, 183);
                         }
                     }
                 }
@@ -2055,7 +2044,7 @@ export default {
                         width: 4px;
                         position:absolute;
                         top: 15%;
-                        background-color: $red;
+                        background-color: #006ab7;
                     }
                     .group-left{
                         .group-input{
@@ -2098,13 +2087,6 @@ export default {
                             }
                         }
                         .show-edit{
-                            .nape-items-handle{
-                                .iconfont{
-                                font-size: calc(24/1920*100vw);
-                                color: #7d8cad;
-                                font-weight: 400;
-                                }
-                            }
                         }
                     }
                 }
@@ -2368,7 +2350,7 @@ export default {
             }
         }
         .noraml-color{
-            background-color: #fff;
+            background-color: #f2f9fe;
         }
         .active-color{
             background-color: #FEE4E7;
@@ -2397,10 +2379,12 @@ export default {
     }
 
   .score-content{
+    background-color: #edf0f2;
     padding: 20px calc(20/1920*100vw);
     border: 1px solid #e3e9f4;
     height: auto;
-    position: relative
+    position: relative;
+    margin-bottom: 20px;
   }
   .el-radio{
     margin-right: calc(20/1920*100vw);
@@ -2452,8 +2436,6 @@ export default {
     padding: 0px !important;
 }
 .addNape .el-dialog__body .dialog-content .NapeForm{
-  width: 90%;
-  margin: 0 auto;
 }
 #el-menuscrollbar .el-scrollbar__wrap {
   overflow-x: hidden;
