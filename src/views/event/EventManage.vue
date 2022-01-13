@@ -1175,6 +1175,10 @@ $h1:#292e36;
     @include point(margin-right,20);
     width: calc(160/1920*100vw);
   }
+  /deep/
+  .el-table th .el-checkbox__input {
+      display: inline-block;
+  }
    /deep/
     .el-table
     .el-table__header-wrapper
