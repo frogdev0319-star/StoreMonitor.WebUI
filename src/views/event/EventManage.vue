@@ -165,6 +165,7 @@
           <div style="width:100%; margin-top:12px;height:31px;">
             <delay-button v-if="showCloseBtn"
               class="btn-close"
+              style="color:#FFF;"
               type="primary"
               size="mini"
               @click="doBachCloseEvent"
@@ -687,7 +688,7 @@ export default {
     },
 
     handleDisable(row, index){
-      if (row.status==3) {
+      if (row.status==2) {
         return false
       } else {
         return true
@@ -1173,6 +1174,10 @@ $h1:#292e36;
   .el-search{
     @include point(margin-right,20);
     width: calc(160/1920*100vw);
+  }
+  /deep/
+  .el-table th .el-checkbox__input {
+      display: inline-block;
   }
    /deep/
     .el-table

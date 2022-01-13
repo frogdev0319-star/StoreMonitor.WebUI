@@ -158,19 +158,23 @@
                 @emitTypeChanged="emitTypeChanged2"
               ></AreaSelected>-->
             </div>
+            
             <div class="pie-area">
-              <div class="pct-panel">
+              <div class="pie-div">
                 <div class="inner"/>
-                  <v-chart
-                      ref="pieChartRef"
-                      :auto-resize="true"
-                      :options="eventSourceOptions"
-                      class="chart-content"
-                  />
+                <div class="pct-panel">
+                    <v-chart
+                        ref="pieChartRef"
+                        :auto-resize="true"
+                        :options="eventSourceOptions"
+                        class="chart-content"
+                        @click="piechartClick"
+                    />
+                </div>
               </div>
-              <div style="margin-top: 10px;width: calc(300/1440*100vw);margin-left:calc(152/1440*100vw);height:206px;overflow-y:auto;overflow-x:hidden;">
+              <div style="margin-top: 10px;width:60%;margin-left:calc(152/1440*100vw);height:206px;overflow-y:auto;overflow-x:hidden;">
               <div v-for="(item,index) in sourcePerArray" :key="index">
-                <div :class="(index==selEventItem) ? 'pie-label-area-active':'pie-label-area'" @click="onClickEventItem(item,index)">
+                <div :class="(item.id==selEventItem) ? 'pie-label-area-active':'pie-label-area'" @click="onClickEventItem(item,index)">
                     <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
                     <div class="pei-item-name">{{item.itemName}}</div>
                     <div class="pei-item-num">{{item.percentage}}%</div>
@@ -1392,9 +1396,6 @@ export default {
       });
       }
       this.setBarchartData();
-      
-      
-      
       //console.log("***filterResult",filterResult);
     },
     orderAllTableData(){
@@ -1499,11 +1500,11 @@ export default {
       let seriesData = [];
       let allItemIds = [];
       util.sortArrayByKeyDesc(self.peiDataSource,'numOfUnqualified');
-      self.peiDataSource.forEach(item => {
+      self.peiDataSource.forEach((item,index) => {
         if(item.numOfUnqualified!=0){
           
-          seriesData.push({value:item.numOfUnqualified,name:item.groupName});
-          jsonArray.push({itemName:item.groupName,amount:item.numOfUnqualified,percentage:item.percentage,itemIds:item.itemIds});
+          seriesData.push({value:item.numOfUnqualified,name:item.groupName,id:index,itemIds:item.itemIds});
+          jsonArray.push({id:index,itemName:item.groupName,amount:item.numOfUnqualified,percentage:item.percentage,itemIds:item.itemIds});
           allItemIds = allItemIds.concat(item.itemIds);
         }
       });
@@ -1511,6 +1512,7 @@ export default {
       allItemIds.forEach(id=>{
         if(!this.allEventItemIds.includes(id)) this.allEventItemIds.push(id);
       });
+      //this.selEventItem = self.peiDataSource[0].id;
       this.selEventItemIds = self.peiDataSource[0].itemIds;
       this.selEventItemName = self.peiDataSource[0].groupName;
       const pieOption = self.getEventBySourcePieOption();
@@ -1552,6 +1554,8 @@ export default {
               }
             },
             data: [],
+            borderWidth:5,
+            borderColor:'#FFF',
             itemStyle: {
               emphasis: {
                 borderWidth:10,
@@ -1559,8 +1563,8 @@ export default {
               },
               normal: {
                 borderWidth:5,
-                borderColor:'#fff',
-                  color: function(params) {
+                borderColor:'#FFF',
+                color: function(params) {
                   const colorList = util.getChartColorArray();
                   return colorList[params.dataIndex];
                 }
@@ -1571,10 +1575,20 @@ export default {
       };
       return pieOption;
     },
-
+    piechartClick(pei){
+      //console.log("piechartClick:",pei);
+      //if(this.selEventItem == pei.data.id){
+      //  this.onSeeAllIncepEventClick();
+      //}else{
+        this.selEventItem = pei.data.id
+        this.selEventItemIds = pei.data.itemIds;
+        this.selEventItemName = pei.data.name;
+        this.getItemDetail();
+      //}
+    },
     onClickEventItem(item,index){
         this.showInvolveTableArea = false;
-        this.selEventItem = index;
+        this.selEventItem = item.id;//index;
         this.selEventItemIds = item.itemIds;
         this.selEventItemName = item.itemName;
         //console.log("click item>item.itemIds",item.itemIds)
@@ -1977,7 +1991,6 @@ export default {
         }
         
         .pie-area{
-          width: calc(((300/1440))*100vw)+276;
           height:300px;
           margin-left: calc(36/1440*100vw);
           margin-right: calc(24/1440*100vw);
@@ -1986,33 +1999,42 @@ export default {
           flex-direction: row;
           justify-content: center;
           align-items: center;
-          
-          .pct-panel{
-            width: 276px;/*calc(276/1440*100vw);*/
-            height: 276px;/*calc(276/1440*100vw);*/
-            border-radius: 50%;
-            border-color:#dae4eb;
-            border-style:dashed dashed dashed dashed; 
+          .pie-div{
+            width: 40%;
+            height: 276px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: end;
+            align-self: center;
             .inner{
-                position:absolute;
-                height: 150px;
-                width: 150px;
-                left:405px;
-                top:143px;
-                border-radius: 50%;
-                border-color:#dae4eb;
-                border-style:dashed dashed dashed dashed; 
+              position:absolute;
+              height: 150px;
+              width: 150px;
+              margin-right: 62px;
+              top:143px;
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
             }
-            .chart-content {
-              width:100%;
-              height:100%;
+            .pct-panel{
+              width: 276px;/*calc(276/1440*100vw);*/
+              height: 276px;/*calc(276/1440*100vw);*/
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
+              align-self: end;
+              
+              .chart-content {
+                width:100%;
+                height:100%;
+              }
             }
           }
           .pie-label-area{
             cursor: pointer;
             width: calc(300/1440*100vw);
             height: 40px;
-            margin-left:calc(152/1440*100vw);
             display:flex;
             flex-direction: row;
             align-items: center;
@@ -2041,9 +2063,8 @@ export default {
             }
           }
           .pie-label-area-active{
-            width: calc(280/1440*100vw);
+            width: calc(300/1440*100vw);
             height: 40px;
-            margin-left:calc(152/1440*100vw);
             display:flex;
             flex-direction: row;
             align-items: center;
