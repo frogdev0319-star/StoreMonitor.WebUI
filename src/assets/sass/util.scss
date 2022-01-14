@@ -154,6 +154,29 @@ $sv_red: #c60957;
     width: calc(18/1920*100vw);
   }
 }
+.storevue-table {
+  .el-checkbox {
+    .is-checked, .is-focus {
+      .el-checkbox__inner {
+        background-color: #e0f2ff;
+        border-color: #2c90d9;
+      }
+    }
+    .el-checkbox__inner {
+      &::after {
+        border: 2px solid #2c90d9;
+        height: 8px;
+        left: 6px;
+        top: 2px;
+        border-left: 0;
+        border-top: 0;
+      }
+      border: 1px solid #acaeb1;
+      height: calc(18/1920*100vw);
+      width: calc(18/1920*100vw);
+    }
+  }
+}
 .storevue-checkbox-filled {
   .is-checked, .is-focus {
     .el-checkbox__inner {

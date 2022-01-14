@@ -1,6 +1,7 @@
 <template>
   <div style="position:relative">
     <el-table
+      class="storevue-table"
       ref="tablePagination"
       :data="tableData"
       v-bind="$attrs"
@@ -152,7 +153,6 @@
 <script>
 import util from '@/common/util';
 import filterString from '@/common/filterString'
-
 export default {
   props: {
     total: {

@@ -1,6 +1,5 @@
 <template>
-  <div class="page-container">
-    <div class="title-table">
+  <div class="paper padding" style="height: 100%">
       <table-pagination
         :column-data="columnData"
         :table-data="tableData"
@@ -9,6 +8,7 @@
         :if-set-cell-style="true"
         :header-class="headerStyle"
         :show-border="false"
+        :is-stripe="false"
         :is-loading-data="isLoadingData"
         :show-selection-column="true"
         :default-sort = "{prop: 'createTime', order: 'descending'}"
@@ -16,7 +16,6 @@
         row-class=""
         @handleOperation="handleEmitOperation"
       />
-    </div>
   </div>
 </template>
 
@@ -127,9 +126,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .page-container{
-    min-height: calc(100vh - 80px - 46px - calc(60/1920*100vw));
-  }
   .title-table{
     min-height: calc(100% - 75px);
     padding: 20px calc(20/1920*100vw);
@@ -139,7 +135,7 @@ export default {
 </style>
 <style>
   .current-row > td {
-    background: #FEE7E4 !important;
+    background: #f2f9fe !important;
   }
   .title-table .el-table .cell{
     padding-left: calc(20/1920*100vw);
