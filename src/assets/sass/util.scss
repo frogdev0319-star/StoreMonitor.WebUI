@@ -20,22 +20,22 @@ $sv_red: #c60957;
   clear: both;
 }
 .header-title{
-  height: 70px;
-  border-bottom: $borderStyle;
-  padding-left: calc(40/1920*100vw);
-  padding-right: calc(25/1920*100vw);
-  margin-bottom: 25px;
-  font-size: calc(20/1920*100vw);
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: $color;
+  // height: 70px;
+  // border-bottom: $borderStyle;
+  // padding-left: calc(40/1920*100vw);
+  // padding-right: calc(25/1920*100vw);
+  // margin-bottom: 25px;
+  // font-size: calc(20/1920*100vw);
+  // font-weight: bold;
+  // display: flex;
+  // justify-content: space-between;
+  // align-items: center;
+  // color: $color;
 }
 
 .page-container{
-  background-color: $background;
-  border: $borderStyle;
+  // background-color: $background;
+  // border: $borderStyle;
 }
 
 .el-table--mini{
@@ -140,9 +140,42 @@ $sv_red: #c60957;
       border-color: #2c90d9;
     }
   }
+  .is-disabled {
+    .el-checkbox__inner {
+      // background-color: #e0f2ff;
+      // border-color: #2c90d9;
+    }
+  }
   .el-checkbox__inner {
     &::after {
       border: 2px solid #2c90d9;
+      height: 8px;
+      left: 6px;
+      top: 2px;
+      border-left: 0;
+      border-top: 0;
+    }
+    border: 1px solid #acaeb1;
+    height: calc(18/1920*100vw);
+    width: calc(18/1920*100vw);
+  }
+}
+.storevue-checkbox-filled {
+  .is-checked, .is-focus {
+    .el-checkbox__inner {
+      background-color: #2c90d9;
+      border-color: #2c90d9;
+    }
+  }
+  .is-disabled {
+    .el-checkbox__inner {
+      // background-color: #2c90d9;
+      // border-color: #2c90d9;
+    }
+  }
+  .el-checkbox__inner {
+    &::after {
+      border: 2px solid #fff;
       height: 8px;
       left: 6px;
       top: 2px;
@@ -175,27 +208,6 @@ $sv_red: #c60957;
       height: calc(18/1920*100vw);
       width: calc(18/1920*100vw);
     }
-  }
-}
-.storevue-checkbox-filled {
-  .is-checked, .is-focus {
-    .el-checkbox__inner {
-      background-color: #2c90d9;
-      border-color: #2c90d9;
-    }
-  }
-  .el-checkbox__inner {
-    &::after {
-      border: 2px solid #fff;
-      height: 8px;
-      left: 6px;
-      top: 2px;
-      border-left: 0;
-      border-top: 0;
-    }
-    border: 1px solid #acaeb1;
-    height: calc(18/1920*100vw);
-    width: calc(18/1920*100vw);
   }
 }
 .storevue-form-dialog .el-dialog__header{
