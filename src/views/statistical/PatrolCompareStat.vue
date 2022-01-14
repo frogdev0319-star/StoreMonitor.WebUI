@@ -4,7 +4,7 @@
             <el-col :span="24" class="aaa">
                 <search-component
                 ref="inspectEvalutionSearch"
-                :is-patrol = "true"
+                isInspectItem=true
                 :showDateSelector = "false"
                 path="inspectEvalutionStatistics"
                 @emitSearch = "emitSearch"/>
@@ -85,13 +85,19 @@
                 </div>
                 <div class="average-cahrt">
                   <div style="height:68px;margin-top: 16px;">
-                    <AreaSelected
+                    <TypeSelectArea
+                      path="inspectEvalutionStatistics"
+                      :allow-all=false
+                      :limit-num=2
+                      :region-array1="params.curProvince"
+                      :region-array2="params.curCity"
+                      :cur-store-group="params.curStoreGroup"
+                      :cur-store-type="params.curStoreType"
+                      :cur-stores="params.curStore"
                       :cached-params="params"
                       :cur-country="curCountry"
-                      :limit-num="2"
-                      :allow-all="false"
                       @emitTypeChanged="emitTypeChanged2"
-                    ></AreaSelected>
+                    ></TypeSelectArea>
                   </div>
                   <div class="score-area" style="display:flex;flex-direction:row;height:92px;align-item:center;">
                     <div style="width:145px;border-right:solid 1px #f7f9f9;">
@@ -229,9 +235,12 @@ export default {
         let start = this.$moment(today).startOf('week').format("YYYY/MM/DD");
         let end = this.$moment(today).endOf('week').format("YYYYY/MM/DD");
         let dateRange = this.doGetPre12DateRange(start,end,'week');
+        this.filterDateRange = dateRange;
+        this.filterDateRange2 = dateRange;
         this.avgChartOption = this.getAverageBarchartOption();
         this.assChartOption = this.getAverageBarchartOption();
         this.doGetAverageScore(dateRange); //預設本周
+        this.doGetAssessmentScore(dateRange);
         this.getInspectTagStandardScore();
     },
     getSearchParams() {
@@ -278,10 +287,9 @@ export default {
       console.log("emitSearch > params",this.params);
       this.curCountry = this.params.curCountry;
       //console.log("emitSearch > inspectId",this.params.inspectId );
-      if(this.params.inspectId!=-1){
-        this.doGetAssessmentStandardScore();
-      }
-      this.searchData();
+      this.doGetAverageScore(this.filterDateRange); 
+      this.doGetAssessmentScore(this.filterDateRange2);
+      //this.searchData();
     },
     async searchData() {
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
@@ -320,7 +328,8 @@ export default {
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.compareType = compareType;
-      this.compareIds = selStoreIdArr;//compareArr;
+      if(compareType=="area1" || compareType=='area2') this.compareIds = selStoreIdArr;
+      else this.compareIds = compareArr;
       this.comapareLabels = selectedLabels;
       this.doGetAverageScore(this.filterDateRange);
     },
@@ -357,8 +366,9 @@ export default {
           }
           return this.getInspectStatsDistributionOverRegion(params);
         });
-        
-        Promise.all(promisesAvgMap).then(result=>{
+        console.log('promisesAvgMap:',promisesAvgMap);
+        Promise.all(promisesAvgMap).then((result)=>{
+          console.log('result:',result);
           let AvgChartDataset = [];
           AvgChartDataset[0] = new Array();
           AvgChartDataset[1] = new Array();
@@ -378,6 +388,9 @@ export default {
                     AvgChartDataset[j].push(0);
                   }
                 }
+              }else{
+                AvgChartDataset[0].push(0);
+                AvgChartDataset[1].push(0);
               }
             }else{AvgChartDataset.push(0);}
 
@@ -432,9 +445,10 @@ export default {
       //console.log("DateRangeFilter:",DateRangeFilter);
       this.doGetAssessmentScore(this.filterDateRange);
     },
-    emitTypeChanged2({compareType,compareArr,selectedLabels}){ //劃分類型選擇
+    emitTypeChanged2({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.compareType2 = compareType;
-      this.compareIds2 = compareArr;
+      if(compareType=="area1" || compareType=='area2') this.compareIds2 = selStoreIdArr;
+      else this.compareIds2 = compareArr;
       this.comapareLabels2 = selectedLabels;
       this.doGetAssessmentScore(this.filterDateRange);
     },
@@ -446,13 +460,13 @@ export default {
       
       
       if(this.comapareLabels2.length>0 && this.inspectId!=-1){
-        let Assessment;
+        let Assessment={};
         if(region[0].value<3){ //store, area1, area2
           Assessment = {beginTs:Date.parse(DateRangeFilter[0].startDate),endTs:Date.parse(DateRangeFilter[11].endDate),groupMode:region[0].value,storeIds:this.compareIds2};
         }else{ //groupType, storeGroup
           Assessment = {beginTs:Date.parse(DateRangeFilter[0].startDate),endTs:Date.parse(DateRangeFilter[11].endDate),groupMode:region[0].value,groupIds:this.compareIds2};
         }
-        
+        console.log("Assessment:",Assessment);
 
         const areaAverage = await this.getInspectStatsDistributionOverRegion(Assessment);
         //console.log("**Assessment:",areaAverage);
@@ -493,6 +507,9 @@ export default {
                     AssChartDataset[j].push(0);
                   }
                 }
+              }else{
+                AssChartDataset[0].push(0);
+                AssChartDataset[1].push(0);
               }
 
             }else{AssChartDataset.push(0);}
