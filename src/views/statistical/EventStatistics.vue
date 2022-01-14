@@ -1660,6 +1660,7 @@ export default {
       const self = this;
       self.eventItemTable.page = pageObj.page;
       self.eventItemTable.sizeNum = pageObj.size;
+      self.eventItemTable.total = Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
       self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
     },
 
