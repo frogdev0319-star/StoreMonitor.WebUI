@@ -1,5 +1,5 @@
 <template>
-  <div class="page-container report-setting">
+  <div class="page-container report-setting paper">
     <div class="setting-titles padding flex-center">
       {{this.$t('titleView.reportTemplate')}}
       <div class="spacer"></div>

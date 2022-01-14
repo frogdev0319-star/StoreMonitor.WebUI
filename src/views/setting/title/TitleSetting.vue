@@ -530,6 +530,10 @@ export default {
   $border:#e3e9f4;
   $black:#182752;
 
+*{
+    font-family: Roboto, Arial, Microsoft YaHei;
+    text-align: left;
+}
   .page-container{
     display: flex;
     flex-direction: column;
@@ -610,7 +614,6 @@ export default {
           align-items: center;
         }
         .role-group{
-          width: 60%;
           margin-top: 25px;
           margin-bottom: 25px;
           .role-all-checkbox{
@@ -622,18 +625,20 @@ export default {
             }
           }
           .role-content{
-            margin-left: calc(50/1920*100vw);
+            margin-left: calc(200/1920*100vw);
             overflow: hidden;
+            background-color: #f7f9fa;
+            display: flex;
+            flex-wrap: wrap;
+            padding: calc(10/1920*100vw) calc(20/1920*100vw);
             .role-detail{
-              width: auto;
-              margin-left:calc(15/1920*100vw);
-              margin-top: 15px;
-              width: calc(180/1920*100vw);
-              min-width: 140px;
-              float: left;
+                    width: auto;
+                    margin-top: calc(10/1920*100vw);
+                    margin-bottom: calc(10/1920*100vw);
+                    min-width: calc(215/1920*100vw);
               .role-name{
-                margin-left:calc(15/1920*100vw);
-                font-size: calc(14/1920*100vw);
+                        margin-left: calc(20/1920*100vw);
+                        font-size: 14px;
               }
             }
             .en-role-detail{
