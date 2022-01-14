@@ -60,6 +60,16 @@ export default {
       default: 'jumper,total, prev,pager, next,sizes'
     },
   },
+  watch:{
+    total:{
+      immediate: false, 
+      deep: true,
+      handler (val) {
+          this.total = val;
+          this.currentPage = 1;
+      }
+    }
+  },
   data() {//,{value:'position',label:this.$t('overview.position')},{value:'users',label:this.$t('overview.user')}
     return {
       pageSizeOption: [{value:10,label:"10 "+this.$t('overview.pageSizeUnit')}, {value:20,label:"20 "+this.$t('overview.pageSizeUnit')}, 
@@ -67,7 +77,7 @@ export default {
     }
   },
   methods:{
-    handleCurrentChange(currentPage) {
+    handleCurrentChange(currentPage) { 
       const pageObj = {
         page: currentPage,
         size: this.pagesize
@@ -77,8 +87,9 @@ export default {
 
     handleSizeChange(pageSize) {
       console.log("handleSizeChange:",pageSize);
+      
       const pageObj = {
-        page: this.currentPage,
+        page: 1,
         size: pageSize
       };
       this.$emit('sizeChange', pageObj);

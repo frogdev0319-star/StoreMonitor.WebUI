@@ -867,7 +867,7 @@ export default {
       showInvolveTableArea:false,
       componentsProps_EventCommentList:{},
       gloableEventData:[],
-      barActiveinnerId:'-1',
+      barActiveName:'-1',
       inspectId:null,
     };
   },
@@ -1163,7 +1163,8 @@ export default {
       }else{
         self.eventBarChartData = [];
       }
-      this.doFilterEventListBySelBar( self.eventBarChartData[0].groupName);
+      this.barActiveName=self.eventBarChartData[0].groupName;
+      this.doFilterEventListBySelBar( );
       self.setBarchartData()
     },
     getBarchartOption(){
@@ -1265,7 +1266,7 @@ export default {
             smooth: true,
             data: [0,0,0,0,0,0,0,0,0,0,0,0],
             color:(context)=>{
-                if(this.barActiveinnerId==context.innerId){
+                if(this.barActiveName==context.data.name){
                   return '#7bd8eb';
                 }else{
                   return '#D7F3F9';
@@ -1292,14 +1293,14 @@ export default {
       if(this.eventBarChartData.length>0){
         this.eventBarChartData.forEach(item => {
           date_xAxis.push(item.groupName);
-          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId,itemStyle:{color:(item.innerId==this.barActiveinnerId)?"#7bd8eb":"#D7F3F9"}});
+          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId,itemStyle:{color:(item.groupName==this.barActiveName)?"#7bd8eb":"#D7F3F9"}});
         });
         this.barchartOption.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
         this.barchartOption.series[0].data = chart_dataset;
-        this.barActiveinnerId=chart_dataset[0].innerId;
+        
         //
       }
     },
@@ -1374,7 +1375,9 @@ export default {
       //this.eventTableData = this.allEventTableData;
       //this.getEventTableData();
       this.eventTableData = [];
-      this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      //this.eventTableData = [...this.allEventTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      //this.total = Math.ceil(this.eventTableData.length/this.sizeNum);
+      this.doFilterEventListBySelBar();
     },
     barchartClick(bar){
       //console.log("barchartClick:",bar);
@@ -1382,16 +1385,16 @@ export default {
         this.barActiveinnerId = '-1';
         this.setEventTableData();
       }else{*/
-        this.barActiveinnerId = bar.data.innerId;
-        this.doFilterEventListBySelBar(bar.data.name);
+        this.barActiveName = bar.data.name;
+        this.doFilterEventListBySelBar();
         //return item.groupName == bar.data.name;
-      
       //}
       this.setBarchartData();
       //console.log("***filterResult",filterResult);
     },
-    doFilterEventListBySelBar(name){
-      this.eventTableData = this.allEventTableData.filter(item=>{
+    doFilterEventListBySelBar(){
+      let name = this.barActiveName;
+      let filterData = this.allEventTableData.filter(item=>{
         if(this.compareType=="area1"){
           return (item.province == name);
         }else if(this.compareType=="area2"){
@@ -1404,6 +1407,9 @@ export default {
           return (item.groupName == name);
         }
       });
+      this.total =Math.ceil( filterData.length/this.sizeNum);
+      this.eventTableData = [...filterData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      
     },
     orderAllTableData(){
       let key = this.defaultSort.prop;
