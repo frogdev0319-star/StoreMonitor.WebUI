@@ -1163,6 +1163,7 @@ export default {
       }else{
         self.eventBarChartData = [];
       }
+      this.doFilterEventListBySelBar( self.eventBarChartData[0].groupName);
       self.setBarchartData()
     },
     getBarchartOption(){
@@ -1298,6 +1299,8 @@ export default {
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
         this.barchartOption.series[0].data = chart_dataset;
+        this.barActiveinnerId=chart_dataset[0].innerId;
+        //
       }
     },
     /*end 畫barChart */
@@ -1375,28 +1378,32 @@ export default {
     },
     barchartClick(bar){
       //console.log("barchartClick:",bar);
-      if(this.barActiveinnerId == bar.data.innerId){
+      /*if(this.barActiveinnerId == bar.data.innerId){
         this.barActiveinnerId = '-1';
         this.setEventTableData();
-      }else{
+      }else{*/
         this.barActiveinnerId = bar.data.innerId;
-        this.eventTableData = this.allEventTableData.filter(item=>{
-        if(this.compareType=="area1"){
-          return (item.province == bar.data.name);
-        }else if(this.compareType=="area2"){
-          return (item.city == bar.data.name);
-        }else if(this.compareType=="storeGroup"){
-          return (item.groupName == bar.data.name);
-        }else if(this.compareType=="storeType"){
-          return (item.groupName == bar.data.name);
-        }else if(this.compareType=="stores"){
-          return (item.groupName == bar.data.name);
-        }
+        this.doFilterEventListBySelBar(bar.data.name);
         //return item.groupName == bar.data.name;
-      });
-      }
+      
+      //}
       this.setBarchartData();
       //console.log("***filterResult",filterResult);
+    },
+    doFilterEventListBySelBar(name){
+      this.eventTableData = this.allEventTableData.filter(item=>{
+        if(this.compareType=="area1"){
+          return (item.province == name);
+        }else if(this.compareType=="area2"){
+          return (item.city == name);
+        }else if(this.compareType=="storeGroup"){
+          return (item.groupName == name);
+        }else if(this.compareType=="storeType"){
+          return (item.groupName == name);
+        }else if(this.compareType=="stores"){
+          return (item.groupName == name);
+        }
+      });
     },
     orderAllTableData(){
       let key = this.defaultSort.prop;
