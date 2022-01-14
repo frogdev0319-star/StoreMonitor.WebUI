@@ -52,7 +52,7 @@
     min-height:28px !important;
 }
 .el-date-table td.in-range div, .el-date-table td.in-range div:hover, .el-date-table.is-week-mode .el-date-table__row.current div, .el-date-table.is-week-mode .el-date-table__row:hover div{
-    background-color: rgba(251,76,93, 0.2) !important;
+    background-color: #e4f3fd !important;
 }
 .el-input__inner .el-input__inner{
   border: 1px solid #dddddd;

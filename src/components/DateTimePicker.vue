@@ -6,7 +6,8 @@
       v-model="dateTimeValue"
       :clearable="false"
       :editable="false"
-      :popper-class="poperClass"
+      :disabled="diablePick"
+      popper-class="poperClass"
       :start-placeholder="$t('overview.startDate')"
       :end-placeholder="$t('overview.endDate')"
       :picker-options="pickerOptions"
@@ -43,6 +44,10 @@ export default {
     dateRange:{
       type:Number,
       required:true
+    },
+    diablePick:{
+      type:Boolean,
+      default: false
     }
   },
   data() {
@@ -226,7 +231,25 @@ export default {
     float: left;
     line-height: 24px;
 }
-.el-range-editor--mini.el-input__inner {
-    width: calc(335/1440*100vw);
+.global-date-pick.el-range-editor--mini.el-input__inner {
+    width: calc(207/1440*100vw);
+}
+.el-date-table td.end-date span, .el-date-table td.start-date span {
+    background-color: #2c90d9;
+}
+.el-date-table td.end-date span:hover, .el-date-table td.start-date span:hover {
+    color: #FFF;
+}
+.el-date-table td.in-range div, .el-date-table td.in-range div:hover, .el-date-table.is-week-mode .el-date-table__row.current div, .el-date-table.is-week-mode .el-date-table__row:hover div{
+  background-color:#e4f3fd !important;
+}
+.el-date-table td.today span {
+    color: #2c90d9;
+}
+.el-date-table td span:hover{
+  color: #2c90d9;
+}
+.el-range-editor.is-disabled input{
+  background-color:#FFF;
 }
 </style>

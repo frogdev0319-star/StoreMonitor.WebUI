@@ -124,5 +124,8 @@ export default {
         border:none;
         background-color: #f7f9fa;
     }
+    .date-picker{
+        font-size:13px;
+    }
 }  
 </style>
