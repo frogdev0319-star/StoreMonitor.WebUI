@@ -1,34 +1,29 @@
 <template>
   <div class="page-container">
     <div class="basic-info">
-      <div class="header-title">
-        <div>{{ $t('titleView.titleSetting') }}</div>
-        <delay-button size="mini" type="primary" @click="saveBasicInfo">{{ $t('titleView.save') }}</delay-button>
-      </div>
-      <div class="basic-information">
-        <div class="title-content">
-          <div class="title-description">{{ $t('titleView.titleName') }}</div>
+      <div class="header-title flex-center">
+        <div class="title-content flex-center">
+          <div class="title-description" style="margin-right: 10px">{{ `${$t('titleView.titleName')}:` }}</div>
           <div class="title-name">{{ infoForm.title }}</div>
         </div>
-        <div class="access-content">
-          <div class="access-video">
-            <span class="required-name">*</span>
-            <div class="title-description">{{ $t('titleView.canAccessVideo') }}</div>
-            <el-radio-group v-model="ifAccessVideo">
-              <el-radio v-for="(item, index) in accessVideoList" :label="item.value" :key="index">{{ item.label }}</el-radio>
-            </el-radio-group>
+        <div class="spacer"></div>
+        <delay-button type="filled" @click="saveBasicInfo">{{ $t('titleView.save') }}</delay-button>
+      </div>
+      <div class="basic-information flex" style="padding: 20px 0 20px 20px">
+        <div style="width: 250px; display: flex; flex-direction: column">
+          <div class="flex-center spacer">
+            <div class="title-description spacer">{{ $t('titleView.canAccessVideo') }}</div>
+            <el-switch v-model="ifAccessVideo"></el-switch>
           </div>
-          <div class="access-video">
-            <span class="required-name">*</span>
-            <div class="title-description">{{ $t('titleView.canReceiveMessage') }}</div>
-            <el-radio-group v-model="ifReceiveMes">
-              <el-radio v-for="(item, index) in accessVideoList" :label="item.value" :key="index">{{ item.label }}</el-radio>
-            </el-radio-group>
+          <div class="flex-center spacer">
+            <div class="title-description spacer">{{ $t('titleView.canReceiveMessage') }}</div>
+            <el-switch v-model="ifReceiveMes"></el-switch>
           </div>
         </div>
-        <div class="clear-float">
-          <div class="comment-class">
-            <div class="title-description">{{ $t('titleView.remarksContent') }}</div>
+        <hr class="hr-vertical" style="margin: 0 30px">
+        <div class="flex spacer">
+          <div class="title-description" style="margin-right: 20px">{{ $t('titleView.remarksContent') }}</div>
+          <div class="spacer">
             <el-input
               v-model="infoForm.comment"
               :autosize="{minRows: 2, maxRows: 4}"
@@ -37,34 +32,31 @@
               class="role-comment"
               @input="commentChange"
               @blur="notShowInputRuleTips"/>
+            <div class="text">{{ curLength ? curLength : 0 }}/200</div>
+            <span v-if="commentRuletip" class="rules">{{ $t('titleView.commentRuletip') }}</span>
           </div>
-          <div class="text">{{ curLength }}/200</div>
-          <span v-if="commentRuletip" class="rules">{{ $t('titleView.commentRuletip') }}</span>
         </div>
       </div>
     </div>
     <div class="role-setting">
-      <div class="setting-title">
-        <div
-          :class="showRolesList ? 'active-pointer':''"
-          class="pointer"
-          @click="getTemplateAuthorities">{{ $t('titleView.useTemplate') }} | </div>
-        <div
-          :class="!showRolesList ? 'active-pointer':''"
-          class="pointer"
-          @click="getRoleAuthority">{{ $t('titleView.roleSetting') }}</div>
-      </div>
-      <div class="role-list">
-        <div v-if="showRolesList" class="template-info">
-          <el-radio-group v-model="templateRoleId">
-            <el-radio v-for="(item, index) in roleList" :label="item.value" :key="index">{{ item.label }}</el-radio>
-          </el-radio-group>
-          <delay-button size="mini" type="primary" @click="saveTemplateTitle">{{ $t('titleView.useAndSave') }}</delay-button>
+      <div class="role-list paper padding">
+        <div class="flex-center" style="padding-bottom: 20px">
+          <div>{{ $t('titleView.roleSetting') }}</div>
+          <div class="spacer"></div>
+          <el-select
+            v-model="templateRoleId"
+            class="device-select"
+            @change="saveTemplateTitle">
+            <el-option v-for="(item, index) in roleList" :label="item.label" :key="index" :value="item.value">
+              {{ item.label }}
+            </el-option>
+          </el-select>
         </div>
+        <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group">
-            <div class="role-all-checkbox">
-              <el-checkbox v-model="item.checked" :disabled="item.disabled" @change="(val)=>checkAllChildrenRole(index, val)"/>
+            <div class="role-all-checkbox" style="text-align: left">
+              <el-checkbox class="storevue-checkbox-filled" v-model="item.checked" :disabled="item.disabled" @change="(val)=>checkAllChildrenRole(index, val)"/>
               <span class="group-name">{{ item.roleName }}</span>
             </div>
             <div class="role-content">
@@ -73,6 +65,7 @@
                 :class="lang.indexOf('zh') === -1 ? 'en-role-detail': 'role-detail'"
                 :key="_index">
                 <el-checkbox
+                  class="storevue-checkbox-outlined"
                   v-model="_item.checked"
                   :disabled="_item.disabled"
                   @change="(val)=>checkParentRole(index, val)"/>
@@ -98,6 +91,7 @@ export default {
   components: { DelayButton },
   data() {
     return {
+      curTemplate: '',
       commentRuletip: false,
       infoForm: {},
       accessVideoList: [
@@ -280,9 +274,9 @@ export default {
       authorityInfoLists: [],
       lang: this.$i18n.locale,
       roleId: 0,
-      templateRoleId: 0,
+      templateRoleId: 1,
       ifAccessVideo: 0,
-      ifReceiveMes: 0,
+      ifReceiveMes: false,
       hasCheckedAuthoritiesList: []
     };
   },
@@ -313,6 +307,9 @@ export default {
   },
 
   methods: {
+    changeCurTemplate () {
+
+    },
     getTitleInfo() {
       const data = sessionStorage.getItem('titleInfo');
       this.infoForm = JSON.parse(data);
@@ -366,8 +363,8 @@ export default {
       this.roleNameList[4].children[4].checked = !!PermissionHelper.enableReportSetting();
 
       if (authorities.length === 6 && resetFlag) {
-        this.ifAccessVideo = PermissionHelper.enableVideo() ? 1 : 0;
-        this.ifReceiveMes = PermissionHelper.enableMessage() ? 1 : 0;
+        this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
+        this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
       }
       this.getRequiredAuthority();
     },
@@ -414,7 +411,7 @@ export default {
 
     getRoleAuthority() {
       this.showRolesList = false;
-      this.templateRoleId = 0;
+      // this.templateRoleId = 0;
       this.setDefaultValueOfRoleNameList();
       this.getAvailableAuthority(this.hasCheckedAuthoritiesList);
     },
@@ -423,7 +420,7 @@ export default {
       this.setDefaultValueOfRoleNameList();
       this.showRolesList = false;
       this.getAvailableAuthority(this.authorityInfoLists[this.templateRoleId - 1].availableAuth);
-      this.templateRoleId = 0;
+      // this.templateRoleId = 0;
     },
 
     setDefaultValueOfRoleNameList(){
@@ -533,30 +530,31 @@ export default {
   $border:#e3e9f4;
   $black:#182752;
 
+*{
+    font-family: Roboto, Arial, Microsoft YaHei;
+    text-align: left;
+}
   .page-container{
-    height: calc(100vh - 80px - 40px - calc(60/1920*100vw));
     display: flex;
     flex-direction: column;
-    padding-bottom: 20px;
     .basic-info{
+      .header-title {
+        color: #2b2b2b;
+        font-size: 18px;
+        font-weight: 600;
+      }
       .basic-information{
         text-align: left;
-        margin-left: calc(25/1920*100vw);
-        margin-right: calc(25/1920*100vw);
-        padding-left: calc(15/1920*100vw);
-        border-bottom: 1px solid $border;
-        font-size: calc(14/1920*100vw);
+        // margin-left: calc(25/1920*100vw);
+        // margin-right: calc(25/1920*100vw);
+        // padding-left: calc(15/1920*100vw);
+        // border-bottom: 1px solid $border;
+        // font-size: calc(14/1920*100vw);
         .title-description{
-          display: inline-block;
-          min-width: 160px;
         }
         .title-content{
-          display: flex;
-          height: 48px;
-          align-items: center;
         }
         .access-content{
-          @extend .title-content;
           .access-video{
             flex: 1;
           }
@@ -567,9 +565,8 @@ export default {
         }
         .text{
           float: right;
-          color: #909399;
-          height: 14px;
-          margin-bottom: 20px;
+          color: #acaeb1;
+          font-size: 12px;
         }
         .rules{
           font-size: 10px;
@@ -582,10 +579,6 @@ export default {
     }
     .role-setting{
       flex-grow: 1;
-      margin-left: calc(25/1920*100vw);
-      margin-right: calc(25/1920*100vw);
-      margin-bottom: 25px;
-      text-align: left;
       height: calc(100% - 303px);
       .setting-title{
         padding-left: calc(15/1920*100vw);
@@ -602,8 +595,6 @@ export default {
         font-weight: bold;
       }
       .role-list{
-        background-color: #F6F7FB;
-        border:0.5px solid #e3e9f4;
         color: $black;
         height: calc(100% - 70px);
         .el-menuscrollbar{
@@ -623,7 +614,6 @@ export default {
           align-items: center;
         }
         .role-group{
-          width: 60%;
           margin-top: 25px;
           margin-bottom: 25px;
           .role-all-checkbox{
@@ -635,18 +625,20 @@ export default {
             }
           }
           .role-content{
-            margin-left: calc(50/1920*100vw);
+            margin-left: calc(200/1920*100vw);
             overflow: hidden;
+            background-color: #f7f9fa;
+            display: flex;
+            flex-wrap: wrap;
+            padding: calc(10/1920*100vw) calc(20/1920*100vw);
             .role-detail{
-              width: auto;
-              margin-left:calc(15/1920*100vw);
-              margin-top: 15px;
-              width: calc(180/1920*100vw);
-              min-width: 140px;
-              float: left;
+                    width: auto;
+                    margin-top: calc(10/1920*100vw);
+                    margin-bottom: calc(10/1920*100vw);
+                    min-width: calc(215/1920*100vw);
               .role-name{
-                margin-left:calc(15/1920*100vw);
-                font-size: calc(14/1920*100vw);
+                        margin-left: calc(20/1920*100vw);
+                        font-size: 14px;
               }
             }
             .en-role-detail{
@@ -670,10 +662,6 @@ export default {
 <style>
   .role-group .el-checkbox{
     margin-right: 0;
-  }
-  .role-group .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner{
-    background-color:#f31d65 ;
-    border-color: #f31d65;
   }
   .role-list #el-menuscrollbar .el-scrollbar__wrap{
     overflow-x: hidden;
