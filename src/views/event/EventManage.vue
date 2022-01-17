@@ -519,11 +519,18 @@ export default {
 
     async getEventList(val) {
       const self = this;
+      console.log("this.activeName:",this.activeName);
       const tabIndex = Number(this.activeName);
-
+      //const routeParams = sessionStorage.getItem('event_manage');
+      //console.log("routeParams:",routeParams);
+      /*if(routeParams!=''){
+        const routeData = JSON.parse(routeParams);
+        this.getRouterData(routeData);
+      }else{*/
       self.getEventListRequestParams(val);
       this.ifSaveParams && self.saveSearchParams();
       this.ifSaveParams = true;
+      //}
       if (self.params.clause.storeId.length === 0) {
         this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
@@ -532,8 +539,10 @@ export default {
         this.numberOfElements = 0;
         return;
       }
+      console.log("self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
+        console.log("data:",data);
         const temp = [];
         data.forEach(item => {
           const attachment = [];
@@ -570,12 +579,12 @@ export default {
         self.tableDataList[tabIndex].eventCount = res.data.totalElements;
         self.totalElements = res.data.totalElements;
         self.numberOfElements = res.data.numberOfElements;
-        console.log("*",this.tableDataList[tabIndex].page);
+        //self.handleTabClick(this.activeName);
       }).catch(err => {
         console.log('EventManagement-getEventList:' + err);
       });
     },
-
+    
     getEventListRequestParams(val) {
       const tabIndex = Number(this.activeName);
       let like = {};
@@ -604,7 +613,12 @@ export default {
           }
         }
       } else {
-        status = [];
+        if(this.searchParams.curState.length>0){
+          status = this.searchParams.curState;
+        }else{
+          status = [];
+        }
+        
       }
       let page = 0;
       if (val === 'currentChange') {
@@ -625,18 +639,24 @@ export default {
       }
       end = end - end % 1000 + 999;
       this.params = {
-        beginTs: start,
-        endTs: end,
-        clause: {
-          status: status,
-          storeId: storeId
-        },
-        filter: {
-          page: page,
-          size: this.tableDataList[tabIndex].sizeNum
-        },
-        like: like
-      };
+          beginTs: start,
+          endTs: end,
+          clause: {
+            status: status,
+            storeId: storeId
+          },
+          filter: {
+            page: page,
+            size: this.tableDataList[tabIndex].sizeNum
+          },
+          like: like
+      }
+      console.log("this.params:",this.params);
+      console.log("this.searchParams:",this.searchParams);
+      if(typeof this.searchParams.clause !="undefined"){
+        this.params.clause =  this.searchParams.clause;
+        this.params.clause.status = status;
+      }
       const curTabSortColumn = this.sortColumnOfTab[tabIndex];
       const order = curTabSortColumn.sortType.order;
       const prop = curTabSortColumn.sortType.prop;
@@ -721,6 +741,10 @@ export default {
         },
         like: like
       };
+      if(typeof this.searchParams.clause !="undefined"){
+        params.clause =  this.searchParams.clause;
+      }
+      delete params.clause['status'];
       if (storeId.length === 0) {
         for (let i = 0; i < 4; i++) {
           self.tableDataList[i].eventCount = 0;
@@ -854,8 +878,33 @@ export default {
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
       }
+      this.tableDataList[Number(this.activeName)].page = 1;
+      this.getEventListAndCount() ;
     },
-
+    getRouterData(routeData) {
+      console.log("1.eventManage routeData:", routeData);
+      let start = '', end = '';
+      start = this.$moment(this.dateValue[0]).valueOf();
+      const endTime = this.dateValue[1];
+      end = this.$moment(endTime);
+      this.params = {
+          beginTs: start,
+          endTs: end,
+          clause: {
+            status:[0],
+            storeId: routeData.storeId,
+            assigner : routeData.assigner
+          },
+          filter: {
+            page: 1,
+            size: 10
+          },
+        };
+        console.log("eventManage params:", this.params);
+        sessionStorage.setItem('event_manage', '');
+        console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
+        this.getEventList('Back');
+    },
     saveSearchParams() {
       const params = this.storeFilterObj;
       const { clause, filter, like, order } = { ...this.params };
@@ -875,25 +924,28 @@ export default {
     },
 
     getSearchParams() {
-      const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
-      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-      this.params.beginTs = this.dateValue[0].valueOf();
-      this.params.endTs = this.dateValue[1].valueOf();
-      if (Object.keys(searchParams).length > 0) {
-        this.inputSearchValue = searchParams.inputSearchValue;
-        this.curState = searchParams.curState;
-        this.activeName = searchParams.activeName;
-        this.sizeNum = searchParams.sizeNum;
-        this.page = searchParams.page;
-        this.order = searchParams.order;
-        this.tableDataList[Number(this.activeName)].page = searchParams.page;
-        this.params = searchParams.searchParams;
-        this.searchParams = searchParams;
-        this.ifGetParamsFromCash = true;
-      } else {
-        this.searchParams = {};
-        this.curState = [0];
-      }
+      
+        const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
+        this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+        this.params.beginTs = this.dateValue[0].valueOf();
+        this.params.endTs = this.dateValue[1].valueOf();
+        
+        if (Object.keys(searchParams).length > 0) {
+          this.inputSearchValue = searchParams.inputSearchValue;
+          this.curState = searchParams.curState;
+          this.activeName = searchParams.activeName;
+          this.sizeNum = searchParams.sizeNum;
+          this.page = searchParams.page;
+          this.order = searchParams.order;
+          this.tableDataList[Number(this.activeName)].page = searchParams.page;
+          this.params = searchParams.searchParams;
+          this.searchParams = searchParams;
+          this.ifGetParamsFromCash = true;
+        } else {
+          this.searchParams = {};
+          this.curState = [0];
+        }
+      
     },
 
     onStoreChange(storeObj) {
