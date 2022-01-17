@@ -674,7 +674,7 @@ export default {
           'width': '60',
           'maxWidth': '100',
           'pdfwidth': '12%',
-          'isCellClick':true
+          'isCellClick':false
         },
         {
           'prop': 'detail',
@@ -939,7 +939,6 @@ export default {
 
       }*/
       this.params = searchParams;
-      console.log('**emit search params:',this.params);
       this.compareIds = this.compareIds2 = this.params.storeIds;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
@@ -1463,10 +1462,26 @@ export default {
       this.setEventTableData();
     },
     onEvenListNumClick(row){
-      //console.log("clcick row:",row);
+      console.log("clcick row:",row);
       const self = this;
+      if(row.prop == "numOfTotal"){
+        this.params.activeName = "4";
+      }else if(row.prop == "numOfUnprocessed"){
+        this.params.activeName = "0";
+      }else if(row.prop == "numOfInprocess"){
+        this.params.activeName = "1";
+      }else if(row.prop == "numOfProcessed"){
+        this.params.activeName = "2";
+      }else if(row.prop == "numOfRejected"){
+        this.params.activeName = "3";
+      }
+      this.params.inputSearchValue="";
+      this.params.sizeNum=10;
+      this.params.page=1; 
+      this.params.curState=[Number(this.params.activeName)];
+      this.params.clause ={storeId:row.row.id,storeName:this.barActiveName};
       const searchParamsObj = {
-        path: 'inspectReport',
+        path: 'eventManage',
         params: this.params
       };
       self.$refs.eventSearch.saveSearchParams(searchParamsObj);

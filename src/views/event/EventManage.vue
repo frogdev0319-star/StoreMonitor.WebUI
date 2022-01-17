@@ -539,8 +539,10 @@ export default {
         this.numberOfElements = 0;
         return;
       }
+      console.log("self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
+        console.log("data:",data);
         const temp = [];
         data.forEach(item => {
           const attachment = [];
@@ -577,7 +579,7 @@ export default {
         self.tableDataList[tabIndex].eventCount = res.data.totalElements;
         self.totalElements = res.data.totalElements;
         self.numberOfElements = res.data.numberOfElements;
-        self.handleTabClick(this.activeName);
+        //self.handleTabClick(this.activeName);
       }).catch(err => {
         console.log('EventManagement-getEventList:' + err);
       });
@@ -611,7 +613,12 @@ export default {
           }
         }
       } else {
-        status = [];
+        if(this.searchParams.curState.length>0){
+          status = this.searchParams.curState;
+        }else{
+          status = [];
+        }
+        
       }
       let page = 0;
       if (val === 'currentChange') {
@@ -645,9 +652,10 @@ export default {
           like: like
       }
       console.log("this.params:",this.params);
-      console.log("this.searchParams.assigner:",this.searchParams.assigner);
-      if(typeof this.searchParams.assigner !="undefined"){
-        this.params.clause.assigner =  this.searchParams.assigner;
+      console.log("this.searchParams:",this.searchParams);
+      if(typeof this.searchParams.clause !="undefined"){
+        this.params.clause =  this.searchParams.clause;
+        this.params.clause.status = status;
       }
       const curTabSortColumn = this.sortColumnOfTab[tabIndex];
       const order = curTabSortColumn.sortType.order;
@@ -733,9 +741,10 @@ export default {
         },
         like: like
       };
-      if(typeof this.searchParams.assigner !="undefined"){
-        params.clause.assigner =  this.searchParams.assigner;
+      if(typeof this.searchParams.clause !="undefined"){
+        params.clause =  this.searchParams.clause;
       }
+      delete params.clause['status'];
       if (storeId.length === 0) {
         for (let i = 0; i < 4; i++) {
           self.tableDataList[i].eventCount = 0;
@@ -869,6 +878,7 @@ export default {
       if (windowHeight > 800) {
         self.tableHeight = 770 + 'px';
       }
+      this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount() ;
     },
     getRouterData(routeData) {

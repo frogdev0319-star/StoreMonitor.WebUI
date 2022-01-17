@@ -366,15 +366,13 @@ export default {
             const passObj = {
                 inputSearchValue:"",
                 storeId:rowItem.storeId,
-                curState:[0],
+                curState:[4],
                 activeName:'4',
                 sizeNum:10,
                 page:1,    
-                searchParams : { clause:{"assigner":this.submitter}},
+                clause : {assigner:this.submitter,storeId:rowItem.storeId},
                 assigner:this.submitter
             };
-            console.log("row:",row);
-            console.log("passObj:",passObj);
             const searchConditon = {
                 path: 'eventManage',
                 params: passObj
