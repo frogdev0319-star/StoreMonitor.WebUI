@@ -2335,9 +2335,11 @@ export default {
                 });
 
             })
+            console.log("Change inspect Itemlist")
+           // console.log(this.inspectItemList);
             this.inspectItemList = tempList ;
             this.curInspectId = searchParams.inspectId
-            console.log(this.inspectItemList);
+         
           }
         }
 

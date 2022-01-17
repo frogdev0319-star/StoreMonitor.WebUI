@@ -81,10 +81,10 @@ export default {
   },
   watch: {
       inspectItemList: {
-        immediate: false, 
-        deep: true,
         handler (val,old ) {
           console.log("selectedItemList Changed")
+          console.log(val)
+          console.log(old)
           this.getLayer1List(val);
         }
     },
