@@ -78,11 +78,12 @@
 import TablePagination from '@/components/TablePagination_V2';
 import { getInspectReportList,getNotInspectStoresByPerson } from '@/api/inspect';
 import {GetEventAndCommentList} from '@/api/event';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 import util from '@/common/util';
 export default {
     name:'TabInceptionDetail',
     components: {
-        'table-pagination':TablePagination,
+        'table-pagination':TablePagination
     },
     props:{
         submitter:{
@@ -280,6 +281,8 @@ export default {
                         reportObj.submitterName = item.submitterName;
                         reportObj.submitter = item.submitter;
                         reportObj.totalScore = item.totalScore;
+                        reportObj.mode = item.mode;
+                        reportObj.status = item.status;
                         reportObj.detail = self.$t('statistics.patrolPerson.seeDetail')
                         temp.push(reportObj);
                     });
@@ -342,15 +345,43 @@ export default {
             export_json_to_excel(tHeader, data, fileName);
         });
       },
-      handleEmitDetailRowClick(row){
+      handleEmitDetailRowClick(row){ //去巡檢報告詳情
           const self = this;
-            sessionStorage.setItem('report_data', JSON.stringify(row));
-            self.$router.push({ name: 'reportDetails', params: { data: row }});
+          const parsObj = {
+            id : row.row.id,
+            storeName : row.row.storeName,
+            status : row.row.status,
+            ts : row.row.date,
+            submitterName : row.row.submitterName,
+            tagName : row.row.tagName,
+            mode : row.row.mode,
+          };
+          sessionStorage.setItem('report_data', JSON.stringify(parsObj));
+          self.$router.push({ name: 'reportDetails', params: { data: parsObj }});
+           
       },
-      handleEmitPersonEventRowClick(row){
+      handleEmitPersonEventRowClick(row){//进入事件列表界面，展示该门店该人员产生的事件
             const self = this;
-            sessionStorage.setItem('report_data', JSON.stringify(row));
-            self.$router.push({ name: 'eventManage', params: { data: row }});
+            const rowItem = row.row;
+            const passObj = {
+                inputSearchValue:"",
+                storeId:rowItem.storeId,
+                curState:[0],
+                activeName:'4',
+                sizeNum:10,
+                page:1,    
+                searchParams : { clause:{"assigner":this.submitter}},
+                assigner:this.submitter
+            };
+            console.log("row:",row);
+            console.log("passObj:",passObj);
+            const searchConditon = {
+                path: 'eventManage',
+                params: passObj
+            };
+            SearchConditionUtil.saveSearchCondition(searchConditon);
+                    //sessionStorage.setItem('event_manage', JSON.stringify(passObj));
+            self.$router.push({ name: 'eventManage', params: { data: passObj }});
       },
       getNotInspectedStores(){
           const self = this;
@@ -414,6 +445,7 @@ export default {
                         Unprocessed=0;Inprocess=0;Processed=0;Rejected=0;Overdue=0;
                         tempStorId = item.storeId;
                         tempStorName = item.name;
+                        assignerName = item.assignerName;
                     }
                         
                     switch(item.status){
@@ -437,6 +469,7 @@ export default {
                     if(idx==data.length-1){
                         const reportObj = {
                             id:tempStorId,
+                            storeId:tempStorId,
                             storeName:tempStorName,
                             Unprocessed,
                             Inprocess,
