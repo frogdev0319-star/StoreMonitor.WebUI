@@ -514,7 +514,9 @@ export default {
     "submitter": "Submitter",
     "time": "Time",
     "timePlaceholder": "The maximum search time is one month",
-    "view": "View"
+    "view": "View",
+    "expire":"expired",
+    "expiredate":" expired date "
   },
 
   // Inspection Management page language

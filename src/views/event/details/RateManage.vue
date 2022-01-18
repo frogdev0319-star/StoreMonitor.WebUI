@@ -277,6 +277,7 @@
             class="des-input"
             type="textarea"
             resize="none"
+            :disabled="curStatus==3"
             @input="(val)=>ivsIdChange(val)"
             @blur="notShowInputRuleTips"/>
       </div>
@@ -700,6 +701,7 @@ export default {
         if (errMsg === 'Success') {
           util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
           self.getCommentList(1);
+          self.event.status = status;
           self.eventDes = '';
           setTimeout(() => {
             self.commentList.forEach((_item, _index) => {

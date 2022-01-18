@@ -366,7 +366,7 @@ export default {
             const passObj = {
                 inputSearchValue:"",
                 storeId:rowItem.storeId,
-                curState:[4],
+                curState:[],
                 activeName:'4',
                 sizeNum:10,
                 page:1,    

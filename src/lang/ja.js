@@ -510,7 +510,9 @@ export default {
     "submitter": "提出者",
     "time": "タイム",
     "timePlaceholder": "最大検索時間は3か月です",
-    "view": "ビュー"
+    "view": "ビュー",
+    "expiretag":"逾期",
+    "expiredate":" 結案時間 "
   },
 
   // Inspection Management page language

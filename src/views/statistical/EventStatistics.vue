@@ -1498,19 +1498,24 @@ export default {
       const self = this;
       if(row.prop == "numOfTotal"){
         this.params.activeName = "4";
+        this.params.curState=[];
       }else if(row.prop == "numOfUnprocessed"){
         this.params.activeName = "0";
+        this.params.curState=[0];
       }else if(row.prop == "numOfInprocess"){
         this.params.activeName = "1";
+        this.params.curState=[1];
       }else if(row.prop == "numOfProcessed"){
         this.params.activeName = "2";
+        this.params.curState=[2,4];
       }else if(row.prop == "numOfRejected"){
         this.params.activeName = "3";
+        this.params.curState=[3];
       }
       this.params.inputSearchValue="";
       this.params.sizeNum=10;
       this.params.page=1; 
-      this.params.curState=[Number(this.params.activeName)];
+      
       this.params.clause ={storeId:row.row.id,storeName:this.barActiveName};
       const searchParamsObj = {
         path: 'eventManage',

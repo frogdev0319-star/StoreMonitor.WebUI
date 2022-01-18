@@ -10,7 +10,6 @@
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0">
         <div class="flex-center">
-          <div class="search-label">{{ $t('eventView.time') }}</div>
           <date-time-selector @change="dateChange"/>
         </div>
         <!--<div class="flex-center">
@@ -104,7 +103,7 @@
                     {{ $t('eventView.handled') }}
                   </span>
                   <span
-                    v-else-if="scope.row.status === 2"
+                    v-else-if="scope.row.status === 2 || scope.row.status === 4"
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
                     style="background-color:#efefef;color:#6e6e6e;" >
                     {{ $t('eventView.closed') }}
@@ -115,6 +114,13 @@
                     style="background-color:#ffeff5;color:#e22472;" >
                     {{ $t('eventView.returnStatus') }}
                   </span>
+                  
+                  <el-tooltip v-if="scope.row.status === 4" effect="light" placement="right-end">
+                    <div slot="content">{{ $t('eventView.expiredate')+scope.row.updateTs }}</div>
+                    <div v-if="scope.row.status === 4" class="expiretag">
+                     {{ '('+$t('eventView.expiretag')+')' }}
+                    </div>
+                  </el-tooltip>
                 </template>
               </el-table-column>
               <el-table-column
@@ -555,6 +561,7 @@ export default {
           const obj = {
             id: item.id,
             ts: util.getDateTime(item.ts),
+            updateTs:(item.status==4)?util.getDateTime(item.updateTs):"",
             assignee: item.assignee,
             assignerName: item.assignerName,
             assigneeName: item.assigneeName,
@@ -1185,6 +1192,11 @@ $h1:#292e36;
           color: #fff;
         }
       }
+    }
+    .expiretag{
+      font-family: NotoSansCJKTC;
+      font-size: 10px;
+      color: #556679;
     }
     #tabs-content  .el-tabs__item {
       padding: 0 0;

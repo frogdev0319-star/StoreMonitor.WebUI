@@ -511,7 +511,9 @@ export default {
     "submitter": "제출자",
     "time": "시간",
     "timePlaceholder": "최대 검색 시간은 3개월입니다.",
-    "view": "보기"
+    "view": "보기",
+    "expiretag":"逾期",
+    "expiredate":" 結案時間 "
   },
 
   // Inspection Management page language

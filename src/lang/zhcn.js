@@ -521,7 +521,9 @@ export default {
     "submitter": "提报人",
     "time": "起止时间",
     "timePlaceholder": "最长搜索时间为三个月",
-    "view": "查看"
+    "view": "查看",
+    "expiretag":"逾期",
+    "expiredate":" 结案时间 "
   },
 
   // Inspection Management page language
