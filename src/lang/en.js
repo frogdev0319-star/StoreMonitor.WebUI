@@ -516,7 +516,9 @@ export default {
     "timePlaceholder": "The maximum search time is one month",
     "view": "View",
     "expire":"expired",
-    "expiredate":" expired date "
+    "expiredate":" expired date ",
+    "closeSelectedEvent":"Confirm close choosed event?",
+    "confirmBachClose":"Confirm bach close events"
   },
 
   // Inspection Management page language

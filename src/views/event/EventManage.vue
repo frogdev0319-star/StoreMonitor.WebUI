@@ -190,6 +190,13 @@
         </el-tab-pane>
       </el-tabs>
     </div>
+    <dialog-vue 
+    :dialog-title="$t('eventView.confirmBachClose')" 
+    :show-info="$t('eventView.closeSelectedEvent')" 
+    :is-warning=true 
+    :dialog-closed="showBachCloseDialog" 
+    @confirmed="confirmBachClose" 
+    @canceled="showBachCloseDialog = false"/>
   </div>
 </template>
 
@@ -210,6 +217,7 @@ import StoreFilter from '@/components/StoreFilter';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from '@/components/SelectedStores';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
+import DialogVue from '@/components/DialogVue';
 
 export default {
   name: 'EventManage',
@@ -221,7 +229,8 @@ export default {
     LimitSelect,
     MultiSelect,
     RegionMultiSelect,
-    TblPaginationOnly
+    TblPaginationOnly,
+    DialogVue
   },
 
   data() {
@@ -327,6 +336,7 @@ export default {
       showCloseBtn:false,
       closingEventId:[],
       stopRowClick:false,
+      showBachCloseDialog:false
     };
   },
 
@@ -962,6 +972,9 @@ export default {
       this.ifSearchData = false;
     },
     doBachCloseEvent(){
+      this.showBachCloseDialog = true;
+    },
+    confirmBachClose(){
       const self = this;
       //const eventIds = [];
       //eventIds.push(self.event.id);
@@ -976,6 +989,7 @@ export default {
         comment: comments
       };
       eventRESTful.addComment(params).then(res => {
+        self.showBachCloseDialog = false;
         const errMsg = res.errMsg;
         if (errMsg === 'Success') {
           util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
@@ -993,6 +1007,7 @@ export default {
         console.log('EventDetail-addComment:' + err);
       });
     }
+
   },
 
   beforeRouteEnter(to, from, next) {

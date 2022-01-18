@@ -523,7 +523,9 @@ export default {
     "timePlaceholder": "最长搜索时间为三个月",
     "view": "查看",
     "expiretag":"逾期",
-    "expiredate":" 结案时间 "
+    "expiredate":" 结案时间 ",
+    "closeSelectedEvent":"确认将选择事件结案?",
+    "confirmBachClose":"确认批量结案"
   },
 
   // Inspection Management page language

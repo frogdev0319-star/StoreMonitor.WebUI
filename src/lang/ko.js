@@ -513,7 +513,9 @@ export default {
     "timePlaceholder": "최대 검색 시간은 3개월입니다.",
     "view": "보기",
     "expiretag":"逾期",
-    "expiredate":" 結案時間 "
+    "expiredate":" 結案時間 ",
+    "closeSelectedEvent":"確認將選擇事件結案?",
+    "confirmBachClose":"確認批次結案"
   },
 
   // Inspection Management page language
