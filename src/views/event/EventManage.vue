@@ -446,6 +446,7 @@ export default {
     },
 
     searchEventList() {
+      delete this.searchParams['clause']; //重新搜尋要把跳轉帶來的刪掉
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount();
     },

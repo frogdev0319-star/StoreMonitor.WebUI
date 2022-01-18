@@ -10,7 +10,7 @@
                   :value="item.value"
                 ></el-option>
             </el-select>
-            <div style="width:1px; height:20px;border:1px solid rgba(172, 174, 177,0.3);align-self: center;"></div>
+            <div style="width:1px; height:20px;background-color:rgba(172, 174, 177,0.3);align-self: center;"></div>
             <div v-if="allowAll">
               <multi-select
                 ref="multiSelectTypeSelected"

@@ -100,36 +100,41 @@
                   </delay-button>
                 </div>
               </div>
-              <div style="margin-top:20.5px;">
-                <table-only
-                  ref="elTP"
-                  :column-data="eventInfoData"
-                  :table-data="eventTableData"
-                  :total="total"
-                  :highlight-current-row= "true"
-                  :pagesize="sizeNum"
-                  :current-page="page"
-                  :is-event = "false"
-                  :default-sort = "defaultSort"
-                  :allowRowExpand = "true"
-                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
-                  :tableHeight = "726"
-                  layout = "prev,pager,next,sizes"
-                  expand-component = "IncepItemTop5"
-                  :expandCompProperties = "componentsProps"
-                   @sortChange="handleSortChange"
-                  @onCellClick = "onEvenListNumClick"
-                />
+              <div v-if="viewMode==0">
+                <div style="margin-top:20.5px;">
+                  <table-only
+                    ref="elTP"
+                    :column-data="eventInfoData"
+                    :table-data="eventTableData"
+                    :total="total"
+                    :highlight-current-row= "true"
+                    :pagesize="sizeNum"
+                    :current-page="page"
+                    :is-event = "false"
+                    :default-sort = "defaultSort"
+                    :allowRowExpand = "true"
+                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                    :tableHeight = "726"
+                    layout = "prev,pager,next,sizes"
+                    expand-component = "IncepItemTop5"
+                    :expandCompProperties = "componentsProps"
+                    @sortChange="handleSortChange"
+                    @onCellClick = "onEvenListNumClick"
+                  />
+                </div>
+                <div style="width:100%; margin-top:12px;height:31px;">
+                  <tbl-pagination-only
+                    :total="total"
+                    :current-page="page"
+                    :page-size="sizeNum"
+                    layout = "prev,pager, next,sizes,slot"
+                    @sizeChange="handlePageAndSizeChange"
+                    @currentChange="handleCurrentChange"
+                  />
+                </div>
               </div>
-              <div style="width:100%; margin-top:12px;height:31px;">
-                <tbl-pagination-only
-                  :total="total"
-                  :current-page="page"
-                  :page-size="sizeNum"
-                  layout = "prev,pager, next,sizes,slot"
-                  @sizeChange="handlePageAndSizeChange"
-                  @currentChange="handleCurrentChange"
-                />
+              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+                <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"/>
               </div>
             </div>
           </el-col>
@@ -272,30 +277,35 @@
                     </delay-button>
                   </div>
                 </div>
-                <div style="margin-top:20.5px;">
-                  <table-only
-                    ref="elTP"
-                    :column-data="eventInvolveTable.column_data"
-                    :table-data="eventInvolveTable.table_data"
-                    :highlight-current-row= "true"
-                    :is-event = "false"
-                    :default-sort = "eventInvolveTable.defaultSort"
-                    :allowRowExpand = "true"
-                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
-                    :tableHeight = "726"
-                    expand-component = "EventCommentList"
-                    :expandCompProperties = "componentsProps_EventCommentList"
-                  />
+                <div v-if="viewMode_eventStores==0">
+                  <div style="margin-top:20.5px;">
+                    <table-only
+                      ref="elTP"
+                      :column-data="eventInvolveTable.column_data"
+                      :table-data="eventInvolveTable.table_data"
+                      :highlight-current-row= "true"
+                      :is-event = "false"
+                      :default-sort = "eventInvolveTable.defaultSort"
+                      :allowRowExpand = "true"
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :tableHeight = "726"
+                      expand-component = "EventCommentList"
+                      :expandCompProperties = "componentsProps_EventCommentList"
+                    />
+                  </div>
+                  <div style="width:100%; margin-top:12px;height:31px;">
+                    <tbl-pagination-only
+                      :total="eventInvolveTable.total"
+                      :current-page="eventInvolveTable.page"
+                      :page-size="eventInvolveTable.sizeNum"
+                      layout = "prev,pager, next,sizes,slot"
+                      @sizeChange="handlePageAndSizeChange_eventStores"
+                      @currentChange="handlePageAndSizeChange_eventStores"
+                    />
+                  </div>
                 </div>
-                <div style="width:100%; margin-top:12px;height:31px;">
-                  <tbl-pagination-only
-                    :total="eventInvolveTable.total"
-                    :current-page="eventInvolveTable.page"
-                    :page-size="eventInvolveTable.sizeNum"
-                    layout = "prev,pager, next,sizes,slot"
-                    @sizeChange="handlePageAndSizeChange_eventStores"
-                    @currentChange="handlePageAndSizeChange_eventStores"
-                  />
+                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+                  <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"/>
                 </div>
               </div>
             </div>
@@ -508,6 +518,7 @@ export default {
       areaMode:[{key:'area1',value:1},{key:'area2',value:2},{key:'stores',value:0},{key:'storeGroup',value:4},{key:'storeType',value:3}],
       barchartOption:null,
       viewMode:0,
+      barchartOptionViewMode0:null,
       storeNameStr: '',
       storeGroupStr: '',
       storeTypeStr: '',
@@ -863,6 +874,7 @@ export default {
         defaultSort: { prop: 'rankByNumOfUnqualified', order: 'ascending' },
       },
       viewMode_eventStores:0,
+      barchartOptionViewMode_eventStores:null,
       eventInvolveItemId:null,
       showInvolveTableArea:false,
       componentsProps_EventCommentList:{},
@@ -1309,6 +1321,25 @@ export default {
     onSwitchMode(val){
       this.viewMode=val;
     },
+    doDrawEventChartMode(chartData){
+      this.barchartOptionViewMode0 = this.getBarchartOption();
+      let date_xAxis=[];
+      let chart_dataset=[];
+      if(chartData.length>0){
+        chartData.forEach(item => {
+          date_xAxis.push(item.groupName);
+          chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
+        });
+        this.barchartOptionViewMode0.xAxis.data = date_xAxis;
+        //this.barchartOption.yAxis.splitLine.show = true;
+        //this.barchartOption.series.name= this.Avg12Num[0].name;
+        //console.log("chart_dataset:",chart_dataset);
+        this.barchartOptionViewMode0.series[0].data = chart_dataset;
+        
+        //
+      }
+      
+    },
     async getEventTableData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
@@ -1406,6 +1437,7 @@ export default {
           return (item.groupName == name);
         }
       });
+      this.doDrawEventChartMode(filterData);
       this.total =Math.ceil( filterData.length/this.sizeNum);
       this.eventTableData = [...filterData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
       
@@ -1729,6 +1761,7 @@ export default {
       this.eventInvolveTable.table_data = [];
       let page = this.eventInvolveTable.page;
       let sizeNum = this.eventInvolveTable.sizeNum;
+      this.doDrawEventInvolveChartMode(this.eventInvolveTable.itemAllData);
       this.eventInvolveTable.table_data = [...this.eventInvolveTable.itemAllData.slice( (page - 1)* sizeNum, page* sizeNum)];
     },
     orderAllTableData_eventStores(){
@@ -1773,6 +1806,25 @@ export default {
     },
     onSwitchMode_eventStores(val){
       this.viewMode_eventStores=val;
+      
+    },
+    doDrawEventInvolveChartMode(chartData){
+      this.barchartOptionViewMode_eventStores = this.getBarchartOption();
+      let date_xAxis=[];
+      let chart_dataset=[];
+      if(chartData.length>0){
+        chartData.forEach(item => {
+          date_xAxis.push(item.name);
+          chart_dataset.push({value:item.numOfUnqualified,name:item.name,innerId:item.id});
+        });
+        this.barchartOptionViewMode_eventStores.xAxis.data = date_xAxis;
+        //this.barchartOption.yAxis.splitLine.show = true;
+        //this.barchartOption.series.name= this.Avg12Num[0].name;
+        //console.log("chart_dataset:",chart_dataset);
+        this.barchartOptionViewMode_eventStores.series[0].data = chart_dataset;
+        
+        //
+      }
       
     },
     /*End 事件涉及門店 */
@@ -2164,7 +2216,15 @@ export default {
             }
           }
         }
-        
+        .barchart-area{
+          height:271px;
+          margin-left: calc(36/1440*100vw);
+          margin-right: calc(24/1440*100vw);
+          .chart-content {
+            width: 100%;
+            height: 100%;
+          }
+        }
         .kpi-list{
           height: 100%;
           border-bottom: 1px solid $border;
