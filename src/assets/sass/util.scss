@@ -391,6 +391,10 @@ $sv_red: #c60957;
     display: none;
   }
 }
+.el-button {
+  min-height: 28px;
+  min-width: 85px;
+}
 .storevue-button-outlined {
   background-color: #fff;
   border-color: #c60957;
@@ -456,6 +460,18 @@ $sv_red: #c60957;
   color: #fff;
   font-size: calc(15/1920*100vw);
   padding: calc(8 / 1920 * 100vw) calc(25 / 1920 * 100vw);
+  &.is-disabled {
+    background-color: #c60957;
+    border-color: #c60957;
+    color: #fff;
+    opacity: .5;
+    &:hover {
+      background-color: #c60957;
+      border-color: #c60957;
+      color: #fff;
+      opacity: .5;
+    }
+  }
   &:hover {
     background-color: #ae0048;
     border-color: #ae0048;

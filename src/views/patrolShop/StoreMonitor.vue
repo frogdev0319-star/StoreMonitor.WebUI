@@ -127,7 +127,19 @@
       </el-col>
       <el-col :span="isFullScreenMode ? 24: 12" class="rside">
         <div class="paper padding" style="text-align: left">
-          <span class="event-title">{{ $t("remotePatrol.createMothod") }}</span>
+          <div class="flex-center">
+            <span class="event-title">{{ $t("remotePatrol.createMothod") }}</span>
+            <div class="spacer"></div>
+            <el-button
+              v-loading.fullscreen.lock="fullscreenLoading"
+              :disabled="sourceList.length === 0"
+              class="storevue-button-filled"
+              size="mini"
+              type="primary"
+              @click="submit"
+            >{{ $t("remotePatrol.submit") }}
+            </el-button>
+          </div>
           <hr class="hr-horizontal">
           <div class="flex-center">
             <div
@@ -864,7 +876,7 @@ export default {
         beginTs: date.getTime() - 3600 * 24 * 30 * 1000 * 30,
         endTs: date.getTime(),
         clause: {
-          storeId: self.store.storeId,
+          storeId: self.activeStore.storeId,
           status: 0,
           sourceType: 0
         },
@@ -1061,7 +1073,7 @@ export default {
     getStorageInfo() {
       const self = this;
       const params = {};
-      params.storeId = self.store.storeId;
+      params.storeId = self.activeStore.storeId;
       return new Promise((resolve, reject) => {
         getStorageInfo(params).then((res) => {
           if (res.errCode === 0) {
@@ -1106,7 +1118,7 @@ export default {
       const obj = {};
       obj.ts = new Date().getTime();
       obj.subject = self.eventName.trim();
-      obj.storeId = self.store.storeId;
+      obj.storeId = self.activeStore.storeId;
       obj.deviceId = self.channel.id;
       obj.comment = commentobj;
       const params = obj;
@@ -1128,8 +1140,8 @@ export default {
             isSuccess: isSuccess
           },
           store: {
-            storeId: self.store.storeId,
-            storeName: self.store.storeName
+            storeId: self.activeStore.storeId,
+            storeName: self.activeStore.storeName
           },
           channel: {
             deviceId: self.channel.id
@@ -1185,8 +1197,8 @@ export default {
             isSuccess: isSuccess
           },
           store: {
-            storeId: self.store.storeId,
-            storeName: self.store.storeName
+            storeId: self.activeStore.storeId,
+            storeName: self.activeStore.storeName
           },
           channel: {
             deviceId: self.channel.id
