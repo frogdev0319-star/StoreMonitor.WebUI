@@ -50,7 +50,7 @@
                       <el-col class="line"/>
                     </el-col>
                     <el-col :span="8" class="division">
-                    <el-col class="text-area"   @click.native="routeToInspectionReport">   
+                    <el-col class="text-area">   
                        <el-row class="top">
                            <span class="mainTitle">{{overviewCount.avgScore!=-9999?overviewCount.avgScore:'N/A'}}</span>
                            <span class="unit">{{ $t('statistics.overview.avg_unit') }}</span>
@@ -1974,7 +1974,7 @@ export default {
     filterContent(content,type,ids,labels,originArray){
       let output = [];
       console.log("Filter POST="+type)
-      console.log(content)
+
       if(type == 'stores'){
         content.map(function(item,i){
           item.list = [];
@@ -1985,9 +1985,12 @@ export default {
       else if(type == 'position'){
           
           originArray.map(function(d){
+             console.log(d.label)
+             
              var  pos = null;
              var totalScore =0;
              var totalStandard = 0;
+             if(ids.indexOf(d.value)>=0)
              content.map(function(item,i){
                
                 if(d.contents.indexOf(item.innerId)>=0){
@@ -2094,7 +2097,8 @@ export default {
       else if(this.part1.compareType=='position'){
         let users = [];
          this.part1.originArray.forEach(function(item){
-           users =  users.concat(item.contents);
+           if(this.part1.compareIds.indexOf(item.value)>=0)
+            users =  users.concat(item.contents);
          })
          params.submitters  = users;
          params.groupIds  = users;
@@ -2375,7 +2379,8 @@ export default {
       else if(this.part2.compareType=='position'){
          let users = [];
          this.part2.originArray.forEach(function(item){
-           users =  users.concat(item.contents);
+           if(this.part2.compareIds.indexOf(item.value)>=0)
+            users =  users.concat(item.contents);
          })
          params.submitters  = users;
          params.groupIds  = users;
@@ -2597,7 +2602,8 @@ export default {
       else if(this.part3.compareType=='position'){
          let users = [];
          this.part3.originArray.forEach(function(item){
-           users =  users.concat(item.contents);
+           if(this.part3.compareIds.indexOf(item.value)>=0)
+            users =  users.concat(item.contents);
          })
          params.submitters  = users;
          params.groupIds  = users;
