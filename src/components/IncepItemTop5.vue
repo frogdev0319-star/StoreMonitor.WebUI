@@ -2,7 +2,26 @@
     <div class="content">
         <div class="head">{{$t('statistics.event.top5')}}</div>
         <div class="table-area">
-        <table-pagination
+            <el-table
+              :data="table_data"
+              :highlight-current-row="false"
+              :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
+              :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
+              empty-text="没有事件数据"
+              align="left"
+              style="width: 100%"
+              class="tbl-IncepItemTop5"
+            >
+                <el-table-column
+                    v-for="(_item,_index) in column_data"
+                    :key="_index"
+                    :prop="_item.prop"
+                    :label="_item.label"
+                    :min-width="_item.width"
+                >
+                </el-table-column>
+            </el-table>
+        <!--<table-pagination
                 ref="detail"
                 class="tbl-IncepItemTop5"
                 :column-data="column_data"
@@ -11,7 +30,7 @@
                 :highlight-current-row= "false"
                 :is-event = "false"
                 :showPagination = "false"
-            />
+            />-->
         </div>
     </div>
 </template>
@@ -108,8 +127,11 @@ export default {
             let unitCount = 0;
             let curSubject = "",curTagName="";
             let eventItem = [];
+            this.table_data=[{subject:'',inspectTagName:'',num:0,rate:''}];
             //let eventObj={subject:'',inspectTagName:'',num:0,rate:''};
-            this.eventData.forEach(((item,idx)=>{
+            //this.eventData.forEach(((item,idx)=>{
+            for(var idx=0; idx<this.eventData.length;idx++){
+                var item = this.eventData[idx];
                 if(idx==0){
                     curSubject = item.subject;
                     curTagName = item.inspectTagName; 
@@ -136,10 +158,11 @@ export default {
                     };
                     eventItem.push(eventObj);
                 }
-            }));
+            }//));
             util.sortArrayByKeyDesc(eventItem,"num");
             
             this.table_data = [...eventItem.slice( 0, (eventItem.length>5)?5:eventItem.length)];
+            
         }
         
     },
@@ -160,6 +183,17 @@ export default {
     .table-area{
         margin-top:10px;
         width:calc(984/1440*100vw);
+        border-top:1px solid rgba(172,174,177,0.3);
+        .el-table{
+            border: none !important;
+            box-shadow: none !important;
+            &::before{
+                 background-color: transparent;
+            }
+            &::after{
+                 background-color: transparent;
+            }
+        }
     }
     .tbl-IncepItemTop5{
         background-color: #EFF3F5;

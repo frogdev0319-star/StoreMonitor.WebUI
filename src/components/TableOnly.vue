@@ -10,7 +10,7 @@
       :header-cell-style="headerStyle"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
-      :cell-style="ifSetCellStyle ? setCellStyle : {}"
+      :cell-style="ifSetCellStyle ? setCellStyle : {borderBottom:'1px solid rgba(172,174,177,0.3)'}"
       :border="showBorder"
       :stripe="isStripe"
       :max-height="tableHeight"
@@ -156,7 +156,7 @@ import TabInceptionDetail from '@/components/TabInceptionDetail'
 import IncepItemTop5 from '@/components/IncepItemTop5'
 import EventCommentList from '@/components/EventCommentList'
 export default {
-  name:'TablePagination_V2',
+  name:'TableOnly',
   components: {
     TabInceptionDetail,
     IncepItemTop5,
