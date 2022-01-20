@@ -1293,6 +1293,7 @@ $h1:#292e36;
                     @include point(max-width,220);
                     .img-content{
                         position: relative;
+                        border-radius: 5px;
                         cursor: pointer;
                         .start-icon{
                             position: absolute;
@@ -1301,6 +1302,7 @@ $h1:#292e36;
                         }
                       .imgLittle{
                         width: calc(130/1920*100vw);
+                        border-radius: 5px;
                       }
                     }
                     .video-content{

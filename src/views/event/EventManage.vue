@@ -726,7 +726,7 @@ export default {
     },
 
     handleDisable(row, index){
-      if (row.status==2) {
+      if (row.status==2 || row.status==4) {
         return false
       } else {
         return true

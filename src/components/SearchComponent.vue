@@ -365,7 +365,7 @@ export default {
     color: $black;
     position: relative;
     .store-filter{
-      display: inline-block;
+      margin-left: 32px;
 
     }
     .header-details{
@@ -434,7 +434,6 @@ export default {
       justify-content: space-between;
       margin-top: 16px;
       padding-bottom: 24px;
-      margin-left: -33px;
       .search-button{
         margin-left:35px;
         width: 102px;
@@ -470,6 +469,10 @@ export default {
         min-width: 85px;
         min-height: 28px;
       }
+    }
+    /deep/
+    .el-select.el-select--medium .el-input .el-input__inner{
+      background-color: #fff !important;
     }
   }
 </style>

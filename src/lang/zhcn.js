@@ -121,7 +121,7 @@ export default {
     "dangerousMore": "立即督导≥60%",
     "dataRangeTips": "* 时间范围：最短一天，最长一年",
     "dataZoomInfo": "坐标系内滚动鼠标实现数据区域缩放，查看数据细节",
-    "date": "时间自定",
+    "date": "时间范围",
     "day": "天",
     "daysww": "号",
     "department": "部门",

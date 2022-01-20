@@ -192,9 +192,14 @@ export default {
     box-sizing: border-box;
   }
   .input-class{
-    /* width: calc(100% - 30px); */
+    width: calc(100% - 30px); 
     position: absolute;
     left: 0;
+    top:0;
+    z-index: 100;
+     text-overflow: ellipsis;
+     white-space:nowrap;
+     overflow:hidden;
   }
   .content{
     text-align: left;

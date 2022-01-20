@@ -283,6 +283,9 @@ export default {
     width: calc(100% - 30px);
     position: absolute;
     left: 0;
+    top:0;
+    z-index: 100;
+     text-overflow: ellipsis;
   }
   >>> .el-select .el-input--medium .el-input__suffix{
     top:0px !important;
