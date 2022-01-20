@@ -382,6 +382,7 @@ export default {
     },
 
     onChangeStoreGroup(val) {
+      console.log("onChangeStoreGroup:",val);
       this.curStoreGroup = val;
       this.filterStore();
     },
@@ -418,26 +419,39 @@ export default {
       } else {
         this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
+        //console.log("groupIdArray:",groupIdArray);
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
+        //console.log("typeIdArr:",typeIdArr);
         const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
+        //console.log("ilterStoreArray:",filterStoreArray);
+        
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
+        console.log("filterStoreId:",filterStoreId);
       }
 
       let filterStoreStr = '';
+      let temp=[];
       filterStoreId.forEach(storeId => {
         this.storeList.forEach(store => {
           if (storeId === store.storeId) {
             filterStoreStr += `${store.name}，`;
+            const obj = {
+                storeId: store.storeId,
+                label: store.name,
+                value: store.name
+              };
+              temp.push(obj);
           }
         });
       });
+      this.storeDataList = temp;
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-
+      //console.log("temp:",temp);
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
-      this.$emit('emitStoreList', this.storeDataList);
+      //this.$emit('emitStoreList', this.storeDataList);
     },
 
     getStoreGroupString() {
@@ -492,7 +506,9 @@ export default {
         return typeIdArr.flat();
       }
       groupIdArr = groupArr.map(group => group.contents);
+      //console.log("2.groupIdArr:",groupIdArr);
       typeIdArr = typeArr.map(type => type.contents);
+      //console.log("2.typeIdArr:",typeIdArr);
       return util.getIntersectionOfArrs(groupIdArr.flat(), typeIdArr.flat());
     },
 

@@ -462,7 +462,7 @@ export default {
         height: 36px;
         background-color: #fff;
         border-radius: 5px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
       }
       .el-province{
         width: calc(222/1440*100vw);
