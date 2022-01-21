@@ -100,14 +100,17 @@
                     ></TypeSelectArea>
                   </div>
                   <div  class="score-area" style="display:flex;flex-direction:row;height:92px;align-item:center;">
-                    <div v-show="standardRate=='- -'" style="width:145px;border-right:solid 1px #f7f9f9;">
+                    <div v-show="standardRate!='- -'" style="width:145px;border-right:solid 1px #f7f9f9;">
                       <div style="height:70px;font-size:48px;color:#484848;">{{standardRate}}<span style="font-size:15px;">{{$t('statistics.score')}}</span></div>
                       <div style="font-size:15px;">{{$t('statistics.standardScore')}}</div>
                     </div>
                     <div>
                       <div v-if="Ass12Num.length>0" class="avg-score" style="width:260px;background-color:#fdf6f4;justify-content:space-between;margin-left:24px;">
                         <div class="avg12item" style="width:200px;">
-                          <div class="score-item-name" >{{Ass12Num[0].name}}</div>
+                          <el-tooltip effect="light" placement="bottom">
+                            <div slot="content">{{Ass12Num[0].name}}</div>
+                            <div class="score-item-name" >{{Ass12Num[0].name}}</div>
+                          </el-tooltip>
                           <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
                         </div>
                         <div class="avg12item">
@@ -783,7 +786,7 @@ export default {
         justify-content: space-between;
       }
       .score-item-name{
-        width:calc(90/1440*100vw);
+        width:calc(60/1440*100vw);
         margin-left:10px;
         align-self:center;
         font-size:normal;
