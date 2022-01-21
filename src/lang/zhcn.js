@@ -670,7 +670,7 @@ export default {
     "selectStoreToBind": "请选择{tableName}巡检表，需要绑定的门店",
     "selecttitle": "请选择关联职务",
     "setFullScoreEmpty": "项目总分值不能为空！",
-    "setFullScoreRange": "取值范围为0~50！",
+    "setFullScoreRange": "取值范围为-50~50！",
     "setItem": "巡检项设置",
     "setMaxScore": "最高",
     "setMinScore": "最低",

@@ -658,7 +658,7 @@ export default {
     "selectStoreToBind": "연동 메모리",
     "selecttitle": "관련 위치를 선택하십시오",
     "setFullScoreEmpty": "총 점수는 비워 둘 수 없습니다.",
-    "setFullScoreRange": "이 가치 범위가 0~50이다!",
+    "setFullScoreRange": "이 가치 범위가 -50~50이다!",
     "setItem": "항목 설정",
     "setMaxScore": "최고고의",
     "setMinScore": "최저의",
