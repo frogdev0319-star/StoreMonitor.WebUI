@@ -33,7 +33,7 @@
                       :region-array2="params.curCity"
                       :cur-store-group="params.curStoreGroup"
                       :cur-store-type="params.curStoreType"
-                      :cur-stores="params.curStore"
+                      :cur-stores="storeIds"
                       :cached-params="params"
                       :cur-country="curCountry"
                       @emitTypeChanged="emitTypeChanged"
@@ -41,7 +41,7 @@
                   </div>
                   <div v-if="Avg12Num.length>0" class="avg-score" style="background-color:#fdf6f4;justify-content:space-between;">
                     <div class="avg12item" style="width:170px;">
-                      <div style="margin-left:10px;align-self:center;font-size:normal;">{{Avg12Num[0].name}}</div>
+                      <div class="score-item-name">{{Avg12Num[0].name}}</div>
                       <div style="margin-left:10px;">{{$t('statistics.averageScore')}}</div>
                     </div>
                     <div class="avg12item">
@@ -51,7 +51,7 @@
                   </div>
                   <div v-if="Avg12Num.length>1" class="avg-score" style="background-color:#edf6e8;justify-content:space-between;">
                     <div class="avg12item" style="width:170px;">
-                      <div style="margin-left:10px;align-self:center;font-size:normal;">{{Avg12Num[1].name}}</div>
+                      <div class="score-item-name" >{{Avg12Num[1].name}}</div>
                       <div style="margin-left:10px;">{{$t('statistics.averageScore')}}</div>
                     </div>
                     <div class="avg12item">
@@ -93,21 +93,21 @@
                       :region-array2="params.curCity"
                       :cur-store-group="params.curStoreGroup"
                       :cur-store-type="params.curStoreType"
-                      :cur-stores="params.curStore"
+                      :cur-stores="storeIds"
                       :cached-params="params"
                       :cur-country="curCountry"
                       @emitTypeChanged="emitTypeChanged2"
                     ></TypeSelectArea>
                   </div>
-                  <div class="score-area" style="display:flex;flex-direction:row;height:92px;align-item:center;">
-                    <div style="width:145px;border-right:solid 1px #f7f9f9;">
+                  <div  class="score-area" style="display:flex;flex-direction:row;height:92px;align-item:center;">
+                    <div v-show="standardRate=='- -'" style="width:145px;border-right:solid 1px #f7f9f9;">
                       <div style="height:70px;font-size:48px;color:#484848;">{{standardRate}}<span style="font-size:15px;">{{$t('statistics.score')}}</span></div>
                       <div style="font-size:15px;">{{$t('statistics.standardScore')}}</div>
                     </div>
                     <div>
                       <div v-if="Ass12Num.length>0" class="avg-score" style="width:260px;background-color:#fdf6f4;justify-content:space-between;margin-left:24px;">
                         <div class="avg12item" style="width:200px;">
-                          <div style="margin-left:10px;align-self:center;font-size:normal;">{{Ass12Num[0].name}}</div>
+                          <div class="score-item-name" >{{Ass12Num[0].name}}</div>
                           <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
                         </div>
                         <div class="avg12item">
@@ -117,7 +117,7 @@
                       </div>
                       <div v-if="Ass12Num.length>1" class="avg-score" style="width:260px;background-color:#edf6e8;justify-content:space-between;margin-left:24px;">
                         <div class="avg12item" style="width:200px;">
-                          <div style="margin-left:10px;align-self:center;font-size:normal;">{{Ass12Num[1].name}}</div>
+                          <div class="score-item-name" >{{Ass12Num[1].name}}</div>
                           <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
                         </div>
                         <div class="avg12item">
@@ -204,7 +204,7 @@ export default {
         AssChartOption:null,
         showNoData2:true,
         standardRate:'- -',
-       
+        storeIds:[]
     }
   },
   computed: {
@@ -270,8 +270,10 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
     },
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      //console.log("emitSearch:",searchParams);
+      console.log("emitSearch:",searchParams);
+      this.storeIds = [];
       this.params = searchParams;
+      this.storeIds = this.params.storeIds;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
@@ -287,9 +289,8 @@ export default {
       console.log("emitSearch > params",this.params);
       this.curCountry = this.params.curCountry;
       //console.log("emitSearch > inspectId",this.params.inspectId );
-      this.doGetAverageScore(this.filterDateRange); 
-      this.doGetAssessmentScore(this.filterDateRange2);
-      //this.searchData();
+      
+      this.searchData();
     },
     async searchData() {
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
@@ -299,13 +300,27 @@ export default {
         //await this.getInspectStatsOverviewOfRegion();
         //wait this.getInspectStatsOverviewOfStore();
         //await this.getInspectStatsLine();
+        this.compareIds = this.params.storeIds;
+        this.compareType='stores';
+        this.compareIds2  = this.params.storeIds;
+        this.compareType2='stores',
+        this.doGetAverageScore(this.filterDateRange); 
+        this.doGetAssessmentScore(this.filterDateRange2);
       } else {
-        this.totalRegion = 0;
-        this.regionTableData = [];
-        //this.getRegionPie();
-        this.storeTableData = [];
-        this.regionsList = [];
-        this.curRegion = [];
+        this.compareIds = [];
+        this.comapareLabels=[];
+        this.compareType='stores';
+        this.Avg12Num=[];
+        this.avgChartOption=null;
+        this.filterDateRange2=[];
+        this.compareIds2=[];
+        this.comapareLabels2=[];
+        this.compareType2='stores',
+        this.Ass12Num=[];
+        this.AssChartOption=null;
+        this.standardRate='- -';
+        this.doGetAverageScore(this.filterDateRange); 
+        this.doGetAssessmentScore(this.filterDateRange2);
       }
     },
     doGetPre12DateRange(start_date,end_date,range_type){
@@ -767,7 +782,15 @@ export default {
         align-items:center;
         justify-content: space-between;
       }
-
+      .score-item-name{
+        width:calc(90/1440*100vw);
+        margin-left:10px;
+        align-self:center;
+        font-size:normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .pct-panel {
         width: calc(1035px/1440*100vw);
         height: 403px;
