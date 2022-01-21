@@ -645,7 +645,7 @@ export default {
     "selectStoreToBind": "Bound Stores",
     "selecttitle": "Please select the related positions",
     "setFullScoreEmpty": "The total score cannot be empty!",
-    "setFullScoreRange": "The value range is 0~50!",
+    "setFullScoreRange": "The value range is -50~50!",
     "setItem": "Item Settings",
     "setMaxScore": "highest",
     "setMinScore": "lowest",

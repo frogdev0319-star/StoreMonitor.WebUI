@@ -649,7 +649,7 @@ export default {
     "selectStoreToBind": "請選擇{tableName}巡檢表，需要綁定的門店",
     "selecttitle": "請選擇關聯職務",
     "setFullScoreEmpty": "項目總分值不能為空！",
-    "setFullScoreRange": "取值範圍為0~50！",
+    "setFullScoreRange": "取值範圍為-50~50！",
     "setItem": "巡檢項設置",
     "setMaxScore": "最高",
     "setMinScore": "最低",
