@@ -39,6 +39,8 @@ export default {
       this.dateRange = val;
       if(val!=4){
         this.diablePick = true;
+      }else{
+        this.diablePick = false;
       }
       //this.getDateRange();
     },

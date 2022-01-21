@@ -565,8 +565,8 @@ export default {
           const attachment = [];
           if (item.initialComment.attachment.length !== 0) {
             item.initialComment.attachment.some(x => x.mediaType === 0) ? attachment.push({ url: self.attachmentAudio }) : '';
-            item.initialComment.attachment.some(x => x.mediaType === 1) ? attachment.push({ url: self.attachmentVideo }) : '';
-            item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
+            item.initialComment.attachment.some(x => (x.mediaType === 1||x.mediaType === 2)) ? attachment.push({ url: self.attachmentVideo }) : '';
+            //item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
           }
           const obj = {
             id: item.id,
