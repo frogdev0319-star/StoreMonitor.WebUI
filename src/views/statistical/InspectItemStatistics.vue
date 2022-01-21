@@ -26,7 +26,7 @@
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
                               :cur-store-type="params.curStoreType"
-                              :cur-stores="params.curStore"
+                              :cur-stores="params.storeIds"
                               :cached-params="params"
                               :cur-country="curCountry"
                               @emitTypeChanged="emitTypeChangedPart3"
@@ -92,7 +92,7 @@
                       size="mini"
                       @click="exportStore2Excel"
                   >
-                    <div class="button-area" style="margin-left:15px">
+                    <div class="button-area" style="width:120px;margin-left:15px">
                       <img :src="exportPng" class="icon-excel">
                         <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
@@ -270,7 +270,7 @@ export default {
           'maxWidth': '230'
         },
         {
-          'prop': 'numOfReport',
+          'prop': 'numOfTotal',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
           'pdfwidth': '12%',
@@ -382,7 +382,7 @@ export default {
           'maxWidth': '230'
         },
         {
-          'prop': 'numOfReport',
+          'prop': 'numOfTotal',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
           'pdfwidth': '14%',
@@ -537,7 +537,7 @@ export default {
           'pdfwidth': '11%'
         },
         {
-          'prop': 'numOfReport',
+          'prop': 'numOfTotal',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
           'pdfwidth': '14%',
@@ -620,7 +620,7 @@ export default {
           'pdfwidth': '11%'
         },
         {
-          'prop': 'numOfReport',
+          'prop': 'numOfTotal',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
           'pdfwidth': '14%',
@@ -702,7 +702,7 @@ export default {
           'pdfwidth': '11%'
         },
          {
-          'prop': 'numOfReport',
+          'prop': 'numOfTotal',
           'label': this.$t('overview.numOfEvaluations'),
           'sortable': 'custom',
           'pdfwidth': '14%',
@@ -747,7 +747,7 @@ export default {
               storeMode:0, barRegionSort:1,barStoreStore:1,
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{},
-              table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfReport'}},
+              table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfTotal'}},
     };
   },
 
@@ -916,7 +916,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportRegionHeader;
-        const filterVal = ['region', 'cycleOfInspect', 'numOfReport', 'numOfQualified', 'numOfImproved',
+        const filterVal = ['region', 'cycleOfInspect', 'numOfTotal', 'numOfQualified', 'numOfImproved',
           'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
         const self = this;
         const size = self.totalRegion;
@@ -988,7 +988,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
-        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'averageScore', 'rank'];
+        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfTotal', 'averageScore', 'rank'];
         const self = this;
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
@@ -1327,13 +1327,13 @@ export default {
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.regionMode = self.regionMode;
-      params.storeIds = self.params.curStore;
+      params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
       const overviewResult = await self.getInspectReulstStatsOverview(params);
       if (overviewResult.errCode === 0) {
         const result = overviewResult.data;
         if (result) {
-          console.log(result)
+         // console.log(result)
           this.overviewCount.store = result.numOfStores;
           this.overviewCount.items = result.numOfInspects;
           if(result.overallByAverageScore){
@@ -1353,9 +1353,10 @@ export default {
     
       const self = this;
       const params = {};
-      this.part1.pieOption = null;
-      this.part1.barRegionOption = null;
-      this.part1.barStoreOption = null;
+      this.part1.pieOption = {};
+      this.part1.barRegionOption = {};
+      this.part1.barStoreOption = {};
+      this.part1.storeTableData = null;
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.regionMode = 3;
@@ -1388,8 +1389,8 @@ export default {
     },
     async dataGetPart3(){
       this.part3.storeTableData = null;
-      this.part3.barRegionOption = null;
-      this.part3.barStoreOption = null;
+      this.part3.barRegionOption = {};
+      this.part3.barStoreOption = {};
       await this.getPart3RegionBar();
     },
     async getInspectStatsOverviewOfRegionTable() {
@@ -1465,11 +1466,11 @@ export default {
                   if(!pos){
                     pos = JSON.parse(JSON.stringify(item))
                     if(item.averageScore){
-                        totalScore += item.averageScore * item.numOfReport;
+                        totalScore += item.averageScore * item.numOfTotal;
                         console.log("X Total Score="+totalScore)
                     }
                     if(item.standardRate){
-                        totalStandard+= item.standardRate * item.numOfReport;
+                        totalStandard+= item.standardRate * item.numOfTotal;
                     }
                     pos.submitters =[item.groupName]
                     pos.groupName = d.label;
@@ -1478,15 +1479,15 @@ export default {
                     pos.numOfDargerous += item.numOfDargerous;
                     pos.numOfQualified += item.numOfQualified;
                     pos.numOfImproved += item.numOfImproved;
-                    pos.numOfReport  += item.numOfReport;
+                    pos.numOfTotal  += item.numOfTotal;
                     pos.numOfStandard += item.numOfStandard;
                     pos.submitters.push(item.groupName)
                     if(item.averageScore){
-                        totalScore += parseFloat(item.averageScore) * item.numOfReport;
+                        totalScore += parseFloat(item.averageScore) * item.numOfTotal;
                         console.log("X Total Score="+totalScore)
                     }
                     if(item.standardRate){
-                        totalStandard+= item.standardRate * item.numOfReport;
+                        totalStandard+= item.standardRate * item.numOfTotal;
                     }
                   }
                 
@@ -1495,8 +1496,8 @@ export default {
 
         
               if(pos){
-                if(totalScore>0) totalScore = (totalScore/pos.numOfReport).toFixed(1)
-                if(totalStandard>0)totalStandard=(totalStandard/pos.numOfReport).toFixed(1)
+                if(totalScore>0) totalScore = (totalScore/pos.numOfTotal).toFixed(1)
+                if(totalStandard>0)totalStandard=(totalStandard/pos.numOfTotal).toFixed(1)
                 pos.averageScore = totalScore;
                 pos.standardRate = totalStandard;
                 console.log(pos)
@@ -1578,7 +1579,7 @@ export default {
               totalDargerous += item.numOfDangerous;
               totalImproved += item.numOfImproved;
               totalQualified += item.numOfQualified;
-              totalReport += item.numOfReport;
+              totalReport += item.numOfTotal;
             });
           }
           seriesData = [
@@ -1790,8 +1791,8 @@ export default {
                                   this.part2.comapareLabels,
                                   this.part2.originArray);
             this.part2.content.forEach(function(item){
-                  totalReport += item.numOfReport;
-                  totalStandard +=  item.averageScore * item.numOfReport;
+                  totalReport += item.numOfTotal;
+                  totalStandard +=  item.averageScore * item.numOfTotal;
             })       
             this.part2.averageScore =  totalStandard>0? Math.round( (totalStandard) /totalReport):-1;
             console.log("Leave FIlterContent")
@@ -1994,7 +1995,7 @@ export default {
                                   this.part3.comapareLabels,
                                   this.part3.originArray);
             this.part3.content.forEach(function(item){
-                  totalReport += item.numOfReport;
+                  totalReport += item.numOfTotal;
                   totalStandard +=  item.numOfStandard;
             })       
             this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
@@ -2157,6 +2158,12 @@ export default {
         
 
       content.map((item,index) => {
+          item.storeGroup = item.storeRegion.toString();
+          item.storeType = item.storeBranchType.toString();
+          if(item.submitters)item.storeSubmitters = item.submitters.toString();
+          if(item.code=='')item.code='- -'
+          if(item.storeGroup=='')item.storeGroup='- -'
+          if(item.storeType=='')item.storeType='- -'
           item.rank = item.rankByAverageScore;
           item.compareTrend = this.$t('statistics.check');
           if(item.code=='')item.code='- -'
