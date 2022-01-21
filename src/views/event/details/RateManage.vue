@@ -37,11 +37,13 @@
         v-if="dialogFormVisible"
         :title="$t('eventView.view')"
         :visible.sync="dialogFormVisible"
-        :close-on-click-modal="false"
+        :close-on-click-modal="true"
         width="850px"
+        height="834px"
         top="12%"
         class="rate-video-dialog"
         @close="closeRealTime">
+        <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
         <div
           class="video-dialog-content"
           style="overflow:hidden;"
@@ -64,9 +66,11 @@
         :visible.sync="dialogCommentVideo"
         :close-on-click-modal="false"
         width="850px"
+        height="834px"
         top="12%"
         class="rate-video-dialog"
         @close="stopCommentVideo">
+        <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
         <div class="video-dialog-content" style="overflow:hidden;">
           <hr class="dialog-hr">
           <div class="video-content" >
@@ -86,14 +90,16 @@
         :visible.sync="showRelatedChannelFlag"
         :close-on-click-modal="false"
         width="540px"
+        height="834px"
         top="18%"
         class="rate-video-dialog"
         @close="showRelatedChannelFlag = false">
         <div class="video-dialog-content" style="overflow:hidden;">
+          <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
           <hr class="dialog-hr">
           <div class="channel-content" >
             <el-radio-group v-model="channelRadio" class="radio-group">
-              <el-radio v-for="(item, index) in relatedChannels" :label="item.id" :key="index" class="radio-class">
+              <el-radio v-for="(item, index) in relatedChannels" :label="item.id" :key="index" class="radio-class" @click="showRelatedChannel">
                 <img :src="cameraImg" class="radio-img">
                 <span class="radio-span">{{ item.name }}</span>
               </el-radio>
@@ -168,7 +174,7 @@
                   <span class="ahref">{{ item.name+'区域' }}</span>
                 </div>
               </div>
-              <div v-if="item.deviceId!=-1" class="imgLittle">
+              <div v-if="item.deviceId!=-1" class="imgLittle"  @click="showRelatedChannel">
                 <img :src="cameraImg" style="width:14px;height:14px;" />
                 <span style="color:#2c90d9;font-family: Roboto;font-size: 12px;margin-left:4px;">{{item.name}}</span>
               </div>
@@ -182,7 +188,7 @@
                   :preview-src-list="getImgList(index, imgsourceList)"
                   class="imgLittle imgInner"/>
               </div>
-              <div v-if="item.deviceId!=-1" class="imgLittle">
+              <div v-if="item.deviceId!=-1" class="imgLittle" @click="showRelatedChannel">
                 <img :src="cameraImg" style="width:14px;height:14px;" />
                 <span style="color:#2c90d9;font-family: Roboto;font-size: 12px;margin-left:4px;">{{item.name}}</span>
               </div>
@@ -343,7 +349,7 @@ export default {
       insiteInspectSrc: require('../../../../static/img/onsite_patrol.png'),
       startIcon: require('../../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
-      cameraImg: require('../../../../static/img/icon_camera.png'),
+      cameraImg: require('../../../../static/img/icon_camera.svg'),
       curStatus: null,
       showControlInfo: true,
       lang: this.$i18n.locale,
@@ -804,8 +810,9 @@ export default {
 
     showRelatedChannel() {
       const self = this;
-      self.showRelatedChannelFlag = true;
+      //self.showRelatedChannelFlag = true;
       self.channelRadio = self.relatedChannels[0].id;
+      this.confirmSelect();
     },
 
     cancelSelect() {
@@ -952,7 +959,7 @@ $h1:#292e36;
                 font-weight: bold;
                 color: $black;
                 margin-left: 20px;
-                max-width: calc(442/1440*100vw);
+                width: calc(442/1440*100vw);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -993,13 +1000,24 @@ $h1:#292e36;
                 user-select: none;
             }
         }
+        .dialog-title{
+          text-align:left;
+          font-size:24px;
+          padding-left:20px;
+          color:#484848;
+          font-family: NotoSansCJKtc;
+        }
         .video-dialog-content{
             width:100%;
             height:100%;
             margin: auto;
+            padding: 0 34px 42px 34px;
+            .rate-video-dialog{
+              border-radius: 5px;
+            }
+            
             .dialog-hr{
-                border: 0.5px solid ;
-                border-color: #dfe2e9;
+                border: none;
                 margin-bottom:10px;
                 bottom: 5px;
                 margin-top: 0;
@@ -1077,7 +1095,7 @@ $h1:#292e36;
             }
             .channel-content{
               margin: 20px 30px;
-              padding-top: 0;
+              padding: 0 34px 42px 34px;
               position: relative;
               .radio-group{
                 display: grid;
