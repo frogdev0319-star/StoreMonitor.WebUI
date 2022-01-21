@@ -2,10 +2,11 @@
   <el-row class="el-rate-container">
     <el-col :span="12" :style="{'height':windowHeight*0.82+'px','overflow-y': 'auto'}" class="lside">
       <div class="title-content">
-        <div>
-          <img  :src="sourceSrc"  :class="(event.sourceType!=2)?'title-img':'title-img-inside'" >
-          <span class="event-title">{{ event.eventTitle }}</span>
-        </div>
+        <img  :src="sourceSrc"  :class="(event.sourceType!=2)?'title-img':'title-img-inside'" >
+        <el-tooltip effect="light" placement="bottom">
+          <div slot="content">{{ event.eventTitle }}</div>
+          <div class="event-title">{{ event.eventTitle }}</div>
+        </el-tooltip>
         <span
             v-if="event.status === 0"
             class="event-status"
@@ -926,6 +927,7 @@ $h1:#292e36;
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.06);
         background-color: #fff;
         width: calc(540/1440*100vw);
+        margin-left: calc(24/1440*100vw);
         .title-content{
             @include title-content;
             display: flex;
@@ -950,7 +952,7 @@ $h1:#292e36;
                 font-weight: bold;
                 color: $black;
                 margin-left: 20px;
-                max-width: 50%;
+                max-width: calc(442/1440*100vw);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -1159,11 +1161,11 @@ $h1:#292e36;
                 width: 5em;
             }
             .w4{
-                font-weight: bold;
+                font-weight: normal;
                 float: left;
             }
             .en-w4{
-              font-weight: bold;
+              font-weight: normal;
               float: left;
               width: 105px
             }
@@ -1191,11 +1193,11 @@ $h1:#292e36;
             .w3{
                 letter-spacing:0.3334em; /*如果需要y个字两端对齐，则为(x-y)/(y-1),这里是（4-3）/(3-1)=0.5em */
                 margin-right:-0.3334em; /*同上*/
-                font-weight: bold;
+                font-weight: normal;
                 float: left;
             }
             .en-w3{
-              font-weight: bold;
+              font-weight: normal;
               float: left;
               width: 105px
             }
