@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width:100%"> 
     <el-row class="statistics-container">
       <el-col :span="24">
         <search-component
@@ -23,7 +23,7 @@
                     </el-col>
                 </div>
                 <el-row :span="24" class="region-overview">
-                    <el-col :span="8" class="division" @click="routeToInspectionReport">
+                    <el-col :span="8" class="division" @click.native="routeToInspectionReport">
                       <el-col class="text-area">        
                         <el-row class="top">
                            <span class="mainTitle">{{overviewCount.store>0?overviewCount.store:'N/A'}}</span>
@@ -78,7 +78,7 @@
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
                               :cur-store-type="params.curStoreType"
-                              :cur-stores="params.curStore"
+                              :cur-stores="params.storeIds"
                               :inspect-id="params.inspectId"
                               :cached-params="params"
                               :cur-country="curCountry"
@@ -149,7 +149,7 @@
                       size="mini"
                       @click="exportStore2ExcelPart1"
                   >
-                    <div class="button-area" style="margin-left:15px">
+                    <div class="button-area" style="width:120px;margin-left:15px">
                       <img :src="exportPng" class="icon-excel">
                         <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
@@ -219,7 +219,7 @@
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
                               :cur-store-type="params.curStoreType"
-                              :cur-stores="params.curStore"
+                              :cur-stores="params.storeIds"
                               :cached-params="params"
                               :inspect-id="params.inspectId"
                               :cur-country="curCountry"
@@ -288,7 +288,7 @@
                       size="mini"
                       @click="exportStore2ExcelPart2"
                   >
-                    <div class="button-area" style="margin-left:15px">
+                    <div class="button-area" style="width:120px;margin-left:15px">
                       <img :src="exportPng" class="icon-excel">
                         <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
@@ -366,7 +366,7 @@
                               :region-array2="params.curCity"
                               :cur-store-group="params.curStoreGroup"
                               :cur-store-type="params.curStoreType"
-                              :cur-stores="params.curStore"
+                              :cur-stores="params.storeIds"
                               :inspect-id="params.inspectId"
                               :cached-params="params"
                               :cur-country="curCountry"
@@ -422,7 +422,7 @@
                       size="mini"
                       @click="exportStore2ExcelPart3"
                   >
-                    <div class="button-area" style="margin-left:15px">
+                    <div class="button-area" style="width:120px;margin-left:15px">
                       <img :src="exportPng" class="icon-excel">
                         <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
@@ -1368,18 +1368,18 @@ export default {
     async searchData() {
     
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
-      this.part1.pieOption = null;
+      this.part1.pieOption = {};
       this.part1.storeTableData = null;
-      this.part1.barRegionOption = null;
-      this.part1.barStoreOption = null;
-      this.part2.pieOption = null;
+      this.part1.barRegionOption = {};
+      this.part1.barStoreOption = {};
+      this.part2.pieOption = {};
       this.part2.storeTableData = null;
-      this.part2.barRegionOption = null;
-      this.part2.barStoreOption = null;
-      this.part3.pieOption = null;
+      this.part2.barRegionOption = {};
+      this.part2.barStoreOption = {};
+      this.part3.pieOption = {};
       this.part3.storeTableData = null;
-      this.part3.barRegionOption = null;
-      this.part3.barStoreOption = null;
+      this.part3.barRegionOption = {};
+      this.part3.barStoreOption = {};
       this.overviewCount={store:-9999,items:-9999,avgScore:-9999};
       if(this.params.storeIds.length>0){
         await this.dataGetOverview();
@@ -1898,25 +1898,26 @@ export default {
 
     async dataGetPart1() {
       console.log("dataGetPart1")
-      this.part1.pieOption = null;
+      this.part1.pieOption = {};
+      this.regionsPerArray ={};
       this.part1.storeTableData = null;
-      this.part1.barRegionOption = null;
-      this.part1.barStoreOption = null;
+      this.part1.barRegionOption = {};
+      this.part1.barStoreOption = {};
       await this.getPart1RegionBar();
       //self.getInspectStatsLine();:
     },
     async dataGetPart2(){
-      this.part2.pieOption = null;
+      this.part2.pieOption = {};
       this.part2.storeTableData = null;
-      this.part2.barRegionOption = null;
-      this.part2.barStoreOption = null;
+      this.part2.barRegionOption = {};
+      this.part2.barStoreOption = {};
       await this.getPart2RegionBar();
     },
     async dataGetPart3(){
-      this.part3.pieOption = null;
+      this.part3.pieOption = {};
       this.part3.storeTableData = null;
-      this.part3.barRegionOption = null;
-      this.part3.barStoreOption = null;
+      this.part3.barRegionOption = {};
+      this.part3.barStoreOption = {};
       await this.getPart3RegionBar();
     },
     async getInspectStatsOverviewOfRegionTable() {
@@ -2097,7 +2098,7 @@ export default {
       else if(this.part1.compareType=='position'){
         let users = [];
          this.part1.originArray.forEach(function(item){
-           if(this.part1.compareIds.indexOf(item.value)>=0)
+           if(self.part1.compareIds.indexOf(item.value)>=0)
             users =  users.concat(item.contents);
          })
          params.submitters  = users;
@@ -2379,7 +2380,7 @@ export default {
       else if(this.part2.compareType=='position'){
          let users = [];
          this.part2.originArray.forEach(function(item){
-           if(this.part2.compareIds.indexOf(item.value)>=0)
+           if(self.part2.compareIds.indexOf(item.value)>=0)
             users =  users.concat(item.contents);
          })
          params.submitters  = users;
@@ -2602,7 +2603,7 @@ export default {
       else if(this.part3.compareType=='position'){
          let users = [];
          this.part3.originArray.forEach(function(item){
-           if(this.part3.compareIds.indexOf(item.value)>=0)
+           if(self.part3.compareIds.indexOf(item.value)>=0)
             users =  users.concat(item.contents);
          })
          params.submitters  = users;
@@ -3089,6 +3090,7 @@ export default {
 <style lang="scss" scoped>
   @import "../../assets/sass/stastical.scss";
   .statistics-container{
+     width:100%;
     .export-header{
       min-height: 100px;
       margin: 0 20px 20px 20px;
@@ -3108,6 +3110,7 @@ export default {
     }
 
     .statistics-content{
+      width: calc(100% - calc(60/1920*100vw));
       margin-left: calc(30/1920*100vw);
       margin-right: calc(30/1920*100vw);
       padding-left:0px;
