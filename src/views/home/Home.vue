@@ -1472,9 +1472,9 @@ $collapseWidth: 5.5%;
     margin-left: 20px;
   }
 }
-.el-dialog__headerbtn {
+/*.el-dialog__headerbtn {
   display: none;
-}
+}*/
 .el-form-item--mini.el-form-item {
   margin-bottom: 0;
 }
