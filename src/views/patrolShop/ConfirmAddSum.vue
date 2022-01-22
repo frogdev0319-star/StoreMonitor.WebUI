@@ -215,6 +215,9 @@
                                 :key="sourceindex"
                                 :height="imgHeight+'px'"
                                 class="source-details">
+                                <div v-if="sourceitem.mediaType==3">
+                                  {{sourceitem.src}}
+                                </div>
                                 <div v-if="sourceitem.mediaType==2" class="img-content">
                                   <el-image
                                     :src="sourceitem.src"
@@ -252,6 +255,9 @@
                                 :key="sourceindex"
                                 :height="imgHeight+'px'"
                                 class="source-details">
+                                <div v-if="sourceitem.mediaType==3">
+                                  {{sourceitem.src}}
+                                </div>
                                 <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
                                   <el-image
                                     :src="sourceitem.src"
@@ -284,14 +290,12 @@
                       </div>
                     </div>
                     <div v-if="_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
-                      <p class="cdm-title">{{ $t('remotePatrol.description') }}：</p>
-                      <div v-if="_item.description!=null&&_item.description!=''" >
-                        <div v-for="(text, index) in _item.description.split('|')" :key="index" class="cdm-word">
-                          <span>{{ `${index+1}. ${text}` }}</span>
-                        </div>
-                      </div>
+                      
                       <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
                         <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
+                          <div v-if="sourceitem.mediaType==3">
+                            {{sourceitem.src}}
+                          </div>
                           <div v-if="sourceitem.mediaType==2" class="img-content">
                             <el-image
                               :src="sourceitem.src"

@@ -1,13 +1,11 @@
 <template>
   <div>
-    <el-row>
-      <store-filter
-        type="patrol"
-        @emitSelectedStore = "getCurStore"
-      ></store-filter>
-    </el-row>
-    <el-row class="el-container" style="margin-top: 20px" :class="isFullScreenMode ? 'block paper' : 'flex'">
-      <el-col :span="isFullScreenMode ? 24: 12" class="lside" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" >
+    <store-filter
+      type="patrol"
+      @storeChange="onStoreChange"
+    ></store-filter>
+    <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
+      <div :class="{liseAnmiClass:showSpread}" class="lside paper spacer">
         <div class="el-header-title flex-center">
           <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
           <span v-if="showStoreUp" class="lside-title">
@@ -86,77 +84,37 @@
               autoplay/>
           </div>
         </el-dialog>
-        <el-dialog
+        <dialog-pop
           v-if="showAddTextFeedbackDialog"
           :title="$t('remotePatrol.feedbacks')"
-          :visible.sync="showAddTextFeedbackDialog"
+          :append-to-body="true"
           :close-on-click-modal="false"
-          :width="480*percentHeight+'px'"
-          top="12%">
-          <div class="canvas-content" style="overflow:hidden;">
-            <div class="dialog-event-content">
-              <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
+          :isWarning="true"
+          :visible="showAddTextFeedbackDialog"
+          @cancelHandler="showAddTextFeedbackDialog = false"
+          @confirmHandler="confirmAddTextFeedback"
+          >
+          <div class="dialog-slot">
+            <div class="dialog-event-content fullWidth">
+              <div class="margin-bottom-sm"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</div>
               <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
               <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
-              <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-              <div style="padding: 0 20px">
-                <div v-if="eventDes.trim().length > 0">
-                  <div v-for="(text, index) in eventDes.split('|')" :key="index" class="flex-center">
-                    <img :src="deleteInspectIcon" alt="delete" />
-                    <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
-                      <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                      <hr class="hr-vertical"/>
-                      <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
-                    </div>
-                  </div>
-                </div>
-                <div v-if="isEditEventDes" style="position: relative; margin-top: 10px">
-                  <el-input
-                    :autosize="{ minRows: 4, maxRows: 7}"
-                    v-model="eventDesEdit.val"
-                    :placeholder="$t('remotePatrol.descPlaceholder')"
-                    size="mini"
-                    class="des-input"
-                    type="textarea"
-                    resize="none"
-                    @input="eventDesChanged"
-                    @blur="notShowInputRuleTips('eventDes')"/>
-                  <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
-                  <el-button 
-                    size="mini" 
-                    style="position: absolute; right: 5px; bottom: 5px;"
-                    @click="itemSubmitEventDescription()"
-                  >{{$t('remotePatrol.confirm')}}</el-button>
-                </div>
-                <div v-else style="position: relative; margin-top: 10px">
-                  <el-input
-                    :autosize="{ minRows: 4, maxRows: 7}"
-                    v-model="eventDesInfo"
-                    :placeholder="$t('remotePatrol.descPlaceholder')"
-                    size="mini"
-                    class="des-input"
-                    type="textarea"
-                    resize="none"
-                    @input="eventDesChanged"
-                    @blur="notShowInputRuleTips('eventDes')"/>
-                  <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
-                  <el-button 
-                    size="mini" 
-                    style="position: absolute; right: 5px; bottom: 5px;"
-                    @click="itemSubmitEventDescription()"
-                  >{{$t('remotePatrol.confirm')}}</el-button>
-                </div>
-              </div>
+              <div class="margin-bottom-top-sm">{{ $t('remotePatrol.description') }}</div>
+              <el-input
+                :autosize="{ minRows: 2, maxRows: 7}"
+                v-model="eventDes"
+                :placeholder="$t('remotePatrol.descPlaceholder')"
+                size="mini"
+                class="des-input"
+                type="textarea"
+                resize="none"
+                @input="eventDesChanged"
+                @blur="notShowInputRuleTips('eventDes')"/>
+              <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
             </div>
           </div>
-          <div slot="footer">
-            <el-button id="cancelBtn" size="mini" @click="showAddTextFeedbackDialog = false">{{ $t('remotePatrol.cancel') }}</el-button>
-            <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddTextFeedback">
-              {{ $t('remotePatrol.confirm') }}
-            </el-button>
-          </div>
-        </el-dialog>
+        </dialog-pop>
         <el-dialog
           v-if="showFeedDialog2"
           :title="$t('remotePatrol.feedbacks')"
@@ -213,52 +171,17 @@
               <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-              <div v-if="eventDes.trim().length > 0">
-                <div v-for="(text, index) in eventDes.split('|')" :key="index" class="flex-center">
-                  <img :src="deleteInspectIcon" alt="delete" />
-                  <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
-                    <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                    <hr class="hr-vertical"/>
-                    <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
-                  </div>
-                </div>
-              </div>
-              <div v-if="isEditEventDes" style="position: relative; margin-top: 10px">
-                <el-input
-                  :autosize="{ minRows: 4, maxRows: 7}"
-                  v-model="eventDesEdit.val"
-                  :placeholder="$t('remotePatrol.descPlaceholder')"
-                  size="mini"
-                  class="des-input"
-                  type="textarea"
-                  resize="none"
-                  @input="eventDesChanged"
-                  @blur="notShowInputRuleTips('eventDes')"/>
-                <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
-                <el-button 
-                  size="mini" 
-                  style="position: absolute; right: 5px; bottom: 5px;"
-                  @click="itemSubmitEventDescription()"
-                >{{$t('remotePatrol.confirm')}}</el-button>
-              </div>
-              <div v-else style="position: relative; margin-top: 10px">
-                <el-input
-                  :autosize="{ minRows: 4, maxRows: 7}"
-                  v-model="eventDesInfo"
-                  :placeholder="$t('remotePatrol.descPlaceholder')"
-                  size="mini"
-                  class="des-input"
-                  type="textarea"
-                  resize="none"
-                  @input="eventDesChanged"
-                  @blur="notShowInputRuleTips('eventDes')"/>
-                <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
-                <el-button 
-                  size="mini" 
-                  style="position: absolute; right: 5px; bottom: 5px;"
-                  @click="itemSubmitEventDescription()"
-                >{{$t('remotePatrol.confirm')}}</el-button>
-              </div>
+              <el-input
+                :autosize="{ minRows: 4, maxRows: 7}"
+                v-model="eventDes"
+                :placeholder="$t('remotePatrol.descPlaceholder')"
+                size="mini"
+                class="des-input"
+                type="textarea"
+                resize="none"
+                @input="eventDesChanged"
+                @blur="notShowInputRuleTips('eventDes')"/>
+              <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
             </div>
           </div>
           <div slot="footer">
@@ -275,8 +198,29 @@
         <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
         <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
         <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
-        
-        <div>
+        <div v-if="showGuide && inspectList.length > 0" class="guide-content">
+          <div class="guide-rside">
+            <div class="num-content">
+              <span class="guide-num">2</span>
+              <span class="guide-title">
+                {{ $t('remotePatrol.takeSnapshot') }}
+              </span>
+            </div>
+            <img :src="arrows2Src" alt="arrow2">
+            <div class="iconright-content">
+              <div :class="lang.indexOf('zh') === -1 ? 'en-iconright' : 'iconright'">
+                <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
+                <span>{{ $t('remotePatrol.snapshot') }}</span>
+              </div>
+              <div :class="lang.indexOf('zh') === -1? 'en-iconright' : 'iconright'" style="display: none">
+                <i v-if="lang.indexOf('zh') === -1 " class="iconfont icon-luxiang iconpaizhao" style="font-size:21px;"/>
+                <i v-else class="iconfont icon-luxiang iconpaizhao" style="font-size:21px"/>
+                <span>{{ $t('remotePatrol.record') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else>
           <component
             :is="currentVideoComponent"
             ref="vendorVideo"
@@ -286,44 +230,20 @@
             :store-id="store.storeId"
             :video-authority="videoAuthority"
             @confirmEzvizCanvas="editEzvizCanvas"
-            @ezvizCutPictureFeedback="ezvizPictureFeedback"
-          />
+            @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
         </div>
         <div class="channelbar-content" style="flex: 1">
           <div class="channel-content" style="height: 100%; display: flex; flex-direction: column;">
-            <div v-if="isFullScreenMode" class="padding flex-center">
-              <span style="margin-right: 20px; line-height: 36px">{{ $t('remotePatrol.selectInspect') }}</span>
-              <el-select class="storevue-select" v-model="patrolstore" :laceholder="$t('remotePatrol.selectInspect')" @change="changeInspect">
-                <el-option
-                  v-for="item in PatrolList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                >
-                </el-option>
-              </el-select>
-              <div style="flex: 1"></div>
-              <el-button v-if="sheetName.length!=0" :disabled="!allRemarkItemsFlag && !isDisabled"
-                        :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
-                        :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
-                {{ $t('remotePatrol.confirmSum') }}
-              </el-button>
-            </div>
-            <div class="flex-center" style="margin: 20px">
-              <span style="text-align: left">{{ $t('remotePatrol.channelList') }}</span>
-              <div class="spacer"/>
-              <search-text style="width: 170px" v-model="channelFilterStr" :placeholder="$t('insSettingView.enterChannelNameFilter')"/>
-            </div>
-            <div class="channels-srollbar" style="flex: 1; overflow: auto">
+            <div class="padding" style="text-align: left">{{ $t('remotePatrol.zoneList') }}</div>
+            <div class="channels-srollbar">
               <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div>
-              <div 
-                class="btn-content" 
+              <div class="btn-content" v-if="!curItem.disabled"
                 :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
               >
                 <div 
-                  v-for="(item,index) in showChannelBtns.filter(channel => channel.name.indexOf(channelFilterStr) > -1)" 
+                  v-for="(item,index) in showChannelBtns" 
                   :key="index" 
                   class="btn-details"
                   :class="{'child-space': isFullScreenMode}"
@@ -345,380 +265,242 @@
             </div>
           </div>
         </div>
-      </el-col>
-      <el-col :span="isFullScreenMode ? 24: 12">
-        <div :class="{paper: !isFullScreenMode, flex: isFullScreenMode}" :style="isFullScreenMode ? {'margin': '0 auto 20px 0'}: {}">
-          <div style="padding: 20px">
-            <div v-if="!isFullScreenMode" class="flex-center">
-              <span style="margin-right: 20px; line-height: 36px;">{{ $t('remotePatrol.selectInspect') }}</span>
-              <el-select class="storevue-select" v-model="patrolstore" :placeholder="$t('remotePatrol.selectInspect')" @change="changeInspect">
-                <el-option
-                  v-for="item in PatrolList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                >
-                </el-option>
-              </el-select>
-              <div style="flex: 1"></div>
-              <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
-                        :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
-                        :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
-                {{ $t('remotePatrol.confirmSum') }}
-              </el-button>
-            </div>
-            <template v-if="isFullScreenMode">
-              <div v-for="(_item,_index) in sheetName" :key="_index">
-                  <template v-if="_item.isCategory">
-                    <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
-                    class="margin-bottom-top-sm"
-                    style="text-align: left; cursor: pointer"
-                         @click="changeSheet(_item,_index)">
-                      <span>{{ _item.label }}</span>
-                      <!-- <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span> -->
-                      <i class="el-icon-arrow-right icon"/>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
-                    class="margin-bottom-top-sm"
-                    style="text-align: left; cursor: pointer"
-                         @click="getItemOfCategory(_item, _index)" >
-                      <span>{{ _item.label }}</span>
-                      <!-- <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span> -->
-                      <i class="el-icon-arrow-right icon"/>
-                    </div>
-                  </template>
-                </div>
-
-            </template>
-            <template v-else>
-              <hr class="hr-horizontal" style="margin: 15px 0;"/>
-              <div class="groups">
-                <search-text style="width: 100%;" v-model="groupFilterStr" :placeholder="$t('insSettingView.enterInspectFilter')"/>
-                <div 
-                  v-for="(_item,_index) in sheetName.filter(sheet => sheet.label.indexOf(groupFilterStr) > -1)" 
-                  :key="_index" 
-                >
-                  <template v-if="_item.isCategory">
-                    <div
-                      class="group"
-                      @click="changeSheet(_item,_index)"
-                      :style="_index === 0 ? {'margin-left': 0}:{}"
-                      :class="{ group__active: _item.isClick }">
-                      {{ _item.label}}
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div 
-                      class="group"
-                      :class="{ group__active: _item.isClick }"
-                      :style="_index === 0 ? {'margin-left': 0}:{}"
-                      @click="getItemOfCategory(_item, _index)"
-                    >
-                      {{ _item.label}}
-                    </div>
-                  </template>
-                </div>
-              </div>
-            </template>
-          </div>
-
-          <div 
-            :class="{'flex-wrap':$store.getters.collapsed && isFullScreenMode}"
-            :style="isFullScreenMode?{'margin-right': '20px', 'margin-left': '20px'}:{'margin': 'auto'}" 
-            style="flex: 1; height: 600px; background-color: #edf0f2; padding: calc(25/1920*100vw); overflow: auto;">
-            <template v-if="patrolstore===''">
-              {{$t('remotePatrol.selectInspect')}}
-            </template>
-            <template v-else-if="showFeedBack">
-              <div class="paper" style="height: 100%; position: relative; padding: 20px 0; oveflow: auto">
-                <div v-if="eventList.length === 0" style="padding: 80px 24px 24px 40px; color: #006ab7; text-align: left; font-size: 24px;">
-                  <div style="margin: 0 76px 30px 0;">{{ $t('remotePatrol.methodI') }}</div>
-                  <div style="margin: 30px 52px 30.9px 0;">{{ $t('remotePatrol.methodII') }}</div>
-                </div>
-                <div v-for="(item,index) in eventList" :key="index" style="width: 100%; padding: 0 20px;">
-                  <div class="flex-center margin-bottom-sm">
-                    <span>{{ `${index+1}. ${item.eventName}` }}</span>
-                    <div style="flex: 1"></div>
-                    <div class="font-size-sm" style="border: 1px solid #c60957; padding: 3px 9px; border-radius: 5px; color: #c60957" @click="deleteEvent(item,index)">{{$t('titleView.delete')}}</div>
-                  </div>
-                  <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2">
-                    <el-image
-                      :src="item.sourceObj.src"
-                      :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
-                      :preview-src-list="getImgList(0, [item.sourceObj])"/>
-                  </div>
-                  <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1">
-                    <img class="start-icon" :src="startIcon" :height="36" @click="playCutVideo(item,index)">
-                    <img class="imgLittle" :src="videoImgSrc" height="100">
-                  </div>
-                  <div style="flex: 1; text-align: left;">
-                    <div v-if="item.eventDes.trim().length > 0">
-                      <div v-for="(text, _index) in item.eventDes.split('|')" :key="_index" class="flex-center">
-                        <img :src="deleteInspectIcon" :alt="$t('titleView.delete')" @click="editFeedback(item, index)"/>
-                        <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px">
-                          <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                          <hr class="hr-vertical"/>
-                          <img :src="editInspectIcon" @click="editFeedback(item, index)" alt="edit" style="margin: 5px"/>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <hr v-if="index !== eventList.length -1" style="margin: 20px 0"/>
-                </div>
-                <img v-if="eventList.length === 0" :src="arrows2Src" alt="arrow2" height="70" style="position: absolute; right: 125px; bottom: 100px;">
-                <img :src="plusSrc" alt="plusSrc" @click="addFeedBack" style="position: absolute; right: 20px; bottom: 20px;">
-              </div>
-            </template>
-            <template v-else>
-              <template v-if="isCategory">
-                  <div
-                    v-for="(_item,_index) in groupItems" 
-                    :key="_index"
-                    class="paper padding font-size-md"
-                    :class="{'margin-bottom-md': _index !== groupItems.length, 'margin-right-md': _index % 2 === 0 && $store.getters.collapsed}"
-                    :style="$store.getters.collapsed && isFullScreenMode ? {'width': 'calc(50% - 10px)'}: {}"
-                  >
-                    <div class="flex">
-                      <span style="border-left: 4px solid #2c90d9; padding-left: 5px;">{{_item.groupName}}</span>
-                    </div>
-                    <hr/>
-                    <div v-for="(item,index) in _item.items" :key="index" style="margin-bottom: 20px;">
-                      <div class="margin-bottom-sm flex-center" >
-                        <span
-                          style="flex: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-                          :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                          :style="item.checked?{'font-weight':'bold'}:{}"
-                          :title="`${index+1}. ${item.subject}`"
-                          @click="!item.manualIgnore && clickItem(item,index)">
-                          {{ `${item.subject}` }}
-                        </span>
-                        <template v-if="item.itemType === 0">
-                          <div 
-                            v-if="item.groupType !== 1" 
-                            class="check_scoring"
-                            style="margin-right: 20px; margin-left: 20px"
-                            :class="!item.manualIgnore?'noraml-title':'ignore-title'" 
-                          >
-                            <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
-                              :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
-                              {{ itemDS.scoreTitle }}
-                            </p>
-                          </div>
-                          <el-dropdown 
-                            :disabled="item.disabled" 
-                            v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                            trigger="click" 
-                            class="item-score" 
-                            size="small"
-                            style="margin-right: 20px; margin-left: 20px"
-                          >
-                            <span class="el-dropdown-link" :class="item.isQualified ? 'color-qualified' : 'color-unqualified'">
-                              {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                              <i class="el-icon-arrow-down el-icon--right"/>
-                            </span>
-                            <el-dropdown-menu slot="dropdown" class="score-menu">
-                              <el-dropdown-item
-                                v-for="itemDS in item.itemScoreLength"
-                                :key="itemDS"
-                                style="width:70px;text-align:center;"
-                                @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
-                            </el-dropdown-menu>
-                          </el-dropdown>
-                          <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{ $t('remotePatrol.ignore') }}</span>
-                          <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{ $t('remotePatrol.cancel') }}</span>
-                        </template>
-                        <div v-if="item.checked" class="icon-clicked"/>
-                      </div>
-                      <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="font-size-sm" style="text-align: left">
-                        {{ item.description }}
-                      </div>
-                      <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{$t('remotePatrol.failedRecord') + item.lastUnqualifiedNumber}} </div>
-                      <div v-if="item.inspectText.trim().length > 0">
-                        <div v-for="(text, index) in item.inspectText.split('|')" :key="index" class="flex-center">
-                          <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
-                          <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${item.inspectEdit.index === index ? '#006ab7': 'transparent'}` }">
-                            <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                            <hr class="hr-vertical"/>
-                            <img @click="editDescription(index, item)" :src="editInspectIcon" alt="edit" style="margin: 5px"/>
-                          </div>
-                        </div>
-                      </div>
-                      <div v-if="item.isEditingInspect" style="position: relative; margin-top: 10px">
-                        <el-input
-                          :autosize="{ minRows: 2, maxRows:7}"
-                          v-model="item.inspectEdit.val"
-                          :placeholder="$t('remotePatrol.coment')"
-                          :disabled="item.disabled"
-                          size="mini"
-                          class="des-input"
-                          type="textarea"
-                          resize="none"
-                          @input="(val)=>itemDescriptionChanged(val,item)"
-                          @blur="notShowInputRuleTips('item',item)"/>
-                        <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-                        <el-button 
-                          size="mini" 
-                          :disabled="item.disabled"
-                          style="position: absolute; right: 5px; bottom: 5px;"
-                          @click="itemSubmitDescription(item)"
-                        >{{$t('remotePatrol.confirm')}}</el-button>
-                      </div>
-                      <div v-else style="position: relative">
-                        <el-input
-                          :autosize="{ minRows: 2, maxRows:7}"
-                          v-model="item.inspectInput"
-                          :placeholder="$t('remotePatrol.coment')"
-                          :disabled="item.disabled"
-                          size="mini"
-                          class="des-input"
-                          type="textarea"
-                          resize="none"
-                          @input="(val)=>itemDescriptionChanged(val,item)"
-                          @blur="notShowInputRuleTips('item',item)"/>
-                        <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-                        <el-button 
-                          size="mini" 
-                          :disabled="item.disabled"
-                          style="position: absolute; right: 5px; bottom: 5px;"
-                          @click="itemSubmitDescription(item)"
-                        >{{$t('remotePatrol.confirm')}}</el-button>
-                      </div>
-                    </div>
-                  </div>
-              </template>
-              <template v-else>
-                <div class="paper padding font-size-md">
-                  <div class="flex">
-                    <span style="border-left: 4px solid #2c90d9; padding-left: 5px;">{{ this.curGroup && this.curGroup.label }}</span>
-                  </div>
-                  <hr/>
-                  <div v-for="(item,index) in inspectItemList" :key="index" style="margin-bottom: 20px;">
-                      <div class="margin-bottom-sm flex-center" >
-                        <span
-                          style="flex: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-                          :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                          :style="item.checked?{'font-weight':'bold'}:{}"
-                          :title="`${index+1}. ${item.subject}`"
-                          @click="!item.manualIgnore && clickItem(item,index)">
-                          {{ `${item.subject}` }}
-                        </span>
-                        <template v-if="item.itemType === 0">
-                          <div 
-                            v-if="item.groupType !== 1" 
-                            class="check_scoring"
-                            style="margin-right: 20px; margin-left: 20px"
-                            :class="!item.manualIgnore?'noraml-title':'ignore-title'" 
-                          >
-                            <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
-                              :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore(item,itemDS,0)">
-                              {{ itemDS.scoreTitle }}
-                            </p>
-                          </div>
-                          <el-dropdown 
-                            :disabled="item.disabled" 
-                            v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                            trigger="click" 
-                            class="item-score" 
-                            size="small"
-                            style="margin-right: 20px; margin-left: 20px"
-                          >
-                            <span class="el-dropdown-link">
-                              {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                              <i class="el-icon-arrow-down el-icon--right"/>
-                            </span>
-                            <el-dropdown-menu slot="dropdown" class="score-menu">
-                              <el-dropdown-item
-                                v-for="itemDS in item.itemScoreLength"
-                                :key="itemDS"
-                                style="width:70px;text-align:center;"
-                                @click.native="checkScore(item,itemDS,1)">{{ itemDS }}</el-dropdown-item>
-                            </el-dropdown-menu>
-                          </el-dropdown>
-                          <span class="font-size-sm" v-if="!item.manualIgnore" @click="ignoreItem(item,index,0)">{{$t('remotePatrol.ignore')}}</span>
-                          <span class="font-size-sm" v-else @click="CancleIgnoreItem(item,index)">{{$t('remotePatrol.cancel')}}</span>
-                        </template>
-                        <div v-if="item.checked" class="icon-clicked"/>
-                      </div>
-                      <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="font-size-sm" style="text-align: left">
-                        {{ item.description }}
-                      </div>
-                      <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
-                        <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                          <div v-if="_item.mediaType==2" class="img-content">
-                            <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                            <el-image
-                              :src="_item.src"
-                              :style="{width: _item.width, height: _item.height}"
-                              :preview-src-list="getImgList(_index, item.sourceList)"/>
-                          </div>
-                          <div v-if="_item.mediaType==1" class="img-content">
-                            <i class="el-icon-close icondelete" @click="deleteImg(item,_index)" />
-                            <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
-                            <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="font-size-sm flex-center margin-bottom-top-sm" style="color: #006ab7">{{$t('remotePatrol.failedRecord') + item.lastUnqualifiedNumber}} </div>
-                        <div v-if="item.inspectText.trim().length > 0">
-                          <div v-for="(text, index) in item.inspectText.split('|')" :key="index" class="flex-center">
-                            <img @click="deleteDescription(index, item)" :src="deleteInspectIcon" alt="delete" />
-                            <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${item.inspectEdit.index === index ? '#006ab7': 'transparent'}` }">
-                              <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                              <hr class="hr-vertical"/>
-                              <img @click="editDescription(index, item)" :src="editInspectIcon" alt="edit" style="margin: 5px"/>
-                            </div>
-                          </div>
-                        </div>
-                        <div v-if="item.isEditingInspect" style="position: relative; margin-top: 10px">
-                          <el-input
-                            :autosize="{ minRows: 2, maxRows:7}"
-                            v-model="item.inspectEdit.val"
-                            :placeholder="$t('remotePatrol.coment')"
-                            :disabled="item.disabled"
-                            size="mini"
-                            class="des-input"
-                            type="textarea"
-                            resize="none"
-                            @input="(val)=>itemDescriptionChanged(val,item)"
-                            @blur="notShowInputRuleTips('item',item)"/>
-                          <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-                          <el-button 
-                            size="mini" 
-                            :disabled="item.disabled"
-                            style="position: absolute; right: 5px; bottom: 5px;"
-                            @click="itemSubmitDescription(item)"
-                          >{{$t('remotePatrol.confirm')}}</el-button>
-                        </div>
-                        <div v-else style="position: relative">
-                          <el-input
-                            :autosize="{ minRows: 2, maxRows:7}"
-                            v-model="item.inspectInput"
-                            :placeholder="$t('remotePatrol.coment')"
-                            :disabled="item.disabled"
-                            size="mini"
-                            class="des-input"
-                            type="textarea"
-                            resize="none"
-                            @input="(val)=>itemDescriptionChanged(val,item)"
-                            @blur="notShowInputRuleTips('item',item)"/>
-                          <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
-                          <el-button 
-                            size="mini" 
-                            :disabled="item.disabled"
-                            style="position: absolute; right: 5px; bottom: 5px;"
-                            @click="itemSubmitDescription(item)"
-                          >{{$t('remotePatrol.confirm')}}</el-button>
-                        </div>
-                  </div>
-                </div>
-              </template>
-            </template>
+      </div>
+      <div :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" v-if="!showSpread" class="rside paper spacer ">
+        <div class="patrol-select" :class="{'padding': !isFullScreenMode}">
+          <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
+            {{ $t('remotePatrol.selectInspect') }}
+            <el-select 
+              style="margin-left: 20px"
+              class="storevue-select" 
+              v-model="patrolstore" 
+              :placeholder="$t('remotePatrol.selectInspect')"
+              @change="changeInspect">
+              <el-option
+                v-for="item in PatrolList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+            <div class="spacer"></div>
+            <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
+                      :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
+                      :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
+              {{ $t('remotePatrol.confirmSum') }}
+            </el-button>
           </div>
         </div>
-      </el-col>
-    </el-row>
+        <hr class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
+        <div v-if="sheetName.length!=0&&!showIgnoreItem" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
+          <div v-if="isFullScreenMode" style="width: 200px">
+            <div v-for="(_item,_index) in sheetName" :key="_index">
+                <template v-if="_item.isCategory">
+                  <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
+                  class="margin-bottom-top-sm"
+                  style="text-align: left; cursor: pointer"
+                        @click="changeSheet(_item,_index)">
+                    <span>{{ _item.label }}</span>
+                    <!-- <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span> -->
+                    <i class="el-icon-arrow-right icon"/>
+                  </div>
+                </template>
+                <template v-else>
+                  <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
+                  class="margin-bottom-top-sm"
+                  style="text-align: left; cursor: pointer"
+                        @click="getItemOfCategory(_item, _index)" >
+                    <span>{{ _item.label }}</span>
+                    <!-- <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span> -->
+                    <i class="el-icon-arrow-right icon"/>
+                  </div>
+                </template>
+              </div>
+          </div>
+          <div v-else class="flex-center padding" style="flex-wrap: wrap">
+            <div v-for="(_item,_index) in sheetName" :key="_index">
+              <template v-if="_item.isCategory">
+                <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                      @click="changeSheet(_item,_index)">
+                  <span>{{ _item.label }}</span>
+                  <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span>
+                </div>
+              </template>
+              <template v-else>
+                <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                      @click="getItemOfCategory(_item, _index)" >
+                  <span>{{ _item.label }}</span>
+                  <span v-if="_item.groupId==undefined">（{{ _item.dealCount+'/'+_item.count }}）</span>
+                </div>
+              </template>
+            </div>
+          </div>
+          <div class="fullWidth">
+            <div v-if="!showFeedBack" class="padding spacer" style="height: 60vh; overflow: auto; background-color: #edf0f2;">
+              <div v-for="(item,index) in inspectItemList" :key="index" class="paper padding" style="text-align: left" :class="{'margin-bottom-md': index!==inspectItemList.length}">
+                <template v-if="Array.isArray(item)">
+                  <inspection-item 
+                    v-for="(_item, _index) in item" 
+                    :item="_item" 
+                    :key="_item.id"
+                    :index="_index"
+                    :class="{'margin-bottom-sm': _index !== item.length}"
+                    @emitClickItem="clickItem"
+                    @emitCheckScore="checkScore"
+                    @emitIgnoreItem="ignoreItem"
+                    @emitCancleIgnoreItem="CancleIgnoreItem"
+                    @emitDeleteImg="deleteImg"
+                    @emitGetImgList="getImgList"
+                    @emitItemDescriptionChanged="itemDescriptionChanged"
+                    @emitNotShowInputRuleTips="notShowInputRuleTips"
+                    @emitSubmitItemComment="submitItemResource"
+                    @emitEditItemResource="editItemResource"
+                    @emitDeleteItemResource="deleteItemResource"
+                  ></inspection-item>
+                </template>
+                <template v-else>
+                  <inspection-item 
+                    :item="item"
+                    :index="index"
+                    @emitClickItem="clickItem"
+                    @emitCheckScore="checkScore"
+                    @emitIgnoreItem="ignoreItem"
+                    @emitCancleIgnoreItem="CancleIgnoreItem"
+                    @emitDeleteImg="deleteImg"
+                    @emitGetImgList="getImgList"
+                    @emitItemDescriptionChanged="itemDescriptionChanged"
+                    @emitNotShowInputRuleTips="notShowInputRuleTips"
+                    @emitSubmitItemComment="submitItemResource"
+                    @emitEditItemResource="editItemResource"
+                    @emitDeleteItemResource="deleteItemResource"
+                  ></inspection-item>
+                </template>
+              </div>
+            </div>
+            <div v-if="showFeedBack" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
+              <div v-if="showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px; height: calc(100% - 40px); position: relative">
+                <div id="feedback-content">
+                  <div class="feedback-info">{{ $t('remotePatrol.methodI') }}</div>
+                  <div class="feedback-info">{{ $t('remotePatrol.methodII') }}</div>
+                </div>
+                <img :src="arrows2Src" alt="arrow2" style="position: absolute; bottom: 90px; right: 100px" height="70">
+                <img :src="plusSrc" alt="plusSrc" style="position: absolute; bottom: 20px; right: 20px" @click="addFeedBack">
+              </div>
+              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px">
+                <div class="feedbacks-content padding">
+                  <div v-for="(item,index) in eventList" :key="index" class="flex-center" :class="{'margin-bottom-sm': index !== eventList.length}">
+                    <img
+                      :src="crossicon"
+                      alt="delete"
+                      @click="deleteEvent(item,index)"
+                    />
+                    <div
+                      class="paper flex-center"
+                      style="padding: 5px; flex: 1; margin-left: 20px"
+                    >
+                      <div @click="editFeedback(item, index)" class="title-description spacer" style="text-align: left">
+                        <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
+                        <span class="feedback-eventdes">{{ item.eventDes }}</span>
+                      </div>
+                      <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
+                        <el-image
+                          :src="item.sourceObj.src"
+                          :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                          :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
+                      </div>
+                      <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
+                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(item,index)">
+                        <img :src="videoImgSrc" class="imgLittle" height="100">
+                      </div>
+                      <hr class="hr-vertical" />
+                      <img
+                        :src="penicon"
+                        alt="edit"
+                        style="margin: 5px"
+                        @click="editFeedback(item, index)"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack" style="float: right; margin-top: 20px">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-if="showIgnoreItem">
+          <div v-for="(item,index) in hasIgnoretemp" :key="index" class="item-details">
+            <span
+              :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+              :style="item.checked?{'font-weight':'bold'}:{}"
+              :title="`${index+1}. ${item.subject}`"
+              class="titles"
+              @click="clickItem({ item, index })">{{ `${index+1}. ${item.subject}` }}</span>
+            <div v-if="item.disabled" class="dropdown-model"/>
+            <template v-if="item.itemType === 0">
+              <div v-if="item.type!=1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
+                <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                    :class="itemDS.isClick?'check_isClick':'check_normal'"
+                    @click="checkIgnoreScore(item,itemDS,0,index)">{{ itemDS.scoreTitle }}</p>
+              </div>
+              <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'" trigger="click" class="item-score" size="small">
+              <span class="el-dropdown-link">
+                {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
+                <i class="el-icon-arrow-down el-icon--right"/>
+              </span>
+                <el-dropdown-menu slot="dropdown" class="score-menu">
+                  <el-dropdown-item
+                    v-for="itemDS in item.itemScoreLength"
+                    :key="itemDS"
+                    style="width:70px;text-align:center;"
+                    @click.native="checkIgnoreScore(item,itemDS,1,index)">{{ itemDS }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem({item,index,e:1})"/>
+              <img v-if="item.manualIgnore" class="iconfont iconhulve" src="../../../static/img/ignore_cancel.png"
+                    @click="CancleIgnoreItem({item,index})">
+            </template>
+            <div v-if="item.checked" class="icon-clicked"/>
+            <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
+              {{ item.description }}
+            </div>
+            <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
+              <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                <div v-if="_item.mediaType==2" class="img-content">
+                  <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
+                  <el-image
+                    :src="_item.src"
+                    :style="{width: _item.width, height: _item.height}"
+                    :preview-src-list="getImgList({index: _index, sourceList: item.sourceList})"/>
+                </div>
+                <div v-if="_item.mediaType==1" class="img-content">
+                  <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
+                  <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
+                  <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
+                </div>
+              </div>
+            </div>
+            <el-input
+              :autosize="{ minRows: 2, maxRows:7}"
+              v-model="item.inspectInput"
+              :placeholder="$t('remotePatrol.coment')"
+              :disabled="item.disabled"
+              size="mini"
+              class="des-input"
+              type="textarea"
+              resize="none"
+              @input="(val)=>itemDescriptionChanged({val,item})"
+              @blur="notShowInputRuleTips('item',item)"/>
+            <span v-if="item.Ruletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+          </div>
+        </div>
+        <div v-if="sheetName.length==0" class="spacer flex-center" style="align-items: center; justify-content: center">
+          <div class="inspect-empty">
+            <span>{{ $t('remotePatrol.noItems') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -727,6 +509,8 @@ import util from '@/common/util';
 import { getStoreList, addFavoriteStore, deleteFavoriteStore } from '@/api/store';
 import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
+import InspectionItem from '@/components/InspectionItem.vue';
+import DialogPop from '@/components/DialogPop.vue';
 import DialogVue from '@/components/DialogVue.vue';
 import ChannelIconBtn from '@/components/ChannelIconBtn.vue';
 import { getCookie } from '@/common/auth';
@@ -737,25 +521,23 @@ import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
 import StoreFilter from '@/components/StoreFilter_';
-import SearchText from '@/components/SearchText';
 
 export default {
   name: 'ReInspection',
   components: {
+    InspectionItem,
+    DialogPop,
     DialogVue,
     ChannelIconBtn,
     SkywatchVideo,
     DashVideo,
     EzvizVideo,
     BeseyeVideo,
-    StoreFilter,
-    SearchText
+    StoreFilter
   },
   data() {
     return {
-      defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-      sel: 'val1',
-      options: [],
+      isFullScreenMode: false,
       sheetName: [],
       isShowWarn: false,
       notShowAlert: false,
@@ -763,7 +545,6 @@ export default {
       PatrolList: [],
       showControls: false,
       showGuide: true,
-      showFavorite: false,
       sourceList: [],
       isDisabled: false,
       penBtnSrc: require('../../../static/img/edit_btn.png'),
@@ -800,6 +581,9 @@ export default {
       showVideo: true,
       showCancelContent: false,
       showSpread: false,
+      curSelStoreId: '',
+      storeList: [],
+      storeList_: [],
       tabList: [
         {
           label: this.$t('remotePatrol.star'),
@@ -922,9 +706,6 @@ export default {
       hideNext: false,
       eventName: '',
       eventDes: '',
-      eventDesInfo: '',
-      eventDesEdit: {index: -1, val: ''},
-      isEditEventDes: false,
       showFeedBackInfo: true,
       showAddFeedBackBtn: true,
       timerPlayReal: null,
@@ -951,12 +732,7 @@ export default {
       itemOptionsForType1: [],
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
-      isFullScreenMode: false,
-      groupItems: [],
-      storeOptions: [],
-      channelFilterStr: '',
-      groupFilterStr: '',
-      activeStore: {}
+      curEditIndex: -1
     };
   },
   computed: {
@@ -1034,11 +810,11 @@ export default {
   async mounted() {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
-    console.log(PatrolHistory)
     if (PatrolHistory != null) {
+      console.log(PatrolHistory)
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
-
+      self.storeList = PatrolHistory.storeList
       const indexFeed = PatrolHistory.sheetName.map(x => x.groupId).indexOf('feedBack');
       let getdealnum = 0;
       const sheetName = PatrolHistory.sheetName.slice(0, indexFeed);
@@ -1086,7 +862,7 @@ export default {
         self.notShowAlert = true;
       }
     } else {
-      self.getFaStoreData();
+      self.getAllStore();
     }
     document.onmouseup = self.mouseUpAction;
     self.getUpLoadBucketInfo();
@@ -1102,34 +878,7 @@ export default {
   },
 
   methods: {
-    getCurStore(storeArr) {
-      const key = 'activeStore';
-      this.activeStore = {...storeArr[0]}
-      this.changeStore(this.activeStore)
-      localStorage.setItem(key, storeArr[0].storeId)
-    },
-    clickStore(item, index, _item, _index) {
-      const self = this;
-      if (!_item.hasInspect && _item.hasInspect != undefined) {
-        return false;
-      }
-      if (!util.validateLicense(_item.status)) {
-        return false;
-      }
-      self.curTabIndex = index;
-      self.curTabItem = item;
-      self.curStoreIndex = _index;
-      self.curStoreItem = _item;
-      self.deviceList = _item.device;
-      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
-          || (self.$store.getters.PatrolHistory != null) ) {
-        self.changeStoreObj.dialogCosed = true;
-      } else {
-        self.changeStore(item, index, _item, _index);
-      }
-    },
-
-    changeStore(_item) {
+    changeStore_(_item) {
       const self = this;
       self.patrolstore = '';
       self.curSheetIndex = 0;
@@ -1137,6 +886,7 @@ export default {
       self.inspectList = [];
       self.sheetName = [];
       self.tempArr = [];
+      self.showChannelBtns = [];
       self.patrolStoreName = _item.name;
       self.PatrolList = [];
       self.hasIgnoretemp = [];
@@ -1144,9 +894,6 @@ export default {
       self.isShowWarn = false;
       self.notShowAlert = false;
       self.showIgnoreItem = false;
-      self.allChannelBtns = [..._item.device]
-      self.showChannelBtns = [..._item.device];
-      console.log(this.curItem)
       _item.authorizedInspect.forEach(au_item => {
         if (au_item.mode === 0) {
           self.PatrolList.push(au_item);
@@ -1175,6 +922,12 @@ export default {
         obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
       }
       self.store = obj;
+      let curStoreId = '';
+      curStoreId = _item.storeId;
+      const storeObj = {
+        storeId: curStoreId
+      };
+      self.saveStoreObj(storeObj);
     },
     changeBrand() {
       const self = this;
@@ -1200,7 +953,7 @@ export default {
       self.showChannelBtns = [];
       self.showError = false;
       self.errorText = '';
-      self.getFaStoreData();
+      self.getAllStore();
     },
     anchorLinkTo() {
       const self = this;
@@ -1402,7 +1155,7 @@ export default {
       item.dealCount = item.Effective = item.inputCount = 1;
     },
 
-    checkScore(item, itemDS, e) {
+    checkScore({item, itemDS, e}) {
       const self = this;
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
@@ -1499,6 +1252,43 @@ export default {
       });
       return tempArray;
     },
+    async getStoreList_() {
+      const self = this;
+      const getStoreTemp = data => {
+        const temp = [];
+        data.forEach((item, index) => {
+          const obj = {};
+          if (self.store.storeId == item.storeId) {
+            obj.isActive = true;
+          } else {
+            obj.isActive = false;
+          }
+          obj.storeId = item.storeId;
+          obj.name = item.name;
+          obj.userId = item.userId;
+          obj.favorite = item.favorite == undefined ? true : item.favorite;
+          obj.device = item.device;
+          obj.status = item.status;
+          if (item.authorizedInspect.length != 0) {
+            const remoteInspectList = item.authorizedInspect.filter(inspcetItem => inspcetItem.mode === 0);
+            if(remoteInspectList.length > 0){
+              obj.authorizedInspect = item.authorizedInspect;
+              obj.hasInspect = true;
+            } else {
+              obj.hasInspect = false;
+            }
+
+          } else {
+            obj.hasInspect = false;
+          }
+          temp.push(obj);
+        });
+        return temp;
+      };
+      let data;
+      data = self.getStoreObj();
+      this.storeList = getStoreTemp(data);
+    },
     async getStoreList() {
       const self = this;
       const getStoreTemp = data => {
@@ -1555,6 +1345,52 @@ export default {
           break;
       }
     },
+    
+    onStoreChange (storeData) {
+      console.log(storeData)
+      this.curSelStoreId = storeData.curStore
+      this.historyObj = {
+        ...this.historyObj,
+        
+      }
+      const storeItem = this.storeList.find(store => store.storeId === storeData.curStore)
+      this.changeStore_(storeItem)
+    },
+    async getAllStore () {
+      const self = this;
+      const getStoreTemp = data => {
+        const temp = [];
+        data.forEach((item, index) => {
+          const obj = {};
+          obj.storeId = item.storeId;
+          obj.name = item.name;
+          obj.userId = item.userId;
+          obj.favorite = item.favorite == undefined ? true : item.favorite;
+          obj.device = item.device;
+          obj.isActive = false;
+          obj.status = item.status;
+          if (item.authorizedInspect.length != 0) {
+            obj.authorizedInspect = item.authorizedInspect;
+            obj.hasInspect = true;
+            if (index == 0) {
+              obj.isActive = true;
+            }
+          } else {
+            obj.hasInspect = false;
+          }
+          temp.push(obj);
+        });
+        return temp;
+      };
+      const allStoreData = await self.getAllStoreList();
+      if (allStoreData.errCode === 0) {
+        self.getInitStoreData(allStoreData);
+        const storeData = allStoreData.data.content;
+        self.storeList = getStoreTemp(storeData);
+        const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
+        self.changeStore_(storeItem)
+      }
+    },
     async getFaStoreData() {
       const self = this;
       const getStoreTemp = data => {
@@ -1584,8 +1420,7 @@ export default {
       const allStoreData = await self.getAllStoreList();
       if (allStoreData.errCode === 0) {
         self.getInitStoreData(allStoreData);
-        const storeData = allStoreData.data.content
-        // console.log(storeData)
+        const storeData = allStoreData.data.content.filter(store => store.favorite === true);
         self.tabList[0].storeList = getStoreTemp(storeData);
         if (storeData.length === 0) {
           self.showStoreUp = false;
@@ -1757,20 +1592,27 @@ export default {
     mouseoutGroup(item, index) {
       item.isHover = false;
     },
-    getItemByGroup(item, index) {
+    getItemByGroup(group, index, sheet) {
+      let inspectItems = []
+      if (sheet) {
+        sheet.inspectList.forEach(inspect => {
+          inspectItems.push(inspect.items)
+        })
+      } else {
+        inspectItems = group.items
+      }
       const self = this;
-      // console.log(item)
       self.curGroupIndex = index;
-      self.curGroup = item;
+      self.curGroup = group;
       self.curItemIndex = 0;
-      self.inspectItemList = item.items;
+      self.inspectItemList = inspectItems;
       self.showFeedBack = false;
       self.hideNext = false;
       self.hideLast = false;
-      // self.channelBtns = [];
-      this.groupType = item.type;
+      self.channelBtns = [];
+      this.groupType = group.type;
       this.isCategory = true;
-      item.isClick = true;
+      group.isClick = true;
       this.$nextTick(() => {
         self.anchorLinkTo();
       });
@@ -1782,7 +1624,6 @@ export default {
     },
 
     getItemOfCategory(item, index){
-      console.log(item)
       this.inspectItemList = [];
       this.curGroupIndex = 0;
       this.curSheetIndex = index;
@@ -1805,12 +1646,12 @@ export default {
           _item.isClick = false;
         }
       });
-      this.groupItems = this.inspectItemList
     },
 
     getDeviceById(deviceId) {
+      const self = this;
       const device = [];
-      this.deviceList.forEach(item => {
+      self.deviceList.forEach(item => {
         deviceId.forEach(_item => {
           if (_item == item.id) {
             device.push(item);
@@ -1820,7 +1661,7 @@ export default {
       return device;
     },
 
-    getImgList(index, sourceList) {
+    getImgList({index, sourceList}) {
       const arr = [];
       let i = 0;
       for (i; i < sourceList.length; i++) {
@@ -1832,7 +1673,7 @@ export default {
       return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
 
-    deleteImg(item, index) {
+    deleteImg({item, index}) {
       const self = this;
       item.sourceList.splice(index, 1);
       self.sourceListLength--;
@@ -1851,7 +1692,6 @@ export default {
           self.hasIgnoretemp[self.curItemIndex].dealCount = 1;
         }
         if (self.hasIgnoretemp[self.curItemIndex].manualIgnore) {
-          self.hasIgnoretemp[self.curItemIndex].inspectText = '';
           self.hasIgnoretemp[self.curItemIndex].inspectInput = '';
           self.hasIgnoretemp[self.curItemIndex].sourceList = [];
           self.hasIgnoretemp[self.curItemIndex].itemScoreTitle = '--';
@@ -1870,7 +1710,6 @@ export default {
           self.sheetName[self.curSheetIndex].dealCount++;
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore) {
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectText = '';
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = [];
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle = '--';
@@ -1922,8 +1761,7 @@ export default {
       const self = this;
       self.CancleIgnoreInspectObj.dialogCosed = false;
     },
-    ignoreItem(item, index, e) {
-      
+    ignoreItem({item, index, e}) {
       const self = this;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
@@ -1934,19 +1772,19 @@ export default {
         self.hasIgnoretemp[index].checked = false;
         self.hasIgnoretemp[index].disabled = false;
       }
-      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount++;
+      self.$refs.vendorVideo.editCount++;
       self.curItemIndex = index;
       self.curItem = item;
-      // if (item.deviceId === -1) {
-      //   self.noBindDeviceObj.dialogCosed = true;
-      //   return false;
-      // }
-      if (self.$refs.vendorVideo) self.$refs.vendorVideo.stopVideoPlay();
+      if (item.deviceId === -1) {
+        self.noBindDeviceObj.dialogCosed = true;
+        return false;
+      }
+      self.$refs.vendorVideo.stopVideoPlay();
       self.handleIgnore();
     },
-    CancleIgnoreItem(item, index) {
+    CancleIgnoreItem({item, index}) {
       const self = this;
-      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount--;
+      self.$refs.vendorVideo.editCount--;
       self.curItemIndex = index;
       self.curItem = item;
       self.cancleIgnore();
@@ -1983,20 +1821,41 @@ export default {
         self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
       });
     },
-    clickItem(item, index) {
+    clickItem({item, index}) {
       const self = this;
       if (item.isIgnore) {
         return false;
       }
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
-      item.checked = true;
+      self.showGuide = false;
+      self.channel = {...self.allChannelBtns[0]};
+      self.vendor = self.channel.vendor;
+      self.channelBtns = [...self.allChannelBtns];
+      self.showError = false;
+      self.showGuide = false;
+      self.$nextTick(() => {
+        self.showGuide = false;
+        self.getshowBtns(self.channelBtns);
+      });
+      self.channelBtns.forEach((_item, _index) => {
+        if (self.channel != null) {
+          if (_item.id === self.channel.id) {
+            _item.isClick = true;
+          } else {
+            _item.isClick = false;
+          }
+        }
+      });
+      self.$nextTick(() => {
+        self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+      });
+      self.curDeviceId = item.deviceId[0];
       self.curItem = item;
       self.curItemIndex = index;
       self.curItemId = item.id;
       item.disabled = false;
-      
-
+      item.checked = true;
       self.inspectItemList.forEach((_item, _index) => {
         if (index != _index) {
           _item.checked = false;
@@ -2069,7 +1928,6 @@ export default {
             item.items.forEach((_item, _index) => {
               if (_item.inputCount === 0) {
                 _item.isIgnore = true;
-                _item.inspectText = '';
                 _item.inspectInput = '';
                 _item.sourceList = [];
                 if (inspectSettings.qualifiedForIgnoredWithType1 && _item.type === 0
@@ -2089,7 +1947,6 @@ export default {
               this.hasIgnoretemp.forEach((h_item, h_index) => {
                 if (this.hasIgnoretemp[h_index].inputCount == 0) {
                   this.hasIgnoretemp[h_index].isIgnore = true;
-                  this.hasIgnoretemp[h_index].inspectText = '';
                   this.hasIgnoretemp[h_index].inspectInput = '';
                   this.hasIgnoretemp[h_index].sourceList = [];
                   if (inspectSettings.qualifiedForIgnoredWithType1 && h_item.type === 0
@@ -2270,6 +2127,75 @@ export default {
       self.tabList[2].storeList = getStore2Temp(tempArray);
     },
 
+    changeStore(item, index, _item, _index) {
+      const self = this;
+      self.patrolstore = '';
+      self.curSheetIndex = 0;
+      self.inspectItemList = [];
+      self.inspectList = [];
+      self.sheetName = [];
+      self.tempArr = [];
+      self.showChannelBtns = [];
+      self.patrolStoreName = _item.name;
+      self.PatrolList = [];
+      self.hasIgnoretemp = [];
+      self.$store.dispatch('setPatrolHistory', null);
+      self.isShowWarn = false;
+      self.notShowAlert = false;
+      self.showIgnoreItem = false;
+      _item.authorizedInspect.forEach(au_item => {
+        if (au_item.mode === 0) {
+          self.PatrolList.push(au_item);
+        }
+      });
+      _item.isActive = true;
+      self.showStoreUp = true;
+
+      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
+      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
+      self.showError = false;
+      self.curDeviceId = -1;
+      self.showFeedBack = false;
+      self.eventList = [];
+      self.showGuide = true;
+      const obj = {};
+      obj.storeId = _item.storeId;
+      obj.storeName = _item.name;
+      obj.storeTitle = _item.name;
+      obj.storeUp = _item.favorite;
+      self.channel = null;
+      self.getChannelByStore(_item);
+      if (_item.favorite) {
+        obj.storeUpTitle = this.$t('remotePatrol.stared');
+      } else {
+        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
+      }
+      self.store = obj;
+      let curStoreId = '';
+      const tabIndex = Number(self.activeIndex);
+      if (tabIndex != 2) {
+        item.storeList.forEach((itemS, indexS) => {
+          if (_index != indexS) {
+            itemS.isActive = false;
+          }
+        });
+        curStoreId = _item.storeId;
+      } else {
+        item.storeList.forEach((itemS, indexS) => {
+          itemS.storeList.forEach((itemChild, indexChild) => {
+            if (itemChild.storeId != _item.storeId) {
+              itemChild.isActive = false;
+            } else {
+              curStoreId = itemChild.storeId;
+            }
+          });
+        });
+      }
+      const storeObj = {
+        storeId: curStoreId
+      };
+      self.saveStoreObj(storeObj);
+    },
     changeBrandDialog() {
       const self = this;
     },
@@ -2408,7 +2334,7 @@ export default {
       self.notShowAlert = false;
       self.showIgnoreItem = false;
       self.eventList = [];
-      // self.showChannelBtns = [];
+      self.showChannelBtns = [];
       self.curSheetIndex = 0;
       self.PatrolList.forEach(item => {
         if (item.id == val) {
@@ -2512,10 +2438,7 @@ export default {
               itemObj.itemScoreTitle = '--';
               // itemObj.deviceId=_item.deviceId;
               itemObj.deviceId = _item.deviceIds;
-              itemObj.inspectText = '';
               itemObj.inspectInput = '';
-              itemObj.inspectEdit = {index: -1, val: ''};
-              itemObj.isEditingInspect = false;
               itemObj.inputCount = 0;
               itemObj.disabled = true;
               itemObj.checked = false;
@@ -2576,7 +2499,6 @@ export default {
           if (self.sheetName.length != 0) {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
-            this.groupItems = self.inspectList
           }
         }
       })
@@ -2694,7 +2616,7 @@ export default {
       } else {
         self.inspectList = item.inspectList;
         self.curSheetIndex = index;
-        self.getItemByGroup(item.inspectList[0], 0);
+        self.getItemByGroup(item.inspectList[0], 0, item);
       }
       self.sheetName.forEach((_item, _index) => {
         if (index == _index) {
@@ -2703,8 +2625,28 @@ export default {
           _item.isClick = false;
         }
       });
-      this.groupItems = this.inspectList
     },
+    clickStore(item, index, _item, _index) {
+      const self = this;
+      if (!_item.hasInspect && _item.hasInspect != undefined) {
+        return false;
+      }
+      if (!util.validateLicense(_item.status)) {
+        return false;
+      }
+      self.curTabIndex = index;
+      self.curTabItem = item;
+      self.curStoreIndex = _index;
+      self.curStoreItem = _item;
+      self.deviceList = _item.device;
+      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
+          || (self.$store.getters.PatrolHistory != null) ) {
+        self.changeStoreObj.dialogCosed = true;
+      } else {
+        self.changeStore(item, index, _item, _index);
+      }
+    },
+
     checkFull() {
       var isFull = window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
       if (isFull === undefined) {
@@ -2790,72 +2732,35 @@ export default {
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
     },
-    
-    itemSubmitEventDescription () {
-      if (this.isEditEventDes) {
-        var arr = this.eventDes.split("|");
-          arr[this.eventDesEdit.index] = this.eventDesEdit.val;
-          this.eventDes = arr.join('|');
-          this.eventDesEdit.index = -1;
-          this.eventDesEdit.val = '';
-          this.isEditEventDes = false;
+    submitItemResource({ item }) {
+      const self = this
+      if (item.inspectInput.trim().length === 0) return
+      if (this.curEditIndex > -1) {
+        item.sourceList = item.sourceList.map((source, idx) => {
+          if (idx === self.curEditIndex) return {
+            ...source,
+            src: item.inspectInput,
+          }
+          else return { ...source }
+        })
+        this.curEditIndex = -1
       } else {
-        if (this.eventDes === '') {
-          this.eventDes = this.eventDesInfo
-        } else {
-          var arr = this.eventDes.split('|');
-          arr.push(this.eventDesInfo)
-          this.eventDes = arr.join('|');
-        }
-        this.eventDesInfo = ''
+        item.sourceList.push({
+          mediaType: 3,
+          src: item.inspectInput,
+        })
       }
+      item.inspectInput = ''  
     },
-    editEventDes(index) {
-      if (this.isEditEventDes) {
-        this.isEditEventDes = false;
-        this.eventDesEdit = {index: -1, val: ''}
-      } else {
-        var arr = this.eventDes.split("|");
-        this.eventDesEdit = {index: index, val: arr[index]}
-        this.isEditEventDes = true
-      }
+    deleteItemResource({ item, index }) {
+      const self = this
+      item.sourceList = item.sourceList.filter((source, idx) => idx !== index)
     },
-    itemSubmitDescription (item) {
-      if (item.isEditingInspect) {
-        var arr = item.inspectText.split('|');
-        arr[item.inspectEdit.index] = item.inspectEdit.val;
-        item.inspectText = arr.join('|');
-        item.inspectEdit.index = -1;
-        item.inspectEdit.val = '';
-        item.isEditingInspect = false;
-      } else {
-        if (item.inspectText === '') {
-          item.inspectText = item.inspectInput;
-        } else {
-          var arr = item.inspectText.split('|');
-          arr.push(item.inspectInput);
-          item.inspectText = arr.join('|');
-        }
-        item.inspectInput = '';
-      }
+    editItemResource ({ item, index }) {
+      this.curEditIndex = index
+      item.inspectInput = item.sourceList[index].src
     },
-    editDescription(index, item) {
-      if (item.isEditingInspect) {
-        item.isEditingInspect = false;
-        item.inspectEdit.val = '';
-        item.inspectEdit.index = -1;
-      } else {
-        var arr = item.inspectText.split('|');
-        item.isEditingInspect = true;
-        item.inspectEdit = {index: index, val: arr[index]};
-      }
-    },
-    deleteDescription(index, item) {
-      var arr = item.inspectText.split('|');
-      arr = arr.filter((item, i) => index !== i);
-      item.inspectText = arr.join('|');
-    },
-    itemDescriptionChanged(val, item) {
+    itemDescriptionChanged({ val, item }) {
       const content = filterString.all(val, 200);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
@@ -2900,14 +2805,7 @@ export default {
     },
     eventDesChanged(val) {
       const self = this;
-      const content = filterString.all(val, 200);
-      self.eventDesInfo = content;
-      const length = filterString.getContentLength(val);
-      if (length > 200) {
-        this.eventDesRuletip = true;
-      } else {
-        this.eventDesRuletip = false;
-      }
+      self.eventDes = val;
     },
     notShowInputRuleTips(e, item) {
       if (e == 'item') {
@@ -2933,8 +2831,7 @@ export default {
       this.eventName = feedbackObj.eventName;
       this.eventDes = feedbackObj.eventDes;
       this.showEventNameInfo = false;
-    },
-
+    }
   }
 };
 </script>
@@ -2945,22 +2842,6 @@ export default {
   $background:#f4f5f9;
   $tab:#7d8cad;
   $h1:#292e36;
-  .filters {
-    border-radius: 5px;
-    height: 36px;
-    >>> i {    
-      color: #2c90d9;
-      line-height: 36px;
-      height: 36px;
-    }
-    >>> input {
-      height: 36px !important;
-      background-color: transparent !important;
-    }
-    >>> span {
-      top: 0px !important;
-    }
-  }
   .fade-enter-active {
     transition: all 1s ease;
     width: 68px;
@@ -2977,6 +2858,20 @@ export default {
   }
   .fadepen-enter-active,.fadepen-leave-active{
     transition: opacity .5s
+  }
+  #feedback-content{
+    padding-top: calc(80/1920*100vw);
+    text-align: left;
+    .feedback-info {
+      display: block;
+      padding-left: calc(40/1920*100vw);
+      color: #006ab7;
+      font-size: calc(24/1920*100vw);
+      font-weight: bold; 
+      &:last-child {
+        margin-top: calc(30/1920*100vw);
+      }
+    }
   }
   .fadepen-enter, .fadepen-leave-to{
     opacity: 0;
@@ -3002,7 +2897,7 @@ export default {
     pointer-events: none;
   }
   .el-container{
-    // background-color: $background;
+    background-color: $background;
     .spreadLsideClass{
       width: 98%;
     }
@@ -3093,8 +2988,8 @@ export default {
         .des-input{
           display: block;
           width: auto;
-          // @include point(margin-left,20);
-          // @include point(margin-right,20);
+          @include point(margin-left,20);
+          @include point(margin-right,20);
         }
       }
       .feed-canvas-content{
@@ -3249,15 +3144,11 @@ export default {
       }
     }
     .lside{
-      padding-bottom: calc(25/1920*100vw);
-      display: flex;
-      flex-direction: column;
-      margin: 0 calc(25/1920*100vw) 0 0;
       .el-header-title{
         text-align: left;
         position: relative;
-        height: 60px;
-        line-height: 60px;
+        height: 80px;
+        line-height: 80px;
         border-bottom: 1px solid $border;
         padding-left: calc(25/1920*100vw);
         padding-right: calc(25/1920*100vw);
@@ -3314,6 +3205,7 @@ export default {
           line-height: 18px;
           cursor: pointer;
           position: relative;
+          bottom: 2px;
           span{
             font-size: 12px;
             /*vertical-align: middle;*/
@@ -3803,9 +3695,9 @@ export default {
             span{
               width: 100%;
               display: block;
-              white-space: nowrap; 
-              overflow: hidden; 
-              text-overflow: ellipsis; 
+              white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+              overflow: hidden; //隐藏超出单元格的部分。
+              text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
             }
           }
           .guide-lside{
@@ -3897,7 +3789,7 @@ export default {
             text-align: left;
             .feedback-info{
               display: block;
-              color: $red;
+              color: #006ab7;
               font-size: calc(18/1920*100vw);
               font-weight: bold;
               &:last-child{
@@ -3930,9 +3822,9 @@ export default {
             span{
               width: 100%;
               display: block;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+              overflow: hidden; //隐藏超出单元格的部分。
+              text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
             }
           }
           .noraml-title{
@@ -4172,9 +4064,9 @@ export default {
       }
     }
     .rside{
-      // border: 1px solid $border;
-      // background-color: #fff;
-      //@include point(margin-right,20);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       .el-header-title{
         text-align: left;
         position: relative;
@@ -4236,9 +4128,9 @@ export default {
             cursor: pointer;
             @include point(width,76);
             @include point(padding,6);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+            overflow: hidden; //隐藏超出单元格的部分。
+            text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
           }
           .store-name{
             display: inline-block;
@@ -4255,9 +4147,9 @@ export default {
             span{
               width: 100%;
               display: block;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              white-space: nowrap; //保证文本内容不会自动换行，如果多余的内容会在水平方向撑破单元格。
+              overflow: hidden; //隐藏超出单元格的部分。
+              text-overflow: ellipsis; //将被隐藏的那部分用省略号代替。
             }
           }
 
@@ -4273,11 +4165,6 @@ export default {
         float:right;
       }
       .patrol-select{
-        height:160px;
-        width:92%;
-        text-align: left;
-        margin:0 auto;
-        border-top:0.5px solid #e3e9f4;
         .patrol-dropdown{
           padding:5px 12px;
           border:1px solid #ddd;
@@ -4291,7 +4178,6 @@ export default {
           }
         }
         .patrol-content{
-          padding: 0 30px;
           .patrol-title{
             font-size:14px;
             color:#182752;
@@ -4304,7 +4190,6 @@ export default {
         }
       }
       .channelbar-content{
-        flex: 1;
         .rside-hr{
           width: 100%;
           border: 0.5px solid $border;
@@ -4338,19 +4223,46 @@ export default {
           .icon-arrow{
             cursor: pointer;
           }
+          .btn-content{
+            width: 86%;
+            float: left;
+            display: flex;
+            .btn-details{
+              display: inline-block;
+              margin-bottom: 5px;
+              margin-left: calc(20/1920*100vw);
+              overflow: hidden;
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              &:last-child{
+                margin-right: calc(20/1920*100vw);
+              }
+            }
+          }
         }
       }
     }
+    .group_content {
+      border: 1px solid #e6e6e6;
+      border-radius: 4px;
+      padding: 5px 20px;
+      margin-left: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+      font-size: 15px;
+    }
     .noraml-color{
-      background-color: #fff !important;
-      color: $black !important;
-      font-weight: bold;
+      background-color: #006ab7;
+      color: #fff;
     }
     .noraml-groupColor{
-      background-color: $background !important;
+      background-color: #fff;
+      color: #006ab7;
     }
   }
-
+  .patrol-content >>> .el-select .el-input--medium .el-input__inner{
+    color:#333;
+  }
 </style>
 <style>
   #storetab-content .el-tabs__nav-scroll{
@@ -4395,39 +4307,64 @@ export default {
   #storetab-content div#tab-2{
     width:33.33%;
   }
-  
+  .item-score .el-icon--right{
+    position: absolute !important;
+    right: 1px !important;
+    top: 6px !important;
+  }
   #storetab-content .el-tabs__active-bar .is-top{
     width: 115px !important;
   }
 
 </style>
-<style scoped>
-  .el-search-input.el-input--small >>>.el-input__inner{
-    background: #F4F5F9 !important;
-    border-radius: 15px !important;
-    height: 32px !important;
-    line-height:32px !important;
-    padding-left:30px;
-    color:#425262;
-    letter-spacing: 0px;
+
+<style lang="scss" scoped>
+  .channel {
+    cursor: pointer;
+    width: 100%;
+    height: 40px;
+    padding: 8px 10px 8px 16px;
+    border-radius: 5px;
+    border: solid 1px #e6e6e6;
+    background-color: #fff;
+    color: #69727c;
+    display: flex;
+    align-items: center;
+  }
+  .channel-isActive {
+    color: #006ab7;
+    border: solid 1px #006ab7;
+    background-color: #e4f3fd;
+  }
+  .btn-content{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 20px;
+    .btn-details{
+      cursor: pointer;
+      margin-bottom: 5px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 </style>
+
 <style>
   @import '../../assets/css/importfile.css';
   @import '../../assets/css/videoBar.css';
   @import '../../assets/css/tabsItem.css';
   @import '../../assets/css/pagination.css';
   .el-test .el-input__inner{
-    height: 20px;
-    line-height: 20px;
-    border-radius: 4px;
-    border: 1px solid #fff;
-    background-color: transparent;
-    color: #C8C9CA;
-    padding: 0px;
-    text-align: center;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 0px;
+    background-color: #34374A;
+    color: #fff;
+    padding:0 10px;
+    border: 0px;
   }
-  
   .el-test .el-input__icon{
     line-height: 24px;
   }
@@ -4480,141 +4417,4 @@ export default {
     font-size: calc(20/1920*100vw);
     top: 20px;
   }
-</style>
-<style lang="scss" scoped>
-  @function rem($val){
-    @return $val/16+rem;
-  }
-  @function checkRem($val){
-    @if($val==0){
-      @return 0;
-    }
-    @else if($val==auto){
-      @return auto;
-    }
-    @else{
-      @return rem($val);
-    }
-  }
-  @mixin point($poi,$val){
-    #{$poi}:checkRem($val);
-  }
-  .groups {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .group {
-    border: 1px solid #e6e6e6;
-    border-radius: 4px;
-    padding: 5px 20px;
-    margin-left: 10px;
-    margin-top: 10px;
-    cursor: pointer;
-    font-size: 15px;
-    &__active {
-      border: solid 1px #006ab7;
-      background-color: #006ab7;
-      color: #fff;
-    }
-  }
-  .color-qualified {
-    background-color: #edf6e8;
-    color: #59ab22;
-  }
-  .color-unqualified {
-    background-color: #f57949;
-    color: #fdf6f4;
-  }
-  .el-dropdown-link{
-    text-align: left;
-    display: inline-block;
-    font-size: 12px;
-    width: 90px;
-    height: 26px;
-    background-color: #edf8f9;
-    line-height: 26px;
-    color: #006ab7;
-    border-radius: 5px;
-    cursor: pointer;
-    padding-right: 10px;
-    box-sizing: border-box;
-    padding-left: 10px
-  }
-  .check_scoring{
-    font-size: 12px;
-    width: 120px;
-    height: 25px;
-    line-height: 25px;
-    border:1px solid #dcdcdc;
-    background-color: #f7f8fc;
-    border-radius: 4px;
-    display: flex;
-    p{
-      margin:0;
-      width:58.5px;
-      text-align: center;
-      display: inline-block;
-    }
-    p:nth-child(1){
-      border-radius: 4px 0 0 4px;
-      border-right: 1px solid #dcdcdc;
-    }
-    p:nth-child(2){
-      border-radius: 0 4px 4px 0;
-    }
-    .check_normal{
-      color:#7b8da0;
-      font-size: calc(12/1920*100vw);
-    }
-    .check_isClick{
-      background-color:#fcba3f;
-      font-size: calc(14/1920*100vw);
-      color:#fff;
-    }
-  }
-  .noraml-title{
-    cursor: pointer;
-    opacity: 1;
-  }
-  .ignore-title{
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-  .el-icon--right{
-    position: absolute;
-    top: 7px;
-    right: 6px;
-  }
-  .channel {
-    width: 100%;
-    height: 40px;
-    padding: 8px 10px 8px 16px;
-    border-radius: 5px;
-    border: solid 1px #e6e6e6;
-    background-color: #fff;
-    color: #69727c;
-    display: flex;
-    align-items: center;
-  }
-  .channel-isActive {
-    color: #006ab7;
-    border: solid 1px #006ab7;
-    background-color: #e4f3fd;
-  }
-  .btn-content{
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    padding: 0 20px;
-    .btn-details{
-      cursor: pointer;
-      margin-bottom: 5px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-</style>
-<style scoped>
-
 </style>

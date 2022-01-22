@@ -473,7 +473,7 @@ export default {
       "tues": "二",
       "wed": "三"
     },
-    "zoneList": "區域列表",
+    "zoneList": "攝影機列表",
   },
 
   // event Management page language

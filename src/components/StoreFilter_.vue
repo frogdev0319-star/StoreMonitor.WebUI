@@ -67,7 +67,7 @@
       </div>
       <el-select
         class="filter-select"
-        v-model="selectedStore"
+        v-model="curStore"
         :placeholder="$t('remotePatrol.stores')"
         size="mini">
         <el-option
@@ -147,8 +147,10 @@ export default {
       provinceList: [],
       curCity: [],
       cityList: [],
-      curStore: [],
-      curStoreData: [],
+      curStore: '',
+      curStoreData: {},
+      curStores: [],
+      curStoresData: [],
       storeList: [],
       storeDataList: [],
       lang: this.$i18n.locale,
@@ -185,11 +187,6 @@ export default {
   computed: {
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
-  mounted() {
-    if (localStorage.getItem('activeStore')) {
-      this.selectedStore = localStorage.getItem('activeStore');
-    }
-  },
 
   watch: {
     async accountChanged(val) {
@@ -203,22 +200,8 @@ export default {
     cachedParams() {
       this.getSearchParams();
     },
-    curStore() {
-      let selected = this.curStore;
-      this.storeOptions = this.allInitStoreList.filter(store => selected.includes(store.storeId)).map(store =>({
-        value: store.storeId,
-        label: store.name
-      }))
-    },
-    selectedStore () {
-      var temp = this.allInitStoreList.filter(store=> store.storeId === this.selectedStore)
-      this.$emit('emitSelectedStore', temp);
-    },
-    showFavorite () {
-      this.storeOptions = this.allInitStoreList.filter(store => store.favorite).map(store =>({
-        value: store.storeId,
-        label: store.name
-      }))
+    curStore () {
+      this.emitParams()
     }
   },
 
@@ -252,24 +235,12 @@ export default {
     },
 
     getStoreListAndGroupAndType() {
-      const storeListPromise = this.getComplexStoreData();
+      const storeListPromise = this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        storeList = storeList.content
-        this.allInitStoreList = results[0].content;
-        storeList = storeList
-        .map(store => ({
-          city: store.city,
-          country: store.country,
-          name: store.name,
-          province: store.province,
-          storeId: store.storeId,
-          tagIds: store.tagIds,
-          userId: store.userId,
-        }))
-        // console.log(storeList)
+        this.allInitStoreList = results[0];
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -286,15 +257,13 @@ export default {
         this.getCountryStore();
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
-        var temp = this.allInitStoreList.filter(store=> store.storeId === this.selectedStore)
-        this.$emit('emitSelectedStore', temp);
       }).catch(err => {
         console.log('StoreFilter - getStoreGroupAndType: ' + err);
       });
     },
 
     onChangeStore(arr) {
-      this.curStore = arr;
+      this.curStores = arr;
       this.changeStoreNew(arr);
     },
 
@@ -386,9 +355,9 @@ export default {
         arr.push(item.value);
         arr_.push({ id: item.storeId, name: item.name })
       });
-      self.curStoreData = arr_;
-      self.curStore = storeArr;
-      self.changeStoreNew(self.curStore);
+      self.curStoresData = arr_;
+      self.curStores = storeArr;
+      self.changeStoreNew(self.curStores);
     },
 
     getComplexStoreData() {
@@ -456,13 +425,13 @@ export default {
       let filterStoreId = [];
       let self = this;
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
-        filterStoreId = this.curStore;
+        filterStoreId = this.curStores;
       } else {
         this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
         const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
-        filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
+        filterStoreId = util.getIntersectionOfArrs(this.curStores, filterStoreArray);
       }
 
       let filterStoreStr = '';
@@ -475,8 +444,8 @@ export default {
       });
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-      this.curStore = this.curStoreData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
-      this.filterStoreIds = this.curStoreData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
+      this.curStores = this.curStoresData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
+      this.filterStoreIds = this.curStoresData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
@@ -503,11 +472,14 @@ export default {
 
     emitParams() {
       const tempsearchParamsObj = {};
+      const self = this
       tempsearchParamsObj.curCountry = this.curCountry;
       tempsearchParamsObj.curProvince = this.curProvince;
       tempsearchParamsObj.curCity = this.curCity;
       tempsearchParamsObj.curStore = this.curStore;
-      tempsearchParamsObj.curStoreData = this.curStoreData;
+      tempsearchParamsObj.curStoreData = this.allInitStoreList.find(store => store.storeId === self.curStore)
+      tempsearchParamsObj.curStores = this.curStores;
+      tempsearchParamsObj.curStoresData = this.curStoresData;
       tempsearchParamsObj.curStoreGroup = this.curStoreGroup;
       tempsearchParamsObj.curStoreType = this.curStoreType;
       tempsearchParamsObj.storeStr = this.storeStr;
@@ -519,7 +491,7 @@ export default {
       tempsearchParamsObj.curRegionII = this.curRegionII;
       tempsearchParamsObj.regionMode = this.regionMode;
       
-      console.log(tempsearchParamsObj)
+      this.$store.dispatch("setStoreCache", tempsearchParamsObj);
       this.$emit('storeChange', tempsearchParamsObj);
     },
 
@@ -601,15 +573,15 @@ export default {
           name: item.name
         })
       });
-      self.curStoreData = arr_;
-      self.curStore = storeArr;
-      self.changeStoreNew(self.curStore);
+      self.curStoresData = arr_;
+      self.curStores = storeArr;
+      self.changeStoreNew(self.curStores);
     },
 
     clearStoreInfo() {
       const self = this;
-      self.curStore = [];
-      self.curStoreData = [];
+      self.curStores = [];
+      self.curStoresData = [];
       // self.$refs.multiSelect.selectedArray = [];
       // self.$refs.multiSelect.input = '';
     },
@@ -719,10 +691,10 @@ export default {
         })
       });
       setTimeout(async() => {
-        self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
-        self.curStoreData = (self.ifGetParamsFromCash && self.curStoreData.indexOf('-1') === -1) ? self.curStoreData : dataArr;
+        self.curStores = (self.ifGetParamsFromCash && self.curStores.indexOf('-1') === -1) ? self.curStores : storeArr;
+        self.curStoresData = (self.ifGetParamsFromCash && self.curStoresData.indexOf('-1') === -1) ? self.curStoresData : dataArr;
         self.ifGetParamsFromCash = false;
-        self.changeStoreNew(self.curStore);
+        self.changeStoreNew(self.curStores);
       }, 100);
     },
 
@@ -734,8 +706,8 @@ export default {
           this.curCountry = searchParams.curCountry;
           this.curProvince = searchParams.curProvince;
           this.curCity = searchParams.curCity;
-          this.curStore = searchParams.curStore;
-          this.curStoreData = searchParams.curStoreData;
+          this.curStores = searchParams.curStores;
+          this.curStoresData = searchParams.curStoresData;
           this.curStoreGroup = searchParams.curStoreGroup;
           this.curStoreType = searchParams.curStoreType;
           this.ifGetParamsFromCash = true;
