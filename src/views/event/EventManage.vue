@@ -405,7 +405,14 @@ export default {
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
   },
-
+  beforeDestroy() {
+    if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+        console.log("in beforeDestroy");
+        delete this.searchParams['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+        this.ifSaveParams && self.saveSearchParams();
+    }
+  },
   methods: {
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {'border-bottom': '1px solid #acaeb1'};
@@ -462,8 +469,11 @@ export default {
     },
 
     searchEventList() {
-      delete this.searchParams['clause']; //重新搜尋要把跳轉帶來的刪掉
       this.tableDataList[Number(this.activeName)].page = 1;
+      if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+        delete this.searchParams['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+      }
       this.getEventListAndCount();
     },
 
@@ -669,12 +679,12 @@ export default {
           },
           like: like
       }
-      console.log("this.params:",this.params);
+      
       console.log("this.searchParams:",this.searchParams);
       if(typeof this.searchParams.clause !="undefined"){
-        this.params.clause =  this.searchParams.clause;
-        this.params.clause.status = status;
+        this.params.clause['assigner'] =  this.searchParams.clause.assigner;
       }
+      console.log("this.params:",this.params);
       const curTabSortColumn = this.sortColumnOfTab[tabIndex];
       const order = curTabSortColumn.sortType.order;
       const prop = curTabSortColumn.sortType.prop;
@@ -1341,13 +1351,13 @@ $h1:#292e36;
    .table-content.el-table__body tr:hover>td{
     background-color: #f2f9fe !important;
   }
-  .tbl-checkbox.el-checkbox__input.is-checked .el-checkbox__inner{
+  /*.tbl-checkbox.el-checkbox__input.is-checked .el-checkbox__inner{
     background-color: #edf0f2;
     border-color: #acaeb1;
   }
   .tbl-checkbox.el-checkbox__input.is-checked .el-checkbox__inner {
     background-color: #e0f2ff;
     border-color: #2c90d9;
-}
+}*/
 </style>
 
