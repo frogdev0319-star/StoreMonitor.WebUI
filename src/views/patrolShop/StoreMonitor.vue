@@ -3,14 +3,14 @@
     <el-row>
       <store-filter
         type="patrol"
-        @emitSelectedStore = "getCurStore"
+        @storeChange = "getCurStore"
       ></store-filter>
     </el-row>
     <el-row class="el-container" :class="isFullScreenMode ? 'block paper' : 'flex'">
-      <el-col :span="isFullScreenMode ? 24: 12" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" class="lside">
+      <el-col :span="isFullScreenMode ? 24: 12" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" class="lside paper spacer">
         <div class="el-header-title flex-center">
-          <img :src="activeStore.favorite? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
-          <span> {{ activeStore.name }} </span>
+          <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
+          <span class="lside-title"> {{ store.storeName }} </span>
           <div style="flex: 1"></div>
           <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
             <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon"  style="margin-right: 10px">
@@ -61,19 +61,19 @@
               :placeholder="$t('remotePatrol.channelPlaceholder')"
               v-model="serachChannelValue"
               size="small"
-              class="el-search-input el-channel-search-input"
-              @keyup.enter.native="searchChannel"
+              class="storevue-input-search"
             >
               <i
                 slot="prefix"
                 class="iconfont icon-sousuo"
-                style="position: relative; top: 6px; left: 6px; font-size: 18px"
+                style="position: relative; top: 7px; left: 6px; font-size: 18px; color: #2b2b2b;"
               />
             </el-input>
           </div>
           <div class="btn-content" :style="{'justify-content':isFullScreenMode?'unset':'space-between'}">
+            <!-- <div v-if="!store.device">{{}}</div> -->
             <div
-              v-for="(item, index) in activeStore.device"
+              v-for="(item, index) in (store.device && store.device.filter(d => d.name.indexOf(serachChannelValue) > -1))"
               :key="index"
               class="btn-details"
               :class="{'child-space': isFullScreenMode}"
@@ -125,10 +125,10 @@
           </div>
         </div>
       </el-col>
-      <el-col :span="isFullScreenMode ? 24: 12" class="rside">
-        <div class="paper padding" style="text-align: left">
-          <div class="flex-center">
-            <span class="event-title">{{ $t("remotePatrol.createMothod") }}</span>
+      <el-col :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" class="rside paper spacer ">
+        <div class="paper padding">
+          <div class="text-left flex-center" :class="{'margin-bottom-md': !isFullScreenMode}">
+            {{ $t("remotePatrol.createMothod") }}
             <div class="spacer"></div>
             <el-button
               v-loading.fullscreen.lock="fullscreenLoading"
@@ -141,7 +141,7 @@
             </el-button>
           </div>
           <hr class="hr-horizontal">
-          <div class="flex-center">
+          <div class="flex-center margin-top-md">
             <div
               v-for="(item, index) in evBtns"
               :key="index"
@@ -466,8 +466,8 @@ export default {
       currentVideoComponent: 'EzvizVideo',
       showFavorite: false,
       isFullScreenMode: false,
-      activeStore: {},
-      problemTab: 0
+      problemTab: 0,
+      curSelStoreId: '',
     };
   },
 
@@ -562,7 +562,7 @@ export default {
     self.myDivHeight();
     self.getOssInfo();
     self.getUpLoadBucketInfo();
-    // self.getInitStoreData();
+    self.getInitStoreData();
   },
 
   beforeDestroy() {
@@ -573,11 +573,9 @@ export default {
   },
 
   methods: {
-    getCurStore(storeArr) {
-      const key = 'activeStore';
-      this.activeStore = {...storeArr[0]}
-      this.getChannelByStore()
-      localStorage.setItem(key, storeArr[0].storeId)
+    getCurStore(storeData) {
+      this.curSelStoreId = storeData.curStore
+      this.getInitStoreData()
     },
     changeBrand() {
       const self = this;
@@ -718,10 +716,11 @@ export default {
         obj.storeName = storeData[0].name;
         obj.storeTitle = storeData[0].name;
         obj.userName = storeData[0].userName;
+        obj.device = storeData[0].device;
         obj.storeUp = true;
         obj.storeUpTitle = self.$t('remotePatrol.stared');
         obj.status = storeData[0].status;
-        self.store = obj;
+        self.store = { ...obj };
         self.showStoreUp = true;
         const curStoreId = storeData[0].storeId;
 
@@ -733,7 +732,7 @@ export default {
       }
     },
 
-    async getInitStoreData(storeData) {
+    async getInitStoreData() {
       const self = this;
       const getStore2Temp = (data) => {
         const cityList = [];
@@ -774,9 +773,9 @@ export default {
       try {
         const res = await self.getAllStoreList();
         if (res.errCode === 0) {
-          const favoriteStoreList = res.data.content.filter(item => item.favorite === true);
+          const favoriteStoreList = res.data.content.filter(item => item.storeId === this.curSelStoreId);
           self.getFaStoreData(favoriteStoreList);
-          const storeData = res.data.content;
+          const storeData = res.data.content.filter(item => item.storeId === this.curSelStoreId)
           self.allInitStoreList = storeData;
           if (storeData.length === 0) {
             self.tabList[2].storeList = [];
@@ -858,7 +857,7 @@ export default {
     addStoreUp() {
       const self = this;
       const temp = [];
-      temp.push(self.activeStore.storeId);
+      temp.push(self.store.storeId);
       const params = {
         storeIds: temp
       };
@@ -876,7 +875,7 @@ export default {
         beginTs: date.getTime() - 3600 * 24 * 30 * 1000 * 30,
         endTs: date.getTime(),
         clause: {
-          storeId: self.activeStore.storeId,
+          storeId: self.store.storeId,
           status: 0,
           sourceType: 0
         },
@@ -1073,7 +1072,7 @@ export default {
     getStorageInfo() {
       const self = this;
       const params = {};
-      params.storeId = self.activeStore.storeId;
+      params.storeId = self.store.storeId;
       return new Promise((resolve, reject) => {
         getStorageInfo(params).then((res) => {
           if (res.errCode === 0) {
@@ -1118,7 +1117,7 @@ export default {
       const obj = {};
       obj.ts = new Date().getTime();
       obj.subject = self.eventName.trim();
-      obj.storeId = self.activeStore.storeId;
+      obj.storeId = self.store.storeId;
       obj.deviceId = self.channel.id;
       obj.comment = commentobj;
       const params = obj;
@@ -1140,8 +1139,8 @@ export default {
             isSuccess: isSuccess
           },
           store: {
-            storeId: self.activeStore.storeId,
-            storeName: self.activeStore.storeName
+            storeId: self.store.storeId,
+            storeName: self.store.storeName
           },
           channel: {
             deviceId: self.channel.id
@@ -1197,8 +1196,8 @@ export default {
             isSuccess: isSuccess
           },
           store: {
-            storeId: self.activeStore.storeId,
-            storeName: self.activeStore.storeName
+            storeId: self.store.storeId,
+            storeName: self.store.storeName
           },
           channel: {
             deviceId: self.channel.id
@@ -1476,7 +1475,7 @@ export default {
       self.hideNext = false;
       self.showCutContent = false;
       self.$refs.vendorVideo.playState && self.$refs.vendorVideo.stopVideoPlay();
-      this.activeStore.device.forEach((item, index) => {
+      this.store.device.forEach((item, index) => {
         const obj = {};
         obj.id = item.id;
         obj.name = item.name;
@@ -1499,8 +1498,8 @@ export default {
         }
         item.status === 1 && temp.push(obj);
       });
-      this.activeStore = { 
-        ...this.activeStore,
+      this.store = { 
+        ...this.store,
         device: [...temp]
       }
       self.channelBtns = temp;
@@ -1761,8 +1760,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import "node_modules/bootstrap/scss/bootstrap";
-@import "node_modules/bootstrap-vue/src/index.scss";
 
 * {
   font-family: Roboto, Arial, Microsoft YaHei;
@@ -1858,7 +1855,6 @@ $h1: #292e36;
 
 .el-container {
   margin-top: 20px;
-  background-color: $background;
   .spreadLsideClass {
     width: 98%;
   }
@@ -1885,16 +1881,14 @@ $h1: #292e36;
   }
   /*左侧视频区域css*/
   .lside {
-    margin-right: calc(25 / 1920 * 100vw);
-    border: 1px solid $border;
-    background-color: #fff;
     .el-header-title {
       text-align: left;
       position: relative;
-      height: 60px;
-      line-height: 60px;
-      padding-left: calc(25 / 1920 * 100vw);
-      padding-right: calc(25 / 1920 * 100vw);
+      height: 80px;
+      line-height: 80px;
+      border-bottom: 1px solid $border;
+      padding-left: calc(25/1920*100vw);
+      padding-right: calc(25/1920*100vw);
       .lside-title {
         font-weight: bold;
         color: $h1;
@@ -2091,7 +2085,6 @@ $h1: #292e36;
   .rside {
     display: flex;
     flex-direction: column;
-    border: 1px solid $border;
     background-color: #edf0f2;
     //@include point(margin-right,20);
     @media screen and(max-width: 1366px) {

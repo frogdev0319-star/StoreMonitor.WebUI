@@ -210,7 +210,7 @@
             :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"
             :style="[
               showBorder ? { 'border-width': '0.5px' } : {},
-              $route.path === '/reinspection'
+              $route.path === '/reinspection' || $route.path === '/storemonitor'
                 ? {
                     background:
                       '#f7f9fa url(../../static/img/reinspection_bg.png) no-repeat 100% 0',
@@ -1436,6 +1436,9 @@ $collapseWidth: 5.5%;
 }
 .margin-right-md {
   margin-right: 20px;
+}
+.margin-top-md {
+  margin-top: 20px;
 }
 .margin-bottom-md {
   margin-bottom: 20px;
