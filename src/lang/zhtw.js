@@ -1189,7 +1189,7 @@ export default {
       "storeGroup":"門店群組",
       "storeType":"門店類型",
       "detail":"詳情",
-      "top5":"常見巡檢項是件TOP5",
+      "top5":"常見巡檢項事件TOP5",
       "topEventItem":"事件項名稱",
       "inceptionTag":"巡檢表",
       "happenAmount":"發生次數",
