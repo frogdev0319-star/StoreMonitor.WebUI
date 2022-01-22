@@ -361,22 +361,29 @@ export default {
            
       },
       handleEmitPersonEventRowClick(row){//进入事件列表界面，展示该门店该人员产生的事件
-            const self = this;
+        const self = this;
+        const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
+        /*let storeIds=[];
+        if (Object.keys(searchParams).length > 0) {
+            //this.params = searchParams.searchParams;
+            storeIds = searchParams.searchParams.storeIds;
+        }*/
             const rowItem = row.row;
             const passObj = {
                 inputSearchValue:"",
-                storeId:rowItem.storeId,
                 curState:[],
                 activeName:'4',
                 sizeNum:10,
                 page:1,    
-                clause : {assigner:this.submitter,storeId:rowItem.storeId},
-                assigner:this.submitter
+                clause : {assigner:this.submitter},
+                assigner:this.submitter,
+                searchFrom:'PatrolPersonStat'
             };
             const searchConditon = {
                 path: 'eventManage',
                 params: passObj
             };
+            console.log("searchConditon:",searchConditon);
             SearchConditionUtil.saveSearchCondition(searchConditon);
                     //sessionStorage.setItem('event_manage', JSON.stringify(passObj));
             self.$router.push({ name: 'eventManage', params: { data: passObj }});
@@ -443,7 +450,7 @@ export default {
                         Unprocessed=0;Inprocess=0;Processed=0;Rejected=0;Overdue=0;
                         tempStorId = item.storeId;
                         tempStorName = item.name;
-                        assignerName = item.assignerName;
+                        //assignerName = item.assignerName;
                     }
                         
                     switch(item.status){
@@ -481,7 +488,7 @@ export default {
                     }
                         
                 });
-                //console.log("temp:",temp);
+                console.log("temp:",temp);
                 this.eventTbl.all_data = temp;
                 this.eventTbl.total = temp.length;
                 this.setEventTableData();
