@@ -518,7 +518,11 @@ export default {
     "submitter": "提報人",
     "time": "起止時間",
     "timePlaceholder": "最長搜索時間為一個月",
-    "view": "查看"
+    "view": "查看",
+    "expiretag":"逾期",
+    "expiredate":" 結案時間 ",
+    "closeSelectedEvent":"確認將選擇事件結案?",
+    "confirmBachClose":"確認批次結案"
   },
 
   // Inspection Management page language
@@ -663,7 +667,7 @@ export default {
     "selectStoreToBind": "請選擇{tableName}巡檢表，需要綁定的門店",
     "selecttitle": "請選擇關聯職務",
     "setFullScoreEmpty": "項目總分值不能為空！",
-    "setFullScoreRange": "取值範圍為0~50！",
+    "setFullScoreRange": "取值範圍為-50~50！",
     "setItem": "巡檢項設置",
     "setMaxScore": "最高",
     "setMinScore": "最低",
@@ -1185,7 +1189,7 @@ export default {
       "storeGroup":"門店群組",
       "storeType":"門店類型",
       "detail":"詳情",
-      "top5":"常見巡檢項是件TOP5",
+      "top5":"常見巡檢項事件TOP5",
       "topEventItem":"事件項名稱",
       "inceptionTag":"巡檢表",
       "happenAmount":"發生次數",

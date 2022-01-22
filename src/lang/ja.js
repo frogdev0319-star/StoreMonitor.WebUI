@@ -510,7 +510,11 @@ export default {
     "submitter": "提出者",
     "time": "タイム",
     "timePlaceholder": "最大検索時間は3か月です",
-    "view": "ビュー"
+    "view": "ビュー",
+    "expiretag":"逾期",
+    "expiredate":" 結案時間 ",
+    "closeSelectedEvent":"確認將選擇事件結案?",
+    "confirmBachClose":"確認批次結案"
   },
 
   // Inspection Management page language
@@ -653,7 +657,7 @@ export default {
     "selectStoreToBind": "ストアがバインドされる",
     "selecttitle": "関連したポジションを選択してください",
     "setFullScoreEmpty": "合計スコアを空にすることはできません！",
-    "setFullScoreRange": "値の範囲は0ー50です！",
+    "setFullScoreRange": "値の範囲は-50ー50です！",
     "setItem": "アイテム設定",
     "setMaxScore": "最高",
     "setMinScore": "最低",

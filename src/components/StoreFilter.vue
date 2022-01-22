@@ -24,7 +24,7 @@
           readonly
           class="input-class"/>
       </div>
-      <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+      <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
       <region-multi-select
           ref="proviceSelect"
           :selected="curProvince"
@@ -34,7 +34,7 @@
           :all="$t('overview.allZoneI')"
           class="region"
           @changeInput="onChangeProvince"/>
-      <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+      <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
       <region-multi-select
           ref="citySelect"
           :selected="curCity"
@@ -44,7 +44,7 @@
           :all="$t('overview.allZoneII')"
           class="region"
           @changeInput="onChangeCity"/>
-      <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+      <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
       <multi-select
           class="store-group-select region"
           :selected="curStoreGroup"
@@ -53,7 +53,7 @@
           :alltype="0"
           :options="storeGroupList"
           @changeInput="onChangeStoreGroup"/>
-      <div style="width:0px;height:25px;border:1px solid #556679; opacity:0.2;" />
+      <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
       <multi-select
           class="store-group-select region"
           :selected="curStoreType"
@@ -68,7 +68,7 @@
   <div class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
     <multi-select
         v-if="showStoreSelect"
-        class="store-group-select store shadow-light"
+        class="store-group-select store shadow-light storeFilter-muti"
         ref="multiSelect"
         :selected="curStore"
         :placeholder="$t('remotePatrol.stores')"
@@ -382,6 +382,7 @@ export default {
     },
 
     onChangeStoreGroup(val) {
+      console.log("onChangeStoreGroup:",val);
       this.curStoreGroup = val;
       this.filterStore();
     },
@@ -418,26 +419,39 @@ export default {
       } else {
         this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
+        //console.log("groupIdArray:",groupIdArray);
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
+        //console.log("typeIdArr:",typeIdArr);
         const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
+        //console.log("ilterStoreArray:",filterStoreArray);
+        
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
+        console.log("filterStoreId:",filterStoreId);
       }
 
       let filterStoreStr = '';
+      let temp=[];
       filterStoreId.forEach(storeId => {
         this.storeList.forEach(store => {
           if (storeId === store.storeId) {
             filterStoreStr += `${store.name}，`;
+            const obj = {
+                storeId: store.storeId,
+                label: store.name,
+                value: store.name
+              };
+              temp.push(obj);
           }
         });
       });
+      this.storeDataList = temp;
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-
+      //console.log("temp:",temp);
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
-      this.$emit('emitStoreList', this.storeDataList);
+      //this.$emit('emitStoreList', this.storeDataList);
     },
 
     getStoreGroupString() {
@@ -492,7 +506,9 @@ export default {
         return typeIdArr.flat();
       }
       groupIdArr = groupArr.map(group => group.contents);
+      //console.log("2.groupIdArr:",groupIdArr);
       typeIdArr = typeArr.map(type => type.contents);
+      //console.log("2.typeIdArr:",typeIdArr);
       return util.getIntersectionOfArrs(groupIdArr.flat(), typeIdArr.flat());
     },
 
@@ -713,13 +729,12 @@ export default {
     }
   }
   .padding-left {
-    padding-left: calc(71/1440*100vw);
+    padding-left: calc(76/1440*100vw);
   }
   .header-details{
     text-align: left;
     display: flex;
     flex-direction: row;
-    width: 100%;
     height: calc(36/1920*100vw);
     background-color: #FFF;
     border-radius: 5px;
@@ -774,6 +789,10 @@ export default {
   .store{
     // display:inline;
     width: calc(222/1440*100vw);
+    /deep/
+    .el-select.el-select--medium{
+      background-color: #FFF !important;
+    }
   }
 </style>
 <style scoped>
@@ -807,6 +826,7 @@ export default {
     width: calc(100% - 30px);
     position: absolute;
     left: 0;
+    
   }
   >>> .el-select .el-input--medium .el-input__suffix{
     top:0px !important;
@@ -828,15 +848,15 @@ export default {
     min-height: 28px;
   }
   >>> .el-select.el-select--medium .el-input .el-input__inner{
-    position: relative;
     z-index: 1;
-    background: transparent !important;
+    background: #FFF !important;
     border: none;
     font-size: 15px;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     min-height: 28px;
     min-width: 85px;
+    text-overflow: ellipsis;
   }
 
   >>> .el-select.el-select--medium .el-input .el-input__suffix-inner{

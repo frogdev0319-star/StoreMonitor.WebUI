@@ -514,7 +514,11 @@ export default {
     "submitter": "Submitter",
     "time": "Time",
     "timePlaceholder": "The maximum search time is one month",
-    "view": "View"
+    "view": "View",
+    "expire":"expired",
+    "expiredate":" expired date ",
+    "closeSelectedEvent":"Confirm close choosed event?",
+    "confirmBachClose":"Confirm bach close events"
   },
 
   // Inspection Management page language
@@ -657,7 +661,7 @@ export default {
     "selectStoreToBind": "Bound Stores",
     "selecttitle": "Please select the related positions",
     "setFullScoreEmpty": "The total score cannot be empty!",
-    "setFullScoreRange": "The value range is 0~50!",
+    "setFullScoreRange": "The value range is -50~50!",
     "setItem": "Item Settings",
     "setMaxScore": "highest",
     "setMinScore": "lowest",

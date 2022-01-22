@@ -2,10 +2,11 @@
   <el-row class="el-rate-container">
     <el-col :span="12" :style="{'height':windowHeight*0.82+'px','overflow-y': 'auto'}" class="lside">
       <div class="title-content">
-        <div>
-          <img  :src="sourceSrc"  :class="(event.sourceType!=2)?'title-img':'title-img-inside'" >
-          <span class="event-title">{{ event.eventTitle }}</span>
-        </div>
+        <img  :src="sourceSrc"  :class="(event.sourceType!=2)?'title-img':'title-img-inside'" >
+        <el-tooltip effect="light" placement="bottom">
+          <div slot="content">{{ event.eventTitle }}</div>
+          <div class="event-title">{{ event.eventTitle }}</div>
+        </el-tooltip>
         <span
             v-if="event.status === 0"
             class="event-status"
@@ -36,11 +37,13 @@
         v-if="dialogFormVisible"
         :title="$t('eventView.view')"
         :visible.sync="dialogFormVisible"
-        :close-on-click-modal="false"
+        :close-on-click-modal="true"
         width="850px"
+        height="834px"
         top="12%"
         class="rate-video-dialog"
         @close="closeRealTime">
+        <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
         <div
           class="video-dialog-content"
           style="overflow:hidden;"
@@ -63,9 +66,11 @@
         :visible.sync="dialogCommentVideo"
         :close-on-click-modal="false"
         width="850px"
+        height="834px"
         top="12%"
         class="rate-video-dialog"
         @close="stopCommentVideo">
+        <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
         <div class="video-dialog-content" style="overflow:hidden;">
           <hr class="dialog-hr">
           <div class="video-content" >
@@ -85,14 +90,16 @@
         :visible.sync="showRelatedChannelFlag"
         :close-on-click-modal="false"
         width="540px"
+        height="834px"
         top="18%"
         class="rate-video-dialog"
         @close="showRelatedChannelFlag = false">
         <div class="video-dialog-content" style="overflow:hidden;">
+          <div slot="title" class="dialog-title">{{$t('eventView.view')}}</div>
           <hr class="dialog-hr">
           <div class="channel-content" >
             <el-radio-group v-model="channelRadio" class="radio-group">
-              <el-radio v-for="(item, index) in relatedChannels" :label="item.id" :key="index" class="radio-class">
+              <el-radio v-for="(item, index) in relatedChannels" :label="item.id" :key="index" class="radio-class" @click="showRelatedChannel">
                 <img :src="cameraImg" class="radio-img">
                 <span class="radio-span">{{ item.name }}</span>
               </el-radio>
@@ -167,7 +174,7 @@
                   <span class="ahref">{{ item.name+'区域' }}</span>
                 </div>
               </div>
-              <div v-if="item.deviceId!=-1" class="imgLittle">
+              <div v-if="item.deviceId!=-1" class="imgLittle"  @click="showRelatedChannel">
                 <img :src="cameraImg" style="width:14px;height:14px;" />
                 <span style="color:#2c90d9;font-family: Roboto;font-size: 12px;margin-left:4px;">{{item.name}}</span>
               </div>
@@ -181,7 +188,7 @@
                   :preview-src-list="getImgList(index, imgsourceList)"
                   class="imgLittle imgInner"/>
               </div>
-              <div v-if="item.deviceId!=-1" class="imgLittle">
+              <div v-if="item.deviceId!=-1" class="imgLittle" @click="showRelatedChannel">
                 <img :src="cameraImg" style="width:14px;height:14px;" />
                 <span style="color:#2c90d9;font-family: Roboto;font-size: 12px;margin-left:4px;">{{item.name}}</span>
               </div>
@@ -277,6 +284,7 @@
             class="des-input"
             type="textarea"
             resize="none"
+            :disabled="curStatus==3"
             @input="(val)=>ivsIdChange(val)"
             @blur="notShowInputRuleTips"/>
       </div>
@@ -341,7 +349,7 @@ export default {
       insiteInspectSrc: require('../../../../static/img/onsite_patrol.png'),
       startIcon: require('../../../../static/img/play_icon.png'),
       videoImgSrc: require('../../../../static/img/video_thumbnail.png'),
-      cameraImg: require('../../../../static/img/icon_camera.png'),
+      cameraImg: require('../../../../static/img/icon_camera.svg'),
       curStatus: null,
       showControlInfo: true,
       lang: this.$i18n.locale,
@@ -700,6 +708,7 @@ export default {
         if (errMsg === 'Success') {
           util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
           self.getCommentList(1);
+          self.event.status = status;
           self.eventDes = '';
           setTimeout(() => {
             self.commentList.forEach((_item, _index) => {
@@ -801,8 +810,9 @@ export default {
 
     showRelatedChannel() {
       const self = this;
-      self.showRelatedChannelFlag = true;
+      //self.showRelatedChannelFlag = true;
       self.channelRadio = self.relatedChannels[0].id;
+      this.confirmSelect();
     },
 
     cancelSelect() {
@@ -924,6 +934,7 @@ $h1:#292e36;
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.06);
         background-color: #fff;
         width: calc(540/1440*100vw);
+        margin-left: calc(24/1440*100vw);
         .title-content{
             @include title-content;
             display: flex;
@@ -948,7 +959,7 @@ $h1:#292e36;
                 font-weight: bold;
                 color: $black;
                 margin-left: 20px;
-                max-width: 50%;
+                width: calc(442/1440*100vw);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -989,13 +1000,24 @@ $h1:#292e36;
                 user-select: none;
             }
         }
+        .dialog-title{
+          text-align:left;
+          font-size:24px;
+          padding-left:20px;
+          color:#484848;
+          font-family: NotoSansCJKtc;
+        }
         .video-dialog-content{
             width:100%;
             height:100%;
             margin: auto;
+            padding: 0 34px 42px 34px;
+            .rate-video-dialog{
+              border-radius: 5px;
+            }
+            
             .dialog-hr{
-                border: 0.5px solid ;
-                border-color: #dfe2e9;
+                border: none;
                 margin-bottom:10px;
                 bottom: 5px;
                 margin-top: 0;
@@ -1073,7 +1095,7 @@ $h1:#292e36;
             }
             .channel-content{
               margin: 20px 30px;
-              padding-top: 0;
+              padding: 0 34px 42px 34px;
               position: relative;
               .radio-group{
                 display: grid;
@@ -1157,11 +1179,11 @@ $h1:#292e36;
                 width: 5em;
             }
             .w4{
-                font-weight: bold;
+                font-weight: normal;
                 float: left;
             }
             .en-w4{
-              font-weight: bold;
+              font-weight: normal;
               float: left;
               width: 105px
             }
@@ -1189,11 +1211,11 @@ $h1:#292e36;
             .w3{
                 letter-spacing:0.3334em; /*如果需要y个字两端对齐，则为(x-y)/(y-1),这里是（4-3）/(3-1)=0.5em */
                 margin-right:-0.3334em; /*同上*/
-                font-weight: bold;
+                font-weight: normal;
                 float: left;
             }
             .en-w3{
-              font-weight: bold;
+              font-weight: normal;
               float: left;
               width: 105px
             }
@@ -1291,6 +1313,7 @@ $h1:#292e36;
                     @include point(max-width,220);
                     .img-content{
                         position: relative;
+                        border-radius: 5px;
                         cursor: pointer;
                         .start-icon{
                             position: absolute;
@@ -1299,6 +1322,7 @@ $h1:#292e36;
                         }
                       .imgLittle{
                         width: calc(130/1920*100vw);
+                        border-radius: 5px;
                       }
                     }
                     .video-content{

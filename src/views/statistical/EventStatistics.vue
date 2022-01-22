@@ -48,7 +48,7 @@
                   :region-array2="params.curCity"
                   :cur-store-group="params.curStoreGroup"
                   :cur-store-type="params.curStoreType"
-                  :cur-stores="params.curStore"
+                  :cur-stores="storeIds"
                   :cached-params="params"
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged"
@@ -509,6 +509,7 @@ export default {
   mixins: [resize],
   data() {
     return {
+      storeIds:[],
       ispdf: false,
       pdfSrc: '',
       curCountry:"-1",
@@ -922,35 +923,8 @@ export default {
       };
       this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
         this.ifSaveParams = true;
-      /*if(searchParams.inspectId && searchParams.inspectId!=''){
-        console.log(searchParams.inspectId,this.curInspectId)
-        if(searchParams.inspectId !=this.curInspectId){
-          console.log("Change ")
-          let result  = await  this.getInspectItemList(searchParams.inspectId)
-          if(result.errCode==0 && result.data){
-            let tempList = [];
-            result.data.forEach(function(item){
-                if(item.parentId == -1){
-                  tempList.push(item);
-                }
-            })
-            result.data.forEach(function(item){
-                tempList.forEach(function(subitem){
-                    if(item.parentId == subitem.id){
-                      subitem.items.push(item);
-                    }
-                });
-
-            })
-            this.inspectItemList = tempList ;
-
-            this.curInspectId = searchParams.inspectId
-            console.log(this.inspectItemList);
-          }
-        }
-
-      }*/
       this.params = searchParams;
+      this.storeIds = this.params.storeIds;
       this.compareIds = this.compareIds2 = this.params.storeIds;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
@@ -969,6 +943,7 @@ export default {
       self.componentsProps.endTs = self.params.endTs;
       if (self.params.storeIds.length === 0) {
         self.eventTableData = [];
+        self.storeIds = [];
         self.total = 0;
         self.allEventData = [];
         self.getEventsNum();
@@ -989,16 +964,13 @@ export default {
         self.params.order = this.order;
         self.hasNoData = false;
 
-        /**
-         *firstly, call getEventTableData to get all event num and display the first page of table
-         * secondly, call getAllEventData to get all event and pie chart data
-         */
-      }
         await self.getUpperGloableEventData();
         await self.getEventTableData();
         await self.getAllEventData();
         await self.getEventBarChartData();
         self.doGetInspecEvenItems();
+      }
+        
       
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
@@ -1021,7 +993,7 @@ export default {
       const params = {};
       params.beginTs = this.params.beginTs;
       params.endTs = this.params.endTs;
-      params.storeIds = this.params.storeIds;
+      params.storeIds = this.storeIds;
       params.regionMode = 0;
     
       try {
@@ -1498,19 +1470,24 @@ export default {
       const self = this;
       if(row.prop == "numOfTotal"){
         this.params.activeName = "4";
+        this.params.curState=[];
       }else if(row.prop == "numOfUnprocessed"){
         this.params.activeName = "0";
+        this.params.curState=[0];
       }else if(row.prop == "numOfInprocess"){
         this.params.activeName = "1";
+        this.params.curState=[1];
       }else if(row.prop == "numOfProcessed"){
         this.params.activeName = "2";
+        this.params.curState=[2,4];
       }else if(row.prop == "numOfRejected"){
         this.params.activeName = "3";
+        this.params.curState=[3];
       }
       this.params.inputSearchValue="";
       this.params.sizeNum=10;
       this.params.page=1; 
-      this.params.curState=[Number(this.params.activeName)];
+      
       this.params.clause ={storeId:row.row.id,storeName:this.barActiveName};
       const searchParamsObj = {
         path: 'eventManage',
@@ -1666,11 +1643,17 @@ export default {
     },
     async getItemDetail(){
       const self = this;
-      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2};
-      let result = await this.getInspecItemStatsOverview(params);
-      self.eventItemTable.itemAllData = result.data;
-      self.eventItemTable.total = Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
-      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+      if(this.selEventItemIds.length>0){
+        let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2};
+        let result = await this.getInspecItemStatsOverview(params);
+        self.eventItemTable.itemAllData = result.data;
+        self.eventItemTable.total = Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
+        self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+      }else{
+        self.eventItemTable.page=1;
+        self.eventItemTable.itemAllData=[]
+        self.eventItemTable.table_data=[]
+      }
     },
     async onSeeAllIncepEventClick(){
       const self = this;

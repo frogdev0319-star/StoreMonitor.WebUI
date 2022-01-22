@@ -10,7 +10,6 @@
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0">
         <div class="flex-center">
-          <div class="search-label">{{ $t('eventView.time') }}</div>
           <date-time-selector @change="dateChange"/>
         </div>
         <!--<div class="flex-center">
@@ -104,7 +103,7 @@
                     {{ $t('eventView.handled') }}
                   </span>
                   <span
-                    v-else-if="scope.row.status === 2"
+                    v-else-if="scope.row.status === 2 || scope.row.status === 4"
                     :class="lang.indexOf('ja') !== -1 ? 'ja-icon': 'icon-span'"
                     style="background-color:#efefef;color:#6e6e6e;" >
                     {{ $t('eventView.closed') }}
@@ -115,6 +114,13 @@
                     style="background-color:#ffeff5;color:#e22472;" >
                     {{ $t('eventView.returnStatus') }}
                   </span>
+                  
+                  <el-tooltip v-if="scope.row.status === 4" effect="light" placement="right-end">
+                    <div slot="content">{{ $t('eventView.expiredate')+scope.row.updateTs }}</div>
+                    <div v-if="scope.row.status === 4" class="expiretag">
+                     {{ '('+$t('eventView.expiretag')+')' }}
+                    </div>
+                  </el-tooltip>
                 </template>
               </el-table-column>
               <el-table-column
@@ -184,6 +190,13 @@
         </el-tab-pane>
       </el-tabs>
     </div>
+    <dialog-vue 
+    :dialog-title="$t('eventView.confirmBachClose')" 
+    :show-info="$t('eventView.closeSelectedEvent')" 
+    :is-warning=true 
+    :dialog-closed="showBachCloseDialog" 
+    @confirmed="confirmBachClose" 
+    @canceled="showBachCloseDialog = false"/>
   </div>
 </template>
 
@@ -204,6 +217,7 @@ import StoreFilter from '@/components/StoreFilter';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from '@/components/SelectedStores';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
+import DialogVue from '@/components/DialogVue';
 
 export default {
   name: 'EventManage',
@@ -215,7 +229,8 @@ export default {
     LimitSelect,
     MultiSelect,
     RegionMultiSelect,
-    TblPaginationOnly
+    TblPaginationOnly,
+    DialogVue
   },
 
   data() {
@@ -321,6 +336,7 @@ export default {
       showCloseBtn:false,
       closingEventId:[],
       stopRowClick:false,
+      showBachCloseDialog:false
     };
   },
 
@@ -549,12 +565,13 @@ export default {
           const attachment = [];
           if (item.initialComment.attachment.length !== 0) {
             item.initialComment.attachment.some(x => x.mediaType === 0) ? attachment.push({ url: self.attachmentAudio }) : '';
-            item.initialComment.attachment.some(x => x.mediaType === 1) ? attachment.push({ url: self.attachmentVideo }) : '';
-            item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
+            item.initialComment.attachment.some(x => (x.mediaType === 1||x.mediaType === 2)) ? attachment.push({ url: self.attachmentVideo }) : '';
+            //item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
           }
           const obj = {
             id: item.id,
             ts: util.getDateTime(item.ts),
+            updateTs:(item.status==4)?util.getDateTime(item.updateTs):"",
             assignee: item.assignee,
             assignerName: item.assignerName,
             assigneeName: item.assigneeName,
@@ -709,7 +726,7 @@ export default {
     },
 
     handleDisable(row, index){
-      if (row.status==2) {
+      if (row.status==2 || row.status==4) {
         return false
       } else {
         return true
@@ -955,6 +972,9 @@ export default {
       this.ifSearchData = false;
     },
     doBachCloseEvent(){
+      this.showBachCloseDialog = true;
+    },
+    confirmBachClose(){
       const self = this;
       //const eventIds = [];
       //eventIds.push(self.event.id);
@@ -969,6 +989,7 @@ export default {
         comment: comments
       };
       eventRESTful.addComment(params).then(res => {
+        self.showBachCloseDialog = false;
         const errMsg = res.errMsg;
         if (errMsg === 'Success') {
           util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
@@ -986,6 +1007,7 @@ export default {
         console.log('EventDetail-addComment:' + err);
       });
     }
+
   },
 
   beforeRouteEnter(to, from, next) {
@@ -1185,6 +1207,11 @@ $h1:#292e36;
           color: #fff;
         }
       }
+    }
+    .expiretag{
+      font-family: NotoSansCJKTC;
+      font-size: 10px;
+      color: #556679;
     }
     #tabs-content  .el-tabs__item {
       padding: 0 0;

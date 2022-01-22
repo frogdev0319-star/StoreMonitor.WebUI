@@ -511,7 +511,11 @@ export default {
     "submitter": "제출자",
     "time": "시간",
     "timePlaceholder": "최대 검색 시간은 3개월입니다.",
-    "view": "보기"
+    "view": "보기",
+    "expiretag":"逾期",
+    "expiredate":" 結案時間 ",
+    "closeSelectedEvent":"確認將選擇事件結案?",
+    "confirmBachClose":"確認批次結案"
   },
 
   // Inspection Management page language
@@ -654,7 +658,7 @@ export default {
     "selectStoreToBind": "연동 메모리",
     "selecttitle": "관련 위치를 선택하십시오",
     "setFullScoreEmpty": "총 점수는 비워 둘 수 없습니다.",
-    "setFullScoreRange": "이 가치 범위가 0~50이다!",
+    "setFullScoreRange": "이 가치 범위가 -50~50이다!",
     "setItem": "항목 설정",
     "setMaxScore": "최고고의",
     "setMinScore": "최저의",

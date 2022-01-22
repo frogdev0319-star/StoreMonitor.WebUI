@@ -366,7 +366,7 @@ export default {
             const passObj = {
                 inputSearchValue:"",
                 storeId:rowItem.storeId,
-                curState:[4],
+                curState:[],
                 activeName:'4',
                 sizeNum:10,
                 page:1,    
@@ -534,12 +534,14 @@ export default {
         padding:0;
         justify-content: space-between;
         font-size: 13px;
+        margin-top: -5px;
         cursor: pointer;
+        border-bottom:1px solid rgba(172,174,177,0.34);
     }
     .ja-export-btn,
     .en-export-btn,
     .export-btn{
-      background-color: #edf0f2;
+      background-color: #EFF3F5;
       color: #006ab7;
     }
   }
@@ -555,7 +557,7 @@ export default {
     font-family: NotoSansCJKTC;
     font-size: 13px;
     font-weight: 500;
-    background-color: EFF3F5;
+    background-color: #EFF3F5;
 
   }
   .active-name-btn{
@@ -567,6 +569,7 @@ export default {
     background-color: #EFF3F5;
     padding-top: 16.5px;
     padding-bottom: 16.5px;
+    border-top:1px solid rgba(172,174,177,0.34);
     .table{
       margin: 0 calc(24/1920*100vw);
       background-color: #EFF3F5;
@@ -604,6 +607,7 @@ export default {
     padding: 16.5px 24px;
     max-height:300px;
     overflow-y:auto;
+    border-top:1px solid rgba(172,174,177,0.34);
     .store-div{
         width: calc(220/1440*100vw);
         height:40px;

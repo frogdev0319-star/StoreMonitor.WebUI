@@ -55,7 +55,6 @@
         </template>
       </store-filter>
       <div class="flex-center padding" style="padding-top: 0">
-        <span class="search-label" :class="lang === 'en' ? 'en-span-class' : ''">{{ $t('remotePatrol.time') }}</span>
         <date-time-selector @change="dateChange"/> 
         <div class="spacer"></div>
         <div class="flex-center">

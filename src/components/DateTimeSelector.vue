@@ -39,6 +39,8 @@ export default {
       this.dateRange = val;
       if(val!=4){
         this.diablePick = true;
+      }else{
+        this.diablePick = false;
       }
       //this.getDateRange();
     },
@@ -56,7 +58,7 @@ export default {
     // background-color: #fff;
     // border-radius: 5px;
     .time-title{
-      width:cacl(76/1440*100vw);
+      width:calc(76/1440*100vw);
       align-self:center;
       font-size:15px;
       color:#484848

@@ -1219,7 +1219,7 @@ export default {
         }
         if(self.ItemTotalScore === ''){
           self.ItemTotalScoreTip0 = true;
-        }else if(parseFloat(self.ItemTotalScore)>50 || parseFloat(self.ItemTotalScore)<0){
+        }else if(parseFloat(self.ItemTotalScore)>50 || parseFloat(self.ItemTotalScore)<-50){
           self.ItemTotalScoreTip1 = true;
         }else{
           if(self.ItemMinScore === ''){
@@ -1593,7 +1593,7 @@ export default {
       const self = this;
       self.ItemTotalScore = self.getUtilScore(val,0);
       self.ItemTotalScoreTip0 = false;
-      if(parseFloat(self.ItemTotalScore)<0 || parseFloat(self.ItemTotalScore) >50){
+      if(parseFloat(self.ItemTotalScore)<-50 || parseFloat(self.ItemTotalScore) >50){
         self.ItemTotalScoreTip1 = true;
       }else{
         self.ItemTotalScoreTip1 = false;
