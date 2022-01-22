@@ -811,7 +811,7 @@ export default {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
     if (PatrolHistory != null) {
-      console.log(PatrolHistory)
+      console.log(1)
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
       self.storeList = PatrolHistory.storeList
@@ -861,9 +861,8 @@ export default {
       if (PatrolHistory.hasIgnoretemp.length === 0) {
         self.notShowAlert = true;
       }
-    } else {
-      self.getAllStore();
     }
+    self.getAllStore();
     document.onmouseup = self.mouseUpAction;
     self.getUpLoadBucketInfo();
     self.getOssInfo();
@@ -1347,14 +1346,14 @@ export default {
     },
     
     onStoreChange (storeData) {
-      console.log(storeData)
+      console.log(storeData.curStore, this.storeList)
       this.curSelStoreId = storeData.curStore
       this.historyObj = {
         ...this.historyObj,
         
       }
       const storeItem = this.storeList.find(store => store.storeId === storeData.curStore)
-      this.changeStore_(storeItem)
+      if (storeItem) this.changeStore_(storeItem)
     },
     async getAllStore () {
       const self = this;
@@ -1387,6 +1386,7 @@ export default {
         self.getInitStoreData(allStoreData);
         const storeData = allStoreData.data.content;
         self.storeList = getStoreTemp(storeData);
+        console.log('self.storeList', self.storeList)
         const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
         self.changeStore_(storeItem)
       }

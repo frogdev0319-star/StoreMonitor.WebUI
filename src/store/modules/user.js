@@ -35,7 +35,7 @@ const user = {
     collapsed: false,
     templateOptions: [],
     curTemplateIndex: -1,
-    storeCache: {}
+    storeCache: null
   },
 
   mutations: {
