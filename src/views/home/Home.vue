@@ -1405,6 +1405,10 @@ $collapseWidth: 5.5%;
   display: flex;
   flex-wrap: wrap;
 }
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
 .flex-center {
   display: flex;
   align-items: center;
@@ -1422,6 +1426,9 @@ $collapseWidth: 5.5%;
   margin-top: 10px;
   margin-bottom: 10px;
 }
+.margin-bottom-mini {
+  margin-bottom: 5px;
+}
 .margin-bottom-sm {
   margin-bottom: 10px;
 }
@@ -1431,6 +1438,9 @@ $collapseWidth: 5.5%;
 .margin-bottom-md {
   margin-bottom: 20px;
 }
+.margin-left-md {
+  margin-left: 20px
+}
 .font-size-sm {
   font-size: 12px;
 }
@@ -1439,6 +1449,9 @@ $collapseWidth: 5.5%;
 }
 .spacer {
   flex: 1;
+}
+.text-left {
+  text-align: left;
 }
 .hr-vertical {
   margin: 0;

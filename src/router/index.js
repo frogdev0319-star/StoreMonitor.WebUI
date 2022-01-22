@@ -305,7 +305,7 @@ export const navbarRoute = {
     };
 
     const deviceRoutes = this.getDeviceRoutes();
-    console.log(deviceRoutes)
+    // console.log(deviceRoutes)
     PermissionHelper.enableDeviceSetting() && deviceRoutes.length > 0 && systemSettingRoute.children.push(
       {
         path: '/device',

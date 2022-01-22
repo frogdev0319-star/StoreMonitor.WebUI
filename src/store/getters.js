@@ -19,5 +19,6 @@ const getters = {
   collapsed: state => state.user.collapsed,
   templateOptions: state => state.user.templateOptions,
   curTemplateIndex: state => state.user.curTemplateIndex,
+  storeCache: state => state.user.storeCache,
 };
 export default getters;

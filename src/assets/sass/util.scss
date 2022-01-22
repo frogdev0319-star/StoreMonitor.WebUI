@@ -65,7 +65,7 @@ $sv_red: #c60957;
   background-color: #f7f9fa;
 }
 .dialog-slot{
-  margin: 0 30px;
+  margin: 0 20px 20px;;
   display: flex;
   align-items: center;
 }
@@ -322,6 +322,25 @@ $sv_red: #c60957;
     .el-input__inner {
       border-color: #f4f6f7 !important;
     }
+  }
+}
+.storevue-textarea {
+  textarea {
+    background-color: #f4f6f7;
+    border: none;
+    border-radius: 5px;
+    &:focus {
+    }
+  }
+}
+.inspection-select {
+  .el-input__inner {
+    border: none !important;
+    width: 90px;
+    height: 26px;
+    line-height: 26px;
+    color: #006ab7;
+    background-color: #edf8f9 !important;
   }
 }
 .el-select-dropdown__list {
