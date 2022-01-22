@@ -369,7 +369,7 @@ export default {
             filterVal.push(item.prop);
           }
         })
-        const curData = that.insRecordTableData;
+        const curData = that.allInsRecordData//insRecordTableData;
         const data = that.formatJson(filterVal, curData);
         const fileName = 'Inspection record_' +  util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
