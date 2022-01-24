@@ -234,16 +234,30 @@
         </div>
         <div class="channelbar-content" style="flex: 1">
           <div class="channel-content" style="height: 100%; display: flex; flex-direction: column;">
-            <div class="padding" style="text-align: left">{{ $t('remotePatrol.zoneList') }}</div>
+            <div class="flex-center padding" style="justify-content: space-between;">
+              {{ $t('remotePatrol.zoneList') }}
+              <el-input
+                :placeholder="$t('remotePatrol.channelPlaceholder')"
+                v-model="serachChannelValue"
+                size="small"
+                class="storevue-input-search"
+              >
+                <i
+                  slot="prefix"
+                  class="iconfont icon-sousuo"
+                  style="position: relative; top: 7px; left: 6px; font-size: 18px; color: #2b2b2b;"
+                />
+              </el-input>
+            </div>
             <div class="channels-srollbar">
               <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div>
-              <div class="btn-content" v-if="!curItem.disabled"
+              <div class="btn-content padding" v-if="!curItem.disabled"
                 :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
               >
                 <div 
-                  v-for="(item,index) in showChannelBtns" 
+                  v-for="(item,index) in (store.device && store.device.filter(d => d.name.indexOf(serachChannelValue) > -1))" 
                   :key="index" 
                   class="btn-details"
                   :class="{'child-space': isFullScreenMode}"
@@ -286,8 +300,8 @@
             </el-select>
             <div class="spacer"></div>
             <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
-                      :class="lang== 'en' ? 'en-el-submit' :'el-submit'"
-                      :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
+              class="storevue-button-filled"
+              :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
               {{ $t('remotePatrol.confirmSum') }}
             </el-button>
           </div>
@@ -537,6 +551,7 @@ export default {
   },
   data() {
     return {
+      serachChannelValue: '',
       isFullScreenMode: false,
       sheetName: [],
       isShowWarn: false,
@@ -810,8 +825,8 @@ export default {
   async mounted() {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
+    
     if (PatrolHistory != null) {
-      console.log(PatrolHistory)
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
       self.storeList = PatrolHistory.storeList
@@ -914,6 +929,7 @@ export default {
       obj.storeName = _item.name;
       obj.storeTitle = _item.name;
       obj.storeUp = _item.favorite;
+      obj.device = _item.device;
       self.channel = null;
       self.getChannelByStore(_item);
       if (_item.favorite) {
@@ -1347,14 +1363,13 @@ export default {
     },
     
     onStoreChange (storeData) {
-      console.log(storeData)
       this.curSelStoreId = storeData.curStore
       this.historyObj = {
         ...this.historyObj,
         
       }
       const storeItem = this.storeList.find(store => store.storeId === storeData.curStore)
-      this.changeStore_(storeItem)
+      if (storeItem) this.changeStore_(storeItem)
     },
     async getAllStore () {
       const self = this;
@@ -1387,6 +1402,7 @@ export default {
         self.getInitStoreData(allStoreData);
         const storeData = allStoreData.data.content;
         self.storeList = getStoreTemp(storeData);
+        console.log('self.storeList', self.storeList)
         const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
         self.changeStore_(storeItem)
       }
@@ -2897,7 +2913,7 @@ export default {
     pointer-events: none;
   }
   .el-container{
-    background-color: $background;
+    // background-color: $background;
     .spreadLsideClass{
       width: 98%;
     }
@@ -4340,7 +4356,6 @@ export default {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    padding: 0 20px;
     .btn-details{
       cursor: pointer;
       margin-bottom: 5px;

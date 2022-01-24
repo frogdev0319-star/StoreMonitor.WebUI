@@ -71,10 +71,10 @@
         :placeholder="$t('remotePatrol.stores')"
         size="mini">
         <el-option
-          v-for="item in storeOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"/>
+          v-for="item in curStoresData"
+          :key="item.id"
+          :label="item.name"
+          :value="item.id"/>
       </el-select>
       <slot name="others"></slot>
     </div>
@@ -187,6 +187,33 @@ export default {
   computed: {
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
+  mounted() {
+    const self = this;
+    const storeCache = self.$store.getters.storeCache;
+    if (storeCache !== null) {
+      this.curCountry = storeCache.curCountry;
+      this.curProvince = storeCache.curProvince;
+      this.curCity = storeCache.curCity;
+      this.curStore = storeCache.curStore;
+      this.curStoreData = storeCache.curStoreData;
+      this.curStores = storeCache.curStores;
+      this.curStoresData = storeCache.curStoresData;
+      this.curStoreGroup = storeCache.curStoreGroup;
+      this.curStoreType = storeCache.curStoreType;
+      this.storeStr = storeCache.storeStr;
+      this.storeGroupString = storeCache.storeGroupString;
+      this.storeTypeString = storeCache.storeTypeString;
+      this.filterStoreIds = storeCache.filterStoreIds;
+      this.curRegionI = storeCache.curRegionI;
+      this.curRegionII = storeCache.curRegionII;
+      this.regionMode = storeCache.regionMode;
+      this.countryList = storeCache.countryList;
+      this.cityList = storeCache.cityList;
+      this.provinceList = storeCache.provinceList;
+    } else {
+      this.getStoreListAndGroupAndType();
+    }
+  },
 
   watch: {
     async accountChanged(val) {
@@ -201,13 +228,19 @@ export default {
       this.getSearchParams();
     },
     curStore () {
+      // console.log(this.curStore)
       this.emitParams()
-    }
+    },
+    // showFavorite () {
+    //   this.storeOptions = this.allInitStoreList.filter(store => store.favorite).map(store =>({
+    //     value: store.storeId,
+    //     label: store.name
+    //   }))
+    // }
   },
 
   created() {
     this.getSearchParams();
-    this.getStoreListAndGroupAndType();
   },
 
   methods: {
@@ -240,7 +273,8 @@ export default {
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        this.allInitStoreList = results[0];
+        this.allInitStoreList = results[0].content;
+        // console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -288,11 +322,13 @@ export default {
       this.filterStore();
     },
     onChangeProvince(arr) {
+      console.log(arr)
       this.curProvince = arr;
       this.changePro(arr);
     },
 
     onChangeCity(arr) {
+      console.log(arr)
       this.curCity = arr;
       this.changeCity(arr);
     },
@@ -353,7 +389,7 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
         arr.push(item.value);
-        arr_.push({ id: item.storeId, name: item.name })
+        arr_.push({ id: item.storeId, name: item.label })
       });
       self.curStoresData = arr_;
       self.curStores = storeArr;
@@ -477,7 +513,7 @@ export default {
       tempsearchParamsObj.curProvince = this.curProvince;
       tempsearchParamsObj.curCity = this.curCity;
       tempsearchParamsObj.curStore = this.curStore;
-      tempsearchParamsObj.curStoreData = this.allInitStoreList.find(store => store.storeId === self.curStore)
+      tempsearchParamsObj.curStoreData = this.curStoreData;
       tempsearchParamsObj.curStores = this.curStores;
       tempsearchParamsObj.curStoresData = this.curStoresData;
       tempsearchParamsObj.curStoreGroup = this.curStoreGroup;
@@ -490,6 +526,10 @@ export default {
       tempsearchParamsObj.curRegionI = this.curRegionI;
       tempsearchParamsObj.curRegionII = this.curRegionII;
       tempsearchParamsObj.regionMode = this.regionMode;
+      tempsearchParamsObj.provinceList = this.provinceList;
+      tempsearchParamsObj.countryList = this.countryList;
+      tempsearchParamsObj.cityList = this.cityList;
+      // console.log(tempsearchParamsObj)
       
       this.$store.dispatch("setStoreCache", tempsearchParamsObj);
       this.$emit('storeChange', tempsearchParamsObj);
@@ -570,7 +610,7 @@ export default {
         arr.push(item.value);
         arr_.push({
           id: item.storeId,
-          name: item.name
+          name: item.label
         })
       });
       self.curStoresData = arr_;
