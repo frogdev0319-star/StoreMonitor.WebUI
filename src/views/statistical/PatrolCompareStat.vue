@@ -160,17 +160,17 @@
             </div>
           </el-col>
           <el-col :span="24">
-          <div id="pdf-area" ref="printPDF" v-if="ispdf" >
-            <div class="statistics-content-pdf" style="height: 735px;">
-              <div id="img_avg" >
-                <img :src="pdfSrc_avg">
+            <div id="pdf-area" ref="printPDF" v-if="ispdf" >
+              <div class="statistics-content-pdf" style="height: 735px;">
+                <div id="img_avg" >
+                  <img :src="pdfSrc_avg">
+                </div>
               </div>
-            </div>
-            <div class="statistics-content-pdf" style="height: 700px;margin-top:24px;">
-              <div id="img_assm"  class="avg-score" >
-                  <img :src="pdfSrc_assm">
+              <div class="statistics-content-pdf" style="height: 700px;margin-top:24px;">
+                <div id="img_assm"  class="avg-score" >
+                    <img :src="pdfSrc_assm">
+                </div>
               </div>
-            </div>
           </div>
           </el-col>
           
