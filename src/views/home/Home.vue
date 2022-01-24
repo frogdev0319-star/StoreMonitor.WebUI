@@ -52,14 +52,22 @@
             />
           </el-select>
           <el-button
-            v-if="$route.path === '/reportdetails'"
-            style="background-color: transparent; color: #fff; border: none"
+            v-if="$route.path === '/reportdetails' 
+              || $route.path === '/patrolPersonStat' 
+             || $route.path === '/patrolCompareStat'
+             || $route.path ==='/eventStat'"
+            style="background-color: transparent; color: #fff; border: none; position:absolute;top:21px;right:24px"
             @click="handleDownload"
           >
-            <div>
+            <div class="button-area">
+              <img :src="exportPdf" class="icon-excel">
+              <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+            </div>
+            <!--<div>
+              <img :src="exportPdf" class="icon-excel">
               <i class="iconfont icon-pdf export" />
               <span>{{ $t("remotePatrol.InspectionDetail") }}</span>
-            </div>
+            </div>-->
           </el-button>
         </div>
       </div>
@@ -252,6 +260,7 @@ export default {
   data() {
     return {
       showTag: false,
+      exportPdf: require('../../../static/img/export-pdf.png'),
       imgSrc: require("../../../static/img/logo_title.png"),
       miniImgSrc: require("../../../static/img/logo_title-mini.png"),
       arrowRightIcon: require("../../../static/img/arrow-right.png"),
@@ -1490,5 +1499,10 @@ $collapseWidth: 5.5%;
 }*/
 .el-form-item--mini.el-form-item {
   margin-bottom: 0;
+}
+.button-area .icon-excel{
+  height: calc(24/1920*100vw);
+  width: calc(24/1920*100vw);
+  margin-right: calc(8/1920*100vw);
 }
 </style>

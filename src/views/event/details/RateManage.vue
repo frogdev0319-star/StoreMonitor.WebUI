@@ -1383,13 +1383,13 @@ $h1:#292e36;
                 }
             }
             .process-detail{
-              width: calc(492/1440*100vw);
+              width: calc(468/1440*100vw);
               padding: 16px 16px 30px;
               border: solid 1px #f5f5f5;
               background-color:#f7f9fa;
               border-radius: 5px;
               .deal-details{
-                width:calc(460/1440*100vw);
+                width:calc(436/1440*100vw);
                 border-bottom: solid 2px #006ab7;
                 .creator-area{
                   width:100%;

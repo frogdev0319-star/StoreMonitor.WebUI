@@ -1,5 +1,21 @@
 <template>
   <div>
+    <div style="display: none">
+      <div class="no-print">
+        <delay-button
+          id="downloadPdf"
+          class="exportbtn"
+          type="primary"
+          size="mini"
+          @click="exportPdf"
+        >
+          <div class="button-area">
+            <i class="iconfont icon-pdf export"/>
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+          </div>
+        </delay-button>
+      </div>
+    </div>
     <div class="el-overview-content">
       <el-col :span="24">
         <search-component
