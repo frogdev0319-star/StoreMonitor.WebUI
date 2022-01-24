@@ -267,15 +267,18 @@
       </div>
     </el-dialog>
     <!--feedback based on snapshot -->
-    <el-dialog
+    <dialog-pop
       v-if="showSnapshotFeedbackDialog"
       :title= "$t('remotePatrol.feedbacks')"
-      :visible.sync="showSnapshotFeedbackDialog"
+      :append-to-body="true"
       :close-on-click-modal="false"
-      :width="860*percentHeight+'px'"
-      height="300px"
-      top="5%">
-      <div class="canvas-content" style="overflow:hidden;">
+      :isWarning="true"
+      :dialogWidth="860*percentHeight+'px'"
+      :visible="showSnapshotFeedbackDialog"
+      @cancelHandler="showSnapshotFeedbackDialog = false"
+      @confirmHandler="confirmFeedBackOnSnapshot"
+    >
+      <div class="canvas-content dialog-slot">
         <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
           <canvas
             id="icanvas"
@@ -301,7 +304,7 @@
             </div>
           </div>
         </div>
-        <div class="event-content" style="padding-right: 20px">
+        <div class="event-content">
           <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
           <el-input
             v-model="eventName"
@@ -312,47 +315,20 @@
           <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
           <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
           <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-          <div v-if="eventDes.trim().length > 0">
-            <div v-for="(text, index) in eventDes.split('|')" :key="index" class="flex-center">
-              <img :src="deleteInspectIcon" alt="delete" @click="deleteEventDes(index)"/>
-              <div class="paper flex-center margin-bottom-sm" style="padding: 5px; flex: 1; margin-left: 20px" :style="{border: `1px solid ${eventDesEdit.index === index ? '#006ab7': 'transparent'}` }">
-                <div style="flex: 1; text-align: left; margin: 5px">{{text}}</div>
-                <hr class="hr-vertical"/>
-                <img :src="editInspectIcon" @click="editEventDes(index)" alt="edit" style="margin: 5px"/>
-              </div>
-            </div>
-          </div>
-          <div style="position: relative;">
-            <el-input
-              :autosize="{ minRows: 4, maxRows: 7}"
-              v-model="eventDesEdit.val"
-              :placeholder="$t('remotePatrol.descPlaceholder')"
-              size="mini"
-              class="des-input"
-              type="textarea"
-              resize="none"
-              @input="eventDesChanged"
-              @blur="notShowInputRuleTips('eventDes')"/>
-            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
-            <el-button 
-              size="mini" 
-              style="position: absolute; right: 5px; bottom: 5px;"
-              @click="itemSubmitDescription"
-            >
-              確認
-            </el-button>
-          </div>
+          <el-input
+            :autosize="{ minRows: 4, maxRows:7}"
+            v-model="eventDes"
+            :placeholder="$t('remotePatrol.descPlaceholder')"
+            size="mini"
+            class="des-input"
+            type="textarea"
+            resize="none"
+            @input="eventDesChanged"
+            @blur="notShowInputRuleTips('eventDes')"/>
+          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
         </div>
       </div>
-      <div slot="footer">
-        <el-button id="cancelBtn" size="mini" @click="showSnapshotFeedbackDialog = false">
-          {{ $t('remotePatrol.cancel') }}
-        </el-button>
-        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmFeedBackOnSnapshot">
-          {{ $t('remotePatrol.confirm') }}
-        </el-button>
-      </div>
-    </el-dialog>
+    </dialog-pop>
 
     <!-- enter device validate code -->
     <el-dialog
@@ -398,9 +374,11 @@ import Environment from '@/common/environment';
 import html2canvas from 'html2canvas';
 import util from '@/common/util';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import DialogPop from '@/components/DialogPop.vue';
 
 export default {
   name: 'EzvizVideo',
+  components: {DialogPop},
   props: {
     channelInfo: {
       type: Object,

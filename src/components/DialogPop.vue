@@ -62,7 +62,11 @@ export default {
     confirmBtnDisabled: {
       type: Boolean,
       default: false
-    }
+    },
+    width: {
+      type: String,
+      default: ''
+    },
   },
 
   computed: {

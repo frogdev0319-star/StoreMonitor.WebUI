@@ -657,7 +657,7 @@ export default {
     "selectStoreToBind": "ストアがバインドされる",
     "selecttitle": "関連したポジションを選択してください",
     "setFullScoreEmpty": "合計スコアを空にすることはできません！",
-    "setFullScoreRange": "値の範囲は0ー50です！",
+    "setFullScoreRange": "値の範囲は-50ー50です！",
     "setItem": "アイテム設定",
     "setMaxScore": "最高",
     "setMinScore": "最低",

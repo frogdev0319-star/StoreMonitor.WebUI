@@ -10,7 +10,7 @@ export default {
     "bindStore": "门店绑定",
     "checkInStatistics": "巡店签到统计",
     "checkSchedule": "排程设置（点检排程）",
-    "confirmSum": "确认总结",
+    "confirmSum": "完成巡检",
     "dashDevice": "Dash",
     "dashDeviceMgt": "监控设备管理（Dash）",
     "dataCenter": "数据中心",
@@ -295,7 +295,7 @@ export default {
     "confirm": "确 认",
     "confirmChangeBind": "巡检表尚未提交，是否确认切换巡检表？",
     "confirmIgnore": "确认是否忽略当前巡检项？",
-    "confirmSum": "确认总结",
+    "confirmSum": "完成巡检",
     "confirmSwitch": "本次巡店尚未完成，确认是否切换当前门店？",
     "confirmSwitchBrand": "本次巡店尚未完成，确认是否切换当前品牌？",
     "confirmSwitchInspect": "本次巡店尚未完成，确认是否切换当前巡检表？",
@@ -476,7 +476,7 @@ export default {
       "tues": "二",
       "wed": "三"
     },
-    "zoneList": "区域列表"
+    "zoneList": "攝影機列表"
   },
 
   // event Management page language
@@ -670,7 +670,7 @@ export default {
     "selectStoreToBind": "请选择{tableName}巡检表，需要绑定的门店",
     "selecttitle": "请选择关联职务",
     "setFullScoreEmpty": "项目总分值不能为空！",
-    "setFullScoreRange": "取值范围为0~50！",
+    "setFullScoreRange": "取值范围为-50~50！",
     "setItem": "巡检项设置",
     "setMaxScore": "最高",
     "setMinScore": "最低",
@@ -1191,7 +1191,7 @@ export default {
       "storeGroup":"门店群组",
       "storeType":"门店类型",
       "detail":"详情",
-      "top5":"常见巡检项是件TOP5",
+      "top5":"常见巡检项事件TOP5",
       "topEventItem":"事件项名称",
       "inceptionTag":"巡检表",
       "happenAmount":"发生次数",

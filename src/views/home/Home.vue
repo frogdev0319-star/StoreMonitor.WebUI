@@ -52,14 +52,22 @@
             />
           </el-select>
           <el-button
-            v-if="$route.path === '/reportdetails'"
-            style="background-color: transparent; color: #fff; border: none"
+            v-if="$route.path === '/reportdetails' 
+              || $route.path === '/patrolPersonStat' 
+             || $route.path === '/patrolCompareStat'
+             || $route.path ==='/eventStat'"
+            style="background-color: transparent; color: #fff; border: none; position:absolute;top:21px;right:24px"
             @click="handleDownload"
           >
-            <div>
+            <div class="button-area">
+              <img :src="exportPdf" class="icon-excel">
+              <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+            </div>
+            <!--<div>
+              <img :src="exportPdf" class="icon-excel">
               <i class="iconfont icon-pdf export" />
               <span>{{ $t("remotePatrol.InspectionDetail") }}</span>
-            </div>
+            </div>-->
           </el-button>
         </div>
       </div>
@@ -210,7 +218,7 @@
             :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"
             :style="[
               showBorder ? { 'border-width': '0.5px' } : {},
-              $route.path === '/reinspection'
+              $route.path === '/reinspection' || $route.path === '/storemonitor'
                 ? {
                     background:
                       '#f7f9fa url(../../static/img/reinspection_bg.png) no-repeat 100% 0',
@@ -252,6 +260,7 @@ export default {
   data() {
     return {
       showTag: false,
+      exportPdf: require('../../../static/img/export-pdf.png'),
       imgSrc: require("../../../static/img/logo_title.png"),
       miniImgSrc: require("../../../static/img/logo_title-mini.png"),
       arrowRightIcon: require("../../../static/img/arrow-right.png"),
@@ -1407,6 +1416,10 @@ $collapseWidth: 5.5%;
   display: flex;
   flex-wrap: wrap;
 }
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
 .flex-center {
   display: flex;
   align-items: center;
@@ -1424,14 +1437,23 @@ $collapseWidth: 5.5%;
   margin-top: 10px;
   margin-bottom: 10px;
 }
+.margin-bottom-mini {
+  margin-bottom: 5px;
+}
 .margin-bottom-sm {
   margin-bottom: 10px;
 }
 .margin-right-md {
   margin-right: 20px;
 }
+.margin-top-md {
+  margin-top: 20px;
+}
 .margin-bottom-md {
   margin-bottom: 20px;
+}
+.margin-left-md {
+  margin-left: 20px
 }
 .font-size-sm {
   font-size: 12px;
@@ -1441,6 +1463,9 @@ $collapseWidth: 5.5%;
 }
 .spacer {
   flex: 1;
+}
+.text-left {
+  text-align: left;
 }
 .hr-vertical {
   margin: 0;
@@ -1477,5 +1502,10 @@ $collapseWidth: 5.5%;
 }*/
 .el-form-item--mini.el-form-item {
   margin-bottom: 0;
+}
+.button-area .icon-excel{
+  height: calc(24/1920*100vw);
+  width: calc(24/1920*100vw);
+  margin-right: calc(8/1920*100vw);
 }
 </style>

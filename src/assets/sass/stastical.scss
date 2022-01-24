@@ -216,3 +216,35 @@ $store: #fccc3f;
   padding:0;
   justify-content: space-between;
 }
+.no-print{
+  display: none;
+}
+.statistics-content-pdf{
+  margin-left: calc(32/1440*100vw);
+  margin-right: calc(32/1440*100vw);
+  width: 1000px;
+  margin: 0px 32px 24px;
+  padding: 17px 24px 24px 22px;
+  background-color: #fff;
+  border-radius: 5px;
+  .head{
+    width: 952px;
+    margin-left:20px;
+    margin-right:20px; 
+    padding-right:23px;
+    height: 42px;
+    border-bottom: solid 1px $border;
+    align-items: center;
+    display: flex;
+    flex-direction:row;
+    justify-content:space-between;
+    .region-titles{
+        font-family: NotoSansCJKTC;
+        font-size: calc(18/1920*100vw);
+        font-weight: 500;
+        text-align: left;
+        color: #2b2b2b;
+    }
+    
+  }
+}

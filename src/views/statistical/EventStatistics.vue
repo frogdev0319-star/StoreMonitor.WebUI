@@ -1,5 +1,21 @@
 <template>
   <div>
+    <div style="display: none">
+      <div class="no-print">
+        <delay-button
+          id="downloadPdf"
+          class="exportbtn"
+          type="primary"
+          size="mini"
+          @click="exportPdf"
+        >
+          <div class="button-area">
+            <i class="iconfont icon-pdf export"/>
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+          </div>
+        </delay-button>
+      </div>
+    </div>
     <div class="el-overview-content">
       <el-col :span="24">
         <search-component
@@ -48,7 +64,7 @@
                   :region-array2="params.curCity"
                   :cur-store-group="params.curStoreGroup"
                   :cur-store-type="params.curStoreType"
-                  :cur-stores="params.curStore"
+                  :cur-stores="storeIds"
                   :cached-params="params"
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged"
@@ -313,151 +329,320 @@
         </el-row>
       </el-col>
     </div>
-    <div v-if="ispdf" class="el-overview-content">
-      <el-col id="pdfDom" ref="printPDF" :span="24" class="el-overview" style="padding:40px 20px;width:1150px;">
-        <div :span="24" class="export-header">
-          <p>
-            <span>{{ $t('remotePatrol.storeSelect') }}：</span>
-            <span class="content-header">{{ storeNameStr }}</span>
-          </p>
-          <p>
-            <span>{{ $t('remotePatrol.storeGroup') }}：</span>
-            <span class="content-header">{{ storeGroupStr }}</span>
-          </p>
-          <p>
-            <span>{{ $t('remotePatrol.storeType') }}：</span>
-            <span class="content-header">{{ storeTypeStr }}</span>
-          </p>
-          <p>
-            <span>{{ $t('remotePatrol.time') }}：</span>
-            <span class="content-header">{{ storeDateValue }}</span>
-          </p>
+    <div id="pdf-area" ref="printPDF" v-if="ispdf" >
+      <div class="el-overview-content" style="height: 194px;box-shadow:none;">
+        <div id="img_amount" class="amout_row">
+          <img :src="pdfSrc_amount">
         </div>
-        <el-row class="first-row">
-          <el-col :span="24">
-            <img :src="pdfSrc">
+      </div>
+      <div class="el-overview-content" style="height: 700px;margin-top:24px;box-shadow:none;">
+        <div id="img_first"  class="first-row" >
+            <img :src="pdfSrc_first">
+        </div>
+      </div>
+      <div class="el-overview-content" style="height: 700px;margin-top:24px;box-shadow:none;">
+        <div id="img_second"  class="second-row" >
+            <img :src="pdfSrc_second">
+        </div>
+      </div>
+    </div>
+    <div v-if="ispdf" class="el-overview-content" style="width:1000px;">
+      <el-col :span="24" class="el-overview" style="box-shadow:none;">
+        <el-row class="amout_row" id="imgTest_amount" style="box-shadow:none;">
+          <el-col :span="24" class="kpi-list">
+            <div class="title">{{ $t('statistics.event.eventProcessStatus') }}</div>
+          </el-col>
+          <el-col :span="24" class="amount_region">
+            <div class="region-area" style="width:200px;"  v-for="(item,index) in eventKPIs" :key="index">
+              <div class="num-area">
+                <div style="display:flex;height:84.5px;">
+                  <div class="number">{{ item.eventNum }}
+                    <span v-if="index!=3" style="font-size:15px;margin-left:5px;">{{$t('statistics.event.unit')}}</span>
+                    <span v-else style="font-size:15px;margin-left:5px;">%</span>
+                  </div>
+                </div>
+                <div class="description">{{ item.eventTitle}}</div>
+              </div>
+              <div class="img-area">
+                <img v-if="index==0" src="../../../static/img/statistics/ic_totalEvent.svg" style="width:84.8;height:79.8px;align-items:flex-end;padding-bottom:10.5px;" />
+                <img v-else-if="index==1" src="../../../static/img/statistics/ic_inprocess.svg" style="width:108.5;height:65.6px;align-items:flex-end;padding-bottom:10.5px;" />
+                <img v-else-if="index==2" src="../../../static/img/statistics/ic_processed.svg" style="width:111.8;height:74.5px;align-items:flex-end;padding-bottom:10.5px;" />
+                <img v-else src="../../../static/img/statistics/ic_compeleted.svg" style="width:115.5;height:74px;align-items:flex-end;padding-bottom:10.5px;" />
+              </div>
+              <div v-if="index!=3" class="split-line"></div>
+            </div>
           </el-col>
         </el-row>
-        <div class="no-print">
-          <el-row id="imgTest" class="first-row" style="width:1045px;">
-            <el-col :span="24" class="kpi-list" style="background-color:#ffffff;">
-              <div class="title">{{ $t('overview.eventGraph') }}</div>
-            </el-col>
-            <el-col :span="3" class="kpi-list" style="background-color:#ffffff;">
-              <div class="kpi-content">
-                <div v-for="(item,index) in eventKPIs" :key="index" class="event-list">
-                  <div class="event-title">{{ item.eventTitle }}</div>
-                  <div class="event-num">{{ item.eventNum }}</div>
-                </div>
+        <el-row class="first-row" id="imgTest_first" style="box-shadow:none;">
+          <el-col :span="24" class="kpi-list">
+            <div class="head">
+              <div class="title">{{ $t('statistics.event.eventRank') }}</div>
+              <TypeSelectArea
+                  path="eventStatistics"
+                  :allow-all=true
+                  :region-array1="params.curProvince"
+                  :region-array2="params.curCity"
+                  :cur-store-group="params.curStoreGroup"
+                  :cur-store-type="params.curStoreType"
+                  :cur-stores="storeIds"
+                  :cached-params="params"
+                  :cur-country="curCountry"
+                  @emitTypeChanged="emitTypeChanged"
+              ></TypeSelectArea>
+              <!--<AreaSelected
+                path="eventStatistics"
+                allow-all="true"
+                :cached-params="params"
+                :cur-country="curCountry"
+                @emitTypeChanged="emitTypeChanged"
+              ></AreaSelected>-->
+            </div>
+            <div class="barchart-area">
+              <div style="position:absolute;right:24px;top:94px;z-index:10;" @click='changeBarchartSorOrder'>
+                  <div class="button-area" >
+                      <span style="color:#acaeb1">{{ barchartOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                      <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                  </div>    
               </div>
-            </el-col>
-            <el-col :span="14" class="store-events" style="background-color:#ffffff;">
-              <div class="region-result">
-                <div class="charts-content">
-                  <v-chart
-                    ref="storeEventRef"
-                    :options="storeEventsOptions"
-                    :auto-resize="true"
-                    class="result-content"/>
-                </div>
-              </div>
-            </el-col>
-            <el-col :span="7" class="source-list" style="background-color:#ffffff;">
-              <div class="pct-content">
-                <div class="pct-panel">
-                  <v-chart
-                    ref="pieChartRef"
-                    :auto-resize="true"
-                    :options="eventSourceOptions"
-                    class="chart-content"/>
-                </div>
-                <div class="pct-nums">
-                  <div
-                    v-for="(item, index) in sourcePerArray"
-                    :class="lang === 'en' ? 'en-label' : ''"
-                    :key="index"
-                    class="content-labels">
-                    <div class="excellent_nums">{{ item.percent }}%</div>
-                    <div class="excellent_labels">
-                      <span :class="`label-` + index" class="labels excellent-label"/>
-                      <span class="label-desc">{{ item.type }}</span>
-                    </div>
+              <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
+            </div>
+            <div class="table-area">
+              <div class="sec-head">
+                <div class="title">{{ $t('statistics.event.storeEvent') }}</div>
+                <div class="operation-btns">
+                  <div class="switch-btn">
+                    <el-button
+                    class="mode-btn"
+                    :class="{'active-mode-btn' :viewMode==0}"
+                    @click="onSwitchMode(0)"
+                    >{{ $t('statistics.event.tableMode')}}</el-button>
+                    <el-button
+                      class="mode-btn"
+                      :class="{'active-mode-btn' :viewMode==1}"
+                      @click="onSwitchMode(1)"
+                    >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
+                  <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;background-color:#FFF;color:#006ab7;"
+                    type="default"
+                    size="mini"
+                    @click="export2Excel"
+                  >
+                    <div class="button-area">
+                      <img :src="exportPng" class="icon-excel">
+                      <span>{{ $t('eventView.exportReport') }}</span>
+                    </div>
+                  </delay-button>
                 </div>
               </div>
-            </el-col>
-          </el-row>
-        </div>
-        <el-row class="second-row" style="padding-bottom:20px;">
-          <el-col :span="24" class="items-title">
-            <span class="title">{{ $t('overview.eventList') }}</span>
+              <div v-if="viewMode==0">
+                <div style="margin-top:20.5px;">
+                  <table-only
+                    ref="elTP"
+                    :column-data="eventInfoData"
+                    :table-data="eventTableData"
+                    :total="total"
+                    :highlight-current-row= "true"
+                    :pagesize="sizeNum"
+                    :current-page="page"
+                    :is-event = "false"
+                    :default-sort = "defaultSort"
+                    :allowRowExpand = "true"
+                    :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                    :tableHeight = "726"
+                    layout = "prev,pager,next,sizes"
+                    expand-component = "IncepItemTop5"
+                    :expandCompProperties = "componentsProps"
+                    @sortChange="handleSortChange"
+                    @onCellClick = "onEvenListNumClick"
+                  />
+                </div>
+                <div style="width:100%; margin-top:12px;height:31px;">
+                  <tbl-pagination-only
+                    :total="total"
+                    :current-page="page"
+                    :page-size="sizeNum"
+                    layout = "prev,pager, next,sizes,slot"
+                    @sizeChange="handlePageAndSizeChange"
+                    @currentChange="handleCurrentChange"
+                  />
+                </div>
+              </div>
+              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+                <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"/>
+              </div>
+            </div>
           </el-col>
-          <el-col :span="24" class="event-table">
-            <div class="table">
-              <div class="event-content">
-                <el-table
-                  :data="allEventData"
-                  :highlight-current-row="true"
-                  :default-sort = "defaultSort"
-                  :header-cell-class-name="headerClass"
-                  :cell-class-name="cellClass"
-                  :row-class-name="rowClass"
-                  empty-text="无数据"
-                  align="left"
-                  stripe
-                  border
-                  style="width: 100%"
-                  size="mini"
-                >
-                  <el-table-column
-                    v-for="(_item,_index) in eventInfoData"
-                    :key="_index"
-                    :prop="_item.prop"
-                    :label="_item.label"
-                    :min-width="_item.pdfwidth"
-                    :sortable="_item.sortable"/>
-                  <el-table-column
-                    :label="$t('overview.remotePatrol')"
-                    :min-width="lang.indexOf('zh') !== -1 ? '8% ': '9%'"
-                    sortable="custom"
-                    prop="RemoteStr">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper remote">
-                        <el-tag size="small" color="#f31d651a">{{ scope.row.RemoteStr }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    :label="$t('overview.onsitePatrol')"
-                    :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
-                    sortable="custom"
-                    prop="OnsiteStr">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper onsite">
-                        <el-tag size="small" color="#fb804f1a">{{ scope.row.OnsiteStr }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <el-table-column
-                    :label="$t('overview.storeMonitor')"
-                    :min-width="lang.indexOf('zh') !== -1 ? '8%' : '9%'"
-                    sortable="custom"
-                    prop="VideoStr">
-                    <template slot-scope="scope">
-                      <div slot="reference" class="name-wrapper video">
-                        <el-tag size="small" color="#fccc3f1a">{{ scope.row.VideoStr }}</el-tag>
-                      </div>
-                    </template>
-                  </el-table-column>
-                  <div slot="empty">
-                    <div>
-                      <i class="iconfont icon-zhengque empty-data-icon"/>
-                      <span :style="{'margin-left':'20px','font-size':'14px','color':'#7d8cad'}">
-                        {{ $t('overview.noData') }}
-                      </span>
+        </el-row>
+        <el-row class="second-row" id="imgTest_second" style="box-shadow:none;">
+          <el-col :span="24" class="kpi-list">
+            <div class="head">
+              <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
+              <TypeSelectArea
+                  path="eventStatistics"
+                  :allow-all=true
+                  :region-array1="params.curProvince"
+                  :region-array2="params.curCity"
+                  :cur-store-group="params.curStoreGroup"
+                  :cur-store-type="params.curStoreType"
+                  :cur-stores="params.curStore"
+                  :cached-params="params"
+                  :cur-country="curCountry"
+                  @emitTypeChanged="emitTypeChanged2"
+              ></TypeSelectArea>
+              <!--<AreaSelected
+                path="eventStatistics"
+                allow-all="true"
+                :cached-params="params"
+                :cur-country="curCountry"
+                @emitTypeChanged="emitTypeChanged2"
+              ></AreaSelected>-->
+            </div>
+            
+            <div class="pie-area">
+              <div class="pie-div">
+                <div class="inner"/>
+                <div class="pct-panel">
+                    <v-chart
+                        ref="pieChartRef"
+                        :auto-resize="true"
+                        :options="eventSourceOptions"
+                        class="chart-content"
+                        @click="piechartClick"
+                    />
+                </div>
+              </div>
+              <div style="margin-top: 10px;width:60%;margin-left:calc(152/1440*100vw);height:206px;overflow-y:auto;overflow-x:hidden;">
+              <div v-for="(item,index) in sourcePerArray" :key="index">
+                <div :class="(item.id==selEventItem) ? 'pie-label-area-active':'pie-label-area'" @click="onClickEventItem(item,index)">
+                    <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
+                    <div class="pei-item-name">{{item.itemName}}</div>
+                    <div class="pei-item-num">{{item.percentage}}%</div>
+                    <div class="pei-item-num">{{item.amount}}次</div>
+                </div>
+              </div> 
+              </div>
+            </div>
+            <div class="table-area">
+              <div class="sec-head">
+                <div class="title">{{ selEventItemName+$t('statistics.event.envirmentRate') }}</div>
+                <div class="operation-btns">
+                  <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;width:210px;background-color:#FFF;color:#006ab7;"
+                    type="primary"
+                    size="mini"
+                    @click="onSeeAllIncepEventClick"
+                  >
+                    <div class="button-area">
+                      <img :src="seeAllsvg" class="icon-excel">
+                      <span>{{ $t('statistics.event.seeAllIncepEvent') }}</span>
                     </div>
+                  </delay-button>
+                  <delay-button
+                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    style="margin-left:32px;background-color:#FFF;color:#006ab7;"
+                    type="default"
+                    size="mini"
+                    @click="export2Excel_eventItem"
+                  >
+                    <div class="button-area">
+                      <img :src="exportPng" class="icon-excel">
+                      <span>{{ $t('eventView.exportReport') }}</span>
+                    </div>
+                  </delay-button>
+                </div>
+              </div>
+              <div style="margin-top:20.5px;">
+                <table-only
+                  ref="elTP"
+                  :column-data="eventItemTable.column_data"
+                  :table-data="eventItemTable.table_data"
+                  :highlight-current-row= "true"
+                  :is-event = "false"
+                  :default-sort = "defaultSort"
+                  :allowRowExpand = "false"
+                  :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                  :tableHeight = "726"
+                  @handleChange="handlePageAndSizeChange_eventItem"
+                  @sortChange="handleSortChange_eventItem"
+                  @onCellClick = "onEvenInvolveStoreClick"
+                />
+              </div>
+              <div style="width:100%; margin-top:12px;height:31px;">
+                <tbl-pagination-only
+                  :total="eventItemTable.total"
+                  :current-page="eventItemTable.page"
+                  :page-size="eventItemTable.sizeNum"
+                  layout = "prev,pager, next,sizes,slot"
+                  @sizeChange="handlePageAndSizeChange_eventItem"
+                  @currentChange="handlePageAndSizeChange_eventItem"
+                />
+              </div>
+            </div>
+            <div v-if="showInvolveTableArea" style="margin-top:100px;height: auto;">
+              <div style="height: 1px;margin-left:calc(36/1440*100vw);margin-right: calc(24/1440*100vw);border-bottom: solid 1px #acaeb1;"></div>
+              <div class="table-area" style="">
+                <div class="sec-head">
+                  <div class="title">{{ selEventItemName+$t('statistics.event.eventInvolveStores') }}</div>
+                  <div class="operation-btns" style="width:calc(344/1440*100vw)">
+                    <div class="switch-btn">
+                      <el-button
+                      class="mode-btn"
+                      :class="{'active-mode-btn' :viewMode_eventStores==0}"
+                      @click="onSwitchMode_eventStores(0)"
+                      >{{ $t('statistics.event.tableMode')}}</el-button>
+                      <el-button
+                        class="mode-btn"
+                        :class="{'active-mode-btn' :viewMode_eventStores==1}"
+                        @click="onSwitchMode_eventStores(1)"
+                      >{{ $t('statistics.event.imageMode')}}</el-button>
+                    </div>
+                    <delay-button
+                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                      style="margin-left:32px;background-color:#FFF;color:#006ab7;"
+                      type="default"
+                      size="mini"
+                      @click="export2Excel_eventStores"
+                    >
+                      <div class="button-area">
+                        <img :src="exportPng" class="icon-excel">
+                        <span>{{ $t('eventView.exportReport') }}</span>
+                      </div>
+                    </delay-button>
                   </div>
-                </el-table>
+                </div>
+                <div v-if="viewMode_eventStores==0">
+                  <div style="margin-top:20.5px;">
+                    <table-only
+                      ref="elTP"
+                      :column-data="eventInvolveTable.column_data"
+                      :table-data="eventInvolveTable.table_data"
+                      :highlight-current-row= "true"
+                      :is-event = "false"
+                      :default-sort = "eventInvolveTable.defaultSort"
+                      :allowRowExpand = "true"
+                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                      :tableHeight = "726"
+                      expand-component = "EventCommentList"
+                      :expandCompProperties = "componentsProps_EventCommentList"
+                    />
+                  </div>
+                  <div style="width:100%; margin-top:12px;height:31px;">
+                    <tbl-pagination-only
+                      :total="eventInvolveTable.total"
+                      :current-page="eventInvolveTable.page"
+                      :page-size="eventInvolveTable.sizeNum"
+                      layout = "prev,pager, next,sizes,slot"
+                      @sizeChange="handlePageAndSizeChange_eventStores"
+                      @currentChange="handlePageAndSizeChange_eventStores"
+                    />
+                  </div>
+                </div>
+                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+                  <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"/>
+                </div>
               </div>
             </div>
           </el-col>
@@ -509,8 +694,11 @@ export default {
   mixins: [resize],
   data() {
     return {
+      storeIds:[],
       ispdf: false,
-      pdfSrc: '',
+      pdfSrc_amount: '',
+      pdfSrc_first: '',
+      pdfSrc_second: '',
       curCountry:"-1",
       compareIds:[],
       comapareLabels:[],
@@ -922,35 +1110,8 @@ export default {
       };
       this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
         this.ifSaveParams = true;
-      /*if(searchParams.inspectId && searchParams.inspectId!=''){
-        console.log(searchParams.inspectId,this.curInspectId)
-        if(searchParams.inspectId !=this.curInspectId){
-          console.log("Change ")
-          let result  = await  this.getInspectItemList(searchParams.inspectId)
-          if(result.errCode==0 && result.data){
-            let tempList = [];
-            result.data.forEach(function(item){
-                if(item.parentId == -1){
-                  tempList.push(item);
-                }
-            })
-            result.data.forEach(function(item){
-                tempList.forEach(function(subitem){
-                    if(item.parentId == subitem.id){
-                      subitem.items.push(item);
-                    }
-                });
-
-            })
-            this.inspectItemList = tempList ;
-
-            this.curInspectId = searchParams.inspectId
-            console.log(this.inspectItemList);
-          }
-        }
-
-      }*/
       this.params = searchParams;
+      this.storeIds = this.params.storeIds;
       this.compareIds = this.compareIds2 = this.params.storeIds;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
@@ -969,6 +1130,7 @@ export default {
       self.componentsProps.endTs = self.params.endTs;
       if (self.params.storeIds.length === 0) {
         self.eventTableData = [];
+        self.storeIds = [];
         self.total = 0;
         self.allEventData = [];
         self.getEventsNum();
@@ -989,16 +1151,13 @@ export default {
         self.params.order = this.order;
         self.hasNoData = false;
 
-        /**
-         *firstly, call getEventTableData to get all event num and display the first page of table
-         * secondly, call getAllEventData to get all event and pie chart data
-         */
-      }
         await self.getUpperGloableEventData();
         await self.getEventTableData();
         await self.getAllEventData();
         await self.getEventBarChartData();
         self.doGetInspecEvenItems();
+      }
+        
       
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
@@ -1021,7 +1180,7 @@ export default {
       const params = {};
       params.beginTs = this.params.beginTs;
       params.endTs = this.params.endTs;
-      params.storeIds = this.params.storeIds;
+      params.storeIds = this.storeIds;
       params.regionMode = 0;
     
       try {
@@ -1671,11 +1830,17 @@ export default {
     },
     async getItemDetail(){
       const self = this;
-      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2};
-      let result = await this.getInspecItemStatsOverview(params);
-      self.eventItemTable.itemAllData = result.data;
-      self.eventItemTable.total = Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
-      self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+      if(this.selEventItemIds.length>0){
+        let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,itemIds:self.selEventItemIds,storeIds:self.compareIds2};
+        let result = await this.getInspecItemStatsOverview(params);
+        self.eventItemTable.itemAllData = result.data;
+        self.eventItemTable.total = Math.ceil( self.eventItemTable.itemAllData.length/self.eventItemTable.sizeNum );
+        self.eventItemTable.table_data = [...self.eventItemTable.itemAllData.slice((self.eventItemTable.page - 1)* self.eventItemTable.sizeNum, self.eventItemTable.page* self.eventItemTable.sizeNum)];
+      }else{
+        self.eventItemTable.page=1;
+        self.eventItemTable.itemAllData=[]
+        self.eventItemTable.table_data=[]
+      }
     },
     async onSeeAllIncepEventClick(){
       const self = this;
@@ -1842,11 +2007,21 @@ export default {
       }
       self.ispdf = true;
       this.$nextTick(() => {
-        const img = document.getElementById('imgTest');
+        const img_amount = document.getElementById('imgTest_amount');
+        const img_first = document.getElementById('imgTest_first');
+        const img_second = document.getElementById('imgTest_second');
         setTimeout(() => {
-          html2canvas(img).then(function(canvas) {
-            var oGrayImg = canvas.toDataURL('image/jpeg');
-            self.pdfSrc = oGrayImg;
+          html2canvas(img_amount).then(function(canvas) {
+            var oGrayImg1 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_amount = oGrayImg1;
+          });
+          html2canvas(img_first).then(function(canvas) {
+            var oGrayImg2 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_first = oGrayImg2;
+          });
+          html2canvas(img_second).then(function(canvas) {
+            var oGrayImg3 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_second = oGrayImg3;
           });
           setTimeout(() => {
             self.$print(self.$refs.printPDF);
@@ -1860,10 +2035,10 @@ export default {
       this.$refs.pieChartRef && this.$refs.pieChartRef.resize();
       this.$refs.storeEventRef && this.$refs.storeEventRef.resize();
     },
-    exportPdf(storeNameStr, groupStr, typeStr) {
-      this.storeNameStr = storeNameStr;
-      this.storeGroupStr = groupStr;
-      this.storeTypeStr = typeStr;
+    exportPdf() {
+      this.storeNameStr = this.params.storeStr;
+      this.storeGroupStr = this.params.storeGroupStr;
+      this.storeTypeStr = this.params.storeTypeStr;
       this.handleDown();
     },
 

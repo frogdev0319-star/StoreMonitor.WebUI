@@ -1,5 +1,22 @@
 <template>
-  <div>
+  <div class="report-container">
+    <div style="display: none">
+      <div class="no-print">
+        <delay-button
+          id="downloadPdf"
+          :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+          class="exportbtn"
+          type="primary"
+          size="mini"
+          @click="handleDown"
+        >
+          <div class="button-area">
+            <i class="iconfont icon-pdf export"/>
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+          </div>
+        </delay-button>
+      </div>
+    </div>
     <el-row  class="statistics-container">
       <el-col :span="24">
         <div class="statistics-header" style="margin-bottom:0px;">
@@ -83,6 +100,42 @@
         </div>
       </el-col>
     </el-row>
+    <div v-if="ispdf">
+      <el-row id="pdf-area" ref="printPDF" class="statistics-container">
+        <el-col :span="24" class="statistics-content" style="height: auto">
+          <div class="head">
+            <div class="title">{{ $t('statistics.patrolPerson.insRecordList') }}</div>
+          </div>
+          <div style="margin-top:20.5px;">
+            <table-only
+              ref="elTP"
+              :column-data="insRecordColData"
+              :table-data="allInsRecordData"
+              :highlight-current-row= "true"
+              :is-event = "false"
+              :default-sort = "defaultSort"
+              :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+              :allowRowExpand = "true"
+              :isexportPDF = "isexportPDF"
+              expand-component = "TabInceptionDetail"
+              :expandCompProperties = "componentsProps"
+              @sortChange="handleSortChange"
+            />
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <dialog-pop
+      :title="$t('insSettingView.export')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :visible="ispdf"
+      :show-button="false"
+      :show-close="false"
+      class="LoadDialog"
+    >
+      <p>{{ $t('insSettingView.isExportPDF') }}......</p>
+    </dialog-pop>
   </div>
 </template>
 
@@ -107,6 +160,7 @@ import { getUserInfo } from '@/api/login';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import MultiSelect from '@/components/MultiSelect2';
 import TabInceptionDetail from '@/components/TabInceptionDetail'
+import html2canvas from 'html2canvas';
 export default {
   name: 'PatrolPersonStat',
 
@@ -227,7 +281,9 @@ export default {
           'isExpand':true
         }
       ],
-      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()}
+      componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()},
+      isexportPDF:false,
+      ispdf:false,
     }
   },
 
@@ -369,7 +425,7 @@ export default {
             filterVal.push(item.prop);
           }
         })
-        const curData = that.insRecordTableData;
+        const curData = that.allInsRecordData//insRecordTableData;
         const data = that.formatJson(filterVal, curData);
         const fileName = 'Inspection record_' +  util.getCurDateStr();
         export_json_to_excel(tHeader, data, fileName);
@@ -447,7 +503,27 @@ export default {
       this.defaultSort.order === 'descending' ? this.allInsRecordData.sort((a,b) => { return b[key] - a[key] })
                                 : this.allInsRecordData.sort((a,b) => { return a[key] - b[key] });
     },
-
+    handleDown() {
+      const self = this;
+      if (self.allInsRecordData.length === 0) {
+        util.notify(self.$t('statistics.emptyInsRecordList'), 'warning', 3000);
+        return false;
+      }
+      self.ispdf = true;
+      this.$nextTick(() => {
+        const img = document.getElementById('pdf-area');
+        setTimeout(() => {
+          html2canvas(img).then(function(canvas) {
+            var oGrayImg = canvas.toDataURL('image/jpeg');
+            self.pdfSrc = oGrayImg;
+          });
+          setTimeout(() => {
+            self.$print(self.$refs.printPDF);
+            self.ispdf = false;
+          }, 1000);
+        }, 5000);
+      });
+    },
   }
 };
 </script>

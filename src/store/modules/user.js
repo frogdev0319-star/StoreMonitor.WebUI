@@ -34,12 +34,16 @@ const user = {
     availabePathList: [],
     collapsed: false,
     templateOptions: [],
-    curTemplateIndex: -1
+    curTemplateIndex: -1,
+    storeCache: null
   },
 
   mutations: {
     SET_CUR_TEMPLATE_INDEX: (state, index) => {
       state.curTemplateIndex = index
+    },
+    SET_STORE_CACHE: (state, store) => {
+      state.storeCache = {...store}
     },
     SET_TEMPLATE_OPTIONS: (state, options) => {
       state.templateOptions = options
@@ -153,6 +157,9 @@ const user = {
     setCurTemplateIndex({ commit }, index) {
       commit('SET_CUR_TEMPLATE_INDEX', index);
     },
+    setStoreCache({ commit }, store) {
+      commit('SET_STORE_CACHE', store);
+    },
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
         getDashServerInfo().then(res => {
@@ -208,7 +215,7 @@ const user = {
       };
       return new Promise((resolve, reject) => {
         loginByUsername(params).then(res => {
-          console.log(res);
+          // console.log(res);
           const data = res.data;
           if (res.data) {
             commit('SET_TOKEN', data.token);

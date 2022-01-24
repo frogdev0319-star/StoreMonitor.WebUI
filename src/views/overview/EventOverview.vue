@@ -1,7 +1,6 @@
 <template>
   <div class="el-overview-content">
-    <div class="overview-date">
-      <span class="date-title">{{ $t('overview.date') }}</span>
+    <div class="overview-date" style="margin-left:24px;">
       <date-time-selector @change="dateChange"/>
       <span class="el-store">
         {{ $t('overview.totalStore', {storeNum: numOfStores}) }}

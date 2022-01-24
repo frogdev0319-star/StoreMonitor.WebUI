@@ -1,16 +1,32 @@
 <template>
     <div>
-        <el-row class="statistics-container">
-            <el-col :span="24" class="aaa">
-                <search-component
-                ref="inspectEvalutionSearch"
-                isInspectItem=true
-                :showDateSelector = "false"
-                path="inspectEvalutionStatistics"
-                @emitSearch = "emitSearch"/>
-            </el-col>
-            <el-col :span="24">
-            <div class="statistics-content" style="height: 735px;">
+      <div style="display: none">
+        <div class="no-print">
+          <delay-button
+            id="downloadPdf"
+            class="exportbtn"
+            type="primary"
+            size="mini"
+            @click="exportPDF"
+          >
+            <div class="button-area">
+              <i class="iconfont icon-pdf export"/>
+              <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+            </div>
+          </delay-button>
+        </div>
+      </div>
+      <el-row class="statistics-container">
+          <el-col :span="24" class="aaa">
+              <search-component
+              ref="inspectEvalutionSearch"
+              isInspectItem=true
+              :showDateSelector = "false"
+              path="inspectEvalutionStatistics"
+              @emitSearch = "emitSearch"/>
+          </el-col>
+          <el-col :span="24">
+            <div class="statistics-content" style="height: 735px;" >
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -33,7 +49,7 @@
                       :region-array2="params.curCity"
                       :cur-store-group="params.curStoreGroup"
                       :cur-store-type="params.curStoreType"
-                      :cur-stores="params.curStore"
+                      :cur-stores="storeIds"
                       :cached-params="params"
                       :cur-country="curCountry"
                       @emitTypeChanged="emitTypeChanged"
@@ -41,7 +57,7 @@
                   </div>
                   <div v-if="Avg12Num.length>0" class="avg-score" style="background-color:#fdf6f4;justify-content:space-between;">
                     <div class="avg12item" style="width:170px;">
-                      <div style="margin-left:10px;align-self:center;font-size:normal;">{{Avg12Num[0].name}}</div>
+                      <div class="score-item-name">{{Avg12Num[0].name}}</div>
                       <div style="margin-left:10px;">{{$t('statistics.averageScore')}}</div>
                     </div>
                     <div class="avg12item">
@@ -51,7 +67,7 @@
                   </div>
                   <div v-if="Avg12Num.length>1" class="avg-score" style="background-color:#edf6e8;justify-content:space-between;">
                     <div class="avg12item" style="width:170px;">
-                      <div style="margin-left:10px;align-self:center;font-size:normal;">{{Avg12Num[1].name}}</div>
+                      <div class="score-item-name" >{{Avg12Num[1].name}}</div>
                       <div style="margin-left:10px;">{{$t('statistics.averageScore')}}</div>
                     </div>
                     <div class="avg12item">
@@ -59,7 +75,7 @@
                       <div style="margin-left:10px;margin-right:10px;">{{$t('statistics.score')}}</div>
                     </div>
                   </div>
-                  <div class="pct-panel" v-if="avgChartOption">
+                  <div  class="pct-panel" v-if="avgChartOption">
                     <div v-show="showNoData" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
                       <img src="../../../static/img/statistics/ic_nodata.svg" style="widht:90px;height:81px;" />
                       <div style="height:55px;display:flex;justify-content:center;flex-direction:column">
@@ -93,21 +109,24 @@
                       :region-array2="params.curCity"
                       :cur-store-group="params.curStoreGroup"
                       :cur-store-type="params.curStoreType"
-                      :cur-stores="params.curStore"
+                      :cur-stores="storeIds"
                       :cached-params="params"
                       :cur-country="curCountry"
                       @emitTypeChanged="emitTypeChanged2"
                     ></TypeSelectArea>
                   </div>
-                  <div class="score-area" style="display:flex;flex-direction:row;height:92px;align-item:center;">
-                    <div style="width:145px;border-right:solid 1px #f7f9f9;">
+                  <div  class="score-area" style="display:flex;flex-direction:row;height:92px;align-item:center;">
+                    <div v-show="standardRate!='- -'" style="width:145px;border-right:solid 1px #f7f9f9;">
                       <div style="height:70px;font-size:48px;color:#484848;">{{standardRate}}<span style="font-size:15px;">{{$t('statistics.score')}}</span></div>
                       <div style="font-size:15px;">{{$t('statistics.standardScore')}}</div>
                     </div>
                     <div>
                       <div v-if="Ass12Num.length>0" class="avg-score" style="width:260px;background-color:#fdf6f4;justify-content:space-between;margin-left:24px;">
                         <div class="avg12item" style="width:200px;">
-                          <div style="margin-left:10px;align-self:center;font-size:normal;">{{Ass12Num[0].name}}</div>
+                          <el-tooltip effect="light" placement="bottom">
+                            <div slot="content">{{Ass12Num[0].name}}</div>
+                            <div class="score-item-name" >{{Ass12Num[0].name}}</div>
+                          </el-tooltip>
                           <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
                         </div>
                         <div class="avg12item">
@@ -117,7 +136,7 @@
                       </div>
                       <div v-if="Ass12Num.length>1" class="avg-score" style="width:260px;background-color:#edf6e8;justify-content:space-between;margin-left:24px;">
                         <div class="avg12item" style="width:200px;">
-                          <div style="margin-left:10px;align-self:center;font-size:normal;">{{Ass12Num[1].name}}</div>
+                          <div class="score-item-name" >{{Ass12Num[1].name}}</div>
                           <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
                         </div>
                         <div class="avg12item">
@@ -135,12 +154,177 @@
                         <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
                       </div>
                     </div>
-                    <v-chart ref="itemsChart2" :auto-resize="true" :options="AssChartOption" class="chart-content"/>
+                    <v-chart ref="itemsChart2" :auto-resize="true" :options="AssChartOption" :class="ispdf?'chart-content':'chart-content-pdf'"/>
                   </div>
                 </div>
             </div>
+          </el-col>
+          <el-col :span="24">
+            <div id="pdf-area" ref="printPDF" v-if="ispdf" >
+              <div class="statistics-content-pdf" style="height: 735px;">
+                <div id="img_avg" >
+                  <img :src="pdfSrc_avg">
+                </div>
+              </div>
+              <div class="statistics-content-pdf" style="height: 700px;margin-top:24px;">
+                <div id="img_assm"  class="avg-score" >
+                    <img :src="pdfSrc_assm">
+                </div>
+              </div>
+          </div>
+          </el-col>
+          
+          <div v-if="ispdf">
+            <el-col :span="24">
+            <div id="imgTest_avg" class="statistics-content-pdf" style="height: 735px;" >
+                  <div class="head">
+                      <el-col :span="17">
+                          <div class="region-titles">
+                              <span class="title">
+                                  {{ $t('statistics.averageCompare') }}
+                              </span>
+                          </div>
+                      </el-col>
+                      <el-col :span="7">
+                          <AreaDateTimeSelected @emitFilterDateRange="emitFilterDateRange"></AreaDateTimeSelected>
+                      </el-col>
+                  </div>
+                  <div class="average-cahrt">
+                    <div style="height:68px;margin-top: 16px;">
+                      <TypeSelectArea
+                        path="inspectEvalutionStatistics"
+                        :allow-all=false
+                        :limit-num=2
+                        :region-array1="params.curProvince"
+                        :region-array2="params.curCity"
+                        :cur-store-group="params.curStoreGroup"
+                        :cur-store-type="params.curStoreType"
+                        :cur-stores="storeIds"
+                        :cached-params="params"
+                        :cur-country="curCountry"
+                        @emitTypeChanged="emitTypeChanged"
+                      ></TypeSelectArea>
+                    </div>
+                    <div v-if="Avg12Num.length>0" class="avg-score" style="background-color:#fdf6f4;justify-content:space-between;">
+                      <div class="avg12item" style="width:170px;">
+                        <div class="score-item-name">{{Avg12Num[0].name}}</div>
+                        <div style="margin-left:10px;">{{$t('statistics.averageScore')}}</div>
+                      </div>
+                      <div class="avg12item">
+                        <div style="font-size:24px;font-weight:600;color: #f57949;">{{Avg12Num[0].score}}</div>
+                        <div style="margin-left:10px;margin-right:10px;">{{$t('statistics.score')}}</div>
+                      </div>
+                    </div>
+                    <div v-if="Avg12Num.length>1" class="avg-score" style="background-color:#edf6e8;justify-content:space-between;">
+                      <div class="avg12item" style="width:170px;">
+                        <div class="score-item-name" >{{Avg12Num[1].name}}</div>
+                        <div style="margin-left:10px;">{{$t('statistics.averageScore')}}</div>
+                      </div>
+                      <div class="avg12item">
+                        <div style="font-size:24px;font-weight:600;color: #59ab22;">{{Avg12Num[1].score}}</div>
+                        <div style="margin-left:10px;margin-right:10px;">{{$t('statistics.score')}}</div>
+                      </div>
+                    </div>
+                    <div  class="pct-panel-pdf" v-if="avgChartOption">
+                      <div v-show="showNoData" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
+                        <img src="../../../static/img/statistics/ic_nodata.svg" style="widht:90px;height:81px;" />
+                        <div style="height:55px;display:flex;justify-content:center;flex-direction:column">
+                          <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
+                        </div>
+                      </div>
+                      <v-chart ref="itemsChart1" :auto-resize="true" :options="avgChartOption" class="chart-content"/>
+                    </div>
+                  </div>
+            </div>
             </el-col>
-        </el-row>
+            <el-col :span="24">
+            <div id="imgTest_assm" class="statistics-content-pdf" style="height: 700px;margin-top:24px;=">
+                  <div class="head">
+                      <el-col :span="17">
+                          <div class="region-titles">
+                              <span class="title">
+                                  {{ $t('statistics.assessemntCompare') }}
+                              </span>
+                          </div>
+                      </el-col>
+                      <el-col :span="7">
+                          <AreaDateTimeSelected @emitFilterDateRange="emitFilterDateRange2"></AreaDateTimeSelected>
+                      </el-col>
+                  </div>
+                  <div class="average-cahrt">
+                    <div style="height:68px;margin-top: 16px;">
+                      <TypeSelectArea
+                        path="inspectEvalutionStatistics"
+                        :allow-all=false
+                        :limit-num=2
+                        :region-array1="params.curProvince"
+                        :region-array2="params.curCity"
+                        :cur-store-group="params.curStoreGroup"
+                        :cur-store-type="params.curStoreType"
+                        :cur-stores="storeIds"
+                        :cached-params="params"
+                        :cur-country="curCountry"
+                        @emitTypeChanged="emitTypeChanged2"
+                      ></TypeSelectArea>
+                    </div>
+                    <div  class="score-area" style="display:flex;flex-direction:row;height:92px;align-item:center;">
+                      <div v-show="standardRate!='- -'" style="width:145px;border-right:solid 1px #f7f9f9;">
+                        <div style="height:70px;font-size:48px;color:#484848;">{{standardRate}}<span style="font-size:15px;">{{$t('statistics.score')}}</span></div>
+                        <div style="font-size:15px;">{{$t('statistics.standardScore')}}</div>
+                      </div>
+                      <div>
+                        <div v-if="Ass12Num.length>0" class="avg-score" style="width:260px;background-color:#fdf6f4;justify-content:space-between;margin-left:24px;">
+                          <div class="avg12item" style="width:200px;">
+                            <el-tooltip effect="light" placement="bottom">
+                              <div slot="content">{{Ass12Num[0].name}}</div>
+                              <div class="score-item-name" >{{Ass12Num[0].name}}</div>
+                            </el-tooltip>
+                            <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
+                          </div>
+                          <div class="avg12item">
+                            <div style="font-size:24px;font-weight:600;color: #f57949;">{{Ass12Num[0].score}}</div>
+                            <div style="margin-left:10px;margin-right:10px;">%</div>
+                          </div>
+                        </div>
+                        <div v-if="Ass12Num.length>1" class="avg-score" style="width:260px;background-color:#edf6e8;justify-content:space-between;margin-left:24px;">
+                          <div class="avg12item" style="width:200px;">
+                            <div class="score-item-name" >{{Ass12Num[1].name}}</div>
+                            <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
+                          </div>
+                          <div class="avg12item">
+                            <div style="font-size:24px;font-weight:600;color: #59ab22;">{{Ass12Num[1].score}}</div>
+                            <div style="margin-left:10px;margin-right:10px;">%</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="pct-panel-pdf">
+                      <div v-show="showNoData2" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
+                        <img src="../../../static/img/statistics/ic_nodata.svg" style="widht:90px;height:81px;" />
+                        <div style="height:55px;display:flex;justify-content:center;flex-direction:column">
+                          <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
+                        </div>
+                      </div>
+                      <v-chart ref="itemsChart2" :auto-resize="true" :options="AssChartOption" :class="ispdf?'chart-content':'chart-content-pdf'"/>
+                    </div>
+                  </div>
+            </div>
+            </el-col>
+          </div>
+      </el-row>
+          <dialog-pop
+            :title="$t('insSettingView.export')"
+            :append-to-body="true"
+            :close-on-click-modal="false"
+            :visible="ispdf"
+            :show-button="false"
+            :show-close="false"
+            class="LoadDialog"
+          >
+            <p>{{ $t('insSettingView.isExportPDF') }}......</p>
+          </dialog-pop>
+        
     </div>          
 </template>
 <script>
@@ -159,6 +343,7 @@ import AreaDateTimeSelected from '@/components/AreaDateTimeSelected';
 import AreaSelected from '@/components/AreaSelected';
 import TypeSelectArea from '@/components/TypeSelectArea';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import html2canvas from 'html2canvas';
 import moment from 'moment';
 import { left } from '../../../static/video';
 export default {
@@ -178,6 +363,7 @@ export default {
   mixins: [resize],
   data() {
     return {
+        lang: this.$i18n.locale,
         params: {},
         searchParams:{},
         daysRangeList : [],
@@ -204,7 +390,10 @@ export default {
         AssChartOption:null,
         showNoData2:true,
         standardRate:'- -',
-       
+        storeIds:[],
+        ispdf:false,
+      pdfSrc_avg:'',
+      pdfSrc_assm:''
     }
   },
   computed: {
@@ -270,8 +459,10 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
     },
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      //console.log("emitSearch:",searchParams);
+      console.log("emitSearch:",searchParams);
+      this.storeIds = [];
       this.params = searchParams;
+      this.storeIds = this.params.storeIds;
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
@@ -287,9 +478,8 @@ export default {
       console.log("emitSearch > params",this.params);
       this.curCountry = this.params.curCountry;
       //console.log("emitSearch > inspectId",this.params.inspectId );
-      this.doGetAverageScore(this.filterDateRange); 
-      this.doGetAssessmentScore(this.filterDateRange2);
-      //this.searchData();
+      
+      this.searchData();
     },
     async searchData() {
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
@@ -299,13 +489,27 @@ export default {
         //await this.getInspectStatsOverviewOfRegion();
         //wait this.getInspectStatsOverviewOfStore();
         //await this.getInspectStatsLine();
+        this.compareIds = this.params.storeIds;
+        this.compareType='stores';
+        this.compareIds2  = this.params.storeIds;
+        this.compareType2='stores',
+        this.doGetAverageScore(this.filterDateRange); 
+        this.doGetAssessmentScore(this.filterDateRange2);
       } else {
-        this.totalRegion = 0;
-        this.regionTableData = [];
-        //this.getRegionPie();
-        this.storeTableData = [];
-        this.regionsList = [];
-        this.curRegion = [];
+        this.compareIds = [];
+        this.comapareLabels=[];
+        this.compareType='stores';
+        this.Avg12Num=[];
+        this.avgChartOption=null;
+        this.filterDateRange2=[];
+        this.compareIds2=[];
+        this.comapareLabels2=[];
+        this.compareType2='stores',
+        this.Ass12Num=[];
+        this.AssChartOption=null;
+        this.standardRate='- -';
+        this.doGetAverageScore(this.filterDateRange); 
+        this.doGetAssessmentScore(this.filterDateRange2);
       }
     },
     doGetPre12DateRange(start_date,end_date,range_type){
@@ -734,6 +938,33 @@ export default {
         });
       });
     },
+    exportPDF() {
+      const self = this;
+      if (self.avgChartOption.series[0].data.length === 0 && self.AssChartOption.series[0].data.length===0) {
+        util.notify(self.$t('statistics.emptyInsRecordList'), 'warning', 3000);
+        return false;
+      }
+      self.ispdf = true;
+      this.$nextTick(() => {
+        const img_avg = document.getElementById('imgTest_avg');
+        const img_assm = document.getElementById('imgTest_assm');
+        setTimeout(() => {
+          html2canvas(img_avg,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg1 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_avg = oGrayImg1;
+          });
+          html2canvas(img_assm,{ backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg2 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_assm = oGrayImg2;
+          });
+          setTimeout(() => {
+            self.$print(self.$refs.printPDF);
+            self.ispdf = false;
+          }, 1000);
+        }, 5000);
+      });
+    },
+  
   }
 }
 </script>
@@ -767,13 +998,39 @@ export default {
         align-items:center;
         justify-content: space-between;
       }
-
+      .score-item-name{
+        width:calc(60/1440*100vw);
+        margin-left:10px;
+        align-self:center;
+        font-size:normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
       .pct-panel {
         width: calc(1035px/1440*100vw);
         height: 403px;
         margin-top: 33px;
         
           .chart-content {
+            width: 100%;
+            height: 100%;
+          }
+          .chart-content-pdf {
+            width: 100%;
+            height: 100%;
+          }
+      }
+      .pct-panel-pdf {
+        width: calc(1035px/1440*100vw);
+        height: 403px;
+        margin-top: 33px;
+        
+          .chart-content {
+            width: 100%;
+            height: 100%;
+          }
+          .chart-content-pdf {
             width: 100%;
             height: 100%;
           }
