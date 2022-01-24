@@ -210,7 +210,7 @@
             :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"
             :style="[
               showBorder ? { 'border-width': '0.5px' } : {},
-              $route.path === '/reinspection' || $route.path === '/storemonitor'
+              $route.path === '/reinspection' || $route.path === '/storemonitor' || $route.path === '/report'
                 ? {
                     background:
                       '#f7f9fa url(../../static/img/reinspection_bg.png) no-repeat 100% 0',
@@ -351,7 +351,7 @@ export default {
 
     showHeader() {
       const showBorderPathArr = [
-        "/report",
+        // "/report",
         "/patrolOverview",
         "/eventOverview",
         "/patrolEvaluation",
