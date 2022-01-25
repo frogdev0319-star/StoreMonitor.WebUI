@@ -1435,13 +1435,7 @@ export default {
             barWidth: "16px",
             smooth: true,
             data: [0,0,0,0,0,0,0,0,0,0,0,0],
-            color:(context)=>{
-                if(this.barActiveName==context.data.name){
-                  return '#7bd8eb';
-                }else{
-                  return '#D7F3F9';
-                }
-              },
+            color:'#D7F3F9',
             barGap:0,
             emphasis: {
               focus:'none',
