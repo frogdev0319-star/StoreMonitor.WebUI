@@ -257,7 +257,7 @@ export default {
 
     onChangeStore(arr) {
       this.curStore = arr;
-      this.changeStoreNew(arr);
+      //this.changeStoreNew(arr);
     },
 
     getStoreDefineList(type) {
@@ -382,7 +382,7 @@ export default {
     },
 
     onChangeStoreGroup(val) {
-      console.log("onChangeStoreGroup:",val);
+      //console.log("onChangeStoreGroup:",val);
       this.curStoreGroup = val;
       this.filterStore();
     },
