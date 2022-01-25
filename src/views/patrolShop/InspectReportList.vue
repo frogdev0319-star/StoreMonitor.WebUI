@@ -1,12 +1,11 @@
 <template>
-  <el-row id="el-containter">
-    <div class="report-header">
+  <div class="flex-column" style="height: calc(100% - 20px)">
+    <div>
       <store-filter
-        style="padding: 20px"
-        :cached-params="searchParams"
+        type="report"
         @storeChange = "onStoreChange"
       >
-        <template v-slot:others>
+        <!-- <template v-slot:others>
           <div>
             <span style="margin-right: 10px">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
@@ -52,176 +51,180 @@
                 :value="item.id"/>
             </el-select>
           </div>
-        </template>
+        </template> -->
       </store-filter>
-      <div class="flex-center padding" style="padding-top: 0">
-        <date-time-selector @change="dateChange"/> 
-        <div class="spacer"></div>
-        <div class="flex-center">
-          <div class="search-content flex-center" style="margin-right: 20px">
-            <span class="search-label">{{ $t('remotePatrol.keywords') }}</span>
-            <el-input v-model="searchInput" size="mini" class="search-input shadow-light" clearable/>
-          </div>
-          <delay-button
-            class="search-button"
-            type="primary"
-            size="mini"
-            @click="searchData"
-          >
-            <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
-          </delay-button>
-        </div>
-      </div>
-      <selected-stores :store-str="storeStr"/>
     </div>
-    <el-col :span="24" class="report-content loading">
-      <el-row
-        v-loading="isLoading"
-        v-if="reportList.length !== 0"
-        :element-loading-text="$t('insSettingView.loadingbindstore')"
-        class="card-content self-loading paper">
-        <el-col v-if="reportList.length !== 0" :span="24" class="card-header">
-          <el-radio
-            v-for="(item,index) in sortTypeList"
-            v-model="curSortType"
-            :key="index"
-            :label="item.id"
-            style="height:calc(36/1920*100vw);line-height:calc(36/1920*100vw);vertical-align: middle;"
-            @change="checkSortType">
-            <span>{{ item.name }}</span>
-          </el-radio>
-          <div class="list_card">
-            <div
-              :style="isHoverCard || ShowCard ? 'color:#f31d65':''"
-              class="pattern_btn"
-              @click="getReportListOfCard"
-              @mouseover="isHoverCard=true"
-              @mouseout="isHoverCard=false">
-              <i class="iconfont icon-suolvetu iconCard"/>
-              <span class="text-pattern">{{ $t('remotePatrol.cardStyle') }}</span>
-            </div>
-            <div style="width:1px;height:calc(20/1920*100vw);background-color:#e3e9f4;display:inline-block;margin:0 15px;"/>
-            <div
-              :style="isHoverList || !ShowCard ? 'color:#f31d65':''"
-              class="pattern_btn"
-              @click="ShowCard=false"
-              @mouseover="isHoverList=true"
-              @mouseout="isHoverList=false">
-              <i class="iconfont icon-liebiao iconCard"/>
-              <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
+    <div id="el-containter" class="flex-column spacer">
+      <div class="report-header">
+        <div class="flex-center" style="padding-top: 0">
+          <date-time-selector @change="dateChange"/> 
+          <div class="spacer"></div>
+          <div class="flex-center">
+            <div class="search-content flex-center" style="margin-right: 20px">
+              <span class="search-label">{{ $t('remotePatrol.keywords') }}</span>
+              <el-input v-model="searchInput" size="mini" class="search-input shadow-light" clearable/>
             </div>
             <delay-button
-              :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-              class="export-report-btn"
+              class="search-button"
               type="primary"
               size="mini"
-              @click="export2Excel"
+              @click="searchData"
             >
-              <div class="button-area">
-                <img :src="exportPng" class="icon-excel">
-                <span>{{ $t('eventView.exportReport') }}</span>
-              </div>
+              <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
             </delay-button>
           </div>
-        </el-col>
-        <div v-if="ShowCard" class="showCardHeight">
-            <el-col v-for="(item,index) in reportList" :span="4" :key="index" class="report-card">
-              <div class="cards shadow-light" @click="clickReport(item,index)">
-                <div class="flex-center" style="margin-bottom: 5px">
-                  <div style="font-size: 15px; flex: 1; min-width: 0; margin-right: 10px">{{ item.storeName }}</div>
-                  <img :src="item.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" >
-                </div>
-                <div style="margin-bottom: 5px">{{ item.tagName }}</div>
-                <div style="margin-bottom: 12px">
-                  <div style="border-radius: 5px; padding: 2px 15px"
-                    :style="{
-                      0: {'color':'#e22472','background-color':'#ffecf4'},
-                      1: {'color':'#f57848','background-color':'#ffefeb'},
-                      2: {'color':'#59ab22','background-color':'#e8f6de'}
-                    }[item.statusCode]"
-                  >{{item.status}}</div>
-                </div>
-                <!-- //0: danger,1: improve,2: pass -->
-                <div class="flex-center">
-                  <div style="font-size: 32px; margin-right: 5px; margin-bottom: 30px">{{ item.totalScore }}</div>
-                  <div v-if="lang.indexOf('zh') !== -1" class="score-unit">
-                    {{ $t('insSettingView.scores') }}
-                  </div>
-                </div>
-                <div style="margin-bottom: 5px">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
-                <div>{{ item.datestr }}</div>
-              </div>
-            </el-col>
         </div>
-        <div v-else class="list-table">
-          <el-table
-            :data="reportList"
-            :highlight-current-row="true"
-            :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
-            :cell-style="cellStyle"
-            :cell-class-name="cellClass"
-            :header-cell-class-name="headerClass"
-            align="left"
-            stripe
-            style=""
-            class="table-content"
-            @row-click="clickReport"
-            @sort-change="sortChange"
-          >
-            <el-table-column
-              v-for="(_item,_index) in reportInfoTable"
-              :key="_index"
-              :prop="_item.prop"
-              :label="_item.label"
-              :sortable="_item.sortable"
-              :min-width="_item.width"
-              align="left"/>
-            <el-table-column
-              :label="$t('eventView.operation')"
-              prop="option"
-              min-width="110"
-              align="left">
-              <template slot-scope="scope">
-                <i class="iconfont icon-gengduo"/>
-              </template>
-            </el-table-column>
-            <div slot="empty">
-              <div>
-                <i class="iconfont icon-zhengque empty-data-icon"/>
-                <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{ $t('eventView.noEvents') }}</span>
+        <!-- <selected-stores :store-str="storeStr"/> -->
+      </div>
+      <div class="report-content loading spacer paper">
+        <div
+          v-loading="isLoading"
+          v-if="reportList.length !== 0"
+          :element-loading-text="$t('insSettingView.loadingbindstore')"
+          class="card-content self-loading ">
+          <div v-if="reportList.length !== 0" class="card-header">
+            <el-radio
+              v-for="(item,index) in sortTypeList"
+              v-model="curSortType"
+              :key="index"
+              :label="item.id"
+              style="height:calc(36/1920*100vw);line-height:calc(36/1920*100vw);vertical-align: middle;"
+              @change="checkSortType">
+              <span>{{ item.name }}</span>
+            </el-radio>
+            <div class="list_card">
+              <div
+                :style="isHoverCard || ShowCard ? 'color:#f31d65':''"
+                class="pattern_btn"
+                @click="getReportListOfCard"
+                @mouseover="isHoverCard=true"
+                @mouseout="isHoverCard=false">
+                <i class="iconfont icon-suolvetu iconCard"/>
+                <span class="text-pattern">{{ $t('remotePatrol.cardStyle') }}</span>
               </div>
+              <div style="width:1px;height:calc(20/1920*100vw);background-color:#e3e9f4;display:inline-block;margin:0 15px;"/>
+              <div
+                :style="isHoverList || !ShowCard ? 'color:#f31d65':''"
+                class="pattern_btn"
+                @click="ShowCard=false"
+                @mouseover="isHoverList=true"
+                @mouseout="isHoverList=false">
+                <i class="iconfont icon-liebiao iconCard"/>
+                <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
+              </div>
+              <delay-button
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                class="export-report-btn"
+                type="primary"
+                size="mini"
+                @click="export2Excel"
+              >
+                <div class="button-area">
+                  <img :src="exportPng" class="icon-excel">
+                  <span>{{ $t('eventView.exportReport') }}</span>
+                </div>
+              </delay-button>
             </div>
-          </el-table>
+          </div>
+          <div v-if="ShowCard" class="showCardHeight">
+              <el-col v-for="(item,index) in reportList" :span="4" :key="index" class="report-card">
+                <div class="cards shadow-light" @click="clickReport(item,index)">
+                  <div class="flex-center" style="margin-bottom: 5px">
+                    <div style="font-size: 15px; flex: 1; min-width: 0; margin-right: 10px">{{ item.storeName }}</div>
+                    <img :src="item.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" >
+                  </div>
+                  <div style="margin-bottom: 5px">{{ item.tagName }}</div>
+                  <div style="margin-bottom: 12px">
+                    <div style="border-radius: 5px; padding: 2px 15px"
+                      :style="{
+                        0: {'color':'#e22472','background-color':'#ffecf4'},
+                        1: {'color':'#f57848','background-color':'#ffefeb'},
+                        2: {'color':'#59ab22','background-color':'#e8f6de'}
+                      }[item.statusCode]"
+                    >{{item.status}}</div>
+                  </div>
+                  <!-- //0: danger,1: improve,2: pass -->
+                  <div class="flex-center">
+                    <div style="font-size: 32px; margin-right: 5px; margin-bottom: 30px">{{ item.totalScore }}</div>
+                    <div v-if="lang.indexOf('zh') !== -1" class="score-unit">
+                      {{ $t('insSettingView.scores') }}
+                    </div>
+                  </div>
+                  <div style="margin-bottom: 5px">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
+                  <div>{{ item.datestr }}</div>
+                </div>
+              </el-col>
+          </div>
+          <div v-else class="list-table">
+            <el-table
+              :data="reportList"
+              :highlight-current-row="true"
+              :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
+              :cell-style="cellStyle"
+              :cell-class-name="cellClass"
+              :header-cell-class-name="headerClass"
+              align="left"
+              stripe
+              style=""
+              class="table-content"
+              @row-click="clickReport"
+              @sort-change="sortChange"
+            >
+              <el-table-column
+                v-for="(_item,_index) in reportInfoTable"
+                :key="_index"
+                :prop="_item.prop"
+                :label="_item.label"
+                :sortable="_item.sortable"
+                :min-width="_item.width"
+                align="left"/>
+              <el-table-column
+                :label="$t('eventView.operation')"
+                prop="option"
+                min-width="110"
+                align="left">
+                <template slot-scope="scope">
+                  <i class="iconfont icon-gengduo"/>
+                </template>
+              </el-table-column>
+              <div slot="empty">
+                <div>
+                  <i class="iconfont icon-zhengque empty-data-icon"/>
+                  <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{ $t('eventView.noEvents') }}</span>
+                </div>
+              </div>
+            </el-table>
+          </div>
+          <div class="el-pat">
+            <el-pagination
+              :page-size="sizeNum"
+              :total="total"
+              :current-page="page"
+              :page-sizes="[12,24,50,100]"
+              background
+              small
+              layout="jumper,total, prev, pager, next,sizes"
+              class="el-pag"
+              @current-change="currentChange"
+              @size-change="sizeChange"/>
+          </div>
         </div>
-        <el-col :span="24" class="el-pat">
-          <el-pagination
-            :page-size="sizeNum"
-            :total="total"
-            :current-page="page"
-            :page-sizes="[12,24,50,100]"
-            background
-            small
-            layout="jumper,total, prev, pager, next,sizes"
-            class="el-pag"
-            @current-change="currentChange"
-            @size-change="sizeChange"/>
-        </el-col>
-      </el-row>
-      <el-row
-        v-loading="isLoading"
-        v-else
-        :element-loading-text="$t('insSettingView.loadingbindstore')"
-        class="card-content self-loading">
-        <div class="empty-content">{{ noData }}</div>
-      </el-row>
-    </el-col>
-  </el-row>
+        <div
+          v-loading="isLoading"
+          v-else
+          :element-loading-text="$t('insSettingView.loadingbindstore')"
+          class="card-content self-loading">
+          <div class="empty-content">{{ noData }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 import { getInspectReportList, GetInspectTagList } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
-import StoreFilter from '@/components/StoreFilter';
+import StoreFilter from '@/components/StoreFilter_';
 import DelayButton from '@/components/DelayButton';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
@@ -763,7 +766,7 @@ export default {
 
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
-      console.log(searchParams)
+      // console.log(searchParams)
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       this.params.beginTs = this.dateValue[0].valueOf();
       this.params.endTs = this.dateValue[1].valueOf();
@@ -796,6 +799,7 @@ export default {
     },
 
     onStoreChange(storeObj) {
+      // console.log(storeObj)
       this.storeStr = storeObj.storeStr;
       this.storeFilterObj = storeObj;
       this.ifSearchData && this.searchData();
@@ -875,6 +879,7 @@ $suggestBack:#F1F6FE;
 }
 #el-containter{
     .report-header{
+        margin-top: 20px;
         margin-bottom: 20px;
         .header-details{
             text-align: left;
@@ -938,9 +943,10 @@ $suggestBack:#F1F6FE;
       }
     }
     .report-content{
-        padding-right: calc(20/1920*100vw);
-        padding-left: calc(20/1920*100vw);
+        // padding-right: calc(20/1920*100vw);
+        // padding-left: calc(20/1920*100vw);
         .card-content{
+          height: 100%;
           padding: calc(20/1920*100vw);
         }
         .empty-content{
@@ -1106,7 +1112,7 @@ $suggestBack:#F1F6FE;
         position: absolute;
         //float: right;
         right: calc(20/1920*100vw);
-        bottom: 20px;
+        bottom: 0px;
     }
 }
 }

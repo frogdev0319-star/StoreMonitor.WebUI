@@ -218,7 +218,7 @@
             :class="wrapperAll ? 'content-wrapper-all' : 'content-wrapper'"
             :style="[
               showBorder ? { 'border-width': '0.5px' } : {},
-              $route.path === '/reinspection' || $route.path === '/storemonitor'
+              $route.path === '/reinspection' || $route.path === '/storemonitor' || $route.path === '/report'
                 ? {
                     background:
                       '#f7f9fa url(../../static/img/reinspection_bg.png) no-repeat 100% 0',
@@ -360,7 +360,7 @@ export default {
 
     showHeader() {
       const showBorderPathArr = [
-        "/report",
+        // "/report",
         "/patrolOverview",
         "/eventOverview",
         "/patrolEvaluation",
@@ -1434,8 +1434,8 @@ $collapseWidth: 5.5%;
   padding: 20px;
 }
 .margin-bottom-top-sm {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
 }
 .margin-bottom-mini {
   margin-bottom: 5px;
