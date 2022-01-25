@@ -1425,8 +1425,8 @@ $collapseWidth: 5.5%;
   padding: 20px;
 }
 .margin-bottom-top-sm {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
 }
 .margin-bottom-mini {
   margin-bottom: 5px;
