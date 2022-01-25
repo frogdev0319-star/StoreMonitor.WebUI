@@ -249,7 +249,7 @@ export default {
 .el-date-table td span:hover{
   color: #2c90d9;
 }
-.el-range-editor.is-disabled input{
-  background-color:#FFF;
+.global-date-pick.el-range-editor.is-disabled input{
+  background-color:#FFF !important;
 }
 </style>

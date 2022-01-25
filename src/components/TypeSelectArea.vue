@@ -726,7 +726,7 @@ export default {
 <style lang="scss" scoped>
 .content{
     width:calc(355/1440*100vw);
-    height:35px;
+    height:36px;
     border-radius: 5px;
     display:flex;
     flex-direction:row;

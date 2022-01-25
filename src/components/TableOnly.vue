@@ -21,6 +21,7 @@
       v-on="$listeners"
       :row-key="getRowKeys"
       :expand-row-keys="expandRowKeys"
+      :default-expand-all="isexportPDF"
       @expand-change="expandChange"
       @sort-change="handleSortChange"
       @row-click="handleRowClick"

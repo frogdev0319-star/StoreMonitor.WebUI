@@ -21,7 +21,7 @@
             {{ $t('eventView.handled') }}
           </span>
           <div
-            v-else-if="event.status === 2"
+            v-else-if="event.status === 2 || event.status === 4"
             class="event-status"
             style="background-color:#efefef;color:#6e6e6e;" >
             {{ $t('eventView.closed') }}
@@ -284,7 +284,7 @@
             class="des-input"
             type="textarea"
             resize="none"
-            :disabled="curStatus==3"
+            :disabled="curStatus==2 || curStatus==4"
             @input="(val)=>ivsIdChange(val)"
             @blur="notShowInputRuleTips"/>
       </div>
@@ -508,6 +508,7 @@ export default {
     async getSessionData() {
       const self = this;
       const event = JSON.parse(sessionStorage.getItem('event'));
+      self.curStatus = event.status;
       const obj = {
         id: event.id,
         eventTitle: event.subject,
@@ -610,11 +611,13 @@ export default {
           const comments = data[0];
           const dataComments = comments.comment;
           const temp = [];
-          self.curStatus = dataComments[0].status;
+          //self.curStatus = dataComments[0].status;
+          //console.log("dataComments[0].status:",dataComments[0].status);
           // 0 pending：handle、add、closed
           // 1 handled：add、closed、reject
           // 2 closed：
           // 3 reject：handle、add、closed
+          // 4 
           self.subBtnList.forEach(item => {
             if (self.curStatus === 0 || self.curStatus === 3) {
               item.order === 0 || item.order === 1 || item.order === 2 ? item.isShow = true : item.isShow = false;
@@ -641,8 +644,10 @@ export default {
                 obj.process = this.$t('eventView.closed'); break;
               case 3: obj.showLabel = true; obj.spanStyle = { 'color': '#e22472' };
                 obj.process = this.$t('eventView.returnStatus'); break;
+              case 4: obj.showLabel = true; obj.spanStyle = { 'color': '#6e6e6e' };
+                obj.process = this.$t('eventView.closed'); break;
             }
-            if (item.status === 2) {
+            if (self.curStatus === 2 || self.curStatus === 4) {
               self.showWinpBtn = false;
             }
             
@@ -1378,13 +1383,13 @@ $h1:#292e36;
                 }
             }
             .process-detail{
-              width: calc(492/1440*100vw);
+              width: calc(468/1440*100vw);
               padding: 16px 16px 30px;
               border: solid 1px #f5f5f5;
               background-color:#f7f9fa;
               border-radius: 5px;
               .deal-details{
-                width:calc(460/1440*100vw);
+                width:calc(436/1440*100vw);
                 border-bottom: solid 2px #006ab7;
                 .creator-area{
                   width:100%;
