@@ -46,7 +46,7 @@
         {{{
           0 : $t('remotePatrol.dangerous'),
           1 : $t('remotePatrol.improve'),
-          2 : $t('remotePatrol.echartGood'),
+          2 : $t('overview.echartGood'),
         }[report.status]}}</div>
       </div>
       <!-- <el-row class="report-content">

@@ -130,17 +130,14 @@
                           class="content-detail-main"
                           style="padding-bottom: 20px;">
                           <p class="cdm-title">{{ $t('remotePatrol.commentDetail') }}</p>
-                          <div v-if="categoryItem.inspectText!=null&&categoryItem.inspectText!=''">
-                            <div class="cdm-word" v-for="(text, index) in categoryItem.inspectText.split('|')" :key="index">
-                              <span>{{ `${index+1}. ${text}` }}</span>
-                            </div>
-                          </div>
+                          
                           <div v-if="categoryItem.sourceList!=null&&categoryItem.sourceList.length!=0" class="cdm-pic">
                             <div
                               v-for="(sourceitem,sourceindex) in categoryItem.sourceList"
                               :key="sourceindex"
                               :height="imgHeight+'px'"
                               class="source-details">
+                              
                               <div v-if="sourceitem.mediaType==2" class="img-content">
                                 <el-image
                                   :src="sourceitem.src"
@@ -214,10 +211,10 @@
                                 v-for="(sourceitem,sourceindex) in childItem.sourceList"
                                 :key="sourceindex"
                                 :height="imgHeight+'px'"
-                                class="source-details">
-                                <div v-if="sourceitem.mediaType==3">
-                                  {{sourceitem.src}}
-                                </div>
+                                :class="{'source-details': sourceitem.mediaType!=3}">
+                                <template v-if="sourceitem.mediaType==3">
+                                  {{`${sourceindex+1}. ${sourceitem.src}`}}
+                                </template>
                                 <div v-if="sourceitem.mediaType==2" class="img-content">
                                   <el-image
                                     :src="sourceitem.src"
@@ -254,10 +251,10 @@
                                 v-for="(sourceitem,sourceindex) in _item.sourceList"
                                 :key="sourceindex"
                                 :height="imgHeight+'px'"
-                                class="source-details">
-                                <div v-if="sourceitem.mediaType==3">
-                                  {{sourceitem.src}}
-                                </div>
+                                :class="{'source-details': sourceitem.mediaType!=3}">
+                                <template v-if="sourceitem.mediaType==3">
+                                 {{`${sourceindex+1}. ${sourceitem.src}`}}
+                                </template>
                                 <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
                                   <el-image
                                     :src="sourceitem.src"
@@ -292,10 +289,10 @@
                     <div v-if="_item.sourceList!=null||item.description!=null&&item.description!=''" class="content-detail-main">
                       
                       <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
-                        <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" class="source-details">
-                          <div v-if="sourceitem.mediaType==3">
-                            {{sourceitem.src}}
-                          </div>
+                        <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" :class="{'source-details': sourceitem.mediaType!=3}">
+                          <template v-if="sourceitem.mediaType==3">
+                            {{`${index+1}. ${sourceitem.src}`}}
+                          </template>
                           <div v-if="sourceitem.mediaType==2" class="img-content">
                             <el-image
                               :src="sourceitem.src"
@@ -1612,7 +1609,6 @@ export default {
                 overflow: hidden;
                 .source-details{
                   display: inline-block;
-                        margin-top: 10px;
                   .img-content{
                     margin-right: calc(10/1920*100vw);
                     position: relative;
