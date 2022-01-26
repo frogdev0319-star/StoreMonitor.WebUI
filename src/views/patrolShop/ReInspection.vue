@@ -1404,7 +1404,7 @@ export default {
         self.getInitStoreData(allStoreData);
         const storeData = allStoreData.data.content;
         self.storeList = getStoreTemp(storeData);
-        console.log('self.storeList', self.storeList)
+        // console.log('self.storeList', self.storeList)
         const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
         self.changeStore_(storeItem)
       }

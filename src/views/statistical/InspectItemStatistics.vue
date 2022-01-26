@@ -20,6 +20,7 @@
                         </div>
                             <TypeSelectArea
                               path="inspectItemStatistics"
+                              ref="typeSelectArea"
                               :allow-all=true
                               :allow-person=true
                               :region-array1="params.curProvince"
@@ -773,6 +774,17 @@ export default {
   },
 
   methods: {
+        maxLabel(s){  
+      if(s.length>7){
+        return s.substring(0,7)+'...'
+      }
+      else{
+        return s;
+
+      }
+     
+    //  return "TEST";
+    },
     handlePageAndSizeChangePart3(e){
         console.log(e)
         this.part3.table.page = e.page;
@@ -1454,57 +1466,6 @@ export default {
           output.push(item)
         });;
       }
-      else if(type == 'position'){
-          
-          originArray.map(function(d){
-             var  pos = null;
-             var totalScore =0;
-             var totalStandard = 0;
-             content.map(function(item,i){
-               
-                if(d.contents.indexOf(item.innerId)>=0){
-                  if(!pos){
-                    pos = JSON.parse(JSON.stringify(item))
-                    if(item.averageScore){
-                        totalScore += item.averageScore * item.numOfTotal;
-                        console.log("X Total Score="+totalScore)
-                    }
-                    if(item.standardRate){
-                        totalStandard+= item.standardRate * item.numOfTotal;
-                    }
-                    pos.submitters =[item.groupName]
-                    pos.groupName = d.label;
-                  }
-                  else{
-                    pos.numOfDargerous += item.numOfDargerous;
-                    pos.numOfQualified += item.numOfQualified;
-                    pos.numOfImproved += item.numOfImproved;
-                    pos.numOfTotal  += item.numOfTotal;
-                    pos.numOfStandard += item.numOfStandard;
-                    pos.submitters.push(item.groupName)
-                    if(item.averageScore){
-                        totalScore += parseFloat(item.averageScore) * item.numOfTotal;
-                        console.log("X Total Score="+totalScore)
-                    }
-                    if(item.standardRate){
-                        totalStandard+= item.standardRate * item.numOfTotal;
-                    }
-                  }
-                
-                }
-              })
-
-        
-              if(pos){
-                if(totalScore>0) totalScore = (totalScore/pos.numOfTotal).toFixed(1)
-                if(totalStandard>0)totalStandard=(totalStandard/pos.numOfTotal).toFixed(1)
-                pos.averageScore = totalScore;
-                pos.standardRate = totalStandard;
-                console.log(pos)
-                output.push(pos)
-              }
-        });;
-      }
       else{
         content.map(function(item,i){
           originArray.map(function(d){
@@ -1558,8 +1519,19 @@ export default {
          params.groupIds  = this.part1.compareIds;
          params.groupMode = 4;
       }
-         else if(this.part1.compareType=='users'){
+     else if(this.part1.compareType=='users'){
          params.submitters  = this.part1.compareIds;
+         params.groupIds  = this.part1.compareIds;
+         params.groupMode = 5;
+      }
+      else if(this.part1.compareType=='position'){
+        let users = [];
+         this.part1.originArray.forEach(function(item){
+           if(self.part1.compareIds.indexOf(item.value)>=0)
+            users =  users.concat(item.contents);
+         })
+         params.submitters  = users;
+         params.groupIds  = users;
          params.groupMode = 5;
       }
       if (self.totalRegion > 0) {
@@ -1655,7 +1627,7 @@ export default {
           }})
           }
   
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
 
@@ -1726,7 +1698,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part1.storeTableData = content;
@@ -1836,7 +1808,7 @@ export default {
           }})
           }
   
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
 
@@ -1898,7 +1870,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part2.storeTableData = content;
@@ -2047,7 +2019,7 @@ export default {
           }})
           }
   
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
         if(count>0){
           totalAvgScore = Math.round(totalAvgScore/count);
@@ -2109,7 +2081,11 @@ export default {
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
             params.groupIds = this.part3.content[this.part3.indexRegion].list;
             if(this.part3.compareType=='users' || this.part3.compareType=='position'){
+              let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+              console.log("Get ID=="+id);
+              
               params.storeIds = self.params.storeIds;
+              params.submitters=[id]
             }
             params.inspectTagId = self.params.inspectId;
             if(this.inspectItem){
@@ -2123,34 +2099,13 @@ export default {
               page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
-            console.log(params)
+
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             console.log(storeResult)
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
-                    if(this.part3.compareType=='users' ){
-                      let sel = this.part3.content[this.part3.indexRegion];
-                      result.content.forEach(function(item){
-                        if(item.submitters && item.submitters.indexOf(sel.groupName)>=0){
-                          content.push(item);
-                        }
-                      })
-                  }
-                  else if(this.part3.compareType=='position'){
-                      let sel = this.part3.content[this.part3.indexRegion];
-                      sel.submitters.forEach(function(sub){
-                          result.content.forEach(function(item){
-                            if(item.submitters && item.submitters.indexOf(sub)>=0){
-                              content.push(item);
-                            }
-                          })
-
-                      })
-                   
-                  }
-                  else 
-                    content = result.content
+                  content = result.content
                   this.part3.table.total = result.totalPages;
               }
             }
@@ -2172,7 +2127,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part3.storeTableData = content;

@@ -7,7 +7,9 @@
     overflow:hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    ">{{selectedStr}}</div>
+    ">
+    {{selectedStr}}
+    </div>
     <el-select
       v-model="selected"
       multiple
@@ -18,9 +20,9 @@
     >
       <el-option
         v-for="item in mdoptionsList"
-        :key="item.key"
-        :label="item.name"
-        :value="item.id"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
       />
     </el-select>
   </div>
@@ -44,7 +46,7 @@ export default {
     }
   },
   data() {
-    const selected = this.value || [];
+    const selected = this.value || []
     return {
       selected,
       mdoptionsValue: [],
@@ -68,13 +70,13 @@ export default {
         change: () => {
           this.$emit(
             "change",
-            (_this.selected || []).filter((v) => v !== "all")
+            (_this.selected || []).filter((v) => v !== "-1")
           );
         },
         input: () => {
           this.$emit(
             "input",
-            (_this.selected || []).filter((v) => v !== "all")
+            (_this.selected || []).filter((v) => v !== "-1")
           );
         },
       });
@@ -87,10 +89,10 @@ export default {
       handler(val) {
         const self = this;
         let options_ = [...this.options]
-        this.$emit("input",(val || []).filter((v) => v !== "all"));
+        this.$emit("input",(val || []).filter((v) => v !== "-1"));
         this.selectedStr = options_
-        .filter(option => (val || []).includes(option.id))
-        .map(op => op.name)
+        .filter(option => (val || []).includes(option.value))
+        .map(op => op.label)
         .join(',')
       },
     },
@@ -103,9 +105,8 @@ export default {
         } else {
           this.mdoptionsList = [
             {
-              key: "all",
-              id: "all",
-              name: "全部",
+              value: "-1",
+              label: "全部",
             },
             ...val,
           ];
@@ -113,14 +114,15 @@ export default {
       },
     },
   },
-  mounted() {},
+  mounted() {
+  },
   methods: {
     onChange(val) {
       // eslint-disable-next-line no-debugger
       const allValues = [];
       // 保留所有值
       for (const item of this.mdoptionsList) {
-        allValues.push(item.id);
+        allValues.push(item.value);
       }
       // 用来储存上一次的值，可以进行对比
       const oldVal =
@@ -128,20 +130,20 @@ export default {
           ? []
           : this.oldMdoptionsValue[1] || [];
       // 若是全部选择
-      if (val.includes("all")) this.selected = allValues;
+      if (val.includes("-1")) this.selected = allValues;
       // 取消全部选中  上次有 当前没有 表示取消全选
-      if (oldVal.includes("all") && !val.includes("all")) this.selected = [];
+      if (oldVal.includes("-1") && !val.includes("-1")) this.selected = [];
       // 点击非全部选中  需要排除全部选中 以及 当前点击的选项
       // 新老数据都有全部选中
-      if (oldVal.includes("all") && val.includes("all")) {
-        const index = val.indexOf("all");
+      if (oldVal.includes("-1") && val.includes("-1")) {
+        const index = val.indexOf("-1");
         val.splice(index, 1); // 排除全选选项
         this.selected = val;
       }
       // 全选未选 但是其他选项全部选上 则全选选上 上次和当前 都没有全选
-      if (!oldVal.includes("all") && !val.includes("all")) {
+      if (!oldVal.includes("-1") && !val.includes("-1")) {
         if (val.length === allValues.length - 1)
-          this.selected = ["all"].concat(val);
+          this.selected = ["-1"].concat(val);
       }
       // 储存当前最后的结果 作为下次的老数据
       this.oldMdoptionsValue[1] = this.selected;

@@ -73,11 +73,12 @@
             size="mini">
             <el-option
               v-for="item in curStoresData"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"/>
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"/>
           </el-select>
         </div>
+        <div class="spacer"></div>
       </template>
       <template v-if="type === 'report'" >
         <multi-selector
@@ -399,9 +400,9 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
         arr.push(item.value);
-        arr_.push({ id: item.storeId, name: item.label })
+        arr_.push({ value: item.storeId, label: item.label })
       });
-      self.curStoresData = arr_;
+      self.curStoresData = [...arr_];
       self.curStores = storeArr;
       self.changeStoreNew(self.curStores);
     },
@@ -617,8 +618,8 @@ export default {
         storeArr.push(item.storeId);
         arr.push(item.value);
         arr_.push({
-          id: item.storeId,
-          name: item.label
+          value: item.storeId,
+          label: item.label
         })
       });
       self.curStoresData = arr_;
@@ -734,8 +735,8 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
         dataArr.push({
-          id: item.storeId,
-          name: item.label
+          value: item.storeId,
+          label: item.label
         })
       });
       setTimeout(async() => {
