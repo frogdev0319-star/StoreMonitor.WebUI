@@ -1215,15 +1215,17 @@ export default {
     },
      onEvenListNumClickPart2(e){
       if(e.prop == 'compareTrend'){
-          let params = JSON.parse(JSON.stringify(this.params))
+        //  let params = JSON.parse(JSON.stringify(this.params))
       //    const searchParams = SearchConditionUtil.getSearchCondition('inspectEvalutionStatistics');
+          const params= SearchConditionUtil.getSearchCondition('PatrolCompareStat');
           params.storeIds = [e.row.innerId]
           params.curStore = [e.row.innerId]
           const searchParamsObj = {
             path: 'PatrolCompareStat',
             params: params
           };
-          this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+           SearchConditionUtil.saveSearchCondition(searchParamsObj);
+         // this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
           this.$router.push({
             path: '/patrolCompareStat',
           });
