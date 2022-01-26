@@ -489,7 +489,16 @@ export default {
         console.log(e);
       }
     },
-
+    getUserIdFromName(name){
+      console.log("getUserIdFromName="+name)
+      if(this.userList){
+        console.log(this.userList)
+        let d =  this.userList.find(item=>item.label==name);
+        console.log(d)
+        if(d)return d.value;
+      }
+      return null;
+    },
     getUserPositionList(data) {
       console.log(data)
       this.positionsList = [];
