@@ -2,10 +2,11 @@
   <div class="flex-column" style="height: calc(100% - 20px)">
     <div>
       <store-filter
+        :cached-params="searchParams"
         type="report"
         @storeChange = "onStoreChange"
       >
-        <!-- <template v-slot:others>
+        <template v-slot:others>
           <div>
             <span style="margin-right: 10px">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
@@ -51,7 +52,7 @@
                 :value="item.id"/>
             </el-select>
           </div>
-        </template> -->
+        </template>
       </store-filter>
     </div>
     <div id="el-containter" class="flex-column spacer">
