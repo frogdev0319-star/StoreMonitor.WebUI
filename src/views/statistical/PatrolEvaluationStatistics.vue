@@ -72,6 +72,7 @@
                         </div>
                             <TypeSelectArea
                               path="inspectEvalutionStatistics"
+                              ref="typeSelectArea1"
                               :allow-all=true
                               :allow-person=true
                               :region-array1="params.curProvince"
@@ -1173,46 +1174,64 @@ export default {
   },
 
   methods: {
-    onEvenListNumClickPart1(e){
-      console.log(e)
-      let params = JSON.parse(JSON.stringify(this.params))
-      params.storeIds = [e.row.innerId]
-      console.log(params)
+    maxLabel(s){  
+      if(s.length>7){
+        return s.substring(0,7)+'...'
+      }
+      else{
+        return s;
+
+      }
+     
+    //  return "TEST";
+    },
+    routeToInpectReportWithParam(e){
+     const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
+      searchParams.jump = true;
+      searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
+      searchParams.searchCondition.clause ={storeId:[e.row.innerId]};
+      searchParams.clause ={storeId:[e.row.innerId]};
+      searchParams.filterStoreIds=[e.row.innerId]
+      searchParams.curStore=[e.row.innerId]
+      searchParams.storeIds=[e.row.innerId]
+      searchParams.searchCondition.storeIds=[e.row.innerId]
+      searchParams.curAppraise = -1;
+      searchParams.curReportType = -1;
+      searchParams.filter ={ page: 0, size: 12 };
+      console.log(searchParams)
       const searchParamsObj = {
         path: 'inspectReport',
-        params: params
+        params: searchParams
       };
-      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      SearchConditionUtil.saveSearchCondition(searchParamsObj);
+      //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
        this.$router.push({
          path: '/report',
       });
-      
+    },
+    onEvenListNumClickPart1(e){
+      this.routeToInpectReportWithParam(e);
 
     },
      onEvenListNumClickPart2(e){
       if(e.prop == 'compareTrend'){
-          let params = JSON.parse(JSON.stringify(this.params))
+        //  let params = JSON.parse(JSON.stringify(this.params))
+      //    const searchParams = SearchConditionUtil.getSearchCondition('inspectEvalutionStatistics');
+          const params= SearchConditionUtil.getSearchCondition('PatrolCompareStat');
           params.storeIds = [e.row.innerId]
+          params.curStore = [e.row.innerId]
           const searchParamsObj = {
-            path: 'inspectEvalutionStatistics',
+            path: 'PatrolCompareStat',
             params: params
           };
-          this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+           SearchConditionUtil.saveSearchCondition(searchParamsObj);
+         // this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
           this.$router.push({
             path: '/patrolCompareStat',
           });
       }
       else{
-        let params = JSON.parse(JSON.stringify(this.params))
-        params.storeIds = [e.row.innerId]
-        const searchParamsObj = {
-          path: 'inspectReport',
-          params: params
-        };
-        this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
-        this.$router.push({
-          path: '/report',
-        });
+        this.routeToInpectReportWithParam(e);
       }
       
 
@@ -1221,8 +1240,9 @@ export default {
        if(e.prop == 'compareTrend'){
           let params = JSON.parse(JSON.stringify(this.params))
           params.storeIds = [e.row.innerId]
+          params.curStore = [e.row.innerId]
           const searchParamsObj = {
-            path: 'inspectEvalutionStatistics',
+            path: 'PatrolCompareStat',
             params: params
           };
           this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
@@ -1231,16 +1251,7 @@ export default {
           });
       }
       else{
-        let params = JSON.parse(JSON.stringify(this.params))
-        params.storeIds = [e.row.innerId]
-        const searchParamsObj = {
-          path: 'inspectReport',
-          params: params
-        };
-        this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
-        this.$router.push({
-          path: '/report',
-        });
+        this.routeToInpectReportWithParam(e);
       }
 
     },
@@ -1983,60 +1994,6 @@ export default {
           output.push(item)
         });;
       }
-      else if(type == 'position'){
-          
-          originArray.map(function(d){
-             console.log(d.label)
-             
-             var  pos = null;
-             var totalScore =0;
-             var totalStandard = 0;
-             if(ids.indexOf(d.value)>=0)
-             content.map(function(item,i){
-               
-                if(d.contents.indexOf(item.innerId)>=0){
-                  if(!pos){
-                    pos = JSON.parse(JSON.stringify(item))
-                    if(item.averageScore){
-                        totalScore += item.averageScore * item.numOfReport;
-                        console.log("X Total Score="+totalScore)
-                    }
-                    if(item.standardRate){
-                        totalStandard+= item.standardRate * item.numOfReport;
-                    }
-                    pos.submitters =[item.groupName]
-                    pos.groupName = d.label;
-                  }
-                  else{
-                    pos.numOfDargerous += item.numOfDargerous;
-                    pos.numOfQualified += item.numOfQualified;
-                    pos.numOfImproved += item.numOfImproved;
-                    pos.numOfReport  += item.numOfReport;
-                    pos.numOfStandard += item.numOfStandard;
-                    pos.submitters.push(item.groupName)
-                    if(item.averageScore){
-                        totalScore += parseFloat(item.averageScore) * item.numOfReport;
-                        console.log("X Total Score="+totalScore)
-                    }
-                    if(item.standardRate){
-                        totalStandard+= item.standardRate * item.numOfReport;
-                    }
-                  }
-                
-                }
-              })
-
-        
-              if(pos){
-                if(totalScore>0) totalScore = (totalScore/pos.numOfReport).toFixed(1)
-                if(totalStandard>0)totalStandard=(totalStandard/pos.numOfReport).toFixed(1)
-                pos.averageScore = totalScore;
-                pos.standardRate = totalStandard;
-                console.log(pos)
-                output.push(pos)
-              }
-        });;
-      }
       else{
         content.map(function(item,i){
           originArray.map(function(d){
@@ -2179,7 +2136,7 @@ export default {
           else if(this.part1.indexType==2){
               value =  util.getPercentValue(arr, 2, 2)
           }
-          item.value = value;
+          item.value = parseFloat(value);
         });
         this.part1.content = this.part1.content.sort(function(a,b){
           if(self.part1.regionOrder == "desc")
@@ -2212,7 +2169,7 @@ export default {
           }})
           }
   
-          regionLabel.push(item.groupName)
+          regionLabel.push(this.maxLabel(item.groupName))
         });
       }
 
@@ -2253,6 +2210,7 @@ export default {
             params.storeIds = this.part1.content[this.part1.indexRegion].list;
             if(this.part1.compareType=='users' || this.part1.compareType=='position'){
               params.storeIds = self.params.storeIds;
+              params.submitters=[self.part1.content[self.part1.indexRegion].innerId]
             }
             params.inspectTagId = self.params.inspectId;
             params.order={
@@ -2263,41 +2221,23 @@ export default {
               page:(this.part1.storeMode==1) ? 0:this.part1.table.page-1,
               size:(this.part1.storeMode==1) ?params.storeIds.length: this.part1.table.sizeNum
             }
+        
+            console.log(params)
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
-                  if(this.part1.compareType=='users' ){
-                      let sel = this.part1.content[this.part1.indexRegion];
-                      result.content.forEach(function(item){
-                        if(item.submitters.indexOf(sel.groupName)>=0){
-                          content.push(item);
-                        }
-                      })
-                  }
-                  else if(this.part1.compareType=='position'){
-                      let sel = this.part1.content[this.part1.indexRegion];
-                      sel.submitters.forEach(function(sub){
-                          result.content.forEach(function(item){
-                            if(item.submitters.indexOf(sub)>=0){
-                              content.push(item);
-                            }
-                          })
-
-                      })
-                   
-                  }
-                  else 
                     content = result.content
+                    this.part1.table.total = result.totalPages;
 
-                  this.part1.table.total = result.totalPages;
+                  
                //   console.log(result)
               }
             }
         }
         
-
-        content.map((item,index) => {
+        console.log("Content store bar")
+        content.forEach((item,index) => {
           item.storeGroup = item.storeRegion.toString();
           item.storeType = item.storeBranchType.toString();
           if(item.submitters)item.storeSubmitters = item.submitters.toString();
@@ -2315,10 +2255,21 @@ export default {
           else if(this.part1.indexType==2){
               value =  util.getPercentValue(arr, 2, 2)
           }
-          regionData.push({value,itemStyle: {
+          item.value = value;
+        });
+        console.log(content)
+        content = content.sort(function(a,b){
+          if(self.part1.storeOrder == "desc")
+             return b.value -a.value; 
+          else
+             return a.value -b.value; 
+        })
+        console.log(content)
+        content.map((item,index) => {
+          regionData.push({value:item.value,itemStyle: {
             color: '#7bd8eb',
           }})
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part1.storeTableData = content;
@@ -2444,7 +2395,7 @@ export default {
           }})
           }
   
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
 
@@ -2469,7 +2420,6 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log("getPart1StoreBar")
       let content = [];
       if(this.part2.content && this.part2.content[this.part2.indexRegion]){
         if(this.part2.compareType == 'stores'){
@@ -2483,6 +2433,7 @@ export default {
             params.storeIds = this.part2.content[this.part2.indexRegion].list;
             if(this.part2.compareType=='users' || this.part2.compareType=='position'){
               params.storeIds = self.params.storeIds;
+              params.submitters=[self.part2.content[self.part2.indexRegion].innerId]
             }
             params.inspectTagId = self.params.inspectId;
             params.order={
@@ -2493,34 +2444,13 @@ export default {
               page:(this.part2.storeMode==1) ? 0:this.part2.table.page-1,
               size:(this.part2.storeMode==1) ?params.storeIds.length: this.part2.table.sizeNum
             }
+
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
                  if (result) {
-                  if(this.part2.compareType=='users' ){
-                      let sel = this.part2.content[this.part2.indexRegion];
-                      result.content.forEach(function(item){
-                        if(item.submitters.indexOf(sel.groupName)>=0){
-                          content.push(item);
-                        }
-                      })
-                  }
-                  else if(this.part2.compareType=='position'){
-                      let sel = this.part2.content[this.part2.indexRegion];
-                      sel.submitters.forEach(function(sub){
-                          result.content.forEach(function(item){
-                            if(item.submitters.indexOf(sub)>=0){
-                              content.push(item);
-                            }
-                          })
-
-                      })
-                   
-                  }
-                  else 
-                    content = result.content
-
-                 this.part2.table.total = result.totalPages;
+                  content = result.content
+                  this.part2.table.total = result.totalPages;
                   console.log(result)
               }
             }
@@ -2540,7 +2470,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part2.storeTableData = content;
@@ -2667,7 +2597,7 @@ export default {
           }})
           }
   
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
 
@@ -2692,7 +2622,6 @@ export default {
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
-      console.log("getPart1StoreBar")
       let content = [];
       if(this.part3.content && this.part3.content[this.part3.indexRegion]){
         if(this.part3.compareType == 'stores'){
@@ -2706,6 +2635,7 @@ export default {
             params.storeIds = this.part3.content[this.part3.indexRegion].list;
             if(this.part3.compareType=='users' || this.part3.compareType=='position'){
               params.storeIds = self.params.storeIds;
+              params.submitters=[self.part3.content[self.part3.indexRegion].innerId]
             }
             params.inspectTagId = self.params.inspectId;
             params.order={
@@ -2720,32 +2650,12 @@ export default {
               page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
+
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                const result = storeResult.data;
                if (result) {
-                  if(this.part3.compareType=='users' ){
-                      let sel = this.part3.content[this.part3.indexRegion];
-                      result.content.forEach(function(item){
-                        if(item.submitters.indexOf(sel.groupName)>=0){
-                          content.push(item);
-                        }
-                      })
-                  }
-                  else if(this.part3.compareType=='position'){
-                      let sel = this.part3.content[this.part3.indexRegion];
-                      sel.submitters.forEach(function(sub){
-                          result.content.forEach(function(item){
-                            if(item.submitters.indexOf(sub)>=0){
-                              content.push(item);
-                            }
-                          })
-
-                      })
-                   
-                  }
-                  else 
-                    content = result.content
+                  content = result.content
                   this.part3.table.total = result.totalPages;
               }
             }
@@ -2765,7 +2675,7 @@ export default {
           regionData.push({value,itemStyle: {
             color: '#7bd8eb',
           }})
-          regionLabel.push(item.groupName)
+           regionLabel.push(this.maxLabel(item.groupName))
         });
       }
       this.part3.storeTableData = content;

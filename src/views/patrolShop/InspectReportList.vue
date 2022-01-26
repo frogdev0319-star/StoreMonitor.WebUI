@@ -767,14 +767,14 @@ export default {
     },
 
     getSearchParams() {
+      console.log("Get SEarch Parameter");
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
-      // console.log(searchParams)
+      console.log(searchParams)
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       this.params.beginTs = this.dateValue[0].valueOf();
       this.params.endTs = this.dateValue[1].valueOf();
    
       if (Object.keys(searchParams).length > 0) {
-        if(searchParams.order){
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.params = searchParams.searchCondition;
@@ -784,14 +784,6 @@ export default {
         this.inspectCatch = !searchParams.searchCondition.inspectTagId ? '-1' : searchParams.searchCondition.inspectTagId;
         this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
-        }
-        else{
-          this.searchParams = searchParams;
-          this.params = JSON.parse(JSON.stringify(searchParams))
-          this.params.filter = { page: 0, size: this.sizeNum };
-          this.params.clause = { storeId:searchParams.curStore };
-        }
-
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
