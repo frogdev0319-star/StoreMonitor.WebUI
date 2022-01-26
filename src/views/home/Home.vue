@@ -827,6 +827,7 @@ export default {
     color:#a5a5a5;
     margin-left: 10px;
   }
+  
   /deep/ .el-menu--collapse {
     i {
       display: none;
@@ -873,6 +874,7 @@ export default {
         color: #006ab7;
       }
     }
+    
   }
   /deep/ .el-submenu {
     text-align: left;
@@ -947,6 +949,7 @@ export default {
       }
     }
   }
+  
 }
 </style>
 <style lang="scss" scoped>
@@ -1208,6 +1211,7 @@ $collapseWidth: 5.5%;
       /deep/ .el-input--suffix .el-input__inner {
         padding-left: 0;
       }
+      
     }
     .collapsed-brand-panel {
       height: 40px;

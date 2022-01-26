@@ -58,7 +58,7 @@
       </div>
 
     </div>
-    <div v-if="type === 'patrol' || type === 'report'" class="flex-center padding-left" style="text-align: left; margin-top: 20px">
+    <div v-if="type === 'patrol' || type === 'report'" class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
       <template v-if="type === 'patrol'" >
         <div class="paper shadow-light"
           @click="showFavorite = !showFavorite"
@@ -78,6 +78,7 @@
               :value="item.id"/>
           </el-select>
         </div>
+        <div class="spacer"></div>
       </template>
       <template v-if="type === 'report'" >
         <multi-selector

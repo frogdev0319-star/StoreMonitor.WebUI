@@ -1220,7 +1220,7 @@ export default {
           params.storeIds = [e.row.innerId]
           params.curStore = [e.row.innerId]
           const searchParamsObj = {
-            path: 'patrolCompareStatics',
+            path: 'PatrolCompareStat',
             params: params
           };
           this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
@@ -1240,7 +1240,7 @@ export default {
           params.storeIds = [e.row.innerId]
           params.curStore = [e.row.innerId]
           const searchParamsObj = {
-            path: 'inspectEvalutionStatistics',
+            path: 'PatrolCompareStat',
             params: params
           };
           this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);

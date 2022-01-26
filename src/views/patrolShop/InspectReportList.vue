@@ -2,10 +2,11 @@
   <div class="flex-column" style="height: calc(100% - 20px)">
     <div>
       <store-filter
+        :cached-params="searchParams"
         type="report"
         @storeChange = "onStoreChange"
       >
-        <!-- <template v-slot:others>
+        <template v-slot:others>
           <div>
             <span style="margin-right: 10px">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
@@ -51,7 +52,7 @@
                 :value="item.id"/>
             </el-select>
           </div>
-        </template> -->
+        </template>
       </store-filter>
     </div>
     <div id="el-containter" class="flex-column spacer">
@@ -767,7 +768,7 @@ export default {
     getSearchParams() {
       console.log("Get SEarch Parameter");
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
-      // console.log(searchParams)
+      console.log(searchParams)
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       this.params.beginTs = this.dateValue[0].valueOf();
       this.params.endTs = this.dateValue[1].valueOf();

@@ -22,7 +22,7 @@
               ref="inspectEvalutionSearch"
               isInspectItem=true
               :showDateSelector = "false"
-              path="patrolCompareStaticss"
+              path="inspectEvalutionStatistics"
               @emitSearch = "emitSearch"/>
           </el-col>
           <el-col :span="24">
@@ -42,7 +42,7 @@
                 <div class="average-cahrt">
                   <div style="height:68px;margin-top: 16px;">
                     <TypeSelectArea
-                      path="patrolCompareStaticss"
+                      path="inspectEvalutionStatistics"
                       :allow-all=false
                       :limit-num=2
                       :region-array1="params.curProvince"
@@ -102,7 +102,7 @@
                 <div class="average-cahrt">
                   <div style="height:68px;margin-top: 16px;">
                     <TypeSelectArea
-                      path="patrolCompareStaticss"
+                      path="inspectEvalutionStatistics"
                       :allow-all=false
                       :limit-num=2
                       :region-array1="params.curProvince"
@@ -192,7 +192,7 @@
                   <div class="average-cahrt">
                     <div style="height:68px;margin-top: 16px;">
                       <TypeSelectArea
-                        path="patrolCompareStaticss"
+                        path="inspectEvalutionStatistics"
                         :allow-all=false
                         :limit-num=2
                         :region-array1="params.curProvince"
@@ -254,7 +254,7 @@
                   <div class="average-cahrt">
                     <div style="height:68px;margin-top: 16px;">
                       <TypeSelectArea
-                        path="patrolCompareStaticss"
+                        path="inspectEvalutionStatistics"
                         :allow-all=false
                         :limit-num=2
                         :region-array1="params.curProvince"
@@ -433,7 +433,7 @@ export default {
         this.getInspectTagStandardScore();
     },
     getSearchParams() {
-      const searchParams = SearchConditionUtil.getSearchCondition('patrolCompareStaticss');
+      const searchParams = SearchConditionUtil.getSearchCondition('inspectEvalutionStatistics');
       console.log("!!searchParams:",searchParams);
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       this.params.beginTs = this.dateValue[0].valueOf();
@@ -459,7 +459,7 @@ export default {
       this.timeMode = daysDiff <= 30 ? 1 : 2;
     },
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      console.log("XXXXXemitSearch:",searchParams);
+      console.log("emitSearch:",searchParams);
       this.storeIds = [];
       this.params = searchParams;
       this.storeIds = this.params.storeIds;
@@ -470,7 +470,7 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       const searchParamsObj = {
-        path: 'patrolCompareStaticss',
+        path: 'inspectEvalutionStatistics',
         params: this.params
       };
       this.ifSaveParams && this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
