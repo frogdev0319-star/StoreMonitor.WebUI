@@ -78,6 +78,7 @@
               :value="item.id"/>
           </el-select>
         </div>
+        <div class="spacer"></div>
       </template>
       <template v-if="type === 'report'" >
         <multi-selector
