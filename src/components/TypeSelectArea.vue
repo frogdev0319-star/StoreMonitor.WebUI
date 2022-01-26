@@ -548,7 +548,7 @@ export default {
       });
     },
     changeCompareType(val){
-      console.log("Change Compare Type=" +val);
+      //console.log("Change Compare Type=" +val);
       let self = this;
       self.compareType = val;
       self.curSelectId = [];
@@ -613,7 +613,9 @@ export default {
           self.selAllString=self.$t('overview.all');
           self.curTypeArrary = self.curStoreList;
           for(let i=0; i<self.curTypeArrary ;i++){
-            storeIds.push(self.curTypeArrary[i].storeId);
+            if(self.curTypeArrary[i].storeId != '-1'){
+              storeIds.push(self.curTypeArrary[i].storeId);
+            }
           }
           break;
         default:
@@ -622,7 +624,7 @@ export default {
           self.curTypeArrary = self.curStoreList;
           break;
       }
-      console.log("curSelectId:",self.curSelectId);
+      //console.log("curSelectId:",self.curSelectId);
       //if(self.curSelectId.length==0){
         let selectedLabels = [];
         /*if(!self.allowAll){
@@ -649,7 +651,7 @@ export default {
           let selIdLength = self.curSelectId.length;
           for(let i=0; i<defaultSel;i++){
             if(selIdLength==0){
-              if(self.allowAll) self.curSelectId.push('-1');
+              //if(self.allowAll) self.curSelectId.push('-1');
               self.curSelectId.push((self.compareType=="stores")?self.curTypeArrary[i].storeId:self.curTypeArrary[i].value);
             }
             selectedLabels.push(self.curTypeArrary[i].label);
@@ -662,16 +664,16 @@ export default {
             
           }
         //}
-          console.log("storeIds:",storeIds);
-          self.onChangeCompareType({selectedArray:self.curSelectId,storeIds,selectedLabels});
+          //console.log("storeIds:",storeIds);
+          self.onChangeCompareType({selectedArray:self.curSelectId,storeIds:storeIds,selectedLabels});
             //self.$emit("emitTypeChanged",{compareType:self.compareType,compareArr:storeIds,selectedLabels});    
       //}
         
     },
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
-      console.log("onChangeCompareType > selectedArray:",selectedArray);
-      console.log("onChangeCompareType > selectedLabels:",selectedLabels);
-      
+      //console.log("onChangeCompareType > selectedArray:",selectedArray);
+      //console.log("onChangeCompareType > selectedLabels:",selectedLabels);
+      //console.log("1.onChangeCompareType > storeIds:",storeIds);
       this.curSelectId = selectedArray;
       let originArray = [];
       this.curTypeArrary.forEach(function(item){
@@ -683,7 +685,11 @@ export default {
       selectedArray.forEach(function(item){
           if(item!='-1')compareArr.push(item)
       })
-      let storeId = storeIds;
+      let storeId = [];
+      if(storeIds.includes('-1')){
+        storeIds = storeIds.slice(1,storeIds.length-1);
+      }
+      storeId = storeIds;
       if(this.compareType== 'area1'){
         storeId=this.doGetStoreIdsByProvince(selectedArray);
         //("storeId:",storeId);
@@ -692,6 +698,7 @@ export default {
         storeId=this.doGetStoreIdsByCity(selectedArray);
         //console.log("storeId:",storeId);
       }
+      //console.log("2.onChangeCompareType > storeId:",storeId);
       this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:compareArr,selectedLabels,originArray,selStoreIdArr:storeId});
     },
     doGetStoreIdsByProvince(provinceArrary){

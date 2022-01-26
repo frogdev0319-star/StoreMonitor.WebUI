@@ -1162,13 +1162,20 @@ export default {
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.compareType = compareType;
-      console.log("emitTypeChanged > selStoreIdArr :",selStoreIdArr);
+      //console.log("emitTypeChanged > selStoreIdArr :",selStoreIdArr);
       //console.log("compareArr.includ :",compareArr.includes('-1'));
-      if(selStoreIdArr.includes('-1')){
+      /*if(selStoreIdArr.includes('-1')){
         selStoreIdArr.shift();
-      }
-      this.compareIds = selStoreIdArr;
-      console.log("1.emitTypeChanged > this.compareIds:",this.compareIds); 
+      }*/
+      let tempId = [];
+      selStoreIdArr.forEach((item)=>{
+        if(item!='-1'){
+          tempId.push(item);
+        }
+      });
+
+      this.compareIds = tempId
+      //console.log("1.emitTypeChanged > this.compareIds:",this.compareIds); 
       
       this.comapareLabels = selectedLabels;
       this.getAllEventData();
@@ -1308,7 +1315,7 @@ export default {
       self.params.groupMode = region[0].value;
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:this.compareIds,
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:self.compareIds,
           order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
         //console.log("*getEventTableData>searchCondition:",searchCondition);
@@ -1435,13 +1442,7 @@ export default {
             barWidth: "16px",
             smooth: true,
             data: [0,0,0,0,0,0,0,0,0,0,0,0],
-            color:(context)=>{
-                if(this.barActiveName==context.data.name){
-                  return '#7bd8eb';
-                }else{
-                  return '#D7F3F9';
-                }
-              },
+            color:'#D7F3F9',
             barGap:0,
             emphasis: {
               focus:'none',
@@ -1508,11 +1509,12 @@ export default {
       self.params.storeIds = self.compareIds;
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
+      //console.log("getEventTableData > this.compareIds:",self.compareIds); 
       searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:0,storeIds:self.compareIds};
           //filter:{"page":this.page-1,"size":this.sizeNum},
           //order:this.order
         //};
-      console.log("*getEventTableData>searchCondition:",searchCondition);
+      //console.log("*getEventTableData>searchCondition:",searchCondition);
       /*}else{ //groupType, storeGroup
         self.params.groupIds=this.compareIds
         searchCondition  = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,groupIds:this.compareIds};
@@ -1688,14 +1690,18 @@ export default {
     emitTypeChanged2({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
       this.showInvolveTableArea = false;
       this.compareType2 = compareType;
-      //this.compareIds2 = compareArr;
-      //console.log("compareArr :",compareArr);
-      //console.log("compareArr.includ :",compareArr.includes('-1'));
-      if(selStoreIdArr.includes("-1")){
+      let tempId = [];
+      selStoreIdArr.forEach((item)=>{
+        if(item!='-1'){
+          tempId.push(item);
+        }
+      });
+      this.compareIds2 = tempId;
+      /*if(selStoreIdArr.includes("-1")){
         selStoreIdArr.shift();
       }else{
         this.compareIds2 = selStoreIdArr
-      }
+      }*/
       this.comapareLabels2 = selectedLabels;
       this.doGetInspecEvenItems();
     },

@@ -257,12 +257,12 @@
                 :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
               >
                 <div 
-                  v-for="(item,index) in (store.device && store.device.filter(d => d.name.indexOf(serachChannelValue) > -1))" 
+                  v-for="(item,index) in showChannelBtns.filter(d => d.name.indexOf(serachChannelValue) > -1)" 
                   :key="index" 
                   class="btn-details"
                   :class="{'child-space': isFullScreenMode}"
                   :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
-                >
+                > 
                   <div 
                     @click="clickBtn(item,index)"
                     class="channel"
@@ -354,6 +354,8 @@
             <div v-if="!showFeedBack" class="padding spacer" style="height: 60vh; overflow: auto; background-color: #edf0f2;">
               <div v-for="(item,index) in inspectItemList" :key="index" class="paper padding" style="text-align: left" :class="{'margin-bottom-md': index!==inspectItemList.length}">
                 <template v-if="Array.isArray(item)">
+                  <span style="border-left: 4px solid rgb(44, 144, 217); padding-left: 5px;">{{item[0].groupName}}</span>
+                  <hr class="hr-horizontal margin-bottom-top-sm" >
                   <inspection-item 
                     v-for="(_item, _index) in item" 
                     :item="_item" 
@@ -1611,10 +1613,12 @@ export default {
     getItemByGroup(group, index, sheet) {
       let inspectItems = []
       if (sheet) {
+        console.log(1)
         sheet.inspectList.forEach(inspect => {
           inspectItems.push(inspect.items)
         })
       } else {
+        console.log(2)
         inspectItems = group.items
       }
       const self = this;
@@ -1640,6 +1644,7 @@ export default {
     },
 
     getItemOfCategory(item, index){
+      console.log(3)
       this.inspectItemList = [];
       this.curGroupIndex = 0;
       this.curSheetIndex = index;
@@ -1844,28 +1849,6 @@ export default {
       }
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
-      self.showGuide = false;
-      self.channel = {...self.allChannelBtns[0]};
-      self.vendor = self.channel.vendor;
-      self.channelBtns = [...self.allChannelBtns];
-      self.showError = false;
-      self.showGuide = false;
-      self.$nextTick(() => {
-        self.showGuide = false;
-        self.getshowBtns(self.channelBtns);
-      });
-      self.channelBtns.forEach((_item, _index) => {
-        if (self.channel != null) {
-          if (_item.id === self.channel.id) {
-            _item.isClick = true;
-          } else {
-            _item.isClick = false;
-          }
-        }
-      });
-      self.$nextTick(() => {
-        self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
-      });
       self.curDeviceId = item.deviceId[0];
       self.curItem = item;
       self.curItemIndex = index;
@@ -2323,6 +2306,28 @@ export default {
       });
       self.channelBtns = temp;
       self.allChannelBtns = temp;
+      self.showGuide = false;
+      self.channel = {...self.allChannelBtns[0]};
+      self.vendor = self.channel.vendor;
+      self.channelBtns = [...self.allChannelBtns];
+      self.showError = false;
+      self.showGuide = false;
+      self.$nextTick(() => {
+        self.showGuide = false;
+        self.getshowBtns(self.channelBtns);
+      });
+      self.channelBtns.forEach((_item, _index) => {
+        if (self.channel != null) {
+          if (_item.id === self.channel.id) {
+            _item.isClick = true;
+          } else {
+            _item.isClick = false;
+          }
+        }
+      });
+      self.$nextTick(() => {
+        self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+      });
     },
     changeInspect(val) {
       const self = this;
@@ -2350,7 +2355,7 @@ export default {
       self.notShowAlert = false;
       self.showIgnoreItem = false;
       self.eventList = [];
-      self.showChannelBtns = [];
+      // self.showChannelBtns = [];
       self.curSheetIndex = 0;
       self.PatrolList.forEach(item => {
         if (item.id == val) {
@@ -2432,6 +2437,7 @@ export default {
               const itemObj = {};
               itemObj.id = _item.id;
               itemObj.groupId = item.groupId;
+              itemObj.groupName = item.groupName;
               itemObj.subject = _item.subject;
               itemObj.description = _item.description;
               itemObj.itemScore = _item.itemScore;

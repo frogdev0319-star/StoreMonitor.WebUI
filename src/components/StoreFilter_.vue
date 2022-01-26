@@ -58,24 +58,35 @@
       </div>
 
     </div>
-    <div v-if="type === 'patrol'" class="flex-center padding-left" style="text-align: left; margin-top: 20px">
-      <div class="paper shadow-light"
-        @click="showFavorite = !showFavorite"
-        :style="showFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}"
-        style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px; text-align: center">
-          {{ $t('remotePatrol.favoriteStore') }}
-      </div>
-      <el-select
-        class="filter-select"
-        v-model="curStore"
-        :placeholder="$t('remotePatrol.stores')"
-        size="mini">
-        <el-option
-          v-for="item in curStoresData"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id"/>
-      </el-select>
+    <div v-if="type === 'patrol' || type === 'report'" class="flex-center padding-left" style="text-align: left; margin-top: 20px">
+      <template v-if="type === 'patrol'" >
+        <div class="paper shadow-light"
+          @click="showFavorite = !showFavorite"
+          :style="showFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}"
+          style="width: 115px; height: 36px; font-size: 13px; line-height: 36px; user-select: none; cursor: pointer; margin-right: 20px; text-align: center">
+            {{ $t('remotePatrol.favoriteStore') }}
+        </div>
+        <div class="single-select shadow-light">
+          <el-select
+            v-model="curStore"
+            :placeholder="$t('remotePatrol.selectStores')"
+            size="mini">
+            <el-option
+              v-for="item in curStoresData"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"/>
+          </el-select>
+        </div>
+      </template>
+      <template v-if="type === 'report'" >
+        <multi-selector
+          v-model="curStores"
+          :options="curStoresData"
+          @change="changeCurStores"
+          :placeholder="$t('remotePatrol.selectStores')"
+        />
+      </template>
       <slot name="others"></slot>
     </div>
     <div v-if="type === 'bindroute'" class="flex-center padding-left" style="text-align: left; margin-top: 20px">
@@ -100,6 +111,7 @@
 
 <script>
 import MultiSelect from '@/components/MultiSelect';
+import MultiSelector from '@/components/MultiSelect_';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import { getBriefStoreList, getStoreDefineGroup, getStoreList } from '@/api/store';
@@ -109,6 +121,7 @@ export default {
   name: 'StoreFilter',
   components: {
     MultiSelect,
+    MultiSelector,
     RegionMultiSelect
   },
 
@@ -228,15 +241,8 @@ export default {
       this.getSearchParams();
     },
     curStore () {
-      // console.log(this.curStore)
       this.emitParams()
     },
-    // showFavorite () {
-    //   this.storeOptions = this.allInitStoreList.filter(store => store.favorite).map(store =>({
-    //     value: store.storeId,
-    //     label: store.name
-    //   }))
-    // }
   },
 
   created() {
@@ -244,6 +250,10 @@ export default {
   },
 
   methods: {
+    changeCurStores (val) {
+      this.curStores = [...val]
+      this.filterStore()
+    },
     getCountryStore() {
       let temp = [];
       if (this.storeList.length !== 0) {
@@ -472,7 +482,7 @@ export default {
 
       let filterStoreStr = '';
       filterStoreId.forEach(storeId => {
-        this.storeList.forEach(store => {
+        self.storeList.forEach(store => {
           if (storeId === store.storeId) {
             filterStoreStr += `${store.name}，`;
           }
@@ -480,12 +490,11 @@ export default {
       });
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-      this.curStores = this.curStoresData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
-      this.filterStoreIds = this.curStoresData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
+      // this.curStores = this.curStoresData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
+      // this.filterStoreIds = this.curStoresData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
-      // this.$emit('emitStoreList', this.storeDataList);
     },
 
     getStoreGroupString() {
@@ -514,14 +523,14 @@ export default {
       tempsearchParamsObj.curCity = this.curCity;
       tempsearchParamsObj.curStore = this.curStore;
       tempsearchParamsObj.curStoreData = this.curStoreData;
-      tempsearchParamsObj.curStores = this.curStores;
+      tempsearchParamsObj.curStores = [...this.curStores];
       tempsearchParamsObj.curStoresData = this.curStoresData;
       tempsearchParamsObj.curStoreGroup = this.curStoreGroup;
       tempsearchParamsObj.curStoreType = this.curStoreType;
       tempsearchParamsObj.storeStr = this.storeStr;
       tempsearchParamsObj.storeGroupString = this.storeGroupString;
       tempsearchParamsObj.storeTypeString = this.storeTypeString;
-      tempsearchParamsObj.filterStoreIds = this.filterStoreIds;
+      tempsearchParamsObj.filterStoreIds = [...this.filterStoreIds];
       this.isPatrol && this.getSelectCountryOrCity();
       tempsearchParamsObj.curRegionI = this.curRegionI;
       tempsearchParamsObj.curRegionII = this.curRegionII;
@@ -529,7 +538,6 @@ export default {
       tempsearchParamsObj.provinceList = this.provinceList;
       tempsearchParamsObj.countryList = this.countryList;
       tempsearchParamsObj.cityList = this.cityList;
-      // console.log(tempsearchParamsObj)
       
       this.$store.dispatch("setStoreCache", tempsearchParamsObj);
       this.$emit('storeChange', tempsearchParamsObj);
@@ -786,7 +794,6 @@ export default {
   }
   .content {
     display: flex;
-    width: 100%;
     align-items: center;
     .search-label{
       width: calc(76/1440*100vw);
@@ -862,49 +869,15 @@ export default {
   }
 </style>
 <style lang="scss" scoped>
-  .input {
-    /deep/ .el-input__inner {
-      height: 36px;
-      line-height: 36px;
-      border: none;
-      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-    }
-  }
-
-  .el-select-dropdown__item{
-    padding: 0 20px 0 20px !important;
-    /*color: #7d8cad;*/
-  }
-  .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
-    font-family: "iconfont" !important;
-    content: '\e6a2';
-    left: 20px;
-    font-size: 15px;
-    font-style: normal;
-    color: #2c90d9;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  .el-select-dropdown.is-multiple .el-select-dropdown__item::after{
-    font-family: "iconfont" !important;
-    position: absolute;
-    left: 20px;
-    content: "\e64a";
-    color: #2c90d9;
-    font-weight: 700;
-    -webkit-font-smoothing: antialiased;
-    font-size: 15px;
-    font-style: normal;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  /deep/ .el-select.el-select--medium .el-input .el-input__suffix-inner{
+  .single-select {
     position: relative;
-    z-index: 1;
-  }
-  /deep/ .el-input--medium .el-input__icon {
-    line-height: calc(36/1920*100vw);
-    height: calc(36/1920*100vw);
-    min-height: 36px;
-    color: #2c90d9;
+    background: #fff;
+    border-radius: 3px;
+    /deep/ .el-input__inner {
+      border: none;
+      font-size: 15px;
+      height: calc(36/1920*100vw);
+      line-height: calc(36/1920*100vw);
+    }
   }
 </style>
