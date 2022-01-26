@@ -59,20 +59,20 @@
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0">
           <date-time-selector @change="dateChange"/> 
-          <div class="spacer"></div>
-          <div class="flex-center">
+          <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <span class="search-label">{{ $t('remotePatrol.keywords') }}</span>
               <el-input v-model="searchInput" size="mini" class="search-input shadow-light" clearable/>
             </div>
-            <delay-button
-              class="search-button"
+            <div class="spacer"></div>
+            <el-button
+              class="storevue-button-search"
               type="primary"
               size="mini"
               @click="searchData"
             >
               <span style="margin-right: 0">{{ $t('remotePatrol.search') }}</span>
-            </delay-button>
+            </el-button>
           </div>
         </div>
         <!-- <selected-stores :store-str="storeStr"/> -->
@@ -543,6 +543,7 @@ export default {
             temp.push(reportObj);
           });
           self.reportList = temp;
+          console.log(temp)
           self.total = res.data.totalElements;
           self.isLoading = false;
           if (self.reportList.length === 0) {
