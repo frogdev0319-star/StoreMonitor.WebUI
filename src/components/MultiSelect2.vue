@@ -78,21 +78,21 @@ export default {
       this.initData();
     },
     selected(val, oldVal) {
-      console.log("selected > val:",val);
+      //console.log("selected > val:",val);
       this.selectedArray = val;
       this.initData();
     },
 
     options(val){
-      console.log("options > val:",val);
+      //console.log("options > val:",val);
       this.selectedArray = [...this.selected];
       this.initData();
     },
     placeholder(val){
-      console.log("placehold:",val);
+      //console.log("placehold:",val);
     },
     disabled(val){
-      console.log("disabled:",val);
+      //console.log("disabled:",val);
       return val;
     }
   },
@@ -143,7 +143,7 @@ export default {
     changeSelect(val) {
       this.changed = true;
       var emitArray = [];
-      console.log("val:",val);
+      //console.log("changeSelect > val:",val);
       if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
         this.input = this.all;
         this.selectedArray.unshift('-1');
@@ -337,8 +337,8 @@ export default {
     background: transparent !important;
     border: none;
     font-size: 13px;
-    height: 35px;
-    line-height: 28px;
+    height: 36px;
+    line-height: 36px;
     bottom: calc(2/1920*100vw);
     min-height: 28px;
     min-width: 85px;
@@ -350,19 +350,19 @@ export default {
     border: none;
     font-size: 13px;
     height: 35px;
-    line-height: 28px;
+    line-height: 36px;
   }
   >>> .el-select.el-select--mini .el-input .el-input__suffix-inner{
     position: relative;
     z-index: 1;
   }
   >>> .el-input--medium .el-input__icon {
-    line-height: 28px;
-    height: 28px;
+    line-height: 36px;
+    height: 36px;
   }
   .el-province >>> .el-input--mini .el-input__icon {
-    line-height: 28px;
-    height: 28px;
+    line-height: 36px;
+    height: 36px;
   }
   .el-select.el-select--medium{
     color: #7d8cad;
