@@ -535,6 +535,39 @@ $sv_red: #c60957;
     color: rgba(255,255,255,.4);
   }
 }
+.storevue-button-search {
+  background-color: #556679;
+  border-color: #556679;
+  color: #fff;
+  font-size: calc(15/1920*100vw);
+  padding: calc(8 / 1920 * 100vw) calc(25 / 1920 * 100vw);
+  &.is-disabled {
+    background-color: #556679;
+    border-color: #556679;
+    color: #fff;
+    opacity: .5;
+    &:hover {
+      background-color: #556679;
+      border-color: #556679;
+      color: #fff;
+      opacity: .5;
+    }
+  }
+  &:hover {
+    background-color: #3d4854;
+    border-color: #3d4854;
+  }
+  &:focus {
+    background-color: #3d4854;
+    border-color: #3d4854;
+    color: rgba(255,255,255,.4);
+  }
+  &:active {
+    background-color: #3d4854;
+    border-color: #3d4854;
+    color: rgba(255,255,255,.4);
+  }
+}
 .storevue-button-outlined .iconfont{
   margin-right: calc(8/1920*100vw);
 }
