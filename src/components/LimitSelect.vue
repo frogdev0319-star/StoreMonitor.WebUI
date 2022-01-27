@@ -225,6 +225,7 @@ export default {
   .is-multiple {
     .el-select-dropdown__item{
       &:first-child {
+        padding-left: 10px !important;
         background: none;
         border-left: solid 1px rgba(172, 174, 177, 0.34);
       }
@@ -235,6 +236,7 @@ export default {
     }
     .el-select-dropdown__item.selected {
       &:first-child {
+        padding-left: 10px !important;
         background: url("~@/../static/img/select-checked.svg") no-repeat;
         background-position: center right 20px;
         border-left: solid 1px rgba(44, 144, 217, 0.34);
