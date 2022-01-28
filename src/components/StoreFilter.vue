@@ -257,7 +257,8 @@ export default {
 
     onChangeStore(arr) {
       this.curStore = arr;
-      //this.changeStoreNew(arr);
+      //this.emitParams();
+      this.changeStoreNew(arr);
     },
 
     getStoreDefineList(type) {
@@ -273,8 +274,11 @@ export default {
       });
     },
 
-    changeStoreNew() {
-      this.filterStore();
+    changeStoreNew(arr) {
+      //this.filterStore();
+      console.log("arr:",arr);
+      this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
+      this.emitParams();
     },
 
     onChangeProvince(arr) {
@@ -474,7 +478,7 @@ export default {
 
     emitParams() {
       const tempsearchParamsObj = {};
-      console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
+      //console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
       tempsearchParamsObj.curCountry = this.curCountry;
       tempsearchParamsObj.curProvince = this.curProvince;
       tempsearchParamsObj.curCity = this.curCity;

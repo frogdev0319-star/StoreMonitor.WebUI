@@ -362,31 +362,51 @@ export default {
       },
       handleEmitPersonEventRowClick(row){//进入事件列表界面，展示该门店该人员产生的事件
         const self = this;
-        const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
+        const params = SearchConditionUtil.getSearchCondition('eventManage');
         /*let storeIds=[];
         if (Object.keys(searchParams).length > 0) {
             //this.params = searchParams.searchParams;
             storeIds = searchParams.searchParams.storeIds;
         }*/
+        console.log("1.",params)
             const rowItem = row.row;
-            const passObj = {
+            //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
+      params.searchParams.clause ={assigner:this.submitter,storeId:[rowItem.id],status:[]};
+      params.filterStoreIds=[rowItem.id];
+      params.curStore=[rowItem.id];
+      params.storeIds=[rowItem.id];
+      params.curCountry = "-1"
+      params.inputSearchValue = "";
+      params.curState = [];
+      params.activeName = '4';
+      params.searchParams.filter ={ page: 0, size: 10 };
+      params.beginTs=this.beginTs,
+      params.endTs=this.endTs
+      params.searchFrom='PatrolPersonStat';
+      
+      console.log("2.",params);
+            /*const passObj = {
                 inputSearchValue:"",
                 curState:[],
                 activeName:'4',
                 sizeNum:10,
-                page:1,    
-                clause : {assigner:this.submitter},
+                page:1,  
+                curStore:[rowItem.id],
+                clause : {assigner:this.submitter,storeId:[rowItem.id]},
                 assigner:this.submitter,
-                searchFrom:'PatrolPersonStat'
-            };
+                searchFrom:'PatrolPersonStat',
+                curStore:rowItem.id,
+                beginTs:this.beginTs,
+                endTs:this.endTs
+            };*/
             const searchConditon = {
                 path: 'eventManage',
-                params: passObj
+                params: params
             };
             console.log("searchConditon:",searchConditon);
             SearchConditionUtil.saveSearchCondition(searchConditon);
                     //sessionStorage.setItem('event_manage', JSON.stringify(passObj));
-            self.$router.push({ name: 'eventManage', params: { data: passObj }});
+            self.$router.push({ name: 'eventManage', params: params});
       },
       getNotInspectedStores(){
           const self = this;
