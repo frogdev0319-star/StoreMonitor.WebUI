@@ -1510,6 +1510,7 @@ $h1:#292e36;
                       word-wrap:break-word; /* Internet Explorer 5.5+ */
                       .description-content{
                         font-size: 14px;
+                        word-break:break-all;
                       }
                   }
                   /deep/
