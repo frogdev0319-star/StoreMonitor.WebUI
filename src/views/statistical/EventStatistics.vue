@@ -1120,7 +1120,7 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
-      this.inspectId = this.params.inspectId
+      this.inspectId = this.params.inspectId;
       this.searchData();
     },
     async searchData() {
