@@ -375,7 +375,9 @@ export default {
       params.filterStoreIds=[rowItem.id];
       params.curStore=[rowItem.id];
       params.storeIds=[rowItem.id];
-      params.curCountry = "-1"
+      params.curCountry = "-1";
+      params.curProvince = [];
+      params.curCity = [];
       params.inputSearchValue = "";
       params.curState = [];
       params.activeName = '4';

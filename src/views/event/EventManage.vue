@@ -570,7 +570,7 @@ export default {
         this.getRouterData(routeData);
       }else{*/
       self.getEventListRequestParams(val);
-      this.ifSaveParams && self.saveSearchParams();
+      this.ifSaveParams && self.saveSearchParams(false);
       this.ifSaveParams = true;
       //}
       if (self.params.clause.storeId.length === 0) {
@@ -581,10 +581,10 @@ export default {
         this.numberOfElements = 0;
         return;
       }
-      console.log("self.params:",self.params);
+      //console.log("self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
-        console.log("data:",data);
+        //console.log("data:",data);
         const temp = [];
         data.forEach(item => {
           const attachment = [];
@@ -643,7 +643,7 @@ export default {
       }
       let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
       
-      console.log("EventMange > storeId:",storeId);
+      //console.log("EventMange > storeId:",storeId);
       let status = [];
       if (this.curState.length !== 0) {
         if (this.curState.length === 1) {
@@ -702,11 +702,11 @@ export default {
           like: like
       }
       
-      console.log("this.searchParams:",this.searchParams);
+      //console.log("this.searchParams:",this.searchParams);
       if(typeof this.searchParams.searchParams.clause !="undefined"){
         this.params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
       }
-      console.log("this.params:",this.params);
+      //console.log("this.params:",this.params);
       const curTabSortColumn = this.sortColumnOfTab[tabIndex];
       const order = curTabSortColumn.sortType.order;
       const prop = curTabSortColumn.sortType.prop;
@@ -973,7 +973,7 @@ export default {
         params.searchParams = { clause, filter, like, order };
       }
       console.log("save params:",params);
-      //params.filterStoreIds = this.curStore;
+      params.filterStoreIds = this.curStore;
       params.inputSearchValue = this.inputSearchValue;
       params.dateValue = this.dateValue;
       params.curState = this.curState;
@@ -997,6 +997,11 @@ export default {
           if(searchParams['searchFrom']=='PatrolPersonStat'){
             //this.dateValue =[searchParams.];
             this.storeFilterObj.filterStoreIds = searchParams.curStore;
+            this.storeFilterObj.curStore=searchParams.curStore;
+            this.storeFilterObj.storeIds=searchParams.curStore;
+            this.storeFilterObj.curCountry = "-1";
+            this.storeFilterObj.curProvince = ["-1"];
+            this.storeFilterObj.curCity = ["-1"];
             this.params.beginTs = searchParams.beginTs;
             this.params.endTs = searchParams.endTs;
             this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
