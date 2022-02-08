@@ -645,7 +645,8 @@ export default {
           const comments = data[0];
           const dataComments = comments.comment;
           const temp = [];
-          //self.curStatus = dataComments[0].status;
+          self.curStatus = dataComments[0].status;
+          self.event.status = dataComments[0].status;
           //console.log("dataComments[0].status:",dataComments[0].status);
           // 0 pending：handle、add、closed
           // 1 handled：add、closed、reject
@@ -660,6 +661,9 @@ export default {
             if (self.curStatus === 1) {
               item.order === 1 || item.order === 2 || item.order === 3 ? item.isShow = true : item.isShow = false;
               item.order === 1 ? item.isActive = true : item.isActive = false;
+            }
+            if (self.curStatus === 2 || self.curStatus === 4) {
+              item.isShow = false;
             }
           });
           dataComments.forEach((item, index) => {
@@ -751,6 +755,7 @@ export default {
           util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
           self.getCommentList(1);
           self.event.status = status;
+
           self.eventDes = '';
           setTimeout(() => {
             self.commentList.forEach((_item, _index) => {
@@ -791,6 +796,8 @@ export default {
       } else if (self.subBtnList[1].isActive) {
         if (self.subBtnList[1].order === 1) {
           status = 2;
+          this.isEdit = false;
+          self.subBtnList[1].isShow=false;
         } else {
           status = self.curStatus;
         }
