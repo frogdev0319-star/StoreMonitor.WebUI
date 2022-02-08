@@ -102,7 +102,7 @@
     </el-row>
     <div v-if="ispdf">
       <el-row id="pdf-area" ref="printPDF" class="statistics-container">
-        <el-col :span="24" class="statistics-content" style="height: auto">
+        <el-col :span="24" class="statistics-content" style="height: auto;width:1000px;">
           <div class="head">
             <div class="title">{{ $t('statistics.patrolPerson.insRecordList') }}</div>
           </div>
