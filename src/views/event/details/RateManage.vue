@@ -1002,6 +1002,10 @@ $h1:#292e36;
         .description{
             max-width: 70%;
             min-width: 70%;
+            /deep/
+            span{
+              word-break: break-all;
+            }
         }
         .event-title{
             @include point(font-size,18);

@@ -737,10 +737,10 @@ export default {
       self.tableDataList[Number(self.activeName)].page = val.page;
       self.getEventList('currentChange');
 
-      const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
+      const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-left')[0];
       const offestTop = dom.offsetTop;
       if (dom != undefined) {
-        document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop = 0;
+        document.getElementsByClassName('el-table__body-wrapper is-scrolling-left')[0].scrollTop = 0;
       }
     },
 
