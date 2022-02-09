@@ -352,47 +352,114 @@
           </div>
           <div class="fullWidth">
             <div v-if="!showFeedBack" class="padding spacer" style="height: 60vh; overflow: auto; background-color: #edf0f2;">
-              <div v-for="(item,index) in inspectItemList" :key="index" class="paper padding" style="text-align: left" :class="{'margin-bottom-md': index!==inspectItemList.length}">
-                <template v-if="Array.isArray(item)">
-                  <span style="border-left: 4px solid rgb(44, 144, 217); padding-left: 5px;">{{item[0].groupName}}</span>
-                  <hr class="hr-horizontal margin-bottom-top-sm" >
-                  <inspection-item 
-                    v-for="(_item, _index) in item" 
-                    :item="_item" 
-                    :key="_item.id"
-                    :index="_index"
-                    :class="{'margin-bottom-sm': _index !== item.length}"
-                    @emitClickItem="clickItem"
-                    @emitCheckScore="checkScore"
-                    @emitIgnoreItem="ignoreItem"
-                    @emitCancleIgnoreItem="CancleIgnoreItem"
-                    @emitDeleteImg="deleteImg"
-                    @emitGetImgList="getImgList"
-                    @emitItemDescriptionChanged="itemDescriptionChanged"
-                    @emitNotShowInputRuleTips="notShowInputRuleTips"
-                    @emitSubmitItemComment="submitItemResource"
-                    @emitEditItemResource="editItemResource"
-                    @emitDeleteItemResource="deleteItemResource"
-                  ></inspection-item>
-                </template>
-                <template v-else>
-                  <inspection-item 
-                    :item="item"
-                    :index="index"
-                    @emitClickItem="clickItem"
-                    @emitCheckScore="checkScore"
-                    @emitIgnoreItem="ignoreItem"
-                    @emitCancleIgnoreItem="CancleIgnoreItem"
-                    @emitDeleteImg="deleteImg"
-                    @emitGetImgList="getImgList"
-                    @emitItemDescriptionChanged="itemDescriptionChanged"
-                    @emitNotShowInputRuleTips="notShowInputRuleTips"
-                    @emitSubmitItemComment="submitItemResource"
-                    @emitEditItemResource="editItemResource"
-                    @emitDeleteItemResource="deleteItemResource"
-                  ></inspection-item>
-                </template>
+              <div
+                v-for="(item_) in inspectList"
+                :key="item_.id"
+                class="inspect-details paper margin-bottom-sm padding">
+                <span>{{ item_.groupName }}</span>
+                <div v-for="(item,index) in item_.items" :key="index" class="item-details">
+                  <span
+                    :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                    :style="item.checked?{'font-weight':'bold'}:{}"
+                    :title="`${index+1}. ${item.subject}`"
+                    class="titles"
+                    @click="clickItem({item,index})">{{ `${index+1}. ${item.subject}` }}</span>
+                  <template v-if="item.itemType === 0">
+                    <div v-if="item.disabled" class="dropdown-model"/>
+                    <div v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="check_scoring">
+                      <p v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
+                          :class="itemDS.isClick?'check_isClick':'check_normal'" @click="checkScore({item,itemDS: itemDS,e:0})">
+                        {{ itemDS.scoreTitle }}
+                      </p>
+                    </div>
+                    <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
+                                  trigger="click" class="item-score" size="small">
+                    <span class="el-dropdown-link">
+                      {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
+                      <i class="el-icon-arrow-down el-icon--right"/>
+                    </span>
+                      <el-dropdown-menu slot="dropdown" class="score-menu">
+                        <el-dropdown-item
+                          v-for="itemDS in item.itemScoreLength"
+                          :key="itemDS"
+                          style="width:70px;text-align:center;"
+                          @click.native="checkScore({item,itemDS: itemDS,e:1})">{{ itemDS }}</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                    <i v-if="!item.manualIgnore" class="iconfont icon-hulve iconhulve" @click="ignoreItem({item,index,e:0})"/>
+                    <img v-if="item.manualIgnore" class="iconfont iconhulve"
+                          src="../../../static/img/ignore_cancel.png" @click="CancleIgnoreItem({item,index})">
+                  </template>
+                  <div v-if="item.checked" class="icon-clicked"/>
+                  <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content">
+                    <span>{{ item.description }}</span>
+                  </div>
+                  <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
+                    <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                      <div v-if="_item.mediaType==2" class="img-content">
+                        <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
+                        <el-image
+                          :src="_item.src"
+                          :style="{width: _item.width, height: _item.height}"
+                          :preview-src-list="getImgList({index: _index, sourceList: item.sourceList})"/>
+                      </div>
+                      <div v-if="_item.mediaType==1" class="img-content">
+                        <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
+                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
+                        <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
+                      </div>
+                      <div v-if="_item.mediaType == 3" class="flex-center">
+                        <img
+                          :src="deleteInspectIcon"
+                          alt="delete"
+                          @click="deleteItemResource({ item, index: _index })"
+                        />
+                        <div
+                          class="paper flex-center margin-bottom-sm"
+                          style="padding: 5px; flex: 1; margin-left: 20px"
+                        >
+                          <div style="flex: 1; text-align: left; margin: 5px">
+                            {{ _item.src }}
+                          </div>
+                          <hr class="hr-vertical" />
+                          <img
+                            :src="editInspectIcon"
+                            alt="edit"
+                            style="margin: 5px"
+                            @click="editItemResource({ item, index: _index })"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style="position: relative">
+                    <el-input
+                      :autosize="{ minRows: 2, maxRows: 7 }"
+                      v-model="item.inspectInput"
+                      :placeholder="$t('remotePatrol.coment')"
+                      :disabled="item.disabled"
+                      size="mini"
+                      class="storevue-textarea"
+                      type="textarea"
+                      resize="none"
+                      @input="(val) => itemDescriptionChanged({ val, item })"
+                      @blur="notShowInputRuleTips({ e: 'item', item })"
+                    />
+                    <button
+                      class="button"
+                      :disabled="item.disabled"
+                      @click="submitItemResource({ item })"
+                    >
+                      確認
+                    </button>
+                  </div>
+                  <span v-if="item.Ruletip" class="rules">{{
+                    $t("remotePatrol.comentRuletip")
+                  }}</span>
+                </div>
               </div>
+              
             </div>
             <div v-if="showFeedBack" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
               <div v-if="showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px; height: calc(100% - 40px); position: relative">
@@ -426,7 +493,7 @@
                           :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
                       </div>
                       <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
-                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(item,index)">
+                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
                         <img :src="videoImgSrc" class="imgLittle" height="100">
                       </div>
                       <hr class="hr-vertical" />
@@ -491,7 +558,7 @@
                 </div>
                 <div v-if="_item.mediaType==1" class="img-content">
                   <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
-                  <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
+                  <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index:_index})">
                   <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
                 </div>
               </div>
@@ -631,6 +698,7 @@ export default {
       curGroupIndex: 0,
       curItemIndex: 0,
       curSheetIndex: 0,
+      curSheet: null,
       curItem: {disabled : false},
       curItemId: 0,
       curhasIgnoreItem: 0,
@@ -851,6 +919,7 @@ export default {
       self.showChannelBtns = PatrolHistory.showChannelBtns;
       self.allChannelBtns = PatrolHistory.allChannelBtns;
       self.curSheetIndex = PatrolHistory.curSheetIndex;
+      self.curSheet = PatrolHistory.curSheet;
       self.curGroupIndex = PatrolHistory.curGroupIndex;
       self.curItemIndex = PatrolHistory.curItemIndex;
       self.deviceList = PatrolHistory.deviceList;
@@ -869,7 +938,8 @@ export default {
           self.showFeedBack = true;
         }
       } else {
-        self.inspectItemList = PatrolHistory.inspectItemList;
+        console.log('inspectItemList mounted')
+        self.inspectItemList = [...PatrolHistory.inspectItemList];
       }
       self.store = PatrolHistory.store;
       self.patrolStoreName = PatrolHistory.store.storeName;
@@ -899,6 +969,7 @@ export default {
       const self = this;
       self.patrolstore = '';
       self.curSheetIndex = 0;
+      self.curSheet = {};
       self.inspectItemList = [];
       self.inspectList = [];
       self.sheetName = [];
@@ -1610,60 +1681,24 @@ export default {
     mouseoutGroup(item, index) {
       item.isHover = false;
     },
-    getItemByGroup(group, index, sheet) {
-      let inspectItems = []
-      if (sheet) {
-        console.log(1)
-        sheet.inspectList.forEach(inspect => {
-          inspectItems.push(inspect.items)
-        })
-      } else {
-        console.log(2)
-        inspectItems = group.items
-      }
+    getItemByGroup(item, index) {
       const self = this;
       self.curGroupIndex = index;
-      self.curGroup = group;
+      self.curGroup = item;
       self.curItemIndex = 0;
-      self.inspectItemList = inspectItems;
+      self.inspectItemList = item.items;
       self.showFeedBack = false;
       self.hideNext = false;
       self.hideLast = false;
       self.channelBtns = [];
-      this.groupType = group.type;
+      this.groupType = item.type;
       this.isCategory = true;
-      group.isClick = true;
+      item.isClick = true;
       this.$nextTick(() => {
         self.anchorLinkTo();
       });
       self.inspectList.forEach((_item, _index) => {
         if (index != _index) {
-          _item.isClick = false;
-        }
-      });
-    },
-
-    getItemOfCategory(item, index){
-      console.log(3)
-      this.inspectItemList = [];
-      this.curGroupIndex = 0;
-      this.curSheetIndex = index;
-      this.curGroup = item;
-      this.curItemIndex = 0;
-      this.groupType = item.type;
-      this.inspectItemList = item.inspectList[0].items;
-      this.showFeedBack = false;
-      this.hideNext = false;
-      this.hideLast = false;
-      this.channelBtns = [];
-      this.isCategory = false;
-      this.inspectList = item.inspectList;
-      item.isClick = true;
-      this.$nextTick(() => {
-        this.anchorLinkTo();
-      });
-      this.sheetName.forEach((_item, _index) => {
-        if ((!_item.isCategory && index !== _index) || _item.isCategory) {
           _item.isClick = false;
         }
       });
@@ -1710,16 +1745,16 @@ export default {
       self.curItem.disabled = true;
       if (self.showIgnoreItem) {
         if (self.hasIgnoretemp[self.curItemIndex].dealCount === 0) {
-          self.hasIgnoretemp[self.curItemIndex].dealCount = 1;
+            self.hasIgnoretemp[self.curItemIndex].dealCount = 1;
         }
         if (self.hasIgnoretemp[self.curItemIndex].manualIgnore) {
-          self.hasIgnoretemp[self.curItemIndex].inspectInput = '';
-          self.hasIgnoretemp[self.curItemIndex].sourceList = [];
-          self.hasIgnoretemp[self.curItemIndex].itemScoreTitle = '--';
-          self.hasIgnoretemp[self.curItemIndex].inputCount = 0;
-          self.hasIgnoretemp[self.curItemIndex].scoreList.forEach(x => {
-            x.isClick = false;
-          });
+            self.hasIgnoretemp[self.curItemIndex].inspectInput = '';
+            self.hasIgnoretemp[self.curItemIndex].sourceList = [];
+            self.hasIgnoretemp[self.curItemIndex].itemScoreTitle = '--';
+            self.hasIgnoretemp[self.curItemIndex].inputCount = 0;
+            self.hasIgnoretemp[self.curItemIndex].scoreList.forEach(x => {
+              x.isClick = false;
+            });
         }
       } else {
         self.showGuide = false;
@@ -1728,14 +1763,14 @@ export default {
           self.sheetName[self.curSheetIndex].Effective--;
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
-          self.sheetName[self.curSheetIndex].dealCount++;
+            self.sheetName[self.curSheetIndex].dealCount++;
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore) {
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = [];
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle = '--';
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount = 0;
-          self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x => {
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = [];
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle = '--';
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount = 0;
+            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x => {
             x.isClick = false;
           });
         }
@@ -1843,10 +1878,18 @@ export default {
       });
     },
     clickItem({item, index}) {
+      const groupItem = null;
+      const groupIndex = 0;
       const self = this;
       if (item.isIgnore) {
         return false;
       }
+      this.inspectList.forEach((group, idx) => {
+        if (group.groupId === item.groupId) {
+          self.curGroup = { ...group };
+          self.curGroupIndex = idx
+        }
+      })
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       self.curDeviceId = item.deviceId[0];
@@ -1992,11 +2035,12 @@ export default {
         activeIndex: this.activeIndex,
         store: this.store,
         hasIgnoretemp: hasIgnoretemp,
-        inspectItemList: this.inspectItemList,
+        inspectItemList: [...this.inspectItemList],
         eventList: this.eventList,
         showChannelBtns: this.showChannelBtns,
         allChannelBtns: this.allChannelBtns,
         curSheetIndex: this.curSheetIndex,
+        curSheet: this.curSheet,
         curGroupIndex: this.curGroupIndex,
         curItemIndex: this.curItemIndex,
         channel: this.channel,
@@ -2130,6 +2174,7 @@ export default {
       const self = this;
       self.patrolstore = '';
       self.curSheetIndex = 0;
+      self.curSheet = {};
       self.inspectItemList = [];
       self.inspectList = [];
       self.sheetName = [];
@@ -2357,6 +2402,7 @@ export default {
       self.eventList = [];
       // self.showChannelBtns = [];
       self.curSheetIndex = 0;
+      self.curSheet = {};
       self.PatrolList.forEach(item => {
         if (item.id == val) {
           self.patrolstore = item.name;
@@ -2505,7 +2551,6 @@ export default {
               });
             } else {
               handleData[i].subcatergy.forEach(item => count += item.items.length);
-              console.log(count)
               te_temp.push({
                 inspectList: handleData[i].subcatergy, dealCount: 0, Effective: 0, count: count, isClick: false,
                 label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: true
@@ -2517,6 +2562,7 @@ export default {
           self.sheetName[0].isClick = true;
           const isCategory = self.sheetName[0].isCategory;
           self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
+          //bug
           const feedobj = {groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false, isCategory: true};
           if (self.sheetName.length != 0) {
             self.sheetName.push(feedobj);
@@ -2603,11 +2649,14 @@ export default {
         s_item.dealCount = dealtemp.length;
         s_item.Effective = notIgnoretemp.length;
         if (s_item.isClick && !self.showFeedBack) {
-          self.inspectItemList = s_item.inspectList[self.curGroupIndex].items;
+          self.inspectItemList = [...s_item.inspectList[self.curGroupIndex].items];
         }
       });
       self.isShowWarn = self.hasIgnoretemp.some(x => x.inputCount == 0);
       self.notShowAlert = self.sheetName.every(x => x.count == x.dealCount);
+    },
+    getItemBySheet () {
+
     },
     changeSheet(item, index) {
       const self = this;
@@ -2638,12 +2687,39 @@ export default {
       } else {
         self.inspectList = item.inspectList;
         self.curSheetIndex = index;
-        self.getItemByGroup(item.inspectList[0], 0, item);
+        this.curSheet = { ...item };
+        self.getItemByGroup(item.inspectList[0], 0, item.inspectList);
       }
       self.sheetName.forEach((_item, _index) => {
         if (index == _index) {
           _item.isClick = _item.isClick == false;
         } else {
+          _item.isClick = false;
+        }
+      });
+    },
+
+    getItemOfCategory(item, index){
+      this.curSheet = { ...item }
+      this.inspectItemList = [];
+      this.curGroupIndex = 0;
+      this.curSheetIndex = index;
+      this.curGroup = item;
+      this.curItemIndex = 0;
+      this.groupType = item.type;
+      this.inspectItemList = [...item.inspectList[0].items];
+      this.showFeedBack = false;
+      this.hideNext = false;
+      this.hideLast = false;
+      this.channelBtns = [];
+      this.isCategory = false;
+      this.inspectList = item.inspectList;
+      item.isClick = true;
+      this.$nextTick(() => {
+        this.anchorLinkTo();
+      });
+      this.sheetName.forEach((_item, _index) => {
+        if ((!_item.isCategory && index !== _index) || _item.isCategory) {
           _item.isClick = false;
         }
       });
@@ -2754,8 +2830,9 @@ export default {
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
     },
-    submitItemResource({ item }) {
-      const self = this
+    submitItemResource({ item, index }) {
+      const self = this;
+      this.curItemIndex = index;
       if (item.inspectInput.trim().length === 0) return
       if (this.curEditIndex > -1) {
         item.sourceList = item.sourceList.map((source, idx) => {
@@ -2772,7 +2849,8 @@ export default {
           src: item.inspectInput,
         })
       }
-      item.inspectInput = ''  
+      item.inspectInput = ''
+
     },
     deleteItemResource({ item, index }) {
       const self = this

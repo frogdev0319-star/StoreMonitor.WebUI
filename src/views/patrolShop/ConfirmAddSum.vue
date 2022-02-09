@@ -4,7 +4,7 @@
       <div class="submit-header flex-center margin-bottom-md">
         <span>{{ $t('remotePatrol.summary') }}</span>
         <div class="spacer"></div>
-        <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="sum-btn" type="primary" @click="submit">
+        <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit">
           {{ $t('remotePatrol.submit') }}
         </el-button>
       </div>
@@ -597,38 +597,33 @@ export default {
             objItem.storeId = self.store.storeId;
             objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
             const tempFileUrl = [];
-            if (inspect[i].inspectList[g].items[j].inspectText.trim().length > 0) {
-              let arr = inspect[i].inspectList[g].items[j].inspectText.trim().split('|')
-              arr.forEach(item => {
-                let obj = {};
-                obj.mediaType = 3;
-                obj.url = item;
-                tempFileUrl.push(obj);
-              })
-            }
             if (!inspect[i].inspectList[g].items[j].isIgnore) {
               for (const k in inspect[i].inspectList[g].items[j].sourceList) {
                 const obj = {};
-                await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
-                  self.uploadingnumOfPic++;
-                  if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
-                    obj.mediaType = 2;
-                    obj.url = url;
-                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                  } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
-                    obj.mediaType = 1;
-                    obj.url = url;
-                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2 || inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
+                  await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
+                    self.uploadingnumOfPic++;
+                    if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
+                      obj.mediaType = 2;
+                      obj.url = url;
+                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                    } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
+                      obj.mediaType = 1;
+                      obj.url = url;
+                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                    }
+                  }).catch((err) => {
+                    upload++;
+                  });
+                  if (upload !== 0) {
+                    self.uploadProgress = false;
+                    util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                    return false;
                   }
-                }).catch((err) => {
-                  upload++;
-                });
-                if (upload !== 0) {
-                  self.uploadProgress = false;
-                  util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-                  return false;
+                } else {
+                  obj.mediaType = 3;
+                  obj.url = inspect[i].inspectList[g].items[j].sourceList[k].src;
                 }
-
                 tempFileUrl.push(obj);
               }
             }

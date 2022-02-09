@@ -6,7 +6,7 @@
         :style="item.checked ? { 'font-weight': 'bold' } : {}"
         :title="`${index + 1}. ${item.subject}`"
         class="spacer"
-        @click="$emit('emitClickItem', { item, index })"
+        @click="$emit('emitClickItem', { item, index: index })"
       >
         {{ `${index + 1}. ${item.subject}` }}
       </span>
@@ -45,13 +45,13 @@
         <span
           class="font-size-sm"
           v-if="!item.manualIgnore"
-          @click="$emit('emitIgnoreItem', { item, index, e: 0 })"
+          @click="$emit('emitIgnoreItem', { item, index: index, e: 1 })"
           >{{$t('remotePatrol.ignore')}}</span
         >
         <span
           class="font-size-sm"
           v-if="item.manualIgnore"
-          @click="$emit('emitCancleIgnoreItem', { item, index })"
+          @click="$emit('emitCancleIgnoreItem', { item, index: index })"
           >{{$t('titleView.cancel')}}</span
         >
       </div>
