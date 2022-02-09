@@ -1,21 +1,35 @@
 <template>
-  <div class="paper padding" style="height: 100%">
-      <table-pagination
-        :column-data="columnData"
-        :table-data="tableData"
-        :table-operation ="columnOperationData"
-        :show-pagination="false"
-        :if-set-cell-style="true"
-        :header-class="headerStyle"
-        :show-border="false"
-        :is-stripe="false"
-        :is-loading-data="isLoadingData"
-        :show-selection-column="true"
-        :default-sort = "{prop: 'createTime', order: 'descending'}"
-        cell-class=""
-        row-class=""
-        @handleOperation="handleEmitOperation"
-      />
+  <div style="height: 100%">
+      <div>
+        <table-only
+          ref="elTP"
+          class="table-white"
+          :table-themes="white"
+          :column-data="columnData"
+          :table-data="tableData"
+          :table-operation ="columnOperationData"
+          :highlight-current-row= "false"
+          :is-loading-data="isLoadingData"
+          :allowRowExpand = "false"
+          :showBorder = "false"
+          :default-sort = "{prop: 'createTime', order: 'descending'}"
+          :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+          :tableHeight = "760"
+          :cellStyle="{backgroundColor: '#fff !important'}"
+          @handleOperation="handleEmitOperation"
+        />
+      </div>
+      <div style="width:100%; margin-top:12px;height:31px;">
+        <tbl-pagination-only
+          :btn-style="{backgroundColor:'transparent'}"
+          :total="total"
+          :current-page="page"
+          :page-size="sizeNum"
+          layout = "prev,pager, next,sizes,slot"
+          @sizeChange="handlePageAndSizeChange"
+          @currentChange="handlePageAndSizeChange"
+        />
+      </div>
   </div>
 </template>
 
@@ -23,13 +37,16 @@
 import { titleRESTful } from '@/api/index';
 import { mapGetters } from 'vuex';
 import TablePagination from '@/components/TablePagination';
+import TableOnly from '@/components/TableOnly';
+import TblPaginationOnly from '@/components/TblPaginationOnly';
 import util from '@/common/util';
 
 export default {
   name: 'TitleManage',
-  components: { TablePagination },
+  components: { TablePagination,TableOnly,TblPaginationOnly },
   data() {
     return {
+      allTableData:[],
       tableData: [],
       noData: this.$t('deviceView.noData'),
       isLoadingData: true,
@@ -38,7 +55,8 @@ export default {
           'prop': 'title',
           'label': this.$t('titleView.titleName'),
           'width': 90,
-          'maxWidth': 130
+          'maxWidth': 130,
+          'isExpand': false
         },
         {
           'prop': 'createTime',
@@ -46,30 +64,38 @@ export default {
           'sortable': true,
           'width': 130,
           'maxWidth': 130,
+          'isExpand': false
         },
         {
           'prop': 'comment',
           'label': this.$t('titleView.description'),
           'width': 130,
           'maxWidth': 130,
+          'isExpand': false,
           formatter: (cellValue) => {
-            return cellValue || '--';
+            return cellValue.comment || '--';
           }
-        }
+        },
       ],
       columnOperationData: {
         label: this.$t('titleView.operation'),
-        minWidth: '120',
+        minWidth: '30',
         align: 'left',
-        operation: [
+        customIcon: true,
+        src : require('@/../static/img/icon_pen.png'),
+        methods: 'set'
+        /*operation: [
           {
             lable: '',
-            icon: 'icon-gengduo',
+            src : 'penSrc',
             methods: 'set'
           }
-        ]
+        ]*/
       },
-      headerStyle: 'table-header'
+      headerStyle: 'table-header',
+      total:0,
+      page:1,
+      sizeNum:10
     };
   },
 
@@ -89,13 +115,15 @@ export default {
 
   methods: {
     getTitleList() {
-      this.tableData = [];
+      this.allTableData = [];
       titleRESTful.getUserTitleList().then(res => {
         this.isLoadingData = false;
         res.data.map(item => {
           item.createTime = util.getDateStr1(item.createTime);
         });
-        this.tableData = res.data;
+        this.allTableData = res.data;
+        this.total = Math.ceil(this.allTableData.length/this.sizeNum);
+        this.setPagingTableData();
       })
         .catch(err => {
           this.isLoadingData = false;
@@ -115,7 +143,17 @@ export default {
         }
       }
     },
-
+    handlePageAndSizeChange(pageObj) {
+      const self = this;
+      self.page = pageObj.page;
+      self.sizeNum = pageObj.size;
+      //self.params.filter = { page: self.page - 1, size: self.sizeNum };
+      self.setPagingTableData();
+    },
+    setPagingTableData(){
+      this.tableData = [];
+      this.tableData = [...this.allTableData.slice( (self.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+    },
     updateTitle(row) {
       this.$router.push({ name: 'titleSetting' });
       sessionStorage.setItem('titleInfo', JSON.stringify(row));
@@ -128,28 +166,9 @@ export default {
 <style scoped lang="scss">
   .title-table{
     min-height: calc(100% - 75px);
-    padding: 20px calc(20/1920*100vw);
-    border-top: 1px solid #e3e9f4;
-    margin-top: 70px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    padding: 0 24px;
+    border-radius: 5px;
   }
-</style>
-<style>
-  .current-row > td {
-    background: #f2f9fe !important;
-  }
-  .title-table .el-table .cell{
-    padding-left: calc(20/1920*100vw);
-    padding-right: calc(20/1920*100vw);
-    font-size: calc(14/1920*100vw);
-  }
-  .title-table .el-table .cell:first-child{
-    padding-right: calc(10/1920*100vw);
-  }
-  .el-table--border::after, .el-table--group::after{
-    width: 0 !important;
-  }
- .el-table th .el-checkbox__input{
-    display: none;
-  }
-
 </style>

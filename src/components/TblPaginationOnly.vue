@@ -1,8 +1,8 @@
 <template>
   <div class="toolbar pagination">
-    <el-button class="btnArrow" icon="el-icon-arrow-left" :disabled="currentPage==1" @click="handlePrevClick"></el-button>
+    <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-left" :disabled="currentPage==1" @click="handlePrevClick"></el-button>
     <div class="pageNum">{{currentPage}}</div>
-    <el-button class="btnArrow" icon="el-icon-arrow-right" :disabled="currentPage==total" @click="handleNextClick"></el-button>
+    <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-right" :disabled="currentPage==total" @click="handleNextClick"></el-button>
     <div class="pageSizeTitle">{{$t('overview.pageSize')}}</div>
     <div class="pageSize-select">
           <el-select
@@ -59,6 +59,10 @@ export default {
       type: String,
       default: 'jumper,total, prev,pager, next,sizes'
     },
+    btnStyle:{
+      type:Object,
+      default: () => {}
+    }
   },
   watch:{
     total:{
