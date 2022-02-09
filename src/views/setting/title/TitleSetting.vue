@@ -379,10 +379,8 @@ export default {
       this.roleNameList[4].children[4].checked = !!PermissionHelper.enableReportSetting();
 
       if (authorities.length === 6 && resetFlag) {
-        //this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
-        //this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
-        this.ifAccessVideo = PermissionHelper.enableVideo() ? 1 : 0;
-        this.ifReceiveMes = PermissionHelper.enableMessage() ? 1 : 0;
+        this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
+        this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
       }
       this.getRequiredAuthority();
     },
@@ -459,6 +457,8 @@ export default {
       this.updateBasicInformation().then(res => {
         if (res.errCode === 0) {
           util.notify(this.$t('titleView.saveSuss'), 'success', 3000);
+          this.isCheckChanged = true;
+          this.templateRoleId = 0;
         } else {
           util.notify(this.$t('titleView.saveFail'), 'warning', 3000);
         }
