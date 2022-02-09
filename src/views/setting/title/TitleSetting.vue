@@ -43,14 +43,18 @@
         <div class="flex-center" style="padding-bottom: 20px">
           <div>{{ $t('titleView.roleSetting') }}</div>
           <div class="spacer"></div>
-          <el-select
-            v-model="templateRoleId"
-            class="device-select"
-            @change="saveTemplateTitle">
-            <el-option v-for="(item, index) in roleList" :label="item.label" :key="index" :value="item.value">
-              {{ item.label }}
-            </el-option>
-          </el-select>
+          <div class="temp-select-area">
+            <div class="temp-select-label">{{ $t('titleView.templateSelection') }}</div> 
+            <el-select
+              v-model="templateRoleId"
+              class="device-select"
+              style="font-size:13px"
+              @change="changeCurTemplate">
+              <el-option v-for="(item, index) in roleList" :label="item.label" :key="index" :value="item.value">
+                {{ item.label }}
+              </el-option>
+            </el-select>
+          </div>
         </div>
         <hr class="hr-horizontal">
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
@@ -91,7 +95,7 @@ export default {
   components: { DelayButton },
   data() {
     return {
-      curTemplate: '',
+      curTemplate: 1,
       commentRuletip: false,
       infoForm: {},
       accessVideoList: [
@@ -106,6 +110,10 @@ export default {
       ],
       showRolesList: false,
       roleList: [
+        {
+          label: this.$t('titleView.roleId0Title'),
+          value: 0
+        },
         {
           label: this.$t('titleView.roleId1Title'),
           value: 1
@@ -274,10 +282,11 @@ export default {
       authorityInfoLists: [],
       lang: this.$i18n.locale,
       roleId: 0,
-      templateRoleId: 1,
+      templateRoleId: 0,
       ifAccessVideo: 0,
       ifReceiveMes: false,
-      hasCheckedAuthoritiesList: []
+      hasCheckedAuthoritiesList: [],
+      isCheckChanged:false
     };
   },
 
@@ -289,7 +298,7 @@ export default {
           item.disabled = true;
           item.children.forEach(_item => {
             _item.checked = false;
-            _item.disabled = true;
+            _item.disabled = false;
           });
         });
         this.getAvailableAuthority(this.authorityInfoLists[newValue - 1].availableAuth, false);
@@ -307,8 +316,15 @@ export default {
   },
 
   methods: {
-    changeCurTemplate () {
-
+    changeCurTemplate (val) {
+      console.log("changeCurTemplate:",val);
+      this.templateRoleId =  val;
+      if(!this.isCheckChanged){
+        this.setDefaultValueOfRoleNameList();
+        this.isCheckChanged = false;
+      }
+      this.showRolesList = false;
+      this.getAvailableAuthority(this.authorityInfoLists[this.templateRoleId - 1].availableAuth);
     },
     getTitleInfo() {
       const data = sessionStorage.getItem('titleInfo');
@@ -363,8 +379,10 @@ export default {
       this.roleNameList[4].children[4].checked = !!PermissionHelper.enableReportSetting();
 
       if (authorities.length === 6 && resetFlag) {
-        this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
-        this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
+        //this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
+        //this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
+        this.ifAccessVideo = PermissionHelper.enableVideo() ? 1 : 0;
+        this.ifReceiveMes = PermissionHelper.enableMessage() ? 1 : 0;
       }
       this.getRequiredAuthority();
     },
@@ -411,7 +429,8 @@ export default {
 
     getRoleAuthority() {
       this.showRolesList = false;
-      // this.templateRoleId = 0;
+      //*
+      //this.templateRoleId = 0;
       this.setDefaultValueOfRoleNameList();
       this.getAvailableAuthority(this.hasCheckedAuthoritiesList);
     },
@@ -420,7 +439,8 @@ export default {
       this.setDefaultValueOfRoleNameList();
       this.showRolesList = false;
       this.getAvailableAuthority(this.authorityInfoLists[this.templateRoleId - 1].availableAuth);
-      // this.templateRoleId = 0;
+      //*
+      this.templateRoleId = 0;
     },
 
     setDefaultValueOfRoleNameList(){
@@ -499,6 +519,7 @@ export default {
       const parentDisable = self.roleNameList[index].disabled;
       let childrenCheckedNum = 0;
       let childrenDisableNum = 0;
+      self.isCheckChanged = true;
       self.roleNameList[index].children.forEach(item => {
         if (item.checked) {
           childrenCheckedNum++;
@@ -519,6 +540,7 @@ export default {
         self.roleNameList[index].disabled = false;
         self.roleNameList[index].checked = false;
       }
+      self.templateRoleId = 0;
     }
 
   }
@@ -657,6 +679,24 @@ export default {
       }
     }
 
+  }
+  .temp-select-area{
+    display:flex; 
+    flex-direction:row;
+    height:calc(30/1920*100vw);
+    width:220px;
+    align-items:center;
+    background-color:#f4f6f7;
+    border-radius:5px;
+    font-size: 13px;
+    .temp-select-label{
+      color:#556679;
+      font-family: NotoSansCJKtc;
+      font-size: 13px;
+      width:75px;
+      line-height:36px;
+      margin-left:16px
+    }
   }
 </style>
 <style>

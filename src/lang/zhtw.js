@@ -1069,6 +1069,7 @@ export default {
     "radar": "雷達圖",
     "remarksContent": " 備註說明",
     "reportTemplate": "巡檢報告樣板",
+    "roleId0Title": "自訂義",
     "roleId1Title": "管理員",
     "roleId2Title": "督導主管",
     "roleId3Title": "督導",
@@ -1090,7 +1091,8 @@ export default {
     "unqualified": "不合格",
     "useAndSave": "選擇並套用",
     "useTemplate": "樣板",
-    "yes": "允許"
+    "yes": "允許",
+    "templateSelection":"選擇模板"
   },
   "statistics":{
     "averageCompare":"平均分同比分析",

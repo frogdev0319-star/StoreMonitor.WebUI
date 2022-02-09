@@ -1071,6 +1071,7 @@ export default {
     "radar": "雷达图",
     "remarksContent": "备注说明",
     "reportTemplate": "巡检报告模板",
+    "roleId0Title": "自订义",
     "roleId1Title": "管理员",
     "roleId2Title": "督导主管",
     "roleId3Title": "督导",
@@ -1092,7 +1093,8 @@ export default {
     "unqualified": "不合格",
     "useAndSave": "选择并套用",
     "useTemplate": "模板",
-    "yes": "允许"
+    "yes": "允许",
+    "templateSelection":"选择模版"
   },
   "statistics":{
     "averageCompare":"平均分同比分析",

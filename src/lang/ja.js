@@ -1057,6 +1057,7 @@ export default {
     "radar": "レーダーチャート",
     "remarksContent": "説明",
     "reportTemplate": "レポートテンプレート",
+    "roleId0Title": "自訂義",
     "roleId1Title": "管理者",
     "roleId2Title": "マネージャー",
     "roleId3Title": "スーパーバイザー",
@@ -1078,6 +1079,7 @@ export default {
     "unqualified": "失敗しました",
     "useAndSave": "選択と使用",
     "useTemplate": "テンプレート",
-    "yes": "はい"
+    "yes": "はい",
+    "templateSelection":"テンプレートを選択してください"
   }
 };
