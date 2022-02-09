@@ -123,7 +123,7 @@ export default {
     align-items: center;
     justify-content: flex-start;
     .duration{
-      width: 30px;
+      width: 35px;
       height: 14px;
       margin: 7px 12.4px 7px 0;
       font-family: Roboto;

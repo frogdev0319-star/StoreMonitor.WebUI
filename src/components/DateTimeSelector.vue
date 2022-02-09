@@ -10,7 +10,12 @@
               :value="item.value"
             ></el-option>
         </el-select>
-      <date-time-picker :dateRange="dateRange" :poper-class="date-range" :diablePick="diablePick" @change="dateChange"/>
+      <date-time-picker 
+        :dateRange="dateRange" 
+        :poper-class="date-range" 
+        :diablePick="diablePick" 
+        :dateTimeValue="dateTimeValue"
+        @change="dateChange"/>
     </div>
   </div>
 </template>
@@ -21,6 +26,12 @@ import DateTimePicker from './DateTimePicker';
 export default {
   name: 'DateTimeSelector',
   components: { DateTimePicker },
+  props:{
+    dateTimeValue:{
+      type:Object,
+      default:()=>{return [];}
+    }
+  },
   data() {
     return {
       dateRangeItems:[{value:3,label:this.$t('overview.last3Days')},{value:7,label:this.$t('overview.last7Days')},
@@ -28,10 +39,27 @@ export default {
                       {value:0,label:this.$t('overview.thisMonth')},{value:1,label:this.$t('overview.lastMonth')},
                       {value:2,label:this.$t('overview.thisQuarter')},{value:4,label:this.$t('overview.customDate')}],
       dateRange:4,
-      diablePick:false
+      diablePick:false,
+
+    }
+  },
+  mounted() {
+    this.getDefaultTimeList();
+  },
+  created(){
+    if(this.dateTimeValue==[]){
+      this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
     }
   },
   methods: {
+    getDefaultTimeList() {
+      console.log("2.dateTimeValue:",this.dateTimeValue);
+      if(this.dateTimeValue.length==0){
+        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      }
+      //this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+    },
     dateChange(val) {
       this.$emit('change', val);
     },

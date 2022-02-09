@@ -276,17 +276,45 @@
       </div>
       <div class="submit-content">
         <span style="display:block;"><span style="color:red;">* </span>{{ $t('eventView.addDetails') }}</span>
+        <div class="description" v-for="(des, idx) in addDescriptionList" :key="idx">
+            <img :src="delDesImg" style="widht:16px;height:16px;align-self:start;margin-top:10px;" :key="'img_'+idx" @click="onDeleteDescription(idx)" />
+            <div class="edit-description">
+              <div class="edit-input">
+                
+                <el-input 
+                  class="edit-event-input"
+                  v-model="addDescriptionList[idx]"
+                  type="textarea"
+                  resize="none"
+                  :readonly="!isEdit"
+                  @input="(val)=>editDesChang(val,idx)"
+                />
+                <span v-if="editDesRuletip[idx]" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+              </div>
+              <div class="edit-icon-div" >
+                <img :src="editDesImg" style="width:20px;height:20px;align-self:center;cursor:pointer;" @click="onEditDescription"/>
+              </div>
+            </div>
+        </div>
+        <div v-if="curDeslistNum<5" class="des-input"> 
+          <div style="min-height:36px;height:auto;"> 
           <el-input
             :autosize="{ minRows: 2}"
             v-model="eventDes"
             :placeholder="$t('eventView.describe')"
             size="mini"
-            class="des-input"
             type="textarea"
             resize="none"
-            :disabled="curStatus==2 || curStatus==4"
+            class="input-area"
+            :disabled="curStatus==2 || curStatus==4 || curDeslistNum>=5"
             @input="(val)=>ivsIdChange(val)"
             @blur="notShowInputRuleTips"/>
+            <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
+          </div>
+          <div  class="btn-content">
+            <div class="btn-des-confirm" @click="comfirmAddDes">確認</div>
+          </div>
+        </div>
       </div>
     </el-col>
   </el-row>
@@ -367,7 +395,13 @@ export default {
       vendor: 1,
       currentVideoComponent: 'EzvizVideo',
       audioList: [],
-      descriptionList: []
+      descriptionList: [],
+      addDescriptionList:[],
+      curDeslistNum:0,
+      delDesImg: require('../../../../static/img/del_description.svg'),
+      editDesImg: require('../../../../static/img/event-pen.svg'),
+      isEdit:false,
+      editDesRuletip:[false,false,false,false,false]
     };
   },
   watch:{
@@ -611,7 +645,8 @@ export default {
           const comments = data[0];
           const dataComments = comments.comment;
           const temp = [];
-          //self.curStatus = dataComments[0].status;
+          self.curStatus = dataComments[0].status;
+          self.event.status = dataComments[0].status;
           //console.log("dataComments[0].status:",dataComments[0].status);
           // 0 pending：handle、add、closed
           // 1 handled：add、closed、reject
@@ -626,6 +661,9 @@ export default {
             if (self.curStatus === 1) {
               item.order === 1 || item.order === 2 || item.order === 3 ? item.isShow = true : item.isShow = false;
               item.order === 1 ? item.isActive = true : item.isActive = false;
+            }
+            if (self.curStatus === 2 || self.curStatus === 4) {
+              item.isShow = false;
             }
           });
           dataComments.forEach((item, index) => {
@@ -700,9 +738,10 @@ export default {
       eventIds.push(self.event.id);
       const comments = {
         ts: new Date().getTime(),
-        description: description,
+        //description: description,
         account: self.event.createor,
-        status: status
+        status: status,
+        attachment:description
       };
       const params = {
         eventIds: eventIds,
@@ -711,9 +750,12 @@ export default {
       eventRESTful.addComment(params).then(res => {
         const errMsg = res.errMsg;
         if (errMsg === 'Success') {
+          self.addDescriptionList = [];
+          self.curDeslistNum = 0;
           util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
           self.getCommentList(1);
           self.event.status = status;
+
           self.eventDes = '';
           setTimeout(() => {
             self.commentList.forEach((_item, _index) => {
@@ -735,11 +777,14 @@ export default {
       }
       const self = this;
       let status = 0;
-      const description = self.eventDes;
-      if (description.trim().length === 0) {
+      const attachment_des = [];
+      if (this.addDescriptionList.length === 0) {
         util.notify(this.$t('eventView.emptyInfo'), 'warning', 3000);
         return false;
       }
+      this.addDescriptionList.forEach(att=>{
+        attachment_des.push({mediaType:3,url:att});
+      })
       if (self.subBtnList[0].isActive) {
         if (status = self.subBtnList[0].order === 0) {
           status = 1;
@@ -751,6 +796,8 @@ export default {
       } else if (self.subBtnList[1].isActive) {
         if (self.subBtnList[1].order === 1) {
           status = 2;
+          this.isEdit = false;
+          self.subBtnList[1].isShow=false;
         } else {
           status = self.curStatus;
         }
@@ -769,7 +816,7 @@ export default {
       } else {
         status = self.curStatus;
       }
-      self.addComment(status, description);
+      self.addComment(status, attachment_des);
     },
 
     checkFull() {
@@ -846,8 +893,35 @@ export default {
 
     playVendorVideo() {
       this.$refs.vendorVideo.startVideo(this.channelInfo.ivsId, this.channelInfo.channelId, null);
+    },
+    comfirmAddDes(){
+      if(this.curDeslistNum<5 && this.eventDes.trim()!=''){
+        const description = this.eventDes;
+        this.addDescriptionList.push(description);
+        this.eventDes="";
+        this.curDeslistNum+=1;
+      }
+    },
+    onDeleteDescription(index){
+      if (index > -1) {
+        this.addDescriptionList.splice(index, 1); // 2nd parameter means remove one item only
+        this.curDeslistNum-=1;
+      }
+    },
+    onEditDescription(){
+      this.isEdit =!this.isEdit;
+    },
+    editDesChang(val,idx){
+      const self = this;
+      const comment = filterString.all(val, 200);
+      self.addDescriptionList[idx] = comment;
+      const length = filterString.getContentLength(val);
+      if (length > 200) {
+        self.editDesRuletip[idx] = true;
+      } else {
+        self.editDesRuletip[idx] = false;
+      }
     }
-
   }
 };
 </script>
@@ -908,6 +982,10 @@ $h1:#292e36;
         .description{
             max-width: 75%;
             min-width: 75%;
+            /deep/
+            span{
+              word-break: break-all;
+            }
         }
         .event-title{
             font-size: 18px;
@@ -924,6 +1002,10 @@ $h1:#292e36;
         .description{
             max-width: 70%;
             min-width: 70%;
+            /deep/
+            span{
+              word-break: break-all;
+            }
         }
         .event-title{
             @include point(font-size,18);
@@ -1439,6 +1521,7 @@ $h1:#292e36;
                       word-wrap:break-word; /* Internet Explorer 5.5+ */
                       .description-content{
                         font-size: 14px;
+                        word-break:break-all;
                       }
                   }
                   /deep/
@@ -1579,13 +1662,77 @@ $h1:#292e36;
                 margin-bottom: 25px;
                 display: block;
             }
-            .des-input{
-                @include point(margin-right,20);
-                margin-top: 16px;
-                width: calc(488/1440*100vw);
-                min-height:64px;
-                background-color: #f4f6f7;
+            .description{
+              margin:16px 19px 0px 16px;
+              display:flex;
+              flex-direction:row;
+              align-items: center;
+              .edit-description{
+                margin-left:14px;
+                padding: 6px 9px 6px 16px;
+                box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+                border: solid 1px #e6e6e6;
                 border-radius: 5px;
+                width: calc(455/1440*100vw);
+                display: flex;
+                flex: row;
+                min-height: 62px;
+                .edit-input{
+                  width:calc(455/1440*100vw);
+                  border-right: solid 1px #e6e6e6;
+                  min-height: 50px;
+                  .edit-event-input{
+                    border:none;
+                    /deep/
+                    .el-textarea__inner,
+                    .el-textarea__inner:focus {
+                      border:none;
+                    }
+                  }
+                }
+                .edit-icon-div{
+                  width: 38px;
+                  display: flex;
+                  flex-direction: row;
+                  align-content: center;
+                  align-items: center;
+                  min-height: 50px;
+                  justify-content:center;
+                  cursor:pointer;
+                }
+              }
+            }
+            .des-input{
+              margin-top: 16px;
+              margin-left: 16px;
+              margin-right: 19px;
+              width: calc(478/1440*100vw);
+              min-height:86px;
+              background-color: #f4f6f7;
+              border-radius: 5px;
+              display: flex;
+              flex-direction: column;
+              .input-area{
+                min-height:56px;
+              }
+              .btn-content{
+                margin-right: 6px;
+                align-items: flex-end;
+                margin-bottom: 6px;
+                .btn-des-confirm{
+                  height: 20px;
+                  padding: 1px 8px 2px;
+                  border: solid 1px #e6e6e6;
+                  border-radius: 5px;
+                  background-color: #fff;
+                  font-family: NotoSansCJKtc;
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: #556679;
+                  float: right;
+                  cursor:pointer;
+                }
+              }
             }
             
             .rules{
@@ -1594,6 +1741,7 @@ $h1:#292e36;
                 margin-top: 3px;
                 display: block;
             }
+            
         }
         
         .deal-content{

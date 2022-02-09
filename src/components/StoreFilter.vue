@@ -214,6 +214,7 @@ export default {
     },
 
     getStoreListAndGroupAndType() {
+      //console.log("getStoreListAndGroupAndType");
       const storeListPromise = this.showFavorite ? this.getComplexStoreData() : this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
@@ -257,7 +258,8 @@ export default {
 
     onChangeStore(arr) {
       this.curStore = arr;
-      //this.changeStoreNew(arr);
+      //this.emitParams();
+      this.changeStoreNew(arr);
     },
 
     getStoreDefineList(type) {
@@ -273,8 +275,11 @@ export default {
       });
     },
 
-    changeStoreNew() {
-      this.filterStore();
+    changeStoreNew(arr) {
+      //this.filterStore();
+      //console.log("arr:",arr);
+      this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
+      this.emitParams();
     },
 
     onChangeProvince(arr) {
@@ -474,7 +479,7 @@ export default {
 
     emitParams() {
       const tempsearchParamsObj = {};
-      console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
+      //console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
       tempsearchParamsObj.curCountry = this.curCountry;
       tempsearchParamsObj.curProvince = this.curProvince;
       tempsearchParamsObj.curCity = this.curCity;
@@ -695,7 +700,9 @@ export default {
 
     getSearchParams() {
       const searchParams = this.cachedParams;
+      //console.log("getSearchParams > searchParams:",searchParams);
       if (Object.keys(searchParams).length > 0) {
+        
         if (searchParams.curCountry) {
           this.curCountry = searchParams.curCountry;
           this.curProvince = searchParams.curProvince;
@@ -704,6 +711,9 @@ export default {
           this.curStoreGroup = searchParams.curStoreGroup;
           this.curStoreType = searchParams.curStoreType;
           this.ifGetParamsFromCash = true;
+          if(searchParams.searchFrom == "PatrolPersonStat"){
+            this.getStoreListAndGroupAndType();
+          }
         } else {
           this.ifGetParamsFromCash = false;
         }

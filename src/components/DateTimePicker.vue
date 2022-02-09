@@ -48,6 +48,10 @@ export default {
     diablePick:{
       type:Boolean,
       default: false
+    },
+    dateTimeValue:{
+      type:Object,
+      default:()=>{return [];}
     }
   },
   data() {
@@ -59,7 +63,7 @@ export default {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         }
       },
-      dateTimeValue: [this.$moment().subtract(29, 'days'), this.$moment()],
+      //dateTimeValue: [this.$moment().subtract(29, 'days'), this.$moment()],
       pickerOptions: {
         disabledDate: (time) => {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
@@ -128,7 +132,6 @@ export default {
   computed: {
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
-
   watch: {
     accountChanged(val) {
       if (val !== 0) {
@@ -147,7 +150,12 @@ export default {
 
   methods: {
     getDefaultTimeList() {
-      this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      console.log("dateTimeValue:",this.dateTimeValue);
+      if(this.dateTimeValue.length==0){
+        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      }
+      //this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
     },
 
     dateChange(val) {

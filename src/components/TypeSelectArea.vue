@@ -227,6 +227,8 @@ export default {
         immediate: false, 
         deep: true,
         handler (val,old ) {
+          //console.log("Change curStoreGroup")
+          //console.log(val);
           this.curStoreGroupList = [];
           val.map(item => {
             if(item!='-1'){
@@ -238,7 +240,7 @@ export default {
             }
           });
     
-          if(this.compareGroup== 'storeGroup'){
+          if(this.compareType== 'storeGroup'){
             this.curSelectId=[];
             this.changeCompareType(this.compareType);
           }
@@ -582,12 +584,14 @@ export default {
           })
           break;
         case 'storeGroup':
+          //console.log("storeGroup");
           self.dropdownPlaceholder =  self.$t('remotePatrol.storeGroup');
           self.selAllString=self.$t('storeView.all');
           self.curTypeArrary = self.curStoreGroupList;
           for(let i=0; i<self.curTypeArrary ;i++){
             storeIds = storeIds.concat(self.curTypeArrary[i].storeIds);
           }
+          //console.log("self.curTypeArrary:",self.curTypeArrary);
           break;
         case 'storeType':
           self.dropdownPlaceholder =  self.$t('remotePatrol.storeType');

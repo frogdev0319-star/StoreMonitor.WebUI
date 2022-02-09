@@ -4,13 +4,17 @@
       <div class="el-area">
         <store-filter
           :cached-params="searchParams"
+          path = "eventManage"
           @storeChange = "onStoreChange"
         >
         </store-filter>
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0">
         <div class="flex-center">
-          <date-time-selector @change="dateChange"/>
+          <date-time-selector 
+            :dateTimeValue = dateValue
+            @change="dateChange"
+          />
         </div>
         <!--<div class="flex-center">
           <span style="margin-right: 10px; white-space:nowrap;">{{ $t('eventView.status') }}</span>
@@ -404,14 +408,26 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
-  },
+  }, 
   beforeDestroy() {
+    console.log("in beforeDestroy");
+    console.log('searchFrom:',this.searchParams['searchFrom']);
     if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         console.log("in beforeDestroy");
-        delete this.searchParams['clause']; //重新搜尋要把跳轉帶來的刪掉
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
-        this.ifSaveParams && self.saveSearchParams();
+        this.ifSaveParams && this.saveSearchParams(true);
     }
+  },
+  deactivated() {
+      console.log('deactivated');
+      console.log('searchFrom:',this.searchParams['searchFrom']);
+      if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+          console.log("in deactivated");
+          delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+          this.searchParams['searchFrom'] = '';
+          this.ifSaveParams && this.saveSearchParams(true);
+      }
   },
   methods: {
     cellStyle({ row, column, rowIndex, columnIndex }) {
@@ -471,14 +487,14 @@ export default {
     searchEventList() {
       this.tableDataList[Number(this.activeName)].page = 1;
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
-        delete this.searchParams['clause']; //重新搜尋要把跳轉帶來的刪掉
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
       }
       this.getEventListAndCount();
     },
 
     searchData() {
-      this.tableDataList[Number(this.activeName)].page = this.page;
+      this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount();
     },
 
@@ -546,7 +562,6 @@ export default {
 
     async getEventList(val) {
       const self = this;
-      console.log("this.activeName:",this.activeName);
       const tabIndex = Number(this.activeName);
       //const routeParams = sessionStorage.getItem('event_manage');
       //console.log("routeParams:",routeParams);
@@ -555,7 +570,7 @@ export default {
         this.getRouterData(routeData);
       }else{*/
       self.getEventListRequestParams(val);
-      this.ifSaveParams && self.saveSearchParams();
+      this.ifSaveParams && self.saveSearchParams(false);
       this.ifSaveParams = true;
       //}
       if (self.params.clause.storeId.length === 0) {
@@ -566,10 +581,10 @@ export default {
         this.numberOfElements = 0;
         return;
       }
-      console.log("self.params:",self.params);
+      //console.log("self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
-        console.log("data:",data);
+        //console.log("data:",data);
         const temp = [];
         data.forEach(item => {
           const attachment = [];
@@ -626,8 +641,9 @@ export default {
       } else {
         like = {};
       }
-      const storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
-
+      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
+      
+      //console.log("EventMange > storeId:",storeId);
       let status = [];
       if (this.curState.length !== 0) {
         if (this.curState.length === 1) {
@@ -657,13 +673,19 @@ export default {
         page = this.params.filter.page;
       }
       let start = '', end = '';
-      if (val === 0) {
-        start = this.$moment(this.dateValue[0]).valueOf();
-        end = this.$moment(this.dateValue[1]).valueOf();
-      } else {
-        start = this.$moment(this.dateValue[0]).valueOf();
-        const endTime = this.dateValue[1];
-        end = this.$moment(endTime);
+      if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+         //storeId = this.searchParams.clause.storeId;
+         start = this.searchParams.beginTs;
+         end = this.searchParams.endTs;
+      }else{
+        if (val === 0) {
+          start = this.$moment(this.dateValue[0]).valueOf();
+          end = this.$moment(this.dateValue[1]).valueOf();
+        } else {
+          start = this.$moment(this.dateValue[0]).valueOf();
+          const endTime = this.dateValue[1];
+          end = this.$moment(endTime);
+        }
       }
       end = end - end % 1000 + 999;
       this.params = {
@@ -680,11 +702,11 @@ export default {
           like: like
       }
       
-      console.log("this.searchParams:",this.searchParams);
-      if(typeof this.searchParams.clause !="undefined"){
-        this.params.clause['assigner'] =  this.searchParams.clause.assigner;
+      //console.log("this.searchParams:",this.searchParams);
+      if(typeof this.searchParams.searchParams.clause !="undefined"){
+        this.params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
       }
-      console.log("this.params:",this.params);
+      //console.log("this.params:",this.params);
       const curTabSortColumn = this.sortColumnOfTab[tabIndex];
       const order = curTabSortColumn.sortType.order;
       const prop = curTabSortColumn.sortType.prop;
@@ -715,10 +737,10 @@ export default {
       self.tableDataList[Number(self.activeName)].page = val.page;
       self.getEventList('currentChange');
 
-      const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0];
+      const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-left')[0];
       const offestTop = dom.offsetTop;
       if (dom != undefined) {
-        document.getElementsByClassName('el-table__body-wrapper is-scrolling-none')[0].scrollTop = 0;
+        document.getElementsByClassName('el-table__body-wrapper is-scrolling-left')[0].scrollTop = 0;
       }
     },
 
@@ -745,11 +767,16 @@ export default {
 
     getEventCount() {
       const self = this;
-      const start = this.$moment(self.dateValue[0]).valueOf();
-      const endTime = this.$moment(self.dateValue[1]).valueOf();
+      let start = this.$moment(self.dateValue[0]).valueOf();
+      let endTime = this.$moment(self.dateValue[1]).valueOf();
       let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
       end = end - end % 1000 + 999;
-      const storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
+      if(self.searchParams['searchFrom']=='PatrolPersonStat'){
+         //storeId = this.searchParams.clause.storeId;
+         start = self.searchParams.beginTs;
+         end = self.searchParams.endTs;
+      }
+      const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : self.params.clause.storeId;
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         const inputValue = self.inputSearchValue.trim();
@@ -769,9 +796,10 @@ export default {
         },
         like: like
       };
-      if(typeof this.searchParams.clause !="undefined"){
-        params.clause =  this.searchParams.clause;
+      if(typeof self.searchParams.searchParams.clause !="undefined"){
+        params.clause['assigner'] =  self.searchParams.searchParams.clause.assigner;
       }
+      
       delete params.clause['status'];
       if (storeId.length === 0) {
         for (let i = 0; i < 4; i++) {
@@ -933,10 +961,19 @@ export default {
         console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
         this.getEventList('Back');
     },
-    saveSearchParams() {
+    saveSearchParams(isLeave=false) {
       const params = this.storeFilterObj;
       const { clause, filter, like, order } = { ...this.params };
-      params.searchParams = { clause, filter, like, order };
+      if(isLeave){
+        let tempClause = clause;
+        delete clause["assigner"];
+        params.searchParams = { clause:tempClause, filter, like, order };
+        console.log("leave searchParams:",params.searchParams);
+      }else{
+        params.searchParams = { clause, filter, like, order };
+      }
+      console.log("save params:",params);
+      params.filterStoreIds = this.curStore;
       params.inputSearchValue = this.inputSearchValue;
       params.dateValue = this.dateValue;
       params.curState = this.curState;
@@ -954,13 +991,32 @@ export default {
     getSearchParams() {
       
         const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
-        this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-        this.params.beginTs = this.dateValue[0].valueOf();
-        this.params.endTs = this.dateValue[1].valueOf();
-        
+        console.log("EventMange > getSearchParams > searchParams:",searchParams);
         if (Object.keys(searchParams).length > 0) {
+          
+          if(searchParams['searchFrom']=='PatrolPersonStat'){
+            //this.dateValue =[searchParams.];
+            this.storeFilterObj.filterStoreIds = searchParams.curStore;
+            this.storeFilterObj.curStore=searchParams.curStore;
+            this.storeFilterObj.storeIds=searchParams.curStore;
+            this.storeFilterObj.curCountry = "-1";
+            this.storeFilterObj.curProvince = ["-1"];
+            this.storeFilterObj.curCity = ["-1"];
+            this.params.beginTs = searchParams.beginTs;
+            this.params.endTs = searchParams.endTs;
+            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
+            console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
+            //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+          }else{
+            this.storeFilterObj.filterStoreIds = searchParams.curStore;
+            this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+            console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
+            this.params.beginTs = this.dateValue[0].valueOf();
+            this.params.endTs = this.dateValue[1].valueOf();
+          }
           this.inputSearchValue = searchParams.inputSearchValue;
           this.curState = searchParams.curState;
+          this.curStore = searchParams.curStore;
           this.activeName = searchParams.activeName;
           this.sizeNum = searchParams.sizeNum;
           this.page = searchParams.page;
@@ -972,14 +1028,17 @@ export default {
         } else {
           this.searchParams = {};
           this.curState = [0];
+          this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+          this.params.beginTs = this.dateValue[0].valueOf();
+          this.params.endTs = this.dateValue[1].valueOf();
         }
       
     },
 
     onStoreChange(storeObj) {
       this.storeFilterObj = storeObj;
-      this.ifSearchData && this.searchData();
-      this.ifSearchData = false;
+      //this.ifSearchData && this.searchData();
+      //this.ifSearchData = false;
     },
     doBachCloseEvent(){
       this.showBachCloseDialog = true;

@@ -86,7 +86,7 @@
                   </div>
                 </div>
             </div>
-            <div class="statistics-content" style="height: 700px;margin-top:24px;">
+            <div v-if="standardRate!='- -'" class="statistics-content" style="height: 700px;margin-top:24px;">
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -116,7 +116,7 @@
                     ></TypeSelectArea>
                   </div>
                   <div  class="score-area" style="display:flex;flex-direction:row;height:92px;align-item:center;">
-                    <div v-show="standardRate!='- -'" style="width:145px;border-right:solid 1px #f7f9f9;">
+                    <div style="width:145px;border-right:solid 1px #f7f9f9;">
                       <div style="height:70px;font-size:48px;color:#484848;">{{standardRate}}<span style="font-size:15px;">{{$t('statistics.score')}}</span></div>
                       <div style="font-size:15px;">{{$t('statistics.standardScore')}}</div>
                     </div>
@@ -166,7 +166,7 @@
                   <img :src="pdfSrc_avg">
                 </div>
               </div>
-              <div class="statistics-content-pdf" style="height: 700px;margin-top:24px;">
+              <div v-if="standardRate!='- -'" class="statistics-content-pdf" style="height: 700px;margin-top:24px;">
                 <div id="img_assm"  class="avg-score" >
                     <img :src="pdfSrc_assm">
                 </div>
@@ -495,6 +495,9 @@ export default {
         this.compareType2='stores',
         this.doGetAverageScore(this.filterDateRange); 
         this.doGetAssessmentScore(this.filterDateRange2);
+        if(this.params.inspectId!=-1){
+          this.doGetAssessmentStandardScore();
+        }
       } else {
         this.compareIds = [];
         this.comapareLabels=[];
