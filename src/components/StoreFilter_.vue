@@ -491,8 +491,6 @@ export default {
       });
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-      // this.curStores = this.curStoresData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
-      // this.filterStoreIds = this.curStoresData.filter(data => data.name.indexOf(self.searchStr) > -1).map(data => data.id)
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
@@ -631,8 +629,6 @@ export default {
       const self = this;
       self.curStores = [];
       self.curStoresData = [];
-      // self.$refs.multiSelect.selectedArray = [];
-      // self.$refs.multiSelect.input = '';
     },
 
     clearProviceInfo() {
