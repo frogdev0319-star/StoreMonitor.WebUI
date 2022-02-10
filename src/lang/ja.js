@@ -1080,6 +1080,7 @@ export default {
     "useAndSave": "選択と使用",
     "useTemplate": "テンプレート",
     "yes": "はい",
-    "templateSelection":"テンプレートを選択してください"
+    "templateSelection":"テンプレートを選択してください",
+    "reportTemplateLabel": "レポートテンプレート",
   }
 };

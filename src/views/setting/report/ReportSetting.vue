@@ -5,6 +5,14 @@
       <div class="spacer"></div>
       <div class="buttons">
         <delay-button
+          :disabled="templateList.length === 0"
+          class="schedule-btn"
+          @click="deleteReportTemplate">
+          <div class="button-area">
+            <span>{{ $t('titleView.delete') }}</span>
+          </div>
+        </delay-button>
+        <delay-button
           class="schedule-btn"
           @click="addReportTemplate">
           <div class="button-area">
@@ -12,33 +20,26 @@
             <span>{{ $t('titleView.add') }}</span>
           </div>
         </delay-button>
-        <delay-button
-          :disabled="templateList.length === 0"
-          class="schedule-btn"
-          @click="deleteReportTemplate">
-          <div class="button-area">
-            <i class="iconfont icon-shanchu"/>
-            <span>{{ $t('titleView.delete') }}</span>
-          </div>
-        </delay-button>
       </div>
     </div>
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="content-titles">
-        <el-select
-          v-model="curTemplateIndex"
-          class="device-select"
-          size="mini"
-          style="margin-right: 20px"
-          @change="displayTemplateInfo"
-          placeholder="">
-          <el-option
-            v-for="(item, index) in templateList"
-            :key="index"
-            :label="item.name"
-            :value="index"
-          />
-        </el-select>
+        <div class="template-select-area">
+          <div class="template-select-label">{{ $t('titleView.reportTemplateLabel') }}</div> 
+          <el-select
+            v-model="curTemplateIndex"
+            class="device-select"
+            size="mini"
+            @change="displayTemplateInfo"
+            placeholder="">
+            <el-option
+              v-for="(item, index) in templateList"
+              :key="index"
+              :label="item.name"
+              :value="index"
+            />
+          </el-select>
+        </div>
         <div>
           <span class="enable-font">{{ $t('scheduleView.enable') }}</span>
           <el-switch v-model="curTemplate.enable" @change="changTemplateEnableStatus">{{ curTemplate.enable }}</el-switch>
@@ -591,8 +592,9 @@ export default {
   }
 
   .name-tips{
-    display: inline-flex;
-    flex-direction: column;
+    display:flex; 
+    flex-direction:column;
+    
   }
   .error-text{
     font-size: 12px;
@@ -681,6 +683,25 @@ export default {
     height: 60px;
     font-size: 12px;
   }
+  .template-select-area{
+    display:flex; 
+    flex-direction:row;
+    height:calc(30/1920*100vw);
+    width:200px;
+    align-items:center;
+    background-color:#f4f6f7;
+    border-radius:5px;
+    font-size: 13px;
+    margin-right: 20px;
+  }
+  .template-select-label{
+      color:#556679;
+      font-family: NotoSansCJKtc;
+      font-size: 13px;
+      width:75px;
+      line-height:36px;
+      margin-left:16px;
+    }
   .inspect-basic{
     margin-bottom: 30px;
   }

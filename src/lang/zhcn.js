@@ -1033,7 +1033,7 @@ export default {
   },
 
   "titleView": {
-    "add": "新增",
+    "add": "新增模板",
     "atLeastOneTemplate": "报告模板至少保留一份",
     "basicInfo": "基本信息",
     "canAccessVideo": "允许访问视频",
@@ -1066,7 +1066,7 @@ export default {
     "operation": "操作",
     "others": "其他",
     "pie": "饼状图",
-    "qualified": "合格",
+    "qualified": "显示",
     "qualifiedItem": "合格项",
     "radar": "雷达图",
     "remarksContent": "备注说明",
@@ -1080,8 +1080,8 @@ export default {
     "save": "保存",
     "saveFail": "保存失败",
     "saveSuss": "保存成功",
-    "showAllDetails": "巡检详情全部展示",
-    "showPartsDetails": "巡检详情部分展示",
+    "showAllDetails": "全部展示",
+    "showPartsDetails": "部分展示",
     "statisIndex": "统计指标",
     "statistics": "统计图",
     "summaryTable": "统计表",
@@ -1090,11 +1090,12 @@ export default {
     "templateOutOfLimit": "模板数量超限",
     "titleName": "职务名称",
     "titleSetting": "职务设置",
-    "unqualified": "不合格",
+    "unqualified": "不显示",
     "useAndSave": "选择并套用",
     "useTemplate": "模板",
     "yes": "允许",
-    "templateSelection":"选择模版"
+    "templateSelection":"选择模版",
+    "reportTemplateLabel": "报告模板",
   },
   "statistics":{
     "averageCompare":"平均分同比分析",

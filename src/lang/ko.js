@@ -1081,6 +1081,7 @@ export default {
     "useAndSave": "선택&사용",
     "useTemplate": "형판",
     "yes": "네",
-    "templateSelection":"템플릿 선택"
+    "templateSelection":"템플릿 선택",
+    "reportTemplateLabel": "보고서 서식 파일",
   }
 };

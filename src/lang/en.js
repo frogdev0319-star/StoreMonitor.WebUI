@@ -1085,7 +1085,8 @@ export default {
     "useAndSave": "Choose & Save",
     "useTemplate": "Template",
     "yes": "Yes",
-    "templateSelection":"Choose a template"
+    "templateSelection":"Choose a template",
+    "reportTemplateLabel": "Report Template",
   },
   "statistics":{
     "averageCompare":"Average Compare",
