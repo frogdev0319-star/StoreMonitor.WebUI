@@ -873,14 +873,17 @@ export default {
     display: inline-flex;
   }
   .prompt-image{
-    height: 60px;
-    width: 80px;
+    height: 84px;
+    width: 84px;
   }
   .prompt-msg{
     margin-left: calc(30/1920*100vw);
-    font-size: 20px;
-    color: #f31b65;
-    font-weight: bold;
+    font-size: 24px;
+    color: #006ab7;
+    font-weight:600;
+    font-family: 'NotoSansCJKtc';
+    margin-top:19px;
+
   }
 }
 </style>

@@ -78,7 +78,9 @@
               v-for="(item,index) in tableOperation.operation" 
               :src="`./static/img/table-${item.methods}.png`" 
               @click="handleOperationButton(item.methods, scope.row, scope.$index)"
-              height="26px" />
+              height="24px"
+              width="24px"
+            />
           </div>
         </template>
       </el-table-column>

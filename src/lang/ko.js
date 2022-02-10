@@ -1059,6 +1059,7 @@ export default {
     "radar": "방사형",
     "remarksContent": "기술",
     "reportTemplate": "보고서 서식 파일",
+    "roleId0Title": "커스텀",
     "roleId1Title": "관리",
     "roleId2Title": "관리자",
     "roleId3Title": "관리자",
@@ -1080,6 +1081,8 @@ export default {
     "unqualified": "실패",
     "useAndSave": "선택&사용",
     "useTemplate": "형판",
-    "yes": "네"
+    "yes": "네",
+    "templateSelection":"템플릿 선택",
+    "reportTemplateLabel": "보고서 서식 파일",
   }
 };

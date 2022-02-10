@@ -1,8 +1,8 @@
 <template>
-  <div class="table">
+  <div :class="tableThemes=='grey' ? 'table':'table-white'">
     <el-table
       ref="tablePagination"
-      class="tbl-style"
+      :class="tableThemes=='grey' ? 'tbl-style':'tbl-style-white'"
       :data="tableData"
       v-bind="$attrs"
       :highlight-current-row="true"
@@ -10,7 +10,7 @@
       :header-cell-style="headerStyle"
       :cell-class-name="cellClass"
       :row-class-name="rowClass"
-      :cell-style="ifSetCellStyle ? setCellStyle : {borderBottom:'1px solid rgba(172,174,177,0.3)'}"
+      :cell-style="cellStyle"
       :border="showBorder"
       :stripe="isStripe"
       :max-height="tableHeight"
@@ -64,7 +64,7 @@
           </template>
         </template>
       </el-table-column>
-      <el-table-column type="expand">
+      <el-table-column type="expand" v-if="allowRowExpand">
         <template slot-scope="{row}">
           <component :is="expandComponent" v-bind="currentProperties"></component>
         </template>
@@ -83,6 +83,9 @@
             <div class="iconrised" @click="cancelEdit(scope.row)">
               <i class="el-icon-close"/>
             </div>
+          </div>
+          <div v-else-if="tableOperation.customIcon" >
+            <img :src="tableOperation.src" style="width:24px;height:24px;" @click="handleOperationButton(tableOperation.methods, scope.row, scope.$index)">
           </div>
           <div v-else>
             <i
@@ -164,6 +167,10 @@ export default {
     EventCommentList
   },
   props: {
+    tableThemes:{
+      type:String,
+      default:'grey'
+    },
     tableData: {
       type: Array,
       default: () => [],
@@ -203,6 +210,12 @@ export default {
     headerStyle: {
       type: Object,
       default: {height:'75px',backgroundColor: 'transparent',border:'none',fontSize:'12px'}
+    },
+    cellStyle:{
+      type: Object,
+      default:  () => {
+        return {};
+      }
     },
     cellClass: {
       type: String,
@@ -294,8 +307,7 @@ export default {
 
   methods: {
     setCellStyle({ row, column, rowIndex, columnIndex }) {
-      let obj = {};
-      if (columnIndex === 0) {
+      let obj = {};if (columnIndex === 0) {
         obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
       } else {
         obj = { 'border-right': '1px solid #e3e9f4' };
@@ -413,6 +425,13 @@ export default {
       background-color: #f7f9fa;
     }
   }
+  .tbl-style-white{
+    padding: 0 24px;
+    background-color: #fff;
+    tbody{
+      background-color: #fff;
+    }
+  }
   .el-table--mini{
     font-size: calc(15/1920*100vw);
     background-color: #f7f9fa;
@@ -508,6 +527,14 @@ export default {
     .el-table{
       box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
       border: solid 1px #f5f5f5;
+    }
+  }
+  .table-white {
+    .el-table{
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+      border-radius: 5px;
+      border: solid 1px #f5f5f5;
+      background-color: #fff;
     }
   }
   

@@ -3,6 +3,16 @@
     <div class="flex-center margin-bottom-md">
       <div class="spacer"></div>
       <el-button
+        size="mini"
+        type="primary"
+        class="storevue-button-outlined"
+        @click="onShowDeleteDialogMethod"
+      >
+        <div class="btn-area">
+          <span>{{ $t('deviceView.deleteDevice') }}</span>
+        </div>
+      </el-button>
+      <el-button
         class="storevue-button-outlined"
         size="mini"
         type="primary"
@@ -13,17 +23,6 @@
           <span>{{ $t('deviceView.addDevice') }}</span>
         </div>
       </el-button>
-      <el-button
-        size="mini"
-        type="primary"
-        class="storevue-button-outlined"
-        @click="onShowDeleteDialogMethod"
-      >
-        <div class="btn-area">
-          <i class="iconfont icon-shanchu"/>
-          <span>{{ $t('deviceView.deleteDevice') }}</span>
-        </div>
-      </el-button>
     </div>
     <dialog-pop
       :is-form="true"
@@ -32,6 +31,7 @@
       :visible.sync="showAddDeviceDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       dialogWidth="520px"
       @cancelHandler="showAddDeviceDialog = false"
       @confirmHandler="confirmAddDevice">
@@ -69,6 +69,7 @@
       :visible.sync="showDeleteDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :title="$t('deviceView.deleteDevice')"
       @cancelHandler="showDeleteDialog = false"
       @confirmHandler="confirmDeleteDevice">

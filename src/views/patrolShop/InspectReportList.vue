@@ -639,8 +639,8 @@ export default {
       if (val.length === 0) return;
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
       const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      self.params.beginTs = start;
-      self.params.endTs = end;
+      self.params["beginTs"] = start;
+      self.params["endTs"] = end;
       self.page = 1;
       const clause = {};
       clause.storeId = this.storeFilterObj.filterStoreIds;
@@ -777,7 +777,7 @@ export default {
       if (Object.keys(searchParams).length > 0) {
         this.order = searchParams.order;
         this.filter = searchParams.filter;
-        this.params = searchParams.searchCondition;
+        this.params = searchParams;
         this.checkSortType(this.curSortType);
         this.curAppraise = searchParams.searchCondition.clause.status;
         this.curReportType = searchParams.curReportType;

@@ -70,7 +70,7 @@
                 class="child-space"
                 :src="`./static/img/table-delete.png`" 
                 @click="showDeleteBeseyeDeviceDialog(index,item)"
-                height="26px" />
+                height="24px" />
             </div>
           </div>
         </div>
@@ -95,7 +95,7 @@
             </el-form>
           </div>
         </dialog-pop>
-        <div class="toolbar pagination" style="width:100%; margin-top:10px;">
+        <!--<div class="toolbar pagination" style="width:100%; margin-top:10px;">
           <el-pagination
             :page-size="sizeNum"
             :total="total"
@@ -106,7 +106,7 @@
             layout="jumper,total,prev,pager,next"
             @size-change="sizeChange"
             @current-change="currentChange"/>
-        </div>
+        </div>-->
       </div>
       <div v-else class="no-data-container">{{ $t('deviceView.noData') }}</div>
       <el-dialog

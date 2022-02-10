@@ -1063,6 +1063,7 @@ export default {
     "radar": "Radar Chart",
     "remarksContent": "Note",
     "reportTemplate": "Report Template",
+    "roleId0Title": "Custom",
     "roleId1Title": "Admin",
     "roleId2Title": "Manager",
     "roleId3Title": "Supervisor",
@@ -1084,7 +1085,9 @@ export default {
     "unqualified": "Fail",
     "useAndSave": "Choose & Save",
     "useTemplate": "Template",
-    "yes": "Yes"
+    "yes": "Yes",
+    "templateSelection":"Choose a template",
+    "reportTemplateLabel": "Report Template",
   },
   "statistics":{
     "averageCompare":"Average Compare",
