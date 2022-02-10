@@ -1083,7 +1083,7 @@ export default {
     "showPartsDetails": "部分展示",
     "statisIndex": "統計指標",
     "statistics": "統計圖",
-    "summaryTable": "統計表",
+    "summaryTable": "統計表  (web)",
     "templateName": "報告樣板名稱",
     "templateNameExist": "樣板名稱已存在",
     "templateOutOfLimit": "模板數量超限",

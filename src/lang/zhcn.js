@@ -1085,7 +1085,7 @@ export default {
     "showPartsDetails": "部分展示",
     "statisIndex": "统计指标",
     "statistics": "统计图",
-    "summaryTable": "统计表",
+    "summaryTable": "统计表 (web)",
     "templateName": "报告模板名称",
     "templateNameExist": "模板名称已存在",
     "templateOutOfLimit": "模板数量超限",

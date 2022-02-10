@@ -1072,7 +1072,7 @@ export default {
     "showPartsDetails": "부분 세부 정보 표시",
     "statisIndex": "통계 색인",
     "statistics": "통계 그래프",
-    "summaryTable": "통계 테이블",
+    "summaryTable": "통계 테이블 (web)",
     "templateName": "템플릿 이름",
     "templateNameExist": "템플릿 이름이 이미 있습니다.",
     "templateOutOfLimit": "템플릿 수가 제한을 초과합니다.",
