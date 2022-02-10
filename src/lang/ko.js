@@ -114,6 +114,7 @@ export default {
     "closedEvents": "종료 이벤트",
     "closedFive": "이벤트 TOP5 종료",
     "completeRate": "검사의 완성률",
+    "confirm": "confirm",
     "createdEvent": "이벤트 생성 수",
     "cycle": "주기",
     "danger": "위험하다",

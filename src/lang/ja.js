@@ -113,6 +113,7 @@ export default {
     "closedEvents": "終了イベント",
     "closedFive": "終了イベントTOP5",
     "completeRate": "インスペクション完了率",
+    "confirm": "confirm",
     "createdEvent": "作成されたイベントの数",
     "cycle": "サイクル",
     "danger": "危ない",

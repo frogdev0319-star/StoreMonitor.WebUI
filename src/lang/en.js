@@ -111,6 +111,7 @@ export default {
     "closedEvents": "Closed Events",
     "closedFive": "Closed event TOP5",
     "completeRate": "Completion Rate of Inspection",
+    "confirm": "confirm",
     "createdEvent": "Created Events",
     "cycle": "Cycle",
     "danger": "Dangerous",
