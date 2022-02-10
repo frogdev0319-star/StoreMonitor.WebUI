@@ -33,6 +33,7 @@
       :visible.sync="showDeleteBeseyeUser"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       width="28%"
       top="35vh"
       left="40vh">

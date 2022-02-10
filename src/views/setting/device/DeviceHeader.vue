@@ -31,6 +31,7 @@
       :visible.sync="showAddDeviceDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       dialogWidth="520px"
       @cancelHandler="showAddDeviceDialog = false"
       @confirmHandler="confirmAddDevice">
@@ -68,6 +69,7 @@
       :visible.sync="showDeleteDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :title="$t('deviceView.deleteDevice')"
       @cancelHandler="showDeleteDialog = false"
       @confirmHandler="confirmDeleteDevice">
