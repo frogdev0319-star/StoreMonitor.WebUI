@@ -3,6 +3,16 @@
     <div class="flex-center margin-bottom-md">
       <div class="spacer"></div>
       <el-button
+        size="mini"
+        type="primary"
+        class="storevue-button-outlined"
+        @click="onShowDeleteDialogMethod"
+      >
+        <div class="btn-area">
+          <span>{{ $t('deviceView.deleteDevice') }}</span>
+        </div>
+      </el-button>
+      <el-button
         class="storevue-button-outlined"
         size="mini"
         type="primary"
@@ -11,17 +21,6 @@
         <div class="btn-area">
           <i class="iconfont el-icon-plus"/>
           <span>{{ $t('deviceView.addDevice') }}</span>
-        </div>
-      </el-button>
-      <el-button
-        size="mini"
-        type="primary"
-        class="storevue-button-outlined"
-        @click="onShowDeleteDialogMethod"
-      >
-        <div class="btn-area">
-          <i class="iconfont icon-shanchu"/>
-          <span>{{ $t('deviceView.deleteDevice') }}</span>
         </div>
       </el-button>
     </div>

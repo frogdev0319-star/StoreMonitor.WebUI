@@ -5,8 +5,10 @@
       :authorized-devices-num="authorizedDevicesNum"
       @click="getBeseyeGrantCode"
     >
-      <div class="button-area">
-        <img :src="`../../static/img/icon-authorize.png`" height="26px" />
+      <div class="button-area" style="width:134px;">
+        <div style="width: 34px;display: flex; flex-direction: row; justify-content: start;">
+          <img :src="`../../static/img/icon-authorize.png`" height="18px" />
+        </div>
         <span>{{ $t('deviceView.beseyeAuthorize') }}</span>
       </div>
     </account-header>
@@ -78,13 +80,13 @@ export default {
         {
           'prop': 'name',
           'label': this.$t('deviceView.accountName'),
-          'width': 130,
+          'width': 1000,
           'maxWidth': 130
         }
       ],
       columnOperationData: {
         label: this.$t('deviceView.operation'),
-        minWidth: '120',
+        minWidth: '134',
         align: 'center',
         operation: [
           {
