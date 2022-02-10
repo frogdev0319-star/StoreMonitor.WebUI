@@ -107,7 +107,7 @@
               <div
                 :style="isHoverList || !ShowCard ? 'color:#f31d65':''"
                 class="pattern_btn"
-                @click="ShowCard=false"
+                @click="()=>{ShowCard=false; page=1;}"
                 @mouseover="isHoverList=true"
                 @mouseout="isHoverList=false">
                 <i class="iconfont icon-liebiao iconCard"/>
@@ -196,8 +196,18 @@
               </div>
             </el-table>
           </div>
-          <div class="el-pat">
-            <el-pagination
+          
+        </div>
+        
+        <div
+          v-loading="isLoading"
+          v-else
+          :element-loading-text="$t('insSettingView.loadingbindstore')"
+          class="card-content self-loading">
+          <div class="empty-content">{{ noData }}</div>
+        </div>
+        <div class="el-pat">
+            <!--<el-pagination
               :page-size="sizeNum"
               :total="total"
               :current-page="page"
@@ -207,16 +217,17 @@
               layout="jumper,total, prev, pager, next,sizes"
               class="el-pag"
               @current-change="currentChange"
-              @size-change="sizeChange"/>
+              @size-change="sizeChange"/>-->
+              <tbl-pagination-only
+              :btn-style="{backgroundColor:'transparent'}"
+              :total="total"
+              :current-page="page"
+              :page-size="sizeNum"
+              layout = "prev,pager, next,sizes,slot"
+              @sizeChange="sizeChange"
+              @currentChange="currentChange"
+            />
           </div>
-        </div>
-        <div
-          v-loading="isLoading"
-          v-else
-          :element-loading-text="$t('insSettingView.loadingbindstore')"
-          class="card-content self-loading">
-          <div class="empty-content">{{ noData }}</div>
-        </div>
       </div>
     </div>
   </div>
@@ -230,14 +241,15 @@ import DelayButton from '@/components/DelayButton';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
-
+import TblPaginationOnly from '@/components/TblPaginationOnly';
 export default {
   name: 'InspectReportList',
   components: {
     DateTimeSelector,
     SelectedStores,
     DelayButton,
-    StoreFilter
+    StoreFilter,
+    TblPaginationOnly
   },
   data() {
     return {
@@ -354,7 +366,7 @@ export default {
       ],
       storeStr: '',
       total: 0,
-      page: 0,
+      page: 1,
       params: {},
       storeDataList: [],
       storeIdList: [],
@@ -544,7 +556,7 @@ export default {
           });
           self.reportList = temp;
           console.log(temp)
-          self.total = res.data.totalElements;
+          self.total = Math.ceil(res.data.totalElements/self.sizeNum);
           self.isLoading = false;
           if (self.reportList.length === 0) {
             self.noData = self.$t('deviceView.noData');
@@ -621,15 +633,15 @@ export default {
 
     currentChange(val) {
       const self = this;
-      self.page = val;
-      self.params.filter = { page: val - 1, size: self.sizeNum };
+      self.page = val.page;
+      self.params.filter = { page: val.page - 1, size: self.sizeNum };
       self.getReportList(self.params);
     },
 
     sizeChange(val) {
       const self = this;
-      self.sizeNum = val;
-      self.params.filter = { page: 0, size: val };
+      self.sizeNum = val.size;
+      self.params.filter = { page: 0, size: val.size };
       self.getReportList(self.params);
     },
 
@@ -1102,6 +1114,7 @@ $suggestBack:#F1F6FE;
 .el-pat{
     //position: absolute;
     height: 30px;
+    margin-top: -10px;
     .el-pag{
         position: absolute;
         //float: right;
