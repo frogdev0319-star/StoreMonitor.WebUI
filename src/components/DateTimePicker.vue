@@ -19,14 +19,7 @@
       unlink-panels
       @change="dateChange"
     />
-    <el-tooltip
-      v-if="showTooltips"
-      class="date-time-tooltip"
-      effect="dark"
-      placement="right">
-      <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
-      <i class="iconfont icon-bangzhu iconbangzhu"/>
-    </el-tooltip>
+    
   </div>
 </template>
 
