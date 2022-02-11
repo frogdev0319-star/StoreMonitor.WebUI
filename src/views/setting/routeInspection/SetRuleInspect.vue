@@ -36,7 +36,17 @@
             {{ $t('insSettingView.CalculationMethod') }}：
           </p>
           <p class="rule-item">
-            <el-radio v-model="hundredMarkType" label="-1" class="radio">
+            <el-radio v-model="hundredMarkType" label="0" class="radio">
+              {{ $t('insSettingView.Proportional') }}
+            </el-radio>
+            <el-tooltip
+              class="item"
+              effect="dark"
+              placement="bottom-end">
+              <div slot="content">{{ $t('insSettingView.ProportionalDes') }}</div>
+              <i class="iconfont icon-bangzhu iconbangzhu" style="color: #7d8cad;"/>
+            </el-tooltip>
+            <el-radio v-model="hundredMarkType" label="-1" class="radio" style="margin-left: calc(40/1920*100vw);">
               {{ $t('insSettingView.totalScore') }}
             </el-radio>
             <el-tooltip
@@ -366,7 +376,7 @@ export default {
                 self.qualifiedForIgnoredWithType2 = item.value;
                 break;
               case 'hundredMarkType':
-                self.hundredMarkType = item.value === 0 ? '-1' : item.value.toString();
+                self.hundredMarkType = item.value.toString();
                 break;
               case 'minScore':
                 self.minScore = item.value;
