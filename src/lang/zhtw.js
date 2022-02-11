@@ -246,7 +246,7 @@ export default {
     "weeks": "週",
     "worstItems": "缺失項目TOP5",
     "worstPatrol": "巡檢完成最差TOP5",
-    "worstRegion": "重點關註區域",
+    "worstRegion": "重點關注區域",
     "customDate":"自訂義",
     "pageSize":"每頁顯示",
     "pageSizeUnit":"筆"
