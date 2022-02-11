@@ -1186,7 +1186,8 @@
         const obj = {
           eventName: self.eventName,
           eventDes: self.eventDes,
-          src: src
+          src: src,
+          sourceList: []
         };
         if (self.eventName.trim().length === 0) {
           self.showEventNameInfo = true;

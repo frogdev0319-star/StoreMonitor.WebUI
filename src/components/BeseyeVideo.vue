@@ -559,7 +559,8 @@ export default {
       const obj = {
         eventName: self.eventName,
         eventDes: self.eventDes,
-        src: src
+        src: src,
+        sourceList: []
       };
       if (self.eventName.trim().length === 0) {
         // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);

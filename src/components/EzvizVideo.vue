@@ -310,23 +310,55 @@
           <el-input
             v-model="eventName"
             size="mini"
-            class="name-input"
+            class="storevue-input-white"
             @input="eventNameChanged"
             @blur="notShowInputRuleTips('eventName')"/>
           <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
           <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
           <span class="event-title">{{ $t('remotePatrol.description') }}</span>
+          <div v-for="(_item,_index) in sourceList" :key="_index" class="source-details">
+            <div class="flex-center">
+              <img
+                :src="deleteInspectIcon"
+                alt="delete"
+                @click="deleteItemResource(_index)"
+              />
+              <div
+                class="paper flex-center margin-bottom-sm"
+                style="padding: 5px; flex: 1; margin-left: 20px"
+              >
+                <div style="flex: 1; text-align: left; margin: 5px">
+                  {{ _item.src }}
+                </div>
+                <hr class="hr-vertical" />
+                <img
+                  :src="editInspectIcon"
+                  alt="edit"
+                  style="margin: 5px"
+                  @click="editItemResource(_index)"
+                />
+              </div>
+            </div>
+          </div>
+          <div style="position: relative">
           <el-input
-            :autosize="{ minRows: 4, maxRows:7}"
-            v-model="eventDes"
+            :autosize="{ minRows: 4, maxRows: 7 }"
+            v-model="inspectInput"
             :placeholder="$t('remotePatrol.descPlaceholder')"
             size="mini"
-            class="des-input"
+            class="storevue-textarea-white"
             type="textarea"
             resize="none"
             @input="eventDesChanged"
             @blur="notShowInputRuleTips('eventDes')"/>
-          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+            <button
+              class="inspect-btn"
+              @click="submitItemResource()"
+            >
+              {{$t('remotePatrol.confirm')}}
+            </button>
+          </div>
         </div>
       </div>
     </dialog-pop>
@@ -484,6 +516,9 @@ export default {
       flag: 0,
       eventName: '',
       eventDes: '',
+      inspectInput: '',
+      curEditIndex: -1,
+      sourceList: [],
       showSnapshotFeedbackDialog: false,
       timerPlayReal: null,
       realTimeSpeed: 0,
@@ -672,38 +707,39 @@ export default {
   },
 
   methods: {
-    itemSubmitDescription () {
-      if (this.eventDes === '') {
-        this.eventDes = this.eventDesEdit.val;
+    deleteItemResource (index) {
+      const self = this
+      this.sourceList = this.sourceList.filter((source, idx) => idx !== index)
+    },
+    editItemResource (index) {
+      this.curEditIndex = index
+      this.inspectInput = this.sourceList[index].src
+    },
+    submitItemResource() {
+      const self = this;
+      if (this.inspectInput.trim().length === 0) return
+      if (this.curEditIndex > -1) {
+        this.sourceList = this.sourceList.map((source, idx) => {
+          if (idx === self.curEditIndex) return {
+            ...source,
+            src: self.inspectInput,
+          }
+          else return { ...source }
+        })
+        this.curEditIndex = -1
       } else {
-        var arr = this.eventDes.split('|');
-        arr.push(this.eventDesEdit.val);
-        this.eventDes = arr.join('|');
+        this.sourceList.push({
+          mediaType: 3,
+          src: this.inspectInput,
+        })
       }
-      this.eventDesEdit.val = '';
-      this.eventDesEdit.index = -1;
+      this.inspectInput = ''
     },
     onClickQualityLabel(index){
       this.curQualityIndex = index;
       this.qualityVisible = false;
       this.saveVideoQuality();
       this.stopPlayingVideoAndPlay();
-    },
-    deleteEventDes(index) {
-      var arr = this.eventDes.split("|");
-      arr = arr.filter((item, i) => i === index)
-      this.eventDes = arr.join('|');
-      this.eventDesEdit = {index: -1, val: ''}
-    },
-    editEventDes(index) {
-      if (this.isEditEventDes) {
-        this.isEditEventDes = false;
-        this.eventDesEdit = {index: -1, val: ''}
-      } else {
-        var arr = this.eventDes.split("|");
-        this.eventDesEdit = {index: index, val: arr[index]}
-        this.isEditEventDes = true
-      }
     },
     saveVideoQuality() {
       const params = {
@@ -1661,7 +1697,8 @@ export default {
       const obj = {
         eventName: self.eventName,
         eventDes: self.eventDes,
-        src: src
+        src: src,
+        sourceList: self.sourceList
       };
       if (self.eventName.trim().length === 0) {
         self.showEventNameInfo = true;
@@ -1853,7 +1890,6 @@ export default {
     eventNameChanged(val) {
       const self = this;
       const content = filterString.all(val, 50);
-      console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
       const length = filterString.getContentLength(val);

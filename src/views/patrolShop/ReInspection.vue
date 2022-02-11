@@ -98,34 +98,68 @@
           <div class="dialog-slot">
             <div class="dialog-event-content fullWidth">
               <div class="margin-bottom-sm"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</div>
-              <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
+              <el-input v-model="eventName" size="mini" class="storevue-input-white" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
               <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <div class="margin-bottom-top-sm">{{ $t('remotePatrol.description') }}</div>
-              <el-input
-                :autosize="{ minRows: 2, maxRows: 7}"
-                v-model="eventDes"
-                :placeholder="$t('remotePatrol.descPlaceholder')"
-                size="mini"
-                class="des-input"
-                type="textarea"
-                resize="none"
-                @input="eventDesChanged"
-                @blur="notShowInputRuleTips('eventDes')"/>
-              <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+              <div v-for="(_item,_index) in feedbackSourceList" :key="_index" class="source-details">
+                  <div class="flex-center">
+                    <img
+                      :src="deleteInspectIcon"
+                      alt="delete"
+                      @click="deleteFeedbackItemResource(_index)"
+                    />
+                    <div
+                      class="paper flex-center margin-bottom-sm"
+                      style="padding: 5px; flex: 1; margin-left: 20px"
+                    >
+                      <div style="flex: 1; text-align: left; margin: 5px">
+                        {{ _item.src }}
+                      </div>
+                      <hr class="hr-vertical" />
+                      <img
+                        :src="editInspectIcon"
+                        alt="edit"
+                        style="margin: 5px"
+                        @click="editItemFeedbackResource(_index)"
+                      />
+                    </div>
+                  </div>
+              </div>
+              <div style="position: relative">
+                <el-input
+                  :autosize="{ minRows: 2, maxRows: 7}"
+                  v-model="feedbackInput"
+                  :placeholder="$t('remotePatrol.descPlaceholder')"
+                  size="mini"
+                  class="storevue-textarea-white"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"/>
+                <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                <button
+                  class="inspect-btn"
+                  @click="submitFeedbackItemResource()"
+                >
+                  {{$t('remotePatrol.confirm')}}
+                </button>
+              </div>
             </div>
           </div>
         </dialog-pop>
-        <el-dialog
+        <dialog-pop
           v-if="showFeedDialog2"
           :title="$t('remotePatrol.feedbacks')"
-          :visible.sync="showFeedDialog2"
+          :append-to-body="true"
           :close-on-click-modal="false"
-          :width="860*percentHeight+'px'"
-          height="300px"
-          top="5%">
-          <div class="canvas-content" style="overflow:hidden;">
-            <hr class="dialog-hr">
+          :isWarning="true"
+          :dialogWidth="860*percentHeight+'px'"
+          :visible="showFeedDialog2"
+          @cancelHandler="showFeedDialog2 = false"
+          @confirmHandler="confirmAddFeedBack2"
+          >
+          <div class="canvas-content  dialog-slot">
             <div class="feed-canvas-content" v-if="feedbackIndex === -1" @mouseenter="showCancel" @mouseleave="hiddenCancel">
               <div v-if="showPenBtn" id="iconR" class="icon-right">
                 <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
@@ -166,31 +200,58 @@
                 class="canvas-img"
                 :src="eventList[feedbackIndex].sourceObj.src">
             </div>
-            <div class="event-content">
+            <div class="event-content spacer">
               <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
-              <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
+              <el-input v-model="eventName" size="mini" class="storevue-input-white" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
               <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-              <el-input
-                :autosize="{ minRows: 4, maxRows: 7}"
-                v-model="eventDes"
-                :placeholder="$t('remotePatrol.descPlaceholder')"
-                size="mini"
-                class="des-input"
-                type="textarea"
-                resize="none"
-                @input="eventDesChanged"
-                @blur="notShowInputRuleTips('eventDes')"/>
-              <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+              <div v-for="(_item,_index) in feedbackSourceList" :key="_index" class="source-details">
+                <div class="flex-center">
+                  <img
+                    :src="deleteInspectIcon"
+                    alt="delete"
+                    @click="deleteFeedbackItemResource(_index)"
+                  />
+                  <div
+                    class="paper flex-center margin-bottom-sm"
+                    style="padding: 5px; flex: 1; margin-left: 20px"
+                  >
+                    <div style="flex: 1; text-align: left; margin: 5px">
+                      {{ _item.src }}
+                    </div>
+                    <hr class="hr-vertical" />
+                    <img
+                      :src="editInspectIcon"
+                      alt="edit"
+                      style="margin: 5px"
+                      @click="editItemFeedbackResource(_index)"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div style="position: relative">
+                <el-input
+                  :autosize="{ minRows: 2, maxRows: 7}"
+                  v-model="feedbackInput"
+                  :placeholder="$t('remotePatrol.descPlaceholder')"
+                  size="mini"
+                  class="storevue-textarea-white"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"/>
+                <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                <button
+                  class="inspect-btn"
+                  @click="submitFeedbackItemResource()"
+                >
+                  {{$t('remotePatrol.confirm')}}
+                </button>
+              </div>
             </div>
           </div>
-          <div slot="footer">
-            <el-button id="cancelBtn" size="mini" @click="showFeedDialog2 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-            <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack2">
-              {{ $t('remotePatrol.confirm') }}</el-button>
-          </div>
-        </el-dialog>
+        </dialog-pop>
 
         <dialog-vue :dialog-title="changeBrandObj.title" :show-info="changeBrandObj.showInfo" :is-warning="changeBrandObj.isWarning" :dialog-closed="changeBrandObj.dialogCosed" @confirmed="changeBrandDialog" @canceled="canceldChangeBrand"/>
         <dialog-vue :dialog-title="changeStoreObj.title" :show-info="changeStoreObj.showInfo" :is-warning="changeStoreObj.isWarning" :dialog-closed="changeStoreObj.dialogCosed" @confirmed="changeStoreDialog" @canceled="canceldChangeStore"/>
@@ -246,7 +307,6 @@
                 <i
                   slot="prefix"
                   class="iconfont icon-sousuo"
-                  style="position: relative; top: 7px; left: 6px; font-size: 18px; color: #2b2b2b;"
                 />
               </el-input>
             </div>
@@ -331,20 +391,33 @@
                 </template>
               </div>
           </div>
-          <div v-else class="flex-center padding" style="flex-wrap: wrap">
-            <div v-for="(_item,_index) in sheetName" :key="_index">
-              <template v-if="_item.isCategory">
-                <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
-                      @click="changeSheet(_item,_index)">
-                  <span>{{ _item.label }}</span>
-                </div>
-              </template>
-              <template v-else>
-                <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
-                      @click="getItemOfCategory(_item, _index)" >
-                  <span>{{ _item.label }}</span>
-                </div>
-              </template>
+          <div v-else class="flex-column padding" >
+            <el-input
+              :placeholder="$t('remotePatrol.itemPlaceholder')"
+              v-model="searchItemValue"
+              size="small"
+              class="storevue-input-search fullWidth"
+            >
+              <i
+                slot="prefix"
+                class="iconfont icon-sousuo"
+              />
+            </el-input>
+            <div class="flex" style="flex-wrap: wrap">
+              <div v-for="(_item,_index) in sheetName" :key="_index">
+                <template v-if="_item.isCategory">
+                  <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                        @click="changeSheet(_item,_index)">
+                    <span>{{ _item.label }}</span>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                        @click="getItemOfCategory(_item, _index)" >
+                    <span>{{ _item.label }}</span>
+                  </div>
+                </template>
+              </div>
             </div>
           </div>
           <div class="fullWidth rside">
@@ -358,7 +431,7 @@
                   <div>{{ item_.dealCount+'/'+item_.count }}</div>
                 </div>
                 <hr class="hr-horizontal">
-                <div v-for="(item,index) in item_.items" :key="index" class="item-details padding-sm">
+                <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue) > -1)" :key="index" class="item-details padding-sm">
                   <div class="flex fullWidth">
                     <div style="width: calc(20/1920*100vw); text-align: left" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
                     <div class="flex padding-bottom-sm spacer" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
@@ -489,43 +562,59 @@
                 <img :src="arrows2Src" alt="arrow2" style="position: absolute; bottom: 90px; right: 100px" height="70">
                 <img :src="plusSrc" alt="plusSrc" style="position: absolute; bottom: 20px; right: 20px" @click="addFeedBack">
               </div>
-              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px">
-                <div class="feedbacks-content padding">
-                  <div v-for="(item,index) in eventList" :key="index" class="flex-center" :class="{'margin-bottom-sm': index !== eventList.length}">
-                    <img
-                      :src="crossicon"
-                      alt="delete"
-                      @click="deleteEvent(item,index)"
-                    />
-                    <div
-                      class="paper flex-center"
-                      style="padding: 5px; flex: 1; margin-left: 20px"
-                    >
-                      <div @click="editFeedback(item, index)" class="title-description spacer" style="text-align: left">
-                        <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
-                        <span class="feedback-eventdes">{{ item.eventDes }}</span>
-                      </div>
-                      <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                        <el-image
-                          :src="item.sourceObj.src"
-                          :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
-                          :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
-                      </div>
-                      <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
-                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
-                        <img :src="videoImgSrc" class="imgLittle" height="100">
-                      </div>
-                      <hr class="hr-vertical" />
+              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content paper padding-sm margin-md">
+                <div class="feedbacks-content padding-sm ">
+                  <div v-for="(item,index) in eventList" :key="index" :class="{'margin-bottom-sm': index !== eventList.length}">
+                    <div class="flex-center margin-bottom-sm">
+                      {{ `${index+1}. ${item.eventName}` }}
+                      <div class="spacer"></div>
+                      <button
+                        class="feedback-delete-btn"
+                        @click="deleteEvent(item,index)"
+                      >
+                        {{$t('remotePatrol.delete')}}
+                      </button>
+                    </div>
+                    
+                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
+                      <el-image
+                        :src="item.sourceObj.src"
+                        :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                        :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
+                    </div>
+                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
+                      <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
+                      <img :src="videoImgSrc" class="imgLittle" height="100">
+                    </div>
+                    <div class="flex-center"
+                      v-for="(source, idx) in item.sourceList"
+                      :key="idx">
                       <img
-                        :src="penicon"
-                        alt="edit"
-                        style="margin: 5px"
+                        :src="deleteInspectIcon"
+                        alt="delete"
                         @click="editFeedback(item, index)"
                       />
+                      <div
+                        class="paper flex-center margin-bottom-sm"
+                        style="padding: 5px; flex: 1; margin-left: 20px"
+                      >
+                        <div style="flex: 1; text-align: left; margin: 5px">
+                          {{source.src}}
+                        </div>
+                        <hr class="hr-vertical" />
+                        <img
+                          :src="editInspectIcon"
+                          alt="edit"
+                          style="margin: 5px"
+                        @click="editFeedback(item, index)"
+                        />
+                      </div>
                     </div>
+                    <hr v-if="index !== eventList.length" class="hr-horizontal">
                   </div>
                 </div>
-                <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack" style="float: right; margin-top: 20px">
+                <div class="flex fullWidth" style="justify-content: right"><img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack"></div>
+               
               </div>
             </div>
           </div>
@@ -587,7 +676,7 @@
               :placeholder="$t('remotePatrol.coment')"
               :disabled="item.disabled"
               size="mini"
-              class="des-input"
+              class="storevue-textarea"
               type="textarea"
               resize="none"
               @input="(val)=>itemDescriptionChanged({val,item})"
@@ -671,6 +760,7 @@ export default {
       showInfoContent: true,
       activeIndex: '0',
       serachVale: '',
+      searchItemValue: '',
       varyWindowHeight: window.innerHeight,
       varyWindowWidth: window.innerWidth,
       showDate: true,
@@ -835,7 +925,10 @@ export default {
       itemOptionsForType1: [],
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
-      curEditIndex: -1
+      curEditIndex: -1,
+      feedbackInput: '',
+      curEditFeedbackIndex: -1,
+      feedbackSourceList: []
     };
   },
   computed: {
@@ -1116,6 +1209,7 @@ export default {
       this.eventName = '';
       this.eventDes = '';
       this.showEventNameInfo = false;
+      this.feedbackSourceList = [];
     },
 
     confirmAddFeedBack2() {
@@ -1139,12 +1233,14 @@ export default {
         const obj = {
           eventName: this.eventName,
           eventDes: this.eventDes,
-          sourceObj: srcObj
+          sourceObj: srcObj,
+          sourceList: this.feedbackSourceList
         };
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
-        this.eventList[this.feedbackIndex].eventDes = this.eventDes;
+        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
+        // this.eventList[this.feedbackIndex].eventDes = this.eventDes;
       }
       this.showFeedDialog2 = false;
       this.showFeedBackInfo = false;
@@ -1155,7 +1251,8 @@ export default {
         const obj = {
           eventName: this.eventName,
           eventDes: this.eventDes,
-          sourceObj: null
+          sourceObj: null,
+          sourceList: this.feedbackSourceList
         };
         if (this.eventName.trim().length == 0) {
           this.showEventNameInfo = true;
@@ -1164,7 +1261,7 @@ export default {
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
-        this.eventList[this.feedbackIndex].eventDes = this.eventDes;
+        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
       }
       this.showAddTextFeedbackDialog = false;
       this.showFeedBackInfo = false;
@@ -2862,7 +2959,8 @@ export default {
       const picObj = {
         eventName: obj.eventName,
         eventDes: obj.eventDes,
-        sourceObj: srcObj
+        sourceObj: srcObj,
+        sourceList: obj.sourceList
       };
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
@@ -2887,7 +2985,6 @@ export default {
         })
       }
       item.inspectInput = ''
-
     },
     deleteItemResource({ item, index }) {
       const self = this
@@ -2896,6 +2993,33 @@ export default {
     editItemResource ({ item, index }) {
       this.curEditIndex = index
       item.inspectInput = item.sourceList[index].src
+    },
+    deleteFeedbackItemResource(index) {
+      this.feedbackSourceList = this.feedbackSourceList.filter((source, idx) => idx !== index)
+    },
+    editItemFeedbackResource(index) {
+      this.curEditFeedbackIndex = index
+      this.feedbackInput = this.feedbackSourceList[index].src
+    },
+    submitFeedbackItemResource () {
+      const self = this;
+      if (this.feedbackInput.trim().length === 0) return
+      if (this.curEditFeedbackIndex > -1) {
+        this.feedbackSourceList = this.feedbackSourceList.map((source, idx) => {
+          if (idx === self.curEditFeedbackIndex) return {
+            ...source,
+            src: self.feedbackInput,
+          }
+          else return { ...source }
+        })
+        this.curEditFeedbackIndex = -1
+      } else {
+        this.feedbackSourceList.push({
+          mediaType: 3,
+          src: this.feedbackInput,
+        })
+      }
+      this.feedbackInput = ''
     },
     itemDescriptionChanged({ val, item }) {
       const content = filterString.all(val, 200);
@@ -2932,7 +3056,6 @@ export default {
           item.inputCount = 0;
         }
       }
-
     },
     eventNameChanged(val) {
       const self = this;
@@ -2973,6 +3096,7 @@ export default {
       !feedbackObj.sourceObj ? this.showAddTextFeedbackDialog = true : this.showFeedDialog2 = true;
       this.eventName = feedbackObj.eventName;
       this.eventDes = feedbackObj.eventDes;
+      this.feedbackSourceList = feedbackObj.sourceList;
       this.showEventNameInfo = false;
     }
   }
@@ -3290,8 +3414,8 @@ export default {
       .el-header-title{
         text-align: left;
         position: relative;
-        height: 80px;
-        line-height: 80px;
+        height: calc(80/1920*100vw);
+        line-height: calc(80/1920*100vw);
         border-bottom: 1px solid $border;
         padding-left: calc(25/1920*100vw);
         padding-right: calc(25/1920*100vw);
@@ -4353,11 +4477,11 @@ export default {
     .group_content {
       border: 1px solid #e6e6e6;
       border-radius: 4px;
-      padding: 5px 20px;
-      margin-left: 10px;
-      margin-top: 10px;
+      padding: calc(5/1920*100vw) calc(20/1920*100vw);
+      margin-right: calc(10/1920*100vw);
+      margin-top: calc(10/1920*100vw);
       cursor: pointer;
-      font-size: 15px;
+      font-size: calc(15/1920*100vw);
     }
     .noraml-color{
       background-color: #006ab7;
@@ -4415,20 +4539,21 @@ export default {
     font-size: calc(12/1920*100vw);
     color: #7d8cad;
   }
-  .inspect-btn {
-    color: #556679;
-    position: absolute;
+  .feedback-delete-btn {
+    color: #c60957;
     background-color: #fff;
-    border: none;
-    border-radius: 2px;
-    right: calc(6/1920*100vw);
-    bottom: calc(6/1920*100vw);
+    border: 1px solid #c60957;
+    padding: calc(2/1920*100vw) calc(6/1920*100vw);
+    border-radius: 3px;
   }
   .cancel-text {
     display: inline;
     font-size: calc(12/1920*100vw);
     color: #556679;
     cursor: pointer;
+  }
+  .img-content {
+    text-align: left;
   }
 </style>
 <style>

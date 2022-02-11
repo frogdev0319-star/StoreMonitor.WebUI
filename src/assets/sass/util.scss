@@ -271,8 +271,15 @@ $sv_red: #c60957;
   .el-input__inner {
     border: none;
     background-color: #edf0f2;
-    height: calc(36/1920*100vw);
-    line-height: calc(36/1920*100vw);
+    height: calc(30/1920*100vw);
+    line-height: calc(30/1920*100vw);
+  }
+  i {
+    position: relative; 
+    top: calc(5/1920*100vw);
+    left: calc(5/1920*100vw);
+    font-size: calc(18/1920*100vw);
+    color: #2b2b2b;
   }
 }
 .storevue-input {
@@ -280,6 +287,16 @@ $sv_red: #c60957;
     border: none;
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
+  }
+}
+.storevue-input-white {
+  .el-input__inner {
+    background-color: #fff;
+    border: solid 1px #c3c4c5;
+    border-radius: 5px;
+    &:focus {
+      border: solid 1px #c3c4c5;
+    }
   }
 }
 .el-switch.is-checked .el-switch__core{
@@ -334,6 +351,15 @@ $sv_red: #c60957;
   }
 }
 
+.inspect-btn {
+  color: #556679;
+  position: absolute;
+  background-color: #fff;
+  border-radius: 3px;
+  right: calc(6/1920*100vw);
+  bottom: calc(6/1920*100vw);
+  border: solid 1px #e6e6e6;
+}
 .cancel-btn{
   @extend .confirm-btn;
   background-color: $cancelBtnBackground !important;
@@ -359,6 +385,16 @@ $sv_red: #c60957;
     border: none;
     border-radius: 5px;
     &:focus {
+    }
+  }
+}
+.storevue-textarea-white {
+  textarea {
+    background-color: #fff;
+    border: solid 1px #c3c4c5;
+    border-radius: 5px;
+    &:focus {
+      border: solid 1px #c3c4c5;
     }
   }
 }
