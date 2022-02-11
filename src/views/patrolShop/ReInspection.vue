@@ -306,7 +306,6 @@
                 <i
                   slot="prefix"
                   class="iconfont icon-sousuo"
-                  style="position: relative; top: 7px; left: 6px; font-size: 18px; color: #2b2b2b;"
                 />
               </el-input>
             </div>
@@ -391,20 +390,33 @@
                 </template>
               </div>
           </div>
-          <div v-else class="flex-center padding" style="flex-wrap: wrap">
-            <div v-for="(_item,_index) in sheetName" :key="_index">
-              <template v-if="_item.isCategory">
-                <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
-                      @click="changeSheet(_item,_index)">
-                  <span>{{ _item.label }}</span>
-                </div>
-              </template>
-              <template v-else>
-                <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
-                      @click="getItemOfCategory(_item, _index)" >
-                  <span>{{ _item.label }}</span>
-                </div>
-              </template>
+          <div v-else class="flex-column padding" >
+            <el-input
+              :placeholder="$t('remotePatrol.itemPlaceholder')"
+              v-model="searchItemValue"
+              size="small"
+              class="storevue-input-search fullWidth"
+            >
+              <i
+                slot="prefix"
+                class="iconfont icon-sousuo"
+              />
+            </el-input>
+            <div class="flex" style="flex-wrap: wrap">
+              <div v-for="(_item,_index) in sheetName" :key="_index">
+                <template v-if="_item.isCategory">
+                  <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                        @click="changeSheet(_item,_index)">
+                    <span>{{ _item.label }}</span>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                        @click="getItemOfCategory(_item, _index)" >
+                    <span>{{ _item.label }}</span>
+                  </div>
+                </template>
+              </div>
             </div>
           </div>
           <div class="fullWidth rside">
@@ -418,7 +430,7 @@
                   <div>{{ item_.dealCount+'/'+item_.count }}</div>
                 </div>
                 <hr class="hr-horizontal">
-                <div v-for="(item,index) in item_.items" :key="index" class="item-details padding-sm">
+                <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue) > -1)" :key="index" class="item-details padding-sm">
                   <div class="flex fullWidth">
                     <div style="width: calc(20/1920*100vw); text-align: left" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
                     <div class="flex padding-bottom-sm spacer" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
@@ -747,6 +759,7 @@ export default {
       showInfoContent: true,
       activeIndex: '0',
       serachVale: '',
+      searchItemValue: '',
       varyWindowHeight: window.innerHeight,
       varyWindowWidth: window.innerWidth,
       showDate: true,
@@ -3400,8 +3413,8 @@ export default {
       .el-header-title{
         text-align: left;
         position: relative;
-        height: 80px;
-        line-height: 80px;
+        height: calc(80/1920*100vw);
+        line-height: calc(80/1920*100vw);
         border-bottom: 1px solid $border;
         padding-left: calc(25/1920*100vw);
         padding-right: calc(25/1920*100vw);
@@ -4463,11 +4476,11 @@ export default {
     .group_content {
       border: 1px solid #e6e6e6;
       border-radius: 4px;
-      padding: 5px 20px;
-      margin-left: 10px;
-      margin-top: 10px;
+      padding: calc(5/1920*100vw) calc(20/1920*100vw);
+      margin-right: calc(10/1920*100vw);
+      margin-top: calc(10/1920*100vw);
       cursor: pointer;
-      font-size: 15px;
+      font-size: calc(15/1920*100vw);
     }
     .noraml-color{
       background-color: #006ab7;

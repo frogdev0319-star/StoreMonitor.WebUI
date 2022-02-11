@@ -282,6 +282,7 @@ export default {
     "changPageInfo": "当前巡检尚未完成，确认是否离开页面？",
     "changeTimeRange": "当前选择时间范围最大为三个月，已调整！",
     "channelList": "摄影机列表",
+    "itemPlaceholder": "请输入关键字搜索巡检项",
     "channelPlaceholder": "请输入关键字搜索通道",
     "checkinSuccess": "签到成功",
     "clear": "清除",
