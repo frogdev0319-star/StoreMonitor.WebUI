@@ -56,6 +56,7 @@
   font-family: NotoSansCJKTC;
   font-size: 13px;
   color: #a5a5a5;
+  padding: 0 20px !important;
 }
 .el-tabs__item:hover {
   color: #006ab7;

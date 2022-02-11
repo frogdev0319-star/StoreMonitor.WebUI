@@ -272,6 +272,7 @@
       :title= "$t('remotePatrol.feedbacks')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :isWarning="true"
       :dialogWidth="860*percentHeight+'px'"
       :visible="showSnapshotFeedbackDialog"

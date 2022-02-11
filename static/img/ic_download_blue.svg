@@ -1,0 +1,31 @@
+<svg data-name="ic/btn/link/download excel" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <defs>
+        <clipPath id="vqk5v8zgba">
+            <path data-name="Union 41" d="M0 20V0h16v10H9.412v10z" transform="translate(-7964 1129)" style="fill:#fff;stroke:#707070"/>
+        </clipPath>
+        <clipPath id="1zqaepkxpb">
+            <path data-name="Path 2267" d="M0 0h10.11l5.617 5.616L15.6 19.5H0z" transform="translate(-7963.774 1129.259)" style="stroke:#006ab7;stroke-linecap:round;stroke-width:1.5px;fill:none"/>
+        </clipPath>
+    </defs>
+    <g data-name="Group 9">
+        <path style="fill:none" d="M0 0h24v24H0z"/>
+        <g data-name="Group 8211">
+            <path d="m.821 5 .624-1.169c.162-.3.316-.608.479-.893h.043c.171.285.342.589.5.893L3.145 5H4L2.47 2.477 3.88 0h-.812L2.5 1.1c-.137.285-.274.562-.419.838h-.038c-.154-.276-.316-.552-.462-.838L.957 0H.12l1.41 2.394L0 5z" transform="translate(8.857 11)" style="fill:#006ab7"/>
+            <path data-name="x - Outline" d="M4.888 5.5h-2.03l-.843-1.444-.061-.119-.069.129L1.12 5.5H-.873L.95 2.395-.755-.5h2L2.027.869l.012.023.006-.012.008-.016L2.766-.5H4.74L3.05 2.469z" transform="translate(8.857 11)" style="fill:#006ab7"/>
+            <path data-name="Path 26" d="M5 5.75H0A.75.75 0 0 1-.75 5V0a.75.75 0 0 1 .463-.693.75.75 0 0 1 .817.163l5 5A.75.75 0 0 1 5 5.75zM.75 4.25h2.439L.75 1.811z" transform="translate(14 3)" style="fill:#006ab7"/>
+            <g data-name="Group 8209">
+                <g data-name="Group 8208">
+                    <path data-name="Path 27" d="M.5 6.75A.75.75 0 0 1-.25 6V0a.75.75 0 0 1 1.5 0v6a.75.75 0 0 1-.75.75z" transform="translate(17 14)" style="fill:#006ab7"/>
+                    <path data-name="Path 28" d="M2.5 2.75a.749.749 0 0 1-.469-.164l-2.5-2A.75.75 0 0 1-.586-.469.75.75 0 0 1 .469-.586L2.5 1.04 4.532-.586a.75.75 0 0 1 1.054.117.75.75 0 0 1-.118 1.055l-2.5 2a.749.749 0 0 1-.468.164z" transform="translate(15 18)" style="fill:#006ab7"/>
+                </g>
+                <g data-name="Mask Group 18" style="clip-path:url(#vqk5v8zgba)" transform="translate(7968 -1127)">
+                    <g data-name="Mask Group 17" style="clip-path:url(#1zqaepkxpb)">
+                        <g data-name="Group 8207">
+                            <path data-name="Rectangle 1751" d="M1-.75h12A1.752 1.752 0 0 1 14.75 1v16A1.752 1.752 0 0 1 13 18.75H1A1.752 1.752 0 0 1-.75 17V1A1.752 1.752 0 0 1 1-.75zm12 18a.25.25 0 0 0 .25-.25V1A.25.25 0 0 0 13 .75H1A.25.25 0 0 0 .75 1v16a.25.25 0 0 0 .25.25z" transform="translate(-7963 1130)" style="fill:#006ab7"/>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

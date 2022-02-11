@@ -212,6 +212,7 @@
           :visible.sync="showDeleteChannel"
           :append-to-body="true"
           :close-on-click-modal="false"
+          :show-close="false"
           width="610px"
           top="35vh"
           left="40vh">

@@ -80,6 +80,7 @@
           :title="$t('deviceView.editDevice')"
           :append-to-body="true"
           :close-on-click-modal="false"
+          :show-close="false"
           :isWarning="true"
           :visible="showEditDeviceDialog"
           :confirm-context="$t('deviceView.confirm')"

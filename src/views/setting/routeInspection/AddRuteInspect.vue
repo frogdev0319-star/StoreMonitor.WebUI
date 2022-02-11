@@ -1,7 +1,11 @@
 <template>
   <div class="el-addrute paper flex" id="addInspection" style="flex-direction: column">
     <div class="flex-center padding">
-      <span v-if="!showEditTab" class="tab-name" style="margin-right: 20px">{{ routeName }}<i class="iconfont icon-bianji icon-tabname" @click="editTabName"/></span>
+      <div v-if="!showEditTab" style="display:flex;flex-direction:row;margin-right: 20px">
+      <div class="tab-name">{{ routeName }}</div>
+        <!--<i class="iconfont icon-bianji icon-tabname" @click="editTabName"/>-->
+        <img :src="require('../../../../static/img/table-edit.png')" style="width:24px;height:24px;cursor:pointer;margin-left:8px;" @click="editTabName" />
+      </div>
       <el-input v-if="showEditTab" :size="varyWindowWidth>1600?'small':'mini'"
                 :placeholder="$t('insSettingView.enterListName')" v-model="editRouteName" class="tabName-input"
                 @input="RouteNameLength"/>
@@ -23,17 +27,24 @@
     </div>
     <hr class="hr-horizontal">
     <div class="flex padding">
-      <div style="background-color: #f7f9f9; color: #556679; font-size: 13px; padding-left: 10px;border-radius: 3px; line-height: 36px">
-        <span>{{ $t('insSettingView.selecttitle') }}</span>
-        <multi-select
-          style="flex: 1"
-          :options="titleList"
-          :placeholder="$t('insSettingView.selectPost')"
+      <div class="temp-select-area">
+          <div class="temp-select-label">{{ $t('insSettingView.selecttitle') }}</div> 
+          <multi-select
+          class="store-group-select region"
           :selected="ModelPost"
           :prompt-msg="$t('remotePatrol.all')"
           :all-select="0"
           :alltype="0"
+          :options="titleList"
           @changeInput="changeSelect(arguments)"/>
+          <!--<multi-select
+            :options="titleList"
+            :placeholder="$t('insSettingView.selectPost')"
+            :selected="ModelPost"
+            :prompt-msg="$t('remotePatrol.all')"
+            :all-select="0"
+            :alltype="0"
+            @changeInput="changeSelect(arguments)"/>-->
       </div>
     </div>
     <hr class="hr-horizontal">
@@ -48,7 +59,7 @@
       <div class="el-rute-group">
         <div class="group-content" style="height: 100%; display: flex; flex-direction: column;">
           <div class="title-content">
-            <span class="level2"><i class="iconfont icon-wenjian icontitle"/><span class="level2-name">{{ groupTitle }}</span></span>
+            <span class="level2"><span class="level2-name">{{ groupTitle }}</span></span>
             <div class="btn-content">
               <delay-button
                 class="inspction-btn"
@@ -63,12 +74,12 @@
             <div class="group-items group-title" style="height: 100%; display: flex; flex-direction: column;">
               <div class="top-group-title">
                 <div class="group-name-title">
-                  <el-tabs id="group-content" v-model="activeSheetName" @tab-click="handleSheetClick">
+                  <el-tabs id="group-content" class="tab-routeDetail" v-model="activeSheetName" @tab-click="handleSheetClick">
                     <el-tab-pane v-for="(item,index) in sheetName" :key="index" :label="item.label" :name="item.id"/>
                   </el-tabs>
                 </div>
               </div>
-              <draggable class="spacer" style="background-color: #f7f9fa" v-model="groupList" @update="handleUpdateCategorySequence">
+              <draggable class="spacer" style="background-color: #f7f9fa;" v-model="groupList" @update="handleUpdateCategorySequence">
                 <template v-for="(item,index) in groupList">
                   <div :key="index" :class="item.id === activeParentId?'noraml-color':'noraml-groupColor'"
                       class="groupItem" @click="clickCategory(index,item)"
@@ -140,9 +151,15 @@
         <div class="nape-content">
           <div class="title-content">
             <span :class="lang.indexOf('zh') === -1 ? 'en-item-title': 'item-title'" class="level2">
-              <i class="iconfont icon-icon-test icontitle"/>
             <span class="level2-name">{{ napeTitle }}</span></span>
             <div class="btn-content">
+              <delay-button
+                :disabled="groupList.length === 0"
+                class="inspction-btn"
+                @click="deleteNape"
+              >
+                <span>{{ $t('insSettingView.deleteInsItem') }}</span>
+              </delay-button>
               <delay-button
                 :disabled="groupList.length === 0"
                 class="inspction-btn"
@@ -150,14 +167,6 @@
               >
                 <i class="el-icon-plus"/>
                 <span>{{ $t('insSettingView.addInsItem') }}</span>
-              </delay-button>
-              <delay-button
-                :disabled="groupList.length === 0"
-                class="inspction-btn"
-                @click="deleteNape"
-              >
-                <i class="iconfont icon-shanchu"/>
-                <span>{{ $t('insSettingView.deleteInsItem') }}</span>
               </delay-button>
             </div>
           </div>
@@ -180,6 +189,7 @@
       :visible.sync="showAddNape"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       @cancelHandler="showAddNape = false"
       @confirmHandler="confirmUpdateNape">
       <div class="dialog-content padding">
@@ -272,6 +282,7 @@
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :visible="showDeleteItem"
       @visibleChangeHandler="updateDeleteItemDialogFlag"
       @cancelHandler="hideDeleteItemDialog"
@@ -287,6 +298,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :visible="showDeleteGroup"
+      :show-close="false"
       @visibleChangeHandler="updateDeleteGroupDialogFlag"
       @cancelHandler="hideDeleteGroupDialog"
       @confirmHandler="confirmDeleteGroup"
@@ -302,6 +314,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :visible="showAddGroup"
+      :show-close="false"
       @visibleChangeHandler="hideAddGroupDialog"
       @cancelHandler="hideAddGroupDialog"
       @confirmHandler="confirmHandleCategory">
@@ -1771,7 +1784,7 @@ export default {
 @import '../../../assets/css/textstyle.css';
     $red:#f31d65;
     $black:#182752;
-    $border:#e3e9f4;
+    $border:#acaeb1;
     $background:#f4f5f9;
     $tab:#7d8cad;
     $h1:#292e36;
@@ -1956,11 +1969,11 @@ export default {
             .level2{
             //   margin-left: calc(15/1920*100vw);
               .iconfont{
-                font-size: 16px;
+                font-size: 15px;
               }
               .level2-name{
-                font-size: 16px;
-                margin-left: 0;
+                font-size: 15px;
+                margin-left: 24px;
                 @media screen and (max-width:1440px){
                     font-size: calc(16/1920*100vw);
                 }
@@ -2002,14 +2015,32 @@ export default {
                 margin-right: calc(20/1920*100vw);
             }
         }
+        .temp-select-area{
+                  display:flex; 
+                  flex-direction:row;
+                  height:calc(30/1920*100vw);
+                  width:300px;
+                  align-items:center;
+                  background-color:#f7f9fa;
+                  border-radius:5px;
+                  font-size: 13px;
+                  .temp-select-label{
+                    color:#556679;
+                    font-family: NotoSansCJKtc;
+                    font-size: 13px;
+                    width:123px;
+                    line-height:36px;
+                    margin-left:16px
+                  }
+                }
         .el-rute-group{
             // background-color: #FAFAFA;
             .group-items{
                 font-size: 14px;
                 .top-group-title{
                   position: relative;
-                  height: 60px;
-                    line-height: 60px;
+                  height: 33px;
+                    line-height: 33px;
                     text-align: center;
                     font-size: 14px;
                     color: $tab;
@@ -2031,6 +2062,13 @@ export default {
                         }
                         #group-content >>> .el-tabs__item.is-active{
                             color: rgb(0, 106, 183);
+                        }
+                        .tab-routeDetail{
+                          /deep/
+                          .el-tabs__nav-wrap,
+                          .el-tabs__item{
+                            height:33px;
+                          }
                         }
                     }
                 }
@@ -2381,7 +2419,7 @@ export default {
   .score-content{
     background-color: #edf0f2;
     padding: 20px calc(20/1920*100vw);
-    border: 1px solid #e3e9f4;
+    border: 1px solid #acaeb1;
     height: auto;
     position: relative;
     margin-bottom: 20px;
@@ -2408,7 +2446,7 @@ export default {
   .prompt-msg{
     line-height: 25px;
     font-size: calc(20/1920*100vw);
-    color: #f31b65;
+    color: #006ab7;
     font-weight: bold;
     text-align: left;
   }

@@ -1,0 +1,10 @@
+<svg data-name="ic/btn/link/all" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <g data-name="Group 9 Copy 2">
+        <path style="fill:none" d="M0 0h24v24H0z"/>
+        <path d="M14 14v3a1 1 0 0 1-1 1H1a1.048 1.048 0 0 1-1-1V1a1.048 1.048 0 0 1 1-1h12a1 1 0 0 1 1 1v3h0" transform="translate(5 3)" style="stroke-linecap:square;stroke:#006ab7;stroke-miterlimit:10;stroke-width:1.5px;fill:none"/>
+        <g data-name="Group 4">
+            <path data-name="Path 27" d="M-.5 0v6" transform="rotate(90 3.75 16.25)" style="stroke-linecap:round;stroke:#006ab7;stroke-miterlimit:10;stroke-width:1.5px;fill:none"/>
+            <path data-name="Path 28" d="m0 0-2.5 2L-5 0" transform="rotate(90 .75 15.25)" style="stroke-linejoin:round;stroke-linecap:round;stroke:#006ab7;stroke-miterlimit:10;stroke-width:1.5px;fill:none"/>
+        </g>
+    </g>
+</svg>

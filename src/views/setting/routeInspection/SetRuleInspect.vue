@@ -3,32 +3,30 @@
     <el-col :span="24" class="el-rute-title">
       <span class="tab-name">【{{ routeName }}】{{ $t('insSettingView.ruleInspect') }}</span>
       <div style="float:right;">
-        <delay-button
-          size="mini"
-          type="primary"
-          class="bind-btn"
+        <el-button
+          class="storevue-button-filled"
           @click="submitRule">
           {{ $t('titleView.save') }}
-        </delay-button>
+        </el-button>
       </div>
     </el-col>
     <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.PatrolScoreCalculation')">
         <div slot="tableDetail">
           <p class="rule-item">
-            <el-checkbox v-model="includedInTotalScoreWithType1">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="includedInTotalScoreWithType1">
               {{ $t('insSettingView.tab1CalculateScore') }}
             </el-checkbox>
           </p>
           <p class="rule-item">
-            <el-checkbox v-model="qualifiedForIgnoredWithType1">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="qualifiedForIgnoredWithType1">
               <span>
                 {{ $t('insSettingView.tab1IgnoredQualified') }}
               </span>
             </el-checkbox>
           </p>
           <p class="rule-item">
-            <el-checkbox v-model="qualifiedForIgnoredWithType2">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="qualifiedForIgnoredWithType2">
               <span>{{ $t('insSettingView.tab2IgnoredQualified') }}</span>
             </el-checkbox>
           </p>
@@ -115,7 +113,7 @@
       <setting-table :table-name="$t('insSettingView.isCheckSuggest')">
         <div slot="tableDetail">
           <p class="rule-item">
-            <el-checkbox v-model="dangerousOnFailedItem">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="dangerousOnFailedItem">
               <span>
                 {{ $t('insSettingView.tab1FailedDangeous') }}
               </span>
@@ -128,7 +126,7 @@
       <setting-table :table-name="$t('insSettingView.isCheckAnnex')">
         <div slot="tableDetail">
           <p class="rule-item">
-            <el-checkbox v-model="onSitePhotoOnly">
+            <el-checkbox class="storevue-checkbox-outlined" v-model="onSitePhotoOnly">
               <span>
                 {{ $t('insSettingView.AllowPhotos') }}
               </span>
@@ -140,7 +138,7 @@
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionSignature')">
         <div slot="tableDetail" class="setting-config rule-item">
-          <el-checkbox v-model="onSiteSignature">
+          <el-checkbox class="storevue-checkbox-outlined" v-model="onSiteSignature">
             <span>
               {{ $t('insSettingView.needSignatrue') }}
             </span>
@@ -231,7 +229,7 @@
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionCheckin')">
         <div slot="tableDetail" class="setting-config rule-item">
-          <el-checkbox v-model="checkin">
+          <el-checkbox class="storevue-checkbox-outlined" v-model="checkin">
             <span>
               {{ $t('insSettingView.needCheckin') }}
             </span>

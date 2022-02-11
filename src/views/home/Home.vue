@@ -1505,7 +1505,7 @@ $collapseWidth: 5.5%;
   flex-shrink: 0;
   border-width: 0;
   border-style: solid;
-  border-color: #e6e6e6;
+  border-color: #acaeb1;
   border-bottom-width: thin;
 }
 .child-space {

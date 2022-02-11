@@ -1,0 +1,9 @@
+<svg data-name="menu/cell/ic/shop" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <g data-name="Group 5">
+        <path data-name="Rectangle Copy 5" style="fill:none" d="M0 0h24v24H0z"/>
+        <g data-name="Group 7107" transform="translate(3 3)">
+            <path d="M10.8 0v2.027a7.157 7.157 0 0 1 1.857.77l1.434-1.434 2.546 2.546L15.2 5.342a7.157 7.157 0 0 1 .77 1.858H18v3.6h-2.027a7.157 7.157 0 0 1-.77 1.857l1.434 1.434-2.546 2.546-1.433-1.437a7.157 7.157 0 0 1-1.857.77V18H7.2v-2.027a7.157 7.157 0 0 1-1.857-.77l-1.434 1.434-2.546-2.546L2.8 12.658a7.157 7.157 0 0 1-.77-1.857H0V7.2h2.027A7.157 7.157 0 0 1 2.8 5.342L1.363 3.909l2.546-2.546L5.342 2.8A7.157 7.157 0 0 1 7.2 2.027V0z" style="fill-rule:evenodd;stroke:#006ab7;stroke-linejoin:round;stroke-width:1.5px;fill:none"/>
+            <circle cx="4" cy="4" r="4" transform="translate(5 5)" style="stroke:#006ab7;stroke-linejoin:round;stroke-width:1.5px;fill:none"/>
+        </g>
+    </g>
+</svg>

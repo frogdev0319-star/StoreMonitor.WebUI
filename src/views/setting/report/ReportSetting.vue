@@ -147,6 +147,7 @@
       :title="$t('titleView.inspectionStaticSetting')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :visible="showStaticDetailSetting"
       dialog-width="540px"
       @visibleChangeHandler="updateStaticSettingDialogFlag"

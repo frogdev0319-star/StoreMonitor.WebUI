@@ -169,7 +169,7 @@ export default {
     box-sizing: border-box;
     .table-content-item{
       padding-left: calc(27/1920*100vw);
-      border-bottom: 1px solid #e3e9f4;
+      border-bottom: 1px solid #acaeb1;
     }
     .table-checkbox-name{
       width: 27%;
@@ -194,19 +194,25 @@ export default {
   .dragable-table-header, .table-content-item{
     display: flex;
     justify-content: space-between;
-    min-height: 60px;
-    height: auto;
+    
     align-items: center;
   }
   .dragable-table-header{
     position: relative;
-    font-size: 14px;
-    color: #7d8cad;
+    font-size: 12px;
+    color: #484848;
     text-align: center;
+    font-family: 'NotoSansCJKtc';
+    min-height: 33px;
+    height: auto;
+    border-bottom: solid 1px #acaeb1;
   }
   .table-content-item{
-    font-size: 14px;
-    color: #424151;
+    font-size: 15px;
+    color: #484848;
+    font-family: 'Roboto';
+    min-height: 60px;
+    height: auto;
   }
   .table-checkbox-name{
     display: inline-flex;

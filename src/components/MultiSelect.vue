@@ -16,6 +16,7 @@
     </el-select>
     <el-input
       v-model="input"
+      placeholder=""
       readonly
       class="input-class"/>
   </div>
@@ -237,8 +238,8 @@ export default {
     color: #2c90d9;
     -moz-osx-font-smoothing: grayscale;
   }
-  >>> .el-select__tags{
-    opacity: 0;
+  /deep/ .el-select__tags{
+    opacity: 0 !important;
   }
   /* >>> .el-select.el-select--medium .el-input .el-input__inner{
     position: relative;

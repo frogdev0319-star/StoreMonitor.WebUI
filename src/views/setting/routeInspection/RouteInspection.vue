@@ -9,20 +9,22 @@
           style="display: none"
           accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
           @change="importfxx(this)" >
-        <el-button
+        <div
           v-for="(item,index) in btnList"
           :key="index"
           :disabled="item.enabled"
-          style="margin-right: 20px; line-height: 24px"
+          style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
           class="storevue-button-empty"
           size="mini"
           @click="handleNape(index,item)">
-          <i :class="item.iconClass" :style="item.style"/>
-          {{ item.btnTitle }}
-        </el-button>
+          <!--<i :class="item.iconClass" :style="item.style"/>-->
+          <img :src="item.img" :style="item.style"/>
+          <div style="font-size:15px;margin-left:8px;">{{ item.btnTitle }}</div>
+        </div>
           <el-button
             type="primary"
             size="small"
+            style="font-size:15px;"
             class="storevue-button-outlined"
             :disabled="elTableData[Number(activeName)].data.length === 0"
             @click="bindStore"
@@ -56,27 +58,31 @@
               @tab-click="handleClickPatrol" >
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
                 <div class="flex-center" style="color: #acaeb1; font-size: 15px; margin: 15px 0">
-                  <el-select
-                    v-model="patrolActive"
-                    class="device-select"
-                    size="mini"
-                    @change="handleClickPatrol"
-                    placeholder="">
-                    <el-option
-                      v-for="(_item, _index) in item.data"
-                      :key="_index"
-                      :label="_item.name"
-                      :value="String(_index)"
-                    />
-                  </el-select>
-                  <span style="margin-left: 20px" :class="lang.indexOf('zh') === -1 ? 'en-bind-title': 'bind-title'">
+                  <div class="temp-select-area">
+                    <div class="temp-select-label">{{ $t('overview.patrolLists') }}</div> 
+                    <el-select
+                      v-model="patrolActive"
+                      class="device-select"
+                      size="mini"
+                      @change="handleClickPatrol"
+                      placeholder="">
+                      <el-option
+                        v-for="(_item, _index) in item.data"
+                        :key="_index"
+                        :label="_item.name"
+                        :value="String(_index)"
+                      />
+                    </el-select>
+                  </div>
+                  <span style="font-size:15px;margin-left:16px" :class="lang.indexOf('zh') === -1 ? 'en-bind-title': 'bind-title'">
                     {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
                   </span> 
                   <div class="spacer"></div>
-                  <div style="font-size: 13px" @click="setItem(_item.routeData, _item.name, '', _item.name)">
-                    <i class="iconfont icon-quxiaolianjie"/>
-                    <span style="color: #006ab7;border-bottom:1px solid #006ab7; margin-right: 5px">{{ $t('insSettingView.relationDuty') }}:</span>
-                    <span>{{ _item.routeData[0].ModelPost }}</span>
+                  <div style="display:flex; flex-direction:row;font-size: 13px;align-items:center" @click="setItem(_item.routeData, _item.name, '', _item.name)">
+                    <!--<i class="iconfont icon-quxiaolianjie"/>-->
+                    <img :src="require('../../../../static/img/ic_relate.svg')" style="width:24px;height:24px;"/>
+                    <div style="color: #006ab7;margin-left:8px; margin-right: 5px;cursor:pointer;"><u>{{ $t('insSettingView.relationDuty')}}</u></div>
+                    <div>{{ '：'+_item.routeData[0].ModelPost }}</div>
                   </div>
                 </div>
                 <div v-if="_item.routeData && !loading">
@@ -124,6 +130,7 @@
       :title="$t('insSettingView.import')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :visible="showNameImport"
       :confirm-text="$t('insSettingView.select')"
       class="dialog-content"
@@ -146,6 +153,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :visible="showFailInfo"
+      :show-close="false"
       class="dialog-content"
       @visibleChangeHandler="updateShowInfoDialog"
       @cancelHandler="hideShowInfoDialog"
@@ -167,6 +175,7 @@
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :visible="showSingleDeleteContent"
       @visibleChangeHandler="updateDeleteContentDialogFlag"
       @cancelHandler="hideDeleteContentDialog"
@@ -182,6 +191,7 @@
       :title="$t('remotePatrol.prompt')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :visible="showNoPostDialog"
       @visibleChangeHandler="updateTitleDialogFlag"
       @cancelHandler="hideNoTitleDialog"
@@ -197,6 +207,7 @@
       :title="$t('remotePatrol.prompt')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :visible="showImportSucceed"
       @visibleChangeHandler="updateImportSuccDialogFlag"
       @cancelHandler="hideImportSuccDialog"
@@ -276,34 +287,38 @@ export default {
         {
           id: 0,
           iconClass: 'iconfont icon-daoru',
-          style: 'font-size:24px;',
+          style: 'font-size:15px;width:24px;height:24px;',
           name: 'import',
           btnTitle: this.$t('insSettingView.import'),
-          enabled: false
+          enabled: false,
+          img:require('../../../../static/img/ic_import_blue.svg')
         },
         {
           id: 0,
           iconClass: 'iconfont icon-daochu',
-          style: 'font-size:24px;',
+          style: 'font-size:15px;',
           name: 'export',
           btnTitle: this.$t('insSettingView.export'),
-          enabled: false
+          enabled: false,
+          img:require('../../../../static/img/ic_export_blue.svg')
         },
         {
           id: 0,
           iconClass: 'iconfont icon-xiazai',
-          style: 'font-size:24px;',
+          style: 'font-size:15px;',
           name: 'download',
           btnTitle: this.$t('insSettingView.download'),
-          enabled: false
+          enabled: false,
+          img:require('../../../../static/img/ic_download_blue.svg')
         },
         {
           id: 0,
           iconClass: 'iconfont icon-shanchu',
-          style: 'font-size:17px;',
+          style: 'font-size:15px;',
           name: 'delete',
           btnTitle: this.$t('scheduleView.delete'),
-          enabled: false
+          enabled: false,
+          img:require('../../../../static/img/ic_delete_blue.svg')
         }
       ],
 
@@ -2358,7 +2373,7 @@ export default {
   $border: #e3e9f4;
   $tab: #7d8cad;
   *{
-    font-family: Roboto,Arial, Microsoft YaHei;
+    font-family: 'NotoSansCJKtc','Roboto','Arial', 'Microsoft YaHei';
     box-sizing: content-box;
   }
   @function rem($val){
@@ -2445,6 +2460,24 @@ export default {
                         }
                     }
                 }
+                .temp-select-area{
+                  display:flex; 
+                  flex-direction:row;
+                  height:calc(30/1920*100vw);
+                  width:220px;
+                  align-items:center;
+                  background-color:#f4f6f7;
+                  border-radius:5px;
+                  font-size: 13px;
+                  .temp-select-label{
+                    color:#556679;
+                    font-family: NotoSansCJKtc;
+                    font-size: 13px;
+                    width:75px;
+                    line-height:36px;
+                    margin-left:16px
+                  }
+                }
             }
             .el-route-btns{
               height: 36px;
@@ -2523,6 +2556,7 @@ export default {
           width: calc(130/1920*100vw);
         }
       }
+      
     }
   }
 

@@ -8,8 +8,35 @@
         <div class="spacer"></div>
         <div 
           class="flex-center"
-          style="margin-right: 20px">
-          <el-button
+          style="margin-right:20px">
+          <div
+            style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
+            :disabled="routeData.length === 0"
+            class="storevue-button-empty"
+            size="mini"
+            @click="deleteNapes">
+            <img :src="imgDelete" style="width:24px;height:24px;"/>
+            <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ $t('insSettingView.deleteItem') }}</div>
+          </div>
+          <div
+            style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
+            :disabled="routeData.length === 0"
+            class="storevue-button-empty"
+            size="mini"
+            @click="setRule">
+            <img :src="imgIncepSetting" style="width:24px;height:24px;"/>
+            <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ $t('insSettingView.ruleInspect') }}</div>
+          </div>
+          <div
+            style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
+            :disabled="routeData.length === 0"
+            class="storevue-button-empty"
+            size="mini"
+            @click="setItem">
+            <img :src="imgIncepItemSet" style="width:24px;height:24px;"/>
+            <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ $t('insSettingView.setItem') }}</div>
+          </div>
+          <!--<el-button
             :disabled="routeData.length === 0"
             class="storevue-button-empty"
             size="mini"
@@ -36,7 +63,7 @@
           >
             <i class="iconfont icon-button"/>
             <span>{{ $t('insSettingView.setItem') }}</span>
-          </el-button>
+          </el-button>-->
         </div>
       </div>
       <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
@@ -78,7 +105,7 @@
                 <el-checkbox v-model="child.checked" class="storevue-checkbox-outlined" @change="checkSubcatergy(child, item)"/>
                 <span class="table-title">{{ child.groupName }}</span>
               </div>
-              <div v-if="child.itemData.length !== 0" class="table-class">
+              <div v-if="child.itemData.length !== 0" class="table-class" :key="`item-`+childIndex">
                 <draggable-table
                   :is-score-sheet= "isScoreItemActive"
                   :table-header="isScoreItemActive ? scoreTableHeader:passFailTableHeader"
@@ -100,6 +127,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :visible="showDeleteContent"
+      :show-close="false"
       @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showDeleteContent')"
       @cancelHandler="hideDeleteContentDialog('showDeleteContent')"
       @confirmHandler="confirmDelete">
@@ -113,6 +141,7 @@
       :title="$t('insSettingView.confirmDelete')"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       :visible="showSingleDeleteContent"
       @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showSingleDeleteContent')"
       @cancelHandler="hideDeleteContentDialog('showSingleDeleteContent')"
@@ -152,6 +181,9 @@ export default {
 
   data() {
     return {
+      imgDelete:require('../../../../static/img/ic_delete_blue.svg'),
+      imgIncepSetting:require('../../../../static/img/ic_IncepSetting_blue.svg'),
+      imgIncepItemSet:require('../../../../static/img/ic_IncepItemSet_blue.svg'),
       typeNum: 0,
       itemNum: 0,
       showFaildig: false,

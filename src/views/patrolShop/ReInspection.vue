@@ -89,6 +89,7 @@
           :title="$t('remotePatrol.feedbacks')"
           :append-to-body="true"
           :close-on-click-modal="false"
+          :show-close="false"
           :isWarning="true"
           :visible="showAddTextFeedbackDialog"
           @cancelHandler="showAddTextFeedbackDialog = false"
