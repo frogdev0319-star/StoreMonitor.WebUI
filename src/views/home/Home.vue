@@ -1471,6 +1471,9 @@ $collapseWidth: 5.5%;
 .margin-left-md {
   margin-left: calc(20/1920*100vw);
 }
+.margin-md {
+  margin: calc(20/1920*100vw);
+}
 .font-size-sm {
   font-size: calc(12/1920*100vw);
 }

@@ -97,7 +97,7 @@
           <div class="dialog-slot">
             <div class="dialog-event-content fullWidth">
               <div class="margin-bottom-sm"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</div>
-              <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
+              <el-input v-model="eventName" size="mini" class="storevue-input-white" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
               <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <div class="margin-bottom-top-sm">{{ $t('remotePatrol.description') }}</div>
@@ -131,7 +131,7 @@
                   v-model="feedbackInput"
                   :placeholder="$t('remotePatrol.descPlaceholder')"
                   size="mini"
-                  class="des-input"
+                  class="storevue-textarea-white"
                   type="textarea"
                   resize="none"
                   @input="eventDesChanged"
@@ -147,16 +147,18 @@
             </div>
           </div>
         </dialog-pop>
-        <el-dialog
+        <dialog-pop
           v-if="showFeedDialog2"
           :title="$t('remotePatrol.feedbacks')"
-          :visible.sync="showFeedDialog2"
+          :append-to-body="true"
           :close-on-click-modal="false"
-          :width="860*percentHeight+'px'"
-          height="300px"
-          top="5%">
-          <div class="canvas-content" style="overflow:hidden;">
-            <hr class="dialog-hr">
+          :isWarning="true"
+          :dialogWidth="860*percentHeight+'px'"
+          :visible="showFeedDialog2"
+          @cancelHandler="showFeedDialog2 = false"
+          @confirmHandler="confirmAddFeedBack2"
+          >
+          <div class="canvas-content  dialog-slot">
             <div class="feed-canvas-content" v-if="feedbackIndex === -1" @mouseenter="showCancel" @mouseleave="hiddenCancel">
               <div v-if="showPenBtn" id="iconR" class="icon-right">
                 <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
@@ -197,9 +199,9 @@
                 class="canvas-img"
                 :src="eventList[feedbackIndex].sourceObj.src">
             </div>
-            <div class="event-content">
+            <div class="event-content spacer">
               <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
-              <el-input v-model="eventName" size="mini" class="name-input" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
+              <el-input v-model="eventName" size="mini" class="storevue-input-white" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
               <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <span class="event-title">{{ $t('remotePatrol.description') }}</span>
@@ -233,7 +235,7 @@
                   v-model="feedbackInput"
                   :placeholder="$t('remotePatrol.descPlaceholder')"
                   size="mini"
-                  class="des-input"
+                  class="storevue-textarea-white"
                   type="textarea"
                   resize="none"
                   @input="eventDesChanged"
@@ -248,12 +250,7 @@
               </div>
             </div>
           </div>
-          <div slot="footer">
-            <el-button id="cancelBtn" size="mini" @click="showFeedDialog2 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-            <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack2">
-              {{ $t('remotePatrol.confirm') }}</el-button>
-          </div>
-        </el-dialog>
+        </dialog-pop>
 
         <dialog-vue :dialog-title="changeBrandObj.title" :show-info="changeBrandObj.showInfo" :is-warning="changeBrandObj.isWarning" :dialog-closed="changeBrandObj.dialogCosed" @confirmed="changeBrandDialog" @canceled="canceldChangeBrand"/>
         <dialog-vue :dialog-title="changeStoreObj.title" :show-info="changeStoreObj.showInfo" :is-warning="changeStoreObj.isWarning" :dialog-closed="changeStoreObj.dialogCosed" @confirmed="changeStoreDialog" @canceled="canceldChangeStore"/>
@@ -552,8 +549,8 @@
                 <img :src="arrows2Src" alt="arrow2" style="position: absolute; bottom: 90px; right: 100px" height="70">
                 <img :src="plusSrc" alt="plusSrc" style="position: absolute; bottom: 20px; right: 20px" @click="addFeedBack">
               </div>
-              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content paper padding-sm" style="margin: 20px">
-                <div class="feedbacks-content padding-sm">
+              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content paper padding-sm margin-md">
+                <div class="feedbacks-content padding-sm ">
                   <div v-for="(item,index) in eventList" :key="index" :class="{'margin-bottom-sm': index !== eventList.length}">
                     <div class="flex-center margin-bottom-sm">
                       {{ `${index+1}. ${item.eventName}` }}
@@ -603,7 +600,8 @@
                     <hr v-if="index !== eventList.length" class="hr-horizontal">
                   </div>
                 </div>
-                <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack" style="float: right; margin-top: 20px">
+                <div class="flex fullWidth" style="justify-content: right"><img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack"></div>
+               
               </div>
             </div>
           </div>
@@ -665,7 +663,7 @@
               :placeholder="$t('remotePatrol.coment')"
               :disabled="item.disabled"
               size="mini"
-              class="des-input"
+              class="storevue-textarea"
               type="textarea"
               resize="none"
               @input="(val)=>itemDescriptionChanged({val,item})"
@@ -2986,11 +2984,8 @@ export default {
       this.feedbackSourceList = this.feedbackSourceList.filter((source, idx) => idx !== index)
     },
     editItemFeedbackResource(index) {
-      console.log(index)
       this.curEditFeedbackIndex = index
-      console.log(index)
       this.feedbackInput = this.feedbackSourceList[index].src
-      console.log(index)
     },
     submitFeedbackItemResource () {
       const self = this;
@@ -4529,15 +4524,6 @@ export default {
     text-align: left;
     font-size: calc(12/1920*100vw);
     color: #7d8cad;
-  }
-  .inspect-btn {
-    color: #556679;
-    position: absolute;
-    background-color: #fff;
-    border: none;
-    border-radius: 2px;
-    right: calc(6/1920*100vw);
-    bottom: calc(6/1920*100vw);
   }
   .feedback-delete-btn {
     color: #c60957;

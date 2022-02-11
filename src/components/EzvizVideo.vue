@@ -272,7 +272,6 @@
       :title= "$t('remotePatrol.feedbacks')"
       :append-to-body="true"
       :close-on-click-modal="false"
-      :isWarning="true"
       :dialogWidth="860*percentHeight+'px'"
       :visible="showSnapshotFeedbackDialog"
       @cancelHandler="showSnapshotFeedbackDialog = false"
@@ -309,7 +308,7 @@
           <el-input
             v-model="eventName"
             size="mini"
-            class="name-input"
+            class="storevue-input-white"
             @input="eventNameChanged"
             @blur="notShowInputRuleTips('eventName')"/>
           <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
@@ -345,7 +344,7 @@
             v-model="inspectInput"
             :placeholder="$t('remotePatrol.descPlaceholder')"
             size="mini"
-            class="des-input"
+            class="storevue-textarea-white"
             type="textarea"
             resize="none"
             @input="eventDesChanged"
