@@ -1076,7 +1076,7 @@ export default {
     "showPartsDetails": "Show Part of Details",
     "statisIndex": "Statistical indicators",
     "statistics": "Statistics chart",
-    "summaryTable": "Statistics table",
+    "summaryTable": "Statistics table  (web)",
     "templateName": "Template Name",
     "templateNameExist": "Template name already exists",
     "templateOutOfLimit": "The number of templates exceeds the limit",

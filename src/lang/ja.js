@@ -1071,7 +1071,7 @@ export default {
     "showPartsDetails": "詳細の一部を表示",
     "statisIndex": "統計指標",
     "statistics": "統計グラフ",
-    "summaryTable": "統計テーブル",
+    "summaryTable": "統計テーブル (web)",
     "templateName": "テンプレート名",
     "templateNameExist": "テンプレート名は既に存在します",
     "templateOutOfLimit": "テンプレートの数が制限を超えています",

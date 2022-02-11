@@ -9,6 +9,17 @@
           <span>{{ $t('deviceView.deviceInfo') }}</span>
           <div class="spacer"></div>
           <el-button
+            :disabled="tableData.length === 0"
+            class="storevue-button-outlined"
+            size="mini"
+            type="primary"
+            @click="showDeleteDialogMethod(0)"
+          >
+            <div class="btn-area">
+              <span>{{ $t('deviceView.deleteDevice') }}</span>
+            </div>
+          </el-button>
+          <el-button
             :class=" lang === 'en' ? 'en-el-add-btn' : 'el-add-btn'"
             class="storevue-button-outlined"
             size="mini"
@@ -20,20 +31,8 @@
               <span>{{ $t('deviceView.addDevice') }}</span>
             </div>
           </el-button>
-          <el-button
-            :disabled="tableData.length === 0"
-            class="storevue-button-outlined"
-            size="mini"
-            type="primary"
-            @click="showDeleteDialogMethod(0)"
-          >
-            <div class="btn-area">
-              <i class="iconfont icon-shanchu"/>
-              <span>{{ $t('deviceView.deleteDevice') }}</span>
-            </div>
-          </el-button>
         </div>
-        <div class="spacer">
+        <div class="spacer" style="background-color:#f7f9fa">
           <table-pagination
             ref="ezvizDeviceTable"
             :column-data="columnData"
@@ -50,14 +49,22 @@
             :total="total"
             :table-height="varyDivHeight"
             :is-loading-data="isLoadingData"
-            layout="jumper,total, prev,pager, next"
+            :show-pagination="false"
             class="device-table"
             headerBorder="rgba(172, 174, 177, .34)"
             bodyBorder="rgba(172, 174, 177, .34)"
             @handleOperation="handleEmitOperation"
             @emitRowClick="handleEmitRowClick"
             @handleEdit="handleEmitEdit"
-            @handleChange="handlePageAndSizeChange"
+          />
+          <tbl-pagination-only
+            :btn-style="{backgroundColor:'transparent'}"
+            :total="total"
+            :current-page="page"
+            :page-size="sizeNum"
+            layout = "prev,pager, next,sizes,slot"
+            @sizeChange="handlePageAndSizeChange"
+            @currentChange="handlePageAndSizeChange"
           />
       </div>
       </el-col>
@@ -159,6 +166,7 @@
           :isWarning="true"
           :visible="showAddChannelDialog"
           :confirm-context="$t('deviceView.addChannel')"
+          :show-close="false"
           dialog-width="510px"
           @cancelHandler="showAddChannelDialog = false"
           @confirmHandler="addSingleChannel">
@@ -236,6 +244,7 @@
       :isWarning="true"
       :visible="showAddDeviceDialog"
       :confirm-context="$t('deviceView.confirm')"
+      :show-close="false"
       dialog-width="510px"
       @cancelHandler="showAddDeviceDialog = false"
       @confirmHandler="addEzvizDeviceBasedForm">
@@ -368,6 +377,7 @@
       :isWarning="true"
       :visible="showEditDeviceDialog"
       :confirm-context="$t('deviceView.confirm')"
+      :show-close="false"
       dialog-width="510px"
       @cancelHandler="showEditDeviceDialog = false"
       @confirmHandler="confirmEditDialog">
@@ -415,6 +425,7 @@
       :isWarning="true"
       :visible="showEditChannelDialog"
       :confirm-context="$t('deviceView.confirm')"
+      :show-close="false"
       dialog-width="510px"
       @cancelHandler="showEditChannelDialog = false"
       @confirmHandler="confirmEditDialog">
@@ -435,6 +446,7 @@
       :visible.sync="showDeleteDialog"
       :append-to-body="true"
       :close-on-click-modal="false"
+      :show-close="false"
       width="28%"
       top="35vh"
       left="40vh">
@@ -466,11 +478,13 @@ import util from '@/common/util';
 import lodash from 'lodash';
 import TablePagination from '@/components/TablePagination';
 import DialogPop from '@/components/DialogPop';
+import TblPaginationOnly from '@/components/TblPaginationOnly';
 
 export default {
   name: 'EzvizDeviceMgmt',
   components: {
-    TablePagination, DialogPop
+    TablePagination, DialogPop,
+    TblPaginationOnly
   },
   data() {
     return {
@@ -1060,7 +1074,7 @@ export default {
             tempDeviceArr.push(deviceInfo);
           });
           self.tableData = tempDeviceArr;
-          self.total = res.data.totalElements;
+          self.total = Math.ceil(res.data.totalElements/self.sizeNum);
         }
       })
         .then(async() => {
@@ -1907,17 +1921,17 @@ export default {
     font-size: 16px;
   }
   .device-table{
-    height: 100%;
-    background: #f5f7fa;
+    height: 90%;
+    background: #f7f9fa;
   }
   .device-table .el-table--mini{
     height: 100%;
-    background: #f5f7fa;
+    background: #f7f9fa;
   }
   .device-table .el-table__row{
     height: 60px;
     font-weight: 700;
-    background: #f5f7fa;
+    background: #f7f9fa;
   }
   .device-table .el-table__row .iconfont{
     font-weight: 400;

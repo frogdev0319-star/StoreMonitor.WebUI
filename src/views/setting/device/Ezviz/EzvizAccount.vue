@@ -29,6 +29,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :isWarning="true"
+      :show-close="false"
       :visible="showDeleteAccount"
       @visibleChangeHandler="updateDeleteAccountDialogFlag($event, 1)"
       @cancelHandler="hideDeleteAccountDialog(1)"
@@ -49,6 +50,7 @@
       :visible="showAddAccount"
       :confirm-context="isAdd ? $t('deviceView.confirmAdd') : $t('deviceView.confirm')"
       :confirm-btn-disabled="!isAccessTokenValid"
+      :show-close="false"
       dialog-width="510px"
       @visibleChangeHandler="updateAddAccountDialogFlag"
       @cancelHandler="hideAddAccountDialog"
@@ -85,7 +87,8 @@
           <div v-else>
             <el-row>
               <el-col :span="24">
-                <el-form-item :label="`${this.$t('deviceView.mobilePhone')}`"
+                <el-form-item class="ezviz-account-form"
+                              :label="`${this.$t('deviceView.mobilePhone')}`"
                               :error="errorAccount" prop="ezvizAccount">
                   <el-input v-model="ezvizAccountInfo.ezvizAccount" @input="ezvizAccountChanged" />
                   <p style="margin: 0;text-align: right;color: rgb(144, 147, 153);">{{this.$t('deviceView.charterSize')}}</p>
@@ -115,7 +118,7 @@
                     <el-button class="get-button" @click.prevent="getAccessToken">
                       {{ $t('deviceView.obtain') }}
                     </el-button>
-                    <span v-if="validateResult" class="validate-text">{{ validateResult }}</span>
+                    <span v-if="validateResult" class="validate-text" style="margin-top:-10px;">{{ validateResult }}</span>
                   </el-form-item>
                 </el-form>
               </div>
@@ -319,11 +322,13 @@ export default {
     },
     appKey() {
       this.validateResult = '';
-      this.isAccessTokenValid = false;
+      //console.log("2");
+      //this.isAccessTokenValid = false;
     },
     appSecret() {
       this.validateResult = '';
-      this.isAccessTokenValid = false;
+      //console.log("3");
+      //this.isAccessTokenValid = false;
     }
   },
 
@@ -360,6 +365,7 @@ export default {
       this.errorAppkeyMsg = '';
       this.errorAccessKey = '';
       this.curLength = 0;
+      this.isAccessTokenValid= true;
     },
 
     showAddEzvizAccountDialog() {
@@ -585,6 +591,7 @@ export default {
     updateAccount(row) {
       const self = this;
       self.isAdd = false;
+      
       self.initEzvizAccountInfo();
       self.ezvizAccountInfo = { ...row };
       self.ezvizAccountInfo.oldEzvizAccount = row.ezvizAccount;
@@ -592,11 +599,13 @@ export default {
       self.deleteId = row.id;
       self.ezvizAccountInfo.comment = row.tempComment;
       self.appliedStores = row.appliedStores;
+      
       if (row.scope === 1) {
         self.getAccessToken();
       } else {
         this.validateResult = '';
         this.isAccessTokenValid = true;
+        
       }
       self.accountTitle = this.$t('deviceView.updateAccount');
       self.errorAccessKey = '';
@@ -676,6 +685,7 @@ export default {
     },
 
     hideAddAccountDialog() {
+      this.isAccessTokenValid = true;
       this.showAddAccount = false;
       this.clearFormValidate();
     },
@@ -741,4 +751,12 @@ export default {
 <style lang="scss">
   @import '../../../../assets/css/importfile.css';
   @import '../../../../assets/sass/device';
+  .ezviz-account-form{
+    .el-form-item__error{
+      color:#F56C6C !important;
+
+      margin-top: -20px;
+    
+    }
+  }
 </style>

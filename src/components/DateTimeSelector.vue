@@ -15,8 +15,17 @@
         :poper-class="date-range" 
         :diablePick="diablePick" 
         :dateTimeValue="dateTimeValue"
+        :showTooltips="showTooltips"
         @change="dateChange"/>
     </div>
+    <el-tooltip
+      v-if="showTooltips"
+      class="date-time-tooltip"
+      effect="light"
+      placement="right">
+      <div slot="content">{{ $t('overview.dataRangeTips') }}</div>
+      <i class="iconfont icon-bangzhu iconbangzhu"/>
+    </el-tooltip>
   </div>
 </template>
 
@@ -30,7 +39,11 @@ export default {
     dateTimeValue:{
       type:Object,
       default:()=>{return [];}
-    }
+    },
+    showTooltips:{
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {
@@ -82,7 +95,7 @@ export default {
     display: flex;
     align-items: center;
     height: 36px;
-    width: calc(378/1440*100vw);
+    width: calc(402/1440*100vw);
     // background-color: #fff;
     // border-radius: 5px;
     .time-title{
