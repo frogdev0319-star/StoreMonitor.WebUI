@@ -307,6 +307,7 @@ export default {
     "defaulteMode": "預設模式",
     "descPlaceholder": "請輸入問題描述文字",
     "description": "問題描述",
+    "delete": "刪除",
     "detailInfo": "巡檢詳情",
     "details": "報告詳情",
     "deviceOffline": "設備離線，播放失敗",

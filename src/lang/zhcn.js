@@ -307,6 +307,7 @@ export default {
     "createProblem": "新建问题",
     "dangerous": "立即督导",
     "dashServerError": "Dash视频服务器请求异常，请刷新后重试！",
+    "delete": "刪除",
     "defaulteMode": "预设模式",
     "descPlaceholder": "请输入问题描述文字",
     "description": "问题描述",

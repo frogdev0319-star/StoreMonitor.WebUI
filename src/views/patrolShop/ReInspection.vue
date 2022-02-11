@@ -101,17 +101,49 @@
               <span v-if="eventNameRuletip" class="rules">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <div class="margin-bottom-top-sm">{{ $t('remotePatrol.description') }}</div>
-              <el-input
-                :autosize="{ minRows: 2, maxRows: 7}"
-                v-model="eventDes"
-                :placeholder="$t('remotePatrol.descPlaceholder')"
-                size="mini"
-                class="des-input"
-                type="textarea"
-                resize="none"
-                @input="eventDesChanged"
-                @blur="notShowInputRuleTips('eventDes')"/>
-              <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+              <div v-for="(_item,_index) in feedbackSourceList" :key="_index" class="source-details">
+                  <div class="flex-center">
+                    <img
+                      :src="deleteInspectIcon"
+                      alt="delete"
+                      @click="deleteFeedbackItemResource(_index)"
+                    />
+                    <div
+                      class="paper flex-center margin-bottom-sm"
+                      style="padding: 5px; flex: 1; margin-left: 20px"
+                    >
+                      <div style="flex: 1; text-align: left; margin: 5px">
+                        {{ _item.src }}
+                      </div>
+                      <hr class="hr-vertical" />
+                      <img
+                        :src="editInspectIcon"
+                        alt="edit"
+                        style="margin: 5px"
+                        @click="editItemFeedbackResource(_index)"
+                      />
+                    </div>
+                  </div>
+              </div>
+              <div style="position: relative">
+                <el-input
+                  :autosize="{ minRows: 2, maxRows: 7}"
+                  v-model="feedbackInput"
+                  :placeholder="$t('remotePatrol.descPlaceholder')"
+                  size="mini"
+                  class="des-input"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"/>
+                <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                <button
+                  class="inspect-btn"
+                  @click="submitFeedbackItemResource()"
+                >
+                  {{$t('remotePatrol.confirm')}}
+                </button>
+              </div>
             </div>
           </div>
         </dialog-pop>
@@ -171,17 +203,49 @@
               <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
               <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
               <span class="event-title">{{ $t('remotePatrol.description') }}</span>
-              <el-input
-                :autosize="{ minRows: 4, maxRows: 7}"
-                v-model="eventDes"
-                :placeholder="$t('remotePatrol.descPlaceholder')"
-                size="mini"
-                class="des-input"
-                type="textarea"
-                resize="none"
-                @input="eventDesChanged"
-                @blur="notShowInputRuleTips('eventDes')"/>
-              <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+              <div v-for="(_item,_index) in feedbackSourceList" :key="_index" class="source-details">
+                <div class="flex-center">
+                  <img
+                    :src="deleteInspectIcon"
+                    alt="delete"
+                    @click="deleteFeedbackItemResource(_index)"
+                  />
+                  <div
+                    class="paper flex-center margin-bottom-sm"
+                    style="padding: 5px; flex: 1; margin-left: 20px"
+                  >
+                    <div style="flex: 1; text-align: left; margin: 5px">
+                      {{ _item.src }}
+                    </div>
+                    <hr class="hr-vertical" />
+                    <img
+                      :src="editInspectIcon"
+                      alt="edit"
+                      style="margin: 5px"
+                      @click="editItemFeedbackResource(_index)"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div style="position: relative">
+                <el-input
+                  :autosize="{ minRows: 2, maxRows: 7}"
+                  v-model="feedbackInput"
+                  :placeholder="$t('remotePatrol.descPlaceholder')"
+                  size="mini"
+                  class="des-input"
+                  type="textarea"
+                  resize="none"
+                  @input="eventDesChanged"
+                  @blur="notShowInputRuleTips('eventDes')"/>
+                <span v-if="eventDesRuletip" class="rules">{{ $t('remotePatrol.comentRuletip') }}</span>
+                <button
+                  class="inspect-btn"
+                  @click="submitFeedbackItemResource()"
+                >
+                  {{$t('remotePatrol.confirm')}}
+                </button>
+              </div>
             </div>
           </div>
           <div slot="footer">
@@ -488,40 +552,55 @@
                 <img :src="arrows2Src" alt="arrow2" style="position: absolute; bottom: 90px; right: 100px" height="70">
                 <img :src="plusSrc" alt="plusSrc" style="position: absolute; bottom: 20px; right: 20px" @click="addFeedBack">
               </div>
-              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content paper" style="margin: 20px">
-                <div class="feedbacks-content padding">
-                  <div v-for="(item,index) in eventList" :key="index" class="flex-center" :class="{'margin-bottom-sm': index !== eventList.length}">
-                    <img
-                      :src="crossicon"
-                      alt="delete"
-                      @click="deleteEvent(item,index)"
-                    />
-                    <div
-                      class="paper flex-center"
-                      style="padding: 5px; flex: 1; margin-left: 20px"
-                    >
-                      <div @click="editFeedback(item, index)" class="title-description spacer" style="text-align: left">
-                        <span class="feedback-eventname">{{ `${index+1}. ${item.eventName}` }}</span>
-                        <span class="feedback-eventdes">{{ item.eventDes }}</span>
-                      </div>
-                      <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                        <el-image
-                          :src="item.sourceObj.src"
-                          :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
-                          :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
-                      </div>
-                      <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
-                        <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
-                        <img :src="videoImgSrc" class="imgLittle" height="100">
-                      </div>
-                      <hr class="hr-vertical" />
+              <div v-if="!showFeedBackInfo&&showFeedBack" class="item-content paper padding-sm" style="margin: 20px">
+                <div class="feedbacks-content padding-sm">
+                  <div v-for="(item,index) in eventList" :key="index" :class="{'margin-bottom-sm': index !== eventList.length}">
+                    <div class="flex-center margin-bottom-sm">
+                      {{ `${index+1}. ${item.eventName}` }}
+                      <div class="spacer"></div>
+                      <button
+                        class="feedback-delete-btn"
+                        @click="deleteEvent(item,index)"
+                      >
+                        {{$t('remotePatrol.delete')}}
+                      </button>
+                    </div>
+                    
+                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
+                      <el-image
+                        :src="item.sourceObj.src"
+                        :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                        :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
+                    </div>
+                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
+                      <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
+                      <img :src="videoImgSrc" class="imgLittle" height="100">
+                    </div>
+                    <div class="flex-center"
+                      v-for="(source, idx) in item.sourceList"
+                      :key="idx">
                       <img
-                        :src="penicon"
-                        alt="edit"
-                        style="margin: 5px"
+                        :src="deleteInspectIcon"
+                        alt="delete"
                         @click="editFeedback(item, index)"
                       />
+                      <div
+                        class="paper flex-center margin-bottom-sm"
+                        style="padding: 5px; flex: 1; margin-left: 20px"
+                      >
+                        <div style="flex: 1; text-align: left; margin: 5px">
+                          {{source.src}}
+                        </div>
+                        <hr class="hr-vertical" />
+                        <img
+                          :src="editInspectIcon"
+                          alt="edit"
+                          style="margin: 5px"
+                        @click="editFeedback(item, index)"
+                        />
+                      </div>
                     </div>
+                    <hr v-if="index !== eventList.length" class="hr-horizontal">
                   </div>
                 </div>
                 <img :src="plusSrc" alt="plusSrc" class="plus-icon" @click="addFeedBack" style="float: right; margin-top: 20px">
@@ -834,7 +913,10 @@ export default {
       itemOptionsForType1: [],
       itemOptionsForType3: [],
       allRemarkItemsFlag: false,
-      curEditIndex: -1
+      curEditIndex: -1,
+      feedbackInput: '',
+      curEditFeedbackIndex: -1,
+      feedbackSourceList: []
     };
   },
   computed: {
@@ -1115,6 +1197,7 @@ export default {
       this.eventName = '';
       this.eventDes = '';
       this.showEventNameInfo = false;
+      this.feedbackSourceList = [];
     },
 
     confirmAddFeedBack2() {
@@ -1138,12 +1221,14 @@ export default {
         const obj = {
           eventName: this.eventName,
           eventDes: this.eventDes,
-          sourceObj: srcObj
+          sourceObj: srcObj,
+          sourceList: this.feedbackSourceList
         };
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
-        this.eventList[this.feedbackIndex].eventDes = this.eventDes;
+        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
+        // this.eventList[this.feedbackIndex].eventDes = this.eventDes;
       }
       this.showFeedDialog2 = false;
       this.showFeedBackInfo = false;
@@ -1154,7 +1239,8 @@ export default {
         const obj = {
           eventName: this.eventName,
           eventDes: this.eventDes,
-          sourceObj: null
+          sourceObj: null,
+          sourceList: this.feedbackSourceList
         };
         if (this.eventName.trim().length == 0) {
           this.showEventNameInfo = true;
@@ -1163,7 +1249,7 @@ export default {
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
-        this.eventList[this.feedbackIndex].eventDes = this.eventDes;
+        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
       }
       this.showAddTextFeedbackDialog = false;
       this.showFeedBackInfo = false;
@@ -2861,7 +2947,8 @@ export default {
       const picObj = {
         eventName: obj.eventName,
         eventDes: obj.eventDes,
-        sourceObj: srcObj
+        sourceObj: srcObj,
+        sourceList: obj.sourceList
       };
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
@@ -2886,7 +2973,6 @@ export default {
         })
       }
       item.inspectInput = ''
-
     },
     deleteItemResource({ item, index }) {
       const self = this
@@ -2895,6 +2981,36 @@ export default {
     editItemResource ({ item, index }) {
       this.curEditIndex = index
       item.inspectInput = item.sourceList[index].src
+    },
+    deleteFeedbackItemResource(index) {
+      this.feedbackSourceList = this.feedbackSourceList.filter((source, idx) => idx !== index)
+    },
+    editItemFeedbackResource(index) {
+      console.log(index)
+      this.curEditFeedbackIndex = index
+      console.log(index)
+      this.feedbackInput = this.feedbackSourceList[index].src
+      console.log(index)
+    },
+    submitFeedbackItemResource () {
+      const self = this;
+      if (this.feedbackInput.trim().length === 0) return
+      if (this.curEditFeedbackIndex > -1) {
+        this.feedbackSourceList = this.feedbackSourceList.map((source, idx) => {
+          if (idx === self.curEditFeedbackIndex) return {
+            ...source,
+            src: self.feedbackInput,
+          }
+          else return { ...source }
+        })
+        this.curEditFeedbackIndex = -1
+      } else {
+        this.feedbackSourceList.push({
+          mediaType: 3,
+          src: this.feedbackInput,
+        })
+      }
+      this.feedbackInput = ''
     },
     itemDescriptionChanged({ val, item }) {
       const content = filterString.all(val, 200);
@@ -2931,7 +3047,6 @@ export default {
           item.inputCount = 0;
         }
       }
-
     },
     eventNameChanged(val) {
       const self = this;
@@ -2972,6 +3087,7 @@ export default {
       !feedbackObj.sourceObj ? this.showAddTextFeedbackDialog = true : this.showFeedDialog2 = true;
       this.eventName = feedbackObj.eventName;
       this.eventDes = feedbackObj.eventDes;
+      this.feedbackSourceList = feedbackObj.sourceList;
       this.showEventNameInfo = false;
     }
   }
@@ -4423,11 +4539,21 @@ export default {
     right: calc(6/1920*100vw);
     bottom: calc(6/1920*100vw);
   }
+  .feedback-delete-btn {
+    color: #c60957;
+    background-color: #fff;
+    border: 1px solid #c60957;
+    padding: calc(2/1920*100vw) calc(6/1920*100vw);
+    border-radius: 3px;
+  }
   .cancel-text {
     display: inline;
     font-size: calc(12/1920*100vw);
     color: #556679;
     cursor: pointer;
+  }
+  .img-content {
+    text-align: left;
   }
 </style>
 <style>
