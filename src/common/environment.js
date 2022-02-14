@@ -1,47 +1,15 @@
 const version = 'v1.0';
 
-const _Environments = {
-  Debug_XA: {
-    CHINA_WEBSITE: 'http://172.21.81.63:8080/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://172.21.81.63:8081/storemonitor/api/',
-    VERSION: version
-  },
-  Preview: {
-    CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'https://preview-inspect.storevue.com/storemonitor/api/',
-    VERSION: version,
-    clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
-  },
-  Stable: {
-    CHINA_WEBSITE: 'http://mgmt.storevue.com.cn:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'https://mgmt.storevue.com/storemonitor/api/',
-    VERSION: version,
-    clientId: 'abf2c7e17648cc11f1562e2ea26e2d61743cae99c3df395ba68b817f37c99a03'
-  },
-  QA: {
-    // CHINA_WEBSITE: 'http://axa.wise-insightapm.com:19085/storemonitor/api/',
-    CHINA_WEBSITE: 'http://172.21.81.176:9050/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://172.21.81.176:9050/storemonitor/api/',
-    VERSION: version
-  },
-  Beta: {
-    CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'https://rc-inspection.storevue.com/storemonitor/api/',
-    VERSION: version
-  },
-  RC: {
-    CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
-    GLOBAL_WEBSITE: 'https://rc-inspect.advantech-ics.com/storemonitor/api/',
-    VERSION: version
-  }
-};
+const _Environments = require("@/common/environment.json");
 
-const environJSON = _Environments.Debug_XA;
+const runtimeEnvironment = process.env.Runtime_Environment|| Object.keys(_Environments)[0];
+
+const environJSON = _Environments[runtimeEnvironment];
 const isGlobalWebsite = process.env.NODE_ENV === "production";
 
 let Environment;
 export default Environment = {
-  VERSION: environJSON.VERSION,
+  VERSION: environJSON.VERSION || version,
   isGlobalWebsite: isGlobalWebsite,
   BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE
 };
