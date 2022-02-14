@@ -725,7 +725,7 @@ export default {
   // Device Management page language
   "deviceView": {
     "EzvizAccount": "串流服務帳號",
-    "NvrnameRuletip": "最多可輸入30個字元",
+    "NvrnameRuletip": "最多可輸入50個字元",
     "accessKey": "訪問密鑰",
     "accountExist": "該帳號已存在",
     "accountName": "用戶名",

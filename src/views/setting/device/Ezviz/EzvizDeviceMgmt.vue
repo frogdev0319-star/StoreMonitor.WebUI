@@ -1424,10 +1424,10 @@ export default {
 
     serialNumberChange(val) {
       const self = this;
-      const comment = filterString.all(val, 30);
+      const comment = filterString.all(val, 50);
       self.addDeviceData.serialNumber = comment;
       const length = filterString.getContentLength(val);
-      if (length > 30) {
+      if (length > 50) {
         this.serialRuletip = true;
       } else {
         this.serialRuletip = false;

@@ -717,7 +717,7 @@ export default {
   // Device Management page language
   "deviceView": {
     "EzvizAccount": "Streaming Service Account",
-    "NvrnameRuletip": "Enter up to 30 characters",
+    "NvrnameRuletip": "Enter up to 50 characters",
     "accessKey": "Access Key",
     "accountExist": "Account is already Existed!",
     "accountName": "User Name",

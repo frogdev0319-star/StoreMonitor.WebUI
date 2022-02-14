@@ -190,6 +190,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
+      :is-warning="true"
       @cancelHandler="showAddNape = false"
       @confirmHandler="confirmUpdateNape">
       <div class="dialog-content padding">
@@ -283,6 +284,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
+      :is-warning="true"
       :visible="showDeleteItem"
       @visibleChangeHandler="updateDeleteItemDialogFlag"
       @cancelHandler="hideDeleteItemDialog"
@@ -299,6 +301,7 @@
       :close-on-click-modal="false"
       :visible="showDeleteGroup"
       :show-close="false"
+      :is-warning="true"
       @visibleChangeHandler="updateDeleteGroupDialogFlag"
       @cancelHandler="hideDeleteGroupDialog"
       @confirmHandler="confirmDeleteGroup"
@@ -315,6 +318,7 @@
       :close-on-click-modal="false"
       :visible="showAddGroup"
       :show-close="false"
+      :is-warning="true"
       @visibleChangeHandler="hideAddGroupDialog"
       @cancelHandler="hideAddGroupDialog"
       @confirmHandler="confirmHandleCategory">
@@ -2420,10 +2424,11 @@ export default {
   .score-content{
     background-color: #edf0f2;
     padding: 20px calc(20/1920*100vw);
-    border: 1px solid #acaeb1;
+    /*border: 1px solid #acaeb1;*/
     height: auto;
     position: relative;
     margin-bottom: 20px;
+    border-radius: 5px;
   }
   .el-radio{
     margin-right: calc(20/1920*100vw);

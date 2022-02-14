@@ -713,7 +713,7 @@ export default {
   // Device Management page language
   "deviceView": {
     "EzvizAccount": "アカウント",
-    "NvrnameRuletip": "最大30文字まで入力できます",
+    "NvrnameRuletip": "最大50文字まで入力できます",
     "accessKey": "アクセスキー",
     "accountExist": "アカウントはすでに存在します",
     "accountName": "ユーザーネーム",

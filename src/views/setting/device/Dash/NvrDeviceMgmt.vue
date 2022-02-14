@@ -1710,14 +1710,14 @@ export default {
 
     nvrNameChange(val, item) {
       const self = this;
-      const comment = filterString.all(val, 30);
+      const comment = filterString.all(val, 50);
       if (Object.keys(item).length === 0) {
         self.addNvrData.name = comment;
       } else {
         item.tempDeviceName = comment;
       }
       const length = filterString.getContentLength(val);
-      if (length > 30) {
+      if (length > 50) {
         this.NvrnameRuletip = true;
       } else {
         this.NvrnameRuletip = false;
