@@ -60,18 +60,19 @@
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group">
             <div class="role-all-checkbox" style="text-align: left">
-              <el-checkbox class="storevue-checkbox-filled" v-model="item.checked" :disabled="item.disabled" @change="(val)=>checkAllChildrenRole(index, val)"/>
+              <el-checkbox  class="storevue-checkbox-filled" v-model="item.checked" :disabled="item.disabled" @change="(val)=>checkAllChildrenRole(index, val)"/>
               <span class="group-name">{{ item.roleName }}</span>
             </div>
             <div class="role-content">
               <div
                 v-for="(_item,_index) in item.children"
+                v-show="_item.visabled"
                 :class="lang.indexOf('zh') === -1 ? 'en-role-detail': 'role-detail'"
                 :key="_index">
                 <el-checkbox
                   class="storevue-checkbox-outlined"
+                  v-show="_item.visabled"
                   v-model="_item.checked"
-                  :disabled="_item.disabled"
                   @change="(val)=>checkParentRole(index, val)"/>
                 <span class="role-name">{{ _item.roleName }}</span>
               </div>
@@ -141,12 +142,14 @@ export default {
             {
               roleName: this.$t('route.patrolOverview'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.eventOverview'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             }
           ]
         },
@@ -158,32 +161,38 @@ export default {
             {
               roleName: this.$t('route.remotePatrol'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('overview.onsitePatrol'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.reports'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.patrolPlan'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.storeMonitor'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.transactionMonitor'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:false
             }
           ]
         },
@@ -195,22 +204,26 @@ export default {
             {
               roleName: this.$t('eventView.handling'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('eventView.closing'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('eventView.adding'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('eventView.returnStatus'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             }
           ]
         },
@@ -222,22 +235,38 @@ export default {
             {
               roleName: this.$t('route.patrolAppraisalStat'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.patrolItemsStat'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.eventStat'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
-              roleName: this.$t('route.supervisorStat'),
+              roleName: this.$t('route.patrolPersonStat'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: this.$t('route.singleStoreStat'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: this.$t('route.appraisalCompareStat'),
+              checked: false,
+              disabled: false,
+              visabled:true
             }
             // {
             //   roleName: this.$t('route.checkInStatistics'),
@@ -254,27 +283,32 @@ export default {
             {
               roleName: this.$t('route.deviceManage'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.inspectListSetting'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             },
             {
               roleName: this.$t('route.storeManage'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:false
             },
             {
               roleName: this.$t('route.scheduleManage'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:false
             },
             {
               roleName: this.$t('route.insepctionReportSetting'),
               checked: false,
-              disabled: false
+              disabled: false,
+              visabled:true
             }
           ]
         }
@@ -343,6 +377,7 @@ export default {
         });
       }).then(res => {
         self.authorityInfoLists = res.data;
+        console.log("self.authorityInfoLists:",self.authorityInfoLists);
         this.infoForm.authorities.length > 0 ? self.getAvailableAuthority(this.infoForm.authorities) : this.getRequiredAuthority();
       }).catch(err => {
         console.log('TitleSetting-getAuthorityInfoList: ' + err);
@@ -371,6 +406,8 @@ export default {
       this.roleNameList[3].children[2].checked = !!PermissionHelper.enableEventStatistics();
       this.roleNameList[3].children[3].checked = !!PermissionHelper.enableSupervisionEffStatistics();
       // this.roleNameList[3].children[4].checked = !!PermissionHelper.enableCheckinStatistics();
+      this.roleNameList[3].children[4].checked = !!PermissionHelper.enableSingleStoreStatStatistics();
+      this.roleNameList[3].children[5].checked = !!PermissionHelper.enableAppraisalCompareStatistics();
 
       this.roleNameList[4].children[0].checked = !!PermissionHelper.enableDeviceSetting();
       this.roleNameList[4].children[1].checked = !!PermissionHelper.enablePatrolSetting();

@@ -85,6 +85,8 @@ export default {
     "patrolItemStat": "巡检项统计",
     "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
+    "singleStoreStat":"单店分析",
+    "appraisalCompareStat":"考评同比分析"
   },
 
   "overview": {

@@ -83,6 +83,8 @@ export default {
     "onsitePatrol": "Onsite Inspection",
     "patrolPersonStat": "Inspection Person Statistics",
     "patrolCompareStat": "Inspection Compare Statistics",
+    "singleStoreStat":"Single store Statistics",
+    "appraisalCompareStat":"Inspection Evaluation Compare Statistics"
   },
 
   "overview": {
