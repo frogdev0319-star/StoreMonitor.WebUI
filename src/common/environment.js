@@ -37,7 +37,7 @@ const _Environments = {
 };
 
 const environJSON = _Environments.Debug_XA;
-const isGlobalWebsite = false;
+const isGlobalWebsite = process.env.NODE_ENV === "production";
 
 let Environment;
 export default Environment = {

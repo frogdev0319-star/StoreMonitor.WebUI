@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import Environment from '@/common/environment';
 import LoginForm from '@/views/login/LoginForm';
 import AuthRedirect from '@/views/login/AuthRedirect';
 import Home from '@/views/home/Home';
@@ -16,16 +17,19 @@ const originalPush = Router.prototype.push;
 Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err);
 }
-export const constantRoutes = [
-  // {
-  //   path: '/login',
-  //   name: 'Login',
-  //   hidden: true,
-  //   component: LoginForm,
-  //   meta: {
-  //     requireAuth: false
-  //   }
-  // },
+export const constantRoutes = [];
+if (!Environment.isGlobalWebsite) {
+  constantRoutes.push({
+    path: '/login',
+    name: 'Login',
+    hidden: true,
+    component: LoginForm,
+    meta: {
+      requireAuth: false
+    }
+  });
+}
+constantRoutes.push(...[
   {
     path: '/:token/:userId/:ezvizAppKey/:ezvizProtocol/:lang/:deviceAuth',
     redirect: '/',
@@ -37,7 +41,7 @@ export const constantRoutes = [
     hidden: true,
     component: AuthRedirect
   }
-];
+]);
 
 const createRouter = () => new Router({
   mode: 'history', // require service support
