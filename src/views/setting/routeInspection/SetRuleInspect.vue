@@ -92,6 +92,9 @@
               <span v-if="ScoreMsg" class="score_msg">
                 *{{ $t('insSettingView.rangeScoreTips') }}
               </span>
+              <span v-if="MinScoreMsg" class="score_msg">
+                *{{ $t('insSettingView.minScoreEmpty') }}
+              </span>
             </template>
             <template>
               <span class="rangeScore">
@@ -274,7 +277,8 @@ export default {
       passFailBtnAttr: '',
       itemOptionsForType3: {},
       otherBtnAttr: '',
-      standardScore: 100
+      standardScore: 100,
+      MinScoreMsg:false
     };
   },
   watch: {
@@ -304,7 +308,8 @@ export default {
         util.notify(this.$t('insSettingView.enterBtnAttr'), 'warning', 3000);
         return false;
       }
-      if (!self.ScoreMsg) {
+      self.MinScoreMsg = (self.hundredMarkType==1 && self.minScore.toString()=="");
+      if (!self.ScoreMsg && !self.MinScoreMsg) {
         const params = {
           inspectTagId: self.inspectId,
           ruleItems: [
@@ -442,6 +447,7 @@ export default {
       const self = this;
       self.minScore = self.getUtilScore(e.target.value);
       self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
+      self.MinScoreMsg = (self.hundredMarkType==1 && self.minScore.toString()=="");
     },
 
     getUtilScore(val) {

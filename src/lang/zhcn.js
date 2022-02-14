@@ -722,7 +722,8 @@ export default {
     "updateCategory": "编辑巡检类别",
     "userDefined": "自定义",
     "waveline": "按钮～",
-    "yesNo": "是/否"
+    "yesNo": "是/否",
+    "minScoreEmpty":"考评总分最低值不得为空！"
   },
 
   // Device Management page language
