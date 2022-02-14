@@ -186,6 +186,23 @@ $sv_red: #c60957;
   }
   
 }
+.storevue-select-grey {
+  .el-input__inner {
+    border-color: #edf0f2 !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    min-height: 36px !important;
+    background-color: #edf0f2
+  }
+  .is-focus {
+    .el-input__inner {
+      border-color: #edf0f2 !important;
+    }
+  }
+  .el-input__suffix {
+    // top: 
+  }
+}
 .storevue-select {
   .el-input__inner {
     border-color: #c9cdd5 !important;

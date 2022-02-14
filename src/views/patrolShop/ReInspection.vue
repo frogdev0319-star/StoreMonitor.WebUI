@@ -347,8 +347,8 @@
           <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
             {{ $t('remotePatrol.selectInspect') }}
             <el-select 
-              style="margin-left: 20px"
-              class="storevue-select" 
+              style="margin-left: 20px;"
+              class="storevue-select-grey" 
               v-model="patrolstore" 
               :placeholder="$t('remotePatrol.selectInspect')"
               @change="changeInspect">
