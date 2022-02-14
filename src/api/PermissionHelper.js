@@ -100,10 +100,15 @@ export default class PermissionHelper {
     return this.enableAuthorities(3, 0x0, 0x8);
   }
 
-  static enableCheckinStatistics() {
+  /*static enableCheckinStatistics() {
+    return this.enableAuthorities(3, 0x0, 0x10);
+  }*/
+  static enableSingleStoreStatStatistics() {
     return this.enableAuthorities(3, 0x0, 0x10);
   }
-
+  static enableAppraisalCompareStatistics() {
+    return this.enableAuthorities(3, 0x0, 0x20);
+  }
   static enableStatistics() {
     return this.enableAuthorities(3, 0x8, 0x0);
   }

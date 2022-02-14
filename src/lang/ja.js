@@ -85,6 +85,8 @@ export default {
     "patrolItemStat": "巡检项统计",
     "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
+    "singleStoreStat":"单店分析",
+    "appraisalCompareStat":"考评同比分析"
   },
 
   "overview": {
@@ -713,7 +715,7 @@ export default {
   // Device Management page language
   "deviceView": {
     "EzvizAccount": "アカウント",
-    "NvrnameRuletip": "最大30文字まで入力できます",
+    "NvrnameRuletip": "最大50文字まで入力できます",
     "accessKey": "アクセスキー",
     "accountExist": "アカウントはすでに存在します",
     "accountName": "ユーザーネーム",

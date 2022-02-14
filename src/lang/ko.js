@@ -86,6 +86,8 @@ export default {
     "patrolItemStat": "巡检项统计",
     "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
+    "singleStoreStat":"单店分析",
+    "appraisalCompareStat":"考评同比分析"
   },
 
   "overview": {
@@ -714,7 +716,7 @@ export default {
   // Device Management page language
   "deviceView": {
     "EzvizAccount": "장부",
-    "NvrnameRuletip": "최대 30자까지 입력할 수 있습니다.",
+    "NvrnameRuletip": "최대 50자까지 입력할 수 있습니다.",
     "accessKey": "방문 비밀 키",
     "accountExist": " 장부가 이미 존재하였다!",
     "accountName": "상용자 이름",

@@ -86,6 +86,8 @@ export default {
     "patrolItemStat": "巡检项统计",
     "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
+    "singleStoreStat":"单店分析",
+    "appraisalCompareStat":"考评同比分析"
   },
 
   "overview": {
@@ -722,13 +724,14 @@ export default {
     "updateCategory": "编辑巡检类别",
     "userDefined": "自定义",
     "waveline": "按钮～",
-    "yesNo": "是/否"
+    "yesNo": "是/否",
+    "minScoreEmpty":"考评总分最低值不得为空！"
   },
 
   // Device Management page language
   "deviceView": {
     "EzvizAccount": "串流服务账号",
-    "NvrnameRuletip": "最多可输入30个字符",
+    "NvrnameRuletip": "最多可输入50个字符",
     "accessKey": "访问密钥",
     "accountExist": "该账号已存在",
     "accountName": "用户名",

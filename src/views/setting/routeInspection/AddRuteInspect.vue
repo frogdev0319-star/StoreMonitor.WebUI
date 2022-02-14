@@ -190,6 +190,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
+      :is-warning="true"
       @cancelHandler="showAddNape = false"
       @confirmHandler="confirmUpdateNape">
       <div class="dialog-content padding">
@@ -283,6 +284,7 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
+      :is-warning="true"
       :visible="showDeleteItem"
       @visibleChangeHandler="updateDeleteItemDialogFlag"
       @cancelHandler="hideDeleteItemDialog"
@@ -299,6 +301,7 @@
       :close-on-click-modal="false"
       :visible="showDeleteGroup"
       :show-close="false"
+      :is-warning="true"
       @visibleChangeHandler="updateDeleteGroupDialogFlag"
       @cancelHandler="hideDeleteGroupDialog"
       @confirmHandler="confirmDeleteGroup"
@@ -315,6 +318,7 @@
       :close-on-click-modal="false"
       :visible="showAddGroup"
       :show-close="false"
+      :is-warning="true"
       @visibleChangeHandler="hideAddGroupDialog"
       @cancelHandler="hideAddGroupDialog"
       @confirmHandler="confirmHandleCategory">
@@ -392,8 +396,8 @@ export default {
       ItemDescription:'',
       PFScoreTip:false,
       enterItemNameTip:false,
+      enterScoreTip:false,
       ItemMinScoreTip:false,
-      OtherScoreTip:false,
       OtherScoreTipEmpty:false,
       ItemTotalScoreTip0:false,
       ItemTotalScoreTip1:false,
@@ -1108,7 +1112,7 @@ export default {
       self.showAddNape = true;
       self.updateType = {type:0};
       self.setDialogContent();
-      self.ItemSheetScore = self.activeSheetName === '0' ? 10 : 0;
+      self.ItemSheetScore = self.activeSheetName === '0' ? '' : 0;
     },
 
     deleteNape(item) {
@@ -1210,7 +1214,8 @@ export default {
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
-          self.ItemSheetScore = itemScore = 10;
+          //self.ItemSheetScore = itemScore = 10;
+          self.OtherScoreTipEmpty = true;
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
@@ -2419,10 +2424,11 @@ export default {
   .score-content{
     background-color: #edf0f2;
     padding: 20px calc(20/1920*100vw);
-    border: 1px solid #acaeb1;
+    /*border: 1px solid #acaeb1;*/
     height: auto;
     position: relative;
     margin-bottom: 20px;
+    border-radius: 5px;
   }
   .el-radio{
     margin-right: calc(20/1920*100vw);

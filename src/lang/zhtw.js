@@ -83,6 +83,8 @@ export default {
     "userAccountDeviceSetting": "企業賬號設備配置",
     "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
+    "singleStoreStat":"單店分析",
+    "appraisalCompareStat":"考評同比分析"
   },
 
   "overview": {
@@ -725,7 +727,7 @@ export default {
   // Device Management page language
   "deviceView": {
     "EzvizAccount": "串流服務帳號",
-    "NvrnameRuletip": "最多可輸入30個字元",
+    "NvrnameRuletip": "最多可輸入0個字元",
     "accessKey": "訪問密鑰",
     "accountExist": "該帳號已存在",
     "accountName": "用戶名",
