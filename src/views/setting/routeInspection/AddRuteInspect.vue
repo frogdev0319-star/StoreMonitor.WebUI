@@ -392,8 +392,8 @@ export default {
       ItemDescription:'',
       PFScoreTip:false,
       enterItemNameTip:false,
+      enterScoreTip:false,
       ItemMinScoreTip:false,
-      OtherScoreTip:false,
       OtherScoreTipEmpty:false,
       ItemTotalScoreTip0:false,
       ItemTotalScoreTip1:false,
@@ -1108,7 +1108,7 @@ export default {
       self.showAddNape = true;
       self.updateType = {type:0};
       self.setDialogContent();
-      self.ItemSheetScore = self.activeSheetName === '0' ? 10 : 0;
+      self.ItemSheetScore = self.activeSheetName === '0' ? '' : 0;
     },
 
     deleteNape(item) {
@@ -1210,7 +1210,8 @@ export default {
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
-          self.ItemSheetScore = itemScore = 10;
+          //self.ItemSheetScore = itemScore = 10;
+          self.OtherScoreTipEmpty = true;
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
