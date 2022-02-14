@@ -381,7 +381,7 @@ export default {
     "name": "问题名称",
     "noDevice": "无效的设备，请联系管理员",
     "noHistoryVideo": "回放时间段无录像",
-    "noItems": "暂无巡检项",
+    "noItems": "暂无数据",
     "noVideoSource": "设备无视频源",
     "notBindCamera": "当前门店的巡检项未绑定设备！",
     "notCombined": "该门店暂未绑定巡检项！",
