@@ -413,6 +413,11 @@ export default {
     console.log("in beforeDestroy");
     console.log('searchFrom:',this.searchParams['searchFrom']);
     if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+        //console.log("in beforeDestroy");
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+        this.ifSaveParams && this.saveSearchParams(true);
+    }else if(this.searchParams['searchFrom']=='EventStatistics'){
         console.log("in beforeDestroy");
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
@@ -423,11 +428,16 @@ export default {
       console.log('deactivated');
       console.log('searchFrom:',this.searchParams['searchFrom']);
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
-          console.log("in deactivated");
+          //console.log("in deactivated");
           delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
           this.searchParams['searchFrom'] = '';
           this.ifSaveParams && this.saveSearchParams(true);
-      }
+      }else if(this.searchParams['searchFrom']=='EventStatistics'){
+        //console.log("in beforeDestroy");
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+        this.ifSaveParams && this.saveSearchParams(true);
+    }
   },
   methods: {
     cellStyle({ row, column, rowIndex, columnIndex }) {
@@ -489,7 +499,10 @@ export default {
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
-      }
+      }else if(this.searchParams['searchFrom']=='EventStatistics'){
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+    }
       this.getEventListAndCount();
     },
 
@@ -657,7 +670,7 @@ export default {
           }
         }
       } else {
-        if(this.searchParams.curState.length>0){
+        if(typeof this.searchParams.curState!="undefined" &&  this.searchParams.curState.length>0){
           status = this.searchParams.curState;
         }else{
           status = [];
@@ -673,7 +686,7 @@ export default {
         page = this.params.filter.page;
       }
       let start = '', end = '';
-      if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+      if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics"){
          //storeId = this.searchParams.clause.storeId;
          start = this.searchParams.beginTs;
          end = this.searchParams.endTs;
@@ -703,8 +716,11 @@ export default {
       }
       
       //console.log("this.searchParams:",this.searchParams);
-      if(typeof this.searchParams.searchParams.clause !="undefined"){
+      if(typeof this.searchParams.searchParams.clause !="undefined" && this.searchParams['searchFrom']=='PatrolPersonStat'){
         this.params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+      }
+      if(typeof this.searchParams.searchParams.clause !="undefined" && this.searchParams['searchFrom']=='EventStatistics'){
+        this.params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
       }
       //console.log("this.params:",this.params);
       const curTabSortColumn = this.sortColumnOfTab[tabIndex];
@@ -771,7 +787,7 @@ export default {
       let endTime = this.$moment(self.dateValue[1]).valueOf();
       let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
       end = end - end % 1000 + 999;
-      if(self.searchParams['searchFrom']=='PatrolPersonStat'){
+      if(self.searchParams['searchFrom']=='PatrolPersonStat'|| this.searchParams['searchFrom']=="EventStatistics"){
          //storeId = this.searchParams.clause.storeId;
          start = self.searchParams.beginTs;
          end = self.searchParams.endTs;
@@ -1005,12 +1021,19 @@ export default {
             this.params.beginTs = searchParams.beginTs;
             this.params.endTs = searchParams.endTs;
             this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
-            console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
+            //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
             //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+          }else if(searchParams['searchFrom']=="EventStatistics"){
+            this.params.beginTs = searchParams.beginTs;
+            this.params.endTs = searchParams.endTs;
+            this.storeFilterObj.curStore=searchParams.curStore;
+            this.storeFilterObj.storeIds=searchParams.curStore;
+            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
+            //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
           }else{
             this.storeFilterObj.filterStoreIds = searchParams.curStore;
             this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-            console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
+            //console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
             this.params.beginTs = this.dateValue[0].valueOf();
             this.params.endTs = this.dateValue[1].valueOf();
           }
