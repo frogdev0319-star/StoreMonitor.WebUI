@@ -1508,12 +1508,12 @@ $collapseWidth: 5.5%;
   flex-shrink: 0;
   border-width: 0;
   border-style: solid;
-  border-color: #acaeb1;
+  border-color: #bebebe;
   border-bottom-width: thin;
 }
 .child-space {
   &:not(:first-child) {
-    margin-left: 20px;
+    margin-left: calc(20/1920*100vw);
   }
 }
 /*.el-dialog__headerbtn {

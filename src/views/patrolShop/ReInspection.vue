@@ -7,13 +7,13 @@
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
       <div :class="{liseAnmiClass:showSpread}" class="lside paper spacer">
         <div class="el-header-title flex-center">
-          <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
-          <span v-if="showStoreUp" class="lside-title">
+          <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="cursor: pointer">
+          <span v-if="showStoreUp" class="lside-title store-title">
             {{ store.storeTitle }}
           </span>
           <div style="flex: 1"></div>
           <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
-            <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon"  style="margin-right: 10px">
+            <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon">
             {{isFullScreenMode? $t('remotePatrol.defaulteMode'):$t('remotePatrol.fullScreenMode')}}
           </div>
         </div>
@@ -296,7 +296,7 @@
         </div>
         <div class="channelbar-content" style="flex: 1">
           <div class="channel-content" style="height: 100%; display: flex; flex-direction: column;">
-            <div class="flex-center padding" style="justify-content: space-between;">
+            <div class="flex-center padding title" style="justify-content: space-between">
               {{ $t('remotePatrol.zoneList') }}
               <el-input
                 :placeholder="$t('remotePatrol.channelPlaceholder')"
@@ -315,6 +315,7 @@
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div> -->
               <div class="btn-content padding"
+                style="padding-top: 0px"
                 :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
               >
                 <div 
@@ -342,12 +343,12 @@
         </div>
       </div>
       <div :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" v-if="!showSpread" class="rside paper spacer ">
-        <div class="patrol-select" :class="{'padding': !isFullScreenMode}">
+        <div class="patrol-select title" :class="{'padding': !isFullScreenMode}">
           <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
             {{ $t('remotePatrol.selectInspect') }}
             <el-select 
-              style="margin-left: 20px"
-              class="storevue-select" 
+              style="margin-left: 20px;"
+              class="storevue-select-grey" 
               v-model="patrolstore" 
               :placeholder="$t('remotePatrol.selectInspect')"
               @change="changeInspect">
@@ -426,20 +427,20 @@
                 v-for="(item_) in inspectList"
                 :key="item_.id"
                 class="inspect-details paper margin-bottom-sm">
-                <div class="flex padding-sm">
-                  <div class="spacer" style="text-align: left; border-left: 4px solid #2c90d9; padding-left: 8px;">{{ item_.groupName }}</div>
+                <div class="flex padding-sm title">
+                  <div class="spacer font-13" style="text-align: left; border-left: 4px solid #2c90d9; padding-left: 8px;">{{ item_.groupName }}</div>
                   <div>{{ item_.dealCount+'/'+item_.count }}</div>
                 </div>
                 <hr class="hr-horizontal">
                 <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue) > -1)" :key="index" class="item-details padding-sm">
                   <div class="flex fullWidth">
-                    <div style="width: calc(20/1920*100vw); text-align: left" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
+                    <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
                     <div class="flex padding-bottom-sm spacer" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
                       <div
                         :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                        :style="item.checked?{'color':'#006ab7'}:{}"
-                        class="spacer titles"
-                        style="text-align: left"
+                        :style="item.checked?{'color':'#006ab7'}:{'color': '#484848'}"
+                        class="spacer font-15"
+                        style="text-align: left; font-weight: 500"
                         @click="clickItem({item,index})">
                         {{ item.subject }}
                       </div>
@@ -625,7 +626,7 @@
               :class="!item.manualIgnore?'noraml-title':'ignore-title'"
               :style="item.checked?{'font-weight':'bold'}:{}"
               :title="`${index+1}. ${item.subject}`"
-              class="titles"
+              class="title"
               @click="clickItem({ item, index })">{{ `${index+1}. ${item.subject}` }}</span>
             <div v-if="item.disabled" class="dropdown-model"/>
             <template v-if="item.itemType === 0">
@@ -686,7 +687,8 @@
         </div>
         <div v-if="sheetName.length==0" class="spacer flex-center" style="align-items: center; justify-content: center">
           <div class="inspect-empty">
-            <span>{{ $t('remotePatrol.noItems') }}</span>
+            <img :src="noItemIcon" class="no-item">
+            <div class="font-15" style="color: #69727c; margin-top: calc(10/1920*100vw)">{{ $t('remotePatrol.noItems') }}</div>
           </div>
         </div>
       </div>
@@ -756,6 +758,7 @@ export default {
       starGreyIcon: require('../../../static/img/star-grey.png'),
       defaultModeIcon: require('../../../static/img/default-mode.png'),
       fullScreenModeIcon: require('../../../static/img/full-screen.png'),
+      noItemIcon: require('../../../static/img/no-item.png'),
       showModelContent: false,
       showInfoContent: true,
       activeIndex: '0',
@@ -3419,6 +3422,10 @@ export default {
         border-bottom: 1px solid $border;
         padding-left: calc(25/1920*100vw);
         padding-right: calc(25/1920*100vw);
+        img {
+          height: calc(23 / 1920 * 100vw);
+          margin-right: calc(10 / 1920 * 100vw);
+        }
         .lside-title{
           font-weight: bold;
           color:$h1;
@@ -4495,7 +4502,15 @@ export default {
   .patrol-content >>> .el-select .el-input--medium .el-input__inner{
     color:#333;
   }
-  
+  .no-item {
+    height: calc(25 / 1920 * 100vw);
+  }
+  .title {
+    font-size: calc(14 / 1920 * 100vw);
+  }
+  .store-title {
+    font-size: calc(23 / 1920 * 100vw) !important;
+  }
   .item-score{
     font-size: calc(12/1920*100vw);
     //width: 96px;
@@ -4607,16 +4622,19 @@ export default {
 
 <style lang="scss" scoped>
   .channel {
-    cursor: pointer;
     width: 100%;
-    height: 40px;
-    padding: 8px 10px 8px 16px;
+    height: calc(40 / 1920 * 100vw);
+    padding: calc(8 / 1920 * 100vw) calc(10 / 1920 * 100vw) calc(8 / 1920 * 100vw) calc(16 / 1920 * 100vw);
     border-radius: 5px;
+    font-size: calc(15 / 1920 * 100vw);
     border: solid 1px #e6e6e6;
     background-color: #fff;
     color: #69727c;
     display: flex;
     align-items: center;
+    img {
+      height: calc(24 / 1920 * 100vw);
+    }
   }
   .channel-isActive {
     color: #006ab7;

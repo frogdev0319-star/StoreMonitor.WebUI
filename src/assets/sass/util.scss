@@ -37,7 +37,15 @@ $sv_red: #c60957;
   // background-color: $background;
   // border: $borderStyle;
 }
-
+.font-13 {
+  font-size: calc(13/1920*100vw);
+}
+.font-14 {
+  font-size: calc(14/1920*100vw);
+}
+.font-15 {
+  font-size: calc(15/1920*100vw);
+}
 .el-table--mini{
   font-size: calc(14/1920*100vw);
   .el-table__row {
@@ -178,14 +186,37 @@ $sv_red: #c60957;
   }
   
 }
+.storevue-select-grey {
+  .el-input__inner {
+    border-color: #edf0f2 !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    min-height: 36px !important;
+    background-color: #edf0f2
+  }
+  .is-focus {
+    .el-input__inner {
+      border-color: #edf0f2 !important;
+    }
+  }
+  .el-input__suffix {
+    // top: 
+  }
+}
 .storevue-select {
   .el-input__inner {
     border-color: #c9cdd5 !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    min-height: 36px !important;
   }
   .is-focus {
     .el-input__inner {
       border-color: #adadad !important;
     }
+  }
+  .el-input__suffix {
+    // top: 
   }
 }
 .device-select {
@@ -299,9 +330,47 @@ $sv_red: #c60957;
     }
   }
 }
+.storevue-input-grey {
+  .el-input__inner {
+    background-color: #f4f6f7;
+    border: solid 1px #f4f6f7;
+    border-radius: 5px;
+    &:focus {
+      border: solid 1px #f4f6f7;
+    }
+    &:disabled {
+      background-color: #f4f6f7 !important;
+      border: solid 1px #f4f6f7 !important;
+    }
+  }
+}
 .el-switch.is-checked .el-switch__core{
   border-color: $sv_red;
   background-color: $sv_red;
+}
+.storevue-radio-blue {
+  .el-radio__inner {
+    border-color: #d9dde1;
+    background: #fff;
+    width: calc(16/1920*100vw);
+    height: calc(16/1920*100vw);
+  }
+  &.is-checked {
+    .el-radio__inner {
+      border-color: #2c90d9;
+      background: #e0f2ff;
+      width: calc(16/1920*100vw);
+      height: calc(16/1920*100vw);
+    }
+    .el-radio__inner::after {
+      width: calc(8/1920*100vw);
+      height:calc(8/1920*100vw);
+      background: #2c90d9;
+    }
+  }
+  span {
+    font-size: calc(15/1920*100vw);
+  }
 }
 .storevue-radio {
   label{

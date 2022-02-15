@@ -9,11 +9,11 @@
     <el-row class="el-container" :class="isFullScreenMode ? 'block paper' : 'flex'">
       <el-col :span="isFullScreenMode ? 24: 12" :class="{ liseAnmiClass: showSpread, paper: !isFullScreenMode }" class="lside paper spacer">
         <div class="el-header-title flex-center">
-          <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="margin-right: 20px; cursor: pointer">
-          <span class="lside-title"> {{ store.storeName }} </span>
+          <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp">
+          <span class="lside-title store-title"> {{ store.storeName }} </span>
           <div style="flex: 1"></div>
           <div @click="isFullScreenMode=!isFullScreenMode" class="flex-center font-size-md" style="color: #006ab7; cursor: pointer">
-            <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon"  style="margin-right: 10px">
+            <img :src="isFullScreenMode? defaultModeIcon : fullScreenModeIcon">
             {{isFullScreenMode? $t('remotePatrol.defaulteMode'):$t('remotePatrol.fullScreenMode')}}
           </div>
         </div>
@@ -56,7 +56,7 @@
 
         <div class="channel-content">
           <div class="flex-center padding" style="justify-content: space-between;">
-            <span>{{ $t("remotePatrol.zoneList") }}</span>
+            <span class="title">{{ $t("remotePatrol.zoneList") }}</span>
             <el-input
               :placeholder="$t('remotePatrol.channelPlaceholder')"
               v-model="serachChannelValue"
@@ -66,7 +66,6 @@
               <i
                 slot="prefix"
                 class="iconfont icon-sousuo"
-                style="position: relative; top: 7px; left: 6px; font-size: 18px; color: #2b2b2b;"
               />
             </el-input>
           </div>
@@ -84,28 +83,20 @@
                 class="channel"
                 :class="{'channel-isActive': item.isClick}"
               >
-              <img :src="item.isClick ? channelActiveIcon: channelIcon" height="24" style="margin-right: 20px">
+              <img :src="item.isClick ? channelActiveIcon: channelIcon" style="margin-right: calc(20 / 1920 * 100vw)">
               {{ item.name }}
               </div>
             </div>
           </div>
         </div>
         <div class="time-content">
-          <div class="time-title">
-            <span class="date-title">{{ $t("remotePatrol.selectDate") }}</span>
-            <div @click="backCurDate" 
-            style="
-            width: 120px; 
-            height: 30px; 
-            line-height: 30px;
-            border-radius: 5px;
-            border: solid 1px #c60957; 
-            font-size: 15px;
-            color: #c60957;
-            cursor: pointer;
-            background-color: #fff;">{{ $t("remotePatrol.backToNow")}}</div>
+          <div class="time-title padding">
+            <span class="title">{{ $t("remotePatrol.selectDate") }}</span>
+            <div @click="backCurDate"
+            class="backToNow"
+            style="">{{ $t("remotePatrol.backToNow")}}</div>
           </div>
-          <div style="padding: 20px; display: flex; justify-content: space-between; padding-top: 0">
+          <div class="padding flex" style="justify-content: space-between; padding-top: 0px">
             <el-date-picker
               v-model="dateValue"
               :picker-options="pickerOptions"
@@ -126,8 +117,8 @@
         </div>
       </el-col>
       <el-col :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" class="rside paper spacer ">
-        <div class="paper padding">
-          <div class="text-left flex-center" :class="{'margin-bottom-md': !isFullScreenMode}">
+        <div class="padding" style="background-color: #fff; border-top-left-radius: calc(10 / 1920 * 100vw); border-top-right-radius: calc(10 / 1920 * 100vw);">
+          <div class="text-left flex-center margin-bottom-md" style="font-size: calc(15/1920*100vw)">
             {{ $t("remotePatrol.createMothod") }}
             <div class="spacer"></div>
             <el-button
@@ -154,13 +145,13 @@
           </div>
         </div>
         <div class="el-event" style="flex: 1">
-          <div class="paper" style="height: calc(100% - 80px); margin: 20px; margin-top: 60px; position: relative" >
-            <div v-if="corEvent" style="position: absolute; top: -34px; left: 20px; font-size: 12px" class="flex-center">
-              <div class="problemTab" :style="problemTab===0?{'background-color': '#f7f9fa'}:{}" @click="problemTab = 0">問題描述</div>
-              <div class="problemTab" :style="problemTab===1?{'background-color': '#f7f9fa'}:{}" @click="problemTab = 1">{{$t("remotePatrol.relevantEvent")}}</div>
+          <div :class="{'event-box': !isFullScreenMode, 'event-box-full': isFullScreenMode}">
+            <div v-if="corEvent" class="flex-center tabs">
+              <div class="problemTab" :style="problemTab===0?{'background-color': '#f7f9fa', color: '#006ab7' }:{}" @click="problemTab = 0">問題描述</div>
+              <div class="problemTab" :style="problemTab===1?{'background-color': '#f7f9fa', color: '#006ab7' }:{}" @click="problemTab = 1">{{$t("remotePatrol.relevantEvent")}}</div>
             </div>
             <div v-else>
-              <div class="problemTab" style="position: absolute; top: -34px; left: 20px; font-size: 12px; background-color: #f7f9fa">問題描述</div>
+              <div class="problemTab tabs" style="background-color: #f7f9fa">問題描述</div>
             </div>
             <div v-if="problemTab == 0" class="padding" style="height: 100%; text-align: left">
                   <div class="event-title margin-bottom-sm"><span class="is-required">* </span>{{ $t("remotePatrol.title") }}</div>
@@ -168,7 +159,7 @@
                     :disabled="corEvent"
                     v-model="eventName"
                     size="mini"
-                    class="fullWidth margin-bottom-md"
+                    class="fullWidth margin-bottom-md storevue-input-grey"
                     @input="eventNameChanged"
                     @blur="notShowInputRuleTips('eventName')"
                   />
@@ -184,7 +175,7 @@
                     v-model="eventDes"
                     :placeholder="$t('remotePatrol.descPlaceholder')"
                     size="mini"
-                    class="des-input fullWidth"
+                    class="storevue-textarea fullWidth"
                     type="textarea"
                     resize="none"
                     @input="eventDesChanged"
@@ -194,6 +185,7 @@
                   <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
 
                   <div class="source-content">
+                    <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
                     <div
                       v-for="(item, index) in sourceList"
                       :key="index"
@@ -206,11 +198,10 @@
                         />
                         <el-image
                           :src="item.src"
-                          :style="{width: item.width, height: item.height}"
+                          :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
                           :preview-src-list="getImgList(index, sourceList)"/>
                       </div>
                     </div>
-                    <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
                   </div>
             </div>
             <div v-if="corEvent && problemTab == 1">
@@ -222,6 +213,7 @@
                   <el-radio
                     v-model="curEvent"
                     :label="item.id"
+                    class="storevue-radio-blue"
                     style="flex: 1; text-align: left; margin: 0"
                     @change="checkEvent"
                   >
@@ -1694,8 +1686,8 @@ export default {
       const obj = {};
       obj.mediaType = 2;
       obj.src = src;
-      obj.height = '100px';
-      obj.width = '140px';
+      obj.height = 100;
+      obj.width = 140;
       obj.fileName = self.bucketImage + '/' + 'event' + '_' + util.getCurTimeStr() + '_' +
                       self.store.storeId + '_' + self.channel.channelId + '.jpg';
       obj.file = util.base64ToBlob(obj.src);
@@ -1780,7 +1772,7 @@ $h1: #292e36;
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  padding: 0 20px;
+  padding: 0 calc(20 / 1920 * 100vw);
   .btn-details{
     cursor: pointer;
     margin-bottom: 5px;
@@ -1789,16 +1781,23 @@ $h1: #292e36;
     text-overflow: ellipsis;
   }
 }
+.store-title {
+  font-size: calc(23 / 1920 * 100vw) !important;
+}
 .channel {
   width: 100%;
-  height: 40px;
-  padding: 8px 10px 8px 16px;
+  height: calc(40 / 1920 * 100vw);
+  padding: calc(8 / 1920 * 100vw) calc(10 / 1920 * 100vw) calc(8 / 1920 * 100vw) calc(16 / 1920 * 100vw);
   border-radius: 5px;
+  font-size: calc(15 / 1920 * 100vw);
   border: solid 1px #e6e6e6;
   background-color: #fff;
   color: #69727c;
   display: flex;
   align-items: center;
+  img {
+    height: calc(24 / 1920 * 100vw);
+  }
 }
 .channel-isActive {
   color: #006ab7;
@@ -1808,7 +1807,6 @@ $h1: #292e36;
 .time-title {
   display: flex;
   justify-content: space-between;
-  padding: 20px;
   align-items: center;
 }
 @function rem($val) {
@@ -1884,11 +1882,15 @@ $h1: #292e36;
     .el-header-title {
       text-align: left;
       position: relative;
-      height: 80px;
-      line-height: 80px;
+      height: calc(80 / 1920 * 100vw);
+      line-height: calc(80 / 1920 * 100vw);
       border-bottom: 1px solid $border;
-      padding-left: calc(25/1920*100vw);
-      padding-right: calc(25/1920*100vw);
+      padding-left: calc(16/1920*100vw);
+      padding-right: calc(16/1920*100vw);
+      img {
+        height: calc(23 / 1920 * 100vw);
+        margin-right: calc(10 / 1920 * 100vw);
+      }
       .lside-title {
         font-weight: bold;
         color: $h1;
@@ -2231,14 +2233,17 @@ $h1: #292e36;
     }
   }
   .el-radio-details {  
-    width: 160px;
-    height: 40px;
-    margin: 0 0 0 16px;
-    line-height: 40px;
+    width: calc(160 / 1920 * 100vw);
+    height: calc(40 / 1920 * 100vw);
+    margin: 0 0 0 calc(16 / 1920 * 100vw);
+    line-height: calc(40 / 1920 * 100vw);
     border: solid 1px #e6e6e6;
     cursor: pointer;
     border-radius: 5px;
     text-align: center;
+    span {
+      font-size: calc(15 / 1920 * 100vw);
+    }
   }
     .el-event {
       @media screen and(max-width: 1366px) {
@@ -2362,17 +2367,16 @@ $h1: #292e36;
       .source-content {
         min-height: 120px;
         width: 90%;
-        margin: auto 20px;
         span {
           font-size: 12px;
-          color: #fcb83b;
-          margin: 15px 0;
+          color: #f7d057;
+          margin: calc(6 / 1920 * 100vw) 0;
           display: block;
         }
         .source-details {
           display: inline-block;
-          margin-right: 15px;
-          padding-top: 15px;
+          margin-right: calc(6 / 1920 * 100vw);
+          margin-bottom: calc(6 / 1920 * 100vw);
           .img-content {
             width: 100%;
             height: 100%;
@@ -2402,12 +2406,33 @@ $h1: #292e36;
 </style>
 <style scoped>
 .problemTab {
-  width: 120px; 
-  height: 34px; 
-  line-height: 34px; 
+  width: calc(120 / 1920 * 100vw); 
+  height: calc(34 / 1920 * 100vw);
+  line-height: calc(34 / 1920 * 100vw);
   cursor: pointer; 
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
+  font-size: calc(13 / 1920 * 100vw); 
+}
+.tabs {
+  position: absolute; 
+  top: calc(-34 / 1920 * 100vw);
+  left: 20px; 
+}
+.event-box {
+  height: calc(100% - 80 / 1920 * 100vw); 
+  margin: calc(20 / 1920 * 100vw);
+  margin-top: calc(60 / 1920 * 100vw) ;
+  position: relative;
+  background-color: #fff;
+  border-radius: calc(10 / 1920 * 100vw);
+}
+.event-box-full {
+  height: calc(100% - 80 / 1920 * 100vw); 
+  margin-top: calc(60 / 1920 * 100vw) ;
+  position: relative;
+  background-color: #fff;
+  border-radius: calc(10 / 1920 * 100vw);
 }
 .el-test {
   width: 70px;
@@ -2416,6 +2441,9 @@ $h1: #292e36;
 }
 .des-input {
   font-size: 12px;
+}
+.el-image {
+  border-radius: 5px;
 }
 </style>
 <style>
@@ -2438,7 +2466,17 @@ $h1: #292e36;
   padding: 0 10px;
   border: 0px;
 }
-
+.backToNow {
+  width: calc(120 / 1920 * 100vw); 
+  height: calc(30 / 1920 * 100vw); 
+  line-height: calc(30 / 1920 * 100vw);
+  border-radius: 5px;
+  border: solid 1px #c60957; 
+  font-size: calc(15 / 1920 * 100vw);
+  color: #c60957;
+  cursor: pointer;
+  background-color: #fff;
+}
 .el-test .el-input__icon {
   line-height: 24px;
 }

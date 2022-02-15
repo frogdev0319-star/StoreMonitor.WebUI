@@ -380,7 +380,7 @@ export default {
     "name": "問題名稱",
     "noDevice": "無效的設備，請聯繫管理員",
     "noHistoryVideo": "回放事件段無錄像",
-    "noItems": "暫無巡檢項！",
+    "noItems": "暫無數據",
     "noVideoSource": "設備無影像源",
     "notBindCamera": "當前門店的巡檢項未綁定設備！",
     "notCombined": "該門店暫未綁定巡檢項！",
