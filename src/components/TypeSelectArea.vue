@@ -360,9 +360,9 @@ export default {
             }
           });
           this.curStoreList = curStoreList;
-          console.log(this.orginStoreList)
-          console.log(this.curStoreList)
-          console.log("StoreListAndGroupAndType Leave")
+          //console.log(this.orginStoreList)
+          //console.log(this.curStoreList)
+          //console.log("StoreListAndGroupAndType Leave")
      /// }).catch(err => {
       //  console.log('StoreFilter - getStoreGroupAndType: ' + err);
       //});

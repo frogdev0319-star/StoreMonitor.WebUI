@@ -19,6 +19,14 @@
                     :label="_item.label"
                     :min-width="_item.width"
                 >
+                <template slot-scope="{row}">
+                    <template v-if="_item.isCellClick">
+                        <span style="cursor:pointer;color:#006ab7;" @click="cellClick(row,_item.prop)">{{ row[_item.prop]}}</span>
+                    </template>
+                    <template v-else>
+                        <span>{{ row[_item.prop]}}</span>
+                    </template>
+                </template>
                 </el-table-column>
             </el-table>
         <!--<table-pagination
@@ -38,6 +46,7 @@
 import {getEventList} from '@/api/event';
 import TablePagination_V2 from '@/components/TablePagination_V2';
 import util from '@/common/util';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 export default {
     name:'IncepItemTop5',
     components: {
@@ -70,7 +79,8 @@ export default {
                     'width': '400',
                     'maxWidth': '400',
                     'pdfwidth': '11%',
-                    'isExpand': false
+                    'isExpand': false,
+                    'isCellClick':false
                 },
                 {
                     'prop': 'inspectTagName',
@@ -79,7 +89,8 @@ export default {
                     'width': '200',
                     'maxWidth': '200',
                     'pdfwidth': '11%',
-                    'isExpand':false
+                    'isExpand':false,
+                    'isCellClick':false
                 },
                 {
                     'prop': 'num',
@@ -88,7 +99,8 @@ export default {
                     'width': '50',
                     'maxWidth': '60',
                     'pdfwidth': '11%',
-                    'isExpand':false
+                    'isExpand':false,
+                    'isCellClick':true
                 },
                 {
                     'prop': 'rate',
@@ -97,7 +109,8 @@ export default {
                     'width': '50',
                     'maxWidth': '60',
                     'pdfwidth': '11%',
-                    'isExpand':false
+                    'isExpand':false,
+                    'isCellClick':false
                 }
             ],
             eventData:[],
@@ -163,6 +176,35 @@ export default {
             
             this.table_data = [...eventItem.slice( 0, (eventItem.length>5)?5:eventItem.length)];
             
+        },
+        cellClick(row,prop){
+            //console.log("row:",row);
+            const self = this;
+            var params = SearchConditionUtil.getSearchCondition('eventManage');
+            const statics_params = SearchConditionUtil.getSearchCondition('eventStatistics');
+            const rowItem = row.row;
+            
+            params.searchParams = {clause : {storeId:statics_params.curStore,status:[],subject:row.subject},filter:{ page: 0, size: 10 }};
+            params.filterStoreIds=statics_params.curStore;
+            params.curStore=statics_params.curStore;
+            params.storeIds=statics_params.curStore;
+            params.curCountry = statics_params.curCountry;
+            params.curProvince = statics_params.curProvince;
+            params.curCity = statics_params.curCity;
+            params.inputSearchValue = "";
+            params.curState = [];
+            params.activeName = '4';
+            params.beginTs=this.beginTs;
+            params.endTs=this.endTs;
+            params.searchFrom='EventStatistics';
+            const searchConditon = {
+                path: 'eventManage',
+                params: params
+            };
+            console.log("searchConditon:",searchConditon);
+            SearchConditionUtil.saveSearchCondition(searchConditon);
+                    //sessionStorage.setItem('event_manage', JSON.stringify(passObj));
+            self.$router.push({ name: 'eventManage', params: params});
         }
         
     },

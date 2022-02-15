@@ -303,7 +303,7 @@ export default {
     },
 
     saveSearchParams(saveParamsObj) {
-      console.log("saveSearchParams:",saveParamsObj);
+      //console.log("saveSearchParams:",saveParamsObj);
       const params = saveParamsObj.params;
       params.curCountry = this.storeFilterObj.curCountry;
       params.curProvince = this.storeFilterObj.curProvince;
@@ -314,7 +314,7 @@ export default {
       params.timeMode = this.timeMode;
       params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
       params.storeIds = this.storeFilterObj.filterStoreIds;
-      console.log("Save Comdition="+saveParamsObj.path)
+      //console.log("Save Comdition="+saveParamsObj.path)
       SearchConditionUtil.saveSearchCondition(saveParamsObj);
     },
 

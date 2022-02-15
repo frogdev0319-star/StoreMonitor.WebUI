@@ -46,7 +46,7 @@
             <el-input v-model="row.tempDeviceName" class="edit-input" size="small" @input="val => inputDeviceNameChange(val, row)"/>
           </template>
           <template v-else-if="_item.isExpand">
-            <span style="margin-right:13.5px;">{{ row[_item.prop]}}</span>
+            <span style="margin-right:13.5px;color:#006ab7;">{{ row[_item.prop]}}</span>
             <i v-if="row.id != expands" class="el-icon-arrow-down" style="color:#2c90d9;cursor:pointer;" @click="expandChange(row)"></i>
             <i v-if="row.id == expands" class="el-icon-arrow-up" style="color:#2c90d9;cursor:pointer;" @click="expandChange(row)"></i>
           </template>
@@ -296,7 +296,7 @@ export default {
       if (this.expandComponent=== 'TabInceptionDetail') {
         return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs }
       }else if(this.expandComponent=== 'IncepItemTop5'){
-        //console.log("this.expands:",this.expands);
+        //console.log("this.expandCompProperties:",this.expandCompProperties);
         return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs }
       }else if(this.expandComponent=== 'EventCommentList'){
         //console.log("this.expands:",this.expands);
