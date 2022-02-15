@@ -528,6 +528,9 @@ export default {
       box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
       border: solid 1px #f5f5f5;
     }
+    tr{
+      background-color: #f7f9fa !important;
+    }
   }
   .table-white {
     .el-table{
