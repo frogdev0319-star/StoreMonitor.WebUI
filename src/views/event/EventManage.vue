@@ -9,7 +9,7 @@
         >
         </store-filter>
       </div>
-      <div class="flex-center" style="justify-content: space-between; margin: 20px 0">
+      <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px -20px">
         <div class="flex-center">
           <date-time-selector 
             :dateTimeValue = dateValue
