@@ -95,7 +95,8 @@
           class="sider"
           :class="collapsed?'sider-collapsed':'sider-expand'"
         >
-          <div v-if="!collapsed" style="width: 215px; margin-left: auto; margin-right: auto; margin-bottom: 45px; margin-top: 50px">
+          <div v-if="!collapsed" style="width: 236px; margin-left: 32px; margin-right: auto; margin-bottom: 45px; margin-top: 40px">
+            <p class="brand-id">{{$t('route.brandId')}}<span style="font-family:'Noto Sans'">{{accountId}}</span></p>
             <el-select
               ref="fieldSelect"
               class="store-select"
@@ -130,6 +131,7 @@
                 :key="index"
                 :index="item.children[0].path"
                 :disabled="item.isReadOnly"
+                :style="{'paddingLeft':'12px','marginLeft': '18px','height': '66px','lineHeight': '66px'}"
               >
                 <img class="menu_img" :src="`./static/img/menu/${index}.png`" height="26px" />
                 <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" height="26px" />
@@ -141,7 +143,7 @@
                 v-if="!item.leaf"
                 :key="index"
                 :index="index+''"
-                :style="groupHeight+'px'">
+                :style="{}">
                 <template slot="title">
                   <img class="menu_img" :src="`./static/img/menu/${index}.png`" height="26px" />
                   <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" height="26px" />
@@ -151,7 +153,7 @@
                   <el-menu-item
                     v-if="!child.hidden && !child.threeChild"
                     :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'"
-                    :style="groupHeight+'px'"
+                    :style="{}"
                     :index="child.path"
                     :disabled="child.isReadOnly">
                     <div class="item-icon"></div>
@@ -160,12 +162,12 @@
                   <el-submenu
                     v-else-if="!child.hidden && child.threeChild"
                     :class="lang === 'en' ? 'three-child el-submenu-group' : 'zh-three-child'"
-                    :style="varyWindowWidth < 1366 ? {'padding-right':'0px'} : {}"
+                    :style="{}"
                     :index="child.path"
                     :disabled="child.isReadOnly"
                     :key="child.path">
                     <template slot="title">
-                      <div class="item-icon"></div>
+                      <div class="item-icon" style="margin-left:-10px;"></div>
                       <span>{{ $t(`route.${child.name}`) }}</span>
                     </template>
                     <div v-for="grandChild in child.children" :key="grandChild.path">
@@ -189,7 +191,7 @@
             </div>
           </el-menu>
           <div class="spacer"></div>
-          <div class="headUrl-content flex-center" style="justify-content: center; padding: 20px">
+          <div class="headUrl-content flex-center" style="padding: 32px">
             <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
               <span v-if="!collapsed" class="username">
                 {{ userName }}
@@ -788,12 +790,35 @@ export default {
 .el-menu--collapse {
   width: unset;
 }
+.brand-id{
+    font-size: 12px;
+    font-family: "Roboto", sans-serif, "微软雅黑";
+    line-height: 12px;
+    padding-left: 0;
+    width: calc(52/1920*100vw + 40px);
+    margin-bottom: 8px;
+    font-weight: normal;
+    color: #a5a5a5;
+    padding-top: 0vw;
+    white-space: nowrap;
+    span{
+      font-size: 12px !important;
+      margin-left:0px !important;
+    }
+
+}
 .store-select {
   /deep/ .el-input__inner {
     border: none;
     padding-left: 0;
     font-size: 22px;
   }
+    /deep/
+    .el-select__caret{
+      color:#1375bc !important;
+      font-weight: bold !important;
+    }
+  
 }
 .sider-collapsed {
   width: 90px;
@@ -835,9 +860,11 @@ export default {
   }
   /deep/ .el-menu {
     border-right: none;
+    
   }
   /deep/ .el-menu-item {
     text-align: left;
+    
     .menu_img {
       display: inline-block;
     }
@@ -913,6 +940,9 @@ export default {
     &.is-active {
       background-color: #e4f3fd;
       .el-submenu__title {
+        margin-left: 10px;
+        height: 66px;
+      line-height: 66px;
         span {
           color: #006ab7;
         }
@@ -932,6 +962,9 @@ export default {
     }
     .el-submenu__title {
       padding: 0 calc(30 / 1920 * 100vw);
+      margin-left: 10px;
+      height: 66px;
+      line-height: 66px;
       i {
         right: 32px;
       }

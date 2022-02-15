@@ -5,6 +5,7 @@ export default {
     "beseyeAccount": "Beseye",
     "beseyeDeviceMgt": "Monitor Device Management (Beseye)",
     "beseyeDeviceSetting": "Device Settings of Beseye",
+    "brandId": "Brand ID：",
     "brand": "Brand",
     "bindStore": "Bind Stores",
     "checkInStatistics": "Check In Statistics",
