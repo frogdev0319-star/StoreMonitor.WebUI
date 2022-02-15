@@ -4,9 +4,10 @@
     :visible.sync="dialogVisible"
     :width="dialogWidth"
     :height="dialogHeight"
+    :show-close="false"
     :class="isForm ? 'storevue-form-dialog' : 'storevue-dialog'"
   >
-    <template slot="title">{{title}}<img v-if="isWarning" src="../../static/img/dialog-icon.png" height="40px"> </template>
+    <template slot="title">{{title}}<img v-if="isWarning" src="../../static/img/dialog-icon.png"> </template>
     <div class="main-dialog-body">
       <slot/>
     </div>
