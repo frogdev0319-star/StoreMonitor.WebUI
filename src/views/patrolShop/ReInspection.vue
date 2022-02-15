@@ -4706,7 +4706,8 @@ export default {
   }
   .confirmClass .confirmBtn{
     width: 4.75rem;
-    background-color: #f31d65;;
+    border: none;
+    background-color: #006ab7;
     color: #fff !important;
     font-size: 12px;
     line-height: 12px;
