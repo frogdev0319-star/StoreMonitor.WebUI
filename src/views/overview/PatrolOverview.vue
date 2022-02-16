@@ -96,9 +96,20 @@
         <el-col :span="6" class="evalution-pct paper">
           <div class="title">{{ $t('overview.itemsAssessment') }}</div>
           <div class="pct-content">
-            <div class="pct-panel">
-              <v-chart ref="itemsPie" :auto-resize="true" :options="itemsOptions" class="chart-content"/>
+            <div class="pie-div">
+              <div class="inner"/>
+              <div class="pct-panel">
+                  <v-chart
+                      ref="temsPie"
+                      :auto-resize="true"
+                      :options="itemsOptions"
+                      class="chart-content"
+                  />
+              </div>
             </div>
+            <!--<div class="pct-panel">
+              <v-chart ref="itemsPie" :auto-resize="true" :options="itemsOptions" class="chart-content"/>
+            </div>-->
             <div class="pct-nums">
               <div
                 v-for="(item, index) in itemsPerArray"
@@ -943,15 +954,18 @@ export default {
                 }
               },
               data: seriesData,
+              borderWidth:5,
+              borderColor:'#FFF',
               itemStyle: {
                 emphasis: {
-                  shadowBlur: 10,
-                  shadowOffsetX: 0,
-                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                  borderWidth:10,
+                  borderColor:'#EDF0F2'
                 },
                 normal: {
+                  borderWidth:5,
+                  borderColor:'#FFF',
                   color: function(params) {
-                    var colorList = ['#8fd92e', '#f59249', '#cad1db'];
+                    var colorList = ['#8fd92e', '#f59249', '#b9c6d2'];
                     return colorList[params.dataIndex];
                   }
                 }

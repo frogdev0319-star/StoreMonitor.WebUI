@@ -11,7 +11,7 @@ $remote: #7bd8eb;
 $onsite: #7b9feb;
 $store: #5274bb;
 $excellent: #57e78f;
-$pass: #6a98ee;
+$pass: #8fd92e;
 $failed: #f59249;
 $ignored: #b9c6d2;
 
@@ -339,7 +339,39 @@ $ignored: #b9c6d2;
           border-top: 1px solid $border;
           width: 100%;
           text-align: center;
-          .pct-panel {
+          .pie-div{
+            width: 100%;
+            height: 210px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: end;
+            align-self: center;
+            .inner{
+              position:absolute;
+              height: 130px;
+              width: 130px;
+              margin-right: 110px;
+              top:133px;
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
+            }
+            .pct-panel{
+              width: 210px;/*calc(276/1440*100vw);*/
+              height: 210px;/*calc(276/1440*100vw);*/
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
+              align-self: end;
+              
+              .chart-content {
+                width:100%;
+                height:100%;
+              }
+            }
+          }
+          /*.pct-panel {
             // height: 210px;
             width: 210px;
             margin: 0 auto;
@@ -349,7 +381,7 @@ $ignored: #b9c6d2;
               width: 100%;
               height: 100%;
             }
-          }
+          }*/
           .pct-nums {
             font-size: calc(12 / 1920 * 100vw);
             display: flex;
@@ -708,7 +740,7 @@ $ignored: #b9c6d2;
         width: 204px;
         margin: 0 auto;
         border-radius: 50%;
-        background: -webkit-radial-gradient( circle closest-side,#fff 60%, $background 40%);
+        /*background: -webkit-radial-gradient( circle closest-side,#fff 60%, $background 40%);*/
         .chart-content{
           width: 100%;
           height: 100%;
@@ -839,7 +871,39 @@ $ignored: #b9c6d2;
           border-top: 1px solid $border;
           width: 100%;
           text-align: center;
-          .pct-panel{
+          .pie-div{
+            width: 100%;
+            height: 210px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: end;
+            align-self: center;
+            .inner{
+              position:absolute;
+              height: 120px;
+              width: 120px;
+              margin-right: 184px;
+              top:153px;
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
+            }
+            .pct-panel{
+              width: 210px;/*calc(276/1440*100vw);*/
+              height: 210px;/*calc(276/1440*100vw);*/
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
+              align-self: end;
+              
+              .chart-content {
+                width:100%;
+                height:100%;
+              }
+            }
+          }
+          /*.pct-panel{
             height: 204px;
             width: 204px;
             margin: 0 auto;
@@ -849,7 +913,7 @@ $ignored: #b9c6d2;
               width: 100%;
               height: 100%;
             }
-          }
+          }*/
           .pct-nums{
             // margin-top: 28px;
             padding: 0 calc(20/1920*100vw);
@@ -941,6 +1005,49 @@ $ignored: #b9c6d2;
           font-size: calc(20 / 1920 * 100vw);
           text-align: left;
           color: $black;
+        }
+        .pct-content{
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          flex: 1;
+          padding-top: calc(20 / 1920 * 100vw);
+          // padding-bottom: 20px;
+          border-top: 1px solid $border;
+          width: 100%;
+          text-align: center;
+          .pie-div{
+            width: 100%;
+            height: 210px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: end;
+            align-self: center;
+            .inner{
+              position:absolute;
+              height: 120px;
+              width: 120px;
+              margin-right: 116px;
+              top:133px;
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
+            }
+            .pct-panel{
+              width: 210px;/*calc(276/1440*100vw);*/
+              height: 210px;/*calc(276/1440*100vw);*/
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
+              align-self: end;
+              
+              .chart-content {
+                width:100%;
+                height:100%;
+              }
+            }
+          }
         }
         .label-0 {
           background-color: $pending;

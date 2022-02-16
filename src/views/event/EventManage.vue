@@ -812,8 +812,11 @@ export default {
         },
         like: like
       };
-      if(typeof self.searchParams.searchParams.clause !="undefined"){
-        params.clause['assigner'] =  self.searchParams.searchParams.clause.assigner;
+      if(typeof this.searchParams.searchParams.clause !="undefined" && this.searchParams['searchFrom']=='PatrolPersonStat'){
+        params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+      }
+      if(typeof this.searchParams.searchParams.clause !="undefined" && this.searchParams['searchFrom']=='EventStatistics'){
+        params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
       }
       
       delete params.clause['status'];
@@ -1026,6 +1029,7 @@ export default {
           }else if(searchParams['searchFrom']=="EventStatistics"){
             this.params.beginTs = searchParams.beginTs;
             this.params.endTs = searchParams.endTs;
+            this.storeFilterObj.filterStoreIds = searchParams.curStore;
             this.storeFilterObj.curStore=searchParams.curStore;
             this.storeFilterObj.storeIds=searchParams.curStore;
             this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
