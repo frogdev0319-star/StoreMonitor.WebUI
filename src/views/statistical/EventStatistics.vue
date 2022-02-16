@@ -1721,14 +1721,54 @@ export default {
       //console.log("doGetInspecEvenItems:",params);
       const result = await this.getInspecEvenItems(params);
       
-      self.peiDataSource = result.data;
-      self.getEventBySourcePie();
+      //self.peiDataSource = result.data;
+      self.doGetFirstEventLayer(result.data);
+      
+    },
+    doGetFirstEventLayer(data){
+      const childLayer = data.filter(item1 =>{
+        return item1.parentId!=-1;
+      });
+      console.log("childLayer:",childLayer);
+      var sourceData = [];
+      if(childLayer.length>0){
+        data.forEach((item,index)=>{
+          console.log("data item:",item);
+          if(item.parentId == -1 ){ //只抓第一層
+            if(item.itemIds.length==0){ //表示他有2類
+              const tempLayer = childLayer.filter(layer=>{
+              return layer.parentId==item.groupId
+              });
+              console.log(" tempLayer:", tempLayer);
+              var tagIds = [], numOfUnqualified=0, perc=0;
+              for(var i=0;i<tempLayer.length;i++){
+                tagIds = tagIds.concat(tempLayer[i].itemIds);
+                numOfUnqualified = numOfUnqualified+tempLayer[i].numOfUnqualified
+                perc = perc + tempLayer[i].percentage;
+              }
+              item.itemIds = tagIds;
+              item.numOfUnqualified = numOfUnqualified;
+              item.percentage = perc/tempLayer.length;
+            }
+            sourceData.push(item);
+          }
+        })
+        console.log("sourceData:",sourceData);
+        this.peiDataSource = sourceData;
+            this.getEventBySourcePie();
+      }else{
+        sourceData = data;
+        this.peiDataSource = sourceData;
+        this.getEventBySourcePie();
+      }
+      
     },
     getEventBySourcePie() {
       const self = this;
       let jsonArray = [];
       let seriesData = [];
       let allItemIds = [];
+      console.log("self.peiDataSource:",self.peiDataSource);
       util.sortArrayByKeyDesc(self.peiDataSource,'numOfUnqualified');
       self.peiDataSource.forEach((item,index) => {
         if(item.numOfUnqualified!=0){
