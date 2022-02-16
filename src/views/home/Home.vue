@@ -131,7 +131,7 @@
                 :key="index"
                 :index="item.children[0].path"
                 :disabled="item.isReadOnly"
-                :style="{'paddingLeft':'12px','marginLeft': '18px','height': '66px','lineHeight': '66px'}"
+                :style="{'paddingLeft':'30px','height': '66px','lineHeight': '66px'}"
               >
                 <img class="menu_img" :src="`./static/img/menu/${index}.png`" height="26px" />
                 <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" height="26px" />
@@ -197,13 +197,12 @@
                 {{ userName }}
                 <i class="el-icon-arrow-down el-icon--right"/>
               </span>
-              <img :src="headUrl" alt="" class="headImg" :style="collapsed?{}:{'margin-right':'16px'}">
+              <div class="headImg" :style="collapsed?{}:{'margin-right':'16px'}">{{iconName}}</div>
               <el-dropdown-menu slot="dropdown" class="dropdown">
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
-                  style="width:120px;
-                padding-left:20px">{{ $t('route.my') }}</el-dropdown-item>
+                  style="width:120px; padding-left:20px;">{{ $t('route.my') }}</el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
                   style=" width:120px;
@@ -268,6 +267,7 @@ export default {
       arrowRightIcon: require("../../../static/img/arrow-right.png"),
       arrowLeftIcon: require("../../../static/img/arrow-left.png"),
       userName: "Admin",
+      iconName:"",
       headUrl: "",
       breadList: [],
       collapsed: this.$store.getters.collapsed,
@@ -767,6 +767,8 @@ export default {
           ? result.userName.substr(0, 10) + "..."
           : result.userName;
       self.accountId = result.accountId;
+      var un = result.userName.split(' ');
+      self.iconName = (un.lenght>1)? un[0].substr(0, 1)+un[1].substr(0, 1) : un[0].substr(0, 1);
       const accountId = result.accountId.toLowerCase();
       localStorage.setItem("oss_bucket", accountId);
     },
@@ -812,6 +814,8 @@ export default {
     border: none;
     padding-left: 0;
     font-size: 22px;
+    background-color: #FFF;
+    color: #484848;
   }
     /deep/
     .el-select__caret{
@@ -1134,76 +1138,7 @@ $collapseWidth: 5.5%;
         }
       }
     }
-    .headUrl-content {
-      height: 100%;
-      float: right;
-      color: #fff;
-      position: relative;
-      overflow: hidden;
-      margin-right: calc(33 / 1920 * 100vw);
-      display: inline-flex;
-      justify-content: flex-end;
-      /*width: 320px;*/
-      .system-name {
-        font-size: 14px;
-        margin-right: calc(20 / 1920 * 100vw);
-        color: #4b5262;
-        float: left;
-      }
-      .bell-content {
-        @include point(width, 60);
-        @include point(height, 60);
-        border-left: 1px solid rgba(255, 255, 255, 0.2);
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
-        position: relative;
-        float: left;
-        cursor: pointer;
-        &:hover {
-          background-color: #f3f3f3;
-        }
-        .el-icon-bell {
-          font-size: 25px;
-          vertical-align: middle;
-          color: #4b5262;
-        }
-        .item {
-          position: absolute;
-          top: -5px;
-          @include point(left, 35);
-        }
-      }
-      .el-user-drop {
-        .username {
-          font-weight: bold;
-          color: #006ab7;
-          margin: auto 10px;
-          max-width: 90px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          cursor: pointer;
-          i {
-            color: #a5a5a5;
-            font-weight: bold;
-            margin-left: 6px;
-            cursor: pointer;
-          }
-        }
-        .headImg {
-          position: relative;
-          top: 10px;
-          margin-left: 10px;
-          cursor: pointer;
-        }
-        .dropdown {
-          margin-top: 0px;
-          .dropdown-item {
-            width: 120px !important;
-            padding-left: 20px !important;
-          }
-        }
-      }
-    }
+    
   }
 
   .main {
@@ -1322,6 +1257,58 @@ $collapseWidth: 5.5%;
       color: #444;
     }
   }
+  .headUrl-content {
+      height: 100%;
+      float: right;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      margin-right: calc(33 / 1920 * 100vw);
+      display: inline-flex;
+      justify-content: flex-start;
+      align-items: end;
+      /*width: 320px;*/
+      
+      .el-user-drop {
+        .username {
+          font-weight: normal;
+          color: #006ab7;
+          margin: auto 10px;
+          max-width: 90px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          cursor: pointer;
+          i {
+            color: #006ab7;;
+            font-weight: bold;
+            margin-left: 6px;
+            cursor: pointer;
+            display: none;
+          }
+        }
+        .headImg {
+          display: inline-block;
+          position: relative;
+          width:48px;
+          height:48px;
+          line-height: 48px;
+          cursor: pointer;
+          border-radius: 50%;
+          background: #2c90d9;
+          color: #fff;
+          text-align: center;
+          font-size: 18px;
+        }
+        .dropdown {
+          margin-top: 0px;
+          .dropdown-item {
+            width: 120px !important;
+            padding-left: 20px !important;
+          }
+        }
+      }
+    }
   .aside-width {
     width: calc(350 / 1920 * 100vw);
     min-width: 290px;
