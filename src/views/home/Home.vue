@@ -816,6 +816,7 @@ export default {
     font-size: 22px;
     background-color: #FFF;
     color: #484848;
+    height:40px;
   }
     /deep/
     .el-select__caret{
