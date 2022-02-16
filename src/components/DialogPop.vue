@@ -12,6 +12,7 @@
       <slot/>
     </div>
     <div v-if="showButton" slot="footer">
+      <div style="display: inline; float: left; color: #f57949" v-if="hasIgnore" @click="hasIgnoreHandler">{{$t('remotePatrol.clickToContent')}}</div>
       <el-button class="cancel-btn" size="mini" @click="cancelHandler">
         {{ $t('remotePatrol.cancel') }}
       </el-button>
@@ -68,6 +69,10 @@ export default {
       type: String,
       default: ''
     },
+    hasIgnore: {
+      type: Boolean,
+      default: false
+    },
   },
 
   computed: {
@@ -88,7 +93,11 @@ export default {
 
     confirmHandler() {
       this.$emit('confirmHandler');
-    }
+    },
+    
+    hasIgnoreHandler() {
+      this.$emit('hasIgnoreHandler');
+    },
   }
 };
 </script>

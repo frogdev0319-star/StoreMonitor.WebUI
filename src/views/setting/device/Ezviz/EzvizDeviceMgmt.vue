@@ -146,7 +146,7 @@
               </div>
               <div v-if="!item.isClick" class="icon-list">
                 <img 
-                  :src="`../../static/img/table-edit.png`" 
+                  :src="`./static/img/table-edit.png`" 
                   @click="handleEdit(index,item)"
                   height="26px" />
                 <i

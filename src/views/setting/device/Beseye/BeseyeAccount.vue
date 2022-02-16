@@ -7,7 +7,7 @@
     >
       <div class="button-area" style="width:134px;">
         <div style="width: 34px;display: flex; flex-direction: row; justify-content: start;">
-          <img :src="`../../static/img/icon-authorize.png`" height="18px" />
+          <img :src="`./static/img/icon-authorize.png`" height="18px" />
         </div>
         <span>{{ $t('deviceView.beseyeAuthorize') }}</span>
       </div>

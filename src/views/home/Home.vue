@@ -222,7 +222,7 @@
               $route.path === '/reinspection' || $route.path === '/storemonitor' || $route.path === '/report'
                 ? {
                     background:
-                      '#f7f9fa url(../../static/img/reinspection_bg.png) no-repeat 100% 0',
+                      '#f7f9fa url(./static/img/reinspection_bg.png) no-repeat 100% 0',
                   }
                 : { 'background-color': '#f4f5f9' },
             ]"
@@ -1460,6 +1460,9 @@ $collapseWidth: 5.5%;
 }
 .padding-bottom-sm {
   padding-bottom: calc(16/1920*100vw);
+}
+.padding-vertical-sm {
+  padding: calc(16/1920*100vw) 0;
 }
 .padding-horizontal-sm {
   padding: 0 calc(16/1920*100vw);
