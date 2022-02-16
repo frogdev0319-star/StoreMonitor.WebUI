@@ -2292,7 +2292,8 @@ export default {
         inspect: sheetName,
         event: this.eventList,
         store: this.store,
-        channel: this.channel
+        channel: this.channel,
+        allRemarkItemsFlag: this.allRemarkItemsFlag
       };
       this.historyObj = {
         storeList: this.tabList[Number(this.activeIndex)].storeList,
@@ -2855,6 +2856,7 @@ export default {
         tempArr.push(...group.items);
       })
       const remarkItemsArr = tempArr.filter(item => item.type === 1);
+      console.log(remarkItemsArr.length === tempArr.length)
       if(remarkItemsArr.length === tempArr.length){
         this.allRemarkItemsFlag = true;
         this.notShowAlert = true;
@@ -3172,8 +3174,7 @@ export default {
         item.Ruletip = false;
       }
       if(!this.showIgnoreItem){
-        
-        self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
+        this.sheetName[this.curSheetIndex].inspectList.forEach((inspect, idx) => {
           inspect.items.forEach(item_ => {
             if (item_.id === self.curItemId) self.curGroupIndex = idx
           })
