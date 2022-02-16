@@ -46,13 +46,24 @@
             <span class="area-title">{{ $t('overview.eventSource') }}</span>
           </div>
           <div class="pct-content">
-            <div class="pct-panel">
+            <div class="pie-div">
+              <div class="inner"/>
+              <div class="pct-panel">
+                  <v-chart
+                      ref="eventSourceRef"
+                      :auto-resize="true"
+                      :options="eventSourceOptions"
+                      class="chart-content"
+                  />
+              </div>
+            </div>
+            <!--<div class="pct-panel">
               <v-chart
                 ref="eventSourceRef"
                 :auto-resize="true"
                 :options="eventSourceOptions"
                 class="chart-content"/>
-            </div>
+            </div>-->
             <div class="pct-nums">
               <div
                 v-for="(item, index) in sourcePerArray"
@@ -75,13 +86,24 @@
             {{ $t('overview.eventStatus') }}
           </div>
           <div class="pct-content">
-            <div class="pct-panel">
+            <div class="pie-div">
+              <div class="inner"/>
+              <div class="pct-panel">
+                  <v-chart
+                      ref="eventSourceRef"
+                      :auto-resize="true"
+                      :options="eventStatusOptions"
+                      class="chart-content"
+                  />
+              </div>
+            </div>
+            <!--<div class="pct-panel">
               <v-chart
                 ref="eventStatusRef"
                 :auto-resize="true"
                 :options="eventStatusOptions"
                 class="chart-content"/>
-            </div>
+            </div>-->
             <div class="pct-nums">
               <div v-for="(item, index) in statusPerArray" :key="index" class="content-labels">
                 <div class="excellent_nums">{{ item.percent }}%</div>
@@ -481,13 +503,16 @@ export default {
               }
             },
             data: seriesData,
+            borderWidth:5,
+            borderColor:'#FFF',
             itemStyle: {
               emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                borderWidth:10,
+                borderColor:'#EDF0F2'
               },
               normal: {
+                borderWidth:5,
+                borderColor:'#FFF',
                 color: function(params) {
                   const colorList = ['#7bd8eb', '#7b9feb', '#5274bb'];
                   return colorList[params.dataIndex];
@@ -571,13 +596,16 @@ export default {
               }
             },
             data: [],
+            borderWidth:5,
+            borderColor:'#FFF',
             itemStyle: {
               emphasis: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                borderWidth:10,
+                borderColor:'#EDF0F2'
               },
               normal: {
+                borderWidth:5,
+                borderColor:'#FFF',
                 color: function(params) {
                   const colorList = [self.pendingColor, self.doneColor, self.closedColor];
                   return colorList[params.dataIndex];

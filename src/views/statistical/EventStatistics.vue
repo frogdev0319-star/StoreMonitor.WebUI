@@ -1729,17 +1729,17 @@ export default {
       const childLayer = data.filter(item1 =>{
         return item1.parentId!=-1;
       });
-      console.log("childLayer:",childLayer);
+      //console.log("childLayer:",childLayer);
       var sourceData = [];
       if(childLayer.length>0){
         data.forEach((item,index)=>{
-          console.log("data item:",item);
+          //console.log("data item:",item);
           if(item.parentId == -1 ){ //只抓第一層
             if(item.itemIds.length==0){ //表示他有2類
               const tempLayer = childLayer.filter(layer=>{
               return layer.parentId==item.groupId
               });
-              console.log(" tempLayer:", tempLayer);
+              //console.log(" tempLayer:", tempLayer);
               var tagIds = [], numOfUnqualified=0, perc=0;
               for(var i=0;i<tempLayer.length;i++){
                 tagIds = tagIds.concat(tempLayer[i].itemIds);
@@ -1829,7 +1829,7 @@ export default {
             itemStyle: {
               emphasis: {
                 borderWidth:10,
-                borderColor:'#f7f9fa'
+                borderColor:'#EDF0F2'
               },
               normal: {
                 borderWidth:5,
