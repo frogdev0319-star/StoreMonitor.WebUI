@@ -13,7 +13,7 @@
       @mousemove="showModel">
       <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.channelName }}</span>
       <div v-if="showInfoContent || playBackState" class="icon-footer">
-        <div class="iconlside flex-center" style="margin-left: 60px">
+        <div class="iconlside flex-center">
           <i v-if="playState" class="iconfont icon-zantingtingzhi iconplay" @click="stopRealTime"/>
           <i v-else class="iconfont icon-bofang1 iconplay" @click="realTime"/>
         </div>
@@ -51,7 +51,7 @@
               >
                 <el-popover
                   v-model="qualityVisible"
-                  placement="bottom"
+                  placement="top"
                   popper-class="quality-tooltip">
                   <div
                     v-for="(item, index) in videoQualityList"
@@ -67,7 +67,23 @@
                 </el-popover>
               </div>
               <span style="margin-right: 20px">{{ $t('remotePatrol.ezuikitwidth') }}</span>
-              <el-select
+              <el-popover
+                v-model="sizeVisible"
+                placement="top"
+                popper-class="quality-tooltip">
+                <div
+                  v-for="(item, index) in proportionList"
+                  :key="index"
+                  :class="{'checked-label': index === curSizeIndex}"
+                  class="quaility-label"
+                  @click="checkPro(item.label, index)">
+                  {{ item.label }}
+                </div>
+                <el-button slot="reference" class="quality-button">
+                  {{ proportionList[curSizeIndex].label }}
+                </el-button>
+              </el-popover>
+              <!-- <el-select
                 style="margin-right: 20px"
                 :value="proportion"
                 :popper-class="popperClass"
@@ -82,16 +98,16 @@
                   :value="item.label"
                   @click.native="checkPro(item.label)"
                 />
-              </el-select>
+              </el-select> -->
             </div>
           </div>
-          <div class="flex-center" style="margin-right: 20px">
+          <div class="flex-center snapshot">
             <img :src="snapshotIcon"  @click="cutPicture" v-if="!isEvent">
           </div>
-          <div class="iconlside flex-center" style="margin-right: 20px">
-            <img :src="muted? voiceOffIcon : voiceONIcon"  @click="onMuted">
+          <div class="iconlside flex-center">
+            <img class="icon-auido" :src="muted? voiceOffIcon : voiceONIcon"  @click="onMuted">
           </div>
-          <div class="screen-content flex-center" style="margin-right: 40px">
+          <div class="screen-content flex-center">
             <img :src="screenExpIcon"  @click="controlScreen">
           </div>
         </div>
@@ -162,7 +178,7 @@
                 >
                   <el-popover
                     v-model="qualityVisible"
-                    placement="bottom"
+                    placement="top"
                     popper-class="quality-tooltip">
                     <div
                       v-for="(item, index) in videoQualityList"
@@ -177,29 +193,29 @@
                     </el-button>
                   </el-popover>
                 </div>
-                <span style="margin-right: 20px">{{ $t('remotePatrol.ezuikitwidth') }}</span>
-                <el-select
-                  style="margin-right: 20px"
-                  :value="proportion"
-                  :popper-class="popperClass"
-                  :popper-append-to-body="false"
-                  class="el-test"
-                  size="mini"
-                  placeholder="">
-                  <el-option
-                    v-for="(item,index) in proportionList"
+                <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+                <el-popover
+                  v-model="sizeVisible"
+                  placement="top"
+                  popper-class="quality-tooltip">
+                  <div
+                    v-for="(item, index) in proportionList"
                     :key="index"
-                    :label="item.label"
-                    :value="item.label"
-                    @click.native="checkPro(item.label)"
-                  />
-                </el-select>
+                    :class="{'checked-label': index === curSizeIndex}"
+                    class="quaility-label"
+                    @click="checkPro(item.label, index)">
+                    {{ item.label }}
+                  </div>
+                  <el-button slot="reference" class="quality-button">
+                    {{ proportionList[curSizeIndex].label }}
+                  </el-button>
+                </el-popover>
               </div>
             </div>
-            <div class="iconlside flex-center" style="margin-right: 20px">
-              <img :src="muted? voiceOffIcon : voiceONIcon"  @click="onMuted">
+            <div class="iconlside flex-center">
+              <img class="icon-auido" :src="muted? voiceOffIcon : voiceONIcon"  @click="onMuted">
             </div>
-            <div class="screen-content flex-center" style="margin-right: 40px">
+            <div class="screen-content flex-center">
               <img :src="screenColIcon"  @click="controlScreen">
             </div>
           </div>
@@ -565,6 +581,7 @@ export default {
       paused: true,
       qualityVisible: false,
       sizeVisible: false,
+      curSizeIndex: 0,
       curQualityIndex: 1,
       videoQualityList: [
         {
@@ -777,9 +794,12 @@ export default {
       }
     },
 
-    checkPro(item) {
+    checkPro(item, index) {
+
       const self = this;
+      self.curSizeIndex = index
       self.proportion = item;
+      self.sizeVisible = false;
       if (self.fullWindow) {
         if (self.playState) {
           !self.muted && self.fullDecoder.closeSound();
@@ -2196,9 +2216,7 @@ export default {
       color: #fff;
       z-index: 10;
       display: block;
-      width:-webkit-calc(100% - 30px);
-      width:-moz-calc(100% - 30px);
-      width:calc(100% - 30px);
+      width: 100%;
       height: 40px;
       line-height: 40px;
       text-align: left;
@@ -2219,14 +2237,19 @@ export default {
       user-select: none;
       z-index: 10;
       background-color: rgba($color: #24293d, $alpha: 0.6);
+      .snapshot {
+        margin: 0 calc(20/1920*100vw);
+      }
       .iconlside{
         text-align: left;
         .iconplay{
           font-size: 18px;
+          margin-left: calc(60/1920*100vw);
           cursor: pointer;
         }
         .icon-auido{
           font-size: 18px;
+          margin-right: calc(20/1920*100vw);
           cursor: pointer;
         }
       }
@@ -2263,23 +2286,11 @@ export default {
           }
           .video-quality{
           }
-          .quality-button{
-            width: 45px;
-            height: 20px;
-            padding: 0;
-            color: #C8C9CA;
-            background-color: transparent;
-            border: 1px solid #fff;
-            font-size: 12px;
-          }
-          .quality-button.el-button:hover, .quality-button.el-button:focus{
-            border: 1px solid #5E5F61;
-            color: #5E5F61 !important;
-          }
         }
       }
     }
     .screen-content{
+      margin-right: calc(20/1920*100vw);
       .iconscreen{
         font-size: 18px;
         // position: relative;
@@ -2545,7 +2556,7 @@ export default {
     }
   }
 </style>
-<style>
+<style lang="scss">
   .select-popClass .el-select-dropdown__item{
     font-size:12px;
     height: 24px;
@@ -2589,28 +2600,46 @@ export default {
     z-index: 900;
   }
 
+  .quality-button {
+    // width: calc(40/1920*100vw);
+    padding: calc(3/1920*100vw);
+    span {
+      padding: calc(3/1920*100vw) calc(10/1920*100vw);
+    }
+    min-width: calc(60/1920*100vw);
+    min-height: unset;
+    color: #fbfafc;
+    background-color: transparent;
+    border: 1px solid #fff;
+    font-size: 12px;
+  }
+  .quality-button.el-button:hover, .quality-button.el-button:focus, .quality-button.el-button:active{
+    color: #fbfafc;
+    background-color: transparent;
+    border: 1px solid #fff;
+  }
   .el-popover.quality-tooltip{
-    min-width: 48px;
-    padding: 0;
+    min-width: calc(60/1920*100vw);
     text-align: center;
-    background-color: #34374A;
+    background-color: transparent;
     border-radius: 0;
-    margin-bottom: 2px;
     border: none;
-    margin-top: 0px;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
   }
   .quality-tooltip .popper__arrow{
     display: none;
   }
   .quaility-label{
-    height: 24px;
-    line-height: 24px;
     cursor: pointer;
-    color: #C8C9CA;
+    color: #fbfafc;
+    background-color: rgba(52, 55, 74, .6);
     font-size: 12px;
   }
   .checked-label{
-    color: #006ab7;
+    border: 1px solid #006ab7;
+    background-color: rgba(0, 106, 183, .6);
   }
 </style>
 

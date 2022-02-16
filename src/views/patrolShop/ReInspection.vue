@@ -253,13 +253,90 @@
           </div>
         </dialog-pop>
 
-        <dialog-vue :dialog-title="changeBrandObj.title" :show-info="changeBrandObj.showInfo" :is-warning="changeBrandObj.isWarning" :dialog-closed="changeBrandObj.dialogCosed" @confirmed="changeBrandDialog" @canceled="canceldChangeBrand"/>
-        <dialog-vue :dialog-title="changeStoreObj.title" :show-info="changeStoreObj.showInfo" :is-warning="changeStoreObj.isWarning" :dialog-closed="changeStoreObj.dialogCosed" @confirmed="changeStoreDialog" @canceled="canceldChangeStore"/>
-        <dialog-vue :dialog-title="changeInspectObj.title" :show-info="changeInspectObj.showInfo" :is-warning="changeInspectObj.isWarning" :dialog-closed="changeInspectObj.dialogCosed" @confirmed="changeInspectDialog" @canceled="canceldChangeInspect"/>
-        <dialog-vue :dialog-title="noBindDeviceObj.title" :show-info="noBindDeviceObj.showInfo" :is-warning="noBindDeviceObj.isWarning" :dialog-closed="noBindDeviceObj.dialogCosed" @confirmed="noBindDeviceDialog" @canceled="canceldNoBind"/>
-        <dialog-vue :dialog-title="noAllInspectObj.title" :show-info="noAllInspectObj.showInfo" :is-warning="noAllInspectObj.isWarning" :dialog-closed="noAllInspectObj.dialogCosed" @confirmed="noAllInspectDialog" @canceled="canceldNoAllInspect"/>
-        <dialog-vue :dialog-title="allIgnoreObj.title" :show-info="allIgnoreObj.showInfo" :is-warning="allIgnoreObj.isWarning" :dialog-closed="allIgnoreObj.dialogCosed" @confirmed="allIgnoreDialog" @canceled="cancelAllIgnore"/>
-        <dialog-vue :dialog-title="leaveObj.title" :show-info="leaveObj.showInfo" :is-warning="leaveObj.isWarning" :dialog-closed="leaveObj.dialogCosed" @confirmed="leaveDialog" @canceled="cancelLeave"/>
+        <dialog-pop
+          v-if="changeBrandObj.dialogCosed"
+          :title="changeBrandObj.title"
+          :isWarning="changeBrandObj.isWarning"
+          :visible="changeBrandObj.dialogCosed"
+          @cancelHandler="canceldChangeBrand"
+          @confirmHandler="changeBrandDialog"
+          >
+          <div class="dialog-slot">
+            {{changeBrandObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="changeStoreObj.dialogCosed"
+          :title="changeStoreObj.title"
+          :isWarning="changeStoreObj.isWarning"
+          :visible="changeStoreObj.dialogCosed"
+          @cancelHandler="canceldChangeStore"
+          @confirmHandler="changeStoreDialog"
+          >
+          <div class="dialog-slot">
+            {{changeStoreObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="changeInspectObj.dialogCosed"
+          :title="changeInspectObj.title"
+          :isWarning="changeInspectObj.isWarning"
+          :visible="changeInspectObj.dialogCosed"
+          @cancelHandler="canceldChangeInspect"
+          @confirmHandler="changeInspectDialog"
+          >
+          <div class="dialog-slot">
+            {{changeInspectObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="noBindDeviceObj.dialogCosed"
+          :title="noBindDeviceObj.title"
+          :isWarning="noBindDeviceObj.isWarning"
+          :visible="noBindDeviceObj.dialogCosed"
+          @cancelHandler="canceldNoBind"
+          @confirmHandler="noBindDeviceDialog"
+          >
+          <div class="dialog-slot">
+            {{noBindDeviceObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="noAllInspectObj.dialogCosed"
+          :title="noAllInspectObj.title"
+          :isWarning="noAllInspectObj.isWarning"
+          :visible="noAllInspectObj.dialogCosed"
+          @cancelHandler="canceldNoAllInspect"
+          @confirmHandler="noAllInspectDialog"
+          >
+          <div class="dialog-slot">
+            {{noAllInspectObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="allIgnoreObj.dialogCosed"
+          :title="allIgnoreObj.title"
+          :isWarning="allIgnoreObj.isWarning"
+          :visible="allIgnoreObj.dialogCosed"
+          @cancelHandler="cancelAllIgnore"
+          @confirmHandler="allIgnoreDialog"
+          >
+          <div class="dialog-slot">
+            {{allIgnoreObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="leaveObj.dialogCosed"
+          :title="leaveObj.title"
+          :isWarning="leaveObj.isWarning"
+          :visible="leaveObj.dialogCosed"
+          @cancelHandler="cancelLeave"
+          @confirmHandler="leaveDialog"
+          >
+          <div class="dialog-slot">
+            {{leaveObj.showInfo}}
+          </div>
+        </dialog-pop>
         <div v-if="showGuide && inspectList.length > 0" class="guide-content">
           <div class="guide-rside">
             <div class="num-content">
@@ -859,7 +936,7 @@ export default {
         dialogCosed: false
       },
       noAllInspectObj: {
-        title: this.$t('remotePatrol.prompt'),
+        title: this.$t('remotePatrol.confirmSum'),
         showInfo: this.$t('remotePatrol.incompleteInfo'),
         isWarning: true,
         dialogCosed: false
@@ -3704,9 +3781,7 @@ export default {
           color: #fff;
           z-index: 10;
           display: block;
-          width:-webkit-calc(100% - 30px);
-          width:-moz-calc(100% - 30px);
-          width:calc(100% - 30px);
+          width: 100%;
           height: 40px;
           line-height: 40px;
           text-align: left;
@@ -4708,7 +4783,8 @@ export default {
   }
   .confirmClass .confirmBtn{
     width: 4.75rem;
-    background-color: #f31d65;;
+    border: none;
+    background-color: #006ab7;
     color: #fff !important;
     font-size: 12px;
     line-height: 12px;

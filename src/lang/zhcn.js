@@ -6,6 +6,7 @@ export default {
     "beseyeAccount": "Beseye",
     "beseyeDeviceMgt": "监控设备管理（Beseye）",
     "beseyeDeviceSetting": "Beseye设备配置",
+    "brandId": "品牌 ID：",
     "brand": "品牌",
     "bindStore": "门店绑定",
     "checkInStatistics": "巡店签到统计",

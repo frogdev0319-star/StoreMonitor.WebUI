@@ -1357,9 +1357,7 @@
       color: #fff;
       z-index: 10;
       display: block;
-      width:-webkit-calc(100% - 30px);
-      width:-moz-calc(100% - 30px);
-      width:calc(100% - 30px);
+      width: 100%;
       height: 40px;
       line-height: 40px;
       text-align: left;
