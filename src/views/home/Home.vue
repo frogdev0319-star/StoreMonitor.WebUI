@@ -222,7 +222,7 @@
               $route.path === '/reinspection' || $route.path === '/storemonitor' || $route.path === '/report'
                 ? {
                     background:
-                      '#f7f9fa url(../../static/img/reinspection_bg.png) no-repeat 100% 0',
+                      '#f7f9fa url(./static/img/reinspection_bg.png) no-repeat 100% 0',
                   }
                 : { 'background-color': '#f4f5f9' },
             ]"
