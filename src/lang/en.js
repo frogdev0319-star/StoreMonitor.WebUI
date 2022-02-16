@@ -84,7 +84,8 @@ export default {
     "patrolPersonStat": "Inspection Person Statistics",
     "patrolCompareStat": "Inspection Compare Statistics",
     "singleStoreStat":"Single store Statistics",
-    "appraisalCompareStat":"Inspection Evaluation Compare Statistics"
+    "appraisalCompareStat":"Inspection Evaluation Compare Statistics",
+    "accountTerminated": "Unavailable Account ",
   },
 
   "overview": {

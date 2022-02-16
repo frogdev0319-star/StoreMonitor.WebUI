@@ -1393,11 +1393,18 @@ export default {
       this.part3.barStoreOption = {};
       this.overviewCount={store:-9999,items:-9999,avgScore:-9999};
       if(this.params.storeIds.length>0){
+
         await this.dataGetOverview();
         await this.dataGetPart1() ;
         await this.dataGetPart2() ;
         await this.dataGetPart3() ;
 
+      }
+      else{
+          if (this.params.storeIds.length === 0) {
+              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              return false;
+            }
       }
 
     },
@@ -1437,7 +1444,7 @@ export default {
               size:params.storeIds.length
             }
              if (params.storeIds.length === 0) {
-              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              ;
               return false;
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
@@ -1482,7 +1489,7 @@ export default {
               size:params.storeIds.length
             }
              if (params.storeIds.length === 0) {
-              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              ;
               return false;
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
@@ -1526,7 +1533,7 @@ export default {
               size:params.storeIds.length
             }
              if (params.storeIds.length === 0) {
-              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              ;
               return false;
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
@@ -2064,8 +2071,10 @@ export default {
       }
       
         params.filter = { page: 0, size: params.groupIds.length };
-        console.log("Get Part1 Region bar")
-        console.log(params)
+        if (params.storeIds.length === 0) {
+              ;
+              return false;
+        }
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2223,6 +2232,7 @@ export default {
             }
         
             console.log(params)
+            if(params.storeIds.length==0)return;
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -2342,6 +2352,11 @@ export default {
       let totalReport = 0;
       let totalStandard = 0;
       params.filter = { page: 0, size: params.groupIds.length };
+      
+      if (params.storeIds.length === 0) {
+              ;
+              return false;
+            }
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2444,7 +2459,10 @@ export default {
               page:(this.part2.storeMode==1) ? 0:this.part2.table.page-1,
               size:(this.part2.storeMode==1) ?params.storeIds.length: this.part2.table.sizeNum
             }
-
+           if (params.storeIds.length === 0) {
+              ;
+              return false;
+            }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -2544,6 +2562,7 @@ export default {
       let totalReport = 0;
       let totalStandard = 0;
       params.filter = { page: 0, size: params.groupIds.length };
+        if(params.storeIds.length==0)return;
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2651,6 +2670,7 @@ export default {
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
 
+            if(params.storeIds.length==0)return;
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                const result = storeResult.data;

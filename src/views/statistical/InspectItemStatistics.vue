@@ -1954,7 +1954,7 @@ export default {
         return;
       }
         params.filter = { page: 0, size: params.groupIds.length };
-       
+        if(params.itemIds.length==0 || params.storeIds.length ==0)return
         const storeResult = await self.getInspectStatsItemOverGroup(params);
         console.log(storeResult)
         if (storeResult.errCode === 0) {
@@ -2099,7 +2099,7 @@ export default {
               page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
-
+            if(params.itemIds.length==0 || params.storeIds.length ==0)return
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             console.log(storeResult)
             if (storeResult.errCode === 0) {
