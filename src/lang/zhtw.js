@@ -286,7 +286,7 @@ export default {
     "channelPlaceholder": "請輸入關鍵字搜索通道",
     "checkinSuccess": "簽到成功",
     "clear": "清除",
-    "clickToContent": "部分巡檢未評估，點擊查看！",
+    "clickToContent": "查看未評項目",
     "clickToStar": "點擊關注",
     "closeConnection": "連接關閉",
     "code": "分店代碼",

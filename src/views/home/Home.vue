@@ -1473,6 +1473,9 @@ $collapseWidth: 5.5%;
 .padding-bottom-sm {
   padding-bottom: calc(16/1920*100vw);
 }
+.padding-vertical-sm {
+  padding: calc(16/1920*100vw) 0;
+}
 .padding-horizontal-sm {
   padding: 0 calc(16/1920*100vw);
 }
