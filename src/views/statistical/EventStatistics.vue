@@ -1740,15 +1740,15 @@ export default {
               return layer.parentId==item.groupId
               });
               //console.log(" tempLayer:", tempLayer);
-              var tagIds = [], numOfUnqualified=0, perc=0;
+              var tagIds = [];//, numOfUnqualified=0, perc=0;
               for(var i=0;i<tempLayer.length;i++){
                 tagIds = tagIds.concat(tempLayer[i].itemIds);
-                numOfUnqualified = numOfUnqualified+tempLayer[i].numOfUnqualified
-                perc = perc + tempLayer[i].percentage;
+                //numOfUnqualified = numOfUnqualified+tempLayer[i].numOfUnqualified
+                //perc = perc + tempLayer[i].percentage;
               }
               item.itemIds = tagIds;
-              item.numOfUnqualified = numOfUnqualified;
-              item.percentage = perc/tempLayer.length;
+              //item.numOfUnqualified = numOfUnqualified;
+              //item.percentage = perc/tempLayer.length;
             }
             sourceData.push(item);
           }
