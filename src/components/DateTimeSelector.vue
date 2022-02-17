@@ -37,7 +37,7 @@ export default {
   components: { DateTimePicker },
   props:{
     dateTimeValue:{
-      type:Object,
+      type: Array,
       default:()=>{return [];}
     },
     showTooltips:{

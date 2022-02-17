@@ -58,7 +58,9 @@
     <div id="el-containter" class="flex-column spacer">
       <div class="report-header">
         <div class="flex-center" style="padding-top: 0">
-          <date-time-selector @change="dateChange"/> 
+          <date-time-selector
+           @change="dateChange" 
+          :dateTimeValue = dateValue /> 
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
               <span class="search-label">{{ $t('remotePatrol.keywords') }}</span>
@@ -130,28 +132,31 @@
           <div v-if="ShowCard" class="showCardHeight">
               <el-col v-for="(item,index) in reportList" :span="4" :key="index" class="report-card">
                 <div class="cards shadow-light" @click="clickReport(item,index)">
-                  <div class="flex-center" style="margin-bottom: 5px">
-                    <div style="font-size: 15px; flex: 1; min-width: 0; margin-right: 10px">{{ item.storeName }}</div>
+                  <div class="flex-center margin-bottom-5">
+                    <div class="card-title">{{ item.storeName }}</div>
                     <img :src="item.mode===1?onsiteIcon:remoteIcon" :height="20" alt="" >
                   </div>
-                  <div style="margin-bottom: 5px">{{ item.tagName }}</div>
-                  <div style="margin-bottom: 12px">
-                    <div style="border-radius: 5px; padding: 2px 15px"
+                  <div class="margin-bottom-5">{{ item.tagName }}</div>
+                  <div style="margin-bottom: 12px" class="flex">
+                    <div class="status-tag"
                       :style="{
                         0: {'color':'#e22472','background-color':'#ffecf4'},
                         1: {'color':'#f57848','background-color':'#ffefeb'},
                         2: {'color':'#59ab22','background-color':'#e8f6de'}
                       }[item.statusCode]"
                     >{{item.status}}</div>
+                    <div style="margin-left: calc(10/1920*100vw)" class="status-tag"
+                      :style="item.totalScore >= item.standard ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
+                    >{{item.totalScore >= item.standard ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
                   </div>
                   <!-- //0: danger,1: improve,2: pass -->
                   <div class="flex-center">
-                    <div style="font-size: 32px; margin-right: 5px; margin-bottom: 30px">{{ item.totalScore }}</div>
+                    <div class="score">{{ item.totalScore }}</div>
                     <div v-if="lang.indexOf('zh') !== -1" class="score-unit">
                       {{ $t('insSettingView.scores') }}
                     </div>
                   </div>
-                  <div style="margin-bottom: 5px">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
+                  <div class="margin-bottom-5">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
                   <div>{{ item.datestr }}</div>
                 </div>
               </el-col>
@@ -1014,7 +1019,13 @@ $suggestBack:#F1F6FE;
     .report-card{
         margin-bottom: 20px;
         .cards{
-          >>> div {
+          .card-title {
+             font-size: calc(15/1920*100vw);
+             flex: 1; 
+             min-width: 0; 
+             margin-right: calc(10/1920*100vw);
+          }
+          div {
             display: flex;
             align-items: center;
             text-align: left;
@@ -1022,22 +1033,22 @@ $suggestBack:#F1F6FE;
             white-space: nowrap;
             text-overflow: ellipsis;
           }
-          padding: calc(20/1920*100vw);
+            padding: calc(15/1920*100vw);
             cursor: pointer;
             margin-left: calc(10/1920*100vw);
             margin-right: calc(10/1920*100vw);
             border: 1px solid #e3e9f4;
             font-size: 12px;
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-            // width: calc(200/1920*100vw);
-            height: calc(240/1920*100vw);
+            width: calc(200/1920*100vw);
+            height: calc(210/1920*100vw);
             position: relative;
             color: #69727c;
-            min-height: 160px;
+            min-height: calc(160/1920*100vw);
             .item-img{
-                position: absolute;
-                right: 1px;
-                top: 1px;
+              position: absolute;
+              right: 1px;
+              top: 1px;
             }
           .item-flex{
             display: flex;
@@ -1087,6 +1098,18 @@ $suggestBack:#F1F6FE;
         .inspectIcon{
           font-size: calc(60/1920*100vw);
           color: $border;
+        }
+        .score {
+          font-size: calc(32/1920*100vw); 
+          margin-right: calc(5/1920*100vw);
+          margin-bottom: calc(30/1920*100vw);
+        }
+        .status-tag {
+          border-radius: calc(5/1920*100vw); 
+          padding: calc(2/1920*100vw) calc(15/1920*100vw);
+        }
+        .margin-bottom-5 {
+          margin-bottom: calc(5/1920*100vw);
         }
         .item-score{
           color: $tab;

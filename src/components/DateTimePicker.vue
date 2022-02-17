@@ -43,7 +43,7 @@ export default {
       default: false
     },
     dateTimeValue:{
-      type:Object,
+      type: Array,
       default:()=>{return [];}
     }
   },
