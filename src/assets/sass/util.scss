@@ -105,13 +105,15 @@ $sv_red: #c60957;
   position: absolute;
   display: flex;
   flex-direction: column;
-  border-radius: 5px;
+  
+  border-radius: calc(10/1920*100vw);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   margin: 0 !important;
   .el-dialog__header {
     background-color: #f7f9fa;
+    border-radius: calc(10/1920*100vw);
   }
   .el-dialog__body {
     flex: 1;
