@@ -23,23 +23,24 @@
             v-if="playBackState" 
             class="iconrside"
           >
-            <div class="speed-content flex-center">
-              <span>{{ $t('remotePatrol.back') }}</span>
-              <el-select
-                :value="curBack"
-                :popper-class="popperClass"
-                :popper-append-to-body="false"
-                class="el-test"
-                size="mini"
-                placeholder="">
-                <el-option
-                  v-for="(item) in backList"
+            <div style="margin-right: 20px" class="speed-content flex-center">
+              <span style="margin-right: 20px">{{ $t('remotePatrol.back') }}</span>
+              <el-popover
+                v-model="playBackVisible"
+                placement="top"
+                popper-class="quality-tooltip">
+                <div
+                  v-for="(item, index) in backList"
                   :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                  @click.native="adjustProcess(item.value, item.label)"
-                />
-              </el-select>
+                  :class="{'checked-label': index === curPlayBackIndex}"
+                  class="quaility-label"
+                  @click="adjustProcess(item.value, item.label, index)">
+                  {{ item.label }}
+                </div>
+                <el-button slot="reference" class="quality-button">
+                  {{ backList[curPlayBackIndex].label }}
+                </el-button>
+              </el-popover>
             </div>
           </div>
           <div class="iconrside">
@@ -83,22 +84,6 @@
                   {{ proportionList[curSizeIndex].label }}
                 </el-button>
               </el-popover>
-              <!-- <el-select
-                style="margin-right: 20px"
-                :value="proportion"
-                :popper-class="popperClass"
-                :popper-append-to-body="false"
-                class="el-test"
-                size="mini"
-                placeholder="">
-                <el-option
-                  v-for="(item,index) in proportionList"
-                  :key="index"
-                  :label="item.label"
-                  :value="item.label"
-                  @click.native="checkPro(item.label)"
-                />
-              </el-select> -->
             </div>
           </div>
           <div class="flex-center snapshot">
@@ -150,23 +135,24 @@
           <div style="flex: 1;"></div>
           <div class="footer-right flex-center">
             <div v-if="playBackState" class="iconrside">
-              <div class="speed-content flex-center">
-                <span>{{ $t('remotePatrol.back') }}</span>
-                <el-select
-                  :value="curBack"
-                  :popper-class="popperClass"
-                  :popper-append-to-body="false"
-                  class="el-test"
-                  size="mini"
-                  placeholder="">
-                  <el-option
-                    v-for="(item) in backList"
+              <div style="margin-right: 20px"  class="speed-content flex-center">
+                <span style="margin-right: 20px">{{ $t('remotePatrol.back') }}</span>
+                <el-popover
+                  v-model="playBackVisible"
+                  placement="top"
+                  popper-class="quality-tooltip">
+                  <div
+                    v-for="(item, index) in backList"
                     :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                    @click.native="adjustProcess(item.value, item.label)"
-                  />
-                </el-select>
+                    :class="{'checked-label': index === curPlayBackIndex}"
+                    class="quaility-label"
+                    @click="adjustProcess(item.value, item.label, index)">
+                    {{ item.label }}
+                  </div>
+                  <el-button slot="reference" class="quality-button">
+                    {{ backList[curPlayBackIndex].label }}
+                  </el-button>
+                </el-popover>
               </div>
             </div>
             <div class="iconrside">
@@ -193,7 +179,7 @@
                     </el-button>
                   </el-popover>
                 </div>
-                <span>{{ $t('remotePatrol.ezuikitwidth') }}</span>
+                <span  style="margin-right: 20px">{{ $t('remotePatrol.ezuikitwidth') }}</span>
                 <el-popover
                   v-model="sizeVisible"
                   placement="top"
@@ -211,6 +197,9 @@
                   </el-button>
                 </el-popover>
               </div>
+            </div>
+            <div class="flex-center snapshot">
+              <img :src="snapshotIcon"  @click="cutPicture" v-if="!isEvent">
             </div>
             <div class="iconlside flex-center">
               <img class="icon-auido" :src="muted? voiceOffIcon : voiceONIcon"  @click="onMuted">
@@ -581,8 +570,10 @@ export default {
       paused: true,
       qualityVisible: false,
       sizeVisible: false,
+      playBackVisible: false,
       curSizeIndex: 0,
       curQualityIndex: 1,
+      curPlayBackIndex: 0,
       videoQualityList: [
         {
           label: this.$t('remotePatrol.highDefinition'),
@@ -1772,9 +1763,10 @@ export default {
       }
     },
 
-    adjustProcess(val, label) {
+    adjustProcess(val, label, index) {
       const self = this;
       self.curBack = label;
+      self.curPlayBackIndex = index;
       var callback = function(iTime) {
         switch (val) {
           case 0: self.startTs = iTime - 10 * 1000; break;
