@@ -1186,18 +1186,22 @@ export default {
     //  return "TEST";
     },
     routeToInpectReportWithParam(e){
-     const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
+    // const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
+      let searchParams =   JSON.parse(JSON.stringify(this.params))
       searchParams.jump = true;
-      searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
-      searchParams.searchCondition.clause ={storeId:[e.row.innerId]};
       searchParams.clause ={storeId:[e.row.innerId]};
       searchParams.filterStoreIds=[e.row.innerId]
+      searchParams.curStores=[e.row.innerId]
       searchParams.curStore=[e.row.innerId]
       searchParams.storeIds=[e.row.innerId]
-      searchParams.searchCondition.storeIds=[e.row.innerId]
+      searchParams.filterStoreIds=[e.row.innerId]
       searchParams.curAppraise = -1;
       searchParams.curReportType = -1;
+      searchParams.inspectTagId =  searchParams.inspectId;
+      searchParams.beginTs  = this.params.beginTs;
+      searchParams.endTs  = this.params.endTs;
       searchParams.filter ={ page: 0, size: 12 };
+ 
       console.log(searchParams)
       const searchParamsObj = {
         path: 'inspectReport',
@@ -1207,7 +1211,7 @@ export default {
       //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
        this.$router.push({
          path: '/report',
-      });
+       });
     },
     onEvenListNumClickPart1(e){
       this.routeToInpectReportWithParam(e);
@@ -2815,6 +2819,8 @@ export default {
 
     initData() {
       this.params = SearchConditionUtil.getSearchCondition(this.path);
+      console.log("Init Data")
+      console.log(this.params)
       this.params.filter = { page: 0, size: this.sizeNumStore };
     },
 
