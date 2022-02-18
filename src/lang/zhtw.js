@@ -85,7 +85,8 @@ export default {
     "patrolPersonStat": "巡檢人員統計",
     "patrolCompareStat": "巡檢同比分析",
     "singleStoreStat":"單店分析",
-    "appraisalCompareStat":"考評同比分析"
+    "appraisalCompareStat":"考評同比分析",
+    "accountTerminated": "帳號已停用無法切換",
   },
 
   "overview": {

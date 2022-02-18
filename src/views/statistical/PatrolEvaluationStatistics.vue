@@ -1186,18 +1186,22 @@ export default {
     //  return "TEST";
     },
     routeToInpectReportWithParam(e){
-     const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
+    // const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
+      let searchParams =   JSON.parse(JSON.stringify(this.params))
       searchParams.jump = true;
-      searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
-      searchParams.searchCondition.clause ={storeId:[e.row.innerId]};
       searchParams.clause ={storeId:[e.row.innerId]};
       searchParams.filterStoreIds=[e.row.innerId]
+      searchParams.curStores=[e.row.innerId]
       searchParams.curStore=[e.row.innerId]
       searchParams.storeIds=[e.row.innerId]
-      searchParams.searchCondition.storeIds=[e.row.innerId]
+      searchParams.filterStoreIds=[e.row.innerId]
       searchParams.curAppraise = -1;
       searchParams.curReportType = -1;
+      searchParams.inspectTagId =  searchParams.inspectId;
+      searchParams.beginTs  = this.params.beginTs;
+      searchParams.endTs  = this.params.endTs;
       searchParams.filter ={ page: 0, size: 12 };
+ 
       console.log(searchParams)
       const searchParamsObj = {
         path: 'inspectReport',
@@ -1207,7 +1211,7 @@ export default {
       //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
        this.$router.push({
          path: '/report',
-      });
+       });
     },
     onEvenListNumClickPart1(e){
       this.routeToInpectReportWithParam(e);
@@ -1217,9 +1221,18 @@ export default {
       if(e.prop == 'compareTrend'){
         //  let params = JSON.parse(JSON.stringify(this.params))
       //    const searchParams = SearchConditionUtil.getSearchCondition('inspectEvalutionStatistics');
-          const params= SearchConditionUtil.getSearchCondition('PatrolCompareStat');
+        //  const params= SearchConditionUtil.getSearchCondition('PatrolCompareStat');
+       //   let  params= SearchConditionUtil.getSearchCondition('PatrolCompareStat');
+          let  params= JSON.parse(JSON.stringify(this.params));
           params.storeIds = [e.row.innerId]
           params.curStore = [e.row.innerId]
+          params.filterStoreIds = [e.row.innerId]
+          if(!params.curProvince){
+            params.curProvince =[];
+          }
+            if(!params.curCity){
+            params.curCity =[];
+          }
           const searchParamsObj = {
             path: 'PatrolCompareStat',
             params: params
@@ -1393,11 +1406,18 @@ export default {
       this.part3.barStoreOption = {};
       this.overviewCount={store:-9999,items:-9999,avgScore:-9999};
       if(this.params.storeIds.length>0){
+
         await this.dataGetOverview();
         await this.dataGetPart1() ;
         await this.dataGetPart2() ;
         await this.dataGetPart3() ;
 
+      }
+      else{
+          if (this.params.storeIds.length === 0) {
+              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              return false;
+            }
       }
 
     },
@@ -1437,7 +1457,7 @@ export default {
               size:params.storeIds.length
             }
              if (params.storeIds.length === 0) {
-              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              ;
               return false;
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
@@ -1482,7 +1502,7 @@ export default {
               size:params.storeIds.length
             }
              if (params.storeIds.length === 0) {
-              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              ;
               return false;
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
@@ -1526,7 +1546,7 @@ export default {
               size:params.storeIds.length
             }
              if (params.storeIds.length === 0) {
-              util.notify(self.$t('overview.emptyStoreList'), 'warning', 3000);
+              ;
               return false;
             }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
@@ -2064,8 +2084,10 @@ export default {
       }
       
         params.filter = { page: 0, size: params.groupIds.length };
-        console.log("Get Part1 Region bar")
-        console.log(params)
+        if (params.storeIds.length === 0) {
+              ;
+              return false;
+        }
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2223,6 +2245,7 @@ export default {
             }
         
             console.log(params)
+            if(params.storeIds.length==0)return;
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -2342,6 +2365,11 @@ export default {
       let totalReport = 0;
       let totalStandard = 0;
       params.filter = { page: 0, size: params.groupIds.length };
+      
+      if (params.storeIds.length === 0) {
+              ;
+              return false;
+            }
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2444,7 +2472,10 @@ export default {
               page:(this.part2.storeMode==1) ? 0:this.part2.table.page-1,
               size:(this.part2.storeMode==1) ?params.storeIds.length: this.part2.table.sizeNum
             }
-
+           if (params.storeIds.length === 0) {
+              ;
+              return false;
+            }
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
@@ -2544,6 +2575,7 @@ export default {
       let totalReport = 0;
       let totalStandard = 0;
       params.filter = { page: 0, size: params.groupIds.length };
+        if(params.storeIds.length==0)return;
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
@@ -2651,6 +2683,7 @@ export default {
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
 
+            if(params.storeIds.length==0)return;
             const storeResult = await this.getInspectStatsOverviewWithGroup(params);
             if (storeResult.errCode === 0) {
                const result = storeResult.data;
@@ -2795,6 +2828,8 @@ export default {
 
     initData() {
       this.params = SearchConditionUtil.getSearchCondition(this.path);
+      console.log("Init Data")
+      console.log(this.params)
       this.params.filter = { page: 0, size: this.sizeNumStore };
     },
 

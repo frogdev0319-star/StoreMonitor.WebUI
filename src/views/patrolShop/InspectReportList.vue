@@ -3,12 +3,12 @@
     <div>
       <store-filter
         :cached-params="searchParams"
-        type="report"
+        :is-patrol = "false"
         @storeChange = "onStoreChange"
       >
         <template v-slot:others>
-          <div>
-            <span style="margin-right: 10px">{{ $t('remotePatrol.resultType') }}</span>
+          <div class="last-row" >
+            <span style="margin-right: 10px;margin-left: 15px">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
               v-model="curAppraise"
               :placeholder="$t('remotePatrol.all')"
@@ -21,14 +21,15 @@
                 :label="item.label"
                 :value="item.status"/>
             </el-select>
-          </div>
-          <div>
             <span style="margin-right: 10px">{{ $t('remotePatrol.reportType') }}</span>
+            <div class="flex-center">
             <el-select
               v-model="curReportType"
+
               :placeholder="$t('remotePatrol.all')"
               size="mini"
               class="el-province"
+              style="margin-right:0px"
               @change="getInspectList"
             >
               <el-option
@@ -37,10 +38,8 @@
                 :label="item.label"
                 :value="item.mode"/>
             </el-select>
-          </div>
-          <div>
-            <span style="margin-right: 10px">{{ $t('overview.patrolLists') }}</span>
-            <el-select
+              <el-select
+               style="margin-left:0px"
               v-model="inspectId"
               :placeholder="$t('insSettingView.selectPost')"
               size="mini"
@@ -51,14 +50,16 @@
                 :label="item.name"
                 :value="item.id"/>
             </el-select>
+            </div>
           </div>
         </template>
       </store-filter>
     </div>
-    <div id="el-containter" class="flex-column spacer">
+    <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
       <div class="report-header">
-        <div class="flex-center" style="padding-top: 0">
+        <div class="flex-center" style="padding-top: 0;margin-left:-10px">
           <date-time-selector
+           class="time-selector"
            @change="dateChange" 
           :dateTimeValue = dateValue /> 
           <div class="flex-center fullWidth" style="margin-left: 20px">
@@ -241,7 +242,7 @@
 import { getInspectReportList, GetInspectTagList } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
-import StoreFilter from '@/components/StoreFilter_';
+import StoreFilter from '@/components/StoreFilter';
 import DelayButton from '@/components/DelayButton';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
@@ -505,7 +506,8 @@ export default {
       return obj;
     },
 
-    getReportList(params) {
+    getReportList(p) {
+      let params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
@@ -680,7 +682,7 @@ export default {
       } else {
         self.params.like = {};
       }
-
+  
       self.params.filter = { page: 0, size: self.sizeNum };
       self.saveSearchParams();
       self.getReportList(self.params);
@@ -773,9 +775,15 @@ export default {
     },
 
     saveSearchParams() {
-      const tempsearchParamsObj = this.storeFilterObj;
-      tempsearchParamsObj.searchCondition = this.params;
+      let tempsearchParamsObj = this.storeFilterObj;
       tempsearchParamsObj.curReportType = this.curReportType;
+      tempsearchParamsObj.clause={
+        storeId: this.storeFilterObj.filterStoreIds
+      }
+      tempsearchParamsObj.inspectTagId = this.inspectId;
+      tempsearchParamsObj.clause = this.params.clause
+      console.log("Save ")
+      console.log(tempsearchParamsObj)
       const searchParamsObj = {
         path: 'inspectReport',
         params: tempsearchParamsObj
@@ -788,26 +796,45 @@ export default {
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
       console.log(searchParams)
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-      this.params.beginTs = this.dateValue[0].valueOf();
-      this.params.endTs = this.dateValue[1].valueOf();
+   
    
       if (Object.keys(searchParams).length > 0) {
+        console.log("Get Old Params")
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.params = searchParams;
         this.checkSortType(this.curSortType);
-        this.curAppraise = searchParams.searchCondition.clause.status;
+        this.curAppraise = searchParams.clause.status;
         this.curReportType = searchParams.curReportType;
-        this.inspectCatch = !searchParams.searchCondition.inspectTagId ? '-1' : searchParams.searchCondition.inspectTagId;
+        this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
         this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
+        if(!searchParams.curProvince){
+          searchParams.curProvince =[];
+        }
+        if(!searchParams.curCity){
+          searchParams.curCity =[];
+        }
+        if(searchParams.jump){
+          console.log("Jump to ")
+          this.params.jump = false;
+          this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
+          console.log(this.dateValue)
+       //   this.saveSearchParams();
+        }
+        
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
         this.ifGetParamsFromCash = false;
         this.searchParams = {};
       }
+      if(!this.params.beginTs)this.params.beginTs = this.dateValue[0].valueOf();
+      if(!this.params.endTs)this.params.endTs = this.dateValue[1].valueOf();
+  
+  
     },
+    
 
     onStoreChange(storeObj) {
       // console.log(storeObj)
@@ -1149,6 +1176,17 @@ $suggestBack:#F1F6FE;
   position: absolute;
   top: 0;
 }
+.last-row{
+      display: flex;
+      flex-direction: row;
+      width:calc(1066/1440*100vw);
+      height: 30px;
+      justify-content: space-between;
+      align-items:center;
+}
+    .time-selector{
+      margin-right: calc(30/1920*100vw);
+    }
 </style>
 <style scoped>
 
