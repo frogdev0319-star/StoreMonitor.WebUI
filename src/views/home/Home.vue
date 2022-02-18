@@ -197,7 +197,7 @@
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
-              <p style="text-align:left;">v2.0.1.0 &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
+              <p style="text-align:left;">v{{ webVersion }} &copy; {{ getFullYear }} Advantech Intelligent City Services Co., Ltd. (AiCS) All Rights Reserved.</p>
             </footer>
           </el-col>
         </section>
@@ -209,6 +209,7 @@
 import { mapGetters } from 'vuex';
 import PubSub from 'pubsub-js';
 import Database from '@/common/Database';
+import Environment from '@/common/environment';
 
 export default {
   name: 'Home',
@@ -233,7 +234,8 @@ export default {
       lang: this.$i18n.locale,
       title: '',
       isMobile: false,
-      brandDisabled: false
+      brandDisabled: false,
+      webVersion: Environment.Web_Version
     };
   },
 

@@ -11,5 +11,6 @@ let Environment;
 export default Environment = {
   VERSION: environJSON.VERSION || version,
   isGlobalWebsite: isGlobalWebsite,
-  BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE
+  BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE,
+  Web_Version: process.env.Web_Version
 };
