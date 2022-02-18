@@ -1,5 +1,21 @@
 <template>
   <div ref="printPDF" class="report-container">
+    <div style="display: none">
+      <div class="no-print">
+        <delay-button
+          id="downloadPdf"
+          class="exportbtn"
+          type="primary"
+          size="mini"
+          @click="handleDown"
+        >
+          <div class="button-area">
+            <i class="iconfont icon-pdf export"/>
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+          </div>
+        </delay-button>
+      </div>
+    </div>
     <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
       <div class="left-header">
@@ -10,28 +26,15 @@
         </p>
       </div>
       <div class="info-content">
-        <div class="pdf_font_24 right-header">
-          <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
-          <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
-          <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
-          <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
-          <div style="display:inline-block;">
-            <div>
-              <delay-button
-                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                class="exportbtn"
-                type="primary"
-                size="mini"
-                @click="handleDown"
-              >
-                <div class="button-area">
-                  <i class="iconfont icon-pdf export"/>
-                  <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-                </div>
-              </delay-button>
-            </div>
-          </div>
+        <div class="pdf_font_24">
+            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.submitter') }}</span>
+            <span :class="isexportPDF ? 'pdf-info-value' : 'info-value'">{{ report.submitterName }}</span>
+            <span v-if="!isexportPDF" class="info-label">{{ $t('remotePatrol.generateTime') }}</span>
+            <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
         </div>
+        <div class="weather-content">
+              <img class="weather-info-content" :src="weatherImg">
+            </div>
       </div>
     </div>
     <div class="template-titles">
@@ -65,9 +68,7 @@
             <div class="checkin-content">
               <div class="checkin-info-content"> {{ checkinInfo }}</div>
             </div>
-            <div class="weather-content">
-              <img class="weather-info-content" :src="weatherImg">
-            </div>
+            
           </div>
         </el-col>
       </el-row>
@@ -1260,7 +1261,13 @@ export default {
               }
             },
             itemStyle: {
+              emphasis: {
+                borderWidth:10,
+                borderColor:'#EDF0F2'
+              },
               normal: {
+                borderWidth:5,
+                borderColor:'#FFF',
                 color: function(params) {
                   const colorList = ['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757',
                     '#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'];
@@ -1269,11 +1276,13 @@ export default {
               }
             },
             label: {
+              show: false,
               fontSize: 14,
               color: '#9A9A9C',
               formatter: '{b}-{d}%'
             },
             labelLine: {
+              show: false,
               length: 10,
               length2: 50,
               lineStyle: {
@@ -1450,15 +1459,15 @@ export default {
     }
     .el-header {
       width: 100%;
-      height: 80px;
+      height: 76px;
+      margin-top:29px;
       text-align: left;
-      line-height: 80px;
       padding-left: calc(30 / 1920 * 100vw);
       position: relative;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
       padding-right: calc(110/1920*100vw);
-      justify-content: space-between;
       .pdf-title-icon{
         width:46px;
         height:54px;
@@ -1469,39 +1478,43 @@ export default {
         height:34px;
       }
       .pdf-report-title{
-        font-size: 26px;
+        font-size: 18px;
+        height: 25px;
         font-weight: bold;
         margin:0;
         vertical-align: middle;
         display: inline-block;
         margin-left: 20px;
-        width:900px;
+        width:100%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
       .report-title {
-        font-size: calc(20 / 1920 * 100vw);
+        font-size: 18px;
         font-weight: bold;
         margin:0;
-        display: inline-block;
         margin-left: calc(20 / 1920 * 100vw);
       }
       .nochart-report-title{
         font-size: 20px;
       }
       .left-header{
-        display: inline-flex;
         align-items: center;
+        display: flex;
+        flex-direction: row;
+        height: 25px;
       }
       .info-content {
-        position: absolute;
-        right: calc(110 / 1920 * 100vw);
-        top: 0;
-        font-size: calc(12 / 1920 * 100vw);
+        margin-top:20px;
+        font-size: 12px;
+        margin-left:26px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         color: $tab;
         .info-label {
-          margin-left: calc(40 / 1920 * 100vw);
+          margin-left: calc(20 / 1920 * 100vw);
         }
         .info-value{
           max-width: 200px;
@@ -1517,9 +1530,6 @@ export default {
           display: inline-block;
           min-width:120px;
         }
-      }
-      .right-header{
-        display: inline-flex;
       }
     }
     .el-acticle {
@@ -2164,13 +2174,12 @@ export default {
     }
   }
   .weather-content{
-    display: inline-block;
-    position: absolute;
-    right: 0;
     text-align: center;
-    top: -9px;
+    margin-left:10px;
+    display: flex;
     .weather-info-content{
-      width: 30px;
+      width: 24px;
+      height:24px;
     }
   }
 </style>
