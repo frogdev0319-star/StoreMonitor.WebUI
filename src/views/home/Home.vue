@@ -3,16 +3,16 @@
     <el-row class="container">
       <div class="header">
         <div
-          :style="collapsed?{'width':'90px'}:{'width':'290px'}"
+          :style="collapsed?{'width':'calc(90/1920*100vw)'}:{'width':'calc(280/1920*100vw)'}"
           :class="logoClass"
           class="logo-content">
-          <img style="position: absolute;left:32px;top:38px" id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
-          <div v-if="!collapsed" style="position: absolute;left:32px;top:68px; font-size: 15px">{{$t(`route.meta`)}}</div>
+          <img id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
+          <div v-if="!collapsed" style="position: absolute; left:32px; top:68px; font-size: 15px">{{$t(`route.meta`)}}</div>
           <img
-            style="position: absolute; right:0; top: 15px"
+            class="img-collapsed"
+            style=""
             :src="collapsed ? arrowRightIcon : arrowLeftIcon"
             @click="clickCollapse"
-            width="28px"
           />
         </div>
         <div>
@@ -37,23 +37,8 @@
           </el-breadcrumb>
         </div>
         <div>
-          <el-select
-            v-if="$route.path === '/reportdetails'"
-            class="report-input"
-            v-model="curTemplateIndex"
-            :placeholder="$t('remotePatrol.stores')"
-            size="mini"
-          >
-            <el-option
-              v-for="(item, index) in templateOptions"
-              :key="index"
-              :label="item.name"
-              :value="index"
-            />
-          </el-select>
           <el-button
-            v-if="$route.path === '/reportdetails' 
-              || $route.path === '/patrolPersonStat' 
+            v-if="$route.path === '/patrolPersonStat' 
              || $route.path === '/patrolCompareStat'
              || $route.path ==='/eventStat'"
             style="background-color: transparent; color: #fff; border: none; position:absolute;top:21px;right:24px"
@@ -95,7 +80,7 @@
           class="sider"
           :class="collapsed?'sider-collapsed':'sider-expand'"
         >
-          <div v-if="!collapsed" style="width: 236px; margin-left: 32px; margin-right: auto; margin-bottom: 45px; margin-top: 40px">
+          <div v-if="!collapsed" class="brand-dev" style="">
             <p class="brand-id">{{$t('route.brandId')}}<span style="font-family:'Noto Sans'">{{accountId}}</span></p>
             <el-select
               ref="fieldSelect"
@@ -123,7 +108,7 @@
             router
             @open="handleopen"
             @select="handleselect"
-            :style="collapsed?{'margin-top':'60px'}:{}"
+            :style="collapsed?{'margin-top':'calc(60/1920*100vw)'}:{}"
           >
             <div v-for="(item, index) in routerList" :key="index">
               <el-menu-item
@@ -131,10 +116,10 @@
                 :key="index"
                 :index="item.children[0].path"
                 :disabled="item.isReadOnly"
-                :style="{'paddingLeft':'30px','height': '66px','lineHeight': '66px'}"
+                :style="{'paddingLeft':'calc(30/1920*100vw)','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
               >
-                <img class="menu_img" :src="`./static/img/menu/${index}.png`" height="26px" />
-                <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" height="26px" />
+                <img class="menu_img" :src="`./static/img/menu/${index}.png`" />
+                <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" />
                 <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
               </el-menu-item>
 
@@ -145,8 +130,8 @@
                 :index="index+''"
                 :style="{}">
                 <template slot="title">
-                  <img class="menu_img" :src="`./static/img/menu/${index}.png`" height="26px" />
-                  <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" height="26px" />
+                  <img class="menu_img" :src="`./static/img/menu/${index}.png`"/>
+                  <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`"/>
                   <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                 </template>
                 <div v-for="child in item.children" :key="child.path">
@@ -186,27 +171,24 @@
                   </el-submenu>
                 </div>
               </el-submenu>
-
-              <hr class="hr-horizontal" style="width: calc(100% - 40px); margin: auto;"/>
             </div>
           </el-menu>
           <div class="spacer"></div>
-          <div class="headUrl-content flex-center" style="padding: 32px">
+          <div class="headUrl-content flex-center" style="padding: calc(32/1920*100vw)">
             <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
               <span v-if="!collapsed" class="username">
                 {{ userName }}
                 <i class="el-icon-arrow-down el-icon--right"/>
               </span>
-              <div class="headImg" :style="collapsed?{}:{'margin-right':'16px'}">{{iconName}}</div>
+              <div class="headImg" :style="collapsed?{}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               <el-dropdown-menu slot="dropdown" class="dropdown">
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
-                  style="width:120px; padding-left:20px;">{{ $t('route.my') }}</el-dropdown-item>
+                  style="width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
-                  style=" width:120px;
-                padding-left:20px;"
+                  style=" width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);"
                   @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -262,7 +244,7 @@ export default {
     return {
       showTag: false,
       exportPdf: require('../../../static/img/export-pdf.png'),
-      imgSrc: require("../../../static/img/logo_title.png"),
+      imgSrc: require("../../../static/img/logo.svg"),
       miniImgSrc: require("../../../static/img/logo_title-mini.png"),
       arrowRightIcon: require("../../../static/img/arrow-right.png"),
       arrowLeftIcon: require("../../../static/img/arrow-left.png"),
@@ -831,10 +813,11 @@ export default {
   /deep/ .el-input__inner {
     border: none;
     padding-left: 0;
-    font-size: 22px;
+    padding-bottom: 0.625vw;
+    font-size: calc(22/1920*100vw); 
     background-color: #FFF;
     color: #484848;
-    height:40px;
+    height: calc(40/1920*100vw); 
   }
     /deep/
     .el-select__caret{
@@ -844,10 +827,17 @@ export default {
   
 }
 .sider-collapsed {
-  width: 90px;
+  width: calc(90/1920*100vw);
 }
 .sider-expand {
-  width: 290px;
+  width: calc(280/1920*100vw);
+}
+.brand-dev {
+  width: calc(236/1920*100vw); 
+  margin-left: calc(32/1920*100vw); 
+  margin-right: auto; 
+  margin-bottom: calc(50/1920*100vw); 
+  margin-top: calc(40/1920*100vw);
 }
 .item-icon {
   display:inline-block;
@@ -855,7 +845,7 @@ export default {
   width: 5px;
   border-radius:50%;
   background-color:#a5a5a5;
-  margin-right: calc(12 / 1920 * 100vw);;
+  margin-right: calc(12 / 1920 * 100vw);
 }
 .sider {
   transition: width .3s;
@@ -871,7 +861,7 @@ export default {
     }
   }
   span {
-    font-size: 0.83333vw;
+    font-size: 14px;
     color:#a5a5a5;
     margin-left: 10px;
   }
@@ -887,8 +877,12 @@ export default {
   }
   /deep/ .el-menu-item {
     text-align: left;
-    
+    height: 2.1875vw;
+    line-height: 2.1875vw;
+    padding-left: 1.66vw !important;
     .menu_img {
+      height: 1.35417vw;
+      width: 1.35417vw;
       display: inline-block;
     }
     .menu_img-active {
@@ -907,6 +901,8 @@ export default {
       }
       .menu_img-active {
         display: inline-block;
+        height: 1.35417vw;
+        width: 1.35417vw;
       }
     }
     &:hover {
@@ -918,6 +914,8 @@ export default {
       }
       .menu_img-active {
         display: inline-block;
+        height: 1.35417vw;
+        width: 1.35417vw;
       }
       background-color: #f2f9fe;
       span {
@@ -929,6 +927,8 @@ export default {
   /deep/ .el-submenu {
     text-align: left;
     .menu_img {
+      height: 1.35417vw;
+      width: 1.35417vw;
       display: inline-block;
     }
     .menu_img-active {
@@ -936,6 +936,7 @@ export default {
     }
     span {
       color:#a5a5a5;
+      font-size: 14px;
     }
     &.is-opened {
       background-color: #e4f3fd;
@@ -951,6 +952,8 @@ export default {
         display: none;
       }
       .menu_img-active {
+        height: 1.35417vw;
+        width: 1.35417vw;
         display: inline-block;
       }
       ul {
@@ -963,9 +966,8 @@ export default {
     &.is-active {
       background-color: #e4f3fd;
       .el-submenu__title {
-        margin-left: 10px;
-        height: 66px;
-      line-height: 66px;
+        height: calc(66/1920*100vw);
+        line-height: calc(66/1920*100vw);
         span {
           color: #006ab7;
         }
@@ -974,6 +976,8 @@ export default {
         display: none;
       }
       .menu_img-active {
+        height: 1.35417vw;
+        width: 1.35417vw;
         display: inline-block;
       }
       ul {
@@ -984,10 +988,10 @@ export default {
       }
     }
     .el-submenu__title {
-      padding: 0 calc(30 / 1920 * 100vw);
-      margin-left: 10px;
-      height: 66px;
-      line-height: 66px;
+      padding-left: calc(30/1920*100vw)!important;
+      padding-right: calc(30/1920*100vw);
+      height: calc(66/1920*100vw);
+      line-height: calc(66/1920*100vw);
       i {
         right: 32px;
       }
@@ -1001,6 +1005,8 @@ export default {
         }
         .menu_img-active {
           display: inline-block;
+          height: 1.35417vw;
+          width: 1.35417vw;
         }
       }
     }
@@ -1081,8 +1087,17 @@ $collapseWidth: 5.5%;
     background-color: #1375bc;
     min-width: 1000px;
     .logo-width {
+      #imgLogo {
+        width: calc(153 / 1920 * 100vw);
+      }
+      .img-collapsed {
+        position: absolute; 
+        right:0; 
+        top: calc(15/1920*100vw);
+        width: calc(31/1920*100vw);
+        height: calc(31/1920*100vw);
+      }
       width: calc(318 / 1920 * 100vw);
-      min-width: 258px;
     }
     .logo-collapse-width {
       width: $collapseWidth;
@@ -1107,10 +1122,9 @@ $collapseWidth: 5.5%;
       cursor: pointer;
       position: relative;
       #imgLogo {
-        // width: calc(158 / 1920 * 100vw);
-        // height: calc(24 / 1920 * 100vw);
-        // min-width: 158px;
-        // min-height: 24px;
+        position: absolute;
+        left: calc(32/1920*100vw);
+        top: calc(38/1920*100vw);
       }
       .sys-name {
         font-weight: bold;
@@ -1397,7 +1411,7 @@ $collapseWidth: 5.5%;
     Arial;
 }
 .options {
-  padding-left: 20px;
+  padding-left: calc(20/1920*100vw);
   font-size: calc(24 / 1920 * 100vw) !important;
   font-family: "NotoSansCJKtc", "Microsoft YaHei", "Microsoft JhengHei", SimHei,
     Arial;
@@ -1535,7 +1549,7 @@ $collapseWidth: 5.5%;
   flex-shrink: 0;
   border-width: 0;
   border-style: solid;
-  border-color: #e6e6e6;
+  border-color: rgba(117, 117, 117, 0.2);
   border-bottom-width: 0;
   height: auto;
   border-right-width: thin;
@@ -1550,7 +1564,7 @@ $collapseWidth: 5.5%;
   flex-shrink: 0;
   border-width: 0;
   border-style: solid;
-  border-color: #bebebe;
+  border-color: rgba(117, 117, 117, 0.2);
   border-bottom-width: thin;
 }
 .child-space {
