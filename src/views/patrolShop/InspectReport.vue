@@ -33,8 +33,8 @@
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
         </div>
         <div class="weather-content">
-              <img class="weather-info-content" :src="weatherImg">
-            </div>
+          <img class="weather-info-content" :src="weatherImg">
+        </div>
       </div>
     </div>
     <div class="template-titles">

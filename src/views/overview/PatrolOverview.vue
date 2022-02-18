@@ -96,6 +96,7 @@
         <el-col :span="6" class="evalution-pct paper">
           <div class="title">{{ $t('overview.itemsAssessment') }}</div>
           <div class="pct-content">
+            <div class="pie-area">
             <div class="pie-div">
               <div class="inner"/>
               <div class="pct-panel">
@@ -106,6 +107,7 @@
                       class="chart-content"
                   />
               </div>
+            </div>
             </div>
             <!--<div class="pct-panel">
               <v-chart ref="itemsPie" :auto-resize="true" :options="itemsOptions" class="chart-content"/>
