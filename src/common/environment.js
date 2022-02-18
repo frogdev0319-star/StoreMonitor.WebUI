@@ -2,7 +2,7 @@ const version = 'v1.0';
 
 const _Environments = require("@/common/environment.json");
 
-const runtimeEnvironment = process.env.Runtime_Environment|| Object.keys(_Environments)[0];
+const runtimeEnvironment = process.env.Runtime_Environment === "undefined" ? Object.keys(_Environments)[0] : process.env.Runtime_Environment;
 
 const environJSON = _Environments[runtimeEnvironment];
 const isGlobalWebsite = process.env.NODE_ENV === "production";
