@@ -154,55 +154,55 @@
               <div class="problemTab tabs" style="background-color: #f7f9fa">問題描述</div>
             </div>
             <div v-if="problemTab == 0" class="padding" style="height: 100%; text-align: left">
-                  <div class="event-title margin-bottom-sm"><span class="is-required">* </span>{{ $t("remotePatrol.title") }}</div>
-                  <el-input
-                    :disabled="corEvent"
-                    v-model="eventName"
-                    size="mini"
-                    class="fullWidth margin-bottom-md storevue-input-grey"
-                    @input="eventNameChanged"
-                    @blur="notShowInputRuleTips('eventName')"
-                  />
-                  <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
-                  <span v-if="showEventNameInfo" class="error-class">{{
-                  $t("remotePatrol.emptyEventTitle") }}</span>
-                  <div v-if="!corEvent" class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
-                  <div v-else class="event-title margin-bottom-sm"><div class="is-required">* </div>
-                    {{ $t("remotePatrol.description") }}
-                  </div>
-                  <el-input
-                    :autosize="{ minRows: 2, maxRows: 7 }"
-                    v-model="eventDes"
-                    :placeholder="$t('remotePatrol.descPlaceholder')"
-                    size="mini"
-                    class="storevue-textarea fullWidth"
-                    type="textarea"
-                    resize="none"
-                    @input="eventDesChanged"
-                    @blur="notShowInputRuleTips('eventDes')"
-                  />
-                  <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
-                  <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
+              <div class="event-title margin-bottom-sm"><span class="is-required">* </span>{{ $t("remotePatrol.title") }}</div>
+              <el-input
+                :disabled="corEvent"
+                v-model="eventName"
+                size="mini"
+                class="fullWidth margin-bottom-md storevue-input-grey"
+                @input="eventNameChanged"
+                @blur="notShowInputRuleTips('eventName')"
+              />
+              <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
+              <span v-if="showEventNameInfo" class="error-class">{{
+              $t("remotePatrol.emptyEventTitle") }}</span>
+              <div v-if="!corEvent" class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
+              <div v-else class="event-title margin-bottom-sm"><div class="is-required">* </div>
+                {{ $t("remotePatrol.description") }}
+              </div>
+              <el-input
+                :autosize="{ minRows: 2, maxRows: 7 }"
+                v-model="eventDes"
+                :placeholder="$t('remotePatrol.descPlaceholder')"
+                size="mini"
+                class="storevue-textarea fullWidth"
+                type="textarea"
+                resize="none"
+                @input="eventDesChanged"
+                @blur="notShowInputRuleTips('eventDes')"
+              />
+              <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
+              <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
 
-                  <div class="source-content">
-                    <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
-                    <div
-                      v-for="(item, index) in sourceList"
-                      :key="index"
-                      class="source-details"
-                    >
-                      <div v-if="item.mediaType === 2" class="img-content">
-                        <i
-                          class="el-icon-close icondelete"
-                          @click="deleteImg(item, index)"
-                        />
-                        <el-image
-                          :src="item.src"
-                          :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
-                          :preview-src-list="getImgList(index, sourceList)"/>
-                      </div>
-                    </div>
+              <div class="source-content">
+                <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
+                <div
+                  v-for="(item, index) in sourceList"
+                  :key="index"
+                  class="source-details"
+                >
+                  <div v-if="item.mediaType === 2" class="img-content">
+                    <i
+                      class="el-icon-close icondelete"
+                      @click="deleteImg(item, index)"
+                    />
+                    <el-image
+                      :src="item.src"
+                      :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
+                      :preview-src-list="getImgList(index, sourceList)"/>
                   </div>
+                </div>
+              </div>
             </div>
             <div v-if="corEvent && problemTab == 1">
                 <div
