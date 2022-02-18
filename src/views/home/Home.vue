@@ -10,7 +10,6 @@
           <div v-if="!collapsed" class="meta">{{$t(`route.meta`)}}</div>
           <img
             class="img-collapsed"
-            style=""
             :src="collapsed ? arrowRightIcon : arrowLeftIcon"
             @click="clickCollapse"
           />
@@ -80,8 +79,8 @@
           class="sider"
           :class="collapsed?'sider-collapsed':'sider-expand'"
         >
-          <div v-if="!collapsed" class="brand-dev" style="">
-            <p class="brand-id">{{$t('route.brandId')}}<span style="font-family:'Noto Sans'">{{accountId}}</span></p>
+          <div v-if="!collapsed" class="brand-dev">
+            <!-- <p class="brand-id">{{$t('route.brandId')}}<span style="font-family:'Noto Sans'">{{accountId}}</span></p> -->
             <el-select
               ref="fieldSelect"
               class="store-select"
@@ -821,7 +820,7 @@ export default {
   margin-left: calc(32/1920*100vw); 
   margin-right: auto; 
   margin-bottom: calc(50/1920*100vw); 
-  margin-top: calc(40/1920*100vw);
+  margin-top: calc(90/1920*100vw);
 }
 .item-icon {
   margin-left: 0px !important;
@@ -1085,13 +1084,6 @@ $collapseWidth: 5.5%;
       #imgLogo {
         width: calc(153 / 1920 * 100vw);
       }
-      .img-collapsed {
-        position: absolute; 
-        right:0; 
-        top: calc(15/1920*100vw);
-        width: calc(31/1920*100vw);
-        height: calc(31/1920*100vw);
-      }
       width: calc(318 / 1920 * 100vw);
     }
     .logo-collapse-width {
@@ -1128,10 +1120,12 @@ $collapseWidth: 5.5%;
       }
     }
     .logo-collapse-width #imgLogo {
-      // width: calc(54 / 1920 * 100vw);
-      // height: calc(16 / 1920 * 100vw);
-      // min-width: calc(54 / 1920 * 100vw);
-      // min-height: 14px;
+      position: absolute;
+      height: 1.66667vw;
+      width: 1.66667vw;
+      
+      left: calc(28/1920*100vw);
+      top: calc(43/1920*100vw);
     }
     .el-traggle-content {
       height: 100%;
@@ -1169,10 +1163,18 @@ $collapseWidth: 5.5%;
     }
     
   }
+  
+  .img-collapsed {
+    position: absolute; 
+    right:0; 
+    top: calc(15/1920*100vw);
+    width: calc(31/1920*100vw);
+    height: calc(31/1920*100vw);
+  }
   .meta {
     position: absolute; 
     left: calc(32/1920*100vw);
-    top: calc(68/1920*100vw);
+    top: calc(75/1920*100vw);
     font-size: calc(15/1920*100vw);
     font-weight: bold;
   }
