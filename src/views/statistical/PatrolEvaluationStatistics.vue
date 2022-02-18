@@ -1221,9 +1221,18 @@ export default {
       if(e.prop == 'compareTrend'){
         //  let params = JSON.parse(JSON.stringify(this.params))
       //    const searchParams = SearchConditionUtil.getSearchCondition('inspectEvalutionStatistics');
-          const params= SearchConditionUtil.getSearchCondition('PatrolCompareStat');
+        //  const params= SearchConditionUtil.getSearchCondition('PatrolCompareStat');
+       //   let  params= SearchConditionUtil.getSearchCondition('PatrolCompareStat');
+          let  params= JSON.parse(JSON.stringify(this.params));
           params.storeIds = [e.row.innerId]
           params.curStore = [e.row.innerId]
+          params.filterStoreIds = [e.row.innerId]
+          if(!params.curProvince){
+            params.curProvince =[];
+          }
+            if(!params.curCity){
+            params.curCity =[];
+          }
           const searchParamsObj = {
             path: 'PatrolCompareStat',
             params: params

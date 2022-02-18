@@ -781,7 +781,7 @@ export default {
         storeId: this.storeFilterObj.filterStoreIds
       }
       tempsearchParamsObj.inspectTagId = this.inspectId;
-      
+      tempsearchParamsObj.clause = this.params.clause
       console.log("Save ")
       console.log(tempsearchParamsObj)
       const searchParamsObj = {
