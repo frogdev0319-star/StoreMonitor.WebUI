@@ -37,23 +37,8 @@
           </el-breadcrumb>
         </div>
         <div>
-          <el-select
-            v-if="$route.path === '/reportdetails'"
-            class="report-input"
-            v-model="curTemplateIndex"
-            :placeholder="$t('remotePatrol.stores')"
-            size="mini"
-          >
-            <el-option
-              v-for="(item, index) in templateOptions"
-              :key="index"
-              :label="item.name"
-              :value="index"
-            />
-          </el-select>
           <el-button
-            v-if="$route.path === '/reportdetails' 
-              || $route.path === '/patrolPersonStat' 
+            v-if="$route.path === '/patrolPersonStat' 
              || $route.path === '/patrolCompareStat'
              || $route.path ==='/eventStat'"
             style="background-color: transparent; color: #fff; border: none; position:absolute;top:21px;right:24px"

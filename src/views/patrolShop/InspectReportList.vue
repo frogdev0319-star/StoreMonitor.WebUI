@@ -91,7 +91,7 @@
               v-model="curSortType"
               :key="index"
               :label="item.id"
-              style="height:calc(36/1920*100vw);line-height:calc(36/1920*100vw);vertical-align: middle;"
+              style="height:calc(36/1440*100vw);line-height:calc(36/1440*100vw);vertical-align: middle;"
               @change="checkSortType">
               <span>{{ item.name }}</span>
             </el-radio>
@@ -105,7 +105,7 @@
                 <i class="iconfont icon-suolvetu iconCard"/>
                 <span class="text-pattern">{{ $t('remotePatrol.cardStyle') }}</span>
               </div>
-              <div style="width:1px;height:calc(20/1920*100vw);background-color:#e3e9f4;display:inline-block;margin:0 15px;"/>
+              <div style="width:1px;height:calc(20/1440*100vw);background-color:#e3e9f4;display:inline-block;margin:0 15px;"/>
               <div
                 :style="isHoverList || !ShowCard ? 'color:#f31d65':''"
                 class="pattern_btn"
@@ -129,8 +129,8 @@
               </delay-button>
             </div>
           </div>
-          <div v-if="ShowCard" class="showCardHeight">
-              <el-col v-for="(item,index) in reportList" :span="4" :key="index" class="report-card">
+          <div v-if="ShowCard" class="showCardHeight flex">
+              <div v-for="(item,index) in reportList"  :key="index" class="report-card">
                 <div class="cards shadow-light" @click="clickReport(item,index)">
                   <div class="flex-center margin-bottom-5">
                     <div class="card-title">{{ item.storeName }}</div>
@@ -145,7 +145,7 @@
                         2: {'color':'#59ab22','background-color':'#e8f6de'}
                       }[item.statusCode]"
                     >{{item.status}}</div>
-                    <div style="margin-left: calc(10/1920*100vw)" class="status-tag"
+                    <div style="margin-left: calc(10/1440*100vw)" class="status-tag"
                       :style="item.totalScore >= item.standard ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
                     >{{item.totalScore >= item.standard ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
                   </div>
@@ -159,7 +159,7 @@
                   <div class="margin-bottom-5">{{ $t('remotePatrol.submitter') }} {{ item.submitterName }}</div>
                   <div>{{ item.datestr }}</div>
                 </div>
-              </el-col>
+              </div>
           </div>
           <div v-else class="list-table">
             <el-table
@@ -860,15 +860,15 @@ $suggestBack:#F1F6FE;
   >>> .el-radio__inner {
     border-color: #d9dde1;
     background: #fff;
-    width: calc(16/1920*100vw);
-    height: calc(16/1920*100vw);
+    width: calc(16/1440*100vw);
+    height: calc(16/1440*100vw);
   }
   &.is-checked {
     >>> .el-radio__inner {
       border-color: #2c90d9;
       background: #e0f2ff;
-      width: calc(16/1920*100vw);
-      height: calc(16/1920*100vw);
+      width: calc(16/1440*100vw);
+      height: calc(16/1440*100vw);
     }
     >>> .el-radio__inner::after {
       width: 8px;
@@ -877,7 +877,7 @@ $suggestBack:#F1F6FE;
     }
   }
   >>> span {
-    font-size: calc(15/1920*100vw);
+    font-size: calc(15/1440*100vw);
   }
 }
 .search-label{
@@ -894,7 +894,7 @@ $suggestBack:#F1F6FE;
         margin-bottom: 20px;
         .header-details{
             text-align: left;
-            padding-left: calc(30/1920*100vw);
+            padding-left: calc(30/1440*100vw);
             position: relative;
             .search-content{
                 display: inline-block;
@@ -903,8 +903,8 @@ $suggestBack:#F1F6FE;
                 width:300px;
             }
             .iconbangzhu{
-              font-size: calc(20/1920*100vw);
-              margin-right: calc(20/1920*100vw);
+              font-size: calc(20/1440*100vw);
+              margin-right: calc(20/1440*100vw);
               @media screen and (min-width: 1280px) and (max-width: 1560px){
                 margin-right: 10px;
               };
@@ -913,16 +913,16 @@ $suggestBack:#F1F6FE;
               };
             }
             span{
-                font-size: calc(14/1920*100vw);
-                margin-right: calc(20/1920*100vw);
+                font-size: calc(14/1440*100vw);
+                margin-right: calc(20/1440*100vw);
               @media screen and (min-width: 1280px) and (max-width: 1560px){
                 margin-right: 10px;
               };
             }
             .el-province{
-                width: calc(160/1920*100vw);
+                width: calc(160/1440*100vw);
                 min-width: 85px;
-                margin-right: calc(15/1920*100vw);
+                margin-right: calc(15/1440*100vw);
                 @media screen and (min-width: 1280px) and (max-width: 1360px){
                   width: 85px;
                 };
@@ -939,7 +939,7 @@ $suggestBack:#F1F6FE;
             };
           }
             .search-input{
-                width: calc(160/1920*100vw);
+                width: calc(160/1440*100vw);
                 @media screen and (min-width: 1280px) and (max-width: 1360px){
                   width: 85px;
                 };
@@ -947,18 +947,18 @@ $suggestBack:#F1F6FE;
         }
       .header-details{
         padding-bottom: 15px;
-        padding-right: calc(20/1920*100vw);
+        padding-right: calc(20/1440*100vw);
       }
       .header-details:nth-child(1){
         padding-bottom: 0px;
       }
     }
     .report-content{
-        // padding-right: calc(20/1920*100vw);
-        // padding-left: calc(20/1920*100vw);
+        // padding-right: calc(20/1440*100vw);
+        // padding-left: calc(20/1440*100vw);
         .card-content{
           height: 100%;
-          padding: calc(20/1920*100vw);
+          padding: calc(32/1440*100vw) calc(24/1440*100vw);
         }
         .empty-content{
           font-size: 16px;
@@ -970,7 +970,7 @@ $suggestBack:#F1F6FE;
         }
         .card-header{
             text-align: left;
-            padding: 0 calc(20/1920*100vw);
+            padding: 0 calc(8/1440*100vw);
             padding-right: 0;
             margin-bottom: 15px;
             .list_card{
@@ -979,26 +979,26 @@ $suggestBack:#F1F6FE;
               align-items: center;
               .pattern_btn{
                 display: inline-block;
-                height: calc(36/1920*100vw);
-                line-height: calc(36/1920*100vw);
+                height: calc(36/1440*100vw);
+                line-height: calc(36/1440*100vw);
                 color:#7d8cad;
                 cursor: pointer;
                 vertical-align: middle;
                 .iconCard{
-                  font-size: calc(18/1920*100vw);
-                  margin-right:calc(10/1920*100vw);
+                  font-size: calc(18/1440*100vw);
+                  margin-right:calc(10/1440*100vw);
                   vertical-align: middle;
                 }
                 .text-pattern{
-                  font-size: calc(15/1920*100vw);
+                  font-size: calc(15/1440*100vw);
                   vertical-align: middle;
                 }
               }
               .export-report-btn{
                 background-color: #fff;
                 color: #006ab7;
-                font-size: calc(15/1920*100vw);
-                margin-left: calc(30/1920*100vw);
+                font-size: calc(15/1440*100vw);
+                margin-left: calc(30/1440*100vw);
               }
             }
         }
@@ -1007,23 +1007,23 @@ $suggestBack:#F1F6FE;
        margin-bottom: 60px;
     }
     .list-table{
-      padding-left: calc(20/1920*100vw);
+      padding-left: calc(20/1440*100vw);
       margin-bottom: 20px;
     }
     .list-table >>> .report-cell-class .cell{
-      padding-left: calc(20/1920*100vw) !important;
+      padding-left: calc(20/1440*100vw) !important;
     }
     .list-table >>> .report-header-class .cell{
-      padding-left: calc(20/1920*100vw) !important;
+      padding-left: calc(20/1440*100vw) !important;
     }
     .report-card{
         margin-bottom: 20px;
         .cards{
           .card-title {
-             font-size: calc(15/1920*100vw);
+             font-size: calc(15/1440*100vw);
              flex: 1; 
              min-width: 0; 
-             margin-right: calc(10/1920*100vw);
+             margin-right: calc(10/1440*100vw);
           }
           div {
             display: flex;
@@ -1033,18 +1033,17 @@ $suggestBack:#F1F6FE;
             white-space: nowrap;
             text-overflow: ellipsis;
           }
-            padding: calc(15/1920*100vw);
+            padding: calc(15/1440*100vw);
             cursor: pointer;
-            margin-left: calc(10/1920*100vw);
-            margin-right: calc(10/1920*100vw);
+            margin-right: calc(20/1440*100vw);
             border: 1px solid #e3e9f4;
             font-size: 12px;
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-            width: calc(200/1920*100vw);
-            height: calc(210/1920*100vw);
+            width: calc(200/1440*100vw);
+            height: calc(210/1440*100vw);
             position: relative;
             color: #69727c;
-            min-height: calc(160/1920*100vw);
+            min-height: calc(160/1440*100vw);
             .item-img{
               position: absolute;
               right: 1px;
@@ -1053,28 +1052,28 @@ $suggestBack:#F1F6FE;
           .item-flex{
             display: flex;
             flex-direction: column;
-            padding-top: calc(40/1920*100vw);
+            padding-top: calc(40/1440*100vw);
             justify-content: space-around;
           }
             .item-header{
                 width: 100%;
-                //margin-top: calc(40/1920*100vw);
+                //margin-top: calc(40/1440*100vw);
                 overflow: hidden;
                 .inspect-img{
-                    margin-left: calc(20/1920*100vw);
+                    margin-left: calc(20/1440*100vw);
                     float: left;
                 }
                 .store-name{
                     float: left;
-                    width: calc(120/1920*100vw);
-                    margin-left: calc(20/1920*100vw);
+                    width: calc(120/1440*100vw);
+                    margin-left: calc(20/1440*100vw);
                     text-align: left;
-                    width: calc(100% - 40/1920*100vw);
+                    width: calc(100% - 40/1440*100vw);
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     .name{
-                        font-size: calc(18/1920*100vw);
+                        font-size: calc(18/1440*100vw);
                         font-weight: bold;
                         display: block;
                         color: $black;
@@ -1082,52 +1081,52 @@ $suggestBack:#F1F6FE;
                         text-overflow: ellipsis
                 }
                 .inspect{
-                    font-size: calc(12/1920*100vw);
+                    font-size: calc(12/1440*100vw);
                     color: $tab;
                 }
             }
         }
         .item-icon{
           text-align: left;
-          padding-left: calc(20/1920*100vw);
+          padding-left: calc(20/1440*100vw);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding-right: calc(20/1920*100vw);
+          padding-right: calc(20/1440*100vw);
         }
         .inspectIcon{
-          font-size: calc(60/1920*100vw);
+          font-size: calc(60/1440*100vw);
           color: $border;
         }
         .score {
-          font-size: calc(32/1920*100vw); 
-          margin-right: calc(5/1920*100vw);
-          margin-bottom: calc(30/1920*100vw);
+          font-size: calc(32/1440*100vw); 
+          margin-right: calc(5/1440*100vw);
+          margin-bottom: calc(30/1440*100vw);
         }
         .status-tag {
-          border-radius: calc(5/1920*100vw); 
-          padding: calc(2/1920*100vw) calc(15/1920*100vw);
+          border-radius: calc(5/1440*100vw); 
+          padding: calc(2/1440*100vw) calc(15/1440*100vw);
         }
         .margin-bottom-5 {
-          margin-bottom: calc(5/1920*100vw);
+          margin-bottom: calc(5/1440*100vw);
         }
         .item-score{
           color: $tab;
         }
         .score-num{
-          font-size: calc(40/1920*100vw);
+          font-size: calc(40/1440*100vw);
         }
         .score-unit{
           font-size: 12px;
         }
         .item-content{
             text-align: left;
-            padding-left: calc(20/1920*100vw);
+            padding-left: calc(20/1440*100vw);
             span{
-              font-size: calc(14/1920*100vw);
+              font-size: calc(14/1440*100vw);
               color: $tab;
               display: block;
-              margin-bottom: calc(15/1920*100vw);
+              margin-bottom: calc(15/1440*100vw);
               overflow: hidden;
               text-overflow: ellipsis;
             }
@@ -1141,7 +1140,7 @@ $suggestBack:#F1F6FE;
     .el-pag{
         position: absolute;
         //float: right;
-        right: calc(20/1920*100vw);
+        right: calc(20/1440*100vw);
         bottom: 0px;
     }
 }
