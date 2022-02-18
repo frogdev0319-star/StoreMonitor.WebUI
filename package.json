@@ -1,7 +1,7 @@
 {
   "name": "lookstoreui",
   "version": "1.0.0",
-  "webversion": "2.0.0.6",
+  "webversion": "2.0.1.1",
   "description": "This is the StoreMoinitor PC  UI",
   "author": "jing.bin",
   "private": true,
