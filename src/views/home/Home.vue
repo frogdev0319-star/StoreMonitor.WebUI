@@ -7,7 +7,7 @@
           :class="logoClass"
           class="logo-content">
           <img id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
-          <div v-if="!collapsed" style="position: absolute; left:32px; top:68px; font-size: 15px">{{$t(`route.meta`)}}</div>
+          <div v-if="!collapsed" class="meta">{{$t(`route.meta`)}}</div>
           <img
             class="img-collapsed"
             style=""
@@ -146,6 +146,7 @@
                   </el-menu-item>
                   <el-submenu
                     v-else-if="!child.hidden && child.threeChild"
+                    class="child-submenu"
                     :class="lang === 'en' ? 'three-child el-submenu-group' : 'zh-three-child'"
                     :style="{}"
                     :index="child.path"
@@ -164,6 +165,7 @@
 
                         class="submenu-item">
                         <template>
+                          <div class="item-icon"></div>
                           <span>{{ $t(`route.${grandChild.name}`) }}</span>
                         </template>
                       </el-menu-item>
@@ -174,7 +176,7 @@
             </div>
           </el-menu>
           <div class="spacer"></div>
-          <div class="headUrl-content flex-center" style="padding: calc(32/1920*100vw)">
+          <div class="headUrl-content flex-center">
             <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
               <span v-if="!collapsed" class="username">
                 {{ userName }}
@@ -822,6 +824,7 @@ export default {
   margin-top: calc(40/1920*100vw);
 }
 .item-icon {
+  margin-left: 0px !important;
   display:inline-block;
   height:5px;
   width: 5px;
@@ -833,7 +836,7 @@ export default {
   transition: width .3s;
   position: fixed;
   display: flex;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 62/1920*100vw);
   flex-direction: column;
   background-color: #fff;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
@@ -855,7 +858,7 @@ export default {
   }
   /deep/ .el-menu {
     border-right: none;
-    
+    font-size: 14px;
   }
   /deep/ .el-menu-item {
     text-align: left;
@@ -918,8 +921,12 @@ export default {
     }
     span {
       color:#a5a5a5;
-      font-size: 14px;
     }
+    ul {
+        span {
+          font-size: calc(12 / 1920 * 100vw);
+        }
+      }
     &.is-opened {
       background-color: #e4f3fd;
       .el-submenu__title {
@@ -967,6 +974,12 @@ export default {
           font-size: calc(12 / 1920 * 100vw);
         }
         background-color: #f2f9fe;
+      }
+    }
+    .child-submenu {
+      .el-submenu__title {
+        height: 2.1875vw;
+        line-height: 2.1875vw;
       }
     }
     .el-submenu__title {
@@ -1136,8 +1149,9 @@ $collapseWidth: 5.5%;
     .breadcrumb-inner {
       float: left;
       .breadcrumb-item {
-        height: 80px;
-        line-height: 80px;
+        min-height: calc(62/1920*100vw);
+        height: calc(62/1920*100vw);
+        line-height: calc(62/1920*100vw);
         font-size: 16px;
         &:first-child {
           margin-left: 30px;
@@ -1155,12 +1169,19 @@ $collapseWidth: 5.5%;
     }
     
   }
-
+  .meta {
+    position: absolute; 
+    left: calc(32/1920*100vw);
+    top: calc(68/1920*100vw);
+    font-size: calc(15/1920*100vw);
+    font-weight: bold;
+  }
   .main {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 80px;
+    top: calc(62/1920*100vw);
+    height: calc(100vh - 62/1920*100vw)!important;
     bottom: 0px;
     background-color: #f4f5f9;
     .drawer-bg {
@@ -1273,22 +1294,20 @@ $collapseWidth: 5.5%;
     }
   }
   .headUrl-content {
-      height: 100%;
       float: right;
       color: #fff;
       position: relative;
       overflow: hidden;
-      margin-right: calc(33 / 1920 * 100vw);
       display: inline-flex;
       justify-content: flex-start;
       align-items: end;
-      /*width: 320px;*/
-      
+      padding: 0.9375vw 1.66667vw 1.25vw 1.66667vw;
+      height: 4.6875vw;
       .el-user-drop {
         .username {
           font-weight: normal;
           color: #006ab7;
-          margin: auto 10px;
+          margin-left: 0;
           max-width: 90px;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -1305,9 +1324,9 @@ $collapseWidth: 5.5%;
         .headImg {
           display: inline-block;
           position: relative;
-          width:48px;
-          height:48px;
-          line-height: 48px;
+          line-height: 2.5vw;
+          height: 2.5vw;
+          width: 2.5vw;
           cursor: pointer;
           border-radius: 50%;
           background: #2c90d9;
@@ -1325,7 +1344,7 @@ $collapseWidth: 5.5%;
       }
     }
   .aside-width {
-    width: calc(350 / 1920 * 100vw);
+    width: calc(350/1920*100vw);
     min-width: 290px;
     background-color: #ffffff;
     margin-top: -0.5px;
@@ -1360,13 +1379,13 @@ $collapseWidth: 5.5%;
     //width: 100%;
   }
   .sec-uncoll {
-    margin-left: 290px;
+    margin-left: calc(280/1920*100vw);
     height: auto;;
-      width: calc(100%- 300px);
-    min-width: calc(1000px - 290px);
+    width: calc(100% - 280/1920*100vw);
+    min-width: calc(1000px - 280/1920*100vw);
     @media screen and (max-width: 1590px) {
-      margin-left: 290px;
-      width: calc(100% - 290px);
+      margin-left: calc(280/1920*100vw);
+      width: calc(100% - 280/1920*100vw);
     }
   }
   .sec-uncoll.mobile-sec {
