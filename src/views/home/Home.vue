@@ -874,7 +874,7 @@ export default {
       display: none;
     }
     &.is-active {
-      background-color: #e4f3fd;
+      background-color: #f2f9fe;
       .item-icon {
         background-color:#006ab7;
       }
