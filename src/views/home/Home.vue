@@ -99,82 +99,88 @@
             </el-select>
             <hr class="hr-horizontal">
           </div>
-          <el-menu
-            id="nav-menu"
-            :default-active="activePath"
-            :collapse="collapsed"
-            :unique-opened="true"
-            :collapse-transition="false"
-            router
-            @open="handleopen"
-            @select="handleselect"
-            :style="collapsed?{'margin-top':'calc(60/1920*100vw)'}:{}"
+          <el-scrollbar
+            ref="scroll"
+            id="el-menuscrollbar" 
+            wrap-class="el-scrollbar__wrap"
           >
-            <div v-for="(item, index) in routerList" :key="index">
-              <el-menu-item
-                v-if="item.leaf && item.children.length > 0"
-                :key="index"
-                :index="item.children[0].path"
-                :disabled="item.isReadOnly"
-                :style="{'paddingLeft':'calc(30/1920*100vw)','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
-              >
-                <img class="menu_img" :src="`./static/img/menu/${index}.png`" />
-                <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" />
-                <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
-              </el-menu-item>
+            <el-menu
+              id="nav-menu"
+              :default-active="activePath"
+              :collapse="collapsed"
+              :unique-opened="true"
+              :collapse-transition="false"
+              router
+              @open="handleopen"
+              @select="handleselect"
+              :style="collapsed?{'margin-top':'calc(60/1920*100vw)'}:{}"
+            >
+              <div v-for="(item, index) in routerList" :key="index">
+                <el-menu-item
+                  v-if="item.leaf && item.children.length > 0"
+                  :key="index"
+                  :index="item.children[0].path"
+                  :disabled="item.isReadOnly"
+                  :style="{'paddingLeft':'calc(30/1920*100vw)','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
+                >
+                  <img class="menu_img" :src="`./static/img/menu/${index}.png`" />
+                  <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" />
+                  <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
+                </el-menu-item>
 
-              <!--multi nodes -->
-              <el-submenu
-                v-if="!item.leaf"
-                :key="index"
-                :index="index+''"
-                :style="{}">
-                <template slot="title">
-                  <img class="menu_img" :src="`./static/img/menu/${index}.png`"/>
-                  <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`"/>
-                  <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
-                </template>
-                <div v-for="child in item.children" :key="child.path">
-                  <el-menu-item
-                    v-if="!child.hidden && !child.threeChild"
-                    :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'"
-                    :style="{}"
-                    :index="child.path"
-                    :disabled="child.isReadOnly">
-                    <div class="item-icon"></div>
-                    <span >{{ $t(`route.${child.name}`) }}</span>
-                  </el-menu-item>
-                  <el-submenu
-                    v-else-if="!child.hidden && child.threeChild"
-                    class="child-submenu"
-                    :class="lang === 'en' ? 'three-child el-submenu-group' : 'zh-three-child'"
-                    :style="{}"
-                    :index="child.path"
-                    :disabled="child.isReadOnly"
-                    :key="child.path">
-                    <template slot="title">
-                      <div class="item-icon" style="margin-left:-10px;"></div>
-                      <span>{{ $t(`route.${child.name}`) }}</span>
-                    </template>
-                    <div v-for="grandChild in child.children" :key="grandChild.path">
-                      <el-menu-item
-                        v-if="!grandChild.hidden"
-                        :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
-                        :index="grandChild.path"
-                        :disabled="grandChild.isReadOnly"
+                <!--multi nodes -->
+                <el-submenu
+                  v-if="!item.leaf"
+                  :key="index"
+                  :index="index+''"
+                  :style="{}">
+                  <template slot="title">
+                    <img class="menu_img" :src="`./static/img/menu/${index}.png`"/>
+                    <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`"/>
+                    <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
+                  </template>
+                  <div v-for="child in item.children" :key="child.path">
+                    <el-menu-item
+                      v-if="!child.hidden && !child.threeChild"
+                      :id="lang === 'en' ? 'en-childSubItem' : 'childSubItem'"
+                      :style="{}"
+                      :index="child.path"
+                      :disabled="child.isReadOnly">
+                      <div class="item-icon"></div>
+                      <span >{{ $t(`route.${child.name}`) }}</span>
+                    </el-menu-item>
+                    <el-submenu
+                      v-else-if="!child.hidden && child.threeChild"
+                      class="child-submenu"
+                      :class="lang === 'en' ? 'three-child el-submenu-group' : 'zh-three-child'"
+                      :style="{}"
+                      :index="child.path"
+                      :disabled="child.isReadOnly"
+                      :key="child.path">
+                      <template slot="title">
+                        <div class="item-icon" style="margin-left:-10px;"></div>
+                        <span>{{ $t(`route.${child.name}`) }}</span>
+                      </template>
+                      <div v-for="grandChild in child.children" :key="grandChild.path">
+                        <el-menu-item
+                          v-if="!grandChild.hidden"
+                          :style="varyWindowWidth<1366?{'padding-right':'0px'}:{}"
+                          :index="grandChild.path"
+                          :disabled="grandChild.isReadOnly"
 
-                        class="submenu-item">
-                        <template>
-                          <div class="item-icon"></div>
-                          <span>{{ $t(`route.${grandChild.name}`) }}</span>
-                        </template>
-                      </el-menu-item>
-                    </div>
-                  </el-submenu>
-                </div>
-              </el-submenu>
-            </div>
-          </el-menu>
+                          class="submenu-item">
+                          <template>
+                            <div class="item-icon"></div>
+                            <span>{{ $t(`route.${grandChild.name}`) }}</span>
+                          </template>
+                        </el-menu-item>
+                      </div>
+                    </el-submenu>
+                  </div>
+                </el-submenu>
+              </div>
+            </el-menu>
+          </el-scrollbar>
           <div class="spacer"></div>
           <div class="headUrl-content flex-center">
             <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
@@ -858,6 +864,7 @@ export default {
   flex-direction: column;
   background-color: #fff;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
+  
   .is-active {
     span {
       color:#006ab7;
@@ -877,6 +884,9 @@ export default {
   /deep/ .el-menu {
     border-right: none;
     font-size: 14px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    
   }
   /deep/ .el-menu-item {
     text-align: left;
