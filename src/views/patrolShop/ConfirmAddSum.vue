@@ -92,6 +92,7 @@
                   <template v-if="index !== 2" >
                     <template v-if="!_item.children">
                       <div class="content-title">{{ _item.groupName }}</div>
+                      <hr v-if="!item.children" class="hr-horizontal" />
                       <div v-for="(categoryItem,categoryIndex) in _item.cateryItems" :key="categoryIndex" class="content-detail">
                         <div class="content-detail-title">
                           <div class="detail-title">
@@ -159,13 +160,10 @@
                     </template>
                     <template v-else>
                       <div v-for="(child, childIndex) in _item.children" :key="childIndex">
-                        <div class="flex-center" style="border-left:4px solid #2c90d9;"> 
-                          <div class="content-title">{{ `【${_item.groupName}】 — ` }}</div>
-                          <div style="color: #7d8cad">
-                            {{ ` 【${child.groupName}】` }}
-                          </div>
+                        <div class="content-title flex-center"> 
+                          <div>{{ `【${_item.groupName}】 — 【${child.groupName}】` }}</div>
                         </div>
-                        <hr class="hr-horizontal" style="margin-top: 10px"/>
+                        <hr class="hr-horizontal"/>
                         <div v-for="(childItem, childIndex) in child.cateryItems" :key="childIndex" class="content-detail">
                           <div class="content-detail-title">
                             <div class="detail-title">
@@ -1169,7 +1167,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-  $red:#c60957;
+  $red:#2c90d9;
   $black:#182752;
   $border:#e3e9f4;
   $background:#f4f5f9;
@@ -1510,9 +1508,11 @@ export default {
           border: 1px solid $border;
           border-top:0;
           .content-title{
-            font-size: calc(14 / 1920 * 100vw);
-            color:#7d8cad;
+            border-left:4px solid $red;
+            font-size: 13px;
+            color:#556679;
             padding-left:calc(10 / 1920 * 100vw);
+            margin-bottom:calc(10 / 1920 * 100vw);
             font-weight: bold;
           }
           .content-detail{
