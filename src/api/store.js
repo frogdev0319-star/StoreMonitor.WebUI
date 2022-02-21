@@ -18,6 +18,14 @@ export const getBriefStoreList = data => {
   });
 };
 
+export const getFavoriteStoreList = data => {
+  return request({
+    url: `${version}/store/favorite/list`,
+    method: 'get',
+    data
+  });
+};
+
 export const GetTagList = data => {
   return request({
     url: `${version}/tag/list`,

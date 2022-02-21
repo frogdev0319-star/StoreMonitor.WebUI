@@ -1,7 +1,8 @@
 <template>
   <div>
     <store-filter
-      type="patrol"
+      :multiStore="false"
+      :showFavorite="true"
       @storeChange="onStoreChange"
     ></store-filter>
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
@@ -835,7 +836,7 @@
 <script>
 import { checkOutInspectItemV3 } from '@/api/inspect';
 import util from '@/common/util';
-import { getStoreList, addFavoriteStore, deleteFavoriteStore } from '@/api/store';
+import { getStoreList, addFavoriteStore, deleteFavoriteStore, getStoreInfo } from '@/api/store';
 import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
 import InspectionItem from '@/components/InspectionItem.vue';
@@ -849,7 +850,7 @@ import SkywatchVideo from '@/components/SkywatchVideo';
 import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
-import StoreFilter from '@/components/StoreFilter_';
+import StoreFilter from '@/components/StoreFilter';
 
 export default {
   name: 'ReInspection',
@@ -1696,12 +1697,8 @@ export default {
     },
     
     onStoreChange (storeData) {
-      this.curSelStoreId = storeData.curStore
-      this.historyObj = {
-        ...this.historyObj,
-        
-      }
-      const storeItem = this.storeList.find(store => store.storeId === storeData.curStore)
+      this.curSelStoreId = storeData.curSelectedStore
+      const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
       if (storeItem) this.changeStore_(storeItem)
     },
     async getAllStore () {

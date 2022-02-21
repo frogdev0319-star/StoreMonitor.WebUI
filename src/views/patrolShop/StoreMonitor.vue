@@ -2,7 +2,8 @@
   <div>
     <el-row>
       <store-filter
-        type="patrol"
+        :multiStore="false"
+        :showFavorite="true"
         @storeChange = "getCurStore"
       ></store-filter>
     </el-row>
@@ -258,7 +259,7 @@ import SkywatchVideo from '@/components/SkywatchVideo';
 import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
-import StoreFilter from '@/components/StoreFilter_';
+import StoreFilter from '@/components/StoreFilter';
 
 export default {
   name: 'StoreMoinitor',
@@ -566,7 +567,7 @@ export default {
 
   methods: {
     getCurStore(storeData) {
-      this.curSelStoreId = storeData.curStore
+      this.curSelStoreId = storeData.curSelectedStore
       this.getInitStoreData()
     },
     changeBrand() {
