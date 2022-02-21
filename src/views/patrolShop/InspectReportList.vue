@@ -1031,7 +1031,7 @@ $suggestBack:#F1F6FE;
         }
     }
     .showCardHeight{
-       margin-bottom: 60px;
+       margin-bottom: calc(60/1920*100vw);
     }
     .list-table{
       padding-left: calc(20/1920*100vw);
@@ -1044,13 +1044,13 @@ $suggestBack:#F1F6FE;
       padding-left: calc(20/1920*100vw) !important;
     }
     .report-card{
-        margin-bottom: 20px;
+        margin-bottom: calc(20/1440*100vw);
         .cards{
           .card-title {
-             font-size: calc(15/1920*100vw);
+             font-size: calc(15/1440*100vw);
              flex: 1; 
              min-width: 0; 
-             margin-right: calc(10/1920*100vw);
+             margin-right: calc(10/1440*100vw);
           }
           div {
             display: flex;
@@ -1060,17 +1060,17 @@ $suggestBack:#F1F6FE;
             white-space: nowrap;
             text-overflow: ellipsis;
           }
-            padding: calc(15/1920*100vw);
+            padding: calc(15/1440*100vw);
             cursor: pointer;
-            margin-right: calc(20/1920*100vw);
+            margin-right: calc(20/1440*100vw);
             border: 1px solid #e3e9f4;
-            font-size: 12px;
+            font-size: calc(12/1440*100vw);
             box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-            width: calc(200/1920*100vw);
-            height: calc(210/1920*100vw);
+            width: calc(200/1440*100vw);
+            height: calc(210/1440*100vw);
             position: relative;
             color: #69727c;
-            min-height: calc(160/1920*100vw);
+            min-height: calc(160/1440*100vw);
             .item-img{
               position: absolute;
               right: 1px;
@@ -1079,7 +1079,7 @@ $suggestBack:#F1F6FE;
           .item-flex{
             display: flex;
             flex-direction: column;
-            padding-top: calc(40/1920*100vw);
+            padding-top: calc(40/1440*100vw);
             justify-content: space-around;
           }
             .item-header{
@@ -1126,22 +1126,22 @@ $suggestBack:#F1F6FE;
           color: $border;
         }
         .score {
-          font-size: calc(32/1920*100vw); 
-          margin-right: calc(5/1920*100vw);
-          margin-bottom: calc(30/1920*100vw);
+          font-size: calc(32/1440*100vw); 
+          margin-right: calc(5/1440*100vw);
+          margin-bottom: calc(30/1440*100vw);
         }
         .status-tag {
-          border-radius: calc(5/1920*100vw); 
-          padding: calc(2/1920*100vw) calc(15/1920*100vw);
+          border-radius: calc(5/1440*100vw); 
+          padding: calc(2/1440*100vw) calc(15/1440*100vw);
         }
         .margin-bottom-5 {
-          margin-bottom: calc(5/1920*100vw);
+          margin-bottom: calc(5/1440*100vw);
         }
         .item-score{
           color: $tab;
         }
         .score-num{
-          font-size: calc(40/1920*100vw);
+          font-size: calc(40/1440*100vw);
         }
         .score-unit{
           font-size: 12px;
