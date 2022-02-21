@@ -40,8 +40,10 @@
             v-if="$route.path === '/patrolPersonStat' 
              || $route.path === '/patrolCompareStat'
              || $route.path ==='/eventStat'
+               || $route.path === '/patrolItem'
+             || $route.path ==='/patrolEvaluation'
              || $route.path ==='/reportdetails'"
-            style="background-color: transparent; color: #fff; border: none; position:absolute;top:21px;right:24px"
+            style="background-color: transparent; color: #fff; border: none; position:absolute;top:6px;right:24px"
             @click="handleDownload"
           >
             <div class="button-area">
@@ -465,6 +467,8 @@ export default {
 
   methods: {
     handleDownload() {
+      console.log(document.getElementById("downloadPdf"))
+      console.log(document.getElementById("downloadPdf").click)
       document.getElementById("downloadPdf").click();
     },
     setBrandListDisabled(booleanFlag) {
