@@ -66,8 +66,14 @@
     
   </div>
   <div class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
+    <div class="paper shadow-light favorite"
+      v-if="showFavorite"
+      @click="changeFavorite"
+      :style="isFavorite?{color: '#2b2b2b'}:{color: '#acaeb1'}">
+        {{ $t('remotePatrol.favoriteStore') }}
+    </div>
     <multi-select
-        v-if="showStoreSelect"
+        v-if="multiStore"
         class="store-group-select store shadow-light storeFilter-muti"
         ref="multiSelect"
         :selected="curStore"
@@ -75,6 +81,21 @@
         :options="storeDataList"
         @changeInput="onChangeStore"/>
         
+        <div v-else class="single-select shadow-light">
+          <el-select 
+            v-model="curSelectedStore"
+            @change="onChangeSelectedStore()"
+            size="mini">
+            <el-option
+              v-for="(item) in storeDataList"
+              :key="item.storeId"
+              :label="item.label"
+              :value="item.storeId"
+            />
+          </el-select>
+        </div>
+    
+    <div class="spacer"></div>
     <slot name="others"></slot>
   </div>
   </div>
@@ -84,7 +105,7 @@
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
-import { getBriefStoreList, getStoreDefineGroup, getStoreList } from '@/api/store';
+import { getBriefStoreList, getStoreDefineGroup, getStoreList, getFavoriteStoreList } from '@/api/store';
 import util from '@/common/util.js';
 
 export default {
@@ -103,14 +124,6 @@ export default {
       type: Boolean,
       default: false
     },
-    showStoreSelect: {
-      type: Boolean,
-      default: true
-    },
-    showFavorite: {
-      type: Boolean,
-      default: false
-    },
     path: {
       type: String,
       default: ''
@@ -122,6 +135,14 @@ export default {
     cachedParams: {
       type: Object,
       default: () => { return {}; }
+    },
+    multiStore: {
+      type: Boolean,
+      default: true
+    },
+    showFavorite: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -150,6 +171,7 @@ export default {
       inspectCatch: '',
       curStoreGroup: [],
       curStoreType: [],
+      curSelectedStore: '',
       storeGroupList: [],
       storeTypeList: [],
       curRegionI: [],
@@ -159,7 +181,8 @@ export default {
       storeTypeString: '',
       countries: [],
       provinces: [],
-      cities: []
+      cities: [],
+      isFavorite: false
     };
   },
 
@@ -178,9 +201,6 @@ export default {
     },
     cachedParams() {
       this.getSearchParams();
-    },
-    showFavorite () {
-      this.getStoreListAndGroupAndType();
     }
   },
 
@@ -190,6 +210,10 @@ export default {
   },
 
   methods: {
+    changeFavorite () {
+      this.isFavorite = !this.isFavorite;
+      this.getStoreListAndGroupAndType()
+    },
     getCountryStore() {
       let temp = [];
       if (this.storeList.length !== 0) {
@@ -214,27 +238,12 @@ export default {
     },
 
     getStoreListAndGroupAndType() {
-      //console.log("getStoreListAndGroupAndType");
-      const storeListPromise = this.showFavorite ? this.getComplexStoreData() : this.getBriefStoreData();
+      const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        if (this.showFavorite) {
-          storeList = storeList.content
-          storeList = storeList
-          .filter(store => store.favorite)
-          .map(store => ({
-            city: store.city,
-            country: store.country,
-            name: store.name,
-            province: store.province,
-            storeId: store.storeId,
-            tagIds: store.tagIds,
-            userId: store.userId,
-          }))
-        }
-        // console.log(storeList)
+        console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -258,10 +267,12 @@ export default {
 
     onChangeStore(arr) {
       this.curStore = arr;
-      //this.emitParams();
       this.changeStoreNew(arr);
     },
-
+    onChangeSelectedStore() {
+      this.emitParams();
+      console.log(this.curSelectedStore)
+    },
     getStoreDefineList(type) {
       return new Promise((resolve, reject) => {
         const params = {
@@ -386,6 +397,19 @@ export default {
       });
     },
 
+    getFavoriteStoreData() {
+      return new Promise((resolve, reject) => {
+        getFavoriteStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg && errMsg === 'Success') {
+            resolve(res.data);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
     onChangeStoreGroup(val) {
       //console.log("onChangeStoreGroup:",val);
       this.curStoreGroup = val;
@@ -494,7 +518,7 @@ export default {
       tempsearchParamsObj.curRegionI = this.curRegionI;
       tempsearchParamsObj.curRegionII = this.curRegionII;
       tempsearchParamsObj.regionMode = this.regionMode;
-
+      tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
       this.$emit('storeChange', tempsearchParamsObj);
     },
 
@@ -519,7 +543,6 @@ export default {
 
     getSelectCountryOrCity() {
       const self = this;
-      console.log(self.curCity.length);
       self.regionMode = self.curCity.length > 0 ? 2 : 1;
       if (self.curProvince.length !== 0) {
         self.curRegionI = self.curProvince;
@@ -582,7 +605,7 @@ export default {
     clearStoreInfo() {
       const self = this;
       self.curStore = [];
-      if (this.showStoreSelect) {
+      if (this.multiStore) {
         self.$refs.multiSelect.selectedArray = [];
         self.$refs.multiSelect.input = '';
       }
@@ -591,7 +614,7 @@ export default {
     clearProviceInfo() {
       const self = this;
       self.curProvince = [];
-      if (this.showStoreSelect) {
+      if (this.multiStore) {
         self.$refs.proviceSelect.selectedArray = [];
         self.$refs.proviceSelect.input = '';
       }
@@ -600,7 +623,7 @@ export default {
     clearCityInfo() {
       const self = this;
       self.curCity = [];
-      if (this.showStoreSelect) {
+      if (this.multiStore) {
         self.$refs.citySelect.selectedArray = [];
         self.$refs.citySelect.input = '';
       }
@@ -710,6 +733,7 @@ export default {
           this.curStore = searchParams.curStore;
           this.curStoreGroup = searchParams.curStoreGroup;
           this.curStoreType = searchParams.curStoreType;
+          this.curSelectedStore = searchParams.curSelectedStore;
           this.ifGetParamsFromCash = true;
           if(searchParams.searchFrom == "PatrolPersonStat"){
             this.getStoreListAndGroupAndType();
@@ -724,6 +748,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .single-select {
+    /deep/ .el-input__inner {
+      border: none;
+      font-size: 15px;
+      height: calc(28/1440*100vw); 
+      line-height: calc(28/1440*100vw); 
+    }
+  }
+  .favorite {
+    width: calc(115/1440*100vw); 
+    height: calc(28/1440*100vw); 
+    font-size: 15px;
+    line-height: calc(28/1440*100vw); 
+    user-select: none; 
+    cursor: pointer; 
+    margin-right: calc(20/1440*100vw);  
+    text-align: center;
+  }
   .content{
     display: flex;
     flex-direction: row;
