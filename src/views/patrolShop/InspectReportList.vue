@@ -366,9 +366,9 @@ export default {
       curAppraise: -1,
       appraiseList: [
         { 'status': -1, 'label': this.$t('remotePatrol.all') },
-        { 'status': 0, 'label': this.$t('remotePatrol.dangerous') },
-        { 'status': 1, 'label': this.$t('remotePatrol.improve') },
-        { 'status': 2, 'label': this.$t('overview.echartGood') }
+        { 'status': 0, 'label': this.$t('remotePatrol.dangerous') }, //poor
+        { 'status': 1, 'label': this.$t('remotePatrol.improve') }, //fair
+        { 'status': 2, 'label': this.$t('overview.echartGood') } //good
       ],
       storeStr: '',
       total: 0,
@@ -579,7 +579,7 @@ export default {
       const statusAndLangAndIconMap = [
         {
           status: 0,
-          statusStr: this.$t('overview.danger'),
+          statusStr: this.$t('overview.danger'), // Poor
           children: [{
             'zh': require('../../../static/img/dangerous_cn.png'),
             'zhtw': require('../../../static/img/dangerous_tw.png'),
@@ -590,7 +590,7 @@ export default {
         },
         {
           status: 1,
-          statusStr: this.$t('overview.improve'),
+          statusStr: this.$t('overview.improve'), // Fair
           children: [{
             'zh': require('../../../static/img/improved_cn.png'),
             'zhtw': require('../../../static/img/improved_cn.png'),
@@ -601,7 +601,7 @@ export default {
         },
         {
           status: 2,
-          statusStr: this.$t('overview.pass'),
+          statusStr: this.$t('overview.pass'), // Good
           children: [{
             'zh': require('../../../static/img/good_cn.png'),
             'zhtw': require('../../../static/img/good_cn.png'),
