@@ -3,7 +3,12 @@
     <div v-for="(_item,_index) in reportDetailData" :key="_index" class="content-detail">
       <div class="content-detail-title">
         <div class="detail-title">
-          <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span></p>
+          <p class="title1"><span class="pdf_font_20">{{ _index+1 }}.{{ _item.subject }}</span>
+          <span 
+            style="color: #85898e; font-size: 12px"
+            v-if="_item.itemScore !== Number.MAX_VALUE" 
+            class="pdf_font_18">
+            {{ `( ${$t('remotePatrol.totalScoreUnit')}${_item.itemScore} )` }}</span></p>
           <p class="title2"><span class="pdf_font_18 title2_pdf">{{ _item.description }}</span></p>
         </div>
         <div v-if="_item.type === 0" class="score-title">
@@ -36,12 +41,6 @@
             :class="_item.grade < _item.qualifiedScore ? 'title-btn-failed' : 'title-btn-pass'"
             >
             <span class="pdf_font_18">{{ _item.grade }}</span>
-          </div>
-          <div
-            v-if="_item.itemScore !== Number.MAX_VALUE"
-            class="total-score">
-            <span class="pdf_font_18">
-              {{ $t('remotePatrol.totalScoreUnit') }}{{ _item.itemScore }}</span>
           </div>
         </div>
       </div>
@@ -255,37 +254,40 @@ export default {
       padding-bottom: 10px;
       display: flex;
       .ignore-btn{
-        width: 110px;
-        padding: 5px 20px;
+        width: calc(110/1920*100vw);
+        padding: calc(5/1920*100vw) calc(20/1920*100vw);
         background-color: #f7f9fa;
         font-size: calc(15 / 1920 * 100vw);
         color:#556679;
         font-weight: bold;
         border-radius: 5px;
+        text-align: center;
       }
       .title-btn-failed{
-        width: 110px;
-        padding: 5px 20px;
+        width: calc(110/1920*100vw);
+        padding: calc(5/1920*100vw) calc(20/1920*100vw);
         background-color: #ffefeb;
         font-size: calc(15 / 1920 * 100vw);
         color:#f57949;
         font-weight: bold;
         border-radius: 5px;
+        text-align: center;
       }
       .title-btn-pass{
-        width: 110px;
-        padding: 5px 20px;
+        width: calc(110/1920*100vw);
+        padding: calc(5/1920*100vw) calc(20/1920*100vw);
         background-color: #e8f6de;
         font-size: calc(15 / 1920 * 100vw);
         color:#59ab22;
         font-weight: bold;
         border-radius: 5px;
+        text-align: center;
       }
       .detail-title{
         flex: 1;
         .title1{
           font-size: 15px;
-          color:#182752;
+          color:#484848;
           font-weight: bold;
           margin:0 0 5px 0;
           text-align: left;
