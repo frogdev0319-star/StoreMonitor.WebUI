@@ -1,5 +1,21 @@
 <template>
   <div style="width:100%"> 
+      <div style="display: none">
+        <div class="no-print">
+          <delay-button
+            id="downloadPdf"
+            class="exportbtn"
+            type="primary"
+            size="mini"
+            @click="exportPDF"
+          >
+            <div class="button-area">
+              <i class="iconfont icon-pdf export"/>
+              <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+            </div>
+          </delay-button>
+        </div>
+      </div>
     <el-row class="statistics-container">
       <el-col :span="24">
         <search-component
@@ -12,7 +28,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-      <div class="statistics-content" style="height:194px;margin-top:200px">
+      <div class="statistics-content"  id="imgTest_avg1"   style="height:194px;margin-top:200px">
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -63,7 +79,7 @@
                     </el-col>
                 </el-row>
       </div>
-       <div class="statistics-content" style="height:900px;margin-top:18px">
+       <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -205,7 +221,7 @@
                   </div>
            </el-col>  
       </div> 
-       <div class="statistics-content" style="height:1010px;margin-top:18px">
+       <div class="statistics-content" id="imgTest_avg3"  style="height:1010px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -343,7 +359,7 @@
                   </div>
            </el-col>  
       </div> 
-      <div v-if="part3.standardScore!=-9999" class="statistics-content" style="height:1000px;margin-top:18px">
+      <div v-if="part3.standardScore!=-9999" id="imgTest_avg4"  class="statistics-content" style="height:1000px;margin-top:18px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -480,6 +496,30 @@
            </el-col>  
       </div> 
     </el-row>
+    <el-col :span="24">
+            <div id="pdf-area" ref="printPDF" v-if="ispdf" >
+              <div  class="statistics-content-pdf"  style="marginTop:20px">
+                <div id="img_avg1" >
+                  <img :src="pdfSrc_avg1"  style="display: block;width:100%;height: auto;">
+                </div>
+              </div>
+              <div  class="statistics-content-pdf"  style="marginTop:20px">
+                <div id="img_avg2" >
+                  <img :src="pdfSrc_avg2"  style="display: block;width:100%;height: auto;">
+                </div>
+              </div>
+              <div  class="statistics-content-pdf"  style="marginTop:20px">
+                <div id="img_avg3" >
+                  <img :src="pdfSrc_avg3"  style="display: block;width:100%;height: auto;">
+                </div>
+              </div>
+              <div  v-if="part3.standardScore!=-9999" class="statistics-content-pdf"  style="marginTop:20px">
+                <div id="img_avg4" >
+                  <img :src="pdfSrc_avg4"  style="display: block;width:100%;height: auto;">
+                </div>
+              </div>
+          </div>
+          </el-col>
     <dialog-pop
       :title="$t('insSettingView.export')"
       :append-to-body="true"
@@ -514,6 +554,7 @@ import DialogPop from '@/components/DialogPop';
 import DelayButton from '@/components/DelayButton';
 import TypeSelectArea from '@/components/TypeSelectArea';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import html2canvas from 'html2canvas';
 import "../../assets/sass/util.scss";
 export default {
   name: 'PatrolEvaluationSta',
@@ -1149,6 +1190,10 @@ export default {
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{},
               table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfReport'}},
+      pdfSrc_avg1:"",
+      pdfSrc_avg2:"",
+      pdfSrc_avg3:"",
+      pdfSrc_avg4:"",
     };
   },
 
@@ -2861,12 +2906,64 @@ export default {
       this.searchData();
     },
 
-    exportPdf(storeNameStr, storeGroupStr, storeTypeStr) {
-      this.isexportPDF = true;
-      this.storeNameStr = storeNameStr;
-      this.storeGroupStr = storeGroupStr;
-      this.storeTypeStr = storeTypeStr;
-      this.handleExportReport();
+    exportPDF() {
+      console.log("Export PDF")
+       const self = this;
+       self.ispdf = true;
+       this.$nextTick(() => {
+        const img_avg1 = document.getElementById('imgTest_avg1');
+        const img_avg2 = document.getElementById('imgTest_avg2');
+        const img_avg3 = document.getElementById('imgTest_avg3');
+        const img_avg4 = document.getElementById('imgTest_avg4');
+        setTimeout(() => {
+          html2canvas(img_avg1,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg1 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_avg1 = oGrayImg1;
+          });
+          html2canvas(img_avg2,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg2 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_avg2 = oGrayImg2;
+          });
+          html2canvas(img_avg3,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg3 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_avg3 = oGrayImg3;
+          });
+          html2canvas(img_avg4,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg4 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_avg4 = oGrayImg4;
+          });
+          setTimeout(() => {
+            self.$print(self.$refs.printPDF);
+            self.ispdf = false;
+          }, 1000);
+        }, 5000);
+      });
+      // this.handleExportReport();
+       /*
+        if (self.avgChartOption.series[0].data.length === 0 && self.AssChartOption.series[0].data.length===0) {
+        util.notify(self.$t('statistics.emptyInsRecordList'), 'warning', 3000);
+        return false;
+      }
+      self.ispdf = true;
+      this.$nextTick(() => {
+        const img_avg = document.getElementById('imgTest_avg');
+        const img_assm = document.getElementById('imgTest_assm');
+        setTimeout(() => {
+          html2canvas(img_avg,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg1 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_avg = oGrayImg1;
+          });
+          html2canvas(img_assm,{ backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg2 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_assm = oGrayImg2;
+          });
+          setTimeout(() => {
+            self.$print(self.$refs.printPDF);
+            self.ispdf = false;
+          }, 1000);
+        }, 5000);
+      });
+    */
     },
 
     handleRegionPageAndSizeChange(pageObj) {
