@@ -46,6 +46,7 @@
             <span class="area-title">{{ $t('overview.eventSource') }}</span>
           </div>
           <div class="pct-content">
+            <div class="pie-area">
             <div class="pie-div">
               <div class="inner"/>
               <div class="pct-panel">
@@ -55,6 +56,7 @@
                       :options="eventSourceOptions"
                       class="chart-content"
                   />
+              </div>
               </div>
             </div>
             <!--<div class="pct-panel">
@@ -86,15 +88,17 @@
             {{ $t('overview.eventStatus') }}
           </div>
           <div class="pct-content">
-            <div class="pie-div">
-              <div class="inner"/>
-              <div class="pct-panel">
-                  <v-chart
-                      ref="eventSourceRef"
-                      :auto-resize="true"
-                      :options="eventStatusOptions"
-                      class="chart-content"
-                  />
+            <div class="pie-area">
+              <div class="pie-div">
+                <div class="inner"/>
+                <div class="pct-panel">
+                    <v-chart
+                        ref="eventSourceRef"
+                        :auto-resize="true"
+                        :options="eventStatusOptions"
+                        class="chart-content"
+                    />
+                </div>
               </div>
             </div>
             <!--<div class="pct-panel">

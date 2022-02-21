@@ -329,7 +329,7 @@ $ignored: #b9c6d2;
         // box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
-        padding: calc(20 / 1920 * 100vw);
+        padding:20px;
         // height: 400px;
         .pct-content {
           padding-top: 25px;
@@ -339,8 +339,16 @@ $ignored: #b9c6d2;
           border-top: 1px solid $border;
           width: 100%;
           text-align: center;
+          .pie-area{
+            height:210px;
+            margin-left: calc(36/1440*100vw);
+            margin-right: calc(24/1440*100vw);
+            display:flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
           .pie-div{
-            width: 100%;
+            width: 210px;
             height: 210px;
             display: flex;
             flex-direction: column;
@@ -351,7 +359,7 @@ $ignored: #b9c6d2;
               position:absolute;
               height: 130px;
               width: 130px;
-              margin-right: 110px;
+              margin-right: 40px;
               top:133px;
               border-radius: 50%;
               border-color:#dae4eb;
@@ -370,6 +378,7 @@ $ignored: #b9c6d2;
                 height:100%;
               }
             }
+          }
           }
           /*.pct-panel {
             // height: 210px;
@@ -735,6 +744,7 @@ $ignored: #b9c6d2;
       border-top: 1px solid $border;
       width: 100%;
       text-align: center;
+
       .pct-panel{
         height: 204px;
         width: 204px;
@@ -871,19 +881,27 @@ $ignored: #b9c6d2;
           border-top: 1px solid $border;
           width: 100%;
           text-align: center;
-          .pie-div{
-            width: 100%;
-            height: 210px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: end;
-            align-self: center;
+          .pie-area{
+            height:210px;
+            margin-left: calc(36/1440*100vw);
+            margin-right: calc(24/1440*100vw);
+            display:flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            .pie-div{
+              width: 210px;
+              height: 210px;
+              display: flex;
+              flex-direction: column;
+              align-items: flex-end;
+              justify-content: end;
+              align-self: center;
             .inner{
               position:absolute;
               height: 120px;
               width: 120px;
-              margin-right: 184px;
+              margin-right: 45px;
               top:153px;
               border-radius: 50%;
               border-color:#dae4eb;
@@ -901,6 +919,7 @@ $ignored: #b9c6d2;
                 width:100%;
                 height:100%;
               }
+            }
             }
           }
           /*.pct-panel{
@@ -1013,11 +1032,18 @@ $ignored: #b9c6d2;
           flex: 1;
           padding-top: calc(20 / 1920 * 100vw);
           // padding-bottom: 20px;
-          border-top: 1px solid $border;
           width: 100%;
           text-align: center;
+          .pie-area{
+            height:210px;
+            margin-left: calc(36/1440*100vw);
+            margin-right: calc(24/1440*100vw);
+            display:flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
           .pie-div{
-            width: 100%;
+            width: 210px;
             height: 210px;
             display: flex;
             flex-direction: column;
@@ -1028,7 +1054,7 @@ $ignored: #b9c6d2;
               position:absolute;
               height: 120px;
               width: 120px;
-              margin-right: 116px;
+              margin-right: 45px;
               top:133px;
               border-radius: 50%;
               border-color:#dae4eb;
@@ -1047,6 +1073,7 @@ $ignored: #b9c6d2;
                 height:100%;
               }
             }
+          }
           }
         }
         .label-0 {

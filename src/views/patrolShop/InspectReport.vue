@@ -33,8 +33,8 @@
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
         </div>
         <div class="weather-content">
-              <img class="weather-info-content" :src="weatherImg">
-            </div>
+          <img class="weather-info-content" :src="weatherImg">
+        </div>
       </div>
     </div>
     <div class="template-titles">
@@ -310,12 +310,28 @@
             :style="isexportPDF ? 'height:450px;' : ''"
             class="pie-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
-            <v-chart
-              v-if="pageItem.data"
-              ref="chartRadar"
-              :options="pageItem.data"
-              :auto-resize="true"
-              class="pie-chart-content"/>
+            <div class="pie-area">
+              <div class="pie-div">
+                <!--<div class="inner"/>-->
+                <div class="pct-panel">
+                    <v-chart
+                        ref="pieChartRef"
+                        :auto-resize="true"
+                        :options="pageItem.data"
+                        class="pie-chart-content"
+                    />
+                </div>
+              </div>
+              <div style="margin-top: 10px;width:60%;margin-left:calc(152/1440*100vw);height:206px;overflow-y:auto;overflow-x:hidden;">
+              <div v-for="(item,index) in chartLabelArr" :key="index">
+                <div class="pie-label-area">
+                    <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
+                    <div class="pei-item-name">{{item.name}}</div>
+                    <div class="pei-item-num">{{item.value}}%</div>
+                </div>
+              </div> 
+              </div>
+            </div>
           </el-col>
           <el-col
             v-if="!staticalConfig.chart"
@@ -509,7 +525,9 @@ export default {
       standard: 2,
       standardMsg: '',
       checkinInfo: '',
-      weatherImg: ''
+      weatherImg: '',
+      chartLabelArr:[],
+      pieColorList:['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757','#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB']
     };
   },
 
@@ -1230,6 +1248,7 @@ export default {
         obj.value = this.staticalConfig.qualified ? item.numOfUnqualifiedItems : item.numOfQualifiedItems;
         obj.value > 0 && seriesData.push(obj);
       });
+      this.chartLabelArr = seriesData;
       pieOptions.series[1].data = seriesData;
       return pieOptions;
     },
@@ -1242,8 +1261,11 @@ export default {
             radius: ['43%', '70%'],
             itemStyle: {
               normal: {
+                borderWidth:2,
+                borderType:'dashed',
+                borderColor:'#dae4eb',
                 color: function(params) {
-                  const colorList = ['#f4f5f9'];
+                  const colorList = ['#FFF'];
                   return colorList[params.dataIndex];
                 }
               }
@@ -1594,10 +1616,77 @@ export default {
           right: 0;
           z-index: 2;
         }
-        .pie-chart-content {
-          width: 1000px;
-          margin:0 auto;
-          height: 100%;
+        .pie-area{
+          height:325px;
+          margin-left: calc(36/1440*100vw);
+          margin-right: calc(24/1440*100vw);
+          display:flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          .pie-div{
+            width: 40%;
+            height: 276px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: end;
+            align-self: center;
+            .inner{
+              position:absolute;
+              height: 150px;
+              width: 150px;
+              margin-right: 62px;
+              top:143px;
+              border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; 
+            }
+            .pct-panel{
+              width: 350px;/*calc(276/1440*100vw);*/
+              height: 350px;/*calc(276/1440*100vw);*/
+              /*border-radius: 50%;
+              border-color:#dae4eb;
+              border-style:dashed dashed dashed dashed; */
+              align-self: end;
+              
+              .pie-chart-content {
+                width:100%;
+                height:100%;
+              }
+            }
+          }
+          .pie-label-area{
+            cursor: pointer;
+            width: calc(300/1440*100vw);
+            height: 40px;
+            display:flex;
+            flex-direction: row;
+            align-items: center;
+            text-align: left;
+            .pie-color{
+              width:18px;
+              height: 18px;
+              margin-left: 12px;
+            }
+            .pei-item-name{
+              margin-left:calc(12/1440*100vw);
+              color: #484848;
+              width:calc(167/1440*100vw);
+              height: 18px;
+              font-size: 15px;
+
+            }
+            .pei-item-num{
+              color: #484848;
+              width:calc(40/1440*100vw);
+              height: 18px;
+              font-size: 15px;
+              font-family: Roboto;
+              font-weight: bold;
+              line-height:18px;
+            }
+          } 
         }
       }
       .radar-content {

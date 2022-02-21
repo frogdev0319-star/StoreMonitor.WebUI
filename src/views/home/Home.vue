@@ -225,7 +225,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.0.9 &copy; {{ getFullYear }} Advantech Intelligent City
+                v3.0.0.10 &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>
@@ -239,7 +239,7 @@
 import { mapGetters } from "vuex";
 import PubSub from 'pubsub-js';
 import Database from '@/common/Database';
-
+import util from '@/common/util.js';
 export default {
   name: "Home",
   data() {
@@ -711,16 +711,33 @@ export default {
       const idIndex = this.brandList
         .map((item) => item.accountId)
         .indexOf(accountId);
-      idIndex !== -1 &&
-        sessionStorage.setItem("accountName", this.brandList[idIndex].name);
-      sessionStorage.setItem("accountId", this.accountId);
+      let data = null;
+      if(idIndex !== -1)
+        data = this.brandList[idIndex].srp.find(item=>item.type == "Custom_Inspection");
+      console.log("Change Account")
+      console.log(this.brandList[idIndex])
+  
+
+      if(!data || !data.enable){
+         this.accountId = this.orgAccountId
+         util.notify(self.$t('route.noInspectionAccessRights'), 'warning', 3000);
+         return ;
+      }
+
       const params = {
         accountId: accountId,
       };
+      console.log("Change Account:",this.orgAccountId,this.accountId)
       self.$store.dispatch("changeAccount", params).then((res) => {
         if (res.errCode === 0) {
+          sessionStorage.setItem("accountName", this.brandList[idIndex].name);
+          sessionStorage.setItem("accountId", this.accountId);
           self.changeRoutes();
           self.$route.meta.keepAlive = false;
+        }
+        else{
+          this.accountId = this.orgAccountId
+           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);  
         }
       });
     },
@@ -750,6 +767,7 @@ export default {
         result.userName.length > 10
           ? result.userName.substr(0, 10) + "..."
           : result.userName;
+      self.orgAccountId = result.accountId;
       self.accountId = result.accountId;
       var un = result.userName.split(' ');
       self.iconName = (un.lenght>1)? un[0].substr(0, 1)+un[1].substr(0, 1) : un[0].substr(0, 1);
