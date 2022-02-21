@@ -43,11 +43,7 @@
                || $route.path === '/patrolItem'
              || $route.path ==='/patrolEvaluation'
              || $route.path ==='/reportdetails'"
-<<<<<<< HEAD
-            style="background-color: transparent; color: #fff; border: none; position:absolute;top:8px;right:24px"
-=======
             style="background-color: transparent; color: #fff; border: none; position:absolute;top:6px;right:24px"
->>>>>>> fafd5786dcc4e665350dcb28bea19c88cd10b3b6
             @click="handleDownload"
           >
             <div class="button-area">
