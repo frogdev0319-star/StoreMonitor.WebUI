@@ -338,12 +338,27 @@
             :style="isexportPDF ? 'height:450px;' : ''"
             class="radar-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
-            <v-chart
-              v-if="pageItem.data"
-              ref="chartRadar"
-              :options="pageItem.data"
-              :auto-resize="true"
-              class="radar-chart-content"/>
+            <div class="radar-area">
+              <div class="radar-div">
+                <div class="pct-panel">
+                <v-chart
+                  v-if="pageItem.data"
+                  ref="chartRadar"
+                  :options="pageItem.data"
+                  :auto-resize="true"
+                  class="radar-chart-content"/>
+                  </div>
+              </div>
+              <div class="radar-label" >
+                <div style="margin-left:16px;color:#484848;font-size:15px;line-height:20px">{{$t('remotePatrol.category')}}</div>
+                <div v-for="(item,index) in chartLabelArr" :key="index">
+                  <div class="radar-label-area">
+                      <div class="radar-item-name">{{item.name}}</div>
+                      <div class="radar-item-num">{{item.value}}</div>
+                  </div>
+                </div> 
+              </div>
+            </div> 
           </el-col>
         </template>
 
@@ -1116,6 +1131,8 @@ export default {
       const options = self.getRadarChartOption();
       const tempIndicator = [];
       const seriesValue = [];
+      this.chartLabelArr = []; 
+      var templabe = [];
       summary.forEach((item, index) => {
         const obj = {};
         obj.name = item.groupName;
@@ -1131,9 +1148,19 @@ export default {
             : seriesValue.splice(1, 0, item.numOfQualifiedItems);
         }
       });
+
+      for(var i=0; i<tempIndicator.length;i++){
+        let arrObj = {
+          name:tempIndicator[i].name,
+          value:seriesValue[i]
+        }
+        templabe.push(arrObj);
+      }
+      this.chartLabelArr = templabe;
       const temp = [];
       const obj = { value: seriesValue };
       temp.push(obj);
+      
       options.radar[0].indicator = tempIndicator;
       options.radar[1].indicator = tempIndicator;
       options.series[0].data = temp;
@@ -1150,25 +1177,41 @@ export default {
       const radarChartOption = {
         backgroundColor: '#fff',
         tooltip: {
-          backgroundColor: 'rgba(30,34,52,0.75)',
-          position: function(point) {
-            return [point[0], '10%'];
+          backgroundColor:'#FFF',
+          extraCssText: "box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);",
+          textStyle:{
+            color:'#484848',
+            fontStyle:' NotoSansCJKtc',
+            fontSize: '15px',
+            fontEeight: 'normal',
           }
         },
         textStyle: {
-          fontFamily: 'Roboto, Microsoft YaHei'
+          fontFamily: 'NotoSansCJKtc, Roboto, Microsoft YaHei'
         },
         legend: {
+          x: 'center',
+          y: 'bottom',
+          itemWidth: 10,
+          itemHeight: 10,
+          itemGap: 20,
+          fontSize: 12,
+          padding: 0,
+          textStyle: {
+            color: '#7d8cab',
+            fontSize: 12
+          },
           data: ['inspect radar']
         },
         radar: [
           {
+            shape: "circle",
             indicator: [],
             nameGap: 5,
             center: ['50%', '50%'],
             name: {
               textStyle: {
-                color: '#7d8cad',
+                color: '#69727c',
                 borderRadius: 3,
                 padding: [3, 5]
               }
@@ -1178,6 +1221,7 @@ export default {
             }
           },
           {
+            shape: "circle",
             indicator: [],
             center: ['50%', '50%'],
             name: {
@@ -1194,7 +1238,9 @@ export default {
         ],
         series: [{
           type: 'radar',
-          data: []
+          data: [],
+          symbol:'circle',
+          symbolSize:1,
         },
         {
           type: 'radar',
@@ -1203,18 +1249,25 @@ export default {
           radarIndex: 1,
           itemStyle: {
             normal: {
+              symbolSize:1,
+              color:'#006ab7',
+              backgroundColor:'#006ab7',
               lineStyle: {
-                color: '#FDBA40',
-                width: 4
+                color: '#006ab7',
+                width: 2
               },
               areaStyle: {
-                color: '#D7E5FD'
+                color: new ECharts.graphic.LinearGradient(
+                  0,0,0,1,
+                  [
+                    { offset: 1, color: 'rgba(0,106,183, 0.4)' },
+                    { offset: 0, color: 'rgba(235,243, 249, 0.4)' }
+                  ]  
+                ),
               }
             }
           },
-          tooltip: {
-            trigger: 'item'
-          }
+          
         }
         ]
       };
@@ -1690,9 +1743,9 @@ export default {
         }
       }
       .radar-content {
-        height: 300px;
+        width:100%;
+        height: 325px;
         position: relative;
-        margin-top: 20px;
         .span-4{
           position: absolute;
           font-weight: 400;
@@ -1702,11 +1755,74 @@ export default {
           right: 0;
           z-index: 2;
         }
-        .radar-chart-content {
-          width: 1000px;
-          margin:0 auto;
-          height: 100%;
+        .radar-area{
+          width:100%;
+          height:325px;
+          margin-left: calc(36/1440*100vw);
+          margin-right: calc(24/1440*100vw);
+          display:flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          .radar-div{
+            width: 390px;
+            height: 276px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: end;
+            align-self: center;
+            
+            .pct-panel{
+              width: 390px;/*calc(276/1440*100vw);*/
+              height: 290px;
+              align-self: end;
+              
+              .radar-chart-content {
+                width: 100%;
+                margin:0 auto;
+                height: 100%;
+              }
+            }
+          }
+          .radar-label{
+            width: 236px;
+            height: 290px;
+            margin-left: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+            border-radius: 4px;
+            overflow-y: auto;
+            .radar-label-area{
+              width: 184px;
+              height: 30px;
+              display:flex;
+              flex-direction: row;
+              align-items: center;
+              text-align: left;
+              .radar-item-name{
+                margin-left:16px;
+                color: #484848;
+                width:calc(167/1440*100vw);
+                height: 16px;
+                font-size: 15px;
+
+              }
+              .radar-item-num{
+                color: #484848;
+                width:20px;
+                height: 18px;
+                font-size: 15px;
+                font-family: Roboto;
+                font-weight: bold;
+                line-height:16px;
+              }
+            }
+          }
+
         }
+        
       }
       .report-content {
         margin-top: 15px;
