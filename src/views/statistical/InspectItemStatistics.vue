@@ -1,5 +1,21 @@
 <template>
   <div>
+      <div style="display: none">
+        <div class="no-print">
+          <delay-button
+            id="downloadPdf"
+            class="exportbtn"
+            type="primary"
+            size="mini"
+            @click="exportPDF"
+          >
+            <div class="button-area">
+              <i class="iconfont icon-pdf export"/>
+              <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+            </div>
+          </delay-button>
+        </div>
+      </div>
     <el-row class="statistics-container">
       <el-col :span="24">
         <search-component
@@ -11,7 +27,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-     <div class="statistics-content" style="height:1110px;margin-top:200px">
+     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -150,6 +166,15 @@
            </el-col>  
       </div> 
     </el-row>
+        <el-col :span="24">
+            <div id="pdf-area" ref="printPDF" v-if="ispdf" >
+              <div  class="statistics-content-pdf"  style="marginTop:20px">
+                <div id="img_avg1" >
+                  <img :src="pdfSrc_avg1"  style="display: block;width:100%;height: auto;">
+                </div>
+              </div>
+          </div>
+          </el-col>
     <dialog-pop
       :title="$t('insSettingView.export')"
       :append-to-body="true"
@@ -185,6 +210,7 @@ import InspectItemSelect from '@/components/InspectItemSelect';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import html2canvas from 'html2canvas';
 export default {
   name: 'PatrolEvaluationSta',
 
@@ -203,6 +229,7 @@ export default {
   mixins: [resize],
   data() {
     return {
+      pdfSrc_avg1:"",
       inspectSubTitle: this.$t('statistics.itemAverageScore'),
       inspectDetailSubTitle: this.$t('statistics.evalDetail'),
       totalAvgScore:-9999,
@@ -2324,12 +2351,23 @@ export default {
 
     },
 
-    exportPdf(storeNameStr, storeGroupStr, storeTypeStr) {
-      this.isexportPDF = true;
-      this.storeNameStr = storeNameStr;
-      this.storeGroupStr = storeGroupStr;
-      this.storeTypeStr = storeTypeStr;
-      this.handleExportReport();
+ exportPDF() {
+      console.log("Export PDF")
+       const self = this;
+       self.ispdf = true;
+       this.$nextTick(() => {
+        const img_avg1 = document.getElementById('imgTest_avg1');
+        setTimeout(() => {
+          html2canvas(img_avg1,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+            var oGrayImg1 = canvas.toDataURL('image/jpeg');
+            self.pdfSrc_avg1 = oGrayImg1;
+          });
+          setTimeout(() => {
+            self.$print(self.$refs.printPDF);
+            self.ispdf = false;
+          }, 1000);
+        }, 5000);
+      });
     },
 
     handleRegionPageAndSizeChange(pageObj) {

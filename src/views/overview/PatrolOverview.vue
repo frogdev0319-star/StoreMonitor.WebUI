@@ -315,7 +315,7 @@ export default {
       descending: require('../../../static/img/descending.png'),
       ascending: require('../../../static/img/ascending.png'),
       currentIndex: 0,
-      fontFamily: 'Roboto, Microsoft YaHei'
+      fontFamily: 'NotoSansCJKtc,Roboto, Microsoft YaHei'
     };
   },
 
