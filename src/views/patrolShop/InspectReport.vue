@@ -16,7 +16,6 @@
         </delay-button>
       </div>
     </div>
-    <img :src="report.iconSrc" :height="reportImgHeight" alt="" class="report-img">
     <div class="el-header">
       <div class="left-header">
         <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
@@ -24,6 +23,12 @@
           {{ accountName + ' | ' + report.storeName+' '+report.tagName }}
           <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
         </p>
+        <div class="spacer"></div>
+        <span class="font-15">{{ $t('remotePatrol.getscore') }}：</span>
+        <span class="font-score">
+          {{ totalScore }}
+          <span class="font-score_count">{{ $t('remotePatrol.scorecount') }}</span>
+        </span>
       </div>
       <div class="info-content">
         <div class="pdf_font_24">
@@ -35,31 +40,44 @@
         <div class="weather-content">
           <img class="weather-info-content" :src="weatherImg">
         </div>
+        <div 
+          style="margin-left: calc(20/1440*100vw)"
+          class="status-tag"
+          :style="{
+            0: {'color':'#e22472','background-color':'#ffecf4'},
+            1: {'color':'#f57848','background-color':'#ffefeb'},
+            2: {'color':'#59ab22','background-color':'#e8f6de'}
+          }[report.status]"
+        >
+          {{{
+            0: $t('overview.danger'),
+            1: $t('overview.improve'),
+            2: $t('overview.pass')
+          }[report.status]}}
+        </div>
+        <div style="margin-left: calc(20/1440*100vw)" class="status-tag"
+          :style="totalScore >= standard ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
+        >{{totalScore >= standard ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
       </div>
     </div>
     <div class="template-titles">
-      <div v-if="templateList.length > 1" class="names">
-        <div
+      <el-select 
+        class="storevue-select"
+        v-if="templateList.length > 1" 
+        :value="curTemplateIndex" 
+        @change="getTemplateConfig">
+        <el-option
           v-for="(item,index) in templateList"
-          :class="{'click-btn' : curTemplateIndex === index}"
+          :value="index"
           :key="index"
-          class="template-name"
-          @click="getTemplateConfig(index)">
-          {{ item.name }}
-        </div>
-      </div>
+          :label="item.name"
+        />
+      </el-select>
     </div>
     <div class="el-acticle">
-      <el-row class="report-content">
+      <el-row class="report-content" v-if="standardMsg || checkinInfo">
         <el-col :span="24" class="">
           <div class="header-score">
-            <span class="span-1"><span class="pdf_font_20">{{ $t('remotePatrol.getscore') }}：</span></span>
-            <span class="span-2">
-              <span class="pdf_font_26">
-                {{ totalScore }}
-                <span>{{ $t('remotePatrol.scorecount') }}</span>
-              </span>
-            </span>
             <div class="standard-btn">
               <div
                 :class="{'up-to-standard': standard === 1, 'not-up-to-standard': standard === 0}"
@@ -96,7 +114,8 @@
             <div v-if="pageItem.ifExpand" class="item-content">
               <div class="pdf_font_20">
                 <div v-for="(item,index) in pageItem.data" :key="index" style="border-bottom:1px solid #f4f5f9;margin-bottom:20px;">
-                  <div class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
+                  <div v-if="!item.children" class="content-title"><span class="pdf_font_20">{{ item.groupName }}</span></div>
+                  <hr v-if="!item.children" class="hr-horizontal" />
                   <template v-if="!item.children">
                     <report-detail
                       :report-detail-data="item.cateryItems"
@@ -108,9 +127,8 @@
                   </template>
                   <template v-else>
                     <div v-for="(child, childIndex) in item.children" :key="childIndex">
-                      <div class="subcatergy-title">
-                        {{ child.groupName }}
-                      </div>
+                      <div class="content-title"><span class="pdf_font_20">{{ `【${item.groupName}】 —【${child.groupName}】` }}</span></div>
+                      <hr class="hr-horizontal" />
                       <report-detail
                         :report-detail-data="child.cateryItems"
                         :is-export-pdf="isexportPDF"
@@ -791,7 +809,7 @@ export default {
 
     async getReportInfo(res) {
       if (res.errCode === 0 && res.data.length > 0) {
-        const data = res.data[0].info;
+        const data = res.data[0].info;  
         this.totalScore = data.totalScore;
         this.standard = data.standard;
         this.standardMsg = util.setStandardMsg(this.standard);
@@ -1493,15 +1511,19 @@ export default {
     .pdf_font_36{font-size: 36px;}
     .title2_pdf{color:#182752;line-height:45px;}
   }
-  $red: #f31d65;
+  $red: #2c90d9;
   $black: #182752;
   $border: #e3e9f4;
-  $background: #f4f5f9;
+  $background: #f7f9fa;
   $tab: #7d8cad;
   $h1: #292e36;
-  $qualified: #6097F3;
+  $qualified: #69727c;
   $noqualied: #FDBA40;
-  $suggestBack: #F1F6FE;
+  $suggestBack: #f7f9fa;
+  
+  tr {
+    background-color: #fff !important;
+  }
   .fade-enter-active, .fade-leave-active {
     transition: opacity .5s
   }
@@ -1542,15 +1564,14 @@ export default {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      padding-right: calc(110/1920*100vw);
       .pdf-title-icon{
         width:46px;
         height:54px;
         vertical-align: middle;
       }
       .title-icon{
-        width:26px;
-        height:34px;
+        width: calc(20/1440*100vw);
+        height: calc(20/1440*100vw);
       }
       .pdf-report-title{
         font-size: 18px;
@@ -1566,7 +1587,8 @@ export default {
         white-space: nowrap;
       }
       .report-title {
-        font-size: 18px;
+        color: #2b2b2b;
+        font-size: calc(18/1440*100vw);
         font-weight: bold;
         margin:0;
         margin-left: calc(20 / 1920 * 100vw);
@@ -1575,10 +1597,28 @@ export default {
         font-size: 20px;
       }
       .left-header{
+        width: 100%;
         align-items: center;
         display: flex;
-        flex-direction: row;
         height: 25px;
+        .font-15 {
+           font-size: calc(15/1440*100vw); 
+           height: calc(32/1440*100vw); 
+          line-height: calc(40/1440*100vw); 
+        }
+        .font-score {
+           font-size: calc(32/1440*100vw); 
+           color: #c60957;
+        }
+        .font-score_count {
+           font-size: calc(12/1440*100vw); 
+           color: #69727c;
+        }
+      }
+      
+      .status-tag {
+        border-radius: calc(5/1440*100vw); 
+        padding: calc(2/1440*100vw) calc(15/1440*100vw);
       }
       .info-content {
         margin-top:20px;
@@ -1620,18 +1660,19 @@ export default {
         margin-top: 20px;
         font-size: calc(14 / 1920 * 100vw);
         font-weight: bold;
+        border-radius: 5px;
         background-color: $suggestBack;
         color: $qualified;
         height: auto;
         overflow-y: auto;
-        border: 1px solid #a0c1f8;
+        border: 1px solid #f5f5f5;
+        padding: 16px;
         .suggest-content {
           max-height: 180px;
           display: flex;
-          padding-left: calc(30 / 1920 * 100vw);
         }
         span:first-child {
-          padding-right: 20px;
+          padding-right: 10px;
         }
         span:last-child{
           flex:1;
@@ -1847,7 +1888,7 @@ export default {
               }
           }
           th {
-            color: $tab;
+            color: #556679;
             background-color: $background;
             text-align: center;
             border-bottom-width: 1px;
@@ -1916,8 +1957,8 @@ export default {
               width: auto;
               height: auto;
               border-radius: 10px;
-              background-color: #D4DBE5;
-              color: $tab;
+              background-color: #edf8f9;
+              color: #006ab7;
               font-size: 12px;
               margin-right: calc(20/1920*100vw);
               float:right;
@@ -1986,10 +2027,11 @@ export default {
           border: 1px solid $border;
           border-top:0;
           .content-title{
-            border-left:4px solid #eb1d63;
-            font-size: calc(14 / 1920 * 100vw);
-            color:#7d8cad;
-            padding-left:calc(20 / 1920 * 100vw);
+            border-left:4px solid $red;
+            font-size: 13px;
+            color:#556679;
+            padding-left:calc(10 / 1920 * 100vw);
+            margin-bottom:calc(10 / 1920 * 100vw);
             font-weight: bold;
           }
           .content-detail{
@@ -2266,11 +2308,16 @@ export default {
     }
   }
   .template-titles{
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid $border;
-    padding-left: calc(40 / 1920 * 100vw);
-    padding-right: calc(40 / 1920 * 100vw);
+    position: fixed;
+    top: calc(10/1440*100vw);
+    right: calc(150/1440*100vw);
+    z-index: 999;
+    /deep/ .el-input__inner {
+      border: none;
+      background-color: rgba(255, 255, 255, .2);
+      color: #fff;
+      width: calc(160/1440*100vw);
+    }
   }
   .names{
     display: flex;

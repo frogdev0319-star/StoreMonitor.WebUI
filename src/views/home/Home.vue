@@ -41,7 +41,7 @@
              || $route.path === '/patrolCompareStat'
              || $route.path ==='/eventStat'
              || $route.path ==='/reportdetails'"
-            style="background-color: transparent; color: #fff; border: none; position:absolute;top:21px;right:24px"
+            style="background-color: transparent; color: #fff; border: none; position:absolute;top:8px;right:24px"
             @click="handleDownload"
           >
             <div class="button-area">
