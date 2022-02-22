@@ -427,7 +427,7 @@
             <el-select 
               style="margin-left: 20px;"
               class="storevue-select-grey" 
-              v-model="patrolstore" 
+              :value="patrolstore" 
               :placeholder="$t('remotePatrol.selectInspect')"
               @change="changeInspect">
               <el-option
@@ -2643,6 +2643,7 @@ export default {
       });
     },
     changeInspect(val) {
+      console.log(val)
       const self = this;
       if ( (!self.showGuide && self.$refs.vendorVideo.editCount !== 0)
           ||(self.$store.getters.PatrolHistory != null) ) {
