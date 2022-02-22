@@ -138,7 +138,9 @@
                               :key="sourceindex"
                               :height="imgHeight+'px'"
                               class="source-details">
-                              
+                              <template v-if="sourceitem.mediaType==3">
+                                 {{`${sourceitem.src}`}}
+                                </template>
                               <div v-if="sourceitem.mediaType==2" class="img-content">
                                 <el-image
                                   :src="sourceitem.src"
@@ -211,7 +213,7 @@
                                 :height="imgHeight+'px'"
                                 :class="{'source-details': sourceitem.mediaType!=3}">
                                 <template v-if="sourceitem.mediaType==3">
-                                  {{`${sourceindex+1}. ${sourceitem.src}`}}
+                                  {{`${sourceitem.src}`}}
                                 </template>
                                 <div v-if="sourceitem.mediaType==2" class="img-content">
                                   <el-image
@@ -251,7 +253,7 @@
                                 :height="imgHeight+'px'"
                                 :class="{'source-details': sourceitem.mediaType!=3}">
                                 <template v-if="sourceitem.mediaType==3">
-                                 {{`${sourceindex+1}. ${sourceitem.src}`}}
+                                 {{`${sourceitem.src}`}}
                                 </template>
                                 <div v-if="sourceitem.mediaType === 2" :style="isexportPDF ? 'margin-right:20px;margin-bottom:20px' : ''" class="img-content">
                                   <el-image
@@ -289,7 +291,7 @@
                       <div v-if="_item.sourceList!=null&&_item.sourceList.length!=0" class="cdm-pic">
                         <div v-for="(sourceitem,index) in _item.sourceList" :key="index" :height="imgHeight+'px'" :class="{'source-details': sourceitem.mediaType!=3}">
                           <template v-if="sourceitem.mediaType==3">
-                            {{`${index+1}. ${sourceitem.src}`}}
+                            {{`${sourceitem.src}`}}
                           </template>
                           <div v-if="sourceitem.mediaType==2" class="img-content">
                             <el-image
@@ -1600,7 +1602,7 @@ export default {
                 }
               }
               .cdm-pic{
-                    margin-top: 10px;
+                margin-top: 10px;
                 overflow: hidden;
                 .source-details{
                   display: inline-block;

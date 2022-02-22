@@ -111,8 +111,7 @@
                       @click="deleteFeedbackItemResource(_index)"
                     />
                     <div
-                      class="paper flex-center margin-bottom-sm"
-                      style="padding: 5px; flex: 1; margin-left: 20px"
+                      class="paper flex-center margin-bottom-sm inspect-text"
                     >
                       <div style="flex: 1; text-align: left; margin: 5px">
                         {{ _item.src }}
@@ -215,8 +214,7 @@
                     @click="deleteFeedbackItemResource(_index)"
                   />
                   <div
-                    class="paper flex-center margin-bottom-sm"
-                    style="padding: 5px; flex: 1; margin-left: 20px"
+                    class="paper flex-center margin-bottom-sm inspect-text"
                   >
                     <div style="flex: 1; text-align: left; margin: 5px">
                       {{ _item.src }}
@@ -565,7 +563,7 @@
                     </div>
                   </div>
                   <div style="padding-left: calc(20/1920*100vw)">
-                    <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
+                    <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType==2" class="img-content">
                           <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
@@ -579,6 +577,10 @@
                           <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
                           <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
                         </div>
+                      </div>
+                    </div>
+                    <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
+                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
                           <img
                             :src="deleteInspectIcon"
@@ -586,9 +588,8 @@
                             @click="deleteItemResource({ item, index: _index })"
                           />
                           <div
-                            class="paper flex-center margin-bottom-sm"
+                            class="paper flex-center margin-bottom-sm inspect-text"
                             :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
-                            style="padding: 5px; flex: 1; margin-left: 20px"
                           >
                             <div style="flex: 1; text-align: left; margin: 5px">
                               {{ _item.src }}
@@ -676,8 +677,7 @@
                         @click="editFeedback(item, index)"
                       />
                       <div
-                        class="paper flex-center margin-bottom-sm"
-                        style="padding: 5px; flex: 1; margin-left: 20px"
+                        class="paper flex-center margin-bottom-sm inspect-text"
                       >
                         <div style="flex: 1; text-align: left; margin: 5px">
                           {{source.src}}
@@ -755,7 +755,7 @@
                 </div>
               </div>
               <div style="padding-left: calc(20/1920*100vw)">
-                <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
+                <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                   <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                     <div v-if="_item.mediaType==2" class="img-content">
                       <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
@@ -769,6 +769,10 @@
                       <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
                       <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
                     </div>
+                  </div>
+                </div>
+                <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
+                  <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                     <div v-if="_item.mediaType == 3" class="flex-center">
                       <img
                         :src="deleteInspectIcon"
@@ -776,9 +780,8 @@
                         @click="deleteItemResource({ item, index: _index })"
                       />
                       <div
-                        class="paper flex-center margin-bottom-sm"
+                        class="paper flex-center margin-bottom-sm inspect-text"
                         :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
-                        style="padding: 5px; flex: 1; margin-left: 20px"
                       >
                         <div style="flex: 1; text-align: left; margin: 5px">
                           {{ _item.src }}
@@ -3128,6 +3131,8 @@ export default {
     },
     deleteItemResource({ item, index }) {
       const self = this
+      item.curEditIndex = -1;
+      item.inspectInput = '';
       item.sourceList = item.sourceList.filter((source, idx) => idx !== index)
     },
     editItemResource ({ item, index }) {
@@ -3135,6 +3140,8 @@ export default {
       item.inspectInput = item.sourceList[index].src
     },
     deleteFeedbackItemResource(index) {
+      this.curEditFeedbackIndex = -1
+      this.feedbackInput = ''
       this.feedbackSourceList = this.feedbackSourceList.filter((source, idx) => idx !== index)
     },
     editItemFeedbackResource(index) {
@@ -3281,6 +3288,36 @@ export default {
   }
   .fadepen-enter, .fadepen-leave-to{
     opacity: 0;
+  }
+  .img-source-content {
+    display: flex;
+    margin-bottom: calc(10/1920*100vw);
+  }
+  .img-content{
+    position: relative;
+    width: calc(140/1920*100vw);
+    height: calc(100/1920*100vw);
+    margin-right: calc(15/1920*100vw);
+    .el-image {
+      border-radius: 5px;
+    }
+    .start-icon{
+      position: absolute;
+      left: 35%;
+      top: 30%;
+      cursor: pointer;
+    }
+  }
+  .icondelete {
+    position: absolute;
+    font-size: 14px;
+    right: 5px;
+    margin-top: 8px;
+    z-index: 2;
+    color: #fff;
+    cursor: pointer;
+    background-color: rgba($color: $black, $alpha: 0.8);
+    border-radius: 50%;
   }
   @function rem($val){
     @return $val/16+rem;
