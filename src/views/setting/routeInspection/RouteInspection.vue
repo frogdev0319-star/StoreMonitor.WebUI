@@ -58,8 +58,8 @@
               @tab-click="handleClickPatrol" >
               <el-tab-pane v-for="(_item,_index) in item.data" :key="_index" :name="_index.toString()">
                 <div class="flex-center" style="color: #acaeb1; font-size: 15px; margin: 15px 0">
-                  <div class="temp-select-area">
-                    <div class="temp-select-label">{{ $t('overview.patrolLists') }}</div> 
+                  <div class="temp-select-area" :style="lang.indexOf('zh') === -1 ? {'width':'250px'}:{}">
+                    <div class="temp-select-label" :style="lang.indexOf('zh') === -1 ? {'width':'105px'}:{}">{{ $t('overview.patrolLists') }}</div> 
                     <el-select
                       v-model="patrolActive"
                       class="device-select"
@@ -2464,7 +2464,8 @@ export default {
                   display:flex; 
                   flex-direction:row;
                   height:calc(30/1920*100vw);
-                  width:220px;
+                  min-width:220px;
+                  max-width: 250px;
                   align-items:center;
                   background-color:#f4f6f7;
                   border-radius:5px;
@@ -2473,9 +2474,11 @@ export default {
                     color:#556679;
                     font-family: NotoSansCJKtc;
                     font-size: 13px;
-                    width:75px;
+                    min-width:75px;
+                    max-width:105px;
                     line-height:36px;
-                    margin-left:16px
+                    margin-left:16px;
+                    width:auto;
                   }
                 }
             }
