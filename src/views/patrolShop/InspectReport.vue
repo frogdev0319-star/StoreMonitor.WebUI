@@ -26,7 +26,7 @@
         <div class="spacer"></div>
         <span class="font-15">{{ $t('remotePatrol.getscore') }}：</span>
         <span class="font-score">
-          {{ totalScore }}
+          {{ allRemarkItemsFlag ? '--' : totalScore }}
           <span class="font-score_count">{{ $t('remotePatrol.scorecount') }}</span>
         </span>
       </div>
@@ -560,7 +560,8 @@ export default {
       checkinInfo: '',
       weatherImg: '',
       chartLabelArr:[],
-      pieColorList:['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757','#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB']
+      pieColorList:['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757','#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'],
+      allRemarkItemsFlag: false
     };
   },
 
@@ -812,6 +813,7 @@ export default {
         const data = res.data[0].info;  
         this.totalScore = data.totalScore;
         this.standard = data.standard;
+        this.allRemarkItemsFlag = res.data[0].info.type === 1
         this.standardMsg = util.setStandardMsg(this.standard);
         this.checkinInfo = data.checkinRecord ? util.getDateStr(data.checkinRecord.ts) + ' ' + i18n.t('remotePatrol.checkinSuccess') : '';
         this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
