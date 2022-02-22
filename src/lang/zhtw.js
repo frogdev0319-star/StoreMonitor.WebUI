@@ -724,7 +724,7 @@ export default {
     "userDefined": "自定義",
     "waveline": "按鈕～",
     "yesNo": "是/否",
-    "minScoreEmpty":"考評總分最低值不得為空！"
+    "minScoreEmpty":"扣分起始值不得為空！"
   },
 
   // Device Management page language

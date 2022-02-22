@@ -68,6 +68,9 @@
               <span class="input-text">
                 {{ $t('remotePatrol.scorecount') }}
               </span>
+              <span v-if="MinScoreMsg" class="score_msg">
+                *{{ $t('insSettingView.minScoreEmpty') }}
+              </span>
             </template>
             <template>
               <span class="rangeScore">
@@ -92,9 +95,7 @@
               <span v-if="ScoreMsg" class="score_msg">
                 *{{ $t('insSettingView.rangeScoreTips') }}
               </span>
-              <span v-if="MinScoreMsg" class="score_msg">
-                *{{ $t('insSettingView.minScoreEmpty') }}
-              </span>
+              
             </template>
             <template>
               <span class="rangeScore">
@@ -308,7 +309,7 @@ export default {
         util.notify(this.$t('insSettingView.enterBtnAttr'), 'warning', 3000);
         return false;
       }
-      self.MinScoreMsg = (self.hundredMarkType==1 && self.minScore.toString()=="");
+      self.MinScoreMsg = (self.hundredMarkType==1 && self.baseScore.toString()=="");
       if (!self.ScoreMsg && !self.MinScoreMsg) {
         const params = {
           inspectTagId: self.inspectId,
@@ -447,7 +448,7 @@ export default {
       const self = this;
       self.minScore = self.getUtilScore(e.target.value);
       self.ScoreMsg = parseFloat(self.minScore) > parseFloat(self.maxScore);
-      self.MinScoreMsg = (self.hundredMarkType==1 && self.minScore.toString()=="");
+      self.MinScoreMsg = (self.hundredMarkType==1 && self.baseScore.toString()=="");
     },
 
     getUtilScore(val) {

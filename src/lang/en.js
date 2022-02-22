@@ -716,7 +716,7 @@ export default {
     "userDefined": "Customize",
     "waveline": "～",
     "yesNo": "Yes/No",
-    "minScoreEmpty":"Total min score should not be empty！"
+    "minScoreEmpty":"Total score should not be empty！"
   },
 
   // Device Management page language

@@ -712,7 +712,7 @@ export default {
     "userDefined": "Customize",
     "waveline": "～に",
     "yesNo": "Yes/No",
-    "minScoreEmpty":"考評總分最低值不得為空！"
+    "minScoreEmpty":"扣分起始值不得為空！"
   },
 
   // Device Management page language
