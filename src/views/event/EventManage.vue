@@ -586,7 +586,7 @@ export default {
       this.ifSaveParams && self.saveSearchParams(false);
       this.ifSaveParams = true;
       //}
-      if (self.params.clause.storeId.length === 0) {
+      if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
         this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
         this.tableDataList[tabIndex].eventCount = 0;
@@ -654,7 +654,7 @@ export default {
       } else {
         like = {};
       }
-      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : this.params.clause.storeId;
+      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
       
       //console.log("EventMange > storeId:",storeId);
       let status = [];
@@ -705,8 +705,7 @@ export default {
           beginTs: start,
           endTs: end,
           clause: {
-            status: status,
-            storeId: storeId
+            status: status
           },
           filter: {
             page: page,
@@ -714,13 +713,18 @@ export default {
           },
           like: like
       }
-      
-      //console.log("this.searchParams:",this.searchParams);
-      if(typeof this.searchParams.searchParams.clause !="undefined" && this.searchParams['searchFrom']=='PatrolPersonStat'){
-        this.params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+      if(storeId!='-1'){
+         this.params.clause['storeId'] = storeId;
       }
-      if(typeof this.searchParams.searchParams.clause !="undefined" && this.searchParams['searchFrom']=='EventStatistics'){
-        this.params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
+      
+      console.log("this.searchParams:",this.searchParams);
+      if(this.searchParams.hasOwnProperty('searchParams')){
+        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='PatrolPersonStat'){
+          this.params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+        }
+        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='EventStatistics'){
+          this.params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
+        }
       }
       //console.log("this.params:",this.params);
       const curTabSortColumn = this.sortColumnOfTab[tabIndex];
@@ -792,7 +796,8 @@ export default {
          start = self.searchParams.beginTs;
          end = self.searchParams.endTs;
       }
-      const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : self.params.clause.storeId;
+      console.log("self.params:",self.params);
+      const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         const inputValue = self.inputSearchValue.trim();
@@ -812,14 +817,20 @@ export default {
         },
         like: like
       };
-      if(typeof this.searchParams.searchParams.clause !="undefined" && this.searchParams['searchFrom']=='PatrolPersonStat'){
-        params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+      if(storeId!='-1'){
+        params['clause']['storeId'] = storeId
       }
-      if(typeof this.searchParams.searchParams.clause !="undefined" && this.searchParams['searchFrom']=='EventStatistics'){
-        params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
+      console.log("820: params",params);
+      if(this.searchParams.hasOwnProperty('searchParams')){
+        if(this.searchParams.searchParams.hasOwnProperty('clause')  && this.searchParams['searchFrom']=='PatrolPersonStat'){
+          params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+        }
+        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='EventStatistics'){
+          params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
+        }
       }
       
-      delete params.clause['status'];
+      //delete params.clause['status'];
       if (storeId.length === 0) {
         for (let i = 0; i < 4; i++) {
           self.tableDataList[i].eventCount = 0;
