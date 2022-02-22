@@ -1257,17 +1257,21 @@ export default {
         series: [{
           type: 'radar',
           data: [],
-          symbol:'circle',
-          symbolSize:1,
+          symbol:'none',
         },
         {
           type: 'radar',
           data: [],
           name: this.$t('remotePatrol.category'),
+          symbol:'none',
           radarIndex: 1,
           itemStyle: {
+            decal:{
+                symbol:'rect',
+                 symbolSize:1,
+                color:'red',
+              },
             normal: {
-              symbolSize:1,
               color:'#006ab7',
               backgroundColor:'#006ab7',
               lineStyle: {
@@ -1275,8 +1279,8 @@ export default {
                 width: 2
               },
               areaStyle: {
-                color: new ECharts.graphic.LinearGradient(
-                  0,0,0,1,
+                color: new ECharts.graphic.RadialGradient( //圓圈中心建變色填滿 
+                  0.5, 0.5, 0.5,
                   [
                     { offset: 1, color: 'rgba(0,106,183, 0.4)' },
                     { offset: 0, color: 'rgba(235,243, 249, 0.4)' }
