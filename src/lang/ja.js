@@ -711,7 +711,8 @@ export default {
     "updateCategory": "Edit Category",
     "userDefined": "Customize",
     "waveline": "～に",
-    "yesNo": "Yes/No"
+    "yesNo": "Yes/No",
+    "minScoreEmpty":"考評總分最低值不得為空！"
   },
 
   // Device Management page language

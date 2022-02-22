@@ -715,7 +715,8 @@ export default {
     "updateCategory": "Edit Category",
     "userDefined": "Customize",
     "waveline": "～",
-    "yesNo": "Yes/No"
+    "yesNo": "Yes/No",
+    "minScoreEmpty":"Total min score should not be empty！"
   },
 
   // Device Management page language
