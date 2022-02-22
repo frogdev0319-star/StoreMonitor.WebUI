@@ -61,13 +61,15 @@
                 <tr style="vertical-align:middle;">
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
                     <span class="sheet_title">{{ inspectItem.label }}</span>
+                    <span class="count-blag">{{inspectItem.count}}</span>
                   </td>
                 </tr>
                 <tr
                   v-for="(item,index) in inspectItem.inspectList"
                   :key="index">
-                  <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ item.groupName }}</span><span class="count-blag">
-                    {{ item.items.length }}</span>
+                  <td style="word-break: keep-all;white-space:nowrap;">
+                    <span class="item-name">{{ inspectItem.isCategory ? item.groupName : '--' }}</span>
+                    <span class="count-blag">{{ item.items.length }}</span>
                   </td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
@@ -1144,22 +1146,22 @@ export default {
       this.tab3BtnArr = [setting.itemOptionsForType3[0].name, setting.itemOptionsForType3[1].name];
 
       this.theaderPassFail = [
-        { name: '', width: 'width:32%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:32%;' },
+        { name: this.$t('remotePatrol.category'), width: 'width:32%;' },
+        { name: this.$t('insSettingView.subCategory'), width: 'width:32%;' },
         { name: this.tab1BtnArr[0], width: 'width:12%;' },
         { name: this.tab1BtnArr[1], width: 'width:12%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
       ];
       this.theaderOther = [
-        { name: '', width: 'width:32%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:32%;' },
+        { name: this.$t('remotePatrol.category'), width: 'width:32%;' },
+        { name: this.$t('insSettingView.subCategory'), width: 'width:32%;' },
         { name: this.tab3BtnArr[0], width: 'width:12%;' },
         { name: this.tab3BtnArr[1], width: 'width:12%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
       ];
       this.theaderScore = [
-        { name: '', width: 'width:32%;' },
-        { name: this.$t('remotePatrol.item'), width: 'width:32%;' },
+        { name: this.$t('remotePatrol.category'), width: 'width:32%;' },
+        { name: this.$t('insSettingView.subCategory'), width: 'width:32%;' },
         { name: this.$t('remotePatrol.TableTotal'), width: 'width:24%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
       ];
