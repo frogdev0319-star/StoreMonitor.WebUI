@@ -984,7 +984,6 @@ $suggestBack:#F1F6FE;
         // padding-right: calc(20/1920*100vw);
         // padding-left: calc(20/1920*100vw);
         .card-content{
-          height: 100%;
           padding: calc(32/1920*100vw) calc(24/1920*100vw);
         }
         .empty-content{
@@ -1031,7 +1030,9 @@ $suggestBack:#F1F6FE;
         }
     }
     .showCardHeight{
-       margin-bottom: calc(60/1920*100vw);
+      flex-wrap: wrap;
+      height: calc(450/1440*100vw);
+      overflow: auto;
     }
     .list-table{
       padding-left: calc(20/1920*100vw);
