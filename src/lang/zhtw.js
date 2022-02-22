@@ -400,7 +400,7 @@ export default {
     "playTime": "播放時間",
     "preview": "巡檢預覽",
     "prompt": "提示",
-    "qualified": "合格",
+    "qualified": "良好",
     "rankScore": "按總評嚴重等級排序",
     "rankStore": "按門店名稱排序",
     "rankTime": "按時間排序",

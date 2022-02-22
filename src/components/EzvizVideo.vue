@@ -329,8 +329,7 @@
                 @click="deleteItemResource(_index)"
               />
               <div
-                class="paper flex-center margin-bottom-sm"
-                style="padding: 5px; flex: 1; margin-left: 20px"
+                class="paper flex-center margin-bottom-sm inspect-text"
               >
                 <div style="flex: 1; text-align: left; margin: 5px">
                   {{ _item.src }}
