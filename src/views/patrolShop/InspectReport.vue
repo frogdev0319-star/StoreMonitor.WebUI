@@ -75,7 +75,7 @@
       </el-select>
     </div>
     <div class="el-acticle">
-      <el-row class="report-content" v-if="standardMsg || checkinInfo">
+      <!-- <el-row class="report-content" v-if="standardMsg || checkinInfo">
         <el-col :span="24" class="">
           <div class="header-score">
             <div class="standard-btn">
@@ -89,7 +89,7 @@
             
           </div>
         </el-col>
-      </el-row>
+      </el-row> -->
       <el-row v-for="(pageItem, pageIndex) in pageData" :class="pageItem.class" :key="pageIndex">
         <el-col>
           <div v-if="pageItem.class === 'row-detail'">
