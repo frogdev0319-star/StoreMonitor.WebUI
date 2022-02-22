@@ -403,7 +403,7 @@ export default {
     "playTime": "播放时间",
     "preview": "巡检预览",
     "prompt": "提示",
-    "qualified": "合格",
+    "qualified": "良好",
     "rankScore": "按总评严重等级排序",
     "rankStore": "按门店名称排序",
     "rankTime": "按时间排序",
