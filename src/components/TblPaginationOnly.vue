@@ -3,8 +3,8 @@
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-left" :disabled="currentPage==1" @click="handlePrevClick"></el-button>
     <div class="pageNum">{{currentPage}}</div>
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-right" :disabled="currentPage==total" @click="handleNextClick"></el-button>
-    <div class="pageSizeTitle">{{$t('overview.pageSize')}}</div>
-    <div class="pageSize-select">
+    <div v-if="showPageSize" class="pageSizeTitle">{{$t('overview.pageSize')}}</div>
+    <div v-if="showPageSize" class="pageSize-select">
           <el-select
             v-model="pagesize"
             size="medium"
@@ -62,6 +62,27 @@ export default {
     btnStyle:{
       type:Object,
       default: () => {}
+    },
+    showPageSize:{
+      type:Boolean,
+      default:true,
+      required: false
+    },
+    pageSizeArray:{
+      type:Array,
+      default: () => [],
+      required: false
+    }
+  },
+  computed:{
+    pageSizeOption(){
+      console.log("pageSizeArray:",this.pageSizeArray)
+      if(this.pageSizeArray.length>0){
+        console.log("pageSizeArray:",this.pageSizeArray)
+        return this.pageSizeArray;
+      }else{
+        return this.pageSizeList;
+      }
     }
   },
   watch:{
@@ -76,8 +97,12 @@ export default {
   },
   data() {//,{value:'position',label:this.$t('overview.position')},{value:'users',label:this.$t('overview.user')}
     return {
-      pageSizeOption: [{value:10,label:"10 "+this.$t('overview.pageSizeUnit')}, {value:20,label:"20 "+this.$t('overview.pageSizeUnit')}, 
-      {value:50,label:"50 "+this.$t('overview.pageSizeUnit')}, {value:100,label:"100 "+this.$t('overview.pageSizeUnit')}]
+      pageSizeList: [
+        {value:10,label:"10 "+this.$t('overview.pageSizeUnit')}, 
+        {value:20,label:"20 "+this.$t('overview.pageSizeUnit')}, 
+        {value:50,label:"50 "+this.$t('overview.pageSizeUnit')}, 
+        {value:100,label:"100 "+this.$t('overview.pageSizeUnit')}
+        ],
     }
   },
   methods:{
@@ -159,7 +184,8 @@ export default {
     
   }
   .el-pagesize{
-    ::v-deep.el-input__icon{
+    /deep/
+    .el-input__icon{
       line-height: 31px;
     }
   } 

@@ -25,22 +25,41 @@
             </div>
         </div>
         <div v-if="currentTab=='Detail'" class="insep-detail-tbl">
-            <table-pagination
-                ref="detail"
-                class="tbl-TabInspecDetail"
-                :column-data="detailTbl.column_data"
-                :table-data="detailTbl.table_data"
-                :highlight-current-row= "true"
-                :tableHeight = "300"
-                :pagesize = "detailTbl.sizeNum"
-                :total = "detailTbl.total"
-                :current-page = "detailTbl.page"
-                layout = "prev,pager,next"
-                :headerStyle="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
-                :is-event = "false"
-                :showPagination = "true"
-                @onCellClick ="handleEmitDetailRowClick"
-                @handleChange="handlePageAndSizeChange_detail"
+            <el-table
+              :data="detailTbl.table_data"
+              :highlight-current-row="true"
+              :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
+              :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
+              :empty-text="$t('deviceView.noData')"
+              align="left"
+              style="width: 100%"
+              class="tbl-TabInspecDetail"
+            >
+                <el-table-column
+                    v-for="(_item,_index) in detailTbl.column_data"
+                    :key="_index"
+                    :prop="_item.prop"
+                    :label="_item.label"
+                    :min-width="_item.width"
+                >
+                <template slot-scope="{row}">
+                    <template v-if="_item.isCellClick">
+                        <span style="cursor:pointer;color:#006ab7;" @click="handleEmitDetailRowClick(row)">{{ row[_item.prop]}}</span>
+                    </template>
+                    <template v-else>
+                        <span>{{ row[_item.prop]}}</span>
+                    </template>
+                </template>
+                </el-table-column>
+            </el-table>
+            <tbl-pagination-only
+              :total="detailTbl.total"
+              :current-page="detailTbl.page"
+              :pagesize="detailTbl.sizeNum"
+              :btnStyle="{'backgroundColor': '#EFF3F5'}"
+              :showPageSize="false"
+              @sizeChange="handlePageAndSizeChange_detail"
+              @currentChange="handlePageAndSizeChange_detail"
             />
         </div>
         <div v-if="currentTab=='NotInspected'" class="not-inspected">
@@ -54,21 +73,41 @@
             </el-row>
         </div>
         <div v-if="currentTab=='Event'" class="insep-detail-tbl">
-            <table-pagination
-                ref="detail"
-                class="tbl-TabInspecDetail"
-                :column-data="eventTbl.column_data"
-                :table-data="eventTbl.table_data"
-                :pagesize = "eventTbl.sizeNum"
-                :total = "eventTbl.total"
-                :current-page="eventTbl.page"
-                :headerStyle="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
-                :highlight-current-row= "true"
-                :is-event = "false"
-                :showPagination = "true"
-                @onCellClick ="handleEmitPersonEventRowClick"
-                layout = "prev,pager,next"
-                @handleChange="handlePageAndSizeChange_event"
+            <el-table
+              :data="eventTbl.table_data"
+              :highlight-current-row="true"
+              :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
+              :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
+              :empty-text="$t('deviceView.noData')"
+              align="left"
+              style="width: 100%"
+              class="tbl-TabInspecDetail"
+            >
+                <el-table-column
+                    v-for="(_item,_index) in eventTbl.column_data"
+                    :key="_index"
+                    :prop="_item.prop"
+                    :label="_item.label"
+                    :min-width="_item.width"
+                >
+                <template slot-scope="{row}">
+                    <template v-if="_item.isCellClick">
+                        <span style="cursor:pointer;color:#006ab7;" @click="handleEmitPersonEventRowClick(row)">{{ row[_item.prop]}}</span>
+                    </template>
+                    <template v-else>
+                        <span>{{ row[_item.prop]}}</span>
+                    </template>
+                </template>
+                </el-table-column>
+            </el-table>
+            <tbl-pagination-only
+              :total="eventTbl.total"
+              :current-page="eventTbl.page"
+              :pagesize="eventTbl.sizeNum"
+              :btnStyle="{'backgroundColor': '#EFF3F5'}"
+              :showPageSize="false"
+              @sizeChange="handlePageAndSizeChange_detail"
+              @currentChange="handlePageAndSizeChange_event"
             />
         </div>
     </div>
@@ -80,10 +119,11 @@ import { getInspectReportList,getNotInspectStoresByPerson } from '@/api/inspect'
 import {GetEventAndCommentList} from '@/api/event';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import util from '@/common/util';
+import TblPaginationOnly from '@/components/TblPaginationOnly';
 export default {
     name:'TabInceptionDetail',
     components: {
-        'table-pagination':TablePagination
+        'table-pagination':TablePagination,TblPaginationOnly
     },
     props:{
         submitter:{
@@ -240,7 +280,10 @@ export default {
                 sizeNum:5,
                 page:1
             },
-            submitterName:""
+            submitterName:"",
+            pageSizeOption:[
+                {value:5,label:"5 "+this.$t('overview.pageSizeUnit')},
+                {value:10,label:"10 "+this.$t('overview.pageSizeUnit')}]
         };
     },
     created(){
@@ -289,7 +332,7 @@ export default {
                     if(temp.length>0){
                         self.submitterName = temp[0].submitterName;
                         self.detailTbl.all_data = temp;
-                        self.detailTbl.total = temp.length;
+                        self.detailTbl.total = Math.ceil(temp.length/this.detailTbl.sizeNum);
                         this.setDetailTableData();
                     }
                     resolve(temp);
@@ -346,15 +389,16 @@ export default {
         });
       },
       handleEmitDetailRowClick(row){ //去巡檢報告詳情
+            console.log("row:",row.id);
           const self = this;
           const parsObj = {
-            id : row.row.id,
-            storeName : row.row.storeName,
-            status : row.row.status,
-            ts : row.row.date,
-            submitterName : row.row.submitterName,
-            tagName : row.row.tagName,
-            mode : row.row.mode,
+            id : row.id,
+            storeName : row.storeName,
+            status : row.status,
+            ts : row.date,
+            submitterName : row.submitterName,
+            tagName : row.tagName,
+            mode : row.mode,
           };
           sessionStorage.setItem('report_data', JSON.stringify(parsObj));
           self.$router.push({ name: 'reportDetails', params: { data: parsObj }});
@@ -369,7 +413,7 @@ export default {
             storeIds = searchParams.searchParams.storeIds;
         }*/
         console.log("1.",params)
-            const rowItem = row.row;
+            const rowItem = row;
             //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
       params.searchParams.clause ={assigner:this.submitter,storeId:[rowItem.id],status:[]};
       params.filterStoreIds=[rowItem.id];
@@ -512,7 +556,7 @@ export default {
                 });
                 console.log("temp:",temp);
                 this.eventTbl.all_data = temp;
-                this.eventTbl.total = temp.length;
+                this.eventTbl.total =Math.ceil(temp.length/this.eventTbl.sizeNum);
                 this.setEventTableData();
                 resolve(temp);
             }).catch(err => {
@@ -599,6 +643,16 @@ export default {
     padding-top: 16.5px;
     padding-bottom: 16.5px;
     border-top:1px solid rgba(172,174,177,0.34);
+    .el-table{
+        border: none !important;
+        box-shadow: none !important;
+        &::before{
+             background-color: transparent;
+        }
+        &::after{
+             background-color: transparent;
+        }
+    }
     .table{
       margin: 0 calc(24/1920*100vw);
       background-color: #EFF3F5;

@@ -7,7 +7,7 @@
               :highlight-current-row="false"
               :header-cell-style="{height:'47px',backgroundColor: '#EFF3F5',border:'none',fontSize:'12px'}"
               :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
-              empty-text="没有事件数据"
+              :empty-text="$t('deviceView.noData')"
               align="left"
               style="width: 100%"
               class="tbl-IncepItemTop5"
