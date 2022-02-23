@@ -180,7 +180,7 @@ export default {
               roleName: this.$t('route.patrolPlan'),
               checked: false,
               disabled: false,
-              visabled:true
+              visabled:false
             },
             {
               roleName: this.$t('route.storeMonitor'),
