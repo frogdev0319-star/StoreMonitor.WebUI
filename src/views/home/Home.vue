@@ -125,8 +125,8 @@
                   :disabled="item.isReadOnly"
                   :style="{'paddingLeft':'calc(30/1920*100vw)','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
                 >
-                  <img class="menu_img" :src="`./static/img/menu/${index}.png`" />
-                  <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`" />
+                  <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`" />
+                  <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`" />
                   <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
                 </el-menu-item>
 
@@ -137,8 +137,8 @@
                   :index="index+''"
                   :style="{}">
                   <template slot="title">
-                    <img class="menu_img" :src="`./static/img/menu/${index}.png`"/>
-                    <img class="menu_img-active" :src="`./static/img/menu/${index}-active.png`"/>
+                    <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`"/>
+                    <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`"/>
                     <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                   </template>
                   <div v-for="child in item.children" :key="child.path">
@@ -377,6 +377,8 @@ export default {
 
     activePath() {
       let path = this.$route.path;
+      //console.log("activePath:",path);
+      //console.log("active rout name:",this.$route.name);
       const pathMapArr = [
         {
           curPath: ["/reinspect/confirmrein", "/reinspect/submit"],
