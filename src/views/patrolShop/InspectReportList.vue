@@ -147,8 +147,8 @@
                       }[item.statusCode]"
                     >{{item.status}}</div>
                     <div style="margin-left: calc(10/1920*100vw)" class="status-tag"
-                      :style="item.totalScore >= item.standard ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
-                    >{{item.totalScore >= item.standard ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
+                      :style="item.standard==1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
+                    >{{item.standard==1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
                   </div>
                   <!-- //0: danger,1: improve,2: pass -->
                   <div class="flex-center">
@@ -507,7 +507,8 @@ export default {
     },
 
     getReportList(p) {
-      let params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
+      console.log("p:",p);
+      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
@@ -515,6 +516,7 @@ export default {
         return;
       }
       return new Promise((resolve) => {
+        console.log("params:",params);
         getInspectReportList(params).then(res => {
           const errCode = res.errCode;
           let data = [];

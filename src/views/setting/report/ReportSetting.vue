@@ -88,7 +88,7 @@
                     <div class="flex-center">
                       <span class="span-font" style="margin-right: 20px">{{ $t('titleView.statisIndex') }}</span>
                       <div>
-                        <el-radio-group class="storevue-radio" v-model="statisticSettingDetail.qualified">
+                        <el-radio-group class="storevue-radio" v-model="item.qualified">
                           <el-radio :label="0">{{ $t('titleView.qualified') }}</el-radio>
                           <el-radio :label="1">{{ $t('titleView.unqualified') }}</el-radio>
                         </el-radio-group>
@@ -96,7 +96,7 @@
                     </div>
                     <div class="flex-center">
                       <span class="span-font" style="margin-right: 20px;margin-left: 60px">{{ $t('titleView.displayofStatisticalResults') }}</span>
-                      <el-radio-group class="storevue-radio" v-model="statisticSettingDetail.chart">
+                      <el-radio-group class="storevue-radio" v-model="item.chart">
                         <el-radio :label="0">{{ $t('titleView.radar') }}</el-radio>
                         <el-radio :label="1">{{ $t('titleView.pie') }}</el-radio>
                       </el-radio-group>
@@ -149,6 +149,7 @@
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showStaticDetailSetting"
+      :isWarning="true"
       dialog-width="540px"
       @visibleChangeHandler="updateStaticSettingDialogFlag"
       @cancelHandler="hideStaticSettingDialog"

@@ -49,6 +49,7 @@
         class="content-detail-main"
         style="padding-bottom: 20px;">
         <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
+        <div class="description-area">
         <audio-vue
           v-if="_item.showAudio"
           :is-export-pdf="isExportPdf"
@@ -88,6 +89,7 @@
                 class="imgLittle">
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -246,7 +248,7 @@ export default {
   .content-detail{
     margin-top: 10px;
     .content-detail-title{
-      min-height:70px;
+      min-height:36px;
       // background-color:$background;
       padding-left:calc(20 / 1920 * 100vw);
       padding-right: calc(20 / 1920 * 100vw);
@@ -318,9 +320,14 @@ export default {
       padding-right: calc(20 / 1920 * 100vw);
       .cdm-title{
         font-size:calc(12 / 1920 * 100vw);
-        color:#94a4b4;
-        font-weight: bold;
-        margin: 0;
+        color:#006ab7;
+        font-weight: 500;
+        padding-left:calc(10 / 1920 * 100vw);
+      }
+      .description-area{
+        background-color:#f7f9fa;
+        border-radius:5px;
+        padding: 10px calc(10 / 1920 * 100vw) 18px calc(10 / 1920 * 100vw);
       }
       .cdm-voice{
         margin-top: 10px;

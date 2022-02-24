@@ -128,11 +128,11 @@
       :close-on-click-modal="false"
       :visible="showDeleteContent"
       :show-close="false"
+      :isWarning="true"
       @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showDeleteContent')"
       @cancelHandler="hideDeleteContentDialog('showDeleteContent')"
       @confirmHandler="confirmDelete">
       <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
         <div class="dialog-content">{{ $t('insSettingView.confirmSelecDel') }}</div>
       </div>
     </dialog-pop>
@@ -143,12 +143,12 @@
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showSingleDeleteContent"
+      :isWarning="true"
       @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showSingleDeleteContent')"
       @cancelHandler="hideDeleteContentDialog('showSingleDeleteContent')"
       @confirmHandler="confirmDeleteSingle"
     >
       <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
         <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }}</div>
       </div>
     </dialog-pop>

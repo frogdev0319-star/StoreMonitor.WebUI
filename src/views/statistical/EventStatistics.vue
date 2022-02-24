@@ -656,6 +656,7 @@
       :visible="ispdf"
       :show-button="false"
       :show-close="false"
+      :isWarning="true"
       class="LoadDialog"
     >
       <p>{{ $t('insSettingView.isExportPDF') }}......</p>

@@ -137,7 +137,7 @@
                   :key="index"
                   :index="item.children[0].path"
                   :disabled="item.isReadOnly"
-                  :style="{'paddingLeft':'calc(30/1920*100vw)','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
+                  :style="{'paddingLeft':'calc(30/1920*100vw) !important','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
                 >
                   <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`" />
                   <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`" />
@@ -920,7 +920,7 @@ export default {
     text-align: left;
     height: 2.1875vw;
     line-height: 2.1875vw;
-    padding-left: 1.66vw !important;
+    padding-left: calc(40/1920*100vw) !important;
     .menu_img {
       height: 1.35417vw;
       width: 1.35417vw;
@@ -983,9 +983,13 @@ export default {
           font-size: calc(12 / 1920 * 100vw);
         }
       }
+      .el-submenu__title {
+        padding-left: calc(30/1920*100vw) !important;
+      }
     &.is-opened {
       background-color: #e4f3fd;
       .el-submenu__title {
+        padding-left: calc(30/1920*100vw) !important;
         span {
           color: #006ab7;
         }
@@ -1011,6 +1015,7 @@ export default {
     &.is-active {
       background-color: #e4f3fd;
       .el-submenu__title {
+        padding-left: calc(30/1920*100vw) !important;
         height: calc(66/1920*100vw);
         line-height: calc(66/1920*100vw);
         span {
@@ -1032,20 +1037,30 @@ export default {
         background-color: #f2f9fe;
       }
     }
+    
     .child-submenu {
       .el-submenu__title {
+        padding-left: calc(40/1920*100vw) !important;
         height: 2.1875vw;
         line-height: 2.1875vw;
       }
+      &.is-opened {
+      .el-submenu__title {
+          padding-left: calc(40/1920*100vw) !important;
+        }
+      }
     }
     .el-submenu__title {
-      padding-left: calc(30/1920*100vw)!important;
+      padding-left: calc(40/1920*100vw);
       padding-right: calc(30/1920*100vw);
+      //padding: 0 calc(30 / 1920 * 100vw);
+      //margin-left: 10px;
       height: calc(66/1920*100vw);
       line-height: calc(66/1920*100vw);
       i {
         right: 32px;
       }
+      
       &:hover {
         background-color: #e4f3fd;
         span {
@@ -1060,6 +1075,9 @@ export default {
           width: 1.35417vw;
         }
       }
+    }
+    .submenu-item{
+      padding-left: calc(40/1920*100vw) !important;
     }
   }
   
