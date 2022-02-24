@@ -123,7 +123,7 @@
                   :key="index"
                   :index="item.children[0].path"
                   :disabled="item.isReadOnly"
-                  :style="{'paddingLeft':'calc(30/1920*100vw)','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
+                  :style="{'paddingLeft':'calc(30/1920*100vw) !important','height': 'calc(66/1920*100vw)','lineHeight': 'calc(66/1920*100vw)'}"
                 >
                   <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`" />
                   <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`" />
@@ -898,7 +898,7 @@ export default {
     text-align: left;
     height: 2.1875vw;
     line-height: 2.1875vw;
-    //padding-left: 1.66vw !important;
+    padding-left: calc(40/1920*100vw) !important;
     .menu_img {
       height: 1.35417vw;
       width: 1.35417vw;
