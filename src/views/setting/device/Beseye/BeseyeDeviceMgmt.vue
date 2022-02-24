@@ -2,17 +2,17 @@
   <div class="device-container">
     <device-header
       ref="deviceHeader"
-      :vendor="3"
-      :account="skywatchAccount"
+      :vendor="2"
+      :account="beseyeAccount"
       :device-list="beseyeDevicesList"
       :serial-nums="deleteSerialNums"
       :channel-ids="deleteChannelIds"
-      @addDeviceHandler="addBeseyeDeviceDialog"
-      @deleteDeviceHandler="showDeleteDialogMethod"/>
+      @addDeviceHandler="confirmAddBeseyeDevice"
+      @deleteDeviceHandler="bachDeleteBeseyeDevice"/>
     <div class="table-container paper padding">
       <div class="device-title">
         <div class="header-sn">
-          <el-checkbox v-model="checkAllDevice" class="header-checkbox" @change="changeIfCheckAllDevices"/>
+          <el-checkbox v-model="checkAllDevice" class="header-checkbox storevue-checkbox-outlined" @change="changeIfCheckAllDevices"/>
           <div class="header-sn-name">{{ $t('deviceView.deviceSeriNum') }}</div>
         </div>
         <div class="header-name">{{ $t('deviceView.deviceName') }}</div>
@@ -25,10 +25,10 @@
           v-for="(item,index) in beseyeDevicesList"
           :key="index"
           :class="!item.isClick ? 'noraml-color' : 'active-color'"
-          class="device-data group-title"
+          class="device-data storevue-checkbox-outlined"
           @click="clickBeseyeDevice(index,item)">
           <div class="data-sn titles">
-            <el-checkbox v-model="item.isChecked" class="data-checkbox" @change="changeIfCheckDevice(item, index)"/>
+            <el-checkbox v-model="item.isChecked" class="data-checkbox storevue-checkbox-outlined" @change="changeIfCheckDevice(item, index)"/>
             <div class="data-sn-name titles">
               <span>{{ item.serialNumber }}</span>
             </div>
@@ -110,7 +110,24 @@
         </div>-->
       </div>
       <div v-else class="no-data-container">{{ $t('deviceView.noData') }}</div>
-      <el-dialog
+      <dialog-pop
+      v-if="showDeleteDialog"
+      :visible.sync="showDeleteDialog"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :is-warning="true"
+      :title="$t('deviceView.deleteDevice')"
+      @cancelHandler="showDeleteDialog = false"
+      @confirmHandler="confirmDeleteBeseyeDevice">
+      <div class="dialog-content">
+        <hr class="dialog-hr">
+        <p class="dialog-box">
+          <span class="warning-content">{{ $t('deviceView.deleteDevice') }}</span>
+        </p>
+      </div>
+      </dialog-pop>
+      <!--<el-dialog
         v-if="showAddBeseyeDialog"
         :title="$t('deviceView.addDevice')"
         :visible.sync="showAddBeseyeDialog"
@@ -196,7 +213,7 @@
           <el-button class="file-confirm-btn" size="mini" type="primary" @click="confirmDeleteBeseyeDevice()">
             {{ $t('deviceView.confirm') }}</el-button>
         </div>
-      </el-dialog>
+      </el-dialog>-->
     </div>
   </div>
 </template>
@@ -321,9 +338,11 @@ export default {
       });
     },
 
-    async addBeseyeDeviceDialog() {
-      await this.getAvailableBeseyeDevice();
-      this.showAddBeseyeDialog = true;
+    addBeseyeDeviceDialog( {deviceParams, channelParams}) {
+      console.log("deviceParams:",deviceParams);
+      console.log("channelParams:",channelParams);
+      //this.getAvailableBeseyeDevice();
+      //this.showAddBeseyeDialog = true;
     },
 
     changeIfCheckAllDevices(val) {
@@ -595,7 +614,27 @@ export default {
         this.showDeleteDialog = true;
       }
     },
+    
+    async bachDeleteBeseyeDevice({deleteChannelParmas, deleteParmas }) {
+      //this.showDeleteDialog = false;
+      //const deleteChannelParmas = this.setDeleteChannelParams();
+      //deleteChannelParmas.deviceIds = this.deleteChannelIds;
+      //const deleteParmas = this.setDeleteDeviceParmas();
+      try {
+        const deleteDeviceResult = await beseyeRESTful.deleteBeseyeDevice(deleteParmas);
 
+        if (deleteDeviceResult.errCode === 0) {
+          util.notify(this.$t('deviceView.deleteSuccess'), 'success', 3000);
+          const params = this.setParams();
+          await this.getBeseyeDeviceList(params);
+        } else {
+          throw new Error(deleteDeviceResult.errMsg);
+        }
+      } catch (error) {
+        util.notify(this.$t('deviceView.deleteFail'), 'warning', 3000);
+        console.log('BeseyeDeviceMgmt-deleteBeseyeDevice: ' + error);
+      }
+    },
     async confirmDeleteBeseyeDevice() {
       this.showDeleteDialog = false;
       const deleteChannelParmas = this.setDeleteChannelParams();
@@ -634,12 +673,14 @@ export default {
       item.tempDeviceName = comment;
     },
 
-    async confirmAddBeseyeDevice() {
+    async confirmAddBeseyeDevice({deviceParams, channelParams}) {
+      console.log("deviceParams:",deviceParams);
+      console.log("channelParams:",channelParams);
       const self = this;
-      const deviceParams = {};
-      const selectDevice = self.avilableDeviceList.filter(item => item.checked === true);
-      if (self.validateParams(selectDevice)) {
-        deviceParams.device = selectDevice;
+      //const deviceParams = {};
+      //const selectDevice = self.avilableDeviceList.filter(item => item.checked === true);
+      //if (self.validateParams(selectDevice)) {
+        //deviceParams.device = selectDevice;
         try {
           const addDeviceResult = await beseyeRESTful.addBeseyeDevice(deviceParams);
           if (addDeviceResult.errCode === 0) {
@@ -654,7 +695,7 @@ export default {
           self.showAddBeseyeDialog = false;
           console.log('BeseyeDeviceMgmt-confirmAddBeseyeDevice: ' + error);
         }
-      }
+      //}
     },
 
     validateParams(selectDevice) {
@@ -706,10 +747,10 @@ export default {
   @import '../../../../assets/css/importfile.css';
   @import '../../../../assets/css/textstyle.css';
   @import '../../../../assets/sass/device';
-  $mainColor:#f31d65;
+  $mainColor:#006ab7;
   $border:#e3e9f4;
   $tab: #7d8cad;
-  $color: #4b5262;
+  $color: #484848;
   .noraml-color{
     color: $color;
     cursor: pointer;
@@ -724,8 +765,7 @@ export default {
       line-height: 60px;
       display: flex;
       font-size: calc(14/1920*100vw);
-      font-weight: bold;
-      color: #909399;
+      color: #484848;
       border-bottom: 1px solid $border;
       .header-checkbox{
         width: 10%;

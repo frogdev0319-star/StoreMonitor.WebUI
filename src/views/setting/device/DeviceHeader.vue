@@ -32,7 +32,8 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
-      dialogWidth="520px"
+      :is-warning="true"
+      dialogWidth="600px"
       @cancelHandler="showAddDeviceDialog = false"
       @confirmHandler="confirmAddDevice">
       <div class="fullWidth padding">
@@ -41,8 +42,8 @@
           <template v-if="avilableDeviceList.length > 0">
             <div class="flex-center" style="justify-content: space-between" v-for="(item, index) of avilableDeviceList" :key="index">
               <el-checkbox class="storevue-checkbox-outlined" v-model="item.checked"/>
-              <span>{{ item.serialNumber }}</span>
-              <span>{{ item.name }}</span>
+              <span style="margin-left:8px;">{{ item.serialNumber }}</span>
+              <span style="margin-left:8px;">{{ item.name }}</span>
               <el-select
                 class="device-select"
                 v-model="item.storeId"
@@ -70,14 +71,13 @@
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
+      :is-warning="true"
       :title="$t('deviceView.deleteDevice')"
       @cancelHandler="showDeleteDialog = false"
       @confirmHandler="confirmDeleteDevice">
       <div class="dialog-content">
         <hr class="dialog-hr">
-
         <p class="dialog-box">
-          <i class="el-icon-warning"/>
           <span class="warning-content">{{ $t('deviceView.deleteDevice') }}</span>
         </p>
       </div>

@@ -149,6 +149,7 @@
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showStaticDetailSetting"
+      :isWarning="true"
       dialog-width="540px"
       @visibleChangeHandler="updateStaticSettingDialogFlag"
       @cancelHandler="hideStaticSettingDialog"

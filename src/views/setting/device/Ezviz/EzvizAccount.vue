@@ -36,7 +36,6 @@
       @confirmHandler="deleteAccount"
     >
       <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
         <div class="dialog-content">{{ $t('deviceView.confirmDelete') }}</div>
       </div>
     </dialog-pop>

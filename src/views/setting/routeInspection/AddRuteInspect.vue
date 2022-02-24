@@ -291,7 +291,6 @@
       @confirmHandler="confirmDeleteItem"
     >
       <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
         <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }}</div>
       </div>
     </dialog-pop>
@@ -307,7 +306,6 @@
       @confirmHandler="confirmDeleteGroup"
     >
       <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
         <div class="dialog-content">{{ $t('insSettingView.deleteGroup') }}</div>
       </div>
     </dialog-pop>

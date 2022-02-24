@@ -133,6 +133,7 @@
       :show-close="false"
       :visible="showNameImport"
       :confirm-text="$t('insSettingView.select')"
+      :isWarning="true"
       class="dialog-content"
       @visibleChangeHandler="cancelImportName"
       @cancelHandler="cancelImportName"
@@ -154,13 +155,13 @@
       :close-on-click-modal="false"
       :visible="showFailInfo"
       :show-close="false"
+      :isWarning="true"
       class="dialog-content"
       @visibleChangeHandler="updateShowInfoDialog"
       @cancelHandler="hideShowInfoDialog"
       @confirmHandler="hideShowInfoDialog"
     >
       <div class="import-slot">
-        <i class="el-icon-warning dialog-icon"/>
         <span>{{ $t('insSettingView.FailTitle') }}</span>
       </div>
       <ul class="ul_style">
@@ -177,12 +178,12 @@
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showSingleDeleteContent"
+      :isWarning="true"
       @visibleChangeHandler="updateDeleteContentDialogFlag"
       @cancelHandler="hideDeleteContentDialog"
       @confirmHandler="confirmDelete"
     >
       <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
         <div class="dialog-content">{{ $t('insSettingView.confirmDelData') }}</div>
       </div>
     </dialog-pop>
@@ -193,12 +194,12 @@
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showNoPostDialog"
+      :isWarning="true"
       @visibleChangeHandler="updateTitleDialogFlag"
       @cancelHandler="hideNoTitleDialog"
       @confirmHandler="confirmToBind"
     >
       <div class="dialog-slot">
-        <i class="el-icon-warning dialog-icon"/>
         <span>{{ $t('insSettingView.confirmToBindData') }}</span>
       </div>
     </dialog-pop>
@@ -209,6 +210,7 @@
       :close-on-click-modal="false"
       :show-close="false"
       :visible="showImportSucceed"
+      :isWarning="true"
       @visibleChangeHandler="updateImportSuccDialogFlag"
       @cancelHandler="hideImportSuccDialog"
       @confirmHandler="toSetRules"

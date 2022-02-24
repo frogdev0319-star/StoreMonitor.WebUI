@@ -7,7 +7,15 @@
     :show-close="false"
     :class="isForm ? 'storevue-form-dialog' : 'storevue-dialog'"
   >
-    <template slot="title">{{title}}<img v-if="isWarning" src="../../static/img/dialog-icon.png"> </template>
+  <template slot="title">
+
+    <div slot="title" class="flex-center title" :style="isForm ?{'width':'100%'}:{'width':dialogWidth}">
+      <div>{{title}}</div>
+      <div  class="flex-center">
+        <img v-if="isWarning" :src="headerIcon" height="40px">
+      </div>
+    </div>
+  </template>
     <div class="main-dialog-body">
       <slot/>
     </div>
@@ -74,7 +82,11 @@ export default {
       default: false
     },
   },
-
+  data() {
+    return {
+      headerIcon: require('../../static/img/dialog-icon.png'),
+    };
+  },
   computed: {
     dialogVisible: {
       get() {
@@ -103,5 +115,10 @@ export default {
 </script>
 
 <style scoped>
-
+.title{
+  font-size: 24px; 
+  font-weight: 500;
+  display:flex;
+  justify-content: space-between;
+}
 </style>
