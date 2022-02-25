@@ -179,7 +179,8 @@
                               <div
                                 v-if="(childItem.type === 0 ||childItem.type === 2)&&item.detailType !== 1"
                                 class="title-btn">
-                                {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                                {{ $t('remotePatrol.scoreUnit') }}
+                                <span>{{childItem.itemScoreTitle}}</span>
                               </div>
                               <div v-if="childItem.type==1&&item.detailType!=1" class="title-btn">
                                 {{ $t('remotePatrol.scoreUnit') }}
