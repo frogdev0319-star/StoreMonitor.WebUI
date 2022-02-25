@@ -2921,7 +2921,7 @@ export default {
      */
     editEzvizCanvas(src) {
       const self = this;
-      self.sourceList = [];
+      // self.sourceList = [];
       const obj = {};
       obj.mediaType = 2;
       obj.src = src;
@@ -3179,7 +3179,7 @@ export default {
   }
   .img-content{
     position: relative;
-    width: calc(140/1920*100vw);
+    // width: calc(140/1920*100vw);
     // height: calc(100/1920*100vw);
     margin-right: calc(15/1920*100vw);
     .el-image {
