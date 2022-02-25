@@ -33,6 +33,7 @@ Vue.prototype.$moment = moment;
 Vue.config.productionTip = false;
 Vue.prototype.appName = '看门店管理系统';
 Vue.prototype.$message = message;
+Vue.prototype.$showIgnoreItem = true;
 
 process.env.MOCK && require('@/mock');
 

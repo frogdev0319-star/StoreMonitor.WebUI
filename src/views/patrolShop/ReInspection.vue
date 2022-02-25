@@ -304,7 +304,7 @@
           v-if="noAllInspectObj.dialogCosed"
           :title="noAllInspectObj.title"
           :isWarning="noAllInspectObj.isWarning"
-          :hasIgnore="true"
+          :hasIgnore="!showIgnoreItem"
           :visible="noAllInspectObj.dialogCosed"
           @hasIgnoreHandler="hasIgnoreItem"
           @cancelHandler="canceldNoAllInspect"
@@ -447,7 +447,7 @@
           </div>
         </div>
         <hr class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
-        <div v-if="sheetName.length!=0&&!showIgnoreItem" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
+        <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
           <div v-if="isFullScreenMode" style="width: 200px">
             <div v-for="(_item,_index) in sheetName" :key="_index">
                 <template v-if="_item.isCategory">
@@ -485,13 +485,13 @@
             <div class="flex" style="flex-wrap: wrap">
               <div v-for="(_item,_index) in sheetName" :key="_index">
                 <template v-if="_item.isCategory">
-                  <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                  <div v-if="!showIgnoreItem ||_item.ignoreCount>0"  class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
                         @click="changeSheet(_item,_index)">
                     <span>{{ _item.label }}</span>
                   </div>
                 </template>
                 <template v-else>
-                  <div class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
+                  <div  v-if="!showIgnoreItem ||_item.ignoreCount>0" class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
                         @click="getItemOfCategory(_item, _index)" >
                     <span>{{ _item.label }}</span>
                   </div>
@@ -505,12 +505,12 @@
                 v-for="(item_) in inspectList"
                 :key="item_.id"
                 class="inspect-details paper margin-bottom-sm">
-                <div class="flex padding-sm title">
+                <div  v-if="!showIgnoreItem ||item_.ignoreCount>0" class="flex padding-sm title">
                   <div class="spacer font-13" style="text-align: left; border-left: 4px solid #2c90d9; padding-left: 8px;">{{ item_.groupName }}</div>
-                  <div>{{ item_.dealCount+'/'+item_.count }}</div>
+                  <div v-if="!showIgnoreItem ">{{ item_.dealCount+'/'+item_.count }}</div>
                 </div>
-                <hr class="hr-horizontal">
-                <div v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue) > -1)" :key="index" class="item-details padding-sm">
+                <hr v-if="!showIgnoreItem ||item_.ignoreCount>0"  class="hr-horizontal">
+                <div   v-for="(item,index) in item_.items.filter(d => d.subject.indexOf(searchItemValue ) > -1 && (!showIgnoreItem || d.ignore )) " :key="index" class="item-details padding-sm">
                   <div class="flex fullWidth">
                     <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
                     <div class="flex padding-bottom-sm spacer" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
@@ -700,132 +700,6 @@
             </div>
           </div>
         </div>
-        <div v-if="showIgnoreItem" class="padding" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
-          <div class="paper padding">
-            <div v-for="(item,index) in hasIgnoretemp" :key="index" class="item-details margin-bottom-sm">
-              <div class="flex fullWidth">
-                <div class="font-15" style="text-align: left; width: calc(20/1920*100vw)" :style="item.checked?{'color':'#006ab7'}:{}">{{(index+1) + '.'}}</div>
-                <div class="flex padding-bottom-sm spacer" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
-                  <div
-                    :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                    :style="item.checked?{'color':'#006ab7'}:{'color': '#484848'}"
-                    class="spacer font-15"
-                    style="text-align: left; font-weight: 500"
-                    @click="clickItem({item,index})">
-                    {{ item.subject }}
-                  </div>
-                  <div v-if="item.itemType === 0">
-                    <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                  trigger="click" class="item-score" size="small" :disabled="!item.checked">
-                      <span class="el-dropdown-link">
-                        {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                        <i class="el-icon-arrow-down el-icon--right"/>
-                      </span>
-                      <el-dropdown-menu slot="dropdown" class="score-menu" >
-                        <el-dropdown-item
-                          v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
-                          style="width:70px;text-align:center;"
-                          @click.native="checkScore({item,itemDS: itemDS,e:0})">{{ itemDS.scoreTitle }}</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </el-dropdown>
-                    <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                  trigger="click" class="item-score" size="small" :disabled="!item.checked">
-                      <span class="el-dropdown-link">
-                        {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
-                        <i class="el-icon-arrow-down el-icon--right"/>
-                      </span>
-                      <el-dropdown-menu slot="dropdown" class="score-menu">
-                        <el-dropdown-item
-                          v-for="itemDS in item.itemScoreLength"
-                          :key="itemDS"
-                          style="width:70px;text-align:center;"
-                          @click.native="checkScore({item,itemDS: itemDS,e:1})">{{ itemDS }}</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </el-dropdown>
-                    <div class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
-                  </div>
-                </div>
-              </div>
-              <div style="margin-left: calc(20/1920*100vw)" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
-                <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content margin-bottom-sm">
-                  {{ item.description }}
-                </div>
-                <div v-if="item.lastUnqualifiedNumber > 0" class="details-failed-record margin-bottom-sm">
-                  {{ $t('remotePatrol.failedRecord') + item.lastUnqualifiedNumber }}
-                </div>
-              </div>
-              <div style="padding-left: calc(20/1920*100vw)">
-                <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
-                  <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                    <div v-if="_item.mediaType==2" class="img-content">
-                      <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
-                      <el-image
-                        :src="_item.src"
-                        :style="{width: _item.width, height: _item.height}"
-                        :preview-src-list="getImgList({index: _index, sourceList: item.sourceList})"/>
-                    </div>
-                    <div v-if="_item.mediaType==1" class="img-content">
-                      <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
-                      <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
-                      <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
-                    </div>
-                  </div>
-                </div>
-                <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
-                  <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                    <div v-if="_item.mediaType == 3" class="flex-center">
-                      <img
-                        :src="deleteInspectIcon"
-                        alt="delete"
-                        @click="deleteItemResource({ item, index: _index })"
-                      />
-                      <div
-                        class="paper flex-center margin-bottom-sm inspect-text"
-                        :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
-                      >
-                        <div style="flex: 1; text-align: left; margin: 5px">
-                          {{ _item.src }}
-                        </div>
-                        <hr class="hr-vertical" />
-                        <img
-                          :src="editInspectIcon"
-                          alt="edit"
-                          style="margin: 5px"
-                          @click="editItemResource({ item, index: _index })"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div style="position: relative">
-                  <el-input
-                    :autosize="{ minRows: 2, maxRows: 7 }"
-                    v-model="item.inspectInput"
-                    :placeholder="$t('remotePatrol.coment')"
-                    :disabled="item.disabled"
-                    size="mini"
-                    class="storevue-textarea"
-                    type="textarea"
-                    resize="none"
-                    @input="(val) => itemDescriptionChanged({ val, item })"
-                    @blur="notShowInputRuleTips({ e: 'item', item })"
-                  />
-                  <button
-                    class="inspect-btn"
-                    :disabled="item.disabled"
-                    @click="submitItemResource({ item })"
-                  >
-                    {{$t('remotePatrol.confirm')}}
-                  </button>
-                </div>
-
-                <span v-if="item.Ruletip" class="rules">{{
-                  $t("remotePatrol.comentRuletip")
-                }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
         <div v-if="sheetName.length==0" class="spacer flex-center" style="align-items: center; justify-content: center">
           <div class="inspect-empty">
             <img :src="noItemIcon" class="no-item">
@@ -867,6 +741,12 @@ export default {
     EzvizVideo,
     BeseyeVideo,
     StoreFilter
+  },
+  props: {
+    showIgnore: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -1059,7 +939,6 @@ export default {
       oldVal: '',
       historyObj: null,
       beforepatrolstore: '',
-      showIgnoreItem: false,
       hasIgnoretemp: [],
       vendor: 1,
       feedbackIndex: -1,
@@ -1083,7 +962,6 @@ export default {
       accountChanged: 'accountChanged',
       videoAuthority: 'videoAuthority'
     }),
-
     storeUpClass() {
       return {
         'coll': this.store.storeUp,
@@ -1094,10 +972,18 @@ export default {
     }
   },
   watch: {
+   
     accountChanged(val, oldVal) {
       const self = this;
       if (val !== 0) {
         self.changeBrand();
+      }
+    },
+    showIgnore(nv,old){
+      const self = this;
+      if(old && !nv){
+        self.backToPatrol()
+        this.$forceUpdate();
       }
     },
     vendor(){
@@ -1236,7 +1122,8 @@ export default {
       self.$store.dispatch('setPatrolHistory', null);
       self.isShowWarn = false;
       self.notShowAlert = false;
-      self.showIgnoreItem = false;
+      this.showIgnoreItem = false;
+      this.$emit("listenerChild", false);
       _item.authorizedInspect.forEach(au_item => {
         if (au_item.mode === 0) {
           self.PatrolList.push(au_item);
@@ -1289,7 +1176,8 @@ export default {
       self.sheetName = [];
       self.tempArr = [];
       self.hasIgnoretemp = null;
-      self.showIgnoreItem = false;
+      this.showIgnoreItem = false;
+      this.$emit("listenerChild", false);
       self.isShowWarn = false;
       self.notShowAlert = false;
       self.showFeedBackInfo = true;
@@ -1416,15 +1304,7 @@ export default {
       let tempId = null;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-      if (self.showIgnoreItem) {
-        self.hasIgnoretemp.forEach((item, index) => {
-          if (item.id == id) {
-            tempId = {
-              itemIndex: index
-            };
-          }
-        });
-      } else {
+  
         sheetName.forEach((s_item, s_index) => {
           s_item.inspectList[0].items.forEach((item, index) => {
             if (item.id === id) {
@@ -1435,7 +1315,7 @@ export default {
             }
           });
         });
-      }
+      
       return tempId;
     },
     getChannelIndexById(id) {
@@ -1548,7 +1428,7 @@ export default {
         s_item.inspectList.forEach(item => {
           item.items.forEach((_item, _index) => {
             if (_item.inputCount === 0 && !_item.manualIgnore) {
-              hasIgnoretemp.push(_item);
+            //  hasIgnoretemp.push(_item);
             }
           });
         });
@@ -2009,20 +1889,7 @@ export default {
       const self = this;
       self.curItem.manualIgnore = true;
       self.curItem.disabled = true;
-      if (self.showIgnoreItem) {
-        if (self.hasIgnoretemp[self.curItemIndex].dealCount === 0) {
-            self.hasIgnoretemp[self.curItemIndex].dealCount = 1;
-        }
-        if (self.hasIgnoretemp[self.curItemIndex].manualIgnore) {
-            self.hasIgnoretemp[self.curItemIndex].inspectInput = '';
-            self.hasIgnoretemp[self.curItemIndex].sourceList = [];
-            self.hasIgnoretemp[self.curItemIndex].itemScoreTitle = '--';
-            self.hasIgnoretemp[self.curItemIndex].inputCount = 0;
-            self.hasIgnoretemp[self.curItemIndex].scoreList.forEach(x => {
-              x.isClick = false;
-            });
-        }
-      } else {
+
         self.showGuide = false;
         
         self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
@@ -2045,7 +1912,7 @@ export default {
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x => {
             x.isClick = false;
           });
-        }
+        
         const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
         const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
         const hasIgnoretemp = [];
@@ -2056,7 +1923,8 @@ export default {
             item.items.forEach((_item, _index) => {
               _item.manualIgnore ? manualCount++ : null;
               if (_item.inputCount == 0 && !_item.manualIgnore) {
-                hasIgnoretemp.push(_item);
+                _item.ignore = true;
+             //   hasIgnoretemp.push(_item);
               }
             });
           });
@@ -2074,12 +1942,10 @@ export default {
     cancleIgnore() {
       const self = this;
       self.curItem.manualIgnore = false;
-      if (self.showIgnoreItem) {
-        self.hasIgnoretemp[self.curItemIndex].dealCount != 0 ? self.hasIgnoretemp[self.curItemIndex].dealCount-- : null;
-      } else {
+
         self.sheetName[self.curSheetIndex].dealCount != 0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
         self.notShowAlert ? self.notShowAlert = false : null;
-      }
+
     },
     cancelIgnoreInspect(val) {
       const self = this;
@@ -2096,13 +1962,10 @@ export default {
           if (item_.id === item.id) self.curGroupIndex = idx
         })
       })
-      if (e === 0) {
+   
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
-      } else {
-        self.hasIgnoretemp[index].checked = false;
-        self.hasIgnoretemp[index].disabled = false;
-      }
+
       self.$refs.vendorVideo.editCount++;
       self.curItemIndex = index;
       self.curItem = item;
@@ -2153,10 +2016,13 @@ export default {
       });
     },
     clickItem({item, index}) {
+      console.log("Click indxe="+index)
+      console.log(item)
       const self = this;
       if (item.isIgnore) {
         return false;
       }
+      console.log("Do thins")
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       self.curDeviceId = item.deviceId[0];
@@ -2166,22 +2032,12 @@ export default {
       item.disabled = false;
       item.checked = true;
       self.inspectItemList.forEach((_item, _index) => {
-        if (index != _index) {
+        if (_item.id != item.id) {
           _item.checked = false;
           _item.disabled = true;
         }
       });
-      if (self.hasIgnoretemp.length != 0 && self.showIgnoreItem) {
-        self.hasIgnoretemp.forEach((_item, _index) => {
-          if (index != _index) {
-            _item.checked = false;
-            _item.disabled = true;
-          } else {
-            _item.checked = true;
-            _item.disabled = false;
-          }
-        });
-      }
+
       self.sheetName.slice(0, self.sheetName.length - 1).forEach((_item, _index) => {
         _item.inspectList.forEach((p_item, p_index) => {
           p_item.items.forEach((itemDS, indexDS) => {
@@ -2454,7 +2310,8 @@ export default {
       self.$store.dispatch('setPatrolHistory', null);
       self.isShowWarn = false;
       self.notShowAlert = false;
-      self.showIgnoreItem = false;
+      this.showIgnoreItem = false;
+      this.$emit("listenerChild", false);
       _item.authorizedInspect.forEach(au_item => {
         if (au_item.mode === 0) {
           self.PatrolList.push(au_item);
@@ -2667,7 +2524,8 @@ export default {
       Database.addDataToDB(self.userId, {data: {}, rule: {}});
       self.isShowWarn = false;
       self.notShowAlert = false;
-      self.showIgnoreItem = false;
+      this.showIgnoreItem = false;
+       this.$emit("listenerChild", false); 
       self.eventList = [];
       // self.showChannelBtns = [];
       self.curSheetIndex = 0;
@@ -2871,30 +2729,55 @@ export default {
 
     hasIgnoreItem() {
       const self = this;
-      self.showIgnoreItem = true;
+      //this.showIgnoreItem = true;
+      this.$emit("listenerChild", true);
+      this.showIgnoreItem = true;
+
       self.showFeedBack = false;
       self.noAllInspectObj.dialogCosed = false;
       self.isShowWarn = false;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
-      const sheetName = self.sheetName.slice(0, indexFeed);
+     // const sheetName = self.sheetName.slice(0, indexFeed);
       const hasIgnoretemp = [];
-      sheetName.forEach(s_item => {
-        s_item.inspectList.forEach(item => {
+      let first = true;
+      let sheetIndex =0;
+      this.sheetName.forEach(s_item => {
+        let count = 0;
+        if(s_item.inspectList){
+          s_item.inspectList.forEach(item => {
+          let ignoreCount = 0;
           item.items.forEach((_item, _index) => {
             if (_item.inputCount == 0 && !_item.manualIgnore) {
-              hasIgnoretemp.push(_item);
-            } else if (_item.inputCount != 0) {
-              self.tempArr.push(_item.type);
+              ignoreCount++;
+              _item.ignore = true;
+            //  hasIgnoretemp.push(_item);
+            } else  {
+              _item.ignore  = false;
+           //   self.tempArr.push(_item.type);
             }
           });
-        });
+          item.ignoreCount = ignoreCount;
+          if(ignoreCount>0)count++;
+         });
+
+
+        }
+        
+        s_item.ignoreCount = count;
+        if(s_item.ignoreCount>0&&first){
+          this.changeSheet(s_item,sheetIndex)
+          first=false;
+        }
+        sheetIndex++;
 
       });
-      self.hasIgnoretemp = hasIgnoretemp;
+      //self.hasIgnoretemp = hasIgnoretemp;
     },
     backToPatrol() {
       const self = this;
-      self.showIgnoreItem = false;
+      //this.showIgnoreItem = false;
+      this.showIgnoreItem =false;
+      this.$emit("listenerChild", false);
       self.showFeedBack = self.sheetName[Number(self.sheetName.length - 1)].isClick;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
@@ -3055,7 +2938,7 @@ export default {
         })
       })
       if (tempId != null) {
-        if (!self.showIgnoreItem) {
+        if (!this.showIgnoreItem) {
           self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
           if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
@@ -3079,7 +2962,7 @@ export default {
       } else {
         self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
       }
-      if (!self.showIgnoreItem) {
+      if (!this.showIgnoreItem) {
         self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
       } else {
         self.sourceListLength = self.hasIgnoretemp[self.curItemIndex].sourceList.length;

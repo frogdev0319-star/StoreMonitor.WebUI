@@ -22,15 +22,29 @@
               :key="item.path"
               :to="{ path: item.path }"
               class="breadcrumb-item"
-            >
+            > 
+              
               <span
+              v-if="!(item.name=='remotePatrol' && showIgnoreItem)"
                 :class="
-                  breadList.length > 2 && index === 1
-                    ? 'normal-breadcrumb-span'
-                    : 'bold-breadcrumb-span'
+                 item.name=='remotePatrol' && showIgnoreItem
+                    ? 'bold-breadcrumb-span'
+                    : 'normal-breadcrumb-span'
                 "
               >
-                {{ $t(`route.${item.name}`) }}</span
+                {{ $t(`route.${item.name}`)}}</span
+              >
+              <span
+                @click="backPage"
+               v-if="item.name=='remotePatrol' && showIgnoreItem"
+                class="bold-breadcrumb-span"
+              >
+                {{ $t(`route.${item.name}`)}}</span
+              >
+              <span v-if="item.name=='remotePatrol' && showIgnoreItem"
+                :class="'normal-breadcrumb-span'"
+              >
+                {{" / " + $t("remotePatrol.clickToContent")}}</span
               >
             </el-breadcrumb-item>
           </el-breadcrumb>
@@ -220,15 +234,15 @@
             ]"
           >
             <keep-alive :max="1">
-              <router-view v-if="$route.meta.keepAlive" />
+              <router-view  :show-ignore="showIgnoreItem" v-on:listenerChild="listenerChild" v-if="$route.meta.keepAlive" />
             </keep-alive>
-            <router-view v-if="!$route.meta.keepAlive" />
+            <router-view  :show-ignore="showIgnoreItem" v-on:listenerChild="listenerChild"  v-if="!$route.meta.keepAlive" />
           </el-col>
           <el-col v-else class="wrapper-header">
             <keep-alive :max="1">
-              <router-view v-if="$route.meta.keepAlive" />
+              <router-view  :show-ignore="showIgnoreItem" v-on:listenerChild="listenerChild" v-if="$route.meta.keepAlive" />
             </keep-alive>
-            <router-view v-if="!$route.meta.keepAlive" />
+            <router-view  :show-ignore="showIgnoreItem" v-on:listenerChild="listenerChild" v-if="!$route.meta.keepAlive" />
           </el-col>
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
@@ -286,6 +300,7 @@ export default {
       title: "",
       isMobile: false,
       brandDisabled: false,
+      showIgnoreItem:false,
     };
   },
 
@@ -468,6 +483,13 @@ export default {
   },
 
   methods: {
+    listenerChild(reply) {
+      //console.log("listenerChil="+reply)
+      this.showIgnoreItem = reply;
+    },
+    backPage(){
+      this.showIgnoreItem  =false;
+    },
     handleDownload() {
       console.log(document.getElementById("downloadPdf"))
       console.log(document.getElementById("downloadPdf").click)
