@@ -141,8 +141,8 @@
                               :height="imgHeight+'px'"
                               class="source-details">
                               <template v-if="sourceitem.mediaType==3">
-                                 {{`${sourceitem.src}`}}
-                                </template>
+                                {{`${sourceitem.src}`}}
+                              </template>
                               <div v-if="sourceitem.mediaType==2" class="img-content">
                                 <el-image
                                   :src="sourceitem.src"
@@ -179,7 +179,8 @@
                               <div
                                 v-if="(childItem.type === 0 ||childItem.type === 2)&&item.detailType !== 1"
                                 class="title-btn">
-                                {{ $t('remotePatrol.scoreUnit') }}<span>{{ $t('remotePatrol.failed') }}</span>
+                                {{ $t('remotePatrol.scoreUnit') }}
+                                <span>{{childItem.itemScoreTitle}}</span>
                               </div>
                               <div v-if="childItem.type==1&&item.detailType!=1" class="title-btn">
                                 {{ $t('remotePatrol.scoreUnit') }}
@@ -203,11 +204,11 @@
                             || childItem.inspectText != null&&childItem.inspectText !== ''"
                             class="content-detail-main"
                             style="padding-bottom: 20px;">
-                            <div v-if="childItem.inspectText!=null&&childItem.inspectText!=''">
+                            <!-- <div v-if="childItem.inspectText!=null&&childItem.inspectText!=''">
                               <div class="cdm-word" v-for="(text, index) in childItem.inspectText.split('|')" :key="index">
                                 <span>{{ `${index+1}. ${text}` }}</span>
                               </div>
-                            </div>
+                            </div> -->
                             <div v-if="childItem.sourceList!=null&&childItem.sourceList.length!=0" class="cdm-pic">
                               <div
                                 v-for="(sourceitem,sourceindex) in childItem.sourceList"
@@ -991,11 +992,12 @@ export default {
         self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore
           : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
         self.summary = this.groupbyKey(inspect, 'type');
+        console.log(self.summary,eventList)
         eventList.forEach((item, index) => {
           const objFeedBack = {};
           objFeedBack.subject = item.eventName;
           objFeedBack.description = item.eventDes;
-          objFeedBack.sourceList = [];
+          objFeedBack.sourceList = item.sourceList;
           item.sourceObj != null ? objFeedBack.sourceList.push(item.sourceObj) : '';
           feedBackTemp.push(objFeedBack);
         });
@@ -1604,7 +1606,6 @@ export default {
                 }
               }
               .cdm-pic{
-                margin-top: 10px;
                 overflow: hidden;
                 .source-details{
                   display: inline-block;
