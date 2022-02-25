@@ -107,10 +107,11 @@ $sv_red: #c60957;
   padding: 5px; 
   flex: 1;
   div {
-    overflow:hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    // overflow:hidden;
+    // white-space: nowrap;
+    // text-overflow: ellipsis;
     max-width: calc(700/1920*100vw);
+    word-wrap:break-word;
   }
   margin-left: calc(20/1920*100vw);
 }
