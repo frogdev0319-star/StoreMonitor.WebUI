@@ -89,8 +89,8 @@
                       <span class="span-font" style="margin-right: 20px">{{ $t('titleView.statisIndex') }}</span>
                       <div>
                         <el-radio-group class="storevue-radio" v-model="item.qualified">
-                          <el-radio :label="0">{{ $t('titleView.qualified') }}</el-radio>
-                          <el-radio :label="1">{{ $t('titleView.unqualified') }}</el-radio>
+                          <el-radio :label="0">{{ $t('overview.pass') }}</el-radio>
+                          <el-radio :label="1">{{ $t('overview.failed') }}</el-radio>
                         </el-radio-group>
                       </div>
                     </div>
