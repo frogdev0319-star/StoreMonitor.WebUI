@@ -248,6 +248,7 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
+import { getInspectReportInfo } from '@/api/inspect';//為了取是否有設置評分
 export default {
   name: 'InspectReportList',
   components: {
@@ -405,7 +406,8 @@ export default {
       inspectCatch: '',
       storeFilterObj: {},
       searchParams: {},
-      ifSearchData: true
+      ifSearchData: true,
+      isScore:true,
     };
   },
 
@@ -506,8 +508,8 @@ export default {
       return obj;
     },
 
-    getReportList(p) {
-      console.log("p:",p);
+   getReportList(p) {
+      //console.log("p:",p);
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
@@ -516,15 +518,17 @@ export default {
         return;
       }
       return new Promise((resolve) => {
-        console.log("params:",params);
-        getInspectReportList(params).then(res => {
+        //console.log("params:",params);
+        getInspectReportList(params).then((res) => {
           const errCode = res.errCode;
           let data = [];
           if (errCode === 0) {
             data = res.data.content;
           }
           const temp = [];
-          data.forEach(item => {
+          data.forEach(async (item) => {
+            let isScore = await this.getReportInfo(item.id);
+            console.log("isScore:",isScore);
             const reportObj = {};
             reportObj.province = item.province;
             reportObj.city = item.city;
@@ -536,7 +540,7 @@ export default {
             reportObj.submitter = item.submitter;
             reportObj.routeObj = item;
             reportObj.mode = item.mode;
-            reportObj.totalScore = item.totalScore;
+            reportObj.totalScore = isScore? item.totalScore:"--";
             reportObj.code = item.code !== null ? item.code : '--';
             reportObj.standard = item.standard;
             reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
@@ -577,6 +581,20 @@ export default {
       });
     },
 
+    getReportInfo(reportId){
+      return new Promise((resolve) => {
+        getInspectReportInfo({ reportIds: [reportId] }).then(res=>{
+          var allRemarkItemsFlag = true;
+          if (res.errCode === 0 && res.data.length > 0) {
+            allRemarkItemsFlag = (res.data[0].info.type != 1);
+          }
+          resolve(allRemarkItemsFlag);
+        }).catch(err => {
+          console.log('InspectReportList-getReportInfo: ' + err);
+        });
+      });
+    },
+
     getIconSrc(status) {
       const statusAndLangAndIconMap = [
         {
@@ -603,7 +621,7 @@ export default {
         },
         {
           status: 2,
-          statusStr: this.$t('overview.pass'), // Good
+          statusStr: this.$t('overview.echartGood'), // Good
           children: [{
             'zh': require('../../../static/img/good_cn.png'),
             'zhtw': require('../../../static/img/good_cn.png'),
