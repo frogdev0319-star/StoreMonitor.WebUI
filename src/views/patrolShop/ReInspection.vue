@@ -6,7 +6,11 @@
       @storeChange="onStoreChange"
     ></store-filter>
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
-      <div :class="{liseAnmiClass:showSpread}" class="lside paper spacer">
+      <div :style="{'border-bottom-right-radius': isFullScreenMode ? '0px': 'unset', 'border-bottom-left-radius': isFullScreenMode ? '0px': 'unset'}"
+        :class="{liseAnmiClass:showSpread}" 
+        class="lside paper spacer"
+        
+      >
         <div class="el-header-title flex-center">
           <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="cursor: pointer">
           <span v-if="showStoreUp" class="lside-title store-title">
@@ -372,15 +376,44 @@
             @confirmEzvizCanvas="editEzvizCanvas"
             @ezvizCutPictureFeedback="ezvizPictureFeedback"/>
         </div>
-        <div class="channelbar-content" style="flex: 1">
-          <div class="channel-content" style="height: 100%; display: flex; flex-direction: column;">
-            <div class="flex-center padding title" style="justify-content: space-between">
+        <div class="channelbar-content padding" style="flex: 1">
+          <div v-if="isFullScreenMode" class="patrol-select title ">
+            <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
+              {{ $t('remotePatrol.selectInspect') }}
+              <el-select 
+                style="margin-left: 20px;"
+                class="storevue-select-grey" 
+                :value="patrolstore" 
+                :placeholder="$t('remotePatrol.selectInspect')"
+                @change="changeInspect">
+                <el-option
+                  v-for="item in PatrolList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                </el-option>
+              </el-select>
+              <div class="spacer"></div>
+              <el-button :disabled="!allRemarkItemsFlag && !isDisabled"
+                class="storevue-button-filled"
+                :size="varyWindowWidth>1680?'small':'mini'" type="primary" @click="confirmSummary">
+                {{ $t('remotePatrol.confirmSum') }}
+              </el-button>
+            </div>
+          </div>
+          <div class="channel-content" :class="{'margin-bottom-md': isFullScreenMode}" style="height: 100%; display: flex; flex-direction: column;">
+            <div 
+              class="flex-center title " 
+              :style="{'justify-content': isFullScreenMode?'unset':'space-between'}"
+            >
               {{ $t('remotePatrol.zoneList') }}
               <el-input
                 :placeholder="$t('remotePatrol.channelPlaceholder')"
                 v-model="serachChannelValue"
                 size="small"
                 class="storevue-input-search"
+                style="margin-left: 20px"
               >
                 <i
                   slot="prefix"
@@ -392,7 +425,7 @@
               <!-- <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div> -->
-              <div class="btn-content padding"
+              <div v-if="showChannelBtns.length > 0" class="btn-content padding"
                 style="padding-top: 0px"
                 :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
               >
@@ -418,10 +451,15 @@
               </div> -->
             </div>
           </div>
+          
+          <hr v-if="isFullScreenMode" class="hr-horizontal" >
         </div>
       </div>
-      <div :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" v-if="!showSpread" class="rside paper spacer" >
-        <div class="patrol-select title" :class="{'padding': !isFullScreenMode}">
+      
+      
+      <div :style="{'border-top-right-radius': isFullScreenMode ? '0px': 'unset', 'border-top-left-radius': isFullScreenMode ? '0px': 'unset'}"
+      :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" v-if="!showSpread" class="rside paper spacer" >
+        <div v-if="!isFullScreenMode" class="patrol-select title" :class="{'padding': !isFullScreenMode}">
           <div class="patrol-content text-left flex-center" :class="{'margin-bottom-md': isFullScreenMode}">
             {{ $t('remotePatrol.selectInspect') }}
             <el-select 
@@ -446,9 +484,20 @@
             </el-button>
           </div>
         </div>
-        <hr class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
+        <hr v-if="!isFullScreenMode" class="hr-horizontal" :style="isFullScreenMode?{'margin-bottom': '20px'}:{}">
         <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
-          <div v-if="isFullScreenMode" style="width: 200px">
+          <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
+            <el-input
+              :placeholder="$t('remotePatrol.itemPlaceholder')"
+              v-model="searchItemValue"
+              size="small"
+              class="storevue-input-search fullWidth"
+            >
+              <i
+                slot="prefix"
+                class="iconfont icon-sousuo"
+              />
+            </el-input>
             <div v-for="(_item,_index) in sheetName" :key="_index">
                 <template v-if="_item.isCategory">
                   <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
@@ -4555,7 +4604,7 @@ export default {
     }
   }
   .patrol-content >>> .el-select .el-input--medium .el-input__inner{
-    color:#333;
+    color:#2b2b2b;
   }
   .no-item {
     height: calc(25 / 1920 * 100vw);

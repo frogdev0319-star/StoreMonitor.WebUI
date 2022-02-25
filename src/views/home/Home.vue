@@ -1577,6 +1577,9 @@ $collapseWidth: 5.5%;
 .padding-horizontal-sm {
   padding: 0 calc(16/1920*100vw);
 }
+.padding-horizontal {
+  padding: 0 calc(20/1920*100vw);
+}
 .padding {
   padding: calc(20/1920*100vw);
 }
