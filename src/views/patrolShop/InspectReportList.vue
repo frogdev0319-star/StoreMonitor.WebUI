@@ -8,7 +8,7 @@
       >
         <template v-slot:others>
           <div class="last-row" >
-            <span style="margin-right: 10px;margin-left: 15px">{{ $t('remotePatrol.resultType') }}</span>
+            <span style="margin-right: 16px; font-size:15px;width:83px;">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
               v-model="curAppraise"
               :placeholder="$t('remotePatrol.all')"
@@ -21,7 +21,7 @@
                 :label="item.label"
                 :value="item.status"/>
             </el-select>
-            <span style="margin-right: 10px">{{ $t('remotePatrol.reportType') }}</span>
+            <span style="margin-right: 16px; margin-left:24px;font-size:15px;width:83px;">{{ $t('remotePatrol.reportType') }}</span>
             <div class="flex-center">
             <el-select
               v-model="curReportType"
@@ -903,6 +903,7 @@ $h1:#292e36;
 $qualified:#6097F3;
 $noqualied:#FDBA40;
 $suggestBack:#F1F6FE;
+$filterWidth: 100%;
 .el-radio {
   >>> .el-radio__inner {
     border-color: #d9dde1;
@@ -1200,10 +1201,13 @@ $suggestBack:#F1F6FE;
 .last-row{
       display: flex;
       flex-direction: row;
-      width:calc(1066/1920*100vw);
-      height: 30px;
-      justify-content: space-between;
+      width:$filterWidth;
+      margin-left: 42px;
+      height: 36px;
+      align-items: flex-start;
       align-items:center;
+      justify-content: space-between;
+      padding-right: calc(180/1920*100VW);
 }
     .time-selector{
       margin-right: calc(30/1920*100vw);
