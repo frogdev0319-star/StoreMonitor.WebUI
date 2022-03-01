@@ -1956,12 +1956,12 @@ export default {
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore) {
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
-            self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = [];
+            // self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = [];
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].itemScoreTitle = '--';
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount = 0;
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].scoreList.forEach(x => {
-            x.isClick = false;
-          });
+              x.isClick = false;
+            });
         
         const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
         const sheetName = JSON.parse(JSON.stringify(self.sheetName.slice(0, indexFeed)));
@@ -2023,7 +2023,7 @@ export default {
         self.noBindDeviceObj.dialogCosed = true;
         return false;
       }
-      self.$refs.vendorVideo.stopVideoPlay();
+      // self.$refs.vendorVideo.stopVideoPlay();
       self.handleIgnore();
     },
     CancleIgnoreItem({item, index}) {
