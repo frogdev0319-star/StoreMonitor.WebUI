@@ -140,12 +140,14 @@
                 <el-popover
                   v-model="playBackVisible"
                   placement="top"
+                   :append-to-body="false"
                   popper-class="quality-tooltip">
                   <div
                     v-for="(item, index) in backList"
                     :key="item.value"
                     :class="{'checked-label': index === curPlayBackIndex}"
                     class="quaility-label"
+                     :append-to-body="false"
                     @click="adjustProcess(item.value, item.label, index)">
                     {{ item.label }}
                   </div>
@@ -165,12 +167,14 @@
                   <el-popover
                     v-model="qualityVisible"
                     placement="top"
+                     :append-to-body="false"
                     popper-class="quality-tooltip">
                     <div
                       v-for="(item, index) in videoQualityList"
                       :key="index"
                       :class="{'checked-label': index === curQualityIndex}"
                       class="quaility-label"
+                       :append-to-body="false"
                       @click="onClickQualityLabel(index)">
                       {{ item.label }}
                     </div>
@@ -183,12 +187,14 @@
                 <el-popover
                   v-model="sizeVisible"
                   placement="top"
+                  :append-to-body="false"
                   popper-class="quality-tooltip">
                   <div
                     v-for="(item, index) in proportionList"
                     :key="index"
                     :class="{'checked-label': index === curSizeIndex}"
                     class="quaility-label"
+                    :append-to-body="false"
                     @click="checkPro(item.label, index)">
                     {{ item.label }}
                   </div>
