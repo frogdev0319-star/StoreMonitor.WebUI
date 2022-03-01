@@ -4624,36 +4624,17 @@ export default {
   }
   .item-score{
     font-size: calc(12/1920*100vw);
-    //width: 96px;
+    // width: calc(12/1920*100vw);
     padding: 0 calc(10/1920*100vw);
-    // @include point(width,86);
-    //@include point(padding-left,10);
     height: calc(26/1920*100vw);
     background-color: #edf8f9;
     line-height: calc(26/1920*100vw);
     color: #006ab7;
     border-radius: 4px;
     cursor: pointer;
-    // .el-dropdown-link{
-    //   display: inline-block;
-    //   font-size: 12px;
-    //   margin-right: 20px;
-    //   width: 120px;
-    //   height: 22px;
-    //   background-color: orange;
-    //   line-height: 22px;
-    //   color: #fff;
-    //   border-radius: 13px;
-    //   cursor: pointer;
-    //   padding-right: 10px;
-    //   box-sizing: border-box;
-    //   padding-left: 10px
-    // }
-  // .item-score .el-icon--right{
-  //   position: absolute !important;
-  //   right: 1px !important;
-  //   top: 6px !important;
-  // }
+  }
+  .el-dropdown-menu--small .el-dropdown-menu__item {
+    width: unset !important;
   }
   .details-failed-record {
     text-align: left;
