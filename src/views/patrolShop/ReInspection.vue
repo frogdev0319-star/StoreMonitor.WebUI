@@ -425,8 +425,8 @@
               <!-- <div class="arrow-content">
                 <i v-if="hideLast" class="el-icon-arrow-left icon-arrow" @click="lastBar"/>
               </div> -->
-              <div v-if="showChannelBtns.length > 0" class="btn-content padding"
-                style="padding-top: 0px"
+              <div class="btn-content"
+                style="padding-top: 20px"
                 :style="{'justify-content':isFullScreenMode?'unset':'space-between'}"
               >
                 <div 
