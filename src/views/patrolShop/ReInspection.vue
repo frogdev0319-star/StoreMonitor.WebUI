@@ -1289,6 +1289,7 @@ export default {
       this.showAddTextFeedbackDialog = true;
       this.eventName = '';
       this.eventDes = '';
+      this.feedbackInput = '';
       this.showEventNameInfo = false;
       this.feedbackSourceList = [];
     },
