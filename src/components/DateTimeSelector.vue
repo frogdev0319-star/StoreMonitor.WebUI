@@ -1,7 +1,7 @@
 <template>
   <div class="date-selector-container">
       <div class="time-title">{{ $t('overview.date') }}</div>
-      <div class="paper shadow-light" style="display:flex; flex-direction:row;margin-left:8px;">
+      <div class="paper shadow-light" style="display:flex; flex-direction:row;">
         <el-select class="bDateSel" v-model="dateRange" value-key="value" @change="changeDateRange">
             <el-option 
               v-for="item in dateRangeItems"
@@ -102,7 +102,8 @@ export default {
       width:calc(76/1440*100vw);
       align-self:center;
       font-size:15px;
-      color:#484848
+      color:#484848;
+      text-align:left;
     }
     .date-range{
       width:cacl(207/1440*100vw);

@@ -81,21 +81,21 @@
         :options="storeDataList"
         @changeInput="onChangeStore"/>
         
-        <div v-else class="single-select shadow-light">
-          <el-select 
-            v-model="curSelectedStore"
-            @change="onChangeSelectedStore()"
-            size="mini">
-            <el-option
-              v-for="(item) in storeDataList"
-              :key="item.storeId"
-              :label="item.label"
-              :value="item.storeId"
-            />
-          </el-select>
-        </div>
+    <div v-else class="single-select shadow-light">
+      <el-select 
+        v-model="curSelectedStore"
+        @change="onChangeSelectedStore()"
+        size="mini">
+        <el-option
+          v-for="(item) in storeDataList"
+          :key="item.storeId"
+          :label="item.label"
+          :value="item.storeId"
+        />
+      </el-select>
+    </div>
     
-    <!--<div class="spacer"></div>-->
+    <div v-if="!multiStore" class="spacer"></div>
     <slot name="others"></slot>
   </div>
   </div>

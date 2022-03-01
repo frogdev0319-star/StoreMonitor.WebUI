@@ -519,14 +519,17 @@ export default {
       }
       return new Promise((resolve) => {
         //console.log("params:",params);
-        getInspectReportList(params).then((res) => {
+        getInspectReportList(params).then(async(res) => {
           const errCode = res.errCode;
           let data = [];
           if (errCode === 0) {
             data = res.data.content;
           }
           const temp = [];
-          data.forEach(async (item) => {
+          self.isLoading = true;
+          for(const item of data){
+          //data.forEach(async (item,index) => {
+            //console.log(index+"."+item.tagName);
             let isScore = await this.getReportInfo(item.id);
             console.log("isScore:",isScore);
             const reportObj = {};
@@ -566,14 +569,15 @@ export default {
             reportObj.status = statusAndIconObj.status;
             reportObj.iconSrc = statusAndIconObj.iconSrc;
             temp.push(reportObj);
-          });
+          }
+          //);
           self.reportList = temp;
-          console.log(temp)
           self.total = Math.ceil(res.data.totalElements/self.sizeNum);
           self.isLoading = false;
-          if (self.reportList.length === 0) {
+          if (temp.length === 0) {
             self.noData = self.$t('deviceView.noData');
           }
+          console.log("getReportList > temp:",temp);
           resolve(temp);
         }).catch(err => {
           console.log('InspectReportList-getReportList: ' + err);
