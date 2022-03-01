@@ -1623,6 +1623,9 @@ export default {
     },
 
     getInspectStatsOverviewWithRegion(params) {
+         if(params.filter.size==0){
+           params.filter.size==10;
+         }
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewWithRegionV2(params).then(res => {
           resolve(res);
@@ -1634,6 +1637,10 @@ export default {
     },
     
        getInspectStatsOverviewWithGroup(params) {
+         console.log("getInspectStatsOverviewWithGroup")
+         if(params.filter.size==0){
+           return;
+         }
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewWithGroup(params).then(res => {
           resolve(res);
@@ -1644,6 +1651,9 @@ export default {
       });
     },
    getInspectReulstStatsOverview(params) {
+        if(params.filter.size==0){
+           params.filter.size==10;
+         }
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewV2(params).then(res => {
           resolve(res);
@@ -1654,6 +1664,9 @@ export default {
       });
     },
     getInspectResultOverRegion(params) {
+         if(params.filter.size==0){
+           params.filter.size==10;
+         }
       return new Promise((resolve, reject) => {
         getInspectStatsOverRegion(params).then(res => {
           resolve(res);

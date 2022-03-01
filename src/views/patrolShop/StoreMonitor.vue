@@ -148,11 +148,11 @@
         <div class="el-event" style="flex: 1">
           <div :class="{'event-box': !isFullScreenMode, 'event-box-full': isFullScreenMode}">
             <div v-if="corEvent" class="flex-center tabs">
-              <div class="problemTab" :style="problemTab===0?{'background-color': '#f7f9fa', color: '#006ab7' }:{}" @click="problemTab = 0">問題描述</div>
+              <div class="problemTab" :style="problemTab===0?{'background-color': '#f7f9fa', color: '#006ab7' }:{}" @click="problemTab = 0">{{$t("remotePatrol.description")}}</div>
               <div class="problemTab" :style="problemTab===1?{'background-color': '#f7f9fa', color: '#006ab7' }:{}" @click="problemTab = 1">{{$t("remotePatrol.relevantEvent")}}</div>
             </div>
             <div v-else>
-              <div class="problemTab tabs" style="background-color: #f7f9fa">問題描述</div>
+              <div class="problemTab tabs" style="background-color: #f7f9fa">{{$t("remotePatrol.description")}}</div>
             </div>
             <div v-if="problemTab == 0" class="padding" style="height: 100%; text-align: left">
               <div class="event-title margin-bottom-sm"><span class="is-required">* </span>{{ $t("remotePatrol.title") }}</div>
@@ -165,23 +165,55 @@
                 @blur="notShowInputRuleTips('eventName')"
               />
               <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
-              <span v-if="showEventNameInfo" class="error-class">{{
-              $t("remotePatrol.emptyEventTitle") }}</span>
-              <div v-if="!corEvent" class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
-              <div v-else class="event-title margin-bottom-sm"><div class="is-required">* </div>
-                {{ $t("remotePatrol.description") }}
-              </div>
-              <el-input
-                :autosize="{ minRows: 2, maxRows: 7 }"
-                v-model="eventDes"
-                :placeholder="$t('remotePatrol.descPlaceholder')"
-                size="mini"
-                class="storevue-textarea fullWidth"
-                type="textarea"
-                resize="none"
-                @input="eventDesChanged"
-                @blur="notShowInputRuleTips('eventDes')"
-              />
+              <span v-if="showEventNameInfo" class="error-class">{{$t("remotePatrol.emptyEventTitle") }}</span>
+              <div class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
+              <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length!=0" :class="'noraml-title'" class="tsource-content">
+                      <div v-for="(_item,_index) in sourceList" :key="_index" class="fullWidth source-details">
+                        <div v-if="_item.mediaType == 3" class="flex-center">
+                          <img
+                            :src="deleteInspectIcon"
+                            alt="delete"
+                            @click="deleteItemResource({ index: _index })"
+                          />
+                          <div
+                            class="paper flex-center margin-bottom-sm inspect-text"
+                            :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
+                          >
+                            <div style="flex: 1; text-align: left; margin: 5px">
+                              {{ _item.src }}
+                            </div>
+                            <hr class="hr-vertical" />
+                            <img
+                              :src="editInspectIcon"
+                              alt="edit"
+                              style="margin: 5px"
+                              @click="editItemResource({  index: _index })"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+               <div style="position: relative">
+                      <el-input
+                        :autosize="{ minRows: 2, maxRows: 7 }"
+                        v-model="eventDes"
+                        :placeholder="$t('remotePatrol.coment')"
+                        :disabled="false"
+                        size="mini"
+                        class="storevue-textarea"
+                        type="textarea"
+                        resize="none"
+                        @input="eventDesChanged"
+                        @blur="notShowInputRuleTips('eventDes')"
+                      />
+                      <button
+                        class="inspect-btn"
+                        :disabled="false"
+                        @click="submitItemResource()"
+                      >
+                        {{$t('remotePatrol.confirm')}}
+                      </button>
+                    </div>
               <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
               <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
 
@@ -193,10 +225,6 @@
                   class="source-details"
                 >
                   <div v-if="item.mediaType === 2" class="img-content">
-                    <i
-                      class="el-icon-close icondelete"
-                      @click="deleteImg(item, index)"
-                    />
                     <el-image
                       :src="item.src"
                       :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
@@ -205,7 +233,7 @@
                 </div>
               </div>
             </div>
-            <div v-if="corEvent && problemTab == 1">
+            <div v-if="corEvent && problemTab == 1 && store.storeId ">
                 <div
                   v-for="(item, index) in eventList"
                   :key="index"
@@ -276,6 +304,9 @@ export default {
 
   data() {
     return {
+      deleteInspectIcon: require('../../../static/img/cross.png'),
+      editInspectIcon: require('../../../static/img/pen.png'),
+      curEditIndex : -1,
       patrolstore: '',
       PatrolList: [],
       hideLast: false,
@@ -566,6 +597,40 @@ export default {
   },
 
   methods: {
+    submitItemResource() {
+      const self = this;
+      if (this.eventDes.trim().length === 0) return
+
+      if (this.curEditIndex > -1) {
+        this.sourceList = this.sourceList.map((source, idx) => {
+          if (idx === self.curEditIndex) return {
+            ...source,
+            src: this.eventDes,
+          }
+          else return { ...source }
+        })
+        this.curEditIndex = -1
+      } else {
+        this.sourceList.push({
+         mediaType: 3,
+           src: this.eventDes,
+        })
+      }
+
+      this.eventDes = ''
+    },
+    deleteItemResource({  index }) {
+      const self = this
+      curEditIndex = -1;
+      eventDes = '';
+      sourceList = sourceList.filter((source, idx) => idx !== index)
+    },
+    editItemResource ({ index }) {
+      console.log("index="+index)
+      console.log(this.sourceList[index])
+      this.curEditIndex = index
+      this.eventDes= this.sourceList[index].src
+    },
     getCurStore(storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       this.getInitStoreData()
@@ -1082,7 +1147,12 @@ export default {
       const tempFileUrl = [];
       for (let i = 0; i < this.sourceList.length; i++) {
         const obj = {};
-        if (this.sourceList[i].mediaType === 2) {
+        if (this.sourceList[i].mediaType === 3) {;
+          obj.mediaType = 3;
+          obj.url = this.sourceList[i].src;
+          obj.deviceId = this.channel.id;
+        } 
+        else if (this.sourceList[i].mediaType === 2) {
           const url = await this.upLoadFile(this.sourceList[i]);
           obj.mediaType = 2;
           obj.url = url;
@@ -1099,10 +1169,11 @@ export default {
     },
 
     addEvent(tempFileUrl) {
+      console.log("AddEvent")
       const self = this;
       const commentobj = {
         ts: new Date().getTime(),
-        description: self.eventDes.trim(),
+        description:"N/A",
         attachment: tempFileUrl,
         status: 0
       };
@@ -1157,6 +1228,7 @@ export default {
     },
 
     async addComment(tempFileUrl) {
+      console.log("Add Comment")
       const self = this;
       let isSuccess = false;
       const eventIds = [];
@@ -2365,6 +2437,47 @@ $h1: #292e36;
         color: #ff2400;
         display: block;
       }
+      .tsource-content{
+              min-height: 110px;
+              width: 90%;
+              margin: auto 20px;
+              .source-details{
+                display: inline-block;
+                margin-right: 15px;
+                padding-top: 15px;
+                position: relative;
+                span{
+                  font-size: 12px;
+                  color: #FCB83B;
+                  margin-top: 0;
+                }
+                .icondelete{
+                  position: absolute;
+                  font-size: 14px;
+                  right: 5px;
+                  margin-top: 8px;
+                  z-index: 2;
+                  color: #fff;
+                  cursor: pointer;
+                  background-color: rgba($color: $black, $alpha: 0.8);
+                  border-radius: 50%;
+                }
+                .img-content{
+                  width: 100%;
+                  height: 100%;
+                  position: relative;
+                  .el-image {
+                    border-radius: 5px;
+                  }
+                }
+                .start-icon{
+                  position: absolute;
+                  left: 35%;
+                  top: 30%;
+                  cursor: pointer;
+                }
+              }
+      }
       .source-content {
         min-height: 120px;
         width: 90%;
@@ -2525,6 +2638,10 @@ $h1: #292e36;
 
 .select-popClass.el-popper[x-placement^="bottom"] .popper__arrow::after {
   border-bottom-color: #34374a !important;
+}
+.noraml-title{
+  cursor: pointer;
+  opacity: 1;
 }
 </style>
 

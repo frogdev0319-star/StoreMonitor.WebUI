@@ -24,12 +24,13 @@
       <div class="details">
         <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 25px;">{{ $t('remotePatrol.storeName') }}:</span>
         <span v-else class="event-label" >{{ $t('remotePatrol.storeName') }}:</span>
-        <span>{{ storeName }}</span>
+        <span class="data">{{ storeName }}</span>
       </div>
+      <div style="margin-top:20px;margin-left:20px;height:1px;background-color:#acaeb1;width:calc(100% - 50px)"/>
       <div class="details">
         <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 75px;">{{ $t('remotePatrol.eventTitle') }}:</span>
         <span v-else class="event-label" >{{ $t('remotePatrol.eventTitle') }}：</span>
-        <span>{{ eventName }}</span>
+        <span class="data" >{{ eventName }}</span>
       </div>
       <div class="details">
         <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 60px;">{{ $t('remotePatrol.eventStatus') }}:</span>
@@ -37,37 +38,27 @@
         <span class="icon-span">{{ $t('remotePatrol.untreated') }}</span>
       </div>
       <div class="details">
-        <span :class="lang.indexOf('zh') === -1 ? 'en-event-label' : 'event-label'">{{ $t('remotePatrol.description') }}:</span>
-        <div
-          v-for="(item,index) in commentList"
-          v-if="item.eventDes.length > 0"
-          :key="index"
-          class="comment-details">
-          <div
-            :style="item.showContent ? {'background-color':'#FBC7CC'} : {'background-color':'#FAFAFA'}"
-            class="circle-content">
-            <div class="circle"/>
-          </div>
-          <div class="lside"/>
-          <div class="rside">
-            <div class="event-name">
-              <span>{{ item.eventDes }}</span>
-            </div>
-            <div class="source-content">
+        <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 60px;">{{ $t('remotePatrol.description') }}:</span>
+        <span v-else class="event-label" >{{ $t('remotePatrol.description') }}：</span>
+      </div>
+       <div class="source-content flex fullWidth" style="margin-top:20px;margin-left:20px">
               <div v-for="(_item, _index) in sourceList" :key="_index" class="source-details">
-                <div v-if="_item.mediaType === 2" class="img-content">
+                <div v-if="_item.mediaType === 3" class="img-content">
+                  {{_item.url}}
+                </div>
+              </div>
+        </div>
+      <div class="source-content flex fullWidth"  style="margin-top:20px;margin-left:20px">
+              <div v-for="(_item, _index) in sourceList" :key="_index" class="source-details">
+                <div v-if="_item.mediaType === 2" class="img-content" style="margin-right:10px;border-radius:5px">
                   <img :src="_item.url" height="100" width="140">
                 </div>
-                <div v-if="_item.mediaType === 1" class="img-content">
+                <div v-if="_item.mediaType === 1" class="img-content"  style="margin-right:10px;border-radius:5px">
                   <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
                   <img :src="videoImgSrc" height="100">
                 </div>
               </div>
-            </div>
-            <span class="event-ts">{{ item.ts }}</span>
-          </div>
         </div>
-      </div>
     </div>
     <div v-else class="page-err-btn">
       <el-button size="mini" type="primary" class="retry-btn" @click="reTry">
@@ -175,7 +166,7 @@ export default {
         ts: self.routeData.curTs
       };
       temp.push(obj);
-      self.commentList = temp;
+      self.commentList = self.routeData.event.fileList
     },
 
     reTry() {
@@ -239,16 +230,16 @@ export default {
                     height: 80px;
                 }
                 .sucInfo{
-                    font-size: 14px;
-                    color: #6097F3;
+                    font-size: 18px;
+                    color: #b7c7df;
                 }
                 .errInfo{
-                    font-size: 14px;
-                    color: #ddd;
+                    font-size: 18px;
+                    color: #b7c7df;
                 }
                 .sucret-info{
-                    font-size: 12px;
-                    color: #FB4C5D;
+                    font-size: 13px;
+                    color: #b7c7df;
                 }
             }
         }
@@ -266,7 +257,7 @@ export default {
                 text-align: left;
                 margin-top: 20px;
                 margin-left: 20px;
-                color: #424151;
+                color: #556679;
                 font-size: 14px;
                 .event-label{
                     font-weight: bold;
@@ -276,15 +267,26 @@ export default {
                   font-weight: bold;
                   margin-right: 10px;
                 }
+                .data{
+                  color: #484848;
+                }
                 .icon-span{
                     display:inline-block;
-                    width:68px;
-                    height:22px;
-                    line-height: 22px;
-                    color:white;
-                    font-size: 12px;
-                    background-color: #FEA316;
+                    width:110px;
+                    height:26px;
+                    line-height: 26px;
+                    color:#f57848;
+                    background-color: #fff2ef;
                     text-align: center;
+                    padding-top:3px;
+                      font-size: 15px;
+                    font-weight: 500;
+                    font-stretch: normal;
+                    font-style: normal;
+                    line-height: normal;
+                    letter-spacing: normal;
+                    text-align: center;
+                    border-radius:3px;
 
                 }
                 .comment-details{
@@ -332,26 +334,40 @@ export default {
                             white-space:pre-wrap;
                             word-wrap:break-word;
                         }
-                        .source-content{
-                            min-height: 150px;
-                            width: auto;
-                            margin: auto 20px;
-                            .source-details{
+                        .source-content {
+                              margin-left:15px;
+                              margin-top:20px;
+                              min-height: 120px;
+                              width: 90%;
+                              display:flex;
+                              flex-direction:row;
+                              span {
+                                font-size: 12px;
+                                color: #f7d057;
+                                margin: calc(6 / 1920 * 100vw) 0;
+                                display: block;
+                              }
+                              .source-details {
                                 display: inline-block;
-                                margin-right: 15px;
-                                padding-top: 15px;
-                                .img-content{
-                                    width: 100%;
-                                    height: 100%;
-                                    position: relative;
-                                    .start-icon{
-                                        position: absolute;
-                                        left: 35%;
-                                        top: 30%;
-                                        cursor: pointer;
-                                    }
+                                margin-right: calc(6 / 1920 * 100vw);
+                                margin-bottom: calc(6 / 1920 * 100vw);
+                                .img-content {
+                                  width: 100%;
+                                  height: 100%;
+                                  border-radius:4px;
+                                  margin-right:5px;
+                                  position: relative;
+                                  .el-image {
+                                    border-radius: 5px;
+                                  }
                                 }
-                            }
+                                .start-icon {
+                                  position: absolute;
+                                  left: 35%;
+                                  top: 30%;
+                                  cursor: pointer;
+                                }
+                              }
                         }
                         .event-ts{
                             font-size: 12px;
