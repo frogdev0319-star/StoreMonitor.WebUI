@@ -3064,7 +3064,7 @@ export default {
     },
     deleteItemResource({ item, index }) {
       const self = this
-      item.curEditIndex = -1;
+      this.curEditIndex = -1;
       item.inspectInput = '';
       item.sourceList = item.sourceList.filter((source, idx) => idx !== index)
     },
