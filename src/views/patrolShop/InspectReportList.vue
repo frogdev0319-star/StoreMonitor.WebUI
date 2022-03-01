@@ -146,7 +146,7 @@
                         2: {'color':'#59ab22','background-color':'#e8f6de'}
                       }[item.statusCode]"
                     >{{item.status}}</div>
-                    <div v-if="item.standard!=0" style="margin-left: calc(10/1920*100vw)" class="status-tag"
+                    <div v-if="item.standard!=-1" style="margin-left: calc(10/1920*100vw)" class="status-tag"
                       :style="item.standard==1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
                     >{{item.standard==1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
                   </div>
@@ -356,7 +356,7 @@ export default {
       ],
       storeList: [],
       searchInput: '',
-      sizeNum: 12,
+      sizeNum: 10,
       dateValue: [],
       curReportType: -1,
       reportTypeList: [

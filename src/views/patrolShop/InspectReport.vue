@@ -52,12 +52,12 @@
           {{{
             0: $t('overview.danger'),
             1: $t('overview.improve'),
-            2: $t('overview.pass')
+            2: $t('overview.echartGood')
           }[report.status]}}
         </div>
-        <div style="margin-left: calc(20/1440*100vw)" class="status-tag"
-          :style="totalScore >= standard ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
-        >{{totalScore >= standard ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
+        <div v-if="standard!=-1" style="margin-left: calc(20/1440*100vw)" class="status-tag"
+          :style="standard == 1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
+        >{{standard == 1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
       </div>
     </div>
     <div class="template-titles">
@@ -300,7 +300,7 @@
               </tr>
             </thead>
             <template v-for="(categoryItem, categoryIndex) in tableItem">
-              <tbody :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
+              <tbody v-if="categoryItem.children.length>1" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
                     <span>{{ categoryItem.groupName }}</span>
@@ -310,9 +310,26 @@
                   v-for="(subcategory,subcategoryIndex) in categoryItem.children"
                   :key="subcategoryIndex"
                   :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
-                  <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ subcategory.groupName }}</span>
+                  <td style="word-break: keep-all;white-space:nowrap;">
+                    <span class="item-name">{{ subcategory.groupName }}</span>
                     <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
                   </td>
+                  <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
+                  <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
+                  <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
+                  <td><span>{{ subcategory.actualScore | filterScore }}</span></td>
+                </tr>
+              </tbody>
+              <tbody v-else :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
+                <tr
+                  v-for="(subcategory,subcategoryIndex) in categoryItem.children"
+                  :key="subcategoryIndex"
+                  :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
+                  <td style="word-break: keep-all;white-space:nowrap;">
+                    <span class="item-name">{{ subcategory.groupName }}</span>
+                    <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
+                  </td>
+                  <td style="vertical-align:middle;"><span class="item-name">-</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
@@ -726,7 +743,7 @@ export default {
         },
         {
           status: 2,
-          statusStr: this.$t('overview.pass'),
+          statusStr: this.$t('overview.echartGood'),
           children: [{
             'zh': require('../../../static/img/good_cn.png'),
             'zhtw': require('../../../static/img/good_cn.png'),
@@ -980,22 +997,22 @@ export default {
 
     getTableHeader() {
       this.theaderPassFail = [
-        { name: '', width: 'width:32%;', pdfWidth: 'width: 35%' },
-        { name: this.$t('remotePatrol.item'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('remotePatrol.category'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('insSettingView.subCategory'), width: 'width:32%;', pdfWidth: 'width: 35%' },
         { name: this.tab1BtnArr[0], width: 'width:12%;', pdfWidth: 'width: 10%' },
         { name: this.tab1BtnArr[1], width: 'width:12%;', pdfWidth: 'width: 10%' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;', pdfWidth: 'width: 10%' }
       ];
       this.theaderOther = [
-        { name: '', width: 'width:32%;', pdfWidth: 'width: 35%' },
-        { name: this.$t('remotePatrol.item'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('remotePatrol.category'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('insSettingView.subCategory'), width: 'width:32%;', pdfWidth: 'width: 35%' },
         { name: this.tab3BtnArr[0], width: 'width:12%;', pdfWidth: 'width: 10%' },
         { name: this.tab3BtnArr[1], width: 'width:12%;', pdfWidth: 'width: 10%' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;', pdfWidth: 'width: 10%' }
       ];
       this.theaderScore = [
-        { name: '', width: 'width:32%;', pdfWidth: 'width: 35%' },
-        { name: this.$t('remotePatrol.item'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('remotePatrol.category'), width: 'width:32%;', pdfWidth: 'width: 35%' },
+        { name: this.$t('insSettingView.subCategory'), width: 'width:32%;', pdfWidth: 'width: 35%' },
         { name: this.$t('remotePatrol.TableTotal'), width: 'width:24%;', pdfWidth: 'width: 20%' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;', pdfWidth: 'width: 10%' }
       ];
@@ -1402,6 +1419,7 @@ export default {
 
     getGroupsItems(status) {
       const treeData = util.handleInspctionCatergyTree(this.groups, 'groupId');
+      console.log('treeData:',treeData);
       const group = [];
       treeData.forEach(catergy => {
         const tempGroupItem = {};
@@ -1455,6 +1473,7 @@ export default {
           }
         }
       });
+      console.log('group:',group);
       return group;
     },
 
