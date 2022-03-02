@@ -1633,8 +1633,7 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      if ( (!this.showGuide && this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0)
-          || (this.$store.getters.PatrolHistory != null) ) {
+      if ((this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0)) {
         this.changeStoreObj.dialogCosed = true;
       } else {
         if (storeItem) this.changeStore_(storeItem)
