@@ -254,7 +254,7 @@ export default {
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        console.log(storeList)
+        //console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -301,6 +301,10 @@ export default {
       //this.filterStore();
       //console.log("arr:",arr);
       this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
+      if(this.emitChanged){
+        console.log('*****emitStoreChange');
+        this.$emit('emitStoreChange', this.filterStoreIds);
+      }
       this.emitParams();
     },
 
@@ -491,9 +495,8 @@ export default {
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
-      if(this.emitChanged){
-        this.$emit('emitStoreList', this.filterStoreIds);
-      }
+      console.log("emitChanged:",this.emitChanged);
+      
     },
 
     getStoreGroupString() {
@@ -643,6 +646,7 @@ export default {
     },
 
     async selectAllProAndCity(val, isFirst) {
+      //console.log("contry changed");
       const self = this;
       const storeList = self.storeList;
       const temp = [];

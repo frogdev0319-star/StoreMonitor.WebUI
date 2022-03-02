@@ -1086,10 +1086,25 @@ export default {
   }
   
 }
-.el-menu--popup{
-    background-color: #e4f3fd !important;
-    .el-submenu{
-    /deep/.el-submenu__title {
+.el-menu--vertical .el-menu--popup .el-menu-item {
+    &.is-active {
+      background-color: #f2f9fe;
+      .item-icon {
+        background-color:#006ab7;
+      }
+      span {
+        color: #006ab7;
+      }
+    }
+    &:hover {
+      background-color: #e4f3fd !important;
+      span {
+        color: #006ab7 !important;
+      }
+    }
+  }
+  .el-menu--vertical .el-menu--popup .el-submenu{
+    .el-submenu__title {
       &:hover {
         background-color: #e4f3fd !important;
         span {
@@ -1097,6 +1112,11 @@ export default {
         }
       }
     }
+    /deep/
+    .el-submenu__title {
+      &:hover {
+          background-color: #e4f3fd !important;
+      }
     }
   }
 </style>
@@ -1591,6 +1611,12 @@ $collapseWidth: 5.5%;
 .padding-vertical-sm {
   padding: calc(16/1920*100vw) 0;
 }
+.padding-right {
+  padding-right: calc(20/1920*100vw);
+}
+.padding-vertical {
+  padding: calc(20/1920*100vw) 0;
+}
 .padding-horizontal-sm {
   padding: 0 calc(16/1920*100vw);
 }
@@ -1639,6 +1665,42 @@ $collapseWidth: 5.5%;
 }
 .text-left {
   text-align: left;
+}
+.el-date-table td.current:not(.disabled) span {
+  background-color: rgb(0, 106, 183);
+}
+.el-time-panel__btn.confirm {
+  color: rgb(0, 106, 183);
+}
+.storevue-datepicker {
+  i {display: none;}
+  width: calc(150/1920*100vw) !important;
+  .el-input__inner {
+    height: calc(36/1920*100vw);
+    width: calc(150/1920*100vw);
+    color: #484848;
+    font-size: calc(15/1920*100vw);
+    border-color: #e6e6e6;
+    padding-left: calc(52/1920*100vw);
+    padding-right: calc(15/1920*100vw);
+    background: url("~@/../static/img/calender.svg") no-repeat;
+    background-position: center left calc(16/1920*100vw);
+  }
+}
+.storevue-timepicker {
+  i {display: none;}
+  width: calc(150/1920*100vw) !important;
+  .el-input__inner {
+    height: calc(36/1920*100vw);
+    width: calc(150/1920*100vw);
+    color: #484848;
+    font-size: calc(15/1920*100vw);
+    border-color: #e6e6e6;
+    padding-left: calc(52/1920*100vw);
+    padding-right: calc(15/1920*100vw);
+    background: url("~@/../static/img/timepicker.svg") no-repeat;
+    background-position: center left calc(16/1920*100vw);
+  }
 }
 .hr-vertical {
   margin: 0;

@@ -1123,7 +1123,7 @@ export default {
 
     handleSuccess() {
       const self = this;
-      self.editCount++;
+      // self.editCount++;
       self.showError = false;
       self.errorMsg = '';
       self.realTimeSpeed = 0;
@@ -1152,7 +1152,7 @@ export default {
 
     handleFullWindowSuccess() {
       const self = this;
-      self.editCount++;
+      // self.editCount++;
       self.showError = false;
       self.errorMsg = '';
       if (self.playState) {
@@ -2480,6 +2480,7 @@ export default {
       text-align: left;
       margin-left: 1%;
       #icanvas{
+        margin-left: 20px;
       }
       .cancel-content{
         position: absolute;
