@@ -646,7 +646,9 @@ export default {
           const dataComments = comments.comment;
           const temp = [];
           self.curStatus = dataComments[0].status;
-          self.event.status = dataComments[0].status;
+          if(comments.hasOwnProperty('status')){
+            self.event.status = comments.status;
+          }
           //console.log("dataComments[0].status:",dataComments[0].status);
           // 0 pending：handle、add、closed
           // 1 handled：add、closed、reject
