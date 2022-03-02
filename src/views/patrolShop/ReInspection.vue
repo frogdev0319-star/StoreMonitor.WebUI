@@ -612,22 +612,6 @@
                     </div>
                   </div>
                   <div style="padding-left: calc(20/1920*100vw)">
-                    <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
-                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                        <div v-if="_item.mediaType==2" class="img-content">
-                          <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
-                          <el-image
-                            :src="_item.src"
-                            :style="{width: _item.width, height: _item.height}"
-                            :preview-src-list="getImgList({index: _index, sourceList: item.sourceList})"/>
-                        </div>
-                        <div v-if="_item.mediaType==1" class="img-content">
-                          <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
-                          <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
-                          <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
-                        </div>
-                      </div>
-                    </div>
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
@@ -651,6 +635,22 @@
                               @click="editItemResource({ item, index: _index })"
                             />
                           </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
+                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                        <div v-if="_item.mediaType==2" class="img-content">
+                          <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
+                          <el-image
+                            :src="_item.src"
+                            :style="{width: _item.width, height: _item.height}"
+                            :preview-src-list="getImgList({index: _index, sourceList: item.sourceList})"/>
+                        </div>
+                        <div v-if="_item.mediaType==1" class="img-content">
+                          <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
+                          <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
+                          <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
                         </div>
                       </div>
                     </div>
@@ -706,17 +706,6 @@
                         {{$t('remotePatrol.delete')}}
                       </button>
                     </div>
-                    
-                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                      <el-image
-                        :src="item.sourceObj.src"
-                        :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
-                        :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
-                    </div>
-                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
-                      <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
-                      <img :src="videoImgSrc" class="imgLittle" height="100">
-                    </div>
                     <div class="flex-center"
                       v-for="(source, idx) in item.sourceList"
                       :key="idx">
@@ -739,6 +728,16 @@
                         @click="editFeedback(item, index)"
                         />
                       </div>
+                    </div>
+                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content margin-bottom-sm">
+                      <el-image
+                        :src="item.sourceObj.src"
+                        :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                        :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
+                    </div>
+                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content margin-bottom-sm">
+                      <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
+                      <img :src="videoImgSrc" class="imgLittle" height="100">
                     </div>
                     <hr v-if="index !== eventList.length" class="hr-horizontal">
                   </div>
