@@ -643,7 +643,7 @@ export default {
       if (!this.playBack) {
         window.clearInterval(self.timerPlayReal);
         self.timerPlayReal = window.setInterval(() => {
-          console.log(self.realTimeSpeed);
+          // console.log(self.realTimeSpeed);
           self.realTimeSpeed = self.realTimeSpeed + 1;
         }, 1000);
       } else {
