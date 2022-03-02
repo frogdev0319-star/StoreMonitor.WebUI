@@ -1182,8 +1182,8 @@ export default {
       _item.isActive = true;
       self.showStoreUp = true;
 
-      !self.showGuide && self.$refs.vendorVideo && (self.$refs.vendorVideo.editCount = 0);
-      !self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.stopVideoPlay();
+      self.$refs.vendorVideo && (self.$refs.vendorVideo.editCount = 0);
+      self.$refs.vendorVideo && self.$refs.vendorVideo.stopVideoPlay();
       self.showError = false;
       self.curDeviceId = -1;
       self.showFeedBack = false;
@@ -2557,9 +2557,9 @@ export default {
       });
     },
     changeInspect(val) {
-      console.log(val)
       const self = this;
-      if ( (!self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0)
+      console.log(self.$refs.vendorVideo.editCount)
+      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0)
           ||(self.$store.getters.PatrolHistory != null) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
