@@ -1,109 +1,101 @@
 <template>
   <div>
-    <div>
-      <div
-        v-loading="isLoading"
-        id="videoContent"
-        :style="isEvent?{}: {'margin-bottom': 0}"
-        class="video-content"
-        element-loading-background="rgba(0, 0, 0, 0.8)">
-        <div v-if="showGetVideo" class="getvideo-content">
-          <div class="btn-graph">
-            <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"/>
-          </div>
-          <canvas id="vcanvas" :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"/>
+    <div
+      v-loading="isLoading"
+      id="videoContent"
+      :style="isEvent?{}: {'margin-bottom': 0}"
+      class="video-content"
+      element-loading-background="rgba(0, 0, 0, 0.8)">
+      <div v-if="showGetVideo" class="getvideo-content">
+        <div class="btn-graph">
+          <canvas id="btn-graph-canvas" :width="graphBtnWidth" :height="graphBtnWidth"/>
         </div>
-        <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.name }}</span>
-        <div v-if="showInfoContent" class="icon-footer">
-          <div class="iconlside">
-            <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'" class= "iconfont iconplay" @click="onPlay"/>
+        <canvas id="vcanvas" :width="varyWindowWidth*0.418+'px'" :height="varyWindowWidth*0.282+'px'"/>
+      </div>
+      <span v-if="showInfoContent && channelInfo" id="channelName">{{ channelInfo.name }}</span>
+      <div v-if="showInfoContent" class="icon-footer">
+        <div class="iconlside">
+          <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'" class= "iconfont iconplay" @click="onPlay"/>
+        </div>
+        <div class="iconrside">
+          <div v-if="playBack" class="speed-content">
+            <span>{{ $t('remotePatrol.back') }}</span>
+            <el-select :value="curBack" :popper-class="popperClass" class="el-test" size="mini" placeholder=" ">
+              <el-option
+                v-for="(item) in backList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+                @click.native="adjustProcess(item.value, item.label)"
+              />
+            </el-select>
           </div>
-          <div class="iconrside">
-            <div v-if="playBack" class="speed-content">
-              <span>{{ $t('remotePatrol.back') }}</span>
-              <el-select :value="curBack" :popper-class="popperClass" class="el-test" size="mini" placeholder=" ">
-                <el-option
-                  v-for="(item) in backList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                  @click.native="adjustProcess(item.value, item.label)"
-                />
-              </el-select>
+          <div class="screen-content">
+            <div v-if="showModelContent && !isEvent" class="flex-center snapshot">
+              <img :src="snapshotIcon"  @click="captureSnapshot">
             </div>
-            <div class="screen-content">
-              <i
-                :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
-                class="iconfont iconscreen"
-                @click="controlScreen"/>
-            </div>
+            <i
+              :class="fullScreen?'icon-tuichuquanping':'icon-quanping'"
+              class="iconfont iconscreen"
+              @click="controlScreen"/>
           </div>
         </div>
-        <div v-if="playBack" class="progress-content">
-          <b-progress
-            id="bprogress"
-            :value="currentTimeValue"
-            :max="durationTimeValue"
-            class="mb-3 prog"
-            height="0.2rem"
-            style="margin-bottom:0px !important;"/>
-        </div>
-        <transition name="fade">
-          <div
-            v-if="showModelContent && !isEvent"
-            :class="lang== 'en'? 'en-iconright' : 'iconright'"
-            @click="captureSnapshot">
-            <i class="iconfont icon-xiangji iconpaizhao" style="font-size:18px;"/>
-            <span>{{ $t('remotePatrol.snapshot') }}</span>
-          </div>
-        </transition>
-        <div v-if="showError" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
-          <span>{{ errorText }}</span>
-        </div>
-        <div v-else>
-          <video
-            v-show ="showVideo && !playBack"
-            id="beseyeVideo"
-            :controls="showControls"
-            height="100%"
-            width="90%"
-            prload
-            autoplay
-            style="margin: auto"
-            @waiting="onPlayerWaiting($event)"
-            @playing="onPlayerPlaying($event)"
-            @loadstart="onPlayerWaiting($event)"
-            @error="onPlayerWaiting($event)"
-            @canplay="onPlayerCanPlay()"/>
-          <video
-            v-show="playBack"
-            id="video1"
-            :controls="showControls"
-            height="83%"
-            width="90%"
-            prload
-            autoplay
-            style="margin: auto"
-            @waiting="onPlayerWaiting($event)"
-            @playing="onPlayerPlaying($event)"
-            @loadstart="onPlayerWaiting($event)"
-            @error="onPlayerWaiting($event)"
-            @canplay="onPlayerCanPlay()"/>
-          <video
-            v-show="playBack"
-            id="video2"
-            :controls="showControls"
-            height="83%"
-            width="90%"
-            prload
-            autoplay
-            style="margin: auto"
-            @waiting="onPlayerWaiting($event)"
-            @playing="onPlayerPlaying($event)"
-            @loadstart="onPlayerWaiting($event)"
-            @error="onPlayerWaiting($event)"
-            @canplay="onPlayerCanPlay()"/>
-        </div>
+      </div>
+      <div v-if="playBack" class="progress-content">
+        <b-progress
+          id="bprogress"
+          :value="currentTimeValue"
+          :max="durationTimeValue"
+          class="mb-3 prog"
+          height="0.2rem"
+          style="margin-bottom:0px !important;"/>
+      </div>
+      <div v-if="showError" :class="isEvent ? 'event-error': ''" class="errorVideo-model">
+        <span>{{ errorText }}</span>
+      </div>
+      <div v-else>
+        <video
+          v-show ="showVideo && !playBack"
+          id="beseyeVideo"
+          :controls="showControls"
+          height="100%"
+          width="90%"
+          prload
+          autoplay
+          style="margin: auto"
+          @waiting="onPlayerWaiting($event)"
+          @playing="onPlayerPlaying($event)"
+          @loadstart="onPlayerWaiting($event)"
+          @error="onPlayerWaiting($event)"
+          @canplay="onPlayerCanPlay()"/>
+        <video
+          v-show="playBack"
+          id="video1"
+          :controls="showControls"
+          height="83%"
+          width="90%"
+          prload
+          autoplay
+          style="margin: auto"
+          @waiting="onPlayerWaiting($event)"
+          @playing="onPlayerPlaying($event)"
+          @loadstart="onPlayerWaiting($event)"
+          @error="onPlayerWaiting($event)"
+          @canplay="onPlayerCanPlay()"/>
+        <video
+          v-show="playBack"
+          id="video2"
+          :controls="showControls"
+          height="83%"
+          width="90%"
+          prload
+          autoplay
+          style="margin: auto"
+          @waiting="onPlayerWaiting($event)"
+          @playing="onPlayerPlaying($event)"
+          @loadstart="onPlayerWaiting($event)"
+          @error="onPlayerWaiting($event)"
+          @canplay="onPlayerCanPlay()"/>
       </div>
     </div>
     <el-dialog
@@ -114,8 +106,8 @@
       :width="860*percentHeight+'px'"
       height="300px"
       top="5%">
-      <div class="canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel" @mouseup="mouseUpHandler">
-        <hr class="dialog-hr">
+      <div class="canvas-content" style="display: inline-block" @mouseenter="showCancel" @mouseleave="hiddenCancel" @mouseup="mouseUpHandler">
+        <!-- <hr class="dialog-hr">
         <div v-if="showPenBtn" id="iconR" class="icon-right">
           <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
           <transition name="fadepen">
@@ -126,7 +118,7 @@
               </div>
             </div>
           </transition>
-        </div>
+        </div> -->
         <canvas
           id="icanvas"
           :width="767*percentHeight"
@@ -137,16 +129,18 @@
         <img id="imgTest" :src="imgSrc" style="display: none">
         <div
           v-if="showCancelContent"
-          :style="{'width':767*percentHeight+'px',
-                   'margin-left':47*percentHeight+'px'}"
           class="cancel-content">
-          <div class="content" @click="cancelEditCanvas">
-            <img :src="clearIconSrc" class="icon-clear" height="22px">
-            <span>{{ $t('remotePatrol.clear') }}</span>
+          <div id="iconR" class="icon-right">
+            <img :src="penBtnSrc" class="pen-btn" @click="showPenList" style="margin-right: 40px">
+            <div class="pen-content">
+              <div v-for="(item,index) in penList"  style="margin-right: 15px" :style="{'background-color': item.id, 'border': item.showContent ? item.border : '3px solid transparent'}" :key="index" class="content" @click="checkPen(item,index)">
+              </div>
+            </div>
           </div>
-          <div class="content" @click="confirmEditCanvas">
-            <img :src="removeIconSrc" class="icon-clear" height="22px">
-            <span>{{ $t('remotePatrol.cancel') }}</span>
+          <div style="flex: 1"></div>
+          <div style="display: flex">
+            <img :src="clearIconSrc" class="icon-clear" height="36px" @click="cancelEditCanvas" style="margin-right: 80px">
+            <img :src="removeIconSrc" class="icon-clear" height="36px" @click="confirmEditCanvas">
           </div>
         </div>
       </div>
@@ -336,6 +330,7 @@ export default {
       clearIconSrc: require('../../static/img/clear.png'),
       removeIconSrc: require('../../static/img/cancel.png'),
       penBtnSrc: require('../../static/img/edit_btn.png'),
+      snapshotIcon: require('../../static/img/snapshot.png'),
       flag: 0,
       eventName: '',
       eventNameRuletip: false,
@@ -1693,9 +1688,12 @@ export default {
       }
       .iconrside {
         // max-width: 230px;
-        display: inline-block;
+        // display: inline-block;
         margin-right: 20px;
         float: right;
+        .snapshot {
+          margin: 0 calc(20/1920*100vw);
+        }
         span {
           font-size: 13px;
           margin-right: 6px;
@@ -1713,10 +1711,9 @@ export default {
       }
     }
     .screen-content {
-      display: inline-block;
-      float: right;
+      display: flex;
+      // float: right;
       .iconscreen {
-        margin-right: 20px;
         font-size: 18px;
         // position: relative;
         cursor: pointer;
