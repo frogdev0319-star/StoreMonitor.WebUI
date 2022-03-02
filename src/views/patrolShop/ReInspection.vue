@@ -499,7 +499,7 @@
                 class="iconfont icon-sousuo"
               />
             </el-input>
-            <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
+            <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.groupId === 'feedBack' || sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
               <template v-if="_item.isCategory">
                 <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
                 class="margin-bottom-top-sm"
@@ -533,7 +533,7 @@
               />
             </el-input>
             <div class="flex" style="flex-wrap: wrap">
-              <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
+              <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.groupId === 'feedBack' || sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
                 <template v-if="_item.isCategory">
                   <div v-if="!showIgnoreItem ||_item.ignoreCount>0"  class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
                         @click="changeSheet(_item,_index)">
@@ -2555,6 +2555,8 @@ export default {
     },
     changeInspect(val) {
       const self = this;
+      console.log(self.$refs.vendorVideo.editCount)
+      // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
       if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
@@ -3229,7 +3231,10 @@ export default {
   }
   .img-source-content {
     display: flex;
+    flex-wrap: wrap;
     margin-bottom: calc(10/1920*100vw);
+  }
+  .item-details {
   }
   .img-content{
     position: relative;
@@ -4226,6 +4231,7 @@ export default {
             @include point(padding-left,20);
             padding-bottom: 0;
             margin-top: 5px;
+            
             .rules{
               margin-left: 20px;
               font-size: 10px;
