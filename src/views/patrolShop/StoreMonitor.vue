@@ -54,70 +54,218 @@
           :cur-time="playBackTime"
           :video-authority="videoAuthority"
           @confirmEzvizCanvas="editEzvizCanvas"/>
-
-        <div class="channel-content">
-          <div class="flex-center padding" style="justify-content: space-between;">
-            <span class="title">{{ $t("remotePatrol.zoneList") }}</span>
-            <el-input
-              :placeholder="$t('remotePatrol.channelPlaceholder')"
-              v-model="serachChannelValue"
-              size="small"
-              class="storevue-input-search"
-            >
-              <i
-                slot="prefix"
-                class="iconfont icon-sousuo"
-              />
-            </el-input>
+        <div :class="{flex: isFullScreenMode, 'padding': isFullScreenMode}" :style="{'padding-left': '0px'}">
+          <div class="spacer">
+            <div class="channel-content">
+              <div class="flex-center padding" style="justify-content: space-between;">
+                <span class="title">{{ $t("remotePatrol.zoneList") }}</span>
+                <el-input
+                  :placeholder="$t('remotePatrol.channelPlaceholder')"
+                  v-model="serachChannelValue"
+                  size="small"
+                  class="storevue-input-search"
+                >
+                  <i
+                    slot="prefix"
+                    class="iconfont icon-sousuo"
+                  />
+                </el-input>
+              </div>
+              <div class="btn-content" :style="{'justify-content':isFullScreenMode?'unset':'space-between'}">
+                <!-- <div v-if="!store.device">{{}}</div> -->
+                <div
+                  v-for="(item, index) in (store.device && store.device.filter(d => d.name.indexOf(serachChannelValue) > -1))"
+                  :key="index"
+                  class="btn-details"
+                  :class="{'child-space': isFullScreenMode}"
+                  :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
+                >
+                  <div 
+                    @click="clickBtn(item,index)"
+                    class="channel"
+                    :class="{'channel-isActive': item.isClick}"
+                  >
+                  <img :src="item.isClick ? channelActiveIcon: channelIcon" style="margin-right: calc(20 / 1920 * 100vw)">
+                  {{ item.name }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="time-content">
+              <div class="time-title padding">
+                <span class="title">{{ $t("remotePatrol.selectDate") }}</span>
+                <div @click="backCurDate"
+                class="backToNow"
+                style="">{{ $t("remotePatrol.backToNow")}}</div>
+              </div>
+              <div class="padding flex" style="padding-top: 0px">
+                <el-date-picker
+                  v-model="dateValue"
+                  :picker-options="pickerOptions"
+                  :clearable="false"
+                  class="storevue-datepicker"
+                  type="date"
+                  placeholder="日期"
+                  size="mini"
+                />
+                <el-time-picker
+                  v-model="curTime"
+                  :clearable="false"
+                  :placeholder="$t('remotePatrol.playTime')"
+                  class="storevue-timepicker margin-left-md"
+                  size="mini"
+                />
+              </div>
+            </div>
           </div>
-          <div class="btn-content" :style="{'justify-content':isFullScreenMode?'unset':'space-between'}">
-            <!-- <div v-if="!store.device">{{}}</div> -->
-            <div
-              v-for="(item, index) in (store.device && store.device.filter(d => d.name.indexOf(serachChannelValue) > -1))"
-              :key="index"
-              class="btn-details"
-              :class="{'child-space': isFullScreenMode}"
-              :style="{'width':isFullScreenMode?'246px':'calc(50% - 10px)'}"
-            >
-              <div 
-                @click="clickBtn(item,index)"
-                class="channel"
-                :class="{'channel-isActive': item.isClick}"
-              >
-              <img :src="item.isClick ? channelActiveIcon: channelIcon" style="margin-right: calc(20 / 1920 * 100vw)">
-              {{ item.name }}
+          <div v-if="isFullScreenMode" class="rside spacer padding" style="background-color: #edf0f2;">
+            <div class="padding" style="background-color: #fff; border-top-left-radius: calc(10 / 1920 * 100vw); border-top-right-radius: calc(10 / 1920 * 100vw);">
+              <div class="text-left flex-center margin-bottom-md" style="font-size: calc(15/1920*100vw)">
+                {{ $t("remotePatrol.createMothod") }}
+                <div class="spacer"></div>
+                <el-button
+                  v-loading.fullscreen.lock="fullscreenLoading"
+                  :disabled="sourceList.length === 0"
+                  class="storevue-button-filled"
+                  size="mini"
+                  type="primary"
+                  @click="submit"
+                >{{ $t("remotePatrol.submit") }}
+                </el-button>
+              </div>
+              <hr class="hr-horizontal">
+              <div class="flex-center margin-top-md">
+                <div
+                  v-for="(item, index) in evBtns"
+                  :key="index"
+                  :style="item.isActive ? {'background-color': '#006ab7', 'color': '#fff', 'border-color': '#006ab7'} : {}"
+                  class="el-radio-details"
+                  @click="clickEventBtn(item, index)"
+                >
+                  <span>{{ item.name }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="el-event" style="flex: 1">
+              <div :class="{'event-box': !isFullScreenMode, 'event-box-full': isFullScreenMode}">
+                <div v-if="corEvent" class="flex-center tabs">
+                  <div class="problemTab" :style="problemTab===0?{'background-color': '#f7f9fa', color: '#006ab7' }:{}" @click="problemTab = 0">{{$t("remotePatrol.description")}}</div>
+                  <div class="problemTab" :style="problemTab===1?{'background-color': '#f7f9fa', color: '#006ab7' }:{}" @click="problemTab = 1">{{$t("remotePatrol.relevantEvent")}}</div>
+                </div>
+                <div v-else>
+                  <div class="problemTab tabs" style="background-color: #f7f9fa">{{$t("remotePatrol.description")}}</div>
+                </div>
+                <div v-if="problemTab == 0" class="padding" style="height: 100%; text-align: left">
+                  <div class="event-title margin-bottom-sm"><span class="is-required">* </span>{{ $t("remotePatrol.title") }}</div>
+                  <el-input
+                    :disabled="corEvent"
+                    v-model="eventName"
+                    size="mini"
+                    class="fullWidth margin-bottom-md storevue-input-grey"
+                    @input="eventNameChanged"
+                    @blur="notShowInputRuleTips('eventName')"
+                  />
+                  <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
+                  <span v-if="showEventNameInfo" class="error-class">{{$t("remotePatrol.emptyEventTitle") }}</span>
+                  <div class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
+                  <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length!=0" :class="'noraml-title'" class="tsource-content">
+                          <div v-for="(_item,_index) in sourceList" :key="_index" class="fullWidth source-details">
+                            <div v-if="_item.mediaType == 3" class="flex-center">
+                              <img
+                                :src="deleteInspectIcon"
+                                alt="delete"
+                                @click="deleteItemResource({ index: _index })"
+                              />
+                              <div
+                                class="paper flex-center margin-bottom-sm inspect-text"
+                                :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
+                              >
+                                <div style="flex: 1; text-align: left; margin: 5px">
+                                  {{ _item.src }}
+                                </div>
+                                <hr class="hr-vertical" />
+                                <img
+                                  :src="editInspectIcon"
+                                  alt="edit"
+                                  style="margin: 5px"
+                                  @click="editItemResource({  index: _index })"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                  <div style="position: relative">
+                          <el-input
+                            :autosize="{ minRows: 2, maxRows: 7 }"
+                            v-model="eventDes"
+                            :placeholder="$t('remotePatrol.coment')"
+                            :disabled="false"
+                            size="mini"
+                            class="storevue-textarea"
+                            type="textarea"
+                            resize="none"
+                            @input="eventDesChanged"
+                            @blur="notShowInputRuleTips('eventDes')"
+                          />
+                          <button
+                            class="inspect-btn"
+                            :disabled="false"
+                            @click="submitItemResource()"
+                          >
+                            {{$t('remotePatrol.confirm')}}
+                          </button>
+                        </div>
+                  <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
+                  <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
+
+                  <div class="source-content">
+                    <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
+                    <div
+                      v-for="(item, index) in sourceList"
+                      :key="index"
+                      class="source-details"
+                    >
+                      <div v-if="item.mediaType === 2" class="img-content">
+                        <el-image
+                          :src="item.src"
+                          :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
+                          :preview-src-list="getImgList(index, sourceList)"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-if="corEvent && problemTab == 1 && store.storeId ">
+                    <div
+                      v-for="(item, index) in eventList"
+                      :key="index"
+                      class="flex-center padding"
+                    >
+                      <el-radio
+                        v-model="curEvent"
+                        :label="item.id"
+                        class="storevue-radio-blue"
+                        style="flex: 1; text-align: left; margin: 0"
+                        @change="checkEvent"
+                      >
+                        <span :title="item.name">{{
+                          item.name
+                        }}</span></el-radio
+                        >
+                      <div style="width: 125px; font-size: 13px">
+                        <span class="date-year">{{ item.dateYear }}</span>
+                        <span class="date-day">{{ item.dateDay }}</span>
+                      </div>
+                      <p :title="item.descrition">
+                        {{ item.descrition }}
+                      </p>
+                    </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="time-content">
-          <div class="time-title padding">
-            <span class="title">{{ $t("remotePatrol.selectDate") }}</span>
-            <div @click="backCurDate"
-            class="backToNow"
-            style="">{{ $t("remotePatrol.backToNow")}}</div>
-          </div>
-          <div class="padding flex" style="justify-content: space-between; padding-top: 0px">
-            <el-date-picker
-              v-model="dateValue"
-              :picker-options="pickerOptions"
-              :clearable="false"
-              class="date-picker"
-              type="date"
-              placeholder="日期"
-              size="mini"
-            />
-            <el-time-picker
-              v-model="curTime"
-              :clearable="false"
-              :placeholder="$t('remotePatrol.playTime')"
-              class="time-picker"
-              size="mini"
-            />
-          </div>
-        </div>
       </el-col>
-      <el-col :class="{'margin-left-md': !isFullScreenMode, 'padding': isFullScreenMode}" class="rside paper spacer ">
+      <el-col v-if="!isFullScreenMode" :class="{'margin-left-md': !isFullScreenMode}" class="rside paper spacer ">
         <div class="padding" style="background-color: #fff; border-top-left-radius: calc(10 / 1920 * 100vw); border-top-right-radius: calc(10 / 1920 * 100vw);">
           <div class="text-left flex-center margin-bottom-md" style="font-size: calc(15/1920*100vw)">
             {{ $t("remotePatrol.createMothod") }}

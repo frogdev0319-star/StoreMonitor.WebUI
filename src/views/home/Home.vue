@@ -1590,6 +1590,12 @@ $collapseWidth: 5.5%;
 .padding-vertical-sm {
   padding: calc(16/1920*100vw) 0;
 }
+.padding-right {
+  padding-right: calc(20/1920*100vw);
+}
+.padding-vertical {
+  padding: calc(20/1920*100vw) 0;
+}
 .padding-horizontal-sm {
   padding: 0 calc(16/1920*100vw);
 }
@@ -1638,6 +1644,42 @@ $collapseWidth: 5.5%;
 }
 .text-left {
   text-align: left;
+}
+.el-date-table td.current:not(.disabled) span {
+  background-color: rgb(0, 106, 183);
+}
+.el-time-panel__btn.confirm {
+  color: rgb(0, 106, 183);
+}
+.storevue-datepicker {
+  i {display: none;}
+  width: calc(150/1920*100vw) !important;
+  .el-input__inner {
+    height: calc(36/1920*100vw);
+    width: calc(150/1920*100vw);
+    color: #484848;
+    font-size: calc(15/1920*100vw);
+    border-color: #e6e6e6;
+    padding-left: calc(52/1920*100vw);
+    padding-right: calc(15/1920*100vw);
+    background: url("~@/../static/img/calender.svg") no-repeat;
+    background-position: center left calc(16/1920*100vw);
+  }
+}
+.storevue-timepicker {
+  i {display: none;}
+  width: calc(150/1920*100vw) !important;
+  .el-input__inner {
+    height: calc(36/1920*100vw);
+    width: calc(150/1920*100vw);
+    color: #484848;
+    font-size: calc(15/1920*100vw);
+    border-color: #e6e6e6;
+    padding-left: calc(52/1920*100vw);
+    padding-right: calc(15/1920*100vw);
+    background: url("~@/../static/img/timepicker.svg") no-repeat;
+    background-position: center left calc(16/1920*100vw);
+  }
 }
 .hr-vertical {
   margin: 0;
