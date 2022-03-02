@@ -2,8 +2,8 @@ const version = 'v1.0';
 
 const _Environments = {
   Debug_XA: {
-    CHINA_WEBSITE: 'http://172.21.81.63:8080/storemonitor/api/',
-    GLOBAL_WEBSITE: 'http://172.21.81.63:8081/storemonitor/api/',
+    CHINA_WEBSITE: 'http://172.22.24.90:8082/storemonitor/api/',//http://172.21.81.63:8080/storemonitor/api/',
+    GLOBAL_WEBSITE: 'http://172.22.24.90:8082/storemonitor/api/',//http://172.21.81.63:8081/storemonitor/api/',
     VERSION: version
   },
   Preview: {

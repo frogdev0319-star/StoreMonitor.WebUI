@@ -680,6 +680,7 @@ import DelayButton from '@/components/DelayButton';
 import DialogPop from '@/components/DialogPop';
 import AreaSelected from '@/components/AreaSelected';
 import TypeSelectArea from '@/components/TypeSelectArea';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 import vm from '@/main.js';
 export default {
   name: 'EventStatistics',
@@ -1655,37 +1656,74 @@ export default {
       };
       this.setEventTableData();
     },
+    doGetEventSeachParam(row){
+      const self = this;
+      const params = SearchConditionUtil.getSearchCondition('eventManage');
+      const rowItem = row.row;
+            //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
+        params.filterStoreIds=[rowItem.id];
+        params.curStore=[rowItem.id];
+        params.storeIds=[rowItem.id];
+        params.curCountry = "-1";
+        params.curProvince = [];
+        params.curCity = [];
+        params.inputSearchValue = "";
+        params.curState = [];
+        params.activeName = '4';
+        params.searchParams.filter ={ page: 0, size: 10 };
+        params.beginTs=this.params.beginTs,
+        params.endTs=this.params.endTs
+        params.searchFrom='EventStatistics';
+        return params;
+    },
     onEvenListNumClick(row){
       console.log("clcick row:",row);
       const self = this;
-      if(row.prop == "numOfTotal"){
-        this.params.activeName = "4";
-        this.params.curState=[];
-      }else if(row.prop == "numOfUnprocessed"){
-        this.params.activeName = "0";
-        this.params.curState=[0];
-      }else if(row.prop == "numOfInprocess"){
-        this.params.activeName = "1";
-        this.params.curState=[1];
-      }else if(row.prop == "numOfProcessed"){
-        this.params.activeName = "2";
-        this.params.curState=[2,4];
-      }else if(row.prop == "numOfRejected"){
-        this.params.activeName = "3";
-        this.params.curState=[3];
-      }
-      this.params.inputSearchValue="";
-      this.params.sizeNum=10;
-      this.params.page=1; 
+      var params = SearchConditionUtil.getSearchCondition('eventManage');
+      const rowItem = row.row;
+            
       
-      this.params.clause ={storeId:row.row.id,storeName:this.barActiveName};
+      params.filterStoreIds=[rowItem.id];
+      params.curStore=[rowItem.id];
+      params.storeIds=[rowItem.id];
+      params.curCountry = self.params.curCountry;
+      params.curProvince = self.params.curProvince;
+      params.curCity = self.params.curCity;
+      params.inputSearchValue = "";
+      params.beginTs=self.params.beginTs;
+      params.endTs=self.params.endTs;
+      params.searchFrom='EventStatistics';
+            
+      if(row.prop == "numOfTotal"){
+        params.activeName = "4";
+        params.curState=[];
+      }else if(row.prop == "numOfUnprocessed"){
+        params.activeName = "0";
+        params.curState=[0];
+      }else if(row.prop == "numOfInprocess"){
+        params.activeName = "1";
+        params.curState=[1];
+      }else if(row.prop == "numOfProcessed"){
+        params.activeName = "2";
+        params.curState=[2,4];
+      }else if(row.prop == "numOfRejected"){
+        params.activeName = "3";
+        params.curState=[3];
+      }
+      params.searchParams = {clause : {storeId:[rowItem.id],status:[]},filter:{ page: 0, size: 10 }};
+      params.inputSearchValue="";
+      params.sizeNum=10;
+      params.page=1; 
+      params.clause ={storeId:[rowItem.id],storeName:this.barActiveName};
+
       const searchParamsObj = {
         path: 'eventManage',
-        params: this.params
+        params: params
       };
-      self.$refs.eventSearch.saveSearchParams(searchParamsObj);
-      //sessionStorage.setItem('report_data', JSON.stringify(row));
-      self.$router.push({ name: 'eventManage', params: { data: row }});
+      //console.log("onEvenListNumClick:",searchParamsObj);
+      //this.$refs.eventSearch.saveSearchParams(searchParamsObj);
+      SearchConditionUtil.saveSearchCondition(searchParamsObj);
+      this.$router.push({ name: 'eventManage', params: params});
     },
     /*巡檢項事件 sec-row*/
     emitTypeChanged2({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇

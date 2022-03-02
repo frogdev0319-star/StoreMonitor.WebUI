@@ -184,10 +184,10 @@ export default {
             const statics_params = SearchConditionUtil.getSearchCondition('eventStatistics');
             const rowItem = row.row;
             
-            params.searchParams = {clause : {storeId:statics_params.curStore,status:[],subject:row.subject},filter:{ page: 0, size: 10 }};
-            params.filterStoreIds=statics_params.curStore;
-            params.curStore=statics_params.curStore;
-            params.storeIds=statics_params.curStore;
+            params.searchParams = {clause : {storeId:[this.storeId],status:[],subject:row.subject},filter:{ page: 0, size: 10 }};
+            params.filterStoreIds=[this.storeId];
+            params.curStore=[this.storeId];
+            params.storeIds=[this.storeId];
             params.curCountry = statics_params.curCountry;
             params.curProvince = statics_params.curProvince;
             params.curCity = statics_params.curCity;
