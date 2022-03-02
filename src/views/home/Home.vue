@@ -25,26 +25,29 @@
             > 
               
               <span
-              v-if="!(item.name=='remotePatrol' && showIgnoreItem)"
+              v-if="item.name!='remotePatrol'"
                 :class="
-                 item.name=='remotePatrol' && showIgnoreItem
+                  index!=breadList.length-1
+                    ? 'bold-breadcrumb-span'
+                    : 'normal-breadcrumb-span'"
+              >
+                {{ $t(`route.${item.name}`)}}</span
+              >
+              <span
+                @click="backPage"
+               v-if="item.name=='remotePatrol'"
+                 :class="
+                   showIgnoreItem
                     ? 'bold-breadcrumb-span'
                     : 'normal-breadcrumb-span'
                 "
               >
                 {{ $t(`route.${item.name}`)}}</span
               >
-              <span
-                @click="backPage"
-               v-if="item.name=='remotePatrol' && showIgnoreItem"
-                class="bold-breadcrumb-span"
-              >
-                {{ $t(`route.${item.name}`)}}</span
-              >
-              <span v-if="item.name=='remotePatrol' && showIgnoreItem"
+              <span v-if="item.name=='remotePatrol' && showIgnoreItem && breadList.length==2"
                 :class="'normal-breadcrumb-span'"
               >
-                {{" / " + $t("remotePatrol.clickToContent")}}</span
+                {{" | " + $t("remotePatrol.clickToContent")}}</span
               >
             </el-breadcrumb-item>
           </el-breadcrumb>
@@ -247,7 +250,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.0.13 &copy; {{ getFullYear }} Advantech Intelligent City
+                v3.0.0.14 &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>

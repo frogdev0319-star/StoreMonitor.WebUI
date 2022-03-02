@@ -621,9 +621,10 @@ export default {
     },
     deleteItemResource({  index }) {
       const self = this
-      curEditIndex = -1;
-      eventDes = '';
-      sourceList = sourceList.filter((source, idx) => idx !== index)
+      this.curEditIndex = -1;
+      this.eventDes = '';
+      console.log("Delete Index")
+      this.sourceList = this.sourceList.filter((source, idx) => idx !== index)
     },
     editItemResource ({ index }) {
       console.log("index="+index)
