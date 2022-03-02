@@ -69,7 +69,7 @@
                   :key="index">
                   <td style="word-break: keep-all;white-space:nowrap;">
                     <span class="item-name">{{ inspectItem.isCategory ? item.groupName : '--' }}</span>
-                    <span class="count-blag">{{ item.items.length }}</span>
+                    <span v-if="inspectItem.isCategory" class="count-blag">{{ item.items.length }}</span>
                   </td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
@@ -83,7 +83,6 @@
         <el-row v-for="(item,index) in tempList" :key="index" class="row-detail">
           <el-col v-if="item.data.length!=0">
             <div class="item-header">
-              <!-- <i :class="item.iconSrc" class="iconfont icontemp"/> -->
               <span class="title-lable">{{ item.itemTitleName }}</span>
               <span style="float:right;" class="count-content"><span class="count">{{ item.itemCount }}</span>
               <span class="blag">{{ $t('remotePatrol.unit') }}</span></span>
@@ -204,11 +203,6 @@
                             || childItem.inspectText != null&&childItem.inspectText !== ''"
                             class="content-detail-main"
                             style="padding-bottom: 20px;">
-                            <!-- <div v-if="childItem.inspectText!=null&&childItem.inspectText!=''">
-                              <div class="cdm-word" v-for="(text, index) in childItem.inspectText.split('|')" :key="index">
-                                <span>{{ `${index+1}. ${text}` }}</span>
-                              </div>
-                            </div> -->
                             <div v-if="childItem.sourceList!=null&&childItem.sourceList.length!=0" class="cdm-pic">
                               <div
                                 v-for="(sourceitem,sourceindex) in childItem.sourceList"

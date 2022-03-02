@@ -1518,8 +1518,10 @@ export default {
         self.decoder.capturePicture(0, 'default');
       }
       self.imageCanvasList = [];
+      self.sourceList = [];
       if (self.showFeedBack) {
         self.showSnapshotFeedbackDialog = true;
+        
         self.eventName = '';
         self.eventDes = '';
         self.showEventNameInfo = false;
