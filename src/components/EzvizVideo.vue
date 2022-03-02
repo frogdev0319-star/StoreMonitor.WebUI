@@ -2480,6 +2480,7 @@ export default {
       text-align: left;
       margin-left: 1%;
       #icanvas{
+        margin-left: 20px;
       }
       .cancel-content{
         position: absolute;

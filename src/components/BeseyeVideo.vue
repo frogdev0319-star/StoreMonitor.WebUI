@@ -31,7 +31,7 @@
             </el-select>
           </div>
           <div class="screen-content">
-            <div v-if="showModelContent && !isEvent" class="flex-center snapshot">
+            <div class="flex-center snapshot">
               <img :src="snapshotIcon"  @click="captureSnapshot">
             </div>
             <i
@@ -107,18 +107,6 @@
       height="300px"
       top="5%">
       <div class="canvas-content" style="display: inline-block" @mouseenter="showCancel" @mouseleave="hiddenCancel" @mouseup="mouseUpHandler">
-        <!-- <hr class="dialog-hr">
-        <div v-if="showPenBtn" id="iconR" class="icon-right">
-          <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-          <transition name="fadepen">
-            <div v-if="showPen" class="pen-content">
-              <div v-for="(item,index) in penList" :key="index" class="content">
-                <div :class="{colorActive:item.showContent}"/>
-                <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-              </div>
-            </div>
-          </transition>
-        </div> -->
         <canvas
           id="icanvas"
           :width="767*percentHeight"
@@ -150,28 +138,20 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog
+    <dialog-pop
       v-if="showFeedDialog2"
       :title="$t('remotePatrol.feedbacks')"
-      :visible.sync="showFeedDialog2"
+      :append-to-body="true"
       :close-on-click-modal="false"
-      :width="860*percentHeight+'px'"
-      height="300px"
-      top="5%">
-      <div class="canvas-content" style="overflow:hidden;">
-        <hr class="dialog-hr">
+      :show-close="false"
+      :isWarning="true"
+      :dialogWidth="860*percentHeight+'px'"
+      :visible="showFeedDialog2"
+      @cancelHandler="showFeedDialog2 = false"
+      @confirmHandler="confirmAddFeedBack2"
+      >
+      <div class="canvas-content dialog-slot">
         <div class="feed-canvas-content" @mouseenter="showCancel" @mouseleave="hiddenCancel">
-          <div v-if="showPenBtn" id="iconR" class="icon-right">
-            <img :src="penBtnSrc" class="pen-btn" @click="showPenList">
-            <transition name="fadepen">
-              <div v-if="showPen" class="pen-content">
-                <div v-for="(item,index) in penList" :key="index" class="content">
-                  <div :class="{colorActive:item.showContent}"/>
-                  <div :id="item.id" class="color" @click="checkPen(item,index)"/>
-                </div>
-              </div>
-            </transition>
-          </div>
           <canvas
             id="icanvas"
             :width="520*percentHeight"
@@ -181,18 +161,18 @@
             @mousemove="mouseMoveAction($event)"
             @mouseleave="mouseLeaveAction($event)"/>
           <img id="imgTest" :src="imgSrc" style="display: none">
-          <div
-            v-if="showCancelContent"
-            :style="{'width':520*percentHeight+'px',
-                     'margin-left':47*percentHeight+'px'}"
-            class="cancel-content">
-            <div class="content" @click="cancelEditCanvas">
-              <img :src="clearIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.clear') }}</span>
+          <div class="cancel-content" :style="{'width': 520*percentHeight + 'px'}">
+            <div id="iconR" class="icon-right">
+              <img :src="penBtnSrc" class="pen-btn" @click="showPenList" style="margin-right: 40px">
+              <div class="pen-content">
+                <div v-for="(item,index) in penList"  style="margin-right: 15px" :style="{'background-color': item.id, 'border': item.showContent ? item.border : '3px solid transparent'}" :key="index" class="content" @click="checkPen(item,index)">
+                </div>
+              </div>
             </div>
-            <div class="content" @click="confirmEditCanvas">
-              <img :src="removeIconSrc" class="icon-clear" height="22px">
-              <span>{{ $t('remotePatrol.cancel') }}</span>
+            <div style="flex: 1"></div>
+            <div style="display: flex">
+              <img :src="clearIconSrc" class="icon-clear" height="36px" @click="cancelEditCanvas" style="margin-right: 80px">
+              <img :src="removeIconSrc" class="icon-clear" height="36px" @click="confirmEditCanvas">
             </div>
           </div>
         </div>
@@ -201,35 +181,57 @@
           <el-input
             v-model="eventName"
             size="mini"
-            class="name-input"
+            class="storevue-input-white"
             @input="eventNameChanged"
             @blur="notShowInputRuleTips('eventName')"/>
-          <span
-            v-if="eventNameRuletip"
-            class="rules"
-            style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
-          <span v-if="showEventNameInfo" class="error-class">{{ $t('storeMonitor.emptyTitle') }}</span>
+          <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
+          <span v-if="showEventNameInfo" class="error-class">{{ $t('remotePatrol.emptyTitle') }}</span>
           <span class="event-title">{{ $t('remotePatrol.description') }}</span>
+          <div v-for="(_item,_index) in sourceList" :key="_index" class="source-details">
+            <div class="flex-center">
+              <img
+                :src="deleteInspectIcon"
+                alt="delete"
+                @click="deleteItemResource(_index)"
+              />
+              <div
+                class="paper flex-center margin-bottom-sm inspect-text"
+              >
+                <div style="flex: 1; text-align: left; margin: 5px">
+                  {{ _item.src }}
+                </div>
+                <hr class="hr-vertical" />
+                <img
+                  :src="editInspectIcon"
+                  alt="edit"
+                  style="margin: 5px"
+                  @click="editItemResource(_index)"
+                />
+              </div>
+            </div>
+          </div>
+          <div style="position: relative">
           <el-input
-            :autosize="{ minRows: 4, maxRows:7}"
-            v-model="eventDes"
+            :autosize="{ minRows: 4, maxRows: 7 }"
+            v-model="inspectInput"
             :placeholder="$t('remotePatrol.descPlaceholder')"
             size="mini"
-            class="des-input"
+            class="storevue-textarea-white"
             type="textarea"
             resize="none"
             @input="eventDesChanged"
             @blur="notShowInputRuleTips('eventDes')"/>
-          <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+            <span v-if="eventDesRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.comentRuletip') }}</span>
+            <button
+              class="inspect-btn"
+              @click="submitItemResource()"
+            >
+              {{$t('remotePatrol.confirm')}}
+            </button>
+          </div>
         </div>
       </div>
-      <div slot="footer">
-        <el-button id="cancelBtn" size="mini" @click="showFeedDialog2 = false">{{ $t('remotePatrol.cancel') }}</el-button>
-        <el-button id="confirmBtn" size="mini" type="primary" @click="confirmAddFeedBack2">
-          {{ $t('remotePatrol.confirm') }}
-        </el-button>
-      </div>
-    </el-dialog>
+    </dialog-pop>
   </div>
 </template>
 
@@ -238,9 +240,11 @@ import i18n from '../lang';
 import { getBeseyeAccessToken, getPlaylistInfo, getStreamInfo } from '../api/beseye';
 import filterString from '../common/filterString';
 import { mapGetters } from 'vuex';
+import DialogPop from '@/components/DialogPop.vue';
 
 export default {
   name: 'BeseyeVue',
+  components: {DialogPop},
   props: {
     channelInfo: {
       type: Object
@@ -331,11 +335,16 @@ export default {
       removeIconSrc: require('../../static/img/cancel.png'),
       penBtnSrc: require('../../static/img/edit_btn.png'),
       snapshotIcon: require('../../static/img/snapshot.png'),
+      deleteInspectIcon: require('../../static/img/cross.png'),
+      editInspectIcon: require('../../static/img/pen.png'),
       flag: 0,
       eventName: '',
       eventNameRuletip: false,
       eventDesRuletip: false,
       eventDes: '',
+      inspectInput: '',
+      curEditIndex: -1,
+      sourceList: [],
       editCount: 0,
       currentStoreId: '',
       expireTime: 0,
@@ -415,6 +424,34 @@ export default {
   },
 
   methods: {
+    deleteItemResource (index) {
+      const self = this
+      this.sourceList = this.sourceList.filter((source, idx) => idx !== index)
+    },
+    editItemResource (index) {
+      this.curEditIndex = index
+      this.inspectInput = this.sourceList[index].src
+    },
+    submitItemResource() {
+      const self = this;
+      if (this.inspectInput.trim().length === 0) return
+      if (this.curEditIndex > -1) {
+        this.sourceList = this.sourceList.map((source, idx) => {
+          if (idx === self.curEditIndex) return {
+            ...source,
+            src: self.inspectInput,
+          }
+          else return { ...source }
+        })
+        this.curEditIndex = -1
+      } else {
+        this.sourceList.push({
+          mediaType: 3,
+          src: this.inspectInput,
+        })
+      }
+      this.inspectInput = ''
+    },
     showPenList() {
       const self = this;
       self.showPen = !self.showPen;
@@ -543,22 +580,20 @@ export default {
 
     hiddenCancel() {
       const self = this;
-      self.showCancelContent = false;
-      self.showPenBtn = false;
+      self.showCancelContent = true;
+      self.showPenBtn = true;
     },
 
     confirmAddFeedBack2() {
       const self = this;
       const src = self.canvasEl.toDataURL('image/jpeg');
-
       const obj = {
         eventName: self.eventName,
         eventDes: self.eventDes,
         src: src,
-        sourceList: []
+        sourceList: self.sourceList
       };
       if (self.eventName.trim().length === 0) {
-        // self.notify(self.$t('remotePatrol.emptyTitle'),'warning',3000);
         self.showEventNameInfo = true;
         return false;
       }
@@ -568,7 +603,7 @@ export default {
 
     captureSnapshot() {
       const self = this;
-      console.log(self.curGroupIndex);
+      self.sourceList = [];
       self.imageCanvasList = [];
       if (self.playBackState) {
         const videoArr = document.getElementsByTagName('video')[0].style.display;
@@ -685,7 +720,6 @@ export default {
     eventNameChanged(val) {
       const self = this;
       const content = filterString.standard(val, 50);
-      console.log(content);
       self.eventName = content;
       self.showEventNameInfo = false;
       const length = filterString.getContentLength(val);
@@ -699,7 +733,6 @@ export default {
     eventDesChanged(val) {
       const self = this;
       const content = filterString.all(val, 200);
-      console.log(content);
       self.eventDes = content;
       const length = filterString.getContentLength(val);
       if (length > 200) {
@@ -1873,7 +1906,7 @@ export default {
       bottom: 5px;
     }
     #icanvas {
-      @include point(margin-top, 15);
+      // @include point(margin-top, 15);
     }
     .dialog-img-content {
       @include point(padding, 15);
@@ -1904,12 +1937,12 @@ export default {
       text-align: left;
       margin-left: 1%;
       #icanvas {
-        margin-left: 20px;
+        // margin-left: 20px;
       }
       .cancel-content {
-        margin-left: 20px !important;
-        height: 30px;
-        line-height: 30px;
+        position: absolute;
+        bottom: 5px;
+        width: 100%;
       }
     }
     .event-content {
@@ -1948,83 +1981,34 @@ export default {
     }
     .cancel-content {
       position: absolute;
-      bottom: 2px;
-      @include point(height, 30);
-      @include point(line-height, 30);
-      background-color: rgba($color: $black, $alpha: 0.5);
+      bottom: 5px;
+      width: 100%;
+      padding: 0 90px;
+      display: flex;
+      align-items: center;
+      background-color: rgba(72, 72, 72, .65);
       z-index: 10;
-      overflow: hidden;
-      .content {
-        text-align: center;
-        float: left;
-        color: #fff;
+      height: 50px;
+      // overflow: hidden;
+      .content{
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
         cursor: pointer;
-        width: 49%;
-        &:first-child {
-          border-right: 1px solid #fff;
-        }
-        .icon-clear {
-          position: relative;
-          @include point(top, 3);
-          margin-right: 15px;
-        }
-        @media screen and(max-width: 1366px) {
-          span {
-            position: relative;
-            @include point(bottom, 4)
-          }
-        }
 
       }
     }
-    .icon-right {
-      width: 120px;
-      height: auto;
-      position: absolute;
-      right: 30px;
-      top: 5%;
-      text-align: center;
-      .pen-btn {
-        width: 40px;
-        margin-right: 20px;
-        margin-bottom: 20px;
+    .icon-right{
+      display: flex;
+
+      .pen-btn{
+        width: 36px;
+        height: 36px;
         cursor: pointer;
       }
-      .content {
-        width: 100%;
-        height: 40px;
-        position: relative;
-        .color {
-          width: 16px;
-          height: 16px;
-          border-radius: 8px;
-          position: absolute;
-          margin: auto 0;
-          top: 4px;
-          left: 34%;
-          margin-left: 4px;
-          z-index: 3;
-          cursor: pointer;
-        }
-        .colorActive {
-          background-color: #ddd;
-          border-radius: 50%;
-          width: 24px;
-          height: 24px;
-          position: absolute;
-          margin: auto 0;
-          left: 34%;
-          z-index: 3;
-        }
-        #white {
-          background-color: white;
-        }
-        #yellow {
-          background-color: yellow;
-        }
-        #red {
-          background-color: red;
-        }
+      .pen-content {
+        display: flex;
+        align-items: center;
       }
     }
   }
