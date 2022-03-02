@@ -1336,19 +1336,40 @@ export default {
         summaryTempArr.push(otherItems);
       }
       const seriesData = [];
+     
+      let totalItem = 0;
       summaryTempArr.forEach(item => {
         const obj = {};
         obj.name = item.groupName;
         obj.value = this.staticalConfig.qualified ? item.numOfUnqualifiedItems : item.numOfQualifiedItems;
+        totalItem += obj.value;
         obj.value > 0 && seriesData.push(obj);
       });
-      this.chartLabelArr = seriesData;
+      const lableData = [];
+      console.log("totalItem:",totalItem);
+      seriesData.forEach(item => {
+        const objl = {};
+        objl.name = item.name;
+        objl.value = ((item.value/totalItem)*100).toFixed(1);
+        console.log("totalItem:",objl.value);
+        objl.value > 0 && lableData.push(objl);
+      });
+      this.chartLabelArr = lableData;
       pieOptions.series[1].data = seriesData;
       return pieOptions;
     },
 
     getPieChartsOption() {
       const pieOption = {
+        tooltip: {
+          trigger: 'item',
+          color:'#9A9A9C',
+          formatter: '{b}-{d}%',
+          textStyle: {
+            align: 'left'
+          },
+          backgroundColor: 'rgba(30,34,52,0.75)',
+        },
         series: [
           {
             type: 'pie',
@@ -1371,15 +1392,11 @@ export default {
           {
             type: 'pie',
             radius: ['50%', '60%'],
-            emphasis: {
-              label: {
-                show: true
-              }
-            },
             itemStyle: {
               emphasis: {
                 borderWidth:10,
-                borderColor:'#EDF0F2'
+                borderColor:'#EDF0F2',
+                
               },
               normal: {
                 borderWidth:5,
@@ -1393,9 +1410,11 @@ export default {
             },
             label: {
               show: false,
-              fontSize: 14,
+              fontSize: 12,
               color: '#9A9A9C',
-              formatter: '{b}-{d}%'
+              formatter: '{b}-{d}%',
+              width:'50',
+              overflow:'break'
             },
             labelLine: {
               show: false,
@@ -1404,10 +1423,6 @@ export default {
               lineStyle: {
                 color: '#9A9A9C'
               }
-            },
-            tooltip: {
-              trigger: 'item',
-              formatter: '{b}-{d}%'
             },
             z: 1,
             data: []

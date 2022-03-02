@@ -39,6 +39,7 @@
             @changeInput="onChangeCity"/>
         <hr class="hr-vertical">
         <multi-select
+            class="store-group-select region"
             style="flex: 1"
             :selected="curStoreGroup"
             :prompt-msg="$t('remotePatrol.storeGroup')"
@@ -48,6 +49,7 @@
             @changeInput="onChangeStoreGroup"/>
         <hr class="hr-vertical">
         <multi-select
+            class="store-group-select region"
             style="flex: 1"
             :selected="curStoreType"
             :prompt-msg="$t('remotePatrol.storeType')"

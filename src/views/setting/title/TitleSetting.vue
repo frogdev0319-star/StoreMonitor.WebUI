@@ -351,7 +351,6 @@ export default {
 
   methods: {
     changeCurTemplate (val) {
-      console.log("changeCurTemplate:",val);
       this.templateRoleId =  val;
       if(!this.isCheckChanged){
         this.setDefaultValueOfRoleNameList();
@@ -377,7 +376,6 @@ export default {
         });
       }).then(res => {
         self.authorityInfoLists = res.data;
-        console.log("self.authorityInfoLists:",self.authorityInfoLists);
         this.infoForm.authorities.length > 0 ? self.getAvailableAuthority(this.infoForm.authorities) : this.getRequiredAuthority();
       }).catch(err => {
         console.log('TitleSetting-getAuthorityInfoList: ' + err);
@@ -423,10 +421,10 @@ export default {
     },
 
     getRequiredAuthority() {
-      this.roleNameList[1].children[2].checked = true;
+      /*this.roleNameList[1].children[2].checked = true;
       this.roleNameList[1].children[2].disabled = true;
       this.roleNameList[1].children[4].checked = true;
-      this.roleNameList[1].children[4].disabled = true;
+      this.roleNameList[1].children[4].disabled = true;*/
       this.setParentIfChecked();
     },
 

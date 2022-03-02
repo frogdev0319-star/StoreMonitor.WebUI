@@ -585,7 +585,7 @@ export default {
           audioObj.audioOftenText = '';
           audioObj.hasNotPlayAudio = true;
           self.audioList.push(audioObj);
-        } else if (item.mediaType === 3) {
+        } else if (item.mediaType === 3 && item.url!='N/A') {
           self.descriptionList.push({ description: item.url });
         } else {
           deviceList.forEach(_item => {

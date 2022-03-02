@@ -343,6 +343,7 @@
           </div>
         </dialog-pop>
         <div v-if="showGuide && inspectList.length > 0" class="guide-content">
+          
           <div class="guide-rside">
             <div class="num-content">
               <span class="guide-num">2</span>
@@ -498,25 +499,25 @@
                 class="iconfont icon-sousuo"
               />
             </el-input>
-            <div v-for="(_item,_index) in sheetName" :key="_index">
-                <template v-if="_item.isCategory">
-                  <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
-                  class="margin-bottom-top-sm"
-                  style="text-align: left; cursor: pointer"
-                        @click="changeSheet(_item,_index)">
-                    <span>{{ _item.label }}</span>
-                    <i class="el-icon-arrow-right icon"/>
-                  </div>
-                </template>
-                <template v-else>
-                  <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
-                  class="margin-bottom-top-sm"
-                  style="text-align: left; cursor: pointer"
-                        @click="getItemOfCategory(_item, _index)" >
-                    <span>{{ _item.label }}</span>
-                    <i class="el-icon-arrow-right icon"/>
-                  </div>
-                </template>
+            <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
+              <template v-if="_item.isCategory">
+                <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
+                class="margin-bottom-top-sm"
+                style="text-align: left; cursor: pointer"
+                      @click="changeSheet(_item,_index)">
+                  <span>{{ _item.label }}</span>
+                  <i class="el-icon-arrow-right icon"/>
+                </div>
+              </template>
+              <template v-else>
+                <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
+                class="margin-bottom-top-sm"
+                style="text-align: left; cursor: pointer"
+                      @click="getItemOfCategory(_item, _index)" >
+                  <span>{{ _item.label }}</span>
+                  <i class="el-icon-arrow-right icon"/>
+                </div>
+              </template>
               </div>
           </div>
           <div v-else class="flex-column padding" >
@@ -532,7 +533,7 @@
               />
             </el-input>
             <div class="flex" style="flex-wrap: wrap">
-              <div v-for="(_item,_index) in sheetName" :key="_index">
+              <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
                 <template v-if="_item.isCategory">
                   <div v-if="!showIgnoreItem ||_item.ignoreCount>0"  class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
                         @click="changeSheet(_item,_index)">
@@ -612,22 +613,6 @@
                     </div>
                   </div>
                   <div style="padding-left: calc(20/1920*100vw)">
-                    <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
-                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
-                        <div v-if="_item.mediaType==2" class="img-content">
-                          <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
-                          <el-image
-                            :src="_item.src"
-                            :style="{width: _item.width, height: _item.height}"
-                            :preview-src-list="getImgList({index: _index, sourceList: item.sourceList})"/>
-                        </div>
-                        <div v-if="_item.mediaType==1" class="img-content">
-                          <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
-                          <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
-                          <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
-                        </div>
-                      </div>
-                    </div>
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
@@ -651,6 +636,22 @@
                               @click="editItemResource({ item, index: _index })"
                             />
                           </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
+                      <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
+                        <div v-if="_item.mediaType==2" class="img-content">
+                          <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
+                          <el-image
+                            :src="_item.src"
+                            :style="{width: _item.width, height: _item.height}"
+                            :preview-src-list="getImgList({index: _index, sourceList: item.sourceList})"/>
+                        </div>
+                        <div v-if="_item.mediaType==1" class="img-content">
+                          <i class="el-icon-close icondelete" @click="deleteImg({item,index:_index})" />
+                          <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item:_item,index: _index})">
+                          <img :src="videoImgSrc" :height="_item.height" class="imgLittle">
                         </div>
                       </div>
                     </div>
@@ -706,17 +707,6 @@
                         {{$t('remotePatrol.delete')}}
                       </button>
                     </div>
-                    
-                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content">
-                      <el-image
-                        :src="item.sourceObj.src"
-                        :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
-                        :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
-                    </div>
-                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content">
-                      <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
-                      <img :src="videoImgSrc" class="imgLittle" height="100">
-                    </div>
                     <div class="flex-center"
                       v-for="(source, idx) in item.sourceList"
                       :key="idx">
@@ -739,6 +729,16 @@
                         @click="editFeedback(item, index)"
                         />
                       </div>
+                    </div>
+                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==2" class="img-content margin-bottom-sm">
+                      <el-image
+                        :src="item.sourceObj.src"
+                        :style="{width: item.sourceObj.width, height: item.sourceObj.height}"
+                        :preview-src-list="getImgList({index: 0, sourceList: [item.sourceObj]})"/>
+                    </div>
+                    <div v-if="item.sourceObj!=null&&item.sourceObj.mediaType==1" class="img-content margin-bottom-sm">
+                      <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo({item,index})">
+                      <img :src="videoImgSrc" class="imgLittle" height="100">
                     </div>
                     <hr v-if="index !== eventList.length" class="hr-horizontal">
                   </div>
@@ -1036,13 +1036,13 @@ export default {
       }
     },
     vendor(){
-      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
+      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor] || 'EzvizVideo';
     }
   },
 
   beforeRouteLeave(to, from, next) {
     const self = this;
-    const canLeave = !self.showGuide && self.$refs.vendorVideo.editCount !== 0;
+    const canLeave = !self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0;
     if (canLeave && to.name !== 'confirmSum') {
       self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
         confirmButtonText: self.$t('remotePatrol.confirm'),
@@ -1156,6 +1156,7 @@ export default {
 
   methods: {
     changeStore_(_item) {
+      console.log(_item)
       const self = this;
       self.patrolstore = '';
       self.curSheetIndex = 0;
@@ -1181,8 +1182,8 @@ export default {
       _item.isActive = true;
       self.showStoreUp = true;
 
-      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
-      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
+      self.$refs.vendorVideo && (self.$refs.vendorVideo.editCount = 0);
+      self.$refs.vendorVideo && self.$refs.vendorVideo.stopVideoPlay();
       self.showError = false;
       self.curDeviceId = -1;
       self.showFeedBack = false;
@@ -1438,7 +1439,7 @@ export default {
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
       });
-      self.$refs.vendorVideo.editCount++;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount++;
       if (e === 0) {
         if (item.groupType === 2) {
           if (item.itemScore < 0) {
@@ -1632,7 +1633,7 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      if ( (!this.showGuide && this.$refs.vendorVideo.editCount != 0)
+      if ( (!this.showGuide && this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0)
           || (this.$store.getters.PatrolHistory != null) ) {
         this.changeStoreObj.dialogCosed = true;
       } else {
@@ -2022,7 +2023,7 @@ export default {
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
 
-      self.$refs.vendorVideo.editCount++;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount++;
       self.curItemIndex = index;
       self.curItem = item;
       if (item.deviceId === -1) {
@@ -2034,7 +2035,7 @@ export default {
     },
     CancleIgnoreItem({item, index}) {
       const self = this;
-      self.$refs.vendorVideo.editCount--;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount--;
       self.curItemIndex = index;
       self.curItem = item;
       self.cancleIgnore();
@@ -2109,7 +2110,7 @@ export default {
     leaveDialog() {
       const self = this;
       self.leaveObj.dialogCosed = false;
-      self.$refs.vendorVideo.editCount = 0;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount = 0;
     },
     cancelLeave() {
       const self = this;
@@ -2433,7 +2434,7 @@ export default {
       const self = this;
       self.changeInspectObj.dialogCosed = false;
       self.changeInspectList(self.beforepatrolstore);
-      self.$refs.vendorVideo.editCount = 0;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount = 0;
     },
     canceldChangeInspect() {
       const self = this;
@@ -2552,13 +2553,13 @@ export default {
         }
       });
       self.$nextTick(() => {
-        self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+        if (self.$refs.vendorVideo) self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
       });
     },
     changeInspect(val) {
-      console.log(val)
       const self = this;
-      if ( (!self.showGuide && self.$refs.vendorVideo.editCount !== 0)
+      console.log(self.$refs.vendorVideo.editCount)
+      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0)
           ||(self.$store.getters.PatrolHistory != null) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
@@ -2568,7 +2569,7 @@ export default {
     },
     changeInspectList(val) {
       const self = this;
-      if (!self.showGuide) {
+      if (!self.showGuide && self.$refs.vendorVideo) {
         self.$refs.vendorVideo.editCount = 0;
         self.$refs.vendorVideo.stopVideoPlay();
       };
@@ -2753,6 +2754,8 @@ export default {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
           }
+          
+        console.log(this.sheetName)
         }
       })
     },
@@ -2949,7 +2952,7 @@ export default {
       self.curStoreIndex = _index;
       self.curStoreItem = _item;
       self.deviceList = _item.device;
-      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
+      if ( (!self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount != 0)
           || (self.$store.getters.PatrolHistory != null) ) {
         self.changeStoreObj.dialogCosed = true;
       } else {

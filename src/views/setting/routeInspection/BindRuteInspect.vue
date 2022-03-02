@@ -1,9 +1,34 @@
 <template>
   <div class="el-bind-device padding">
+    <div>
     <store-filter
-      type="bindroute"
-      @storeChange = "onStoreChange"
-    />
+      :cached-params="searchParams"
+      :is-patrol = "false"
+      :show-store-selected="false"
+      :emit-changed="true"
+      @emit-store-list = onStoreChange
+    >
+      <template v-slot:bindReport>
+        <div class="last-row" >
+        <el-input
+          :placeholder= "$t('insSettingView.searchPlaceholder')"
+          v-model="serachVale"
+          style="width: 200px"
+          size="mini"
+          clearable
+          class="storevue-input paper"
+          @keyup.enter.native="searchStoreInput"
+          @clear="searchStoreInput">
+          <i
+            slot="prefix"
+            class="iconfont icon-sousuo"
+            style="position:relative;top:6px;left:6px;font-size:18px;"
+            @click="searchStoreInput"/>
+        </el-input>
+        </div>
+      </template>
+    </store-filter>
+    </div>
     <div
       v-loading="loading"
       class="paper padding"
@@ -62,7 +87,7 @@ import { getInspectBindList, bindInspectWithStore } from '@/api/inspect';
 import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import util from '@/common/util';
-import StoreFilter from '@/components/StoreFilter_';
+import StoreFilter from '@/components/StoreFilter';
 
 export default {
   name: 'BindRuteInspect',
@@ -135,6 +160,7 @@ export default {
       self.totalCount = data.data.length;
       if (data.errCode === 0) {
         self.tempStoreData = data.data;
+        self.getStoreByCity(data.data)
       }
     },
 
@@ -391,10 +417,11 @@ export default {
       self.tabName = nameLang;
     },
 
-    onStoreChange(storeObj) {
-      this.storeStr = storeObj.storeStr;
-      this.storeFilterObj = storeObj;
-      this.curStore = storeObj.filterStoreIds;
+    onStoreChange(filterStoreIds) {
+      //this.storeStr = storeObj.storeStr;
+      //this.storeFilterObj = storeObj;
+      console.log("onStoreChange:",filterStoreIds);
+      this.curStore = filterStoreIds;
       this.searchStore();
     }
 
@@ -501,7 +528,16 @@ $h1:#292e36;
         font-size: calc(16/1920*100vw);
       }
     }
-    
+    .last-row{
+        display: flex;
+        flex-direction: row;
+        width:100%;
+        height: 36px;
+        align-items: flex-start;
+        align-items:center;
+        justify-content: space-between;
+        padding-right: calc(180/1920*100VW);
+    }
     .el-bind-content{
         margin-top: 15px;
         color: $black;

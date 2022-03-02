@@ -65,7 +65,7 @@
     </div>
     
   </div>
-  <div class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
+  <div v-if="showStoreSelected" class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
     <div class="paper shadow-light favorite"
       v-if="showFavorite"
       @click="changeFavorite"
@@ -97,6 +97,9 @@
     
     <div v-if="!multiStore" class="spacer"></div>
     <slot name="others"></slot>
+  </div>
+  <div v-if="!showStoreSelected" class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
+    <slot name="bindReport"></slot>
   </div>
   </div>
 </template>
@@ -143,6 +146,14 @@ export default {
     showFavorite: {
       type: Boolean,
       default: false
+    },
+    showStoreSelected:{
+      type: Boolean,
+      default: true
+    },
+    emitChanged:{
+      type:Boolean,
+      default:false
     }
   },
 
@@ -480,7 +491,9 @@ export default {
       this.getStoreGroupString();
       this.getStoreTypeString();
       this.emitParams();
-      //this.$emit('emitStoreList', this.storeDataList);
+      if(this.emitChanged){
+        this.$emit('emitStoreList', this.filterStoreIds);
+      }
     },
 
     getStoreGroupString() {
@@ -605,7 +618,7 @@ export default {
     clearStoreInfo() {
       const self = this;
       self.curStore = [];
-      if (this.multiStore) {
+      if (this.multiStore && this.showStoreSelected) {
         self.$refs.multiSelect.selectedArray = [];
         self.$refs.multiSelect.input = '';
       }
