@@ -6,7 +6,7 @@
       :is-patrol = "false"
       :show-store-selected="false"
       :emit-changed="true"
-      @emit-store-list = onStoreChange
+      @emitStoreChange = onStoreChange
     >
       <template v-slot:bindReport>
         <div class="last-row" >
@@ -420,7 +420,7 @@ export default {
     onStoreChange(filterStoreIds) {
       //this.storeStr = storeObj.storeStr;
       //this.storeFilterObj = storeObj;
-      console.log("onStoreChange:",filterStoreIds);
+      //console.log("onStoreChange:",filterStoreIds);
       this.curStore = filterStoreIds;
       this.searchStore();
     }
