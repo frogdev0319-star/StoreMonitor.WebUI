@@ -518,9 +518,10 @@ export default {
     },
 
     rowClickItem(row) {
-      //console.log("rowClickItem",row);
+      console.log("rowClickItem",row);
       if(!this.stopRowClick){
         this.event = row;
+        console.log("rowClickItem:",this.event);
         sessionStorage.setItem('event', JSON.stringify(this.event));
         sessionStorage.setItem('queryparams', JSON.stringify(this.params));
         this.$router.push({ name: 'eventDetails', params: { event: this.event }});
@@ -797,6 +798,7 @@ export default {
          end = self.searchParams.endTs;
       }
       console.log("self.params:",self.params);
+      console.log("self.storeFilterObj:",self.storeFilterObj);
       const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
