@@ -498,25 +498,25 @@
                 class="iconfont icon-sousuo"
               />
             </el-input>
-            <div v-for="(_item,_index) in sheetName" :key="_index">
-                <template v-if="_item.isCategory">
-                  <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
-                  class="margin-bottom-top-sm"
-                  style="text-align: left; cursor: pointer"
-                        @click="changeSheet(_item,_index)">
-                    <span>{{ _item.label }}</span>
-                    <i class="el-icon-arrow-right icon"/>
-                  </div>
-                </template>
-                <template v-else>
-                  <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
-                  class="margin-bottom-top-sm"
-                  style="text-align: left; cursor: pointer"
-                        @click="getItemOfCategory(_item, _index)" >
-                    <span>{{ _item.label }}</span>
-                    <i class="el-icon-arrow-right icon"/>
-                  </div>
-                </template>
+            <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
+              <template v-if="_item.isCategory">
+                <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
+                class="margin-bottom-top-sm"
+                style="text-align: left; cursor: pointer"
+                      @click="changeSheet(_item,_index)">
+                  <span>{{ _item.label }}</span>
+                  <i class="el-icon-arrow-right icon"/>
+                </div>
+              </template>
+              <template v-else>
+                <div :style="_item.isClick?{color: '#006ab7'}:{color: '#69727c'}"
+                class="margin-bottom-top-sm"
+                style="text-align: left; cursor: pointer"
+                      @click="getItemOfCategory(_item, _index)" >
+                  <span>{{ _item.label }}</span>
+                  <i class="el-icon-arrow-right icon"/>
+                </div>
+              </template>
               </div>
           </div>
           <div v-else class="flex-column padding" >
@@ -532,7 +532,7 @@
               />
             </el-input>
             <div class="flex" style="flex-wrap: wrap">
-              <div v-for="(_item,_index) in sheetName" :key="_index">
+              <div v-for="(_item,_index) in sheetName.filter(sheet => sheet.inspectList && sheet.inspectList.some(inspect => inspect.items && inspect.items.some(item => item.subject.indexOf(searchItemValue) > -1)))" :key="_index">
                 <template v-if="_item.isCategory">
                   <div v-if="!showIgnoreItem ||_item.ignoreCount>0"  class="group_content" :class="_item.isClick?'noraml-color':'noraml-groupColor'"
                         @click="changeSheet(_item,_index)">
@@ -2752,6 +2752,8 @@ export default {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
           }
+          
+        console.log(this.sheetName)
         }
       })
     },
