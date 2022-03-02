@@ -1156,7 +1156,6 @@ export default {
 
   methods: {
     changeStore_(_item) {
-      console.log(_item)
       const self = this;
       self.patrolstore = '';
       self.curSheetIndex = 0;
@@ -1181,7 +1180,6 @@ export default {
       });
       _item.isActive = true;
       self.showStoreUp = true;
-
       self.$refs.vendorVideo && (self.$refs.vendorVideo.editCount = 0);
       self.$refs.vendorVideo && self.$refs.vendorVideo.stopVideoPlay();
       self.showError = false;
@@ -1633,8 +1631,7 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      if ( (!this.showGuide && this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0)
-          || (this.$store.getters.PatrolHistory != null) ) {
+      if ((this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0)) {
         this.changeStoreObj.dialogCosed = true;
       } else {
         if (storeItem) this.changeStore_(storeItem)
@@ -2558,9 +2555,7 @@ export default {
     },
     changeInspect(val) {
       const self = this;
-      console.log(self.$refs.vendorVideo.editCount)
-      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0)
-          ||(self.$store.getters.PatrolHistory != null) ) {
+      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
       } else {
