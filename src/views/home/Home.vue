@@ -1085,10 +1085,25 @@ export default {
   }
   
 }
-.el-menu--popup{
-    background-color: #e4f3fd !important;
-    .el-submenu{
-    /deep/.el-submenu__title {
+.el-menu--vertical .el-menu--popup .el-menu-item {
+    &.is-active {
+      background-color: #f2f9fe;
+      .item-icon {
+        background-color:#006ab7;
+      }
+      span {
+        color: #006ab7;
+      }
+    }
+    &:hover {
+      background-color: #e4f3fd !important;
+      span {
+        color: #006ab7 !important;
+      }
+    }
+  }
+  .el-menu--vertical .el-menu--popup .el-submenu{
+    .el-submenu__title {
       &:hover {
         background-color: #e4f3fd !important;
         span {
@@ -1096,6 +1111,11 @@ export default {
         }
       }
     }
+    /deep/
+    .el-submenu__title {
+      &:hover {
+          background-color: #e4f3fd !important;
+      }
     }
   }
 </style>
