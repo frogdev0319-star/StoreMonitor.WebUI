@@ -2555,6 +2555,8 @@ export default {
     },
     changeInspect(val) {
       const self = this;
+      console.log(self.$refs.vendorVideo.editCount)
+      // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
       if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;

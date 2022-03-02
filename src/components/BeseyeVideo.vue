@@ -627,7 +627,7 @@ export default {
     onPlayerPlaying(e) {
       console.log('video is playing');
       this.paused = false;
-      this.editCount++;
+      // this.editCount++;
       this.showModelContent = true;
       this.isLoading = false;
       // if (this.playBack) {
