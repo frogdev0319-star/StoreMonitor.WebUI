@@ -343,6 +343,7 @@
           </div>
         </dialog-pop>
         <div v-if="showGuide && inspectList.length > 0" class="guide-content">
+          
           <div class="guide-rside">
             <div class="num-content">
               <span class="guide-num">2</span>
@@ -1035,13 +1036,13 @@ export default {
       }
     },
     vendor(){
-      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor];
+      this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor] || 'EzvizVideo';
     }
   },
 
   beforeRouteLeave(to, from, next) {
     const self = this;
-    const canLeave = !self.showGuide && self.$refs.vendorVideo.editCount !== 0;
+    const canLeave = !self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0;
     if (canLeave && to.name !== 'confirmSum') {
       self.$confirm(self.$t('remotePatrol.changPageInfo'), self.$t('remotePatrol.prompt'), {
         confirmButtonText: self.$t('remotePatrol.confirm'),
@@ -1155,6 +1156,7 @@ export default {
 
   methods: {
     changeStore_(_item) {
+      console.log(_item)
       const self = this;
       self.patrolstore = '';
       self.curSheetIndex = 0;
@@ -1180,8 +1182,8 @@ export default {
       _item.isActive = true;
       self.showStoreUp = true;
 
-      !self.showGuide && (self.$refs.vendorVideo.editCount = 0);
-      !self.showGuide && self.$refs.vendorVideo.stopVideoPlay();
+      !self.showGuide && self.$refs.vendorVideo && (self.$refs.vendorVideo.editCount = 0);
+      !self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.stopVideoPlay();
       self.showError = false;
       self.curDeviceId = -1;
       self.showFeedBack = false;
@@ -1437,7 +1439,7 @@ export default {
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
       });
-      self.$refs.vendorVideo.editCount++;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount++;
       if (e === 0) {
         if (item.groupType === 2) {
           if (item.itemScore < 0) {
@@ -1631,7 +1633,7 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      if ( (!this.showGuide && this.$refs.vendorVideo.editCount != 0)
+      if ( (!this.showGuide && this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0)
           || (this.$store.getters.PatrolHistory != null) ) {
         this.changeStoreObj.dialogCosed = true;
       } else {
@@ -2021,7 +2023,7 @@ export default {
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
         self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
 
-      self.$refs.vendorVideo.editCount++;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount++;
       self.curItemIndex = index;
       self.curItem = item;
       if (item.deviceId === -1) {
@@ -2033,7 +2035,7 @@ export default {
     },
     CancleIgnoreItem({item, index}) {
       const self = this;
-      self.$refs.vendorVideo.editCount--;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount--;
       self.curItemIndex = index;
       self.curItem = item;
       self.cancleIgnore();
@@ -2108,7 +2110,7 @@ export default {
     leaveDialog() {
       const self = this;
       self.leaveObj.dialogCosed = false;
-      self.$refs.vendorVideo.editCount = 0;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount = 0;
     },
     cancelLeave() {
       const self = this;
@@ -2432,7 +2434,7 @@ export default {
       const self = this;
       self.changeInspectObj.dialogCosed = false;
       self.changeInspectList(self.beforepatrolstore);
-      self.$refs.vendorVideo.editCount = 0;
+      if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount = 0;
     },
     canceldChangeInspect() {
       const self = this;
@@ -2551,13 +2553,13 @@ export default {
         }
       });
       self.$nextTick(() => {
-        self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
+        if (self.$refs.vendorVideo) self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
       });
     },
     changeInspect(val) {
       console.log(val)
       const self = this;
-      if ( (!self.showGuide && self.$refs.vendorVideo.editCount !== 0)
+      if ( (!self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount !== 0)
           ||(self.$store.getters.PatrolHistory != null) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
@@ -2567,7 +2569,7 @@ export default {
     },
     changeInspectList(val) {
       const self = this;
-      if (!self.showGuide) {
+      if (!self.showGuide && self.$refs.vendorVideo) {
         self.$refs.vendorVideo.editCount = 0;
         self.$refs.vendorVideo.stopVideoPlay();
       };
@@ -2950,7 +2952,7 @@ export default {
       self.curStoreIndex = _index;
       self.curStoreItem = _item;
       self.deviceList = _item.device;
-      if ( (!self.showGuide && self.$refs.vendorVideo.editCount != 0)
+      if ( (!self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount != 0)
           || (self.$store.getters.PatrolHistory != null) ) {
         self.changeStoreObj.dialogCosed = true;
       } else {
