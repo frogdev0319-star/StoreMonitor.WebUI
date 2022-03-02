@@ -364,7 +364,7 @@ export default {
         { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
       ],
-      curAppraise: -1,
+      curAppraise: -2,
       appraiseList: [
         { 'status': -1, 'label': this.$t('remotePatrol.all') },
         { 'status': 0, 'label': this.$t('remotePatrol.dangerous') }, //poor
@@ -843,14 +843,15 @@ export default {
           console.log("Jump to ")
           this.params.jump = false;
           this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
-          console.log(this.dateValue)
-       //   this.saveSearchParams();
+          this.saveSearchParams();
+          this.searchData();
         }
         
       } else {
         this.params.filter = { page: 0, size: this.sizeNum };
         this.params.clause = { storeId: [] };
         this.ifGetParamsFromCash = false;
+        this.curAppraise =-1;
         this.searchParams = {};
       }
       if(!this.params.beginTs)this.params.beginTs = this.dateValue[0].valueOf();

@@ -47,7 +47,7 @@
           ref="vendorVideo"
           :store-id="store.storeId"
           :channel-info="channel"
-          :source-list-length= "sourceList.length"
+          :source-list-length= "sourceList.filter((s, idx) =>s.mediaType==2 ).length"
           :is-store-monitor="true"
           :play-back="playBackState"
           :is-event="false"

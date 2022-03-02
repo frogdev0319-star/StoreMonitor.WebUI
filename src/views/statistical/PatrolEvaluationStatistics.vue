@@ -1280,6 +1280,9 @@ export default {
         else if(e.prop =='numOfDangerous'){
           type=0;
         }
+        else{
+          type=-1;
+        }
       this.routeToInpectReportWithParam(e,type);
 
     },
@@ -1311,7 +1314,7 @@ export default {
       }
       else{
        
-        this.routeToInpectReportWithParam(e);
+        this.routeToInpectReportWithParam(e,-1);
       }
       
 
@@ -1331,19 +1334,37 @@ export default {
           });
       }
       else{
-        this.routeToInpectReportWithParam(e);
+        this.routeToInpectReportWithParam(e,-1);
       }
 
     },
     routeToInspectionReport(){
+       let searchParams =   JSON.parse(JSON.stringify(this.params))
+      searchParams.jump = true;
+      searchParams.clause ={storeId:searchParams.curStore};
+      searchParams.filterStoreIds=searchParams.curStore
+      searchParams.storeIds=searchParams.curStore
+      searchParams.filterStoreIds=searchParams.curStore;
+      searchParams.curStores =searchParams.curStore;;
+      searchParams.curAppraise = -1;
+      searchParams.curReportType = -1;
+      searchParams.clause.status = -1;
+
+      searchParams.inspectTagId =  searchParams.inspectId;
+      searchParams.beginTs  = this.params.beginTs;
+      searchParams.endTs  = this.params.endTs;
+      searchParams.filter ={ page: 0, size: 12 };
+ 
+      console.log(searchParams)
       const searchParamsObj = {
         path: 'inspectReport',
-        params: this.params
+        params: searchParams
       };
-      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      SearchConditionUtil.saveSearchCondition(searchParamsObj);
+      //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
        this.$router.push({
          path: '/report',
-      });
+       });
 
     },
     handlePageAndSizeChangePart1(e){
