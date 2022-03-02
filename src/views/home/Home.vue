@@ -1062,9 +1062,9 @@ export default {
       }
       
       &:hover {
-        background-color: #e4f3fd;
+        background-color: #e4f3fd !important;
         span {
-          color: #006ab7;
+          color: #006ab7 !important;
         }
         .menu_img {
           display: none;
@@ -1082,6 +1082,19 @@ export default {
   }
   
 }
+.el-menu--popup{
+    background-color: #e4f3fd !important;
+    .el-submenu{
+    /deep/.el-submenu__title {
+      &:hover {
+        background-color: #e4f3fd !important;
+        span {
+          color: #006ab7 !important;
+        }
+      }
+    }
+    }
+  }
 </style>
 <style lang="scss" scoped>
 $border: #393b4c;

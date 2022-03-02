@@ -57,7 +57,7 @@
     </div>
     <div id="el-containter" class="flex-column spacer" style="margin-left:0px">
       <div class="report-header">
-        <div class="flex-center" style="padding-top: 0;margin-left:-10px">
+        <div class="flex-center" style="padding-top: 0;">
           <date-time-selector
            class="time-selector"
            @change="dateChange" 
