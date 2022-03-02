@@ -124,7 +124,7 @@
             <div class="spacer"></div>
             <el-button
               v-loading.fullscreen.lock="fullscreenLoading"
-              :disabled="sourceList.length === 0"
+              :disabled="sourceList.filter((s, idx) =>s.mediaType==2 ).length=== 0 && eventName.length>0"
               class="storevue-button-filled"
               size="mini"
               type="primary"
@@ -445,7 +445,7 @@ export default {
       accountId: '',
       userId: '',
       changeStoreObj: {
-        title: this.$t('remotePatrol.confirm'),
+        title: "DSDFSDFDF",
         showInfo: this.$t('remotePatrol.switchInfo'),
         isWarning: true,
         dialogCosed: false
@@ -492,6 +492,7 @@ export default {
       isFullScreenMode: false,
       problemTab: 0,
       curSelStoreId: '',
+      tempCurSelStoreId:'',
     };
   },
 
@@ -633,8 +634,19 @@ export default {
       this.eventDes= this.sourceList[index].src
     },
     getCurStore(storeData) {
-      this.curSelStoreId = storeData.curSelectedStore
-      this.getInitStoreData()
+      const self =this
+      this.tempCurSelStoreId = storeData.curSelectedStore;
+      if (self.$refs.vendorVideo.playState || self.eventName.length !== 0|| self.sourceList.length>0 ){
+        self.changeStoreObj.dialogCosed = true;
+      } else {
+         self.curSelStoreId = storeData.curSelectedStore
+         self.store = {};
+         self.channel =null;
+         self.clearTheEventInfo()
+         self.getInitStoreData()
+      }
+     // this.curSelStoreId = storeData.curSelectedStore
+     // this.getInitStoreData()
     },
     changeBrand() {
       const self = this;
@@ -1292,10 +1304,6 @@ export default {
         self.showEventNameInfo = true;
         return false;
       }
-      if (self.corEvent && self.eventDes.trim().length === 0) {
-        self.showEventDescInfo = true;
-        return false;
-      }
       await self.getStorageInfo();
       const tempFileUrl = await self.getAttachmentFileUrl();
       self.fullscreenLoading = true;
@@ -1403,6 +1411,7 @@ export default {
 
     clearTheEventInfo() {
       const self = this;
+      self.$refs.vendorVideo.stopVideoPlay();
       self.evBtns[0].isActive = true;
       self.evBtns[1].isActive = false;
       self.eventName = '';
@@ -1503,14 +1512,14 @@ export default {
     },
 
     changeStoreDialog() {
+      console.log("Change Store Dialog")
       const self = this;
       self.changeStoreObj.dialogCosed = false;
-      self.changeStore(
-        self.curTabItem,
-        self.curTabIndex,
-        self.curStoreItem,
-        self.curStoreIndex
-      );
+      self.curSelStoreId = self.tempCurSelStoreId;
+      self.store = {};
+      self.channel =null;
+      self.clearTheEventInfo()
+      self.getInitStoreData()
     },
 
     canceldChangeStore() {
@@ -1787,18 +1796,12 @@ export default {
       self.eventDes = content;
       self.showEventDescInfo = false;
       const length = filterString.getContentLength(val);
-      if (length > 200) {
-        this.eventDesRuletip = true;
-      } else {
-        this.eventDesRuletip = false;
-      }
+ 
     },
 
     notShowInputRuleTips(e) {
       if (e === 'eventName') {
         this.eventNameRuletip = false;
-      } else if (e === 'eventDes') {
-        this.eventDesRuletip = false;
       }
     },
 

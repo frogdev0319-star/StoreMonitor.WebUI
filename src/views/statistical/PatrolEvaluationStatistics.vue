@@ -1219,16 +1219,22 @@ export default {
   },
 
   methods: {
-    maxLabel(s){  
-      if(s.length>7){
-        return s.substring(0,7)+'...'
-      }
-      else{
-        return s;
-
-      }
-     
-    //  return "TEST";
+    maxLabel(val) {
+        var returnValue = '';
+        var byteValLen = 0;
+        for (var i = 0; i < val.length; i++) {
+            if (val[i].match(/[^\x00-\xff]/ig) != null)
+                byteValLen += 2;
+            else
+                byteValLen += 1;
+            if (byteValLen > 10)
+            {
+                returnValue += '...';
+                break;
+            }
+            returnValue += val[i];
+        }
+        return returnValue;
     },
     routeToInpectReportWithParam(e,type){
     // const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
@@ -2148,6 +2154,9 @@ export default {
       }
       else if(this.part1.compareType=='position'){
         let users = [];
+        console.log("Part1 User")
+        console.log(this.part1.originArray)
+        console.log(self.part1.compareIds)
          this.part1.originArray.forEach(function(item){
            if(self.part1.compareIds.indexOf(item.value)>=0)
             users =  users.concat(item.contents);
@@ -2158,8 +2167,10 @@ export default {
       }
       
         params.filter = { page: 0, size: params.groupIds.length };
+        
+        console.log(params)
         if (params.storeIds.length === 0) {
-              ;
+;
               return false;
         }
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);
