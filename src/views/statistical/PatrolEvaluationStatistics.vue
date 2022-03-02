@@ -1230,7 +1230,7 @@ export default {
      
     //  return "TEST";
     },
-    routeToInpectReportWithParam(e){
+    routeToInpectReportWithParam(e,type){
     // const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
       let searchParams =   JSON.parse(JSON.stringify(this.params))
       searchParams.jump = true;
@@ -1242,6 +1242,10 @@ export default {
       searchParams.filterStoreIds=[e.row.innerId]
       searchParams.curAppraise = -1;
       searchParams.curReportType = -1;
+      if(type!=undefined){
+        searchParams.curAppraise =type;
+        searchParams.clause.status = type;
+      }
       searchParams.inspectTagId =  searchParams.inspectId;
       searchParams.beginTs  = this.params.beginTs;
       searchParams.endTs  = this.params.endTs;
@@ -1259,7 +1263,18 @@ export default {
        });
     },
     onEvenListNumClickPart1(e){
-      this.routeToInpectReportWithParam(e);
+       console.log(e.prop)
+        let type = -1;
+        if(e.prop =='numOfQualified'){
+          type=2;
+        }
+        else if(e.prop =='numOfImproved'){
+          type=1
+        }
+        else if(e.prop =='numOfDangerous'){
+          type=0;
+        }
+      this.routeToInpectReportWithParam(e,type);
 
     },
      onEvenListNumClickPart2(e){
@@ -1289,6 +1304,7 @@ export default {
           });
       }
       else{
+       
         this.routeToInpectReportWithParam(e);
       }
       
@@ -1623,6 +1639,9 @@ export default {
     },
 
     getInspectStatsOverviewWithRegion(params) {
+         if(params.filter.size==0){
+           params.filter.size==10;
+         }
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewWithRegionV2(params).then(res => {
           resolve(res);
@@ -1634,6 +1653,10 @@ export default {
     },
     
        getInspectStatsOverviewWithGroup(params) {
+         console.log("getInspectStatsOverviewWithGroup")
+         if(params.filter.size==0){
+           return;
+         }
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewWithGroup(params).then(res => {
           resolve(res);
@@ -1644,6 +1667,9 @@ export default {
       });
     },
    getInspectReulstStatsOverview(params) {
+        if(params.filter.size==0){
+           params.filter.size==10;
+         }
       return new Promise((resolve, reject) => {
         getInspectStatsOverviewV2(params).then(res => {
           resolve(res);
@@ -1654,6 +1680,9 @@ export default {
       });
     },
     getInspectResultOverRegion(params) {
+         if(params.filter.size==0){
+           params.filter.size==10;
+         }
       return new Promise((resolve, reject) => {
         getInspectStatsOverRegion(params).then(res => {
           resolve(res);
