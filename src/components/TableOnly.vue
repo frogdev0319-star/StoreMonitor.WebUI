@@ -1,10 +1,5 @@
 <template>
   <div :class="tableThemes=='grey' ? 'table':'table-white'">
-    <el-scrollbar
-            ref="scroll"
-            id="el-talescrollbar" 
-            wrap-class="el-scrollbar__wrap"
-          >
     <el-table
       ref="tablePagination"
       :class="tableThemes=='grey' ? 'tbl-style':'tbl-style-white'"
@@ -160,7 +155,6 @@
         </div>
       </div>
     </el-table>
-    </el-scrollbar>
   </div>
 </template>
 
