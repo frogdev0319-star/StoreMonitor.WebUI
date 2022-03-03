@@ -2425,7 +2425,8 @@ export default {
     changeStoreDialog(val) {
       const self = this;
       self.changeStoreObj.dialogCosed = false;
-      self.changeStore(self.curTabItem, self.curTabIndex, self.curStoreItem, self.curStoreIndex);
+      const storeItem = this.storeList.find(store => store.storeId === self.curSelStoreId)
+      if (storeItem) self.changeStore_(storeItem)
     },
     changeInspectDialog() {
       const self = this;
