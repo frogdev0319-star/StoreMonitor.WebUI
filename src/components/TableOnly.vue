@@ -1,5 +1,10 @@
 <template>
   <div :class="tableThemes=='grey' ? 'table':'table-white'">
+    <el-scrollbar
+            ref="scroll"
+            id="el-talescrollbar" 
+            wrap-class="el-scrollbar__wrap"
+          >
     <el-table
       ref="tablePagination"
       :class="tableThemes=='grey' ? 'tbl-style':'tbl-style-white'"
@@ -51,7 +56,12 @@
             <i v-if="row.id == expands" class="el-icon-arrow-up" style="color:#2c90d9;cursor:pointer;" @click="expandChange(row)"></i>
           </template>
           <template v-else-if="_item.isCellClick">
-            <span style="cursor:pointer;color:#006ab7;font-size:15px;" @click="cellClick(row,_item.prop)">{{ row[_item.prop]}}</span>
+            <div v-if="_item.customIcon" >
+              <img :src="_item.src" style="width:24px;height:24px;cursor:pointer;" @click="cellClick(row,_item.prop)">
+            </div>
+            <div v-else>
+              <span style="cursor:pointer;color:#006ab7;font-size:15px;" @click="cellClick(row,_item.prop)">{{ row[_item.prop]}}</span>
+            </div>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
           <template v-else>
@@ -150,6 +160,7 @@
         </div>
       </div>
     </el-table>
+    </el-scrollbar>
   </div>
 </template>
 
@@ -540,6 +551,11 @@ export default {
       background-color: #fff;
     }
   }
-  
+  #el-tablescrollbar {
+  height: calc(100% - 225px);
+}
+/deep/ #el-tablescrollbar .el-scrollbar__wrap {
+  overflow-x: auto;
+}
 </style>
 
