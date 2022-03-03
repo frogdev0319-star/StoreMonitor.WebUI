@@ -569,7 +569,7 @@
                         :style="item.checked?{'color':'#006ab7'}:{'color': '#484848'}"
                         class="spacer font-15"
                         style="text-align: left; font-weight: 500"
-                        @click="clickItem({item,index})">
+                        @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
                         {{ item.subject }}
                       </div>
                       <div v-if="item.itemType === 0">
@@ -1436,6 +1436,10 @@ export default {
 
     checkScore({item, itemDS, e}) {
       const self = this;
+      console.log("Check Score")
+      console.log(self.curSheetIndex, self.curGroupIndex,self.curItemIndex)
+      console.log(item);
+      console.log(itemDS)
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
       });
@@ -1463,6 +1467,7 @@ export default {
           })
         })
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
+          console.log("Find")
           self.sheetName[self.curSheetIndex].dealCount++;
           self.sheetName[self.curSheetIndex].Effective++;
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
@@ -1479,11 +1484,12 @@ export default {
         s_item.inspectList.forEach(item => {
           item.items.forEach((_item, _index) => {
             if (_item.inputCount === 0 && !_item.manualIgnore) {
-            //  hasIgnoretemp.push(_item);
+              hasIgnoretemp.push(_item);
             }
           });
         });
       });
+      console.log(hasIgnoretemp)
       hasIgnoretemp.length === 0 ? self.notShowAlert = true : null;
     },
 
@@ -2072,13 +2078,9 @@ export default {
       });
     },
     clickItem({item, index}) {
-      console.log("Click indxe="+index)
-      console.log(item)
+
       const self = this;
-      if (item.isIgnore) {
-        return false;
-      }
-      console.log("Do thins")
+ 
       self.sourceList = [];
       self.sourceListLength = item.sourceList.length;
       self.curDeviceId = item.deviceId[0];
@@ -2807,6 +2809,7 @@ export default {
           s_item.inspectList.forEach(item => {
           let ignoreCount = 0;
           item.items.forEach((_item, _index) => {
+            _item.originIndex = _index;
             if (_item.inputCount == 0 && !_item.manualIgnore) {
               ignoreCount++;
               _item.ignore = true;
