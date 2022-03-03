@@ -1,0 +1,18 @@
+<svg id="ic_calender" data-name="ic/calender" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <defs>
+        <style>
+            .cls-3{fill:#556679}
+        </style>
+    </defs>
+    <g id="Group_4" data-name="Group 4">
+        <path id="Rectangle" style="fill:none" d="M0 0h24v24H0z"/>
+        <g id="Group_8" data-name="Group 8" transform="translate(2 3)">
+            <g id="Combined_Shape" data-name="Combined Shape" style="stroke-miterlimit:10;fill:#556679">
+                <path d="M19 13.5H1a.5.5 0 0 1-.5-.5V4.75h19V13a.5.5 0 0 1-.5.5zm-6.5-7v5h5v-5h-5zm7-4.249H.5V1A.5.5 0 0 1 1 .5h18a.5.5 0 0 1 .5.5V2.25z" style="stroke:none" transform="translate(0 3)"/>
+                <path d="M19 13V5.25H1V13h18m-7-7h6v6h-6V6m7-4.249V1H1v.75l18 .001m0 12.25H1C.449 14 0 13.55 0 13V4.25h20V13c0 .551-.449 1-1 1zm-6-7V11h4V7h-4zm7-4.25H0V1c0-.551.449-1 1-1h18c.551 0 1 .449 1 1V2.75z" style="fill:#556679;stroke:none" transform="translate(0 3)"/>
+            </g>
+            <path id="Path_3" data-name="Path 3" class="cls-3" d="M1.5 0v4H0V0z" transform="translate(4.75)"/>
+            <path id="Path_3_Copy" data-name="Path 3 Copy" class="cls-3" d="M1.5 0v4H0V0z" transform="translate(13.75)"/>
+        </g>
+    </g>
+</svg>

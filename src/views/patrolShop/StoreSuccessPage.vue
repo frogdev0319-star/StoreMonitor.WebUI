@@ -23,7 +23,7 @@
     <div v-if="isSuccess" :style="{'min-height':varyWindowHeight-460+'px'}" class="page-content">
       <div class="details">
         <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 25px;">{{ $t('remotePatrol.storeName') }}:</span>
-        <span v-else class="event-label" >{{ $t('remotePatrol.storeName') }}:</span>
+        <span v-else class="event-label" >{{ $t('remotePatrol.storeName') }}：</span>
         <span class="data">{{ storeName }}</span>
       </div>
       <div style="margin-top:20px;margin-left:20px;height:1px;background-color:#acaeb1;width:calc(100% - 50px)"/>
@@ -41,9 +41,10 @@
         <span v-if="lang.indexOf('zh') === -1 " class="en-event-label" style="margin-right: 60px;">{{ $t('remotePatrol.description') }}:</span>
         <span v-else class="event-label" >{{ $t('remotePatrol.description') }}：</span>
       </div>
-       <div class="source-content flex fullWidth" style="margin-top:20px;margin-left:20px">
-              <div v-for="(_item, _index) in sourceList" :key="_index" class="source-details">
-                <div v-if="_item.mediaType === 3" class="img-content">
+       <div class="source-content flex fullWidth" style="margin-top:20px;margin-left:20px;display:block">
+              <div v-for="(_item, _index) in sourceList" :key="_index" class="fullwidth" 
+              style="display:flex;justify-content:flex-start;align-items:flex-start;margin-bottom:7px">
+                <div v-if="_item.mediaType === 3"  >
                   {{_item.url}}
                 </div>
               </div>
@@ -147,7 +148,7 @@ export default {
       self.curSecond--;
       if (self.curSecond === 0) {
         clearInterval(self.timeid);
-        self.$router.push({ name: 'storeMonitor', params: { flag: self.isSuccess }});
+      //  self.$router.push({ name: 'storeMonitor', params: { flag: self.isSuccess }});
       }
     },
 

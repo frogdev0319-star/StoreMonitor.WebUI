@@ -801,16 +801,22 @@ export default {
   },
 
   methods: {
-        maxLabel(s){  
-      if(s.length>7){
-        return s.substring(0,7)+'...'
-      }
-      else{
-        return s;
-
-      }
-     
-    //  return "TEST";
+    maxLabel(val) {
+        var returnValue = '';
+        var byteValLen = 0;
+        for (var i = 0; i < val.length; i++) {
+            if (val[i].match(/[^\x00-\xff]/ig) != null)
+                byteValLen += 2;
+            else
+                byteValLen += 1;
+            if (byteValLen > 10)
+            {
+                returnValue += '...';
+                break;
+            }
+            returnValue += val[i];
+        }
+        return returnValue;
     },
     handlePageAndSizeChangePart3(e){
         console.log(e)

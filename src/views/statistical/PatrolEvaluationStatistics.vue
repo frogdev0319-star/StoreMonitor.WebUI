@@ -1219,16 +1219,22 @@ export default {
   },
 
   methods: {
-    maxLabel(s){  
-      if(s.length>7){
-        return s.substring(0,7)+'...'
-      }
-      else{
-        return s;
-
-      }
-     
-    //  return "TEST";
+    maxLabel(val) {
+        var returnValue = '';
+        var byteValLen = 0;
+        for (var i = 0; i < val.length; i++) {
+            if (val[i].match(/[^\x00-\xff]/ig) != null)
+                byteValLen += 2;
+            else
+                byteValLen += 1;
+            if (byteValLen > 10)
+            {
+                returnValue += '...';
+                break;
+            }
+            returnValue += val[i];
+        }
+        return returnValue;
     },
     routeToInpectReportWithParam(e,type){
     // const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
@@ -1274,6 +1280,9 @@ export default {
         else if(e.prop =='numOfDangerous'){
           type=0;
         }
+        else{
+          type=-1;
+        }
       this.routeToInpectReportWithParam(e,type);
 
     },
@@ -1305,7 +1314,7 @@ export default {
       }
       else{
        
-        this.routeToInpectReportWithParam(e);
+        this.routeToInpectReportWithParam(e,-1);
       }
       
 
@@ -1325,19 +1334,37 @@ export default {
           });
       }
       else{
-        this.routeToInpectReportWithParam(e);
+        this.routeToInpectReportWithParam(e,-1);
       }
 
     },
     routeToInspectionReport(){
+       let searchParams =   JSON.parse(JSON.stringify(this.params))
+      searchParams.jump = true;
+      searchParams.clause ={storeId:searchParams.curStore};
+      searchParams.filterStoreIds=searchParams.curStore
+      searchParams.storeIds=searchParams.curStore
+      searchParams.filterStoreIds=searchParams.curStore;
+      searchParams.curStores =searchParams.curStore;;
+      searchParams.curAppraise = -1;
+      searchParams.curReportType = -1;
+      searchParams.clause.status = -1;
+
+      searchParams.inspectTagId =  searchParams.inspectId;
+      searchParams.beginTs  = this.params.beginTs;
+      searchParams.endTs  = this.params.endTs;
+      searchParams.filter ={ page: 0, size: 12 };
+ 
+      console.log(searchParams)
       const searchParamsObj = {
         path: 'inspectReport',
-        params: this.params
+        params: searchParams
       };
-      this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
+      SearchConditionUtil.saveSearchCondition(searchParamsObj);
+      //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
        this.$router.push({
          path: '/report',
-      });
+       });
 
     },
     handlePageAndSizeChangePart1(e){
@@ -2148,6 +2175,9 @@ export default {
       }
       else if(this.part1.compareType=='position'){
         let users = [];
+        console.log("Part1 User")
+        console.log(this.part1.originArray)
+        console.log(self.part1.compareIds)
          this.part1.originArray.forEach(function(item){
            if(self.part1.compareIds.indexOf(item.value)>=0)
             users =  users.concat(item.contents);
@@ -2158,8 +2188,10 @@ export default {
       }
       
         params.filter = { page: 0, size: params.groupIds.length };
+        
+        console.log(params)
         if (params.storeIds.length === 0) {
-              ;
+;
               return false;
         }
         const storeResult = await self.getInspectStatsOverviewWithGroup(params);

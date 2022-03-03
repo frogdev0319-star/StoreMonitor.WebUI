@@ -681,7 +681,7 @@ export default {
       this.curSelectId = selectedArray;
       let originArray = [];
       this.curTypeArrary.forEach(function(item){
-        if(item.value !='-1' && selectedArray.indexOf(item.value) ){
+        if(item.value !='-1'  ){
           originArray.push(item)
         }
       })
