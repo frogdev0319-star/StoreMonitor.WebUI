@@ -42,21 +42,17 @@
         <span v-else class="event-label" >{{ $t('remotePatrol.description') }}：</span>
       </div>
        <div class="source-content flex fullWidth" style="margin-top:20px;margin-left:20px;display:block">
-              <div v-for="(_item, _index) in sourceList" :key="_index" class="fullwidth" 
-              style="display:flex;justify-content:flex-start;align-items:flex-start;margin-bottom:7px">
-                <div v-if="_item.mediaType === 3"  >
+              <div v-for="(_item, _index) in sourceList" :key="_index" >
+                <div v-if="_item.mediaType === 3"  class="fullwidth" 
+                     style="display:flex;justify-content:flex-start;align-items:flex-start;margin-bottom:7px">
                   {{_item.url}}
                 </div>
               </div>
         </div>
-      <div class="source-content flex fullWidth"  style="margin-top:20px;margin-left:20px">
-              <div v-for="(_item, _index) in sourceList" :key="_index" class="source-details">
-                <div v-if="_item.mediaType === 2" class="img-content" style="margin-right:10px;border-radius:5px">
-                  <img :src="_item.url" height="100" width="140">
-                </div>
-                <div v-if="_item.mediaType === 1" class="img-content"  style="margin-right:10px;border-radius:5px">
-                  <img :src="startIcon" :height="36" class="start-icon" @click="playCutVideo(_item,_index)">
-                  <img :src="videoImgSrc" height="100">
+      <div class="source-content flex"  style="flex-wrap: wrap;margin-top:20px;margin-left:20px;width:800px">
+              <div v-for="(_item, _index) in sourceList" :key="_index" class="source-details" >
+                <div v-if="_item.mediaType === 2" class="img-content" >
+                  <img :src="_item.url" height="100" width="140" style="margin-right:10px;border-radius:5px">
                 </div>
               </div>
         </div>
@@ -148,7 +144,7 @@ export default {
       self.curSecond--;
       if (self.curSecond === 0) {
         clearInterval(self.timeid);
-      //  self.$router.push({ name: 'storeMonitor', params: { flag: self.isSuccess }});
+        self.$router.push({ name: 'storeMonitor', params: { flag: self.isSuccess }});
       }
     },
 
@@ -336,12 +332,12 @@ export default {
                             word-wrap:break-word;
                         }
                         .source-content {
+                              display: flex;
+                              flex-direction: row;
                               margin-left:15px;
                               margin-top:20px;
-                              min-height: 120px;
-                              width: 90%;
-                              display:flex;
-                              flex-direction:row;
+                              width: 70%;
+                               flex-wrap: wrap;
                               span {
                                 font-size: 12px;
                                 color: #f7d057;
@@ -349,7 +345,6 @@ export default {
                                 display: block;
                               }
                               .source-details {
-                                display: inline-block;
                                 margin-right: calc(6 / 1920 * 100vw);
                                 margin-bottom: calc(6 / 1920 * 100vw);
                                 .img-content {
