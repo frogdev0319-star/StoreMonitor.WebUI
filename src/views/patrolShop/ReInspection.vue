@@ -550,11 +550,11 @@
             </div>
           </div>
           <div class="fullWidth rside">
-            <div v-if="!showFeedBack" class="padding" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;">
+            <div v-if="!showFeedBack" class="padding" :class="{flex:isFullScreenMode && $store.getters.collapsed}" style="background-color: rgb(237, 240, 242); height: 60vh; overflow: auto;flex-wrap: wrap; justify-content: space-between">
               <div
                 v-for="(item_) in inspectList"
                 :key="item_.id"
-                class="inspect-details paper margin-bottom-sm">
+                class="inspect-details paper margin-bottom-sm" :style="isFullScreenMode && $store.getters.collapsed?{width: 'calc(50% - 10px)'}:{}">
                 <div  v-if="!showIgnoreItem ||item_.ignoreCount>0" class="flex padding-sm title">
                   <div class="spacer font-13" style="text-align: left; border-left: 4px solid #2c90d9; padding-left: 8px;">{{ item_.groupName }}</div>
                   <div v-if="!showIgnoreItem ">{{ item_.dealCount+'/'+item_.count }}</div>

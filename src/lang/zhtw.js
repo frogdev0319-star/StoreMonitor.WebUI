@@ -440,7 +440,7 @@ export default {
     "startingScore": "扣分起始分數：",
     "storeGroup": "門店群組",
     "storeMaxAttach": "影像圖片不能為空，最多支援插入10個。",
-    "storeName": "門店名稱：",
+    "storeName": "門店名稱",
     "storeSelect": "選擇門店",
     "storeTag": "標籤",
     "storeType": "門店類型",

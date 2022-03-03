@@ -163,7 +163,25 @@
               </div>
           </div>
           <div v-else class="list-table">
-            <el-table
+            <table-only
+              ref="elTP"
+              class="table-white"
+              :table-themes="white"
+              :column-data="reportInfoTable"
+              :table-data="reportList"
+              :highlight-current-row= "true"
+              :is-loading-data="isLoading"
+              :allowRowExpand = "false"
+              :showBorder = "false"
+              :default-sort = "{prop: 'datestr', order: 'descending'}"
+              :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
+              :tableHeight = "760"
+              :cellStyle="{backgroundColor: '#fff !important'}"
+              @handleOperation="clickReport"
+              @sortChange="sortChange"
+              @row-click = "clickReport"
+            />
+            <!--<el-table
               :data="reportList"
               :highlight-current-row="true"
               :header-cell-style="{fontSize:'#12px',color:'#7d8cad',height: '47px'}"
@@ -200,7 +218,7 @@
                   <span :style="{'margin-left':'20px','font-size':'16px','color':'#7d8cad'}">{{ $t('eventView.noEvents') }}</span>
                 </div>
               </div>
-            </el-table>
+            </el-table>-->
           </div>
           
         </div>
@@ -249,6 +267,7 @@ import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import { getInspectReportInfo } from '@/api/inspect';//為了取是否有設置評分
+import TableOnly from '@/components/TableOnly';
 export default {
   name: 'InspectReportList',
   components: {
@@ -256,7 +275,8 @@ export default {
     SelectedStores,
     DelayButton,
     StoreFilter,
-    TblPaginationOnly
+    TblPaginationOnly,
+    TableOnly
   },
   data() {
     return {
@@ -288,72 +308,123 @@ export default {
       ],
       reportInfoTable: [
         {
-          prop: 'province',
-          label: this.$t('remotePatrol.regionI'),
-          sortable: false,
-          width: '120'
+          'prop': 'province',
+          'label': this.$t('remotePatrol.regionI'),
+          'sortable': false,
+          'width': '60',
+          'maxWidth': '60',
+          'isExpand': false
         },
         {
-          prop: 'city',
-          label: this.$t('remotePatrol.regionII'),
-          sortable: false,
-          width: '140'
+          'prop': 'city',
+          'label': this.$t('remotePatrol.regionII'),
+          'sortable': false,
+          'width': 60,
+          'maxWidth': 60,
+          'isExpand': false
+
         },
         {
-          prop: 'storeName',
-          label: this.$t('remotePatrol.patrolStore'),
-          sortable: false,
-          width: '140'
+          'prop': 'storeName',
+          'label': this.$t('remotePatrol.patrolStore'),
+          'sortable': false,
+          'width': 80,
+          'maxWidth': 80,
+          'isExpand': false
         },
         {
-          prop: 'code',
-          label: this.$t('remotePatrol.code'),
-          sortable: false,
-          width: '120'
+          'prop': 'code',
+          'label': this.$t('remotePatrol.code'),
+          'sortable': false,
+          'width': 60,
+          'maxWidth': 60,
+          'isExpand': false
         },
         {
-          prop: 'storeType',
-          label: this.$t('remotePatrol.storeType'),
-          sortable: false,
-          width: '115'
+          'prop': 'storeType',
+          'label': this.$t('remotePatrol.storeType'),
+          'sortable': false,
+          'width': 60,
+          'maxWidth': 60,
+          'isExpand': false
         },
         {
-          prop: 'submitterName',
-          label: this.$t('scheduleView.InspectPerson'),
-          sortable: false,
-          width: '130'
+          'prop': 'submitterName',
+          'label': this.$t('scheduleView.InspectPerson'),
+          'sortable': false,
+          'width': 100,
+          'maxWidth': 100,
+          'isExpand': false
         },
         {
-          prop: 'tagName',
-          label: this.$t('overview.patrolLists'),
-          sortable: false,
-          width: '200'
+          'prop': 'tagName',
+          'label': this.$t('overview.patrolLists'),
+          'sortable': false,
+          'width': 100,
+          'maxWidth': 100,
+          'isExpand': false
         },
         {
-          prop: 'modeText',
-          label: this.$t('remotePatrol.patrolWay'),
-          sortable: false,
-          width: '200'
+          'prop': 'modeText',
+          'label': this.$t('remotePatrol.patrolWay'),
+          'sortable': false,
+          'width': 65,
+          'maxWidth': 65,
+          'isExpand': false,
         },
         {
-          prop: 'status',
-          label: this.$t('remotePatrol.patrolResult'),
-          sortable: false,
-          width: '100'
+          'prop': 'status',
+          'label': this.$t('remotePatrol.patrolResult'),
+          'sortable': false,
+          'width': 60,
+          'maxWidth': 60,
+          'isExpand': false
         },
         {
-          prop: 'totalScore',
-          label: this.$t('remotePatrol.patrolScore'),
-          sortable: 'custom',
-          width: '110'
+          'prop': 'totalScore',
+          'label': this.$t('remotePatrol.patrolScore'),
+          'sortable': true,
+          'width': 65,
+          'maxWidth': 65,
+          'isExpand': false
         },
         {
-          prop: 'datestr',
-          label: this.$t('remotePatrol.patrolDate'),
-          sortable: 'custom',
-          width: '220'
+          'prop': 'datestr',
+          'label': this.$t('remotePatrol.patrolDate'),
+          'sortable': 'custom',
+          'width': 100,
+          'maxWidth': 100,
+          'isExpand': false
+        },
+        {
+          'prop': 'operator',
+          'label': this.$t('titleView.operation'),
+          'sortable': false,
+          'width': 50,
+          'maxWidth': 50,
+          'isExpand': false,
+          'isCellClick':true,
+          'align': 'left',
+          'customIcon': true,
+          'src' : require('@/../static/img/icon_pen.png'),
+          'methods': 'set'
         }
       ],
+      columnOperationData: {
+        label: this.$t('titleView.operation'),
+        minWidth: '60',
+        align: 'left',
+        customIcon: true,
+        src : require('@/../static/img/icon_pen.png'),
+        methods: 'set'
+        /*operation: [
+          {
+            lable: '',
+            src : 'penSrc',
+            methods: 'set'
+          }
+        ]*/
+      },
       storeList: [],
       searchInput: '',
       sizeNum: 10,
@@ -1055,13 +1126,13 @@ $filterWidth: 100%;
             }
         }
     }
+    
     .showCardHeight{
       flex-wrap: wrap;
       height: calc(450/1440*100vw);
       overflow: auto;
     }
     .list-table{
-      padding-left: calc(20/1920*100vw);
       margin-bottom: 20px;
     }
     .list-table >>> .report-cell-class .cell{
@@ -1070,6 +1141,19 @@ $filterWidth: 100%;
     .list-table >>> .report-header-class .cell{
       padding-left: calc(20/1920*100vw) !important;
     }
+    .list-table{
+      
+      .table-white {
+        /deep/
+        .el-table{
+          box-shadow: none !important;
+          border: none !important;
+          background-color: #fff;
+          padding-left: 12px;
+        }
+      }
+    }
+    
     .report-card{
         margin-bottom: calc(20/1440*100vw);
         .cards{
