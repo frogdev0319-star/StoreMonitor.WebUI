@@ -168,33 +168,35 @@
                   <span v-if="eventNameRuletip" class="rules">{{ $t("remotePatrol.eventNameRuletip") }}</span>
                   <span v-if="showEventNameInfo" class="error-class">{{$t("remotePatrol.emptyEventTitle") }}</span>
                   <div class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
-                  <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length!=0" :class="'noraml-title'" class="tsource-content">
-                          <div v-for="(_item,_index) in sourceList" :key="_index" class="fullWidth source-details">
-                            <div v-if="_item.mediaType == 3" class="flex-center">
-                              <img
-                                :src="deleteInspectIcon"
-                                alt="delete"
-                                @click="deleteItemResource({ index: _index })"
-                              />
-                              <div
-                                class="paper flex-center margin-bottom-sm inspect-text"
-                                :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
-                              >
-                                <div style="flex: 1; text-align: left; margin: 5px">
-                                  {{ _item.src }}
-                                </div>
-                                <hr class="hr-vertical" />
-                                <img
-                                  :src="editInspectIcon"
-                                  alt="edit"
-                                  style="margin: 5px"
-                                  @click="editItemResource({  index: _index })"
-                                />
-                              </div>
+                   <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length!=0" :class="'noraml-title'" class="tsource-content">
+                      <div v-for="(_item,_index) in sourceList" :key="_index" >
+                       <div  v-if="_item.mediaType == 3"  class="fullWidth source-details" >
+                        <div class="flex-center">
+                          <img
+                            :src="deleteInspectIcon"
+                            alt="delete"
+                            @click="deleteItemResource({ index: _index })"
+                          />
+                          <div
+                            class="paper flex-center margin-bottom-sm inspect-text"
+                            :style="curEditIndex === _index?{'border':'1px solid #006ab7'}:{'border':'1px solid #e6e6e6'}"
+                          >
+                            <div style="flex: 1; text-align: left; margin: 5px">
+                              {{ _item.src }}
                             </div>
+                            <hr class="hr-vertical" />
+                            <img
+                              :src="editInspectIcon"
+                              alt="edit"
+                              style="margin: 5px"
+                              @click="editItemResource({  index: _index })"
+                            />
                           </div>
                         </div>
-                  <div style="position: relative">
+                      </div>
+                      </div>
+                    </div>
+                  <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length<5" style="position: relative">
                           <el-input
                             :autosize="{ minRows: 2, maxRows: 7 }"
                             v-model="eventDes"
@@ -319,8 +321,9 @@
               <span v-if="showEventNameInfo" class="error-class">{{$t("remotePatrol.emptyEventTitle") }}</span>
               <div class="event-title margin-bottom-sm">{{ $t("remotePatrol.description") }}</div>
               <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length!=0" :class="'noraml-title'" class="tsource-content">
-                      <div v-for="(_item,_index) in sourceList" :key="_index" class="fullWidth source-details">
-                        <div v-if="_item.mediaType == 3" class="flex-center">
+                      <div v-for="(_item,_index) in sourceList" :key="_index" >
+                       <div  v-if="_item.mediaType == 3"  class="fullWidth source-details" >
+                        <div class="flex-center">
                           <img
                             :src="deleteInspectIcon"
                             alt="delete"
@@ -343,8 +346,9 @@
                           </div>
                         </div>
                       </div>
+                      </div>
                     </div>
-               <div style="position: relative">
+               <div   v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length<5"  style="position: relative">
                       <el-input
                         :autosize="{ minRows: 2, maxRows: 7 }"
                         v-model="eventDes"
@@ -599,7 +603,7 @@ export default {
       accountId: '',
       userId: '',
       changeStoreObj: {
-        title: "DSDFSDFDF",
+        title: this.$t('remotePatrol.confirm'),
         showInfo: this.$t('remotePatrol.switchInfo'),
         isWarning: true,
         dialogCosed: false
@@ -803,6 +807,7 @@ export default {
          self.channel =null;
          self.clearTheEventInfo()
          self.getInitStoreData()
+         self.getEventList();
       }
      // this.curSelStoreId = storeData.curSelectedStore
      // this.getInitStoreData()
@@ -964,6 +969,7 @@ export default {
 
     async getInitStoreData() {
       const self = this;
+      self.eventList= []
       const getStore2Temp = (data) => {
         const cityList = [];
         data.forEach((item) => {
@@ -1099,13 +1105,15 @@ export default {
     },
 
     getEventList() {
+      
       const self = this;
       const date = new Date();
+      console.log("Get EventList"+self.curSelStoreId);
       const params = {
         beginTs: date.getTime() - 3600 * 24 * 30 * 1000 * 30,
         endTs: date.getTime(),
         clause: {
-          storeId: self.store.storeId,
+          storeId: self.curSelStoreId,
           status: 0,
           sourceType: 0
         },

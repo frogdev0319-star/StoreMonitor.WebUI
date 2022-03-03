@@ -1119,6 +1119,19 @@ export default {
       }
     }
   }
+  .el-popper {
+    /deep/
+    .el-dropdown-menu__item{
+      &:hover {
+        background-color: #e4f3fd !important;
+        color: #006ab7 !important;
+      }
+      &:focus {
+        background-color: #e4f3fd !important;
+        color: #006ab7 !important;
+      }
+    }
+  }
 </style>
 <style lang="scss" scoped>
 $border: #393b4c;
