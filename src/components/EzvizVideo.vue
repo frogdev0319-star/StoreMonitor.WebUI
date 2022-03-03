@@ -1527,6 +1527,7 @@ export default {
       }
       self.imageCanvasList = [];
       self.sourceList = [];
+      self.inspectInput = '';
       if (self.showFeedBack) {
         self.showSnapshotFeedbackDialog = true;
         

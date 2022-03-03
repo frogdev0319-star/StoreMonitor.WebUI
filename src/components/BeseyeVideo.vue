@@ -613,6 +613,7 @@ export default {
       const self = this;
       self.sourceList = [];
       self.imageCanvasList = [];
+      self.inspectInput = '';
       if (self.playBackState) {
         const videoArr = document.getElementsByTagName('video')[0].style.display;
         self.beseyeVideo = videoArr === 'none' ? document.getElementsByTagName('video')[1] : document.getElementsByTagName('video')[0];
