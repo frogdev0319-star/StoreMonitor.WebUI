@@ -204,7 +204,7 @@
                 class="canvas-img"
                 :src="eventList[feedbackIndex].sourceObj.src">
             </div>
-            <div class="event-content spacer">
+            <div class="event-content spacer margin-left-md">
               <span class="event-title"><span class="is-required">*</span>{{ $t('remotePatrol.name') }}</span>
               <el-input v-model="eventName" size="mini" class="storevue-input-white" @input="eventNameChanged" @blur="notShowInputRuleTips('eventName')"/>
               <span v-if="eventNameRuletip" class="rules" style="margin-left:0;">{{ $t('remotePatrol.eventNameRuletip') }}</span>
@@ -676,7 +676,9 @@
                         {{$t('remotePatrol.confirm')}}
                       </button>
                     </div>
-
+                    <span v-if="item.RuleCountTip" class="rules">{{
+                      $t("remotePatrol.commentCountRuleTip")
+                    }}</span>
                     <span v-if="item.Ruletip" class="rules">{{
                       $t("remotePatrol.comentRuletip")
                     }}</span>
@@ -2696,6 +2698,7 @@ export default {
               itemObj.checked = false;
               itemObj.isIgnore = false;
               itemObj.Ruletip = false;
+              itemObj.RuleCountTip = false;
               itemObj.manualIgnore = false;
               itemObj.sourceList = [];
               itemObj.groupType = item.type;
@@ -3063,10 +3066,14 @@ export default {
         })
         this.curEditIndex = -1
       } else {
-        item.sourceList.push({
-          mediaType: 3,
-          src: item.inspectInput,
-        })
+        if (item.sourceList.filter(source => source.mediaType === 3).length < 5) {
+          item.sourceList.push({
+            mediaType: 3,
+            src: item.inspectInput,
+          })
+        } else {
+          item.RuleCountTip = true;
+        }
       }
       item.inspectInput = ''
     },
@@ -3102,10 +3109,14 @@ export default {
         })
         this.curEditFeedbackIndex = -1
       } else {
-        this.feedbackSourceList.push({
-          mediaType: 3,
-          src: this.feedbackInput,
-        })
+        if (this.feedbackSourceList.filter(source => source.mediaType === 3).length < 5) {
+          this.feedbackSourceList.push({
+            mediaType: 3,
+            src: this.feedbackInput,
+          })
+        } else {
+
+        }
       }
       this.feedbackInput = ''
     },
@@ -3113,6 +3124,7 @@ export default {
       const content = filterString.all(val, 200);
       item.inspectInput = content;
       const length = filterString.getContentLength(val);
+      if (item.RuleCountTip) item.RuleCountTip = false;
       if (length > 200) {
         item.Ruletip = true;
       } else {
@@ -3163,6 +3175,7 @@ export default {
     notShowInputRuleTips(e, item) {
       if (e == 'item') {
         item.Ruletip = false;
+        item.RuleCountTip = false;
       } else if (e == 'eventName') {
         this.eventNameRuletip = false;
       } else if (e == 'eventDes') {

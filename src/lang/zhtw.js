@@ -293,6 +293,7 @@ export default {
     "code": "分店代碼",
     "coment": "請輸入處理評論文字",
     "comentRuletip": "最多可輸入200個字元",
+    "commentCountRuleTip": "最多可輸入五個文本",
     "comentRuletip_suggest": "最多可輸入600個字元",
     "commentDetail": "評論詳情：",
     "confirm": "確 認",

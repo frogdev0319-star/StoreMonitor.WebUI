@@ -296,6 +296,7 @@ export default {
     "code": "分店代码",
     "coment": "请输入处理评论文字",
     "comentRuletip": "最多可输入200个字符",
+    "commentCountRuleTip": "最多可输入五个文本",
     "comentRuletip_suggest": "最多可输入600个字符",
     "commentDetail": "评论详情：",
     "confirm": "确 认",

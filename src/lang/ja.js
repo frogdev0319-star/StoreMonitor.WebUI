@@ -291,6 +291,7 @@ export default {
     "code": "ストアコード",
     "coment": "説明を入力してください",
     "comentRuletip": "最大200文字まで入力できます",
+    "commentCountRuleTip": "Up to five texts can be entered",
     "comentRuletip_suggest": "最大600文字まで入力できます",
     "commentDetail": "コメントの詳細：",
     "confirm": "確認",

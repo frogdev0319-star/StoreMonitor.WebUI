@@ -217,6 +217,9 @@
                         </div>
                   <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
                   <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
+              <span v-if="RuleCountTip" class="rules">{{
+                  $t("remotePatrol.commentCountRuleTip")
+                }}</span>
 
                   <div class="source-content">
                     <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
@@ -364,6 +367,9 @@
                     </div>
               <span v-if="showEventDescInfo" class="error-class">{{ $t("remotePatrol.enterDesc") }}</span>
               <span v-if="eventDesRuletip" class="rules">{{ $t("remotePatrol.eventDesRuletip") }}</span>
+              <span v-if="RuleCountTip" class="rules">{{
+                  $t("remotePatrol.commentCountRuleTip")
+                }}</span>
 
               <div class="source-content">
                 <span>* {{ $t("remotePatrol.storeMaxAttach") }}</span>
@@ -634,6 +640,7 @@ export default {
       changeFlag: false,
       eventNameRuletip: false,
       eventDesRuletip: false,
+      RuleCountTip: false,
       vendor: 1,
       currentVideoComponent: 'EzvizVideo',
       showFavorite: false,
@@ -760,10 +767,14 @@ export default {
         })
         this.curEditIndex = -1
       } else {
-        this.sourceList.push({
-         mediaType: 3,
-           src: this.eventDes,
-        })
+        if (this.sourceList.filter(source => source.mediaType === 3).length < 5) {
+          this.sourceList.push({
+          mediaType: 3,
+            src: this.eventDes,
+          })
+        } else {
+          this.RuleCountTip = true;
+        }
       }
 
       this.eventDes = ''

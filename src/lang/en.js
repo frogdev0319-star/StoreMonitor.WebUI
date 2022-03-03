@@ -288,6 +288,7 @@ export default {
     "code": "Store Code",
     "coment": "Enter Descriptions",
     "comentRuletip": "Enter up to 200 characters",
+    "commentCountRuleTip": "Up to five texts can be entered",
     "comentRuletip_suggest": "Enter up to 600 characters",
     "commentDetail": "Comment details:",
     "confirm": "Confirm",

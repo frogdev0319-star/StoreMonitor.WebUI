@@ -229,6 +229,9 @@
               {{$t('remotePatrol.confirm')}}
             </button>
           </div>
+          <span v-if="RuleCountTip" class="rules">{{
+              $t("remotePatrol.commentCountRuleTip")
+            }}</span>
         </div>
       </div>
     </dialog-pop>
@@ -341,6 +344,7 @@ export default {
       eventName: '',
       eventNameRuletip: false,
       eventDesRuletip: false,
+      RuleCountTip: false,
       eventDes: '',
       inspectInput: '',
       curEditIndex: -1,
@@ -445,10 +449,14 @@ export default {
         })
         this.curEditIndex = -1
       } else {
-        this.sourceList.push({
-          mediaType: 3,
-          src: this.inspectInput,
-        })
+        if (this.sourceList.filter(source => source.mediaType === 3).length < 5) {
+          this.sourceList.push({
+            mediaType: 3,
+            src: this.inspectInput,
+          })
+        } else {
+          this.RuleCountTip = true;
+        }
       }
       this.inspectInput = ''
     },
@@ -743,6 +751,7 @@ export default {
     },
 
     notShowInputRuleTips(e) {
+      this.RuleCountTip = false;
       if (e === 'eventName') {
         this.eventNameRuletip = false;
       } else if (e === 'eventDes') {

@@ -292,6 +292,7 @@ export default {
     "code": "메모리 암호",
     "coment": "설명을 입력하기",
     "comentRuletip": "최대 200자까지 입력할 수 있습니다.",
+    "commentCountRuleTip": "Up to five texts can be entered",
     "comentRuletip_suggest": "최대 600자까지 입력할 수 있습니다.",
     "commentDetail": "설명 세부 정보:",
     "confirm": "확인",
