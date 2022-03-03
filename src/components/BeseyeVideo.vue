@@ -58,7 +58,7 @@
           v-show ="showVideo && !playBack"
           id="beseyeVideo"
           :controls="showControls"
-          height="100%"
+          height="420"
           width="90%"
           prload
           autoplay
