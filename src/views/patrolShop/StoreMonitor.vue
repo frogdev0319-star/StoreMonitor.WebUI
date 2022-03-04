@@ -198,7 +198,7 @@
                     </div>
                   <div style="position: relative">
                           <el-input
-                            :autosize="{ minRows: 2, maxRows: 7 }"
+                            :autosize="{ minRows: 1, maxRows: 5 }"
                             v-model="eventDes"
                             :placeholder="$t('remotePatrol.coment')"
                             :disabled="false"
@@ -384,7 +384,7 @@
                   class="source-details"
                 >
                   <div v-if="item.mediaType === 2" class="img-content">
-                    <i class="el-icon-close icondelete"  @click="deleteImg({item,index: _index})" />
+                    <i class="el-icon-close icondelete"  @click="deleteImg(index)" />
                     <el-image
                       :src="item.src"
                       :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
@@ -788,6 +788,7 @@ export default {
     deleteItemResource({  index }) {
       const self = this
       this.curEditIndex = -1;
+      this.RuleCountTip = false;
       this.eventDes = '';
       console.log("Delete Index")
       this.sourceList = this.sourceList.filter((source, idx) => idx !== index)
@@ -801,6 +802,7 @@ export default {
     getCurStore(storeData) {
       const self =this
       this.tempCurSelStoreId = storeData.curSelectedStore;
+      this.RuleCountTip = false;
       if (self.$refs.vendorVideo.playState || self.eventName.length !== 0|| self.sourceList.length>0 ){
         self.changeStoreObj.dialogCosed = true;
       } else {
@@ -1305,7 +1307,8 @@ export default {
       return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
 
-    deleteImg(item, index) {
+    deleteImg( index) {
+      console.log("Delete image index="+index)
       this.sourceList.splice(index, 1);
     },
 
@@ -1473,6 +1476,7 @@ export default {
         self.showEventNameInfo = true;
         return false;
       }
+      this.RuleCountTip = false;
       await self.getStorageInfo();
       const tempFileUrl = await self.getAttachmentFileUrl();
       self.fullscreenLoading = true;
