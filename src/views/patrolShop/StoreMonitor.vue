@@ -231,6 +231,7 @@
                       class="source-details"
                     >
                       <div v-if="item.mediaType === 2" class="img-content">
+                        <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
                         <el-image
                           :src="item.src"
                           :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
@@ -348,7 +349,7 @@
                       </div>
                       </div>
                     </div>
-               <div style="position: relative">
+               <div   style="position: relative">
                       <el-input
                         :autosize="{ minRows: 2, maxRows: 7 }"
                         v-model="eventDes"
@@ -383,6 +384,7 @@
                   class="source-details"
                 >
                   <div v-if="item.mediaType === 2" class="img-content">
+                    <i class="el-icon-close icondelete"  @click="deleteImg({item,index: _index})" />
                     <el-image
                       :src="item.src"
                       :style="{width: `calc(${item.width} / 1920 * 100vw)`, height:  `calc(${item.height} / 1920 * 100vw)`}"
@@ -2008,7 +2010,20 @@ $border: #e3e9f4;
 $background: #f4f5f9;
 $tab: #7d8cad;
 $h1: #292e36;
-
+.icondelete{
+  position: absolute;
+  font-size: 12px;
+  width:18px;
+  height:18px;
+  right: 10px;
+  margin-top: 8px;
+  z-index: 2;
+  padding:3px;
+  color: #fff;
+  cursor: pointer;
+  background-color: #868686;
+  border-radius: 50%;
+}
 .event-title {
   color: $black;
   font-size: calc(14 / 1920 * 100vw);
@@ -2623,17 +2638,6 @@ $h1: #292e36;
                   color: #FCB83B;
                   margin-top: 0;
                 }
-                .icondelete{
-                  position: absolute;
-                  font-size: 14px;
-                  right: 5px;
-                  margin-top: 8px;
-                  z-index: 2;
-                  color: #fff;
-                  cursor: pointer;
-                  background-color: rgba($color: $black, $alpha: 0.8);
-                  border-radius: 50%;
-                }
                 .img-content{
                   width: 100%;
                   height: 100%;
@@ -2661,23 +2665,12 @@ $h1: #292e36;
         }
         .source-details {
           display: inline-block;
-          margin-right: calc(6 / 1920 * 100vw);
           margin-bottom: calc(6 / 1920 * 100vw);
           .img-content {
+            margin-right: calc(6 / 1920 * 100vw);
             width: 100%;
             height: 100%;
             position: relative;
-          }
-          .icondelete {
-            position: absolute;
-            font-size: 14px;
-            right: 5px;
-            margin-top: 8px;
-            z-index: 2;
-            color: #fff;
-            cursor: pointer;
-            background-color: rgba($color: $black, $alpha: 0.8);
-            border-radius: 50%;
           }
           .start-icon {
             position: absolute;
@@ -2731,6 +2724,7 @@ $h1: #292e36;
 .el-image {
   border-radius: 5px;
 }
+
 </style>
 <style>
 .el-radio-button__inner {
