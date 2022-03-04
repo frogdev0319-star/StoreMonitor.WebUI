@@ -1889,6 +1889,7 @@ export default {
 
     clickBtn(item, index) {
       const self = this;
+      self.RuleCountTip = false;
       self.curChannelItem = item;
       self.curChannelIndex = index;
       if (self.eventName.trim().length !== 0) {
