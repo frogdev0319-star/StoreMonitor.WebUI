@@ -50,46 +50,51 @@
         style="padding-bottom: 20px;">
         <p class="cdm-title"><span class="pdf_font_24">{{ $t('remotePatrol.commentDetail') }}</span></p>
         <div class="description-area">
-        <audio-vue
-          v-if="_item.showAudio"
-          :is-export-pdf="isExportPdf"
-          :audio-list="_item.audioList"
-        />
-        <!--<div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">-->
-          <!--<span class="pdf_font_24">{{ _item.comment }}</span>-->
-        <!--</div>-->
-        <description-text
-          v-if="_item.descriptionList.length > 0"
-          :discription-list = "_item.descriptionList"/>
-        <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic">
-          <div
-            v-for="(sourceitem,sourceindex) in _item.sourceList"
-            :key="sourceindex"
-            :height="imgHeight+'px'"
-            class="source-details">
+          <div style="min-width:50%;">
+            <audio-vue
+              v-if="_item.showAudio"
+              :is-export-pdf="isExportPdf"
+              :audio-list="_item.audioList"
+            />
+          <!--<div v-if="_item.comment != null && _item.comment !== ''" class="cdm-word">-->
+            <!--<span class="pdf_font_24">{{ _item.comment }}</span>-->
+          <!--</div>-->
+          
+            <description-text
+              v-if="_item.descriptionList.length > 0"
+              :discription-list = "_item.descriptionList"
+              class="description"
+            />
+          </div>
+          <div v-if="_item.sourceList != null && _item.sourceList.length !== 0" class="cdm-pic source-content">
             <div
-              v-if="sourceitem.mediaType === 2"
-              :style="isExportPdf ? 'margin-right:20px;margin-bottom:20px' : ''"
-              class="img-content">
-              <el-image
-                :style="isExportPdf ? exportImageStyle :imageStyle"
-                :src="sourceitem.url"
-                :preview-src-list="getImgList(sourceindex, _item.sourceList)"
-                class="imgLittle imgInner"/>
-            </div>
-            <div
-              v-if="sourceitem.mediaType==1"
-              class="img-content "
-              @click="playCommentVideo(sourceitem,sourceindex)">
-              <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
-              <img
-                :style="isExportPdf ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
-                :src="videoImgSrc"
-                :height="imgHeight+'px'"
-                class="imgLittle">
+              v-for="(sourceitem,sourceindex) in _item.sourceList"
+              :key="sourceindex"
+              :height="imgHeight+'px'"
+              class="source-details">
+              <div
+                v-if="sourceitem.mediaType === 2"
+                :style="isExportPdf ? 'margin-right:20px;margin-bottom:20px' : ''"
+                class="img-content">
+                <el-image
+                  :style="isExportPdf ? exportImageStyle :imageStyle"
+                  :src="sourceitem.url"
+                  :preview-src-list="getImgList(sourceindex, _item.sourceList)"
+                  class="imgLittle imgInner"/>
+              </div>
+              <div
+                v-if="sourceitem.mediaType==1"
+                class="img-content "
+                @click="playCommentVideo(sourceitem,sourceindex)">
+                <img :src="startIcon" :height="imgHeight*0.4+'px'" class="start-icon">
+                <img
+                  :style="isExportPdf ? 'width:260px;height:148px;':'width: calc(130/1920*100vw);'"
+                  :src="videoImgSrc"
+                  :height="imgHeight+'px'"
+                  class="imgLittle">
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
@@ -328,6 +333,29 @@ export default {
         background-color:#f7f9fa;
         border-radius:5px;
         padding: 10px calc(10 / 1920 * 100vw) 18px calc(10 / 1920 * 100vw);
+        display: flex;
+        flex-direction: row;
+        .description{
+                      float: left;
+                      text-align: left;
+                      @include point(margin-top,6);
+                      font-family: Roboto,Arial, 'Microsoft YaHei';
+                      font-size: 14px;
+                      white-space:pre-wrap; /* css3.0 */
+                      white-space:-moz-pre-wrap; /* Firefox */
+                      white-space:-pre-wrap; /* Opera 4-6 */
+                      white-space:-o-pre-wrap; /* Opera 7 */
+                      word-wrap:break-word; /* Internet Explorer 5.5+ */
+                      .description-content{
+                        font-size: 14px;
+                        word-break:break-all;
+                      }
+                  }
+                  /deep/
+                  .description-content{
+                        font-size: 14px;
+                        word-break:break-all;
+                  }
       }
       .cdm-voice{
         margin-top: 10px;
