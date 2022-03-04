@@ -196,7 +196,7 @@
                       </div>
                       </div>
                     </div>
-                  <div v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length<5" style="position: relative">
+                  <div style="position: relative">
                           <el-input
                             :autosize="{ minRows: 2, maxRows: 7 }"
                             v-model="eventDes"
@@ -349,7 +349,7 @@
                       </div>
                       </div>
                     </div>
-               <div   v-if=" sourceList.filter((s, idx) =>s.mediaType==3 ).length<5"  style="position: relative">
+               <div   style="position: relative">
                       <el-input
                         :autosize="{ minRows: 2, maxRows: 7 }"
                         v-model="eventDes"
@@ -1891,6 +1891,7 @@ export default {
 
     clickBtn(item, index) {
       const self = this;
+      self.RuleCountTip = false;
       self.curChannelItem = item;
       self.curChannelIndex = index;
       if (self.eventName.trim().length !== 0) {
