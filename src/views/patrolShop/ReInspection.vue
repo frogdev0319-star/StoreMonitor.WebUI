@@ -3001,7 +3001,6 @@ export default {
         })
       })
       if (tempId != null) {
-        if (!this.showIgnoreItem) {
           self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
           if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
@@ -3012,16 +3011,6 @@ export default {
             }
             this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
           }
-        } else {
-          self.hasIgnoretemp[tempId.itemIndex].sourceList.push(obj);
-          if (self.hasIgnoretemp[tempId.itemIndex].inputCount === 0) {
-            this.sheetName[this.curSheetIndex].dealCount++;
-            this.sheetName[this.curSheetIndex].Effective++;
-            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
-            this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].Effective++;
-          }
-          this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
-        }
       } else {
         self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
       }
@@ -3268,17 +3257,20 @@ export default {
       cursor: pointer;
     }
   }
-  .icondelete {
-    position: absolute;
-    font-size: 14px;
-    right: 5px;
-    margin-top: 8px;
-    z-index: 2;
-    color: #fff;
-    cursor: pointer;
-    background-color: rgba($color: $black, $alpha: 0.8);
-    border-radius: 50%;
-  }
+.icondelete{
+  position: absolute;
+  font-size: 12px;
+  width:18px;
+  height:18px;
+  right: 10px;
+  margin-top: 8px;
+  z-index: 2;
+  padding:3px;
+  color: #fff;
+  cursor: pointer;
+  background-color: #868686;
+  border-radius: 50%;
+}
   @function rem($val){
     @return $val/16+rem;
   }

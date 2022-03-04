@@ -345,9 +345,9 @@ export default {
                                 display: block;
                               }
                               .source-details {
-                                margin-right: calc(6 / 1920 * 100vw);
                                 margin-bottom: calc(6 / 1920 * 100vw);
                                 .img-content {
+                                  margin-right: calc(6 / 1920 * 100vw);
                                   width: 100%;
                                   height: 100%;
                                   border-radius:4px;
