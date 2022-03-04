@@ -22,14 +22,13 @@
                 :value="item.status"/>
             </el-select>
             <span style="margin-right: 16px; margin-left:24px;font-size:15px;width:83px;">{{ $t('remotePatrol.reportType') }}</span>
-            <div class="flex-center">
+            <div class="flex-center report-type-area">
             <el-select
               v-model="curReportType"
-
+              class="el-province"
               :placeholder="$t('remotePatrol.all')"
               size="mini"
-              class="el-province"
-              style="margin-right:0px"
+              style="margin-right:0px;border:none;"
               @change="getInspectList"
             >
               <el-option
@@ -38,12 +37,13 @@
                 :label="item.label"
                 :value="item.mode"/>
             </el-select>
+            <div style="width:0px;height:25px;border:1px solid #ACAEB1; opacity:0.34;" />
               <el-select
-               style="margin-left:0px"
+                class="el-province"
+               style="margin-left:0px;border:none;border-radius:0px;"
               v-model="inspectId"
               :placeholder="$t('insSettingView.selectPost')"
-              size="mini"
-              class="el-province">
+              size="mini">
               <el-option
                 v-for="item in inspectTableList"
                 :key="item.id"
@@ -979,7 +979,7 @@ $h1:#292e36;
 $qualified:#6097F3;
 $noqualied:#FDBA40;
 $suggestBack:#F1F6FE;
-$filterWidth: 100%;
+$filterWidth: (100%-706);
 .el-radio {
   >>> .el-radio__inner {
     border-color: #d9dde1;
@@ -1012,7 +1012,15 @@ $filterWidth: 100%;
   font-size: 15px;
   font-weight: normal;
 }
+.report-type-area{
+    width:calc(346/1440*100vw);
+    height: 36px;
+    background-color: #FFF;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
 #el-containter{
+    
     .report-header{
         margin-top: 20px;
         margin-bottom: 20px;
@@ -1043,6 +1051,7 @@ $filterWidth: 100%;
                 margin-right: 10px;
               };
             }
+            
             .el-province{
                 width: calc(160/1920*100vw);
                 min-width: 85px;
@@ -1290,13 +1299,13 @@ $filterWidth: 100%;
 .last-row{
       display: flex;
       flex-direction: row;
-      width:$filterWidth;
+      width:100%;
       margin-left: 42px;
       height: 36px;
       align-items: flex-start;
       align-items:center;
       justify-content: space-between;
-      padding-right: calc(180/1920*100VW);
+      padding-right: (180/1920*100vw);
 }
     .time-selector{
       margin-right: calc(30/1920*100vw);
