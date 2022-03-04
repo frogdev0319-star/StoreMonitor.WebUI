@@ -166,7 +166,7 @@
                   :region-array2="params.curCity"
                   :cur-store-group="params.curStoreGroup"
                   :cur-store-type="params.curStoreType"
-                  :cur-stores="params.curStore"
+                  :cur-stores="storeIds"
                   :cached-params="params"
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged2"
@@ -486,7 +486,7 @@
                   :region-array2="params.curCity"
                   :cur-store-group="params.curStoreGroup"
                   :cur-store-type="params.curStoreType"
-                  :cur-stores="params.curStore"
+                  :cur-stores="storeIds"
                   :cached-params="params"
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged2"
@@ -1530,7 +1530,6 @@ export default {
      self.ifSaveParams = true;
      if(this.compareIds.length>0){
         const eventResult = await self.getEventTableDataInfo(searchCondition);
-        //console.log("*getEventTableData>eventResult:",eventResult);
         const ignorePer = 0;
         const errCode = eventResult.errCode;
         if (errCode === 0) {
@@ -1593,13 +1592,14 @@ export default {
         }else if(this.compareType=="area2"){
           return (item.city == name);
         }else if(this.compareType=="storeGroup"){
-          return (item.groupName == name);
+          return (item.storeGroup == name);
         }else if(this.compareType=="storeType"){
-          return (item.groupName == name);
+          return (item.storeGroup == name);
         }else if(this.compareType=="stores"){
           return (item.groupName == name);
         }
       });
+      console.log("filterData:",filterData);
       this.doDrawEventChartMode(filterData);
       this.total =Math.ceil( filterData.length/this.sizeNum);
       this.eventTableData = [...filterData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
@@ -1741,6 +1741,7 @@ export default {
       }else{
         this.compareIds2 = selStoreIdArr
       }*/
+      //console.log("emitTypeChanged2",selStoreIdArr);
       this.comapareLabels2 = selectedLabels;
       this.doGetInspecEvenItems();
     },
@@ -1756,13 +1757,23 @@ export default {
     },
     async doGetInspecEvenItems(){
       const self = this;
-      let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,inspectTagId:self.inspectId,storeIds:self.compareIds2 };
-      //console.log("doGetInspecEvenItems:",params);
-      const result = await this.getInspecEvenItems(params);
-      
-      //self.peiDataSource = result.data;
-      self.doGetFirstEventLayer(result.data);
-      
+      //console.log("compareIds2",self.compareIds2);
+      if(self.compareIds2.length>0 ){
+        let params = {beginTs:self.params.beginTs,endTs:self.params.endTs,inspectTagId:self.inspectId,storeIds:self.compareIds2 };
+        //console.log("doGetInspecEvenItems:",params);
+        const result = await this.getInspecEvenItems(params);
+        
+        //self.peiDataSource = result.data;
+        self.doGetFirstEventLayer(result.data);
+      }else{
+        const pieOption = self.getEventBySourcePieOption();
+        pieOption.series[0].data = [];
+        self.eventSourceOptions = pieOption;
+        self.sourcePerArray = [];
+        self.eventItemTable.page=1;
+        self.eventItemTable.itemAllData=[]
+        self.eventItemTable.table_data=[]
+      }
     },
     doGetFirstEventLayer(data){
       const childLayer = data.filter(item1 =>{
@@ -1807,7 +1818,7 @@ export default {
       let jsonArray = [];
       let seriesData = [];
       let allItemIds = [];
-      console.log("self.peiDataSource:",self.peiDataSource);
+      //console.log("self.peiDataSource:",self.peiDataSource);
       util.sortArrayByKeyDesc(self.peiDataSource,'numOfUnqualified');
       self.peiDataSource.forEach((item,index) => {
         if(item.numOfUnqualified!=0){

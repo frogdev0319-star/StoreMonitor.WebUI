@@ -677,7 +677,7 @@ export default {
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
       //console.log("onChangeCompareType > selectedArray:",selectedArray);
       //console.log("onChangeCompareType > selectedLabels:",selectedLabels);
-      //console.log("1.onChangeCompareType > storeIds:",storeIds);
+      console.log("1.onChangeCompareType > storeIds:",storeIds);
       this.curSelectId = selectedArray;
       let originArray = [];
       this.curTypeArrary.forEach(function(item){

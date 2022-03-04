@@ -147,17 +147,19 @@ export default {
       if (!val.includes('-1') && val.length === this.options.length - this.disabledLength) {
         this.input = this.all;
         this.selectedArray.unshift('-1');
+        //console.log("1.this.selectedArray:",this.selectedArray);
       } else if (val.includes('-1') && (val.length - 1) < this.options.length) {
         this.selectedArray = this.selectedArray.filter((item) => {
           return item !== '-1';
         });
+        //console.log("2.this.selectedArray:",this.selectedArray);
         this.input = '';
         this.selectedArray.forEach(item => {
           this.options.forEach(_item => {
             if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
               if (item === _item.value) {
                 this.input += _item.label + ',';
-                console.log("this.input:",this.input);
+                //console.log("this.input:",this.input);
                 if(_item.storeIds.length>0)
                 {
                   emitArray = emitArray.concat(_item.storeIds);
@@ -178,12 +180,13 @@ export default {
         this.$emit('changeInput', params);*/
       } else {
         this.input = '';
+        //console.log("3.this.selectedArray:",this.selectedArray);
         this.selectedArray.forEach(item => {
           this.options.forEach(_item => {
             if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
               if (item === _item.value) {
                 this.input += _item.label + ',';
-                console.log("_item.contents:",_item.storeIds);
+                //console.log("_item.contents:",_item.storeIds);
                 if(_item.storeIds.length>0)
                 {
                   emitArray = emitArray.concat(_item.storeIds);
@@ -212,6 +215,7 @@ export default {
         let selectedList = [];
         let emitStoreIds = [];
         let emitArray = [];
+      //console.log("4.this.selectedArray:",this.selectedArray);
         this.selectedArray.forEach(item => {
           this.options.forEach(_item => {
             if (this.compareType == 'storeGroup' || this.compareType == 'storeType') {
@@ -219,7 +223,7 @@ export default {
                 //console.log("_item.contents:",_item.storeIds);
                 if(_item.storeIds.length>0)
                 {
-                  emitStoreIds = emitArray.concat(_item.storeIds);
+                  emitStoreIds = emitStoreIds.concat(_item.storeIds);
                 }
                 //console.log("emitStoreIds:",emitStoreIds);
               }
@@ -235,6 +239,7 @@ export default {
       }
     },
     selectAll() {
+      //console.log("selectAll");
       if (this.selectedArray.length < this.options.length - this.disabledLength) {
         this.selectedArray = [];
         this.options.forEach((item) => {
@@ -243,7 +248,14 @@ export default {
           }
         });
         this.input = this.all;
-        const tempArray = [...this.selectedArray];
+        this.selectedArray.forEach(item => {
+          this.options.forEach(_item => {
+            if (item === _item.value) {
+              this.input += _item.label + ',';
+            }
+          });
+        });
+        this.input = this.input.slice(0, this.input.length - 1);
         this.selectedArray.unshift('-1');
       } else {
         this.selectedArray = [];
