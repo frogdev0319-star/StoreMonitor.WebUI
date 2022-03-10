@@ -38,7 +38,7 @@
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
         </div>
         <div class="weather-content">
-          <img class="weather-info-content" :src="weatherImg">
+          <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
         </div>
         <div 
           style="margin-left: calc(20/1440*100vw)"
