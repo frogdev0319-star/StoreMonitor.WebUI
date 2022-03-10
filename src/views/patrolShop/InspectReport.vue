@@ -63,7 +63,6 @@
     <div class="template-titles">
       <el-select 
         class="storevue-select"
-        v-if="templateList.length > 1" 
         :value="curTemplateIndex" 
         @change="getTemplateConfig">
         <el-option
