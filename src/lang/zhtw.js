@@ -739,7 +739,7 @@ export default {
     "accountName": "用戶名",
     "accountNotAuthorized": "該帳號未授權",
     "accountNotExist": "該帳號不存在",
-    "accountType": "賬號類型",
+    "accountType": "帳號類型",
     "addAgain": "再次添加",
     "addAvailableDevice": "添加可用設備",
     "addChannel": "新增通道",

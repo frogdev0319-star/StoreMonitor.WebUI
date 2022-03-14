@@ -742,7 +742,7 @@ export default {
     "accountName": "用户名",
     "accountNotAuthorized": "该账号未授权",
     "accountNotExist": "该账号不存在",
-    "accountType": "账号类型",
+    "accountType": "帐号类型",
     "addAgain": "再次添加",
     "addAvailableDevice": "添加可用设备",
     "addChannel": "新增通道",
