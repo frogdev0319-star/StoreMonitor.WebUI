@@ -415,6 +415,7 @@ export default {
         { curPath: ["/beseyeDeviceSetting"], activePath: "/beseyeAccount" },
         { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
+        { curPath: ["/workflowDetail"], activePath: "/workflows" },
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
       if (pathMAP) {
@@ -537,6 +538,7 @@ export default {
       this.breadList = [];
       const currentRoute = this.$route.fullPath;
       let matched = [];
+      console.log(this.$route, currentRoute)
       matched = this.$route.matched.filter((x) => x.name);
       matched.length === 2 &&
         this.setSecondLevelNavbarBread(matched, currentRoute);
@@ -677,6 +679,10 @@ export default {
         {
           paths: ["/titleSetting"],
           parentBread: { path: "/title", name: "titleManage" },
+        },
+        {
+          paths: ["/workflowDetail"],
+          parentBread: { path: "/workFlows", name: "workflowManage" },
         },
         {
           paths: ["/addroute", "/setroute", "/bindroute"],

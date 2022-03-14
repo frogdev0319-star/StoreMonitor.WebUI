@@ -416,8 +416,14 @@ export const navbarRoute = {
           keepAlive: false, // the component is't to be cache.
           requireAuth: true
         }
+      },
+      {
+        path: '/workflowDetail',
+        name: 'workflowDetail',
+        component: resolve => require(['@/views/setting/workflow/Detail'], resolve),
+        hidden: true
       }
-    ) && primaryPathesList.push('/workflows');
+    ) && primaryPathesList.push('/workflows', '/workflowDetail');
     return systemSettingRoute;
   },
 

@@ -87,7 +87,8 @@ export default {
     "singleStoreStat":"Single store Statistics",
     "appraisalCompareStat":"Inspection Evaluation Compare Statistics",
     "accountTerminated": "Unavailable Account ",
-    "workflowManage": "Workflow"
+    "workflowManage": "Workflow",
+    "workflowDetail": "流程設定"
   },
 
   "overview": {
