@@ -160,7 +160,7 @@
         </div>
         <dialog-pop
           :is-form="true"
-          :title="$t('deviceView.addDevice')"
+          :title="$t('deviceView.addChannel')"
           :append-to-body="true"
           :close-on-click-modal="false"
           :isWarning="true"
@@ -189,7 +189,7 @@
                     <span v-if="channelNameRuletip" class="rules">{{ $t('deviceView.NvrnameRuletip') }}</span>
                   </el-form-item>
                 </el-col>
-                <el-col :span="24">
+                <el-col :span="24" style="margin-top: 20px">
                   <el-form-item :label="$t('deviceView.devChannelNum')" prop="channelId">
                     <el-select v-model="addChannelData.channelId" size="mini">
                       <el-option
