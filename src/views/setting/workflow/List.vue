@@ -121,7 +121,11 @@ export default {
   methods: {
     getWorkflowList() {},
     handleTabClick() {},
-    handleEmitOperation() {},
+    handleEmitOperation({ method, row }) {
+      if (method === 'set') {
+        this.$router.push({ name: 'workflowDetail', params: { data: row }});
+      }
+    },
     handlePageAndSizeChange() {},
     handleSwitchChange({ checked, target }) {
       if (checked) {

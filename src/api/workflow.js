@@ -26,3 +26,12 @@ export const enableWorkflow = data => {
     data
   });
 };
+
+export const getWorkflowInfo = params => {
+    console.log(params)
+  return request({
+    url: `${version}/workflow/info`,
+    method: 'get',
+    params
+  });
+};

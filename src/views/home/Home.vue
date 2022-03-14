@@ -538,7 +538,6 @@ export default {
       this.breadList = [];
       const currentRoute = this.$route.fullPath;
       let matched = [];
-      console.log(this.$route, currentRoute)
       matched = this.$route.matched.filter((x) => x.name);
       matched.length === 2 &&
         this.setSecondLevelNavbarBread(matched, currentRoute);
