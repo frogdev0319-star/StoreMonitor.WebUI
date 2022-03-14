@@ -159,7 +159,6 @@ export const navbarRoute = {
     ) && primaryPathesList.push('/report', '/reportdetails');
     return patrolRoute;
   },
-
   getEventRoute() {
     const eventRoute = {
       path: '/home',
@@ -406,6 +405,19 @@ export const navbarRoute = {
         hidden: true
       }
     ) && primaryPathesList.push('/title', '/titleSetting');
+    systemSettingRoute.children.push(
+      {
+        path: '/workflows',
+        name: 'workflowManage',
+        isReadOnly: false,
+        component: resolve => require(['@/views/setting/workflow/List'], resolve),
+        hidden: false,
+        meta: {
+          keepAlive: false, // the component is't to be cache.
+          requireAuth: true
+        }
+      }
+    ) && primaryPathesList.push('/workflows');
     return systemSettingRoute;
   },
 

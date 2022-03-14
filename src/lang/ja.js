@@ -89,6 +89,7 @@ export default {
     "singleStoreStat":"单店分析",
     "appraisalCompareStat":"考评同比分析",
     "accountTerminated": "帳號已停用無法切換",
+    "workflowManage": "Workflow Management"
   },
 
   "overview": {

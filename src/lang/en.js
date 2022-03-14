@@ -87,6 +87,7 @@ export default {
     "singleStoreStat":"Single store Statistics",
     "appraisalCompareStat":"Inspection Evaluation Compare Statistics",
     "accountTerminated": "Unavailable Account ",
+    "workflowManage": "Workflow"
   },
 
   "overview": {
