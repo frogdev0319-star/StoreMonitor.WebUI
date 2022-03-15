@@ -1213,10 +1213,10 @@ $collapseWidth: 5.5%;
       #imgLogo {
         width: calc(153 / 1920 * 100vw);
       }
-      width: calc(318 / 1920 * 100vw);
+      width: calc(280 / 1920 * 100vw);
     }
     .logo-collapse-width {
-      width: $collapseWidth;
+      width: calc(90 / 1920 * 100vw);
     }
     .logo-collapse-width.logo-mobile {
       width: calc(90 / 1920 * 100vw);
