@@ -117,7 +117,6 @@ export default {
         state: row.state === 1,
         isSwitchDisabled: row.isBind
       }))
-      console.log("getWorkflowList", this.tableData);
     });
   },
   methods: {

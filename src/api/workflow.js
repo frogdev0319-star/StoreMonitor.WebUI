@@ -28,10 +28,17 @@ export const enableWorkflow = data => {
 };
 
 export const getWorkflowInfo = params => {
-    console.log(params)
   return request({
     url: `${version}/workflow/info`,
     method: 'get',
     params
+  });
+};
+
+export const updateWorkflow = data => {
+  return request({
+    url: `${version}/workflow/update`,
+    method: 'post',
+    data
   });
 };
