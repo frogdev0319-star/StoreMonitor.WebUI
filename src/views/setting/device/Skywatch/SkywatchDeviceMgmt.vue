@@ -745,6 +745,10 @@
     border-radius: 15px !important;
     line-height: 50% !important;
   }
+  .toolbar{
+    flex-direction: row-reverse !important;
+    float: none;
+  }
 </style>
 <style>
   @import '../../../../assets/css/pagination.css';
