@@ -66,6 +66,7 @@ export default {
       if (this.inputValue.length === 0) {
         this.showPromotMsgFlag = true;
         this.promptMsg = this.emptyPromptMsg;
+        this.$emit('getInputValue', this.inputValue);
       } else {
         this.showPromotMsgFlag = false;
         this.$emit('getInputValue', this.inputValue);
