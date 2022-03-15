@@ -32,7 +32,8 @@ const _Environments = {
   RC: {
     CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
     GLOBAL_WEBSITE: 'https://rc-inspect.advantech-ics.com/storemonitor/api/',
-    VERSION: version
+    VERSION: version,
+    clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
   }
 };
 

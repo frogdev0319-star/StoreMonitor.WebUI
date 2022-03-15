@@ -3,7 +3,6 @@
     <el-row class="container">
       <div class="header">
         <div
-          :style="collapsed?{'width':'calc(90/1920*100vw)'}:{'width':'calc(280/1920*100vw)'}"
           :class="logoClass"
           class="logo-content">
           <img id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
@@ -90,11 +89,11 @@
         "
         class="main"
       >
-        <div
+        <!-- <div
           v-if="isMobile && !collapsed"
           class="drawer-bg"
           @click="handleClickOutside"
-        />
+        /> -->
         <aside
           class="sider"
           :class="collapsed?'sider-collapsed':'sider-expand'"
@@ -250,7 +249,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.0.18a
+                v3.0.1.1
                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -415,6 +414,7 @@ export default {
         { curPath: ["/beseyeDeviceSetting"], activePath: "/beseyeAccount" },
         { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
+        { curPath: ["/workflowDetail"], activePath: "/workflows" },
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
       if (pathMAP) {
@@ -677,6 +677,10 @@ export default {
         {
           paths: ["/titleSetting"],
           parentBread: { path: "/title", name: "titleManage" },
+        },
+        {
+          paths: ["/workflowDetail"],
+          parentBread: { path: "/workFlows", name: "workflowManage" },
         },
         {
           paths: ["/addroute", "/setroute", "/bindroute"],
@@ -1209,20 +1213,19 @@ $collapseWidth: 5.5%;
       #imgLogo {
         width: calc(153 / 1920 * 100vw);
       }
-      width: calc(318 / 1920 * 100vw);
+      width: calc(280 / 1920 * 100vw);
     }
     .logo-collapse-width {
-      width: $collapseWidth;
+      width: calc(90 / 1920 * 100vw);
     }
     .logo-collapse-width.logo-mobile {
-      width: 0;
+      width: calc(90 / 1920 * 100vw);
       img {
-        display: none;
+        // display: none;
       }
     }
     .logo-width.logo-mobile {
-      width: calc(318 / 1920 * 100vw);
-      min-width: 258px;
+      width: calc(280 / 1920 * 100vw);
     }
     .logo {
       height: calc(80 / 1920 * 100vw);
@@ -1495,13 +1498,12 @@ $collapseWidth: 5.5%;
   }
   .sec-collapsed {
 
-    margin-left: 100px;
-    width: calc(100%- 100px);
+    margin-left: calc(90 / 1920 * 100vw);
+    width: calc(100% - 90 / 1920 * 100vw);
     height: auto;
-    min-width: calc(1000px);
   }
   .mobile-sec {
-    margin-left: 0;
+    margin-left: calc(90 / 1920 * 100vw);
     //min-width: 1000px;
     //width: 100%;
   }
@@ -1516,7 +1518,7 @@ $collapseWidth: 5.5%;
     }
   }
   .sec-uncoll.mobile-sec {
-    margin-left: 0;
+    margin-left: calc(280 / 1920 * 100vw);
     width: 100%;
   }
   .menu li {

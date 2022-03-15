@@ -59,6 +59,9 @@
             </div>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
+          <template v-else-if="_item.isSwitch">
+            <el-switch :value="row[_item.prop]" @change="$emit('handleSwitchChange', { checked: $event, target: row })"></el-switch>
+          </template>
           <template v-else>
             <template v-if="isDevice && _index < 3">
               <el-tooltip class="item" effect="dark" :content="row[_item.prop]" placement="bottom">
@@ -92,17 +95,17 @@
           <div v-else-if="tableOperation.customIcon" >
             <img :src="tableOperation.src" style="width:24px;height:24px;" @click="handleOperationButton(tableOperation.methods, scope.row, scope.$index)">
           </div>
-          <div v-else>
-            <i
-              v-for="(item,index) in tableOperation.operation"
+          <div class="flex-center" v-else>
+            <img 
               :key="index"
-              :type="item.type"
+              class="child-space"
               :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
-              class="iconfont"
-              size="mini"
-              @click="handleOperationButton(item.methods, scope.row, scope.$index)">
-              {{ item.label }}
-            </i>
+              v-for="(item,index) in tableOperation.operation" 
+              :src="`./static/img/table-${item.methods}.png`" 
+              @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+              height="24px"
+              width="24px"
+            />
           </div>
         </template>
       </el-table-column>
@@ -309,7 +312,10 @@ export default {
       }
     }
   },
-
+  mounted() {
+    console.log(this.columnData)
+    console.log(this.tableData)
+  },
   methods: {
     setCellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {};if (columnIndex === 0) {

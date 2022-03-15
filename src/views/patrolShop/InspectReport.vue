@@ -38,7 +38,7 @@
             <span :class="isexportPDF ? 'pdf-info-value' : ''">{{ report.dateStr }}</span>
         </div>
         <div class="weather-content">
-          <img class="weather-info-content" :src="weatherImg">
+          <img v-if="weatherImg" class="weather-info-content" :src="weatherImg">
         </div>
         <div 
           style="margin-left: calc(20/1440*100vw)"
@@ -63,7 +63,6 @@
     <div class="template-titles">
       <el-select 
         class="storevue-select"
-        v-if="templateList.length > 1" 
         :value="curTemplateIndex" 
         @change="getTemplateConfig">
         <el-option
@@ -355,9 +354,12 @@
             class="pie-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
             <div class="pie-area">
-              <div class="pie-div">
-                <!--<div class="inner"/>-->
-                <div class="pct-panel">
+              <div 
+              :style="isexportPDF ? 'margin-left:250px;' : ''"
+              class="pie-div">
+                <div class="pct-panel"
+                :style="isexportPDF ? {'width': '145px', 'height': '175px'}: {'width': '290px', 'height': '350px'}"
+                 >
                     <v-chart
                         ref="pieChartRef"
                         :auto-resize="true"
@@ -366,14 +368,14 @@
                     />
                 </div>
               </div>
-              <div style="margin-top: 10px;width:60%;margin-left:calc(152/1440*100vw);height:206px;overflow-y:auto;overflow-x:hidden;">
-              <div v-for="(item,index) in chartLabelArr" :key="index">
-                <div class="pie-label-area">
-                    <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
-                    <div class="pei-item-name">{{item.name}}</div>
-                    <div class="pei-item-num">{{item.value}}%</div>
-                </div>
-              </div> 
+              <div class="spacer">
+                <div v-for="(item,index) in chartLabelArr" :key="index">
+                  <div class="pie-label-area">
+                      <div class="pie-color" :style="{backgroundColor:pieColorList[index]}"></div>
+                      <div class="pei-item-name">{{item.name}}</div>
+                      <div class="pei-item-num">{{item.value}}%</div>
+                  </div>
+                </div> 
               </div>
             </div>
           </el-col>
@@ -383,8 +385,12 @@
             class="radar-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
             <div class="radar-area">
-              <div class="radar-div">
-                <div class="pct-panel">
+              <div 
+              :style="isexportPDF ? 'margin-left:250px;' : ''"
+              class="radar-div">
+                <div class="pct-panel"
+                :style="isexportPDF ? {'width': '145px', 'height': '175px'}: {'width': '290px', 'height': '350px'}"
+                >
                 <v-chart
                   v-if="pageItem.data"
                   ref="chartRadar"
@@ -1748,7 +1754,6 @@ export default {
         }
       }
       .pie-content {
-        height: 300px;
         position: relative;
         .span-4{
           position: absolute;
@@ -1760,21 +1765,14 @@ export default {
           z-index: 2;
         }
         .pie-area{
-          height:325px;
-          margin-left: calc(36/1440*100vw);
-          margin-right: calc(24/1440*100vw);
           display:flex;
-          flex-direction: row;
           justify-content: center;
-          align-items: center;
+          width: calc(700/1920*100vw);
+          margin: auto;
           .pie-div{
-            width: 40%;
-            height: 276px;
+            flex: 1;
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: end;
-            align-self: center;
+            justify-content: center;
             .inner{
               position:absolute;
               height: 150px;
@@ -1786,12 +1784,11 @@ export default {
               border-style:dashed dashed dashed dashed; 
             }
             .pct-panel{
-              width: 350px;/*calc(276/1440*100vw);*/
-              height: 350px;/*calc(276/1440*100vw);*/
+              // width: 290px;
+              // height: 350px;
               /*border-radius: 50%;
               border-color:#dae4eb;
               border-style:dashed dashed dashed dashed; */
-              align-self: end;
               
               .pie-chart-content {
                 width:100%;
@@ -1834,7 +1831,6 @@ export default {
       }
       .radar-content {
         width:100%;
-        height: 325px;
         position: relative;
         .span-4{
           position: absolute;
@@ -1847,26 +1843,17 @@ export default {
         }
         .radar-area{
           width:100%;
-          height:325px;
-          margin-left: calc(36/1440*100vw);
-          margin-right: calc(24/1440*100vw);
           display:flex;
-          flex-direction: row;
           justify-content: center;
-          align-items: center;
+          // width: calc(700/1920*100vw);
+          margin: auto;
           .radar-div{
-            width: 390px;
-            height: 276px;
+            // flex: 1;
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: end;
-            align-self: center;
-            
+            justify-content: center;
             .pct-panel{
-              width: 390px;/*calc(276/1440*100vw);*/
-              height: 290px;
-              align-self: end;
+              // width: 290px;
+              // height: 350px;
               
               .radar-chart-content {
                 width: 100%;
@@ -1876,7 +1863,7 @@ export default {
             }
           }
           .radar-label{
-            width: 236px;
+            width: calc(216/1440*100vw);
             height: 290px;
             margin-left: 12px;
             padding: 16px;
@@ -1885,7 +1872,6 @@ export default {
             border-radius: 4px;
             overflow-y: auto;
             .radar-label-area{
-              width: 184px;
               height: 30px;
               display:flex;
               flex-direction: row;
