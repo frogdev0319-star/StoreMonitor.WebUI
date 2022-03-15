@@ -1058,6 +1058,7 @@ export default{
       "radar":"แผนภูมิเรดาร์",
       "remarksContent":"หมายเหตุ",
       "reportTemplate":"เทมเพลตรายงาน",
+      "roleId0Title": "Custom",
       "roleId1Title":"ผู้ดูแลระบบ",
       "roleId2Title":"ผู้จัดการ",
       "roleId3Title":"หัวหน้างาน",

@@ -1058,6 +1058,7 @@ export default{
       "radar":"Grafik Radar",
       "remarksContent":"Catatan",
       "reportTemplate":"Template Laporan",
+      "roleId0Title": "Custom",
       "roleId1Title":"Admin",
       "roleId2Title":"Manajer",
       "roleId3Title":"Supervisor",

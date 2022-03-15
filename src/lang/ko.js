@@ -1059,6 +1059,7 @@ export default {
       "radar":"방사형",
       "remarksContent":"기술",
       "reportTemplate":"보고서 서식 파일",
+      "roleId0Title": "Custom",
       "roleId1Title":"관리",
       "roleId2Title":"관리자",
       "roleId3Title":"관리자",

@@ -82,7 +82,8 @@ export default{
       "patrolPersonStat":"Inspection Person Statistics",
       "patrolCompareStat":"Inspection Compare Statistics",
       "supervisorCalStat":"Store assessment statistics",
-      "patrolItemStat":"Inspection item statistics"
+      "patrolItemStat":"Inspection item statistics",
+      "singleStoreStat":"Single Store statistics"
   },
   "overview":{
       "DangerousLess":"Dangerous Ratio＜60%",
@@ -657,7 +658,7 @@ export default{
       "selectItems":"Please select items to delete!",
       "selectPost":"Please select",
       "selectStoreToBind":"Bound Stores",
-      "selecttitle":"Please select the related positions",
+      "selecttitle":"Related positions",
       "setFullScoreEmpty":"The total score cannot be empty!",
       "setFullScoreRange":"The value range is -50~50!",
       "setItem":"Item Settings",
@@ -1058,6 +1059,7 @@ export default{
       "radar":"Radar Chart",
       "remarksContent":"Note",
       "reportTemplate":"Report Template",
+      "roleId0Title": "Custom",
       "roleId1Title":"Admin",
       "roleId2Title":"Manager",
       "roleId3Title":"Supervisor",
@@ -1086,9 +1088,9 @@ export default{
   "statistics":{
       "averageCompare":"Average Compare",
       "assessemntCompare":"Assessment Compare",
-      "dateChoose":"Customized Data",
-      "weekCompare":"Week Compare",
-      "monthCompare":"Month Compare",
+      "dateChoose":"Custom",
+      "weekCompare":"Week",
+      "monthCompare":"Month",
       "areaType":"Area Type",
       "area1":"Area1",
       "area2":"Area2",

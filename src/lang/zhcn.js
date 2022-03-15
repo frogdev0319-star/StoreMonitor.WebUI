@@ -83,7 +83,8 @@ export default{
       "patrolPersonStat":"巡檢人員統計",
       "patrolCompareStat":"巡檢同比分析",
       "supervisorCalStat":"巡店考评统计",
-      "patrolItemStat":"巡检项统计"
+      "patrolItemStat":"巡检项统计",
+      "singleStoreStat":"单店分析"
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",

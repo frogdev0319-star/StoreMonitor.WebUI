@@ -1059,6 +1059,7 @@ export default {
       "radar":"レーダーチャート",
       "remarksContent":"説明",
       "reportTemplate":"レポートテンプレート",
+      "roleId0Title": "Custom",
       "roleId1Title":"管理者",
       "roleId2Title":"マネージャー",
       "roleId3Title":"スーパーバイザー",

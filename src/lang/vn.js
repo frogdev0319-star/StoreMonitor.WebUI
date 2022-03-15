@@ -1058,6 +1058,7 @@ export default{
       "radar":"Biểu đồ radar",
       "remarksContent":"Lưu ý",
       "reportTemplate":"Mẫu báo cáo",
+      "roleId0Title": "Custom",
       "roleId1Title":"Quản trị viên",
       "roleId2Title":"Người quản lý",
       "roleId3Title":"Người giám sát",
