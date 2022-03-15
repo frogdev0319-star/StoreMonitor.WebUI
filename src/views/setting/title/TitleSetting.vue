@@ -263,7 +263,7 @@ export default {
               visabled:true
             },
             {
-              roleName: this.$t('route.appraisalCompareStat'),
+              roleName: this.$t('route.patrolCompareStat'),
               checked: false,
               disabled: false,
               visabled:true

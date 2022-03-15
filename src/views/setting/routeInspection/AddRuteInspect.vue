@@ -2194,6 +2194,7 @@ export default {
         .el-rute-nape{
             height: auto;
             min-height: 90%;
+            width:70%;
             .nape-name-title{
                 display: inline-block;
                 span{
