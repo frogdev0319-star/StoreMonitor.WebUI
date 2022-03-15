@@ -3,7 +3,6 @@
     <el-row class="container">
       <div class="header">
         <div
-          :style="collapsed?{'width':'calc(90/1920*100vw)'}:{'width':'calc(280/1920*100vw)'}"
           :class="logoClass"
           class="logo-content">
           <img id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
@@ -90,11 +89,11 @@
         "
         class="main"
       >
-        <div
+        <!-- <div
           v-if="isMobile && !collapsed"
           class="drawer-bg"
           @click="handleClickOutside"
-        />
+        /> -->
         <aside
           class="sider"
           :class="collapsed?'sider-collapsed':'sider-expand'"
@@ -1220,14 +1219,13 @@ $collapseWidth: 5.5%;
       width: $collapseWidth;
     }
     .logo-collapse-width.logo-mobile {
-      width: 0;
+      width: calc(90 / 1920 * 100vw);
       img {
-        display: none;
+        // display: none;
       }
     }
     .logo-width.logo-mobile {
-      width: calc(318 / 1920 * 100vw);
-      min-width: 258px;
+      width: calc(280 / 1920 * 100vw);
     }
     .logo {
       height: calc(80 / 1920 * 100vw);
@@ -1500,13 +1498,12 @@ $collapseWidth: 5.5%;
   }
   .sec-collapsed {
 
-    margin-left: 100px;
-    width: calc(100%- 100px);
+    margin-left: calc(90 / 1920 * 100vw);
+    width: calc(100% - 90 / 1920 * 100vw);
     height: auto;
-    min-width: calc(1000px);
   }
   .mobile-sec {
-    margin-left: 0;
+    margin-left: calc(90 / 1920 * 100vw);
     //min-width: 1000px;
     //width: 100%;
   }
@@ -1521,7 +1518,7 @@ $collapseWidth: 5.5%;
     }
   }
   .sec-uncoll.mobile-sec {
-    margin-left: 0;
+    margin-left: calc(280 / 1920 * 100vw);
     width: 100%;
   }
   .menu li {
