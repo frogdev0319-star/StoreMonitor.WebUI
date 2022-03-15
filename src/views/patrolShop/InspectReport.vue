@@ -1183,24 +1183,31 @@ export default {
       const options = self.getRadarChartOption();
       const tempIndicator = [];
       const seriesValue = [];
+      let mapArr = []
       this.chartLabelArr = []; 
       var templabe = [];
       summary.forEach((item, index) => {
         const obj = {};
         obj.name = item.groupName;
         obj.max = Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems) === 0
-          ? 1 : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
-        if (index < 2) {
-          tempIndicator.push(obj);
-          this.staticalConfig.qualified ? seriesValue.push(item.numOfUnqualifiedItems)
-            : seriesValue.push(item.numOfQualifiedItems);
-        } else {
-          tempIndicator.splice(1, 0, obj);
-          this.staticalConfig.qualified ? seriesValue.splice(1, 0, item.numOfUnqualifiedItems)
-            : seriesValue.splice(1, 0, item.numOfQualifiedItems);
-        }
+          ? 1 
+          : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
+        tempIndicator.push(obj);
+        this.staticalConfig.qualified 
+          ? seriesValue.push(item.numOfUnqualifiedItems)
+          : seriesValue.push(item.numOfQualifiedItems);
+        // if (index < 2) {
+        //   tempIndicator.push(obj);
+        //   this.staticalConfig.qualified 
+        //     ? seriesValue.push(item.numOfUnqualifiedItems)
+        //     : seriesValue.push(item.numOfQualifiedItems);
+        // } else {
+        //   tempIndicator.splice(1, 0, obj);
+        //   this.staticalConfig.qualified 
+        //     ? seriesValue.splice(1, 0, item.numOfUnqualifiedItems)
+        //     : seriesValue.splice(1, 0, item.numOfQualifiedItems);
+        // }
       });
-
       for(var i=0; i<tempIndicator.length;i++){
         let arrObj = {
           name:tempIndicator[i].name,
@@ -1208,6 +1215,7 @@ export default {
         }
         templabe.push(arrObj);
       }
+      console.log(tempIndicator, seriesValue)
       this.chartLabelArr = templabe;
       const temp = [];
       const obj = { value: seriesValue };
@@ -1449,7 +1457,7 @@ export default {
 
     getGroupsItems(status) {
       const treeData = util.handleInspctionCatergyTree(this.groups, 'groupId');
-      console.log('treeData:',treeData);
+      // console.log('treeData:',treeData);
       const group = [];
       treeData.forEach(catergy => {
         const tempGroupItem = {};
@@ -1503,7 +1511,7 @@ export default {
           }
         }
       });
-      console.log('group:',group);
+      // console.log('group:',group);
       return group;
     },
 
