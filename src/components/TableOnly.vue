@@ -60,7 +60,7 @@
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
           <template v-else-if="_item.isSwitch">
-            <el-switch :value="row[_item.prop]" @change="$emit('handleSwitchChange', { checked: $event, target: row })"></el-switch>
+            <el-switch :disabled="row[_item.switchProp]" :value="row[_item.prop]" @change="$emit('handleSwitchChange', { checked: $event, target: row })"></el-switch>
           </template>
           <template v-else>
             <template v-if="isDevice && _index < 3">

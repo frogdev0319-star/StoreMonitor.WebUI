@@ -103,7 +103,8 @@ export default {
           'label': '狀態',
           'width': 130,
           'maxWidth': 130,
-          'isSwitch': true
+          'isSwitch': true,
+          'switchProp': 'isSwitchDisabled'
         },
       ],
     };
@@ -113,7 +114,8 @@ export default {
       this.isLoadingData = false;
       this.tableData = res.data.content.map(row => ({
         ...row,
-        state: row.state === 1
+        state: row.state === 1,
+        isSwitchDisabled: row.isBind
       }))
       console.log("getWorkflowList", this.tableData);
     });
@@ -141,9 +143,10 @@ export default {
               }
               : { ...row }
             })
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
           }
         }).catch(e => {
-            util.notify(this.$t('route.networkError'), 'error', 5 * 1000 );
+            util.notify(this.$t('route.networkError'), 'error', 1000 );
         })
       } else {
         disableWorkflow({
@@ -158,6 +161,7 @@ export default {
               }
               : { ...row }
             })
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
           }
         }).catch(e => {
             util.notify(this.$t('route.networkError'), 'error', 1000 );
