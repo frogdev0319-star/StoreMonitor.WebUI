@@ -139,14 +139,14 @@
                   </div>
                   <div class="margin-bottom-5">{{ item.tagName }}</div>
                   <div style="margin-bottom: 12px" class="flex">
-                    <div class="status-tag"
+                    <div :class="lang.indexOf('zh') == -1?'status-tag-en':'status-tag' "
                       :style="{
                         0: {'color':'#e22472','background-color':'#ffecf4'},
                         1: {'color':'#f57848','background-color':'#ffefeb'},
                         2: {'color':'#59ab22','background-color':'#e8f6de'}
                       }[item.statusCode]"
                     >{{item.status}}</div>
-                    <div v-if="item.standard!=-1" style="margin-left: calc(10/1920*100vw)" class="status-tag"
+                    <div v-if="item.standard!=-1" style="margin-left: calc(10/1920*100vw)" :class="(lang.indexOf('zh') == -1)?'status-tag-en':'status-tag' "
                       :style="item.standard==1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
                     >{{item.standard==1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
                   </div>
@@ -1246,6 +1246,11 @@ $filterWidth: (100%-706);
           margin-bottom: calc(30/1440*100vw);
         }
         .status-tag {
+          border-radius: calc(5/1440*100vw); 
+          padding: calc(2/1440*100vw) calc(15/1440*100vw);
+        }
+        .status-tag-en{
+          font-size: 14px;
           border-radius: calc(5/1440*100vw); 
           padding: calc(2/1440*100vw) calc(15/1440*100vw);
         }
