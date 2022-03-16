@@ -588,14 +588,15 @@ export default {
       this.ifSaveParams = true;
       //}
       if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
-        this.tableDataList[tabIndex].tableData = [];
+        /*this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
         this.tableDataList[tabIndex].eventCount = 0;
         this.totalElements = 0;
         this.numberOfElements = 0;
-        return;
+        return;*/
+        delete self.params.clause.storeId;
       }
-      //console.log("self.params:",self.params);
+      console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
         //console.log("data:",data);
