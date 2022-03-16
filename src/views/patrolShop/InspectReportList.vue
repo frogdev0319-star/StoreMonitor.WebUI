@@ -600,8 +600,6 @@ export default {
           self.isLoading = true;
           for(const item of data){
           //data.forEach(async (item,index) => {
-            //console.log(index+"."+item.tagName);
-            let isScore = await this.getReportInfo(item.id);
             const reportObj = {};
             reportObj.province = item.province;
             reportObj.city = item.city;
@@ -613,7 +611,7 @@ export default {
             reportObj.submitter = item.submitter;
             reportObj.routeObj = item;
             reportObj.mode = item.mode;
-            reportObj.totalScore = isScore? item.totalScore:"--";
+            reportObj.totalScore = item.type === 0 ? "--" : item.totalScore;
             reportObj.code = item.code !== null ? item.code : '--';
             reportObj.standard = item.standard;
             reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
