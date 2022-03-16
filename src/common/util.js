@@ -251,6 +251,19 @@ export default {
     return dateStr;
   },
 
+  getDateStr2(ts) {
+    let dateStr = '';
+    const t = new Date(ts);
+    const years = t.getFullYear();
+    const month = (t.getMonth() + 1) < 10 ? '0' + (t.getMonth() + 1) : (t.getMonth() + 1);
+    const day = t.getDate() < 10 ? '0' + t.getDate() : t.getDate();
+    const hour = t.getHours() < 10 ? '0' + t.getHours() : t.getHours();
+    const min = t.getMinutes() < 10 ? '0' + t.getMinutes() : t.getMinutes();
+    const second = t.getSeconds() < 10 ? '0' + t.getSeconds() : t.getSeconds();
+    dateStr = years + '/' + month + '/' + day + ' ' + hour + ':' + min + ':' + second;
+    return dateStr;
+  },
+
   getCurDate2Str() {
     const date = new Date();
     const year = date.getFullYear();

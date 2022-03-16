@@ -58,6 +58,9 @@
         <div v-if="standard!=-1" style="margin-left: calc(20/1440*100vw)" class="status-tag"
           :style="standard == 1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
         >{{standard == 1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
+        <div v-if="checkinInfo" style="color: #69727c; font-size: 12px; margin-left: 20px">
+          {{ checkinInfo }}
+        </div>
       </div>
     </div>
     <div class="template-titles">
@@ -74,21 +77,6 @@
       </el-select>
     </div>
     <div class="el-acticle">
-      <!-- <el-row class="report-content" v-if="standardMsg || checkinInfo">
-        <el-col :span="24" class="">
-          <div class="header-score">
-            <div class="standard-btn">
-              <div
-                :class="{'up-to-standard': standard === 1, 'not-up-to-standard': standard === 0}"
-                class="standard-name"> {{ standardMsg }}</div>
-            </div>
-            <div class="checkin-content">
-              <div class="checkin-info-content"> {{ checkinInfo }}</div>
-            </div>
-            
-          </div>
-        </el-col>
-      </el-row> -->
       <el-row v-for="(pageItem, pageIndex) in pageData" :class="pageItem.class" :key="pageIndex">
         <el-col>
           <div v-if="pageItem.class === 'row-detail'">
@@ -694,7 +682,7 @@ export default {
       obj.reportId = routeData.id;
       obj.storeName = routeData.storeName;
       obj.status = routeData.status;
-      obj.dateStr = util.getDateStr(routeData.ts);
+      obj.dateStr = util.getDateStr2(routeData.ts);
       obj.submitterName = routeData.submitterName;
       obj.tagName = routeData.tagName;
       obj.iconSrc = this.getIconSrc(routeData.status);
@@ -825,12 +813,13 @@ export default {
 
     async getReportInfo(res) {
       if (res.errCode === 0 && res.data.length > 0) {
+        console.log(res)
         const data = res.data[0].info;  
         this.totalScore = data.totalScore;
         this.standard = data.standard;
         this.allRemarkItemsFlag = res.data[0].info.type === 1
         this.standardMsg = util.setStandardMsg(this.standard);
-        this.checkinInfo = data.checkinRecord ? util.getDateStr(data.checkinRecord.ts) + ' ' + i18n.t('remotePatrol.checkinSuccess') : '';
+        this.checkinInfo = data.checkinRecord ? `${i18n.t('remotePatrol.checkinSuccess')}  ( ${util.getDateStr2(data.checkinRecord.ts)} )`: '';
         this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.getGroupsData(data.groups);
