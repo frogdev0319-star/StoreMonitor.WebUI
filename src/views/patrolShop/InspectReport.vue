@@ -308,7 +308,7 @@
               </tr>
             </thead>
             <template v-for="(categoryItem, categoryIndex) in tableItem">
-              <tbody v-if="categoryItem.children.length>1" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
+              <tbody :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
                     <span>{{ categoryItem.groupName }}</span>
@@ -318,26 +318,9 @@
                   v-for="(subcategory,subcategoryIndex) in categoryItem.children"
                   :key="subcategoryIndex"
                   :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
-                  <td style="word-break: keep-all;white-space:nowrap;">
-                    <span class="item-name">{{ subcategory.groupName }}</span>
+                  <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ subcategory.groupName }}</span>
                     <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
                   </td>
-                  <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
-                  <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
-                  <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
-                  <td><span>{{ subcategory.actualScore | filterScore }}</span></td>
-                </tr>
-              </tbody>
-              <tbody v-else :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
-                <tr
-                  v-for="(subcategory,subcategoryIndex) in categoryItem.children"
-                  :key="subcategoryIndex"
-                  :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
-                  <td style="word-break: keep-all;white-space:nowrap;">
-                    <span class="item-name">{{ subcategory.groupName }}</span>
-                    <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
-                  </td>
-                  <td style="vertical-align:middle;"><span class="item-name">-</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
