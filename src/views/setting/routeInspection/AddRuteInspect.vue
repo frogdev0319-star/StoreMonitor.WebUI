@@ -2032,7 +2032,7 @@ export default {
                     font-family: NotoSansCJKtc;
                     font-size: 13px;
                     width:123px;
-                    line-height:36px;
+                    height:30px;
                     margin-left:16px
                   }
                 }
