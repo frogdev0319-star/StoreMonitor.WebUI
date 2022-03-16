@@ -176,8 +176,8 @@
                       :disabled="child.isReadOnly"
                       :key="child.path">
                       <template slot="title">
-                        <div class="item-icon" style="margin-left:-10px;"></div>
-                        <span>{{ $t(`route.${child.name}`) }}</span>
+                        <div class="item-icon"></div>
+                        <span  style="margin-left: 15px">{{ $t(`route.${child.name}`) }}</span>
                       </template>
                       <div v-for="grandChild in child.children" :key="grandChild.path">
                         <el-menu-item
@@ -188,8 +188,7 @@
 
                           class="submenu-item">
                           <template>
-                            <div class="item-icon"></div>
-                            <span>{{ $t(`route.${grandChild.name}`) }}</span>
+                            <span style="margin-left: 30px">{{ $t(`route.${grandChild.name}`) }}</span>
                           </template>
                         </el-menu-item>
                       </div>
@@ -890,7 +889,7 @@ export default {
   width: 5px;
   border-radius:50%;
   background-color:#a5a5a5;
-  margin-right: calc(12 / 1920 * 100vw);
+  // margin-right: calc(12 / 1920 * 100vw);
 }
 .sider {
   transition: width .3s;
@@ -1002,9 +1001,6 @@ export default {
           color: #006ab7;
         }
       }
-      // .item-icon {
-      //   background-color:#006ab7;
-      // }
       .menu_img {
         display: none;
       }
