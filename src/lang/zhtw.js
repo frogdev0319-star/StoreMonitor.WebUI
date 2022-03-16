@@ -278,7 +278,7 @@ export default{
       "changeTimeRange":"當前選擇時間範圍最大為三個月，已調整！",
       "channelList":"攝影機列表",
       "channelPlaceholder":"請輸入關鍵字搜索通道",
-      "checkinSuccess":"簽到成功",
+      "checkinSuccess":"已簽到",
       "clear":"清除",
       "clickToContent":"部分巡檢未評估，點擊查看！",
       "clickToStar":"點擊關注",

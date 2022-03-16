@@ -58,6 +58,9 @@
         <div v-if="standard!=-1" style="margin-left: calc(20/1440*100vw)" class="status-tag"
           :style="standard == 1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
         >{{standard == 1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
+        <div v-if="checkinInfo" style="color: #69727c; font-size: 12px; margin-left: 20px">
+          {{ checkinInfo }}
+        </div>
       </div>
     </div>
     <div class="template-titles">
@@ -74,21 +77,6 @@
       </el-select>
     </div>
     <div class="el-acticle">
-      <!-- <el-row class="report-content" v-if="standardMsg || checkinInfo">
-        <el-col :span="24" class="">
-          <div class="header-score">
-            <div class="standard-btn">
-              <div
-                :class="{'up-to-standard': standard === 1, 'not-up-to-standard': standard === 0}"
-                class="standard-name"> {{ standardMsg }}</div>
-            </div>
-            <div class="checkin-content">
-              <div class="checkin-info-content"> {{ checkinInfo }}</div>
-            </div>
-            
-          </div>
-        </el-col>
-      </el-row> -->
       <el-row v-for="(pageItem, pageIndex) in pageData" :class="pageItem.class" :key="pageIndex">
         <el-col>
           <div v-if="pageItem.class === 'row-detail'">
@@ -308,7 +296,7 @@
               </tr>
             </thead>
             <template v-for="(categoryItem, categoryIndex) in tableItem">
-              <tbody v-if="categoryItem.children.length>1" :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
+              <tbody :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
                     <span>{{ categoryItem.groupName }}</span>
@@ -318,26 +306,9 @@
                   v-for="(subcategory,subcategoryIndex) in categoryItem.children"
                   :key="subcategoryIndex"
                   :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
-                  <td style="word-break: keep-all;white-space:nowrap;">
-                    <span class="item-name">{{ subcategory.groupName }}</span>
+                  <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ subcategory.groupName }}</span>
                     <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
                   </td>
-                  <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
-                  <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
-                  <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
-                  <td><span>{{ subcategory.actualScore | filterScore }}</span></td>
-                </tr>
-              </tbody>
-              <tbody v-else :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
-                <tr
-                  v-for="(subcategory,subcategoryIndex) in categoryItem.children"
-                  :key="subcategoryIndex"
-                  :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
-                  <td style="word-break: keep-all;white-space:nowrap;">
-                    <span class="item-name">{{ subcategory.groupName }}</span>
-                    <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
-                  </td>
-                  <td style="vertical-align:middle;"><span class="item-name">-</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
@@ -711,7 +682,7 @@ export default {
       obj.reportId = routeData.id;
       obj.storeName = routeData.storeName;
       obj.status = routeData.status;
-      obj.dateStr = util.getDateStr(routeData.ts);
+      obj.dateStr = util.getDateStr2(routeData.ts);
       obj.submitterName = routeData.submitterName;
       obj.tagName = routeData.tagName;
       obj.iconSrc = this.getIconSrc(routeData.status);
@@ -842,12 +813,13 @@ export default {
 
     async getReportInfo(res) {
       if (res.errCode === 0 && res.data.length > 0) {
+        console.log(res)
         const data = res.data[0].info;  
         this.totalScore = data.totalScore;
         this.standard = data.standard;
         this.allRemarkItemsFlag = res.data[0].info.type === 1
         this.standardMsg = util.setStandardMsg(this.standard);
-        this.checkinInfo = data.checkinRecord ? util.getDateStr(data.checkinRecord.ts) + ' ' + i18n.t('remotePatrol.checkinSuccess') : '';
+        this.checkinInfo = data.checkinRecord ? `${i18n.t('remotePatrol.checkinSuccess')}  ( ${util.getDateStr2(data.checkinRecord.ts)} )`: '';
         this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.getGroupsData(data.groups);
