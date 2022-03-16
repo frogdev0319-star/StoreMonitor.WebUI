@@ -20,7 +20,7 @@
       <slot/>
     </div>
     <div v-if="showButton" slot="footer">
-      <div style="display: inline; float: left; color: #f57949" v-if="hasIgnore" @click="hasIgnoreHandler">{{$t('remotePatrol.clickToContent')}}</div>
+      <div style="display: inline; float: left; color: #f57949;width:45%;word-break:break-word;text-align:left;" v-if="hasIgnore" @click="hasIgnoreHandler">{{$t('remotePatrol.clickToContent')}}</div>
       <el-button class="cancel-btn" size="mini" @click="cancelHandler">
         {{ $t('remotePatrol.cancel') }}
       </el-button>

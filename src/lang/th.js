@@ -598,6 +598,7 @@ export default{
       "excelIllegalCategory":"อักขระที่ไม่ถูกต้อง '@#￥%^&*'!",
       "excelIllegalDes":"ความยาวของคำอธิบายรายการจะต้องไม่เกิน 1200 อักขระ!",
       "excelLongCategory":"ความยาวของหมวดหมู่จะต้องไม่เกิน 30 อักขระ",
+      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
       "excelLongItem":"ความยาวของรายการจะต้องไม่เกิน 250 อักขระ!",
       "excelMinScoreType":"เกณฑ์คะแนน-เหตุการณ์ผิดปกติ ทางเลือก, -50~คะแนนสูงสุดของตัวเลือกคะแนน",
       "excelOtherScoreType":"คะแนน:จำเป็น, -100~100 คะแนน",

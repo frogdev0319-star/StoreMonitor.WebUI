@@ -96,7 +96,7 @@
                 <span class="title">{{ $t("remotePatrol.selectDate") }}</span>
                 <div @click="backCurDate"
                 class="backToNow"
-                style="">{{ $t("remotePatrol.backToNow")}}</div>
+                :style="{'fontSize':lang=='en'?'12px':'15px'}">{{ $t("remotePatrol.backToNow")}}</div>
               </div>
               <div class="padding flex" style="padding-top: 0px">
                 <el-date-picker

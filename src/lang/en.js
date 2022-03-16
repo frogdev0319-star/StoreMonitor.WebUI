@@ -599,6 +599,7 @@ export default{
       "excelIllegalCategory":"llegal characters '@#￥%^&*'!",
       "excelIllegalDes":"The length of item description is 1200 characters at most!",
       "excelLongCategory":"The length of category supports up to 30 characters",
+      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
       "excelLongItem":"The length of item is 250 characters at most!",
       "excelMinScoreType":"Anomaly Events-Score Threshold: Optional, -50~the highest score of Score Options",
       "excelOtherScoreType":"Score:Required, -100~100points",

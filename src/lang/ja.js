@@ -599,6 +599,7 @@ export default {
       "excelIllegalCategory":"カテゴリ名に不正な文字列が含まれています。確認してください！",
       "excelIllegalDes":"アイテムの説明の長さは最大1200文字です",
       "excelLongCategory":"カテゴリの長さは最大30文字をサポートします",
+      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
       "excelLongItem":"アイテムの長さは最大250文字です",
       "excelMinScoreType":"異常イベント-スコアしきい値：オプション、-50ポイントー合計スコア",
       "excelOtherScoreType":"スコア：必須、-100〜100ポイント",

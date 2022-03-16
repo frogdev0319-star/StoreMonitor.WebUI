@@ -598,6 +598,7 @@ export default{
       "excelIllegalCategory":"Karakter ilegal '@#￥%^&*'!",
       "excelIllegalDes":"Panjang deskripsi item maksimal 1200 karakter!",
       "excelLongCategory":"Panjang kategori mendukung hingga 30 karakter",
+      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
       "excelLongItem":"Panjang item maksimal 250 karakter!",
       "excelMinScoreType":"Ambang Nilai-Kejadian Anomali: Opsional, -50~nilai tertinggi pada Opsi Nilai",
       "excelOtherScoreType":"Nilai:Wajib diisi, -100~100poin",

@@ -64,8 +64,8 @@
           :dateTimeValue = dateValue /> 
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
-              <span class="search-label">{{ $t('remotePatrol.keywords') }}</span>
-              <el-input v-model="searchInput" size="mini" class="search-input shadow-light" clearable/>
+              <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
+              <el-input v-model="searchInput" size="mini" class="search-input shadow-light" style="margin-left: 16px;" clearable/>
             </div>
             <div class="spacer"></div>
             <el-button
@@ -1000,12 +1000,15 @@ $filterWidth: (100%-706);
   }
 }
 .search-label{
-  width: 82.5px;
+  min-width: 45px;
   text-align: left;
   align-self: center;
   font-family: NotoSansCJKTC;
   font-size: 15px;
   font-weight: normal;
+  word-break: keep-all;
+  padding-right: 16px;
+  
 }
 .report-type-area{
     width:calc(346/1440*100vw);
