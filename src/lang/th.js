@@ -711,7 +711,8 @@ export default{
       "yesNo":"ใช่/ไม่ใช่",
       "needBind":"ตาราง ร้านค้าที่ต้องผูกโยง",
       "selectStore":"เลือกร้านค้า",
-      "selectStoreTag":"เลือกด่วน"
+      "selectStoreTag":"เลือกด่วน",
+      "minScoreEmpty":"扣分起始值不得為空！"
   },
   "deviceView":{
       "EzvizAccount":"บัญชีบริการสตรีมมิ่ง",
@@ -1057,6 +1058,7 @@ export default{
       "radar":"แผนภูมิเรดาร์",
       "remarksContent":"หมายเหตุ",
       "reportTemplate":"เทมเพลตรายงาน",
+      "roleId0Title": "Custom",
       "roleId1Title":"ผู้ดูแลระบบ",
       "roleId2Title":"ผู้จัดการ",
       "roleId3Title":"หัวหน้างาน",
@@ -1078,7 +1080,9 @@ export default{
       "unqualified":"ไม่ผ่าน",
       "useAndSave":"เลือกและบันทึก",
       "useTemplate":"เทมเพลต",
-      "yes":"ใช่"
+      "yes":"ใช่",
+      "templateSelection":"選擇模板",
+      "reportTemplateLabel": "報告模板"
   },
   "statistics":{
       "averageCompare":"เปรียบเทียบค่าเฉลี่ย",

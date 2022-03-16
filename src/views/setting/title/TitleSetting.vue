@@ -263,7 +263,7 @@ export default {
               visabled:true
             },
             {
-              roleName: this.$t('route.appraisalCompareStat'),
+              roleName: this.$t('route.patrolCompareStat'),
               checked: false,
               disabled: false,
               visabled:true
@@ -729,8 +729,8 @@ export default {
       font-family: NotoSansCJKtc;
       font-size: 13px;
       width:75px;
-      line-height:36px;
-      margin-left:16px
+      margin-left:16px;
+      line-height: 15px;
     }
   }
 </style>

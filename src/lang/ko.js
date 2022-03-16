@@ -712,7 +712,8 @@ export default {
       "yesNo":"예/아니요",
       "needBind":"테이블, 바인딩해야 하는 매장",
       "selectStore":"선택하십시오",
-      "selectStoreTag":"빠른 선택"
+      "selectStoreTag":"빠른 선택",
+      "minScoreEmpty":"扣分起始值不得為空！"
   },
   "deviceView":{
       "EzvizAccount":"장부",
@@ -1058,6 +1059,7 @@ export default {
       "radar":"방사형",
       "remarksContent":"기술",
       "reportTemplate":"보고서 서식 파일",
+      "roleId0Title": "Custom",
       "roleId1Title":"관리",
       "roleId2Title":"관리자",
       "roleId3Title":"관리자",
@@ -1079,7 +1081,9 @@ export default {
       "unqualified":"실패",
       "useAndSave":"선택&사용",
       "useTemplate":"형판",
-      "yes":"네"
+      "yes":"네",
+      "templateSelection":"選擇模板",
+      "reportTemplateLabel": "報告模板"
   },
   "statistics":{
       "averageCompare":"평균 비교",

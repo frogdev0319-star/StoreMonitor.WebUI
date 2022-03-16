@@ -711,7 +711,8 @@ export default{
       "yesNo":"Có/Không",
       "needBind":"Bảng biểu XX, cửa hàng cần được liên kết",
       "selectStore":"Chọn cửa hàng",
-      "selectStoreTag":"Chọn nhanh"
+      "selectStoreTag":"Chọn nhanh",
+      "minScoreEmpty":"扣分起始值不得為空！"
   },
   "deviceView":{
       "EzvizAccount":"Tài khoản dịch vụ Streaming",
@@ -1057,6 +1058,7 @@ export default{
       "radar":"Biểu đồ radar",
       "remarksContent":"Lưu ý",
       "reportTemplate":"Mẫu báo cáo",
+      "roleId0Title": "Custom",
       "roleId1Title":"Quản trị viên",
       "roleId2Title":"Người quản lý",
       "roleId3Title":"Người giám sát",
@@ -1078,7 +1080,9 @@ export default{
       "unqualified":"Thất bại",
       "useAndSave":"Chọn & Lưu",
       "useTemplate":"Mẫu",
-      "yes":"Có"
+      "yes":"Có",
+      "templateSelection":"選擇模板",
+      "reportTemplateLabel": "報告模板"
   },
   "statistics":{
       "averageCompare":"So sánh trung bình",
