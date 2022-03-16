@@ -611,7 +611,7 @@ export default {
             reportObj.submitter = item.submitter;
             reportObj.routeObj = item;
             reportObj.mode = item.mode;
-            reportObj.totalScore = item.type === 0 ? "--" : item.totalScore;
+            reportObj.totalScore = item.type === 1 ? "--" : item.totalScore;
             reportObj.code = item.code !== null ? item.code : '--';
             reportObj.standard = item.standard;
             reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
