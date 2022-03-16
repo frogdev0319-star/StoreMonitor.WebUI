@@ -1592,11 +1592,13 @@ export default {
           const Others = wb.Sheets['Others'];
 
           let PassFailCopy = deepClone(PassFail);
+          console.log('PassFailCopy:',PassFailCopy);
           let ScoreCopy = deepClone(Score);
           let OthersCopy = deepClone(Others);
           const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
 
           outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
+          console.log('outdata.PassFail:',outdata.PassFail);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
           outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
 
@@ -1705,12 +1707,12 @@ export default {
             rowDataObj.subCatergyName = '';
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.score = _item.__EMPTY_2;
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
           } else {
             rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
             rowDataObj.score = _item.__EMPTY_3;
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_4);
+            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
           }
 
           rowDataArray.push(rowDataObj);
@@ -2022,7 +2024,7 @@ export default {
           if (othersFlag.flagSubGroupLengthOthers) {
             flagArr.push('[Others]');
           }
-          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongCategory');
+          const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelLongSubCategory');
           warningInfo.push(flag);
         }
         if (passFailFlag.flagItemNamePassFail || scoreFlag.flagItemNameScore || othersFlag.flagItemNameOthers) {
