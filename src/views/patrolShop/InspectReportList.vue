@@ -1164,18 +1164,15 @@ $filterWidth: (100%-706);
         margin-bottom: calc(20/1440*100vw);
         .cards{
           .card-title {
-             font-size: calc(15/1440*100vw);
-             flex: 1; 
-             min-width: 0; 
-             margin-right: calc(10/1440*100vw);
-          }
-          div {
-            display: flex;
-            align-items: center;
-            text-align: left;
+            width: calc(150/1440*100vw);
             overflow:hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+             font-size: calc(15/1440*100vw);
+             margin-right: calc(10/1440*100vw);
+          }
+          div {
+            text-align: left;
           }
             padding: calc(15/1440*100vw);
             cursor: pointer;
