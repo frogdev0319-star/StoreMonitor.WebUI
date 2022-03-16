@@ -1318,7 +1318,7 @@ export default {
         : summary.sort(this.sortArrayByKeyDesc('numOfQualifiedItems'));
       const summaryTempArr = [];
       for (let summaryIndex = 0; summaryIndex < summary.length; summaryIndex++) {
-        if (summaryIndex < 10) {
+        if (summaryIndex < 9) {
           summaryTempArr.push(summary[summaryIndex]);
         } else {
           otherUnqualified += summary[summaryIndex].numOfUnqualifiedItems;
