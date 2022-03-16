@@ -543,13 +543,13 @@ export default {
         util.notify(that.$t('remotePatrol.emptyReportList'), 'warning', 3000);
         return false;
       }
-      const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
-      const end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
-      that.params.beginTs = start;
-      that.params.endTs = end;
-      that.params.filter = { page: 0, size: that.total };
-      const storeIds = this.storeFilterObj.filterStoreIds;
-      that.params.clause = { storeId: storeIds };
+      // const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
+      // const end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
+      // that.params.beginTs = start;
+      // that.params.endTs = end;
+      // that.params.filter = { page: 0, size: that.total };
+      // const storeIds = this.storeFilterObj.filterStoreIds;
+      // that.params.clause = { storeId: storeIds };
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportReportHeader;
@@ -602,7 +602,6 @@ export default {
           //data.forEach(async (item,index) => {
             //console.log(index+"."+item.tagName);
             let isScore = await this.getReportInfo(item.id);
-            console.log("isScore:",isScore);
             const reportObj = {};
             reportObj.province = item.province;
             reportObj.city = item.city;
@@ -648,10 +647,8 @@ export default {
           if (temp.length === 0) {
             self.noData = self.$t('deviceView.noData');
           }
-          console.log("getReportList > temp:",temp);
           resolve(temp);
         }).catch(err => {
-          console.log('InspectReportList-getReportList: ' + err);
         });
       });
     },
@@ -887,14 +884,14 @@ export default {
     },
 
     getSearchParams() {
-      console.log("Get SEarch Parameter");
+      // console.log("Get SEarch Parameter");
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
-      console.log(searchParams)
+      // console.log(searchParams)
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
    
    
       if (Object.keys(searchParams).length > 0) {
-        console.log("Get Old Params")
+        // console.log("Get Old Params")
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.params = searchParams;
