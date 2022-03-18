@@ -598,6 +598,7 @@ export default{
       "excelIllegalCategory":"Karakter ilegal '@#￥%^&*'!",
       "excelIllegalDes":"Panjang deskripsi item maksimal 1200 karakter!",
       "excelLongCategory":"Panjang kategori mendukung hingga 30 karakter",
+      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
       "excelLongItem":"Panjang item maksimal 250 karakter!",
       "excelMinScoreType":"Ambang Nilai-Kejadian Anomali: Opsional, -50~nilai tertinggi pada Opsi Nilai",
       "excelOtherScoreType":"Nilai:Wajib diisi, -100~100poin",
@@ -711,7 +712,8 @@ export default{
       "yesNo":"Ya/Tidak",
       "needBind":"Tabel XX, toko yang perlu diikat",
       "selectStore":"Pilih Toko",
-      "selectStoreTag":"Pilih cepat"
+      "selectStoreTag":"Pilih cepat",
+      "minScoreEmpty":"扣分起始值不得為空！"
   },
   "deviceView":{
       "EzvizAccount":"Akun Layanan Streaming",
@@ -1057,6 +1059,7 @@ export default{
       "radar":"Grafik Radar",
       "remarksContent":"Catatan",
       "reportTemplate":"Template Laporan",
+      "roleId0Title": "Custom",
       "roleId1Title":"Admin",
       "roleId2Title":"Manajer",
       "roleId3Title":"Supervisor",
@@ -1078,7 +1081,9 @@ export default{
       "unqualified":"Gagal",
       "useAndSave":"Pilih & Simpan",
       "useTemplate":"Template",
-      "yes":"Ya"
+      "yes":"Ya",
+      "templateSelection":"選擇模板",
+      "reportTemplateLabel": "報告模板"
   },
   "statistics":{
       "averageCompare":"Perbandingan Rata-rata",

@@ -495,6 +495,8 @@ export default {
     },
 
     searchEventList() {
+      console.log("@@@searchEventList");
+      this.saveSearchParams(false);
       this.tableDataList[Number(this.activeName)].page = 1;
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
@@ -588,14 +590,15 @@ export default {
       this.ifSaveParams = true;
       //}
       if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
-        this.tableDataList[tabIndex].tableData = [];
+        /*this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
         this.tableDataList[tabIndex].eventCount = 0;
         this.totalElements = 0;
         this.numberOfElements = 0;
-        return;
+        return;*/
+        delete self.params.clause.storeId;
       }
-      //console.log("self.params:",self.params);
+      console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
         //console.log("data:",data);
@@ -657,7 +660,7 @@ export default {
       }
       let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
       
-      //console.log("EventMange > storeId:",storeId);
+      console.log("getEventListRequestParams > storeId:",storeId);
       let status = [];
       if (this.curState.length !== 0) {
         if (this.curState.length === 1) {
@@ -797,9 +800,16 @@ export default {
          start = self.searchParams.beginTs;
          end = self.searchParams.endTs;
       }
-      console.log("self.params:",self.params);
-      console.log("self.storeFilterObj:",self.storeFilterObj);
-      const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
+      self.getEventListRequestParams('currentChange');
+      //}
+      if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
+        delete self.params.clause.storeId;
+      }
+      //console.log("self.params:",self.params);
+      //console.log("self.storeFilterObj:",self.storeFilterObj);
+      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
+      console.log("getEventCount > storeId:",storeId)
+      //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         const inputValue = self.inputSearchValue.trim();
@@ -841,6 +851,7 @@ export default {
       } else {
         eventRESTful.GetEventCountByStatus(params).then(res => {
           const data = res.data;
+          console.log("GetEventCountByStatus > data:",data);
           let numOfEventTotal = 0;
           for (let i = 0; i < 4; i++) {
             self.tableDataList[i].eventCount = data[i].numOfEvent;
@@ -1003,6 +1014,7 @@ export default {
         console.log("leave searchParams:",params.searchParams);
       }else{
         params.searchParams = { clause, filter, like, order };
+        params.searchParams.clause.storeId = params.curStore;
       }
       console.log("save params:",params);
       params.filterStoreIds = this.curStore;
@@ -1076,6 +1088,7 @@ export default {
     },
 
     onStoreChange(storeObj) {
+      console.log("onStoreChange>storeFilterObj",storeObj);
       this.storeFilterObj = storeObj;
       //this.ifSearchData && this.searchData();
       //this.ifSearchData = false;

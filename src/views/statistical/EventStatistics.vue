@@ -84,7 +84,11 @@
                       <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
                   </div>    
               </div>
-              <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
+              <div style="overflow-x:auto;overflow-y:hidden;height:100%;">
+              <v-chart ref="itemsChart1" auto-resize :options="barchartOption" class="chart-content" :width="barchartOption?barchartOption.width:'100%'"
+                :style="{width:barchartOption?barchartOption.width :'100%',height:'100%'}"
+               @click="barchartClick"/>
+              </div>
             </div>
             <div class="table-area">
               <div class="sec-head">
@@ -149,7 +153,7 @@
                   />
                 </div>
               </div>
-              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
                 <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"/>
               </div>
             </div>
@@ -320,7 +324,7 @@
                     />
                   </div>
                 </div>
-                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
                   <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"/>
                 </div>
               </div>
@@ -404,7 +408,9 @@
                       <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
                   </div>    
               </div>
+              <div style="overflow-x:auto;overflow-y:hidden;height:100%;">
               <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
+              </div>
             </div>
             <div class="table-area">
               <div class="sec-head">
@@ -469,7 +475,7 @@
                   />
                 </div>
               </div>
-              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
                 <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"/>
               </div>
             </div>
@@ -1349,9 +1355,11 @@ export default {
     getBarchartOption(){
       const self = this;
       const chartOption = {
+        width:'100%',
         grid:{
           left:40,
           right:40,
+          width:'auto'
         },
         tooltip: {
           trigger: "axis",
@@ -1364,7 +1372,7 @@ export default {
           y: 'bottom',
           itemWidth: 14,
           itemHeight: 14,
-          itemGap: 37,
+          itemGap: 20,
           padding: 0,
           icon: 'rect',
           textStyle: {
@@ -1460,7 +1468,7 @@ export default {
       return chartOption;
     },
     setBarchartData(){
-      this.barchartOption = this.getBarchartOption();
+      var option = this.getBarchartOption();
       let date_xAxis=[];
       let chart_dataset=[];
       if(this.eventBarChartData.length>0){
@@ -1468,12 +1476,20 @@ export default {
           date_xAxis.push(item.groupName);
           chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId,itemStyle:{color:(item.groupName==this.barActiveName)?"#7bd8eb":"#D7F3F9"}});
         });
-        this.barchartOption.xAxis.data = date_xAxis;
+        option.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
-        this.barchartOption.series[0].data = chart_dataset;
-        
+        option.series[0].data = chart_dataset;
+        if(date_xAxis.length>28){
+          var w = ( date_xAxis.length*90) +'px';
+          option.grid.width = w;
+          option.width = w;
+        }
+        else{
+          option.width = '100%'
+        }
+        this.barchartOption = option;
         //
       }
     },
@@ -2272,7 +2288,7 @@ export default {
           margin-right: calc(24/1440*100vw);
           border-bottom: solid 1px #acaeb1;
           .chart-content {
-            width: 100%;
+            width: auto;
             height: 100%;
           }
         }

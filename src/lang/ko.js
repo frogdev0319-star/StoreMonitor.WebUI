@@ -599,6 +599,7 @@ export default {
       "excelIllegalCategory":"범주 이름에 불법 줄을포함하고 확인하십시오!",
       "excelIllegalDes":"최대한 항목 설명 길이가 1200자이다",
       "excelLongCategory":"범주 이름 10자를 초과할 수 없어서 확인하십시오",
+      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
       "excelLongItem":"항목 제목 이름이 250자에 초과하면 안되서 확인하십시오!",
       "excelMinScoreType":"이상 이벤트 득점 한계값: (선택 가능, -50 점~ 총총점)",
       "excelOtherScoreType":"메모리(요청,-100~100점)",
@@ -712,7 +713,8 @@ export default {
       "yesNo":"예/아니요",
       "needBind":"테이블, 바인딩해야 하는 매장",
       "selectStore":"선택하십시오",
-      "selectStoreTag":"빠른 선택"
+      "selectStoreTag":"빠른 선택",
+      "minScoreEmpty":"扣分起始值不得為空！"
   },
   "deviceView":{
       "EzvizAccount":"장부",
@@ -1058,6 +1060,7 @@ export default {
       "radar":"방사형",
       "remarksContent":"기술",
       "reportTemplate":"보고서 서식 파일",
+      "roleId0Title": "Custom",
       "roleId1Title":"관리",
       "roleId2Title":"관리자",
       "roleId3Title":"관리자",
@@ -1079,7 +1082,9 @@ export default {
       "unqualified":"실패",
       "useAndSave":"선택&사용",
       "useTemplate":"형판",
-      "yes":"네"
+      "yes":"네",
+      "templateSelection":"選擇模板",
+      "reportTemplateLabel": "報告模板"
   },
   "statistics":{
       "averageCompare":"평균 비교",

@@ -599,6 +599,7 @@ export default {
       "excelIllegalCategory":"カテゴリ名に不正な文字列が含まれています。確認してください！",
       "excelIllegalDes":"アイテムの説明の長さは最大1200文字です",
       "excelLongCategory":"カテゴリの長さは最大30文字をサポートします",
+      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
       "excelLongItem":"アイテムの長さは最大250文字です",
       "excelMinScoreType":"異常イベント-スコアしきい値：オプション、-50ポイントー合計スコア",
       "excelOtherScoreType":"スコア：必須、-100〜100ポイント",
@@ -712,7 +713,8 @@ export default {
       "yesNo":"はい/いいえ",
       "needBind":"XXテーブル、バインドすべきストア",
       "selectStore":"セレクトしてください",
-      "selectStoreTag":"クイックセレクト"
+      "selectStoreTag":"クイックセレクト",
+      "minScoreEmpty":"扣分起始值不得為空！"
   },
   "deviceView":{
       "EzvizAccount":"アカウント",
@@ -1058,6 +1060,7 @@ export default {
       "radar":"レーダーチャート",
       "remarksContent":"説明",
       "reportTemplate":"レポートテンプレート",
+      "roleId0Title": "Custom",
       "roleId1Title":"管理者",
       "roleId2Title":"マネージャー",
       "roleId3Title":"スーパーバイザー",
@@ -1079,7 +1082,9 @@ export default {
       "unqualified":"失敗しました",
       "useAndSave":"選択と使用",
       "useTemplate":"テンプレート",
-      "yes":"はい"
+      "yes":"はい",
+      "templateSelection":"選擇模板",
+      "reportTemplateLabel": "報告模板"
   },
   "statistics":{
       "averageCompare":"平均比較",

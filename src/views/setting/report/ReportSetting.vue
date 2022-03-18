@@ -701,8 +701,8 @@ export default {
       font-family: NotoSansCJKtc;
       font-size: 13px;
       width:75px;
-      line-height:36px;
       margin-left:16px;
+      line-height: 15px;
     }
   .inspect-basic{
     margin-bottom: 30px;

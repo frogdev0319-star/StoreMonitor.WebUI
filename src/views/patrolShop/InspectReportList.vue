@@ -64,8 +64,8 @@
           :dateTimeValue = dateValue /> 
           <div class="flex-center fullWidth" style="margin-left: 20px">
             <div class="search-content flex-center" style="margin-right: 20px">
-              <span class="search-label">{{ $t('remotePatrol.keywords') }}</span>
-              <el-input v-model="searchInput" size="mini" class="search-input shadow-light" clearable/>
+              <div class="search-label">{{ $t('remotePatrol.keywords') }}</div>
+              <el-input v-model="searchInput" size="mini" class="search-input shadow-light" style="margin-left: 16px;" clearable/>
             </div>
             <div class="spacer"></div>
             <el-button
@@ -139,14 +139,14 @@
                   </div>
                   <div class="margin-bottom-5">{{ item.tagName }}</div>
                   <div style="margin-bottom: 12px" class="flex">
-                    <div class="status-tag"
+                    <div :class="lang.indexOf('zh') == -1?'status-tag-en':'status-tag' "
                       :style="{
                         0: {'color':'#e22472','background-color':'#ffecf4'},
                         1: {'color':'#f57848','background-color':'#ffefeb'},
                         2: {'color':'#59ab22','background-color':'#e8f6de'}
                       }[item.statusCode]"
                     >{{item.status}}</div>
-                    <div v-if="item.standard!=-1" style="margin-left: calc(10/1920*100vw)" class="status-tag"
+                    <div v-if="item.standard!=-1" style="margin-left: calc(10/1920*100vw)" :class="(lang.indexOf('zh') == -1)?'status-tag-en':'status-tag' "
                       :style="item.standard==1 ? {'color':'#59ab22','background-color':'#e8f6de'}: {'color':'#f57848','background-color':'#ffefeb'}"
                     >{{item.standard==1 ? $t('remotePatrol.goalAchieved') : $t('remotePatrol.farBehind')}}</div>
                   </div>
@@ -543,13 +543,13 @@ export default {
         util.notify(that.$t('remotePatrol.emptyReportList'), 'warning', 3000);
         return false;
       }
-      const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
-      const end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
-      that.params.beginTs = start;
-      that.params.endTs = end;
-      that.params.filter = { page: 0, size: that.total };
-      const storeIds = this.storeFilterObj.filterStoreIds;
-      that.params.clause = { storeId: storeIds };
+      // const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
+      // const end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
+      // that.params.beginTs = start;
+      // that.params.endTs = end;
+      // that.params.filter = { page: 0, size: that.total };
+      // const storeIds = this.storeFilterObj.filterStoreIds;
+      // that.params.clause = { storeId: storeIds };
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportReportHeader;
@@ -600,9 +600,6 @@ export default {
           self.isLoading = true;
           for(const item of data){
           //data.forEach(async (item,index) => {
-            //console.log(index+"."+item.tagName);
-            let isScore = await this.getReportInfo(item.id);
-            console.log("isScore:",isScore);
             const reportObj = {};
             reportObj.province = item.province;
             reportObj.city = item.city;
@@ -614,7 +611,7 @@ export default {
             reportObj.submitter = item.submitter;
             reportObj.routeObj = item;
             reportObj.mode = item.mode;
-            reportObj.totalScore = isScore? item.totalScore:"--";
+            reportObj.totalScore = item.type === 1 ? "--" : item.totalScore;
             reportObj.code = item.code !== null ? item.code : '--';
             reportObj.standard = item.standard;
             reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
@@ -648,10 +645,8 @@ export default {
           if (temp.length === 0) {
             self.noData = self.$t('deviceView.noData');
           }
-          console.log("getReportList > temp:",temp);
           resolve(temp);
         }).catch(err => {
-          console.log('InspectReportList-getReportList: ' + err);
         });
       });
     },
@@ -887,14 +882,14 @@ export default {
     },
 
     getSearchParams() {
-      console.log("Get SEarch Parameter");
+      // console.log("Get SEarch Parameter");
       const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
-      console.log(searchParams)
+      // console.log(searchParams)
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
    
    
       if (Object.keys(searchParams).length > 0) {
-        console.log("Get Old Params")
+        // console.log("Get Old Params")
         this.order = searchParams.order;
         this.filter = searchParams.filter;
         this.params = searchParams;
@@ -1005,12 +1000,15 @@ $filterWidth: (100%-706);
   }
 }
 .search-label{
-  width: 82.5px;
+  min-width: 45px;
   text-align: left;
   align-self: center;
   font-family: NotoSansCJKTC;
   font-size: 15px;
   font-weight: normal;
+  word-break: keep-all;
+  padding-right: 16px;
+  
 }
 .report-type-area{
     width:calc(346/1440*100vw);
@@ -1167,18 +1165,15 @@ $filterWidth: (100%-706);
         margin-bottom: calc(20/1440*100vw);
         .cards{
           .card-title {
-             font-size: calc(15/1440*100vw);
-             flex: 1; 
-             min-width: 0; 
-             margin-right: calc(10/1440*100vw);
-          }
-          div {
-            display: flex;
-            align-items: center;
-            text-align: left;
+            width: calc(150/1440*100vw);
             overflow:hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+             font-size: calc(15/1440*100vw);
+             margin-right: calc(10/1440*100vw);
+          }
+          div {
+            text-align: left;
           }
             padding: calc(15/1440*100vw);
             cursor: pointer;
@@ -1251,6 +1246,11 @@ $filterWidth: (100%-706);
           margin-bottom: calc(30/1440*100vw);
         }
         .status-tag {
+          border-radius: calc(5/1440*100vw); 
+          padding: calc(2/1440*100vw) calc(15/1440*100vw);
+        }
+        .status-tag-en{
+          font-size: 14px;
           border-radius: calc(5/1440*100vw); 
           padding: calc(2/1440*100vw) calc(15/1440*100vw);
         }

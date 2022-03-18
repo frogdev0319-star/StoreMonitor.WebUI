@@ -312,7 +312,7 @@
             <span v-if="ivsIdRuletip" class="rules">{{ $t('eventView.RateRuletip') }}</span>
           </div>
           <div  class="btn-content">
-            <div class="btn-des-confirm" @click="comfirmAddDes">確認</div>
+            <div class="btn-des-confirm" @click="comfirmAddDes">{{ $t('remotePatrol.confirm') }}</div>
           </div>
         </div>
       </div>
