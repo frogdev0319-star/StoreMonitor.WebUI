@@ -41,6 +41,7 @@ export default {
     "my": "나의",
     "networkError": "Network error, please check network connection status!",
     "noAuthority": "No authority!",
+    "nodeSetting": "Node Setting",
     "noInspectionAccessRights": "No Inspection Access Rights",
     "noRight": "",
     "operPerm": "No operation permission",

@@ -5,6 +5,11 @@
       size="mini" type="primary" @click="submit">
       保存並發布
     </el-button>
+    <el-button
+      class="storevue-button-outlined"
+      size="mini" type="primary" @click="addNode">
+      新增節點
+    </el-button>
     <el-table
       :data="workflowDetail.nextNodes"
       style="width: 100%">
@@ -74,15 +79,25 @@ export default {
     })
   },
   methods: {
+    addNode() {
+      this.$router.push({ name: 'nodeSetting' })
+    },
     submit() {
       let array = this.workflowDetail.nextNodes;
-      var object = {};
-      // updateWorkflow({
-      //   ...this.workflowDetail
-      // })
-      // .then(res => {
-      //   console.log(res)
-      // })
+      let object = { ...array[0] };
+      let i = array.length - 1;
+      while(i >= 0) {
+        object['nextAuditNode'] = { ...array[i].nextAuditNode };
+        i--;
+      }
+      let nextAuditNode = JSON.parse(JSON.stringify(object));
+      updateWorkflow({
+        ...this.workflowDetail,
+        nextAuditNode
+      })
+      .then(res => {
+        console.log(res)
+      })
     },
     
     

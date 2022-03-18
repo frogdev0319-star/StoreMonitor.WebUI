@@ -40,6 +40,7 @@ export default {
     "my": "マイ",
     "networkError": "Network error, please check network connection status!",
     "noAuthority": "No authority!",
+    "nodeSetting": "Node Setting",
     "noInspectionAccessRights": "No Inspection Access Rights",
     "noRight": "",
     "onsitePatrol": "オンサイト検査",

@@ -40,6 +40,7 @@ export default {
     "my": "My",
     "networkError": "Network error, please check network connection status!",
     "noAuthority": "No authority!",
+    "nodeSetting": "節點設定",
     "noInspectionAccessRights": "No Inspection Access Rights",
     "noRight": "",
     "operPerm": "No operation permission",

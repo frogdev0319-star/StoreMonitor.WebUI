@@ -421,9 +421,15 @@ export const navbarRoute = {
         path: '/workflowDetail',
         name: 'workflowDetail',
         component: resolve => require(['@/views/setting/workflow/Detail'], resolve),
-        hidden: true
+        hidden: true,
+      },
+      {
+        path: '/node',
+        name: 'nodeSetting',
+        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
+        hidden: true,
       }
-    ) && primaryPathesList.push('/workflows', '/workflowDetail');
+    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/node');
     return systemSettingRoute;
   },
 

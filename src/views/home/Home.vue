@@ -14,17 +14,21 @@
           />
         </div>
         <div>
-          <el-breadcrumb separator="|" class="breadcrumb-inner">
+          <el-breadcrumb v-if="$router.currentRoute.path === '/node'" separator="|" class="breadcrumb-inner">
+            <el-breadcrumb-item class="breadcrumb-item" :to="{ path: '/workflows' }"><span class="bold-breadcrumb-span">流程設計</span></el-breadcrumb-item>            
+            <el-breadcrumb-item class="breadcrumb-item" :to="{ path: '/workflowDetail' }"><span class="bold-breadcrumb-span">流程設定</span></el-breadcrumb-item>
+            <el-breadcrumb-item class="breadcrumb-item"><span class="normal-breadcrumb-span">節點設定</span></el-breadcrumb-item>
+          </el-breadcrumb>
+          <el-breadcrumb v-else separator="|" class="breadcrumb-inner">
             <el-breadcrumb-item
               v-for="(item, index) in breadList"
               v-if="index !== 0"
               :key="item.path"
               :to="{ path: item.path }"
               class="breadcrumb-item"
-            > 
-              
+            >
               <span
-              v-if="item.name!='remotePatrol'"
+                v-if="item.name!='remotePatrol'"
                 :class="
                   index!=breadList.length-1
                     ? 'bold-breadcrumb-span'
@@ -41,13 +45,10 @@
                     : 'normal-breadcrumb-span'
                 "
               >
-                {{ $t(`route.${item.name}`)}}</span
-              >
+                {{ $t(`route.${item.name}`)}}</span>
               <span v-if="item.name=='remotePatrol' && showIgnoreItem && breadList.length==2"
-                :class="'normal-breadcrumb-span'"
-              >
-                {{" | " + $t("remotePatrol.clickToContent")}}</span
-              >
+                :class="'normal-breadcrumb-span'" >
+                {{" | " + $t("remotePatrol.clickToContent")}}</span>
             </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -543,6 +544,7 @@ export default {
       matched.length > 2 &&
         matched[0].name === "systemSetting" &&
         this.setSystemNavbarBread(matched, currentRoute);
+      console.log(this.$route)
       this.breadList = matched;
     },
 

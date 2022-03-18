@@ -41,6 +41,7 @@ export default {
     "my": "我的",
     "networkError": "网络异常，请检查网络连接状况！",
     "noAuthority": "无操作权限！",
+    "nodeSetting": "Node Setting",
     "noInspectionAccessRights": "无巡检访问权限",
     "noRight": "",
     "operPerm": "无操作权限",
