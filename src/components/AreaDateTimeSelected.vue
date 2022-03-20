@@ -105,7 +105,7 @@ export default {
             align-self: center;
         }
         .dropdown-select{
-            width:85px;
+            width:105px;
             height:36px;
             border:none;
             color: #2b2b2b;
