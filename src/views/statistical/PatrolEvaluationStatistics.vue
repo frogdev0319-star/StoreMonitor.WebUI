@@ -1240,8 +1240,7 @@ export default {
     // const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
       let searchParams =   JSON.parse(JSON.stringify(this.params))
       searchParams.jump = true;
-      searchParams.clause ={storeId:[e.row.innerId]};
-      searchParams.filterStoreIds=[e.row.innerId]
+      searchParams.clause ={storeId:[e.row.innerId],status:-1};
       searchParams.curStores=[e.row.innerId]
       searchParams.curStore=[e.row.innerId]
       searchParams.storeIds=[e.row.innerId]
@@ -1341,25 +1340,24 @@ export default {
     routeToInspectionReport(){
        let searchParams =   JSON.parse(JSON.stringify(this.params))
       searchParams.jump = true;
-      searchParams.clause ={storeId:searchParams.curStore};
+    
       searchParams.filterStoreIds=searchParams.curStore
       searchParams.storeIds=searchParams.curStore
       searchParams.filterStoreIds=searchParams.curStore;
       searchParams.curStores =searchParams.curStore;;
       searchParams.curAppraise = -1;
       searchParams.curReportType = -1;
-      searchParams.clause.status = -1;
-
+      searchParams.clause ={storeId:searchParams.curStore,status:-1};
       searchParams.inspectTagId =  searchParams.inspectId;
       searchParams.beginTs  = this.params.beginTs;
       searchParams.endTs  = this.params.endTs;
       searchParams.filter ={ page: 0, size: 12 };
- 
-      console.log(searchParams)
+      
       const searchParamsObj = {
         path: 'inspectReport',
         params: searchParams
       };
+      console.log(searchParamsObj)
       SearchConditionUtil.saveSearchCondition(searchParamsObj);
       //this.$refs.inspectEvalutionSearch.saveSearchParams(searchParamsObj);
        this.$router.push({

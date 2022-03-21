@@ -580,11 +580,12 @@ export default {
     },
 
    getReportList(p) {
-      //console.log("p:",p);
+      console.log("Get Report List")
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
+        console.log("No Data")
         this.setNoData();
         return;
       }
@@ -743,6 +744,7 @@ export default {
     },
 
     searchData() {
+      console.log("Search Data" +this.dateValue)
       const self = this;
       const val = self.dateValue;
       if (val.length === 0) return;
@@ -772,7 +774,8 @@ export default {
       } else {
         self.params.like = {};
       }
-  
+      console.log("SearchParams")
+      console.log(self.params)
       self.params.filter = { page: 0, size: self.sizeNum };
       self.saveSearchParams();
       self.getReportList(self.params);
@@ -785,14 +788,15 @@ export default {
       this.noData = this.$t('deviceView.noData');
     },
 
-    checkSortType(typeId) {
+    checkSortType(typeId,notupdate) {
       const self = this;
       switch (typeId) {
         case 0: self.params.order = { direction: 'desc', property: 'ts' }; break;
         case 1: self.params.order = { direction: 'asc', property: 'status' }; break;
         case 2: self.params.order = { direction: 'asc', property: 'storeName' }; break;
       }
-      self.getReportList(self.params);
+      if(!notupdate)
+        self.getReportList(self.params);
     },
 
     clickReport(item, index) {
@@ -865,15 +869,19 @@ export default {
     },
 
     saveSearchParams() {
+      console.log("Save Search Params")
       let tempsearchParamsObj = this.storeFilterObj;
       tempsearchParamsObj.curReportType = this.curReportType;
-      tempsearchParamsObj.clause={
-        storeId: this.storeFilterObj.filterStoreIds
+      if(!tempsearchParamsObj.clause){
+        tempsearchParamsObj.clause={
+          storeId: this.storeFilterObj.filterStoreIds.splice (this.storeFilterObj.filterStoreIds.indexOf('-1'), 1),status:this.curAppraise
+        }
+      }
+      else{
+        tempsearchParamsObj.clause = this.params.clause
       }
       tempsearchParamsObj.inspectTagId = this.inspectId;
-      tempsearchParamsObj.clause = this.params.clause
-      console.log("Save ")
-      console.log(tempsearchParamsObj)
+      //
       const searchParamsObj = {
         path: 'inspectReport',
         params: tempsearchParamsObj
@@ -883,28 +891,34 @@ export default {
 
     getSearchParams() {
       // console.log("Get SEarch Parameter");
-      const searchParams = SearchConditionUtil.getSearchCondition('inspectReport');
-      // console.log(searchParams)
+      let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
+      
       this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
    
    
       if (Object.keys(searchParams).length > 0) {
-        // console.log("Get Old Params")
+         
+        this.storeFilterObj = searchParams;
+        this.params = searchParams;
+        console.log("Get Old Params")
+        console.log(searchParams)
         this.order = searchParams.order;
         this.filter = searchParams.filter;
-        this.params = searchParams;
-        this.checkSortType(this.curSortType);
+       
+        this.checkSortType(this.curSortType,true);
         this.curAppraise = searchParams.clause.status;
         this.curReportType = searchParams.curReportType;
         this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
         this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
+    
         if(!searchParams.curProvince){
           searchParams.curProvince =[];
         }
         if(!searchParams.curCity){
           searchParams.curCity =[];
         }
+    
         if(searchParams.jump){
           console.log("Jump to ")
           this.params.jump = false;
