@@ -706,7 +706,7 @@
                         class="feedback-delete-btn"
                         @click="deleteEvent(item,index)"
                       >
-                        {{$t('remotePatrol.delete')}}
+                        {{$t('titleView.delete')}}
                       </button>
                     </div>
                     <div class="flex-center"
