@@ -11,7 +11,7 @@
       @visible-change="visibileHandler">
       <el-option v-if="options.length > 0" :label="alltype ===0 ? $t('remotePatrol.all'):$t('overview.all')"
                  value="-1" @click.native="selectAll"/>
-      <el-option v-for="(item, index) in options" :key="index" :label="item.label"
+      <el-option v-for="item in options" :key="item.storeId" :label="item.label"
                  :value="alltype === 0 ? item.value:item.storeId" :disabled="item.disabled"/>
     </el-select>
     <el-input
