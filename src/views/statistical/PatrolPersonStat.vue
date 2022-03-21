@@ -519,7 +519,7 @@ export default {
             self.pdfSrc = oGrayImg;
           });
           setTimeout(() => {
-            self.$print(self.$refs.printPDF);
+            self.$print(self.$refs.printPDF,null,self.$t('route.patrolPersonStat')+ util.getCurrentTime());
             self.ispdf = false;
           }, 1000);
         }, 5000);

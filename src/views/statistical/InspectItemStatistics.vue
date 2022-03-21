@@ -2244,6 +2244,7 @@ export default {
       await this.drawPart2RegionBar();
     },
       async clickPart3Bar(event){
+        console.log(event)
       this.part3.indexRegion = event.dataIndex;
       await this.drawPart3RegionBar();
     },
@@ -2369,7 +2370,7 @@ export default {
             self.pdfSrc_avg1 = oGrayImg1;
           });
           setTimeout(() => {
-            self.$print(self.$refs.printPDF);
+            self.$print(self.$refs.printPDF,null,self.$t('route.patrolItemStat')+ util.getCurrentTime());
             self.ispdf = false;
           }, 1000);
         }, 5000);
