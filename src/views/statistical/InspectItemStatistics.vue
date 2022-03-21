@@ -2006,7 +2006,7 @@ export default {
             this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
             console.log("Leave FIlterContent"+Math.round( (100*totalStandard) /totalReport)+ " " + ( (100*totalStandard) /totalReport))
             console.log(this.part3.content)
-            this.part3.indexRegion = -1;
+            this.part3.indexRegion = 0;
             this.drawPart3RegionBar();
           }
         }
@@ -2498,8 +2498,8 @@ export default {
       if(this.inspectItem && this.inspectItem.item){
         let item = this.inspectItem.item;
         let name = item.subject?item.subject:item.name
-        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + " ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
-        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')
+        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
+        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
       }
     }
   }
