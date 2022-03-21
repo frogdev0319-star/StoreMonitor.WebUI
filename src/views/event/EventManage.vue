@@ -636,7 +636,7 @@ export default {
         });
         self.tableDataList[tabIndex].tableData = temp;
         self.tableDataList[tabIndex].total = res.data.totalPages;
-        self.tableDataList[tabIndex].eventCount = res.data.totalElements;
+        //self.tableDataList[tabIndex].eventCount = res.data.totalElements;
         self.totalElements = res.data.totalElements;
         self.numberOfElements = res.data.numberOfElements;
         //self.handleTabClick(this.activeName);
@@ -658,7 +658,7 @@ export default {
       } else {
         like = {};
       }
-      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
+      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
       
       console.log("getEventListRequestParams > storeId:",storeId);
       let status = [];
@@ -800,16 +800,17 @@ export default {
          start = self.searchParams.beginTs;
          end = self.searchParams.endTs;
       }
-      self.getEventListRequestParams('currentChange');
+      //self.getEventListRequestParams('currentChange');
       //}
       if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
         delete self.params.clause.storeId;
       }
-      //console.log("self.params:",self.params);
-      //console.log("self.storeFilterObj:",self.storeFilterObj);
-      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
-      console.log("getEventCount > storeId:",storeId)
+      console.log("self.params:",self.params);
+      console.log("self.storeFilterObj:",self.storeFilterObj);
+      let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
+      
       //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
+      console.log("getEventCount > storeId:",storeId)
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         const inputValue = self.inputSearchValue.trim();
@@ -1005,6 +1006,7 @@ export default {
         this.getEventList('Back');
     },
     saveSearchParams(isLeave=false) {
+      console.log("saveSearchParams:",this.storeFilterObj);
       const params = this.storeFilterObj;
       const { clause, filter, like, order } = { ...this.params };
       if(isLeave){
@@ -1016,7 +1018,7 @@ export default {
         params.searchParams = { clause, filter, like, order };
         params.searchParams.clause.storeId = params.curStore;
       }
-      console.log("save params:",params);
+      
       params.filterStoreIds = this.curStore;
       params.inputSearchValue = this.inputSearchValue;
       params.dateValue = this.dateValue;
@@ -1029,6 +1031,7 @@ export default {
         path: 'eventManage',
         params: params
       };
+      console.log("save params:",params);
       SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
