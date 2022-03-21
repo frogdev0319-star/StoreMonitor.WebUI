@@ -21,8 +21,8 @@
               :key="item.path"
               :to="{ path: item.path }"
               class="breadcrumb-item"
-            > 
-              
+            >
+
               <span
               v-if="item.name!='remotePatrol'"
                 :class="
@@ -53,7 +53,7 @@
         </div>
         <div>
           <el-button
-            v-if="$route.path === '/patrolPersonStat' 
+            v-if="$route.path === '/patrolPersonStat'
              || $route.path === '/patrolCompareStat'
              || $route.path ==='/eventStat'
                || $route.path === '/patrolItem'
@@ -119,7 +119,7 @@
           </div>
           <el-scrollbar
             ref="scroll"
-            id="el-menuscrollbar" 
+            id="el-menuscrollbar"
             wrap-class="el-scrollbar__wrap"
           >
             <el-menu
@@ -248,7 +248,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.1.1
+                v3.0.1.3
                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -757,7 +757,7 @@ export default {
         data = this.brandList[idIndex].srp.find(item=>item.type == "Custom_Inspection");
       console.log("Change Account")
       console.log(this.brandList[idIndex])
-  
+
 
       if(!data || !data.enable){
          this.accountId = this.orgAccountId
@@ -778,7 +778,7 @@ export default {
         }
         else{
           this.accountId = this.orgAccountId
-           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);  
+           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);
         }
       });
     },
@@ -857,17 +857,17 @@ export default {
     border: none;
     padding-left: 0;
     padding-bottom: 0.625vw;
-    font-size: calc(22/1920*100vw); 
+    font-size: calc(22/1920*100vw);
     background-color: #FFF;
     color: #484848;
-    height: calc(40/1920*100vw); 
+    height: calc(40/1920*100vw);
   }
     /deep/
     .el-select__caret{
       color:#1375bc !important;
       font-weight: bold !important;
     }
-  
+
 }
 .sider-collapsed {
   width: calc(90/1920*100vw);
@@ -876,10 +876,10 @@ export default {
   width: calc(280/1920*100vw);
 }
 .brand-dev {
-  width: calc(236/1920*100vw); 
-  margin-left: calc(32/1920*100vw); 
-  margin-right: auto; 
-  margin-bottom: calc(50/1920*100vw); 
+  width: calc(236/1920*100vw);
+  margin-left: calc(32/1920*100vw);
+  margin-right: auto;
+  margin-bottom: calc(50/1920*100vw);
   margin-top: calc(90/1920*100vw);
 }
 .item-icon {
@@ -899,7 +899,7 @@ export default {
   flex-direction: column;
   background-color: #fff;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
-  
+
   .is-active {
     span {
       color:#006ab7;
@@ -910,7 +910,7 @@ export default {
     color:#a5a5a5;
     margin-left: 10px;
   }
-  
+
   /deep/ .el-menu--collapse {
     i {
       display: none;
@@ -921,7 +921,7 @@ export default {
     font-size: 14px;
     overflow-y: auto;
     overflow-x: hidden;
-    
+
   }
   /deep/ .el-menu-item {
     text-align: left;
@@ -970,7 +970,7 @@ export default {
         color: #006ab7;
       }
     }
-    
+
   }
   /deep/ .el-submenu {
     text-align: left;
@@ -1041,7 +1041,7 @@ export default {
         background-color: #f2f9fe;
       }
     }
-    
+
     .child-submenu {
       .el-submenu__title {
         padding-left: calc(40/1920*100vw) !important;
@@ -1064,7 +1064,7 @@ export default {
       i {
         right: 32px;
       }
-      
+
       &:hover {
         background-color: #e4f3fd !important;
         span {
@@ -1084,7 +1084,7 @@ export default {
       padding-left: calc(40/1920*100vw) !important;
     }
   }
-  
+
 }
 .el-menu--vertical .el-menu--popup .el-menu-item {
     &.is-active {
@@ -1247,7 +1247,7 @@ $collapseWidth: 5.5%;
       position: absolute;
       height: 1.66667vw;
       width: 1.66667vw;
-      
+
       left: calc(28/1920*100vw);
       top: calc(43/1920*100vw);
     }
@@ -1285,18 +1285,18 @@ $collapseWidth: 5.5%;
         }
       }
     }
-    
+
   }
-  
+
   .img-collapsed {
-    position: absolute; 
-    right:0; 
+    position: absolute;
+    right:0;
     top: calc(15/1920*100vw);
     width: calc(31/1920*100vw);
     height: calc(31/1920*100vw);
   }
   .meta {
-    position: absolute; 
+    position: absolute;
     left: calc(32/1920*100vw);
     top: calc(75/1920*100vw);
     font-size: calc(15/1920*100vw);
@@ -1341,7 +1341,7 @@ $collapseWidth: 5.5%;
       /deep/ .el-input--suffix .el-input__inner {
         padding-left: 0;
       }
-      
+
     }
     .collapsed-brand-panel {
       height: 40px;
