@@ -550,13 +550,14 @@ export default {
       // that.params.filter = { page: 0, size: that.total };
       // const storeIds = this.storeFilterObj.filterStoreIds;
       // that.params.clause = { storeId: storeIds };
+      // console.log(that.params)
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportReportHeader;
         const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
           'modeText', 'status', 'totalScore', 'datestr'];
         let curData = [];
-        curData = await that.getReportList(that.params);
+        curData = await that.getReportList({...that.params, filter: {page: 0, size: 1000}});
         const data = that.formatJson(filterVal, curData);
         const fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
         sessionStorage.setItem('!merge', true);
