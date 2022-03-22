@@ -203,7 +203,7 @@ export default {
       self.$nextTick(function() {
         var video = document.getElementById('previewVideo');
         this.previewplayer = videojs(video);
-        this.previewplayer.src({ src: item.url });
+        this.previewplayer.src({ src: item.isH265 ? '' : item.url });
         this.previewplayer.play();
       });
     },

@@ -25564,7 +25564,7 @@
     // locales and their language translations
     languages: {},
     // Default message to show when a video cannot be played.
-    notSupportedMessage: 'No compatible source was found for this media.',
+    notSupportedMessage: 'The media could not be loaded, either because the server or network failed or because the format is not supported.',
     breakpoints: {},
     responsive: false
   };
