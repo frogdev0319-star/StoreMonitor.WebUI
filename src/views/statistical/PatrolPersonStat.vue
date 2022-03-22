@@ -445,11 +445,15 @@ export default {
       this.params.submitters = this.userIds;*/
       this.allInsRecordData = [];
       let param = {beginTs:start,endTs:end,submitters:this.userIds};
+      if(this.userIds.includes("-1")){
+        param = {beginTs:start,endTs:end};
+      }
       
       //console.log("doSearchInsRecordList > params:",this.params);
       let record = await this.getInspectStatsPersonInfo(param);
       this.allInsRecordData = record.data.content;
       this.total = Math.ceil(this.allInsRecordData.length/this.sizeNum);
+      this.page =1;
       this.doCoverDepartmentToString();
       //console.log("this.total:",this.total);
       //console.log("this.allInsRecordData:",this.allInsRecordData);

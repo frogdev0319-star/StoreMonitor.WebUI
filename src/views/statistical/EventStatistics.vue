@@ -85,7 +85,7 @@
                   </div>    
               </div>
               <div style="overflow-x:auto;overflow-y:hidden;height:100%;">
-              <v-chart ref="itemsChart1" auto-resize :options="barchartOption" class="chart-content" :width="barchartWidth"
+              <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" :width="barchartWidth"
                 :style="{width:barchartWidth,height:'100%'}"
                @click="barchartClick"/>
               </div>
@@ -1487,6 +1487,7 @@ export default {
         return returnValue;
     },
     setBarchartData(){
+      //this.$ref.itemsChart1.d
       this.barchartOption = {};
       var option = this.getBarchartOption();
       let date_xAxis=[];
@@ -1503,16 +1504,19 @@ export default {
         option.series[0].data = chart_dataset;
         if(date_xAxis.length>28){
           var w = ( date_xAxis.length*90) +'px';
-          option.grid.width = w;
+          
           option.width = w;
+          option.grid.width = w;
           this.barchartWidth = w;
         }
         else{
            //option.grid.width = 'calc(1479/1980*100vw)';
            option.width = 'calc(1479/1980*100vw)';
+           option.grid.width = '100%';
            this.barchartWidth = 'calc(1479/1980*100vw)'
         }
         this.barchartOption = option;
+        //this.$ref.itemsChart1.on('rendered',()=>{console.log('rendered event fired')});
         //
       }
     },
@@ -1541,6 +1545,7 @@ export default {
       }
       
     },
+    
     async getEventTableData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
