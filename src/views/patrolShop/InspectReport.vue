@@ -306,7 +306,8 @@
                   v-for="(subcategory,subcategoryIndex) in categoryItem.children"
                   :key="subcategoryIndex"
                   :style="subcategoryIndex%2!=0?{'background-color':'#F7F8FC'}:{}">
-                  <td style="word-break: keep-all;white-space:nowrap;"><span class="item-name">{{ subcategory.groupName }}</span>
+                  <td style="word-break: keep-all;white-space:nowrap;">
+                    <span class="item-name">{{ subcategory.children ? "--" : subcategory.groupName }}</span>
                     <span class="count-blag"><span class="pdf_font_16">{{ subcategory.numOfTotalItems }}</span></span>
                   </td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
