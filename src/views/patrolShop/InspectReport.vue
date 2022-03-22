@@ -1,5 +1,5 @@
 <template>
-  <div ref="printPDF" class="report-container">
+  <div ref="printPDF" class="report-container" :class="{'print': isexportPDF}">
     <div style="display: none">
       <div class="no-print">
         <delay-button
@@ -1555,7 +1555,10 @@ export default {
   $qualified: #69727c;
   $noqualied: #FDBA40;
   $suggestBack: #f7f9fa;
-  
+  .print {
+    // transform: scale(.8);
+    zoom: .9;
+  }
   tr {
     background-color: #fff !important;
   }
