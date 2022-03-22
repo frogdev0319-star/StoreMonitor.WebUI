@@ -143,7 +143,7 @@
                 >
                   <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`" />
                   <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`" />
-                  <span class="span1">{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
+                  <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
                 </el-menu-item>
 
                 <!--multi nodes -->
@@ -155,7 +155,7 @@
                   <template slot="title">
                     <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`"/>
                     <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`"/>
-                    <span class="span2">{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
+                    <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                   </template>
                   <div v-for="child in item.children" :key="child.path">
                     <el-menu-item
@@ -165,7 +165,7 @@
                       :index="child.path"
                       :disabled="child.isReadOnly">
                       <div class="item-icon"></div>
-                      <span  class="span3">{{ $t(`route.${child.name}`) }}</span>
+                      <span >{{ $t(`route.${child.name}`) }}</span>
                     </el-menu-item>
                     <el-submenu
                       v-else-if="!child.hidden && child.threeChild"
@@ -177,7 +177,7 @@
                       :key="child.path">
                       <template slot="title">
                         <div class="item-icon"></div>
-                        <span  class="span4" style="margin-left: 15px">{{ $t(`route.${child.name}`) }}</span>
+                        <span  style="margin-left: 15px">{{ $t(`route.${child.name}`) }}</span>
                       </template>
                       <div v-for="grandChild in child.children" :key="grandChild.path">
                         <el-menu-item
@@ -188,7 +188,7 @@
 
                           class="submenu-item">
                           <template>
-                            <span class="span5" style="margin-left: 30px">{{ $t(`route.${grandChild.name}`) }}</span>
+                            <span style="margin-left: 30px">{{ $t(`route.${grandChild.name}`) }}</span>
                           </template>
                         </el-menu-item>
                       </div>
@@ -901,14 +901,14 @@ export default {
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
 
   .is-active {
-    .span4 {
-      // color:#006ab7 !important;
+    span {
+      color:#006ab7;
     }
   }
   span {
     font-size: 14px;
     color:#a5a5a5;
-    margin-left: 15px;
+    margin-left: 10px;
   }
 
   /deep/ .el-menu--collapse {
@@ -997,7 +997,7 @@ export default {
       background-color: #e4f3fd;
       .el-submenu__title {
         padding-left: calc(30/1920*100vw) !important;
-        .span2 {
+        span {
           color: #006ab7;
         }
       }
@@ -1022,7 +1022,7 @@ export default {
         padding-left: calc(30/1920*100vw) !important;
         height: calc(66/1920*100vw);
         line-height: calc(66/1920*100vw);
-        .span2 {
+        span {
           color: #006ab7;
         }
       }
@@ -1047,24 +1047,10 @@ export default {
         padding-left: calc(40/1920*100vw) !important;
         height: 2.1875vw;
         line-height: 2.1875vw;
-        &:hover {
-          .item-icon {
-              background-color: #006ab7;
-          }
-          .span4 {
-            color: #006ab7 !important;
-          }
-        }
       }
       &.is-opened {
       .el-submenu__title {
           padding-left: calc(40/1920*100vw) !important;
-          .span4 {
-            color: #006ab7;
-          }
-          .item-icon {
-              background-color: #006ab7;
-          }
         }
       }
     }
@@ -1081,7 +1067,7 @@ export default {
 
       &:hover {
         background-color: #e4f3fd !important;
-        .span2 {
+        span {
           color: #006ab7 !important;
         }
         .menu_img {
