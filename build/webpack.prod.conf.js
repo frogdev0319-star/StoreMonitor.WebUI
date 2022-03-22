@@ -12,6 +12,7 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const  Version = new Date().getTime(); // 这里使用的是时间戳 来区分 ，也可以自己定义成别的如：1.1
 const env = require('../config/prod.env')
+const Environment = require('../src/common/environment')
 
 
 var GenerateAssetPlugin = require('generate-asset-webpack-plugin');
@@ -21,7 +22,7 @@ var createServerConfig = function(compilation){
 }
 
 var createBeseyeConfig = function() {
-  let cfgJson = { client_id: 'abf2c7e17648cc11f1562e2ea26e2d61743cae99c3df395ba68b817f37c99a03' };
+  let cfgJson = { client_id: Environment.client_id };
   return JSON.stringify(cfgJson);
 }
 
