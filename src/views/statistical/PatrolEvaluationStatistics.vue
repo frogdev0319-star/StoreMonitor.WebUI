@@ -1521,7 +1521,7 @@ export default {
           'numOfDangerous', 'qualifiedRateStr', 'averageScore'];
         const self = this;
         const data = that.formatJson(filterVal, this.part1.storeTableData);
-        const fileName = 'Area' + '-' + util.getCurDateStr();
+        const fileName = 'Area' + '-' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1537,10 +1537,17 @@ export default {
        //this.part2.compareType == 'stores'
        console.log(this.part1.content[this.part1.indexRegion])
        params.storeIds = this.part1.compareType == 'stores' ? [this.part1.content[this.part1.indexRegion].innerId]: this.part1.content[this.part1.indexRegion].list;
+       if(this.part1.compareType == 'position'||this.part1.compareType == 'users'){
+         params.storeIds = self.params.storeIds;
+         params.submitters  = [self.part1.content[self.part1.indexRegion].innerId];
+         params.groupIds   = [];
+         params.groupMode = 0;
+       }
+      // console.log(params)
        params.inspectTagId = self.params.inspectId;
             params.filter={
               page:0,
-              size:params.storeIds.length
+              size:params.storeIds.length>0?params.storeIds.length:50
             }
              if (params.storeIds.length === 0) {
               ;
@@ -1564,7 +1571,7 @@ export default {
                 'numOfDangerous'];
               const data = that.formatJson(filterVal, content);
               const name = that.params.inspectId==='' ? 'All' : that.storePatrolLists;
-              const fileName = name + '_Inspection evaluation result_' + util.getCurDateStr();
+              const fileName = this.part1.content[this.part1.indexRegion].groupName + '_Inspection evaluation result_' + util.getCurrentTime();
               export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1582,6 +1589,12 @@ export default {
             }
        console.log(this.part2.content[this.part2.indexRegion])
        params.storeIds = this.part2.compareType == 'stores' ? [this.part2.content[this.part2.indexRegion].innerId]: this.part2.content[this.part2.indexRegion].list;
+       if(this.part2.compareType == 'position'||this.part2.compareType == 'users'){
+         params.storeIds = self.params.storeIds;
+         params.submitters  = [self.part1.content[self.part1.indexRegion].innerId];
+         params.groupIds   = [];
+         params.groupMode = 0;
+       }
        params.inspectTagId = self.params.inspectId;
             params.filter={
               page:0,
@@ -1608,7 +1621,7 @@ export default {
         const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'averageScore', 'rank'];
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = name + '_Inspection score_' + util.getCurDateStr();
+        const fileName = name + '_Inspection score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1624,8 +1637,14 @@ export default {
               direction:"desc",
               property: "standardScore",
             }
-       console.log(this.part3.content[this.part3.indexRegion])
+      // console.log(this.part3.content[this.part3.indexRegion])
        params.storeIds = this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId]: this.part3.content[this.part3.indexRegion].list;
+      if(this.part3.compareType == 'position'||this.part3.compareType == 'users'){
+         params.storeIds = self.params.storeIds;
+         params.submitters  = [self.part1.content[self.part1.indexRegion].innerId];
+         params.groupIds   = [];
+         params.groupMode = 0;
+       }
        params.inspectTagId = self.params.inspectId;
             params.filter={
               page:0,
@@ -1654,7 +1673,7 @@ export default {
         const self = this;
         const data = that.formatJson(filterVal,content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = name + '_Inspection compliance_' + util.getCurDateStr();
+        const fileName = name + '_Inspection compliance_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -2991,8 +3010,9 @@ export default {
             var oGrayImg4 = canvas.toDataURL('image/jpeg');
             self.pdfSrc_avg4 = oGrayImg4;
           });
+          console.log("Name="+self.$t('supervisorCalStat'))
           setTimeout(() => {
-            self.$print(self.$refs.printPDF);
+            self.$print(self.$refs.printPDF,null,self.$t('route.supervisorCalStat')+ util.getCurrentTime());
             self.ispdf = false;
           }, 1000);
         }, 5000);

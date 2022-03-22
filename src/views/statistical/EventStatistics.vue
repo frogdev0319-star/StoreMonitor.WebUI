@@ -2164,7 +2164,7 @@ export default {
             self.pdfSrc_second = oGrayImg3;
           });
           setTimeout(() => {
-            self.$print(self.$refs.printPDF);
+             self.$print(self.$refs.printPDF,null,self.$t('route.eventStat')+ util.getCurrentTime());
             self.ispdf = false;
           }, 1000);
         }, 5000);
