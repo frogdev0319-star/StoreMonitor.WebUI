@@ -44,6 +44,5 @@ let Environment;
 export default Environment = {
   VERSION: environJSON.VERSION,
   isGlobalWebsite: isGlobalWebsite,
-  BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE,
-  clientId: environJSON.clientId
+  BASE_URL: isGlobalWebsite ? environJSON.GLOBAL_WEBSITE : environJSON.CHINA_WEBSITE
 };
