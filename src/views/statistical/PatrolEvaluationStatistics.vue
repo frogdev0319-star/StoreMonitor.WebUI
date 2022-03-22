@@ -28,7 +28,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-      <div class="statistics-content"  id="imgTest_avg1"   style="height:194px;margin-top:200px">
+      <div class="statistics-content"  id="imgTest_avg1"   style="height:194px;margin-top:200px" :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -79,7 +79,7 @@
                     </el-col>
                 </el-row>
       </div>
-       <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px">
+       <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px" :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -178,7 +178,7 @@
                             ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
                                 autoresize
                             :style="{width:part1.barStoreOption?part1.barStoreOption.width :'100%',height:'100%'}" />
-                  <div v-else style="margin-top:20.5px;height:100%;">
+                  <div v-else style="margin-top:20.5px;height:100%;"  :style="{width:ispdf?'1024px':null}">
                   <div style="margin-top:20.5px;">
                     <table-only
                       ref="elTP"
@@ -221,7 +221,7 @@
                   </div>
            </el-col>  
       </div> 
-       <div class="statistics-content" id="imgTest_avg3"  style="height:1010px;margin-top:18px">
+       <div class="statistics-content" id="imgTest_avg3"  style="height:1010px;margin-top:18px" :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -316,7 +316,7 @@
                   <v-chart  v-if="part2.storeMode==1" 
                             ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize
                             :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
-                  <div v-else style="main-rgtop:20.5px;height:100%;overflow-x:auto;">
+                  <div v-else style="main-rgtop:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;">
                     <table-only
                       ref="elTP"
@@ -359,7 +359,7 @@
                   </div>
            </el-col>  
       </div> 
-      <div v-if="part3.standardScore!=-9999" id="imgTest_avg4"  class="statistics-content" style="height:1000px;margin-top:18px">
+      <div v-if="part3.standardScore!=-9999" id="imgTest_avg4"  class="statistics-content" style="height:1000px;margin-top:18px"  :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -452,7 +452,7 @@
                                 ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
                                 :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                   </div>
-                  <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;">
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;"  :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;">
                     <table-only
                       ref="elTP"

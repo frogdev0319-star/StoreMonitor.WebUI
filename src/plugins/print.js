@@ -1,7 +1,7 @@
 // 打印类属性、方法定义
 /* eslint-disable */
 const Print = function (dom, options,name) {
-  console.log("EXPORT"+name)
+  //console.log("EXPORT"+name)
   if (!(this instanceof Print)) return new Print(dom, options,name);
 
   this.options = this.extend({
@@ -18,7 +18,7 @@ const Print = function (dom, options,name) {
 };
 Print.prototype = {
   init: function (name) {
-    console.log("Print init"+name)
+    //console.log("Print init"+name)
     var content = this.getStyle() + this.getHtml();
     this.writeIframe(content,name);
   },
@@ -107,7 +107,7 @@ Print.prototype = {
   },
 
   writeIframe: function (content,name) {
-    console.log("Write Frame="+name)
+    //console.log("Write Frame="+name)
     var w, doc, iframe = document.createElement('iframe'),
       f = document.body.appendChild(iframe);
     iframe.id = "myIframe";
@@ -134,7 +134,7 @@ Print.prototype = {
   },
 
   toPrint: function (frameWindow,name) {
-    console.log("Print to" +name)
+    //console.log("Print to" +name)
     
     const temp = document.title;
     document.title = name;
@@ -152,7 +152,7 @@ Print.prototype = {
         document.title  = temp;
       }, 10);
     } catch (err) {
-      console.log('err', err);
+      //console.log('err', err);
     }
   },
   isDOM: (typeof HTMLElement === 'object') ?

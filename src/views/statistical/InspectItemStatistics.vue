@@ -27,7 +27,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px">
+     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px"  :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -122,7 +122,7 @@
                                 ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
                                 :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                   </div>
-                  <div v-else style="margin-top:20.5px;height:100%;overflow-y:hidden;">
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-y:hidden;"  :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;">
                     <table-only
                       ref="elTP"
@@ -986,7 +986,7 @@ export default {
         }
 
         const data = that.formatJson(filterVal, curData);
-        const fileName = 'Area' + '-' + util.getCurDateStr();
+        const fileName = 'Area' + '-' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1004,7 +1004,18 @@ export default {
               property: "averageScore",
             }
        console.log(this.part3.content[this.part3.indexRegion])
-       params.storeIds = this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId]: this.part3.content[this.part3.indexRegion].list;
+       if(this.part3.compareType == 'stores'){
+         content = [this.part3.content[this.part3.indexRegion]];
+       }
+       else{
+        params.storeIds = this.part3.content[this.part3.indexRegion].list;
+       if(this.part3.compareType == 'position'||this.part3.compareType == 'users'){
+         params.storeIds = self.params.storeIds;
+         let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+         params.submitters  = [id];
+         params.groupIds   = [];
+         params.groupMode = 0;
+       }
        params.inspectTagId = self.params.inspectId;
             params.filter={
               page:0,
@@ -1021,23 +1032,32 @@ export default {
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
-              if (result) {
-                   
-                  content = result.content
-                  content.forEach((item,i)=>{
-                    item.rank= i+1;
-                    if(item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
-                  });
+              if (result) {          
+                  content = result.content            
               }
             }
+
+       }
+       console.log("Export")
+       console.log(content)
+      content.forEach((item,i)=>{
+          item.rank= i+1;
+          if(item.storeGroup)item.storeGroup = item.storeRegion.toString();
+          if(item.storeType)item.storeType = item.storeBranchType.toString();
+          if(item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
+          if(item.code=='')item.code='- -'
+          if(item.storeGroup=='')item.storeGroup='- -'
+          if(item.storeType=='')item.storeType='- -'
+        
+      });
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
-        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfTotal', 'averageScore', 'rank'];
+        const filterVal = ['province', 'city', 'groupName','storeGroup', 'code', 'numOfTotal', 'averageScore', 'rank'];
         const self = this;
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = name + '_Inspection item score_' + util.getCurDateStr();
+        const fileName = name + '_Inspection item score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
