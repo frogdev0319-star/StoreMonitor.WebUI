@@ -360,13 +360,13 @@
               :style="isexportPDF ? 'margin-left:250px;' : ''"
               class="radar-div">
                 <div class="pct-panel"
-                :style="isexportPDF ? {'width': '145px', 'height': '175px'}: {'width': '290px', 'height': '350px'}"
+                :style="isexportPDF ? {'width': '145px', 'height': '175px'}: {'width': '450px', 'height': '350px','marginRight':'50px'}"
                 >
                 <v-chart
                   v-if="pageItem.data"
                   ref="chartRadar"
                   :options="pageItem.data"
-                  :auto-resize="true"
+                  autoresize
                   class="radar-chart-content"/>
                   </div>
               </div>
@@ -1158,35 +1158,42 @@ export default {
       let mapArr = []
       this.chartLabelArr = []; 
       var templabe = [];
+      
       summary.forEach((item, index) => {
         const obj = {};
         obj.name = item.groupName;
         obj.max = Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems) === 0
           ? 1 
           : Number(item.numOfQualifiedItems + item.numOfUnqualifiedItems);
-        tempIndicator.push(obj);
-        this.staticalConfig.qualified 
-          ? seriesValue.push(item.numOfUnqualifiedItems)
-          : seriesValue.push(item.numOfQualifiedItems);
-        // if (index < 2) {
-        //   tempIndicator.push(obj);
-        //   this.staticalConfig.qualified 
-        //     ? seriesValue.push(item.numOfUnqualifiedItems)
-        //     : seriesValue.push(item.numOfQualifiedItems);
-        // } else {
-        //   tempIndicator.splice(1, 0, obj);
-        //   this.staticalConfig.qualified 
-        //     ? seriesValue.splice(1, 0, item.numOfUnqualifiedItems)
-        //     : seriesValue.splice(1, 0, item.numOfQualifiedItems);
-        // }
+        //tempIndicator.push(obj);
+        //this.staticalConfig.qualified 
+        //  ? seriesValue.push(item.numOfUnqualifiedItems)
+        //  : seriesValue.push(item.numOfQualifiedItems);
+        if (index < 2) {
+          tempIndicator.push(obj);
+          this.staticalConfig.qualified 
+            ? seriesValue.push(item.numOfUnqualifiedItems)
+            : seriesValue.push(item.numOfQualifiedItems);
+        } else {
+          tempIndicator.splice(1, 0, obj);
+          this.staticalConfig.qualified 
+            ? seriesValue.splice(1, 0, item.numOfUnqualifiedItems)
+            : seriesValue.splice(1, 0, item.numOfQualifiedItems);
+        }
+        let arrObj = {
+          name:item.groupName,
+          value:this.staticalConfig.qualified ? item.numOfUnqualifiedItems:item.numOfQualifiedItems
+        }
+        templabe.push(arrObj);
       });
-      for(var i=0; i<tempIndicator.length;i++){
+      
+      /*for(var i=0; i<tempIndicator.length;i++){
         let arrObj = {
           name:tempIndicator[i].name,
           value:seriesValue[i]
         }
         templabe.push(arrObj);
-      }
+      }*/
       console.log(tempIndicator, seriesValue)
       this.chartLabelArr = templabe;
       const temp = [];
@@ -1209,6 +1216,7 @@ export default {
       const radarChartOption = {
         backgroundColor: '#fff',
         tooltip: {
+          show:false,
           backgroundColor:'#FFF',
           extraCssText: "box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);",
           textStyle:{
@@ -1216,6 +1224,13 @@ export default {
             fontStyle:' NotoSansCJKtc',
             fontSize: '15px',
             fontEeight: 'normal',
+          }
+        },
+        grid: {
+          width:'auto',
+          containLabel:true,
+          tooltip: {
+            trigger: "none"
           }
         },
         textStyle: {
