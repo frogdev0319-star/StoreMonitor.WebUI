@@ -1,7 +1,8 @@
 // 打印类属性、方法定义
 /* eslint-disable */
-const Print = function (dom, options) {
-  if (!(this instanceof Print)) return new Print(dom, options);
+const Print = function (dom, options,name) {
+  console.log("EXPORT"+name)
+  if (!(this instanceof Print)) return new Print(dom, options,name);
 
   this.options = this.extend({
     'noPrint': '.no-print'
@@ -13,13 +14,13 @@ const Print = function (dom, options) {
     this.isDOM(dom)
     this.dom = this.isDOM(dom) ? dom : dom.$el;
   }
-
-  this.init();
+  this.init(name);
 };
 Print.prototype = {
-  init: function () {
+  init: function (name) {
+    console.log("Print init"+name)
     var content = this.getStyle() + this.getHtml();
-    this.writeIframe(content);
+    this.writeIframe(content,name);
   },
   extend: function (obj, obj2) {
     for (var k in obj2) {
@@ -105,7 +106,8 @@ Print.prototype = {
     return this.dom.outerHTML;
   },
 
-  writeIframe: function (content) {
+  writeIframe: function (content,name) {
+    console.log("Write Frame="+name)
     var w, doc, iframe = document.createElement('iframe'),
       f = document.body.appendChild(iframe);
     iframe.id = "myIframe";
@@ -124,14 +126,18 @@ Print.prototype = {
     }
     var _this = this
     iframe.onload = function(){
-      _this.toPrint(w);
+      _this.toPrint(w,name);
       setTimeout(function () {
         document.body.removeChild(iframe)
       }, 100)
     }
   },
 
-  toPrint: function (frameWindow) {
+  toPrint: function (frameWindow,name) {
+    console.log("Print to" +name)
+    
+    const temp = document.title;
+    document.title = name;
     try {
       setTimeout(function () {
         frameWindow.focus();
@@ -143,6 +149,7 @@ Print.prototype = {
           frameWindow.print();
         }
         frameWindow.close();
+        document.title  = temp;
       }, 10);
     } catch (err) {
       console.log('err', err);

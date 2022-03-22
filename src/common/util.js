@@ -564,7 +564,9 @@ export default {
       duration: time
     });
   },
-
+  getCurrentTime(){
+    return  moment(new Date()).format('YYYYMMDDHHmmss');
+  },
   getDaysRangeList(startTime, endTime, timeMode){
     const startDay = moment(startTime).format('YYYY-MM-DD');
     const endDay = moment(endTime).format('YYYY-MM-DD');
