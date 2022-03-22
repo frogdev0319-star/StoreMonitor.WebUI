@@ -433,7 +433,7 @@
           <v-chart ref="chartRadar" :auto-resize="true" class="pie-chart-content"/>
         </el-col>
       </el-row>
-      <div class="no-print">
+      <div>
         <el-dialog
           v-if="dialogCommentVideo"
           :title="$t('eventView.view')"
