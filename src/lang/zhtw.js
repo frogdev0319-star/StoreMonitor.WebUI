@@ -1051,7 +1051,7 @@ export default{
     "ignoredItem":"不適用項",
     "inspectionStaticSetting":"統計圖顯示設置",
     "no":"不允許",
-    "noEnableTemplate":"删除后无启用样板，请调整再删除",
+    "noEnableTemplate":"刪除後無啟用樣板，請調整再刪除",
     "notJoinItem":"純紀錄不計分項",
     "operation":"操作",
     "others":"其他",
