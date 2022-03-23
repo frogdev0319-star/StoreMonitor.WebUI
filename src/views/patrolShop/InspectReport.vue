@@ -1573,7 +1573,7 @@ export default {
   $suggestBack: #f7f9fa;
   .print {
     // transform: scale(.8);
-    zoom: .9;
+    zoom: .5;
   }
   tr {
     background-color: #fff !important;
