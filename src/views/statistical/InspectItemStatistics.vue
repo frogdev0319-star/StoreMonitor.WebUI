@@ -166,15 +166,15 @@
            </el-col>  
       </div> 
     </el-row>
-        <el-col :span="24">
-            <div id="pdf-area" ref="printPDF" v-if="ispdf" >
+    <div id="pdf-area" ref="printPDF" class="statistics-container">
+            <div style="width:1024px;">
               <div  class="statistics-content-pdf"  style="marginTop:20px">
                 <div id="img_avg1" >
                   <img :src="pdfSrc_avg1"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
           </div>
-          </el-col>
+    </div>
     <dialog-pop
       :title="$t('insSettingView.export')"
       :append-to-body="true"
