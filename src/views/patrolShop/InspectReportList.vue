@@ -557,7 +557,7 @@ export default {
         const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
           'modeText', 'status', 'totalScore', 'datestr'];
         let curData = [];
-        curData = await that.getReportList({...that.params, filter: {page: 0, size: 1000}});
+        curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
         const data = that.formatJson(filterVal, curData);
         const fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
         sessionStorage.setItem('!merge', true);
@@ -579,7 +579,78 @@ export default {
       }
       return obj;
     },
-
+   getReportList_(p) {
+      console.log("Get Report List")
+      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
+      const self = this;
+      params.endTs = params.endTs - params.endTs % 1000 + 999;
+      if (params.clause.storeId.length === 0) {
+        console.log("No Data")
+        this.setNoData();
+        return;
+      }
+      return new Promise((resolve) => {
+        //console.log("params:",params);
+        getInspectReportList(params).then(async(res) => {
+          const errCode = res.errCode;
+          let data = [];
+          if (errCode === 0) {
+            data = res.data.content;
+          }
+          const temp = [];
+          // self.isLoading = true;
+          for(const item of data){
+          //data.forEach(async (item,index) => {
+            const reportObj = {};
+            reportObj.province = item.province;
+            reportObj.city = item.city;
+            reportObj.id = item.id;
+            reportObj.datestr = util.getDateStr(item.ts);
+            reportObj.storeName = item.storeName;
+            reportObj.tagName = item.tagName;
+            reportObj.submitterName = item.submitterName;
+            reportObj.submitter = item.submitter;
+            reportObj.routeObj = item;
+            reportObj.mode = item.mode;
+            reportObj.totalScore = item.type === 1 ? "--" : item.totalScore;
+            reportObj.code = item.code !== null ? item.code : '--';
+            reportObj.standard = item.standard;
+            reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
+            reportObj.statusCode = item.status; 
+            if (item.mode === 0) {
+              reportObj.modeText = self.$t('overview.remotePatrol');
+            } else if (item.mode === 1) {
+              reportObj.modeText = self.$t('overview.onsitePatrol');
+            }
+            let storeType = '';
+            item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
+              const isuu = _index === item.tags.length - 1 ? '' : ',';
+              storeType += _item + isuu;
+            }) : storeType = '--';
+            reportObj.storeType = storeType;
+            self.storeList.forEach(_item => {
+              if (item.storeId === _item.storeId) {
+                reportObj.province = _item.province;
+                reportObj.city = _item.city;
+              }
+            });
+            const statusAndIconObj = self.getIconSrc(item.status);
+            reportObj.status = statusAndIconObj.status;
+            reportObj.iconSrc = statusAndIconObj.iconSrc;
+            temp.push(reportObj);
+          }
+          //);
+          // self.reportList = temp;
+          // self.total = Math.ceil(res.data.totalElements/self.sizeNum);
+          // self.isLoading = false;
+          // if (temp.length === 0) {
+          //   self.noData = self.$t('deviceView.noData');
+          // }
+          resolve(temp);
+        }).catch(err => {
+        });
+      });
+    },
    getReportList(p) {
       console.log("Get Report List")
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
