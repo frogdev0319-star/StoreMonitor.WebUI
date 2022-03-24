@@ -496,30 +496,30 @@
            </el-col>  
       </div> 
     </el-row>
-    <div id="pdf-area" ref="printPDF" class="statistics-container">
-      <div style="width:1024px;">
+    <el-col :span="24">
+            <div id="pdf-area" ref="printPDF" v-if="ispdf" style="width:1000px;background-color:#fff" >
               <div  class="statistics-content-pdf"  style="marginTop:20px">
-                <div id="img_avg1" >
+                <div id="img_avg1" style="background-color:#fff">
                   <img :src="pdfSrc_avg1"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
               <div  class="statistics-content-pdf"  style="marginTop:20px">
-                <div id="img_avg2" >
+                <div id="img_avg2" style="background-color:#fff">
                   <img :src="pdfSrc_avg2"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
               <div  class="statistics-content-pdf"  style="marginTop:20px">
-                <div id="img_avg3" >
+                <div id="img_avg3" style="background-color:#fff">
                   <img :src="pdfSrc_avg3"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
               <div  v-if="part3.standardScore!=-9999" class="statistics-content-pdf"  style="marginTop:20px">
-                <div id="img_avg4" >
+                <div id="img_avg4" style="background-color:#fff" >
                   <img :src="pdfSrc_avg4"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
-       </div>
-    </div>
+          </div>
+          </el-col>
     <dialog-pop
       :title="$t('insSettingView.export')"
       :append-to-body="true"
@@ -825,6 +825,8 @@ export default {
         this.$t('remotePatrol.regionI'),
         this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
+        this.$t('statistics.event.storeGroup'),
+        this.$t('statistics.event.storeType'),
         this.$t('remotePatrol.code'),
         this.$t('statistics.submitter'),
         this.$t('overview.numOfEvaluations'),
@@ -837,6 +839,8 @@ export default {
         this.$t('remotePatrol.regionI'),
         this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
+        this.$t('statistics.event.storeGroup'),
+        this.$t('statistics.event.storeType'),
         this.$t('remotePatrol.code'),
         this.$t('statistics.submitter'),
         this.$t('overview.numOfEvaluations'),
@@ -848,6 +852,8 @@ export default {
         this.$t('remotePatrol.regionI'),
         this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
+        this.$t('statistics.event.storeGroup'),
+        this.$t('statistics.event.storeType'),
         this.$t('remotePatrol.code'),
         this.$t('statistics.submitter'),
         this.$t('overview.numOfEvaluations'),
@@ -1559,25 +1565,28 @@ export default {
               if (result) {
                   content = result.content
                   content.forEach((item,i)=>{
-                    item.rank= i+1;
+                    if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
+                    if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
                     if(item.submitters)item.storeSubmitters = item.submitters.toString();
+                    if(item.code=='')item.code='- -'
+                    if(item.storeGroup=='')item.storeGroup='- -'
+                    if(item.storeType=='')item.storeType='- -'
                   });
               }
             }
             require.ensure([], async() => {
               const { export_json_to_excel } = require('@/excel/Export2Excel');
               const tHeader = self.exportPart1DataHeader;
-              const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'numOfQualified', 'numOfImproved',
+              const filterVal = ['province', 'city','groupName','storeGroup','storeType','code', 'submitters', 'numOfReport', 'numOfQualified', 'numOfImproved',
                 'numOfDangerous'];
               const data = that.formatJson(filterVal, content);
-              const name = that.params.inspectId==='' ? 'All' : that.storePatrolLists;
               const fileName = this.part1.content[this.part1.indexRegion].groupName + '_Inspection evaluation result_' + util.getCurrentTime();
               export_json_to_excel(tHeader, data, fileName);
       });
     },
     async exportStore2ExcelPart2() {
       const self = this;
-      const that = this;  
+      const that = this;    
       let content =[];
        const params = {};
        params.beginTs = self.params.beginTs;
@@ -1611,17 +1620,21 @@ export default {
                   content = result.content
                   content.forEach((item,i)=>{
                     item.rank= i+1;
+                    if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
+                    if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
                     if(item.submitters)item.storeSubmitters = item.submitters.toString();
+                    if(item.code=='')item.code='- -'
+                    if(item.storeGroup=='')item.storeGroup='- -'
+                    if(item.storeType=='')item.storeType='- -'
                   });
               }
             }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart2DataHeader;
-        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport', 'averageScore', 'rank'];
+        const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'submitters', 'numOfReport', 'averageScore', 'rank'];
         const data = that.formatJson(filterVal, content);
-        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = name + '_Inspection score_' + util.getCurrentTime();
+        const fileName = this.part2.content[this.part2.indexRegion].groupName + + '_Inspection score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1661,19 +1674,23 @@ export default {
                   content = result.content
                   content.forEach((item,i)=>{
                     item.rank= i+1;
+                     if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
+                    if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
                     if(item.submitters)item.storeSubmitters = item.submitters.toString();
+                    if(item.code=='')item.code='- -'
+                    if(item.storeGroup=='')item.storeGroup='- -'
+                    if(item.storeType=='')item.storeType='- -'
                   });
               }
             }
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
-        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfReport','numOfStandard',
+        const filterVal = ['province', 'city', 'groupName', 'storeGroup','storeType','code', 'submitters', 'numOfReport','numOfStandard',
         'qualifiedRate','rank'];
         const self = this;
         const data = that.formatJson(filterVal,content);
-        const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = name + '_Inspection compliance_' + util.getCurrentTime();
+        const fileName = this.part3.content[this.part3.indexRegion].groupName  + '_Inspection compliance_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -2985,6 +3002,7 @@ export default {
     },
 
     exportPDF() {
+      console.log("Export PDF")
        const self = this;
        self.ispdf = true;
        this.$nextTick(() => {
@@ -2993,19 +3011,19 @@ export default {
         const img_avg3 = document.getElementById('imgTest_avg3');
         const img_avg4 = document.getElementById('imgTest_avg4');
         setTimeout(() => {
-          html2canvas(img_avg1,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+          html2canvas(img_avg1,{backgroundColor: "#FFFFFF", background :'#F00000'}).then(function(canvas) {
             var oGrayImg1 = canvas.toDataURL('image/jpeg');
             self.pdfSrc_avg1 = oGrayImg1;
           });
-          html2canvas(img_avg2,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+          html2canvas(img_avg2,{backgroundColor: "#FFFFFF", background :'#F00000'}).then(function(canvas) {
             var oGrayImg2 = canvas.toDataURL('image/jpeg');
             self.pdfSrc_avg2 = oGrayImg2;
           });
-          html2canvas(img_avg3,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+          html2canvas(img_avg3,{backgroundColor: "#FFFFFF", background :'#F00000'}).then(function(canvas) {
             var oGrayImg3 = canvas.toDataURL('image/jpeg');
             self.pdfSrc_avg3 = oGrayImg3;
           });
-          html2canvas(img_avg4,{backgroundColor: "#FFFFFF"}).then(function(canvas) {
+          html2canvas(img_avg4,{backgroundColor: "#FFFFFF", background :'#F00000'}).then(function(canvas) {
             var oGrayImg4 = canvas.toDataURL('image/jpeg');
             self.pdfSrc_avg4 = oGrayImg4;
           });
@@ -3235,6 +3253,7 @@ export default {
       margin-right: calc(30/1920*100vw);
       padding-left:0px;
       padding-right:0px;
+      background-color:#fff;
     }
     .subtitle-head{
         margin-left:20px;

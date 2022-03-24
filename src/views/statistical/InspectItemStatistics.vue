@@ -357,8 +357,9 @@ export default {
         this.$t('remotePatrol.regionI'),
         this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
+        this.$t('statistics.event.storeGroup'),
+        this.$t('statistics.event.storeType'),
         this.$t('remotePatrol.code'),
-        this.$t('statistics.submitter'),
         this.$t('overview.numOfEvaluations'),
         this.$t('overview.averageScore'),
         this.$t('statistics.rank'),
@@ -1042,22 +1043,22 @@ export default {
        console.log(content)
       content.forEach((item,i)=>{
           item.rank= i+1;
-          if(item.storeGroup)item.storeGroup = item.storeRegion.toString();
-          if(item.storeType)item.storeType = item.storeBranchType.toString();
-          if(item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
-          if(item.code=='')item.code='- -'
-          if(item.storeGroup=='')item.storeGroup='- -'
-          if(item.storeType=='')item.storeType='- -'
+                 if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
+                    if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
+                    if(item.submitters)item.storeSubmitters = item.submitters.toString();
+                    if(item.code=='')item.code='- -'
+                    if(item.storeGroup=='')item.storeGroup='- -'
+                    if(item.storeType=='')item.storeType='- -'
         
       });
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
-        const filterVal = ['province', 'city', 'groupName','storeGroup', 'code', 'numOfTotal', 'averageScore', 'rank'];
+        const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'submitters', 'numOfTotal', 'averageScore', 'rank'];
         const self = this;
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = name + '_Inspection item score_' + util.getCurrentTime();
+        const fileName = this.part3.content[this.part3.indexRegion].groupName + '_Inspection item score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -2554,6 +2555,7 @@ export default {
       margin-right: calc(30/1920*100vw);
       padding-left:0px;
       padding-right:0px;
+      background-color:#fff;
     }
     .subtitle-head{
         margin-left:20px;
