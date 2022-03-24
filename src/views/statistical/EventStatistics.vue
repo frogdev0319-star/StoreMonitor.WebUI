@@ -592,7 +592,7 @@
               <div class="table-area" style="">
                 <div class="sec-head">
                   <div class="title">{{ selEventItemName+$t('statistics.event.eventInvolveStores') }}</div>
-                  <div class="operation-btns" style="width:calc(344/1440*100vw)">
+                  <div :class="lang.indexOf('zh') === -1 ? 'operation-btns':'operation-btns-lang'">
                     <div class="switch-btn">
                       <el-button
                       class="mode-btn"
@@ -2346,6 +2346,16 @@ export default {
               padding:0;
               justify-content: space-between;
             }
+            .operation-btns-lang{
+              align-self: center;
+              display: flex;
+              flex-direction: row;
+              width:calc(404/1440*100vw);
+              height: 30px;
+              align-items: center;
+              padding:0;
+              justify-content: space-between;
+            }
           }
           .event-table {
             overflow-y: auto;
@@ -2515,7 +2525,8 @@ export default {
               align-self: center;
               display: flex;
               flex-direction: row;
-              width:calc(344/1440*100vw);
+              min-width:calc(344/1440*100vw);
+              max-width:calc(384/1440*100vw);
               height: 30px;
               align-items: center;
               padding:0;

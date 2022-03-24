@@ -2480,7 +2480,7 @@ export default {
                     font-size: 13px;
                     min-width:75px;
                     max-width:105px;
-                    line-height:36px;
+                    height:30px;
                     margin-left:16px;
                     width:auto;
                   }

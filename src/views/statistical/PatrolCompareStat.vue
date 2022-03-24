@@ -26,7 +26,7 @@
               @emitSearch = "emitSearch"/>
           </el-col>
           <el-col :span="24">
-            <div class="statistics-content" style="height: 735px;" >
+            <div id="imgTest_avg" :class="ispdf ? 'statistics-content-pdf':'statistics-content'" style="height: 735px;" >
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -86,7 +86,7 @@
                   </div>
                 </div>
             </div>
-            <div v-if="standardRate!='- -'" class="statistics-content" style="height: 700px;margin-top:24px;">
+            <div id="imgTest_assm" v-if="standardRate!='- -'" :class="ispdf ? 'statistics-content-pdf':'statistics-content'" style="height: 700px;margin-top:24px;">
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -174,9 +174,9 @@
           </div>
           </el-col>
           
-          <div v-if="ispdf">
+          <div v-if="false">
             <el-col :span="24">
-            <div id="imgTest_avg" class="statistics-content-pdf" style="height: 735px;" >
+            <div id="imgTest_avg1" class="statistics-content-pdf" style="height: 735px;" >
                   <div class="head">
                       <el-col :span="17">
                           <div class="region-titles">
@@ -238,7 +238,7 @@
             </div>
             </el-col>
             <el-col :span="24">
-            <div id="imgTest_assm" class="statistics-content-pdf" style="height: 700px;margin-top:24px;=">
+            <div id="imgTest_assm1" class="statistics-content-pdf" style="height: 700px;margin-top:24px;=">
                   <div class="head">
                       <el-col :span="17">
                           <div class="region-titles">
