@@ -16,7 +16,7 @@
         </delay-button>
       </div>
     </div>
-    <div class="el-overview-content">
+    <div class="el-overview-content" :style="ispdf ? {'width':'1024px'}:{}">
       <el-col :span="24">
         <search-component
           ref="eventSearch"
@@ -27,13 +27,13 @@
           @exportPdf = "exportPdf"
           @changeDefaultSort="setDefaultSortAndPage"/>
       </el-col>
-      <el-col :span="24" class="el-overview">
-        <el-row class="amout_row">
+      <el-col :span="24" class="el-overview" >
+        <el-row class="amout_row" id="imgTest_amount" style="box-shadow:none;">
           <el-col :span="24" class="kpi-list">
             <div class="title">{{ $t('statistics.event.eventProcessStatus') }}</div>
           </el-col>
           <el-col :span="24" class="amount_region">
-            <div class="region-area"  v-for="(item,index) in eventKPIs" :key="index">
+            <div class="region-area" :style="ispdf ? {'width':'200px'}:{}" v-for="(item,index) in eventKPIs" :key="index">
               <div class="num-area">
                 <div style="display:flex;height:84.5px;">
                   <div class="number">{{ item.eventNum }}
@@ -53,7 +53,7 @@
             </div>
           </el-col>
         </el-row>
-        <el-row class="first-row">
+        <el-row class="first-row" id="imgTest_first" style="box-shadow:none;">
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
@@ -84,7 +84,12 @@
                       <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
                   </div>    
               </div>
-              <div style="overflow-x:auto;overflow-y:hidden;height:100%;">
+              <div v-if="ispdf" style="overflow-x:auto;overflow-y:hidden;height:100%;width:1000px">
+                <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" width="800px"
+                :style="{width:'800px',height:'100%'}"
+                @click="barchartClick"/>
+              </div>
+              <div v-if="!ispdf" style="overflow-x:auto;overflow-y:hidden;height:100%;">
               <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" :width="barchartWidth"
                 :style="{width:barchartWidth,height:'100%'}"
                @click="barchartClick"/>
@@ -159,7 +164,7 @@
             </div>
           </el-col>
         </el-row>
-        <el-row class="second-row">
+        <el-row class="second-row" id="imgTest_second" style="box-shadow:none;">
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
@@ -350,9 +355,9 @@
         </div>
       </div>
     </div>
-    <div v-if="ispdf" class="el-overview-content" style="width:1000px;">
+    <div v-if="false" class="el-overview-content" style="width:1000px;">
       <el-col :span="24" class="el-overview" style="box-shadow:none;">
-        <el-row class="amout_row" id="imgTest_amount" style="box-shadow:none;">
+        <el-row class="amout_row" id="imgTest_amount2" style="box-shadow:none;">
           <el-col :span="24" class="kpi-list">
             <div class="title">{{ $t('statistics.event.eventProcessStatus') }}</div>
           </el-col>
@@ -377,7 +382,7 @@
             </div>
           </el-col>
         </el-row>
-        <el-row class="first-row" id="imgTest_first" style="box-shadow:none;">
+        <el-row class="first-row" id="imgTest_first2" style="box-shadow:none;">
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
@@ -481,7 +486,7 @@
             </div>
           </el-col>
         </el-row>
-        <el-row class="second-row" id="imgTest_second" style="box-shadow:none;">
+        <el-row class="second-row" id="imgTest_second1" style="box-shadow:none;">
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
@@ -1511,9 +1516,15 @@ export default {
         }
         else{
            //option.grid.width = 'calc(1479/1980*100vw)';
-           option.width = 'calc(1479/1980*100vw)';
-           option.grid.width = '100%';
-           this.barchartWidth = 'calc(1479/1980*100vw)'
+           if(this.ispdf){
+             option.width = 'calc(800/1980*100vw)';
+              option.grid.width = '800px';
+              this.barchartWidth = 'calc(800/1980*100vw)';
+           }else{
+            option.width = 'calc(1479/1980*100vw)';
+            option.grid.width = '100%';
+            this.barchartWidth = 'calc(1479/1980*100vw)';
+           }
         }
         this.barchartOption = option;
         //this.$ref.itemsChart1.on('rendered',()=>{console.log('rendered event fired')});
