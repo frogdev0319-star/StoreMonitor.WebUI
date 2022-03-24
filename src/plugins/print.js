@@ -103,6 +103,7 @@ Print.prototype = {
     // for (var k5 = 0; k5 < pages.length; k5++) {
     //   pages[k5].setAttribute('style', 'page-break-after: always');
     // }
+    console.log(this.dom.outerHTML)
     return this.dom.outerHTML;
   },
 

@@ -11,7 +11,7 @@
       @visible-change="visibileHandler">
       <el-option v-if="options.length > 0 && all!=''" :label="all"
                  value="-1" @click.native="selectAll"/>
-      <el-option v-for="(item, index) in options" :key="index" :label="item.label"
+      <el-option v-for="(item) in options" :key="item.value" :label="item.label"
                  :value="compareType === 'stores' ? item.storeId:item.value" :disabled="item.disabled"/>
     </el-select>
     <el-input
@@ -78,7 +78,7 @@ export default {
       this.initData();
     },
     selected(val, oldVal) {
-      //console.log("selected > val:",val);
+      console.log("selected > val:",val);
       this.selectedArray = val;
       this.initData();
     },
