@@ -935,21 +935,24 @@ export default {
     },
 
     async searchData() {
-    
+      
+      console.log("Search Data")
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
-      if (this.params.storeIds.length > 0) {
+      if (this.pareams.storeIds.length > 0) {
         await this.dataGetOverview();
       } else {
+        
         this.totalRegion = 0;
         this.regionTableData = [];
       //  this.getPart1RegionBar();
         this.storeTableData = [];
         this.regionsList = [];
         this.curRegion = [];
-        this.regionsChartsOptions = null;
-        this.part1.pieOption = null;
-        this.part1.barRegionOption = null;
-        this.part1.barStoreOption = null;
+        this.regionsChartsOptions ={};
+       // this.part3.pieOption = null;
+        this.part3.barRegionOption = {};
+        this.part3.barStoreOption = {};
+        console.log("Handle Clear")
       }
     },
 
@@ -1948,9 +1951,10 @@ export default {
       const params = {};
       this.totalAvgScore =-9999;
       this.part3.pieOption = null;
-      this.part3.storeTableData = null;
-      this.part3.barRegionOption = null;
-      this.part3.barStoreOption = null;
+      this.part3.storeTableData = {};
+      this.part3.barRegionOption = {};
+      this.part3.barStoreOption = {};
+      this.part3.content=[];
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.groupMode = 0;
@@ -2003,8 +2007,12 @@ export default {
       }
       let totalReport = 0;
       let totalStandard = 0;
-      if(params.groupIds.length==0){
+      console.log("********************************")
+      console.log(params.groupIds)
+      if(params.groupIds.length==0  ){
         console.log("No group");
+        this.part3.content =[];
+         this.drawPart3RegionBar();
         return;
       }
         params.filter = { page: 0, size: params.groupIds.length };
@@ -2034,7 +2042,7 @@ export default {
 
     },
     async drawPart3RegionBar(){
-      console.log("drawPart2RegionBar")
+      console.log("drawPart3RegionBar")
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
@@ -2323,7 +2331,11 @@ export default {
      // this.part2.standardScore=-1;
      // this.part2.standardScore=-1;
      // this.doGetAssessmentStandardScore();
-      console.log(searchParams)
+      if(searchParams.storeIds.length==0)
+        this.part3.compareIds =[];
+      this.part3.storeTableData = {};
+      this.part3.barRegionOption = {};
+      this.part3.barStoreOption = {};
              
       const searchParamsObj = {
           path: 'inspectItemStatistics',
@@ -2369,12 +2381,12 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
-      this.part3.storeTableData = null;
-      this.part3.barRegionOption = null;
-      this.part3.barStoreOption = null;
-      if(this.params.storeIds.length>0){
+
+      console.log(searchParams)
+      //if(this.params.storeIds.length>0){
+      //  console.log("Get Part3")
         await this.dataGetPart3();
-      }
+     // }
 
 
     },

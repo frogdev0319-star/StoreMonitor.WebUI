@@ -589,7 +589,7 @@ export default {
       this.ifSaveParams && self.saveSearchParams(false);
       this.ifSaveParams = true;
       //}
-      if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
+      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         /*this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
         this.tableDataList[tabIndex].eventCount = 0;
@@ -802,7 +802,9 @@ export default {
       }
       //self.getEventListRequestParams('currentChange');
       //}
-      if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
+      console.log("Get Event Count")
+      console.log(self.params,self.params.clause.storeId)
+      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         delete self.params.clause.storeId;
       }
       console.log("self.params:",self.params);
