@@ -359,7 +359,7 @@
                   </div>
            </el-col>  
       </div> 
-      <div v-if="part3.standardScore!=-9999" id="imgTest_avg4"  class="statistics-content" style="height:1000px;margin-top:18px"  :style="{width:ispdf?'1024px':null}">
+      <div v-if="part3.standardScore!=-9999" id="imgTest_avg4"  class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
