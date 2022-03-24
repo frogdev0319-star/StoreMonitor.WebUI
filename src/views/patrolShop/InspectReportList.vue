@@ -983,7 +983,7 @@ export default {
         this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
         this.searchParams = searchParams;
         this.ifGetParamsFromCash = true;
-    
+        this.inspectId = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
         if(!searchParams.curProvince){
           searchParams.curProvince =[];
         }
