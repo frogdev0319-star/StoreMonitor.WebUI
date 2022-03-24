@@ -496,7 +496,7 @@
            </el-col>  
       </div> 
     </el-row>
-    <div id="pdf-area" ref="printPDF" class="statistics-container">
+    <div id="pdf-area"  v-if="ispdf" ref="printPDF" class="statistics-container">
       <div style="width:1024px;">
               <div  class="statistics-content-pdf"  style="height: 194px;marginTop:20px;box-shadow:none;">
                 <div id="img_avg1" >
@@ -1634,7 +1634,7 @@ export default {
         const tHeader = that.exportPart2DataHeader;
         const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'submitters', 'numOfReport', 'averageScore', 'rank'];
         const data = that.formatJson(filterVal, content);
-        const fileName = this.part2.content[this.part2.indexRegion].groupName + + '_Inspection score_' + util.getCurrentTime();
+        const fileName = this.part2.content[this.part2.indexRegion].groupName +  '_Inspection score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1687,7 +1687,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
         const filterVal = ['province', 'city', 'groupName', 'storeGroup','storeType','code', 'submitters', 'numOfReport','numOfStandard',
-        'qualifiedRate','rank'];
+        'standardRate','rank'];
         const self = this;
         const data = that.formatJson(filterVal,content);
         const fileName = this.part3.content[this.part3.indexRegion].groupName  + '_Inspection compliance_' + util.getCurrentTime();

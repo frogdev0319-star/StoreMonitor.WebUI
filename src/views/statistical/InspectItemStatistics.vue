@@ -1054,7 +1054,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
-        const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'submitters', 'numOfTotal', 'averageScore', 'rank'];
+        const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'numOfTotal', 'averageScore', 'rank'];
         const self = this;
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
