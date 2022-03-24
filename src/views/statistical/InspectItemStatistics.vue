@@ -27,7 +27,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px"  :style="{width:ispdf?'1024px':null}">
+     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -166,9 +166,9 @@
            </el-col>  
       </div> 
     </el-row>
-    <div id="pdf-area" ref="printPDF" class="statistics-container">
+    <div v-if="ispdf" id="pdf-area" ref="printPDF" class="statistics-container">
             <div style="width:1024px;">
-              <div  class="statistics-content-pdf"  style="marginTop:20px">
+              <div  class="statistics-content-pdf"  style="marginTop:20px;height:1010px;">
                 <div id="img_avg1" >
                   <img :src="pdfSrc_avg1"  style="display: block;width:100%;height: auto;">
                 </div>
@@ -2008,7 +2008,7 @@ export default {
         return;
       }
         params.filter = { page: 0, size: params.groupIds.length };
-        if(params.itemIds.length==0 || params.storeIds.length ==0)return
+        if( !params.hasOwnProperty('itemIds') ||params.itemIds.length==0 || params.storeIds.length ==0)return
         const storeResult = await self.getInspectStatsItemOverGroup(params);
         console.log(storeResult)
         if (storeResult.errCode === 0) {

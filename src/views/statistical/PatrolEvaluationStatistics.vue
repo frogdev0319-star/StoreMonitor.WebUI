@@ -28,7 +28,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-      <div class="statistics-content"  id="imgTest_avg1"   style="height:194px;margin-top:200px" :style="{width:ispdf?'1024px':null}">
+      <div class="statistics-content"  id="imgTest_avg1"   style="height:194px;margin-top:200px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -79,7 +79,7 @@
                     </el-col>
                 </el-row>
       </div>
-       <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px" :style="{width:ispdf?'1024px':null}">
+       <div class="statistics-content" id="imgTest_avg2" style="height:900px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -116,7 +116,7 @@
                     <div
                       v-for="(item, index) in regionsPerArray"
                       :class="index==part1.indexType? 'selected-labels': 'content-labels'"
-                      :key="index"
+                      :key="item.type"
                       @click="setPart1Type(index)"
                       >
                       <div class="excellent_labels">
@@ -221,7 +221,7 @@
                   </div>
            </el-col>  
       </div> 
-       <div class="statistics-content" id="imgTest_avg3"  style="height:1010px;margin-top:18px" :style="{width:ispdf?'1024px':null}">
+       <div class="statistics-content" id="imgTest_avg3"  style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -496,30 +496,30 @@
            </el-col>  
       </div> 
     </el-row>
-    <el-col :span="24">
-            <div id="pdf-area" ref="printPDF" v-if="ispdf" style="width:1000px;background-color:#fff" >
-              <div  class="statistics-content-pdf"  style="marginTop:20px">
-                <div id="img_avg1" style="background-color:#fff">
+    <div id="pdf-area" ref="printPDF" class="statistics-container">
+      <div style="width:1024px;">
+              <div  class="statistics-content-pdf"  style="height: 194px;marginTop:20px;box-shadow:none;">
+                <div id="img_avg1" >
                   <img :src="pdfSrc_avg1"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
-              <div  class="statistics-content-pdf"  style="marginTop:20px">
-                <div id="img_avg2" style="background-color:#fff">
+              <div  class="statistics-content-pdf"  style="height: 900px;marginTop:20px;box-shadow:none;">
+                <div id="img_avg2" >
                   <img :src="pdfSrc_avg2"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
-              <div  class="statistics-content-pdf"  style="marginTop:20px">
-                <div id="img_avg3" style="background-color:#fff">
+              <div  class="statistics-content-pdf"  style="height:1010px;marginTop:20px;box-shadow:none;">
+                <div id="img_avg3" >
                   <img :src="pdfSrc_avg3"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
-              <div  v-if="part3.standardScore!=-9999" class="statistics-content-pdf"  style="marginTop:20px">
-                <div id="img_avg4" style="background-color:#fff" >
+              <div  v-if="part3.standardScore!=-9999" class="statistics-content-pdf"  style="marginTop:20px;box-shadow:none;">
+                <div id="img_avg4" >
                   <img :src="pdfSrc_avg4"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
           </div>
-          </el-col>
+    </div>
     <dialog-pop
       :title="$t('insSettingView.export')"
       :append-to-body="true"
