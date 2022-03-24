@@ -116,7 +116,7 @@
                     <div
                       v-for="(item, index) in regionsPerArray"
                       :class="index==part1.indexType? 'selected-labels': 'content-labels'"
-                      :key="index"
+                      :key="item.type"
                       @click="setPart1Type(index)"
                       >
                       <div class="excellent_labels">
@@ -496,8 +496,8 @@
            </el-col>  
       </div> 
     </el-row>
-    <el-col :span="24">
-            <div id="pdf-area" ref="printPDF" v-if="ispdf" >
+    <div id="pdf-area" ref="printPDF" class="statistics-container">
+      <div style="width:1024px;">
               <div  class="statistics-content-pdf"  style="height: 194px;marginTop:20px;box-shadow:none;">
                 <div id="img_avg1" >
                   <img :src="pdfSrc_avg1"  style="display: block;width:100%;height: auto;">
@@ -519,7 +519,7 @@
                 </div>
               </div>
           </div>
-          </el-col>
+    </div>
     <dialog-pop
       :title="$t('insSettingView.export')"
       :append-to-body="true"
@@ -2985,7 +2985,6 @@ export default {
     },
 
     exportPDF() {
-      console.log("Export PDF")
        const self = this;
        self.ispdf = true;
        this.$nextTick(() => {
