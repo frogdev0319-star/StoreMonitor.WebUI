@@ -24,8 +24,8 @@
           <span v-if="!isexportPDF">{{ ' ('+report.inspectType+')' }}</span>
         </p>
         <div class="spacer"></div>
-        <span class="font-15">{{ $t('remotePatrol.getscore') }}：</span>
-        <span class="font-score">
+        <span :style="isexportPDF?{'width':'100px'}:{}" class="font-15">{{ $t('remotePatrol.getscore') }}：</span>
+        <span :style="isexportPDF?{'width':'100px','fontSize':'32px'}:{}" class="font-score">
           {{ allRemarkItemsFlag ? '--' : totalScore }}
           <span class="font-score_count">{{ $t('remotePatrol.scorecount') }}</span>
         </span>
@@ -63,7 +63,7 @@
         </div>
       </div>
     </div>
-    <div class="template-titles">
+    <div class="template-titles" v-if="!isexportPDF">
       <el-select 
         class="storevue-select"
         :value="curTemplateIndex" 
@@ -357,8 +357,7 @@
             class="radar-content">
             <span class="span-4"><span class="pdf_font_18">{{ $t('remotePatrol.scoreU') }}</span></span>
             <div class="radar-area">
-              <div 
-              :style="isexportPDF ? 'margin-left:250px;' : ''"
+              <div
               class="radar-div">
                 <div class="pct-panel"
                 :style="isexportPDF ? {'width': '145px', 'height': '175px'}: {'width': '450px', 'height': '350px','marginRight':'50px'}"
@@ -371,9 +370,14 @@
                   class="radar-chart-content"/>
                   </div>
               </div>
-              <div class="radar-label" >
+              <div 
+                class="radar-label"
+                :style="isexportPDF?{'marginLeft': '175px', 'width':'250px'}:{}"
+              >
                 <div style="margin-left:16px;color:#484848;font-size:15px;line-height:20px">{{$t('remotePatrol.category')}}</div>
-                <div v-for="(item,index) in chartLabelArr" :key="index">
+                <div 
+                v-for="(item,index) in chartLabelArr" 
+                :key="index">
                   <div class="radar-label-area">
                       <div class="radar-item-name">{{item.name}}</div>
                       <div class="radar-item-num">{{item.value}}</div>
@@ -650,7 +654,7 @@ export default {
     handleDown() {
       const self = this;
       if (self.hasAttachment !== 0) {
-        self.downloadProgress = true;
+        // self.downloadProgress = true;
       }
       var timer = setInterval(function() {
         if (document.readyState === 'complete') {
@@ -662,7 +666,7 @@ export default {
             self.isexportPDF = true;
             resolve(true);
           }).then(function() {
-            self.$print(self.$refs.printPDF);
+            self.$print(self.$refs.printPDF, null, self.$t('route.meta'));
             setTimeout(() => {
               if (self.hasAttachment !== 0) {
                 self.downloadProgress = false;
