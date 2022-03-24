@@ -372,15 +372,16 @@
               </div>
               <div 
                 class="radar-label"
-                :style="isexportPDF?{'marginLeft': '175px', 'width':'250px'}:{}"
+                :style="isexportPDF?{'marginLeft': '175px', 'width':'350px'}:{}"
               >
                 <div style="margin-left:16px;color:#484848;font-size:15px;line-height:20px">{{$t('remotePatrol.category')}}</div>
                 <div 
-                v-for="(item,index) in chartLabelArr" 
+                v-for="(item,index) in chartLabelArr"
+                :style="isexportPDF?{'width':'100%'}:{}"
                 :key="index">
-                  <div class="radar-label-area">
-                      <div class="radar-item-name">{{item.name}}</div>
-                      <div class="radar-item-num">{{item.value}}</div>
+                  <div class="radar-label-area" :style="isexportPDF?{'display': 'flex', 'width':'100%'}:{}">
+                      <div :style="isexportPDF?{'flex': 1}:{}" class="radar-item-name">{{item.name}}</div>
+                      <div :style="isexportPDF?{'width': '50px'}:{}" class="radar-item-num">{{item.value}}</div>
                   </div>
                 </div> 
               </div>
