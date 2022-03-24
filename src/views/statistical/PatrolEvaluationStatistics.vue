@@ -116,7 +116,7 @@
                     <div
                       v-for="(item, index) in regionsPerArray"
                       :class="index==part1.indexType? 'selected-labels': 'content-labels'"
-                      :key="index"
+                      :key="item.type"
                       @click="setPart1Type(index)"
                       >
                       <div class="excellent_labels">
