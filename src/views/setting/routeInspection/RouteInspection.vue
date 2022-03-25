@@ -99,7 +99,7 @@
                     @change-routeData="changerouteData"/>
                 </div>
                 <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
-                  <img :src="loadingGif">
+                  <img :src="loadingGif" class="loading_rotate">
                   <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
                 </div>
               </el-tab-pane>
@@ -247,7 +247,7 @@ export default {
   data() {
     return {
       elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
-      loadingGif: require('../../../../static/img/loading.gif'),
+      loadingGif: require('../../../../static/img/loading.svg'),
       radioList: [
         {
           'value': '1',

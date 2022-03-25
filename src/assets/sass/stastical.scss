@@ -248,3 +248,20 @@ $store: #fccc3f;
     
   }
 }
+
+
+.loading_rotate{
+  width: 24px;
+  height: 24px;
+  animation: rotate 1.5s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(720deg);
+  }
+}
