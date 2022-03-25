@@ -240,7 +240,7 @@ export default {
       isWorstWork: true,
       bestStoreIcon: require('../../../static/img/store_best.png'),
       worstStoreIcon: require('../../../static/img/store_worst.png'),
-      loadingGif: require('../../../static/img/loading.gif'),
+      loadingGif: require('../../../static/img/loading.svg'),
       params: {},
       bestAndWorstStore: [],
       itemsOptions: null,
