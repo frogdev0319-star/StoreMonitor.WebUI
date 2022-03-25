@@ -160,11 +160,11 @@
               </div>
               <div v-else style="margin-top:20.5px;border-bottom:none;">
                 <div v-if="ispdf" class="barchart-area"  style="overflow-x:hidden;overflow-y:hidden;height:270px;width:1000px">
-                  <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content" width="800px"
+                  <v-chart ref="ChartViewMode0" autoresize :options="barchartOptionViewMode0" class="chart-content" width="800px"
                   :style="{width:'800px',height:'100%'}"/>
                 </div>
                 <div v-else class="barchart-area"  style="overflow-x:auto;overflow-y:hidden;height:270px">
-                  <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content" width="100%"/>
+                  <v-chart ref="ChartViewMode0" autoresize :options="barchartOptionViewMode0" class="chart-content" width="100%"/>
                 </div>
                 
               </div>
