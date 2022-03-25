@@ -89,7 +89,7 @@
           <span class="title" style="width:80%"  >
             {{ inspectDetailSubTitle }}
           </span>
-           <div class="operation-btns">
+           <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <div class="switch-btn">
                     <el-button
                     class="mode-btn"
@@ -103,16 +103,16 @@
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                <delay-button
-                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                      style="background-color:#FFF;color:#006ab7;padding:0px;"
-                      type="primary"
+                      :class="getLangStyleValue(operationBtnClass)"
+                      style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
+                      type="default"
                       size="mini"
                       @click="exportStore2Excel"
                   >
-                    <div class="button-area" style="width:120px;margin-left:15px">
-                      <img :src="exportPng" class="icon-excel">
-                        <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
-                    </div>
+                    <div class="button-area">
+                        <img :src="exportPng" class="icon-excel">
+                        <span>{{ $t('eventView.exportReport') }}</span>
+                      </div>
                   </delay-button>
             </div>
         </div>
@@ -777,6 +777,16 @@ export default {
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{},
               table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfTotal'}},
+      operationBtnClass:[
+        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhtw'},
+        {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
+        {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
+      ],
+      exportBtnClass:[
+        {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+        {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+        {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+      ],
     };
   },
 
@@ -802,6 +812,10 @@ export default {
   },
 
   methods: {
+    getLangStyleValue(langArray){
+      //console.log('******',util.getLangStyleValue(langArray));
+      return util.getLangStyleValue(langArray);
+    },
     maxLabel(val) {
         var returnValue = '';
         var byteValLen = 0;

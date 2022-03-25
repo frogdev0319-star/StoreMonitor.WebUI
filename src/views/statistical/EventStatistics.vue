@@ -89,16 +89,16 @@
                 :style="{width:'800px',height:'100%'}"
                 @click="barchartClick"/>
               </div>
-              <div v-if="!ispdf" style="overflow-x:auto;overflow-y:hidden;height:100%;">
-              <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" :width="barchartWidth"
-                :style="{width:barchartWidth,height:'100%'}"
-               @click="barchartClick"/>
+              <div v-else style="overflow-x:auto;overflow-y:hidden;height:100%;">
+                <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" :width="barchartWidth"
+                  :style="{width:barchartWidth,height:'100%'}"
+                @click="barchartClick"/>
               </div>
             </div>
             <div class="table-area">
               <div class="sec-head">
                 <div class="title">{{ $t('statistics.event.storeEvent') }}</div>
-                <div class="operation-btns">
+                <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <div class="switch-btn">
                     <el-button
                     class="mode-btn"
@@ -112,7 +112,7 @@
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                   <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    :class="getLangStyleValue(exportBtnClass)"
                     style="margin-left:32px;background-color:#FFF;color:#006ab7;"
                     type="default"
                     size="mini"
@@ -158,8 +158,15 @@
                   />
                 </div>
               </div>
-              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
-                <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"/>
+              <div v-else style="margin-top:20.5px;border-bottom:none;">
+                <div v-if="ispdf" class="barchart-area"  style="overflow-x:hidden;overflow-y:hidden;height:270px;width:1000px">
+                  <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content" width="800px"
+                  :style="{width:'800px',height:'100%'}"/>
+                </div>
+                <div v-else class="barchart-area"  style="overflow-x:auto;overflow-y:hidden;height:270px">
+                  <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content" width="100%"/>
+                </div>
+                
               </div>
             </div>
           </el-col>
@@ -216,10 +223,11 @@
             <div class="table-area">
               <div class="sec-head">
                 <div class="title">{{ selEventItemName+$t('statistics.event.envirmentRate') }}</div>
-                <div class="operation-btns">
+                <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    style="margin-left:32px;width:210px;background-color:#FFF;color:#006ab7;"
+                    class="export-btn"
+                    :class="getLangStyleValue(SeeAllIncepEventClass)"
+                    style="margin-left:32px;background-color:#FFF;color:#006ab7;"
                     type="primary"
                     size="mini"
                     @click="onSeeAllIncepEventClick"
@@ -230,7 +238,7 @@
                     </div>
                   </delay-button>
                   <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    :class="getLangStyleValue(exportBtnClass)"
                     style="margin-left:32px;background-color:#FFF;color:#006ab7;"
                     type="default"
                     size="mini"
@@ -275,7 +283,7 @@
               <div class="table-area" style="">
                 <div class="sec-head">
                   <div class="title">{{ selEventItemName+$t('statistics.event.eventInvolveStores') }}</div>
-                  <div class="operation-btns" style="width:calc(344/1440*100vw)">
+                  <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                     <div class="switch-btn">
                       <el-button
                       class="mode-btn"
@@ -289,7 +297,7 @@
                       >{{ $t('statistics.event.imageMode')}}</el-button>
                     </div>
                     <delay-button
-                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                      :class="getLangStyleValue(exportBtnClass)"
                       style="margin-left:32px;background-color:#FFF;color:#006ab7;"
                       type="default"
                       size="mini"
@@ -420,7 +428,7 @@
             <div class="table-area">
               <div class="sec-head">
                 <div class="title">{{ $t('statistics.event.storeEvent') }}</div>
-                <div class="operation-btns">
+                <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <div class="switch-btn">
                     <el-button
                     class="mode-btn"
@@ -434,7 +442,7 @@
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                   <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    :class="getLangStyleValue(exportBtnClass)"
                     style="margin-left:32px;background-color:#FFF;color:#006ab7;"
                     type="default"
                     size="mini"
@@ -538,9 +546,9 @@
             <div class="table-area">
               <div class="sec-head">
                 <div class="title">{{ selEventItemName+$t('statistics.event.envirmentRate') }}</div>
-                <div class="operation-btns">
+                <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">  
                   <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    :class="getLangStyleValue(exportBtnClass)"
                     style="margin-left:32px;width:210px;background-color:#FFF;color:#006ab7;"
                     type="primary"
                     size="mini"
@@ -552,7 +560,7 @@
                     </div>
                   </delay-button>
                   <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                    :class="getLangStyleValue(exportBtnClass)"
                     style="margin-left:32px;background-color:#FFF;color:#006ab7;"
                     type="default"
                     size="mini"
@@ -597,7 +605,7 @@
               <div class="table-area" style="">
                 <div class="sec-head">
                   <div class="title">{{ selEventItemName+$t('statistics.event.eventInvolveStores') }}</div>
-                  <div :class="lang.indexOf('zh') === -1 ? 'operation-btns':'operation-btns-lang'">
+                  <div class = "operation-btns" :class="getLangStyleValue(operationBtnClass)">
                     <div class="switch-btn">
                       <el-button
                       class="mode-btn"
@@ -611,7 +619,7 @@
                       >{{ $t('statistics.event.imageMode')}}</el-button>
                     </div>
                     <delay-button
-                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                      :class="getLangStyleValue(exportBtnClass)"
                       style="margin-left:32px;background-color:#FFF;color:#006ab7;"
                       type="default"
                       size="mini"
@@ -1082,7 +1090,22 @@ export default {
       gloableEventData:[],
       barActiveName:'-1',
       inspectId:null,
-      barchartWidth:'100%'
+      barchartWidth:'100%',
+      operationBtnClass:[
+        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhtw'},
+        {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
+        {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
+      ],
+      SeeAllIncepEventClass:[
+        {key:'en',value:'AllIncepEvent-btns-en'},{key:'zh',value:'AllIncepEvent-btns-zh'},{key:'zhtw',value:'AllIncepEvent-btns-zhtw'},
+        {key:'ja-JP',value:'AllIncepEvent-btns-ja'},{key:'ko-KR',value:'AllIncepEvent-btns-ko'},{key:'vi-VN',value:'AllIncepEvent-btns-vi'},
+        {key:'id-ID',value:'AllIncepEvent-btns-id'},{key:'th-TH',value:'AllIncepEvent-btns-th'}
+      ],
+      exportBtnClass:[
+        {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+        {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+        {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+      ],
     };
   },
 
@@ -1111,6 +1134,12 @@ export default {
   methods: {
     cellCallbackFuc(){
 
+    },
+    getLangStyleValue(langArray){
+      /*var lang_style = langArray.find( item => {return item.key==this.$i18n.locale});
+      return lang_style.value;*/
+      
+      return util.getLangStyleValue(langArray);
     },
     async initData() {
       this.params.filter = { page: this.page - 1, size: this.sizeNum };
@@ -2357,16 +2386,31 @@ export default {
               padding:0;
               justify-content: space-between;
             }
-            .operation-btns-lang{
-              align-self: center;
-              display: flex;
-              flex-direction: row;
-              width:calc(404/1440*100vw);
-              height: 30px;
-              align-items: center;
-              padding:0;
-              justify-content: space-between;
+            .operation-btns-en{
+              width:calc(344/1440*100vw);
             }
+            .operation-btns-zh{
+              width:calc(344/1440*100vw);
+            }
+            .operation-btns-zhTW{
+              width:calc(344/1440*100vw);
+            }
+            .operation-btns-ja{
+              width:calc(374/1440*100vw);
+            }
+            .operation-btns-ko{
+              width:calc(374/1440*100vw);
+            }
+            .operation-btns-vi{
+              width:calc(374/1440*100vw);
+            }
+            .operation-btns-th{
+              width:calc(374/1440*100vw);
+            }
+            .operation-btns-id{
+              width:calc(344/1440*100vw);
+            }
+            
           }
           .event-table {
             overflow-y: auto;
@@ -2410,6 +2454,35 @@ export default {
             text-align: left;
             color: $black;
           }
+          
+        }
+        .AllIncepEvent-btns-en{
+          width:210px;
+        }
+        .AllIncepEvent-btns-zh{
+          width:210px;
+        }
+        .AllIncepEvent-btns-zhTW{
+          width:210px;
+        }
+        .AllIncepEvent-btns-ja{
+          width:230px;
+          font-size: 13px;
+        }
+        .AllIncepEvent-btns-ko{
+          width:210px;
+        }
+        .AllIncepEvent-btns-vi{
+          width:230px;
+          font-size: 13px;
+        }
+        .AllIncepEvent-btns-th{
+          width:230px;
+          font-size: 13px;
+        }
+        .AllIncepEvent-btns-id{
+          width:230px;
+          font-size: 13px;
         }
         
         .pie-area{
@@ -2536,12 +2609,34 @@ export default {
               align-self: center;
               display: flex;
               flex-direction: row;
-              min-width:calc(344/1440*100vw);
-              max-width:calc(384/1440*100vw);
               height: 30px;
               align-items: center;
               padding:0;
               justify-content: space-between;
+            }
+            .operation-btns-en{
+              width:calc(344/1440*100vw);
+            }
+            .operation-btns-zh{
+              width:calc(344/1440*100vw);
+            }
+            .operation-btns-zhTW{
+              width:calc(344/1440*100vw);
+            }
+            .operation-btns-ja{
+              width:calc(374/1440*100vw);
+            }
+            .operation-btns-ko{
+              width:calc(374/1440*100vw);
+            }
+            .operation-btns-vi{
+              width:calc(374/1440*100vw);
+            }
+            .operation-btns-th{
+              width:calc(374/1440*100vw);
+            }
+            .operation-btns-id{
+              width:calc(344/1440*100vw);
             }
           }
           .event-table {

@@ -751,7 +751,31 @@ $sv_red: #c60957;
   @extend .export-btn;
   width: calc(160/1920*100vw);
 }
+.zh-export-btn{
+  @extend .export-btn;
+  width: calc(160/1920*100vw);
+}
+.zhTW-export-btn{
+  @extend .export-btn;
+  width: calc(160/1920*100vw);
+}
 .ja-export-btn{
+  @extend .export-btn;
+  width: 200px;
+}
+.ko-export-btn{
+  @extend .export-btn;
+  width: 200px;
+}
+.vi-export-btn{
+  @extend .export-btn;
+  width: 200px;
+}
+.id-export-btn{
+  @extend .export-btn;
+  width: 200px;
+}
+.th-export-btn{
   @extend .export-btn;
   width: 200px;
 }
