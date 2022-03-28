@@ -216,6 +216,30 @@ $store: #fccc3f;
   padding:0;
   justify-content: space-between;
 }
+.operation-btns-en{
+  width:calc(344/1440*100vw);
+}
+.operation-btns-zh{
+  width:calc(344/1440*100vw);
+}
+.operation-btns-zhTW{
+  width:calc(344/1440*100vw);
+}
+.operation-btns-ja{
+  width:calc(374/1440*100vw);
+}
+.operation-btns-ko{
+  width:calc(374/1440*100vw);
+}
+.operation-btns-vi{
+  width:calc(374/1440*100vw);
+}
+.operation-btns-th{
+  width:calc(374/1440*100vw);
+}
+.operation-btns-id{
+  width:calc(344/1440*100vw);
+}
 .no-print{
   display: none;
 }
@@ -246,5 +270,22 @@ $store: #fccc3f;
         color: #2b2b2b;
     }
     
+  }
+}
+
+
+.loading_rotate{
+  width: 24px;
+  height: 24px;
+  animation: rotate 1.5s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(720deg);
   }
 }

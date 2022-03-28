@@ -239,6 +239,7 @@ export default {
 
   data() {
     return {
+      first:true,
       dateValue: [],
       toolTipClass: 'page-login-toolTipClass',
       eventStatesList: [
@@ -401,6 +402,7 @@ export default {
     if (!self.$route.meta.isBack || self.isFirstLoad) {
       self.initData();
     } else {
+      console.log("Activate")
       self.getEventList('Back');
       self.getEventCount();
       self.$route.meta.isBack = false;
@@ -509,11 +511,13 @@ export default {
     },
 
     searchData() {
+      console.log("SearchData")
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount();
     },
 
     getEventListAndCount() {
+      console.log("Get Event List and Count")
       if (this.dateValue.length === 0) return;
       this.getEventList();
       this.getEventCount();
@@ -577,6 +581,7 @@ export default {
     },
 
     async getEventList(val) {
+      console.log("GetEventList");
       const self = this;
       const tabIndex = Number(this.activeName);
       //const routeParams = sessionStorage.getItem('event_manage');
@@ -589,7 +594,7 @@ export default {
       this.ifSaveParams && self.saveSearchParams(false);
       this.ifSaveParams = true;
       //}
-      if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
+      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         /*this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
         this.tableDataList[tabIndex].eventCount = 0;
@@ -802,12 +807,14 @@ export default {
       }
       //self.getEventListRequestParams('currentChange');
       //}
-      if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
+      //console.log("Get Event Count")
+      //console.log(self.params,self.params.clause.storeId)
+      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         delete self.params.clause.storeId;
       }
       console.log("self.params:",self.params);
       console.log("self.storeFilterObj:",self.storeFilterObj);
-      let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
+      let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.curStore?self.storeFilterObj.curStore:self.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
       
       //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
       console.log("getEventCount > storeId:",storeId)
@@ -979,7 +986,7 @@ export default {
         self.tableHeight = 770 + 'px';
       }
       this.tableDataList[Number(this.activeName)].page = 1;
-      this.getEventListAndCount() ;
+     // this.getEventListAndCount() ;
     },
     getRouterData(routeData) {
       console.log("1.eventManage routeData:", routeData);
@@ -1093,6 +1100,10 @@ export default {
     onStoreChange(storeObj) {
       console.log("onStoreChange>storeFilterObj",storeObj);
       this.storeFilterObj = storeObj;
+      if(this.first){
+        this.first = false;
+        this.getEventListAndCount() ;
+      }
       //this.ifSearchData && this.searchData();
       //this.ifSearchData = false;
     },

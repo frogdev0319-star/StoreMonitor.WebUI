@@ -70,9 +70,9 @@
         <el-row class="second-row">
           <el-col :span="24" class="items-title">
             <span class="title">{{ $t('overview.eventList') }}</span>
-            <div class="operation-btns">
+            <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
               <delay-button
-                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                :class="getLangStyleValue(exportBtnClass)"
                 type="primary"
                 size="mini"
                 @click="export2Excel"
@@ -474,7 +474,17 @@ export default {
       fontFamily: 'Roboto, Microsoft YaHei',
       ifSaveParams: false,
       defaultSort: { prop: 'numOfTotal', order: 'ascending' },
-      isLoading: true
+      isLoading: true,
+      operationBtnClass:[
+        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhtw'},
+        {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
+        {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
+      ],
+      exportBtnClass:[
+        {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+        {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+        {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+      ],
     };
   },
 
@@ -501,6 +511,9 @@ export default {
   },
 
   methods: {
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     handleDown() {
       const self = this;
       if (self.eventTableData.length === 0) {

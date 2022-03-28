@@ -26,7 +26,7 @@
               @emitSearch = "emitSearch"/>
           </el-col>
           <el-col :span="24">
-            <div class="statistics-content" style="height: 735px;" >
+            <div id="imgTest_avg" :class="ispdf ? 'statistics-content-pdf':'statistics-content'" style="height: 735px;" >
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -55,8 +55,8 @@
                       @emitTypeChanged="emitTypeChanged"
                     ></TypeSelectArea>
                   </div>
-                  <div v-if="Avg12Num.length>0" class="avg-score" style="background-color:#fdf6f4;justify-content:space-between;">
-                    <div class="avg12item" style="width:170px;">
+                  <div v-if="Avg12Num.length>0" class="avg-score" style="background-color:#fdf6f4;justify-content:space-between;" :style="{width:getLangStyleValue(avgScoreWidth)}">
+                    <div class="avg12item" :style="{width:getLangStyleValue(scoreWidth)}">
                       <div class="score-item-name">{{Avg12Num[0].name}}</div>
                       <div style="margin-left:10px;">{{$t('statistics.averageScore')}}</div>
                     </div>
@@ -65,8 +65,8 @@
                       <div style="margin-left:10px;margin-right:10px;">{{$t('statistics.score')}}</div>
                     </div>
                   </div>
-                  <div v-if="Avg12Num.length>1" class="avg-score" style="background-color:#edf6e8;justify-content:space-between;">
-                    <div class="avg12item" style="width:170px;">
+                  <div v-if="Avg12Num.length>1" class="avg-score" style="background-color:#edf6e8;justify-content:space-between;" :style="{width:getLangStyleValue(avgScoreWidth)}">
+                    <div class="avg12item" :style="{width:getLangStyleValue(scoreWidth)}">
                       <div class="score-item-name" >{{Avg12Num[1].name}}</div>
                       <div style="margin-left:10px;">{{$t('statistics.averageScore')}}</div>
                     </div>
@@ -75,18 +75,28 @@
                       <div style="margin-left:10px;margin-right:10px;">{{$t('statistics.score')}}</div>
                     </div>
                   </div>
-                  <div  class="pct-panel" v-if="avgChartOption">
+                  <div class="pct-panel-pdf" v-if="ispdf && avgChartOption">
+                      <div v-show="showNoData" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
+                        <img src="../../../static/img/statistics/ic_nodata.svg" style="widht:90px;height:81px;" />
+                        <div style="height:55px;display:flex;justify-content:center;flex-direction:column">
+                          <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
+                        </div>
+                      </div>
+                      <v-chart ref="itemsChart1" autoresize :options="avgChartOption" class="chart-content" width="1000px"/>
+                    </div>
+                  <div else class="pct-panel" v-if="!ispdf && avgChartOption">
                     <div v-show="showNoData" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
                       <img src="../../../static/img/statistics/ic_nodata.svg" style="widht:90px;height:81px;" />
                       <div style="height:55px;display:flex;justify-content:center;flex-direction:column">
                         <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
                       </div>
                     </div>
-                    <v-chart ref="itemsChart1" :auto-resize="true" :options="avgChartOption" class="chart-content"/>
+                    <v-chart ref="itemsChart1" autoresize :options="avgChartOption" class="chart-content"/>
                   </div>
+                  
                 </div>
             </div>
-            <div v-if="standardRate!='- -'" class="statistics-content" style="height: 700px;margin-top:24px;">
+            <div id="imgTest_assm" v-if="standardRate!='- -'" :class="ispdf ? 'statistics-content-pdf':'statistics-content'" style="height: 700px;margin-top:24px;">
                 <div class="head">
                     <el-col :span="17">
                         <div class="region-titles">
@@ -127,7 +137,7 @@
                             <div slot="content">{{Ass12Num[0].name}}</div>
                             <div class="score-item-name" >{{Ass12Num[0].name}}</div>
                           </el-tooltip>
-                          <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
+                          <div style="margin-left:10px;" :style="{width:getLangStyleValue(standardRateWidth)}">{{$t('statistics.standardRate')}}</div>
                         </div>
                         <div class="avg12item">
                           <div style="font-size:24px;font-weight:600;color: #f57949;">{{Ass12Num[0].score}}</div>
@@ -137,7 +147,7 @@
                       <div v-if="Ass12Num.length>1" class="avg-score" style="width:260px;background-color:#edf6e8;justify-content:space-between;margin-left:24px;">
                         <div class="avg12item" style="width:200px;">
                           <div class="score-item-name" >{{Ass12Num[1].name}}</div>
-                          <div style="margin-left:10px;width:80px;">{{$t('statistics.standardRate')}}</div>
+                          <div style="margin-left:10px;" :style="{width:getLangStyleValue(standardRateWidth)}">{{$t('statistics.standardRate')}}</div>
                         </div>
                         <div class="avg12item">
                           <div style="font-size:24px;font-weight:600;color: #59ab22;">{{Ass12Num[1].score}}</div>
@@ -146,15 +156,23 @@
                       </div>
                     </div>
                   </div>
-                  
-                  <div class="pct-panel">
+                  <div v-if="ispdf" class="pct-panel-pdf">
+                      <div v-show="showNoData2" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
+                        <img src="../../../static/img/statistics/ic_nodata.svg" style="widht:90px;height:81px;" />
+                        <div style="height:55px;display:flex;justify-content:center;flex-direction:column">
+                          <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
+                        </div>
+                      </div>
+                      <v-chart ref="itemsChart2" autoresize :options="AssChartOption" :class="ispdf?'chart-content':'chart-content-pdf'"/>
+                    </div>
+                  <div else class="pct-panel">
                     <div v-show="showNoData2" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
                       <img src="../../../static/img/statistics/ic_nodata.svg" style="widht:90px;height:81px;" />
                       <div style="height:55px;display:flex;justify-content:center;flex-direction:column">
                         <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
                       </div>
                     </div>
-                    <v-chart ref="itemsChart2" :auto-resize="true" :options="AssChartOption" :class="ispdf?'chart-content':'chart-content-pdf'"/>
+                    <v-chart ref="itemsChart2" autoresize :options="AssChartOption" :class="ispdf?'chart-content':'chart-content-pdf'"/>
                   </div>
                 </div>
             </div>
@@ -174,9 +192,9 @@
           </div>
           </el-col>
           
-          <div v-if="ispdf">
+          <div v-if="false">
             <el-col :span="24">
-            <div id="imgTest_avg" class="statistics-content-pdf" style="height: 735px;" >
+            <div id="imgTest_avg1" class="statistics-content-pdf" style="height: 735px;" >
                   <div class="head">
                       <el-col :span="17">
                           <div class="region-titles">
@@ -238,7 +256,7 @@
             </div>
             </el-col>
             <el-col :span="24">
-            <div id="imgTest_assm" class="statistics-content-pdf" style="height: 700px;margin-top:24px;=">
+            <div id="imgTest_assm1" class="statistics-content-pdf" style="height: 700px;margin-top:24px;=">
                   <div class="head">
                       <el-col :span="17">
                           <div class="region-titles">
@@ -393,7 +411,19 @@ export default {
         storeIds:[],
         ispdf:false,
       pdfSrc_avg:'',
-      pdfSrc_assm:''
+      pdfSrc_assm:'',
+      avgScoreWidth:[
+        {key:'en',value:'250px'},{key:'zh',value:'250px'},{key:'zhtw',value:'250px'},{key:'ja-JP',value:'300px'},
+        {key:'ko-KR',value:'250px'},{key:'vi-VN',value:'300px'},{key:'id-ID',value:'300px'},{key:'th-TH',value:'300px'}
+      ],
+      scoreWidth : [
+        {key:'en',value:'170px'},{key:'zh',value:'170px'},{key:'zhtw',value:'170px'},{key:'ja-JP',value:'180px'},
+        {key:'ko-KR',value:'170px'},{key:'vi-VN',value:'210px'},{key:'id-ID',value:'180px'},{key:'th-TH',value:'180px'}
+      ],
+      standardRateWidth:[
+        {key:'en',value:'80px'},{key:'zh',value:'80px'},{key:'zhtw',value:'80px'},{key:'ja-JP',value:'80px'},
+        {key:'ko-KR',value:'80px'},{key:'vi-VN',value:'110px'},{key:'id-ID',value:'110px'},{key:'th-TH',value:'110px'}
+      ],
     }
   },
   computed: {
@@ -409,6 +439,7 @@ export default {
   },
 
   async created() {
+    
     await this.initData();
   },
 
@@ -431,6 +462,9 @@ export default {
         this.doGetAverageScore(dateRange); //預設本周
         this.doGetAssessmentScore(dateRange);
         this.getInspectTagStandardScore();
+    },
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
     },
     getSearchParams() {
       const searchParams = SearchConditionUtil.getSearchCondition('PatrolCompareStat');

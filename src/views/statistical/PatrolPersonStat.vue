@@ -583,7 +583,8 @@ export default {
         align-self: center;
         display: flex;
         flex-direction: row;
-        width:101px;
+        min-width:101px;
+        max-width:171px;
         height: 30px;
         align-items: center;
         padding:0;

@@ -146,7 +146,7 @@
           <span class="title" >
             {{ $t('statistics.titles.storeEvalDetail') }}
           </span>
-           <div class="operation-btns">
+           <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <div class="switch-btn">
                     <el-button
                     class="mode-btn"
@@ -160,20 +160,20 @@
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                   <delay-button
-                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                      style="background-color:#FFF;color:#006ab7;padding:0px;"
-                      type="primary"
+                      :class="getLangStyleValue(operationBtnClass)"
+                      style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
+                      type="default"
                       size="mini"
                       @click="exportStore2ExcelPart1"
                   >
-                    <div class="button-area" style="width:120px;margin-left:15px">
+                    <div class="button-area">
                       <img :src="exportPng" class="icon-excel">
-                        <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
+                        <span>{{ $t('eventView.exportReport') }}</span>
                     </div>
                   </delay-button>
             </div>
         </div>
-         <el-col  style="overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
+         <el-col  style="overflow-y:hidden;overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
                   <v-chart  v-if="part1.storeMode==1" 
                             ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
                                 autoresize
@@ -285,7 +285,7 @@
           <span class="title" >
             {{ $t('statistics.titles.storeEvalDetail') }}
           </span>
-           <div class="operation-btns">
+           <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <div class="switch-btn">
                     <el-button
                     class="mode-btn"
@@ -299,13 +299,13 @@
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                    <delay-button
-                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                      style="background-color:#FFF;color:#006ab7;padding:0px;"
-                      type="primary"
+                      :class="getLangStyleValue(operationBtnClass)"
+                      style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
+                      type="default"
                       size="mini"
                       @click="exportStore2ExcelPart2"
                   >
-                    <div class="button-area" style="width:120px;margin-left:15px">
+                    <div class="button-area">
                       <img :src="exportPng" class="icon-excel">
                         <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
                     </div>
@@ -359,7 +359,7 @@
                   </div>
            </el-col>  
       </div> 
-      <div v-if="part3.standardScore!=-9999" id="imgTest_avg4"  class="statistics-content" style="height:1000px;margin-top:18px"  :style="{width:ispdf?'1024px':null}">
+      <div v-if="part3.standardScore!=-9999" id="imgTest_avg4"  class="statistics-content" style="height:1000px;margin-top:18px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -419,7 +419,7 @@
           <span class="title" >
             {{ $t('statistics.titles.storeEvalDetail') }}
           </span>
-           <div class="operation-btns">
+           <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <div class="switch-btn">
                     <el-button
                     class="mode-btn"
@@ -433,15 +433,15 @@
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                     <delay-button
-                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                      style="background-color:#FFF;color:#006ab7;padding:0px;"
-                      type="primary"
+                      :class="getLangStyleValue(operationBtnClass)"
+                      style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
+                      type="default"
                       size="mini"
                       @click="exportStore2ExcelPart3"
                   >
-                    <div class="button-area" style="width:120px;margin-left:15px">
+                    <div class="button-area">
                       <img :src="exportPng" class="icon-excel">
-                        <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
+                        <span>{{ $t('eventView.exportReport') }}</span>
                     </div>
                   </delay-button>
             </div>
@@ -496,7 +496,7 @@
            </el-col>  
       </div> 
     </el-row>
-    <div id="pdf-area" ref="printPDF" class="statistics-container">
+    <div id="pdf-area"  v-if="ispdf" ref="printPDF" class="statistics-container">
       <div style="width:1024px;">
               <div  class="statistics-content-pdf"  style="height: 194px;marginTop:20px;box-shadow:none;">
                 <div id="img_avg1" >
@@ -1200,6 +1200,16 @@ export default {
       pdfSrc_avg2:"",
       pdfSrc_avg3:"",
       pdfSrc_avg4:"",
+      operationBtnClass:[
+        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhtw'},
+        {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
+        {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
+      ],
+      exportBtnClass:[
+        {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+        {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+        {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+      ],
     };
   },
 
@@ -1225,6 +1235,10 @@ export default {
   },
 
   methods: {
+    getLangStyleValue(langArray){
+      console.log('******',util.getLangStyleValue(langArray));
+      return util.getLangStyleValue(langArray);
+    },
     maxLabel(val) {
         var returnValue = '';
         var byteValLen = 0;
@@ -1634,7 +1648,7 @@ export default {
         const tHeader = that.exportPart2DataHeader;
         const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'submitters', 'numOfReport', 'averageScore', 'rank'];
         const data = that.formatJson(filterVal, content);
-        const fileName = this.part2.content[this.part2.indexRegion].groupName + + '_Inspection score_' + util.getCurrentTime();
+        const fileName = this.part2.content[this.part2.indexRegion].groupName +  '_Inspection score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1687,7 +1701,7 @@ export default {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
         const filterVal = ['province', 'city', 'groupName', 'storeGroup','storeType','code', 'submitters', 'numOfReport','numOfStandard',
-        'qualifiedRate','rank'];
+        'standardRate','rank'];
         const self = this;
         const data = that.formatJson(filterVal,content);
         const fileName = this.part3.content[this.part3.indexRegion].groupName  + '_Inspection compliance_' + util.getCurrentTime();
