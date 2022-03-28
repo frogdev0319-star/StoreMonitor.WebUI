@@ -584,6 +584,10 @@ export default {
       console.log("GetEventList");
       const self = this;
       const tabIndex = Number(this.activeName);
+      for(var k in self.tableDataList){
+        self.tableDataList[k].tableData =[];
+        self.tableDataList[k].total =0;
+      }
       //const routeParams = sessionStorage.getItem('event_manage');
       //console.log("routeParams:",routeParams);
       /*if(routeParams!=''){
@@ -595,13 +599,14 @@ export default {
       this.ifSaveParams = true;
       //}
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
+        return ;
         /*this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
         this.tableDataList[tabIndex].eventCount = 0;
         this.totalElements = 0;
         this.numberOfElements = 0;
         return;*/
-        delete self.params.clause.storeId;
+       // delete self.params.clause.storeId;
       }
       console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
@@ -639,6 +644,7 @@ export default {
           };
           temp.push(obj);
         });
+        console.log("Set ",tabIndex,temp)
         self.tableDataList[tabIndex].tableData = temp;
         self.tableDataList[tabIndex].total = res.data.totalPages;
         //self.tableDataList[tabIndex].eventCount = res.data.totalElements;
@@ -1100,12 +1106,8 @@ export default {
     onStoreChange(storeObj) {
       console.log("onStoreChange>storeFilterObj",storeObj);
       this.storeFilterObj = storeObj;
-      if(this.first){
-        this.first = false;
-        this.getEventListAndCount() ;
-      }
-      //this.ifSearchData && this.searchData();
-      //this.ifSearchData = false;
+      this.ifSearchData && this.getEventListAndCount() ;
+      this.ifSearchData = false;
     },
     doBachCloseEvent(){
       this.showBachCloseDialog = true;
