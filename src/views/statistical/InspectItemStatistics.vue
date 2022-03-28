@@ -27,7 +27,7 @@
           @exportPdf = "exportPdf"
           @setDefaultSortAndPage="setDefaultSortAndPage"/>
       </el-col>
-     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px">
+     <div class="statistics-content"   id="imgTest_avg1"   style="height:1110px;margin-top:200px;box-shadow:none;"  :style="{width:ispdf?'1024px':null}">
                 <div class="head">
                         <div class="region-titles">
                             <span class="title">
@@ -122,7 +122,7 @@
                                 ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
                                 :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                   </div>
-                  <div v-else style="margin-top:20.5px;height:100%;overflow-y:hidden;">
+                  <div v-else style="margin-top:20.5px;height:100%;overflow-y:hidden;"  :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;">
                     <table-only
                       ref="elTP"
@@ -166,15 +166,15 @@
            </el-col>  
       </div> 
     </el-row>
-        <el-col :span="24">
-            <div id="pdf-area" ref="printPDF" v-if="ispdf" >
-              <div  class="statistics-content-pdf"  style="marginTop:20px">
+    <div v-if="ispdf" id="pdf-area" ref="printPDF" class="statistics-container">
+            <div style="width:1024px;">
+              <div  class="statistics-content-pdf"  style="marginTop:20px;height:1010px;">
                 <div id="img_avg1" >
                   <img :src="pdfSrc_avg1"  style="display: block;width:100%;height: auto;">
                 </div>
               </div>
           </div>
-          </el-col>
+    </div>
     <dialog-pop
       :title="$t('insSettingView.export')"
       :append-to-body="true"
@@ -357,8 +357,9 @@ export default {
         this.$t('remotePatrol.regionI'),
         this.$t('remotePatrol.regionII'),
         this.$t('overview.storeName'),
+        this.$t('statistics.event.storeGroup'),
+        this.$t('statistics.event.storeType'),
         this.$t('remotePatrol.code'),
-        this.$t('statistics.submitter'),
         this.$t('overview.numOfEvaluations'),
         this.$t('overview.averageScore'),
         this.$t('statistics.rank'),
@@ -986,7 +987,7 @@ export default {
         }
 
         const data = that.formatJson(filterVal, curData);
-        const fileName = 'Area' + '-' + util.getCurDateStr();
+        const fileName = 'Area' + '-' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1004,7 +1005,18 @@ export default {
               property: "averageScore",
             }
        console.log(this.part3.content[this.part3.indexRegion])
-       params.storeIds = this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId]: this.part3.content[this.part3.indexRegion].list;
+       if(this.part3.compareType == 'stores'){
+         content = [this.part3.content[this.part3.indexRegion]];
+       }
+       else{
+        params.storeIds = this.part3.content[this.part3.indexRegion].list;
+       if(this.part3.compareType == 'position'||this.part3.compareType == 'users'){
+         params.storeIds = self.params.storeIds;
+         let id = this.$refs.typeSelectArea.getUserIdFromName(self.part3.content[self.part3.indexRegion].groupName);
+         params.submitters  = [id];
+         params.groupIds   = [];
+         params.groupMode = 0;
+       }
        params.inspectTagId = self.params.inspectId;
             params.filter={
               page:0,
@@ -1021,23 +1033,32 @@ export default {
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
-              if (result) {
-                   
-                  content = result.content
-                  content.forEach((item,i)=>{
-                    item.rank= i+1;
-                    if(item.storeSubmitters)item.storeSubmitters = item.submitters.toString();
-                  });
+              if (result) {          
+                  content = result.content            
               }
             }
+
+       }
+       console.log("Export")
+       console.log(content)
+      content.forEach((item,i)=>{
+          item.rank= i+1;
+                 if(item.storeRegion)item.storeGroup = item.storeRegion.toString();
+                    if(item.storeBranchType)item.storeType = item.storeBranchType.toString();
+                    if(item.submitters)item.storeSubmitters = item.submitters.toString();
+                    if(item.code=='')item.code='- -'
+                    if(item.storeGroup=='')item.storeGroup='- -'
+                    if(item.storeType=='')item.storeType='- -'
+        
+      });
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
-        const filterVal = ['province', 'city', 'groupName', 'code', 'storeSubmitters', 'numOfTotal', 'averageScore', 'rank'];
+        const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'submitters', 'numOfTotal', 'averageScore', 'rank'];
         const self = this;
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = name + '_Inspection item score_' + util.getCurDateStr();
+        const fileName = this.part3.content[this.part3.indexRegion].groupName + '_Inspection item score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },
@@ -1987,7 +2008,7 @@ export default {
         return;
       }
         params.filter = { page: 0, size: params.groupIds.length };
-        if(params.itemIds.length==0 || params.storeIds.length ==0)return
+        if( !params.hasOwnProperty('itemIds') ||params.itemIds.length==0 || params.storeIds.length ==0)return
         const storeResult = await self.getInspectStatsItemOverGroup(params);
         console.log(storeResult)
         if (storeResult.errCode === 0) {
@@ -2006,7 +2027,7 @@ export default {
             this.part3.averageScore =  totalStandard>0? Math.round( (100*totalStandard) /totalReport):-1;
             console.log("Leave FIlterContent"+Math.round( (100*totalStandard) /totalReport)+ " " + ( (100*totalStandard) /totalReport))
             console.log(this.part3.content)
-            this.part3.indexRegion = -1;
+            this.part3.indexRegion = 0;
             this.drawPart3RegionBar();
           }
         }
@@ -2244,6 +2265,7 @@ export default {
       await this.drawPart2RegionBar();
     },
       async clickPart3Bar(event){
+        console.log(event)
       this.part3.indexRegion = event.dataIndex;
       await this.drawPart3RegionBar();
     },
@@ -2369,7 +2391,7 @@ export default {
             self.pdfSrc_avg1 = oGrayImg1;
           });
           setTimeout(() => {
-            self.$print(self.$refs.printPDF);
+            self.$print(self.$refs.printPDF,null,self.$t('route.patrolItemStat')+ util.getCurrentTime());
             self.ispdf = false;
           }, 1000);
         }, 5000);
@@ -2498,8 +2520,8 @@ export default {
       if(this.inspectItem && this.inspectItem.item){
         let item = this.inspectItem.item;
         let name = item.subject?item.subject:item.name
-        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + " ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
-        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')
+        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
+        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
       }
     }
   }
@@ -2533,6 +2555,7 @@ export default {
       margin-right: calc(30/1920*100vw);
       padding-left:0px;
       padding-right:0px;
+      background-color:#fff;
     }
     .subtitle-head{
         margin-left:20px;

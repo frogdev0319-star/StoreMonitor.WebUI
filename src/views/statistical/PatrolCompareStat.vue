@@ -961,7 +961,7 @@ export default {
             self.pdfSrc_assm = oGrayImg2;
           });
           setTimeout(() => {
-            self.$print(self.$refs.printPDF);
+            self.$print(self.$refs.printPDF,null,self.$t('route.patrolCompareStat')+ util.getCurrentTime());
             self.ispdf = false;
           }, 1000);
         }, 5000);

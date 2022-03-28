@@ -181,8 +181,28 @@ export default {
           label: '繁體中文'
         },
         {
-          value: 'en-US',
+          value: 'en',
           label: 'English'
+        },
+        {
+          value: 'ja-JP',
+          label: 'Japan'
+        },
+        {
+          value: 'ko-KR',
+          label: 'Korean'
+        },
+        {
+          value: 'vi-VN',
+          label: '越南'
+        },
+        {
+          value: 'id-ID',
+          label: '印尼'
+        },
+        {
+          value: 'th-TH',
+          label: '泰國'
         }
       ],
 

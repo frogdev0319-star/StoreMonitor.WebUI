@@ -14,25 +14,30 @@
         <div v-if="_item.type === 0" class="score-title">
           <div
             v-if="_item.grade === Math.pow(-2,31)"
+            :style="isExportPdf?{'width':'150px'}:{}"
             class="ignore-btn">
           <span class="pdf_font_18">{{ $t('remotePatrol.ignored') }}</span></div>
           <div
             v-if="groupType === 0 && _item.grade === 0"
+            :style="isExportPdf?{'width':'150px'}:{}"
             class="title-btn-failed">
             <span class="pdf_font_18">{{ tab1BtnArr[1] }} </span>
           </div>
           <div
             v-if="groupType === 2 && _item.grade === 0"
+            :style="isExportPdf?{'width':'150px'}:{}"
             class="title-btn-failed">
             <span class="pdf_font_18">{{ tab3BtnArr[1] }} </span>
           </div>
           <div
             v-if="groupType === 0 && _item.grade === 1"
+            :style="isExportPdf?{'width':'150px'}:{}"
             class="title-btn-pass">
             <span class="pdf_font_18">{{ tab1BtnArr[0] }} </span>
           </div>
           <div
             v-if="groupType === 2 && _item.grade === 1"
+            :style="isExportPdf?{'width':'150px'}:{}"
             class="title-btn-pass">
             <span class="pdf_font_18">{{ tab3BtnArr[0] }} </span>
           </div>
@@ -203,7 +208,7 @@ export default {
       self.$nextTick(function() {
         var video = document.getElementById('previewVideo');
         this.previewplayer = videojs(video);
-        this.previewplayer.src({ src: item.url });
+        this.previewplayer.src({ src: item.isH265 ? '' : item.url });
         this.previewplayer.play();
       });
     },

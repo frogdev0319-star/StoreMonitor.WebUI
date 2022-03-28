@@ -84,7 +84,11 @@
                       <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
                   </div>    
               </div>
-              <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
+              <div style="overflow-x:auto;overflow-y:hidden;height:100%;">
+              <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" :width="barchartWidth"
+                :style="{width:barchartWidth,height:'100%'}"
+               @click="barchartClick"/>
+              </div>
             </div>
             <div class="table-area">
               <div class="sec-head">
@@ -149,7 +153,7 @@
                   />
                 </div>
               </div>
-              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
                 <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"/>
               </div>
             </div>
@@ -320,7 +324,7 @@
                     />
                   </div>
                 </div>
-                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
                   <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"/>
                 </div>
               </div>
@@ -404,7 +408,9 @@
                       <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
                   </div>    
               </div>
+              <div style="overflow-x:auto;overflow-y:hidden;height:100%;">
               <v-chart ref="itemsChart1" :auto-resize="true" :options="barchartOption" class="chart-content" @click="barchartClick"/>
+              </div>
             </div>
             <div class="table-area">
               <div class="sec-head">
@@ -469,7 +475,7 @@
                   />
                 </div>
               </div>
-              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
+              <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
                 <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"/>
               </div>
             </div>
@@ -1071,6 +1077,7 @@ export default {
       gloableEventData:[],
       barActiveName:'-1',
       inspectId:null,
+      barchartWidth:'100%'
     };
   },
 
@@ -1331,9 +1338,10 @@ export default {
         const ignorePer = 0;
         const errCode = eventResult.errCode;
         if (errCode === 0) {
-          const result = eventResult.data;
-          if (result) {
-            self.eventBarChartData = result.content;
+          const result = eventResult.data.content;
+          if (result.length>0) {
+            self.eventBarChartData = result;
+            this.barActiveName=self.eventBarChartData[0].groupName;
           } else {
             self.eventBarChartData =[];
           }
@@ -1342,16 +1350,18 @@ export default {
       }else{
         self.eventBarChartData = [];
       }
-      this.barActiveName=self.eventBarChartData[0].groupName;
+      
       this.doFilterEventListBySelBar( );
       self.setBarchartData()
     },
     getBarchartOption(){
       const self = this;
       const chartOption = {
+        width:'100%',
         grid:{
           left:40,
           right:40,
+          width:'100%'
         },
         tooltip: {
           trigger: "axis",
@@ -1364,7 +1374,7 @@ export default {
           y: 'bottom',
           itemWidth: 14,
           itemHeight: 14,
-          itemGap: 37,
+          itemGap: 20,
           padding: 0,
           icon: 'rect',
           textStyle: {
@@ -1459,21 +1469,54 @@ export default {
       };
       return chartOption;
     },
+    maxLabel(val) {
+        var returnValue = '';
+        var byteValLen = 0;
+        for (var i = 0; i < val.length; i++) {
+            if (val[i].match(/[^\x00-\xff]/ig) != null)
+                byteValLen += 2;
+            else
+                byteValLen += 1;
+            if (byteValLen > 10)
+            {
+                returnValue += '...';
+                break;
+            }
+            returnValue += val[i];
+        }
+        return returnValue;
+    },
     setBarchartData(){
-      this.barchartOption = this.getBarchartOption();
+      //this.$ref.itemsChart1.d
+      this.barchartOption = {};
+      var option = this.getBarchartOption();
       let date_xAxis=[];
       let chart_dataset=[];
       if(this.eventBarChartData.length>0){
         this.eventBarChartData.forEach(item => {
-          date_xAxis.push(item.groupName);
+          date_xAxis.push(this.maxLabel(item.groupName));
           chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId,itemStyle:{color:(item.groupName==this.barActiveName)?"#7bd8eb":"#D7F3F9"}});
         });
-        this.barchartOption.xAxis.data = date_xAxis;
+        option.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
-        this.barchartOption.series[0].data = chart_dataset;
-        
+        option.series[0].data = chart_dataset;
+        if(date_xAxis.length>28){
+          var w = ( date_xAxis.length*90) +'px';
+          
+          option.width = w;
+          option.grid.width = w;
+          this.barchartWidth = w;
+        }
+        else{
+           //option.grid.width = 'calc(1479/1980*100vw)';
+           option.width = 'calc(1479/1980*100vw)';
+           option.grid.width = '100%';
+           this.barchartWidth = 'calc(1479/1980*100vw)'
+        }
+        this.barchartOption = option;
+        //this.$ref.itemsChart1.on('rendered',()=>{console.log('rendered event fired')});
         //
       }
     },
@@ -1502,6 +1545,7 @@ export default {
       }
       
     },
+    
     async getEventTableData() {
       const self = this;
       self.componentsProps.beginTs = self.params.beginTs;
@@ -1958,7 +2002,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = [];
-        self.eventItemTable.colum_data.forEach(item=>{
+        self.eventItemTable.column_data.forEach(item=>{
           tHeader.push(item.label);
         });
         const filterVal = ['groupName', 'itemName', 'numOfUnqualified', 'percentage', 'numOfStores'];
@@ -2120,7 +2164,7 @@ export default {
             self.pdfSrc_second = oGrayImg3;
           });
           setTimeout(() => {
-            self.$print(self.$refs.printPDF);
+             self.$print(self.$refs.printPDF,null,self.$t('route.eventStat')+ util.getCurrentTime());
             self.ispdf = false;
           }, 1000);
         }, 5000);
@@ -2272,7 +2316,7 @@ export default {
           margin-right: calc(24/1440*100vw);
           border-bottom: solid 1px #acaeb1;
           .chart-content {
-            width: 100%;
+            width: auto;
             height: 100%;
           }
         }

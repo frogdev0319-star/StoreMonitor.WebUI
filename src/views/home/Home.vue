@@ -54,7 +54,7 @@
         </div>
         <div>
           <el-button
-            v-if="$route.path === '/patrolPersonStat' 
+            v-if="$route.path === '/patrolPersonStat'
              || $route.path === '/patrolCompareStat'
              || $route.path ==='/eventStat'
                || $route.path === '/patrolItem'
@@ -120,7 +120,7 @@
           </div>
           <el-scrollbar
             ref="scroll"
-            id="el-menuscrollbar" 
+            id="el-menuscrollbar"
             wrap-class="el-scrollbar__wrap"
           >
             <el-menu
@@ -144,7 +144,7 @@
                 >
                   <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`" />
                   <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`" />
-                  <span>{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
+                  <span class="span1">{{collapsed ? "" : $t(`route.${item.children[0].name}`)}}</span>
                 </el-menu-item>
 
                 <!--multi nodes -->
@@ -156,7 +156,7 @@
                   <template slot="title">
                     <img class="menu_img" :src="($route.name=='auth')? `./../static/img/menu/${index}.png`:`./static/img/menu/${index}.png`"/>
                     <img class="menu_img-active" :src="($route.name=='auth')? `./../static/img/menu/${index}-active.png`:`./static/img/menu/${index}-active.png`"/>
-                    <span>{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
+                    <span class="span2">{{collapsed ? "" : $t(`route.${item.name}`) }}</span>
                   </template>
                   <div v-for="child in item.children" :key="child.path">
                     <el-menu-item
@@ -166,7 +166,7 @@
                       :index="child.path"
                       :disabled="child.isReadOnly">
                       <div class="item-icon"></div>
-                      <span >{{ $t(`route.${child.name}`) }}</span>
+                      <span  class="span3">{{ $t(`route.${child.name}`) }}</span>
                     </el-menu-item>
                     <el-submenu
                       v-else-if="!child.hidden && child.threeChild"
@@ -177,8 +177,8 @@
                       :disabled="child.isReadOnly"
                       :key="child.path">
                       <template slot="title">
-                        <div class="item-icon" style="margin-left:-10px;"></div>
-                        <span>{{ $t(`route.${child.name}`) }}</span>
+                        <div class="item-icon"></div>
+                        <span  class="span4" style="margin-left: 15px">{{ $t(`route.${child.name}`) }}</span>
                       </template>
                       <div v-for="grandChild in child.children" :key="grandChild.path">
                         <el-menu-item
@@ -189,8 +189,7 @@
 
                           class="submenu-item">
                           <template>
-                            <div class="item-icon"></div>
-                            <span>{{ $t(`route.${grandChild.name}`) }}</span>
+                            <span class="span5" style="margin-left: 30px">{{ $t(`route.${grandChild.name}`) }}</span>
                           </template>
                         </el-menu-item>
                       </div>
@@ -250,7 +249,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.1.1
+                v3.0.1.6
                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -760,7 +759,7 @@ export default {
         data = this.brandList[idIndex].srp.find(item=>item.type == "Custom_Inspection");
       console.log("Change Account")
       console.log(this.brandList[idIndex])
-  
+
 
       if(!data || !data.enable){
          this.accountId = this.orgAccountId
@@ -781,7 +780,7 @@ export default {
         }
         else{
           this.accountId = this.orgAccountId
-           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);  
+           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);
         }
       });
     },
@@ -860,17 +859,17 @@ export default {
     border: none;
     padding-left: 0;
     padding-bottom: 0.625vw;
-    font-size: calc(22/1920*100vw); 
+    font-size: calc(22/1920*100vw);
     background-color: #FFF;
     color: #484848;
-    height: calc(40/1920*100vw); 
+    height: calc(40/1920*100vw);
   }
     /deep/
     .el-select__caret{
       color:#1375bc !important;
       font-weight: bold !important;
     }
-  
+
 }
 .sider-collapsed {
   width: calc(90/1920*100vw);
@@ -879,10 +878,10 @@ export default {
   width: calc(280/1920*100vw);
 }
 .brand-dev {
-  width: calc(236/1920*100vw); 
-  margin-left: calc(32/1920*100vw); 
-  margin-right: auto; 
-  margin-bottom: calc(50/1920*100vw); 
+  width: calc(236/1920*100vw);
+  margin-left: calc(32/1920*100vw);
+  margin-right: auto;
+  margin-bottom: calc(50/1920*100vw);
   margin-top: calc(90/1920*100vw);
 }
 .item-icon {
@@ -892,7 +891,7 @@ export default {
   width: 5px;
   border-radius:50%;
   background-color:#a5a5a5;
-  margin-right: calc(12 / 1920 * 100vw);
+  // margin-right: calc(12 / 1920 * 100vw);
 }
 .sider {
   transition: width .3s;
@@ -902,18 +901,18 @@ export default {
   flex-direction: column;
   background-color: #fff;
   box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16);
-  
+
   .is-active {
-    span {
-      color:#006ab7;
+    .span4 {
+      // color:#006ab7 !important;
     }
   }
   span {
     font-size: 14px;
     color:#a5a5a5;
-    margin-left: 10px;
+    margin-left: 15px;
   }
-  
+
   /deep/ .el-menu--collapse {
     i {
       display: none;
@@ -924,7 +923,7 @@ export default {
     font-size: 14px;
     overflow-y: auto;
     overflow-x: hidden;
-    
+
   }
   /deep/ .el-menu-item {
     text-align: left;
@@ -973,7 +972,7 @@ export default {
         color: #006ab7;
       }
     }
-    
+
   }
   /deep/ .el-submenu {
     text-align: left;
@@ -1000,13 +999,10 @@ export default {
       background-color: #e4f3fd;
       .el-submenu__title {
         padding-left: calc(30/1920*100vw) !important;
-        span {
+        .span2 {
           color: #006ab7;
         }
       }
-      // .item-icon {
-      //   background-color:#006ab7;
-      // }
       .menu_img {
         display: none;
       }
@@ -1028,7 +1024,7 @@ export default {
         padding-left: calc(30/1920*100vw) !important;
         height: calc(66/1920*100vw);
         line-height: calc(66/1920*100vw);
-        span {
+        .span2 {
           color: #006ab7;
         }
       }
@@ -1047,16 +1043,30 @@ export default {
         background-color: #f2f9fe;
       }
     }
-    
+
     .child-submenu {
       .el-submenu__title {
         padding-left: calc(40/1920*100vw) !important;
         height: 2.1875vw;
         line-height: 2.1875vw;
+        &:hover {
+          .item-icon {
+              background-color: #006ab7;
+          }
+          .span4 {
+            color: #006ab7 !important;
+          }
+        }
       }
       &.is-opened {
       .el-submenu__title {
           padding-left: calc(40/1920*100vw) !important;
+          .span4 {
+            color: #006ab7;
+          }
+          .item-icon {
+              background-color: #006ab7;
+          }
         }
       }
     }
@@ -1070,10 +1080,10 @@ export default {
       i {
         right: 32px;
       }
-      
+
       &:hover {
         background-color: #e4f3fd !important;
-        span {
+        .span2 {
           color: #006ab7 !important;
         }
         .menu_img {
@@ -1090,7 +1100,7 @@ export default {
       padding-left: calc(40/1920*100vw) !important;
     }
   }
-  
+
 }
 .el-menu--vertical .el-menu--popup .el-menu-item {
     &.is-active {
@@ -1253,7 +1263,7 @@ $collapseWidth: 5.5%;
       position: absolute;
       height: 1.66667vw;
       width: 1.66667vw;
-      
+
       left: calc(28/1920*100vw);
       top: calc(43/1920*100vw);
     }
@@ -1291,18 +1301,18 @@ $collapseWidth: 5.5%;
         }
       }
     }
-    
+
   }
-  
+
   .img-collapsed {
-    position: absolute; 
-    right:0; 
+    position: absolute;
+    right:0;
     top: calc(15/1920*100vw);
     width: calc(31/1920*100vw);
     height: calc(31/1920*100vw);
   }
   .meta {
-    position: absolute; 
+    position: absolute;
     left: calc(32/1920*100vw);
     top: calc(75/1920*100vw);
     font-size: calc(15/1920*100vw);
@@ -1347,7 +1357,7 @@ $collapseWidth: 5.5%;
       /deep/ .el-input--suffix .el-input__inner {
         padding-left: 0;
       }
-      
+
     }
     .collapsed-brand-panel {
       height: 40px;

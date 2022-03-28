@@ -162,7 +162,7 @@ export default {
 <style scoped lang="scss">
 
   .dragable-table-content{
-    margin-left: 4%;
+    margin-left: 24px;
     box-sizing: border-box;
   }
   .dragable-noheader-table-content{
@@ -213,6 +213,7 @@ export default {
     font-family: 'Roboto';
     min-height: 60px;
     height: auto;
+    
   }
   .table-checkbox-name{
     display: inline-flex;
@@ -220,7 +221,10 @@ export default {
     .table-name{
       margin-left: 0.9375rem;
       text-align: left;
-      width: 80%;
+      width: 75%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .table-checkbox{
       height: 14px;
@@ -234,16 +238,23 @@ export default {
   }
 
   .table-checkbox-name{
-    width: 30%;
+    width: 27%;
+    
   }
   .table-description{
     width: 45%;
     text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .table-score-description{
     width: 25%;
     text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .table-operation{

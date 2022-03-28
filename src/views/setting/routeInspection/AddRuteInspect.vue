@@ -2032,7 +2032,7 @@ export default {
                     font-family: NotoSansCJKtc;
                     font-size: 13px;
                     width:123px;
-                    line-height:36px;
+                    height:30px;
                     margin-left:16px
                   }
                 }
@@ -2194,6 +2194,7 @@ export default {
         .el-rute-nape{
             height: auto;
             min-height: 90%;
+            width:70%;
             .nape-name-title{
                 display: inline-block;
                 span{

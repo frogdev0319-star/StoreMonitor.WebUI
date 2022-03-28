@@ -161,6 +161,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect';
 import MultiSelect from '@/components/MultiSelect2';
 import TabInceptionDetail from '@/components/TabInceptionDetail'
 import html2canvas from 'html2canvas';
+import SearchConditionUtil from '@/common/SearchConditionUtil';
 export default {
   name: 'PatrolPersonStat',
 
@@ -284,6 +285,7 @@ export default {
       componentsProps:{beginTs:this.$moment().subtract(29, 'days').startOf('d').toDate(),endTs: this.$moment().endOf('d').toDate()},
       isexportPDF:false,
       ispdf:false,
+      ifCachedParams:false,
     }
   },
 
@@ -308,6 +310,13 @@ export default {
   },
 
   created() {
+    const params = SearchConditionUtil.getSearchCondition('PatrolPersonStat');
+    if(Object.keys(params).length>0){
+      console.log("cache params:",params);
+      this.ifCachedParams = true;
+      if(params.submitters.length>0)this.userIds = params.submitters;;
+      if(params.positionIds.length>0)this.positionIds = params.positionIds;
+    }
     this.initData();
     this.getSearchCondition();
   },
@@ -361,21 +370,22 @@ export default {
         value: '00',
         content: filterUser
       });
-      this.positionIds = this.ifCachedParams ? this.departmentIds : this.positionsList.map(depart => depart.value);
+      this.positionIds = this.ifCachedParams ? this.positionIds : this.positionsList.map(depart => depart.value);
     },
 
     getUserList(data) {
       this.userList = [];
       this.origianlUserList = [];
       data.map(user => {
-        const userJson = {};
-        userJson.label = user.userName;
-        userJson.value = user.userId;
-        userJson.title = user.title;
-        this.origianlUserList.push(userJson);
-        this.userList.push(userJson);
+          const userJson = {};
+          userJson.label = user.userName;
+          userJson.value = user.userId;
+          userJson.title = user.title;
+          this.origianlUserList.push(userJson);
+          this.userList.push(userJson);
+        
       });
-      this.userIds = this.ifCachedParams ? this.userIds : this.userList.map(user => user.value);
+      this.userIds = (this.ifCachedParams && this.userIds.length>0) ? this.userIds : this.userList.map(user => user.value);
     },
 
     getTitleList(data) {
@@ -385,7 +395,7 @@ export default {
         titleJson.value = title.titleId;
         this.positionsList.push(titleJson);
       });
-      this.positionIds = this.ifCachedParams ? this.positionIds : this.positionsList.map(position => position.value);
+      this.positionIds = (this.ifCachedParams && this.positionIds.length>0) ? this.positionIds : this.positionsList.map(position => position.value);
     },
     handlePositionsChange(positionIds) {
       this.positionIds = positionIds;
@@ -394,9 +404,9 @@ export default {
 
     filterUserIds() {
       const filterDepart = this.positionsList.filter(position => this.positionIds.includes(position.value));
-      console.log("filterDepart:",filterDepart);
+      //console.log("filterDepart:",filterDepart);
       const departUserId = filterDepart.map(user => user.contents).flat();
-      console.log("departUserId:",departUserId);
+      //console.log("departUserId:",departUserId);
       this.userList = this.origianlUserList.filter(item => {
         return departUserId.includes(item.value);
       });
@@ -445,11 +455,23 @@ export default {
       this.params.submitters = this.userIds;*/
       this.allInsRecordData = [];
       let param = {beginTs:start,endTs:end,submitters:this.userIds};
+      let searchParams = {...param};
+      searchParams['positionIds'] = this.positionIds; 
+      const searchConditon = {
+        path: 'PatrolPersonStat',
+        params: searchParams
+      };
+      console.log("save searchParams:",searchParams);
+      SearchConditionUtil.saveSearchCondition(searchConditon);
+      /*if(this.userIds.includes("-1")){
+        param = {beginTs:start,endTs:end};
+      }*/
       
       //console.log("doSearchInsRecordList > params:",this.params);
       let record = await this.getInspectStatsPersonInfo(param);
       this.allInsRecordData = record.data.content;
       this.total = Math.ceil(this.allInsRecordData.length/this.sizeNum);
+      this.page =1;
       this.doCoverDepartmentToString();
       //console.log("this.total:",this.total);
       //console.log("this.allInsRecordData:",this.allInsRecordData);
@@ -519,7 +541,7 @@ export default {
             self.pdfSrc = oGrayImg;
           });
           setTimeout(() => {
-            self.$print(self.$refs.printPDF);
+            self.$print(self.$refs.printPDF,null,self.$t('route.patrolPersonStat')+ util.getCurrentTime());
             self.ispdf = false;
           }, 1000);
         }, 5000);

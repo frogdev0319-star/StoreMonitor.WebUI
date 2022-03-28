@@ -1,8 +1,9 @@
 import html2canvas from 'html2canvas';
 import JsPDF from 'jspdf';
 export default{
-  install(Vue, options) {
+  install(Vue, options,name) {
     Vue.prototype.getPdf = function() {
+      console.log("Get PDF "+name)
       sessionStorage.setItem('startPDF', 'start');
       var title = this.htmlTitle;
       html2canvas(document.querySelector('#pdfDom'), {
