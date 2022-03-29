@@ -48,7 +48,7 @@
     </div>
     <div class="el-table-content">
       <delay-button
-        :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+        :class="getLangStyleValue(exportBtnClass)"
         class="absolute-btn"
         style="background-color:#FFF;color:#006ab7;"
         type="primary"
@@ -341,7 +341,12 @@ export default {
       showCloseBtn:false,
       closingEventId:[],
       stopRowClick:false,
-      showBachCloseDialog:false
+      showBachCloseDialog:false,
+      exportBtnClass:[
+                {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+                {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+                {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+            ],
     };
   },
 
@@ -367,10 +372,10 @@ export default {
           self.$route.meta.keepAlive = true;
         },
         300);
-        self.initData();
+        //self.initData();
         self.ifChangeAccount = true;
         self.ifSaveParams = false;
-        this.ifSearchData = true;
+        self.ifSearchData = true;
       }
     },
 
@@ -442,6 +447,10 @@ export default {
     }
   },
   methods: {
+    getLangStyleValue(langArray){
+        
+            return util.getLangStyleValue(langArray);
+        },
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {'border-bottom': '1px solid #acaeb1'};
       /*if (columnIndex === 0) {
@@ -519,7 +528,7 @@ export default {
     getEventListAndCount() {
       console.log("Get Event List and Count")
       if (this.dateValue.length === 0) return;
-      this.getEventList();
+      this.getEventList('');
       this.getEventCount();
     },
 
@@ -587,10 +596,11 @@ export default {
       for(var k in self.tableDataList){
         self.tableDataList[k].tableData =[];
         self.tableDataList[k].total =0;
+        self.tableDataList[k].eventCount = 0;
       }
-      //const routeParams = sessionStorage.getItem('event_manage');
-      //console.log("routeParams:",routeParams);
-      /*if(routeParams!=''){
+      /*const routeParams = sessionStorage.getItem('event_manage');
+      console.log("routeParams:",routeParams);
+      if(routeParams!=''){
         const routeData = JSON.parse(routeParams);
         this.getRouterData(routeData);
       }else{*/
@@ -599,6 +609,7 @@ export default {
       this.ifSaveParams = true;
       //}
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
+        console.log('return');
         return ;
         /*this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
@@ -813,10 +824,12 @@ export default {
       }
       //self.getEventListRequestParams('currentChange');
       //}
-      //console.log("Get Event Count")
-      //console.log(self.params,self.params.clause.storeId)
+      console.log("Get Event Count")
+      console.log(self.params)
+      console.log(self.params.clause.storeId);
       if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         delete self.params.clause.storeId;
+        return;
       }
       console.log("self.params:",self.params);
       console.log("self.storeFilterObj:",self.storeFilterObj);
@@ -981,6 +994,7 @@ export default {
     },
 
     initData() {
+      console.log('init');
       const self = this;
       self.activeName = '0';
       self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
@@ -1051,7 +1065,7 @@ export default {
     getSearchParams() {
       
         const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
-        console.log("EventMange > getSearchParams > searchParams:",searchParams);
+        //console.log("EventMange > getSearchParams > searchParams:",searchParams);
         if (Object.keys(searchParams).length > 0) {
           
           if(searchParams['searchFrom']=='PatrolPersonStat'){
@@ -1106,7 +1120,7 @@ export default {
     onStoreChange(storeObj) {
       console.log("onStoreChange>storeFilterObj",storeObj);
       this.storeFilterObj = storeObj;
-      this.ifSearchData && this.getEventListAndCount() ;
+      this.ifSearchData && this.searchEventList() ;
       this.ifSearchData = false;
     },
     doBachCloseEvent(){

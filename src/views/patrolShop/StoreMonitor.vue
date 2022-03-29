@@ -96,7 +96,8 @@
                 <span class="title">{{ $t("remotePatrol.selectDate") }}</span>
                 <div @click="backCurDate"
                 class="backToNow"
-                :style="{'fontSize':lang=='en'?'12px':'15px'}">{{ $t("remotePatrol.backToNow")}}</div>
+                :class="lang.indexOf('zh') == -1?getLangStyleValue(backToNowClass):''"
+                >{{ $t("remotePatrol.backToNow")}}</div>
               </div>
               <div class="padding flex" style="padding-top: 0px">
                 <el-date-picker
@@ -654,6 +655,11 @@ export default {
       problemTab: 0,
       curSelStoreId: '',
       tempCurSelStoreId:'',
+      backToNowClass:[
+        {key:'en',value:'en-backToNow'},{key:'zh',value:'zh-backToNow'},{key:'zhtw',value:'zhTW-backToNow'},
+        {key:'ja-JP',value:'ja-backToNow'},{key:'ko-KR',value:'ko-backToNow'},{key:'vi-VN',value:'vi-backToNow'},
+        {key:'id-ID',value:'id-backToNow'},{key:'th-TH',value:'th-backToNow'}
+      ]
     };
   },
 
@@ -759,6 +765,9 @@ export default {
   },
 
   methods: {
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     submitItemResource() {
       const self = this;
       if (this.eventDes.trim().length === 0) return
@@ -2760,6 +2769,20 @@ $h1: #292e36;
   color: #c60957;
   cursor: pointer;
   background-color: #fff;
+}
+.en-backToNow{
+  font-size: calc(12 / 1920 * 100vw);
+}
+.id-backToNow{
+  width: calc(150 / 1920 * 100vw); 
+}
+.th-backToNow{
+  width: calc(150 / 1920 * 100vw); 
+  font-size: calc(12 / 1920 * 100vw);
+}
+.vi-backToNow{
+  width: calc(150 / 1920 * 100vw); 
+  font-size: calc(12 / 1920 * 100vw);
 }
 .el-test .el-input__icon {
   line-height: 24px;

@@ -10,10 +10,11 @@
                     {{ item.name }}
                 </div>
             </div>
-            <div v-show="currentTab != 'NotInspected'" class="operation-btns">
+            <div v-show="currentTab != 'NotInspected'" class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                 <delay-button
-                    :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                    type="primary"
+                    :class="getLangStyleValue(exportBtnClass)"
+                    class="export-btn"
+                    type="default"
                     size="mini"
                     @click="export2Excel"
                 >
@@ -283,13 +284,27 @@ export default {
             submitterName:"",
             pageSizeOption:[
                 {value:5,label:"5 "+this.$t('overview.pageSizeUnit')},
-                {value:10,label:"10 "+this.$t('overview.pageSizeUnit')}]
+                {value:10,label:"10 "+this.$t('overview.pageSizeUnit')}],
+                operationBtnClass:[
+                {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhtw'},
+                {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
+                {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
+            ],
+            exportBtnClass:[
+                {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+                {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+                {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+            ],
         };
     },
     created(){
         this.getReportList()
     },
     methods:{
+        getLangStyleValue(langArray){
+        
+            return util.getLangStyleValue(langArray);
+        },
       onClickBtn(item){
         this.currentTab = item;
         if(item == "Detail"){
@@ -611,6 +626,30 @@ export default {
         cursor: pointer;
         border-bottom:1px solid rgba(172,174,177,0.34);
     }
+    .operation-btns-en{
+              width:calc(101/1440*100vw);
+            }
+            .operation-btns-zh{
+              width:calc(101/1440*100vw);
+            }
+            .operation-btns-zhTW{
+              width:calc(101/1440*100vw);
+            }
+            .operation-btns-ja{
+              width:calc(131/1440*100vw);
+            }
+            .operation-btns-ko{
+              width:calc(131/1440*100vw);
+            }
+            .operation-btns-vi{
+              width:calc(131/1440*100vw);
+            }
+            .operation-btns-th{
+              width:calc(131/1440*100vw);
+            }
+            .operation-btns-id{
+              width:calc(101/1440*100vw);
+            }
     .ja-export-btn,
     .en-export-btn,
     .export-btn{

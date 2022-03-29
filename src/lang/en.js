@@ -83,7 +83,7 @@ export default{
       "patrolCompareStat":"Inspection Compare Statistics",
       "supervisorCalStat":"Store assessment statistics",
       "patrolItemStat":"Inspection item statistics",
-      "singleStoreStat":"Single Store statistics"
+      "singleStoreStat":"Single Store Statistics"
   },
   "overview":{
       "DangerousLess":"Pool Ratio＜60%",
@@ -599,7 +599,7 @@ export default{
       "excelIllegalCategory":"llegal characters '@#￥%^&*'!",
       "excelIllegalDes":"The length of item description is 1200 characters at most!",
       "excelLongCategory":"The length of category supports up to 30 characters",
-      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
+      "excelLongSubCategory":"The length of sub-category supports up to 30 characters",
       "excelLongItem":"The length of item is 250 characters at most!",
       "excelMinScoreType":"Anomaly Events-Score Threshold: Optional, -50~the highest score of Score Options",
       "excelOtherScoreType":"Score:Required, -100~100points",
@@ -714,7 +714,7 @@ export default{
       "needBind":"table, store that needs to be bound",
       "selectStore":"Select Store",
       "selectStoreTag":"Quick select",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"The total score can not be empty!"
   },
   "deviceView":{
       "EzvizAccount":"Streaming Service Account",
@@ -1060,7 +1060,7 @@ export default{
       "radar":"Radar Chart",
       "remarksContent":"Note",
       "reportTemplate":"Report Template",
-      "roleId0Title": "Custom",
+      "roleId0Title": "User Defined",
       "roleId1Title":"Admin",
       "roleId2Title":"Manager",
       "roleId3Title":"Supervisor",

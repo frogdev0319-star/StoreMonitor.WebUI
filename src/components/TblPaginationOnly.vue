@@ -4,7 +4,7 @@
     <div class="pageNum">{{currentPage}}</div>
     <el-button class="btnArrow" :style="btnStyle" icon="el-icon-arrow-right" :disabled="currentPage==total" @click="handleNextClick"></el-button>
     <div v-if="showPageSize" class="pageSizeTitle">{{$t('overview.pageSize')}}</div>
-    <div v-if="showPageSize" class="pageSize-select">
+    <div v-if="showPageSize" class="pageSize-select" :class="getLangStyleValue(pageSelectClass)">
           <el-select
             v-model="pagesize"
             size="medium"
@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import util from '@/common/util.js';
 export default {
   
   name:'TblPaginationOnly',
@@ -97,15 +98,24 @@ export default {
   },
   data() {//,{value:'position',label:this.$t('overview.position')},{value:'users',label:this.$t('overview.user')}
     return {
+      lang:this.$i18n.locale,
       pageSizeList: [
         {value:10,label:"10 "+this.$t('overview.pageSizeUnit')}, 
         {value:20,label:"20 "+this.$t('overview.pageSizeUnit')}, 
         {value:50,label:"50 "+this.$t('overview.pageSizeUnit')}, 
         {value:100,label:"100 "+this.$t('overview.pageSizeUnit')}
         ],
+      pageSelectClass:[
+        {key:'en',value:'en-pageSize-select'},{key:'zh',value:'zh-pageSize-select'},{key:'zhtw',value:'zhTW-pageSize-select'},
+        {key:'ja-JP',value:'ja-pageSize-select'},{key:'ko-KR',value:'ko-pageSize-select'},{key:'vi-VN',value:'vi-pageSize-select'},
+        {key:'id-ID',value:'id-pageSize-select'},{key:'th-TH',value:'th-pageSize-select'}
+      ]
     }
   },
   methods:{
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     handleCurrentChange(currentPage) { 
       const pageObj = {
         page: currentPage,
@@ -176,12 +186,35 @@ export default {
     text-align: center;
   }
   .pageSize-select{
-    width:103px;
     height: 31px;
     border-radius: 5px;
     background-color: #edf0f2;
     margin-left: 16px;
     
+  }
+  .en-pageSize-select{
+    width:103px;
+  }
+  .id-pageSize-select{
+    width:103px;
+  }
+  .ja-pageSize-select{
+    width:150px;
+  }
+  .ko-pageSize-select{
+    width:150px;
+  }
+  .th-pageSize-select{
+    width:150px;
+  }
+  .vi-pageSize-select{
+    width:250px;
+  }
+  .zh-pageSize-select{
+    width:103px;
+  }
+  .zhTW-pageSize-select{
+    width:103px;
   }
   .el-pagesize{
     /deep/

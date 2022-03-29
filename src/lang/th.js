@@ -82,7 +82,8 @@ export default{
       "patrolPersonStat":"สถิติบุคคลจากการตรวจสอบ",
       "patrolCompareStat":"สถิติเปรียบเทียบการตรวจสอบ",
       "supervisorCalStat":"สถิติการประเมินร้านค้า",
-      "patrolItemStat":"สถิติรายการในการตรวจสอบ"
+      "patrolItemStat":"สถิติรายการในการตรวจสอบ",
+      "singleStoreStat":"Single Store statistics"
   },
   "overview":{
       "DangerousLess":"อัตราส่วนอันตราย ＜60%",
@@ -598,7 +599,7 @@ export default{
       "excelIllegalCategory":"อักขระที่ไม่ถูกต้อง '@#￥%^&*'!",
       "excelIllegalDes":"ความยาวของคำอธิบายรายการจะต้องไม่เกิน 1200 อักขระ!",
       "excelLongCategory":"ความยาวของหมวดหมู่จะต้องไม่เกิน 30 อักขระ",
-      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
+      "excelLongSubCategory":"ความยาวของหมวดหมู่ย่อยจะต้องไม่เกิน 30 อักขระ",
       "excelLongItem":"ความยาวของรายการจะต้องไม่เกิน 250 อักขระ!",
       "excelMinScoreType":"เกณฑ์คะแนน-เหตุการณ์ผิดปกติ ทางเลือก, -50~คะแนนสูงสุดของตัวเลือกคะแนน",
       "excelOtherScoreType":"คะแนน:จำเป็น, -100~100 คะแนน",
@@ -713,7 +714,7 @@ export default{
       "needBind":"ตาราง ร้านค้าที่ต้องผูกโยง",
       "selectStore":"เลือกร้านค้า",
       "selectStoreTag":"เลือกด่วน",
-      "minScoreEmpty":"扣分起始值不得為空！"
+      "minScoreEmpty":"Min score can not be empty！"
   },
   "deviceView":{
       "EzvizAccount":"บัญชีบริการสตรีมมิ่ง",
@@ -1059,7 +1060,7 @@ export default{
       "radar":"แผนภูมิเรดาร์",
       "remarksContent":"หมายเหตุ",
       "reportTemplate":"เทมเพลตรายงาน",
-      "roleId0Title": "Custom",
+      "roleId0Title": "ผู้ใช้กำหนดเอง",
       "roleId1Title":"ผู้ดูแลระบบ",
       "roleId2Title":"ผู้จัดการ",
       "roleId3Title":"หัวหน้างาน",
@@ -1082,8 +1083,8 @@ export default{
       "useAndSave":"เลือกและบันทึก",
       "useTemplate":"เทมเพลต",
       "yes":"ใช่",
-      "templateSelection":"選擇模板",
-      "reportTemplateLabel": "報告模板"
+      "templateSelection":"Select a template",
+      "reportTemplateLabel": "Report template",
   },
   "statistics":{
       "averageCompare":"เปรียบเทียบค่าเฉลี่ย",

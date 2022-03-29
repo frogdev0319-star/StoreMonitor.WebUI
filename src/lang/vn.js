@@ -82,7 +82,8 @@ export default{
       "patrolPersonStat":"Chuyên viên thống kê kiểm tra",
       "patrolCompareStat":"So sánh thống kê kiểm tra",
       "supervisorCalStat":"Thống kê đánh giá cửa hàng",
-      "patrolItemStat":"Thống kê mục kiểm tra"
+      "patrolItemStat":"Thống kê mục kiểm tra",
+      "singleStoreStat":"Single Store statistics"
   },
   "overview":{
       "DangerousLess":"Tỷ lệ nguy hiểm＜60%",
@@ -598,6 +599,7 @@ export default{
       "excelIllegalCategory":"Ký tự không hợp lệ '@#￥%^&*'!",
       "excelIllegalDes":"Độ dài mô tả mục tối đa là 1200 ký tự!",
       "excelLongCategory":"Hỗ trợ tối đa 30 ký tự cho độ dài danh mục",
+      "excelLongSubCategory":"Hỗ trợ tối đa 30 ký tự cho độ dài tiểu danh mục",
       "excelLongItem":"Độ dài mục tối đa là 250 ký tự!",
       "excelMinScoreType":"Các sự kiện bất thường - Ngưỡng điểm: Không bắt buộc, -50~điểm cao nhất của Các tùy chọn điểm",
       "excelOtherScoreType":"Điểm: Bắt buộc, -100~100 điểm",
@@ -712,7 +714,7 @@ export default{
       "needBind":"Bảng biểu XX, cửa hàng cần được liên kết",
       "selectStore":"Chọn cửa hàng",
       "selectStoreTag":"Chọn nhanh",
-      "minScoreEmpty":"扣分起始值不得為空！"
+      "minScoreEmpty":"Min score can not be empty！"
   },
   "deviceView":{
       "EzvizAccount":"Tài khoản dịch vụ Streaming",
@@ -1058,7 +1060,7 @@ export default{
       "radar":"Biểu đồ radar",
       "remarksContent":"Lưu ý",
       "reportTemplate":"Mẫu báo cáo",
-      "roleId0Title": "Custom",
+      "roleId0Title": "Chỉ định theo người dùng",
       "roleId1Title":"Quản trị viên",
       "roleId2Title":"Người quản lý",
       "roleId3Title":"Người giám sát",
@@ -1081,8 +1083,8 @@ export default{
       "useAndSave":"Chọn & Lưu",
       "useTemplate":"Mẫu",
       "yes":"Có",
-      "templateSelection":"選擇模板",
-      "reportTemplateLabel": "報告模板"
+      "templateSelection":"Select a template",
+      "reportTemplateLabel": "Report template",
   },
   "statistics":{
       "averageCompare":"So sánh trung bình",

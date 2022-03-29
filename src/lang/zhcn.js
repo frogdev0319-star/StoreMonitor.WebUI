@@ -1060,7 +1060,7 @@ export default{
     "radar":"雷达图",
     "remarksContent":"备注说明",
     "reportTemplate":"巡检报告模板",
-    "roleId0Title": "自订义",
+    "roleId0Title": "自定义",
     "roleId1Title":"管理员",
     "roleId2Title":"督导主管",
     "roleId3Title":"督导",

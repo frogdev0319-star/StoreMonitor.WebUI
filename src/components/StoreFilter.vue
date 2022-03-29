@@ -1,7 +1,7 @@
 <template>
   <div>
   <div class="content">
-    <div class="search-label">{{ $t('remotePatrol.storeSelect') }}</div>
+    <div class="search-label" :class="(lang=='vi-VN')?'search-label-vn':'' ">{{ $t('remotePatrol.storeSelect') }}</div>
     <div class="header-details">
       <div style="width:116px;">
         <el-select
@@ -795,6 +795,9 @@ export default {
       font-family: NotoSansCJKTC;
       font-size: 15px;
       font-weight: normal;
+    }
+    .search-label-vn{
+      font-size: 13px;
     }
   }
   .padding-left {

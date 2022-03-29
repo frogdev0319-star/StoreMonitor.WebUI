@@ -1635,7 +1635,7 @@ $h1:#292e36;
                       justify-content: center;
                   }
                   .ja-span{
-                    width: 90px;
+                    width: 120px;
                   }
                   .activeClass{
                       background-color: #006ab7 !important;
