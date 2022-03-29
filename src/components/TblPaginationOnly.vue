@@ -196,7 +196,7 @@ export default {
     width:103px;
   }
   .id-pageSize-select{
-    width:103px;
+    width:113px;
   }
   .ja-pageSize-select{
     width:150px;

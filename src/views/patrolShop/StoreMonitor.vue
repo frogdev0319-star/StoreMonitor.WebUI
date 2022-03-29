@@ -2774,7 +2774,8 @@ $h1: #292e36;
   font-size: calc(12 / 1920 * 100vw);
 }
 .id-backToNow{
-  width: calc(150 / 1920 * 100vw); 
+  width: calc(160 / 1920 * 100vw); 
+  font-size: calc(12 / 1920 * 100vw);
 }
 .th-backToNow{
   width: calc(150 / 1920 * 100vw); 
