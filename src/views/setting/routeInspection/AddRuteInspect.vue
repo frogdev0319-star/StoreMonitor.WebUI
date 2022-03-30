@@ -1364,7 +1364,8 @@ export default {
           itemScore: itemScore,
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable,
-          type: this.itemType
+          type: this.itemType,
+          required: this.itemRequired === '1'
         };
         temp.push(obj);
         const params = {
@@ -1396,6 +1397,7 @@ export default {
       this.ItemScoreOption = item.availableScoreStr;
       this.ItemDescription = item.napeDep;
       this.itemType = item.type;
+      this.itemRequired = item.required ? '1' : '0'
     },
 
     handleDelete(item) {
@@ -1600,7 +1602,8 @@ export default {
           isClick: false,
           checked: false,
           type: _item.type,
-          sequence: _item.sequence
+          sequence: _item.sequence,
+          required: _item.required
         };
         temp.push(obj);
       });
