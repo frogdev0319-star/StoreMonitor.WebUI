@@ -29,6 +29,14 @@ export const getInspectBindList = data => {
   });
 };
 
+export const updateGroupWeight = data => {
+  return request({
+    url: `v1.0/inspect/group/updateWeight`,
+    method: 'post',
+    data
+  });
+};
+
 export const addInspectGroup = data => {
   return request({
     url: `${version}/inspect/group/add`,
