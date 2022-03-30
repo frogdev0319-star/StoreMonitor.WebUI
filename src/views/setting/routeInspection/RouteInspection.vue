@@ -622,6 +622,7 @@ export default {
           const _obj = {};
           _obj.id = _item.id;
           _obj.groupName = _item.name;
+          _obj.groupWeight = _item.weight;
           self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight })
           _obj.itemCount = _item.items.length;
           _obj.type = _item.type;
