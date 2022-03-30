@@ -1225,6 +1225,7 @@ export default {
     },
     emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray,selStoreIdArr}){ //劃分類型選擇
       console.log("Part3 Emit Type Change="+compareType)
+      console.log(compareArr)
       this.part3.compareType = compareType;
       this.part3.compareIds = compareArr;
       this.part3.comapareLabels = selectedLabels;
@@ -1960,7 +1961,7 @@ export default {
       this.part2.barStoreOption = option;
     },
      async getPart3RegionBar() {
-      console.log("getPart3RegionBar888")
+      
       const self = this;
       const params = {};
       this.totalAvgScore =-9999;
@@ -1983,7 +1984,7 @@ export default {
          params.storeIds  = this.part3.compareIds;
          params.groupMode = 0;
       }
-  else if(this.part3.compareType=='area1'){
+      else if(this.part3.compareType=='area1'){
          params.storeIds =  this.part3.selStoreIdArr;
          params.groupIds  = this.part3.compareIds;
          params.groupMode = 1;
@@ -2022,7 +2023,7 @@ export default {
       let totalReport = 0;
       let totalStandard = 0;
       console.log("********************************")
-      console.log(params.groupIds)
+      console.log("getPart3RegionBar="+params.groupIds.length)
       if(params.groupIds.length==0  ){
         console.log("No group");
         this.part3.content =[];
@@ -2342,6 +2343,7 @@ export default {
 
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
+      console.log(storePatrolLists)
      // this.part2.standardScore=-1;
      // this.part2.standardScore=-1;
      // this.doGetAssessmentStandardScore();
@@ -2387,7 +2389,16 @@ export default {
         }
 
       }
-      this.params = searchParams;
+      console.log(this.params)
+      console.log(searchParams)
+      let changed = false;
+      if(this.params.inspectTagId != searchParams.inspectTagId ||
+        this.params.beginTs != searchParams.beginTs &&
+        this.params.endTs!= searchParams.endTs  ){
+          console.log("Change = TRUE")
+          changed = true;
+      }
+      this.params = JSON.parse(JSON.stringify(searchParams));
       this.daysRangeList = dateRangeList;
       this.curRegionI = regionI;
       this.curRegionII = regionII;
@@ -2395,13 +2406,15 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
-
-      console.log(searchParams)
+  
+    //  console.log(searchParams)
       //if(this.params.storeIds.length>0){
       //  console.log("Get Part3")
-        await this.dataGetPart3();
+      //  await this.dataGetPart3();
      // }
-
+      if(changed){
+        await this.dataGetPart3();
+      }
 
     },
 
