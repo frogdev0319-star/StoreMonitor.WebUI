@@ -217,7 +217,7 @@ export default {
 
   created() {
     this.getSearchParams();
-    this.getStoreListAndGroupAndType();
+    this.getStoreListAndGroupAndType(true);
   },
 
   methods: {
@@ -248,7 +248,8 @@ export default {
       this.selectAllProAndCity(this.curCountry, true);
     },
 
-    getStoreListAndGroupAndType() {
+    getStoreListAndGroupAndType(init) {
+      console.log("XXXXgetStoreListAndGroupAndType")
       const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
@@ -267,10 +268,15 @@ export default {
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
+        console.log(storeList)
         this.storeList = storeList;
         this.getCountryStore();
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
+         if(init && ((this.curStoreGroup&& this.curStoreGroup.length>0 && this.curStoreGroup[0]!='-1')||
+              (this.curStoreType&& this.curStoreType.length>0 && this.curStoreType[0]!='-1'))){
+                this.filterStore();
+          }
       }).catch(err => {
         console.log('StoreFilter - getStoreGroupAndType: ' + err);
       });
@@ -463,11 +469,11 @@ export default {
       } else {
         this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
-        //console.log("groupIdArray:",groupIdArray);
+        console.log("groupIdArray:",groupIdArray);
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
-        //console.log("typeIdArr:",typeIdArr);
+        console.log("typeIdArr:",typeIdArr);
         const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
-        //console.log("ilterStoreArray:",filterStoreArray);
+        console.log("ilterStoreArray:",filterStoreArray);
         
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
         console.log("filterStoreId:",filterStoreId);
@@ -539,6 +545,7 @@ export default {
     },
 
     getStoreIdsOfGroupAndType(groupArr, typeArr) {
+      console.log("getStoreIDOF",groupArr, typeArr)
       let groupIdArr = [];
       let typeIdArr = [];
       if (groupArr.length === 0 && typeArr.length === 0) return [];
@@ -752,6 +759,8 @@ export default {
           this.curStoreType = searchParams.curStoreType;
           this.curSelectedStore = searchParams.curSelectedStore;
           this.ifGetParamsFromCash = true;
+ 
+         
           if(searchParams.searchFrom == "PatrolPersonStat"){
             this.getStoreListAndGroupAndType();
           }
