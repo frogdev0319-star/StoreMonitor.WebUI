@@ -209,10 +209,20 @@
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
+              <span class="item_label">必填</span>
+            </div>
+            <el-radio-group class="attribute-group" v-model="itemRequired">
+              <el-radio label="1">必填</el-radio>
+              <el-radio label="0">非必填</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item>
+            <div class="score_item">
+              <span class="sign">*</span>
               <span class="item_label">{{$t('insSettingView.inspectItemType')}}</span>
             </div>
             <el-radio-group class="attribute-group" v-model="itemType">
-              <div v-for="(typeItem, typeIndex) in itemsTypeList"style="display: inline-flex">
+              <div v-for="(typeItem, typeIndex) in itemsTypeList" :key="typeItem.value" style="display: inline-flex">
                 <el-radio :label="typeItem.value" :key="typeIndex">{{typeItem.label}}</el-radio>
               </div>
             </el-radio-group>
@@ -532,6 +542,7 @@ export default {
       hoverId: '',
       notAllowedChangeParentId: false,
       ifClickSubCategory: false,
+      itemRequired: '0',
       itemType: 0,
       childIndex: -1,
       oldGroupSequence: [],

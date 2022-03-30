@@ -78,6 +78,14 @@
                     {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
                   </span> 
                   <div class="spacer"></div>
+                  <div
+                    style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
+                    class="storevue-button-empty"
+                    size="mini"
+                    @click="setWeighting">
+                    <img :src="WeightingSetting" style="width:24px;height:24px;"/>
+                    <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ '權重設定' }}</div>
+                  </div>
                   <div style="display:flex; flex-direction:row;font-size: 13px;align-items:center" @click="setItem(_item.routeData, _item.name, '', _item.name)">
                     <!--<i class="iconfont icon-quxiaolianjie"/>-->
                     <img :src="require('../../../../static/img/ic_relate.svg')" style="width:24px;height:24px;"/>
@@ -219,6 +227,31 @@
         <span>{{ $t('insSettingView.confirmToSetRule') }}</span>
       </div>
     </dialog-pop>
+                
+    <dialog-pop
+      :title="'全重設定'"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showWeightSetting"
+      :isWarning="true"
+      @visibleChangeHandler="showWeightSetting = false"
+      @cancelHandler="showWeightSetting = false"
+      @confirmHandler="updateGroupWeight"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          <div v-for="item in weightOptions" :key="item.id">
+            <span>{{item.name}}</span>
+            <el-input
+              type="number"
+              v-model="item.weight"
+            />
+          </div>
+        </div>
+      </div>
+    </dialog-pop>
+    
   </el-row>
 </template>
 <script>
@@ -248,6 +281,7 @@ export default {
     return {
       elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
       loadingGif: require('../../../../static/img/loading.gif'),
+      WeightingSetting:require('../../../../static/img/ic_WeightingSetting_blue.svg'),
       radioList: [
         {
           'value': '1',
@@ -259,6 +293,7 @@ export default {
         }
       ],
       showNoPostDialog: false,
+      showWeightSetting: false,
       loading: false,
       varyWindowWidth: window.innerHeight,
       addPatrol: '新增巡检表',
@@ -330,7 +365,8 @@ export default {
       lang: this.$i18n.locale,
       taglangList: [this.$t('insSettingView.remotePatrol'), this.$t('insSettingView.onsitePatrol')],
       isLoading: true,
-      showDragInfo: true
+      showDragInfo: true,
+      weightOptions: []
     };
   },
 
@@ -401,7 +437,25 @@ export default {
   },
 
   methods: {
-
+    updateGroupWeight () {
+      let groups = this.weightOptions.map(group => ({
+        id: group.id,
+        weight: Number(group.weight)
+      }))
+      let count = groups.reduce((total, cur) => total + cur.weight, 0)
+      if (count === 100) {
+        inpectRESTful.updateGroupWeight({ groups }).then(() => {
+          util.notify('儲存成功', 'success', 3000)
+          this.showWeightSetting = false;
+        })
+      } else {
+        util.notify('權重不可大於或小於100%', 'error', 3000);
+      }
+    },
+    setWeighting () {
+      this.showWeightSetting = true;
+      this.getTagList();
+    },
     setItem(routeData, tabName, tabNameLang, routeName) {
       const self = this;
       sessionStorage.setItem('NapeItem', JSON.stringify(routeData));
@@ -563,10 +617,12 @@ export default {
         const obj = {};
         const temp = [];
         const groupids = [];
+        self.weightOptions = [];
         NapeData.forEach((_item, _index) => {
           const _obj = {};
           _obj.id = _item.id;
           _obj.groupName = _item.name;
+          self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight })
           _obj.itemCount = _item.items.length;
           _obj.type = _item.type;
           _obj.checked = false;
@@ -1592,7 +1648,6 @@ export default {
           const Others = wb.Sheets['Others'];
 
           let PassFailCopy = deepClone(PassFail);
-          console.log('PassFailCopy:',PassFailCopy);
           let ScoreCopy = deepClone(Score);
           let OthersCopy = deepClone(Others);
           const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
