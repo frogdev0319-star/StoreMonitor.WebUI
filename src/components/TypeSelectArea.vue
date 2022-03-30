@@ -757,7 +757,6 @@ export default {
         flex-direction:row;
         .type-div{
             width: calc(52/1440*100vw);
-            height: 18px;
             margin: 2px 0 4px 4px;
             font-family: NotoSansCJKtc;
             font-size: 13px;
