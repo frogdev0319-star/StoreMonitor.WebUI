@@ -1572,7 +1572,7 @@ export default {
       let chart_dataset=[];
       if(chartData.length>0){
         chartData.forEach(item => {
-          date_xAxis.push(item.groupName);
+          date_xAxis.push(this.maxLabel(item.groupName));
           chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
         });
         this.barchartOptionViewMode0.xAxis.data = date_xAxis;
