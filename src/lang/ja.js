@@ -80,10 +80,11 @@ export default {
       "transactionMonitor":"トランザクションモニタリング",
       "userAccountDeviceSetting":"エンタープライズアカウントのデバイス設定",
       "onsitePatrol":"オンサイト検査",
-      "patrolPersonStat":"巡檢人員統計",
-      "patrolCompareStat":"巡檢同比分析",
+      "patrolPersonStat":"Inspection Person Statistics",
+      "patrolCompareStat":"Inspection Compare Statistics",
       "supervisorCalStat":"インスペクション評価統計",
-      "patrolItemStat":"インスペクションアイテム統計"
+      "patrolItemStat":"インスペクションアイテム統計",
+      "singleStoreStat":"Single Store statistics"
   },
   "overview":{
       "DangerousLess":"危険率＜60％",
@@ -248,7 +249,7 @@ export default {
       "daysww":"日",
       "weeks":"週",
       "pageSize":"ページあたりの表示数",
-      "pageSizeUnit":"XXエントリ"
+      "pageSizeUnit":"エントリ"
   },
   "remotePatrol":{
       "InspectionDetail":"レポートのエクスポート",
@@ -599,7 +600,7 @@ export default {
       "excelIllegalCategory":"カテゴリ名に不正な文字列が含まれています。確認してください！",
       "excelIllegalDes":"アイテムの説明の長さは最大1200文字です",
       "excelLongCategory":"カテゴリの長さは最大30文字をサポートします",
-      "excelLongSubCategory":"The length of subcategory supports up to 30 characters",
+      "excelLongSubCategory":"サブカテゴリの長さは最大30文字をサポートします",
       "excelLongItem":"アイテムの長さは最大250文字です",
       "excelMinScoreType":"異常イベント-スコアしきい値：オプション、-50ポイントー合計スコア",
       "excelOtherScoreType":"スコア：必須、-100〜100ポイント",
@@ -714,7 +715,7 @@ export default {
       "needBind":"XXテーブル、バインドすべきストア",
       "selectStore":"セレクトしてください",
       "selectStoreTag":"クイックセレクト",
-      "minScoreEmpty":"扣分起始值不得為空！"
+      "minScoreEmpty":"Min score can not be empty！"
   },
   "deviceView":{
       "EzvizAccount":"アカウント",
@@ -1060,7 +1061,7 @@ export default {
       "radar":"レーダーチャート",
       "remarksContent":"説明",
       "reportTemplate":"レポートテンプレート",
-      "roleId0Title": "Custom",
+      "roleId0Title": "ユーザーにより定義すること",
       "roleId1Title":"管理者",
       "roleId2Title":"マネージャー",
       "roleId3Title":"スーパーバイザー",
@@ -1083,8 +1084,8 @@ export default {
       "useAndSave":"選択と使用",
       "useTemplate":"テンプレート",
       "yes":"はい",
-      "templateSelection":"選擇模板",
-      "reportTemplateLabel": "報告模板"
+      "templateSelection":"Select a template",
+      "reportTemplateLabel": "Report template",
   },
   "statistics":{
       "averageCompare":"平均比較",

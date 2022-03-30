@@ -48,7 +48,7 @@
     </div>
     <div class="el-table-content">
       <delay-button
-        :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+        :class="getLangStyleValue(exportBtnClass)"
         class="absolute-btn"
         style="background-color:#FFF;color:#006ab7;"
         type="primary"
@@ -169,6 +169,10 @@
                   <i class="iconfont icon-zhengque empty-data-icon"/>
                   <span class="empty-text">{{ $t('eventView.noEvents') }}</span>
                 </div>
+                <!--<div v-else class="empty-content">
+                  <img :src="loadingGif" class="loading_rotate">
+                  <span class="empty-text">{{ $t('remotePatrol.loading') }}</span>
+                </div>-->
               </div>
             </el-table>
           </div>
@@ -239,6 +243,8 @@ export default {
 
   data() {
     return {
+      loadingGif: require('../../../static/img/loading.svg'),
+      first:true,
       dateValue: [],
       toolTipClass: 'page-login-toolTipClass',
       eventStatesList: [
@@ -340,7 +346,12 @@ export default {
       showCloseBtn:false,
       closingEventId:[],
       stopRowClick:false,
-      showBachCloseDialog:false
+      showBachCloseDialog:false,
+      exportBtnClass:[
+                {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+                {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+                {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+            ],
     };
   },
 
@@ -361,6 +372,11 @@ export default {
   watch: {
     accountChanged(val) {
       const self = this;
+      for(let i=0; i<5;i++){
+        self.tableDataList[i].tableData =[];
+        self.tableDataList[i].eventCount = 0;
+      }
+      
       if (val !== 0) {
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
@@ -369,7 +385,8 @@ export default {
         self.initData();
         self.ifChangeAccount = true;
         self.ifSaveParams = false;
-        this.ifSearchData = true;
+        self.ifSearchData = true;
+        
       }
     },
 
@@ -401,6 +418,7 @@ export default {
     if (!self.$route.meta.isBack || self.isFirstLoad) {
       self.initData();
     } else {
+      console.log("Activate")
       self.getEventList('Back');
       self.getEventCount();
       self.$route.meta.isBack = false;
@@ -440,6 +458,10 @@ export default {
     }
   },
   methods: {
+    getLangStyleValue(langArray){
+        
+            return util.getLangStyleValue(langArray);
+        },
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {'border-bottom': '1px solid #acaeb1'};
       /*if (columnIndex === 0) {
@@ -495,8 +517,8 @@ export default {
     },
 
     searchEventList() {
-      console.log("@@@searchEventList");
       this.saveSearchParams(false);
+      
       this.tableDataList[Number(this.activeName)].page = 1;
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
@@ -509,13 +531,15 @@ export default {
     },
 
     searchData() {
+      console.log("SearchData")
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount();
     },
 
     getEventListAndCount() {
+      console.log("Get Event List and Count")
       if (this.dateValue.length === 0) return;
-      this.getEventList();
+      this.getEventList('');
       this.getEventCount();
     },
 
@@ -577,11 +601,17 @@ export default {
     },
 
     async getEventList(val) {
+      console.log("GetEventList");
       const self = this;
       const tabIndex = Number(this.activeName);
-      //const routeParams = sessionStorage.getItem('event_manage');
-      //console.log("routeParams:",routeParams);
-      /*if(routeParams!=''){
+      for(var k in self.tableDataList){
+        self.tableDataList[k].tableData =[];
+        self.tableDataList[k].total =0;
+        //self.tableDataList[k].eventCount = 0;
+      }
+      /*const routeParams = sessionStorage.getItem('event_manage');
+      console.log("routeParams:",routeParams);
+      if(routeParams!=''){
         const routeData = JSON.parse(routeParams);
         this.getRouterData(routeData);
       }else{*/
@@ -589,14 +619,16 @@ export default {
       this.ifSaveParams && self.saveSearchParams(false);
       this.ifSaveParams = true;
       //}
-      if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
+      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
+        //return ;
         /*this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
         this.tableDataList[tabIndex].eventCount = 0;
         this.totalElements = 0;
         this.numberOfElements = 0;
-        return;*/
+        */
         delete self.params.clause.storeId;
+        return;
       }
       console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
@@ -634,9 +666,10 @@ export default {
           };
           temp.push(obj);
         });
+        console.log("Set ",tabIndex,temp)
         self.tableDataList[tabIndex].tableData = temp;
         self.tableDataList[tabIndex].total = res.data.totalPages;
-        //self.tableDataList[tabIndex].eventCount = res.data.totalElements;
+        self.tableDataList[tabIndex].eventCount = res.data.totalElements;
         self.totalElements = res.data.totalElements;
         self.numberOfElements = res.data.numberOfElements;
         //self.handleTabClick(this.activeName);
@@ -802,12 +835,16 @@ export default {
       }
       //self.getEventListRequestParams('currentChange');
       //}
-      if ( self.params.clause.hasOwnProperty('storeId') && self.params.clause.storeId.length === 0) {
+      console.log("Get Event Count")
+      //console.log(self.params)
+      //console.log(self.params.clause.storeId);
+      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         delete self.params.clause.storeId;
+        return;
       }
-      console.log("self.params:",self.params);
-      console.log("self.storeFilterObj:",self.storeFilterObj);
-      let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
+      //console.log("self.params:",self.params);
+      //console.log("self.storeFilterObj:",self.storeFilterObj);
+      let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.curStore?self.storeFilterObj.curStore:self.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
       
       //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
       console.log("getEventCount > storeId:",storeId)
@@ -968,6 +1005,7 @@ export default {
     },
 
     initData() {
+      //console.log('init');
       const self = this;
       self.activeName = '0';
       self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
@@ -1038,7 +1076,7 @@ export default {
     getSearchParams() {
       
         const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
-        console.log("EventMange > getSearchParams > searchParams:",searchParams);
+        //console.log("EventMange > getSearchParams > searchParams:",searchParams);
         if (Object.keys(searchParams).length > 0) {
           
           if(searchParams['searchFrom']=='PatrolPersonStat'){
@@ -1063,7 +1101,7 @@ export default {
             this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
             //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
           }else{
-            this.storeFilterObj.filterStoreIds = searchParams.curStore;
+            this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
             this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
             //console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
             this.params.beginTs = this.dateValue[0].valueOf();
@@ -1093,8 +1131,8 @@ export default {
     onStoreChange(storeObj) {
       console.log("onStoreChange>storeFilterObj",storeObj);
       this.storeFilterObj = storeObj;
-      //this.ifSearchData && this.searchData();
-      //this.ifSearchData = false;
+      this.ifSearchData && this.getEventListAndCount();
+      this.ifSearchData = false;
     },
     doBachCloseEvent(){
       this.showBachCloseDialog = true;

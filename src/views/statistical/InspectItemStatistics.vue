@@ -89,7 +89,7 @@
           <span class="title" style="width:80%"  >
             {{ inspectDetailSubTitle }}
           </span>
-           <div class="operation-btns">
+           <div class="operation-btns" :class="getLangStyleValue(operationBtnClass)">
                   <div class="switch-btn">
                     <el-button
                     class="mode-btn"
@@ -103,16 +103,16 @@
                     >{{ $t('statistics.event.imageMode')}}</el-button>
                   </div>
                <delay-button
-                      :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                      style="background-color:#FFF;color:#006ab7;padding:0px;"
-                      type="primary"
+                      :class="getLangStyleValue(operationBtnClass)"
+                      style="margin-left:32px;background-color:#FFF;color:#006ab7;border:none;"
+                      type="default"
                       size="mini"
                       @click="exportStore2Excel"
                   >
-                    <div class="button-area" style="width:120px;margin-left:15px">
-                      <img :src="exportPng" class="icon-excel">
-                        <span style="color:#006ab7;font-size:10">{{ $t('eventView.exportReport') }}</span>
-                    </div>
+                    <div class="button-area">
+                        <img :src="exportPng" class="icon-excel">
+                        <span>{{ $t('eventView.exportReport') }}</span>
+                      </div>
                   </delay-button>
             </div>
         </div>
@@ -777,6 +777,16 @@ export default {
               pageIndex:0,pargeSize:10,storeTableData:[],
               pieOption:{},barRegionOption:{},barStoreOption:{},
               table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfTotal'}},
+      operationBtnClass:[
+        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhtw'},
+        {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
+        {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
+      ],
+      exportBtnClass:[
+        {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+        {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+        {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+      ],
     };
   },
 
@@ -802,6 +812,10 @@ export default {
   },
 
   methods: {
+    getLangStyleValue(langArray){
+      //console.log('******',util.getLangStyleValue(langArray));
+      return util.getLangStyleValue(langArray);
+    },
     maxLabel(val) {
         var returnValue = '';
         var byteValLen = 0;
@@ -935,21 +949,24 @@ export default {
     },
 
     async searchData() {
-    
+      
+      console.log("Search Data")
       this.storeDateValue = util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
-      if (this.params.storeIds.length > 0) {
+      if (this.pareams.storeIds.length > 0) {
         await this.dataGetOverview();
       } else {
+        
         this.totalRegion = 0;
         this.regionTableData = [];
       //  this.getPart1RegionBar();
         this.storeTableData = [];
         this.regionsList = [];
         this.curRegion = [];
-        this.regionsChartsOptions = null;
-        this.part1.pieOption = null;
-        this.part1.barRegionOption = null;
-        this.part1.barStoreOption = null;
+        this.regionsChartsOptions ={};
+       // this.part3.pieOption = null;
+        this.part3.barRegionOption = {};
+        this.part3.barStoreOption = {};
+        console.log("Handle Clear")
       }
     },
 
@@ -1054,7 +1071,7 @@ export default {
       require.ensure([], async() => {
         const { export_json_to_excel } = require('@/excel/Export2Excel');
         const tHeader = that.exportPart3DataHeader;
-        const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'submitters', 'numOfTotal', 'averageScore', 'rank'];
+        const filterVal = ['province', 'city', 'groupName','storeGroup','storeType', 'code', 'numOfTotal', 'averageScore', 'rank'];
         const self = this;
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
@@ -1948,9 +1965,10 @@ export default {
       const params = {};
       this.totalAvgScore =-9999;
       this.part3.pieOption = null;
-      this.part3.storeTableData = null;
-      this.part3.barRegionOption = null;
-      this.part3.barStoreOption = null;
+      this.part3.storeTableData = {};
+      this.part3.barRegionOption = {};
+      this.part3.barStoreOption = {};
+      this.part3.content=[];
       params.beginTs = self.params.beginTs;
       params.endTs = self.params.endTs;
       params.groupMode = 0;
@@ -2003,8 +2021,12 @@ export default {
       }
       let totalReport = 0;
       let totalStandard = 0;
-      if(params.groupIds.length==0){
+      console.log("********************************")
+      console.log(params.groupIds)
+      if(params.groupIds.length==0  ){
         console.log("No group");
+        this.part3.content =[];
+         this.drawPart3RegionBar();
         return;
       }
         params.filter = { page: 0, size: params.groupIds.length };
@@ -2034,7 +2056,7 @@ export default {
 
     },
     async drawPart3RegionBar(){
-      console.log("drawPart2RegionBar")
+      console.log("drawPart3RegionBar")
       const option = this.getInspectLineOption();
       const regionData =[];
       const regionLabel =[];
@@ -2323,7 +2345,11 @@ export default {
      // this.part2.standardScore=-1;
      // this.part2.standardScore=-1;
      // this.doGetAssessmentStandardScore();
-      console.log(searchParams)
+      if(searchParams.storeIds.length==0)
+        this.part3.compareIds =[];
+      this.part3.storeTableData = {};
+      this.part3.barRegionOption = {};
+      this.part3.barStoreOption = {};
              
       const searchParamsObj = {
           path: 'inspectItemStatistics',
@@ -2369,12 +2395,12 @@ export default {
       this.timeMode = timeMode;
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
-      this.part3.storeTableData = null;
-      this.part3.barRegionOption = null;
-      this.part3.barStoreOption = null;
-      if(this.params.storeIds.length>0){
+
+      console.log(searchParams)
+      //if(this.params.storeIds.length>0){
+      //  console.log("Get Part3")
         await this.dataGetPart3();
-      }
+     // }
 
 
     },

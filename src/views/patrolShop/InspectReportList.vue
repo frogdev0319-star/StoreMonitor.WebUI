@@ -581,7 +581,9 @@ export default {
     },
    getReportList_(p) {
       console.log("Get Report List")
-      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
+      console.log(p)
+      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
+      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
@@ -653,6 +655,7 @@ export default {
     },
    getReportList(p) {
       console.log("Get Report List")
+      console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,inspectTagId:p.inspectTagId}
       const self = this;
       params.endTs = params.endTs - params.endTs % 1000 + 999;
@@ -946,7 +949,7 @@ export default {
       tempsearchParamsObj.curReportType = this.curReportType;
       if(!tempsearchParamsObj.clause){
         tempsearchParamsObj.clause={
-          storeId: this.storeFilterObj.filterStoreIds.splice (this.storeFilterObj.filterStoreIds.indexOf('-1'), 1),status:this.curAppraise
+          storeId: this.storeFilterObj.filterStoreIds,status:this.curAppraise
         }
       }
       else{
@@ -1014,6 +1017,7 @@ export default {
     
 
     onStoreChange(storeObj) {
+      console.log("On Store Changed")
       // console.log(storeObj)
       this.storeStr = storeObj.storeStr;
       this.storeFilterObj = storeObj;

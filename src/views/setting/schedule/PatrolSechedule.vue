@@ -280,7 +280,7 @@
                     <div class="el-bind-content">
                       <div v-if="storeList.length === 0">
                         <div v-if="Havestore === 0|| resultHavestore && Havestore !== 0" class="bind-empty">
-                          <img :src="loadingGif">
+                          <img :src="loadingGif" class="loading_rotate">
                           <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
                         </div>
                       </div>
@@ -420,7 +420,7 @@ export default {
 
       Havestore: 0,
       resultHavestore: false,
-      loadingGif: require('../../../../static/img/loading.gif'),
+      loadingGif: require('../../../../static/img/loading.svg'),
       isActive: 0,
       allData: false,
       allDisabled: false,

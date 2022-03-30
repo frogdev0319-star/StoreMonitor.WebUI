@@ -5,6 +5,11 @@ import moment from 'moment';
 import { getCookie } from './auth';
 
 export default {
+  getLangStyleValue(langArray){
+    console.log("*****lang:",i18n.locale);
+    var lang_style = langArray.find( item => {return item.key==i18n.locale});
+    return lang_style.value;
+  },
   getOneHourTime(para) {
     const bt = new Date(new Date().getTime() - 1 * 60 * 60 * 1000);
     const et = new Date();

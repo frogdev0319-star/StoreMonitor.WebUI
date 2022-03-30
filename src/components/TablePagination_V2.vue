@@ -142,7 +142,7 @@
           <span class="empty-text">{{ $t('deviceView.noData') }}</span>
         </div>
         <div v-else class="empty-content">
-          <img :src="loadingGif">
+          <img :src="loadingGif" class="loading_rotate">
           <span class="empty-text">{{ $t('remotePatrol.loading') }}</span>
         </div>
       </div>
@@ -295,7 +295,7 @@ export default {
       lang: this.$i18n.locale,
       order: { direction: '', property: '' },
       noData: this.$t('deviceView.noData'),
-      loadingGif: require('../../static/img/loading.gif'),
+      loadingGif: require('../../static/img/loading.svg'),
       expands: "",
       expandRowKeys: [],
     };

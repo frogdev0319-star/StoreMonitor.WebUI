@@ -1061,7 +1061,7 @@ export default{
     "radar":"雷達圖",
     "remarksContent":"備註說明",
     "reportTemplate":"巡檢報告樣板",
-    "roleId0Title": "自訂義",
+    "roleId0Title": "自定義",
     "roleId1Title":"管理員",
     "roleId2Title":"督導主管",
     "roleId3Title":"督導",

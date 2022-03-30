@@ -107,7 +107,7 @@
                     @change-routeData="changerouteData"/>
                 </div>
                 <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
-                  <img :src="loadingGif">
+                  <img :src="loadingGif" class="loading_rotate">
                   <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
                 </div>
               </el-tab-pane>
@@ -2535,7 +2535,6 @@ export default {
                     font-size: 13px;
                     min-width:75px;
                     max-width:105px;
-                    line-height:36px;
                     margin-left:16px;
                     width:auto;
                   }

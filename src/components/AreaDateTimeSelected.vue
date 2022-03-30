@@ -96,7 +96,6 @@ export default {
         }
         .range-div{
             width: 52px;
-            height: 18px;
             margin: 2px 0 4px 4px;
             font-family: NotoSansCJKtc;
             font-size: 13px;

@@ -468,7 +468,7 @@ export const navbarRoute = {
         hidden: true
       }
     ) && primaryPathesList.push('/beseyeAccount', '/beseyeDeviceSetting', '/beseye/authorize');
-
+    /*
     util.getVideoAuthority(4) && deviceRoutes.push(
       {
         path: '/skywatchAccount',
@@ -482,7 +482,7 @@ export const navbarRoute = {
         hidden: true
       }
     ) && primaryPathesList.push('/skywatchAccount', '/skywatchDeviceSetting');
-
+    */
     return deviceRoutes;
   },
 

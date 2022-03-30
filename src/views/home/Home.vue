@@ -248,7 +248,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.1.6
+                v3.0.2.3
                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -411,7 +411,7 @@ export default {
         { curPath: ["/storedetail"], activePath: "/storemanage" },
         { curPath: ["/ezvizeDeviceSetting"], activePath: "/ezvizDevice" },
         { curPath: ["/beseyeDeviceSetting"], activePath: "/beseyeAccount" },
-        { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
+     //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
         { curPath: ["/workflowDetail"], activePath: "/workflows" },
       ];
@@ -570,7 +570,7 @@ export default {
         "deviceManage",
         "ezvizDeviceMgt",
         "beseyeDeviceMgt",
-        "skywatchDeviceMgt",
+      //  "skywatchDeviceMgt",
       ];
       if (inspectSettingNameArr.includes(matchedParentName)) {
         this.setInspectionSettingBread(matched, currentRoute);
@@ -653,6 +653,7 @@ export default {
           this.setSecondBread(matched, "beseyeDeviceMgt", "/beseyeAccount");
           break;
         }
+        /*
         case "/skywatchAccount": {
           this.setFirstBread(matched, "skywatchDeviceMgt");
           break;
@@ -661,6 +662,7 @@ export default {
           this.setSecondBread(matched, "skywatchDeviceMgt", "/skywatchAccount");
           break;
         }
+        */
         default: {
           break;
         }
