@@ -1060,7 +1060,7 @@ export default{
       "radar":"Radar Chart",
       "remarksContent":"Note",
       "reportTemplate":"Report Template",
-      "roleId0Title": "User Defined",
+      "roleId0Title": "Custom",
       "roleId1Title":"Admin",
       "roleId2Title":"Manager",
       "roleId3Title":"Supervisor",
