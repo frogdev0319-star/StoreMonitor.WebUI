@@ -318,11 +318,12 @@ export default {
       //this.filterStore();
       console.log("arr:",arr);
       this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
-      /*
+      
      
       console.log(this.filterStoreIds)
       if(this.filterStoreIds){
         let temp=[];
+        let filterStoreStr = ""
         this.filterStoreIds.forEach(storeId => {
           this.storeList.forEach(store => {
             if (storeId === store.storeId) {
@@ -336,9 +337,11 @@ export default {
             }
           });
         });
+        console.log("ChangeSTore",temp)
         this.storeDataList = temp;
+        this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
       }
-      */
+     
      // console.log(this.storeList);
      // console.log(this.storeDataList )
       if(this.emitChanged){
