@@ -2343,7 +2343,7 @@ export default {
 
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
-      console.log(storePatrolLists)
+      console.log(searchParams)
      // this.part2.standardScore=-1;
      // this.part2.standardScore=-1;
      // this.doGetAssessmentStandardScore();
@@ -2360,8 +2360,9 @@ export default {
       this.ifSaveParams && this.$refs.inspectItemSearch.saveSearchParams(searchParamsObj);
       this.ifSaveParams = true;
       if(searchParams.inspectId && searchParams.inspectId!=''){
-        console.log(searchParams.inspectId,this.curInspectId)
-        if(searchParams.inspectId !=this.curInspectId){
+          console.log(searchParams.inspectId,this.curInspectId)
+      //  if(searchParams.inspectId !=this.curInspectId){
+          console.log("Get InpectItemList "+searchParams.inspectId)
           this.inspectItemList =[];
           let result  = await  this.getInspectItemList(searchParams.inspectId)
           console.log(result)
@@ -2386,13 +2387,13 @@ export default {
             this.curInspectId = searchParams.inspectId
          
           }
-        }
+     //   }
 
       }
       console.log(this.params)
       console.log(searchParams)
       let changed = false;
-      if(this.params.inspectTagId != searchParams.inspectTagId ||
+      if(this.params.inspectId != searchParams.inspectId ||
         this.params.beginTs != searchParams.beginTs &&
         this.params.endTs!= searchParams.endTs  ){
           console.log("Change = TRUE")

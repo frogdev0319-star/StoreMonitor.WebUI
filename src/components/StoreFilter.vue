@@ -205,6 +205,7 @@ export default {
     async accountChanged(val) {
       const self = this;
       if (val !== 0) {
+        console.log("Account Changed")
         self.ifGetParamsFromCash = false;
         this.getStoreListAndGroupAndType();
         await this.getSearchParams();
@@ -225,7 +226,8 @@ export default {
       this.isFavorite = !this.isFavorite;
       this.getStoreListAndGroupAndType()
     },
-    getCountryStore() {
+    getCountryStore(initFilter) {
+      console.log("getCountryStore"+initFilter)
       let temp = [];
       if (this.storeList.length !== 0) {
         this.storeList.forEach(item => {
@@ -245,11 +247,12 @@ export default {
       this.countryList[0].countryList = countryList;
       this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
       this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
-      this.selectAllProAndCity(this.curCountry, true);
+      if(!initFilter)
+       this.selectAllProAndCity(this.curCountry, true);
     },
 
     getStoreListAndGroupAndType(init) {
-      console.log("XXXXgetStoreListAndGroupAndType")
+    
       const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
@@ -268,13 +271,19 @@ export default {
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
-        console.log(storeList)
+        console.log("XXXXgetStoreListAndGroupAndType")
         this.storeList = storeList;
-        this.getCountryStore();
+        let initFilter =false;
+        if(init && ((this.curStoreGroup&& this.curStoreGroup.length>0 && this.curStoreGroup[0]!='-1')||
+              (this.curStoreType&& this.curStoreType.length>0 && this.curStoreType[0]!='-1'))){
+                initFilter=true;
+        }
+        this.getCountryStore(initFilter);
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
-         if(init && ((this.curStoreGroup&& this.curStoreGroup.length>0 && this.curStoreGroup[0]!='-1')||
-              (this.curStoreType&& this.curStoreType.length>0 && this.curStoreType[0]!='-1'))){
+      //  console.log(this.curStoreGroup,this.curStoreType)
+         if(initFilter){
+                console.log("To FIlter stores")
                 this.filterStore();
           }
       }).catch(err => {
@@ -284,9 +293,11 @@ export default {
 
     onChangeStore(arr) {
       this.curStore = arr;
+      console.log("Change",this.curStore)
       this.changeStoreNew(arr);
     },
     onChangeSelectedStore() {
+      console.log("On Change select store ")
       this.emitParams();
       console.log(this.curSelectedStore)
     },
@@ -305,12 +316,36 @@ export default {
 
     changeStoreNew(arr) {
       //this.filterStore();
-      //console.log("arr:",arr);
+      console.log("arr:",arr);
       this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
+      /*
+     
+      console.log(this.filterStoreIds)
+      if(this.filterStoreIds){
+        let temp=[];
+        this.filterStoreIds.forEach(storeId => {
+          this.storeList.forEach(store => {
+            if (storeId === store.storeId) {
+              filterStoreStr += `${store.name}，`;
+              const obj = {
+                  storeId: store.storeId,
+                  label: store.name,
+                  value: store.name
+                };
+                temp.push(obj);
+            }
+          });
+        });
+        this.storeDataList = temp;
+      }
+      */
+     // console.log(this.storeList);
+     // console.log(this.storeDataList )
       if(this.emitChanged){
         console.log('*****emitStoreChange');
         this.$emit('emitStoreChange', this.filterStoreIds);
       }
+      console.log("Change store new")
       this.emitParams();
     },
 
@@ -463,6 +498,7 @@ export default {
     },
 
     filterStore() {
+      console.log("Filter Store=>>")
       let filterStoreId = [];
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
         filterStoreId = this.curStore;
@@ -473,8 +509,8 @@ export default {
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
         console.log("typeIdArr:",typeIdArr);
         const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
-        console.log("ilterStoreArray:",filterStoreArray);
-        
+       // console.log("ilterStoreArray:",filterStoreArray);
+        console.log(this.curStore);
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
         console.log("filterStoreId:",filterStoreId);
       }
@@ -497,11 +533,11 @@ export default {
       this.storeDataList = temp;
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-      //console.log("temp:",temp);
       this.getStoreGroupString();
       this.getStoreTypeString();
+      console.log("Emit From fitlerstore")
       this.emitParams();
-      console.log("emitChanged:",this.emitChanged);
+     // console.log("emitChanged:",this.emitChanged);
       
     },
 
@@ -524,6 +560,7 @@ export default {
     },
 
     emitParams() {
+      console.log("Emit Params")
       const tempsearchParamsObj = {};
       //console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
       tempsearchParamsObj.curCountry = this.curCountry;
@@ -541,6 +578,7 @@ export default {
       tempsearchParamsObj.curRegionII = this.curRegionII;
       tempsearchParamsObj.regionMode = this.regionMode;
       tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
+      //console.log(tempsearchParamsObj)
       this.$emit('storeChange', tempsearchParamsObj);
     },
 
