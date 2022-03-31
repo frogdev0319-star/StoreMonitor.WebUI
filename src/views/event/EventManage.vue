@@ -382,7 +382,7 @@ export default {
           self.$route.meta.keepAlive = true;
         },
         300);
-        self.initData();
+        //self.initData();
         self.ifChangeAccount = true;
         self.ifSaveParams = false;
         self.ifSearchData = true;
@@ -1076,7 +1076,7 @@ export default {
     getSearchParams() {
       
         const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
-        //console.log("EventMange > getSearchParams > searchParams:",searchParams);
+        console.log("EventMange > getSearchParams > searchParams:",searchParams);
         if (Object.keys(searchParams).length > 0) {
           
           if(searchParams['searchFrom']=='PatrolPersonStat'){

@@ -207,8 +207,11 @@ export default {
       if (val !== 0) {
         console.log("Account Changed")
         self.ifGetParamsFromCash = false;
-        this.getStoreListAndGroupAndType();
-        await this.getSearchParams();
+        
+        //this.getStoreListAndGroupAndType();
+        self.getStoreListAndGroupAndType(true);
+        //await self.getSearchParams();
+        
       }
     },
     cachedParams() {
@@ -227,11 +230,16 @@ export default {
       this.getStoreListAndGroupAndType()
     },
     getCountryStore(initFilter) {
-      console.log("getCountryStore"+initFilter)
+      console.log("getCountryStore:"+initFilter)
       let temp = [];
       if (this.storeList.length !== 0) {
+        console.log("2.getCountryStore");
+        console.log("2.this.storeList:",this.storeList);
         this.storeList.forEach(item => {
           const country = item.country;
+          //console.log("2.country:",country);
+          //let searchkey = temp.find(x=>{return x.label==country} );
+          
           if (temp.map(x => x.label).indexOf(country) === -1) {
             const obj = {
               value: country,
@@ -241,14 +249,31 @@ export default {
           }
         });
       }
+      var self = this;
+      console.log("1.tmp:",temp);
+      temp.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+      console.log("2.tmp:",temp);
       const countryList = temp;
-      this.countryList[0] = {};
-      this.countryList[0].label = this.$t('remotePatrol.country');
-      this.countryList[0].countryList = countryList;
-      this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
+      console.log("2.countryList[0]:",this.countryList);
+      if(this.countryList.length>0){
+        console.log("2.this.countryList:",this.countryList);
+        this.countryList[0] = {};
+        this.countryList[0]['label'] = this.$t('remotePatrol.country');
+        this.countryList[0]['countryList'] = countryList;
+        //this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
+      }else{
+        console.log("3.this.countryList:",self.countryList);
+        var templist=[];
+        //countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+        templist.push({label:self.$t('remotePatrol.country'),countryList:countryList,});
+        console.log("4.templist:",templist);
+        
+        self.countryList = templist;
+        console.log("5.this.countryList:",self.countryList);
+      }
       this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
-      if(!initFilter)
-       this.selectAllProAndCity(this.curCountry, true);
+      //if(!initFilter)
+       this.selectAllProAndCity(this.curCountry);
     },
 
     getStoreListAndGroupAndType(init) {
@@ -258,7 +283,7 @@ export default {
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        //console.log(storeList)
+        console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -278,7 +303,7 @@ export default {
               (this.curStoreType&& this.curStoreType.length>0 && this.curStoreType[0]!='-1'))){
                 initFilter=true;
         }
-        this.getCountryStore(initFilter);
+        this.getCountryStore(initFilter||init);
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
       //  console.log(this.curStoreGroup,this.curStoreType)
@@ -294,6 +319,7 @@ export default {
     onChangeStore(arr) {
       this.curStore = arr;
       console.log("Change",this.curStore)
+      console.log("2.go changeStoreNew:",arr);
       this.changeStoreNew(arr);
     },
     onChangeSelectedStore() {
@@ -337,8 +363,9 @@ export default {
             }
           });
         });
-        console.log("ChangeSTore",temp)
-        this.storeDataList = temp;
+        if(this.storeDataList.lenght==0)
+          this.storeDataList = this.storeList;
+        //this.curStore = temp;
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
       }
      
@@ -581,7 +608,7 @@ export default {
       tempsearchParamsObj.curRegionII = this.curRegionII;
       tempsearchParamsObj.regionMode = this.regionMode;
       tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
-      //console.log(tempsearchParamsObj)
+      console.log('emitParams:',tempsearchParamsObj)
       this.$emit('storeChange', tempsearchParamsObj);
     },
 
@@ -631,7 +658,7 @@ export default {
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      self.selectAllProAndCity(val, false);
+      self.selectAllProAndCity(val);
     },
 
     changeCity(val) {
@@ -693,8 +720,8 @@ export default {
       }
     },
 
-    async selectAllProAndCity(val, isFirst) {
-      //console.log("contry changed");
+    async selectAllProAndCity(val) {
+      console.log("contry changed");
       const self = this;
       const storeList = self.storeList;
       const temp = [];
@@ -782,13 +809,14 @@ export default {
       setTimeout(async() => {
         self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
         self.ifGetParamsFromCash = false;
+        console.log("go changeStoreNew:",self.curStore);
         self.changeStoreNew(self.curStore);
       }, 100);
     },
 
     getSearchParams() {
       const searchParams = this.cachedParams;
-      //console.log("getSearchParams > searchParams:",searchParams);
+      console.log("getSearchParams > searchParams:",searchParams);
       if (Object.keys(searchParams).length > 0) {
         
         if (searchParams.curCountry) {
