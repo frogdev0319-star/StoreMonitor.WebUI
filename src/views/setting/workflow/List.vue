@@ -1,6 +1,29 @@
 <template>
   <div style="height: 100%">
     <div>
+
+      <div class="workflow-header">
+
+        <div class="flex-center">
+          <el-input
+            v-model="inputSearchValue"
+            size="small"
+            prefix-icon="el-icon-search"
+            class="search-input shadow-light"
+            placeholder="搜尋流程名稱"
+            clearable/>
+        </div>
+
+        <delay-button
+          :disabled="authorizedDevicesNum === 0"
+          @click="" >
+          <div class="button-area">
+            <i class="iconfont el-icon-plus"/>
+            <span>添加流程</span>
+          </div>
+        </delay-button>
+      </div>
+
       <table-only
         ref="elTP"
         class="table-white"
@@ -38,12 +61,20 @@ import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import util from '@/common/util';
 
+import DelayButton from '@/components/DelayButton';
+
 export default {
-  name: "WorkflowList",
-  components: { TableOnly, TblPaginationOnly },
+  name: 'WorkflowList',
+  components: {
+    TableOnly,
+    TblPaginationOnly,
+    DelayButton
+  },
   data() {
     return {
-      tableData: [],
+      inputSearchValue: '',
+      serachData: '',
+      authorizedDevicesNum: 0,
       isLoadingData: false,
       columnOperationData: {
         label: this.$t('deviceView.operation'),
@@ -67,6 +98,44 @@ export default {
           }
         ]
       },
+      tableData: [
+        {
+          'name': 'Test Workflow',
+          'type': 'Test',
+          'createdUser': 'Albert',
+          'description': 'TEST',
+          'createdTs': '123456',
+
+          'state': true
+        },
+        {
+          'name': 'Test Workflow',
+          'type': 'Test',
+          'createdUser': 'Frog',
+          'description': 'TEST',
+          'createdTs': '22334',
+
+          'state': false
+        },
+        {
+          'name': 'Test Workflow',
+          'type': 'Test',
+          'createdUser': 'Deng',
+          'description': 'TEST',
+          'createdTs': '378',
+
+          'state': false
+        },
+        {
+          'name': 'Test Workflow',
+          'type': 'Test',
+          'createdUser': '飄髮哥',
+          'description': 'TEST',
+          'createdTs': '1890',
+
+          'state': false
+        },
+      ],
       columnData: [
         {
           'prop': 'name',
@@ -110,14 +179,14 @@ export default {
     };
   },
   mounted() {
-    getWorkflowList({}).then((res) => {
-      this.isLoadingData = false;
-      this.tableData = res.data.content.map(row => ({
-        ...row,
-        state: row.state === 1,
-        isSwitchDisabled: row.isBind
-      }))
-    });
+    // getWorkflowList({}).then((res) => {
+    //   this.isLoadingData = false;
+    //   this.tableData = res.data.content.map(row => ({
+    //     ...row,
+    //     state: row.state === 1,
+    //     isSwitchDisabled: row.isBind
+    //   }))
+    // });
   },
   methods: {
     getWorkflowList() {},
@@ -136,16 +205,16 @@ export default {
           if (res.errCode === 0) {
             this.tableData = this.tableData.map(row => {
               return row.processDefinitionKey === target.processDefinitionKey
-              ? {
-                ...row,
-                state: true
-              }
-              : { ...row }
+                ? {
+                  ...row,
+                  state: true
+                }
+                : { ...row }
             })
             util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
           }
         }).catch(e => {
-            util.notify(this.$t('route.networkError'), 'error', 1000 );
+          util.notify(this.$t('route.networkError'), 'error', 1000 );
         })
       } else {
         disableWorkflow({
@@ -154,19 +223,31 @@ export default {
           if (res.errCode === 0) {
             this.tableData = this.tableData.map(row => {
               return row.processDefinitionKey === target.processDefinitionKey
-              ? {
-                ...row,
-                state: false
-              }
-              : { ...row }
+                ? {
+                  ...row,
+                  state: false
+                }
+                : { ...row }
             })
             util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
           }
         }).catch(e => {
-            util.notify(this.$t('route.networkError'), 'error', 1000 );
+          util.notify(this.$t('route.networkError'), 'error', 1000 );
         })
       }
     }
   },
 };
 </script>
+
+<style lang="sass">
+  .workflow-header
+    width: 100%
+    // height: 150px
+    // background: #dedede
+    margin-bottom: 20px
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    align-items: flex-start
+</style>
