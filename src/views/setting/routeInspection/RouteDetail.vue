@@ -83,7 +83,7 @@
           </div>
           <div class="catergy-title">
             <el-checkbox v-model="item.checked" class="storevue-checkbox-outlined" @change="checkItemsOfCatergy(item)"/>
-            <span class="table-title">{{ item.groupName }}（{{ item.itemCount }}）</span>
+            <span class="table-title"><span style="color: #c60957">{{ item.groupWeight }}%</span>{{ item.groupName }}（{{ item.itemCount }}）</span>
           </div>
           <template v-if="!item.children">
             <div v-if="item.itemData.length !== 0" class="table-class">
@@ -836,7 +836,8 @@ export default {
             font-size: 14px;
             font-weight: bold;
             text-align: center;
-            width:120px;
+            width:auto;
+            min-width:120px;
             height:34px;
             line-height: 34px;
             border-radius:4px 4px 0 0;
