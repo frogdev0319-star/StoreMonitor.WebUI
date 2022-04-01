@@ -12,6 +12,7 @@
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px">
         <div class="flex-center">
           <date-time-selector 
+            ref="eventTimePicker"
             :dateTimeValue = dateValue
             @change="dateChange"
           />
@@ -428,8 +429,7 @@ export default {
     self.isFirstLoad = false;
   }, 
   beforeDestroy() {
-    console.log("in beforeDestroy");
-    console.log('searchFrom:',this.searchParams['searchFrom']);
+    //console.log('searchFrom:',this.searchParams['searchFrom']);
     if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         //console.log("in beforeDestroy");
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
@@ -444,7 +444,8 @@ export default {
   },
   deactivated() {
       console.log('deactivated');
-      console.log('searchFrom:',this.searchParams['searchFrom']);
+      //console.log('searchFrom:',this.searchParams['searchFrom']);
+      
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
           //console.log("in deactivated");
           delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉

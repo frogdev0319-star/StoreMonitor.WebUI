@@ -1236,7 +1236,6 @@ export default {
 
   methods: {
     getLangStyleValue(langArray){
-      console.log('******',util.getLangStyleValue(langArray));
       return util.getLangStyleValue(langArray);
     },
     maxLabel(val) {
