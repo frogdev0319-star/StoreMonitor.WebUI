@@ -700,6 +700,7 @@ export default{
     "tHeaderE":"項目分值（選填，0.5~50分，默認10分）",
     "tHeaderF":"低於*分，須門店負責人處理（選填，-50~滿分）",
     "tHeaderG":"評分選項（必填，-50~滿分）",
+    "tHeaderH":"Required",
     "tab1CalculateScore":"與其他tab組合時，Tab1（Pass&Fail）項目分值參與考評總分運算",
     "tab1FailedDangeous":"Tab1（Pass&Fail）中存在不合格項時，巡檢結果為：立即督導",
     "tab1IgnoredQualified":"Tab1(Pass&Fail)中忽略項目視同得分",

@@ -693,6 +693,7 @@ export default{
       "tHeaderE":"Điểm (Không bắt buộc, 0,5~50 điểm, mặc định 10 điểm)",
       "tHeaderF":"Các sự kiện bất thường - Ngưỡng điểm (Không bắt buộc ，-50~tổng điểm)",
       "tHeaderG":"Các tùy chọn điểm (Bắt buộc-50~tổng điểm)",
+      "tHeaderH":"Required",
       "tab1CalculateScore":"Khi kết hợp với các thẻ khác, điểm tham chiếu Thẻ 1 (Đạt & Thất bại) sẽ tham gia vào quy trình đánh giá tính toán tổng điểm",
       "tab1FailedDangeous":"Khi có các mục chưa đạt chuẩn ở Thẻ 1 (Đạt & Thất bại), kết quả kiểm tra sẽ là: Nguy hiểm.",
       "tab1IgnoredQualified":"Tính điểm cho các mục bị bỏ qua ở Thẻ 1 (Đạt & Thất bại)",
