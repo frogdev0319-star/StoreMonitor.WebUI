@@ -6,6 +6,8 @@ const path = require('path')
 
 module.exports = {
   dev: {
+    
+    lintOnSave: false,
 
     // Paths
     assetsSubDirectory: 'static',

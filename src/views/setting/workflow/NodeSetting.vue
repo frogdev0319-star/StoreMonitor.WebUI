@@ -14,6 +14,7 @@
         </delay-button>
       </div>
     </div>
+
     <!-- 基本信息 -->
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="template-info">
@@ -130,51 +131,50 @@
       </div>
     </div>
 
-<!--   
-    <el-button
-      class="storevue-button-filled"
-      size="mini" type="primary" @click="submit">
-      保存並發布
-    </el-button>
-    <el-button
-      class="storevue-button-outlined"
-      size="mini" type="primary" @click="addNode">
-      新增節點
-    </el-button> -->
-    <!-- <el-table
-      :data="workflowDetail.nextNodes"
-      style="width: 100%">
-      <el-table-column
-        prop="name"
-        label="節點名稱"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="auditByUsers"
-        label="審批人"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        label="審批方式">
-        <template slot-scope="{row}">
-          <span>{{row.rowdata}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="是否需要簽名">
-        <template slot-scope="{row}">
-          <span>{{row.rowdata}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="操作">
-        <template slot-scope="{row}">
-          <span>{{row.rowdata}}</span>
-        </template>
-      </el-table-column>
-    </el-table> -->
+    <!-- 節點停留時間 -->
+    <div v-loading="isLoadingData" class="setting-details self-loading">
+      <div class="template-info">
+        <div class="inspect-basic">
+          <setting-table table-name="節點停留時間">
+            <template slot="tableDetail">
 
+              <!-- row -->
+              <div class="setting-config basic-config">
+                <div class="title-status">
+                  <el-checkbox
+                    class="storevue-checkbox-outlined"
+                    label="超時發送訊息提醒"/>
+                </div>
+                <div class="title-status">
+                  <el-checkbox
+                    class="storevue-checkbox-outlined"
+                    label="超時發送訊息提醒"/>
+                </div>
+              </div>
+              
+              <!-- row -->
+              <div class="setting-config basic-config">
+                <div class="title-status">
+                  停留超過
+                  <el-input
+                    placeholder=""
+                    class="input-name_short"/>
+                  天
+                </div>
+                <div class="title-status">
+                  停留超過
+                  <el-input
+                    placeholder=""
+                    class="input-name_short"/>
+                  天
+                </div>
+              </div>
 
+            </template>
+          </setting-table>
+        </div>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -380,6 +380,16 @@ export default {
     height: 30px;
   }
   .input-name.el-input--medium >>> .el-input__inner{
+    height: 30px;
+    line-height: 30px;
+    font-size: 12px;
+  }
+
+  .input-name_short{
+    width: 100px;
+    height: 30px;
+  }
+  .input-name_short.el-input--medium >>> .el-input__inner{
     height: 30px;
     line-height: 30px;
     font-size: 12px;

@@ -84,7 +84,11 @@ export default{
       "patrolCompareStat":"巡檢同比分析",
       "supervisorCalStat":"巡店考評統計",
       "patrolItemStat":"巡檢項統計",
-      "singleStoreStat":"單店分析"
+      "singleStoreStat":"單店分析",
+      "workflowManage":"流程設計",
+      "workflowDetail":"流程配置",
+      "nodeSetting":"添加審核節點"
+
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",

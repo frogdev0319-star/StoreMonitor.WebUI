@@ -5,21 +5,15 @@
         <div
           :class="logoClass"
           class="logo-content">
-          <img id="imgLogo" :src="collapsed?miniImgSrc:imgSrc" alt="logo" @click="routerHome" />
-          <div v-if="!collapsed" class="meta">{{$t(`route.meta`)}}</div>
+          <img id="imgLogo" :src="collapsed ? miniImgSrc:imgSrc" alt="logo" @click="routerHome" >
+          <div v-if="!collapsed" class="meta">{{ $t(`route.meta`) }}</div>
           <img
+            :src=" collapsed ? arrowRightIcon : arrowLeftIcon "
             class="img-collapsed"
-            :src="collapsed ? arrowRightIcon : arrowLeftIcon"
-            @click="clickCollapse"
-          />
+            @click="clickCollapse" >
         </div>
         <div>
-          <el-breadcrumb v-if="$router.currentRoute.path === '/node'" separator="|" class="breadcrumb-inner">
-            <el-breadcrumb-item class="breadcrumb-item" :to="{ path: '/workflows' }"><span class="bold-breadcrumb-span">流程設計</span></el-breadcrumb-item>            
-            <el-breadcrumb-item class="breadcrumb-item" :to="{ path: '/workflowDetail' }"><span class="bold-breadcrumb-span">流程設定</span></el-breadcrumb-item>
-            <el-breadcrumb-item class="breadcrumb-item"><span class="normal-breadcrumb-span">節點設定</span></el-breadcrumb-item>
-          </el-breadcrumb>
-          <el-breadcrumb v-else separator="|" class="breadcrumb-inner">
+          <el-breadcrumb separator="|" class="breadcrumb-inner">
             <el-breadcrumb-item
               v-for="(item, index) in breadList"
               v-if="index !== 0"
@@ -32,34 +26,34 @@
                 :class="
                   index!=breadList.length-1
                     ? 'bold-breadcrumb-span'
-                    : 'normal-breadcrumb-span'"
-              >
-                {{ $t(`route.${item.name}`)}}</span
-              >
+                  : 'normal-breadcrumb-span'">
+                {{ $t(`route.${item.name}`) }}</span>
+                
               <span
                 @click="backPage"
-               v-if="item.name=='remotePatrol'"
-                 :class="
-                   showIgnoreItem
-                    ? 'bold-breadcrumb-span'
-                    : 'normal-breadcrumb-span'
-                "
-              >
+                v-if="item.name=='remotePatrol'"
+                  :class="
+                    showIgnoreItem
+                      ? 'bold-breadcrumb-span'
+                      : 'normal-breadcrumb-span'
+                  "
+                >
                 {{ $t(`route.${item.name}`)}}</span>
               <span v-if="item.name=='remotePatrol' && showIgnoreItem && breadList.length==2"
                 :class="'normal-breadcrumb-span'" >
                 {{" | " + $t("remotePatrol.clickToContent")}}</span>
+
             </el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div>
           <el-button
             v-if="$route.path === '/patrolPersonStat'
-             || $route.path === '/patrolCompareStat'
-             || $route.path ==='/eventStat'
-               || $route.path === '/patrolItem'
-             || $route.path ==='/patrolEvaluation'
-             || $route.path ==='/reportdetails'"
+              || $route.path === '/patrolCompareStat'
+              || $route.path ==='/eventStat'
+                || $route.path === '/patrolItem'
+              || $route.path ==='/patrolEvaluation'
+              || $route.path ==='/reportdetails'"
             style="background-color: transparent; color: #fff; border: none; position:absolute;top:6px;right:24px"
             @click="handleDownload"
           >
@@ -250,7 +244,7 @@
             <footer class="footerInfo">
               <p style="text-align: left">
                 v3.0.2.3
-                 &copy; {{ getFullYear }} Advantech Intelligent City
+                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>
@@ -395,8 +389,8 @@ export default {
 
     activePath() {
       let path = this.$route.path;
-      //console.log("activePath:",path);
-      //console.log("active rout name:",this.$route.name);
+      // console.log("activePath:",path);
+      // console.log("active rout name:",this.$route.name);
       const pathMapArr = [
         {
           curPath: ["/reinspect/confirmrein", "/reinspect/submit"],
@@ -412,7 +406,7 @@ export default {
         { curPath: ["/storedetail"], activePath: "/storemanage" },
         { curPath: ["/ezvizeDeviceSetting"], activePath: "/ezvizDevice" },
         { curPath: ["/beseyeDeviceSetting"], activePath: "/beseyeAccount" },
-     //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
+        //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
         { curPath: ["/workflowDetail"], activePath: "/workflows" },
       ];
@@ -467,7 +461,8 @@ export default {
     });
     PubSub.subscribe("success-page", (event, data) => {
       if (data.changeStyle) {
-        self.wapper = true;
+        self.wapper = true; 
+        
       }
     });
     window.addEventListener("resize", this.$_isMobile);
@@ -536,6 +531,9 @@ export default {
     getBread() {
       this.breadList = [];
       const currentRoute = this.$route.fullPath;
+
+      console.log('currentRoute ===>', currentRoute)
+
       let matched = [];
       matched = this.$route.matched.filter((x) => x.name);
       matched.length === 2 &&
@@ -543,7 +541,9 @@ export default {
       matched.length > 2 &&
         matched[0].name === "systemSetting" &&
         this.setSystemNavbarBread(matched, currentRoute);
-      console.log(this.$route)
+
+      console.log('matched ===>', matched)
+
       this.breadList = matched;
     },
 
@@ -589,6 +589,7 @@ export default {
     setSecondBread(matched, str, path) {
       matched[1].name = str;
       matched[1].path = path;
+    
     },
 
     setInspectionSettingBread(matched, currentRoute) {
