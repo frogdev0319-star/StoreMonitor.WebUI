@@ -20,7 +20,7 @@
                 class="storevue-checkbox-outlined"
                 @change="onCheckItem(sortableTableData)"/>
             </div>
-            <div class="table-name">{{ contentItem.name }}</div>
+            <div class="table-name" style="position: relative"><span v-if="contentItem.required" style="color: #c60957; position: absolute">*</span><span style="margin-left: 10px">{{ contentItem.name }}</span></div>
           </div>
           <div :class="isScoreSheet? 'table-score-description': 'table-description'">
             {{ contentItem.description }}

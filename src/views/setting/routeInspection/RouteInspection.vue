@@ -639,6 +639,7 @@ export default {
             objChild.qualifiedScore = itemChild.qualifiedScore;
             objChild.sequence = itemChild.sequence;
             objChild.type = itemChild.type;
+            objChild.required = itemChild.required;
             let availableScores = '';
             if (itemChild.availableScores.length !== 0) {
               itemChild.availableScores.forEach((x_item, x_index) => {
