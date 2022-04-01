@@ -931,10 +931,9 @@ export default {
       }
 
       primaryColumnCells.filter(cell => cell.v).forEach((cell, i) => {
-        primaryGroupCelss.push(cell);
-
+        primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
         let next, current = sheet[cell.cellRef];
-
+        
         if (primaryColumnCells.filter(cell => cell.v)[i + 1]) {
           next = sheet[primaryColumnCells.filter(cell => cell.v)[i + 1].cellRef];
           sheet[cell.cellRef].next = sheet[primaryColumnCells.filter(cell => cell.v)[i + 1].cellRef];
@@ -1166,7 +1165,8 @@ export default {
           mode: this.activeName === '0' ? 1 : 0,
           parentId: cell.parent && cell.parent.id ? cell.parent.id : -1,
           type: groupType,
-          tag: this.ImportName
+          tag: this.ImportName,
+          weight: cell.weight
         };
       });
       const primaryResult = await this.addGroup({ groups: addGroupParams });
@@ -1208,15 +1208,14 @@ export default {
         current[next.cellAddress.r].parent = nextCell.parent;
         return current;
       }, {});
-
       const subjectMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderB', 'subject');
       const itemScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderE', 'itemScore');
       const descriptionMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderD', 'description');
       const availableScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderG', 'availableScores');
       const qualifiedScoreMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderF', 'qualifiedScore');
+      const requiredMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderH', 'required');
       const mapping = {};
-      Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping);
-
+      Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping, requiredMapping);
       Object.values(rowCellsObject).forEach(rowCells => {
         const item = {};
         rowCells.forEach(cell => {
@@ -1229,6 +1228,8 @@ export default {
             if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1);
           } else if (mapping[key] === 'description') {
             item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
+          } else if (mapping[key] === 'required') {
+            item[mapping[key]] = cell.v === 'Y'
           } else {
             item[mapping[key]] = cell.v || '';
           }
@@ -1240,8 +1241,8 @@ export default {
           item['itemScore'] = maxAvailableScore;
           item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
         }
-
         if (item['subject']) {
+          console.log(1)
           if (requestGroups[rowCells.parent.id]) {
             requestGroups[rowCells.parent.id].items.push(item);
           } else {
@@ -1253,6 +1254,7 @@ export default {
         }
       });
 
+      console.log(requestGroups)
       const addItemParams = {
         request: Object.values(requestGroups)
       };
@@ -1651,12 +1653,11 @@ export default {
           let PassFailCopy = deepClone(PassFail);
           let ScoreCopy = deepClone(Score);
           let OthersCopy = deepClone(Others);
-          const tableVersion = _this.getTableVersonBasedOnB1(PassFail, Score, Others);
+          const tableVersion = _this.getTableVersonBasedOnWeight(PassFail, Score, Others);
 
           outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
-          console.log('outdata.PassFail:',outdata.PassFail);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
-          outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
+          outdata.Others = _this.getOthersSheetJsonData(wb, Others, tableVersion);
 
           if (outdata.PassFail.length > 0) {
             if (!outdata.PassFail[0].catergyName) {
@@ -1711,7 +1712,6 @@ export default {
             util.notify(_this.$t('insSettingView.templateEmpty'), 'warning', 3000);
             return false;
           }
-
           _this.addAllDataCopy({
             PassFail: PassFailCopy,
             Score: ScoreCopy,
@@ -1737,10 +1737,10 @@ export default {
       return allTranslation;
     },
 
-    getTableVersonBasedOnB1(sheet1, sheet2, sheet3) {
+    getTableVersonBasedOnWeight(sheet1, sheet2, sheet3) {
       const subCategoryArr = this.getAllTranslationBasedOnKey('insSettingView.subCategory');
-      const containSubColumn = (sheet1 && subCategoryArr.includes(this.formatTableHeader(sheet1.B1.w))) ||
-          (sheet2 && subCategoryArr.includes(this.formatTableHeader(sheet2.B1.w))) ||
+      const containSubColumn = (sheet1 && subCategoryArr.includes(this.formatTableHeader(sheet1.C1.w))) ||
+          (sheet2 && subCategoryArr.includes(this.formatTableHeader(sheet2.C1.w))) ||
           (sheet3 && subCategoryArr.includes(this.formatTableHeader(sheet3.B1.w)));
       const tableVersion = containSubColumn ? 2 : 1;
       return tableVersion;
@@ -1752,6 +1752,38 @@ export default {
     },
 
     getPassAndFailSheetJsonData(workbook, sheet, tableVersion) {
+      if (sheet) {
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.G1;
+        const sheetArray = XLSX.utils.sheet_to_json(sheet);
+        const rowDataArray = [];
+        sheetArray.forEach((_item) => {
+          const rowDataObj = {};
+          rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
+          if (tableVersion === 1) {
+            rowDataObj.subCatergyName = '';
+            rowDataObj.weight = _item.__EMPTY_1;
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+            rowDataObj.score = _item.__EMPTY_3;
+            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+            rowDataObj.required = _item.__EMPTY_4;
+          } else {
+            rowDataObj.weight = _item.__EMPTY_1;
+            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.score = _item.__EMPTY_4;
+            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+            rowDataObj.required = _item.__EMPTY_5;
+          }
+
+          rowDataArray.push(rowDataObj);
+        });
+        return rowDataArray;
+      }
+      return [];
+    },
+
+
+    getOthersSheetJsonData(workbook, sheet, tableVersion) {
       if (sheet) {
         delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
@@ -1780,26 +1812,29 @@ export default {
 
     getScoreSheetJsonData(workbook, sheet, tableVersion) {
       if (sheet) {
-        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1;
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1; delete sheet.G1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         sheetArray.forEach((_item) => {
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
+          rowDataObj.weight = _item.__EMPTY_1;
           if (tableVersion === 1) {
             rowDataObj.subCatergyName = '';
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
-            rowDataObj.totalScore = _item.__EMPTY_2;
-            rowDataObj.scoreThreshold = _item.__EMPTY_3;
-            rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_5);
-          } else {
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.score = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.totalScore = _item.__EMPTY_3;
             rowDataObj.scoreThreshold = _item.__EMPTY_4;
-            rowDataObj.totalScore = Infinity;
+            rowDataObj.score = this.getTableCellData(_item.__EMPTY_5);
             rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
+            rowDataObj.required = _item.__EMPTY_7;
+          } else {
+            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
+            rowDataObj.scoreThreshold = _item.__EMPTY_5;
+            rowDataObj.totalScore = Infinity;
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_7);
+            rowDataObj.required = _item.__EMPTY_8;
           }
 
           rowDataArray.push(rowDataObj);
@@ -1825,14 +1860,16 @@ export default {
           flagItemNamePassFail: false,
           flagItemLengthPassFail: false,
           flagPassFailScoreType: false,
-          flagDesLengthPassFail: false
+          flagDesLengthPassFail: false,
+          flagGroupWeightTotal: false
         }
       };
       if (passFailArr.length === 0) {
         return passFailFlagObj;
       }
-      console.log(passFailArr);
+      let count = 0;
       passFailArr.forEach((item, index) => {
+        if (item.weight) count += item.weight;
         if (item.catergyName != undefined && item.catergyName.length > 0) {
           passFailFlagObj.indexArrPassFail.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -1862,6 +1899,7 @@ export default {
           }
         }
       });
+      if (count !== 100) passFailFlagObj.flags.flagGroupWeightTotal = true;
       return passFailFlagObj;
     },
 
@@ -1882,13 +1920,16 @@ export default {
           flagScoreItemType: false,
           flagDesLengthScore: false,
           flagScoreItemEmpty: false,
-          flagFullScoreLimitation: false
+          flagFullScoreLimitation: false,
+          flagGroupWeightTotal: false
         }
       };
       if (scoreArr.length === 0) {
         return scoreFlagObj;
       }
+      let count = 0;
       scoreArr.forEach((item, index) => {
+        if (item.weight) count += item.weight;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -1993,6 +2034,7 @@ export default {
           }
         }
       });
+      if (count !== 100) scoreFlagObj.flags.flagGroupWeightTotal = true;
       return scoreFlagObj;
     },
 
@@ -2115,6 +2157,12 @@ export default {
           if (othersFlag.flagDesLengthOthers) { flagArr.push('Others'); }
           const flag = flagArr.toString() + ' ' + this.$t('insSettingView.excelIllegalDes');
           warningInfo.push(flag);
+        }
+        if (passFailFlag.flagGroupWeightTotal) {
+          warningInfo.push('[PassFail]' + ' ' + '權重總和不能小於100');
+        }
+        if (scoreFlag.flagGroupWeightTotal) {
+          warningInfo.push('[Score]' + ' ' + '權重總和不能小於100');
         }
         if (passFailFlag.flagPassFailScoreType) {
           warningInfo.push('[PassFail]' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));

@@ -695,6 +695,7 @@ export default{
     "tHeaderE":"项目分值（选填，0.5~50分，默认10分）",
     "tHeaderF":"低于*分，须门店负责人处理（选填，-50~满分）",
     "tHeaderG":"评分选项（必填，-50~满分）",
+    "tHeaderH":"Required",
     "tab1CalculateScore":"与其他tab组合时，Tab1（Pass&Fail）项目分值参与考评总分运算",
     "tab1FailedDangeous":"Tab1（Pass&Fail）中存在不合格项时，巡检结果为：立即督导",
     "tab1IgnoredQualified":"Tab1(Pass&Fail)中忽略项目视同得分",

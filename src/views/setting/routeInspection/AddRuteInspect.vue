@@ -88,10 +88,8 @@
                       <div class="category-name">
                         <div class="group-left">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
-                          <div>
-                            <span :style="activeParentId === item.id?{'color':'#006ab7'}:{}">
-                              {{ item.name }}（{{ item.groupNum }}）
-                            </span>
+                          <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex-center">
+                            <div style="color: #c60957; width: 40px; text-align: center">{{ item.weight }}%</div> <div>{{ item.name }}（{{ item.groupNum }}）</div>
                           </div>
                         </div>
                         <div class="group-right">
@@ -1303,7 +1301,8 @@ export default {
         itemScore: itemScore,
         qualifiedScore: qualifiedScore,
         availableScores: selectAvailable,
-        type: this.itemType
+        type: this.itemType,
+        required: this.itemRequired === '1'
       };
         temp.push(objItem);
         const obj = {
@@ -1466,6 +1465,7 @@ export default {
         obj.parentId = item.parentId;
         obj.children = item.children;
         obj.sequence = item.sequence;
+        obj.weight = item.weight;
         temp.push(obj);
         groupIds.push(item.id);
       });
