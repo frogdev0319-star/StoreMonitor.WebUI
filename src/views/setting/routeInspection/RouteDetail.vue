@@ -836,7 +836,8 @@ export default {
             font-size: 14px;
             font-weight: bold;
             text-align: center;
-            width:120px;
+            width:auto;
+            min-width:120px;
             height:34px;
             line-height: 34px;
             border-radius:4px 4px 0 0;

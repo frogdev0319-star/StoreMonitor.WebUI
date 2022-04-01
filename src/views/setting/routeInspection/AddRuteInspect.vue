@@ -2029,7 +2029,8 @@ export default {
                 width: auto;
                 height: auto;
                 float: right;
-                margin-right: calc(20/1920*100vw);
+                margin-right: calc(10/1920*100vw);
+                margin-left: calc(10/1920*100vw);
             }
         }
         .temp-select-area{
@@ -2046,7 +2047,6 @@ export default {
                     font-family: NotoSansCJKtc;
                     font-size: 13px;
                     width:123px;
-                    height:30px;
                     margin-left:16px
                   }
                 }
