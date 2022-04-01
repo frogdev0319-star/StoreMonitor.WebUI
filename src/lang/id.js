@@ -408,6 +408,7 @@ export default{
       "resultType":"Tipe Hasil",
       "return":"Otomatis kembali dalam {seconds} detik",
       "returnStoreMonitor":"Otomatis kembali dalam {seconds} detik",
+      "requiredValid": "尚有必填項目未完成",
       "score":"Nilai",
       "scoreU":"Unit:  PCS",
       "scoreUnit":"Nilai: ",

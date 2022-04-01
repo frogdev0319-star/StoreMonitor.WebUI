@@ -409,6 +409,7 @@ export default {
       "resultType":"リザルトタイプ",
       "return":"{seconds}秒で自動的に戻ります！",
       "returnStoreMonitor":"自動的に{seconds}秒後に戻る",
+      "requiredValid": "尚有必填項目未完成",
       "score":"スコア",
       "scoreU":"単位：PCS",
       "scoreUnit":"スコア：",

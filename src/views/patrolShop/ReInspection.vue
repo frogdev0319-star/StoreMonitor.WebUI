@@ -319,6 +319,18 @@
           </div>
         </dialog-pop>
         <dialog-pop
+          v-if="requiredObj.dialogCosed"
+          :title="requiredObj.title"
+          :isWarning="requiredObj.isWarning"
+          :visible="requiredObj.dialogCosed"
+          @cancelHandler="requiredObj.dialogCosed = false"
+          @confirmHandler="requiredObj.dialogCosed = false"
+          >
+          <div class="dialog-slot">
+            <div class="padding-vertical-sm">{{requiredObj.showInfo}}</div>
+          </div>
+        </dialog-pop>
+        <dialog-pop
           v-if="allIgnoreObj.dialogCosed"
           :title="allIgnoreObj.title"
           :isWarning="allIgnoreObj.isWarning"
@@ -570,6 +582,7 @@
                         class="spacer font-15"
                         style="text-align: left; font-weight: 500"
                         @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
+                        <span style="color: #c60957" v-if="item.required">*</span>
                         {{ item.subject }}
                       </div>
                       <div v-if="item.itemType === 0">
@@ -945,6 +958,12 @@ export default {
       leaveObj: {
         title: this.$t('remotePatrol.prompt'),
         showInfo: this.$t('remotePatrol.changPageInfo'),
+        isWarning: true,
+        dialogCosed: false
+      },
+      requiredObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.requiredValid'),
         isWarning: true,
         dialogCosed: false
       },
@@ -2240,8 +2259,18 @@ export default {
       const temp = [];
       let count = 0;
       let dealCount = 0;
+      let requiredValid = false;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
+      sheetName.forEach(s_item => {
+          s_item.inspectList.forEach(item => {
+            item.items.forEach((_item, _index) => {
+              if (!(_item.inputCount != 0 || _item.manualIgnore) && _item.required) {
+                requiredValid = true
+              }
+            });
+          });
+        });
       if (self.hasIgnoretemp.length === 0) {
         sheetName.forEach(s_item => {
           dealCount = dealCount + s_item.dealCount;
@@ -2264,6 +2293,10 @@ export default {
           dealCount = dealCount + s_item.dealCount;
           count = count + s_item.count;
         });
+      }
+      if (requiredValid) {
+        self.requiredObj.dialogCosed = true;
+        return false;
       }
       if(this.allRemarkItemsFlag && dealCount === 0){
         util.notify(this.$t('remotePatrol.invalidInspection'), 'warning', 3000);
@@ -2675,6 +2708,7 @@ export default {
               itemObj.subject = _item.subject;
               itemObj.description = _item.description;
               itemObj.itemScore = _item.itemScore;
+              itemObj.required = _item.required;
               let itemScoreLength = [];
               if (_item.availableScores.length !== 0) {
                 itemScoreLength = _item.availableScores;

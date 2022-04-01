@@ -409,6 +409,7 @@ export default {
       "resultType":"결과 형식",
       "return":"{seconds}초 후에 자동으로 돌아가다!",
       "returnStoreMonitor":"{seconds}초 후에 자동으로 돌아가기",
+      "requiredValid": "尚有必填項目未完成",
       "score":"점수",
       "scoreU":"단위:개",
       "scoreUnit":"득점: ",

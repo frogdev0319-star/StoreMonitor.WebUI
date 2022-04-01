@@ -408,6 +408,7 @@ export default{
       "resultType":"Loại kết quả",
       "return":"Tự đồi hoàn lại trong vòng {giây}",
       "returnStoreMonitor":"Tự đồi hoàn lại trong vòng {giây}",
+      "requiredValid": "尚有必填項目未完成",
       "score":"Điểm",
       "scoreU":"Đơn vị:  CHIẾC",
       "scoreUnit":"Điểm: ",

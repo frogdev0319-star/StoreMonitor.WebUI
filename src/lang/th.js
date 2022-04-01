@@ -408,6 +408,7 @@ export default{
       "resultType":"ประเภทผลลัพธ์",
       "return":"ส่งคืนอัตโนมัติใน {seconds} วินาที",
       "returnStoreMonitor":"ส่งคืนอัตโนมัติใน {seconds} วินาที",
+      "requiredValid": "尚有必填項目未完成",
       "score":"คะแนน",
       "scoreU":"หน่วย:  ชิ้น",
       "scoreUnit":"คะแนน: ",

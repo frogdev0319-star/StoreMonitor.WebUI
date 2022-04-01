@@ -408,6 +408,7 @@ export default{
       "resultType":"Result Type",
       "return":"Automatically return in {seconds}s",
       "returnStoreMonitor":"Automatically return in {seconds}s",
+      "requiredValid": "尚有必填項目未完成",
       "score":"Score",
       "scoreU":"Unit:  PCS",
       "scoreUnit":"Score: ",
