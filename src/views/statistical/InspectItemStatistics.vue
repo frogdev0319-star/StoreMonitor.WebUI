@@ -778,7 +778,7 @@ export default {
               pieOption:{},barRegionOption:{},barStoreOption:{},
               table:{total:0,page:1,sizeNum:10,order:'desc',property:'numOfTotal'}},
       operationBtnClass:[
-        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhtw'},
+        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
         {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
         {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
       ],
