@@ -1153,7 +1153,7 @@ export default {
       //this.getSearchParams();
     },
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      
+      //console.log("eventStatistics > searchParams:",searchParams);
       this.params = searchParams;
       this.storeIds = this.params.storeIds;
       this.compareIds = this.compareIds2 = this.params.storeIds;

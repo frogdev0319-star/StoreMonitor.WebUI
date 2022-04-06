@@ -193,7 +193,8 @@ export default {
       countries: [],
       provinces: [],
       cities: [],
-      isFavorite: false
+      isFavorite: false,
+      isChangeAccount:false
     };
   },
 
@@ -206,6 +207,7 @@ export default {
       const self = this;
       if (val !== 0) {
         console.log("Account Changed")
+        self.isChangeAccount = true;
         self.ifGetParamsFromCash = false;
         
         //this.getStoreListAndGroupAndType();
@@ -273,7 +275,8 @@ export default {
       }
       this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
       //if(!initFilter)
-       this.selectAllProAndCity(this.curCountry);
+       this.selectAllProAndCity(this.curCountry,initFilter);
+      
     },
 
     getStoreListAndGroupAndType(init) {
@@ -531,7 +534,9 @@ export default {
       console.log("Filter Store=>>")
       let filterStoreId = [];
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
+        console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
         filterStoreId = this.curStore;
+
       } else {
         this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
@@ -720,7 +725,7 @@ export default {
       }
     },
 
-    async selectAllProAndCity(val) {
+    async selectAllProAndCity(val,initFilter) {
       console.log("contry changed");
       const self = this;
       const storeList = self.storeList;
@@ -806,12 +811,16 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      setTimeout(async() => {
-        self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
-        self.ifGetParamsFromCash = false;
-        console.log("go changeStoreNew:",self.curStore);
-        self.changeStoreNew(self.curStore);
-      }, 100);
+      if(!initFilter || self.isChangeAccount){
+        setTimeout(async() => {
+          if(self.isChangeAccount) self.isChangeAccount=false;
+          self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
+          self.ifGetParamsFromCash = false;
+          //self.getStoreListAndGroupAndType(true);
+          console.log("go changeStoreNew:",self.curStore);
+          self.changeStoreNew(self.curStore);
+        }, 100);
+      }
     },
 
     getSearchParams() {
