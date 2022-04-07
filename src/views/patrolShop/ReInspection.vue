@@ -489,7 +489,7 @@
         <div v-if="sheetName.length!=0" :class="{'flex': isFullScreenMode, fullWidth: isFullScreenMode}">
           <div v-if="isFullScreenMode" style="width: 200px; padding-right: 10px">
             <el-input
-              :placeholder="$t('remotePatrol.itemPlaceholder')"
+              :placeholder="$t('insSettingView.enterInspectFilter')"
               v-model="searchItemValue"
               size="small"
               class="storevue-input-search fullWidth"
@@ -522,7 +522,7 @@
           </div>
           <div v-else class="flex-column padding" >
             <el-input
-              :placeholder="$t('remotePatrol.itemPlaceholder')"
+              :placeholder="$t('insSettingView.enterInspectFilter')"
               v-model="searchItemValue"
               size="small"
               class="storevue-input-search fullWidth"
