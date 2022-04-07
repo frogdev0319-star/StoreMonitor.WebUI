@@ -719,7 +719,9 @@ export default{
     "waveline":"按钮～",
     "yesNo":"是/否",
     "needBind":"表，需要绑定的门店",
-    "minScoreEmpty":"扣分起始值不得为空！"
+    "minScoreEmpty":"扣分起始值不得为空！",
+    "weight": "權重值%",
+    "weightSetting": "權重設定"
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",

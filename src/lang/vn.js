@@ -719,7 +719,9 @@ export default{
       "needBind":"Bảng biểu XX, cửa hàng cần được liên kết",
       "selectStore":"Chọn cửa hàng",
       "selectStoreTag":"Chọn nhanh",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"Min score can not be empty！",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"Tài khoản dịch vụ Streaming",

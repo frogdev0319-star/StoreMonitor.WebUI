@@ -719,7 +719,9 @@ export default{
       "needBind":"table, store that needs to be bound",
       "selectStore":"Select Store",
       "selectStoreTag":"Quick select",
-      "minScoreEmpty":"The total score can not be empty!"
+      "minScoreEmpty":"The total score can not be empty!",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"Streaming Service Account",

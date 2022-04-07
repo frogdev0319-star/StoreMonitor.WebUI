@@ -720,7 +720,9 @@ export default {
       "needBind":"테이블, 바인딩해야 하는 매장",
       "selectStore":"선택하십시오",
       "selectStoreTag":"빠른 선택",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"Min score can not be empty！",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"장부",

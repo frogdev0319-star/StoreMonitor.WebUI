@@ -720,7 +720,9 @@ export default {
       "needBind":"XXテーブル、バインドすべきストア",
       "selectStore":"セレクトしてください",
       "selectStoreTag":"クイックセレクト",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"Min score can not be empty！",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"アカウント",

@@ -719,7 +719,9 @@ export default{
       "needBind":"Tabel XX, toko yang perlu diikat",
       "selectStore":"Pilih Toko",
       "selectStoreTag":"Pilih cepat",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"Min score can not be empty！",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"Akun Layanan Streaming",

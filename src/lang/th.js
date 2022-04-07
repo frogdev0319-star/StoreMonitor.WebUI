@@ -719,7 +719,9 @@ export default{
       "needBind":"ตาราง ร้านค้าที่ต้องผูกโยง",
       "selectStore":"เลือกร้านค้า",
       "selectStoreTag":"เลือกด่วน",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"Min score can not be empty！",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"บัญชีบริการสตรีมมิ่ง",
