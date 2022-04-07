@@ -37,7 +37,7 @@ const _Environments = {
   }
 };
 
-const environJSON = _Environments.Stable;
+const environJSON = _Environments.RC;
 const isGlobalWebsite = true;
 
 let Environment;
