@@ -220,14 +220,16 @@ export default {
     },
 
     async searchData() {
-      console.log("Search Data")
+      
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
+      console.log("Search Data",this.params.storeIds)
+     // if( this.params.storeIds && this.params.storeIds[0] &&this.params.storeIds[0]=='-1')this.params.storeIds=  this.params.storeIds.shift()
       this.params.timeMode = this.timeMode;
       this.params.curCountry= this.storeFilterObj.curCountry;
-      this.params.curStore= this.storeFilterObj.curStore;
+      this.params.curStore= this.storeFilterObj.curStore; 
       this.params.curStoreGroup= this.storeFilterObj.curStoreGroup;
       this.params.curStoreType= this.storeFilterObj.curStoreType;
-
+      this.params.inspectId = this.inspectList;
       const emitParmas = {};
       emitParmas.searchParams = this.params;
       emitParmas.dateRangeList = this.daysRangeList;
@@ -240,6 +242,7 @@ export default {
       emitParmas.storeGroupStr = this.storeFilterObj.storeGroupString;
       emitParmas.storeTypeStr = this.storeFilterObj.storeTypeString;
       emitParmas.timeMode = this.timeMode;
+      //console.log(emitParmas)
       this.$emit('emitSearch', emitParmas);
     },
 
@@ -335,7 +338,7 @@ export default {
       } else {
         this.searchParams = {};
       }
-      console.log("Get Search Component")
+    //  console.log("Get Search Component")
       const daysDiff = this.$moment(this.params.endTs).diff(this.params.beginTs, 'days');
       this.timeMode = daysDiff <= 30 ? 1 : 2;
     },
@@ -348,7 +351,7 @@ export default {
     },
 
     onStoreChange(storeObj) {
-      console.log("*onStoreChange>storeObj:",storeObj);
+     // console.log("*onStoreChange>storeObj:",storeObj);
       this.storeFilterObj = storeObj;
       !this.ifSaveParams && this.searchData();
       this.ifSaveParams = true;

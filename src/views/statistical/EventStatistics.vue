@@ -337,9 +337,15 @@
                     />
                   </div>
                 </div>
-                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
-                  <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"/>
+                <div v-else style="margin-top:20.5px;border-bottom:none;">
+                <div v-if="ispdf" class="barchart-area"  style="overflow-x:hidden;overflow-y:hidden;height:270px;width:1000px">
+                  <v-chart ref="ChartViewMode_eventStores" autoresize :options="barchartOptionViewMode_eventStores" class="chart-content" width="800px"
+                  :style="{width:'800px',height:'100%'}"/>
                 </div>
+                <div v-else class="barchart-area"  style="overflow-x:auto;overflow-y:hidden;height:270px">
+                  <v-chart ref="ChartViewMode_eventStores" autoresize :options="barchartOptionViewMode_eventStores" class="chart-content" width="100%"/>
+                </div>
+              </div>
               </div>
             </div>
           </el-col>
@@ -1147,12 +1153,7 @@ export default {
       //this.getSearchParams();
     },
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
-      const searchParamsObj = {
-          path: 'eventStatistics',
-          params: this.params
-      };
-      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
-        this.ifSaveParams = true;
+      //console.log("eventStatistics > searchParams:",searchParams);
       this.params = searchParams;
       this.storeIds = this.params.storeIds;
       this.compareIds = this.compareIds2 = this.params.storeIds;
@@ -1164,6 +1165,12 @@ export default {
       this.storePatrolLists = storePatrolLists;
       this.curCountry = this.params.curCountry;
       this.inspectId = this.params.inspectId;
+      const searchParamsObj = {
+          path: 'eventStatistics',
+          params: this.params
+      };
+      this.ifSaveParams && this.$refs.eventSearch.saveSearchParams(searchParamsObj);
+        this.ifSaveParams = true;
       this.searchData();
     },
     async searchData() {
@@ -2164,7 +2171,7 @@ export default {
       let chart_dataset=[];
       if(chartData.length>0){
         chartData.forEach(item => {
-          date_xAxis.push(item.name);
+          date_xAxis.push(this.maxLabel(item.name));
           chart_dataset.push({value:item.numOfUnqualified,name:item.name,innerId:item.id});
         });
         this.barchartOptionViewMode_eventStores.xAxis.data = date_xAxis;

@@ -193,7 +193,8 @@ export default {
       countries: [],
       provinces: [],
       cities: [],
-      isFavorite: false
+      isFavorite: false,
+      isChangeAccount:false
     };
   },
 
@@ -205,9 +206,14 @@ export default {
     async accountChanged(val) {
       const self = this;
       if (val !== 0) {
+        console.log("Account Changed")
+        self.isChangeAccount = true;
         self.ifGetParamsFromCash = false;
-        this.getStoreListAndGroupAndType();
-        await this.getSearchParams();
+        
+        //this.getStoreListAndGroupAndType();
+        self.getStoreListAndGroupAndType(true);
+        //await self.getSearchParams();
+        
       }
     },
     cachedParams() {
@@ -217,7 +223,7 @@ export default {
 
   created() {
     this.getSearchParams();
-    this.getStoreListAndGroupAndType();
+    this.getStoreListAndGroupAndType(true);
   },
 
   methods: {
@@ -225,11 +231,17 @@ export default {
       this.isFavorite = !this.isFavorite;
       this.getStoreListAndGroupAndType()
     },
-    getCountryStore() {
+    getCountryStore(initFilter) {
+      console.log("getCountryStore:"+initFilter)
       let temp = [];
       if (this.storeList.length !== 0) {
+        console.log("2.getCountryStore");
+        console.log("2.this.storeList:",this.storeList);
         this.storeList.forEach(item => {
           const country = item.country;
+          //console.log("2.country:",country);
+          //let searchkey = temp.find(x=>{return x.label==country} );
+          
           if (temp.map(x => x.label).indexOf(country) === -1) {
             const obj = {
               value: country,
@@ -239,22 +251,42 @@ export default {
           }
         });
       }
+      var self = this;
+      console.log("1.tmp:",temp);
+      temp.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+      console.log("2.tmp:",temp);
       const countryList = temp;
-      this.countryList[0] = {};
-      this.countryList[0].label = this.$t('remotePatrol.country');
-      this.countryList[0].countryList = countryList;
-      this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
+      console.log("2.countryList[0]:",this.countryList);
+      if(this.countryList.length>0){
+        console.log("2.this.countryList:",this.countryList);
+        this.countryList[0] = {};
+        this.countryList[0]['label'] = this.$t('remotePatrol.country');
+        this.countryList[0]['countryList'] = countryList;
+        //this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
+      }else{
+        console.log("3.this.countryList:",self.countryList);
+        var templist=[];
+        //countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+        templist.push({label:self.$t('remotePatrol.country'),countryList:countryList,});
+        console.log("4.templist:",templist);
+        
+        self.countryList = templist;
+        console.log("5.this.countryList:",self.countryList);
+      }
       this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
-      this.selectAllProAndCity(this.curCountry, true);
+      //if(!initFilter)
+       this.selectAllProAndCity(this.curCountry,initFilter);
+      
     },
 
-    getStoreListAndGroupAndType() {
+    getStoreListAndGroupAndType(init) {
+    
       const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        //console.log(storeList)
+        console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -267,10 +299,21 @@ export default {
           item.value = item.defineId;
           item.storeIds = item.contents;
         });
+        console.log("XXXXgetStoreListAndGroupAndType")
         this.storeList = storeList;
-        this.getCountryStore();
+        let initFilter =false;
+        if(init && ((this.curStoreGroup&& this.curStoreGroup.length>0 && this.curStoreGroup[0]!='-1')||
+              (this.curStoreType&& this.curStoreType.length>0 && this.curStoreType[0]!='-1'))){
+                initFilter=true;
+        }
+        this.getCountryStore(initFilter||init);
         this.storeGroupList = groupList;
         this.storeTypeList = typeList;
+      //  console.log(this.curStoreGroup,this.curStoreType)
+         if(initFilter){
+                console.log("To FIlter stores")
+                this.filterStore();
+          }
       }).catch(err => {
         console.log('StoreFilter - getStoreGroupAndType: ' + err);
       });
@@ -278,9 +321,12 @@ export default {
 
     onChangeStore(arr) {
       this.curStore = arr;
+      console.log("Change",this.curStore)
+      console.log("2.go changeStoreNew:",arr);
       this.changeStoreNew(arr);
     },
     onChangeSelectedStore() {
+      console.log("On Change select store ")
       this.emitParams();
       console.log(this.curSelectedStore)
     },
@@ -299,12 +345,40 @@ export default {
 
     changeStoreNew(arr) {
       //this.filterStore();
-      //console.log("arr:",arr);
+      console.log("arr:",arr);
       this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
+      
+     
+      console.log(this.filterStoreIds)
+      if(this.filterStoreIds){
+        let temp=[];
+        let filterStoreStr = ""
+        this.filterStoreIds.forEach(storeId => {
+          this.storeList.forEach(store => {
+            if (storeId === store.storeId) {
+              filterStoreStr += `${store.name}，`;
+              const obj = {
+                  storeId: store.storeId,
+                  label: store.name,
+                  value: store.name
+                };
+                temp.push(obj);
+            }
+          });
+        });
+        if(this.storeDataList.lenght==0)
+          this.storeDataList = this.storeList;
+        //this.curStore = temp;
+        this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
+      }
+     
+     // console.log(this.storeList);
+     // console.log(this.storeDataList )
       if(this.emitChanged){
         console.log('*****emitStoreChange');
         this.$emit('emitStoreChange', this.filterStoreIds);
       }
+      console.log("Change store new")
       this.emitParams();
     },
 
@@ -457,18 +531,21 @@ export default {
     },
 
     filterStore() {
+      console.log("Filter Store=>>")
       let filterStoreId = [];
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
+        console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
         filterStoreId = this.curStore;
+
       } else {
         this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
-        //console.log("groupIdArray:",groupIdArray);
+        console.log("groupIdArray:",groupIdArray);
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
-        //console.log("typeIdArr:",typeIdArr);
+        console.log("typeIdArr:",typeIdArr);
         const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
-        //console.log("ilterStoreArray:",filterStoreArray);
-        
+       // console.log("ilterStoreArray:",filterStoreArray);
+        console.log(this.curStore);
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
         console.log("filterStoreId:",filterStoreId);
       }
@@ -491,11 +568,11 @@ export default {
       this.storeDataList = temp;
       this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
       this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-      //console.log("temp:",temp);
       this.getStoreGroupString();
       this.getStoreTypeString();
+      console.log("Emit From fitlerstore")
       this.emitParams();
-      console.log("emitChanged:",this.emitChanged);
+     // console.log("emitChanged:",this.emitChanged);
       
     },
 
@@ -518,6 +595,7 @@ export default {
     },
 
     emitParams() {
+      console.log("Emit Params")
       const tempsearchParamsObj = {};
       //console.log("*storeFilter>emitParams>this.curCountry:",this.curCountry);
       tempsearchParamsObj.curCountry = this.curCountry;
@@ -535,10 +613,12 @@ export default {
       tempsearchParamsObj.curRegionII = this.curRegionII;
       tempsearchParamsObj.regionMode = this.regionMode;
       tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
+      console.log('emitParams:',tempsearchParamsObj)
       this.$emit('storeChange', tempsearchParamsObj);
     },
 
     getStoreIdsOfGroupAndType(groupArr, typeArr) {
+      console.log("getStoreIDOF",groupArr, typeArr)
       let groupIdArr = [];
       let typeIdArr = [];
       if (groupArr.length === 0 && typeArr.length === 0) return [];
@@ -583,7 +663,7 @@ export default {
       self.clearProviceInfo();
       self.clearCityInfo();
       self.clearStoreInfo();
-      self.selectAllProAndCity(val, false);
+      self.selectAllProAndCity(val);
     },
 
     changeCity(val) {
@@ -645,8 +725,8 @@ export default {
       }
     },
 
-    async selectAllProAndCity(val, isFirst) {
-      //console.log("contry changed");
+    async selectAllProAndCity(val,initFilter) {
+      console.log("contry changed");
       const self = this;
       const storeList = self.storeList;
       const temp = [];
@@ -731,16 +811,21 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      setTimeout(async() => {
-        self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
-        self.ifGetParamsFromCash = false;
-        self.changeStoreNew(self.curStore);
-      }, 100);
+      if(!initFilter || self.isChangeAccount){
+        setTimeout(async() => {
+          if(self.isChangeAccount) self.isChangeAccount=false;
+          self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
+          self.ifGetParamsFromCash = false;
+          //self.getStoreListAndGroupAndType(true);
+          console.log("go changeStoreNew:",self.curStore);
+          self.changeStoreNew(self.curStore);
+        }, 100);
+      }
     },
 
     getSearchParams() {
       const searchParams = this.cachedParams;
-      //console.log("getSearchParams > searchParams:",searchParams);
+      console.log("getSearchParams > searchParams:",searchParams);
       if (Object.keys(searchParams).length > 0) {
         
         if (searchParams.curCountry) {
@@ -752,6 +837,8 @@ export default {
           this.curStoreType = searchParams.curStoreType;
           this.curSelectedStore = searchParams.curSelectedStore;
           this.ifGetParamsFromCash = true;
+ 
+         
           if(searchParams.searchFrom == "PatrolPersonStat"){
             this.getStoreListAndGroupAndType();
           }

@@ -1236,7 +1236,6 @@ export default {
 
   methods: {
     getLangStyleValue(langArray){
-      console.log('******',util.getLangStyleValue(langArray));
       return util.getLangStyleValue(langArray);
     },
     maxLabel(val) {
@@ -2994,6 +2993,7 @@ export default {
 
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
+      console.log(searchParams)
       this.part2.standardScore=-9999;
       this.part3.standardScore=-9999;
       this.doGetAssessmentStandardScore();
