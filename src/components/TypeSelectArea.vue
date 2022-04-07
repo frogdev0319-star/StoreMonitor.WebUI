@@ -40,6 +40,7 @@
 import util from '@/common/util.js';
 import MultiSelect from '@/components/MultiSelect2';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
+import { mapGetters } from 'vuex';
 import { getDepartmentList } from '@/api/checkin';
 import { getUserInfo } from '@/api/login';
 import { getBriefStoreList, getStoreDefineGroup } from '@/api/store';
@@ -162,8 +163,8 @@ export default {
       const self = this;
       if (val !== 0) {
         self.ifGetParamsFromCash = false;
-        this.getStoreListAndGroupAndType();
-        if(allowPerson){
+        self.getStoreListAndGroupAndType();
+        if(self.allowPerson){
             this.getSearchCondition();
          }
       }
@@ -297,6 +298,7 @@ export default {
     }
   },
   computed: {
+     ...mapGetters({ accountChanged: 'accountChanged' }),
      cachedParamsInfo() {
      // console.log(this.cachedParams)
       return this.cachedParams
