@@ -78,14 +78,14 @@
                     {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
                   </span> 
                   <div class="spacer"></div>
-                  <div
+                  <!-- <div
                     style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
                     class="storevue-button-empty"
                     size="mini"
                     @click="setWeighting">
                     <img :src="WeightingSetting" style="width:24px;height:24px;"/>
                     <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ '權重設定' }}</div>
-                  </div>
+                  </div> -->
                   <div style="display:flex; flex-direction:row;font-size: 13px;align-items:center" @click="setItem(_item.routeData, _item.name, '', _item.name)">
                     <!--<i class="iconfont icon-quxiaolianjie"/>-->
                     <img :src="require('../../../../static/img/ic_relate.svg')" style="width:24px;height:24px;"/>
