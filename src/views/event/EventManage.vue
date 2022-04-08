@@ -691,8 +691,18 @@ export default {
       } else {
         like = {};
       }
-      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
-      
+      let storeId = null;
+      var p = Object.assign({}, this.params);
+      console.log("*p:",p)
+      //if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics")
+        storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause'))?p.clause.storeId:'-1';
+      /*else{
+        if(p.clause){
+          var tempStore = (p.clause.storeId)?p.clause.storeId:[];
+          console.log("tempStore:",tempStore);
+        }
+        storeId =  (tempStore!="-1")? tempStore :((Object.keys(this.storeFilterObj).length > 0) ? this.storeFilterObj.filterStoreIds :'-1');
+      }*/
       console.log("getEventListRequestParams > storeId:",storeId);
       let status = [];
       if (this.curState.length !== 0) {
@@ -851,7 +861,13 @@ export default {
       //console.log("self.storeFilterObj:",self.storeFilterObj);
       //let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds?self.storeFilterObj.filterStoreIds:self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
       
-      const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
+      //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
+      let storeId = null;
+      //if(self.searchParams['searchFrom']=='PatrolPersonStat' || self.searchParams['searchFrom']=="EventStatistics")
+        storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:'-1';
+      /*else
+        storeId =  (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds :'-1';
+      */
       console.log("getEventCount > storeId:",storeId)
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {

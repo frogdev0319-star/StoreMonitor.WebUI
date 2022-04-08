@@ -110,6 +110,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import { getBriefStoreList, getStoreDefineGroup, getStoreList, getFavoriteStoreList } from '@/api/store';
 import util from '@/common/util.js';
+import i18n from '@/lang/index'
 
 export default {
   name: 'StoreFilter',
@@ -253,21 +254,21 @@ export default {
       }
       var self = this;
       console.log("1.tmp:",temp);
-      temp.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
+      temp.unshift({ value: '-1', label: i18n.t('remotePatrol.all') });
       console.log("2.tmp:",temp);
       const countryList = temp;
       console.log("2.countryList[0]:",this.countryList);
       if(this.countryList.length>0){
         console.log("2.this.countryList:",this.countryList);
         this.countryList[0] = {};
-        this.countryList[0]['label'] = this.$t('remotePatrol.country');
+        this.countryList[0]['label'] = i18n.t('remotePatrol.country');
         this.countryList[0]['countryList'] = countryList;
         //this.countryList[0].countryList.unshift({ value: '-1', label: this.$t('remotePatrol.all') });
       }else{
         console.log("3.this.countryList:",self.countryList);
         var templist=[];
         //countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
-        templist.push({label:self.$t('remotePatrol.country'),countryList:countryList,});
+        templist.push({label:i18n.t('remotePatrol.country'),countryList:countryList,});
         console.log("4.templist:",templist);
         
         self.countryList = templist;
@@ -346,7 +347,7 @@ export default {
     changeStoreNew(arr) {
       //this.filterStore();
       console.log("arr:",arr);
-      this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
+      /*this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
       
      
       console.log(this.filterStoreIds)
@@ -370,16 +371,22 @@ export default {
           this.storeDataList = this.storeList;
         //this.curStore = temp;
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
-      }
-     
+      }*/
+      //if(this.isChangeAccount){
+        //this.isChangeAccount=false;
+        this.filterStore();
+      /*} else{
+        if(this.emitChanged){
+          console.log('*****emitStoreChange');
+          this.$emit('emitStoreChange', this.filterStoreIds);
+        }
+        console.log("Change store new")
+        this.emitParams();
+      }*/
+
      // console.log(this.storeList);
      // console.log(this.storeDataList )
-      if(this.emitChanged){
-        console.log('*****emitStoreChange');
-        this.$emit('emitStoreChange', this.filterStoreIds);
-      }
-      console.log("Change store new")
-      this.emitParams();
+      
     },
 
     onChangeProvince(arr) {
@@ -502,12 +509,76 @@ export default {
     onChangeStoreGroup(val) {
       //console.log("onChangeStoreGroup:",val);
       this.curStoreGroup = val;
-      this.filterStore();
+      if(val.length == 0){
+        const filterStoreId = [];
+        let filterStoreStr="";
+        let temp=[];
+        //filterStoreId.forEach(storeId => {
+          this.storeList.forEach(store => {
+            //if (storeId === store.storeId) {
+              filterStoreStr += `${store.name}，`;
+              filterStoreId.push(store.storeId);
+              const obj = {
+                  storeId: store.storeId,
+                  label: store.name,
+                  value: store.name
+                };
+                temp.push(obj);
+            //}
+          });
+        //});
+        console.log("*this.curStore:",this.curStore);
+        console.log("*this.storeList:",this.storeList);
+        
+        this.storeDataList = temp;
+        console.log("*this.storeDataList:",this.storeDataList);
+        this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
+        this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
+        if(this.emitChanged){
+          console.log('*****emitStoreChange');
+          this.$emit('emitStoreChange', this.filterStoreIds);
+        }
+      console.log("Emit From fitlerstore")
+      this.emitParams();
+      }else
+        this.filterStore();
     },
 
     onChangeStoreType(val) {
       this.curStoreType = val;
-      this.filterStore();
+      if(val.length == 0){
+        const filterStoreId = [];
+        let filterStoreStr="";
+        let temp=[];
+        //filterStoreId.forEach(storeId => {
+          this.storeList.forEach(store => {
+            //if (storeId === store.storeId) {
+              filterStoreStr += `${store.name}，`;
+              filterStoreId.push(store.storeId);
+              const obj = {
+                  storeId: store.storeId,
+                  label: store.name,
+                  value: store.name
+                };
+                temp.push(obj);
+            //}
+          });
+        //});
+        console.log("*this.curStore:",this.curStore);
+        console.log("*this.storeList:",this.storeList);
+        
+        this.storeDataList = temp;
+        console.log("*this.storeDataList:",this.storeDataList);
+        this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
+        this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
+        if(this.emitChanged){
+          console.log('*****emitStoreChange');
+          this.$emit('emitStoreChange', this.filterStoreIds);
+        }
+      console.log("Emit From fitlerstore")
+      this.emitParams();
+      }else
+        this.filterStore();
     },
 
     filterArr(arr1, arr2) {
@@ -533,10 +604,33 @@ export default {
     filterStore() {
       console.log("Filter Store=>>")
       let filterStoreId = [];
+      let filterStoreStr = '';
+      let allfilterStoreStr = '';
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
         console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
         filterStoreId = this.curStore;
-
+        let temp=[];
+        filterStoreId.forEach(storeId => {
+          this.storeList.forEach(store => {
+            if (storeId === store.storeId) {
+              filterStoreStr += `${store.name}，`;
+              const obj = {
+                  storeId: store.storeId,
+                  label: store.name,
+                  value: store.name
+                };
+                temp.push(obj);
+            }
+          });
+        });
+        console.log("this.curStore:",this.curStore);
+        console.log("this.storeList:",this.storeList);
+        console.log("this.storeDataList:",this.storeDataList);
+        if(this.storeDataList.length==0)
+          this.storeDataList = temp;
+        //this.storeDataList = temp;
+        this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
+        this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
       } else {
         this.formatGroupAndType();
         const groupIdArray = this.storeGroupList.filter(groupItem => this.curStoreGroup.find(groupId => groupId === groupItem.value));
@@ -544,32 +638,57 @@ export default {
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
         console.log("typeIdArr:",typeIdArr);
         const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
-       // console.log("ilterStoreArray:",filterStoreArray);
-        console.log(this.curStore);
+        console.log("filterStoreArray:",filterStoreArray);
+        console.log("this.curStore:",this.curStore);
+        console.log("this.storeDataList:",this.storeDataList);
+        //let tempstoreList = filterStoreArray;//util.getIntersectionOfArrs(this.storeDataList, filterStoreArray);
+        let temp=[];
+
+        filterStoreArray.forEach(storeId => {
+            this.storeList.forEach(store => {
+              if (storeId === store.storeId) {
+                allfilterStoreStr+= `${store.name}，`;
+                const obj = {
+                    storeId: store.storeId,
+                    label: store.name,
+                    value: store.name
+                  };
+                  temp.push(obj);
+              }
+            });
+        });
+        this.storeDataList = temp;
+        console.log("temp:",temp);
         filterStoreId = util.getIntersectionOfArrs(this.curStore, filterStoreArray);
+        filterStoreId.forEach(storeId => {
+          this.storeList.forEach(store => {
+            if (storeId === store.storeId) {
+              filterStoreStr += `${store.name}，`;
+              /*const obj = {
+                  storeId: store.storeId,
+                  label: store.name,
+                  value: store.name
+                };
+                temp.push(obj);*/
+            }
+          });
+        });
         console.log("filterStoreId:",filterStoreId);
+        if(filterStoreId.length==0){
+          this.curStore = filterStoreArray;
+        }
+
+        this.filterStoreIds = (filterStoreId.length==0)?filterStoreArray:filterStoreId.filter(storeId => storeId !== '-1');
+        this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
       }
 
-      let filterStoreStr = '';
-      let temp=[];
-      filterStoreId.forEach(storeId => {
-        this.storeList.forEach(store => {
-          if (storeId === store.storeId) {
-            filterStoreStr += `${store.name}，`;
-            const obj = {
-                storeId: store.storeId,
-                label: store.name,
-                value: store.name
-              };
-              temp.push(obj);
-          }
-        });
-      });
-      this.storeDataList = temp;
-      this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
-      this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
+      
       this.getStoreGroupString();
       this.getStoreTypeString();
+      if(this.emitChanged){
+          console.log('*****emitStoreChange');
+          this.$emit('emitStoreChange', this.filterStoreIds);
+        }
       console.log("Emit From fitlerstore")
       this.emitParams();
      // console.log("emitChanged:",this.emitChanged);
@@ -811,16 +930,16 @@ export default {
       self.storeDataList.forEach(item => {
         storeArr.push(item.storeId);
       });
-      if(!initFilter || self.isChangeAccount){
+      //if(!initFilter || self.isChangeAccount ){
         setTimeout(async() => {
-          if(self.isChangeAccount) self.isChangeAccount=false;
+          self.isChangeAccount = false;
           self.curStore = (self.ifGetParamsFromCash && self.curStore.indexOf('-1') === -1) ? self.curStore : storeArr;
           self.ifGetParamsFromCash = false;
           //self.getStoreListAndGroupAndType(true);
           console.log("go changeStoreNew:",self.curStore);
           self.changeStoreNew(self.curStore);
         }, 100);
-      }
+      //}
     },
 
     getSearchParams() {
