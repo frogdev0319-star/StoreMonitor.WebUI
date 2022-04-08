@@ -88,10 +88,8 @@
                       <div class="category-name">
                         <div class="group-left">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
-                          <div>
-                            <span :style="activeParentId === item.id?{'color':'#006ab7'}:{}">
-                              {{ item.name }}（{{ item.groupNum }}）
-                            </span>
+                          <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex-center">
+                            <div style="margin-left: 20px">{{ item.name }}（{{ item.groupNum }}）</div>
                           </div>
                         </div>
                         <div class="group-right">
@@ -209,10 +207,20 @@
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
+              <span class="item_label">必填</span>
+            </div>
+            <el-radio-group class="attribute-group" v-model="itemRequired">
+              <el-radio label="1">必填</el-radio>
+              <el-radio label="0">非必填</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item>
+            <div class="score_item">
+              <span class="sign">*</span>
               <span class="item_label">{{$t('insSettingView.inspectItemType')}}</span>
             </div>
             <el-radio-group class="attribute-group" v-model="itemType">
-              <div v-for="(typeItem, typeIndex) in itemsTypeList"style="display: inline-flex">
+              <div v-for="(typeItem, typeIndex) in itemsTypeList" :key="typeItem.value" style="display: inline-flex">
                 <el-radio :label="typeItem.value" :key="typeIndex">{{typeItem.label}}</el-radio>
               </div>
             </el-radio-group>
@@ -532,6 +540,7 @@ export default {
       hoverId: '',
       notAllowedChangeParentId: false,
       ifClickSubCategory: false,
+      itemRequired: '0',
       itemType: 0,
       childIndex: -1,
       oldGroupSequence: [],
@@ -1292,7 +1301,8 @@ export default {
         itemScore: itemScore,
         qualifiedScore: qualifiedScore,
         availableScores: selectAvailable,
-        type: this.itemType
+        type: this.itemType,
+        required: this.itemRequired === '1'
       };
         temp.push(objItem);
         const obj = {
@@ -1353,7 +1363,8 @@ export default {
           itemScore: itemScore,
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable,
-          type: this.itemType
+          type: this.itemType,
+          required: this.itemRequired === '1'
         };
         temp.push(obj);
         const params = {
@@ -1385,6 +1396,7 @@ export default {
       this.ItemScoreOption = item.availableScoreStr;
       this.ItemDescription = item.napeDep;
       this.itemType = item.type;
+      this.itemRequired = item.required ? '1' : '0'
     },
 
     handleDelete(item) {
@@ -1453,6 +1465,7 @@ export default {
         obj.parentId = item.parentId;
         obj.children = item.children;
         obj.sequence = item.sequence;
+        obj.weight = item.weight;
         temp.push(obj);
         groupIds.push(item.id);
       });
@@ -1589,7 +1602,8 @@ export default {
           isClick: false,
           checked: false,
           type: _item.type,
-          sequence: _item.sequence
+          sequence: _item.sequence,
+          required: _item.required
         };
         temp.push(obj);
       });
@@ -2015,7 +2029,8 @@ export default {
                 width: auto;
                 height: auto;
                 float: right;
-                margin-right: calc(20/1920*100vw);
+                margin-right: calc(10/1920*100vw);
+                margin-left: calc(10/1920*100vw);
             }
         }
         .temp-select-area{
@@ -2032,7 +2047,6 @@ export default {
                     font-family: NotoSansCJKtc;
                     font-size: 13px;
                     width:123px;
-                    height:30px;
                     margin-left:16px
                   }
                 }

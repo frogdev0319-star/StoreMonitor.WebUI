@@ -819,7 +819,6 @@ export default {
 
     async getReportInfo(res) {
       if (res.errCode === 0 && res.data.length > 0) {
-        console.log(res)
         const data = res.data[0].info;  
         this.totalScore = data.totalScore;
         this.standard = data.standard;

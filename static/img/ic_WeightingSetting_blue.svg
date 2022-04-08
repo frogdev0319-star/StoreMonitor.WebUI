@@ -1,0 +1,18 @@
+<svg data-name="Component 266 – 1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <g data-name="Group 8308" transform="translate(-1252.5 -168)">
+        <path data-name="Line 164" transform="translate(1256.5 173.5)" style="stroke:#006ab7;stroke-linecap:round;stroke-width:1.5px;fill:none" d="M0 0h16"/>
+        <path data-name="Line 167" transform="translate(1257.5 188.5)" style="stroke:#006ab7;stroke-linecap:round;stroke-width:1.5px;fill:none" d="M0 0h14"/>
+        <path data-name="Line 166" transform="translate(1261.5 185.5)" style="stroke:#006ab7;stroke-linecap:round;stroke-width:1.5px;fill:none" d="M0 0h6"/>
+        <path data-name="Line 165" transform="translate(1264.5 172.5)" style="stroke:#006ab7;stroke-linecap:round;stroke-width:1.5px;fill:none" d="M0 0v13"/>
+        <circle data-name="Ellipse 265" cx="1.5" cy="1.5" r="1.5" transform="translate(1263 170)" style="fill:#006ab7"/>
+        <g data-name="Polygon 94" style="fill:none">
+            <path d="M2.03 3.881a1 1 0 0 1 1.94 0l1.719 6.877A1 1 0 0 1 4.719 12H1.281a1 1 0 0 1-.97-1.243z" style="stroke:none" transform="translate(1256 170.5)"/>
+            <path d="M3 6.185 1.921 10.5H4.08L3 6.185m0-3.062c.422 0 .844.253.97.758l1.72 6.876A1 1 0 0 1 4.72 12H1.28a1 1 0 0 1-.97-1.243l1.72-6.876A.978.978 0 0 1 3 3.123z" style="fill:#006ab7;stroke:none" transform="translate(1256 170.5)"/>
+        </g>
+        <g data-name="Polygon 95" style="fill:none">
+            <path d="M2.03 3.881a1 1 0 0 1 1.94 0l1.719 6.877A1 1 0 0 1 4.719 12H1.281a1 1 0 0 1-.97-1.243z" style="stroke:none" transform="translate(1267 170.5)"/>
+            <path d="M3 6.185 1.921 10.5H4.08L3 6.185m0-3.062c.422 0 .844.253.97.758l1.72 6.876A1 1 0 0 1 4.72 12H1.28a1 1 0 0 1-.97-1.243l1.72-6.876A.978.978 0 0 1 3 3.123z" style="fill:#006ab7;stroke:none" transform="translate(1267 170.5)"/>
+        </g>
+    </g>
+    <path data-name="Rectangle Copy 5" style="fill:none" d="M0 0h24v24H0z"/>
+</svg>
