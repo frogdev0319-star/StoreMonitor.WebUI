@@ -23,36 +23,29 @@
 
               <!-- row -->
               <div class="setting-config basic-config">
-                <div class="title-name">* 流程名称</div>
-                <div class="title-status">
-                  <el-select
-                    v-model="curTemplateIndex"
-                    class="device-select"
-                    size="mini"
-                    placeholder="模板一"
-                    @change="displayTemplateInfo">
-                    <el-option
-                      v-for="(item, index) in templateList"
-                      :key="index"
-                      :label="swswsws"
-                      :value="index"
+                <div class="title-name">* 流程名稱</div>
+                <div class="title-status"> 
+                  <el-input
+                    :placeholder="infoForm.name"
+                    v-model="infoForm.name"
+                    
                     />
-                  </el-select>
                 </div>
 
                 <div class="title-name">* 流程分類</div>
-                <div class="title-status">
+                <div class="title-status"> 
                   <el-select
                     v-model="curTemplateIndex"
                     class="device-select"
-                    size="mini"
-                    placeholder="模板一"
-                    @change="displayTemplateInfo">
+                    :placeholder="infoForm.type"
+                    :disabled="true"
+                    >
                     <el-option
                       v-for="(item, index) in templateList"
                       :key="index"
-                      :label="swswsws"
-                      :value="index"
+                      :label="infoForm.type"
+                      :value="item"
+                      
                     />
                   </el-select>
                 </div>
@@ -60,12 +53,11 @@
               <!-- row -->
               <div class="setting-config basic-config">
                 <div class="title-name">流程描述</div>
-                <div class="title-status">
+                <div class="title-status"> 
                   <el-input
-                    v-model="workflowDescription"
+                    v-model="infoForm.description"
                     :autosize="{ minRows: 3, maxRows: 5 }"
                     placeholder="流程描述"
-                    size="mini"
                     class="storevue-textarea"
                     type="textarea"
                     resize="none"
@@ -180,7 +172,7 @@
           <div class="setting-config basic-config">
             <div class="title-name">添加流程抄送人</div>
             <div class="title-status">
-              <el-select
+              <!-- <el-select
                 v-model="curTemplateIndex"
                 class="device-select"
                 size="mini"
@@ -192,7 +184,7 @@
                   :label="swswsws"
                   :value="index"
                 />
-              </el-select>
+              </el-select> -->
             </div>
           </div>
 
@@ -202,58 +194,13 @@
       </div>
     </div>
 
-<!--   
-    <el-button
-      class="storevue-button-filled"
-      size="mini" type="primary" @click="submit">
-      保存並發布
-    </el-button>
-    <el-button
-      class="storevue-button-outlined"
-      size="mini" type="primary" @click="addNode">
-      新增節點
-    </el-button> -->
-    <!-- <el-table
-      :data="workflowDetail.nextNodes"
-      style="width: 100%">
-      <el-table-column
-        prop="name"
-        label="節點名稱"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="auditByUsers"
-        label="審批人"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        label="審批方式">
-        <template slot-scope="{row}">
-          <span>{{row.rowdata}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="是否需要簽名">
-        <template slot-scope="{row}">
-          <span>{{row.rowdata}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="操作">
-        <template slot-scope="{row}">
-          <span>{{row.rowdata}}</span>
-        </template>
-      </el-table-column>
-    </el-table> -->
-
-
 
   </div>
 </template>
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import { getWorkflowInfo, updateWorkflow, } from "@/api/workflow";
+import {getNodeList } from "@/api/workflow";
 import util from "@/common/util";
 export default {
   name: 'WorkflowDetail',
@@ -265,10 +212,13 @@ export default {
     return {
       dataFromRoute: {},
       workflowDetail: {},
-      templateList: [],
+      templateList: ['巡檢表單'],
+      curTemplateIndex:'',
       basicList: [],
       isLoadingData: false,
       workflowDescription: '',
+      infoForm: {},
+      nodeList:{},
       detailData: [
         {
           'node': 1,
@@ -297,43 +247,71 @@ export default {
 
     };
   },
+  created() {
+    this.getWorkflowInfo()
+    this.getNodeList(this.infoForm.processDefinitionKey)
+  },
   mounted() {
-    this.dataFromRoute = { ...this.$route.params.data }
-    getWorkflowInfo({
-      processDefinitionKey: this.dataFromRoute.processDefinitionKey
-    }).then(res => {
-      function getNodes (nodes, data) {
-        if (data.nextAuditNode) {
-          nodes.push(data.nextAuditNode)
-          getNodes(nodes, data.nextAuditNode)
-        } else return
-      }
-      let nextNodes = [];
-      this.workflowDetail = { ...res.data }
-      getNodes(nextNodes, this.workflowDetail)
-      this.workflowDetail['nextNodes'] = nextNodes;
-    })
+    // this.dataFromRoute = { ...this.$route.params.data }
+    // getWorkflowInfo({
+    //   processDefinitionKey: this.dataFromRoute.processDefinitionKey
+    // }).then(res => {
+    //   function getNodes (nodes, data) {
+    //     if (data.nextAuditNode) {
+    //       nodes.push(data.nextAuditNode)
+    //       getNodes(nodes, data.nextAuditNode)
+    //     } else return
+    //   }
+    //   let nextNodes = [];
+    //   this.workflowDetail = { ...res.data }
+    //   getNodes(nextNodes, this.workflowDetail)
+    //   this.workflowDetail['nextNodes'] = nextNodes;
+    // })
   },
   methods: {
-    addNode() {
-      this.$router.push({ name: 'nodeSetting' })
+    getWorkflowInfo(){
+      const data = sessionStorage.getItem('workflowDetail')
+      this.infoForm = JSON.parse(data)
+      console.log('this.infoForm  ===>> ', this.infoForm );
+      
     },
-    submit() {
-      let array = this.workflowDetail.nextNodes;
-      let object = { ...array[0] };
-      let i = array.length - 1;
-      while(i >= 0) {
-        object['nextAuditNode'] = { ...array[i].nextAuditNode };
-        i--;
-      }
-      let nextAuditNode = JSON.parse(JSON.stringify(object));
-      updateWorkflow({
-        ...this.workflowDetail,
-        nextAuditNode
-      }).then(res => {
-        console.log(res);
+
+
+    getNodeList(id){
+      this.isLoadingData = true
+      getNodeList(id).then(res=>{
+        
+        // console.log('this.userInfo ======>> ', this.userInfo);
+        this.nodeList =  res.data
+        console.log('this.nodeList ======>> ', this.nodeList);
+
+
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
       });
-    }
+
+    },
+    // addNode() {
+    //   this.$router.push({ name: 'nodeSetting' })
+    // },
+    // submit() {
+    //   let array = this.workflowDetail.nextNodes;
+    //   let object = { ...array[0] };
+    //   let i = array.length - 1;
+    //   while(i >= 0) {
+    //     object['nextAuditNode'] = { ...array[i].nextAuditNode };
+    //     i--;
+    //   }
+    //   let nextAuditNode = JSON.parse(JSON.stringify(object));
+    //   updateWorkflow({
+    //     ...this.workflowDetail,
+    //     nextAuditNode
+    //   }).then(res => {
+    //     console.log(res);
+    //   });
+    // }
   }
 };
 </script>
@@ -381,6 +359,9 @@ export default {
     position: absolute
     right: 1%
     top: 3px
+
+
+
 </style>
 
 <style scoped>

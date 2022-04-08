@@ -11,6 +11,32 @@ export const getWorkflowList = data => {
   });
 };
 
+export const getNodeList = data => {
+  return request({
+    url: `${version}/workflow/info?processDefinitionKey=${data}`,
+    method: 'get',
+    data
+  });
+};
+
+export const duplicateRow = data => {
+  console.log('data!!! :>> ', data);
+  return request({
+    url: `${version}/workflow/duplicate`,
+    method: 'post',
+    data
+  });
+};
+
+export const deleteRow = data => {
+  console.log('data!!! :>> ', data);
+  return request({
+    url: `${version}/workflow/delete`,
+    method: 'post',
+    data
+  });
+};
+
 export const disableWorkflow = data => {
   return request({
     url: `${version}/workflow/disable`,

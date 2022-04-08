@@ -59,9 +59,18 @@
             </div>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
+
+          <!-- switch -->
           <template v-else-if="_item.isSwitch">
             <el-switch :disabled="row[_item.switchProp]" :value="row[_item.prop]" @change="$emit('handleSwitchChange', { checked: $event, target: row })"></el-switch>
           </template>
+
+          <template v-else-if="_item.forWorkflowsSwitch">
+            <el-switch :disabled="row[_item.switchProp]" :value="row.state == 1 ? true : false" />
+            <!-- ohohoh - {{row.state}} -->
+          </template>
+
+
           <template v-else>
             <template v-if="isDevice && _index < 3">
               <el-tooltip class="item" effect="dark" :content="row[_item.prop]" placement="bottom">
@@ -72,11 +81,14 @@
           </template>
         </template>
       </el-table-column>
+
       <el-table-column type="expand" v-if="allowRowExpand">
         <template slot-scope="{row}">
           <component :is="expandComponent" v-bind="currentProperties"></component>
         </template>
       </el-table-column>
+      
+      <!-- 操作 -->
       <el-table-column
         v-if="tableOperation.label"
         :min-width="tableOperation.minWidth"
@@ -95,6 +107,7 @@
           <div v-else-if="tableOperation.customIcon" >
             <img :src="tableOperation.src" style="width:24px;height:24px;" @click="handleOperationButton(tableOperation.methods, scope.row, scope.$index)">
           </div>
+
           <div class="flex-center" v-else>
             <img 
               :key="index"
@@ -313,8 +326,8 @@ export default {
     }
   },
   mounted() {
-    console.log(this.columnData)
-    console.log(this.tableData)
+    // console.log(this.columnData)
+    // console.log(this.tableData)
   },
   methods: {
     setCellStyle({ row, column, rowIndex, columnIndex }) {
@@ -330,7 +343,7 @@ export default {
       return row.id;
     },
     expandChange(row) {
-       console.log("row click:",row);
+        console.log("row click:",row);
         this.currentRow = row;
         if(this.allowRowExpand){
           if(row.id == this.expands){
@@ -349,8 +362,8 @@ export default {
       /*console.log("row click:",row);
       if(this.allowRowExpand){
         if(row.id == this.expands){
-           this.expands="";
-           this.expandRowKeys=[];
+          this.expands="";
+          this.expandRowKeys=[];
         }
         else {
           this.expands = row.id;
@@ -398,7 +411,12 @@ export default {
 
     handleOperationButton(methods, row, index) {
       this.tableData.map(item => { item.isEditing = false; });
+      // console.log('this.tableData ======>> ', this.tableData);
+      // console.log('row ======>> ', row);
+      // console.log('index ======>> ', index);
       row.isEditing = this.isDevice && methods === 'edit';
+      // console.log('row.isEditing ======>> ', row.isEditing);
+
       this.$emit('handleOperation', { method: methods, row: row, index: index });
     },
 

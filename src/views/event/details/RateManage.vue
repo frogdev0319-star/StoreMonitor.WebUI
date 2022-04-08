@@ -4,7 +4,7 @@
       <div class="title-content">
         <img  :src="sourceSrc"  :class="(event.sourceType!=2)?'title-img':'title-img-inside'" >
         <el-tooltip effect="light" placement="bottom">
-          <div slot="content">{{ event.eventTitle }}</div>
+          <div slot="content">{{ event.eventTitle }} 111111</div>
           <div class="event-title">{{ event.eventTitle }}</div>
         </el-tooltip>
         <span

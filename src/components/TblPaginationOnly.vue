@@ -139,7 +139,7 @@ export default {
       }
     },
     handleNextClick(){
-      
+
       if(this.currentPage<this.total){
         this.handleCurrentChange(this.currentPage+1)
       }

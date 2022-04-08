@@ -226,21 +226,21 @@ export default {
     };
   },
   mounted() {
-    this.dataFromRoute = { ...this.$route.params.data }
-    getWorkflowInfo({
-      processDefinitionKey: this.dataFromRoute.processDefinitionKey
-    }).then(res => {
-      function getNodes (nodes, data) {
-        if (data.nextAuditNode) {
-          nodes.push(data.nextAuditNode)
-          getNodes(nodes, data.nextAuditNode)
-        } else return
-      }
-      let nextNodes = [];
-      this.workflowDetail = { ...res.data }
-      getNodes(nextNodes, this.workflowDetail)
-      this.workflowDetail['nextNodes'] = nextNodes;
-    })
+    // this.dataFromRoute = { ...this.$route.params.data }
+    // getWorkflowInfo({
+    //   processDefinitionKey: this.dataFromRoute.processDefinitionKey
+    // }).then(res => {
+    //   function getNodes (nodes, data) {
+    //     if (data.nextAuditNode) {
+    //       nodes.push(data.nextAuditNode)
+    //       getNodes(nodes, data.nextAuditNode)
+    //     } else return
+    //   }
+    //   let nextNodes = [];
+    //   this.workflowDetail = { ...res.data }
+    //   getNodes(nextNodes, this.workflowDetail)
+    //   this.workflowDetail['nextNodes'] = nextNodes;
+    // })
   },
   methods: {
     addNode() {

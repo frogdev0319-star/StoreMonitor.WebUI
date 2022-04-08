@@ -349,6 +349,9 @@ export default {
     sessionStorage.removeItem('titleInfo');
   },
 
+  created() {
+    
+  },
   methods: {
     changeCurTemplate (val) {
       this.templateRoleId =  val;

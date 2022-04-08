@@ -3,7 +3,6 @@
     <div>
 
       <div class="workflow-header">
-
         <div class="flex-center">
           <el-input
             v-model="inputSearchValue"
@@ -16,47 +15,49 @@
 
         <delay-button
           :disabled="authorizedDevicesNum === 0"
-          @click="" >
+          >
           <div class="button-area">
             <i class="iconfont el-icon-plus"/>
             <span>添加流程</span>
           </div>
         </delay-button>
       </div>
-
-      <table-only
-        ref="elTP"
-        class="table-white"
-        :column-data="columnData"
-        :table-data="tableData"
-        :table-operation ="columnOperationData"
-        :highlight-current-row= "false"
-        :is-loading-data="isLoadingData"
-        :allowRowExpand = "false"
-        :showBorder = "false"
-        :default-sort = "{prop: 'createTime', order: 'descending'}"
-        :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
-        :tableHeight = "760"
-        :cellStyle="{backgroundColor: '#fff !important'}"
-        @handleOperation="handleEmitOperation"
-        @handleSwitchChange="handleSwitchChange"
-      />
+      <div class="tablelist">
+        <table-only
+          ref="elTP"
+          class="table-white"
+          :column-data="columnData"
+          :table-data="allTableData"
+          :table-operation ="columnOperationData"
+          :highlight-current-row= "false"
+          :is-loading-data="isLoadingData"
+          :allowRowExpand = "false"
+          :showBorder = "false"
+          :default-sort = "{prop: 'createTime', order: 'descending'}"
+          :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+          :tableHeight = "760"
+          :cellStyle="{backgroundColor: '#fff !important'}"
+          @handleOperation="handleEmitOperation"
+          @handleSwitchChange="handleSwitchChange"
+        />
+      </div>
     </div>
-    <!-- <div style="width:100%; margin-top:12px;height:31px;">
+    <div style="width:100%; margin-top:12px;height:31px;">
       <tbl-pagination-only
         :btn-style="{backgroundColor:'transparent'}"
         :total="total"
-        :current-page="page"
+        :current-page="currentPage"
         :page-size="sizeNum"
-        layout = "prev,pager, next,sizes,slot"
-        @sizeChange="handlePageAndSizeChange"
-        @currentChange="handlePageAndSizeChange"
+        layout = "total, prev, pager, next, sizes, slot"
+        @sizeChange="handlePagination"
+        @currentChange="handlePagination"
       />
-    </div> -->
+    </div>
   </div>
 </template>
 <script>
-import { getWorkflowList, disableWorkflow, enableWorkflow } from "@/api/workflow";
+import { getWorkflowList, duplicateRow, deleteRow, disableWorkflow, enableWorkflow } from '@/api/workflow';
+import { getUserInfo } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import util from '@/common/util';
@@ -83,77 +84,48 @@ export default {
         operation: [
           {
             lable: '',
-            icon: 'icon-reauthorize',
+            icon: 'icon-copy',
             methods: 'copy'
           },
           {
             lable: '',
-            icon: 'icon-button',
+            icon: 'icon-setting',
             methods: 'set'
           },
           {
             lable: '',
-            icon: 'icon-shanchu',
+            icon: 'icon-delete',
             methods: 'delete'
           }
         ]
       },
-      tableData: [
-        {
-          'name': 'Test Workflow',
-          'type': 'Test',
-          'createdUser': 'Albert',
-          'description': 'TEST',
-          'createdTs': '123456',
-
-          'state': true
-        },
-        {
-          'name': 'Test Workflow',
-          'type': 'Test',
-          'createdUser': 'Frog',
-          'description': 'TEST',
-          'createdTs': '22334',
-
-          'state': false
-        },
-        {
-          'name': 'Test Workflow',
-          'type': 'Test',
-          'createdUser': 'Deng',
-          'description': 'TEST',
-          'createdTs': '378',
-
-          'state': false
-        },
-        {
-          'name': 'Test Workflow',
-          'type': 'Test',
-          'createdUser': '飄髮哥',
-          'description': 'TEST',
-          'createdTs': '1890',
-
-          'state': false
-        },
-      ],
+      userInfo: [],
+      allTableData:[],
+      tableData: [],
       columnData: [
+        // {
+        //   'prop': 'index',
+        //   'label': 'index',
+        //   'width': 50,
+        //   'maxWidth': 50,
+        // },
         {
           'prop': 'name',
           'label': '名稱',
-          'width': 90,
-          'maxWidth': 130,
+          'width': 150,
+          'maxWidth': 150,
         },
         {
           'prop': 'type',
           'label': '流程分類',
-          'width': 130,
-          'maxWidth': 130,
+          'width': 100,
+          'maxWidth': 100,
         },
         {
           'prop': 'createdUser',
           'label': '創建人',
-          'width': 130,
-          'maxWidth': 130,
+          'width': 110,
+          'maxWidth': 110,
         },
         {
           'prop': 'description',
@@ -170,15 +142,36 @@ export default {
         {
           'prop': 'state',
           'label': '狀態',
-          'width': 130,
+          'width': 80,
           'maxWidth': 130,
-          'isSwitch': true,
-          'switchProp': 'isSwitchDisabled'
+          'forWorkflowsSwitch': true,
         },
       ],
+      total: 5,
+      currentPage: 1,
+      sizeNum: 10,
+      apiBody: {
+          "page": 0,
+          "size": 10,
+          "direction": "ASC",
+          "property": "name",
+          // "name": "test",
+          // "type": 0,
+          "state": [
+              0,
+              1,
+          ]
+      }
     };
   },
   mounted() {
+    
+  },
+  created() {
+    this.init()
+    
+  },
+  methods: {
     // getWorkflowList({}).then((res) => {
     //   this.isLoadingData = false;
     //   this.tableData = res.data.content.map(row => ({
@@ -187,16 +180,128 @@ export default {
     //     isSwitchDisabled: row.isBind
     //   }))
     // });
-  },
-  methods: {
-    getWorkflowList() {},
-    handleTabClick() {},
+    init(){
+      this.getUserInfo()
+      this.getWorkflowList(this.apiBody);
+    },
+
+    getUserInfo(){
+      getUserInfo().then(res=>{
+        this.userInfo = res.data
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    getWorkflowList(param){
+      this.isLoadingData = true
+      getWorkflowList(param).then(res=>{
+        console.log('getWorkflowList ======>> ', res.data.content);
+        // console.log('this.userInfo ======>> ', this.userInfo);
+        res.data.content.map(d => (
+          this.userInfo.forEach(user => {
+            if(d.createdUser === user.userId){
+              d.createdUser = user.userName
+              d.createdTs = new Date(d.createdTs).toLocaleString()
+              d.type = "巡檢表單"
+              d.index = res.data.content.indexOf(d) + 1
+            }
+          })
+        ))
+        this.allTableData = res.data.content
+
+        this.total = res.data.totalPages
+        console.log('this.total :>> ', this.total);
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+    
+
     handleEmitOperation({ method, row }) {
-      if (method === 'set') {
-        this.$router.push({ name: 'workflowDetail', params: { data: row }});
+      console.log('List row =====>> ', row);
+      switch(method){
+        case 'copy':{
+          this.duplicateRow(row.processDefinitionKey)
+          break;
+        }
+        case 'set':{
+          this.settingWorkFlow(row)
+          break;      
+        }
+        case 'delete':{
+          this.deleteRow(row.processDefinitionKey)
+          break;      
+        }
+        default: {
+          break;
+        }
       }
     },
-    handlePageAndSizeChange() {},
+
+    settingWorkFlow(row){
+      this.$router.push({name: 'workflowDetail'})
+      sessionStorage.setItem('workflowDetail', JSON.stringify(row))
+    },
+
+    duplicateRow(processDefinitionKey){
+      const postforms = new FormData()
+      postforms.append('processDefinitionKey', processDefinitionKey)
+      // console.log('postforms0000 :>> ', postforms);
+      // console.log('processDefinitionKey :>> ', processDefinitionKey);
+      duplicateRow(postforms).then(res=>{
+        console.log('res :>> ', res);
+        this.init()
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+    
+    deleteRow(processDefinitionKey){
+      this.isLoadingData = true
+      const rowID = {
+        "processDefinitionKeys": [processDefinitionKey]
+      }
+      deleteRow(rowID).then(res=>{
+        this.init()
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false
+        console.log('error' + err);
+      })
+    },
+
+    handlePagination(pageInfo){
+      const newApiBody = {...this.apiBody, size:pageInfo.size, page: pageInfo.page - 1}
+      this.apiBody = []
+      this.apiBody = newApiBody
+      this.currentPage = pageInfo.page
+      // console.log('pageInfo :>> ', pageInfo);
+      // console.log('this.apiBody :>> ', this.apiBody);
+      this.init()
+    },
+
+    // handlePageAndSizeChange(pageObj) {
+    //   const self = this;
+    //   self.page = pageObj.page;
+    //   self.sizeNum = pageObj.size;
+    //   self.params.filter = { page: self.page - 1, size: self.sizeNum };
+    //   self.setPagingTableData();
+    // },
+
+    // setPagingTableData(){
+    //   this.tableData = [];
+    //   this.tableData = [...this.allTableData.slice( (self.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+    //   console.log('this.tableData :>> ', this.tableData);
+    // },
+
+    handleTabClick() {},
+
+    
+    
     handleSwitchChange({ checked, target }) {
       if (checked) {
         enableWorkflow({
@@ -250,4 +355,13 @@ export default {
     flex-direction: row
     justify-content: space-between
     align-items: flex-start
+  .el-table
+    border: none !important
+
+  .icon-copy, .icon-setting, .icon-delete
+    cursor: pointer
+    transition: all .2s
+    &:hover
+      transform: scale(1.1)
+
 </style>

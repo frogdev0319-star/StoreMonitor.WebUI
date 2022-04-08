@@ -490,8 +490,8 @@ export default {
       this.showIgnoreItem  =false;
     },
     handleDownload() {
-      console.log(document.getElementById("downloadPdf"))
-      console.log(document.getElementById("downloadPdf").click)
+      // console.log(document.getElementById("downloadPdf"))
+      // console.log(document.getElementById("downloadPdf").click)
       document.getElementById("downloadPdf").click();
     },
     setBrandListDisabled(booleanFlag) {
@@ -531,9 +531,6 @@ export default {
     getBread() {
       this.breadList = [];
       const currentRoute = this.$route.fullPath;
-
-      console.log('currentRoute ===>', currentRoute)
-
       let matched = [];
       matched = this.$route.matched.filter((x) => x.name);
       matched.length === 2 &&
@@ -541,9 +538,6 @@ export default {
       matched.length > 2 &&
         matched[0].name === "systemSetting" &&
         this.setSystemNavbarBread(matched, currentRoute);
-
-      console.log('matched ===>', matched)
-
       this.breadList = matched;
     },
 
@@ -740,9 +734,9 @@ export default {
     },
     async getBrandList() {
       await this.changeRoutes();
-      console.log("Get Brand List");
+      // console.log("Get Brand List");
       this.brandList = JSON.parse(sessionStorage.getItem("brandList"));
-      console.log(this.brandList);
+      // console.log(this.brandList);
       const idIndex = this.brandList
         .map((item) => item.accountId)
         .indexOf(this.accountId);
@@ -760,20 +754,20 @@ export default {
       let data = null;
       if(idIndex !== -1)
         data = this.brandList[idIndex].srp.find(item=>item.type == "Custom_Inspection");
-      console.log("Change Account")
-      console.log(this.brandList[idIndex])
+      // console.log("Change Account")
+      // console.log(this.brandList[idIndex])
 
 
       if(!data || !data.enable){
-         this.accountId = this.orgAccountId
-         util.notify(self.$t('route.noInspectionAccessRights'), 'warning', 3000);
-         return ;
+        this.accountId = this.orgAccountId
+        util.notify(self.$t('route.noInspectionAccessRights'), 'warning', 3000);
+        return ;
       }
 
       const params = {
         accountId: accountId,
       };
-      console.log("Change Account:",this.orgAccountId,this.accountId)
+      // console.log("Change Account:",this.orgAccountId,this.accountId)
       self.$store.dispatch("changeAccount", params).then((res) => {
         if (res.errCode === 0) {
           sessionStorage.setItem("accountName", this.brandList[idIndex].name);
@@ -783,13 +777,13 @@ export default {
         }
         else{
           this.accountId = this.orgAccountId
-           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);
+          util.notify(self.$t('route.accountTerminated'), 'warning', 3000);
         }
       });
     },
 
     async changeRoutes() {
-      console.log("Change Routes");
+      // console.log("Change Routes");
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
       if (result.errCode === 0) {
@@ -801,7 +795,7 @@ export default {
         } else if (!availablePathesList.includes(this.$route.path)) {
           this.$router.push(availablePathesList[0]);
         } else {
-          console.log(this.$route.path);
+          // console.log(this.$route.path);
           this.$router.push(this.$route.path);
         }
       }

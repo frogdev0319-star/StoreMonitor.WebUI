@@ -17,15 +17,15 @@ Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err);
 }
 export const constantRoutes = [
-   {
-     path: '/login',
-     name: 'Login',
-     hidden: true,
-     component: LoginForm,
-     meta: {
-       requireAuth: false
-     }
-   },
+  {
+    path: '/login',
+    name: 'Login',
+    hidden: true,
+    component: LoginForm,
+    meta: {
+      requireAuth: false
+    }
+  },
   {
     path: '/:token/:userId/:ezvizAppKey/:ezvizProtocol/:lang/:deviceAuth',
     redirect: '/',
@@ -424,12 +424,12 @@ export const navbarRoute = {
         hidden: true,
       },
       {
-        path: '/node',
+        path: '/workflownode',
         name: 'nodeSetting',
         component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
         hidden: true,
       }
-    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/node');
+    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/workflownode');
     return systemSettingRoute;
   },
 
