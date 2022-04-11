@@ -3,7 +3,7 @@
     <div class="overview-date" style="margin-left:24px;">
       <date-time-selector showTooltips="true" @change="dateChange"/>
       <span class="el-store">
-        {{ $t('overview.totalStore', {storeNum: storeDataList.length-1}) }} 109
+        {{ $t('overview.totalStore', {storeNum: storeDataList.length-1}) }}
       </span>
     </div>
     <div class="el-overview">

@@ -1,7 +1,6 @@
 <template>
-  <div style="height: 100%">
+  <div>
     <div>
-
       <div class="workflow-header">
         <div class="flex-center">
           <el-input
@@ -345,7 +344,7 @@ export default {
 };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
   .workflow-header
     width: 100%
     // height: 150px
@@ -363,5 +362,7 @@ export default {
     transition: all .2s
     &:hover
       transform: scale(1.1)
+
+
 
 </style>

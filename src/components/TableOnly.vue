@@ -27,6 +27,14 @@
       @row-click="handleRowClick"
     >
       <el-table-column
+        v-if="indexType"
+        label= "節點序號"
+        type= "index"
+        align="center"
+        width="100"
+        
+      />
+      <el-table-column
         v-if="showSelectionColumn"
         type="selection"
         align="center"
@@ -188,6 +196,10 @@ export default {
     EventCommentList
   },
   props: {
+    indexType:{
+      type: Boolean,
+      default: false
+    },
     tableThemes:{
       type:String,
       default:'grey'

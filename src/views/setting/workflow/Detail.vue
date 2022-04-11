@@ -45,7 +45,6 @@
                       :key="index"
                       :label="infoForm.type"
                       :value="item"
-                      
                     />
                   </el-select>
                 </div>
@@ -82,11 +81,32 @@
 
           <setting-table table-name="流程配置">
             <template slot="tableDetail" style="padding: 30px">
+                <div class="tablelist">
+                  <table-only
+                    ref="elTP"
+                    class="table-white"
+                    :column-data="columnData"
+                    :table-data="flatNodeData"
+                    :table-operation ="columnOperationData"
+                    :highlight-current-row= "false"
+                    :is-loading-data="isLoadingData"
+                    :allowRowExpand = "false"
+                    :showBorder = "false"
+                    :default-sort = "{prop: 'createTime', order: 'descending'}"
+                    :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                    :tableHeight = "760"
+                    :cellStyle="{backgroundColor: '#fff !important'}"
+                    :indexType="indexType"
+                  />
+                </div>
+            </template>
+
+            <!-- <template slot="tableDetail" style="padding: 30px">
               <el-table
-                :data="detailData"
+                :data="flatNodeData"
                 style="width: 100%">
                 <el-table-column
-                  prop="node"
+                  prop="id"
                   label="節點序號"
                   width="100"/>
                 <el-table-column
@@ -97,6 +117,7 @@
                   prop="auditByUsers"
                   label="審批人"
                   width="180"/>
+
                 <el-table-column
                   label="審批方式">
                   <template slot-scope="{row}">
@@ -131,41 +152,7 @@
                   </template>
                 </el-table-column>
               </el-table>
-
-              <!-- <div class="setting-config basic-config">
-                <div class="title-name">* 流程名称</div>
-                <div class="title-status">
-                  <el-radio-group class="storevue-radio" >
-                    <el-radio :label="true">會簽</el-radio>
-                    <el-radio :label="false">或簽</el-radio>
-                    <el-radio :label="false">需要</el-radio>
-                    <el-radio :label="false">不需要</el-radio>
-                  </el-radio-group>
-                </div>
-                
-                <div class="title-operation">
-                  <div class="flex-center" style="background-color: #f7f9fa; padding: 12px">
-                    <div class="flex-center">
-                      <span class="span-font" style="margin-right: 20px">{{ $t('titleView.statisIndex') }}</span>
-                      <div>
-                        <el-radio-group class="storevue-radio" >
-                          <el-radio :label="0">{{ $t('overview.pass') }}</el-radio>
-                          <el-radio :label="1">{{ $t('overview.failed') }}</el-radio>
-                        </el-radio-group>
-                      </div>
-                    </div>
-                    <div class="flex-center">
-                      <span class="span-font" style="margin-right: 20px;margin-left: 60px">{{ $t('titleView.displayofStatisticalResults') }}</span>
-                      <el-radio-group class="storevue-radio" >
-                        <el-radio :label="0">{{ $t('titleView.radar') }}</el-radio>
-                        <el-radio :label="1">{{ $t('titleView.pie') }}</el-radio>
-                      </el-radio-group>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
-
-            </template>
+            </template> -->
           </setting-table>
 
           <!-- row -->
@@ -201,12 +188,16 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {getNodeList } from "@/api/workflow";
+import TableOnly from '@/components/TableOnly';
 import util from "@/common/util";
 export default {
   name: 'WorkflowDetail',
   components: {
+    TableOnly,
+    
     DelayButton,
-    SettingTable
+    SettingTable,
+    
   },
   data() {
     return {
@@ -219,29 +210,57 @@ export default {
       workflowDescription: '',
       infoForm: {},
       nodeList:{},
-      detailData: [
+      flatNodeData:[],
+      columnOperationData: {
+        label: this.$t('deviceView.operation'),
+        minWidth: '134',
+        align: 'center',
+        operation: [
+          {
+            lable: '',
+            icon: 'icon-copy',
+            methods: 'copy'
+          },
+          {
+            lable: '',
+            icon: 'icon-setting',
+            methods: 'set'
+          },
+          {
+            lable: '',
+            icon: 'icon-delete',
+            methods: 'delete'
+          }
+        ]
+      },
+      columnData: [
         {
-          'node': 1,
-          'name': 'TEST',
-          'auditByUsers': 'Albert',
+          'prop': 'name',
+          'label': '節點名稱',
+          'width': 100,
+          'maxWidth': 100,
         },
         {
-          'node': 2,
-          'name': 'Super Test',
-          'auditByUsers': 'Albert',
+          'prop': 'auditByUsers',
+          'label': '審批人',
+          'width': 110,
+          'maxWidth': 110,
         },
         {
-          'node': 3,
-          'name': 'this TEST',
-          'auditByUsers': 'Albert',
+          'prop': 'auditMethod',
+          'label': '審批方式',
+          'width': 130,
+          'maxWidth': 130,
         },
         {
-          'node': 4,
-          'name': 'OKOKOK',
-          'auditByUsers': 'Albert',
+          'prop': 'signature',
+          'label': '是否需要簽名',
+          'width': 130,
+          'maxWidth': 130
         },
-
+        
       ],
+      indexType: true,
       penSrc: require('../../../../static/img/table-edit.png'),
       deleteSrc: require('../../../../static/img/table-delete.png')
 
@@ -272,6 +291,8 @@ export default {
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
+      this.infoForm.type = "巡檢表單"
+      
       console.log('this.infoForm  ===>> ', this.infoForm );
       
     },
@@ -281,9 +302,39 @@ export default {
       this.isLoadingData = true
       getNodeList(id).then(res=>{
         
-        // console.log('this.userInfo ======>> ', this.userInfo);
         this.nodeList =  res.data
+
+        // get object depth
+        const objectDepth = (o) =>
+          Object (o) === o ? 1 + Math .max (-1, ... Object .values(o) .map (objectDepth)) : 0
+      
+        var depth = objectDepth(this.nodeList) - 3
+        console.log('level :>> ', depth);
+
+        // flat data
+        const needData = []
+        const firtData ={
+            "name": "提交人",
+            "auditByUsers": "提交人",
+        }
+        needData.push(firtData)
+
+        var {nextAuditNode} = this.nodeList
+        needData.push(nextAuditNode)
+
+        for (let index = 1; index < depth; index++) {
+          var {nextAuditNode} = nextAuditNode
+          needData.push(nextAuditNode)
+        }
+        
+        this.flatNodeData = needData  
+
+        
+        // var {nextAuditNode} = this.nodeList.nextAuditNode
         console.log('this.nodeList ======>> ', this.nodeList);
+        console.log('flatNodeData ======>> ', this.flatNodeData);
+
+
 
 
         this.isLoadingData = false
