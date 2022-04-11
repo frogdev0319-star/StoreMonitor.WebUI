@@ -409,6 +409,7 @@ export default {
       "resultType":"リザルトタイプ",
       "return":"{seconds}秒で自動的に戻ります！",
       "returnStoreMonitor":"自動的に{seconds}秒後に戻る",
+      "requiredValid": "尚有必填項目未完成",
       "score":"スコア",
       "scoreU":"単位：PCS",
       "scoreUnit":"スコア：",
@@ -595,6 +596,7 @@ export default {
       "enterScore":"スコアを入力してください",
       "enterSelfListName":"タイトルをエンプティーにすることはできません。",
       "evaluationType":"スコアリングへの参加",
+      "eventTimeoutReminder": "Event timeout unhandled reminder",
       "excelEmpty":"インスペクションカテゴリとアイテムネームをエンプティーにすることはできません",
       "excelFullScoreType":"合計スコア：必須、0ー50ポイント",
       "excelIllegalCategory":"カテゴリ名に不正な文字列が含まれています。確認してください！",
@@ -630,6 +632,7 @@ export default {
       "itemTitleEmpty":"インスペクションアイテムはエンプティーにできません",
       "itemsOfCate":"検査項",
       "loadingbindstore":"読み込み中…",
+      "moreThan": "more than",
       "needSignatrue":"オンサイト署名が必要",
       "no":"いいえ",
       "notallowA":"[パスー失敗]タブと[スコア アイテム]タブ。",
@@ -655,6 +658,7 @@ export default {
       "score":"スコア",
       "scores":"ポイント",
       "searchPlaceholder":"ストアを検索するキーワードを入力します",
+      "sendMsgRemind": "Send message reminder over time",
       "select":"ファイルを選択します",
       "selectImprtLoc":"インポートファイルの場所を選択します。",
       "selectItems":"デリートするアイテムを選択してください！",
@@ -716,7 +720,9 @@ export default {
       "needBind":"XXテーブル、バインドすべきストア",
       "selectStore":"セレクトしてください",
       "selectStoreTag":"クイックセレクト",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"Min score can not be empty！",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"アカウント",

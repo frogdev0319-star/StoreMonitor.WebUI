@@ -239,7 +239,31 @@
         </div>
       </setting-table>
     </el-col>
-
+    <el-col :span="24" class="el-rute-content">
+      <setting-table :table-name="$t('insSettingView.eventTimeoutReminder')">
+        <div slot="tableDetail" class="setting-config rule-item">
+          <div>
+            <div>
+              <el-checkbox class="storevue-checkbox-outlined" v-model="enableDelay">
+                <span>
+                  {{ $t('insSettingView.sendMsgRemind') }}
+                </span>
+              </el-checkbox>
+            </div>
+            <div class="flex-center">
+              <span style="white-space:nowrap;">{{ $t('insSettingView.moreThan') }}</span>
+              <el-input
+                style="margin: 0 20px"
+                v-model="delayDay"
+                type="number"
+                :disabled="!enableDelay"
+              />
+              <span>{{ $t('overview.day') }}</span>
+            </div>
+          </div>
+        </div>
+      </setting-table>
+    </el-col>
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionCheckin')">
         <div slot="tableDetail" class="setting-config rule-item">
@@ -266,6 +290,8 @@ export default {
   components: { ValidateInput, SettingTable, DelayButton },
   data() {
     return {
+      delayDay: 0,
+      enableDelay: false,
       hundredMarkType: '0',
       minScore: 0,
       maxScore: 100,
@@ -345,6 +371,11 @@ export default {
               'name': 'itemOptionsForType3',
               'value': this.otherBtnAttr,
               'extra': this.itemOptionsForType3[2]
+            },
+            {
+              'name': 'eventUnHandleNotify',
+              'value': this.enableDelay,
+              'extra': Number(this.delayDay)
             }
           ]
         };
@@ -370,6 +401,10 @@ export default {
         if (res.errCode === 0) {
           res.data.forEach(item => {
             switch (item.name) {
+              case 'eventUnHandleNotify':
+                self.enableDelay = item.value;
+                self.delayDay = item.extra;
+                break;
               case 'includedInTotalScoreWithType1':
                 self.includedInTotalScoreWithType1 = item.value;
                 break;

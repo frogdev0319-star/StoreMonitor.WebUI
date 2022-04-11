@@ -412,6 +412,7 @@ export default{
       "resultType":"总评类型",
       "return":"{seconds}秒后自动返回远程巡检页面！",
       "returnStoreMonitor":"{seconds}秒后自动返回门店监控页面！",
+      "requiredValid": "尚有必填项目未完成",
       "score":"得分",
       "scoreU":"单位：个",
       "scoreUnit":"评分：",
@@ -598,6 +599,7 @@ export default{
     "enterScore":"请输入分值",
     "enterSelfListName":"请输入自定义巡检表名称！",
     "evaluationType":"参与评分",
+    "eventTimeoutReminder": "事件超时未处理提醒",
     "excelEmpty":"巡检类别与巡检项名称不能为空",
     "excelFullScoreType":"项目总分值必填，取值范围为0~50",
     "excelIllegalCategory":"存在'@#￥%^&*'非法字符！",
@@ -633,6 +635,7 @@ export default{
     "itemTitleEmpty":"巡检项名称不能为空",
     "itemsOfCate":"类别巡检项",
     "loadingbindstore":"加载中",
+    "moreThan": "超过",
     "needSignatrue":"须进行现场签名",
     "no":"无",
     "notallowA":"合格率评估项和附加评分项",
@@ -658,6 +661,7 @@ export default{
     "score":" 项目分值",
     "scores":"分",
     "searchPlaceholder":"请输入关键词搜索门店",
+    "sendMsgRemind": "超时发送讯息提醒",
     "select":"选择文件",
     "selectImprtLoc":"请选择导入文件的位置",
     "selectItems":"请勾选要删除的巡检项类别或巡检项目！",
@@ -718,7 +722,9 @@ export default{
     "waveline":"按钮～",
     "yesNo":"是/否",
     "needBind":"表，需要绑定的门店",
-    "minScoreEmpty":"扣分起始值不得为空！"
+    "minScoreEmpty":"扣分起始值不得为空！",
+    "weight": "權重值%",
+    "weightSetting": "權重設定"
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",

@@ -1201,7 +1201,7 @@ export default {
       pdfSrc_avg3:"",
       pdfSrc_avg4:"",
       operationBtnClass:[
-        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhtw'},
+        {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
         {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
         {key:'id-ID',value:'operation-btns-id'},{key:'th-TH',value:'operation-btns-th'}
       ],
@@ -1236,7 +1236,6 @@ export default {
 
   methods: {
     getLangStyleValue(langArray){
-      console.log('******',util.getLangStyleValue(langArray));
       return util.getLangStyleValue(langArray);
     },
     maxLabel(val) {
@@ -2994,6 +2993,7 @@ export default {
 
     emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
+      console.log(searchParams)
       this.part2.standardScore=-9999;
       this.part3.standardScore=-9999;
       this.doGetAssessmentStandardScore();

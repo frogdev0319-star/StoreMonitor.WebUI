@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import DateTimePicker from './DateTimePicker';
 
 export default {
@@ -51,12 +52,29 @@ export default {
                       {value:30,label:this.$t('overview.last30Days')},{value:90,label:this.$t('overview.last90Days')},
                       {value:0,label:this.$t('overview.thisMonth')},{value:1,label:this.$t('overview.lastMonth')},
                       {value:2,label:this.$t('overview.thisQuarter')},{value:4,label:this.$t('overview.customDate')}],
-      dateRange:4,
+      dateRangevalue:-1,
       diablePick:false,
 
     }
   },
+  computed:{
+    ...mapGetters({ accountChanged: 'accountChanged' }),
+    dateRange:{
+      get(){return this.dateRangevalue;},
+      set(val){
+        //console.log("dateRange computed val:",val);
+        if(val!=-1)this.changeDateRange(val);}
+    }
+  },
+  watch:{
+    async accountChanged(val) {
+      if (val !== 0) {
+        this.dateRange = 4;
+      }
+    },
+  },
   mounted() {
+    this.dateRangevalue = 4;
     this.getDefaultTimeList();
   },
   created(){
@@ -64,9 +82,17 @@ export default {
       this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
     }
   },
+  activated(){
+      //console.log('dateRange activated');
+      this.dateRange = 4;
+  },
+  deactivated(){
+      //console.log('dateRange deactivated');
+      this.dateRange = -1;
+  },
   methods: {
     getDefaultTimeList() {
-      console.log("2.dateTimeValue:",this.dateTimeValue);
+      //console.log("2.dateTimeValue:",this.dateTimeValue);
       if(this.dateTimeValue.length==0){
         this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
       //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
@@ -77,7 +103,7 @@ export default {
       this.$emit('change', val);
     },
     changeDateRange(val){
-      this.dateRange = val;
+      this.dateRangevalue = val;
       if(val!=4){
         this.diablePick = true;
       }else{

@@ -408,6 +408,7 @@ export default{
       "resultType":"Tipe Hasil",
       "return":"Otomatis kembali dalam {seconds} detik",
       "returnStoreMonitor":"Otomatis kembali dalam {seconds} detik",
+      "requiredValid": "尚有必填項目未完成",
       "score":"Nilai",
       "scoreU":"Unit:  PCS",
       "scoreUnit":"Nilai: ",
@@ -594,6 +595,7 @@ export default{
       "enterScore":"Masukkan nilai",
       "enterSelfListName":"Masukkan Daftar Nama Kustom",
       "evaluationType":"Berpartisipasi dalam nilai",
+      "eventTimeoutReminder": "Event timeout unhandled reminder",
       "excelEmpty":"Kategori inspeksi dan nama item tidak boleh kosong",
       "excelFullScoreType":"Nilai total: Wajib diisi, 0~50 poin",
       "excelIllegalCategory":"Karakter ilegal '@#￥%^&*'!",
@@ -629,6 +631,7 @@ export default{
       "itemTitleEmpty":"Judul tidak boleh kosong.",
       "itemsOfCate":"Item Inspeksi dari ",
       "loadingbindstore":"memuat",
+      "moreThan": "more than",
       "needSignatrue":"Tanda tangan di lokasi diperlukan",
       "no":"Tidak",
       "notallowA":" Tab [Pass-Failed] & tab [Score Items]",
@@ -654,6 +657,7 @@ export default{
       "score":"Nilai",
       "scores":"Nilai",
       "searchPlaceholder":"Masukkan kata kunci untuk mencari toko",
+      "sendMsgRemind": "Send message reminder over time",
       "select":"Pilih File",
       "selectImprtLoc":"Pilih lokasi untuk file impor.",
       "selectItems":"Silakan pilih item untuk dihapus!",
@@ -715,7 +719,9 @@ export default{
       "needBind":"Tabel XX, toko yang perlu diikat",
       "selectStore":"Pilih Toko",
       "selectStoreTag":"Pilih cepat",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"Min score can not be empty！",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"Akun Layanan Streaming",

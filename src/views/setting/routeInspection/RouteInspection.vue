@@ -229,7 +229,7 @@
     </dialog-pop>
                 
     <dialog-pop
-      :title="'全重設定'"
+      :title="$t('insSettingView.weightSetting')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -241,9 +241,14 @@
     >
       <div class="dialog-slot">
         <div class="dialog-content">
-          <div v-for="item in weightOptions" :key="item.id">
-            <span>{{item.name}}</span>
+          <div class="flex-center margin-bottom-sm">
+            <div class="spacer">{{$t('insSettingView.inspectName')}}</div>
+            <div class="spacer">{{$t('insSettingView.weight')}}</div>
+          </div>
+          <div v-for="item in weightOptions" :key="item.id" class="flex-center margin-bottom-sm">
+            <span class="spacer">{{item.name}}</span>
             <el-input
+             class="spacer"
               type="number"
               v-model="item.weight"
             />

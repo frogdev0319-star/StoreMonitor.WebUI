@@ -6,7 +6,7 @@ import { getCookie } from './auth';
 
 export default {
   getLangStyleValue(langArray){
-    console.log("*****lang:",i18n.locale);
+    //console.log("*****lang:",i18n.locale);
     var lang_style = langArray.find( item => {return item.key==i18n.locale});
     return lang_style.value;
   },

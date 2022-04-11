@@ -408,6 +408,7 @@ export default{
       "resultType":"Result Type",
       "return":"Automatically return in {seconds}s",
       "returnStoreMonitor":"Automatically return in {seconds}s",
+      "requiredValid": "Please complete the required items first.",
       "score":"Score",
       "scoreU":"Unit:  PCS",
       "scoreUnit":"Score: ",
@@ -594,6 +595,7 @@ export default{
       "enterScore":"Please enter the score",
       "enterSelfListName":"Please Enter Custom List Name",
       "evaluationType":"Participating in scoring",
+      "eventTimeoutReminder": "Event timeout unhandled reminder",
       "excelEmpty":"The inspection category and item name can't empty",
       "excelFullScoreType":"Total Score: Required, 0~50points",
       "excelIllegalCategory":"llegal characters '@#￥%^&*'!",
@@ -629,6 +631,7 @@ export default{
       "itemTitleEmpty":"Title may not be empty.",
       "itemsOfCate":"Inspection items of ",
       "loadingbindstore":"loading",
+      "moreThan": "more than",
       "needSignatrue":"Onsite signature required",
       "no":"No",
       "notallowA":" [Pass-Failed] tab & [Score Items] tab",
@@ -654,6 +657,7 @@ export default{
       "score":"Score",
       "scores":"Score",
       "searchPlaceholder":"Enter keywords to search stores",
+      "sendMsgRemind": "Send message reminder over time",
       "select":"Select File",
       "selectImprtLoc":"Select a location for import files.",
       "selectItems":"Please select items to delete!",
@@ -715,7 +719,9 @@ export default{
       "needBind":"table, store that needs to be bound",
       "selectStore":"Select Store",
       "selectStoreTag":"Quick select",
-      "minScoreEmpty":"The total score can not be empty!"
+      "minScoreEmpty":"The total score can not be empty!",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"Streaming Service Account",

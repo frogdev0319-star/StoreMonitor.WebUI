@@ -408,6 +408,7 @@ export default{
       "resultType":"Loại kết quả",
       "return":"Tự đồi hoàn lại trong vòng {giây}",
       "returnStoreMonitor":"Tự đồi hoàn lại trong vòng {giây}",
+      "requiredValid": "尚有必填項目未完成",
       "score":"Điểm",
       "scoreU":"Đơn vị:  CHIẾC",
       "scoreUnit":"Điểm: ",
@@ -594,6 +595,7 @@ export default{
       "enterScore":"Vui lòng nhập điểm",
       "enterSelfListName":"Vui lòng nhập tên danh mục tùy chỉnh",
       "evaluationType":"Đang chấm điểm",
+      "eventTimeoutReminder": "Event timeout unhandled reminder",
       "excelEmpty":"Không được để trống tên danh mục và danh mục kiểm tra",
       "excelFullScoreType":"Tổng số điểm: Bắt buộc, 0~50 điểm",
       "excelIllegalCategory":"Ký tự không hợp lệ '@#￥%^&*'!",
@@ -629,6 +631,7 @@ export default{
       "itemTitleEmpty":"Không được để trống tiêu đề.",
       "itemsOfCate":"Các mục kiểm tra của ",
       "loadingbindstore":"đang tải",
+      "moreThan": "more than",
       "needSignatrue":"Phải có chữ ký tại chỗ",
       "no":"Không",
       "notallowA":" Thẻ [Đạt - Thất bại] & thẻ [Các mục điểm]",
@@ -654,6 +657,7 @@ export default{
       "score":"Điểm",
       "scores":"Điểm",
       "searchPlaceholder":"Nhập từ khóa để tìm các gian hàng",
+      "sendMsgRemind": "Send message reminder over time",
       "select":"Chọn tập tin",
       "selectImprtLoc":"Chọn một vị trí để nhập tập tin.",
       "selectItems":"Vui lòng chọn các mục để xóa!",
@@ -715,7 +719,9 @@ export default{
       "needBind":"Bảng biểu XX, cửa hàng cần được liên kết",
       "selectStore":"Chọn cửa hàng",
       "selectStoreTag":"Chọn nhanh",
-      "minScoreEmpty":"Min score can not be empty！"
+      "minScoreEmpty":"Min score can not be empty！",
+      "weight": "weight%",
+      "weightSetting": "Weight Setting"
   },
   "deviceView":{
       "EzvizAccount":"Tài khoản dịch vụ Streaming",

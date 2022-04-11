@@ -299,6 +299,7 @@
               <tbody :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
+                    <span style="color: #c60957;">{{ categoryItem.weight }}</span>
                     <span>{{ categoryItem.groupName }}</span>
                   </td>
                 </tr>
@@ -819,7 +820,6 @@ export default {
 
     async getReportInfo(res) {
       if (res.errCode === 0 && res.data.length > 0) {
-        console.log(res)
         const data = res.data[0].info;  
         this.totalScore = data.totalScore;
         this.standard = data.standard;
