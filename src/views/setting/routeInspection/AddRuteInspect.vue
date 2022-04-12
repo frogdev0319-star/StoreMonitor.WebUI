@@ -89,7 +89,7 @@
                         <div class="group-left">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
                           <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex-center">
-                            <div style="margin-left: 20px">{{ item.name }}（{{ item.groupNum }}）</div>
+                            <div style="color: #c60957; width: 40px; text-align: center">{{ item.weight }}%</div> <div>{{ item.name }}（{{ item.groupNum }}）</div>
                           </div>
                         </div>
                         <div class="group-right">

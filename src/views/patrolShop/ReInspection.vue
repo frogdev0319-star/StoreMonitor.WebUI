@@ -582,7 +582,7 @@
                         class="spacer font-15"
                         style="text-align: left; font-weight: 500"
                         @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
-                        
+                        <span style="color: #c60957" v-if="item.required">*</span>
                         {{ item.subject }}
                       </div>
                       <div v-if="item.itemType === 0">
