@@ -533,6 +533,9 @@ export default {
         this.storeDataList = temp;
         console.log("*this.storeDataList:",this.storeDataList);
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
+        if(this.curStore.length != this.filterStoreIds.length){
+          this.curStore = this.filterStoreIds;
+        }
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
         if(this.emitChanged){
           console.log('*****emitStoreChange');
@@ -570,6 +573,9 @@ export default {
         this.storeDataList = temp;
         console.log("*this.storeDataList:",this.storeDataList);
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
+        if(this.curStore.length != this.filterStoreIds.length){
+          this.curStore = this.filterStoreIds;
+        }
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
         if(this.emitChanged){
           console.log('*****emitStoreChange');
