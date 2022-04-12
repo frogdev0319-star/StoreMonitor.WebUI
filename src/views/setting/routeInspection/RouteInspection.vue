@@ -2336,34 +2336,48 @@ export default {
 
     getExcelDataOfSheet(sheetDataArr, type) {
       const tableHeader = this.getExcelTableHeader(type);
+      // console.log(tableHeader)
       const sheetData = [];
       if (sheetDataArr) {
         const treeData = util.handleInspctionCatergyTree(sheetDataArr);
         treeData.forEach(item => {
           if (!item.children) {
+            // console.log(1)
             if (item.itemData.length !== 0) {
+              // console.log(3)
               item.itemData.forEach((_item, _index) => {
                 const obj = {};
                 if (_index === 0) {
                   obj[tableHeader[0]] = item.groupName;
+                  if (type !== 2) {
+                    obj[tableHeader[1]] = item.groupWeight;
+                  }
                 } else {
                   obj[tableHeader[0]] = '';
+                  obj[tableHeader[1]] = '';
                 }
                 if (type === 0 || type === 2) {
-                  obj[tableHeader[1]] = '';
-                  obj[tableHeader[2]] = _item.name;
-                  obj[tableHeader[3]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
-                  obj[tableHeader[4]] = _item.description === '---' ? '' : _item.description;
-                } else {
-                  obj[tableHeader[1]] = '';
-                  obj[tableHeader[2]] = _item.name;
-                  obj[tableHeader[3]] = _item.type === 0 ? _item.availableScores : 0;
-                  obj[tableHeader[4]] = _item.type === 0 ? _item.qualifiedScore : 0;
+                  obj[tableHeader[2]] = '';
+                  obj[tableHeader[3]] = _item.name;
+                  obj[tableHeader[4]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
                   obj[tableHeader[5]] = _item.description === '---' ? '' : _item.description;
+                } else {
+                  obj[tableHeader[2]] = '';
+                  obj[tableHeader[3]] = _item.name;
+                  obj[tableHeader[4]] = _item.type === 0 ? _item.availableScores : 0;
+                  obj[tableHeader[5]] = _item.type === 0 ? _item.qualifiedScore : 0;
+                  obj[tableHeader[6]] = _item.description === '---' ? '' : _item.description;
+                }
+                if (type === 0) {
+                  obj[tableHeader[6]] = _item.required ? 'Y' : '';
+                }
+                if (type === 1) {
+                  obj[tableHeader[7]] = _item.required ? 'Y' : '';
                 }
                 sheetData.push(obj);
               });
             } else {
+              console.log(4)
               const obj = {};
               obj[tableHeader[0]] = item.groupName;
               obj[tableHeader[1]] = '';
@@ -2376,8 +2390,10 @@ export default {
               sheetData.push(obj);
             }
           } else {
+            // console.log(2)
             item.children.forEach((child, childIndex) => {
               if (child.itemData.length > 0) {
+                console.log(5)
                 child.itemData.forEach((childItem, childItemIndex) => {
                   const obj = {};
                   if (childIndex === 0 && childItemIndex === 0) {
@@ -2403,6 +2419,7 @@ export default {
                   sheetData.push(obj);
                 });
               } else {
+                // console.log(6)
                 const obj = {};
                 if (childIndex === 0) {
                   obj[tableHeader[0]] = item.groupName;
@@ -2426,25 +2443,37 @@ export default {
         tableHeader.map(item => obj[item] = undefined);
         sheetData.push(obj);
       }
+      // console.log(sheetData)
       return sheetData;
     },
 
     getExcelTableHeader(type) {
       const sheet1TableHeader = [
-        this.$t('insSettingView.tHeaderA'), this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.tHeaderE'),
-        this.$t('insSettingView.tHeaderD')
+        this.$t('insSettingView.tHeaderA'), 
+        this.$t('insSettingView.tHeaderI'),
+        this.$t('insSettingView.subCategoryHeader'),
+        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.tHeaderE'),
+        this.$t('insSettingView.tHeaderD'),
+        this.$t('insSettingView.tHeaderH')
       ];
 
       const sheet2TableHeader = [
-        this.$t('insSettingView.tHeaderA2'), this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.tHeaderG'),
-        this.$t('insSettingView.tHeaderF'), this.$t('insSettingView.tHeaderD')
+        this.$t('insSettingView.tHeaderA2'), 
+        this.$t('insSettingView.tHeaderI'),
+        this.$t('insSettingView.subCategoryHeader'),
+        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.tHeaderG'),
+        this.$t('insSettingView.tHeaderF'), 
+        this.$t('insSettingView.tHeaderD'),
+        this.$t('insSettingView.tHeaderH')
       ];
 
       const sheet3TableHeader = [
-        this.$t('insSettingView.tHeaderA'), this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.sheetscore2'),
+        this.$t('insSettingView.tHeaderA'), 
+        this.$t('insSettingView.subCategoryHeader'),
+        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.sheetscore2'),
         this.$t('insSettingView.tHeaderD')
       ];
       let tableHeader = [];

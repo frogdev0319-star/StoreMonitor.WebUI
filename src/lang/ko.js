@@ -699,6 +699,7 @@ export default {
       "tHeaderF":"비정상적인 이벤트 - 점수 임계값(옵션,채점 옵션의 최고 점수 이하)",
       "tHeaderG":"점수 옵션(필수,-50~50 포인트)",
       "tHeaderH":"Required",
+      "tHeaderI":"Weight",
       "tab1CalculateScore":"다른 식별표와 조합할 때 식별표 1 (통과& 실패) 프로젝트 점수은 총 점수 산출평가에 참여한다.",
       "tab1FailedDangeous":" 식별표1 (통과&실패)에 불합격 항목이 있을 때 검사 결과가 위험이다",
       "tab1IgnoredQualified":"1 (통과&실패)에 무시한 항목 점수를 산출하기",
