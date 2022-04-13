@@ -1,9 +1,9 @@
 <template>
-    <div class="content">
+    <div class="content" :style="{'width':getLangStyleValue(contentWidth)}">
         <div class="rang-pick">
             <img :src="DatePickIconSrc"/>
-            <div class="range-div">{{$t('statistics.dateChoose')}}</div>
-            <el-select class="dropdown-select" v-model="dateRange" value-key="value" @change="changeDateRange">
+            <div class="range-div" :style="{'width':getLangStyleValue(rangeWidth)}">{{$t('statistics.dateChoose')}}</div>
+            <el-select class="dropdown-select" :style="{'width':getLangStyleValue(dropdownWidth)}" v-model="dateRange" value-key="value" @change="changeDateRange">
                 <el-option 
                   v-for="item in dateRangeItems"
                   :key="item.value"
@@ -21,21 +21,35 @@
 <script>
 import moment from 'moment';
 import { mapGetters } from 'vuex';
+import util from '@/common/util.js';
 export default {
     name: 'AreaDateTimeSelected',
     data() {
         return {
+            lang:this.$i18n.locale,
             DatePickIconSrc: require('../../static/img/statistics/ic_edit.svg'),
             CalenderIconSrc: require('../../static/img/statistics/ic_calender.svg'),
             dateRange:'week',
             dateRangeItems:[{value:'week',label:this.$t('statistics.weekCompare')},{value:'month',label:this.$t('statistics.monthCompare')}],
             date:Date.now(),
             dateFormat:this.$moment(Date.now()).startOf('week').format("YYYY/MM/DD"),
+            contentWidth:[{key:'en',value:'307px'},{key:'zh',value:'307px'},{key:'zhtw',value:'307px'},
+        {key:'ja-JP',value:'347px'},{key:'ko-KR',value:'347px'},{key:'vi-VN',value:'347px'},
+        {key:'id-ID',value:'430px'},{key:'th-TH',value:'407px'}],
+            rangeWidth:[{key:'en',value:'52px'},{key:'zh',value:'52px'},{key:'zhtw',value:'52px'},
+        {key:'ja-JP',value:'80px'},{key:'ko-KR',value:'80px'},{key:'vi-VN',value:'80px'},
+        {key:'id-ID',value:'82px'},{key:'th-TH',value:'80px'}],
+            dropdownWidth:[{key:'en',value:'105px'},{key:'zh',value:'105px'},{key:'zhtw',value:'105px'},
+        {key:'ja-JP',value:'125px'},{key:'ko-KR',value:'125px'},{key:'vi-VN',value:'145px'},
+        {key:'id-ID',value:'205px'},{key:'th-TH',value:'185px'}]
         }
   },
   computed: {
   },
   methods: {
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     changeDateRange(val) {
                 this.dateRange = val;
                 this.getDateRange();
@@ -79,7 +93,7 @@ export default {
 </style>
 <style lang="scss" scoped>
 .content{
-    width:307px;
+    width:307px; //347
     height:35px;
     display:flex;
     flex-direction:row;
@@ -95,8 +109,8 @@ export default {
             align-self: center;
         }
         .range-div{
-            width: 52px;
-            margin: 2px 0 4px 4px;
+            width: 52px;//80
+            margin: 2px 0 2px 4px;
             font-family: NotoSansCJKtc;
             font-size: 13px;
             text-align: left;
@@ -104,8 +118,8 @@ export default {
             align-self: center;
         }
         .dropdown-select{
-            width:105px;
-            height:36px;
+            width:105px;//125
+            height:35px;
             border:none;
             color: #2b2b2b;
             align-self: center;

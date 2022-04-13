@@ -2,7 +2,7 @@
     <div class="content">
         <div class="type-pick">
             <div class="type-div">{{$t('statistics.areaType')}}</div>
-            <el-select class="dropdown-select" v-model="compareType" value-key="value"  @change="changeCompareType">
+            <el-select class="dropdown-select" :style="{'width':getLangStyleValue(dropdownWidth)}" v-model="compareType" value-key="value"  @change="changeCompareType">
                 <el-option 
                   v-for="item in compareTypeItems"
                   :key="item.value"
@@ -145,6 +145,10 @@ export default {
             origianlUserList: [],
             positionIds: [],
             positionsList: [],
+            lang:this.$i18n.locale,
+            dropdownWidth:[{key:'en',value:'calc(105/1440*100vw)'},{key:'zh',value:'calc(105/1440*100vw)'},{key:'zhtw',value:'calc(105/1440*100vw)'},
+        {key:'ja-JP',value:'calc(130/1440*100vw)'},{key:'ko-KR',value:'calc(105/1440*100vw)'},{key:'vi-VN',value:'calc(105/1440*100vw)'},
+        {key:'id-ID',value:'calc(105/1440*100vw)'},{key:'th-TH',value:'calc(110/1440*100vw)'}]
         }
   },
   async created() {
@@ -305,6 +309,9 @@ export default {
     }
   },
   methods: {
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     async getStoreListAndGroupAndType() {
       console.log("getStoreListAndGroupAndType")
       const self = this;  
