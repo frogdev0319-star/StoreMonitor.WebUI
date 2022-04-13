@@ -1095,12 +1095,14 @@ export default {
       });
     },
     
-       getInspectStatsItemOverGroup(params) {
+    getInspectStatsItemOverGroup(params) {
       return new Promise((resolve, reject) => {
         getInspectStatsItemOverGroup(params).then(res => {
+          console.log("*getInspectStatsItemOverGroup res:",res);
           resolve(res);
         })
           .catch(err => {
+            console.log("*getInspectStatsItemOverGroup err:",err);
             reject(err);
           });
       });
@@ -1225,7 +1227,7 @@ export default {
     },
     emitTypeChangedPart3({compareType,compareArr,selectedLabels,originArray,selStoreIdArr}){ //劃分類型選擇
       console.log("Part3 Emit Type Change="+compareType)
-      console.log(compareArr)
+      console.log("compareArr:",compareArr)
       this.part3.compareType = compareType;
       this.part3.compareIds = compareArr;
       this.part3.comapareLabels = selectedLabels;
@@ -1566,39 +1568,39 @@ export default {
       params.endTs = self.params.endTs;
       params.regionMode = 3;
       params.groupMode = 0;
-      if(this.inspectItem){
-        params.itemIds = [this.inspectItem.id]
+      if(self.inspectItem){
+        params.itemIds = [self.inspectItem.id]
       }
       params.storeIds = self.params.storeIds;
       params.inspectTagId = self.params.inspectId;
-      if(this.part1.compareType=='stores'){
-         params.storeIds  = this.part1.compareIds;
+      if(self.part1.compareType=='stores'){
+         params.storeIds  = self.part1.compareIds;
          params.groupMode = 0;
       }
-      else if(this.part1.compareType=='area1'){
-         params.groupIds  = this.part1.compareIds;
+      else if(self.part1.compareType=='area1'){
+         params.groupIds  = self.part1.compareIds;
          params.groupMode = 1;
       }
-      else if(this.part1.compareType=='area2'){
-         params.groupIds  = this.part1.compareIds;
+      else if(self.part1.compareType=='area2'){
+         params.groupIds  = self.part1.compareIds;
          params.groupMode = 2;
       }
-      else if(this.part1.compareType=='storeType'){
-         params.groupIds  = this.part1.compareIds;
+      else if(self.part1.compareType=='storeType'){
+         params.groupIds  = self.part1.compareIds;
          params.groupMode = 3;
       }
-      else if(this.part1.compareType=='storeGroup'){
-         params.groupIds  = this.part1.compareIds;
+      else if(self.part1.compareType=='storeGroup'){
+         params.groupIds  = self.part1.compareIds;
          params.groupMode = 4;
       }
-     else if(this.part1.compareType=='users'){
-         params.submitters  = this.part1.compareIds;
-         params.groupIds  = this.part1.compareIds;
+     else if(self.part1.compareType=='users'){
+         params.submitters  = self.part1.compareIds;
+         params.groupIds  = self.part1.compareIds;
          params.groupMode = 5;
       }
-      else if(this.part1.compareType=='position'){
+      else if(self.part1.compareType=='position'){
         let users = [];
-         this.part1.originArray.forEach(function(item){
+         self.part1.originArray.forEach(function(item){
            if(self.part1.compareIds.indexOf(item.value)>=0)
             users =  users.concat(item.contents);
          })
@@ -1613,12 +1615,12 @@ export default {
           const result = storeResult.data;
           console.log(result)
           if (result) {
-            this.part1.content = this.filterContent(result.content, 
-            this.part1.compareType,
-            this.part1.compareIds,
-            this.part1.comapareLabels,
-            this.part1.originArray);
-            this.part1.indexRegion = -1;
+            self.part1.content = self.filterContent(result.content, 
+            self.part1.compareType,
+            self.part1.compareIds,
+            self.part1.comapareLabels,
+            self.part1.originArray);
+            self.part1.indexRegion = -1;
             result.content.forEach(item => {
               totalDargerous += item.numOfDangerous;
               totalImproved += item.numOfImproved;
@@ -1651,9 +1653,9 @@ export default {
       const pieOption = self.getRegionPieOption();
       pieOption.series[0].data = seriesData;
       self.regionsOptions = pieOption;
-      this.part1.pieOption  = pieOption
+      self.part1.pieOption  = pieOption
       self.regionsPerArray = jsonArray;
-      this.drawPart1RegionBar();
+      self.drawPart1RegionBar();
     },
     async drawPart1RegionBar(){
       console.log("Region Line")
@@ -2176,7 +2178,8 @@ export default {
               page:(this.part3.storeMode==1) ? 0:this.part3.table.page-1,
               size:(this.part3.storeMode==1) ?params.storeIds.length: this.part3.table.sizeNum
             }
-            if(params.itemIds.length==0 || params.storeIds.length ==0)return
+            console.log("***params:",params)
+            if(params.itemIds.length==0 || typeof params.storeIds == 'undefined' || params.storeIds.length ==0)return
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             console.log(storeResult)
             if (storeResult.errCode === 0) {
@@ -2344,6 +2347,7 @@ export default {
     async emitSearch({ searchParams, dateRangeList, regionI, regionII, regionMode, storePatrolLists, timeMode }) {
       console.log("Emit Search");
       console.log(searchParams)
+      this.params = searchParams;
      // this.part2.standardScore=-1;
      // this.part2.standardScore=-1;
      // this.doGetAssessmentStandardScore();
