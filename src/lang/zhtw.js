@@ -713,7 +713,7 @@ export default{
     "toEdit":"進行編輯，再點擊",
     "total":"表共有",
     "totalScorRange":"考評總分範圍設置",
-    "totalScore":"加分製",
+    "totalScore":"加分制",
     "totalScoreDes":"考評總分= SUM(每項巡檢得分)",
     "totalScoreLimitation":"項目總分值須等於評分選項最高分值",
     "updateCategory":"編輯巡檢類別",
