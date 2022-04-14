@@ -613,7 +613,7 @@
                               @click.native="checkScore({item,itemDS: itemDS,e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                        <div class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
+                        <div v-if="!item.required" class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
                       </div>
                     </div>
                   </div>
