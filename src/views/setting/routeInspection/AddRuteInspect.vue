@@ -1223,8 +1223,7 @@ export default {
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
-          //self.ItemSheetScore = itemScore = 10;
-          self.OtherScoreTipEmpty = true;
+          // self.OtherScoreTipEmpty = true;
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
