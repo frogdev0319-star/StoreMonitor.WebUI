@@ -210,8 +210,8 @@
               <span class="item_label">必填</span>
             </div>
             <el-radio-group class="attribute-group" v-model="itemRequired">
-              <el-radio label="1">必填</el-radio>
               <el-radio label="0">非必填</el-radio>
+              <el-radio label="1">必填</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item>
@@ -1117,6 +1117,7 @@ export default {
     addNape() {
       const self = this;
       self.showAddNape = true;
+      this.itemRequired = '0';
       self.updateType = {type:0};
       self.setDialogContent();
       self.ItemSheetScore = self.activeSheetName === '0' ? '' : 0;
