@@ -95,7 +95,7 @@
                 :show-table-header="false"
                 @handleDeleteItem="contentItem => handleDelete(contentItem, index, -1)"
                 @handleCheckItem="tableData => handleCheckCategoryItem(tableData, index)"
-                @updateTableData = "sortableTableData => changeTableData(sortableTableData, index)"
+                @updateTableData="sortableTableData => changeTableData(sortableTableData, index)"
               />
             </div>
           </template>
@@ -114,7 +114,7 @@
                   :show-table-header="false"
                   @handleDeleteItem="contentItem => handleDelete(contentItem, index, childIndex)"
                   @handleCheckItem="(tableData) => handleCheckSubcategoryItem(tableData, index, childIndex)"
-                  @updateTableData = "sortableTableData => changeTableData(sortableTableData,index, childIndex)"
+                  @updateTableData="sortableTableData => changeTableData(sortableTableData,index, childIndex)"
                 />
               </div>
             </template>
