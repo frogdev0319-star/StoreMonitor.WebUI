@@ -1874,8 +1874,10 @@ export default {
         return passFailFlagObj;
       }
       let count = 0;
+      let allWeightEmpty = true;
       passFailArr.forEach((item, index) => {
         if (item.weight) count += item.weight;
+        if (item.weight !== undefined) allWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length > 0) {
           passFailFlagObj.indexArrPassFail.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -1905,7 +1907,7 @@ export default {
           }
         }
       });
-      if (count !== 100) passFailFlagObj.flags.flagGroupWeightTotal = true;
+      if (count !== 100 && !allWeightEmpty) passFailFlagObj.flags.flagGroupWeightTotal = true;
       return passFailFlagObj;
     },
 
@@ -1934,8 +1936,10 @@ export default {
         return scoreFlagObj;
       }
       let count = 0;
+      let allWeightEmpty = true;
       scoreArr.forEach((item, index) => {
         if (item.weight) count += item.weight;
+        if (item.weight !== undefined) allWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -2040,7 +2044,7 @@ export default {
           }
         }
       });
-      if (count !== 100) scoreFlagObj.flags.flagGroupWeightTotal = true;
+      if (count !== 100 && !allWeightEmpty) scoreFlagObj.flags.flagGroupWeightTotal = true;
       return scoreFlagObj;
     },
 
@@ -2165,10 +2169,10 @@ export default {
           warningInfo.push(flag);
         }
         if (passFailFlag.flagGroupWeightTotal) {
-          warningInfo.push('[PassFail]' + ' ' + '權重總和不能小於100');
+          warningInfo.push('[PassFail]' + ' ' + '權重總合不能小於100');
         }
         if (scoreFlag.flagGroupWeightTotal) {
-          warningInfo.push('[Score]' + ' ' + '權重總和不能小於100');
+          warningInfo.push('[Score]' + ' ' + '權重總合不能小於100');
         }
         if (passFailFlag.flagPassFailScoreType) {
           warningInfo.push('[PassFail]' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));
