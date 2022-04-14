@@ -84,7 +84,7 @@
                     size="mini"
                     @click="setWeighting">
                     <img :src="WeightingSetting" style="width:24px;height:24px;"/>
-                    <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ '權重設定' }}</div>
+                    <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ $t('insSettingView.weightSetting') }}</div>
                   </div>
                   <div style="display:flex; flex-direction:row;font-size: 13px;align-items:center" @click="setItem(_item.routeData, _item.name, '', _item.name)">
                     <!--<i class="iconfont icon-quxiaolianjie"/>-->
@@ -628,7 +628,7 @@ export default {
           _obj.id = _item.id;
           _obj.groupName = _item.name;
           _obj.groupWeight = _item.weight;
-          self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight })
+          if (_item.parentId === -1) self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight })
           _obj.itemCount = _item.items.length;
           _obj.type = _item.type;
           _obj.checked = false;
