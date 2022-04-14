@@ -2169,10 +2169,10 @@ export default {
           warningInfo.push(flag);
         }
         if (passFailFlag.flagGroupWeightTotal) {
-          warningInfo.push('[PassFail]' + ' ' + '權重總合不能小於100');
+          warningInfo.push('[PassFail]' + ' ' + this.$t('insSettingView.weightTotalError'));
         }
         if (scoreFlag.flagGroupWeightTotal) {
-          warningInfo.push('[Score]' + ' ' + '權重總合不能小於100');
+          warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.weightTotalError'));
         }
         if (passFailFlag.flagPassFailScoreType) {
           warningInfo.push('[PassFail]' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));

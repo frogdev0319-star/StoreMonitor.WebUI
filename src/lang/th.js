@@ -722,7 +722,8 @@ export default{
       "selectStoreTag":"เลือกด่วน",
       "minScoreEmpty":"Min score can not be empty！",
       "weight": "weight%",
-      "weightSetting": "Weight Setting"
+      "weightSetting": "Weight Setting",
+      "weightTotalError": "Weight cannot be greater or less than 100%",
   },
   "deviceView":{
       "EzvizAccount":"บัญชีบริการสตรีมมิ่ง",

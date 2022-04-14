@@ -722,7 +722,8 @@ export default{
       "selectStoreTag":"Quick select",
       "minScoreEmpty":"The total score can not be empty!",
       "weight": "weight%",
-      "weightSetting": "Weight Setting"
+      "weightSetting": "Weight Setting",
+      "weightTotalError": "Weight cannot be greater or less than 100%",
   },
   "deviceView":{
       "EzvizAccount":"Streaming Service Account",

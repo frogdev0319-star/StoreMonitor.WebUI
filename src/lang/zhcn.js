@@ -722,7 +722,8 @@ export default{
     "needBind":"表，需要绑定的门店",
     "minScoreEmpty":"扣分起始值不得为空！",
     "weight": "權重值%",
-    "weightSetting": "權重設定"
+    "weightSetting": "權重設定",
+    "weightTotalError": "权重不可大于或小于100%",
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",
