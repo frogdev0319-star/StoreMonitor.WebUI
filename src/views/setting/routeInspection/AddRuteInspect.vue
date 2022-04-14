@@ -85,13 +85,14 @@
                       class="groupItem" @click="clickCategory(index,item)"
                       @mouseenter="onShowCategoryEditBtn(index,item)">
                     <div class="category-list">
-                      <div class="category-name">
+                      <div class="category-name flex-center">
                         <div class="group-left">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
                           <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex-center">
                             <div :style="activeSheetName != 2 ? {}: {'visibility': 'hidden'}" style="color: #c60957; width: 40px; text-align: center">{{ item.weight }}%</div> <div>{{ item.name }}（{{ item.groupNum }}）</div>
                           </div>
                         </div>
+                        <div class="spacer"></div>
                         <div class="group-right">
                           <div class="show-edit">
                             <div class="nape-items-handle" v-if="hoverId === item.id">
