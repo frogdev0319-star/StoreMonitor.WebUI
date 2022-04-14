@@ -332,7 +332,7 @@
       <div class="padding">
         <validate-input
           :placeholder="$t('insSettingView.enterName')"
-          :input-limit-length="30"
+          :input-limit-length="50"
           :out-limit-prompt-msg="$t('insSettingView.enterNameRuletip')"
           :empty-prompt-msg="$t('insSettingView.enterName')"
           :input-name="groupNameInput"
