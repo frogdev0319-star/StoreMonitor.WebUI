@@ -22,6 +22,7 @@
         </delay-button>
       </div>
       <div class="tablelist">
+        
         <table-only
           ref="elTP"
           class="table-white"
@@ -344,7 +345,7 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass" >
   .workflow-header
     width: 100%
     // height: 150px
@@ -357,12 +358,6 @@ export default {
   .el-table
     border: none !important
 
-  .icon-copy, .icon-setting, .icon-delete
-    cursor: pointer
-    transition: all .2s
-    &:hover
-      transform: scale(1.1)
 
-
-
+  
 </style>

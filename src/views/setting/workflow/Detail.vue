@@ -28,7 +28,6 @@
                   <el-input
                     :placeholder="infoForm.name"
                     v-model="infoForm.name"
-                    
                     />
                 </div>
 
@@ -81,7 +80,7 @@
 
           <setting-table table-name="流程配置">
             <template slot="tableDetail" style="padding: 30px">
-                <div class="tablelist">
+                <div class="tablelist flow-setting">
                   <table-only
                     ref="elTP"
                     class="table-white"
@@ -97,62 +96,11 @@
                     :tableHeight = "760"
                     :cellStyle="{backgroundColor: '#fff !important'}"
                     :indexType="indexType"
+                    @handleMove="handleEmitMove"
+                    @handleOperation="handleEmitOperation"
                   />
                 </div>
             </template>
-
-            <!-- <template slot="tableDetail" style="padding: 30px">
-              <el-table
-                :data="flatNodeData"
-                style="width: 100%">
-                <el-table-column
-                  prop="id"
-                  label="節點序號"
-                  width="100"/>
-                <el-table-column
-                  prop="name"
-                  label="節點名稱"
-                  width="230"/>
-                <el-table-column
-                  prop="auditByUsers"
-                  label="審批人"
-                  width="180"/>
-
-                <el-table-column
-                  label="審批方式">
-                  <template slot-scope="{row}">
-                    <div class="title-status">
-                      <el-radio-group class="storevue-radio" >
-                        <el-radio :label="true">會簽</el-radio>
-                        <el-radio :label="false">或簽</el-radio>
-                      </el-radio-group>
-                    </div>
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  label="是否需要簽名">
-                  <template slot-scope="{row}">
-                    <div class="title-status">
-                      <el-radio-group class="storevue-radio" >
-                        <el-radio :label="false">需要</el-radio>
-                        <el-radio :label="false">不需要</el-radio>
-                      </el-radio-group>
-                    </div>
-                  </template>
-                </el-table-column>
-                <el-table-column
-                  label="操作">
-                  <template slot-scope="scope">
-                    <div class="for_row">
-                      <div class="go_up">上移</div>
-                      <div class="go_down">下移</div>
-                      <img :src="penSrc" class="iconfont icon-gengduo">
-                      <img :src="deleteSrc" class="iconfont icon-gengduo">
-                    </div>
-                  </template>
-                </el-table-column>
-              </el-table>
-            </template> -->
           </setting-table>
 
           <!-- row -->
@@ -174,9 +122,6 @@
               </el-select> -->
             </div>
           </div>
-
-
-
         </div>
       </div>
     </div>
@@ -188,13 +133,14 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {getNodeList } from "@/api/workflow";
+import {getUserTitleList } from "@/api/title";
+import { getUserInfo } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
 import util from "@/common/util";
 export default {
   name: 'WorkflowDetail',
   components: {
     TableOnly,
-    
     DelayButton,
     SettingTable,
     
@@ -211,16 +157,25 @@ export default {
       infoForm: {},
       nodeList:{},
       flatNodeData:[],
+      userInfo:[],
+      titleList:[],
       columnOperationData: {
         label: this.$t('deviceView.operation'),
+        move: true,
         minWidth: '134',
         align: 'center',
-        operation: [
+        move: [
           {
-            lable: '',
-            icon: 'icon-copy',
-            methods: 'copy'
+            text: '上移',
+            methods: 'moveUp'
           },
+          {
+            text: '下移',
+            methods: 'moveDown'
+          },
+
+        ],
+        operation: [
           {
             lable: '',
             icon: 'icon-setting',
@@ -245,18 +200,21 @@ export default {
           'label': '審批人',
           'width': 110,
           'maxWidth': 110,
+          'auditByUsers': true,
         },
         {
           'prop': 'auditMethod',
           'label': '審批方式',
-          'width': 130,
-          'maxWidth': 130,
+          'width': 100,
+          'maxWidth': 100,
+          'auditMethod': true,
         },
         {
           'prop': 'signature',
           'label': '是否需要簽名',
-          'width': 130,
-          'maxWidth': 130
+          'width': 100,
+          'maxWidth': 100,
+          'signature': true,
         },
         
       ],
@@ -266,9 +224,10 @@ export default {
 
     };
   },
-  created() {
-    this.getWorkflowInfo()
-    this.getNodeList(this.infoForm.processDefinitionKey)
+  async created() {
+    
+    await this.init()
+
   },
   mounted() {
     // this.dataFromRoute = { ...this.$route.params.data }
@@ -288,55 +247,57 @@ export default {
     // })
   },
   methods: {
+
+    async init(){
+      await this.getWorkflowInfo() //1 
+      await this.getTitle() //3
+      await this.getNodeList(this.infoForm.processDefinitionKey) //4
+      await this.getUserInfo() //2
+    
+      await this.handleData() //5
+    },
+
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
       this.infoForm.type = "巡檢表單"
-      
-      console.log('this.infoForm  ===>> ', this.infoForm );
-      
+      console.log('this.infoForm 1 ===>> ', this.infoForm );
     },
-
+    
+    // get user
+    async getUserInfo(){
+      await getUserInfo().then(res=>{
+        this.userInfo = res.data
+        console.log('this.UserInfo 2 ===>> ', this.userInfo);
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+    // get title
+    getTitle(){
+      getUserTitleList().then(res=>{
+        this.titleList =  res.data
+        console.log('this.titleList 3 ===>> ', this.titleList);
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
 
     getNodeList(id){
       this.isLoadingData = true
       getNodeList(id).then(res=>{
-        
         this.nodeList =  res.data
-
-        // get object depth
-        const objectDepth = (o) =>
-          Object (o) === o ? 1 + Math .max (-1, ... Object .values(o) .map (objectDepth)) : 0
-      
-        var depth = objectDepth(this.nodeList) - 3
-        console.log('level :>> ', depth);
-
+  
         // flat data
-        const needData = []
+        this.flattenData(this.nodeList)
+        console.log('this.flatNodeData 4 ===>> ', this.flatNodeData);
         const firtData ={
             "name": "提交人",
-            "auditByUsers": "提交人",
+            "auditByUsers": ['提交人']
         }
-        needData.push(firtData)
-
-        var {nextAuditNode} = this.nodeList
-        needData.push(nextAuditNode)
-
-        for (let index = 1; index < depth; index++) {
-          var {nextAuditNode} = nextAuditNode
-          needData.push(nextAuditNode)
-        }
-        
-        this.flatNodeData = needData  
-
-        
-        // var {nextAuditNode} = this.nodeList.nextAuditNode
-        console.log('this.nodeList ======>> ', this.nodeList);
-        console.log('flatNodeData ======>> ', this.flatNodeData);
-
-
-
-
+        this.flatNodeData= [firtData, ...this.flatNodeData]
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -344,6 +305,82 @@ export default {
       });
 
     },
+    
+    // flatten Data by Recursive
+    flattenData(data, key = 'nextAuditNode') {
+      if(data[key] !== null) {
+          const d = data[key];
+          this.flatNodeData.push(d);
+          this.flattenData(data[key]);
+      } else {
+        return this.flatNodeData;
+      }
+    },
+
+
+  handleData(){
+    console.log('this.userInfo  5-1 要有值啊啊啊===>> ', this.userInfo);
+    
+    this.flatNodeData.forEach(d=>{
+      delete d.nextAuditNode
+      var newArr = []
+      d.auditByUsers.forEach(id=>{
+        this.userInfo.forEach(uu=>{
+          if(id == uu.userId){
+            newArr.push(uu.userName + ",")       
+          } 
+        })
+      })
+      if(d.auditByUsers[0] !== "提交人") d.auditByUsers = newArr
+    })
+    
+    console.log('this.flatNodeData  5-2 要有值啊啊啊===>> ', this.flatNodeData);
+    },
+
+    handleEmitMove(method){
+      // console.log('List method ', method);
+      Array.prototype.move = function (from, to) {
+        this.splice(to, 0, this.splice(from, 1)[0]);
+      };
+      switch(method.method){
+        case 'moveUp':{
+          this.flatNodeData.move(method.index, method.index - 1)
+          break;
+        }
+        case 'moveDown':{
+          this.flatNodeData.move(method.index, method.index + 1)
+          break;      
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+
+    handleEmitOperation({ method, row }) {
+      console.log('List row =====>> ', row);
+      switch(method){
+        case 'set':{
+          this.settingWorkFlow(row)
+          console.log('set :>> ')
+          break;      
+        }
+        case 'delete':{
+          // this.deleteRow(row.processDefinitionKey)
+          console.log('delete :>> ')
+          break;      
+        }
+        default: {
+          break;
+        }
+      }
+    },
+
+    // task_workflow(){
+
+    // },
+    
     // addNode() {
     //   this.$router.push({ name: 'nodeSetting' })
     // },
@@ -627,4 +664,23 @@ export default {
     font-size: 12px;
     color: #7d8cad;
   }
+</style>
+
+<style lang="sass">
+  .audit-user-row
+    display: flex
+    flex-wrap: wrap
+    flex-direction: row
+    justify-content: flex-start
+    align-items: flex-start
+    .audit-user
+      margin-right: 10px
+  
+  .el-table__row
+    &:first-child
+      .el-table_1_column_6
+        .cell
+          display: none
+        
+
 </style>

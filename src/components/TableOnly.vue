@@ -25,14 +25,14 @@
       @expand-change="expandChange"
       @sort-change="handleSortChange"
       @row-click="handleRowClick"
-    >
+    > 
       <el-table-column
         v-if="indexType"
         label= "節點序號"
         type= "index"
-        align="center"
+        align="left"
         width="100"
-        
+        :index= "indexMethod"
       />
       <el-table-column
         v-if="showSelectionColumn"
@@ -79,8 +79,31 @@
           </template>
 
 
+          <!-- workflow auditByUsers -->
+          <template v-else-if="_item.auditByUsers">
+            <div class="audit-user-row">
+              <div class="audit-user" v-for="(item, index) in row.auditByUsers" :key="index">{{item}}</div>
+            </div>
+          </template>
+          <!-- workflow auditMethod -->
+          <template v-else-if="_item.auditMethod && row.auditMethod !== undefined ">
+            <el-radio-group class="storevue-radio" v-model="row.auditMethod">
+              <el-radio :label="1">會簽</el-radio>
+              <el-radio :label="0">或簽</el-radio>
+            </el-radio-group>
+          </template>
+
+          <!-- workflow signature -->
+          <template v-else-if="_item.signature && row.signature !== undefined" >
+            <el-radio-group class="storevue-radio" v-model="row.signature">
+              <el-radio :label="true">需要</el-radio>
+              <el-radio :label="false">不需要</el-radio>
+            </el-radio-group>
+          </template>
+
+          
           <template v-else>
-            <template v-if="isDevice && _index < 3">
+            <template v-if="isDevice && _index < 3 ">
               <el-tooltip class="item" effect="dark" :content="row[_item.prop]" placement="bottom">
                 <div>{{ row[_item.prop] | addEllipsis}}</div>
               </el-tooltip>
@@ -95,6 +118,8 @@
           <component :is="expandComponent" v-bind="currentProperties"></component>
         </template>
       </el-table-column>
+
+    
       
       <!-- 操作 -->
       <el-table-column
@@ -117,6 +142,15 @@
           </div>
 
           <div class="flex-center" v-else>
+            <div class="move" v-if="tableOperation.move" >
+              <div class="move-action" 
+                :class="{moveup_disable:scope.$index == 1 && item.methods == 'moveUp', movedown_disable: scope.$index == maxIndex && item.methods == 'moveDown'}"
+                :key="item.text"
+                v-for="item in tableOperation.move"
+                @click="handleMoveButton(item.methods, scope.row, scope.$index)"
+                >
+                {{item.text}}</div>
+            </div>
             <img 
               :key="index"
               class="child-space"
@@ -130,6 +164,8 @@
           </div>
         </template>
       </el-table-column>
+
+
       <template v-if="isEvent">
         <el-table-column
           :label="$t('overview.remotePatrol')"
@@ -335,11 +371,17 @@ export default {
         //console.log("this.expands:",this.expands);
         return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,itemId:this.expandCompProperties.itemId }
       }
+    },
+    maxIndex(){
+      return this.tableData.length - 1
     }
+  },
+  created() {
+  
   },
   mounted() {
     // console.log(this.columnData)
-    // console.log(this.tableData)
+    // console.log("this.tableData" , this.tableData)
   },
   methods: {
     setCellStyle({ row, column, rowIndex, columnIndex }) {
@@ -432,6 +474,11 @@ export default {
       this.$emit('handleOperation', { method: methods, row: row, index: index });
     },
 
+    handleMoveButton(methods, row, index){
+      this.$emit('handleMove', { method: methods, row: row, index: index });
+    },
+
+
     confirmEdit(row) {
       if (row.tempDeviceName.trim().length === 0) {
         util.notify(this.$t('deviceView.deviceNameEmpty'), 'warning', 3000);
@@ -452,6 +499,9 @@ export default {
     },
     cellClick(row,prop){
       this.$emit('onCellClick',{row,prop});
+    },
+    indexMethod(index){
+      return index 
     }
   }
 };
@@ -587,5 +637,30 @@ export default {
 /deep/ #el-tablescrollbar .el-scrollbar__wrap {
   overflow-x: auto;
 }
+</style>
+
+<style lang="sass" >
+  .move
+      display: flex
+      flex-direction: row
+      justify-content: flex-start
+      align-items: flex-start
+      .move-action
+        color: #006ab7
+        margin-left: 10px
+        cursor: pointer
+        transition: all .2s
+        &:hover
+          transform: scale(1.1)
+      
+  .icon-copy, .icon-setting, .icon-delete
+    cursor: pointer
+    transition: all .2s
+    &:hover
+      transform: scale(1.1)
+  .moveup_disable, .movedown_disable
+    opacity: 0.3 !important
+    pointer-events: none !important
+    
 </style>
 
