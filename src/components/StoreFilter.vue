@@ -210,7 +210,7 @@ export default {
         console.log("Account Changed")
         self.isChangeAccount = true;
         self.ifGetParamsFromCash = false;
-        self.curSelectedStore = '';
+        
         //this.getStoreListAndGroupAndType();
         self.getStoreListAndGroupAndType(true);
         //await self.getSearchParams();
@@ -743,17 +743,25 @@ export default {
     },
 
     getStoreIdsOfGroupAndType(groupArr, typeArr) {
-      console.log("getStoreIDOF",groupArr, typeArr)
+      //console.log("getStoreIDOF",groupArr, typeArr)
       let groupIdArr = [];
       let typeIdArr = [];
       if (groupArr.length === 0 && typeArr.length === 0) return [];
       if (groupArr.length > 0 && typeArr.length === 0) {
         groupIdArr = groupArr.map(group => group.contents);
-        return groupIdArr.flat();
+        //console.log("1.groupIdArr:",groupIdArr);
+        const arrToSet = new Set(groupIdArr.flat()); 
+        const uniqueArray = [...arrToSet];
+        console.log("group uniqueArray:",uniqueArray);
+        return uniqueArray;
       }
       if (groupArr.length === 0 && typeArr.length > 0) {
         typeIdArr = typeArr.map(type => type.contents);
-        return typeIdArr.flat();
+        //console.log("1.typeIdArr:",typeIdArr);
+        const arrToSet = new Set(typeIdArr.flat()); // Set { 1, 3, 5, 7 }
+        const uniqueArray = [...arrToSet];
+        console.log("type uniqueArray:",uniqueArray);
+        return uniqueArray;
       }
       groupIdArr = groupArr.map(group => group.contents);
       //console.log("2.groupIdArr:",groupIdArr);
@@ -761,7 +769,19 @@ export default {
       //console.log("2.typeIdArr:",typeIdArr);
       return util.getIntersectionOfArrs(groupIdArr.flat(), typeIdArr.flat());
     },
-
+    getUniqueStoreId(arrId){
+      var arr1=arrId[0];
+      console.log("*1.newIds:",newIds);
+      for(let i =1; i<arrId.length;i++){
+        var arr2 = arrId[i];
+        let result = arr1.concat(arr2.filter((e)=>{
+          return arr1.indexOf(e) === -1
+        }))
+        arr1 = result;
+      }
+       console.log("*2.newIds:",newIds);
+      return newIds;
+    },
     getSelectCountryOrCity() {
       const self = this;
       self.regionMode = self.curCity.length > 0 ? 2 : 1;
