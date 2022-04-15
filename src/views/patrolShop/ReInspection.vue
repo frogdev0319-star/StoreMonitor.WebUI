@@ -1485,8 +1485,7 @@ export default {
             if (item.id === self.curItemId) self.curGroupIndex = idx
           })
         })
-        if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
-          console.log("Find")
+        if (!item.manualIgnore && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
           self.sheetName[self.curSheetIndex].dealCount++;
           self.sheetName[self.curSheetIndex].Effective++;
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
@@ -1659,7 +1658,7 @@ export default {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
       if (this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0 && storeItem != undefined) {
-        this.changeStoreObj.dialogCosed = true;
+        // this.changeStoreObj.dialogCosed = true;
       } else {
         if (storeItem) {
           this.changeStore_(storeItem)
