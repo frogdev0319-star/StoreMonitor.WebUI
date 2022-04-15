@@ -1658,10 +1658,37 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      if ((this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0)) {
+      if (this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0 && storeItem != undefined) {
         this.changeStoreObj.dialogCosed = true;
       } else {
-        if (storeItem) this.changeStore_(storeItem)
+        if (storeItem) {
+          this.changeStore_(storeItem)
+        } else {
+          this.patrolstore = '';
+          this.curSheetIndex = 0;
+          this.curSheet = {};
+          this.inspectItemList = [];
+          this.inspectList = [];
+          this.sheetName = [];
+          this.tempArr = [];
+          this.showChannelBtns = [];
+          this.patrolStoreName = '';
+          this.PatrolList = [];
+          this.hasIgnoretemp = [];
+          this.$store.dispatch('setPatrolHistory', null);
+          this.isShowWarn = false;
+          this.notShowAlert = false;
+          this.showIgnoreItem = false;
+          this.$emit("listenerChild", false);
+          this.showStoreUp = true;
+          this.$refs.vendorVideo && (this.$refs.vendorVideo.editCount = 0);
+          this.$refs.vendorVideo && this.$refs.vendorVideo.stopVideoPlay();
+          this.showError = false;
+          this.curDeviceId = -1;
+          this.showFeedBack = false;
+          this.eventList = [];
+          this.showGuide = true;
+        }
       }
       
     },
