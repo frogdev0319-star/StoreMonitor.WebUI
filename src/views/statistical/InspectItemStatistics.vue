@@ -2011,8 +2011,11 @@ export default {
       }
       else if(this.part3.compareType=='position'){
          let users = [];
+         var selPosition = this.part3.compareIds;
          this.part3.originArray.forEach(function(item){
-           users =  users.concat(item.contents);
+           if(selPosition.includes(item.value)){
+              users =  users.concat(item.contents);
+           }
          })
          params.submitters  = users;
          params.groupIds  = users;
