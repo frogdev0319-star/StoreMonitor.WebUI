@@ -147,7 +147,7 @@ export default {
             positionsList: [],
             lang:this.$i18n.locale,
             dropdownWidth:[{key:'en',value:'calc(105/1440*100vw)'},{key:'zh',value:'calc(105/1440*100vw)'},{key:'zhtw',value:'calc(105/1440*100vw)'},
-        {key:'ja-JP',value:'calc(130/1440*100vw)'},{key:'ko-KR',value:'calc(105/1440*100vw)'},{key:'vi-VN',value:'calc(105/1440*100vw)'},
+        {key:'ja-JP',value:'calc(130/1440*100vw)'},{key:'ko-KR',value:'calc(105/1440*100vw)'},{key:'vi-VN',value:'calc(130/1440*100vw)'},
         {key:'id-ID',value:'calc(105/1440*100vw)'},{key:'th-TH',value:'calc(110/1440*100vw)'}]
         }
   },

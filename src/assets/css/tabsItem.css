@@ -48,6 +48,11 @@
   font-size: 13px;
   width: 180px;
 }
+.th-tab_content .el-tabs__item {
+  padding: 0 0;
+  font-size: 13px;
+  width: 200px;
+}
 
 #en-tabs-content .el-tabs__active-bar{
   height: 4px;

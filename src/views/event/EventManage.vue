@@ -61,7 +61,7 @@
           <span>{{ $t('eventView.exportReport') }}</span>
         </div>
       </delay-button>
-      <el-tabs id="en-tabs-content" v-model="activeName" @tab-click="handleTabClick">
+      <el-tabs :id="getLangStyleValue(tabContentId)"  v-model="activeName" @tab-click="handleTabClick">
         <el-tab-pane
           v-for="(item,index) in tableDataList"
           :key="index"
@@ -353,6 +353,9 @@ export default {
                 {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
                 {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
             ],
+      tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
+        {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
+        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
     };
   },
 
@@ -460,9 +463,8 @@ export default {
   },
   methods: {
     getLangStyleValue(langArray){
-        
-            return util.getLangStyleValue(langArray);
-        },
+      return util.getLangStyleValue(langArray);
+    },
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {'border-bottom': '1px solid #acaeb1'};
       /*if (columnIndex === 0) {
