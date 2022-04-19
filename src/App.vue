@@ -19,7 +19,7 @@ export default {
         if (val != oldval) {
           sessionStorage.setItem('onLine', this.onLine);
           if (!this.onLine) {
-            util.notify(this.$t('route.networkError'), 'error', 5 * 1000 );
+            // util.notify(this.$t('route.networkError'), 'error', 5 * 1000 );
           }
         }
       },

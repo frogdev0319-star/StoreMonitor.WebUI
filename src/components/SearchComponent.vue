@@ -222,7 +222,7 @@ export default {
     async searchData() {
       
       this.params.storeIds = this.storeFilterObj.filterStoreIds;
-      console.log("Search Data",this.params.storeIds)
+      console.log("Search Data",this.storeFilterObj)
      // if( this.params.storeIds && this.params.storeIds[0] &&this.params.storeIds[0]=='-1')this.params.storeIds=  this.params.storeIds.shift()
       this.params.timeMode = this.timeMode;
       this.params.curCountry= this.storeFilterObj.curCountry;
