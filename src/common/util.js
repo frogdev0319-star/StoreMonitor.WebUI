@@ -636,8 +636,13 @@ export default {
   },
 
   getIntersectionOfArrs(arr1, arr2) {
+    const arr1Set = new Set(arr1); 
+    const uniqueArr1 = [...arr1Set];
+    //console.log("uniqueArr1:",uniqueArr1)
+    //console.log("arr2:",arr2)
     const arr2Set = new Set(arr2);
-    const intersection = arr1.filter(item => arr2Set.has(item));
+    const intersection = uniqueArr1.filter(item => arr2Set.has(item));
+    //console.log("intersection:",intersection)
     return intersection;
   },
 

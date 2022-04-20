@@ -921,8 +921,8 @@ export default {
   /deep/ .el-menu {
     border-right: none;
     font-size: 14px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    // overflow-y: auto;
+    // overflow-x: hidden;
 
   }
   /deep/ .el-menu-item {

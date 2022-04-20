@@ -1230,7 +1230,8 @@ export default {
           if (mapping[key] === 'availableScores') {
             item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
           } else if (mapping[key] === 'itemScore') {
-            item[mapping[key]] = cell.v ? Number(cell.v) : cell.v === 0 ? 0 : 10;
+            item[mapping[key]] = cell.v ? Number(cell.v) : 0;
+            if (cell.v === '') item['type'] = 1;
             if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1);
           } else if (mapping[key] === 'description') {
             item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
@@ -1247,8 +1248,8 @@ export default {
           item['itemScore'] = maxAvailableScore;
           item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
         }
+        console.log(item)
         if (item['subject']) {
-          console.log(1)
           if (requestGroups[rowCells.parent.id]) {
             requestGroups[rowCells.parent.id].items.push(item);
           } else {
@@ -1899,7 +1900,7 @@ export default {
             passFailFlagObj.flags.flagPassFailScoreType = true;
           }
         } else {
-          item.score = 10;
+          item.score = 0;
         }
         if (item.description != undefined) {
           if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
