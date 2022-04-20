@@ -1237,7 +1237,8 @@ export default {
       const params = {};
       params.beginTs = this.params.beginTs;
       params.endTs = this.params.endTs;
-      params.storeIds = this.storeIds;
+      params.storeIds = this.storeIds.filter(storeId => storeId !== '-1');
+      console.log("getUpperGloableEventData > params.storeIds:",params.storeIds);
       params.regionMode = 0;
     
       try {
@@ -1298,11 +1299,11 @@ export default {
       this.params.groupMode = region[0].value;
       params.storeIds = this.compareIds;
       if(region[0].value<3){ //store, area1, area2
-        this.params.storeIds=this.compareIds
-        params.storeIds = this.compareIds;
+        this.params.storeIds=this.compareIds.filter(storeId => storeId !== '-1')
+        params.storeIds = this.compareIds.filter(storeId => storeId !== '-1');
       }else{ //groupType, storeGroup
-        this.params.groupIds=this.compareIds;
-        params.groupIds = this.params.storeIds;
+        this.params.groupIds=this.compareIds.filter(storeId => storeId !== '-1');
+        params.groupIds = this.params.storeIds.filter(storeId => storeId !== '-1');
       }
       params.order = {
         direction: 'desc',
@@ -1365,7 +1366,7 @@ export default {
       self.params.groupMode = region[0].value;
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:self.compareIds,
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:self.compareIds.filter(storeId => storeId !== '-1'),
           order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
         //console.log("*getEventTableData>searchCondition:",searchCondition);
@@ -1599,7 +1600,7 @@ export default {
       self.componentsProps.endTs = self.params.endTs;
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
-      self.params.storeIds = self.compareIds;
+      self.params.storeIds = self.compareIds.filter(storeId => storeId !== '-1');
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
       //console.log("getEventTableData > this.compareIds:",self.compareIds); 
@@ -1754,7 +1755,7 @@ export default {
             //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
         params.filterStoreIds=[rowItem.id];
         params.curStore=[rowItem.id];
-        params.storeIds=[rowItem.id];
+        params.storeIds=[rowItem.id.filter(storeId => storeId !== '-1')];
         params.curCountry = "-1";
         params.curProvince = [];
         params.curCity = [];

@@ -535,6 +535,10 @@ export default {
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         if(this.curStore.length != this.filterStoreIds.length){
           this.curStore = this.filterStoreIds;
+          if(this.filterStoreIds.length == this.storeDataList.length) {
+            this.curStore.unshift( '-1');
+            console.log("**1.select all:",this.curStore);
+          }
         }
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
         if(this.emitChanged){
@@ -575,6 +579,11 @@ export default {
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         if(this.curStore.length != this.filterStoreIds.length){
           this.curStore = this.filterStoreIds;
+          if(this.filterStoreIds.length == this.storeDataList.length) {
+            
+            this.curStore.unshift( '-1');
+            console.log("**2.select all:",this.curStore);
+          }
         }
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
         if(this.emitChanged){
@@ -682,9 +691,18 @@ export default {
         console.log("filterStoreId:",filterStoreId);
         if(filterStoreId.length==0){
           this.curStore = filterStoreArray;
+          
+          /*if(this.curStore.length == filterStoreArray.length){
+            this.curStore.unshift({ value: '-1', label: i18n.t('remotePatrol.all') });
+          }*/
         }
 
         this.filterStoreIds = (filterStoreId.length==0)?filterStoreArray:filterStoreId.filter(storeId => storeId !== '-1');
+        this.curStore = this.filterStoreIds;
+        if(this.storeDataList.length == this.filterStoreIds.length){
+          this.curStore.unshift('-1');
+        }
+        console.log("2.curStore:",this.curStore);
         this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
       }
 
