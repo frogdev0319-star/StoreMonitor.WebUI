@@ -37,7 +37,7 @@
         :key="_index"
         :prop="_item.prop"
         :label="_item.label"
-        :sortable="canSortable ? _item.sortable : false"
+        :sortable="canSortable&&!isexportPDF ? _item.sortable : false"
         :sort-orders="['ascending', 'descending']"
         :min-width="isexportPDF ? _item.pdfwidth : (lang.indexOf('zh') !== -1 ? _item.width : _item.maxWidth)"
         :formatter="_item.formatter">
