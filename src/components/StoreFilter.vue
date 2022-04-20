@@ -210,7 +210,7 @@ export default {
         console.log("Account Changed")
         self.isChangeAccount = true;
         self.ifGetParamsFromCash = false;
-        
+        self.curSelectedStore = '';
         //this.getStoreListAndGroupAndType();
         self.getStoreListAndGroupAndType(true);
         //await self.getSearchParams();

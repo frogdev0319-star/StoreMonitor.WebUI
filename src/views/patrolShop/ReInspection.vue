@@ -2009,7 +2009,8 @@ export default {
           self.sheetName[self.curSheetIndex].Effective--;
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
-            self.sheetName[self.curSheetIndex].dealCount++;
+          this.sheetName[this.curSheetIndex].dealCount++
+          this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore) {
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
@@ -2049,9 +2050,12 @@ export default {
     cancleIgnore() {
       const self = this;
       self.curItem.manualIgnore = false;
-
-        self.sheetName[self.curSheetIndex].dealCount != 0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
-        self.notShowAlert ? self.notShowAlert = false : null;
+      self.sheetName[self.curSheetIndex].dealCount--
+      this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount--
+      // if (self.sheetName[self.curSheetIndex].dealCount != 0) {
+        
+      // }
+      self.notShowAlert ? self.notShowAlert = false : null;
 
     },
     cancelIgnoreInspect(val) {
@@ -2621,7 +2625,7 @@ export default {
       const self = this;
       console.log(self.$refs.vendorVideo.editCount)
       // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
-      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0) ) {
+      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 1) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
       } else {
