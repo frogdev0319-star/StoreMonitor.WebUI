@@ -1661,9 +1661,9 @@ export default {
           let OthersCopy = deepClone(Others);
           const tableVersion = _this.getTableVersonBasedOnWeight(PassFail, Score, Others);
 
-          outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
+         outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
-          outdata.Others = _this.getOthersSheetJsonData(wb, Others, tableVersion);
+          outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
 
           if (outdata.PassFail.length > 0) {
             if (!outdata.PassFail[0].catergyName) {
@@ -1759,7 +1759,7 @@ export default {
 
     getPassAndFailSheetJsonData(workbook, sheet, tableVersion) {
       if (sheet) {
-        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.G1;
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         sheetArray.forEach((_item) => {
@@ -1767,18 +1767,14 @@ export default {
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
           if (tableVersion === 1) {
             rowDataObj.subCatergyName = '';
-            rowDataObj.weight = _item.__EMPTY_1;
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.score = _item.__EMPTY_2;
+            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+          } else {
+            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
             rowDataObj.score = _item.__EMPTY_3;
             rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
-            rowDataObj.required = _item.__EMPTY_4;
-          } else {
-            rowDataObj.weight = _item.__EMPTY_1;
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
-            rowDataObj.score = _item.__EMPTY_4;
-            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
-            rowDataObj.required = _item.__EMPTY_5;
           }
 
           rowDataArray.push(rowDataObj);
@@ -1905,7 +1901,7 @@ export default {
           }
         }
       });
-      if (count !== 100) passFailFlagObj.flags.flagGroupWeightTotal = true;
+      // if (count !== 100) passFailFlagObj.flags.flagGroupWeightTotal = true;
       return passFailFlagObj;
     },
 
@@ -2040,7 +2036,7 @@ export default {
           }
         }
       });
-      if (count !== 100) scoreFlagObj.flags.flagGroupWeightTotal = true;
+      // if (count !== 100) scoreFlagObj.flags.flagGroupWeightTotal = true;
       return scoreFlagObj;
     },
 
