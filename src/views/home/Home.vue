@@ -27,7 +27,8 @@
                   index!=breadList.length-1
                     ? 'bold-breadcrumb-span'
                   : 'normal-breadcrumb-span'">
-                {{ $t(`route.${item.name}`) }}</span>
+                {{ $t(`route.${item.name}`) }} </span>
+                
                 
               <span
                 @click="backPage"
@@ -409,6 +410,7 @@ export default {
         //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
         { curPath: ["/workflowDetail"], activePath: "/workflows" },
+        { curPath: ["/workflownode"], activePath: "/workflowDetail" },
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
       if (pathMAP) {
@@ -531,6 +533,7 @@ export default {
     getBread() {
       this.breadList = [];
       const currentRoute = this.$route.fullPath;
+      
       let matched = [];
       matched = this.$route.matched.filter((x) => x.name);
       matched.length === 2 &&
@@ -539,6 +542,8 @@ export default {
         matched[0].name === "systemSetting" &&
         this.setSystemNavbarBread(matched, currentRoute);
       this.breadList = matched;
+
+      // console.log('breadList ------>> ', this.breadList);
     },
 
     setScheduleBread(matched, currentRoute) {
@@ -679,6 +684,10 @@ export default {
         {
           paths: ["/workflowDetail"],
           parentBread: { path: "/workFlows", name: "workflowManage" },
+        },
+        {
+          paths: ["/workflownode"],
+          parentBread: { path: "/workflowDetail", name: "workflowDetail" },
         },
         {
           paths: ["/addroute", "/setroute", "/bindroute"],

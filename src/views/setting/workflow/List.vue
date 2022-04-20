@@ -217,10 +217,8 @@ export default {
         this.isLoadingData = false;
         console.log('error' + err);
       });
+      
     },
-
-    
-
     handleEmitOperation({ method, row }) {
       console.log('List row =====>> ', row);
       switch(method){

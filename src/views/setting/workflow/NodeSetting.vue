@@ -4,15 +4,8 @@
     <div class="setting-titles padding flex-center">
       添加審核節點
       <div class="spacer"/>
-      <div class="buttons">
-        <delay-button
-          type="filled"
-          class="schedule-btn">
-          <div class="button-area">
-            <span>保存</span>
-          </div>
-        </delay-button>
-      </div>
+      <delay-button type="filled" @click="saveNode">保存</delay-button>
+
     </div>
 
     <!-- 基本信息 -->
@@ -27,51 +20,79 @@
                 <div class="title-name">* 節點名稱</div>
                 <div class="title-status">
                   <el-input
+                    v-model="nodeData.name"
                     placeholder="请输入节点名称"
                     class="input-name"/>
                 </div>
 
                 <div class="title-name">* 添加職務</div>
                 <div class="title-status">
+                  <el-select v-model="managers" placeholder="管理員">
+                    <el-option
+                      v-for="item in templateList"
+                      :key="item"
+                      :label="item"
+                      :value="item">
+                    </el-option>
+                  </el-select>
+                </div>
+                <!-- <div class="title-status">
                   <el-select
-                    v-model="curTemplateIndex"
                     class="device-select"
                     size="mini"
-                    placeholder="管理员"
-                    @change="displayTemplateInfo">
+                    placeholder="管理員">
                     <el-option
                       v-for="(item, index) in templateList"
                       :key="index"
-                      :label="swswsws"
-                      :value="index"
                     />
                   </el-select>
-                </div>
+                </div> -->
               </div>
 
               <!-- row -->
               <div class="setting-config basic-config">
                 <div class="title-name">審批方式</div>
                 <div class="flex">
-                  <el-radio-group class="storevue-radio" >
-                    <el-radio :label="false">需要</el-radio>
-                    <el-radio :label="false">不需要</el-radio>
+                  <el-radio-group class="storevue-radio" v-model="nodeData.auditMethod">
+                    <el-radio :label="1">會簽</el-radio>  
+                    <el-tooltip
+                      class="date-time-tooltip"
+                      effect="light"
+                      placement="right">
+                      <div slot="content">一人通过，则通过；一人驳回，则驳回</div>
+                      <i class="iconfont icon-bangzhu iconbangzhu"/>
+                    </el-tooltip>
+
+                    <el-radio :label="0">或簽</el-radio>
+                    <el-tooltip
+                      class="date-time-tooltip"
+                      effect="light"
+                      placement="right">
+                      <div slot="content">一人通过，则通过；一人驳回，则驳回</div>
+                      <i class="iconfont icon-bangzhu iconbangzhu"/>
+                    </el-tooltip>
                   </el-radio-group>
-                  <el-tooltip
-                    class="date-time-tooltip"
-                    effect="light"
-                    placement="right">
-                    <div slot="content">一人通过，则通过；一人驳回，则驳回</div>
-                    <i class="iconfont icon-bangzhu iconbangzhu"/>
-                  </el-tooltip>
                 </div>
               </div>
+
               <!-- row -->
               <div class="setting-config basic-config">
                 <div class="title-name">審批按鈕</div>
                 <div class="approve">
-                  <div class="approve_row">
+                  <div class="approve_row" v-for="(item, index) in nodeData.customButton" :key="item.type">
                     <el-checkbox
+                      v-model="nodeData.customButton[index].enable"
+                      class="storevue-checkbox-outlined"
+                      :label="item.text"/>
+                    <el-input
+                      placeholder="//自定义属性名称，如通过"
+                      class="input-name"/>
+                  </div>
+
+
+                  <!-- <div class="approve_row">
+                    <el-checkbox
+                      v-model="this.nodeData.customButton[0].enable"
                       class="storevue-checkbox-outlined"
                       label="同意"/>
                     <el-input
@@ -80,6 +101,7 @@
                   </div>
                   <div class="approve_row">  
                     <el-checkbox
+                      v-model="this.nodeData.customButton[1].enable"
                       class="storevue-checkbox-outlined"
                       label="拒絕"/>
                     <el-input
@@ -93,8 +115,7 @@
                     <el-input
                       placeholder="//自定义属性名称，如通过"
                       class="input-name"/>
-                  </div>
-                  
+                  </div> -->
                 </div>
               </div>
 
@@ -103,6 +124,7 @@
                 <div class="title-name">簽名</div>
                 <div class="title-status">
                   <el-checkbox
+                    v-model="nodeData.signature"
                     class="storevue-checkbox-outlined"
                     label="簽名"/>
                 </div>
@@ -145,22 +167,10 @@
                     class="storevue-checkbox-outlined"
                     label="超時發送訊息提醒"/>
                 </div>
-                <div class="title-status">
-                  <el-checkbox
-                    class="storevue-checkbox-outlined"
-                    label="超時發送訊息提醒"/>
-                </div>
               </div>
               
               <!-- row -->
               <div class="setting-config basic-config">
-                <div class="title-status">
-                  停留超過
-                  <el-input
-                    placeholder=""
-                    class="input-name_short"/>
-                  天
-                </div>
                 <div class="title-status">
                   停留超過
                   <el-input
@@ -181,7 +191,8 @@
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import { getWorkflowInfo, updateWorkflow, } from "@/api/workflow";
+import {updateWorkflow} from "@/api/workflow";
+
 import util from "@/common/util";
 export default {
   name: 'WorkflowDetail',
@@ -191,38 +202,18 @@ export default {
   },
   data() {
     return {
+      nodeData: [],
+      infoForm: {},
+      apiData: {},
+
       dataFromRoute: {},
       workflowDetail: {},
-      templateList: [],
+      templateList: ['管理員','店長','總經理'],
+      managers: '',
+
       basicList: [],
       isLoadingData: false,
       workflowDescription: '',
-      detailData: [
-        {
-          'node': 1,
-          'name': 'TEST',
-          'auditByUsers': 'Albert',
-        },
-        {
-          'node': 2,
-          'name': 'Super Test',
-          'auditByUsers': 'Albert',
-        },
-        {
-          'node': 3,
-          'name': 'this TEST',
-          'auditByUsers': 'Albert',
-        },
-        {
-          'node': 4,
-          'name': 'OKOKOK',
-          'auditByUsers': 'Albert',
-        },
-
-      ],
-      penSrc: require('../../../../static/img/table-edit.png'),
-      deleteSrc: require('../../../../static/img/table-delete.png')
-
     };
   },
   mounted() {
@@ -242,26 +233,76 @@ export default {
     //   this.workflowDetail['nextNodes'] = nextNodes;
     // })
   },
+  async created() {
+    await this.init()
+  },
   methods: {
-    addNode() {
-      this.$router.push({ name: 'nodeSetting' })
+    async init(){
+      await this.getNodeInfo() 
+      await this.getWorkflowInfo()
+    }, 
+
+    getWorkflowInfo(){
+      const data = sessionStorage.getItem('workflowDetail')
+      this.infoForm = JSON.parse(data)
+      this.infoForm.type = "巡檢表單"
     },
-    submit() {
-      let array = this.workflowDetail.nextNodes;
-      let object = { ...array[0] };
-      let i = array.length - 1;
-      while(i >= 0) {
-        object['nextAuditNode'] = { ...array[i].nextAuditNode };
-        i--;
+    
+    getNodeInfo(){
+      const data = sessionStorage.getItem('workflowNode')
+      const apiData = sessionStorage.getItem('nodeDataToApi')
+
+      this.nodeData = JSON.parse(data)
+      this.apiData = JSON.parse(apiData)
+      console.log('this.nodeData :>> ', this.nodeData);
+      console.log('this.apiData :>> ', this.apiData);
+    },
+
+    saveNode(){
+      console.log('this.nodeData Adjust:>> ', this.nodeData)
+      if(this.nodeData.id == undefined){
+        console.log("this is add a new Node")
+        this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
+
+        console.log('this.apiData.orderedAuditNodeArray ~~~>> ', this.apiData.orderedAuditNodeArray);
+
+      }else{
+        console.log("this is Editing")
+        var apiDataIndex = this.apiData.orderedAuditNodeArray.findIndex(i => i.id == this.nodeData.id)
+        console.log('apiDataIndex :>> ', apiDataIndex);
+        this.apiData.orderedAuditNodeArray.splice(apiDataIndex, 1 , this.nodeData)
+        sessionStorage.setItem('workflowNode', JSON.stringify(this.nodeData))
+        console.log('this.apiData GO~~~~~>> ', this.apiData);
       }
-      let nextAuditNode = JSON.parse(JSON.stringify(object));
-      updateWorkflow({
-        ...this.workflowDetail,
-        nextAuditNode
-      }).then(res => {
-        console.log(res);
+
+    
+      // call api
+      updateWorkflow(this.apiData).then(res=>{
+        console.log('res :>> ', res);
+        this.$router.push({name: 'workflowDetail'})
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
       });
-    }
+    },
+
+    // submit() {
+    //   let array = this.workflowDetail.nextNodes;
+    //   let object = { ...array[0] };
+    //   let i = array.length - 1;
+    //   while(i >= 0) {
+    //     object['nextAuditNode'] = { ...array[i].nextAuditNode };
+    //     i--;
+    //   }
+    //   let nextAuditNode = JSON.parse(JSON.stringify(object));
+    //   updateWorkflow({
+    //     ...this.workflowDetail,
+    //     nextAuditNode
+    //   }).then(res => {
+    //     console.log(res);
+    //   });
+    // }
   }
 };
 </script>
@@ -321,9 +362,6 @@ export default {
     align-items: center
     .el-input
       margin-left: 30px
-    
-  
-
 </style>
 
 <style scoped>
@@ -494,9 +532,11 @@ export default {
     align-items: center;
   }
   .el-radio{
-    width: 100px;
+    width: 20px !important;
   }
-
+  .el-tooltip{
+    margin-right: 50px;
+  }
   /* .setting-details{
     margin: 0 30px;
   } */

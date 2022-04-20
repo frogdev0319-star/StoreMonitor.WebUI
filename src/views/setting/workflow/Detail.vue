@@ -5,13 +5,14 @@
       流程配置
       <div class="spacer"/>
       <div class="buttons">
-        <delay-button
+        <delay-button type="filled" >保存並發布</delay-button>
+        <!-- <delay-button
           type="filled"
           class="schedule-btn">
           <div class="button-area">
             <span>保存並發布</span>
           </div>
-        </delay-button>
+        </delay-button> -->
       </div>
     </div>
     <!-- 基本信息 -->
@@ -71,6 +72,7 @@
           <!-- btn -->
           <div class="buttons add-node-btn">
             <el-button
+              @click="addNode"
               class="storevue-button-outlined"
               size="mini" type="primary">
               <i class="iconfont el-icon-plus"/>
@@ -85,7 +87,7 @@
                     ref="elTP"
                     class="table-white"
                     :column-data="columnData"
-                    :table-data="flatNodeData"
+                    :table-data="flatNodeDataView"
                     :table-operation ="columnOperationData"
                     :highlight-current-row= "false"
                     :is-loading-data="isLoadingData"
@@ -107,19 +109,14 @@
           <div class="setting-config basic-config">
             <div class="title-name">添加流程抄送人</div>
             <div class="title-status">
-              <!-- <el-select
-                v-model="curTemplateIndex"
-                class="device-select"
-                size="mini"
-                placeholder="大区经理、加盟主…"
-                @change="displayTemplateInfo">
+              <el-select v-model="ccTo" multiple placeholder="请选择">
                 <el-option
-                  v-for="(item, index) in templateList"
-                  :key="index"
-                  :label="swswsws"
-                  :value="index"
-                />
-              </el-select> -->
+                  v-for="item in ccToSelect"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </div>
           </div>
         </div>
@@ -136,6 +133,7 @@ import {getNodeList } from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import { getUserInfo } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
+import MultiSelect from '@/components/MultiSelect';
 import util from "@/common/util";
 export default {
   name: 'WorkflowDetail',
@@ -147,6 +145,24 @@ export default {
   },
   data() {
     return {
+      ccToSelect: [{
+        value: '總經理',
+        label: '總經理'
+      }, {
+        value: '加盟主 A',
+        label: '加盟主 A'
+      }, {
+        value: '加盟主 B',
+        label: '加盟主 B'
+      }, {
+        value: '加盟主 C',
+        label: '加盟主 C'
+      }, {
+        value: '店長',
+        label: '店長'
+      }],
+      ccTo: [],
+
       dataFromRoute: {},
       workflowDetail: {},
       templateList: ['巡檢表單'],
@@ -157,6 +173,8 @@ export default {
       infoForm: {},
       nodeList:{},
       flatNodeData:[],
+      flatNodeDataView:[],
+      nodeDataToApi:[],
       userInfo:[],
       titleList:[],
       columnOperationData: {
@@ -225,9 +243,7 @@ export default {
     };
   },
   async created() {
-    
     await this.init()
-
   },
   mounted() {
     // this.dataFromRoute = { ...this.$route.params.data }
@@ -247,28 +263,31 @@ export default {
     // })
   },
   methods: {
-
     async init(){
       await this.getWorkflowInfo() //1 
       await this.getTitle() //3
       await this.getNodeList(this.infoForm.processDefinitionKey) //4
       await this.getUserInfo() //2
-    
+
       await this.handleData() //5
+      await this.dataToApi() //6
+
+
     },
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
       this.infoForm.type = "巡檢表單"
-      console.log('this.infoForm 1 ===>> ', this.infoForm );
+      console.log('getWorkflowInfo 1 ------>> ', this.infoForm);
     },
     
     // get user
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
-        console.log('this.UserInfo 2 ===>> ', this.userInfo);
+        console.log('getWorkflowInfo 2 ------>> ', this.userInfo);
+
       }).catch(err => {
         console.log('error' + err);
       });
@@ -277,7 +296,8 @@ export default {
     getTitle(){
       getUserTitleList().then(res=>{
         this.titleList =  res.data
-        console.log('this.titleList 3 ===>> ', this.titleList);
+        console.log('this.titleList 3 ------>> ', this.titleList);
+
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -289,21 +309,19 @@ export default {
       this.isLoadingData = true
       getNodeList(id).then(res=>{
         this.nodeList =  res.data
-  
+        console.log('this.nodeList 4 ------>> ', this.nodeList);
         // flat data
         this.flattenData(this.nodeList)
-        console.log('this.flatNodeData 4 ===>> ', this.flatNodeData);
-        const firtData ={
-            "name": "提交人",
-            "auditByUsers": ['提交人']
-        }
-        this.flatNodeData= [firtData, ...this.flatNodeData]
+        this.flatNodeData.forEach(d=>{
+          delete d.nextAuditNode
+        })
+        
+        
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
       });
-
     },
     
     // flatten Data by Recursive
@@ -317,24 +335,63 @@ export default {
       }
     },
 
-
-  handleData(){
-    console.log('this.userInfo  5-1 要有值啊啊啊===>> ', this.userInfo);
-    
-    this.flatNodeData.forEach(d=>{
-      delete d.nextAuditNode
-      var newArr = []
-      d.auditByUsers.forEach(id=>{
-        this.userInfo.forEach(uu=>{
-          if(id == uu.userId){
-            newArr.push(uu.userName + ",")       
-          } 
+    // maping data for page view
+    handleData(){
+      // deep copy
+      this.flatNodeDataView = JSON.parse(JSON.stringify(this.flatNodeData))
+      const firtData ={
+        "name": "提交人",
+        "auditByUsers": ['提交人']
+      }
+      this.flatNodeDataView = [firtData, ...this.flatNodeDataView]
+      this.flatNodeDataView.forEach(d=>{
+        var newArr = []
+        d.auditByUsers.forEach(id=>{
+          this.userInfo.forEach(uu=>{
+            if(id == uu.userId){
+              newArr.push(uu.userName + ",")       
+            } 
+          })
         })
+        if(d.auditByUsers[0] !== "提交人") d.auditByUsers = newArr
       })
-      if(d.auditByUsers[0] !== "提交人") d.auditByUsers = newArr
-    })
+      console.log('this.flatNodeDataView 5 ------>> ', this.flatNodeDataView);
+    },
     
-    console.log('this.flatNodeData  5-2 要有值啊啊啊===>> ', this.flatNodeData);
+
+    // data for api submit
+    dataToApi(){
+      var orderedAuditNodeArray = JSON.parse(JSON.stringify(this.flatNodeData))
+
+      this.nodeDataToApi = this.nodeList
+      delete this.nodeDataToApi.nextAuditNode
+      this.nodeDataToApi.orderedAuditNodeArray = orderedAuditNodeArray
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
+    },
+
+
+    addNode() {
+      const newNode = {
+            "name": "",
+            "auditMethod": 0,
+            "signature": false,
+            "customButton": [
+                {
+                    "type": 0,
+                    "text": "同意",
+                    "enable": true
+                },
+                {
+                    "type": 1,
+                    "text": "拒絕",
+                    "enable": false
+                }
+            ],
+            "auditByUsers": [],
+            "auditByGroups": []
+        }
+      sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
+      this.$router.push({ name: 'nodeSetting' })
     },
 
     handleEmitMove(method){
@@ -344,11 +401,11 @@ export default {
       };
       switch(method.method){
         case 'moveUp':{
-          this.flatNodeData.move(method.index, method.index - 1)
+          this.flatNodeDataView.move(method.index, method.index - 1)
           break;
         }
         case 'moveDown':{
-          this.flatNodeData.move(method.index, method.index + 1)
+          this.flatNodeDataView.move(method.index, method.index + 1)
           break;      
         }
         default: {
@@ -356,19 +413,16 @@ export default {
         }
       }
     },
-
 
     handleEmitOperation({ method, row }) {
       console.log('List row =====>> ', row);
       switch(method){
         case 'set':{
           this.settingWorkFlow(row)
-          console.log('set :>> ')
           break;      
         }
         case 'delete':{
-          // this.deleteRow(row.processDefinitionKey)
-          console.log('delete :>> ')
+          this.deleteRow(row.id)
           break;      
         }
         default: {
@@ -376,14 +430,24 @@ export default {
         }
       }
     },
+    settingWorkFlow(row){
+      this.$router.push({name: 'nodeSetting'})
 
-    // task_workflow(){
+      // 刪除  "isEditing": false
+      var oriData = this.flatNodeData.filter(f => row.id === f.id)
+      delete row.isEditing
+      sessionStorage.setItem('workflowNode', JSON.stringify(oriData[0]))
+    },
 
-    // },
-    
-    // addNode() {
-    //   this.$router.push({ name: 'nodeSetting' })
-    // },
+    deleteRow(deleteId){
+      var deleteData = this.flatNodeData.filter( e =>(
+        e.id !== deleteId
+      ))
+      this.flatNodeData = deleteData
+      console.log('this.flatNodeData by delete >> ', deleteData);
+    },
+
+
     // submit() {
     //   let array = this.workflowDetail.nextNodes;
     //   let object = { ...array[0] };
@@ -447,9 +511,6 @@ export default {
     position: absolute
     right: 1%
     top: 3px
-
-
-
 </style>
 
 <style scoped>
@@ -680,7 +741,7 @@ export default {
     &:first-child
       .el-table_1_column_6
         .cell
-          display: none
+          display: none !important
         
 
 </style>

@@ -123,7 +123,7 @@
       
       <!-- 操作 -->
       <el-table-column
-        v-if="tableOperation.label"
+        v-if="tableOperation.label "
         :min-width="tableOperation.minWidth"
         :label="tableOperation.label"
         align="left"
@@ -142,26 +142,30 @@
           </div>
 
           <div class="flex-center" v-else>
-            <div class="move" v-if="tableOperation.move" >
-              <div class="move-action" 
-                :class="{moveup_disable:scope.$index == 1 && item.methods == 'moveUp', movedown_disable: scope.$index == maxIndex && item.methods == 'moveDown'}"
-                :key="item.text"
-                v-for="item in tableOperation.move"
-                @click="handleMoveButton(item.methods, scope.row, scope.$index)"
-                >
-                {{item.text}}</div>
-            </div>
-            <img 
-              :key="index"
-              class="child-space"
-              :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
-              v-for="(item,index) in tableOperation.operation" 
-              :src="`./static/img/table-${item.methods}.png`" 
-              @click="handleOperationButton(item.methods, scope.row, scope.$index)"
-              height="24px"
-              width="24px"
-            />
+            <template v-if="scope.row.name !== '提交人'">
+              <div class="move" v-if="tableOperation.move" >
+                <div class="move-action" 
+                  :class="{moveup_disable:scope.$index == 1 && item.methods == 'moveUp', movedown_disable: scope.$index == maxIndex && item.methods == 'moveDown'}"
+                  :key="item.text"
+                  v-for="item in tableOperation.move"
+                  @click="handleMoveButton(item.methods, scope.row, scope.$index)"
+                  >
+                  {{item.text}}</div>
+              </div>
+              <img 
+                :key="index"
+                class="child-space"
+                :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
+                v-for="(item,index) in tableOperation.operation" 
+                :src="`./static/img/table-${item.methods}.png`" 
+                @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+                height="24px"
+                width="24px"
+              />
+            </template>
           </div>
+          
+
         </template>
       </el-table-column>
 
@@ -462,6 +466,7 @@ export default {
       }
       this.order.direction = defaultSort.order === 'ascending' ? 'asc' : 'desc';
     },
+
 
     handleOperationButton(methods, row, index) {
       this.tableData.map(item => { item.isEditing = false; });
