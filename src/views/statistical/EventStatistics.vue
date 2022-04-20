@@ -33,17 +33,17 @@
             <div class="title">{{ $t('statistics.event.eventProcessStatus') }}</div>
           </el-col>
           <el-col :span="24" class="amount_region">
-            <div class="region-area" :style="ispdf ? {'width':'200px'}:{}" v-for="(item,index) in eventKPIs" :key="index">
+            <div class="region-area" :style="ispdf ? {'width':'220px'}:{}" v-for="(item,index) in eventKPIs" :key="index">
               <div class="num-area">
                 <div style="display:flex;height:84.5px;">
-                  <div class="number">{{ item.eventNum }}
+                  <div class="number" :style="ispdf ? {'fontSize':'40px'}:{}">{{ item.eventNum }}
                     <span v-if="index!=3" style="font-size:15px;margin-left:5px;">{{$t('statistics.event.unit')}}</span>
                     <span v-else style="font-size:15px;margin-left:5px;">%</span>
                   </div>
                 </div>
                 <div class="description">{{ item.eventTitle}}</div>
               </div>
-              <div class="img-area">
+              <div class="img-area" v-if="!ispdf">
                 <img v-if="index==0" src="../../../static/img/statistics/ic_totalEvent.svg" style="width:84.8;height:79.8px;align-items:flex-end;padding-bottom:10.5px;" />
                 <img v-else-if="index==1" src="../../../static/img/statistics/ic_inprocess.svg" style="width:108.5;height:65.6px;align-items:flex-end;padding-bottom:10.5px;" />
                 <img v-else-if="index==2" src="../../../static/img/statistics/ic_processed.svg" style="width:111.8;height:74.5px;align-items:flex-end;padding-bottom:10.5px;" />
@@ -140,6 +140,7 @@
                     :allowRowExpand = "true"
                     :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                     :tableHeight = "726"
+                    :isexportPDF="ispdf"
                     layout = "prev,pager,next,sizes"
                     expand-component = "IncepItemTop5"
                     :expandCompProperties = "componentsProps"
@@ -262,6 +263,7 @@
                   :allowRowExpand = "false"
                   :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                   :tableHeight = "726"
+                  :isexportPDF="ispdf"
                   @handleChange="handlePageAndSizeChange_eventItem"
                   @sortChange="handleSortChange_eventItem"
                   @onCellClick = "onEvenInvolveStoreClick"
@@ -322,6 +324,7 @@
                       :allowRowExpand = "true"
                       :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                       :tableHeight = "726"
+                      :isexportPDF="ispdf"
                       expand-component = "EventCommentList"
                       :expandCompProperties = "componentsProps_EventCommentList"
                     />
@@ -476,6 +479,7 @@
                     :allowRowExpand = "true"
                     :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                     :tableHeight = "726"
+                    :isexportPDF="ispdf"
                     layout = "prev,pager,next,sizes"
                     expand-component = "IncepItemTop5"
                     :expandCompProperties = "componentsProps"
@@ -590,6 +594,7 @@
                   :allowRowExpand = "false"
                   :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                   :tableHeight = "726"
+                  :isexportPDF="ispdf"
                   @handleChange="handlePageAndSizeChange_eventItem"
                   @sortChange="handleSortChange_eventItem"
                   @onCellClick = "onEvenInvolveStoreClick"
@@ -650,6 +655,7 @@
                       :allowRowExpand = "true"
                       :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                       :tableHeight = "726"
+                      :isexportPDF="ispdf"
                       expand-component = "EventCommentList"
                       :expandCompProperties = "componentsProps_EventCommentList"
                     />
