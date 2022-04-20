@@ -704,7 +704,8 @@ export default{
     "tHeaderE":"項目分值（選填，0.5~50分，默認10分）",
     "tHeaderF":"低於*分，須門店負責人處理（選填，-50~滿分）",
     "tHeaderG":"評分選項（必填，-50~滿分）",
-    "tHeaderH":"Required",
+    "tHeaderH":"是否必填",
+    "tHeaderI":"權重",
     "tab1CalculateScore":"與其他tab組合時，Tab1（Pass&Fail）項目分值參與考評總分運算",
     "tab1FailedDangeous":"Tab1（Pass&Fail）中存在不合格項時，巡檢結果為：立即督導",
     "tab1IgnoredQualified":"Tab1(Pass&Fail)中忽略項目視同得分",
@@ -716,7 +717,7 @@ export default{
     "toEdit":"進行編輯，再點擊",
     "total":"表共有",
     "totalScorRange":"考評總分範圍設置",
-    "totalScore":"加分製",
+    "totalScore":"加分制",
     "totalScoreDes":"考評總分= SUM(每項巡檢得分)",
     "totalScoreLimitation":"項目總分值須等於評分選項最高分值",
     "updateCategory":"編輯巡檢類別",
@@ -726,7 +727,8 @@ export default{
     "needBind":"表，需要綁定的門店",
     "minScoreEmpty":"扣分起始值不得為空！",
     "weight": "權重值%",
-    "weightSetting": "權重設定"
+    "weightSetting": "權重設定",
+    "weightTotalError": "權重不可大於或小於100%",
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",

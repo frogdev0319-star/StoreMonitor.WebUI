@@ -1203,7 +1203,7 @@ export default {
 
         await self.getUpperGloableEventData();
         await self.getEventTableData();
-        await self.getAllEventData();
+        //await self.getAllEventData();
         await self.getEventBarChartData();
         self.doGetInspecEvenItems();
       }
@@ -1228,7 +1228,7 @@ export default {
       //console.log("1.emitTypeChanged > this.compareIds:",this.compareIds); 
       
       this.comapareLabels = selectedLabels;
-      this.getAllEventData();
+      //this.getAllEventData();
       this.getEventTableData();
       this.getEventBarChartData();
     },

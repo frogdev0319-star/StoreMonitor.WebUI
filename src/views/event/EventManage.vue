@@ -61,7 +61,7 @@
           <span>{{ $t('eventView.exportReport') }}</span>
         </div>
       </delay-button>
-      <el-tabs id="en-tabs-content" v-model="activeName" @tab-click="handleTabClick">
+      <el-tabs :id="getLangStyleValue(tabContentId)"  v-model="activeName" @tab-click="handleTabClick">
         <el-tab-pane
           v-for="(item,index) in tableDataList"
           :key="index"
@@ -188,9 +188,9 @@
               <span>{{ $t('eventView.closing') }}</span>
             </delay-button>
             <tbl-pagination-only
-              :total="item.total"
-              :current-page="item.page"
-              :page-size="item.sizeNum"
+              :total="total"
+              :current-page="page"
+              :page-size="sizeNum"
               layout = "prev,pager, next,sizes,slot"
               @sizeChange="sizeChange"
               @currentChange="currentChange"
@@ -353,6 +353,9 @@ export default {
                 {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
                 {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
             ],
+      tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
+        {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
+        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
     };
   },
 
@@ -395,6 +398,7 @@ export default {
       const self = this;
       if (val === 0 && self.totalElements > 0) {
         self.params.filter.page -= 1;
+        console.log('numberofElements');
         self.getEventList();
       }
     }
@@ -460,9 +464,8 @@ export default {
   },
   methods: {
     getLangStyleValue(langArray){
-        
-            return util.getLangStyleValue(langArray);
-        },
+      return util.getLangStyleValue(langArray);
+    },
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {'border-bottom': '1px solid #acaeb1'};
       /*if (columnIndex === 0) {
@@ -492,6 +495,7 @@ export default {
     },
 
     dateChange(val) {
+      console.log("dateChange");
       const self = this;
       const tabIndex = Number(self.activeName);
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
@@ -519,7 +523,7 @@ export default {
 
     searchEventList() {
       //this.saveSearchParams(false);
-      
+      console.log("searchEventList page:",this.tableDataList[Number(this.activeName)].page)
       this.tableDataList[Number(this.activeName)].page = 1;
       if(this.searchParams['searchFrom']=='PatrolPersonStat'){
         delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
@@ -574,6 +578,7 @@ export default {
     sortChange(col) {
       const self = this;
       const tabIndex = Number(self.activeName);
+      console.log("sortChange page:",self.tableDataList[tabIndex].page);
       self.tableDataList[tabIndex].page = 1;
       const order = col.order;
       self.order = order;
@@ -670,7 +675,14 @@ export default {
         self.tableDataList[tabIndex].tableData = temp;
         self.tableDataList[tabIndex].total = res.data.totalPages;
         self.tableDataList[tabIndex].eventCount = res.data.totalElements;
+        console.log("res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
+        self.tableDataList[tabIndex].page = res.data.pageable.pageNumber+1;
         self.totalElements = res.data.totalElements;
+        if(tabIndex == this.activeName){
+          console.log("@@res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
+          self.page = (res.data.pageable.pageNumber+1);
+          self.total = res.data.totalPages;
+        }
         self.numberOfElements = res.data.numberOfElements;
         //self.handleTabClick(this.activeName);
       }).catch(err => {
@@ -691,8 +703,18 @@ export default {
       } else {
         like = {};
       }
-      let storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
-      
+      let storeId = null;
+      var p = Object.assign({}, this.params);
+      console.log("*p:",p)
+      //if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics")
+        storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause'))?p.clause.storeId:'-1';
+      /*else{
+        if(p.clause){
+          var tempStore = (p.clause.storeId)?p.clause.storeId:[];
+          console.log("tempStore:",tempStore);
+        }
+        storeId =  (tempStore!="-1")? tempStore :((Object.keys(this.storeFilterObj).length > 0) ? this.storeFilterObj.filterStoreIds :'-1');
+      }*/
       console.log("getEventListRequestParams > storeId:",storeId);
       let status = [];
       if (this.curState.length !== 0) {
@@ -716,8 +738,8 @@ export default {
       }
       let page = 0;
       if (val === 'currentChange') {
-        console.log(this.tableDataList[tabIndex].page);
-        page = this.tableDataList[tabIndex].page - 1;
+        console.log('currentChange',this.tableDataList[tabIndex].page);
+        page = this.tableDataList[tabIndex].page-1;
       }
       if (val === 'Back') {
         page = this.params.filter.page;
@@ -790,6 +812,7 @@ export default {
       const self = this;
       self.tableDataList[Number(self.activeName)].sizeNum = val.size;
       self.tableDataList[Number(self.activeName)].page = 1;
+      self.sizeNum = val.size;
       self.getEventList();
     },
 
@@ -797,6 +820,7 @@ export default {
       const self = this;
       console.log("currentChange val:",val);
       self.tableDataList[Number(self.activeName)].page = val.page;
+      self.page = val.page;
       self.getEventList('currentChange');
 
       const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-left')[0];
@@ -851,7 +875,13 @@ export default {
       //console.log("self.storeFilterObj:",self.storeFilterObj);
       //let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds?self.storeFilterObj.filterStoreIds:self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
       
-      const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
+      //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
+      let storeId = null;
+      //if(self.searchParams['searchFrom']=='PatrolPersonStat' || self.searchParams['searchFrom']=="EventStatistics")
+        storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:'-1';
+      /*else
+        storeId =  (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds :'-1';
+      */
       console.log("getEventCount > storeId:",storeId)
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {

@@ -698,6 +698,7 @@ export default{
       "tHeaderF":"Nilai Ambang-Kejadian Anomali (Opsional, -50~nilai penuh)",
       "tHeaderG":"Opsi nilai (Wajib Diisi -50~nilai penuh)",
       "tHeaderH":"Required",
+      "tHeaderI":"Weight",
       "tab1CalculateScore":"Ketika digabungkan dengan tab lain, nilai proyek Tab1 (Lulus&Gagal) akan diperhitungkan dalam evaluasi perhitungan nilai total",
       "tab1FailedDangeous":"Ketika ada item yang tidak memenuhi syarat di Tab 1 (Lulus&Gagal), hasil inspeksinya adalah: Berbahaya.",
       "tab1IgnoredQualified":"Hitung nilai item yang diabaikan di Tab1 (Lulus&Gagal)",
@@ -721,7 +722,8 @@ export default{
       "selectStoreTag":"Pilih cepat",
       "minScoreEmpty":"Min score can not be empty！",
       "weight": "weight%",
-      "weightSetting": "Weight Setting"
+      "weightSetting": "Weight Setting",
+      "weightTotalError": "Weight cannot be greater or less than 100%",
   },
   "deviceView":{
       "EzvizAccount":"Akun Layanan Streaming",

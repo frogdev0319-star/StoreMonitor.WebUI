@@ -1,7 +1,7 @@
 <template>
     <div class="content">
         <div class="type-pick">
-            <div class="type-div">{{$t('remotePatrol.inspectionItems')}}</div>
+            <div class="type-div" :style="{'width':getLangStyleValue(typeDivWidth)}">{{$t('remotePatrol.inspectionItems')}}</div>
             <el-select class="dropdown-select" v-model="layer1" value-key="value"  @change="changeLayer1">
                 <el-option 
                   v-for="item in layer1List"
@@ -43,6 +43,7 @@ import RegionMultiSelect from '@/components/RegionMultiSelect';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import { getBriefStoreList, getStoreDefineGroup } from '@/api/store';
 import LimitSelect from '@/components/LimitSelect';
+import util from '@/common/util.js';
 export default {
     name: 'InspectItemSelect',
     components: {
@@ -73,6 +74,10 @@ export default {
             curItem:null,
             selAllString:this.$t('eventView.all'),
             showItems:false,
+            lang:this.$i18n.locale,
+            typeDivWidth:[{key:'en',value:'calc(52/1440*100vw)'},{key:'zh',value:'calc(52/1440*100vw)'},{key:'zhtw',value:'calc(52/1440*100vw)'},
+              {key:'ja-JP',value:'calc(62/1440*100vw)'},{key:'ko-KR',value:'calc(52/1440*100vw)'},{key:'vi-VN',value:'calc(52/1440*100vw)'},
+              {key:'id-ID',value:'calc(52/1440*100vw)'},{key:'th-TH',value:'calc(72/1440*100vw)'}],
         }
   },
   created() {
@@ -93,6 +98,9 @@ export default {
 
   },
   methods: {
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     getLayer1List(list){
       console.log(list)
       let layer1List =[];

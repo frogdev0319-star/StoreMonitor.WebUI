@@ -78,14 +78,14 @@
                     {{ $t('insSettingView.bindWith') }}{{ storeNum }} {{ $t('insSettingView.bindStore') }}
                   </span> 
                   <div class="spacer"></div>
-                  <!-- <div
+                  <div
                     style="display:flex;flex-direction:row;margin-right: 16px; line-height: 24px;cursor:pointer;"
                     class="storevue-button-empty"
                     size="mini"
                     @click="setWeighting">
                     <img :src="WeightingSetting" style="width:24px;height:24px;"/>
-                    <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ '權重設定' }}</div>
-                  </div> -->
+                    <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ $t('insSettingView.weightSetting') }}</div>
+                  </div>
                   <div style="display:flex; flex-direction:row;font-size: 13px;align-items:center" @click="setItem(_item.routeData, _item.name, '', _item.name)">
                     <!--<i class="iconfont icon-quxiaolianjie"/>-->
                     <img :src="require('../../../../static/img/ic_relate.svg')" style="width:24px;height:24px;"/>
@@ -628,7 +628,7 @@ export default {
           _obj.id = _item.id;
           _obj.groupName = _item.name;
           _obj.groupWeight = _item.weight;
-          self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight })
+          if (_item.parentId === -1) self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight })
           _obj.itemCount = _item.items.length;
           _obj.type = _item.type;
           _obj.checked = false;
@@ -1230,7 +1230,8 @@ export default {
           if (mapping[key] === 'availableScores') {
             item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
           } else if (mapping[key] === 'itemScore') {
-            item[mapping[key]] = cell.v ? Number(cell.v) : cell.v === 0 ? 0 : 10;
+            item[mapping[key]] = cell.v ? Number(cell.v) : 0;
+            if (cell.v === '') item['type'] = 1;
             if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1);
           } else if (mapping[key] === 'description') {
             item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
@@ -1247,8 +1248,8 @@ export default {
           item['itemScore'] = maxAvailableScore;
           item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
         }
+        console.log(item)
         if (item['subject']) {
-          console.log(1)
           if (requestGroups[rowCells.parent.id]) {
             requestGroups[rowCells.parent.id].items.push(item);
           } else {
@@ -1874,8 +1875,10 @@ export default {
         return passFailFlagObj;
       }
       let count = 0;
+      let allWeightEmpty = true;
       passFailArr.forEach((item, index) => {
         if (item.weight) count += item.weight;
+        if (item.weight !== undefined) allWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length > 0) {
           passFailFlagObj.indexArrPassFail.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -1897,7 +1900,7 @@ export default {
             passFailFlagObj.flags.flagPassFailScoreType = true;
           }
         } else {
-          item.score = 10;
+          item.score = 0;
         }
         if (item.description != undefined) {
           if (filterString.getContentLength(item.description.toString().trim()) > 1200) {
@@ -1905,7 +1908,7 @@ export default {
           }
         }
       });
-      if (count !== 100) passFailFlagObj.flags.flagGroupWeightTotal = true;
+      if (count !== 100 && !allWeightEmpty) passFailFlagObj.flags.flagGroupWeightTotal = true;
       return passFailFlagObj;
     },
 
@@ -1934,8 +1937,10 @@ export default {
         return scoreFlagObj;
       }
       let count = 0;
+      let allWeightEmpty = true;
       scoreArr.forEach((item, index) => {
         if (item.weight) count += item.weight;
+        if (item.weight !== undefined) allWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -2040,7 +2045,7 @@ export default {
           }
         }
       });
-      if (count !== 100) scoreFlagObj.flags.flagGroupWeightTotal = true;
+      if (count !== 100 && !allWeightEmpty) scoreFlagObj.flags.flagGroupWeightTotal = true;
       return scoreFlagObj;
     },
 
@@ -2165,10 +2170,10 @@ export default {
           warningInfo.push(flag);
         }
         if (passFailFlag.flagGroupWeightTotal) {
-          warningInfo.push('[PassFail]' + ' ' + '權重總和不能小於100');
+          warningInfo.push('[PassFail]' + ' ' + this.$t('insSettingView.weightTotalError'));
         }
         if (scoreFlag.flagGroupWeightTotal) {
-          warningInfo.push('[Score]' + ' ' + '權重總和不能小於100');
+          warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.weightTotalError'));
         }
         if (passFailFlag.flagPassFailScoreType) {
           warningInfo.push('[PassFail]' + ' ' + this.$t('insSettingView.excelPassFailScoreType'));
@@ -2336,34 +2341,48 @@ export default {
 
     getExcelDataOfSheet(sheetDataArr, type) {
       const tableHeader = this.getExcelTableHeader(type);
+      // console.log(tableHeader)
       const sheetData = [];
       if (sheetDataArr) {
         const treeData = util.handleInspctionCatergyTree(sheetDataArr);
         treeData.forEach(item => {
           if (!item.children) {
+            // console.log(1)
             if (item.itemData.length !== 0) {
+              // console.log(3)
               item.itemData.forEach((_item, _index) => {
                 const obj = {};
                 if (_index === 0) {
                   obj[tableHeader[0]] = item.groupName;
+                  if (type !== 2) {
+                    obj[tableHeader[1]] = item.groupWeight;
+                  }
                 } else {
                   obj[tableHeader[0]] = '';
+                  obj[tableHeader[1]] = '';
                 }
                 if (type === 0 || type === 2) {
-                  obj[tableHeader[1]] = '';
-                  obj[tableHeader[2]] = _item.name;
-                  obj[tableHeader[3]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
-                  obj[tableHeader[4]] = _item.description === '---' ? '' : _item.description;
-                } else {
-                  obj[tableHeader[1]] = '';
-                  obj[tableHeader[2]] = _item.name;
-                  obj[tableHeader[3]] = _item.type === 0 ? _item.availableScores : 0;
-                  obj[tableHeader[4]] = _item.type === 0 ? _item.qualifiedScore : 0;
+                  obj[tableHeader[2]] = '';
+                  obj[tableHeader[3]] = _item.name;
+                  obj[tableHeader[4]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
                   obj[tableHeader[5]] = _item.description === '---' ? '' : _item.description;
+                } else {
+                  obj[tableHeader[2]] = '';
+                  obj[tableHeader[3]] = _item.name;
+                  obj[tableHeader[4]] = _item.type === 0 ? _item.availableScores : 0;
+                  obj[tableHeader[5]] = _item.type === 0 ? _item.qualifiedScore : 0;
+                  obj[tableHeader[6]] = _item.description === '---' ? '' : _item.description;
+                }
+                if (type === 0) {
+                  obj[tableHeader[6]] = _item.required ? 'Y' : '';
+                }
+                if (type === 1) {
+                  obj[tableHeader[7]] = _item.required ? 'Y' : '';
                 }
                 sheetData.push(obj);
               });
             } else {
+              console.log(4)
               const obj = {};
               obj[tableHeader[0]] = item.groupName;
               obj[tableHeader[1]] = '';
@@ -2376,8 +2395,10 @@ export default {
               sheetData.push(obj);
             }
           } else {
+            // console.log(2)
             item.children.forEach((child, childIndex) => {
               if (child.itemData.length > 0) {
+                console.log(5)
                 child.itemData.forEach((childItem, childItemIndex) => {
                   const obj = {};
                   if (childIndex === 0 && childItemIndex === 0) {
@@ -2403,6 +2424,7 @@ export default {
                   sheetData.push(obj);
                 });
               } else {
+                // console.log(6)
                 const obj = {};
                 if (childIndex === 0) {
                   obj[tableHeader[0]] = item.groupName;
@@ -2426,25 +2448,37 @@ export default {
         tableHeader.map(item => obj[item] = undefined);
         sheetData.push(obj);
       }
+      // console.log(sheetData)
       return sheetData;
     },
 
     getExcelTableHeader(type) {
       const sheet1TableHeader = [
-        this.$t('insSettingView.tHeaderA'), this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.tHeaderE'),
-        this.$t('insSettingView.tHeaderD')
+        this.$t('insSettingView.tHeaderA'), 
+        this.$t('insSettingView.tHeaderI'),
+        this.$t('insSettingView.subCategoryHeader'),
+        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.tHeaderE'),
+        this.$t('insSettingView.tHeaderD'),
+        this.$t('insSettingView.tHeaderH')
       ];
 
       const sheet2TableHeader = [
-        this.$t('insSettingView.tHeaderA2'), this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.tHeaderG'),
-        this.$t('insSettingView.tHeaderF'), this.$t('insSettingView.tHeaderD')
+        this.$t('insSettingView.tHeaderA2'), 
+        this.$t('insSettingView.tHeaderI'),
+        this.$t('insSettingView.subCategoryHeader'),
+        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.tHeaderG'),
+        this.$t('insSettingView.tHeaderF'), 
+        this.$t('insSettingView.tHeaderD'),
+        this.$t('insSettingView.tHeaderH')
       ];
 
       const sheet3TableHeader = [
-        this.$t('insSettingView.tHeaderA'), this.$t('insSettingView.subCategoryHeader'),
-        this.$t('insSettingView.tHeaderB'), this.$t('insSettingView.sheetscore2'),
+        this.$t('insSettingView.tHeaderA'), 
+        this.$t('insSettingView.subCategoryHeader'),
+        this.$t('insSettingView.tHeaderB'), 
+        this.$t('insSettingView.sheetscore2'),
         this.$t('insSettingView.tHeaderD')
       ];
       let tableHeader = [];

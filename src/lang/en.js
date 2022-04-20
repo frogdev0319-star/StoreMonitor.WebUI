@@ -698,6 +698,7 @@ export default{
       "tHeaderF":"Anomaly Events-Score Threshold(Optional，-50~full marks)",
       "tHeaderG":"Score options(Required-50~full marks)",
       "tHeaderH":"Required",
+      "tHeaderI":"Weight",
       "tab1CalculateScore":"When combined with other tabs, the Tab1 (Pass&Fail) project score will participate in the evaluation of the total score calculation",
       "tab1FailedDangeous":"When there are unqualified items in Tab1 (Pass&Fail), the inspection result is: Dangerous.",
       "tab1IgnoredQualified":"Calculate the score of ignored items in Tab1 (Pass&Fail)",
@@ -721,7 +722,8 @@ export default{
       "selectStoreTag":"Quick select",
       "minScoreEmpty":"The total score can not be empty!",
       "weight": "weight%",
-      "weightSetting": "Weight Setting"
+      "weightSetting": "Weight Setting",
+      "weightTotalError": "Weight cannot be greater or less than 100%",
   },
   "deviceView":{
       "EzvizAccount":"Streaming Service Account",

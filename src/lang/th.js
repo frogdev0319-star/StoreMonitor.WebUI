@@ -698,6 +698,7 @@ export default{
       "tHeaderF":"เกณฑ์คะแนน-เหตุการณ์ผิดปกติ (ทางเลือก,-50~คะแนนเต็ม)",
       "tHeaderG":"ตัวเลือกคะแนน (จำเป็น, -50~ คะแนนเต็ม)",
       "tHeaderH":"Required",
+      "tHeaderI":"Weight",
       "tab1CalculateScore":"เมื่อรวมกับแท็บอื่น ๆ คะแนนโครงการแท็บ 1 (ผ่านและไม่ผ่าน) จะมีส่วนร่วมในการประเมินของการคำนวณคะแนนรวม",
       "tab1FailedDangeous":"เมื่อมีรายการที่ไม่ผ่านในแท็บ 1 (ผ่านและไม่ผ่าน) ผลลัพธ์การตรวจสอบจะเป็น: อันตราย",
       "tab1IgnoredQualified":"คำนวณคะแนนของรายการที่ละเว้นในแท็บ 1 (ผ่านและไม่ผ่าน)",
@@ -721,7 +722,8 @@ export default{
       "selectStoreTag":"เลือกด่วน",
       "minScoreEmpty":"Min score can not be empty！",
       "weight": "weight%",
-      "weightSetting": "Weight Setting"
+      "weightSetting": "Weight Setting",
+      "weightTotalError": "Weight cannot be greater or less than 100%",
   },
   "deviceView":{
       "EzvizAccount":"บัญชีบริการสตรีมมิ่ง",

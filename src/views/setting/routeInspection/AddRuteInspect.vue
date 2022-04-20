@@ -85,13 +85,14 @@
                       class="groupItem" @click="clickCategory(index,item)"
                       @mouseenter="onShowCategoryEditBtn(index,item)">
                     <div class="category-list">
-                      <div class="category-name">
+                      <div class="category-name flex-center">
                         <div class="group-left">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
                           <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex-center">
-                            <div style="margin-left: 20px">{{ item.name }}（{{ item.groupNum }}）</div>
+                            <div :style="activeSheetName != 2 ? {}: {'visibility': 'hidden'}" style="color: #c60957; width: 40px; text-align: center">{{ item.weight }}%</div> <div>{{ item.name }}（{{ item.groupNum }}）</div>
                           </div>
                         </div>
+                        <div class="spacer"></div>
                         <div class="group-right">
                           <div class="show-edit">
                             <div class="nape-items-handle" v-if="hoverId === item.id">
@@ -210,8 +211,8 @@
               <span class="item_label">必填</span>
             </div>
             <el-radio-group class="attribute-group" v-model="itemRequired">
-              <el-radio label="1">必填</el-radio>
               <el-radio label="0">非必填</el-radio>
+              <el-radio label="1">必填</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item>
@@ -331,7 +332,7 @@
       <div class="padding">
         <validate-input
           :placeholder="$t('insSettingView.enterName')"
-          :input-limit-length="30"
+          :input-limit-length="50"
           :out-limit-prompt-msg="$t('insSettingView.enterNameRuletip')"
           :empty-prompt-msg="$t('insSettingView.enterName')"
           :input-name="groupNameInput"
@@ -1117,6 +1118,7 @@ export default {
     addNape() {
       const self = this;
       self.showAddNape = true;
+      this.itemRequired = '0';
       self.updateType = {type:0};
       self.setDialogContent();
       self.ItemSheetScore = self.activeSheetName === '0' ? '' : 0;
@@ -1221,8 +1223,7 @@ export default {
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
-          //self.ItemSheetScore = itemScore = 10;
-          self.OtherScoreTipEmpty = true;
+          // self.OtherScoreTipEmpty = true;
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {

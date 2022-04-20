@@ -699,6 +699,7 @@ export default {
       "tHeaderF":"異常イベント – スコアしきい値(オプション、スコアリングオプションの最高スコア以下)",
       "tHeaderG":"スコアオプション(必須、-50～50)",
       "tHeaderH":"Required",
+      "tHeaderI":"Weight",
       "tab1CalculateScore":"他のタブと組み合わせると、Tab1(パス＆失敗)プロジェクトスコアが合計スコア計算の評価に参加します",
       "tab1FailedDangeous":"Tab1(パス＆失敗)に不適格なアイテムがある場合、インスペクション結果は危険です",
       "tab1IgnoredQualified":"Tab1で無視されたアイテムのスコアを計算します(パス＆失敗)",
@@ -722,7 +723,8 @@ export default {
       "selectStoreTag":"クイックセレクト",
       "minScoreEmpty":"Min score can not be empty！",
       "weight": "weight%",
-      "weightSetting": "Weight Setting"
+      "weightSetting": "Weight Setting",
+      "weightTotalError": "Weight cannot be greater or less than 100%",
   },
   "deviceView":{
       "EzvizAccount":"アカウント",

@@ -582,7 +582,7 @@
                         class="spacer font-15"
                         style="text-align: left; font-weight: 500"
                         @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
-                        
+                        <span style="color: #c60957" v-if="item.required">*</span>
                         {{ item.subject }}
                       </div>
                       <div v-if="item.itemType === 0">
@@ -613,7 +613,7 @@
                               @click.native="checkScore({item,itemDS: itemDS,e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                        <div class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
+                        <div v-if="!item.required" class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
                       </div>
                     </div>
                   </div>
@@ -1485,8 +1485,7 @@ export default {
             if (item.id === self.curItemId) self.curGroupIndex = idx
           })
         })
-        if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
-          console.log("Find")
+        if (!item.manualIgnore && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
           self.sheetName[self.curSheetIndex].dealCount++;
           self.sheetName[self.curSheetIndex].Effective++;
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
@@ -1658,10 +1657,37 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      if ((this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0)) {
-        this.changeStoreObj.dialogCosed = true;
+      if (this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0 && storeItem != undefined) {
+        // this.changeStoreObj.dialogCosed = true;
       } else {
-        if (storeItem) this.changeStore_(storeItem)
+        if (storeItem) {
+          this.changeStore_(storeItem)
+        } else {
+          this.patrolstore = '';
+          this.curSheetIndex = 0;
+          this.curSheet = {};
+          this.inspectItemList = [];
+          this.inspectList = [];
+          this.sheetName = [];
+          this.tempArr = [];
+          this.showChannelBtns = [];
+          this.patrolStoreName = '';
+          this.PatrolList = [];
+          this.hasIgnoretemp = [];
+          this.$store.dispatch('setPatrolHistory', null);
+          this.isShowWarn = false;
+          this.notShowAlert = false;
+          this.showIgnoreItem = false;
+          this.$emit("listenerChild", false);
+          this.showStoreUp = true;
+          this.$refs.vendorVideo && (this.$refs.vendorVideo.editCount = 0);
+          this.$refs.vendorVideo && this.$refs.vendorVideo.stopVideoPlay();
+          this.showError = false;
+          this.curDeviceId = -1;
+          this.showFeedBack = false;
+          this.eventList = [];
+          this.showGuide = true;
+        }
       }
       
     },
@@ -1983,7 +2009,8 @@ export default {
           self.sheetName[self.curSheetIndex].Effective--;
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
-            self.sheetName[self.curSheetIndex].dealCount++;
+          this.sheetName[this.curSheetIndex].dealCount++
+          this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore) {
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
@@ -2023,9 +2050,12 @@ export default {
     cancleIgnore() {
       const self = this;
       self.curItem.manualIgnore = false;
-
-        self.sheetName[self.curSheetIndex].dealCount != 0 ? self.sheetName[self.curSheetIndex].dealCount-- : null;
-        self.notShowAlert ? self.notShowAlert = false : null;
+      self.sheetName[self.curSheetIndex].dealCount--
+      this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount--
+      // if (self.sheetName[self.curSheetIndex].dealCount != 0) {
+        
+      // }
+      self.notShowAlert ? self.notShowAlert = false : null;
 
     },
     cancelIgnoreInspect(val) {
@@ -2595,7 +2625,7 @@ export default {
       const self = this;
       console.log(self.$refs.vendorVideo.editCount)
       // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
-      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0) ) {
+      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 1) ) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
       } else {

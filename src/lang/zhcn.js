@@ -702,7 +702,8 @@ export default{
     "tHeaderE":"项目分值（选填，0.5~50分，默认10分）",
     "tHeaderF":"低于*分，须门店负责人处理（选填，-50~满分）",
     "tHeaderG":"评分选项（必填，-50~满分）",
-    "tHeaderH":"Required",
+    "tHeaderH":"是否必填",
+    "tHeaderI":"權重",
     "tab1CalculateScore":"与其他tab组合时，Tab1（Pass&Fail）项目分值参与考评总分运算",
     "tab1FailedDangeous":"Tab1（Pass&Fail）中存在不合格项时，巡检结果为：立即督导",
     "tab1IgnoredQualified":"Tab1(Pass&Fail)中忽略项目视同得分",
@@ -724,7 +725,8 @@ export default{
     "needBind":"表，需要绑定的门店",
     "minScoreEmpty":"扣分起始值不得为空！",
     "weight": "權重值%",
-    "weightSetting": "權重設定"
+    "weightSetting": "权重设定",
+    "weightTotalError": "权重不可大于或小于100%",
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",

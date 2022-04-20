@@ -147,7 +147,7 @@ export default {
             positionsList: [],
             lang:this.$i18n.locale,
             dropdownWidth:[{key:'en',value:'calc(105/1440*100vw)'},{key:'zh',value:'calc(105/1440*100vw)'},{key:'zhtw',value:'calc(105/1440*100vw)'},
-        {key:'ja-JP',value:'calc(130/1440*100vw)'},{key:'ko-KR',value:'calc(105/1440*100vw)'},{key:'vi-VN',value:'calc(105/1440*100vw)'},
+        {key:'ja-JP',value:'calc(130/1440*100vw)'},{key:'ko-KR',value:'calc(105/1440*100vw)'},{key:'vi-VN',value:'calc(130/1440*100vw)'},
         {key:'id-ID',value:'calc(105/1440*100vw)'},{key:'th-TH',value:'calc(110/1440*100vw)'}]
         }
   },
@@ -677,7 +677,7 @@ export default {
             
           }
         //}
-          //console.log("storeIds:",storeIds);
+          console.log("curSelectId:",self.curSelectId);
           self.onChangeCompareType({selectedArray:self.curSelectId,storeIds:storeIds,selectedLabels});
             //self.$emit("emitTypeChanged",{compareType:self.compareType,compareArr:storeIds,selectedLabels});    
       //}
@@ -686,7 +686,7 @@ export default {
     onChangeCompareType({selectedArray,storeIds,selectedLabels}) {
       //console.log("onChangeCompareType > selectedArray:",selectedArray);
       //console.log("onChangeCompareType > selectedLabels:",selectedLabels);
-      console.log("1.onChangeCompareType > storeIds:",storeIds);
+      //console.log("1.onChangeCompareType > storeIds:",storeIds);
       this.curSelectId = selectedArray;
       let originArray = [];
       this.curTypeArrary.forEach(function(item){
@@ -711,7 +711,8 @@ export default {
         storeId=this.doGetStoreIdsByCity(selectedArray);
         //console.log("storeId:",storeId);
       }
-      //console.log("2.onChangeCompareType > storeId:",storeId);
+      //console.log("2.onChangeCompareType > compareArr:",compareArr);
+      //console.log("2.onChangeCompareType > originArray:",originArray);
       this.$emit("emitTypeChanged",{compareType:this.compareType,compareArr:compareArr,selectedLabels,originArray,selStoreIdArr:storeId});
     },
     doGetStoreIdsByProvince(provinceArrary){

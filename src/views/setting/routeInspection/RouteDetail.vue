@@ -83,7 +83,10 @@
           </div>
           <div class="catergy-title">
             <el-checkbox v-model="item.checked" class="storevue-checkbox-outlined" @change="checkItemsOfCatergy(item)"/>
-            <span class="table-title"><span>{{ item.groupName }}（{{ item.itemCount }}）</span></span>
+            <div style="display: inline-flex;flex-direction: column;font-size: 14px;font-weight: bold;color: #424151; padding-left: calc(38/1920*100vw); margin-left: 10px">
+              <div style="color: #c60957">{{ item.groupWeight }}%</div>
+              <div>{{ item.groupName }}（{{ item.itemCount }}）</div>
+            </div>
           </div>
           <template v-if="!item.children">
             <div v-if="item.itemData.length !== 0" class="table-class">
@@ -95,7 +98,7 @@
                 :show-table-header="false"
                 @handleDeleteItem="contentItem => handleDelete(contentItem, index, -1)"
                 @handleCheckItem="tableData => handleCheckCategoryItem(tableData, index)"
-                @updateTableData = "sortableTableData => changeTableData(sortableTableData, index)"
+                @updateTableData="sortableTableData => changeTableData(sortableTableData, index)"
               />
             </div>
           </template>
@@ -114,7 +117,7 @@
                   :show-table-header="false"
                   @handleDeleteItem="contentItem => handleDelete(contentItem, index, childIndex)"
                   @handleCheckItem="(tableData) => handleCheckSubcategoryItem(tableData, index, childIndex)"
-                  @updateTableData = "sortableTableData => changeTableData(sortableTableData,index, childIndex)"
+                  @updateTableData="sortableTableData => changeTableData(sortableTableData,index, childIndex)"
                 />
               </div>
             </template>

@@ -20,7 +20,7 @@
                 class="storevue-checkbox-outlined"
                 @change="onCheckItem(sortableTableData)"/>
             </div>
-            <div class="table-name" style="position: relative"><span style="margin-left: 10px">{{ contentItem.name }}</span></div>
+            <div class="table-name" style="position: relative"><span v-if="contentItem.required" style="color: #c60957; position: absolute">*</span><span style="margin-left: 10px">{{ contentItem.name }}</span></div>
           </div>
           <div :class="isScoreSheet? 'table-score-description': 'table-description'">
             {{ contentItem.description }}
@@ -135,6 +135,7 @@ export default {
     },
 
     updateItemSequence() {
+      console.log(111)
       const params = {};
       params.items = [];
       this.newSequenceList.forEach((item, index) => {
@@ -147,7 +148,7 @@ export default {
       if (params.items.length > 0) {
         inpectRESTful.updateInspectItem(params).then(res => {
           if (res.errCode === 0) {
-            // this.$emit('updateTableData', this.sortableTableData);
+            this.$emit('updateTableData', this.sortableTableData);
             // this.oldSequenceList = this.newSequenceList.map(value => value.sequence);
           }
         }).catch(err => {
