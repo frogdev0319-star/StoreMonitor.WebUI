@@ -79,7 +79,7 @@ export default {
       ],
       columnOperationData: {
         label: this.$t('titleView.operation'),
-        minWidth: '30',
+        minWidth: '50',
         align: 'left',
         customIcon: true,
         src : require('@/../static/img/icon_pen.png'),
