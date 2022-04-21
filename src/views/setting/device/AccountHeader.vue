@@ -55,5 +55,9 @@ export default {
 </script>
 
 <style scoped>
-
+.error-img{
+  height: calc(24/1920*100vw);
+  width: calc(24/1920*100vw);
+  margin-right: calc(8/1920*100vw);
+}
 </style>
