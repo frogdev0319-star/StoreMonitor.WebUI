@@ -938,9 +938,13 @@ export default {
       if (!primaryColumnCells.some(cell => cell.v) && type === 'Others') {
         primaryColumnCells = [{ ...primaryColumnCells[0], v: this.$t('insSettingView.Addscoreitems') }];
       }
-
+      var names_ = {}
       primaryColumnCells.filter(cell => cell.v).forEach((cell, i) => {
-        primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
+        if (names_[cell.v] === undefined) {
+          names_[cell.v] = cell.v
+          primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
+        }
+        
         let next, current = sheet[cell.cellRef];
         
         if (primaryColumnCells.filter(cell => cell.v)[i + 1]) {
@@ -1167,6 +1171,9 @@ export default {
           }
         }
       });
+      console.log(primaryGroupCelss)
+      // console.log(secondaryGroupCells)
+      // console.log(groupItemCells)
       const groupType = this.getGroupType(type);
       let addGroupParams = primaryGroupCelss.filter(cell => cell.v).map(cell => {
         return {
@@ -1207,7 +1214,7 @@ export default {
       }
 
       const requestGroups = {};
-      const rowCellsObject = groupItemCells.reduce((current, next) => {
+      var rowCellsObject = groupItemCells.reduce((current, next) => {
         const nextCell = sheet[next.cellRef];
         if (current[next.cellAddress.r]) {
           current[next.cellAddress.r].push(nextCell);
@@ -1225,6 +1232,7 @@ export default {
       const requiredMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderH', 'required');
       const mapping = {};
       Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping, requiredMapping);
+      var names = {};
       Object.values(rowCellsObject).forEach(rowCells => {
         const item = {};
         rowCells.forEach(cell => {
@@ -1251,20 +1259,29 @@ export default {
           item['itemScore'] = maxAvailableScore;
           item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
         }
-        console.log(item)
         if (item['subject']) {
-          if (requestGroups[rowCells.parent.id]) {
-            requestGroups[rowCells.parent.id].items.push(item);
+          if (names[rowCells.parent.v] === undefined) {
+            names[rowCells.parent.v] = rowCells.parent.id;
+            if (requestGroups[rowCells.parent.id]) {
+              requestGroups[rowCells.parent.id].items.push(item);
+            } else {
+              requestGroups[rowCells.parent.id] = {
+                groupId: rowCells.parent.id,
+                items: [item]
+              };
+            }
           } else {
-            requestGroups[rowCells.parent.id] = {
-              groupId: rowCells.parent.id,
-              items: [item]
-            };
+            if (requestGroups[names[rowCells.parent.v]]) {
+              requestGroups[names[rowCells.parent.v]].items.push(item);
+            } else {
+              requestGroups[names[rowCells.parent.v]] = {
+                groupId: names[rowCells.parent.v],
+                items: [item]
+              };
+            }
           }
         }
       });
-
-      console.log(requestGroups)
       const addItemParams = {
         request: Object.values(requestGroups)
       };
@@ -1772,6 +1789,7 @@ export default {
         delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.G1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
+        var names = {};
         sheetArray.forEach((_item) => {
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
@@ -1790,8 +1808,14 @@ export default {
             rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
             rowDataObj.required = _item.__EMPTY_5;
           }
+          
+          if (names[rowDataObj.catergyName] === undefined || rowDataObj.catergyName === '') {
+            names[rowDataObj.catergyName] = true;
+            rowDataArray.push(rowDataObj);
+            
+          }
+          
 
-          rowDataArray.push(rowDataObj);
         });
         return rowDataArray;
       }
