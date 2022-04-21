@@ -204,7 +204,7 @@
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
-          <el-form-item>
+          <!-- <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">必填</span>
@@ -213,7 +213,7 @@
               <el-radio label="1">必填</el-radio>
               <el-radio label="0">非必填</el-radio>
             </el-radio-group>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
@@ -1219,10 +1219,13 @@ export default {
         self.enterItemNameTip = true;
       }
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
+      self.OtherScoreTipEmpty = false;
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
           //self.ItemSheetScore = itemScore = 10;
-          self.OtherScoreTipEmpty = true;
+          if(self.itemType === 0 ) {
+            self.OtherScoreTipEmpty = true;
+          }
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
@@ -1279,6 +1282,9 @@ export default {
           qualifiedScore = null;
         }
       }
+      console.log({enterItemNameTip : self.enterItemNameTip, PFScoreTip: self.PFScoreTip, ItemTotalScoreTip0 : self.ItemTotalScoreTip0, ItemTotalScoreTip1: self.ItemTotalScoreTip1,
+          ItemMinScoreTip: self.ItemMinScoreTip, OtherScoreTip: self.OtherScoreTip, enterListNameRuletip: self.enterListNameRuletip, OtherScoreTipEmpty: self.OtherScoreTipEmpty,
+          descriptionRuletip: self.descriptionRuletip, ScoreOptionsTips0: self.ScoreOptionsTips0, ScoreOptionsTips1: self.ScoreOptionsTips1 })
       if(self.enterItemNameTip || self.PFScoreTip || self.ItemTotalScoreTip0 || self.ItemTotalScoreTip1 ||
           self.ItemMinScoreTip || self.OtherScoreTip || self.enterListNameRuletip || self.OtherScoreTipEmpty ||
           self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1){
@@ -1302,7 +1308,7 @@ export default {
         qualifiedScore: qualifiedScore,
         availableScores: selectAvailable,
         type: this.itemType,
-        required: this.itemRequired === '1'
+        // required: this.itemRequired === '1'
       };
         temp.push(objItem);
         const obj = {
@@ -1364,7 +1370,7 @@ export default {
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable,
           type: this.itemType,
-          required: this.itemRequired === '1'
+          // required: this.itemRequired === '1'
         };
         temp.push(obj);
         const params = {
@@ -1396,7 +1402,7 @@ export default {
       this.ItemScoreOption = item.availableScoreStr;
       this.ItemDescription = item.napeDep;
       this.itemType = item.type;
-      this.itemRequired = item.required ? '1' : '0'
+      // this.itemRequired = item.required ? '1' : '0'
     },
 
     handleDelete(item) {
