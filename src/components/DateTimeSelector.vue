@@ -1,8 +1,8 @@
 <template>
-  <div class="date-selector-container">
+  <div class="date-selector-container" :style="{'width':getLangStyleValue(contentWidth)}">
       <div class="time-title">{{ $t('overview.date') }}</div>
       <div class="paper shadow-light" style="display:flex; flex-direction:row;">
-        <el-select class="bDateSel" v-model="dateRange" value-key="value" @change="changeDateRange">
+        <el-select class="bDateSel" :class="getLangStyleValue(selecClass)" v-model="dateRange" value-key="value" :style="{'width':getLangStyleValue(rangeWidth)}" @change="changeDateRange">
             <el-option 
               v-for="item in dateRangeItems"
               :key="item.value"
@@ -32,6 +32,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import DateTimePicker from './DateTimePicker';
+import util from '@/common/util.js';
 
 export default {
   name: 'DateTimeSelector',
@@ -54,7 +55,15 @@ export default {
                       {value:2,label:this.$t('overview.thisQuarter')},{value:4,label:this.$t('overview.customDate')}],
       dateRangevalue:-1,
       diablePick:false,
-
+      contentWidth:[{key:'en',value:'calc(402/1440*100vw)'},{key:'zh',value:'calc(402/1440*100vw)'},{key:'zhtw',value:'calc(402/1440*100vw)'},
+        {key:'ja-JP',value:'calc(492/1440*100vw)'},{key:'ko-KR',value:'calc(402/1440*100vw)'},{key:'vi-VN',value:'calc(442/1440*100vw)'},
+        {key:'id-ID',value:'calc(412/1440*100vw)'},{key:'th-TH',value:'calc(402/1440*100vw)'}],
+            rangeWidth:[{key:'en',value:'calc(105/1440*100vw)'},{key:'zh',value:'calc(95/1440*100vw)'},{key:'zhtw',value:'calc(95/1440*100vw)'},
+        {key:'ja-JP',value:'calc(190/1440*100vw)'},{key:'ko-KR',value:'calc(125/1440*100vw)'},{key:'vi-VN',value:'calc(130/1440*100vw)'},
+        {key:'id-ID',value:'calc(120/1440*100vw)'},{key:'th-TH',value:'calc(95/1440*100vw)'}],
+      selecClass:[{key:'en',value:'rangeSel'},{key:'zh',value:'rangeSel'},{key:'zhtw',value:'rangeSel'},
+        {key:'ja-JP',value:'rangeSel-ja'},{key:'ko-KR',value:'rangeSel-ko'},{key:'vi-VN',value:'rangeSel-vi'},
+        {key:'id-ID',value:'rangeSel-id'},{key:'th-TH',value:'rangeSel'}]
     }
   },
   computed:{
@@ -91,6 +100,9 @@ export default {
       this.dateRange = -1;
   },
   methods: {
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     getDefaultTimeList() {
       //console.log("2.dateTimeValue:",this.dateTimeValue);
       if(this.dateTimeValue.length==0){
@@ -145,6 +157,21 @@ export default {
     border: none;
     color:#2b2b2b;
   background-color: transparent;
+  }
+  .rangeSel.el-select .el-input--medium .el-input__inner {
+    width: calc(95/1440*100vw);
+  }
+  .rangeSel-ja.el-select .el-input--medium .el-input__inner {
+    width: calc(180/1440*100vw);
+  }
+  .rangeSel-ko.el-select .el-input--medium .el-input__inner {
+    width: calc(125/1440*100vw);
+  }
+  .rangeSel-vi.el-select .el-input--medium .el-input__inner {
+    width: calc(130/1440*100vw);
+  }
+  .rangeSel-id.el-select .el-input--medium .el-input__inner {
+    width: calc(120/1440*100vw);
   }
   .bDateSel.el-select .el-input .el-select__caret {
     color: #2c90d9;
