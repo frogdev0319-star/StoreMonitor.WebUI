@@ -1046,7 +1046,7 @@ export default {
     align-items: center;
     padding: 0 !important;
     .el-Country{
-      width: calc(116/1920*100vw);
+      width: calc(126/1920*100vw);
       margin-right: calc(15/1920*100vw);
       min-width: 85px;
       min-height: 36px;

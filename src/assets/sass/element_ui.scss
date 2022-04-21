@@ -80,6 +80,9 @@
 body .el-table th.gutter {
   display: table-cell !important
 }
+.el-table--border th.gutter:last-of-type{
+  border-bottom: none;
+}
 .el-table--border td.cell-class:nth-last-of-type(1) {
   border-right: 1px solid #EBEEF5 !important;
 }
@@ -92,7 +95,27 @@ body .el-table th.gutter {
 .header-class:first-child .cell{
   padding-left: calc(70/1920*100vw) !important;
 }
+.el-table th {
+  background-color: transparent;
+}
+.el-table__expand-icon .el-icon{
+  display: none;
+}
 
+//.el-table {
+//  overflow-x: auto;
+//}
+//.el-table__header-wrapper,
+//.el-table__body-wrapper,
+//.el-table__footer-wrapper {
+//  overflow: visible;
+//}
+//.el-table::after {
+//  position: relative;
+//}
+//.el-table--scrollable-x .el-table__body-wrapper {
+//  overflow: visible;
+//}
 .name-wrapper .el-tag--small{
   width: 45px;
   font-size: calc(14/1920*100vw);
