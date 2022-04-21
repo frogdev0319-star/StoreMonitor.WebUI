@@ -325,6 +325,9 @@ export default {
       hideUpload: false,
       tempdata: [],
       showImportSucceed: false,
+      importCount: 0,
+      allScoreWeightEmpty: true,
+      allPassWeightEmpty: true,
       btnList: [
         {
           id: 0,
@@ -1692,11 +1695,17 @@ export default {
           PassFailCopy = outdata.PassFail.length > 0 ? PassFailCopy : undefined;
           ScoreCopy = outdata.Score.length > 0 ? ScoreCopy : undefined;
           OthersCopy = outdata.Others.length > 0 ? OthersCopy : undefined;
-
-          const passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
-          const scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
+          _this.importCount = 0;
+          var passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
+          var scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
           const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
-
+          passFailSheetFlagObj.flags.flagGroupWeightTotal = false;
+          scoreSheetFlagObj.flags.flagGroupWeightTotal = false;
+          if (_this.importCount !== 100 && !_this.allPassWeightEmpty && !_this.allScoreWeightEmpty) {
+            passFailSheetFlagObj.flags.flagGroupWeightTotal = true;
+            scoreSheetFlagObj.flags.flagGroupWeightTotal = true;
+          }
+          
           const flagTempError = !!(outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined);
 
           _this.FileInfo = _this.getWarningInfo(passFailSheetFlagObj.flags, scoreSheetFlagObj.flags,
@@ -1876,9 +1885,12 @@ export default {
       }
       let count = 0;
       let allWeightEmpty = true;
+      var self = this;
       passFailArr.forEach((item, index) => {
-        if (item.weight) count += item.weight;
-        if (item.weight !== undefined) allWeightEmpty = false;
+        if (item.weight) {
+          self.importCount += item.weight;
+        }
+        if (item.weight !== undefined) self.allPassWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length > 0) {
           passFailFlagObj.indexArrPassFail.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -1908,7 +1920,7 @@ export default {
           }
         }
       });
-      if (count !== 100 && !allWeightEmpty) passFailFlagObj.flags.flagGroupWeightTotal = true;
+      
       return passFailFlagObj;
     },
 
@@ -1939,8 +1951,10 @@ export default {
       let count = 0;
       let allWeightEmpty = true;
       scoreArr.forEach((item, index) => {
-        if (item.weight) count += item.weight;
-        if (item.weight !== undefined) allWeightEmpty = false;
+        if (item.weight) {
+          _this.importCount += item.weight;
+        }
+        if (item.weight !== undefined) _this.allScoreWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -2045,7 +2059,6 @@ export default {
           }
         }
       });
-      if (count !== 100 && !allWeightEmpty) scoreFlagObj.flags.flagGroupWeightTotal = true;
       return scoreFlagObj;
     },
 
@@ -2081,6 +2094,7 @@ export default {
         }
         if (item.itemName == undefined || item.itemName.length == 0) {
           otherFlagObj.flags.flagItemNameOthers = true;
+          console.log(item)
         } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
           otherFlagObj.flags.flagItemLengthOthers = true;
         }
@@ -2347,9 +2361,7 @@ export default {
         const treeData = util.handleInspctionCatergyTree(sheetDataArr);
         treeData.forEach(item => {
           if (!item.children) {
-            // console.log(1)
             if (item.itemData.length !== 0) {
-              // console.log(3)
               item.itemData.forEach((_item, _index) => {
                 const obj = {};
                 if (_index === 0) {
@@ -2361,17 +2373,22 @@ export default {
                   obj[tableHeader[0]] = '';
                   obj[tableHeader[1]] = '';
                 }
-                if (type === 0 || type === 2) {
+                if (type === 0) {
                   obj[tableHeader[2]] = '';
                   obj[tableHeader[3]] = _item.name;
                   obj[tableHeader[4]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
                   obj[tableHeader[5]] = _item.description === '---' ? '' : _item.description;
-                } else {
+                } else if (type === 1) {
                   obj[tableHeader[2]] = '';
                   obj[tableHeader[3]] = _item.name;
                   obj[tableHeader[4]] = _item.type === 0 ? _item.availableScores : 0;
                   obj[tableHeader[5]] = _item.type === 0 ? _item.qualifiedScore : 0;
                   obj[tableHeader[6]] = _item.description === '---' ? '' : _item.description;
+                } else {
+                  obj[tableHeader[1]] = '';
+                  obj[tableHeader[2]] = _item.name;
+                  obj[tableHeader[3]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
+                  obj[tableHeader[4]] = _item.description === '---' ? '' : _item.description;
                 }
                 if (type === 0) {
                   obj[tableHeader[6]] = _item.required ? 'Y' : '';
@@ -2382,7 +2399,6 @@ export default {
                 sheetData.push(obj);
               });
             } else {
-              console.log(4)
               const obj = {};
               obj[tableHeader[0]] = item.groupName;
               obj[tableHeader[1]] = '';
@@ -2395,10 +2411,8 @@ export default {
               sheetData.push(obj);
             }
           } else {
-            // console.log(2)
             item.children.forEach((child, childIndex) => {
               if (child.itemData.length > 0) {
-                console.log(5)
                 child.itemData.forEach((childItem, childItemIndex) => {
                   const obj = {};
                   if (childIndex === 0 && childItemIndex === 0) {
@@ -2411,20 +2425,23 @@ export default {
                   } else {
                     obj[tableHeader[1]] = '';
                   }
-                  if (type === 0 || type === 2) {
+                  if (type === 0) {
                     obj[tableHeader[2]] = childItem.name;
                     obj[tableHeader[3]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
                     obj[tableHeader[4]] = childItem.description === '---' ? '' : childItem.description;
-                  } else {
+                  } else if (type === 1) {
                     obj[tableHeader[2]] = childItem.name;
                     obj[tableHeader[3]] = childItem.type === 0 ? childItem.availableScores : 0;
                     obj[tableHeader[4]] = childItem.type === 0 ? childItem.qualifiedScore : 0;
                     obj[tableHeader[5]] = childItem.description === '---' ? '' : childItem.description;
+                  } else {
+                    obj[tableHeader[1]] = childItem.name;
+                    obj[tableHeader[2]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
+                    obj[tableHeader[3]] = childItem.description === '---' ? '' : childItem.description;
                   }
                   sheetData.push(obj);
                 });
               } else {
-                // console.log(6)
                 const obj = {};
                 if (childIndex === 0) {
                   obj[tableHeader[0]] = item.groupName;

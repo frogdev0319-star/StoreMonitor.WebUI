@@ -1221,8 +1221,12 @@ export default {
         self.enterItemNameTip = true;
       }
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
+      self.OtherScoreTipEmpty = false;
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
+          if(self.itemType === 0 ) {
+            self.OtherScoreTipEmpty = true;
+          }
           // self.OtherScoreTipEmpty = true;
           qualifiedScore = null;
         } else {
