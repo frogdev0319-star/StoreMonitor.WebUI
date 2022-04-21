@@ -810,7 +810,7 @@ export default {
           'prop': 'province',
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
-          'width': '70',
+          'width': '60',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -818,7 +818,7 @@ export default {
           'prop': 'city',
           'label': this.$t('remotePatrol.regionII'),
           'sortable': false,
-          'width': '70',
+          'width': '60',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -826,7 +826,7 @@ export default {
           'prop': 'groupName',
           'label': this.$t('overview.storeName'),
           'sortable': false,
-          'width': '80',
+          'minWidth': '80',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -834,7 +834,7 @@ export default {
           'prop': 'storeGroup',
           'label': this.$t('statistics.event.storeGroup'),
           'sortable': false,
-          'width': '70',
+          'minWidth': '70',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -842,7 +842,7 @@ export default {
           'prop': 'storeType',
           'label': this.$t('statistics.event.storeType'),
           'sortable': false,
-          'width': '70',
+          'minWidth': '70',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -850,7 +850,7 @@ export default {
           'prop': 'code',
           'label': this.$t('remotePatrol.code'),
           'sortable': false,
-          'width': '70',
+          'minWidth': '60',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -867,7 +867,7 @@ export default {
           'prop': 'numOfUnprocessed',
           'label': this.$t('statistics.event.numUnprocessEvents'),
           'sortable': 'custom',
-          'width': '55',
+          'minWidth': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':true
@@ -875,8 +875,8 @@ export default {
         {
           'prop': 'numOfInprocess',
           'label': this.$t('statistics.event.numProcessEvents'),
-          'sortable': 'custom',
-          'width': '55',
+          'sortable': true,
+          'minWidth': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':true
@@ -885,7 +885,7 @@ export default {
           'prop': 'numOfProcessed',
           'label': this.$t('statistics.event.numClosedEvents'),
           'sortable': 'custom',
-          'width': '55',
+          'minWidth': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':true
@@ -893,8 +893,8 @@ export default {
         {
           'prop': 'numOfRejected',
           'label': this.$t('statistics.event.numReturndEvents'),
-          'sortable': 'custom',
-          'width': '55',
+          'sortable': true,
+          'minWidth': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':true
@@ -903,7 +903,7 @@ export default {
           'prop': 'completedRateStr',
           'label': this.$t('statistics.event.completedRate'),
           'sortable': 'custom',
-          'width': '60',
+          'minWidth': '60',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':false
@@ -912,7 +912,7 @@ export default {
           'prop': 'detail',
           'label': this.$t('statistics.event.commonEvent'),
           'sortable': 'false',
-          'width': '90',
+          'minWidth': '90',
           'maxWidth': '140',
           'pdfwidth': '12%',
           'isExpand':true

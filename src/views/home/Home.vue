@@ -1588,6 +1588,7 @@ $collapseWidth: 5.5%;
 }
 .el-table .cell {
   word-break: break-word;
+  text-overflow: clip;
 }
 .el-message__content,
 .el-button,

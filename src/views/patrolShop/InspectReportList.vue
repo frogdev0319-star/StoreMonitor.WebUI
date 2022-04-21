@@ -311,8 +311,8 @@ export default {
           'prop': 'province',
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
-          'width': '60',
-          'maxWidth': '60',
+          'width': 60,
+          'maxWidth': 60,
           'isExpand': false
         },
         {
@@ -386,12 +386,13 @@ export default {
           'sortable': true,
           'width': 65,
           'maxWidth': 65,
+          'minWidth': 65,
           'isExpand': false
         },
         {
           'prop': 'datestr',
           'label': this.$t('remotePatrol.patrolDate'),
-          'sortable': 'custom',
+          'sortable': true,
           'width': 100,
           'maxWidth': 100,
           'isExpand': false
@@ -1248,6 +1249,7 @@ $filterWidth: (100%-706);
           border: none !important;
           background-color: #fff;
           padding-left: 12px;
+          padding-right: 12px;
         }
       }
     }
