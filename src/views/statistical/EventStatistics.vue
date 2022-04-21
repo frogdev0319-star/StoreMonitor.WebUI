@@ -343,7 +343,10 @@
                   :style="{width:'800px',height:'100%'}"/>
                 </div>
                 <div v-else class="barchart-area"  style="overflow-x:auto;overflow-y:hidden;height:270px">
-                  <v-chart ref="ChartViewMode_eventStores" autoresize :options="barchartOptionViewMode_eventStores" class="chart-content" width="100%"/>
+                  <v-chart ref="ChartViewMode_eventStores" autoresize :options="barchartOptionViewMode_eventStores" 
+                  class="chart-content" 
+                  :width="barchartWidth_sec"
+                    :style="{width:barchartWidth_sec}"/>
                 </div>
               </div>
               </div>
@@ -665,8 +668,11 @@
                     />
                   </div>
                 </div>
-                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
-                  <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"/>
+                <div v-else class="barchart-area" style="overflow-x:auto;overflow-y:hidden;margin-top:20.5px;border-bottom:none;">
+                  <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"
+                    :width="barchartWidth_sec"
+                    :style="{width:barchartWidth_sec}"
+                  />
                 </div>
               </div>
             </div>
@@ -1097,6 +1103,7 @@ export default {
       barActiveName:'-1',
       inspectId:null,
       barchartWidth:'100%',
+      barchartWidth_sec:'100%',
       operationBtnClass:[
         {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
         {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
@@ -2167,7 +2174,7 @@ export default {
       
     },
     doDrawEventInvolveChartMode(chartData){
-      this.barchartOptionViewMode_eventStores = this.getBarchartOption();
+      var option = this.getBarchartOption();
       let date_xAxis=[];
       let chart_dataset=[];
       if(chartData.length>0){
@@ -2175,13 +2182,33 @@ export default {
           date_xAxis.push(this.maxLabel(item.name));
           chart_dataset.push({value:item.numOfUnqualified,name:item.name,innerId:item.id});
         });
-        this.barchartOptionViewMode_eventStores.xAxis.data = date_xAxis;
+        option.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
-        this.barchartOptionViewMode_eventStores.series[0].data = chart_dataset;
+        option.series[0].data = chart_dataset;
         
-        //
+        if(date_xAxis.length>28){
+          var w = ( date_xAxis.length*90) +'px';
+          
+          option.width = w;
+          option.grid.width = w;
+          this.barchartWidth_sec = w;
+        }
+        else{
+           //option.grid.width = 'calc(1479/1980*100vw)';
+           if(this.ispdf){
+             option.width = 'calc(800/1980*100vw)';
+              option.grid.width = '800px';
+              this.barchartWidth_sec = 'calc(800/1980*100vw)';
+           }else{
+            option.width = 'calc(1479/1980*100vw)';
+            option.grid.width = '100%';
+            this.barchartWidth_sec = 'calc(1479/1980*100vw)';
+           }
+        }
+        this.barchartOptionViewMode_eventStores = option;
+        
       }
       
     },
