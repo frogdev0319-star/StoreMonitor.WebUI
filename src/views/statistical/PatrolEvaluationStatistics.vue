@@ -173,7 +173,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="overflow-y:hidden;overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
+         <el-col  style="overflow-y:hidden;overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 80px )">
                   <v-chart  v-if="part1.storeMode==1" 
                             ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
                                 autoresize
@@ -269,7 +269,7 @@
                       </el-col> 
                     </el-col>
                 </el-row>
-        <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
+        <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 80px)">
           <div  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
             <v-chart @click='clickPart2Bar' ref="storeChart" :options="part2.barRegionOption"    autoresize
                               :style="{width:part2.barRegionOption?part2.barRegionOption.width :'100%',height:'100%'}" />
@@ -312,7 +312,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  class="partition"  style="overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px)">
+         <el-col  class="partition"  style="overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 80px)">
                   <v-chart  v-if="part2.storeMode==1" 
                             ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize
                             :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
