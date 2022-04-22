@@ -2661,7 +2661,7 @@ export default {
         storeId: self.store.storeId,
         mode: 0,
         authorizedOnly: 1,
-        tagName: self.patrolstore,
+        tagName: encodeURIComponent(self.patrolstore),
         inspectId: val
       };
       self.inspectItemList = [];
