@@ -314,7 +314,7 @@
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
-                  <td><span>{{ subcategory.actualScore | filterScore }}</span></td>
+                  <td><span>{{ subcategory.actualScore * categoryItem.weight / 100 | filterScore }}</span></td>
                 </tr>
               </tbody>
             </template>
