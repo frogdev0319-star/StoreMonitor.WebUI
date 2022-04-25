@@ -451,13 +451,14 @@ export default {
         weight: Number(group.weight)
       }))
       let count = groups.reduce((total, cur) => total + cur.weight, 0)
+      const self = this;
       if (count === 100) {
         inpectRESTful.updateGroupWeight({ groups }).then(() => {
-          util.notify('儲存成功', 'success', 3000)
+          util.notify(self.$t('titleView.saveSuss'), 'success', 3000)
           this.showWeightSetting = false;
         })
       } else {
-        util.notify('權重不可大於或小於100%', 'error', 3000);
+        util.notify(self.$t('insSettingView.weightTotalError'), 'error', 3000);
       }
     },
     setWeighting () {
@@ -1171,7 +1172,7 @@ export default {
           }
         }
       });
-      console.log(primaryGroupCelss)
+      // console.log(primaryGroupCelss)
       // console.log(secondaryGroupCells)
       // console.log(groupItemCells)
       const groupType = this.getGroupType(type);
