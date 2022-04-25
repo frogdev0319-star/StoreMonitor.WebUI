@@ -1814,29 +1814,26 @@ export default {
 
     getScoreSheetJsonData(workbook, sheet, tableVersion) {
       if (sheet) {
-        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1; delete sheet.G1;
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         sheetArray.forEach((_item) => {
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
-          rowDataObj.weight = _item.__EMPTY_1;
           if (tableVersion === 1) {
             rowDataObj.subCatergyName = '';
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.totalScore = _item.__EMPTY_3;
-            rowDataObj.scoreThreshold = _item.__EMPTY_4;
-            rowDataObj.score = this.getTableCellData(_item.__EMPTY_5);
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
-            rowDataObj.required = _item.__EMPTY_7;
-          } else {
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.totalScore = _item.__EMPTY_2;
+            rowDataObj.scoreThreshold = _item.__EMPTY_3;
             rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
-            rowDataObj.scoreThreshold = _item.__EMPTY_5;
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_5);
+          } else {
+            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+            rowDataObj.score = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.scoreThreshold = _item.__EMPTY_4;
             rowDataObj.totalScore = Infinity;
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_7);
-            rowDataObj.required = _item.__EMPTY_8;
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
           }
 
           rowDataArray.push(rowDataObj);
@@ -1905,6 +1902,7 @@ export default {
       return passFailFlagObj;
     },
 
+    
     validateScoreData(scoreArr, tableVersion) {
       const ITEMSLENGTH = 250;
       const _this = this;
@@ -1922,16 +1920,13 @@ export default {
           flagScoreItemType: false,
           flagDesLengthScore: false,
           flagScoreItemEmpty: false,
-          flagFullScoreLimitation: false,
-          flagGroupWeightTotal: false
+          flagFullScoreLimitation: false
         }
       };
       if (scoreArr.length === 0) {
         return scoreFlagObj;
       }
-      let count = 0;
       scoreArr.forEach((item, index) => {
-        if (item.weight) count += item.weight;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -2036,7 +2031,6 @@ export default {
           }
         }
       });
-      // if (count !== 100) scoreFlagObj.flags.flagGroupWeightTotal = true;
       return scoreFlagObj;
     },
 
