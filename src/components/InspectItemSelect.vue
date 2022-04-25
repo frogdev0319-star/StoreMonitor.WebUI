@@ -94,12 +94,12 @@ export default {
   },
   methods: {
     getLayer1List(list){
-      console.log(list)
+      console.log("getLayer1List > list:",list)
       let layer1List =[];
       let layer2List =[{value:'all',label:this.$t('eventView.all')}];
       let showItems = false;
       if(list){
-
+        console.log("getLayer1List list:",list);
         list.forEach(item => {
           layer1List.push({label:item.name,value:item.id})
         });
@@ -117,13 +117,22 @@ export default {
           });
         }
       }
+      console.log("getLayer1List layer1List:",layer1List);
+      console.log("getLayer1List layer2List:",layer2List);
       this.showItems= showItems;
       this.layer2 = 'all'
       this.selectedItem = 'all'
       this.layer2List = layer2List;
       this.itemList =[{value:'all',label:this.$t('eventView.all')}];
       this.layer1List = layer1List;
-      this.notifyItemChanged();
+      if(list.length==0){
+        console.log("emit list empty")
+         this.$emit("emitItemChanged",{item:[]});
+        
+      }else{
+        this.notifyItemChanged();
+      }
+      
     },
     getIds(item){
         const self =this;
@@ -220,6 +229,7 @@ export default {
     },
     notifyItemChanged(){
        console.log("NOtify changed")
+       console.log("this.curItem:",this.curItem)
        let item = this.selectedItem!='all' && this.curItem ? this.curItem: this.layer2!='all'&& this.curLayer2 ?this.curLayer2:this.curLayer1;
        let ids = this.getIds(item)
        console.log(ids)

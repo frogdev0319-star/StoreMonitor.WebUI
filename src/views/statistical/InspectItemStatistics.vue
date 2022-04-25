@@ -1477,6 +1477,7 @@ export default {
       this.part3.storeTableData = null;
       this.part3.barRegionOption = {};
       this.part3.barStoreOption = {};
+      console.log("1.getPart3RegionBar");
       await this.getPart3RegionBar();
     },
     async getInspectStatsOverviewOfRegionTable() {
@@ -1613,7 +1614,7 @@ export default {
         const storeResult = await self.getInspectStatsItemOverGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
-          console.log(result)
+          console.log("getPart1RegionBar:",result);
           if (result) {
             self.part1.content = self.filterContent(result.content, 
             self.part1.compareType,
@@ -1745,7 +1746,7 @@ export default {
               const result = storeResult.data;
               if (result) {
                   content = result.content
-                  console.log(result)
+                  console.log("getPart1StoreBar result :",result)
               }
             }
         }
@@ -1830,6 +1831,7 @@ export default {
         const storeResult = await self.getInspectStatsItemOverGroup(params);
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
+          console.log("getPart2RegionBar result:",result);
           if (result) {
             this.part2.content = this.filterContent(result.content, 
                                   this.part2.compareType,
@@ -1923,6 +1925,7 @@ export default {
             const storeResult = await this.getInspectStatsItemOverGroup(params);
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
+              console.log("getPart2StoreBar result:",result);
               if (result) {
                   content = result.content
                   console.log(result)
@@ -2027,8 +2030,7 @@ export default {
       }
       let totalReport = 0;
       let totalStandard = 0;
-      console.log("********************************")
-      console.log("getPart3RegionBar="+params.groupIds.length)
+      
       if(params.groupIds.length==0  ){
         console.log("No group");
         this.part3.content =[];
@@ -2037,11 +2039,13 @@ export default {
       }
         params.filter = { page: 0, size: params.groupIds.length };
         if( !params.hasOwnProperty('itemIds') ||params.itemIds.length==0 || params.storeIds.length ==0)return
+        console.log("********************************")
+        console.log("getPart3RegionBar params",params)
         const storeResult = await self.getInspectStatsItemOverGroup(params);
-        console.log(storeResult)
+        //console.log(storeResult)
         if (storeResult.errCode === 0) {
           const result = storeResult.data;
-          console.log(result)
+          console.log("getPart3RegionBar result:",result);
           if (result) {
             this.part3.content = this.filterContent(result.content, 
                                   this.part3.compareType,
@@ -2184,7 +2188,7 @@ export default {
             console.log("***params:",params)
             if(params.itemIds.length==0 || typeof params.storeIds == 'undefined' || params.storeIds.length ==0)return
             const storeResult = await this.getInspectStatsItemOverGroup(params);
-            console.log(storeResult)
+            console.log("getPart3StoreBar result:",storeResult)
             if (storeResult.errCode === 0) {
               const result = storeResult.data;
               if (result) {
@@ -2371,58 +2375,70 @@ export default {
       //  if(searchParams.inspectId !=this.curInspectId){
           console.log("Get InpectItemList "+searchParams.inspectId)
           this.inspectItemList =[];
-          let result  = await  this.getInspectItemList(searchParams.inspectId)
-          console.log(result)
-          if(result.errCode==0 && result.data){
-            let tempList = [];
-            result.data.forEach(function(item){
-                if(item.parentId == -1){
-                  tempList.push(item);
-                }
-            })
-            result.data.forEach(function(item){
-                tempList.forEach(function(subitem){
-                    if(item.parentId == subitem.id){
-                      subitem.items.push(item);
-                    }
-                });
+          this.getInspectItemList(searchParams.inspectId).then(result =>{
+            console.log(result)
+            if(result.errCode==0 && result.data){
+              let tempList = [];
+              result.data.forEach(function(item){
+                  if(item.parentId == -1){
+                    tempList.push(item);
+                  }
+              })
+              result.data.forEach(function(item){
+                  tempList.forEach(function(subitem){
+                      if(item.parentId == subitem.id){
+                        subitem.items.push(item);
+                      }
+                  });
 
-            })
-            console.log("Change inspect Itemlist")
-           // console.log(this.inspectItemList);
-            this.inspectItemList = tempList ;
-            this.curInspectId = searchParams.inspectId
-         
-          }
+              })
+              console.log("Change inspect Itemlist")
+            // console.log(this.inspectItemList);
+              this.inspectItemList = tempList ;
+              this.curInspectId = searchParams.inspectId
+              //this.params = JSON.parse(JSON.stringify(searchParams));
+              //this.daysRangeList = dateRangeList;
+              //this.curRegionI = regionI;
+              //this.curRegionII = regionII;
+              //this.regionMode = regionMode;
+              //this.timeMode = timeMode;
+              //this.storePatrolLists = storePatrolLists;
+              //this.curCountry = this.params.curCountry;
+            }
+          });
+
      //   }
 
-      }
-      console.log(this.params)
-      console.log(searchParams)
-      let changed = false;
-      if(this.params.inspectId != searchParams.inspectId ||
-        this.params.beginTs != searchParams.beginTs &&
-        this.params.endTs!= searchParams.endTs  ){
-          console.log("Change = TRUE")
-          changed = true;
-      }
-      this.params = JSON.parse(JSON.stringify(searchParams));
-      this.daysRangeList = dateRangeList;
-      this.curRegionI = regionI;
-      this.curRegionII = regionII;
-      this.regionMode = regionMode;
-      this.timeMode = timeMode;
-      this.storePatrolLists = storePatrolLists;
-      this.curCountry = this.params.curCountry;
+      }else{
+        let changed = false;
+        if(this.params.inspectId != searchParams.inspectId ||
+          this.params.beginTs != searchParams.beginTs &&
+          this.params.endTs!= searchParams.endTs  ){
+            console.log("Change = TRUE")
+            changed = true;
+        }
+          this.params = JSON.parse(JSON.stringify(searchParams));
+          this.daysRangeList = dateRangeList;
+          this.curRegionI = regionI;
+          this.curRegionII = regionII;
+          this.regionMode = regionMode;
+          this.timeMode = timeMode;
+          this.storePatrolLists = storePatrolLists;
+          this.curCountry = this.params.curCountry;
+          /*if(changed){
+            await this.dataGetPart3();
+          }*/
+    }
+      //console.log(this.params)
+      //console.log(searchParams)
+      
   
     //  console.log(searchParams)
       //if(this.params.storeIds.length>0){
       //  console.log("Get Part3")
       //  await this.dataGetPart3();
      // }
-      if(changed){
-        await this.dataGetPart3();
-      }
+      
 
     },
 
@@ -2529,6 +2545,9 @@ export default {
         }).catch(err => {
           reject(err);
         });
+      }).then(result=>{
+        console.log("Promise getInspectItemList:",result);
+        return result;
       });
     },
     emitItemChanged(item){
@@ -2536,6 +2555,7 @@ export default {
        console.log(item);
        this.inspectItem = item;
        this.getItemSubtitle();
+       console.log("2.getPart3RegionBar");
        this.getPart3RegionBar();
     },
     async doGetAssessmentStandardScore(){
