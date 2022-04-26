@@ -19,7 +19,7 @@
         </div>
         <div style="flex: 1;"></div>
         <div class="footer-right flex-center">
-          <div 
+          <!-- <div 
             v-if="playBackState" 
             class="iconrside"
           >
@@ -42,7 +42,7 @@
                 </el-button>
               </el-popover>
             </div>
-          </div>
+          </div> -->
           <div class="iconrside">
             <div class="speed-content flex-center">
               <div
@@ -134,7 +134,7 @@
           </div>
           <div style="flex: 1;"></div>
           <div class="footer-right flex-center">
-            <div v-if="playBackState" class="iconrside">
+            <!-- <div v-if="playBackState" class="iconrside">
               <div style="margin-right: 20px"  class="speed-content flex-center">
                 <span style="margin-right: 20px">{{ $t('remotePatrol.back') }}</span>
                 <el-popover
@@ -156,7 +156,7 @@
                   </el-button>
                 </el-popover>
               </div>
-            </div>
+            </div> -->
             <div class="iconrside">
               <div class="speed-content flex-center">
                 <div

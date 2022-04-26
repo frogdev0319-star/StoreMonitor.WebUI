@@ -2295,8 +2295,14 @@ export default {
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
             item.items.forEach((_item, _index) => {
-              if (!(_item.inputCount != 0 || _item.manualIgnore) && _item.required) {
-                requiredValid = true
+              // console.log(_item)
+              if (!_item.manualIgnore && _item.required) {
+                if (
+                  _item.itemType === 0 && _item.itemScore === '--' || 
+                  _item.itemType === 1 && _item.sourceList.length === 0
+                ) {
+                  requiredValid = true
+                }
               }
             });
           });
@@ -2714,6 +2720,7 @@ export default {
           data.forEach((item, index) => {
             const obj = {};
             obj.groupId = item.groupId;
+            obj.weight = item.weight;
             obj.mode = item.mode;
             obj.type = item.type;
             obj.groupName = item.groupName;
@@ -2733,6 +2740,7 @@ export default {
             item.items.forEach((_item, _index) => {
               const itemObj = {};
               itemObj.id = _item.id;
+              itemObj.weight = item.weight;
               itemObj.groupId = item.groupId;
               itemObj.groupName = item.groupName;
               itemObj.subject = _item.subject;
@@ -2799,14 +2807,28 @@ export default {
             if (handleData[i].subcatergy.length === 0){
               count = handleData[i].cateray.items.length;
               te_temp.push({
-                inspectList: [handleData[i].cateray], dealCount: 0, Effective: 0, count: count, isClick: false,
-                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: false
+                inspectList: [handleData[i].cateray], 
+                dealCount: 0, 
+                Effective: 0, 
+                count: count, 
+                isClick: false,
+                label: handleData[i].cateray.groupName, 
+                type: handleData[i].cateray.type, 
+                isCategory: false,
+                weight: handleData[i].cateray.weight
               });
             } else {
               handleData[i].subcatergy.forEach(item => count += item.items.length);
               te_temp.push({
-                inspectList: handleData[i].subcatergy, dealCount: 0, Effective: 0, count: count, isClick: false,
-                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: true
+                inspectList: handleData[i].subcatergy, 
+                dealCount: 0, 
+                Effective: 0, 
+                count: count, 
+                isClick: false,
+                label: handleData[i].cateray.groupName, 
+                type: handleData[i].cateray.type, 
+                isCategory: true,
+                weight: handleData[i].cateray.weight
               });
             }
           }
@@ -2822,7 +2844,7 @@ export default {
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
           }
           
-        console.log(this.sheetName)
+          
         }
       })
     },

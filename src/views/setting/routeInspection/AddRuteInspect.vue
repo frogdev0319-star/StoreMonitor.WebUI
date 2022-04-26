@@ -27,8 +27,8 @@
     </div>
     <hr class="hr-horizontal">
     <div class="flex padding">
-      <div class="temp-select-area">
-          <div class="temp-select-label">{{ $t('insSettingView.selecttitle') }}</div> 
+      <div class="temp-select-area" :style="{'width':getLangStyleValue(tempSelectAreaWidth)}">
+          <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('insSettingView.selecttitle') }}</div> 
           <multi-select
           class="store-group-select region"
           :selected="ModelPost"
@@ -208,11 +208,11 @@
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
-              <span class="item_label">必填</span>
+              <span class="item_label">{{ $t('insSettingView.isRequired') }}</span>
             </div>
             <el-radio-group class="attribute-group" v-model="itemRequired">
               <el-radio label="0">非必填</el-radio>
-              <el-radio label="1">必填</el-radio>
+              <el-radio label="1">{{ $t('insSettingView.isRequired') }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item>
@@ -551,7 +551,14 @@ export default {
       activeId: -1,
       dragLeftImgSrc: require('../../../../static/img/arrows_left.png'),
       dragTopImgSrc: require('../../../../static/img/arrows_top.png'),
-      showDragInfo: true
+      showDragInfo: true,
+      lang: this.$i18n.locale,
+      tempSelectAreaWidth:[{key:'en',value:'300px'},{key:'zh',value:'300px'},{key:'zhtw',value:'300px'},
+        {key:'ja-JP',value:'400px'},{key:'ko-KR',value:'300px'},{key:'vi-VN',value:'300px'},
+        {key:'id-ID',value:'300px'},{key:'th-TH',value:'300px'}],
+      tempSelectLabelWidth:[{key:'en',value:'123px'},{key:'zh',value:'123px'},{key:'zhtw',value:'123px'},
+        {key:'ja-JP',value:'125px'},{key:'ko-KR',value:'123px'},{key:'vi-VN',value:'123px'},
+        {key:'id-ID',value:'123px'},{key:'th-TH',value:'123px'}],
     };
   },
   computed: {
@@ -577,6 +584,9 @@ export default {
   },
 
   methods: {
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     notShowDragInfo() {
       this.showDragInfo = false;
       document.getElementById('addInspection').removeEventListener('mousedown', this.notShowDragInfo);
@@ -1222,12 +1232,16 @@ export default {
       }
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       self.OtherScoreTipEmpty = false;
+      self.PFScoreTip = false;
+      self.ScoreOptionsTips0 = false;
+      self.ItemTotalScoreTip0 = false;
+      self.ItemTotalScoreTip1 = false;
+      self.ItemMinScoreTip = false;
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
           if(self.itemType === 0 ) {
             self.OtherScoreTipEmpty = true;
           }
-          // self.OtherScoreTipEmpty = true;
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
@@ -1335,15 +1349,17 @@ export default {
               };
               tempParams.push(obj);
             });
+            util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
             if (tempParams.length !== 0) {
               const paramsApply = {
                 storeList: tempParams
               };
+              console.log(1)
               inpectRESTful.applyItemInspectItem(paramsApply).then(resApply => {
+              console.log(2)
                 const res = resApply;
               });
             }
-            util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
             setTimeout(function() {
               if (self.tabName == '远程巡检') {
                 PubSub.publish('change-color', { showTag: true });
@@ -2052,7 +2068,9 @@ export default {
                     font-family: NotoSansCJKtc;
                     font-size: 13px;
                     width:123px;
-                    margin-left:16px
+                    margin-left:16px;
+                    line-height: 16px;
+                    text-align: left;
                   }
                 }
         .el-rute-group{

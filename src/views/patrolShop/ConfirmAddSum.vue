@@ -60,13 +60,12 @@
               <tbody :key="inspectIndex">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
+                    <span style="color: #c60957;">{{ inspectItem.weight == -1 ? '--' : inspectItem.weight + '%' }}</span>
                     <span class="sheet_title">{{ inspectItem.label }}</span>
                     <span class="count-blag">{{inspectItem.count}}</span>
                   </td>
                 </tr>
-                <tr
-                  v-for="(item,index) in inspectItem.inspectList"
-                  :key="index">
+                <tr v-for="(item,index) in inspectItem.inspectList" :key="index">
                   <td style="word-break: keep-all;white-space:nowrap;">
                     <span class="item-name">{{ inspectItem.isCategory ? item.groupName : '--' }}</span>
                     <span v-if="inspectItem.isCategory" class="count-blag">{{ item.items.length }}</span>
@@ -74,7 +73,7 @@
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
                   <td v-if="inspectItem.type === 1"><span>{{ item.itemScore }}</span></td>
-                  <td><span>{{ item.itemgetScore }}</span></td>
+                  <td><span>{{ item.weight == -1 ? item.itemgetScore : item.itemgetScore * item.weight / 100 }}</span></td>
                 </tr>
               </tbody>
             </template>
@@ -741,6 +740,7 @@ export default {
         let totalScore0 = 0, CurAddScoreB = 0, CurOtherTotalScore = 0, PassFileX = 0, PassFileTS = 0, ScoreTS = 0, OtherTS = 0, PassFileN = 0;
         let PassFile_totalScoreX = 0, Score_totalScoreX = 0;
         inspect.forEach(p_item => {
+          // console.log(p_item)
           p_item.inspectList.forEach(item => {
             let QualifiedArr = [], UnqualifiedArr = [], IgnoredArr = [];
             let totalScore = 0, totalGetscore = 0, notAddIgnoretotalScore = 0;
@@ -753,7 +753,6 @@ export default {
             item.numOfCommentItem = 0;
             item.numOfTotalItems = 0;
             item.items.forEach(s_item => {
-              // console.log(s_item.itemgetScore)
               item.numOfTotalItems++;
               if (s_item.itemType === 1) {
                 item.numOfCommentItem++;
@@ -850,7 +849,6 @@ export default {
             if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1) {
               item['itemgetScore'] = '--';
             } else {
-              // console.log(util.isDouble(totalGetscore))
               item['itemgetScore'] = util.isDouble(totalGetscore);
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
@@ -868,7 +866,6 @@ export default {
                                           tab1GetScoreNoContainedIngored);
                 } else {
                   if (p_item.type === 1) item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored);
-                  // console.log(p_item.type, totalGetscore, tab1GetScoreNoContainedIngored)
                 }
               }
               if (inspectSettings.qualifiedForIgnoredWithType1) {
@@ -877,18 +874,18 @@ export default {
               }
             }
             if (p_item.type === 0) {
-              PassFileTotalScoreSystem = PassFileTS;
-              PassFileXS = PassFileX;
-              PassFileXN = PassFileN + PassFileX;
-              PassFileTotalScore = totalScore0;
-              PassFileTotalScoreX = PassFile_totalScoreX;
+              PassFileTotalScoreSystem = PassFileTS * p_item.weight;
+              PassFileXS = PassFileX * p_item.weight;
+              PassFileXN = (PassFileN + PassFileX) * p_item.weight;
+              PassFileTotalScore = totalScore0 * p_item.weight;
+              PassFileTotalScoreX = PassFile_totalScoreX * p_item.weight;
             }
             if (p_item.type === 1) {
               CurAddScoreB += totalScore;
-              allScoreB = CurAddScoreB;
-              ScoreTotalScoreSystem = ScoreTS;
-              ScoreXN = ScoreX + ScoreN;
-              ScoreTotalScoreX = Score_totalScoreX;
+              allScoreB = CurAddScoreB * p_item.weight;
+              ScoreTotalScoreSystem = ScoreTS * p_item.weight;
+              ScoreXN = (ScoreX + ScoreN) * p_item.weight;
+              ScoreTotalScoreX = Score_totalScoreX * p_item.weight;
               item['itemgetScore'] =
                 inspectSettings.qualifiedForIgnoredWithType2
                   ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
@@ -896,8 +893,8 @@ export default {
             }
             if (p_item.type === 2) {
               CurOtherTotalScore += totalGetscore;
-              otherGetscoreTotal = CurOtherTotalScore;
-              OtherTotalScoreSystem = OtherTS;
+              otherGetscoreTotal = CurOtherTotalScore * p_item.weight;
+              OtherTotalScoreSystem = OtherTS * p_item.weight;
             }
           });
           if (p_item.type === 0) {
@@ -916,6 +913,7 @@ export default {
         });
         let s_count = 0;
         if (inspect.length === 1 && inspect[0].type === 0) {
+          // console.log(1)
           if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
             if (inspectSettings.qualifiedForIgnoredWithType1) {
               s_count = PassFileXN;
@@ -958,6 +956,7 @@ export default {
               }
               total_c = total_a === 0 || total_b === 0 ? 0 : (total_a / total_b * 100);
               s_count = total_c + otherGetscoreTotal;
+              // console.log(s_count)
             }
           } else {
             if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
@@ -986,8 +985,14 @@ export default {
         if (inspectSettings.hundredMarkType === '1') {
           s_count = s_count + inspectSettings.baseScore;
         }
-        self.scorecount = s_count > inspectSettings.maxScore ? inspectSettings.maxScore
-          : (s_count < inspectSettings.minScore ? inspectSettings.minScore : parseFloat(s_count.toFixed(1)));
+        self.scorecount = s_count > inspectSettings.maxScore 
+          ? inspectSettings.maxScore
+          : 
+          (
+            s_count < inspectSettings.minScore 
+            ? inspectSettings.minScore 
+            : parseFloat(s_count.toFixed(1))
+          );
         self.summary = this.groupbyKey(inspect, 'type');
         eventList.forEach((item, index) => {
           const objFeedBack = {};
