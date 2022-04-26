@@ -2295,8 +2295,14 @@ export default {
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
             item.items.forEach((_item, _index) => {
-              if (!(_item.inputCount != 0 || _item.manualIgnore) && _item.required) {
-                requiredValid = true
+              // console.log(_item)
+              if (!_item.manualIgnore && _item.required) {
+                if (
+                  _item.itemType === 0 && _item.itemScore === '--' || 
+                  _item.itemType === 1 && _item.sourceList.length === 0
+                ) {
+                  requiredValid = true
+                }
               }
             });
           });
