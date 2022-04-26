@@ -247,10 +247,25 @@
           </div>
           <div v-for="item in weightOptions" :key="item.id" class="flex-center margin-bottom-sm">
             <span class="spacer">{{item.name}}</span>
+            <el-checkbox
+              style="margin-right: 20px"
+              @change="e => changeItemWeight(e, item)"
+              v-model="item.setWeight"
+              class="storevue-checkbox-outlined"
+              :label="$t('insSettingView.weightSetting')"
+            />
             <el-input
-             class="spacer"
+              v-if="item.setWeight"
+              class="spacer"
               type="number"
               v-model="item.weight"
+            />
+            <el-input
+              v-else
+              class="spacer"
+              type="text"
+              value="--"
+              disabled
             />
           </div>
         </div>
@@ -445,17 +460,24 @@ export default {
   },
 
   methods: {
+    changeItemWeight (val, item) {
+      item.weight = val ? 0 : -1
+    },
     updateGroupWeight () {
       let groups = this.weightOptions.map(group => ({
         id: group.id,
         weight: Number(group.weight)
       }))
-      let count = groups.reduce((total, cur) => total + cur.weight, 0)
+      let count = 0 
+      groups.forEach(group => {
+        if (group.weight != -1) count += group.weight
+      })
       const self = this;
       if (count === 100) {
         inpectRESTful.updateGroupWeight({ groups }).then(() => {
           util.notify(self.$t('titleView.saveSuss'), 'success', 3000)
           this.showWeightSetting = false;
+          this.getTagList();
         })
       } else {
         util.notify(self.$t('insSettingView.weightTotalError'), 'error', 3000);
@@ -632,7 +654,7 @@ export default {
           _obj.id = _item.id;
           _obj.groupName = _item.name;
           _obj.groupWeight = _item.weight;
-          if (_item.parentId === -1) self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight })
+          if (_item.parentId === -1 && _item.type !== 2) self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight, setWeight: _item.weight != -1 })
           _obj.itemCount = _item.items.length;
           _obj.type = _item.type;
           _obj.checked = false;
@@ -1243,7 +1265,9 @@ export default {
             item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
           } else if (mapping[key] === 'itemScore') {
             item[mapping[key]] = cell.v ? Number(cell.v) : 0;
-            if (cell.v === '') item['type'] = 1;
+            if (cell.v === '' || cell.v === undefined) {
+              item['type'] = 1;
+            }
             if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1);
           } else if (mapping[key] === 'description') {
             item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
@@ -1719,9 +1743,15 @@ export default {
           const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
           passFailSheetFlagObj.flags.flagGroupWeightTotal = false;
           scoreSheetFlagObj.flags.flagGroupWeightTotal = false;
-          if (_this.importCount !== 100 && !_this.allPassWeightEmpty && !_this.allScoreWeightEmpty) {
-            passFailSheetFlagObj.flags.flagGroupWeightTotal = true;
-            scoreSheetFlagObj.flags.flagGroupWeightTotal = true;
+          // console.log(_this.importCount, _this.allPassWeightEmpty , _this.allScoreWeightEmpty)
+          if (_this.importCount === 100) {
+          } else {
+            if (_this.allPassWeightEmpty && _this.allScoreWeightEmpty) {
+
+            } else {
+              passFailSheetFlagObj.flags.flagGroupWeightTotal = true;
+              scoreSheetFlagObj.flags.flagGroupWeightTotal = true;
+            }
           }
           
           const flagTempError = !!(outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined);
@@ -1912,10 +1942,11 @@ export default {
       let allWeightEmpty = true;
       var self = this;
       passFailArr.forEach((item, index) => {
-        if (item.weight) {
+        if (typeof item.weight === 'number') {
           self.importCount += item.weight;
         }
-        if (item.weight !== undefined) self.allPassWeightEmpty = false;
+        console.log(typeof item.weight === 'number')
+        if (typeof item.weight === 'number') self.allPassWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length > 0) {
           passFailFlagObj.indexArrPassFail.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -1976,10 +2007,11 @@ export default {
       let count = 0;
       let allWeightEmpty = true;
       scoreArr.forEach((item, index) => {
-        if (item.weight) {
+        if (typeof item.weight === 'number') {
           _this.importCount += item.weight;
         }
-        if (item.weight !== undefined) _this.allScoreWeightEmpty = false;
+        console.log(typeof item.weight === 'number')
+        if (typeof item.weight === 'number') _this.allScoreWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
