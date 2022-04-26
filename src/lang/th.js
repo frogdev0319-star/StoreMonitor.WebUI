@@ -248,7 +248,7 @@ export default{
       "daysww":"XX",
       "weeks":"สัปดาห์",
       "pageSize":"การแสดงผลต่อหน้า",
-      "pageSizeUnit":"รายการ"
+      "pageSizeUnit":"รายการ",
   },
   "remotePatrol":{
       "InspectionDetail":"ส่งออกรายงาน",
@@ -1090,8 +1090,10 @@ export default{
       "useAndSave":"เลือกและบันทึก",
       "useTemplate":"เทมเพลต",
       "yes":"ใช่",
-      "templateSelection":"Select a template",
-      "reportTemplateLabel": "Report template",
+      "templateSelection":"เลือกเทมเพลต",
+      "reportTemplateLabel": "เทมเพลตรายงาน",
+      "show":"แสดง",
+      "noShow":"ไม่แสดง"
   },
   "statistics":{
       "averageCompare":"เปรียบเทียบค่าเฉลี่ย",

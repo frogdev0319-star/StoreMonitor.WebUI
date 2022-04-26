@@ -1092,6 +1092,8 @@ export default{
     "yes":"允许",
     "templateSelection":"选择模版",
     "reportTemplateLabel": "报告模板",
+    "show":"显示",
+    "noShow":"不显示"
   },
   "statistics":{
       "averageCompare":"平均分同比分析",

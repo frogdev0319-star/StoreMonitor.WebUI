@@ -1090,8 +1090,10 @@ export default{
       "useAndSave":"Chọn & Lưu",
       "useTemplate":"Mẫu",
       "yes":"Có",
-      "templateSelection":"Select a template",
-      "reportTemplateLabel": "Report template",
+      "templateSelection":"Chọn mẫu",
+      "reportTemplateLabel": "Mẫu báo cáo",
+      "show":"Hiển thị",
+      "noShow":"Không hiển thị"
   },
   "statistics":{
       "averageCompare":"So sánh trung bình",

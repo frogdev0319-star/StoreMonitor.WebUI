@@ -79,8 +79,8 @@
                 <div class="title-name">{{ $t(`titleView.${item.name}`) }}</div>
                 <div class="title-status">
                   <el-radio-group class="storevue-radio" v-model="item.enable">
-                    <el-radio :label="true">{{ $t('titleView.qualified') }}</el-radio>
-                    <el-radio :label="false">{{ $t('titleView.unqualified') }}</el-radio>
+                    <el-radio :label="true">{{ $t('titleView.show') }}</el-radio>
+                    <el-radio :label="false">{{ $t('titleView.noShow') }}</el-radio>
                   </el-radio-group>
                 </div>
                 <div class="title-operation">
@@ -129,8 +129,8 @@
                       <div class="title-name">{{ $t(`titleView.${item.name}`) }}</div>
                       <div class="title-status">
                         <el-radio-group class="storevue-radio" v-model="item.enable">
-                          <el-radio :label="true">{{ $t('titleView.qualified') }}</el-radio>
-                          <el-radio :label="false">{{ $t('titleView.unqualified') }}</el-radio>
+                          <el-radio :label="true">{{ $t('titleView.show') }}</el-radio>
+                          <el-radio :label="false">{{ $t('titleView.noShow') }}</el-radio>
                         </el-radio-group>
                       </div>
                     </template>

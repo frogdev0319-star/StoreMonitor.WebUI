@@ -1370,7 +1370,7 @@ export default {
       searchParams.inspectTagId =  searchParams.inspectId;
       searchParams.beginTs  = this.params.beginTs;
       searchParams.endTs  = this.params.endTs;
-      searchParams.filter ={ page: 0, size: 12 };
+      searchParams.filter ={ page: 0, size: 10 };
       
       const searchParamsObj = {
         path: 'inspectReport',

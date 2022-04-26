@@ -1091,8 +1091,10 @@ export default {
       "useAndSave":"選択と使用",
       "useTemplate":"テンプレート",
       "yes":"はい",
-      "templateSelection":"Select a template",
-      "reportTemplateLabel": "Report template",
+      "templateSelection":"テンプレートの選択",
+      "reportTemplateLabel": "レポートテンプレート",
+      "show":"表示",
+      "noShow":"非表示"
   },
   "statistics":{
       "averageCompare":"平均比較",

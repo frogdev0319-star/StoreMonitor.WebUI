@@ -1090,8 +1090,10 @@ export default{
       "useAndSave":"Pilih & Simpan",
       "useTemplate":"Template",
       "yes":"Ya",
-      "templateSelection":"Select a template",
-      "reportTemplateLabel": "Report template",
+      "templateSelection":"Pilih template",
+      "reportTemplateLabel": "Template laporan",
+      "show":"Tampilkan",
+      "noShow":"Jangan Tampilkan"
   },
   "statistics":{
       "averageCompare":"Perbandingan Rata-rata",
