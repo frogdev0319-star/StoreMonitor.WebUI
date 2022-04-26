@@ -24,8 +24,8 @@
     </div>
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="content-titles">
-        <div class="template-select-area">
-          <div class="template-select-label">{{ $t('titleView.reportTemplateLabel') }}</div> 
+        <div class="template-select-area" :style="lang.indexOf('ja')== -1?{}:{'width':'205px'}">
+          <div class="template-select-label" :style="lang.indexOf('ja')== -1?{}:{'width':'105px'}">{{ $t('titleView.reportTemplateLabel') }}</div> 
           <el-select
             v-model="curTemplateIndex"
             class="device-select"
@@ -79,8 +79,8 @@
                 <div class="title-name">{{ $t(`titleView.${item.name}`) }}</div>
                 <div class="title-status">
                   <el-radio-group class="storevue-radio" v-model="item.enable">
-                    <el-radio :label="true">{{ $t('titleView.qualified') }}</el-radio>
-                    <el-radio :label="false">{{ $t('titleView.unqualified') }}</el-radio>
+                    <el-radio :label="true">{{ $t('titleView.show') }}</el-radio>
+                    <el-radio :label="false">{{ $t('titleView.noShow') }}</el-radio>
                   </el-radio-group>
                 </div>
                 <div class="title-operation">
@@ -129,8 +129,8 @@
                       <div class="title-name">{{ $t(`titleView.${item.name}`) }}</div>
                       <div class="title-status">
                         <el-radio-group class="storevue-radio" v-model="item.enable">
-                          <el-radio :label="true">{{ $t('titleView.qualified') }}</el-radio>
-                          <el-radio :label="false">{{ $t('titleView.unqualified') }}</el-radio>
+                          <el-radio :label="true">{{ $t('titleView.show') }}</el-radio>
+                          <el-radio :label="false">{{ $t('titleView.noShow') }}</el-radio>
                         </el-radio-group>
                       </div>
                     </template>
@@ -161,8 +161,8 @@
             <span class="span-font">{{ $t('titleView.statisIndex') }}</span>
             <span>
               <el-radio-group v-model="statisticSettingDetail.qualified">
-                <el-radio :label="0">{{ $t('titleView.qualified') }}</el-radio>
-                <el-radio :label="1">{{ $t('titleView.unqualified') }}</el-radio>
+                <el-radio :label="0">{{ $t('titleView.show') }}</el-radio>
+                <el-radio :label="1">{{ $t('titleView.noShow') }}</el-radio>
               </el-radio-group>
             </span>
           </div>
@@ -197,6 +197,7 @@ export default {
   components: { SettingTable, ButtonList, DialogPop, DelayButton, draggable },
   data() {
     return {
+      lang:this.$i18n.locale,
       curTemplate: {},
       templateList: [],
       showTemplateTip: false,

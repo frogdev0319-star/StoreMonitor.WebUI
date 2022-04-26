@@ -2700,6 +2700,7 @@ export default {
                     max-width:105px;
                     margin-left:16px;
                     width:auto;
+                    text-align: left;
                   }
                 }
             }

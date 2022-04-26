@@ -724,6 +724,8 @@ export default{
     "weight": "權重值%",
     "weightSetting": "权重设定",
     "weightTotalError": "权重不可大于或小于100%",
+    "isRequired":"必填",
+    "notRequired":"非必填"
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",
@@ -1094,6 +1096,8 @@ export default{
     "yes":"允许",
     "templateSelection":"选择模版",
     "reportTemplateLabel": "报告模板",
+    "show":"显示",
+    "noShow":"不显示"
   },
   "statistics":{
       "averageCompare":"平均分同比分析",
