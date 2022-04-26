@@ -724,6 +724,8 @@ export default{
       "weight": "weight%",
       "weightSetting": "Weight Setting",
       "weightTotalError": "Weight cannot be greater or less than 100%",
+      "isRequired":"Required",
+      "notRequired":"Not Required"
   },
   "deviceView":{
       "EzvizAccount":"Streaming Service Account",
@@ -1095,7 +1097,7 @@ export default{
       "templateSelection":"Select a template",
       "reportTemplateLabel": "Report template",
       "show":"Show",
-      "noShow":"No show"
+      "noShow":"No show",
   },
   "statistics":{
       "averageCompare":"Average Compare",

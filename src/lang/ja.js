@@ -725,6 +725,8 @@ export default {
       "weight": "重み%",
       "weightSetting": "重み設定",
       "weightTotalError": "Weight cannot be greater or less than 100%",
+      "isRequired":"必須",
+      "notRequired":"非必須"
   },
   "deviceView":{
       "EzvizAccount":"アカウント",

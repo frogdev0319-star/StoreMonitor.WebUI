@@ -83,7 +83,7 @@ export default{
       "patrolCompareStat":"สถิติเปรียบเทียบการตรวจสอบ",
       "supervisorCalStat":"สถิติการประเมินร้านค้า",
       "patrolItemStat":"สถิติรายการในการตรวจสอบ",
-      "singleStoreStat":"สถิติร้านค้าเดียว"
+      "singleStoreStat":"สถิติร้านค้าเดียว",
   },
   "overview":{
       "DangerousLess":"อัตราส่วนอันตราย ＜60%",
@@ -724,6 +724,8 @@ export default{
       "weight": "น้ำหนัก%",
       "weightSetting": "การตั้งค่าน้ำหนัก",
       "weightTotalError": "Weight cannot be greater or less than 100%",
+      "isRequired":"จำเป็น",
+      "notRequired":"Not Required"
   },
   "deviceView":{
       "EzvizAccount":"บัญชีบริการสตรีมมิ่ง",
@@ -905,7 +907,7 @@ export default{
       "validateSucc":"ยืนยันสำเร็จ!",
       "validationCode":"รหัสการยืนยัน",
       "videoLicenseOverdue":"สิทธิ์การใช้งานวิดีโอหมดอายุ",
-      "videoMangement":"การจัดการวิดีโอ"
+      "videoMangement":"การจัดการวิดีโอ",
   },
   "storeView":{
       "all":"ทั้งหมด",

@@ -24,8 +24,8 @@
     </div>
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="content-titles">
-        <div class="template-select-area">
-          <div class="template-select-label">{{ $t('titleView.reportTemplateLabel') }}</div> 
+        <div class="template-select-area" :style="lang.indexOf('ja')== -1?{}:{'width':'205px'}">
+          <div class="template-select-label" :style="lang.indexOf('ja')== -1?{}:{'width':'105px'}">{{ $t('titleView.reportTemplateLabel') }}</div> 
           <el-select
             v-model="curTemplateIndex"
             class="device-select"
@@ -197,6 +197,7 @@ export default {
   components: { SettingTable, ButtonList, DialogPop, DelayButton, draggable },
   data() {
     return {
+      lang:this.$i18n.locale,
       curTemplate: {},
       templateList: [],
       showTemplateTip: false,

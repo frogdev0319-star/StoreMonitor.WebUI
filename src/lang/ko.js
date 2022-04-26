@@ -725,6 +725,8 @@ export default {
       "weight": "가중치%",
       "weightSetting": "가중치 설정",
       "weightTotalError": "Weight cannot be greater or less than 100%",
+      "isRequired":"필수",
+      "notRequired":"Not Required"
   },
   "deviceView":{
       "EzvizAccount":"장부",

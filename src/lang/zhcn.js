@@ -724,6 +724,8 @@ export default{
     "weight": "權重值%",
     "weightSetting": "权重设定",
     "weightTotalError": "权重不可大于或小于100%",
+    "isRequired":"必填",
+    "notRequired":"非必填"
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",

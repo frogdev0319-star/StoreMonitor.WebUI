@@ -724,6 +724,8 @@ export default{
       "weight": "%trọng lượng",
       "weightSetting": "Cài đặt trọng lượng",
       "weightTotalError": "Weight cannot be greater or less than 100%",
+      "isRequired":"Bắt buộc",
+      "notRequired":"Not Required"
   },
   "deviceView":{
       "EzvizAccount":"Tài khoản dịch vụ Streaming",
@@ -905,7 +907,8 @@ export default{
       "validateSucc":"Đã xác thực thành công!",
       "validationCode":"Mã xác thực",
       "videoLicenseOverdue":"Bản quyền video bị quá hạn",
-      "videoMangement":"Quản lý video"
+      "videoMangement":"Quản lý video",
+      
   },
   "storeView":{
       "all":"Tất cả",

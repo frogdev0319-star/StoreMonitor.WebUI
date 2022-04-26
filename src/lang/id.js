@@ -724,6 +724,8 @@ export default{
       "weight": "bobot%",
       "weightSetting": "Pengaturan Bobot",
       "weightTotalError": "Weight cannot be greater or less than 100%",
+      "isRequired":"Wajib diisi",
+      "notRequired":"Not Required"
   },
   "deviceView":{
       "EzvizAccount":"Akun Layanan Streaming",
