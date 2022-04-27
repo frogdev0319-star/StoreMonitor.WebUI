@@ -1232,12 +1232,16 @@ export default {
       }
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       self.OtherScoreTipEmpty = false;
+      self.PFScoreTip = false;
+      self.ScoreOptionsTips0 = false;
+      self.ItemTotalScoreTip0 = false;
+      self.ItemTotalScoreTip1 = false;
+      self.ItemMinScoreTip = false;
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
           if(self.itemType === 0 ) {
             self.OtherScoreTipEmpty = true;
           }
-          // self.OtherScoreTipEmpty = true;
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
@@ -1345,15 +1349,17 @@ export default {
               };
               tempParams.push(obj);
             });
+            util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
             if (tempParams.length !== 0) {
               const paramsApply = {
                 storeList: tempParams
               };
+              console.log(1)
               inpectRESTful.applyItemInspectItem(paramsApply).then(resApply => {
+              console.log(2)
                 const res = resApply;
               });
             }
-            util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
             setTimeout(function() {
               if (self.tabName == '远程巡检') {
                 PubSub.publish('change-color', { showTag: true });
