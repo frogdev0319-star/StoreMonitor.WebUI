@@ -1060,9 +1060,11 @@ $h1:#292e36;
                 border-radius: 5px;
                 height: 24px;
                 line-height: 24px;
-                width:68px;
+                //width:68px;
                 text-align: center;
-                
+                padding-left: 5px;
+                padding-right: 5px;
+                white-space: nowrap;
             }
             .el-submit{
                 position: absolute;

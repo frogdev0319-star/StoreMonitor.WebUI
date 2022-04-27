@@ -1292,10 +1292,13 @@ $h1:#292e36;
     }
     .icon-span{
         display:inline-block;
-        width:68px;
+        min-width:68px;
         height:24px;
         font-size: 12px;
         border-radius: 5px;
+        white-space: nowrap;
+        padding-left: 5px;
+        padding-right: 5px;
     }
     .ja-icon{
       @extend .icon-span;
