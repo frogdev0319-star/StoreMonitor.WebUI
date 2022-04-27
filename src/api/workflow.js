@@ -3,6 +3,14 @@ import request from '@/common/request';
 import Environment from '@/common/environment';
 const version = Environment.VERSION;
 
+export const creadNewFlow = data => {
+  return request({
+    url: `${version}/workflow/add`,
+    method: 'post',
+    data
+  });
+};
+
 export const getWorkflowList = data => {
   return request({
     url: `${version}/workflow/list`,

@@ -5,7 +5,7 @@
       流程配置
       <div class="spacer"/>
       <div class="buttons">
-        <delay-button type="filled" >保存並發布</delay-button>
+        <delay-button type="filled" @click="submit">保存並發布</delay-button>
         <!-- <delay-button
           type="filled"
           class="schedule-btn">
@@ -27,8 +27,8 @@
                 <div class="title-name">* 流程名稱</div>
                 <div class="title-status"> 
                   <el-input
-                    :placeholder="infoForm.name"
-                    v-model="infoForm.name"
+                    :placeholder="nodeDataToApi.name"
+                    v-model="nodeDataToApi.name"
                     />
                 </div>
 
@@ -37,13 +37,13 @@
                   <el-select
                     v-model="curTemplateIndex"
                     class="device-select"
-                    :placeholder="infoForm.type"
+                    placeholder="巡檢表單"
                     :disabled="true"
                     >
                     <el-option
                       v-for="(item, index) in templateList"
                       :key="index"
-                      :label="infoForm.type"
+                      :label="item"
                       :value="item"
                     />
                   </el-select>
@@ -54,7 +54,7 @@
                 <div class="title-name">流程描述</div>
                 <div class="title-status"> 
                   <el-input
-                    v-model="infoForm.description"
+                    v-model="nodeDataToApi.description"
                     :autosize="{ minRows: 3, maxRows: 5 }"
                     placeholder="流程描述"
                     class="storevue-textarea"
@@ -88,7 +88,7 @@
                     class="table-white"
                     :column-data="columnData"
                     :table-data="flatNodeDataView"
-                    :table-operation ="columnOperationData"
+                    :tableworkflowOperation ="columnOperationData"
                     :highlight-current-row= "false"
                     :is-loading-data="isLoadingData"
                     :allowRowExpand = "false"
@@ -123,13 +123,12 @@
       </div>
     </div>
 
-
   </div>
 </template>
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import {getNodeList } from "@/api/workflow";
+import {getNodeList, updateWorkflow} from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import { getUserInfo } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
@@ -265,20 +264,19 @@ export default {
   methods: {
     async init(){
       await this.getWorkflowInfo() //1 
-      await this.getTitle() //3
-      await this.getNodeList(this.infoForm.processDefinitionKey) //4
-      await this.getUserInfo() //2
 
+      await this.getNodeList(this.infoForm.processDefinitionKey) //4
+      await this.getTitle() //3
+      await this.getUserInfo() //2
+  
       await this.handleData() //5
       await this.dataToApi() //6
-
-
     },
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
-      this.infoForm.type = "巡檢表單"
+      // this.infoForm.type = "巡檢表單"
       console.log('getWorkflowInfo 1 ------>> ', this.infoForm);
     },
     
@@ -305,9 +303,9 @@ export default {
       });
     },
 
-    getNodeList(id){
+    async getNodeList(id){
       this.isLoadingData = true
-      getNodeList(id).then(res=>{
+      await getNodeList(id).then(res=>{
         this.nodeList =  res.data
         console.log('this.nodeList 4 ------>> ', this.nodeList);
         // flat data
@@ -315,15 +313,16 @@ export default {
         this.flatNodeData.forEach(d=>{
           delete d.nextAuditNode
         })
-        
-        
+        console.log('this.flatNodeData 4 ------>> ', this.flatNodeData);
+        // this.flatNodeData[0].name = this.infoForm.createdUser
+        this.flatNodeData[0].name = "提交人"
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
       });
     },
-    
+
     // flatten Data by Recursive
     flattenData(data, key = 'nextAuditNode') {
       if(data[key] !== null) {
@@ -339,11 +338,11 @@ export default {
     handleData(){
       // deep copy
       this.flatNodeDataView = JSON.parse(JSON.stringify(this.flatNodeData))
-      const firtData ={
-        "name": "提交人",
-        "auditByUsers": ['提交人']
-      }
-      this.flatNodeDataView = [firtData, ...this.flatNodeDataView]
+      // const firtData ={
+      //   "name": "提交人",
+      //   "auditByUsers": ['提交人']
+      // }
+      // this.flatNodeDataView = [firtData, ...this.flatNodeDataView]
       this.flatNodeDataView.forEach(d=>{
         var newArr = []
         d.auditByUsers.forEach(id=>{
@@ -353,8 +352,9 @@ export default {
             } 
           })
         })
-        if(d.auditByUsers[0] !== "提交人") d.auditByUsers = newArr
+        // if(d.auditByUsers[0] !== "提交人") d.auditByUsers = newArr
       })
+
       console.log('this.flatNodeDataView 5 ------>> ', this.flatNodeDataView);
     },
     
@@ -368,8 +368,6 @@ export default {
       this.nodeDataToApi.orderedAuditNodeArray = orderedAuditNodeArray
       sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
     },
-
-
     addNode() {
       const newNode = {
             "name": "",
@@ -402,10 +400,12 @@ export default {
       switch(method.method){
         case 'moveUp':{
           this.flatNodeDataView.move(method.index, method.index - 1)
+          this.moveAction(method.index - 1, method.index - 2)
           break;
         }
         case 'moveDown':{
           this.flatNodeDataView.move(method.index, method.index + 1)
+          this.moveAction(method.index - 1, method.index)
           break;      
         }
         default: {
@@ -430,9 +430,29 @@ export default {
         }
       }
     },
+
+    moveAction(from , to){
+      console.log(from , to);
+      var moving = this.nodeDataToApi.orderedAuditNodeArray.splice(from, 1)[0]
+      this.nodeDataToApi.orderedAuditNodeArray.splice(to, 0 , moving)
+
+
+      // call api for update
+      updateWorkflow(this.nodeDataToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+
+
+    },
+    // moveDown(){
+
+    // },
     settingWorkFlow(row){
       this.$router.push({name: 'nodeSetting'})
-
       // 刪除  "isEditing": false
       var oriData = this.flatNodeData.filter(f => row.id === f.id)
       delete row.isEditing
@@ -440,31 +460,60 @@ export default {
     },
 
     deleteRow(deleteId){
-      var deleteData = this.flatNodeData.filter( e =>(
+      var deleteData = this.flatNodeDataView.filter( e =>(
         e.id !== deleteId
       ))
-      this.flatNodeData = deleteData
-      console.log('this.flatNodeData by delete >> ', deleteData);
+      this.flatNodeDataView = deleteData
+
+      var deleteNode = this.nodeDataToApi.orderedAuditNodeArray.filter( e =>(
+        e.id !== deleteId
+      ))
+      this.nodeDataToApi.orderedAuditNodeArray = deleteNode
+
+      // call api for update
+      updateWorkflow(this.nodeDataToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+
+
     },
 
+    //保存並發布
+    submit() {
 
-    // submit() {
-    //   let array = this.workflowDetail.nextNodes;
-    //   let object = { ...array[0] };
-    //   let i = array.length - 1;
-    //   while(i >= 0) {
-    //     object['nextAuditNode'] = { ...array[i].nextAuditNode };
-    //     i--;
-    //   }
-    //   let nextAuditNode = JSON.parse(JSON.stringify(object));
-    //   updateWorkflow({
-    //     ...this.workflowDetail,
-    //     nextAuditNode
-    //   }).then(res => {
-    //     console.log(res);
-    //   });
-    // }
+       // call api for update
+      updateWorkflow(this.nodeDataToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.$router.push({name: 'workflowManage'})
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+
+      // let array = this.workflowDetail.nextNodes;
+      // let object = { ...array[0] };
+      // let i = array.length - 1;
+      // while(i >= 0) {
+      //   object['nextAuditNode'] = { ...array[i].nextAuditNode };
+      //   i--;
+      // }
+      // let nextAuditNode = JSON.parse(JSON.stringify(object));
+      // console.log('nextAuditNode ~~~>> ', nextAuditNode);
+
+      // updateWorkflow({
+      //   ...this.workflowDetail,
+      //   nextAuditNode
+      // }).then(res => {
+      //   console.log(res);
+      //});
+    }
   }
+
 };
 </script>
 
@@ -742,6 +791,4 @@ export default {
       .el-table_1_column_6
         .cell
           display: none !important
-        
-
 </style>

@@ -12,14 +12,13 @@
             clearable/>
         </div>
 
-        <delay-button
-          :disabled="authorizedDevicesNum === 0"
-          >
+        <delay-button @click="creadNewFlow">
           <div class="button-area">
             <i class="iconfont el-icon-plus"/>
             <span>添加流程</span>
           </div>
         </delay-button>
+
       </div>
       <div class="tablelist">
         
@@ -27,7 +26,7 @@
           ref="elTP"
           class="table-white"
           :column-data="columnData"
-          :table-data="allTableData"
+          :table-data="serachData"
           :table-operation ="columnOperationData"
           :highlight-current-row= "false"
           :is-loading-data="isLoadingData"
@@ -56,7 +55,14 @@
   </div>
 </template>
 <script>
-import { getWorkflowList, duplicateRow, deleteRow, disableWorkflow, enableWorkflow } from '@/api/workflow';
+import {
+    creadNewFlow,
+    getWorkflowList, 
+    duplicateRow, 
+    deleteRow, 
+    disableWorkflow, 
+    enableWorkflow
+  } from '@/api/workflow';
 import { getUserInfo } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -74,7 +80,7 @@ export default {
   data() {
     return {
       inputSearchValue: '',
-      serachData: '',
+      serachData: [],
       authorizedDevicesNum: 0,
       isLoadingData: false,
       columnOperationData: {
@@ -153,16 +159,61 @@ export default {
       apiBody: {
           "page": 0,
           "size": 10,
-          "direction": "ASC",
-          "property": "name",
+          "direction": "DESC",
+          "property": "createdTs",
           // "name": "test",
           // "type": 0,
           "state": [
               0,
               1,
           ]
+      },
+      newFlow:{
+        "name": "",
+        "description": "",
+        "type": 0,
+        "copyToUsers": [],
+        "copyToGroups": [],
+        "nextAuditNode": {
+          "name": "default flow",
+          "auditMethod": 1,
+          "signature": true,
+          "customButton": [
+              {
+                  "type": 1,
+                  "text": "同意",
+                  "enable": true
+              },
+              {
+                  "type": 1,
+                  "text": "拒絕",
+                  "enable": true
+              }
+          ],
+          "auditByUsers": [],
+          "auditByGroups": [],
+          "nextAuditNode": {
+            "name": "default flow 1",
+            "auditMethod": 1,
+            "signature": true,
+            "customButton": [
+                {
+                    "type": 1,
+                    "text": "同意",
+                    "enable": true
+                },
+                {
+                    "type": 1,
+                    "text": "拒絕",
+                    "enable": true
+                }
+            ],
+            "auditByUsers": [],
+            "auditByGroups": [],
+          }
+        },
       }
-    };
+    }
   },
   mounted() {
     
@@ -171,33 +222,36 @@ export default {
     this.init()
     
   },
+  computed:{
+    
+  },
+  watch:{
+    // for search
+    inputSearchValue(val){
+      this.serachData = this.allTableData.filter(item => (
+        item.name.indexOf(val) > -1
+      ))
+    }
+  },
   methods: {
-    // getWorkflowList({}).then((res) => {
-    //   this.isLoadingData = false;
-    //   this.tableData = res.data.content.map(row => ({
-    //     ...row,
-    //     state: row.state === 1,
-    //     isSwitchDisabled: row.isBind
-    //   }))
-    // });
-    init(){
-      this.getUserInfo()
-      this.getWorkflowList(this.apiBody);
+    async init(){
+      await this.getUserInfo()
+      await this.getWorkflowList(this.apiBody);
     },
 
-    getUserInfo(){
-      getUserInfo().then(res=>{
-        this.userInfo = res.data
-      }).catch(err => {
-        console.log('error' + err);
-      });
+    async getUserInfo(){
+      await getUserInfo().then(res=>{
+          this.userInfo = res.data
+          console.log('this.userInfo 1 ======>> ', this.userInfo);
+        }).catch(err => {
+          console.log('error' + err);
+        });
     },
 
-    getWorkflowList(param){
+    async getWorkflowList(param){
       this.isLoadingData = true
-      getWorkflowList(param).then(res=>{
-        console.log('getWorkflowList ======>> ', res.data.content);
-        // console.log('this.userInfo ======>> ', this.userInfo);
+      await getWorkflowList(param).then(res=>{
+
         res.data.content.map(d => (
           this.userInfo.forEach(user => {
             if(d.createdUser === user.userId){
@@ -208,17 +262,44 @@ export default {
             }
           })
         ))
+
         this.allTableData = res.data.content
+        this.serachData = this.allTableData
 
         this.total = res.data.totalPages
         console.log('this.total :>> ', this.total);
+        console.log('getWorkflowList 2 ======>> ', res.data.content);
+
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
       });
-      
     },
+    creadNewFlow(){
+      var time = new Date()
+      var theTime = time.getTime()
+      var t = {
+          year: time.getFullYear(),
+          month: time.getMonth() + 1,
+          date: time.getDate(),
+          hour: time.getHours(),
+          minute: time.getMinutes(),
+          second: time.getSeconds(),
+        }
+      const createTime = t.year + "/" + t.month + "/" + t.date + "-" + t.hour + ":" + t.minute + ":" + t.second
+      this.newFlow.name = "新增流程 " + createTime
+
+      creadNewFlow(this.newFlow).then(res=>{
+          this.newFlow.processDefinitionKey = res.data
+          sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
+          this.$router.push({name: 'workflowDetail'})
+        }).catch(err => {
+          console.log('error' + err);
+      });
+    
+    },
+    
     handleEmitOperation({ method, row }) {
       console.log('List row =====>> ', row);
       switch(method){
@@ -296,10 +377,7 @@ export default {
     //   console.log('this.tableData :>> ', this.tableData);
     // },
 
-    handleTabClick() {},
 
-    
-    
     handleSwitchChange({ checked, target }) {
       if (checked) {
         enableWorkflow({

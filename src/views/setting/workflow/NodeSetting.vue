@@ -79,7 +79,7 @@
               <div class="setting-config basic-config">
                 <div class="title-name">審批按鈕</div>
                 <div class="approve">
-                  <div class="approve_row" v-for="(item, index) in nodeData.customButton" :key="item.type">
+                  <div class="approve_row" v-for="(item, index) in nodeData.customButton" :key="item.index">
                     <el-checkbox
                       v-model="nodeData.customButton[index].enable"
                       class="storevue-checkbox-outlined"
@@ -261,20 +261,15 @@ export default {
     saveNode(){
       console.log('this.nodeData Adjust:>> ', this.nodeData)
       if(this.nodeData.id == undefined){
-        console.log("this is add a new Node")
         this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
-
-        console.log('this.apiData.orderedAuditNodeArray ~~~>> ', this.apiData.orderedAuditNodeArray);
-
       }else{
+        // edit
         console.log("this is Editing")
         var apiDataIndex = this.apiData.orderedAuditNodeArray.findIndex(i => i.id == this.nodeData.id)
         console.log('apiDataIndex :>> ', apiDataIndex);
         this.apiData.orderedAuditNodeArray.splice(apiDataIndex, 1 , this.nodeData)
         sessionStorage.setItem('workflowNode', JSON.stringify(this.nodeData))
-        console.log('this.apiData GO~~~~~>> ', this.apiData);
       }
-
     
       // call api
       updateWorkflow(this.apiData).then(res=>{

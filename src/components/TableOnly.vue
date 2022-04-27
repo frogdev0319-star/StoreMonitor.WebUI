@@ -78,7 +78,7 @@
             <!-- ohohoh - {{row.state}} -->
           </template>
 
-
+          
           <!-- workflow auditByUsers -->
           <template v-else-if="_item.auditByUsers">
             <div class="audit-user-row">
@@ -86,16 +86,16 @@
             </div>
           </template>
           <!-- workflow auditMethod -->
-          <template v-else-if="_item.auditMethod && row.auditMethod !== undefined ">
-            <el-radio-group class="storevue-radio" v-model="row.auditMethod">
+          <template v-else-if="_item.auditMethod">
+            <el-radio-group class="storevue-radio" v-model="row.auditMethod" v-if="row.name !=='提交人'">
               <el-radio :label="1">會簽</el-radio>
               <el-radio :label="0">或簽</el-radio>
             </el-radio-group>
           </template>
 
           <!-- workflow signature -->
-          <template v-else-if="_item.signature && row.signature !== undefined" >
-            <el-radio-group class="storevue-radio" v-model="row.signature">
+          <template v-else-if="_item.signature" >
+            <el-radio-group class="storevue-radio" v-model="row.signature" v-if="row.name !=='提交人'">
               <el-radio :label="true">需要</el-radio>
               <el-radio :label="false">不需要</el-radio>
             </el-radio-group>
@@ -142,16 +142,6 @@
           </div>
 
           <div class="flex-center" v-else>
-            <template v-if="scope.row.name !== '提交人'">
-              <div class="move" v-if="tableOperation.move" >
-                <div class="move-action" 
-                  :class="{moveup_disable:scope.$index == 1 && item.methods == 'moveUp', movedown_disable: scope.$index == maxIndex && item.methods == 'moveDown'}"
-                  :key="item.text"
-                  v-for="item in tableOperation.move"
-                  @click="handleMoveButton(item.methods, scope.row, scope.$index)"
-                  >
-                  {{item.text}}</div>
-              </div>
               <img 
                 :key="index"
                 class="child-space"
@@ -162,13 +152,42 @@
                 height="24px"
                 width="24px"
               />
-            </template>
           </div>
-          
-
         </template>
       </el-table-column>
 
+
+      <!-- workflow 操作 -->
+      <el-table-column
+        v-if="tableworkflowOperation.label "
+        :min-width="tableworkflowOperation.minWidth"
+        :label="tableworkflowOperation.label"
+        align="left"
+        class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+          <div class="flex-center" v-if="scope.$index !== 0">
+              <div class="move" v-if="tableworkflowOperation.move" >
+                <div class="move-action" 
+                  :class="{moveup_disable:scope.$index == 1 && item.methods == 'moveUp', movedown_disable: scope.$index == maxIndex && item.methods == 'moveDown'}"
+                  :key="item.text"
+                  v-for="item in tableworkflowOperation.move"
+                  @click="handleMoveButton(item.methods, scope.row, scope.$index)"
+                  >
+                  {{item.text}} </div>
+              </div>
+              <img 
+                :key="index"
+                class="child-space"
+                :class="index === 2 && item.icon.indexOf('disabled') !== -1 && scope.row.scope === 0 ? `${item.icon} icon-disabled` : item.icon"
+                v-for="(item,index) in tableworkflowOperation.operation" 
+                :src="`./static/img/table-${item.methods}.png`" 
+                @click="handleOperationButton(item.methods, scope.row, scope.$index)"
+                height="24px"
+                width="24px"
+              />
+          </div>
+        </template>
+      </el-table-column>
 
       <template v-if="isEvent">
         <el-table-column
@@ -280,6 +299,12 @@ export default {
         return {};
       }
     },
+    tableworkflowOperation: {
+      type: Object,
+      default: () => {
+        return {};
+      }
+    },
     headerStyle: {
       type: Object,
       default: {height:'75px',backgroundColor: 'transparent',border:'none',fontSize:'12px'}
@@ -384,7 +409,7 @@ export default {
   
   },
   mounted() {
-    // console.log(this.columnData)
+    // console.log("columnData--->", this.columnData)
     // console.log("this.tableData" , this.tableData)
   },
   methods: {
