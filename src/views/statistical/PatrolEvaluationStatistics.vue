@@ -129,10 +129,14 @@
                 </div>
               </el-col>
               <el-col  :span="12"  style="height:290px;padding-top:32px">
-                    <div style="overflow-x:auto;overflow-y:hidden;height:100%;">
-                    <v-chart @click='clickPart1Bar' ref="storeChart" :options="part1.barRegionOption" autoresize
-                            :style="{width:part1.barRegionOption?part1.barRegionOption.width :'100%',height:'100%'}" />
-                    </div>
+                <div v-if="ispdf" style="overflow-x:hidden;overflow-y:hidden;height:100%;width:500px">
+                  <v-chart ref="storeChart" autoresize :options="part1.barRegionOption" class="chart-content" width="500px"
+                  :style="{width:'500px',height:'100%'}"/>
+                </div>
+                <div v-else style="overflow-x:auto;overflow-y:hidden;height:100%;">
+                  <v-chart @click='clickPart1Bar' ref="storeChart" :options="part1.barRegionOption" autoresize
+                  :style="{width:part1.barRegionOption?part1.barRegionOption.width :'100%',height:'100%'}" />
+                </div>
               </el-col>
               <div style="position:absolute;right:0px;top:32px" @click='changePart1RegionOrder'>
                   <div class="button-area" >
@@ -173,53 +177,61 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="overflow-y:hidden;overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 80px )">
-                  <v-chart  v-if="part1.storeMode==1" 
-                            ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
-                                autoresize
-                            :style="{width:part1.barStoreOption?part1.barStoreOption.width :'100%',height:'100%'}" />
-                  <div v-else style="margin-top:20.5px;height:100%;"  :style="{width:ispdf?'1024px':null}">
-                  <div style="margin-top:20.5px;">
-                    <table-only
-                      ref="elTP"
-                     :column-data="part1StoreInfoTableCol"
-                      :table-data="part1.storeTableData"
-                      :total="part1.table.total"
-                      :highlight-current-row= "true"
-                      :pagesize="sizeNum"
-                      :current-page="page"
-                      :is-event = "false"
-                      :default-sort = "defaultSort"
-                      :allowRowExpand = "true"
-                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
-                      :tableHeight = "300"
-                      layout = "prev,pager,next,sizes"
-                      expand-component = "IncepItemTop5"
-                      :expandCompProperties = "componentsProps"
-                      @handleChange="handlePageAndSizeChangePart1"
-                      @sortChange="handleSortChangePart1"
-                      @onCellClick = "onEvenListNumClickPart1"
-                    />
-                  </div>
-                  <div style="width:100%; margin-top:12px;height:31px;">
-                  <tbl-pagination-only
-                    :total="part1.table.total"
-                    :pagesize="part1.table.sizeNum"
-                    :current-page="part1.table.page"
-                    layout = "prev,pager, next,sizes,slot"
-                    @sizeChange="handlePageAndSizeChangePart1"
-                    @currentChange="handlePageAndSizeChangePart1"
-                  />
+          <el-col  style="position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 80px )">
+             <div v-if="part1.storeMode==1" style="height:430px;width:100%" :style="{width:ispdf?'1024px':null}">   
+                <div v-if="ispdf" style="overflow-y:hidden;overflow-x:auto;height:100%;width:1024px">
+                  <v-chart ref="storeChart" :id="part1-region-line-chart" autoresize :options="part1.barStoreOption"
+                  :style="{width:'900px',height:'100%'}"/>
                 </div>
+                <div v-else style="overflow-y:hidden;overflow-x:auto;height:100%;" >
+                  <v-chart   
+                    ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
+                        autoresize
+                    :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}" />
                 </div>
-                  <div  v-if="part1.storeMode==1"  
-                      style="position:absolute;right:40px;top:30px;height:40px" @click='changePart1StoreOrder'>
-                    <div class="button-area" >
-                      <span style="color:#acaeb1">{{ part1.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
-                      <img :src='part1.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
-                    </div>    
+              </div>
+                <div v-else style="margin-top:20.5px;height:100%;"  :style="{width:ispdf?'1024px':null}">
+                    <div style="margin-top:20.5px;">
+                      <table-only
+                        ref="elTP"
+                      :column-data="part1StoreInfoTableCol"
+                        :table-data="part1.storeTableData"
+                        :total="part1.table.total"
+                        :highlight-current-row= "true"
+                        :pagesize="sizeNum"
+                        :current-page="page"
+                        :is-event = "false"
+                        :default-sort = "defaultSort"
+                        :allowRowExpand = "true"
+                        :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
+                        :tableHeight = "300"
+                        layout = "prev,pager,next,sizes"
+                        expand-component = "IncepItemTop5"
+                        :expandCompProperties = "componentsProps"
+                        @handleChange="handlePageAndSizeChangePart1"
+                        @sortChange="handleSortChangePart1"
+                        @onCellClick = "onEvenListNumClickPart1"
+                      />
+                    </div>
+                    <div style="width:100%; margin-top:12px;height:31px;">
+                      <tbl-pagination-only
+                        :total="part1.table.total"
+                        :pagesize="part1.table.sizeNum"
+                        :current-page="part1.table.page"
+                        layout = "prev,pager, next,sizes,slot"
+                        @sizeChange="handlePageAndSizeChangePart1"
+                        @currentChange="handlePageAndSizeChangePart1"
+                      />
                   </div>
-           </el-col>  
+                </div>
+                <div  v-if="part1.storeMode==1"  
+                    style="position:absolute;right:40px;top:30px;height:40px" @click='changePart1StoreOrder'>
+                  <div class="button-area" >
+                    <span style="color:#acaeb1">{{ part1.storeOrder=="desc"?$t('statistics.descOrder'):$t('statistics.ascOrder') }}</span>
+                    <img :src='part1.storeOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
+                  </div>    
+                </div>
+          </el-col>  
       </div> 
        <div class="statistics-content" id="imgTest_avg3"  style="height:1010px;margin-top:18px;box-shadow:none;" :style="{width:ispdf?'1024px':null}">
                 <div class="head">
@@ -1210,6 +1222,9 @@ export default {
         {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
+      part1BarcharWidth:'100%',
+      part2BarcharWidth:'100%',
+      part3BarcharWidth:'100%'
     };
   },
 
@@ -2154,7 +2169,7 @@ export default {
     filterContent(content,type,ids,labels,originArray){
       let output = [];
       console.log("Filter POST="+type)
-
+      console.log("filterContent:",content)
       if(type == 'stores'){
         content.map(function(item,i){
           item.list = [];
@@ -2373,6 +2388,8 @@ export default {
       const regionLabel =[];
 
       let content = [];
+      console.log("getPart1StoreBar > this.part1.indexRegion:",this.part1.indexRegion);
+      console.log("getPart1StoreBar > this.part1.content:",this.part1.content);
       if(this.part1.content && this.part1.content[this.part1.indexRegion]){
         if(this.part1.compareType == 'stores'){
             content =[this.part1.content[this.part1.indexRegion]];
@@ -2456,9 +2473,11 @@ export default {
       regionLabel.push("")
       if(regionLabel.length>20){
         option.width =( regionLabel.length*50) +'px'
+        this.part1BarcharWidth = ( regionLabel.length*50) +'px';
       }
       else{
         option.width = '100%'
+        this.part1BarcharWidth = '100%';
       }
       this.part1.barStoreOption = option;
     },
@@ -2585,7 +2604,7 @@ export default {
       option.xAxis.data = regionLabel;
       regionData.push(0)
       regionLabel.push("")
-      if(regionLabel.length>20){
+      if(regionLabel.length>25){
         option.width =( regionLabel.length*50) +'px'
       }
       else{
