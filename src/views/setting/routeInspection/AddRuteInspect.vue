@@ -204,7 +204,7 @@
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
-          <el-form-item>
+          <!-- <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">必填</span>
@@ -213,7 +213,7 @@
               <el-radio label="1">必填</el-radio>
               <el-radio label="0">非必填</el-radio>
             </el-radio-group>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
@@ -1219,10 +1219,13 @@ export default {
         self.enterItemNameTip = true;
       }
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
+      self.OtherScoreTipEmpty = false;
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
           //self.ItemSheetScore = itemScore = 10;
-          self.OtherScoreTipEmpty = true;
+          if(self.itemType === 0 ) {
+            self.OtherScoreTipEmpty = true;
+          }
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
@@ -1302,7 +1305,7 @@ export default {
         qualifiedScore: qualifiedScore,
         availableScores: selectAvailable,
         type: this.itemType,
-        required: this.itemRequired === '1'
+        // required: this.itemRequired === '1'
       };
         temp.push(objItem);
         const obj = {
@@ -1330,6 +1333,7 @@ export default {
               };
               tempParams.push(obj);
             });
+            util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
             if (tempParams.length !== 0) {
               const paramsApply = {
                 storeList: tempParams
@@ -1338,7 +1342,6 @@ export default {
                 const res = resApply;
               });
             }
-            util.notify(self.$t('insSettingView.addSuss'), 'success', 3000);
             setTimeout(function() {
               if (self.tabName == '远程巡检') {
                 PubSub.publish('change-color', { showTag: true });
@@ -1364,7 +1367,7 @@ export default {
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable,
           type: this.itemType,
-          required: this.itemRequired === '1'
+          // required: this.itemRequired === '1'
         };
         temp.push(obj);
         const params = {
