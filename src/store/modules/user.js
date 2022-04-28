@@ -35,7 +35,8 @@ const user = {
     collapsed: false,
     templateOptions: [],
     curTemplateIndex: -1,
-    storeCache: null
+    storeCache: null,
+    storeListCache: []
   },
 
   mutations: {
@@ -43,7 +44,7 @@ const user = {
       state.curTemplateIndex = index
     },
     SET_STORE_CACHE: (state, store) => {
-      state.storeCache = {...store}
+      state.storeCache = store
     },
     SET_TEMPLATE_OPTIONS: (state, options) => {
       state.templateOptions = options
@@ -133,10 +134,15 @@ const user = {
 
     SET_Available_Path_List: (state, pathList) => {
       state.availabePathList = pathList;
+    },
+    SET_STORELIST: (state, storeList) => {
+      state.storeListCache = storeList
     }
-
   },
   actions: {
+    setStoreList({ commit }, storeList) {
+      commit('SET_STORELIST', storeList);
+    },
     setPatrolHistory({ commit }, PatrolHistory) {
       commit('SET_PatrolHistory', PatrolHistory);
     },

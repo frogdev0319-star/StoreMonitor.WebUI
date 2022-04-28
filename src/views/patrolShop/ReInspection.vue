@@ -1078,10 +1078,14 @@ export default {
           self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
+          self.$store.dispatch('setStoreList', []);
+          self.$store.dispatch('setStoreCache', '');
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
+          self.$store.dispatch('setStoreList', self.storeList);
           self.$store.dispatch('setPatrolHistory', self.historyObj);
+          self.$store.dispatch('setStoreCache', this.curSelStoreId);
         }
         !self.showGuide &&  self.$refs.vendorVideo.stopVideoPlay();
         next();
@@ -1093,10 +1097,13 @@ export default {
         // from.meta.keepAlive=false;
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
+        self.$store.dispatch('setStoreList', []);
+        self.$store.dispatch('setStoreCache', '');
         Database.addDataToDB(self.userId, {data: {}, rule: {}});
       } else {
-        // from.meta.keepAlive=true;
         self.$store.dispatch('setPatrolHistory', self.historyObj);
+        self.$store.dispatch('setStoreList', self.storeList);
+        self.$store.dispatch('setStoreCache', this.curSelStoreId);
       }
       !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       next();
@@ -1106,11 +1113,12 @@ export default {
   async mounted() {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
-    
+    const storeListCache = self.$store.getters.storeListCache;
+    if (storeListCache) self.storeList = storeListCache
     if (PatrolHistory != null) {
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
-      self.storeList = PatrolHistory.storeList
+      // self.storeList = PatrolHistory.storeList
       const indexFeed = PatrolHistory.sheetName.map(x => x.groupId).indexOf('feedBack');
       let getdealnum = 0;
       const sheetName = PatrolHistory.sheetName.slice(0, indexFeed);
@@ -1149,7 +1157,6 @@ export default {
           self.showFeedBack = true;
         }
       } else {
-        console.log('inspectItemList mounted')
         self.inspectItemList = [...PatrolHistory.inspectItemList];
       }
       self.store = PatrolHistory.store;
@@ -1657,37 +1664,11 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      if (this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0 && storeItem != undefined) {
-        // this.changeStoreObj.dialogCosed = true;
+      console.log(this.$store.getters.storeCache)
+      if (!this.$store.getters.storeCache) {
+        this.changeStore_(storeItem)
       } else {
-        if (storeItem) {
-          this.changeStore_(storeItem)
-        } else {
-          this.patrolstore = '';
-          this.curSheetIndex = 0;
-          this.curSheet = {};
-          this.inspectItemList = [];
-          this.inspectList = [];
-          this.sheetName = [];
-          this.tempArr = [];
-          this.showChannelBtns = [];
-          this.patrolStoreName = '';
-          this.PatrolList = [];
-          this.hasIgnoretemp = [];
-          this.$store.dispatch('setPatrolHistory', null);
-          this.isShowWarn = false;
-          this.notShowAlert = false;
-          this.showIgnoreItem = false;
-          this.$emit("listenerChild", false);
-          this.showStoreUp = true;
-          this.$refs.vendorVideo && (this.$refs.vendorVideo.editCount = 0);
-          this.$refs.vendorVideo && this.$refs.vendorVideo.stopVideoPlay();
-          this.showError = false;
-          this.curDeviceId = -1;
-          this.showFeedBack = false;
-          this.eventList = [];
-          this.showGuide = true;
-        }
+        this.$store.dispatch('setStoreCache', '');
       }
       
     },
@@ -1722,7 +1703,6 @@ export default {
         self.getInitStoreData(allStoreData);
         const storeData = allStoreData.data.content;
         self.storeList = getStoreTemp(storeData);
-        // console.log('self.storeList', self.storeList)
         const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
         self.changeStore_(storeItem)
       }
@@ -2280,6 +2260,7 @@ export default {
       };
       this.hasIgnoretemp = [];
       const params = { _id: this.userId, data: obj, rule: inspectSettings };
+      this.$store.dispatch('setStoreList', this.storeList);
       await Database.addDataToDB(this.userId, params);
       this.$router.push({ name: 'confirmSum', params: params });
     },
@@ -2623,7 +2604,6 @@ export default {
     },
     changeInspect(val) {
       const self = this;
-      console.log(self.$refs.vendorVideo.editCount)
       // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
       if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 1) ) {
         self.changeInspectObj.dialogCosed = true;

@@ -183,7 +183,7 @@ export default {
       inspectCatch: '',
       curStoreGroup: [],
       curStoreType: [],
-      curSelectedStore: '',
+      curSelectedStore: this.$store.getters.storeCache || '',
       storeGroupList: [],
       storeTypeList: [],
       curRegionI: [],
