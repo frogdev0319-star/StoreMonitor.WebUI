@@ -730,7 +730,9 @@ export default {
         let PassFileXN = 0, PassFileTotalScore = 0, PassFileTotalScoreX = 0, PassFileXS = 0, PassFileTotalScoreSystem = 0;
         let ScoreX = 0, ScoreN = 0, ScoreXN = 0, ScoreTotalScoreX = 0, allScoreB = 0, ScoreTotalScoreSystem = 0;
         let otherGetscoreTotal = 0, OtherTotalScoreSystem = 0;
+        let isOnlyTab1 = true;
         inspect.forEach(p_item => {
+          if (p_item.type != 0) isOnlyTab1 = false
           if (p_item.dealCount !== 0) {
             dealType.push(p_item.type);
           }
@@ -847,7 +849,7 @@ export default {
             } else {
               item['itemScore'] = notAddIgnoretotalScore;
             }
-            if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1) {
+            if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
               item['itemgetScore'] = '--';
             } else {
               // console.log(util.isDouble(totalGetscore))
@@ -930,7 +932,7 @@ export default {
             }
           }
         } else {
-          if (inspectSettings.includedInTotalScoreWithType1) {
+          if (inspectSettings.includedInTotalScoreWithType1 || isOnlyTab1) {
             if (inspectSettings.hundredMarkType === '-1' || inspectSettings.hundredMarkType === '1') {
               if (inspectSettings.qualifiedForIgnoredWithType1 && !inspectSettings.qualifiedForIgnoredWithType2) {
                 s_count = PassFileXN + ScoreTotalScoreSystem + OtherTotalScoreSystem;
