@@ -116,7 +116,7 @@
                   </delay-button>
             </div>
         </div>
-       <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
+       <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 80px);position:absolute">
                   <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
                       <v-chart 
                                 ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
@@ -2116,7 +2116,7 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-      if(regionLabel.length>20){
+      if(regionLabel.length>25){
         regionData.push(0)
         regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
@@ -2133,7 +2133,7 @@ export default {
       }
       regionData.push(0)
       regionLabel.push("")
-      if(regionLabel.length>20){
+      if(regionLabel.length>25){
         option.width =( regionLabel.length*50) +'px'
       }
       else{
@@ -2221,7 +2221,7 @@ export default {
       option.series[0].name = "";
       option.series[0].data = regionData;
       option.xAxis.data = regionLabel;
-     if(regionLabel.length>20){
+     if(regionLabel.length>25){
         regionData.push(0)
         regionLabel.push("")
         option.width =( regionLabel.length*50) +'px'
@@ -2238,7 +2238,7 @@ export default {
       }
       regionData.push(0)
       regionLabel.push("")
-      if(regionLabel.length>20){
+      if(regionLabel.length>25){
         option.width =( regionLabel.length*50) +'px'
       }
       else{
