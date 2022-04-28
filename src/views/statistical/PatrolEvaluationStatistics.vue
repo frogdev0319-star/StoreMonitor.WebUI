@@ -178,12 +178,12 @@
             </div>
         </div>
           <el-col  style="position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 80px )">
-             <div v-if="part1.storeMode==1" style="height:430px;width:100%" :style="{width:ispdf?'1024px':null}">   
-                <div v-if="ispdf" style="overflow-y:hidden;overflow-x:auto;height:100%;width:1024px">
+             <div v-if="part1.storeMode==1" style="overflow-y:hidden;overflow-x:auto;height:430px;width:100%" :style="{width:ispdf?'900px':null}">   
+                <!--<div v-if="ispdf" style="height:100%;">
                   <v-chart ref="storeChart" :id="part1-region-line-chart" autoresize :options="part1.barStoreOption"
-                  :style="{width:'900px',height:'100%'}"/>
-                </div>
-                <div v-else style="overflow-y:hidden;overflow-x:auto;height:100%;" >
+                  :style="{width:part1.barStoreOption?part1.barStoreOption.width:'100%',height:'100%'}"/>
+                </div>-->
+                <div style="height:100%;" >
                   <v-chart   
                     ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
                         autoresize
@@ -324,7 +324,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  class="partition"  style="overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 80px)">
+         <el-col  class="partition"  style="overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 80px)" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
                   <v-chart  v-if="part2.storeMode==1" 
                             ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize
                             :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
@@ -2479,6 +2479,7 @@ export default {
         option.width = '100%'
         this.part1BarcharWidth = '100%';
       }
+      
       this.part1.barStoreOption = option;
     },
     async getPart2RegionBar() {
