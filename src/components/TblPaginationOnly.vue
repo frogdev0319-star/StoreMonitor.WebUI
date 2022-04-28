@@ -92,7 +92,7 @@ export default {
       deep: true,
       handler (val) {
           this.total = val;
-          this.currentPage = 1;
+          this.currentPage;
       }
     }
   },

@@ -275,11 +275,31 @@
         </div>
       </setting-table>
     </el-col>
+    
+    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
+      <setting-table :table-name="$t('insSettingView.bindWorkFLow')">
+        <div slot="tableDetail" class="setting-config rule-item">
+          <span style="margin-right: 20px">選擇綁定流程</span>  
+          <el-select v-model="workFlowListBind" placeholder="请选择">
+              <el-option
+                v-for="item in workFlowList"
+                :key="item.processDefinitionKey"
+                :label="item.name"
+                :value="item.processDefinitionKey">
+              </el-option>
+            </el-select>
+        </div>
+      </setting-table>
+    </el-col>
+
+
+
   </el-row>
 </template>
 
 <script>
 import { inpectRESTful } from '@/api/index';
+import { getWorkflowList } from '@/api/workflow';
 import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
@@ -315,7 +335,21 @@ export default {
       itemOptionsForType3: {},
       otherBtnAttr: '',
       standardScore: 100,
-      MinScoreMsg:false
+      MinScoreMsg:false,
+      workFlowListBind:'',
+      apiBody: {
+          "page": 0,
+          "size": 1000,
+          "direction": "DESC",
+          "property": "createdTs",
+          // "name": "test",
+          // "type": 0,
+          "state": [
+              0,
+              1,
+          ]
+      },
+      workFlowList:[]
     };
   },
   watch: {
@@ -331,10 +365,14 @@ export default {
         this.$refs.tab3PassInput[0].showPromotMsgFlag = false;
         this.$refs.tab3FailInput[0].showPromotMsgFlag = false;
       }
+    },
+    workFlowListBind(aaa){
+      console.log('HAaaaaaaah~~ processDefinitionKey', aaa);
     }
   },
   mounted() {
     this.getRule();
+    this.getWorkflowList(this.apiBody)
   },
 
   methods: {
@@ -548,7 +586,15 @@ export default {
         score = parseFloat(this.minScore);
       }
       this.standardScore = score;
-    }
+    },
+    
+    async getWorkflowList(param){
+      await getWorkflowList(param).then(res=>{
+        this.workFlowList = res.data.content
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
 
   }
 };

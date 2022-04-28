@@ -220,7 +220,6 @@ export default {
   },
   created() {
     this.init()
-    
   },
   computed:{
     
@@ -234,9 +233,23 @@ export default {
     }
   },
   methods: {
-    async init(){
+    async init(){      
+
       await this.getUserInfo()
-      await this.getWorkflowList(this.apiBody);
+      const data = sessionStorage.getItem('pageInfo')
+      const pageInfo = JSON.parse(data)
+      if(pageInfo == undefined){
+        await this.getWorkflowList(this.apiBody);
+      }else{
+        const newApiBody = {...this.apiBody, size:pageInfo.size, page: pageInfo.page - 1}
+
+        this.currentPage = pageInfo.page
+        // console.log('newApiBody :>> ', newApiBody);
+        await this.getWorkflowList(newApiBody);
+      }
+      
+
+
     },
 
     async getUserInfo(){
@@ -251,7 +264,6 @@ export default {
     async getWorkflowList(param){
       this.isLoadingData = true
       await getWorkflowList(param).then(res=>{
-
         res.data.content.map(d => (
           this.userInfo.forEach(user => {
             if(d.createdUser === user.userId){
@@ -267,6 +279,7 @@ export default {
         this.serachData = this.allTableData
 
         this.total = res.data.totalPages
+
         console.log('this.total :>> ', this.total);
         console.log('getWorkflowList 2 ======>> ', res.data.content);
 
@@ -354,12 +367,13 @@ export default {
     },
 
     handlePagination(pageInfo){
+      sessionStorage.setItem('pageInfo', JSON.stringify(pageInfo))
       const newApiBody = {...this.apiBody, size:pageInfo.size, page: pageInfo.page - 1}
       this.apiBody = []
       this.apiBody = newApiBody
       this.currentPage = pageInfo.page
       // console.log('pageInfo :>> ', pageInfo);
-      // console.log('this.apiBody :>> ', this.apiBody);
+      console.log('this.apiBody :>> ', this.apiBody);
       this.init()
     },
 
@@ -433,7 +447,4 @@ export default {
     align-items: flex-start
   .el-table
     border: none !important
-
-
-  
 </style>

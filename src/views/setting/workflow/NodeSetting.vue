@@ -79,7 +79,32 @@
               <div class="setting-config basic-config">
                 <div class="title-name">審批按鈕</div>
                 <div class="approve">
-                  <div class="approve_row" v-for="(item, index) in nodeData.customButton" :key="item.index">
+                    <div class="approve_row">
+                      <el-radio-group class="storevue-radio" v-model="nodeData.customButton[0].type">
+                        <el-radio :label="1">同意</el-radio>  
+                        <el-radio :label="0">自定義名稱</el-radio>
+                        <el-input
+                          placeholder="//自定义属性名称，如通过"
+                          class="input-name"/>
+                      </el-radio-group>
+                    </div>
+
+                    <div class="approve_row">
+                      <el-radio-group class="storevue-radio" v-model="nodeData.customButton[1].type">
+                        <el-radio :label="1">拒绝</el-radio>  
+                        <el-radio :label="0">自定義名稱</el-radio>
+                        <el-input
+                          placeholder="//自定义属性名称，如通过"
+                          class="input-name"/>
+                      </el-radio-group>
+                    </div>
+                  
+
+
+
+
+
+                  <!-- <div class="approve_row" v-for="(item, index) in nodeData.customButton" :key="item.index">
                     <el-checkbox
                       v-model="nodeData.customButton[index].enable"
                       class="storevue-checkbox-outlined"
@@ -87,7 +112,7 @@
                     <el-input
                       placeholder="//自定义属性名称，如通过"
                       class="input-name"/>
-                  </div>
+                  </div> -->
 
 
                   <!-- <div class="approve_row">
@@ -214,6 +239,7 @@ export default {
       basicList: [],
       isLoadingData: false,
       workflowDescription: '',
+      aa:''
     };
   },
   mounted() {
@@ -356,7 +382,7 @@ export default {
     justify-content: flex-start
     align-items: center
     .el-input
-      margin-left: 30px
+      margin-left: 10px
 </style>
 
 <style scoped>
@@ -527,10 +553,11 @@ export default {
     align-items: center;
   }
   .el-radio{
-    width: 20px !important;
+    /* width: 90px !important; */
+    margin-right: 20px;
   }
   .el-tooltip{
-    margin-right: 50px;
+    margin-right: 30px;
   }
   /* .setting-details{
     margin: 0 30px;

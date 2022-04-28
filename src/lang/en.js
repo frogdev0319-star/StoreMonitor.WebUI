@@ -724,6 +724,8 @@ export default{
       "weight": "weight%",
       "weightSetting": "Weight Setting",
       "weightTotalError": "Weight cannot be greater or less than 100%",
+      "bindWorkFLow": "Binding WorkFLow"
+
   },
   "deviceView":{
       "EzvizAccount":"Streaming Service Account",

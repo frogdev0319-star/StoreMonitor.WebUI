@@ -727,6 +727,9 @@ export default{
     "weight": "權重值%",
     "weightSetting": "权重设定",
     "weightTotalError": "权重不可大于或小于100%",
+
+    "bindWorkFLow": "巡檢表綁定流程"
+
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",
