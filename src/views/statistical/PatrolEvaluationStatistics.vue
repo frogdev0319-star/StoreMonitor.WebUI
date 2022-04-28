@@ -415,7 +415,7 @@
                       </el-col>
                      </el-col>
           </el-row>
-              <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 40px)">
+              <el-row  :span="24" class="partition" style="height:320px;;padding-right:40px;width:calc(100% - 80px)" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
             <el-col  style="overflow-x:auto;overflow-y:hidden;height:320px;width :100%">
                <v-chart @click='clickPart3Bar' ref="storeChart" :options="part3.barRegionOption"  autoresize
                             :style="{width:part3.barRegionOption?part3.barRegionOption.width :'100%',height:'100%'}" />
@@ -458,7 +458,7 @@
                   </delay-button>
             </div>
         </div>
-         <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute">
+         <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 40px);position:absolute" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
                   <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
                       <v-chart 
                                 ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
@@ -1434,12 +1434,15 @@ export default {
 
     onSwitchPart1Mode(mode){
       this.part1.storeMode = mode;
+      this.drawPart1RegionBar();
     },
     onSwitchPart2Mode(mode){
       this.part2.storeMode = mode;
+      this.drawPart2RegionBar();
     },
     onSwitchPart3Mode(mode){
       this.part3.storeMode = mode;
+      this.drawPart3RegionBar();
     },
     async handleExportReport() {
       const self = this;
