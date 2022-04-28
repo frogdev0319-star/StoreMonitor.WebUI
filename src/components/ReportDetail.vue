@@ -309,6 +309,7 @@ export default {
           color:#7d8cad;
           margin: 15px 0 0 10px;
           text-align: left;
+          word-break: break-all
         }
       }
       .score-title{

@@ -1562,6 +1562,7 @@ export default {
                   font-size: calc(12 / 1920 * 100vw);
                   color:#7d8cad;
                   margin: 15px 0 0 10px;
+                  word-break: break-all;
                 }
               }
               .score-title{

@@ -618,7 +618,7 @@
                     </div>
                   </div>
                   <div style="margin-left: calc(20/1920*100vw)" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
-                    <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content margin-bottom-sm">
+                    <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" style=" word-break: break-all" class="details-content margin-bottom-sm">
                       {{ item.description }}
                     </div>
                     <div v-if="item.lastUnqualifiedNumber > 0" class="details-failed-record margin-bottom-sm">
