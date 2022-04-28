@@ -116,7 +116,7 @@
                   </delay-button>
             </div>
         </div>
-       <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 80px);position:absolute">
+       <el-col  style="height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 90px);position:absolute" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
                   <div  v-if="part3.storeMode==1"  style="height:100%;overflow-y:hidden;overflow-x:auto">
                       <v-chart 
                                 ref="storeChart" :id="part3-region-line-chart" :options="part3.barStoreOption"   autoresize
@@ -853,6 +853,7 @@ export default {
     },
     onSwitchPart3Mode(mode){
       this.part3.storeMode = mode;
+      this.drawPart3RegionBar();
     },
     changePart3RegionOrder(){
       if(this.part3.regionOrder == 'desc'){

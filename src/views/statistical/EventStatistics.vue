@@ -1556,7 +1556,7 @@ export default {
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
         option.series[0].data = chart_dataset;
-        if(date_xAxis.length>28){
+        if(date_xAxis.length>18){
           var w = ( date_xAxis.length*90) +'px';
           
           option.width = w;
@@ -1601,7 +1601,7 @@ export default {
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
         option.series[0].data = chart_dataset;
-        if(date_xAxis.length>28){
+        if(date_xAxis.length>25){
           var w = ( date_xAxis.length*90) +'px';
           
           option.width = w;
@@ -1615,9 +1615,9 @@ export default {
               option.grid.width = '800px';
               this.barchartWidthMode0 = 'calc(800/1980*100vw)';
            }else{
-            option.width = 'calc(1479/1980*100vw)';
+            option.width = 'calc(1450/1980*100vw)';
             option.grid.width = '100%';
-            this.barchartWidthMode0 = 'calc(1479/1980*100vw)';
+            this.barchartWidthMode0 = 'calc(1450/1980*100vw)';
            }
         }
         this.barchartOptionViewMode0  = option;
