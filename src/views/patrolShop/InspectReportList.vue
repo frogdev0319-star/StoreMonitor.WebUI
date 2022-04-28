@@ -435,7 +435,7 @@ export default {
         { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
         { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
       ],
-      curAppraise: -2,
+      curAppraise: -1,
       appraiseList: [
         { 'status': -1, 'label': this.$t('remotePatrol.all') },
         { 'status': 0, 'label': this.$t('remotePatrol.dangerous') }, //poor
@@ -793,6 +793,11 @@ export default {
     },
 
     getInitReportList() {
+      if ( (typeof this.params.clause.status !='undefined') && this.params.clause.status == -1) {
+        delete this.params.clause.status
+      }
+      this.params.filter = { page: 0, size: this.sizeNum };
+      console.log("*getInitReportList:",this.params);
       this.getReportList(this.params);
     },
 
@@ -950,7 +955,8 @@ export default {
       tempsearchParamsObj.curReportType = this.curReportType;
       if(!tempsearchParamsObj.clause){
         tempsearchParamsObj.clause={
-          storeId: this.storeFilterObj.filterStoreIds,status:this.curAppraise
+          storeId: this.storeFilterObj.filterStoreIds,
+          status:this.curAppraise
         }
       }
       else{
@@ -982,7 +988,8 @@ export default {
         this.filter = searchParams.filter;
        
         this.checkSortType(this.curSortType,true);
-        this.curAppraise = searchParams.clause.status;
+        console.log("searchParams.clause.status:",searchParams.clause.status);
+        this.curAppraise = (typeof searchParams.clause.status=='undefined') ? -1:searchParams.clause.status;
         this.curReportType = searchParams.curReportType;
         this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
         this.searchParams = searchParams;
