@@ -85,8 +85,8 @@
                       class="groupItem" @click="clickCategory(index,item)"
                       @mouseenter="onShowCategoryEditBtn(index,item)">
                     <div class="category-list">
-                      <div class="category-name">
-                        <div class="group-left">
+                      <div class="category-name flex">
+                        <div class="group-left spacer">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
                           <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex-center">
                             <div style="margin-left: 20px">{{ item.name }}（{{ item.groupNum }}）</div>
