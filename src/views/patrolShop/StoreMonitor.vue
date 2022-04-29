@@ -241,7 +241,7 @@
                     </div>
                   </div>
                 </div>
-                <div v-if="corEvent && problemTab == 1 && store.storeId ">
+                <div v-if="corEvent && problemTab == 1 && store.storeId"  style="height: 500px; overflow: auto;">
                     <div
                       v-for="(item, index) in eventList"
                       :key="index"
@@ -394,7 +394,7 @@
                 </div>
               </div>
             </div>
-            <div v-if="corEvent && problemTab == 1 && store.storeId ">
+            <div v-if="corEvent && problemTab == 1 && store.storeId" style="height: 500px; overflow: auto;">
                 <div
                   v-for="(item, index) in eventList"
                   :key="index"
@@ -1132,7 +1132,7 @@ export default {
         },
         filter: {
           page: 0,
-          size: 5
+          size: 100
         },
         order: {
           direction: 'desc',
@@ -1158,7 +1158,7 @@ export default {
         item.isActive = true;
         self.evBtns[0].isActive = false;
         let data = await self.getEventList();
-        data = data.slice(0, 5);
+        // data = data.slice(0, 5);
         const temp = [];
         data.forEach((item) => {
           const obj = {};
