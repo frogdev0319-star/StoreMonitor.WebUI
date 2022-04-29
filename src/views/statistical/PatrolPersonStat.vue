@@ -317,7 +317,7 @@ export default {
       if(params.submitters.length>0)this.userIds = params.submitters;;
       if(params.positionIds.length>0)this.positionIds = params.positionIds;
     }
-    this.initData();
+    
     this.getSearchCondition();
   },
 
@@ -346,6 +346,7 @@ export default {
         this.getUserList(result[1].data);
         //this.getTitleList(result[2].data);
         this.getUserPositionList(result[0].data);
+        this.initData();
         //this.searchCheckInList();
       } catch (e) {
         console.log(e);
