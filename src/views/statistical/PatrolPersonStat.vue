@@ -297,12 +297,13 @@ export default {
     async accountChanged(val) {
       const self = this;
       if (val !== 0) {
+        this.ifCachedParams = false;
         self.dateValue = [self.$moment().startOf('month').toDate(), self.$moment(new Date()).endOf('d').toDate()];
         const start = typeof (self.dateValue[0]) === 'object' ? self.dateValue[0].getTime() : self.dateValue[0];
         const end = typeof (self.dateValue[1]) === 'object' ? self.dateValue[1].getTime() : self.dateValue[1];
         self.params.beginTs = start;
         self.params.endTs = end;
-        await self.initData();
+        self.getSearchCondition();
         self.curStoreTag = [];
       }
     },
@@ -316,6 +317,7 @@ export default {
       this.ifCachedParams = true;
       if(params.submitters.length>0)this.userIds = params.submitters;;
       if(params.positionIds.length>0)this.positionIds = params.positionIds;
+      
     }
     
     this.getSearchCondition();
@@ -346,6 +348,7 @@ export default {
         this.getUserList(result[1].data);
         //this.getTitleList(result[2].data);
         this.getUserPositionList(result[0].data);
+        this.filterUserIds();
         this.initData();
         //this.searchCheckInList();
       } catch (e) {
@@ -455,7 +458,7 @@ export default {
       this.params.endTs = end;
       this.params.submitters = this.userIds;*/
       this.allInsRecordData = [];
-      let param = {beginTs:start,endTs:end,submitters:this.userIds};
+      let param = {beginTs:start,endTs:end,submitters:(this.userIds.length==0)?[' ']:this.userIds};
       let searchParams = {...param};
       searchParams['positionIds'] = this.positionIds; 
       const searchConditon = {
