@@ -247,9 +247,6 @@ export default {
         // console.log('newApiBody :>> ', newApiBody);
         await this.getWorkflowList(newApiBody);
       }
-      
-
-
     },
 
     async getUserInfo(){
@@ -294,13 +291,13 @@ export default {
       var theTime = time.getTime()
       var t = {
           year: time.getFullYear(),
-          month: time.getMonth() + 1,
-          date: time.getDate(),
-          hour: time.getHours(),
-          minute: time.getMinutes(),
-          second: time.getSeconds(),
+          month: ((time.getMonth() + 1) < 10) ? '0' + (time.getMonth() + 1).toString() : (time.getMonth() + 1).toString(),
+          date: (time.getDate() < 10) ? '0' + time.getDate().toString() : time.getDate().toString(),
+          hour: (time.getHours() < 10) ? '0' + time.getHours().toString() : time.getHours().toString(),
+          minute: (time.getMinutes() < 10) ? '0' + time.getMinutes().toString() : time.getMinutes().toString(),
+          second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
         }
-      const createTime = t.year + "/" + t.month + "/" + t.date + "-" + t.hour + ":" + t.minute + ":" + t.second
+      const createTime = t.year + "-" + t.month + "-" + t.date + " " + t.hour + ":" + t.minute + ":" + t.second
       this.newFlow.name = "新增流程 " + createTime
 
       creadNewFlow(this.newFlow).then(res=>{
@@ -372,6 +369,7 @@ export default {
       this.apiBody = []
       this.apiBody = newApiBody
       this.currentPage = pageInfo.page
+      this.inputSearchValue = ''
       // console.log('pageInfo :>> ', pageInfo);
       console.log('this.apiBody :>> ', this.apiBody);
       this.init()

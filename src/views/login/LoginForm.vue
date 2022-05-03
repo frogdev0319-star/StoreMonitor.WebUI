@@ -212,7 +212,7 @@ export default {
         // password:'abc123'
         username: '',
         password: '',
-        lang: 'zh-CN'
+        lang: 'zh-TW'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
