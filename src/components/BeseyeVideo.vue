@@ -58,8 +58,8 @@
           v-show ="showVideo && !playBack"
           id="beseyeVideo"
           :controls="showControls"
-          height="420"
-          width="90%"
+          height="100%"
+          width="100%"
           prload
           autoplay
           style="margin: auto"
@@ -761,7 +761,7 @@ export default {
     },
 
     fullWindowScreen(...val) {
-      console.log(val);
+      // console.log(val);
       // self.showControls=true;
       var ele = document.getElementById('videoContent');
       ele.style.width = '100%';
