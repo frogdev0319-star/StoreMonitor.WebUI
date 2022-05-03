@@ -227,6 +227,7 @@ import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from '@/components/SelectedStores';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import DialogVue from '@/components/DialogVue';
+import PermissionHelper from '@/api/PermissionHelper';
 
 export default {
   name: 'EventManage',
@@ -842,7 +843,7 @@ export default {
     },
 
     handleDisable(row, index){
-      if (row.status==2 || row.status==4) {
+      if (row.status==2 || row.status==4 || !PermissionHelper.enableEventClose() ) {
         return false
       } else {
         return true
