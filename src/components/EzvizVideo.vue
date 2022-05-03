@@ -831,6 +831,8 @@ export default {
       if (!self.channelInfo.id || !self.channelInfo.ivsId) {
         self.showError = true;
         self.errorMsg = self.$t('remotePatrol.lackParams');
+        this.isLoading = false;
+        this.decoder.stop()
         return;
       }
       self.showError = false;
@@ -1403,6 +1405,8 @@ export default {
       if (this.channelInfo === null || Object.keys(this.channelInfo).length === 0) {
         this.showError = true;
         this.errorMsg = this.$t('remotePatrol.lackParams');
+        this.isLoading = false;
+        this.decoder.stop()
         return;
       }
       if (this.videoAuthority === false) {
