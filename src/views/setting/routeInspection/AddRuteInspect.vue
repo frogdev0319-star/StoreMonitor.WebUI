@@ -110,8 +110,8 @@
                                 class="groupItem" @click.stop="clickSubCategory(index, item.id, childIndex,childItem)"
                                 @mouseenter="onShowSubcategoryEditBtn(childIndex, childItem)">
                               <div v-if="activeChildId === childItem.id" class="proper-flag"/>
-                              <div class="category-name">
-                                <div class="group-left">
+                              <div class="category-name flex">
+                                <div class="group-left spacer">
                                   <div class="subcatergy-item">
                                     <span :style="activeChildId === childItem.id?{'color':'#006ab7'}:{}">
                                       {{ childItem.name }}
@@ -121,14 +121,8 @@
                                 <div class="group-right">
                                   <div class="show-edit">
                                     <div v-if="hoverId === childItem.id" class="nape-items-handle">
-                                      <i
-                                        class="iconfont icon-bianji"
-                                        style="cursor:pointer;"
-                                        @click="editCategory(childIndex,childItem)"/>
-                                      <i
-                                        class="iconfont icon-shanchu"
-                                        style="cursor:pointer;"
-                                        @click="deleteGroup(childIndex, childItem, item)"/>
+                                      <img style="margin-top:15px" :src="`./static/img/table-edit.png`" height="26px" @click="editCategory(childIndex,childItem)"/>
+                                      <img style="margin-top:15px" :src="`./static/img/table-delete.png`" height="26px" @click="deleteGroup(childIndex, childItem, item)"/>
                                     </div>
                                   </div>
                                 </div>
