@@ -31,7 +31,7 @@
             </el-select>
           </div>
           <div class="screen-content">
-            <div class="flex-center snapshot">
+            <div class="flex-center snapshot" v-if="!isEvent">
               <img :src="snapshotIcon"  @click="captureSnapshot">
             </div>
             <i
