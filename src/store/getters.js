@@ -21,5 +21,6 @@ const getters = {
   curTemplateIndex: state => state.user.curTemplateIndex,
   storeCache: state => state.user.storeCache,
   storeListCache: state => state.user.storeListCache,
+  editCount: state => state.user.editCount,
 };
 export default getters;

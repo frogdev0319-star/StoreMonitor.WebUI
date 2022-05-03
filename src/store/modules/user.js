@@ -36,7 +36,8 @@ const user = {
     templateOptions: [],
     curTemplateIndex: -1,
     storeCache: null,
-    storeListCache: []
+    storeListCache: [],
+    editCount: 0
   },
 
   mutations: {
@@ -137,9 +138,15 @@ const user = {
     },
     SET_STORELIST: (state, storeList) => {
       state.storeListCache = storeList
+    },
+    SET_EDIT_COUNT: (state, count) => {
+      state.editCount = count
     }
   },
   actions: {
+    setEditCount({ commit }, count) {
+      commit('SET_EDIT_COUNT', count);
+    },
     setStoreList({ commit }, storeList) {
       commit('SET_STORELIST', storeList);
     },

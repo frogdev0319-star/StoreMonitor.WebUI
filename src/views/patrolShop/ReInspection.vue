@@ -1462,10 +1462,6 @@ export default {
 
     checkScore({item, itemDS, e}) {
       const self = this;
-      console.log("Check Score")
-      console.log(self.curSheetIndex, self.curGroupIndex,self.curItemIndex)
-      console.log(item);
-      console.log(itemDS)
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
       });
@@ -1493,6 +1489,8 @@ export default {
           })
         })
         if (!item.manualIgnore && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
+          this.editCount++;
+          this.$store.dispatch('setEditCount', this.editCount);
           self.sheetName[self.curSheetIndex].dealCount++;
           self.sheetName[self.curSheetIndex].Effective++;
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
@@ -1661,12 +1659,18 @@ export default {
       }
     },
     
+    changeStoreDialog() {
+      this.changeStoreObj.dialogCosed = false;
+      const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
+      this.changeStore_(storeItem);
+      this.editCount = 0;
+      this.$store.dispatch('setEditCount', this.editCount);
+    },
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
-      const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      console.log(this.$store.getters.storeCache)
+      const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
       if (!this.$store.getters.storeCache) {
-        this.changeStore_(storeItem)
+        this.changeStore_(storeItem);
       } else {
         this.$store.dispatch('setStoreCache', '');
       }
@@ -1988,10 +1992,11 @@ export default {
           && self.sheetName[self.curSheetIndex].Effective != 0) {
           self.sheetName[self.curSheetIndex].Effective--;
         }
-        console.log(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex])
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
           this.sheetName[this.curSheetIndex].dealCount++
           this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++
+          this.editCount++;
+          this.$store.dispatch('setEditCount', this.editCount);
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore) {
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
@@ -2470,12 +2475,6 @@ export default {
     },
     changeBrandDialog() {
       const self = this;
-    },
-    changeStoreDialog(val) {
-      const self = this;
-      self.changeStoreObj.dialogCosed = false;
-      const storeItem = this.storeList.find(store => store.storeId === self.curSelStoreId)
-      if (storeItem) self.changeStore_(storeItem)
     },
     changeInspectDialog() {
       const self = this;
@@ -3049,6 +3048,8 @@ export default {
           self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
           if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
+              this.editCount++;
+              this.$store.dispatch('setEditCount', this.editCount);
               this.sheetName[this.curSheetIndex].dealCount++;
               this.sheetName[this.curSheetIndex].Effective++;
               this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
@@ -3168,6 +3169,8 @@ export default {
         item.Ruletip = false;
       }
       if(!this.showIgnoreItem){
+        this.editCount++;
+        this.$store.dispatch('setEditCount', this.editCount);
         this.sheetName[this.curSheetIndex].inspectList.forEach((inspect, idx) => {
           inspect.items.forEach(item_ => {
             if (item_.id === self.curItemId) self.curGroupIndex = idx
