@@ -4,6 +4,7 @@ import { mapMutations } from 'vuex';
 import { setCookie } from '@/common/auth';
 import router from '../../router';
 
+
 export default{
   name: 'AuthRedirect',
   created() {

@@ -254,7 +254,7 @@ export const navbarRoute = {
       {
         path: '/patrolCompareStat',
         name: 'patrolCompareStat',
-        component: resolve => require(['@/views/statistical/patrolCompareStat'], resolve),
+        component: resolve => require(['@/views/statistical/PatrolCompareStat'], resolve),
         hidden: false,
         meta: {
           requireAuth: true,

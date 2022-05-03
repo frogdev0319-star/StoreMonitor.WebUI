@@ -587,7 +587,7 @@
                       </div>
                       <div v-if="item.itemType === 0">
                         <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="!item.checked">
+                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -600,7 +600,7 @@
                           </el-dropdown-menu>
                         </el-dropdown>
                         <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="!item.checked">
+                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -1988,6 +1988,7 @@ export default {
           && self.sheetName[self.curSheetIndex].Effective != 0) {
           self.sheetName[self.curSheetIndex].Effective--;
         }
+        console.log(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex])
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
           this.sheetName[this.curSheetIndex].dealCount++
           this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++
