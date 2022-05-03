@@ -300,7 +300,8 @@ const user = {
 
           const patrolRoute = navbarRoute.getPatrolRoute();
           accessedRoutes.length === 0 ? patrolRoute.redirect = patrolRoute.children[0].path : '';
-          accessedRoutes.push(patrolRoute);
+          if (patrolRoute.children.length > 0) accessedRoutes.push(patrolRoute);
+          
 
           const eventRoute = navbarRoute.getEventRoute();
           accessedRoutes.push(eventRoute);
