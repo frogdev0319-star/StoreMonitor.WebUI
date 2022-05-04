@@ -306,7 +306,7 @@ const user = {
           }
 
           const patrolRoute = navbarRoute.getPatrolRoute();
-          accessedRoutes.length === 0 ? patrolRoute.redirect = patrolRoute.children[0].path : '';
+          accessedRoutes.length === 0 ? patrolRoute.redirect = ((patrolRoute.children.length>0)?patrolRoute.children[0].path:'') : '';
           if (patrolRoute.children.length > 0) accessedRoutes.push(patrolRoute);
           
 
