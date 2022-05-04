@@ -299,7 +299,7 @@
               <tbody :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
-                    <span style="color: #c60957;">{{ categoryItem.weight }}</span>
+                    <span style="color: #c60957;">{{ categoryItem.weight == -1 ? '--' : categoryItem.weight + '%' }}</span>
                     <span>{{ categoryItem.groupName }}</span>
                   </td>
                 </tr>
@@ -314,7 +314,7 @@
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
-                  <td><span>{{ subcategory.actualScore | filterScore }}</span></td>
+                  <td><span>{{ categoryItem.weight == -1 ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100 | filterScore }}</span></td>
                 </tr>
               </tbody>
             </template>

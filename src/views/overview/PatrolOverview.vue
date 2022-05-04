@@ -98,7 +98,6 @@
           <div class="pct-content">
             <div class="pie-area">
             <div class="pie-div">
-              <div class="inner"/>
               <div class="pct-panel">
                   <v-chart
                       ref="temsPie"
@@ -938,6 +937,24 @@ export default {
             backgroundColor: self.echartBackground
           },
           series: [
+            {
+            type: 'pie',
+            radius: ['43%', '70%'],
+            itemStyle: {
+              normal: {
+                borderWidth:2,
+                borderType:'dashed',
+                borderColor:'#dae4eb',
+                color: function(params) {
+                  const colorList = ['#FFF'];
+                  return colorList[params.dataIndex];
+                }
+              }
+            },
+            silent: true,
+            z: 0,
+            data: [{ value: 1, name: '' }]
+          },
             {
               name: self.$t('overview.itemsAssessment'),
               type: 'pie',

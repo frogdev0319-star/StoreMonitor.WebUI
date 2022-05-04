@@ -206,10 +206,10 @@
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
-                  style="width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
+                  style="width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
-                  style=" width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);"
+                  style=" width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
                   @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -244,8 +244,8 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.3.1
-                &copy; {{ getFullYear }} Advantech Intelligent City
+                v3.0.3.2
+                 &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>
@@ -1594,6 +1594,7 @@ $collapseWidth: 5.5%;
 }
 .el-table .cell {
   word-break: break-word;
+  text-overflow: clip;
 }
 .el-message__content,
 .el-button,

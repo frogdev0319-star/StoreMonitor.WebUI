@@ -910,9 +910,9 @@ $ignored: #b9c6d2;
             .pct-panel{
               width: 210px;/*calc(276/1440*100vw);*/
               height: 210px;/*calc(276/1440*100vw);*/
-              border-radius: 50%;
+              /*border-radius: 50%;
               border-color:#dae4eb;
-              border-style:dashed dashed dashed dashed; 
+              border-style:dashed dashed dashed dashed; */
               align-self: end;
               
               .chart-content {
@@ -1063,9 +1063,6 @@ $ignored: #b9c6d2;
             .pct-panel{
               width: 210px;/*calc(276/1440*100vw);*/
               height: 210px;/*calc(276/1440*100vw);*/
-              border-radius: 50%;
-              border-color:#dae4eb;
-              border-style:dashed dashed dashed dashed; 
               align-self: end;
               
               .chart-content {

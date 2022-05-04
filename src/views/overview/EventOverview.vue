@@ -48,7 +48,6 @@
           <div class="pct-content">
             <div class="pie-area">
             <div class="pie-div">
-              <div class="inner"/>
               <div class="pct-panel">
                   <v-chart
                       ref="eventSourceRef"
@@ -90,7 +89,6 @@
           <div class="pct-content">
             <div class="pie-area">
               <div class="pie-div">
-                <div class="inner"/>
                 <div class="pct-panel">
                     <v-chart
                         ref="eventSourceRef"
@@ -490,9 +488,27 @@ export default {
         },
         series: [
           {
+            type: 'pie',
+            radius: ['43%', '80%'],
+            itemStyle: {
+              normal: {
+                borderWidth:2,
+                borderType:'dashed',
+                borderColor:'#dae4eb',
+                color: function(params) {
+                  const colorList = ['#FFF'];
+                  return colorList[params.dataIndex];
+                }
+              }
+            },
+            silent: true,
+            z: 0,
+            data: [{ value: 1, name: '' }]
+          },
+          {
             name: '事件来源占比',
             type: 'pie',
-            radius: ['70%', '85%'],
+            radius: ['50%', '70%'],
             center: ['50%', '50%'],
             hoverOffset: 5,
             label: {
@@ -563,7 +579,7 @@ export default {
         seriesData = [];
       }
       self.eventStatusOptions = self.getEventByStatusPieOption();
-      self.eventStatusOptions.series[0].data = seriesData;
+      self.eventStatusOptions.series[1].data = seriesData;
       self.statusPerArray = jsonArray;
     },
 
@@ -583,9 +599,27 @@ export default {
         },
         series: [
           {
+            type: 'pie',
+            radius: ['43%', '80%'],
+            itemStyle: {
+              normal: {
+                borderWidth:2,
+                borderType:'dashed',
+                borderColor:'#dae4eb',
+                color: function(params) {
+                  const colorList = ['#FFF'];
+                  return colorList[params.dataIndex];
+                }
+              }
+            },
+            silent: true,
+            z: 0,
+            data: [{ value: 1, name: '' }]
+          },
+          {
             name: '事件处理状态占比',
             type: 'pie',
-            radius: ['70%', '85%'],
+            radius: ['50%', '70%'],
             center: ['50%', '50%'],
             hoverOffset: 5,
             label: {

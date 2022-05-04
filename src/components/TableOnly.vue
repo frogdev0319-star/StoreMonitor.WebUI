@@ -16,7 +16,6 @@
       :max-height="tableHeight"
       :empty-text="$t('deviceView.noData')"
       align="left"
-      style="width: 100%"
       size="mini"
       v-on="$listeners"
       :row-key="getRowKeys"
@@ -45,10 +44,11 @@
         :key="_index"
         :prop="_item.prop"
         :label="_item.label"
-        :sortable="canSortable ? _item.sortable : false"
+        :sortable="canSortable&&!isexportPDF ? _item.sortable : false"
         :sort-orders="['ascending', 'descending']"
         :min-width="isexportPDF ? _item.pdfwidth : (lang.indexOf('zh') !== -1 ? _item.width : _item.maxWidth)"
-        :formatter="_item.formatter">
+        :formatter="_item.formatter"
+        :render-header="renderHeader">
         <template slot-scope="{row}">
           <template v-if="_item.canEdit && row.isEditing">
             <el-input v-model="row.tempDeviceName" class="edit-input" size="small" @input="val => inputDeviceNameChange(val, row)"/>
@@ -112,8 +112,7 @@
           </template>
         </template>
       </el-table-column>
-
-      <el-table-column type="expand" v-if="allowRowExpand">
+      <el-table-column type="expand" v-if="allowRowExpand" :render-header="renderHeader">
         <template slot-scope="{row}">
           <component :is="expandComponent" v-bind="currentProperties"></component>
         </template>
@@ -127,7 +126,9 @@
         :min-width="tableOperation.minWidth"
         :label="tableOperation.label"
         align="left"
-        class-name="small-padding fixed-width">
+        class-name="small-padding fixed-width"
+        :render-header="renderHeader"
+        >
         <template slot-scope="scope">
           <div v-if="scope.row.isEditing">
             <div class="iconlised" @click="confirmEdit(scope.row)">
@@ -413,6 +414,28 @@ export default {
     // console.log("this.tableData" , this.tableData)
   },
   methods: {
+    renderHeader(h, { column, $index }) {
+      let realWidth = 0;
+      let span = document.createElement('span');
+      let spancontent = document.createElement('span');
+
+      span.style.display = 'inline-block';
+      span.innerText = column.label;
+      document.body.appendChild(span);
+      //console.log(column.label+" label:"+span.clientWidth )
+      spancontent.style.display = 'inline-block';
+      spancontent.innerText = column.prop;
+      document.body.appendChild(spancontent);
+      //console.log(column.label+" label:"+spancontent.clientWidth )
+
+      realWidth = (spancontent.clientWidth>span.clientWidth)?spancontent.clientWidth:span.clientWidth;
+      if(column.sortable) column.minWidth = realWidth+16;
+      else column.minWidth = realWidth;
+      //console.log(column.label+"realWidth:"+realWidth )
+      document.body.removeChild(span);
+      document.body.removeChild(spancontent);
+      return h('span', {}, [column.label]);
+    },
     setCellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {};if (columnIndex === 0) {
         obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };

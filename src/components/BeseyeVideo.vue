@@ -18,7 +18,7 @@
           <i :class="paused ? 'icon-bofang1' : 'icon-zantingtingzhi'" class= "iconfont iconplay" @click="onPlay"/>
         </div>
         <div class="iconrside">
-          <div v-if="playBack" class="speed-content">
+          <!-- <div v-if="playBack" class="speed-content">
             <span>{{ $t('remotePatrol.back') }}</span>
             <el-select :value="curBack" :popper-class="popperClass" class="el-test" size="mini" placeholder=" ">
               <el-option
@@ -29,7 +29,7 @@
                 @click.native="adjustProcess(item.value, item.label)"
               />
             </el-select>
-          </div>
+          </div> -->
           <div class="screen-content">
             <div class="flex-center snapshot">
               <img :src="snapshotIcon"  @click="captureSnapshot">

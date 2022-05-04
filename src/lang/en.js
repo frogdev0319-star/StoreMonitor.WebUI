@@ -687,10 +687,10 @@ export default{
       "storeNoInspect":"No bound Remote Inspection List with the store",
       "storesBound":"stores bound.",
       "subCategory":"Subcategory",
-      "subCategoryHeader":"Subcategory (Optional, 30 characters)",
-      "subCategoryLength":"The length of sub-category supports up to 30 characters",
-      "tHeaderA":"Inspection Category(Optional, 30 characters)",
-      "tHeaderA2":"Inspection Category(Required, 30 characters)",
+      "subCategoryHeader":"Subcategory (Optional, 50 characters)",
+      "subCategoryLength":"The length of sub-category supports up to 50 characters",
+      "tHeaderA":"Inspection Category(Optional, 50 characters)",
+      "tHeaderA2":"Inspection Category(Required, 50 characters)",
       "tHeaderB":"Inspection Items(Required, 250 characters)",
       "tHeaderC":"Score(0~50points)",
       "tHeaderD":"Inspection Item Description(Optional,1200 characters)",
@@ -724,8 +724,10 @@ export default{
       "weight": "weight%",
       "weightSetting": "Weight Setting",
       "weightTotalError": "Weight cannot be greater or less than 100%",
-      "bindWorkFLow": "Binding WorkFLow"
+      "bindWorkFLow": "Binding WorkFLow",
 
+      "isRequired":"Required",
+      "notRequired":"Not Required"
   },
   "deviceView":{
       "EzvizAccount":"Streaming Service Account",
@@ -1096,6 +1098,8 @@ export default{
       "yes":"Yes",
       "templateSelection":"Select a template",
       "reportTemplateLabel": "Report template",
+      "show":"Show",
+      "noShow":"No show",
   },
   "statistics":{
       "averageCompare":"Average Compare",

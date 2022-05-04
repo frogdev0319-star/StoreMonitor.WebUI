@@ -247,10 +247,25 @@
           </div>
           <div v-for="item in weightOptions" :key="item.id" class="flex-center margin-bottom-sm">
             <span class="spacer">{{item.name}}</span>
+            <el-checkbox
+              style="margin-right: 20px"
+              @change="e => changeItemWeight(e, item)"
+              v-model="item.setWeight"
+              class="storevue-checkbox-outlined"
+              :label="$t('insSettingView.weightSetting')"
+            />
             <el-input
-             class="spacer"
+              v-if="item.setWeight"
+              class="spacer"
               type="number"
               v-model="item.weight"
+            />
+            <el-input
+              v-else
+              class="spacer"
+              type="text"
+              value="--"
+              disabled
             />
           </div>
         </div>
@@ -325,6 +340,9 @@ export default {
       hideUpload: false,
       tempdata: [],
       showImportSucceed: false,
+      importCount: 0,
+      allScoreWeightEmpty: true,
+      allPassWeightEmpty: true,
       btnList: [
         {
           id: 0,
@@ -442,19 +460,27 @@ export default {
   },
 
   methods: {
+    changeItemWeight (val, item) {
+      item.weight = val ? 0 : -1
+    },
     updateGroupWeight () {
       let groups = this.weightOptions.map(group => ({
         id: group.id,
         weight: Number(group.weight)
       }))
-      let count = groups.reduce((total, cur) => total + cur.weight, 0)
+      let count = 0 
+      groups.forEach(group => {
+        if (group.weight != -1) count += group.weight
+      })
+      const self = this;
       if (count === 100) {
         inpectRESTful.updateGroupWeight({ groups }).then(() => {
-          util.notify('儲存成功', 'success', 3000)
+          util.notify(self.$t('titleView.saveSuss'), 'success', 3000)
           this.showWeightSetting = false;
+          this.getTagList();
         })
       } else {
-        util.notify('權重不可大於或小於100%', 'error', 3000);
+        util.notify(self.$t('insSettingView.weightTotalError'), 'error', 3000);
       }
     },
     setWeighting () {
@@ -628,7 +654,7 @@ export default {
           _obj.id = _item.id;
           _obj.groupName = _item.name;
           _obj.groupWeight = _item.weight;
-          if (_item.parentId === -1) self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight })
+          if (_item.parentId === -1 && _item.type !== 2) self.weightOptions.push({ id: _item.id, name: _obj.groupName, weight: _item.weight, setWeight: _item.weight != -1 })
           _obj.itemCount = _item.items.length;
           _obj.type = _item.type;
           _obj.checked = false;
@@ -935,9 +961,13 @@ export default {
       if (!primaryColumnCells.some(cell => cell.v) && type === 'Others') {
         primaryColumnCells = [{ ...primaryColumnCells[0], v: this.$t('insSettingView.Addscoreitems') }];
       }
-
+      var names_ = {}
       primaryColumnCells.filter(cell => cell.v).forEach((cell, i) => {
-        primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
+        if (names_[cell.v] === undefined) {
+          names_[cell.v] = cell.v
+          primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
+        }
+        
         let next, current = sheet[cell.cellRef];
         
         if (primaryColumnCells.filter(cell => cell.v)[i + 1]) {
@@ -1164,6 +1194,9 @@ export default {
           }
         }
       });
+      // console.log(primaryGroupCelss)
+      // console.log(secondaryGroupCells)
+      // console.log(groupItemCells)
       const groupType = this.getGroupType(type);
       let addGroupParams = primaryGroupCelss.filter(cell => cell.v).map(cell => {
         return {
@@ -1204,7 +1237,7 @@ export default {
       }
 
       const requestGroups = {};
-      const rowCellsObject = groupItemCells.reduce((current, next) => {
+      var rowCellsObject = groupItemCells.reduce((current, next) => {
         const nextCell = sheet[next.cellRef];
         if (current[next.cellAddress.r]) {
           current[next.cellAddress.r].push(nextCell);
@@ -1222,6 +1255,7 @@ export default {
       const requiredMapping = this.getTranslationMappingBasedOnKey('insSettingView.tHeaderH', 'required');
       const mapping = {};
       Object.assign(mapping, subjectMapping, itemScoreMapping, descriptionMapping, availableScoreMapping, qualifiedScoreMapping, requiredMapping);
+      var names = {};
       Object.values(rowCellsObject).forEach(rowCells => {
         const item = {};
         rowCells.forEach(cell => {
@@ -1231,7 +1265,9 @@ export default {
             item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
           } else if (mapping[key] === 'itemScore') {
             item[mapping[key]] = cell.v ? Number(cell.v) : 0;
-            if (cell.v === '') item['type'] = 1;
+            if (cell.v === '' || cell.v === undefined) {
+              item['type'] = 1;
+            }
             if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1);
           } else if (mapping[key] === 'description') {
             item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
@@ -1248,20 +1284,29 @@ export default {
           item['itemScore'] = maxAvailableScore;
           item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
         }
-        console.log(item)
         if (item['subject']) {
-          if (requestGroups[rowCells.parent.id]) {
-            requestGroups[rowCells.parent.id].items.push(item);
+          if (names[rowCells.parent.v] === undefined) {
+            names[rowCells.parent.v] = rowCells.parent.id;
+            if (requestGroups[rowCells.parent.id]) {
+              requestGroups[rowCells.parent.id].items.push(item);
+            } else {
+              requestGroups[rowCells.parent.id] = {
+                groupId: rowCells.parent.id,
+                items: [item]
+              };
+            }
           } else {
-            requestGroups[rowCells.parent.id] = {
-              groupId: rowCells.parent.id,
-              items: [item]
-            };
+            if (requestGroups[names[rowCells.parent.v]]) {
+              requestGroups[names[rowCells.parent.v]].items.push(item);
+            } else {
+              requestGroups[names[rowCells.parent.v]] = {
+                groupId: names[rowCells.parent.v],
+                items: [item]
+              };
+            }
           }
         }
       });
-
-      console.log(requestGroups)
       const addItemParams = {
         request: Object.values(requestGroups)
       };
@@ -1692,11 +1737,23 @@ export default {
           PassFailCopy = outdata.PassFail.length > 0 ? PassFailCopy : undefined;
           ScoreCopy = outdata.Score.length > 0 ? ScoreCopy : undefined;
           OthersCopy = outdata.Others.length > 0 ? OthersCopy : undefined;
-
-          const passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
-          const scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
+          _this.importCount = 0;
+          var passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
+          var scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
           const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
+          passFailSheetFlagObj.flags.flagGroupWeightTotal = false;
+          scoreSheetFlagObj.flags.flagGroupWeightTotal = false;
+          // console.log(_this.importCount, _this.allPassWeightEmpty , _this.allScoreWeightEmpty)
+          if (_this.importCount === 100) {
+          } else {
+            if (_this.allPassWeightEmpty && _this.allScoreWeightEmpty) {
 
+            } else {
+              passFailSheetFlagObj.flags.flagGroupWeightTotal = true;
+              scoreSheetFlagObj.flags.flagGroupWeightTotal = true;
+            }
+          }
+          
           const flagTempError = !!(outdata.PassFail == undefined && outdata.Score == undefined && outdata.Others == undefined);
 
           _this.FileInfo = _this.getWarningInfo(passFailSheetFlagObj.flags, scoreSheetFlagObj.flags,
@@ -1763,6 +1820,7 @@ export default {
         delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.G1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
+        var names = {};
         sheetArray.forEach((_item) => {
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
@@ -1781,8 +1839,14 @@ export default {
             rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
             rowDataObj.required = _item.__EMPTY_5;
           }
+          
+          if (names[rowDataObj.catergyName] === undefined || rowDataObj.catergyName === '') {
+            names[rowDataObj.catergyName] = true;
+            rowDataArray.push(rowDataObj);
+            
+          }
+          
 
-          rowDataArray.push(rowDataObj);
         });
         return rowDataArray;
       }
@@ -1876,9 +1940,13 @@ export default {
       }
       let count = 0;
       let allWeightEmpty = true;
+      var self = this;
       passFailArr.forEach((item, index) => {
-        if (item.weight) count += item.weight;
-        if (item.weight !== undefined) allWeightEmpty = false;
+        if (typeof item.weight === 'number') {
+          self.importCount += item.weight;
+        }
+        console.log(typeof item.weight === 'number')
+        if (typeof item.weight === 'number') self.allPassWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length > 0) {
           passFailFlagObj.indexArrPassFail.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -1908,7 +1976,7 @@ export default {
           }
         }
       });
-      if (count !== 100 && !allWeightEmpty) passFailFlagObj.flags.flagGroupWeightTotal = true;
+      
       return passFailFlagObj;
     },
 
@@ -1939,8 +2007,11 @@ export default {
       let count = 0;
       let allWeightEmpty = true;
       scoreArr.forEach((item, index) => {
-        if (item.weight) count += item.weight;
-        if (item.weight !== undefined) allWeightEmpty = false;
+        if (typeof item.weight === 'number') {
+          _this.importCount += item.weight;
+        }
+        console.log(typeof item.weight === 'number')
+        if (typeof item.weight === 'number') _this.allScoreWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
           if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
@@ -2045,7 +2116,6 @@ export default {
           }
         }
       });
-      if (count !== 100 && !allWeightEmpty) scoreFlagObj.flags.flagGroupWeightTotal = true;
       return scoreFlagObj;
     },
 
@@ -2081,6 +2151,7 @@ export default {
         }
         if (item.itemName == undefined || item.itemName.length == 0) {
           otherFlagObj.flags.flagItemNameOthers = true;
+          console.log(item)
         } else if (filterString.getContentLength(item.itemName.toString().trim()) > ITEMSLENGTH) {
           otherFlagObj.flags.flagItemLengthOthers = true;
         }
@@ -2347,9 +2418,7 @@ export default {
         const treeData = util.handleInspctionCatergyTree(sheetDataArr);
         treeData.forEach(item => {
           if (!item.children) {
-            // console.log(1)
             if (item.itemData.length !== 0) {
-              // console.log(3)
               item.itemData.forEach((_item, _index) => {
                 const obj = {};
                 if (_index === 0) {
@@ -2361,17 +2430,22 @@ export default {
                   obj[tableHeader[0]] = '';
                   obj[tableHeader[1]] = '';
                 }
-                if (type === 0 || type === 2) {
+                if (type === 0) {
                   obj[tableHeader[2]] = '';
                   obj[tableHeader[3]] = _item.name;
                   obj[tableHeader[4]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
                   obj[tableHeader[5]] = _item.description === '---' ? '' : _item.description;
-                } else {
+                } else if (type === 1) {
                   obj[tableHeader[2]] = '';
                   obj[tableHeader[3]] = _item.name;
                   obj[tableHeader[4]] = _item.type === 0 ? _item.availableScores : 0;
                   obj[tableHeader[5]] = _item.type === 0 ? _item.qualifiedScore : 0;
                   obj[tableHeader[6]] = _item.description === '---' ? '' : _item.description;
+                } else {
+                  obj[tableHeader[1]] = '';
+                  obj[tableHeader[2]] = _item.name;
+                  obj[tableHeader[3]] = _item.type === 0 ? _item.score : type === 0 ? '' : 0;
+                  obj[tableHeader[4]] = _item.description === '---' ? '' : _item.description;
                 }
                 if (type === 0) {
                   obj[tableHeader[6]] = _item.required ? 'Y' : '';
@@ -2382,7 +2456,6 @@ export default {
                 sheetData.push(obj);
               });
             } else {
-              console.log(4)
               const obj = {};
               obj[tableHeader[0]] = item.groupName;
               obj[tableHeader[1]] = '';
@@ -2395,10 +2468,8 @@ export default {
               sheetData.push(obj);
             }
           } else {
-            // console.log(2)
             item.children.forEach((child, childIndex) => {
               if (child.itemData.length > 0) {
-                console.log(5)
                 child.itemData.forEach((childItem, childItemIndex) => {
                   const obj = {};
                   if (childIndex === 0 && childItemIndex === 0) {
@@ -2411,20 +2482,23 @@ export default {
                   } else {
                     obj[tableHeader[1]] = '';
                   }
-                  if (type === 0 || type === 2) {
+                  if (type === 0) {
                     obj[tableHeader[2]] = childItem.name;
                     obj[tableHeader[3]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
                     obj[tableHeader[4]] = childItem.description === '---' ? '' : childItem.description;
-                  } else {
+                  } else if (type === 1) {
                     obj[tableHeader[2]] = childItem.name;
                     obj[tableHeader[3]] = childItem.type === 0 ? childItem.availableScores : 0;
                     obj[tableHeader[4]] = childItem.type === 0 ? childItem.qualifiedScore : 0;
                     obj[tableHeader[5]] = childItem.description === '---' ? '' : childItem.description;
+                  } else {
+                    obj[tableHeader[1]] = childItem.name;
+                    obj[tableHeader[2]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
+                    obj[tableHeader[3]] = childItem.description === '---' ? '' : childItem.description;
                   }
                   sheetData.push(obj);
                 });
               } else {
-                // console.log(6)
                 const obj = {};
                 if (childIndex === 0) {
                   obj[tableHeader[0]] = item.groupName;
@@ -2626,6 +2700,7 @@ export default {
                     max-width:105px;
                     margin-left:16px;
                     width:auto;
+                    text-align: left;
                   }
                 }
             }

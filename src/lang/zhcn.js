@@ -692,10 +692,10 @@ export default{
     "storeNoInspect":"此门店尚未绑定远程巡检表",
     "storesBound":"家门店！",
     "subCategory":"子类别",
-    "subCategoryHeader":"子类别（选填，30字符）",
-    "subCategoryLength":"巡检子类别长度不可超过30个字符！",
-    "tHeaderA":"巡检类别（选填，30字符）",
-    "tHeaderA2":"巡检类别（必填，30字符）",
+    "subCategoryHeader":"子类别（选填，50字符）",
+    "subCategoryLength":"巡检子类别长度不可超过50个字符！",
+    "tHeaderA":"巡检类别（选填，50字符）",
+    "tHeaderA2":"巡检类别（必填，50字符）",
     "tHeaderB":"巡检项名称（必填，250字符）",
     "tHeaderC":"项目总分值（必填，0~50分）",
     "tHeaderD":"巡检项目详细说明（选填，1200字符）",
@@ -727,9 +727,10 @@ export default{
     "weight": "權重值%",
     "weightSetting": "权重设定",
     "weightTotalError": "权重不可大于或小于100%",
+    "bindWorkFLow": "巡檢表綁定流程",
 
-    "bindWorkFLow": "巡檢表綁定流程"
-
+    "isRequired":"必填",
+    "notRequired":"非必填"
   },
   "deviceView":{
       "EzvizAccount":"串流服务账号",
@@ -1100,6 +1101,8 @@ export default{
     "yes":"允许",
     "templateSelection":"选择模版",
     "reportTemplateLabel": "报告模板",
+    "show":"显示",
+    "noShow":"不显示"
   },
   "statistics":{
       "averageCompare":"平均分同比分析",

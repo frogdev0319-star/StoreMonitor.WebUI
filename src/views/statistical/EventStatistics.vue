@@ -33,17 +33,17 @@
             <div class="title">{{ $t('statistics.event.eventProcessStatus') }}</div>
           </el-col>
           <el-col :span="24" class="amount_region">
-            <div class="region-area" :style="ispdf ? {'width':'200px'}:{}" v-for="(item,index) in eventKPIs" :key="index">
+            <div class="region-area" :style="ispdf ? {'width':'220px'}:{}" v-for="(item,index) in eventKPIs" :key="index">
               <div class="num-area">
                 <div style="display:flex;height:84.5px;">
-                  <div class="number">{{ item.eventNum }}
+                  <div class="number" :style="ispdf ? {'fontSize':'40px'}:{}">{{ item.eventNum }}
                     <span v-if="index!=3" style="font-size:15px;margin-left:5px;">{{$t('statistics.event.unit')}}</span>
                     <span v-else style="font-size:15px;margin-left:5px;">%</span>
                   </div>
                 </div>
                 <div class="description">{{ item.eventTitle}}</div>
               </div>
-              <div class="img-area">
+              <div class="img-area" v-if="!ispdf">
                 <img v-if="index==0" src="../../../static/img/statistics/ic_totalEvent.svg" style="width:84.8;height:79.8px;align-items:flex-end;padding-bottom:10.5px;" />
                 <img v-else-if="index==1" src="../../../static/img/statistics/ic_inprocess.svg" style="width:108.5;height:65.6px;align-items:flex-end;padding-bottom:10.5px;" />
                 <img v-else-if="index==2" src="../../../static/img/statistics/ic_processed.svg" style="width:111.8;height:74.5px;align-items:flex-end;padding-bottom:10.5px;" />
@@ -140,6 +140,7 @@
                     :allowRowExpand = "true"
                     :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                     :tableHeight = "726"
+                    :isexportPDF="ispdf"
                     layout = "prev,pager,next,sizes"
                     expand-component = "IncepItemTop5"
                     :expandCompProperties = "componentsProps"
@@ -262,6 +263,7 @@
                   :allowRowExpand = "false"
                   :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                   :tableHeight = "726"
+                  :isexportPDF="ispdf"
                   @handleChange="handlePageAndSizeChange_eventItem"
                   @sortChange="handleSortChange_eventItem"
                   @onCellClick = "onEvenInvolveStoreClick"
@@ -322,6 +324,7 @@
                       :allowRowExpand = "true"
                       :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                       :tableHeight = "726"
+                      :isexportPDF="ispdf"
                       expand-component = "EventCommentList"
                       :expandCompProperties = "componentsProps_EventCommentList"
                     />
@@ -476,6 +479,7 @@
                     :allowRowExpand = "true"
                     :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                     :tableHeight = "726"
+                    :isexportPDF="ispdf"
                     layout = "prev,pager,next,sizes"
                     expand-component = "IncepItemTop5"
                     :expandCompProperties = "componentsProps"
@@ -590,6 +594,7 @@
                   :allowRowExpand = "false"
                   :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                   :tableHeight = "726"
+                  :isexportPDF="ispdf"
                   @handleChange="handlePageAndSizeChange_eventItem"
                   @sortChange="handleSortChange_eventItem"
                   @onCellClick = "onEvenInvolveStoreClick"
@@ -650,6 +655,7 @@
                       :allowRowExpand = "true"
                       :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                       :tableHeight = "726"
+                      :isexportPDF="ispdf"
                       expand-component = "EventCommentList"
                       :expandCompProperties = "componentsProps_EventCommentList"
                     />
@@ -804,7 +810,7 @@ export default {
           'prop': 'province',
           'label': this.$t('remotePatrol.regionI'),
           'sortable': false,
-          'width': '70',
+          'width': '60',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -812,7 +818,7 @@ export default {
           'prop': 'city',
           'label': this.$t('remotePatrol.regionII'),
           'sortable': false,
-          'width': '70',
+          'width': '60',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -820,7 +826,7 @@ export default {
           'prop': 'groupName',
           'label': this.$t('overview.storeName'),
           'sortable': false,
-          'width': '80',
+          'minWidth': '80',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -828,7 +834,7 @@ export default {
           'prop': 'storeGroup',
           'label': this.$t('statistics.event.storeGroup'),
           'sortable': false,
-          'width': '70',
+          'minWidth': '70',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -836,7 +842,7 @@ export default {
           'prop': 'storeType',
           'label': this.$t('statistics.event.storeType'),
           'sortable': false,
-          'width': '70',
+          'minWidth': '70',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -844,7 +850,7 @@ export default {
           'prop': 'code',
           'label': this.$t('remotePatrol.code'),
           'sortable': false,
-          'width': '70',
+          'minWidth': '60',
           'maxWidth': '100',
           'pdfwidth': '11%'
         },
@@ -861,7 +867,7 @@ export default {
           'prop': 'numOfUnprocessed',
           'label': this.$t('statistics.event.numUnprocessEvents'),
           'sortable': 'custom',
-          'width': '55',
+          'minWidth': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':true
@@ -869,8 +875,8 @@ export default {
         {
           'prop': 'numOfInprocess',
           'label': this.$t('statistics.event.numProcessEvents'),
-          'sortable': 'custom',
-          'width': '55',
+          'sortable': true,
+          'minWidth': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':true
@@ -879,7 +885,7 @@ export default {
           'prop': 'numOfProcessed',
           'label': this.$t('statistics.event.numClosedEvents'),
           'sortable': 'custom',
-          'width': '55',
+          'minWidth': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':true
@@ -887,8 +893,8 @@ export default {
         {
           'prop': 'numOfRejected',
           'label': this.$t('statistics.event.numReturndEvents'),
-          'sortable': 'custom',
-          'width': '55',
+          'sortable': true,
+          'minWidth': '55',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':true
@@ -897,7 +903,7 @@ export default {
           'prop': 'completedRateStr',
           'label': this.$t('statistics.event.completedRate'),
           'sortable': 'custom',
-          'width': '60',
+          'minWidth': '60',
           'maxWidth': '100',
           'pdfwidth': '12%',
           'isCellClick':false
@@ -906,7 +912,7 @@ export default {
           'prop': 'detail',
           'label': this.$t('statistics.event.commonEvent'),
           'sortable': 'false',
-          'width': '90',
+          'minWidth': '90',
           'maxWidth': '140',
           'pdfwidth': '12%',
           'isExpand':true

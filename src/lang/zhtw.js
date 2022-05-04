@@ -694,10 +694,10 @@ export default{
     "storeNoInspect":"此門店尚未綁定遠程巡檢表",
     "storesBound":"家門店！",
     "subCategory":"子類別",
-    "subCategoryHeader":"子類別（選填，30字元）",
-    "subCategoryLength":"巡檢子類別長度不可超過30個字元！",
-    "tHeaderA":"巡檢類別（選填，30字元）",
-    "tHeaderA2":"巡檢類別（必填，30字元）",
+    "subCategoryHeader":"子類別（選填，50字元）",
+    "subCategoryLength":"巡檢子類別長度不可超過50個字元！",
+    "tHeaderA":"巡檢類別（選填，50字元）",
+    "tHeaderA2":"巡檢類別（必填，50字元）",
     "tHeaderB":"巡檢項名稱（必填，250字元）",
     "tHeaderC":"項目總分值（必填，0~50分）",
     "tHeaderD":"巡檢項目詳細說明（選填，1200字元）",
@@ -729,8 +729,9 @@ export default{
     "weight": "權重值%",
     "weightSetting": "權重設定",
     "weightTotalError": "權重不可大於或小於100%",
-    
-    "bindWorkFLow": "巡檢表綁定流程"
+    "bindWorkFLow": "巡檢表綁定流程",
+    "isRequired":"必填",
+    "notRequired":"非必填"
   },
   "deviceView":{
       "EzvizAccount":"串流服務帳號",
@@ -1101,6 +1102,8 @@ export default{
     "yes":"允許",
     "templateSelection":"選擇模板",
     "reportTemplateLabel": "報告模板",
+    "show":"顯示",
+    "noShow":"不顯示"
   },
   "statistics":{
       "averageCompare":"平均分同比分析",

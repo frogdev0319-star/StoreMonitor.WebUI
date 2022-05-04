@@ -71,11 +71,11 @@
               :data="item.tableData"
               :highlight-current-row="true"
               :height="553"
+              :header-row-style="{width:'1920px'}"
               :header-cell-style="{fontSize:'12px',color:'#7d8cad',height: '47px'}"
               :cell-style="cellStyle"
               empty-text="没有事件数据"
               align="left"
-              style=""
               class="table-content tbl-checkbox"
               @sort-change="sortChange"
               @row-click="rowClickItem"
@@ -87,10 +87,10 @@
                 class="tbl-checkbox"
                 type="selection"
                 :selectable="handleDisable"
-                width="55">
+                width="45">
               </el-table-column>
               <el-table-column
-                min-width="100"
+                min-width="90"
                 header-align="center"
                 align="center">
                 <template slot-scope="scope" >
@@ -132,7 +132,7 @@
                 :label="$t('eventView.name')"
                 :class-name = "selfClassName"
                 prop="subject"
-                min-width="220"
+                min-width="200"
                 align="left"
               >
                 <template slot-scope="scope">
@@ -142,25 +142,27 @@
                   <span class="event-subject">{{ scope.row.subject }}</span>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="180"/>
-              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="130">
+              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="150" />
+              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="100" :render-header="renderHeader">
                 <template slot-scope="scope">
                   <div v-if="scope.row.attachment.length!==0">
-                    <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="enclosure-icon">
+                    <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="enclosure-icon" >
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('eventView.submitter')" prop="assignerName" align="left" width="120" sortable="custom"/>
-              <el-table-column :label="$t('eventView.submitTime')" prop="ts" align="left" width="140" sortable="custom"/>
-              <el-table-column :label="$t('remotePatrol.regionI')" prop="province" align="left" min-width="120"/>
-              <el-table-column :label="$t('remotePatrol.regionII')" prop="city" align="left" min-width="120"/>
-              <el-table-column :label="$t('eventView.stores')" prop="storeName" align="left" min-width="140" sortable="custom"/>
-              <el-table-column :label="$t('remotePatrol.code')" prop="code" align="left" min-width="120"/>
+              <el-table-column :label="$t('eventView.submitter')" prop="assignerName" align="left" min-width="80" sortable="custom" :render-header="renderHeader"/>
+              <el-table-column :label="$t('eventView.submitTime')" prop="ts" align="left" width="160" sortable="custom" :render-header="renderHeader"/>
+              <el-table-column :label="$t('remotePatrol.regionI')" prop="province" align="left" width="80" :render-header="renderHeader"/>
+              <el-table-column :label="$t('remotePatrol.regionII')" prop="city" align="left" width="80" :render-header="renderHeader"/>
+              <el-table-column :label="$t('eventView.stores')" prop="storeName" align="left" min-width="100" sortable="custom" :render-header="renderHeader"/>
+              <el-table-column :label="$t('remotePatrol.code')" prop="code" align="left" min-width="70" :render-header="renderHeader"/>
               <el-table-column
                 :label="$t('eventView.operation')"
                 prop="option"
-                min-width="50"
-                align="left">
+                min-width="60"
+                align="left"
+                :render-header="renderHeader"
+                >
                 <template slot-scope="scope">
                   <img :src="penSrc" class="iconfont icon-gengduo" @click="toEventDetail(scope.row)">
                 </template>
@@ -465,6 +467,24 @@ export default {
   methods: {
     getLangStyleValue(langArray){
       return util.getLangStyleValue(langArray);
+    },
+    renderHeader(h, { column, $index }) {
+      let realWidth = 0;
+      let span = document.createElement('span');
+
+      span.style.display = 'inline-block';
+      span.innerText = column.label;
+      document.body.appendChild(span);
+
+      realWidth = span.clientWidth;
+      if(column.sortable == 'custom') realWidth = realWidth;
+      else column.minWidth = realWidth;
+      //console.log(column.label+":"+column.minWidth);
+      //console.log(column.label+" realWidth:"+realWidth);
+      if(column.minWidth<realWidth) column.minWidth = realWidth;
+
+      document.body.removeChild(span);
+      return h('span', {}, [column.label]);
     },
     cellStyle({ row, column, rowIndex, columnIndex }) {
       let obj = {'border-bottom': '1px solid #acaeb1'};
@@ -1272,14 +1292,17 @@ $h1:#292e36;
     }
     .icon-span{
         display:inline-block;
-        width:68px;
+        min-width:68px;
         height:24px;
         font-size: 12px;
         border-radius: 5px;
+        white-space: nowrap;
+        padding-left: 5px;
+        padding-right: 5px;
     }
     .ja-icon{
       @extend .icon-span;
-      width: 80px;
+      width: 90px;
     }
     .icon-gengduo{
       width: 24px;
@@ -1390,7 +1413,7 @@ $h1:#292e36;
       position: relative;
       padding-top: calc(30/1920*100vw);
       .table-content{
-            width:100%;
+            width:1900px;
             text-align: center;
             border: none;
             /*height:300px;*/
@@ -1458,6 +1481,12 @@ $h1:#292e36;
   .el-table th .el-checkbox__input {
       display: inline-block;
   }
+  /deep/
+  .el-table th .cell{
+      word-wrap: normal;
+      white-space: nowrap !important;
+      text-overflow: clip;
+    }
    /deep/
     .el-table
     .el-table__header-wrapper
@@ -1507,6 +1536,10 @@ $h1:#292e36;
        border-color:#2c90d9;
       }
     }
+    /deep/
+    .el-table__fixed-body-wrapper .el-table__body {
+  padding-bottom: 6px; // 6px为横向滚动条高度
+}
 
 </style>
 <style scoped>
@@ -1515,6 +1548,7 @@ $h1:#292e36;
         /*border-radius: 0px !important;*/
         /*border: 0 !important;*/
     }
+    
 </style>
 <style>
  @import '../../assets/css/pagination.css';
@@ -1540,6 +1574,10 @@ $h1:#292e36;
    .table-content.el-table__body tr:hover>td{
     background-color: #f2f9fe !important;
   }
+  
+  /*.el-table__header{
+    width:auto !important;
+  }*/
   /*.tbl-checkbox.el-checkbox__input.is-checked .el-checkbox__inner{
     background-color: #edf0f2;
     border-color: #acaeb1;

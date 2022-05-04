@@ -179,7 +179,7 @@
                                 autoresize
                             :style="{width:part1.barStoreOption?part1.barStoreOption.width :'100%',height:'100%'}" />
                   <div v-else style="margin-top:20.5px;height:100%;"  :style="{width:ispdf?'1024px':null}">
-                  <div style="margin-top:20.5px;">
+                  <div style="margin-top:20.5px;padding-right:10px;">
                     <table-only
                       ref="elTP"
                      :column-data="part1StoreInfoTableCol"
@@ -193,6 +193,7 @@
                       :allowRowExpand = "true"
                       :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                       :tableHeight = "300"
+                      :isexportPDF="ispdf"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
@@ -317,7 +318,7 @@
                             ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize
                             :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
                   <div v-else style="main-rgtop:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1024px':null}">
-                    <div style="margin-top:20.5px;">
+                    <div style="margin-top:20.5px;padding-right:10px;">
                     <table-only
                       ref="elTP"
                      :column-data="part2StoreInfoTableCol"
@@ -331,6 +332,7 @@
                       :allowRowExpand = "true"
                       :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                       :tableHeight = "300"
+                      :isexportPDF="ispdf"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"
@@ -453,7 +455,7 @@
                                 :style="{width:part3.barStoreOption?part3.barStoreOption.width :'100%',height:'100%'}" />
                   </div>
                   <div v-else style="margin-top:20.5px;height:100%;overflow-x:auto;"  :style="{width:ispdf?'1024px':null}">
-                    <div style="margin-top:20.5px;">
+                    <div style="margin-top:20.5px;padding-right:10px;">
                     <table-only
                       ref="elTP"
                      :column-data="part3StoreInfoTableCol"
@@ -467,6 +469,7 @@
                       :allowRowExpand = "true"
                       :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
                       :tableHeight = "300"
+                      :isexportPDF="ispdf"
                       layout = "prev,pager,next,sizes"
                       expand-component = "IncepItemTop5"
                       :expandCompProperties = "componentsProps"

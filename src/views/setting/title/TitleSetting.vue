@@ -43,12 +43,13 @@
         <div class="flex-center" style="padding-bottom: 20px">
           <div>{{ $t('titleView.roleSetting') }}</div>
           <div class="spacer"></div>
-          <div class="temp-select-area">
-            <div class="temp-select-label">{{ $t('titleView.templateSelection') }}</div> 
+          <div class="temp-select-area" :style="{'width':getLangStyleValue(tempSelectAreaWidth)}">
+            <div class="temp-select-label" :style="{'width':getLangStyleValue(tempSelectLabelWidth)}">{{ $t('titleView.templateSelection') }}</div> 
             <el-select
               v-model="templateRoleId"
               class="device-select"
               style="font-size:13px"
+              :style="(lang.indexOf('ja')== -1 && lang.indexOf('vi')==-1)?{}:{'width':'300px'}"
               @change="changeCurTemplate">
               <el-option v-for="(item, index) in roleList" :label="item.label" :key="index" :value="item.value">
                 {{ item.label }}
@@ -320,7 +321,13 @@ export default {
       ifAccessVideo: 0,
       ifReceiveMes: false,
       hasCheckedAuthoritiesList: [],
-      isCheckChanged:false
+      isCheckChanged:false,
+      tempSelectAreaWidth:[{key:'en',value:'220px'},{key:'zh',value:'220px'},{key:'zhtw',value:'220px'},
+        {key:'ja-JP',value:'340px'},{key:'ko-KR',value:'250px'},{key:'vi-VN',value:'310px'},
+        {key:'id-ID',value:'300px'},{key:'th-TH',value:'220px'}],
+      tempSelectLabelWidth:[{key:'en',value:'75px'},{key:'zh',value:'75px'},{key:'zhtw',value:'75px'},
+        {key:'ja-JP',value:'105px'},{key:'ko-KR',value:'85px'},{key:'vi-VN',value:'85px'},
+        {key:'id-ID',value:'95px'},{key:'th-TH',value:'75px'}],
     };
   },
 
@@ -353,6 +360,9 @@ export default {
     
   },
   methods: {
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
     changeCurTemplate (val) {
       this.templateRoleId =  val;
       if(!this.isCheckChanged){
