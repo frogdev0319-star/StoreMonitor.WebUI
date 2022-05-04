@@ -1079,7 +1079,9 @@ export default {
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
           self.$store.dispatch('setStoreList', []);
-          self.$store.dispatch('setStoreCache', '');
+          self.$store.dispatch('setStoreCache', null);
+          this.editCount = 0;
+          this.$store.dispatch('setEditCount', this.editCount);
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
@@ -1095,10 +1097,12 @@ export default {
     } else {
       if (to.name != 'confirmSum') {
         // from.meta.keepAlive=false;
+        this.editCount = 0;
+        this.$store.dispatch('setEditCount', this.editCount);
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
         self.$store.dispatch('setStoreList', []);
-        self.$store.dispatch('setStoreCache', '');
+        self.$store.dispatch('setStoreCache', null);
         Database.addDataToDB(self.userId, {data: {}, rule: {}});
       } else {
         self.$store.dispatch('setPatrolHistory', self.historyObj);
