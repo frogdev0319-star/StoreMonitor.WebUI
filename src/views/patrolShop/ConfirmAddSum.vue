@@ -755,7 +755,6 @@ export default {
             item.numOfCommentItem = 0;
             item.numOfTotalItems = 0;
             item.items.forEach(s_item => {
-              // console.log(s_item.itemgetScore)
               item.numOfTotalItems++;
               if (s_item.itemType === 1) {
                 item.numOfCommentItem++;
@@ -852,7 +851,6 @@ export default {
             if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
               item['itemgetScore'] = '--';
             } else {
-              // console.log(util.isDouble(totalGetscore))
               item['itemgetScore'] = util.isDouble(totalGetscore);
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
@@ -865,7 +863,7 @@ export default {
               }
             } else {
               if (inspectSettings.includedInTotalScoreWithType1) {
-                if (inspectSettings.qualifiedForIgnoredWithType1) {
+                if (inspectSettings.qualifiedForIgnoredWithType1 && (p_item.type === 0 || p_item.type === 1)) {
                   item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored +
                                           tab1GetScoreNoContainedIngored);
                 } else {
