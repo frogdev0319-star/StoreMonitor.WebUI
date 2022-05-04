@@ -842,7 +842,7 @@ export default {
             if (inspectSettings.qualifiedForIgnoredWithType2) {
               item['itemScore'] = totalScore;
               if (p_item.type === 1) {
-                item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
+                item['numOfQualified'] = item['numOfQualified'];
                 item['numIgnore'] = 0;
               }
             } else {
@@ -856,7 +856,7 @@ export default {
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
                 item['itemgetScore'] = tab1GetScoreContainedIgnored + util.isDouble(tab1GetScoreNoContainedIngored);
-                item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
+                item['numOfQualified'] = item['numOfQualified'];
                 item['numIgnore'] = 0;
               } else {
                 item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored);
@@ -872,7 +872,7 @@ export default {
                 }
               }
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['numOfQualified'] = item['numOfQualified'] + item['numIgnore'];
+                item['numOfQualified'] = item['numOfQualified'];
                 item['numIgnore'] = 0;
               }
             }
