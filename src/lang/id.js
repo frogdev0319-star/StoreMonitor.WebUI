@@ -115,7 +115,7 @@ export default{
       "cycle":"Siklus",
       "danger":"Berbahaya",
       "dangerRate":"Tingkat bahaya",
-      "dangerousMore":"Rasio Bahaya＜60%",
+      "dangerousMore":"Rasio Bahaya≥60%",
       "dataRangeTips":"* Rentang Tanggal:  1 ~ 365 hari",
       "dataZoomInfo":"Gulir mouse di sistem koordinat untuk memperbesar area data dan melihat rincian data",
       "date":"Tanggal",

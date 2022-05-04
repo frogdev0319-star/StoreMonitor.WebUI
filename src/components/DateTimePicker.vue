@@ -209,11 +209,11 @@ export default {
 <style lang="scss">
 @import "../assets/sass/stastical.scss";
 .global-date-pick.el-date-editor .el-range-input {
-  font-size:15px;
+  font-size:calc(15/1920*100vw);
 }
 .date-picker{
   width:calc(207/1440*100vw);
-  font-size: 15px;
+  font-size: calc(15/1920*100vw);
   line-height: 35px;
 }
 .global-date-pick.el-range-editor--mini.el-input__inner {
@@ -226,7 +226,7 @@ export default {
     height: 24px;
 }
 .global-date-pick.el-date-editor .el-range__icon {
-    font-size: 24px;
+    font-size: calc(24/1920*100vw);
     margin-left: -5px;
     color: #c0c4cc;
     float: left;

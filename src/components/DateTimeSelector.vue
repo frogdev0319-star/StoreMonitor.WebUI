@@ -56,14 +56,14 @@ export default {
       dateRangevalue:-1,
       diablePick:false,
       contentWidth:[{key:'en',value:'calc(402/1440*100vw)'},{key:'zh',value:'calc(402/1440*100vw)'},{key:'zhtw',value:'calc(402/1440*100vw)'},
-        {key:'ja-JP',value:'calc(492/1440*100vw)'},{key:'ko-KR',value:'calc(402/1440*100vw)'},{key:'vi-VN',value:'calc(442/1440*100vw)'},
-        {key:'id-ID',value:'calc(412/1440*100vw)'},{key:'th-TH',value:'calc(402/1440*100vw)'}],
-            rangeWidth:[{key:'en',value:'calc(105/1440*100vw)'},{key:'zh',value:'calc(95/1440*100vw)'},{key:'zhtw',value:'calc(95/1440*100vw)'},
-        {key:'ja-JP',value:'calc(190/1440*100vw)'},{key:'ko-KR',value:'calc(125/1440*100vw)'},{key:'vi-VN',value:'calc(130/1440*100vw)'},
-        {key:'id-ID',value:'calc(120/1440*100vw)'},{key:'th-TH',value:'calc(95/1440*100vw)'}],
+        {key:'ja-JP',value:util.getWindowWidth()>1366?'calc(492/1440*100vw)':'calc(500/1440*100vw)'},{key:'ko-KR',value:'calc(402/1440*100vw)'},{key:'vi-VN',value:util.getWindowWidth()>1366?'calc(442/1440*100vw)':'calc(475/1440*100vw)'},
+        {key:'id-ID',value:util.getWindowWidth()>1366?'calc(412/1440*100vw)':'calc(450/1440*100vw)'},{key:'th-TH',value:util.getWindowWidth()>1366?'calc(412/1440*100vw)':'calc(450/1440*100vw)'}],
+      rangeWidth:[{key:'en',value:'calc(105/1440*100vw)'},{key:'zh',value:'calc(95/1440*100vw)'},{key:'zhtw',value:'calc(95/1440*100vw)'},
+        {key:'ja-JP',value:util.getWindowWidth()>1366?'calc(190/1440*100vw)':'calc(225/1440*100vw)'},{key:'ko-KR',value:'calc(125/1440*100vw)'},{key:'vi-VN',value:util.getWindowWidth()>1366?'calc(130/1440*100vw)':'calc(160/1440*100vw)'},
+        {key:'id-ID',value:util.getWindowWidth()>1366?'calc(120/1440*100vw)':'calc(150/1440*100vw)'},{key:'th-TH',value:util.getWindowWidth()>1366?'calc(120/1440*100vw)':'calc(150/1440*100vw)'}],
       selecClass:[{key:'en',value:'rangeSel'},{key:'zh',value:'rangeSel'},{key:'zhtw',value:'rangeSel'},
         {key:'ja-JP',value:'rangeSel-ja'},{key:'ko-KR',value:'rangeSel-ko'},{key:'vi-VN',value:'rangeSel-vi'},
-        {key:'id-ID',value:'rangeSel-id'},{key:'th-TH',value:'rangeSel'}]
+        {key:'id-ID',value:'rangeSel-id'},{key:'th-TH',value:'rangeSel-th'}]
     }
   },
   computed:{
@@ -139,20 +139,21 @@ export default {
     .time-title{
       width:calc(76/1440*100vw);
       align-self:center;
-      font-size:15px;
+      font-size:calc(15/1920*100vw);
       color:#484848;
       text-align:left;
+      line-height: 20px;
     }
     .date-range{
       width:cacl(207/1440*100vw);
     }
   }
 </style>
-<style>
+<style lang="scss">
   .bDateSel.el-select .el-input--medium .el-input__inner {
-    width: calc(95/1440*100vw);
+    /*width: calc(95/1440*100vw);*/
     height: 36px;
-    font-size: 15px;
+    font-size: calc(15/1920*100vw);
     text-align: left;
     border: none;
     color:#2b2b2b;
@@ -162,16 +163,42 @@ export default {
     width: calc(95/1440*100vw);
   }
   .rangeSel-ja.el-select .el-input--medium .el-input__inner {
-    width: calc(180/1440*100vw);
+    width:inherit;
+    @media screen and (max-width:1367px) { 
+      width: calc(230/1440*100vw);
+    }
+    @media screen and(min-width: 1367px){
+      width: calc(180/1440*100vw);
+    }
   }
   .rangeSel-ko.el-select .el-input--medium .el-input__inner {
     width: calc(125/1440*100vw);
   }
   .rangeSel-vi.el-select .el-input--medium .el-input__inner {
-    width: calc(130/1440*100vw);
+     @media screen and (max-width:1367px) { 
+      width: calc(150/1440*100vw);
+    }
+    @media screen and(min-width: 1367px){
+      width: calc(130/1440*100vw);
+    }
   }
   .rangeSel-id.el-select .el-input--medium .el-input__inner {
-    width: calc(120/1440*100vw);
+    @media screen and (max-width:1367px) { 
+      width: calc(150/1440*100vw);
+    }
+    @media screen and(min-width: 1367px){
+      width: calc(120/1440*100vw);
+    }
+  }
+  .rangeSel-th.el-select .el-input--medium .el-input__inner {
+    @media screen and (max-width:1367px) { 
+      width: calc(110/1440*100vw) !important;
+    }
+
+    @media screen and(min-width: 1367px){
+      width: calc(95/1440*100vw) !important;
+    }
+    
   }
   .bDateSel.el-select .el-input .el-select__caret {
     color: #2c90d9;

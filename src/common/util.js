@@ -3,10 +3,12 @@ import i18n from '@/lang/index';
 import { message } from '@/common/singleton-message';
 import moment from 'moment';
 import { getCookie } from './auth';
-
 export default {
+  getWindowWidth(){
+    return window.innerWidth;
+  },
   getLangStyleValue(langArray){
-    //console.log("*****lang:",i18n.locale);
+    console.log("*****screenWidth  :",this.getWindowWidth() );
     var lang_style = langArray.find( item => {return item.key==i18n.locale});
     return lang_style.value;
   },
