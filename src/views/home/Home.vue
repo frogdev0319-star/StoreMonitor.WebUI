@@ -210,10 +210,10 @@
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
-                  style="width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
+                  style="width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
-                  style=" width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);"
+                  style=" width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
                   @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>

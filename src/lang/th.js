@@ -63,7 +63,7 @@ export default{
       "skywatchDeviceMgt":"การจัดการอุปกรณ์ตรวจสอบ (Skywatch)",
       "skywatchDeviceSetting":"การตั้งค่าอุปกรณ์ของ Skywatch",
       "statisticalAna":"การวิเคราะห์ทางสถิติ",
-      "statistics":"Statistics Analysis",
+      "statistics":"การวิเคราะห์ทางสถิติ",
       "storeDetail":"รายละเอียดร้านค้า",
       "storeManage":"การผูกโยงอุปกรณ์การตรวจสอบ",
       "storeMonitor":"การตรวจสอบร้านค้า",

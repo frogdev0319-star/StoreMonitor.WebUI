@@ -63,7 +63,7 @@ export default{
       "skywatchDeviceMgt":"Manajemen Perangkat Monitor (Skywatch)",
       "skywatchDeviceSetting":"Pengaturan Perangkat Skywatch",
       "statisticalAna":"Analisis Statistik",
-      "statistics":"Statistics Analysis",
+      "statistics":"Analisis Statistik",
       "storeDetail":"Rincian Toko",
       "storeManage":"Inspeksi Pengikatan Perangkat",
       "storeMonitor":"Monitor Toko",

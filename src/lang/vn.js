@@ -63,7 +63,7 @@ export default{
       "skywatchDeviceMgt":"Quản lý Thiết bị Kiểm soát (Skywatch)",
       "skywatchDeviceSetting":"Cài đặt Thiết bị Skywatch",
       "statisticalAna":"Phân tích thống kê",
-      "statistics":"Statistics Analysis",
+      "statistics":"Phân tích thống kê",
       "storeDetail":"Chi tiết về cửa hàng",
       "storeManage":"Kết nối thiết bị kiểm tra",
       "storeMonitor":"Kiểm soát cửa hàng",
