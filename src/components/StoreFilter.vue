@@ -1025,7 +1025,7 @@ export default {
       text-align: left;
       align-self: center;
       font-family: NotoSansCJKTC;
-      font-size: 15px;
+      font-size: calc(15/1920*100vw);
       font-weight: normal;
     }
     .search-label-vn{
@@ -1147,7 +1147,7 @@ export default {
     color: #2b2b2b;
     background: transparent !important;
     padding: 0 10px;
-    font-size: 15px;
+    font-size: calc(15/1920*100vw);
     min-width: 55px;
     min-height: 28px;
   }
@@ -1155,7 +1155,7 @@ export default {
     z-index: 1;
     background: #FFF !important;
     border: none;
-    font-size: 15px;
+    font-size: calc(15/1920*100vw);
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     min-height: 28px;

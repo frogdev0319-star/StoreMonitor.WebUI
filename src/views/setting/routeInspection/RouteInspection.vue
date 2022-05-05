@@ -2685,7 +2685,7 @@ export default {
                 .temp-select-area{
                   display:flex; 
                   flex-direction:row;
-                  height:calc(30/1920*100vw);
+                  height:30px;
                   min-width:220px;
                   max-width: 250px;
                   align-items:center;

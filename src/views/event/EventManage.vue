@@ -9,7 +9,7 @@
         >
         </store-filter>
       </div>
-      <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px">
+      <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
         <div class="flex-center">
           <date-time-selector 
             ref="eventTimePicker"
@@ -72,7 +72,7 @@
               :highlight-current-row="true"
               :height="553"
               :header-row-style="{width:'1920px'}"
-              :header-cell-style="{fontSize:'12px',color:'#7d8cad',height: '47px'}"
+              :header-cell-style="{fontSize:'calc(12/1920*100vw)',color:'#7d8cad',height: '47px'}"
               :cell-style="cellStyle"
               empty-text="没有事件数据"
               align="left"
@@ -1294,7 +1294,7 @@ $h1:#292e36;
         display:inline-block;
         min-width:68px;
         height:24px;
-        font-size: 12px;
+        font-size: calc(12/1920*100vw);
         border-radius: 5px;
         white-space: nowrap;
         padding-left: 5px;
@@ -1315,7 +1315,7 @@ $h1:#292e36;
       text-align: left;
       align-self: center;
       font-family: NotoSansCJKTC;
-      font-size: 15px;
+      font-size: calc(15/1920*100vw);
       font-weight: normal;
       margin-left:-10px;
     }
@@ -1338,7 +1338,7 @@ $h1:#292e36;
             font-family: "iconfont" !important;
             content: '\e6a2';
             left: 20px;
-            font-size: 14px;
+            font-size: calc(14/1920*100vw);
             font-style: normal;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -1350,7 +1350,7 @@ $h1:#292e36;
             content: "\e64a";
             font-weight: 700;
             -webkit-font-smoothing: antialiased;
-            font-size: 14px;
+            font-size: calc(14/1920*100vw);
             font-style: normal;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -1419,7 +1419,7 @@ $h1:#292e36;
             /*height:300px;*/
             /*float:left;*/
           &.el-table{
-            font-size: 15px;
+            font-size: calc(15/1920*100vw);
           }
         }
       .btn-close{
@@ -1432,12 +1432,12 @@ $h1:#292e36;
     }
     .expiretag{
       font-family: NotoSansCJKTC;
-      font-size: 10px;
+      font-size: calc(10/1920*100vw);
       color: #556679;
     }
     #tabs-content  .el-tabs__item {
       padding: 0 0;
-      font-size: 14px;
+      font-size: calc(14/1920*100vw);
       width: 160px;
     }
     #tabs-content  .el-tabs__nav-scroll{
@@ -1470,7 +1470,7 @@ $h1:#292e36;
     border: 1px solid #DCDFE6;
     border-radius: 4px;
     padding-left: 30px;
-    font-size: 12px;
+    font-size: calc(12/1920*100vw);
 }
 
   .el-search{

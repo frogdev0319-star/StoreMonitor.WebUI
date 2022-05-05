@@ -728,7 +728,7 @@ export default {
   .temp-select-area{
     display:flex; 
     flex-direction:row;
-    height:calc(30/1920*100vw);
+    height:30px;
     width:220px;
     align-items:center;
     background-color:#f4f6f7;

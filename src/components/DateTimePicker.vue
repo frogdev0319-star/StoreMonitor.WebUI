@@ -218,7 +218,7 @@ export default {
 }
 .global-date-pick.el-range-editor--mini.el-input__inner {
   border:none;
-  height: 35px;
+  height: calc(35/1920*100vw);
   background-color: transparent;
 }
 .global-date-pick.el-range-editor--mini .el-range__icon, .el-range-editor--mini .el-range__close-icon {

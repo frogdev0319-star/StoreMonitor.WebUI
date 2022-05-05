@@ -2696,15 +2696,21 @@ $h1: #292e36;
     }
 }
 </style>
-<style scoped>
+<style lang="scss" scoped>
 .problemTab {
-  width: calc(120 / 1920 * 100vw); 
+  
   height: calc(34 / 1920 * 100vw);
   line-height: calc(34 / 1920 * 100vw);
   cursor: pointer; 
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
   font-size: calc(13 / 1920 * 100vw); 
+  @media screen and (max-width:1367px) { 
+      width: calc(150 / 1920 * 100vw); 
+    }
+    @media screen and(min-width: 1367px){
+      width: calc(120 / 1920 * 100vw); 
+    }
 }
 .tabs {
   position: absolute; 

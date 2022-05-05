@@ -565,8 +565,24 @@ export default {
       margin-left: calc(36/1440*100vw);
       margin-right:32px;
       margin-bottom:24px;
-      height:36px;
+      height:calc(36/1920*100vw);
       justify-content: space-between;
+      /deep/
+      .el-select.el-select--medium .el-input .el-input__inner {
+          position: relative;
+          z-index: 1;
+          background: transparent !important;
+          border: none;
+          font-size: calc(15/1920*100vw);
+          height: calc(36/1920*100vw);
+          line-height: calc(36/1920*100vw);
+          min-height: 28px;
+          min-width: 85px;
+      }
+      /deep/
+      .el-input--medium .el-input__icon {
+          line-height: calc(36/1920*100vw);
+      }
     }
     .head{
       display: flex;
@@ -574,8 +590,8 @@ export default {
       justify-content: space-between;
       height: 67.5px;
       .title{
-        height: 30px;
-        font-size: 18px;
+        height: calc(30/1920*100vw);
+        font-size: calc(18/1920*100vw);
         text-align: left;
         color: $black;
       }
@@ -596,9 +612,9 @@ export default {
       display:flex;
         flex-direction:row;
         width: calc(510/1440*100vw);
-        height:36px;
+        height:calc(36/1920*100vw);
         margin-left:72px;
-        font-size: 15px;
+        font-size: calc(15/1920*100vw);
         color: #484848;
         justify-content: space-between;
         align-items: center;
@@ -609,8 +625,14 @@ export default {
           box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
           background-color: #fff;
           width: calc(440/1440*100vw);
-          height:36px;
+          height:calc(36/1920*100vw);
           align-items: center;
+          /deep/
+          .el-input--medium .el-input__inner{
+            border:none;
+            line-height: calc(36/1920*100vw);
+            height: calc(36/1920*100vw);
+          }
         }
         .position{
           display:inline;
@@ -618,6 +640,8 @@ export default {
           /deep/
           .el-input--medium .el-input__inner{
             border:none;
+            line-height: calc(36/1920*100vw);
+            height: calc(36/1920*100vw);
           }
         }
         .person{
@@ -626,6 +650,9 @@ export default {
           /deep/
           .el-input--medium .el-input__inner{
             border:none;
+            line-height: calc(36/1920*100vw);
+            height: calc(36/1920*100vw);
+
           }
         }
     }
@@ -633,11 +660,11 @@ export default {
     .search-button{
       margin-left:35px;
       width: 102px;
-      height: 36px;
+      height: calc(36/1920*100vw);
       background-color: #556679;
       border-color: #556679;
       color:#fff;
-      font-size: 15px;
+      font-size: calc(15/1920*100vw);
     }
 
     .operation-btns{

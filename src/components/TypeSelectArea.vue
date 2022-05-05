@@ -769,7 +769,7 @@ export default {
             width: calc(52/1440*100vw);
             margin: 2px 0 4px 4px;
             font-family: NotoSansCJKtc;
-            font-size: 13px;
+            font-size: calc(13/1920*100vw);
             text-align: center;
             color: #556679;
             align-self: center;
@@ -785,7 +785,7 @@ export default {
     }
     .area-muti{
       width:calc(180/1440*100vw);
-      font-size: 15px;
+      font-size: calc(15/1920*100vw);
       ::v-deep.el-select.el-select--medium{
          background-color: #f7f9f9 !important;
         }
@@ -796,7 +796,7 @@ export default {
 <style>
 .dropdown-select.el-select .el-input--medium .el-input__inner{
     height: 35px;
-    font-size: 13px;
+    font-size: calc(13/1920*100vw);
     text-align: left;
     border: none;
     background-color: #f7f9fa;
@@ -820,7 +820,7 @@ export default {
     background-color: #f7f9f9 !important;
     border:none;
     padding: 0 10px;
-    font-size: 13px;
+    font-size: calc(13/1920*100vw);
     min-width: 55px;
     min-height: 28px;
     text-overflow: ellipsis;

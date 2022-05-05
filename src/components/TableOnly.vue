@@ -55,7 +55,7 @@
               <img :src="_item.src" style="width:24px;height:24px;cursor:pointer;" @click="cellClick(row,_item.prop)">
             </div>
             <div v-else>
-              <span style="cursor:pointer;color:#006ab7;font-size:15px;" @click="cellClick(row,_item.prop)">{{ row[_item.prop]}}</span>
+              <span style="cursor:pointer;color:#006ab7;font-size:calc(15/1920*100vw);" @click="cellClick(row,_item.prop)">{{ row[_item.prop]}}</span>
             </div>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>

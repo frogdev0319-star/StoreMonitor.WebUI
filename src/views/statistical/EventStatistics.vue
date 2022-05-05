@@ -36,9 +36,9 @@
             <div class="region-area" :style="ispdf ? {'width':'220px'}:{}" v-for="(item,index) in eventKPIs" :key="index">
               <div class="num-area">
                 <div style="display:flex;height:84.5px;">
-                  <div class="number" :style="ispdf ? {'fontSize':'40px'}:{}">{{ item.eventNum }}
-                    <span v-if="index!=3" style="font-size:15px;margin-left:5px;">{{$t('statistics.event.unit')}}</span>
-                    <span v-else style="font-size:15px;margin-left:5px;">%</span>
+                  <div class="number" :style="ispdf ? {'fontSize':'calc(40/1980*100vw)'}:{}">{{ item.eventNum }}
+                    <span v-if="index!=3" style="font-size:calc(15/1980*100vw);margin-left:5px;">{{$t('statistics.event.unit')}}</span>
+                    <span v-else style="font-size:calc(15/1980*100vw);margin-left:5px;">%</span>
                   </div>
                 </div>
                 <div class="description">{{ item.eventTitle}}</div>

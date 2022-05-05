@@ -8,7 +8,7 @@
       >
         <template v-slot:others>
           <div class="last-row" >
-            <span style="margin-right: 16px; font-size:15px;width:83px;">{{ $t('remotePatrol.resultType') }}</span>
+            <span style="margin-right: 16px; font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.resultType') }}</span>
             <el-select
               v-model="curAppraise"
               :placeholder="$t('remotePatrol.all')"
@@ -21,7 +21,7 @@
                 :label="item.label"
                 :value="item.status"/>
             </el-select>
-            <span style="margin-right: 16px; margin-left:24px;font-size:15px;width:83px;">{{ $t('remotePatrol.reportType') }}</span>
+            <span style="margin-right: 16px; margin-left:24px;font-size:calc(15/1920*100vw);width:83px;">{{ $t('remotePatrol.reportType') }}</span>
             <div class="flex-center report-type-area">
             <el-select
               v-model="curReportType"
@@ -1096,15 +1096,16 @@ $filterWidth: (100%-706);
   text-align: left;
   align-self: center;
   font-family: NotoSansCJKTC;
-  font-size: 15px;
+  font-size: calc(15/1920*100vw);
   font-weight: normal;
   word-break: keep-all;
   padding-right: 16px;
   
+  
 }
 .report-type-area{
     width:calc(346/1440*100vw);
-    height: 36px;
+    height: calc(36/1920*100vw);
     background-color: #FFF;
     border-radius: 5px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
@@ -1114,6 +1115,22 @@ $filterWidth: (100%-706);
     .report-header{
         margin-top: 20px;
         margin-bottom: 20px;
+        /deep/
+        .el-select.el-select--medium .el-input .el-input__inner {
+            position: relative;
+            z-index: 1;
+            background: transparent !important;
+            border: none;
+            font-size: calc(15/1920*100vw);
+            height: calc(36/1920*100vw);
+            line-height: calc(36/1920*100vw);
+            min-height: 28px;
+            min-width: 85px;
+        }
+        /deep/
+        .el-input--medium .el-input__icon {
+            line-height: calc(36/1920*100vw);
+        }
         .header-details{
             text-align: left;
             padding-left: calc(30/1920*100vw);
@@ -1183,7 +1200,7 @@ $filterWidth: (100%-706);
           padding: calc(32/1920*100vw) calc(24/1920*100vw);
         }
         .empty-content{
-          font-size: 16px;
+          font-size: calc(16/1920*100vw);
           color: $tab;
           position: absolute;
           top: 50%;
@@ -1343,7 +1360,7 @@ $filterWidth: (100%-706);
           padding: calc(2/1440*100vw) calc(15/1440*100vw);
         }
         .status-tag-en{
-          font-size: 14px;
+          font-size: calc(14/1920*100vw);
           border-radius: calc(5/1440*100vw); 
           padding: calc(2/1440*100vw) calc(15/1440*100vw);
         }
@@ -1357,7 +1374,7 @@ $filterWidth: (100%-706);
           font-size: calc(40/1440*100vw);
         }
         .score-unit{
-          font-size: 12px;
+          font-size: calc(12/1920*100vw);
         }
         .item-content{
             text-align: left;

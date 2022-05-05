@@ -188,8 +188,8 @@ $sv_red: #c60957;
       border-top: 0;
     }
     border: 1px solid #acaeb1;
-    height: calc(18/1920*100vw);
-    width: calc(18/1920*100vw);
+    height: 18px;
+    width: 18px;
   }
 }
 .storevue-multi_select {
@@ -728,14 +728,14 @@ $sv_red: #c60957;
   background-color: $primary;
   border:none;
   color: #fff;
-  min-height: 36px;
+  min-height: calc(36/1920*100vw);
   min-width: 102px;
 }
 .export-btn.el-button--default.el-button--mini{
   background-color: #fff;
   border:none;
   color: #006ab7;
-  min-height: 36px;
+  min-height: calc(36/1920*100vw);
   min-width: 102px;
 }
 .export-btn .iconfont{
@@ -784,6 +784,7 @@ $sv_red: #c60957;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: calc(15/1920*100vw);
 }
 
 .el-search-input{
@@ -826,6 +827,7 @@ $sv_red: #c60957;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  
 }
 
 .inspction-btn{

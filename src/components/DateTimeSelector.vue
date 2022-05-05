@@ -132,7 +132,7 @@ export default {
   .date-selector-container{
     display: flex;
     align-items: center;
-    height: 36px;
+    height: calc(36/1920*100vw);
     width: calc(402/1440*100vw);
     // background-color: #fff;
     // border-radius: 5px;
@@ -152,7 +152,7 @@ export default {
 <style lang="scss">
   .bDateSel.el-select .el-input--medium .el-input__inner {
     /*width: calc(95/1440*100vw);*/
-    height: 36px;
+    height: calc(36/1920*100vw);
     font-size: calc(15/1920*100vw);
     text-align: left;
     border: none;
