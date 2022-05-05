@@ -825,10 +825,10 @@ export default {
     $_isMobile() {
       const { body } = document;
       const rect = body.getBoundingClientRect();
-      if (rect.width - 1 < 1280) {
+      if (rect.width - 1 < 1366) {
         this.collapsed = true;
       }
-      this.isMobile = rect.width - 1 < 1280;
+      this.isMobile = rect.width - 1 < 1366;
     },
   },
 };
@@ -908,9 +908,15 @@ export default {
     }
   }
   span {
-    font-size: 14px;
+    
     color:#a5a5a5;
     margin-left: 15px;
+    @media screen and (max-width:1367px) { 
+      font-size: 10px;
+    }
+    @media screen and(min-width: 1367px){
+      font-size: 14px;
+    }
   }
 
   /deep/ .el-menu--collapse {

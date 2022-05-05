@@ -16,6 +16,7 @@
       :max-height="tableHeight"
       :empty-text="$t('deviceView.noData')"
       align="left"
+      style="width:auto"
       size="mini"
       v-on="$listeners"
       :row-key="getRowKeys"
@@ -320,6 +321,7 @@ export default {
   },
   methods: {
     renderHeader(h, { column, $index }) {
+      if(util.getWindowWidth()>1366){
       let realWidth = 0;
       let span = document.createElement('span');
       let spancontent = document.createElement('span');
@@ -339,6 +341,7 @@ export default {
       //console.log(column.label+"realWidth:"+realWidth )
       document.body.removeChild(span);
       document.body.removeChild(spancontent);
+      }
       return h('span', {}, [column.label]);
     },
     setCellStyle({ row, column, rowIndex, columnIndex }) {
@@ -559,9 +562,12 @@ export default {
     background-color: #EFF3F5 !important;
   }
   .table {
+    width: auto;
+    
     .el-table{
       box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.1);
       border: solid 1px #f5f5f5;
+      overflow-x: auto;
     }
     tr{
       background-color: #f7f9fa !important;
