@@ -657,24 +657,23 @@ export default {
           // 2 closed：
           // 3 reject：handle、add、closed
           // 4 
-          console.log("curStatus:",self.curStatus);
-          console.log("PermissionHelper.enableEventClose():",!!PermissionHelper.enableEventClose())
           self.subBtnList.forEach(item => {
             console.log("item:",item);
             if (self.curStatus === 0 || self.curStatus === 3) {
-              if (item.order === 0 && PermissionHelper.enableEventHandle()) item.isShow = true;
-              else if(item.order === 1 && PermissionHelper.enableEventAdd())  item.isShow = true; 
-              else if(item.order === 2 && PermissionHelper.enableEventClose()) item.isShow = true; 
-              else item.isShow = false;
+              //if (item.order === 0 && !!PermissionHelper.enableEventHandle()) item.isShow = true;
+              //else if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true; 
+              //else if(item.order === 2 && !!PermissionHelper.enableEventClose()) item.isShow = true; 
+              //else item.isShow = false;
+              item.order === 0 || item.order === 1 || item.order === 2 ? item.isShow = true : item.isShow = false;
               item.order === 0 ? item.isActive = true : item.isActive = false;
             }
             if (self.curStatus === 1) {
               
-              if(item.order === 1 && PermissionHelper.enableEventAdd())  item.isShow = true; 
-              else if(item.order === 2 && PermissionHelper.enableEventClose()) item.isShow = true;
-              else if (item.order === 3 && PermissionHelper.enableEventReturn()) item.isShow = true; 
-              else item.isShow = false;
-              //item.order === 1 || item.order === 2 || item.order === 3 ? item.isShow = true : item.isShow = false;
+              //if(item.order === 1 && !!PermissionHelper.enableEventAdd())  item.isShow = true; 
+              //else if(item.order === 2 && !!PermissionHelper.enableEventClose()) item.isShow = true;
+              //else if (item.order === 3 && !!PermissionHelper.enableEventReturn()) item.isShow = true; 
+              //else item.isShow = false;
+              item.order === 1 || item.order === 2 || item.order === 3 ? item.isShow = true : item.isShow = false;
               item.order === 1 ? item.isActive = true : item.isActive = false;
             }
             if (self.curStatus === 2 || self.curStatus === 4) {
@@ -847,25 +846,25 @@ export default {
       const authorities = self.$store.state.user.authorities;
       PermissionHelper.setData(authorities);
       const tempBtnList = [];
-      PermissionHelper.enableEventHandle() && tempBtnList.push({
+      !!PermissionHelper.enableEventHandle() && tempBtnList.push({
         name: this.$t('eventView.handling'),
         order: 0,
         isShow: false,
         isActive: false
       });
-      PermissionHelper.enableEventClose() && tempBtnList.push({
+      !!PermissionHelper.enableEventClose() && tempBtnList.push({
         name: this.$t('eventView.closing'),
         order: 1,
         isShow: false,
         isActive: false
       });
-      PermissionHelper.enableEventAdd() && tempBtnList.push({
+      !!PermissionHelper.enableEventAdd() && tempBtnList.push({
         name: this.$t('eventView.adding'),
         order: 2,
         isShow: false,
         isActive: false
       });
-      PermissionHelper.enableEventReturn() && tempBtnList.push({
+      !!PermissionHelper.enableEventReturn() && tempBtnList.push({
         name: this.$t('eventView.returnStatus'),
         order: 3,
         isShow: false,
