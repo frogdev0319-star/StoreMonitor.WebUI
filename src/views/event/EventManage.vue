@@ -76,6 +76,7 @@
               :cell-style="cellStyle"
               empty-text="没有事件数据"
               align="left"
+              style="width:auto"
               class="table-content tbl-checkbox"
               @sort-change="sortChange"
               @row-click="rowClickItem"
@@ -469,21 +470,23 @@ export default {
       return util.getLangStyleValue(langArray);
     },
     renderHeader(h, { column, $index }) {
-      let realWidth = 0;
-      let span = document.createElement('span');
+      if(util.getWindowWidth()>1366){
+        let realWidth = 0;
+        let span = document.createElement('span');
 
-      span.style.display = 'inline-block';
-      span.innerText = column.label;
-      document.body.appendChild(span);
+        span.style.display = 'inline-block';
+        span.innerText = column.label;
+        document.body.appendChild(span);
 
-      realWidth = span.clientWidth;
-      if(column.sortable == 'custom') realWidth = realWidth;
-      else column.minWidth = realWidth;
-      //console.log(column.label+":"+column.minWidth);
-      //console.log(column.label+" realWidth:"+realWidth);
-      if(column.minWidth<realWidth) column.minWidth = realWidth;
+        realWidth = span.clientWidth;
+        if(column.sortable == 'custom') realWidth = realWidth;
+        else column.minWidth = realWidth;
+        //console.log(column.label+":"+column.minWidth);
+        //console.log(column.label+" realWidth:"+realWidth);
+        if(column.minWidth<realWidth) column.minWidth = realWidth;
 
-      document.body.removeChild(span);
+        document.body.removeChild(span);
+      }
       return h('span', {}, [column.label]);
     },
     cellStyle({ row, column, rowIndex, columnIndex }) {
@@ -1416,6 +1419,7 @@ $h1:#292e36;
             width:1900px;
             text-align: center;
             border: none;
+            overflow-x: auto;
             /*height:300px;*/
             /*float:left;*/
           &.el-table{
