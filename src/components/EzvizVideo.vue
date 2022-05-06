@@ -1471,20 +1471,21 @@ export default {
     stopRealTime() {
       const self = this;
       if (self.playState) {
-        if (self.fullWindow) {
-          self.fullDecoder.closeSound();
-          self.fullDecoder.stop();
-          self.fullDecoder = null;
-        } else {
-          self.decoder.closeSound();
-          self.decoder.stop();
-          self.decoder = null;
-        }
 
         window.clearInterval(self.timerPlayReal);
         self.realTimeSpeed = 0;
         self.stopVideoTime = false;
         self.timerPlayReal = null;
+      }
+      if (self.fullWindow && self.fullDecoder) {
+        self.fullDecoder.closeSound();
+        self.fullDecoder.stop();
+        self.fullDecoder = null;
+      } 
+      if (self.decoder) {
+        self.decoder.closeSound();
+        self.decoder.stop();
+        self.decoder = null;
       }
       self.muted = true;
       self.showModelContent = false;

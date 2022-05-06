@@ -812,6 +812,7 @@ export default {
       const self =this
       this.tempCurSelStoreId = storeData.curSelectedStore;
       this.RuleCountTip = false;
+      self.$refs.vendorVideo.stopVideoPlay();
       if (self.$refs.vendorVideo.playState || self.eventName.length !== 0|| self.sourceList.length>0 ){
         self.changeStoreObj.dialogCosed = true;
       } else {
