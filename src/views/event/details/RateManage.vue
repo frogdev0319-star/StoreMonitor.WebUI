@@ -601,17 +601,30 @@ export default {
       });
       self.sourceList = temp;
       console.log("sourceList:",self.sourceList);
+      console.log("event:",event);
+      console.log("deviceList:",deviceList);
       self.videosourceList = temp.filter(x => x.mediaType === 1);
       self.imgsourceList = temp.filter(x => x.mediaType === 2);
-      const relatedDeviceIds = event.relatedDeviceIds.sort();
-      self.relatedChannels = [];
-      relatedDeviceIds.forEach(item => {
-        deviceList.forEach(_item => {
-          if (_item.id === item) {
-            self.relatedChannels.push(_item);
-          }
+      if(event.relatedDeviceIds.length > 0){
+        const relatedDeviceIds = event.relatedDeviceIds.sort();
+        self.relatedChannels = [];
+        
+        relatedDeviceIds.forEach(item => {
+          deviceList.forEach(_item => {
+            if (_item.id === item) {
+              self.relatedChannels.push(_item);
+            }
+          });
         });
-      });
+      }else{
+        self.sourceList.forEach(item => {
+          deviceList.forEach(_item => {
+            if (_item.id === item.deviceId) {
+              self.relatedChannels.push(_item);
+            }
+          });
+        });
+      }
     },
 
     checkVideo(item, index) {
@@ -878,6 +891,7 @@ export default {
     showRelatedChannel() {
       const self = this;
       //self.showRelatedChannelFlag = true;
+      console.log("*relatedChannels:",self.relatedChannels)
       self.channelRadio = self.relatedChannels[0].id;
       this.confirmSelect();
     },
