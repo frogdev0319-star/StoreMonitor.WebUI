@@ -1214,6 +1214,8 @@ export default {
       }
       let itemScore = 0, qualifiedScore = 0, selectAvailable = [];
       self.OtherScoreTipEmpty = false;
+      self.PFScoreTip = false;
+      // console.log(self.ItemSheetScore, self.itemType)
       if (self.activeSheetName == '0') {
         if (self.ItemSheetScore === '') {
           //self.ItemSheetScore = itemScore = 10;
@@ -1223,7 +1225,9 @@ export default {
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
-            self.PFScoreTip = true;
+            if (self.itemType === 0) {
+              self.PFScoreTip = true;
+            }
           } else {
             itemScore = parseFloat(self.getFloat(self.ItemSheetScore));
             qualifiedScore = null;
