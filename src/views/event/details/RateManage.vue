@@ -600,9 +600,9 @@ export default {
         }
       });
       self.sourceList = temp;
-      console.log("sourceList:",self.sourceList);
-      console.log("event:",event);
-      console.log("deviceList:",deviceList);
+      //console.log("sourceList:",self.sourceList);
+      //console.log("event:",event);
+      //console.log("deviceList:",deviceList);
       self.videosourceList = temp.filter(x => x.mediaType === 1);
       self.imgsourceList = temp.filter(x => x.mediaType === 2);
       if(event.relatedDeviceIds.length > 0){
