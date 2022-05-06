@@ -1666,6 +1666,212 @@ export default {
       }
     },
     
+    changeInspect(val) {
+      const self = this;
+      // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
+      if (this.editCount > 0) {
+        self.changeInspectObj.dialogCosed = true;
+        self.beforepatrolstore = val;
+      } else {
+        self.changeInspectList(val);
+      }
+    },
+    changeInspectList(val) {
+      const self = this;
+      if (!self.showGuide && self.$refs.vendorVideo) {
+        self.$refs.vendorVideo.editCount = 0;
+        self.$refs.vendorVideo.stopVideoPlay();
+      };
+      self.isDisabled = false;
+      self.hasIgnoretemp = [];
+      self.tempArr = [];
+      this.editCount = 0;
+      this.$store.dispatch('setEditCount', this.editCount);
+      self.$store.dispatch('setPatrolHistory', null);
+      self.$store.dispatch('setPatrolComment', null);
+      Database.addDataToDB(self.userId, {data: {}, rule: {}});
+      self.isShowWarn = false;
+      self.notShowAlert = false;
+      this.showIgnoreItem = false;
+       this.$emit("listenerChild", false); 
+      self.eventList = [];
+      // self.showChannelBtns = [];
+      self.curSheetIndex = 0;
+      self.curSheet = {};
+      self.PatrolList.forEach(item => {
+        if (item.id == val) {
+          self.patrolstore = item.name;
+        }
+      });
+      const params = {
+        storeId: self.store.storeId,
+        mode: 0,
+        authorizedOnly: 1,
+        tagName: self.patrolstore,
+        inspectId: val
+      };
+      self.inspectItemList = [];
+      checkOutInspectItemV3(params).then(res => {
+        if (res.errCode == 0) {
+          const data = res.data.groups;
+          const inspectSettings = {};
+          res.data.inspectSettings.forEach(item => {
+            switch (item.name) {
+              case 'includedInTotalScoreWithType1':
+                inspectSettings.includedInTotalScoreWithType1 = item.value;
+                break;
+              case 'qualifiedForIgnoredWithType1':
+                inspectSettings.qualifiedForIgnoredWithType1 = item.value;
+                break;
+              case 'qualifiedForIgnoredWithType2':
+                inspectSettings.qualifiedForIgnoredWithType2 = item.value;
+                break;
+              case 'hundredMarkType':
+                inspectSettings.hundredMarkType = item.value.toString();
+                break;
+              case 'minScore':
+                inspectSettings.minScore = item.value;
+                break;
+              case 'maxScore':
+                inspectSettings.maxScore = item.value;
+                break;
+              case 'dangerousOnFailedItem':
+                inspectSettings.dangerousOnFailedItem = item.value;
+                break;
+              case 'baseScore':
+                inspectSettings.baseScore = item.value;
+                break;
+              case 'itemOptionsForType1':
+                inspectSettings.itemOptionsForType1 = item.value;
+                this.itemOptionsForType1 = item.value;
+                break;
+              case 'itemOptionsForType3':
+                inspectSettings.itemOptionsForType3 = item.value;
+                this.itemOptionsForType3 = item.value;
+                break;
+              default:
+                break;
+            }
+          });
+          sessionStorage.setItem('inspectSettings', JSON.stringify(inspectSettings));
+          sessionStorage.setItem('uuid', res.data.uuid);
+          this.checkIfAllItemsAreRemark(data);
+          const temp = [];
+          data.forEach((item, index) => {
+            const obj = {};
+            obj.groupId = item.groupId;
+            obj.mode = item.mode;
+            obj.type = item.type;
+            obj.groupName = item.groupName;
+            obj.dealCount = 0;
+            obj.count = item.items.length;
+            obj.Effective = 0;
+            obj.isHover = false;
+            obj.parentId = item.parentId;
+            obj.lastUnqualifiedNumber = item.lastUnqualifiedNumber;
+            if (index == 0) {
+              obj.isClick = true;
+            } else {
+              obj.isClick = false;
+            }
+            const btnNameArr = this.getTab1AndTab3BtnName(obj.type);
+            const tempItems = [];
+            item.items.forEach((_item, _index) => {
+              const itemObj = {};
+              itemObj.id = _item.id;
+              itemObj.groupId = item.groupId;
+              itemObj.groupName = item.groupName;
+              itemObj.subject = _item.subject;
+              itemObj.description = _item.description;
+              itemObj.itemScore = _item.itemScore;
+              itemObj.required = _item.required;
+              let itemScoreLength = [];
+              if (_item.availableScores.length !== 0) {
+                itemScoreLength = _item.availableScores;
+              } else {
+                for (let i = 0; i < _item.itemScore + 1; i++) {
+                  itemScoreLength.push(i);
+                }
+              }
+              itemScoreLength.sort((a, b) => {
+                return a - b;
+              });
+              itemObj.itemScoreLength = itemScoreLength.reverse();
+              itemObj.itemgetScore = '--';
+              itemObj.isQualified = false;
+              itemObj.qualifiedScore = _item.qualifiedScore;
+              itemObj.type = item.type;
+              itemObj.itemScoreTitle = '--';
+              // itemObj.deviceId=_item.deviceId;
+              itemObj.deviceId = _item.deviceIds;
+              itemObj.inspectInput = '';
+              itemObj.inputCount = 0;
+              itemObj.disabled = true;
+              itemObj.checked = false;
+              itemObj.isIgnore = false;
+              itemObj.Ruletip = false;
+              itemObj.RuleCountTip = false;
+              itemObj.manualIgnore = false;
+              itemObj.sourceList = [];
+              itemObj.groupType = item.type;
+              itemObj.lastUnqualifiedNumber = _item.lastUnqualifiedNumber;
+              itemObj.scoreList = [
+                {val: _item.itemScore, scoreTitle: btnNameArr[0], isClick: false},
+                {val: -1, scoreTitle: btnNameArr[1], isClick: false}
+                ];
+              itemObj.itemType = _item.type;
+              tempItems.push(itemObj);
+            });
+            obj.items = tempItems;
+            temp.push(obj);
+          });
+          const te_temp = [];
+
+          const treeData = temp.filter(item => item.parentId === -1);
+          let handleData = [];
+          treeData.forEach(item => {
+            let obj = {};
+            obj.cateray = item;
+            obj.subcatergy = [];
+            temp.forEach(totalData => {
+              if(item.groupId === totalData.parentId){
+                obj.subcatergy.push(totalData);
+              }
+            })
+            handleData.push(obj);
+          })
+          for (let i = 0; i < handleData.length; i++) {
+            let count = 0, label = '';
+            if (handleData[i].subcatergy.length === 0){
+              count = handleData[i].cateray.items.length;
+              te_temp.push({
+                inspectList: [handleData[i].cateray], dealCount: 0, Effective: 0, count: count, isClick: false,
+                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: false
+              });
+            } else {
+              handleData[i].subcatergy.forEach(item => count += item.items.length);
+              te_temp.push({
+                inspectList: handleData[i].subcatergy, dealCount: 0, Effective: 0, count: count, isClick: false,
+                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: true
+              });
+            }
+          }
+
+          self.sheetName = te_temp.sort((a, b) => {return a.type - b.type});
+          self.sheetName[0].isClick = true;
+          const isCategory = self.sheetName[0].isCategory;
+          self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
+          //bug
+          const feedobj = {groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false, isCategory: true};
+          if (self.sheetName.length != 0) {
+            self.sheetName.push(feedobj);
+            self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
+          }
+          
+        console.log(this.sheetName)
+        }
+      })
+    },
     changeStoreDialog() {
       this.changeStoreObj.dialogCosed = false;
       const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
@@ -2608,210 +2814,6 @@ export default {
       self.$nextTick(() => {
         if (self.$refs.vendorVideo) self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
       });
-    },
-    changeInspect(val) {
-      const self = this;
-      // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
-      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 1) ) {
-        self.changeInspectObj.dialogCosed = true;
-        self.beforepatrolstore = val;
-      } else {
-        self.changeInspectList(val);
-      }
-    },
-    changeInspectList(val) {
-      const self = this;
-      if (!self.showGuide && self.$refs.vendorVideo) {
-        self.$refs.vendorVideo.editCount = 0;
-        self.$refs.vendorVideo.stopVideoPlay();
-      };
-      self.isDisabled = false;
-      self.hasIgnoretemp = [];
-      self.tempArr = [];
-      self.$store.dispatch('setPatrolHistory', null);
-      self.$store.dispatch('setPatrolComment', null);
-      Database.addDataToDB(self.userId, {data: {}, rule: {}});
-      self.isShowWarn = false;
-      self.notShowAlert = false;
-      this.showIgnoreItem = false;
-       this.$emit("listenerChild", false); 
-      self.eventList = [];
-      // self.showChannelBtns = [];
-      self.curSheetIndex = 0;
-      self.curSheet = {};
-      self.PatrolList.forEach(item => {
-        if (item.id == val) {
-          self.patrolstore = item.name;
-        }
-      });
-      const params = {
-        storeId: self.store.storeId,
-        mode: 0,
-        authorizedOnly: 1,
-        tagName: self.patrolstore,
-        inspectId: val
-      };
-      self.inspectItemList = [];
-      checkOutInspectItemV3(params).then(res => {
-        if (res.errCode == 0) {
-          const data = res.data.groups;
-          const inspectSettings = {};
-          res.data.inspectSettings.forEach(item => {
-            switch (item.name) {
-              case 'includedInTotalScoreWithType1':
-                inspectSettings.includedInTotalScoreWithType1 = item.value;
-                break;
-              case 'qualifiedForIgnoredWithType1':
-                inspectSettings.qualifiedForIgnoredWithType1 = item.value;
-                break;
-              case 'qualifiedForIgnoredWithType2':
-                inspectSettings.qualifiedForIgnoredWithType2 = item.value;
-                break;
-              case 'hundredMarkType':
-                inspectSettings.hundredMarkType = item.value.toString();
-                break;
-              case 'minScore':
-                inspectSettings.minScore = item.value;
-                break;
-              case 'maxScore':
-                inspectSettings.maxScore = item.value;
-                break;
-              case 'dangerousOnFailedItem':
-                inspectSettings.dangerousOnFailedItem = item.value;
-                break;
-              case 'baseScore':
-                inspectSettings.baseScore = item.value;
-                break;
-              case 'itemOptionsForType1':
-                inspectSettings.itemOptionsForType1 = item.value;
-                this.itemOptionsForType1 = item.value;
-                break;
-              case 'itemOptionsForType3':
-                inspectSettings.itemOptionsForType3 = item.value;
-                this.itemOptionsForType3 = item.value;
-                break;
-              default:
-                break;
-            }
-          });
-          sessionStorage.setItem('inspectSettings', JSON.stringify(inspectSettings));
-          sessionStorage.setItem('uuid', res.data.uuid);
-          this.checkIfAllItemsAreRemark(data);
-          const temp = [];
-          data.forEach((item, index) => {
-            const obj = {};
-            obj.groupId = item.groupId;
-            obj.mode = item.mode;
-            obj.type = item.type;
-            obj.groupName = item.groupName;
-            obj.dealCount = 0;
-            obj.count = item.items.length;
-            obj.Effective = 0;
-            obj.isHover = false;
-            obj.parentId = item.parentId;
-            obj.lastUnqualifiedNumber = item.lastUnqualifiedNumber;
-            if (index == 0) {
-              obj.isClick = true;
-            } else {
-              obj.isClick = false;
-            }
-            const btnNameArr = this.getTab1AndTab3BtnName(obj.type);
-            const tempItems = [];
-            item.items.forEach((_item, _index) => {
-              const itemObj = {};
-              itemObj.id = _item.id;
-              itemObj.groupId = item.groupId;
-              itemObj.groupName = item.groupName;
-              itemObj.subject = _item.subject;
-              itemObj.description = _item.description;
-              itemObj.itemScore = _item.itemScore;
-              itemObj.required = _item.required;
-              let itemScoreLength = [];
-              if (_item.availableScores.length !== 0) {
-                itemScoreLength = _item.availableScores;
-              } else {
-                for (let i = 0; i < _item.itemScore + 1; i++) {
-                  itemScoreLength.push(i);
-                }
-              }
-              itemScoreLength.sort((a, b) => {
-                return a - b;
-              });
-              itemObj.itemScoreLength = itemScoreLength.reverse();
-              itemObj.itemgetScore = '--';
-              itemObj.isQualified = false;
-              itemObj.qualifiedScore = _item.qualifiedScore;
-              itemObj.type = item.type;
-              itemObj.itemScoreTitle = '--';
-              // itemObj.deviceId=_item.deviceId;
-              itemObj.deviceId = _item.deviceIds;
-              itemObj.inspectInput = '';
-              itemObj.inputCount = 0;
-              itemObj.disabled = true;
-              itemObj.checked = false;
-              itemObj.isIgnore = false;
-              itemObj.Ruletip = false;
-              itemObj.RuleCountTip = false;
-              itemObj.manualIgnore = false;
-              itemObj.sourceList = [];
-              itemObj.groupType = item.type;
-              itemObj.lastUnqualifiedNumber = _item.lastUnqualifiedNumber;
-              itemObj.scoreList = [
-                {val: _item.itemScore, scoreTitle: btnNameArr[0], isClick: false},
-                {val: -1, scoreTitle: btnNameArr[1], isClick: false}
-                ];
-              itemObj.itemType = _item.type;
-              tempItems.push(itemObj);
-            });
-            obj.items = tempItems;
-            temp.push(obj);
-          });
-          const te_temp = [];
-
-          const treeData = temp.filter(item => item.parentId === -1);
-          let handleData = [];
-          treeData.forEach(item => {
-            let obj = {};
-            obj.cateray = item;
-            obj.subcatergy = [];
-            temp.forEach(totalData => {
-              if(item.groupId === totalData.parentId){
-                obj.subcatergy.push(totalData);
-              }
-            })
-            handleData.push(obj);
-          })
-          for (let i = 0; i < handleData.length; i++) {
-            let count = 0, label = '';
-            if (handleData[i].subcatergy.length === 0){
-              count = handleData[i].cateray.items.length;
-              te_temp.push({
-                inspectList: [handleData[i].cateray], dealCount: 0, Effective: 0, count: count, isClick: false,
-                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: false
-              });
-            } else {
-              handleData[i].subcatergy.forEach(item => count += item.items.length);
-              te_temp.push({
-                inspectList: handleData[i].subcatergy, dealCount: 0, Effective: 0, count: count, isClick: false,
-                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: true
-              });
-            }
-          }
-
-          self.sheetName = te_temp.sort((a, b) => {return a.type - b.type});
-          self.sheetName[0].isClick = true;
-          const isCategory = self.sheetName[0].isCategory;
-          self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
-          //bug
-          const feedobj = {groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false, isCategory: true};
-          if (self.sheetName.length != 0) {
-            self.sheetName.push(feedobj);
-            self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
-          }
-          
-        console.log(this.sheetName)
-        }
-      })
     },
 
     getTab1AndTab3BtnName(type){
