@@ -1008,7 +1008,7 @@ export default {
   .favorite {
     width: calc(115/1440*100vw); 
     height: calc(28/1440*100vw); 
-    font-size: 15px;
+    font-size: calc(15/1920*100vw);
     line-height: calc(28/1440*100vw); 
     user-select: none; 
     cursor: pointer; 

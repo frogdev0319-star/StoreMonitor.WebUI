@@ -2745,7 +2745,7 @@ $h1: #292e36;
 }
 
 </style>
-<style>
+<style lang="scss">
 .el-radio-button__inner {
   border-radius: 0px !important;
   width: 90px;
@@ -2780,15 +2780,31 @@ $h1: #292e36;
   font-size: calc(12 / 1920 * 100vw);
 }
 .id-backToNow{
-  width: calc(160 / 1920 * 100vw); 
+  @media screen and (max-width:1367px) { 
+      width: calc(220/1440*100vw);
+  }
+  @media screen and(min-width: 1367px){
+      width: calc(160/1440*100vw);
+  } 
   font-size: calc(12 / 1920 * 100vw);
 }
 .th-backToNow{
-  width: calc(150 / 1920 * 100vw); 
+  
+  @media screen and (max-width:1367px) { 
+      width: calc(160/1440*100vw);
+  }
+  @media screen and(min-width: 1367px){
+      width: calc(150/1440*100vw);
+  }
   font-size: calc(12 / 1920 * 100vw);
 }
 .vi-backToNow{
-  width: calc(150 / 1920 * 100vw); 
+  @media screen and (max-width:1367px) { 
+      width: calc(200/1440*100vw);
+  }
+  @media screen and(min-width: 1367px){
+      width: calc(150/1440*100vw);
+  }
   font-size: calc(12 / 1920 * 100vw);
 }
 .el-test .el-input__icon {

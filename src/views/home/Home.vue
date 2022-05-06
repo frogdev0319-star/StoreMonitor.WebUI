@@ -1710,8 +1710,14 @@ $collapseWidth: 5.5%;
   i {display: none;}
   width: calc(150/1920*100vw) !important;
   .el-input__inner {
+    @media screen and (max-width:1367px) { 
+      width: calc(160/1920*100vw);
+    }
+    @media screen and(min-width: 1367px){
+      width: calc(150/1920*100vw);
+    }
     height: calc(36/1920*100vw);
-    width: calc(150/1920*100vw);
+    
     color: #484848;
     font-size: calc(15/1920*100vw);
     border-color: #e6e6e6;
