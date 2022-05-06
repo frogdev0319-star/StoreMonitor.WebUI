@@ -596,7 +596,7 @@
                             <el-dropdown-item
                               v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
                               style="width:70px;text-align:center;"
-                              @click.native="checkScore({item,itemDS: itemDS,e:0})">{{ itemDS.scoreTitle }}</el-dropdown-item>
+                              @click.native="checkScore({item,itemDS: itemDS,index: index, e:0})">{{ itemDS.scoreTitle }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                         <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
@@ -610,7 +610,7 @@
                               v-for="itemDS in item.itemScoreLength"
                               :key="itemDS"
                               style="width:70px;text-align:center;"
-                              @click.native="checkScore({item,itemDS: itemDS,e:1})">{{ itemDS }}</el-dropdown-item>
+                              @click.native="checkScore({item,itemDS: itemDS,index: index, e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                         <div class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
@@ -1464,7 +1464,11 @@ export default {
       item.dealCount = item.Effective = item.inputCount = 1;
     },
 
-    checkScore({item, itemDS, e}) {
+    checkScore({item, itemDS, index, e}) {
+      this.curItem = {...item};
+      this.curItemIndex = index
+      this.curItemId = item.id;
+      item.disabled = false;
       const self = this;
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
@@ -1516,7 +1520,6 @@ export default {
           });
         });
       });
-      console.log(hasIgnoretemp)
       hasIgnoretemp.length === 0 ? self.notShowAlert = true : null;
     },
 
