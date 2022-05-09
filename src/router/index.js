@@ -191,6 +191,38 @@ export const navbarRoute = {
     return eventRoute;
   },
 
+  getAuditRoute() {
+    const auditRoute = {
+      path: '/home',
+      name: 'auditManage',
+      component: Home,
+      iconCls: 'iconfont icon-shijian',
+      styles: 'font-size:22px',
+      leaf: true,
+      isReadOnly: false,
+      hidden: false,
+      children: []
+    };
+    auditRoute.children.push(
+      {
+        path: '/audit',
+        name: 'AuditManage',
+        component: resolve => require(['@/views/audit/AuditManage'], resolve),
+        meta: {
+          keepAlive: true, // the component is't to be cache.
+          requireAuth: true
+        }
+      },
+      {
+        path: '/auditdetail',
+        name: 'AuditDetail',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
+      }
+    ) && primaryPathesList.push('/audit', '/auditdetail');
+    return auditRoute;
+  },
+
   getStatisticalRoute() {
     const statisticsRoute = {
       path: '/home',
@@ -226,7 +258,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolItem');
-   statisticsRoute.children.push(
+    statisticsRoute.children.push(
       {
         path: '/patrolPersonStat',
         name: 'patrolPersonStat',
@@ -291,6 +323,7 @@ export const navbarRoute = {
     return statisticsRoute;
   },
 
+  
   getSystemSettingRoute() {
     const systemSettingRoute = {
       path: '/home',
@@ -513,7 +546,6 @@ export const navbarRoute = {
   },
 
   getAvailablePath() {
-
     return [...new Set(primaryPathesList)];
   }
 };

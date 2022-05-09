@@ -298,9 +298,13 @@ const user = {
 
           const eventRoute = navbarRoute.getEventRoute();
           accessedRoutes.push(eventRoute);
-          
+
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
+          
+          console.log('navbarRoute ~~~>> ', navbarRoute);
+          const auditRoute = navbarRoute.getAuditRoute();
+          accessedRoutes.push(auditRoute);
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';

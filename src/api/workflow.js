@@ -75,4 +75,19 @@ export const updateWorkflow = data => {
     method: 'post',
     data
   });
-}
+};
+export const bindWorkflow = data => {
+  return request({
+    url: `${version}/workflow/bind`,
+    method: 'post',
+    data
+  });
+};
+
+export const unbindWorkflow = data => {
+  return request({
+    url: `${version}/workflow/unbind`,
+    method: 'post',
+    data
+  });
+};

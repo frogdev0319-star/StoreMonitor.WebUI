@@ -74,7 +74,7 @@
           </template>
 
           <template v-else-if="_item.forWorkflowsSwitch">
-            <el-switch :disabled="row[_item.switchProp]" :value="row.state == 1 ? true : false" />
+            <el-switch :disabled="row[_item.switchProp]" :value="row.isBind ? true : false" />
             <!-- ohohoh - {{row.state}} -->
           </template>
 

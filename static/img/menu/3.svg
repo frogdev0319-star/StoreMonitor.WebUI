@@ -1,12 +1,9 @@
-<svg id="menu_cell_ic_shop" data-name="menu/cell/ic/shop" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
-    <defs>
-        <style>
-            .cls-2{fill:none;stroke:#a5a5a5;stroke-linejoin:round;stroke-miterlimit:10;stroke-width:1.5px}
-        </style>
-    </defs>
-    <g id="Group_5" data-name="Group 5">
-        <path id="Rectangle_Copy_5" data-name="Rectangle Copy 5" style="fill:none" d="M0 0h26v26H0z"/>
-        <circle id="Oval" class="cls-2" cx="9" cy="9" r="9" transform="translate(4 4)"/>
-        <path id="Path_4" data-name="Path 4" class="cls-2" d="M0 0v9l8-4.5" transform="translate(13 4)"/>
+<svg data-name="menu/cell/ic/shop" xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+    <g data-name="Group 5">
+        <path data-name="Rectangle Copy 5" style="fill:none" d="M0 0h26v26H0z"/>
+        <g data-name="组 7107" transform="translate(3 3)">
+            <path d="M12 0v2.252a7.952 7.952 0 0 1 2.064.856l1.593-1.593 2.828 2.828-1.593 1.593A7.952 7.952 0 0 1 17.748 8H20v4h-2.252a7.952 7.952 0 0 1-.856 2.064l1.593 1.593-2.828 2.828-1.593-1.593a7.952 7.952 0 0 1-2.064.856V20H8v-2.252a7.952 7.952 0 0 1-2.064-.856l-1.593 1.593-2.828-2.828 1.593-1.593A7.952 7.952 0 0 1 2.252 12H0V8h2.252a7.952 7.952 0 0 1 .856-2.064L1.515 4.343l2.828-2.828 1.593 1.593A7.952 7.952 0 0 1 8 2.252V0z" style="fill-rule:evenodd;stroke:#a5a5a5;stroke-linejoin:round;stroke-width:1.5px;fill:none"/>
+            <circle cx="4" cy="4" r="4" transform="translate(6 6)" style="stroke:#a5a5a5;stroke-linejoin:round;stroke-width:1.5px;fill:none"/>
+        </g>
     </g>
 </svg>

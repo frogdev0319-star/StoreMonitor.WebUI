@@ -276,16 +276,19 @@
       </setting-table>
     </el-col>
     
-    <el-col v-if="mode === 1" :span="24" class="el-rute-content">
+    <!-- binding workflow -->
+    <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.bindWorkFLow')">
         <div slot="tableDetail" class="setting-config rule-item">
           <span style="margin-right: 20px">選擇綁定流程</span>  
-          <el-select v-model="workFlowListBind" placeholder="请选择">
+          <el-select v-model="workFlowToBind" placeholder="请选择">
               <el-option
                 v-for="item in workFlowList"
                 :key="item.processDefinitionKey"
                 :label="item.name"
-                :value="item.processDefinitionKey">
+                :value="item.processDefinitionKey"
+                >
+                
               </el-option>
             </el-select>
         </div>
@@ -299,7 +302,7 @@
 
 <script>
 import { inpectRESTful } from '@/api/index';
-import { getWorkflowList } from '@/api/workflow';
+import { getWorkflowList, bindWorkflow, unbindWorkflow} from '@/api/workflow';
 import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
@@ -336,7 +339,7 @@ export default {
       otherBtnAttr: '',
       standardScore: 100,
       MinScoreMsg:false,
-      workFlowListBind:'',
+      workFlowToBind:'',
       apiBody: {
           "page": 0,
           "size": 1000,
@@ -349,7 +352,9 @@ export default {
               1,
           ]
       },
-      workFlowList:[]
+      workFlowList:[],
+      bindWorkFlowData:{},
+      workFlowInfoValue:{}
     };
   },
   watch: {
@@ -366,9 +371,11 @@ export default {
         this.$refs.tab3FailInput[0].showPromotMsgFlag = false;
       }
     },
-    workFlowListBind(aaa){
-      console.log('HAaaaaaaah~~ processDefinitionKey', aaa);
-    }
+    workFlowToBind(processDefinitionKey){
+      this.bindWorkFlowData.processDefinitionKey = processDefinitionKey
+      this.bindWorkFlowData.type = 0
+      this.bindWorkFlowData.formId = this.inspectId
+    },
   },
   mounted() {
     this.getRule();
@@ -378,6 +385,18 @@ export default {
   methods: {
     async submitRule() {
       const self = this;
+
+      // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
+       // handle bind workflow
+      if( !!this.workFlowToBind ){
+        if(this.bindWorkFlowData.processDefinitionKey == -1){   
+          this.bindWorkFlowData.processDefinitionKey = this.workFlowInfoValue.processDefinitionKey
+          await this.unbindWorkflow(this.bindWorkFlowData)
+        }else {
+          await this.bindWorkflow(this.bindWorkFlowData)
+        }
+      }
+      
       if ((this.passFailBtnAttr === 'userDefined' && !this.validateUserDefinedPassFailBtnValue()) ||
           (this.otherBtnAttr === 'userDefined' && !this.validateUserDefinedOtherBtnValue())) {
         util.notify(this.$t('insSettingView.enterBtnAttr'), 'warning', 3000);
@@ -426,6 +445,7 @@ export default {
           return false;
         }
       }
+
     },
     async getRule() {
       const self = this;
@@ -502,6 +522,7 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.UpdateInspectRuleSettings(params).then(res => {
           resolve(res);
+          
         }).catch(err => {
           reject(err);
         });
@@ -511,6 +532,9 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
+          
+          const tempArry = res.data.filter(list => list.name == "workflow")
+          this.workFlowInfoValue = tempArry[0].value
         }).catch(err => {
           reject(err);
         });
@@ -591,6 +615,40 @@ export default {
     async getWorkflowList(param){
       await getWorkflowList(param).then(res=>{
         this.workFlowList = res.data.content
+        if(this.workFlowInfoValue !== null){
+          const firstObj = {
+            processDefinitionKey: -1,
+            name: "無",
+          }
+          this.workFlowList = [firstObj, ...res.data.content]
+          this.workFlowToBind = this.workFlowInfoValue.processDefinitionKey
+        }
+        
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    async bindWorkflow(param){
+      await bindWorkflow(param).then(res=>{
+        console.log('bind ~~~~~~>> ', res);
+
+        // const firstObj = {
+        //   processDefinitionKey: -1,
+        //   name: "無",
+        // }
+        // this.workFlowList = [firstObj, ...this.workFlowList]
+        
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    async unbindWorkflow(param){
+      await unbindWorkflow(param).then(res=>{
+        console.log('unbind :>> ', res);
+        // this.workFlowList.shift()
+
       }).catch(err => {
         console.log('error' + err);
       });

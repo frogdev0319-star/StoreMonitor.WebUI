@@ -29,7 +29,7 @@
             :disabled="elTableData[Number(activeName)].data.length === 0"
             @click="bindStore"
           >
-            {{ $t('insSettingView.bindList') }}
+            {{ $t('insSettingView.bindList') }} 
           </el-button>
       </el-col>
       <el-col
@@ -106,10 +106,12 @@
                     @refreshList="getTagList"
                     @change-routeData="changerouteData"/>
                 </div>
+                <!-- loading -->
                 <div v-if="loading" :style="{'line-height':varyWindowWidth*0.52+'px'}" class="bind-empty">
                   <img :src="loadingGif" class="loading_rotate">
                   <span class="empty-text">{{ $t('insSettingView.loadingbindstore') }}</span>
                 </div>
+                
               </el-tab-pane>
             </el-tabs>
             <div v-if="item.data.length === 0 && !isLoading" :style="{'min-height':varyWindowWidth*0.52+'px'}" class="data-empty">
@@ -300,7 +302,7 @@ export default {
   data() {
     return {
       elTableData: [{ label: '现场巡检', data: [] }, { label: '远程巡检', data: [] }],
-      loadingGif: require('../../../../static/img/loading.gif'),
+      loadingGif: require('../../../../static/img/loading.svg'),
       WeightingSetting:require('../../../../static/img/ic_WeightingSetting_blue.svg'),
       radioList: [
         {
@@ -2861,4 +2863,5 @@ export default {
     .self-loading.loading_area >>> .el-loading-mask{
       background-color: transparent;
     }
+
 </style>

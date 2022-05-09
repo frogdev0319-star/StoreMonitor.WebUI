@@ -87,7 +87,9 @@ export default{
       "singleStoreStat":"單店分析",
       "workflowManage":"流程設計",
       "workflowDetail":"流程配置",
-      "nodeSetting":"添加審核節點"
+      "nodeSetting":"添加審核節點",
+
+      "AuditManage":"簽核管理"
 
   },
   "overview":{
