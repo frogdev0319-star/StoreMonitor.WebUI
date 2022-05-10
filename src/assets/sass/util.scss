@@ -329,6 +329,14 @@ $sv_red: #c60957;
     height: calc(30/1920*100vw);
     line-height: calc(30/1920*100vw);
   }
+  .el-input__inner::placeholder {
+    @media screen and (max-width:1367px) { 
+      font-size: calc(10/1920*100vw);
+    }
+    @media screen and(min-width: 1367px){
+      font-size:  calc(12/1920*100vw);
+    }
+  }
   i {
     position: relative; 
     top: calc(5/1920*100vw);

@@ -473,7 +473,8 @@ export default {
         "tues":"火曜日",
         "wed":"水曜日"
     },
-      "zoneList":"カメラリスト"
+      "zoneList":"カメラリスト",
+      "commentCountRuleTip":"Enter up to 5 text comments"
   },
   "eventView":{
       "ClosedEvent":"クローズドイベント",

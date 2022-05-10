@@ -64,6 +64,7 @@
                   v-model="serachChannelValue"
                   size="small"
                   class="storevue-input-search"
+                  style="width:50%;"
                 >
                   <i
                     slot="prefix"

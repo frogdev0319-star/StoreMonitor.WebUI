@@ -472,7 +472,8 @@ export default{
         "tues":"อ.",
         "wed":"พ."
     },
-      "zoneList":"รายการกล้อง"
+      "zoneList":"รายการกล้อง",
+      "commentCountRuleTip":"Enter up to 5 text comments"
   },
   "eventView":{
       "ClosedEvent":"เหตุการณ์ที่ปิดแล้ว",

@@ -472,7 +472,8 @@ export default{
         "tues":"Tues.",
         "wed":"Wed."
     },
-      "zoneList":"Camera List"
+      "zoneList":"Camera List",
+      "commentCountRuleTip":"Enter up to 5 text comments"
   },
   "eventView":{
       "ClosedEvent":"Closed Events",

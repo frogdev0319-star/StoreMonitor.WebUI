@@ -473,7 +473,8 @@ export default {
         "tues":"화요일",
         "wed":"수요일"
     },
-      "zoneList":"카메라 목록"
+      "zoneList":"카메라 목록",
+      "commentCountRuleTip":"Enter up to 5 text comments"
   },
   "eventView":{
       "ClosedEvent":"종료된 이벤트",

@@ -472,7 +472,8 @@ export default{
         "tues":"Sel.",
         "wed":"Rab."
     },
-      "zoneList":"Daftar Kamera"
+      "zoneList":"Daftar Kamera",
+      "commentCountRuleTip":"Enter up to 5 text comments"
   },
   "eventView":{
       "ClosedEvent":"Kejadian Ditutup",

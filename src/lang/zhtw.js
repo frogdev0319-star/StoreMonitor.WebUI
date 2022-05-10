@@ -473,7 +473,8 @@ export default{
         "tues":"二",
         "wed":"三"
     },
-      "zoneList":"攝影機列表"
+      "zoneList":"攝影機列表",
+      "commentCountRuleTip":"文字評論最多輸入5則"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
