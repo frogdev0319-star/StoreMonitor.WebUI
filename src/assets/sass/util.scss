@@ -757,7 +757,7 @@ $sv_red: #c60957;
 }
 .en-export-btn{
   @extend .export-btn;
-  width: calc(160/1920*100vw);
+  width: calc(180/1920*100vw);
 }
 .zh-export-btn{
   @extend .export-btn;

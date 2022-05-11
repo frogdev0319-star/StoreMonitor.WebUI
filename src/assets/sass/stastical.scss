@@ -235,32 +235,47 @@ $store: #fccc3f;
   justify-content: space-between;
 }
 .operation-btns-en{
-  width:calc(344/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 410px ;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(344/1440*100vw);
+  }
 }
 .operation-btns-zh{
-  width:calc(344/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 410px ;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(344/1440*100vw);
+  }
 }
 .operation-btns-zhTW{
-  width:calc(344/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 410px ;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(344/1440*100vw);
+  }
 }
 .operation-btns-ja{
-  @media screen and (max-width:11599px) { 
-    width: 425px;
+  @media screen and (max-width:1559px) { 
+    width: 465px;
   }
   @media screen and(min-width: 1600px){
     width:calc(374/1440*100vw);
   }
 }
 .operation-btns-ko{
-  @media screen and (max-width:11599px) { 
-    width: 425px;
+  @media screen and (max-width:1559px) { 
+    width: 435px;
   }
   @media screen and(min-width: 1600px){
     width:calc(374/1440*100vw);
   }
 }
 .operation-btns-vi{
-  @media screen and (max-width:11599px) { 
+  @media screen and (max-width:1559px) { 
     width: 425px;
   }
   @media screen and(min-width: 1600px){
@@ -269,7 +284,7 @@ $store: #fccc3f;
   
 }
 .operation-btns-th{
-  @media screen and (max-width:11599px) { 
+  @media screen and (max-width:1559px) { 
     width: 425px;
   }
   @media screen and(min-width: 1600px){
@@ -277,7 +292,12 @@ $store: #fccc3f;
   }
 }
 .operation-btns-id{
-  width:calc(344/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 410px ;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(344/1440*100vw);
+  }
 }
 .no-print{
   display: none;

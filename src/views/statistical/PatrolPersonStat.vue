@@ -556,8 +556,9 @@ export default {
 
   .statistics-container{
     .statistics-content{
-      width:calc(1096/1440*100vw);
-      margin-left: calc(36/1440*100vw);
+      width:97%;
+      margin-left: calc(30/1920*100vw);
+      margin-right: calc(30/1920*100vw);
     }
     .search-bar{
       display:flex;

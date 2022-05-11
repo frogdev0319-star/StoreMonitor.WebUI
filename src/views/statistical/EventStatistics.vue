@@ -2400,28 +2400,68 @@ export default {
               justify-content: space-between;
             }
             .operation-btns-en{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-zh{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-zhTW{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-ja{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 435px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-ko{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-vi{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-th{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-id{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             
           }
@@ -2628,28 +2668,68 @@ export default {
               justify-content: space-between;
             }
             .operation-btns-en{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-zh{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-zhTW{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-ja{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 445px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-ko{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-vi{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-th{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-id{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
           }
           .event-table {
