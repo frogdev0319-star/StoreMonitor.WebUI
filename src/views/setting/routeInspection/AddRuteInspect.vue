@@ -2057,7 +2057,7 @@ export default {
         .temp-select-area{
                   display:flex; 
                   flex-direction:row;
-                  height:calc(30/1920*100vw);
+                  height:30px;
                   width:300px;
                   align-items:center;
                   background-color:#f7f9fa;
@@ -2071,6 +2071,11 @@ export default {
                     margin-left:16px;
                     line-height: 16px;
                     text-align: left;
+                  }
+                  /deep/
+                  .el-input--medium .el-input__inner {
+                    height: 30px;
+                    line-height: 30px;
                   }
                 }
         .el-rute-group{
