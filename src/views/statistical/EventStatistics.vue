@@ -57,6 +57,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
+              <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
                   :allow-all=true
@@ -76,6 +77,7 @@
                 :cur-country="curCountry"
                 @emitTypeChanged="emitTypeChanged"
               ></AreaSelected>-->
+              </div>
             </div>
             <div class="barchart-area">
               <div style="position:absolute;right:24px;top:94px;z-index:10;" @click='changeBarchartSorOrder'>
@@ -176,6 +178,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
+              <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
                   :allow-all=true
@@ -188,6 +191,7 @@
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged2"
               ></TypeSelectArea>
+              </div>
               <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
@@ -403,6 +407,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
+              <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
                   :allow-all=true
@@ -415,6 +420,7 @@
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged"
               ></TypeSelectArea>
+              </div>
               <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
@@ -508,6 +514,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
+              <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
                   :allow-all=true
@@ -520,6 +527,7 @@
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged2"
               ></TypeSelectArea>
+              </div>
               <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
@@ -1118,6 +1126,7 @@ export default {
         {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
+      WindowWidth:util.getWindowWidth(),
     };
   },
 
