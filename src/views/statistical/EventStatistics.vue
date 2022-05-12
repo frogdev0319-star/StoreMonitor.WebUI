@@ -2581,7 +2581,7 @@ export default {
           width:210px;
         }
         .AllIncepEvent-btns-ja{
-          width:230px;
+          width:260px;
           font-size: 13px;
         }
         .AllIncepEvent-btns-ko{
@@ -2758,7 +2758,7 @@ export default {
                 width: 445px;
               }
               @media screen and(min-width: 1600px){
-                width:calc(374/1440*100vw);
+                width:calc(400/1440*100vw);
               }
             }
             .operation-btns-ko{
@@ -2790,7 +2790,7 @@ export default {
                 width: 410px ;
               }
               @media screen and(min-width: 1600px){
-                width:calc(344/1440*100vw);
+                width:calc(364/1440*100vw);
               }
             }
           }
