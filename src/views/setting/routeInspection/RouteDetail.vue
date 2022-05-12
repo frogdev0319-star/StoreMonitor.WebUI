@@ -36,34 +36,6 @@
             <img :src="imgIncepItemSet" style="width:24px;height:24px;"/>
             <div style="font-size:13px;margin-left:8px;font-family:'NotoSansCJKtc';">{{ $t('insSettingView.setItem') }}</div>
           </div>
-          <!--<el-button
-            :disabled="routeData.length === 0"
-            class="storevue-button-empty"
-            size="mini"
-            @click="deleteNapes"
-          >
-            <i class="iconfont icon-shanchu"/>
-            <span>{{ $t('insSettingView.deleteItem') }}</span>
-          </el-button>
-          <el-button
-            :disabled="routeData.length === 0"
-            class="storevue-button-empty"
-            size="mini"
-            style="margin-left: 16px"
-            @click="setRule">
-            <i class="iconfont icon-guize1"/>
-            <span>{{ $t('insSettingView.ruleInspect') }}</span>
-          </el-button>
-          <el-button
-            :disabled="routeData.length === 0"
-            class="storevue-button-empty"
-            size="mini"
-            style="margin-left: 16px"
-            @click="setItem"
-          >
-            <i class="iconfont icon-button"/>
-            <span>{{ $t('insSettingView.setItem') }}</span>
-          </el-button>-->
         </div>
       </div>
       <div v-if="routeData.length !== 0" :style="{'min-height':varyWindowWidth*0.52+'px'}">
@@ -84,7 +56,7 @@
           <div class="catergy-title">
             <el-checkbox v-model="item.checked" class="storevue-checkbox-outlined" @change="checkItemsOfCatergy(item)"/>
             <div style="display: inline-flex;flex-direction: column;font-size: 14px;font-weight: bold;color: #424151; padding-left: calc(38/1920*100vw); margin-left: 10px">
-              <div style="color: #c60957">{{ item.groupWeight == -1 ? '--' : `${item.groupWeight}%` }}</div>
+              <div v-if="sheetIndex != 2" style="color: #c60957">{{ item.groupWeight == -1 ? '--' : `${item.groupWeight}%` }}</div>
               <div>{{ item.groupName }}（{{ item.itemCount }}）</div>
             </div>
           </div>
