@@ -523,10 +523,10 @@ export default {
         //await this.getInspectStatsOverviewOfRegion();
         //wait this.getInspectStatsOverviewOfStore();
         //await this.getInspectStatsLine();
-        this.compareIds = this.params.storeIds;
+        /*this.compareIds = this.params.storeIds;
         this.compareType='stores';
         this.compareIds2  = this.params.storeIds;
-        this.compareType2='stores',
+        this.compareType2='stores',*/
         this.doGetAverageScore(this.filterDateRange); 
         this.doGetAssessmentScore(this.filterDateRange2);
         if(this.params.inspectId!=-1){

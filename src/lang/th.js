@@ -248,7 +248,7 @@ export default{
       "daysww":"XX",
       "weeks":"สัปดาห์",
       "pageSize":"การแสดงผลต่อหน้า",
-      "pageSizeUnit":"รายการ"
+      "pageSizeUnit":"รายการ",
   },
   "remotePatrol":{
       "InspectionDetail":"ส่งออกรายงาน",

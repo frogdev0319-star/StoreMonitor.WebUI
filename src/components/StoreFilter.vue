@@ -83,8 +83,8 @@
         
     <div v-else class="single-select shadow-light">
       <el-select 
-        v-model="curSelectedStore"
-        @change="onChangeSelectedStore()"
+        :value="curSelectedStore"
+        @change="onChangeSelectedStore"
         size="mini">
         <el-option
           v-for="(item) in storeDataList"
@@ -93,6 +93,18 @@
           :value="item.storeId"
         />
       </el-select>
+      <dialog-pop
+        v-if="changeStoreObj.dialogCosed"
+        :title="changeStoreObj.title"
+        :isWarning="changeStoreObj.isWarning"
+        :visible="changeStoreObj.dialogCosed"
+        @cancelHandler="canceldChangeStore"
+        @confirmHandler="changeStoreDialog"
+        >
+        <div class="dialog-slot">
+          {{changeStoreObj.showInfo}}
+        </div>
+      </dialog-pop>
     </div>
     
     <div v-if="!multiStore" class="spacer"></div>
@@ -110,13 +122,15 @@ import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import { getBriefStoreList, getStoreDefineGroup, getStoreList, getFavoriteStoreList } from '@/api/store';
 import util from '@/common/util.js';
+import DialogPop from '@/components/DialogPop.vue';
 import i18n from '@/lang/index'
 
 export default {
   name: 'StoreFilter',
   components: {
     MultiSelect,
-    RegionMultiSelect
+    RegionMultiSelect,
+    DialogPop,
   },
 
   props: {
@@ -183,7 +197,8 @@ export default {
       inspectCatch: '',
       curStoreGroup: [],
       curStoreType: [],
-      curSelectedStore: '',
+      curSelectedStore: this.$store.getters.storeCache || '',
+      curSelectedStore_: '',
       storeGroupList: [],
       storeTypeList: [],
       curRegionI: [],
@@ -195,7 +210,14 @@ export default {
       provinces: [],
       cities: [],
       isFavorite: false,
-      isChangeAccount:false
+      isChangeAccount:false,
+      
+      changeStoreObj: {
+        title: this.$t('remotePatrol.confirm'),
+        showInfo: this.$t('remotePatrol.confirmSwitch'),
+        isWarning: true,
+        dialogCosed: false
+      },
     };
   },
 
@@ -326,10 +348,25 @@ export default {
       console.log("2.go changeStoreNew:",arr);
       this.changeStoreNew(arr);
     },
-    onChangeSelectedStore() {
-      console.log("On Change select store ")
+    canceldChangeStore() {
+      this.changeStoreObj.dialogCosed = false;
+      this.curSelectedStore_ = '';
+    },
+    changeStoreDialog () {
+      this.curSelectedStore = this.curSelectedStore_;
+      this.curSelectedStore_ = '';
       this.emitParams();
-      console.log(this.curSelectedStore)
+      this.changeStoreObj.dialogCosed = false;
+      this.$store.dispatch('setEditCount', 0);
+    },
+    onChangeSelectedStore(val) {
+      if(this.$store.getters.editCount === 0) {
+        this.curSelectedStore=val
+        this.emitParams();
+      } else {
+        this.curSelectedStore_ = val;
+        this.changeStoreObj.dialogCosed = true;
+      }
     },
     getStoreDefineList(type) {
       return new Promise((resolve, reject) => {
@@ -535,6 +572,10 @@ export default {
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         if(this.curStore.length != this.filterStoreIds.length){
           this.curStore = this.filterStoreIds;
+          if(this.filterStoreIds.length == this.storeDataList.length) {
+            this.curStore.unshift( '-1');
+            console.log("**1.select all:",this.curStore);
+          }
         }
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
         if(this.emitChanged){
@@ -575,6 +616,11 @@ export default {
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         if(this.curStore.length != this.filterStoreIds.length){
           this.curStore = this.filterStoreIds;
+          if(this.filterStoreIds.length == this.storeDataList.length) {
+            
+            this.curStore.unshift( '-1');
+            console.log("**2.select all:",this.curStore);
+          }
         }
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
         if(this.emitChanged){
@@ -682,9 +728,18 @@ export default {
         console.log("filterStoreId:",filterStoreId);
         if(filterStoreId.length==0){
           this.curStore = filterStoreArray;
+          
+          /*if(this.curStore.length == filterStoreArray.length){
+            this.curStore.unshift({ value: '-1', label: i18n.t('remotePatrol.all') });
+          }*/
         }
 
         this.filterStoreIds = (filterStoreId.length==0)?filterStoreArray:filterStoreId.filter(storeId => storeId !== '-1');
+        this.curStore = this.filterStoreIds;
+        if(this.storeDataList.length == this.filterStoreIds.length){
+          this.curStore.unshift('-1');
+        }
+        console.log("2.curStore:",this.curStore);
         this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
       }
 

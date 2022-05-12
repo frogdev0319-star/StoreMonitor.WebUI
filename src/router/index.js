@@ -226,7 +226,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolItem');
-   statisticsRoute.children.push(
+    PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolPersonStat',
         name: 'patrolPersonStat',
@@ -250,11 +250,11 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/eventStat');
-    PermissionHelper.enableEventStatistics() && statisticsRoute.children.push(
+    PermissionHelper.enableAppraisalCompareStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolCompareStat',
         name: 'patrolCompareStat',
-        component: resolve => require(['@/views/statistical/patrolCompareStat'], resolve),
+        component: resolve => require(['@/views/statistical/PatrolCompareStat'], resolve),
         hidden: false,
         meta: {
           requireAuth: true,

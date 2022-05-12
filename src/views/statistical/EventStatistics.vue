@@ -167,7 +167,9 @@
                   :style="{width:'800px',height:'100%'}"/>
                 </div>
                 <div v-else class="barchart-area"  style="overflow-x:auto;overflow-y:hidden;height:270px">
-                  <v-chart ref="ChartViewMode0" autoresize :options="barchartOptionViewMode0" class="chart-content" width="100%"/>
+                  <v-chart ref="ChartViewMode0" autoresize :options="barchartOptionViewMode0" class="chart-content" 
+                  :width="barchartWidthMode0"
+                :style="{width:barchartWidthMode0}"/>
                 </div>
                 
               </div>
@@ -350,7 +352,10 @@
                   :style="{width:'800px',height:'100%'}"/>
                 </div>
                 <div v-else class="barchart-area"  style="overflow-x:auto;overflow-y:hidden;height:270px">
-                  <v-chart ref="ChartViewMode_eventStores" autoresize :options="barchartOptionViewMode_eventStores" class="chart-content" width="100%"/>
+                  <v-chart ref="ChartViewMode_eventStores" autoresize :options="barchartOptionViewMode_eventStores" 
+                  class="chart-content" 
+                  :width="barchartWidth_sec"
+                    :style="{width:barchartWidth_sec}"/>
                 </div>
               </div>
               </div>
@@ -505,7 +510,9 @@
                 </div>
               </div>
               <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;overflow-x:auto;overflow-y:hidden;height:100%;">
-                <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"/>
+                <v-chart ref="ChartViewMode0"  :options="barchartOptionViewMode0" class="chart-content"
+                :width="barchartWidthMode0"
+                :style="{width:barchartWidthMode0}"/>
               </div>
             </div>
           </el-col>
@@ -679,8 +686,11 @@
                     />
                   </div>
                 </div>
-                <div v-else class="barchart-area" style="margin-top:20.5px;border-bottom:none;">
-                  <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"/>
+                <div v-else class="barchart-area" style="overflow-x:auto;overflow-y:hidden;margin-top:20.5px;border-bottom:none;">
+                  <v-chart ref="ChartViewMode_eventStores"  :options="barchartOptionViewMode_eventStores" class="chart-content"
+                    :width="barchartWidth_sec"
+                    :style="{width:barchartWidth_sec}"
+                  />
                 </div>
               </div>
             </div>
@@ -1111,6 +1121,8 @@ export default {
       barActiveName:'-1',
       inspectId:null,
       barchartWidth:'100%',
+      barchartWidthMode0:'100%',
+      barchartWidth_sec:'100%',
       operationBtnClass:[
         {key:'en',value:'operation-btns-en'},{key:'zh',value:'operation-btns-zh'},{key:'zhtw',value:'operation-btns-zhTW'},
         {key:'ja-JP',value:'operation-btns-ja'},{key:'ko-KR',value:'operation-btns-ko'},{key:'vi-VN',value:'operation-btns-vi'},
@@ -1252,7 +1264,8 @@ export default {
       const params = {};
       params.beginTs = this.params.beginTs;
       params.endTs = this.params.endTs;
-      params.storeIds = this.storeIds;
+      params.storeIds = this.storeIds.filter(storeId => storeId !== '-1');
+      console.log("getUpperGloableEventData > params.storeIds:",params.storeIds);
       params.regionMode = 0;
     
       try {
@@ -1313,11 +1326,11 @@ export default {
       this.params.groupMode = region[0].value;
       params.storeIds = this.compareIds;
       if(region[0].value<3){ //store, area1, area2
-        this.params.storeIds=this.compareIds
-        params.storeIds = this.compareIds;
+        this.params.storeIds=this.compareIds.filter(storeId => storeId !== '-1')
+        params.storeIds = this.compareIds.filter(storeId => storeId !== '-1');
       }else{ //groupType, storeGroup
-        this.params.groupIds=this.compareIds;
-        params.groupIds = this.params.storeIds;
+        this.params.groupIds=this.compareIds.filter(storeId => storeId !== '-1');
+        params.groupIds = this.params.storeIds.filter(storeId => storeId !== '-1');
       }
       params.order = {
         direction: 'desc',
@@ -1380,7 +1393,7 @@ export default {
       self.params.groupMode = region[0].value;
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
-        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:self.compareIds,
+        searchCondition = {beginTs:this.params.beginTs,endTs:this.params.endTs,groupMode:region[0].value,storeIds:self.compareIds.filter(storeId => storeId !== '-1'),
           order:{"direction":this.barchartOrder,"property":"numOfTotal"}
         };
         //console.log("*getEventTableData>searchCondition:",searchCondition);
@@ -1558,7 +1571,7 @@ export default {
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
         option.series[0].data = chart_dataset;
-        if(date_xAxis.length>28){
+        if(date_xAxis.length>18){
           var w = ( date_xAxis.length*90) +'px';
           
           option.width = w;
@@ -1589,7 +1602,8 @@ export default {
       this.viewMode=val;
     },
     doDrawEventChartMode(chartData){
-      this.barchartOptionViewMode0 = this.getBarchartOption();
+      
+      var option = this.getBarchartOption();
       let date_xAxis=[];
       let chart_dataset=[];
       if(chartData.length>0){
@@ -1597,12 +1611,31 @@ export default {
           date_xAxis.push(this.maxLabel(item.groupName));
           chart_dataset.push({value:item.numOfTotal,name:item.groupName,innerId:item.innerId});
         });
-        this.barchartOptionViewMode0.xAxis.data = date_xAxis;
+        option.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
-        this.barchartOptionViewMode0.series[0].data = chart_dataset;
-        
+        option.series[0].data = chart_dataset;
+        if(date_xAxis.length>25){
+          var w = ( date_xAxis.length*90) +'px';
+          
+          option.width = w;
+          option.grid.width = w;
+          this.barchartWidthMode0 = w;
+        }
+        else{
+           //option.grid.width = 'calc(1479/1980*100vw)';
+           if(this.ispdf){
+             option.width = 'calc(800/1980*100vw)';
+              option.grid.width = '800px';
+              this.barchartWidthMode0 = 'calc(800/1980*100vw)';
+           }else{
+            option.width = 'calc(1450/1980*100vw)';
+            option.grid.width = '100%';
+            this.barchartWidthMode0 = 'calc(1450/1980*100vw)';
+           }
+        }
+        this.barchartOptionViewMode0  = option;
         //
       }
       
@@ -1614,7 +1647,7 @@ export default {
       self.componentsProps.endTs = self.params.endTs;
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       self.params.groupMode = region[0].value;
-      self.params.storeIds = self.compareIds;
+      self.params.storeIds = self.compareIds.filter(storeId => storeId !== '-1');
       let searchCondition = {}
       //if(region[0].value<3){ //store, area1, area2
       //console.log("getEventTableData > this.compareIds:",self.compareIds); 
@@ -1769,7 +1802,7 @@ export default {
             //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
         params.filterStoreIds=[rowItem.id];
         params.curStore=[rowItem.id];
-        params.storeIds=[rowItem.id];
+        params.storeIds=[rowItem.id.filter(storeId => storeId !== '-1')];
         params.curCountry = "-1";
         params.curProvince = [];
         params.curCity = [];
@@ -2181,7 +2214,7 @@ export default {
       
     },
     doDrawEventInvolveChartMode(chartData){
-      this.barchartOptionViewMode_eventStores = this.getBarchartOption();
+      var option = this.getBarchartOption();
       let date_xAxis=[];
       let chart_dataset=[];
       if(chartData.length>0){
@@ -2189,13 +2222,33 @@ export default {
           date_xAxis.push(this.maxLabel(item.name));
           chart_dataset.push({value:item.numOfUnqualified,name:item.name,innerId:item.id});
         });
-        this.barchartOptionViewMode_eventStores.xAxis.data = date_xAxis;
+        option.xAxis.data = date_xAxis;
         //this.barchartOption.yAxis.splitLine.show = true;
         //this.barchartOption.series.name= this.Avg12Num[0].name;
         //console.log("chart_dataset:",chart_dataset);
-        this.barchartOptionViewMode_eventStores.series[0].data = chart_dataset;
+        option.series[0].data = chart_dataset;
         
-        //
+        if(date_xAxis.length>28){
+          var w = ( date_xAxis.length*90) +'px';
+          
+          option.width = w;
+          option.grid.width = w;
+          this.barchartWidth_sec = w;
+        }
+        else{
+           //option.grid.width = 'calc(1479/1980*100vw)';
+           if(this.ispdf){
+             option.width = 'calc(800/1980*100vw)';
+              option.grid.width = '800px';
+              this.barchartWidth_sec = 'calc(800/1980*100vw)';
+           }else{
+            option.width = 'calc(1479/1980*100vw)';
+            option.grid.width = '100%';
+            this.barchartWidth_sec = 'calc(1479/1980*100vw)';
+           }
+        }
+        this.barchartOptionViewMode_eventStores = option;
+        
       }
       
     },

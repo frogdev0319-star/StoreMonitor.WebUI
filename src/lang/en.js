@@ -1098,7 +1098,7 @@ export default{
       "templateSelection":"Select a template",
       "reportTemplateLabel": "Report template",
       "show":"Show",
-      "noShow":"No show",
+      "noShow":"No show"
   },
   "statistics":{
       "averageCompare":"Average Compare",

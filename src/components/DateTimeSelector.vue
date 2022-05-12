@@ -79,6 +79,7 @@ export default {
     async accountChanged(val) {
       if (val !== 0) {
         this.dateRange = 4;
+        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
       }
     },
   },

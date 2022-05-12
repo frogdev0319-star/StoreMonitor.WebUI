@@ -54,6 +54,11 @@ export default {
 };
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+.error-img{
+  height: calc(24/1920*100vw);
+  width: calc(24/1920*100vw);
+  margin-right: calc(8/1920*100vw);
+  padding-right: 0;
+}
 </style>
