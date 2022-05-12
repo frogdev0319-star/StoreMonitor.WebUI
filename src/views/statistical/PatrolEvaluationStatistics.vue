@@ -177,34 +177,6 @@
                   </delay-button>
             </div>
         </div>
-         <!-- <el-col  style="overflow-y:hidden;overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 40px )">
-                  <v-chart  v-if="part1.storeMode==1" 
-                            ref="storeChart" :id="part1-region-line-chart" :options="part1.barStoreOption" 
-                                autoresize
-                            :style="{width:part1.barStoreOption?part1.barStoreOption.width :'100%',height:'100%'}" />
-                  <div v-else style="margin-top:20.5px;height:100%;"  :style="{width:ispdf?'1024px':null}">
-                  <div style="margin-top:20.5px;padding-right:10px;">
-                    <table-only
-                      ref="elTP"
-                     :column-data="part1StoreInfoTableCol"
-                      :table-data="part1.storeTableData"
-                      :total="part1.table.total"
-                      :highlight-current-row= "true"
-                      :pagesize="sizeNum"
-                      :current-page="page"
-                      :is-event = "false"
-                      :default-sort = "defaultSort"
-                      :allowRowExpand = "true"
-                      :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" 
-                      :tableHeight = "300"
-                      :isexportPDF="ispdf"
-                      layout = "prev,pager,next,sizes"
-                      expand-component = "IncepItemTop5"
-                      :expandCompProperties = "componentsProps"
-                      @handleChange="handlePageAndSizeChangePart1"
-                      @sortChange="handleSortChangePart1"
-                      @onCellClick = "onEvenListNumClickPart1"
-                    /> -->
           <el-col  style="position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc( 100% - 80px )">
              <div v-if="part1.storeMode==1" style="overflow-y:hidden;overflow-x:auto;height:430px;width:100%" :style="{width:ispdf?'900px':null}">   
                 <!--<div v-if="ispdf" style="height:100%;">
