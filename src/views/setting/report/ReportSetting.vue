@@ -689,7 +689,7 @@ export default {
   .template-select-area{
     display:flex; 
     flex-direction:row;
-    height:calc(30/1920*100vw);
+    height:30px;
     width:200px;
     align-items:center;
     background-color:#f4f6f7;

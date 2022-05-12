@@ -175,7 +175,13 @@ $store: #fccc3f;
   
 }
 .switch-btn{
-  width:calc(202/1440*100vw);
+  @media screen and (max-width:11599px) { 
+    width: 242px;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(202/1440*100vw);
+  }
+  
   height:32px;
   display:flex;
   flex-direction:row;
@@ -183,22 +189,34 @@ $store: #fccc3f;
   border-radius: 5px;
   border: 1px solid #e6e6e6;
   .mode-btn{
+    @media screen and (max-width:11599px) { 
+      width: 131px;
+    }
+    @media screen and(min-width: 1600px){
+      width:calc(101/1440*100vw);
+    }
     color: #556679;
     background-color: #fff;
-    width:calc(101/1440*100vw);
+    
     height:30px;
-    font-size: 15px;
+    font-size: calc(15/1920*100vw);
     border:none;
     text-align: center;
     line-height: 10px;
     margin-left:0px;
   }
   .active-mode-btn{
+    @media screen and (max-width:11599px) { 
+      width: 131px;
+    }
+    @media screen and(min-width: 1600px){
+      width:calc(101/1440*100vw);
+    }
     color:#fff;
     background-color: #006ab7;
-    width:calc(101/1440*100vw);
+    
     height:30px;
-    font-size: 15px;
+    font-size: calc(15/1920*100vw);
     border:none;
     text-align: center;
     line-height: 10px;
@@ -217,28 +235,69 @@ $store: #fccc3f;
   justify-content: space-between;
 }
 .operation-btns-en{
-  width:calc(344/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 410px ;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(344/1440*100vw);
+  }
 }
 .operation-btns-zh{
-  width:calc(344/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 410px ;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(344/1440*100vw);
+  }
 }
 .operation-btns-zhTW{
-  width:calc(344/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 410px ;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(344/1440*100vw);
+  }
 }
 .operation-btns-ja{
-  width:calc(374/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 465px;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(374/1440*100vw);
+  }
 }
 .operation-btns-ko{
-  width:calc(374/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 435px;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(374/1440*100vw);
+  }
 }
 .operation-btns-vi{
-  width:calc(374/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 425px;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(374/1440*100vw);
+  }
+  
 }
 .operation-btns-th{
-  width:calc(374/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 425px;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(374/1440*100vw);
+  }
 }
 .operation-btns-id{
-  width:calc(344/1440*100vw);
+  @media screen and (max-width:1559px) { 
+    width: 410px ;
+  }
+  @media screen and(min-width: 1600px){
+    width:calc(344/1440*100vw);
+  }
 }
 .no-print{
   display: none;

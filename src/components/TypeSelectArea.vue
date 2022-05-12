@@ -146,9 +146,9 @@ export default {
             positionIds: [],
             positionsList: [],
             lang:this.$i18n.locale,
-            dropdownWidth:[{key:'en',value:'calc(105/1440*100vw)'},{key:'zh',value:'calc(105/1440*100vw)'},{key:'zhtw',value:'calc(105/1440*100vw)'},
-        {key:'ja-JP',value:'calc(130/1440*100vw)'},{key:'ko-KR',value:'calc(105/1440*100vw)'},{key:'vi-VN',value:'calc(130/1440*100vw)'},
-        {key:'id-ID',value:'calc(105/1440*100vw)'},{key:'th-TH',value:'calc(110/1440*100vw)'}]
+            dropdownWidth:[{key:'en',value:util.getWindowWidth()>1600?'calc(105/1440*100vw)':'130px'},{key:'zh',value:util.getWindowWidth()>1600?'calc(105/1440*100vw)':'130px'},{key:'zhtw',value:util.getWindowWidth()>1600?'calc(105/1440*100vw)':'130px'},
+        {key:'ja-JP',value:util.getWindowWidth()>1600?'calc(130/1440*100vw)':'150px'},{key:'ko-KR',value:util.getWindowWidth()>1600?'calc(105/1440*100vw)':'130px'},{key:'vi-VN',value:util.getWindowWidth()>1600?'calc(130/1440*100vw)':'155px'},
+        {key:'id-ID',value:util.getWindowWidth()>1600?'calc(105/1440*100vw)':'130px'},{key:'th-TH',value:util.getWindowWidth()>1600?'calc(130/1440*100vw)':'150px'}]
         }
   },
   async created() {
@@ -755,7 +755,13 @@ export default {
 
 <style lang="scss" scoped>
 .content{
-    width:calc(355/1440*100vw);
+    @media screen and (max-width:1559px) { 
+      width: 360px;
+    }
+    @media screen and(min-width: 1600px){
+      width:calc(355/1440*100vw);;
+    }
+    
     height:36px;
     border-radius: 5px;
     display:flex;
@@ -766,10 +772,16 @@ export default {
         display:flex;
         flex-direction:row;
         .type-div{
-            width: calc(52/1440*100vw);
+            @media screen and (max-width:1559px) { 
+              width: 60px;
+            }
+            @media screen and(min-width: 1600px){
+              width: calc(52/1440*100vw);
+            }
+            
             margin: 2px 0 4px 4px;
             font-family: NotoSansCJKtc;
-            font-size: 13px;
+            font-size: calc(13/1920*100vw);
             text-align: center;
             color: #556679;
             align-self: center;
@@ -785,7 +797,7 @@ export default {
     }
     .area-muti{
       width:calc(180/1440*100vw);
-      font-size: 15px;
+      font-size: calc(15/1920*100vw);
       ::v-deep.el-select.el-select--medium{
          background-color: #f7f9f9 !important;
         }
@@ -796,7 +808,7 @@ export default {
 <style>
 .dropdown-select.el-select .el-input--medium .el-input__inner{
     height: 35px;
-    font-size: 13px;
+    font-size: calc(13/1920*100vw);
     text-align: left;
     border: none;
     background-color: #f7f9fa;
@@ -820,7 +832,7 @@ export default {
     background-color: #f7f9f9 !important;
     border:none;
     padding: 0 10px;
-    font-size: 13px;
+    font-size: calc(13/1920*100vw);
     min-width: 55px;
     min-height: 28px;
     text-overflow: ellipsis;

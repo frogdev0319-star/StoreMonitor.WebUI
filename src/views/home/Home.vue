@@ -206,10 +206,10 @@
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
-                  style="width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
+                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
-                  style=" width: calc(120/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
+                  style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
                   @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -831,10 +831,10 @@ export default {
     $_isMobile() {
       const { body } = document;
       const rect = body.getBoundingClientRect();
-      if (rect.width - 1 < 1280) {
+      if (rect.width - 1 < 1366) {
         this.collapsed = true;
       }
-      this.isMobile = rect.width - 1 < 1280;
+      this.isMobile = rect.width - 1 < 1366;
     },
   },
 };
@@ -914,9 +914,15 @@ export default {
     }
   }
   span {
-    font-size: 14px;
+    
     color:#a5a5a5;
     margin-left: 15px;
+    @media screen and (max-width:1367px) { 
+      font-size: 10px;
+    }
+    @media screen and(min-width: 1367px){
+      font-size: 14px;
+    }
   }
 
   /deep/ .el-menu--collapse {
@@ -1710,8 +1716,14 @@ $collapseWidth: 5.5%;
   i {display: none;}
   width: calc(150/1920*100vw) !important;
   .el-input__inner {
+    @media screen and (max-width:1367px) { 
+      width: calc(160/1920*100vw);
+    }
+    @media screen and(min-width: 1367px){
+      width: calc(150/1920*100vw);
+    }
     height: calc(36/1920*100vw);
-    width: calc(150/1920*100vw);
+    
     color: #484848;
     font-size: calc(15/1920*100vw);
     border-color: #e6e6e6;
@@ -1777,4 +1789,5 @@ $collapseWidth: 5.5%;
   width: calc(24/1920*100vw);
   margin-right: calc(8/1920*100vw);
 }
+
 </style>

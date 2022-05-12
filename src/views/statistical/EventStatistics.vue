@@ -36,9 +36,9 @@
             <div class="region-area" :style="ispdf ? {'width':'220px'}:{}" v-for="(item,index) in eventKPIs" :key="index">
               <div class="num-area">
                 <div style="display:flex;height:84.5px;">
-                  <div class="number" :style="ispdf ? {'fontSize':'40px'}:{}">{{ item.eventNum }}
-                    <span v-if="index!=3" style="font-size:15px;margin-left:5px;">{{$t('statistics.event.unit')}}</span>
-                    <span v-else style="font-size:15px;margin-left:5px;">%</span>
+                  <div class="number" :style="ispdf ? {'fontSize':'calc(40/1980*100vw)'}:{}">{{ item.eventNum }}
+                    <span v-if="index!=3" style="font-size:calc(15/1980*100vw);margin-left:5px;">{{$t('statistics.event.unit')}}</span>
+                    <span v-else style="font-size:calc(15/1980*100vw);margin-left:5px;">%</span>
                   </div>
                 </div>
                 <div class="description">{{ item.eventTitle}}</div>
@@ -57,6 +57,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
+              <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
                   :allow-all=true
@@ -76,6 +77,7 @@
                 :cur-country="curCountry"
                 @emitTypeChanged="emitTypeChanged"
               ></AreaSelected>-->
+              </div>
             </div>
             <div class="barchart-area">
               <div style="position:absolute;right:24px;top:94px;z-index:10;" @click='changeBarchartSorOrder'>
@@ -176,6 +178,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
+              <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
                   :allow-all=true
@@ -188,6 +191,7 @@
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged2"
               ></TypeSelectArea>
+              </div>
               <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
@@ -403,6 +407,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.eventRank') }}</div>
+              <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
                   :allow-all=true
@@ -415,6 +420,7 @@
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged"
               ></TypeSelectArea>
+              </div>
               <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
@@ -508,6 +514,7 @@
           <el-col :span="24" class="kpi-list">
             <div class="head">
               <div class="title">{{ $t('statistics.event.incepItemEvent') }}</div>
+              <div :style="WindowWidth>1600?{}:{'marginRight':'30px'}">
               <TypeSelectArea
                   path="eventStatistics"
                   :allow-all=true
@@ -520,6 +527,7 @@
                   :cur-country="curCountry"
                   @emitTypeChanged="emitTypeChanged2"
               ></TypeSelectArea>
+              </div>
               <!--<AreaSelected
                 path="eventStatistics"
                 allow-all="true"
@@ -1118,6 +1126,7 @@ export default {
         {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
         {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
       ],
+      WindowWidth:util.getWindowWidth(),
     };
   },
 
@@ -2400,28 +2409,68 @@ export default {
               justify-content: space-between;
             }
             .operation-btns-en{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-zh{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-zhTW{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-ja{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 435px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-ko{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-vi{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-th{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-id{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             
           }
@@ -2628,28 +2677,68 @@ export default {
               justify-content: space-between;
             }
             .operation-btns-en{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-zh{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-zhTW{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
             .operation-btns-ja{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 445px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-ko{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-vi{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-th{
-              width:calc(374/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 425px;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(374/1440*100vw);
+              }
             }
             .operation-btns-id{
-              width:calc(344/1440*100vw);
+              @media screen and (max-width:1559px) { 
+                width: 410px ;
+              }
+              @media screen and(min-width: 1600px){
+                width:calc(344/1440*100vw);
+              }
             }
           }
           .event-table {

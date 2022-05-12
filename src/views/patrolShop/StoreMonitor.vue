@@ -64,6 +64,7 @@
                   v-model="serachChannelValue"
                   size="small"
                   class="storevue-input-search"
+                  style="width:50%;"
                 >
                   <i
                     slot="prefix"
@@ -2696,15 +2697,21 @@ $h1: #292e36;
     }
 }
 </style>
-<style scoped>
+<style lang="scss" scoped>
 .problemTab {
-  width: calc(120 / 1920 * 100vw); 
+  
   height: calc(34 / 1920 * 100vw);
   line-height: calc(34 / 1920 * 100vw);
   cursor: pointer; 
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
   font-size: calc(13 / 1920 * 100vw); 
+  @media screen and (max-width:1367px) { 
+      width: calc(150 / 1920 * 100vw); 
+    }
+    @media screen and(min-width: 1367px){
+      width: calc(120 / 1920 * 100vw); 
+    }
 }
 .tabs {
   position: absolute; 
@@ -2739,7 +2746,7 @@ $h1: #292e36;
 }
 
 </style>
-<style>
+<style lang="scss">
 .el-radio-button__inner {
   border-radius: 0px !important;
   width: 90px;
@@ -2774,15 +2781,31 @@ $h1: #292e36;
   font-size: calc(12 / 1920 * 100vw);
 }
 .id-backToNow{
-  width: calc(160 / 1920 * 100vw); 
+  @media screen and (max-width:1367px) { 
+      width: calc(220/1440*100vw);
+  }
+  @media screen and(min-width: 1367px){
+      width: calc(160/1440*100vw);
+  } 
   font-size: calc(12 / 1920 * 100vw);
 }
 .th-backToNow{
-  width: calc(150 / 1920 * 100vw); 
+  
+  @media screen and (max-width:1367px) { 
+      width: calc(160/1440*100vw);
+  }
+  @media screen and(min-width: 1367px){
+      width: calc(150/1440*100vw);
+  }
   font-size: calc(12 / 1920 * 100vw);
 }
 .vi-backToNow{
-  width: calc(150 / 1920 * 100vw); 
+  @media screen and (max-width:1367px) { 
+      width: calc(200/1440*100vw);
+  }
+  @media screen and(min-width: 1367px){
+      width: calc(150/1440*100vw);
+  }
   font-size: calc(12 / 1920 * 100vw);
 }
 .el-test .el-input__icon {

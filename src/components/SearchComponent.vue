@@ -440,11 +440,11 @@ export default {
       .search-button{
         margin-left:35px;
         width: 102px;
-        height: 36px;
+        height: calc(36/1920*100vw);
         background-color: #556679;
         border-color: #556679;
         color:#fff;
-        font-size: 15px;
+        font-size: calc(15/1920*100vw);
       }
     }
     .inspect-div{
@@ -457,12 +457,12 @@ export default {
         text-align: left;
         align-self: center;
         font-family: NotoSansCJKTC;
-        font-size: 15px;
+        font-size: calc(15/1920*100vw);
         font-weight: normal;
       }
       .tag-select{
         width:calc(222/1440*100vw);
-        height: 36px;
+        height: calc(36/1920*100vw);
         background-color: #fff;
         border-radius: 5px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
@@ -504,7 +504,7 @@ export default {
     color: #2b2b2b;
     background: transparent !important;
     padding: 0 10px;
-    font-size: 15px;
+    font-size: calc(15/1920*100vw);
     min-width: 55px;
     min-height: 28px;
   }
@@ -513,7 +513,7 @@ export default {
     z-index: 1;
     background: transparent !important;
     border: none;
-    font-size: 15px;
+    font-size: calc(15/1920*100vw);
     height: calc(36/1920*100vw);
     line-height: calc(36/1920*100vw);
     min-height: 28px;
@@ -538,7 +538,7 @@ export default {
     border: none !important;
     width: 100%;
     border-radius: 3px;
-    min-height: 28px;
+    min-height: calc(28/1920*100vw);
     min-width: 85px;
   }
 </style>

@@ -123,7 +123,7 @@
             <div class="store-panel">
               <div class="store-list">
                 <span class="store-name">{{ $t('overview.rankType') }}</span>
-                <el-select class="storevue-select" v-model="rankType" style="width: 200px" size="mini" @change="changeRankType">
+                <el-select class="storevue-select" v-model="rankType" style="width: 280px" size="mini" @change="changeRankType">
                   <el-option
                     v-for="item in rankTypeArr"
                     :key="item.value"

@@ -479,7 +479,8 @@ export default{
         "tues":"二",
         "wed":"三"
     },
-      "zoneList":"攝影機列表"
+      "zoneList":"攝影機列表",
+      "commentCountRuleTip":"文字評論最多輸入5則"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
@@ -543,7 +544,7 @@ export default{
     "RemoteLength":"遠程巡檢表數量超限，請刪除後再導入",
     "SchdRemoteLength":"排程數量超限，請刪除後再創建",
     "ScoreEmpty":"項目分值不能為空",
-    "accumulateTotalScore":"扣分製",
+    "accumulateTotalScore":"扣分制",
     "accumulateTotalScoreInfo":"考評總分= SUM(每項巡檢得分) + 扣分起始分數",
     "addCategory":"添加巡檢類別",
     "addFail":"添加失敗",

@@ -472,7 +472,8 @@ export default{
         "tues":"Thứ 3",
         "wed":"Thứ 4"
     },
-      "zoneList":"Danh sách camera"
+      "zoneList":"Danh sách camera",
+      "commentCountRuleTip":"Enter up to 5 text comments"
   },
   "eventView":{
       "ClosedEvent":"Các sự kiện đã đóng",

@@ -101,7 +101,43 @@ body .el-table th.gutter {
 .el-table__expand-icon .el-icon{
   display: none;
 }
-
+.el-table__footer-wrapper, .el-table__header-wrapper {
+  @media screen and (max-width:1367px) { 
+    overflow: visible;
+  }
+  @media screen and(min-width: 1367px){
+    overflow: hidden;
+  }
+  
+}
+.el-table__body-wrapper {
+  @media screen and (max-width:1367px) { 
+    overflow: visible;
+  }
+  @media screen and(min-width: 1367px){
+    overflow: hidden;
+  }
+}
+.el-table--scrollable-x .el-table__body-wrapper {
+  @media screen and (max-width:1367px) { 
+    overflow: visible;
+  }
+  @media screen and(min-width: 1367px){
+    overflow: hidden;
+  }
+}
+.el-table--border::after, .el-table--group::after {
+  width: 0px; 
+}
+.el-table th>.cell{
+  @media screen and (max-width:1367px) { 
+    width:max-content;
+  }
+  @media screen and(min-width: 1367px){
+    width:100%;
+  }
+  
+}
 //.el-table {
 //  overflow-x: auto;
 //}
