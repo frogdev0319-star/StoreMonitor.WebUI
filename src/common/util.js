@@ -8,7 +8,7 @@ export default {
     return window.innerWidth;
   },
   getLangStyleValue(langArray){
-    console.log("*****screenWidth  :",this.getWindowWidth() );
+    // console.log("*****screenWidth  :",this.getWindowWidth() );
     var lang_style = langArray.find( item => {return item.key==i18n.locale});
     return lang_style.value;
   },

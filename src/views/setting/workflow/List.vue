@@ -52,6 +52,24 @@
         @currentChange="handlePagination"
       />
     </div>
+
+    <!-- popup -->
+    <dialog-pop
+      :title="$t('insSettingView.confirmDelete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showSingleDeleteContent"
+      :isWarning="true"
+      @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showSingleDeleteContent')"
+      @cancelHandler="hideDeleteContentDialog('showSingleDeleteContent')"
+      @confirmHandler="confirmDeleteSingle(deletedProcessDefinitionKey)"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">確認刪除當前簽核流程？ </div>
+      </div>
+    </dialog-pop>
+
   </div>
 </template>
 <script>
@@ -69,13 +87,15 @@ import TblPaginationOnly from '@/components/TblPaginationOnly';
 import util from '@/common/util';
 
 import DelayButton from '@/components/DelayButton';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'WorkflowList',
   components: {
     TableOnly,
     TblPaginationOnly,
-    DelayButton
+    DelayButton,
+    DialogPop
   },
   data() {
     return {
@@ -83,6 +103,8 @@ export default {
       serachData: [],
       authorizedDevicesNum: 0,
       isLoadingData: false,
+      showSingleDeleteContent: false,
+      deletedProcessDefinitionKey: '',
       columnOperationData: {
         label: this.$t('deviceView.operation'),
         minWidth: '134',
@@ -118,7 +140,7 @@ export default {
         {
           'prop': 'name',
           'label': '名稱',
-          'width': 150,
+          'width': 180,
           'maxWidth': 150,
         },
         {
@@ -147,9 +169,9 @@ export default {
         },
         {
           'prop': 'state',
-          'label': '狀態',
+          'label': '綁定狀態',
           'width': 80,
-          'maxWidth': 130,
+          'maxWidth': 100,
           'forWorkflowsSwitch': true,
         },
       ],
@@ -322,7 +344,17 @@ export default {
           break;      
         }
         case 'delete':{
-          this.deleteRow(row.processDefinitionKey)
+          if(!row.isBind){
+            this.showSingleDeleteContent = true
+            this.deletedProcessDefinitionKey = row.processDefinitionKey
+          }else{
+            this.$message({
+              type: 'error',
+              message: '已綁定簽核流程無法刪除'
+            }); 
+          }
+          
+          console.log('row :>> ', row);
           break;      
         }
         default: {
@@ -343,6 +375,10 @@ export default {
       // console.log('processDefinitionKey :>> ', processDefinitionKey);
       duplicateRow(postforms).then(res=>{
         console.log('res :>> ', res);
+        this.$message({
+          type: 'success',
+          message: '已成功複製流程'
+        });  
         this.init()
       }).catch(err => {
         console.log('error' + err);
@@ -357,11 +393,54 @@ export default {
       deleteRow(rowID).then(res=>{
         this.init()
         this.isLoadingData = false
+        this.showSingleDeleteContent = false
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      
       }).catch(err => {
         this.isLoadingData = false
+        this.showSingleDeleteContent = false
         console.log('error' + err);
+        this.$message({
+          type: 'error',
+          message: '删除失敗!'
+        })
       })
     },
+
+    hideDeleteContentDialog(key) {
+      this[key] = false;
+    },
+
+    confirmDeleteSingle(value){
+      console.log('Let me delete value', value);
+      this.deleteRow(value)
+      
+    },
+    // open lightbox
+    // open(processDefinitionKey) {
+    //   this.$confirm('此操作将永久删除该文件, 是否继续?', {
+    //     confirmButtonText: '确定',
+    //     cancelButtonText: '取消',
+    //     type: 'warning'
+    //   }).then(() => {
+    //     this.deleteRow(processDefinitionKey)
+    //     this.$message({
+    //       type: 'success',
+    //       message: '删除成功!'
+    //     });
+    //   }).catch(() => {
+    //     // this.$message({
+    //     //   type: 'info',
+    //     //   message: '已取消删除'
+    //     // });          
+    //   });
+    // },
+
+
+
 
     handlePagination(pageInfo){
       sessionStorage.setItem('pageInfo', JSON.stringify(pageInfo))
@@ -428,7 +507,10 @@ export default {
           util.notify(this.$t('route.networkError'), 'error', 1000 );
         })
       }
-    }
+    },
+    
+
+
   },
 };
 </script>
@@ -445,4 +527,9 @@ export default {
     align-items: flex-start
   .el-table
     border: none !important
+    
+  // .el-button--primary
+  //   color: #fff
+  //   background-color: #190
+  //   border-color: #190
 </style>

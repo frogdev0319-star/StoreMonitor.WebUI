@@ -4,7 +4,11 @@
     <div class="setting-titles padding flex-center">
       添加審核節點
       <div class="spacer"/>
-      <delay-button type="filled" @click="saveNode">保存</delay-button>
+      <delay-button 
+        type="filled" 
+        @click="saveNode"
+        v-loading.fullscreen.lock="fullscreenLoading"
+        >保存</delay-button>
 
     </div>
 
@@ -235,7 +239,7 @@ export default {
       workflowDetail: {},
       templateList: ['管理員','店長','總經理'],
       managers: '',
-
+      fullscreenLoading: false,
       basicList: [],
       isLoadingData: false,
       workflowDescription: '',
@@ -286,6 +290,7 @@ export default {
 
     saveNode(){
       console.log('this.nodeData Adjust:>> ', this.nodeData)
+      this.fullscreenLoading = true
       if(this.nodeData.id == undefined){
         this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
       }else{

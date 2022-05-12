@@ -136,7 +136,7 @@
       @cancelHandler="hideDeleteContentDialog('showDeleteContent')"
       @confirmHandler="confirmDelete">
       <div class="dialog-slot">
-        <div class="dialog-content">{{ $t('insSettingView.confirmSelecDel') }}</div>
+        <div class="dialog-content">{{ $t('insSettingView.confirmSelecDel') }} </div>
       </div>
     </dialog-pop>
 
@@ -152,7 +152,7 @@
       @confirmHandler="confirmDeleteSingle"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }}</div>
+        <div class="dialog-content">{{ $t('insSettingView.confirmCurDel') }} </div>
       </div>
     </dialog-pop>
   </div>

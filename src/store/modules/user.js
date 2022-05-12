@@ -302,7 +302,6 @@ const user = {
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
           
-          console.log('navbarRoute ~~~>> ', navbarRoute);
           const auditRoute = navbarRoute.getAuditRoute();
           accessedRoutes.push(auditRoute);
 

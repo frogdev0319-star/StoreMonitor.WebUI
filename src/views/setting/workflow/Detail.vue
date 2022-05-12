@@ -82,7 +82,7 @@
 
           <setting-table table-name="流程配置">
             <template slot="tableDetail" style="padding: 30px">
-                <div class="tablelist flow-setting">
+                <div class="tablelist flow-setting" v-loading.fullscreen.lock="fullscreenLoading">
                   <table-only
                     ref="elTP"
                     class="table-white"
@@ -123,6 +123,23 @@
       </div>
     </div>
 
+    <!-- popup -->
+    <dialog-pop
+      :title="$t('insSettingView.confirmDelete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showSingleDeleteContent"
+      :isWarning="true"
+      @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showSingleDeleteContent')"
+      @cancelHandler="hideDeleteContentDialog('showSingleDeleteContent')"
+      @confirmHandler="confirmDeleteSingle(rowId)"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">確認刪除當前簽核流程節點？ </div>
+      </div>
+    </dialog-pop>
+
   </div>
 </template>
 <script>
@@ -132,6 +149,8 @@ import {getNodeList, updateWorkflow} from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import { getUserInfo } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
+import DialogPop from '@/components/DialogPop';
+
 import MultiSelect from '@/components/MultiSelect';
 import util from "@/common/util";
 export default {
@@ -140,7 +159,7 @@ export default {
     TableOnly,
     DelayButton,
     SettingTable,
-    
+    DialogPop
   },
   data() {
     return {
@@ -162,6 +181,7 @@ export default {
       }],
       ccTo: [],
 
+      showSingleDeleteContent:false,
       dataFromRoute: {},
       workflowDetail: {},
       templateList: ['巡檢表單'],
@@ -176,6 +196,7 @@ export default {
       nodeDataToApi:[],
       userInfo:[],
       titleList:[],
+      fullscreenLoading: false,
       columnOperationData: {
         label: this.$t('deviceView.operation'),
         move: true,
@@ -237,7 +258,8 @@ export default {
       ],
       indexType: true,
       penSrc: require('../../../../static/img/table-edit.png'),
-      deleteSrc: require('../../../../static/img/table-delete.png')
+      deleteSrc: require('../../../../static/img/table-delete.png'),
+      rowId:''
 
     };
   },
@@ -361,6 +383,7 @@ export default {
 
     // data for api submit
     dataToApi(){
+      // deep copy
       var orderedAuditNodeArray = JSON.parse(JSON.stringify(this.flatNodeData))
 
       this.nodeDataToApi = this.nodeList
@@ -400,12 +423,13 @@ export default {
       switch(method.method){
         case 'moveUp':{
           this.flatNodeDataView.move(method.index, method.index - 1)
-          this.moveAction(method.index - 1, method.index - 2)
+          this.moveAction(method.index, method.index - 1)
+
           break;
         }
         case 'moveDown':{
           this.flatNodeDataView.move(method.index, method.index + 1)
-          this.moveAction(method.index - 1, method.index)
+          this.moveAction(method.index, method.index + 1)
           break;      
         }
         default: {
@@ -422,7 +446,9 @@ export default {
           break;      
         }
         case 'delete':{
-          this.deleteRow(row.id)
+          // this.deleteRow(row.id)
+          this.rowId = row.id
+          this.showSingleDeleteContent = true
           break;      
         }
         default: {
@@ -430,27 +456,42 @@ export default {
         }
       }
     },
-
+  
     moveAction(from , to){
       console.log(from , to);
+      this.fullscreenLoading = true
       var moving = this.nodeDataToApi.orderedAuditNodeArray.splice(from, 1)[0]
       this.nodeDataToApi.orderedAuditNodeArray.splice(to, 0 , moving)
-
+      
+      // sync sessionStorage
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
 
       // call api for update
       updateWorkflow(this.nodeDataToApi).then(res=>{
         console.log('res :>> ', res);
-        this.isLoadingData = false
+        this.fullscreenLoading = false
+        this.$message({
+          type: 'success',
+          message: '流程順序已修改。'
+        })
       }).catch(err => {
-        this.isLoadingData = false;
+        this.fullscreenLoading = false
         console.log('error' + err);
       });
-
-
     },
-    // moveDown(){
 
-    // },
+    hideDeleteContentDialog(key) {
+      this[key] = false;
+    },
+    confirmDeleteSingle(id){
+      console.log('Let me delete value', id);
+      this.deleteRow(id)
+      
+      this.showSingleDeleteContent = false
+    },
+
+
+
     settingWorkFlow(row){
       this.$router.push({name: 'nodeSetting'})
       // 刪除  "isEditing": false
@@ -458,8 +499,11 @@ export default {
       delete row.isEditing
       sessionStorage.setItem('workflowNode', JSON.stringify(oriData[0]))
     },
+          // sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
 
     deleteRow(deleteId){
+      this.fullscreenLoading = true
+      
       var deleteData = this.flatNodeDataView.filter( e =>(
         e.id !== deleteId
       ))
@@ -469,22 +513,25 @@ export default {
         e.id !== deleteId
       ))
       this.nodeDataToApi.orderedAuditNodeArray = deleteNode
-
+      
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
       // call api for update
       updateWorkflow(this.nodeDataToApi).then(res=>{
         console.log('res :>> ', res);
-        this.isLoadingData = false
+        this.fullscreenLoading = false;
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+
       }).catch(err => {
-        this.isLoadingData = false;
+        this.fullscreenLoading = false;
         console.log('error' + err);
       });
-
-
     },
 
     //保存並發布
     submit() {
-
        // call api for update
       updateWorkflow(this.nodeDataToApi).then(res=>{
         console.log('res :>> ', res);
@@ -495,22 +542,6 @@ export default {
         console.log('error' + err);
       });
 
-      // let array = this.workflowDetail.nextNodes;
-      // let object = { ...array[0] };
-      // let i = array.length - 1;
-      // while(i >= 0) {
-      //   object['nextAuditNode'] = { ...array[i].nextAuditNode };
-      //   i--;
-      // }
-      // let nextAuditNode = JSON.parse(JSON.stringify(object));
-      // console.log('nextAuditNode ~~~>> ', nextAuditNode);
-
-      // updateWorkflow({
-      //   ...this.workflowDetail,
-      //   nextAuditNode
-      // }).then(res => {
-      //   console.log(res);
-      //});
     }
   }
 
