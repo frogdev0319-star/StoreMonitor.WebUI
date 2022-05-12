@@ -397,7 +397,7 @@ export default {
                 }
             });
             //const filterVal = ['province', 'city', 'name', 'percentage', 'numOfStores'];
-            const curData = table.table_data;
+            const curData = table.all_data;
             const data = self.formatJson(filterVal, curData);
             //const fileName =  table_data[0].submitterName+ '_Inspection detail_' + util.getCurDateStr();
             export_json_to_excel(tHeader, data, fileName);

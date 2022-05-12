@@ -76,7 +76,7 @@ export default {
             showItems:false,
             lang:this.$i18n.locale,
             typeDivWidth:[{key:'en',value:'calc(52/1440*100vw)'},{key:'zh',value:'calc(52/1440*100vw)'},{key:'zhtw',value:'calc(52/1440*100vw)'},
-              {key:'ja-JP',value:'calc(62/1440*100vw)'},{key:'ko-KR',value:'calc(52/1440*100vw)'},{key:'vi-VN',value:'calc(52/1440*100vw)'},
+              {key:'ja-JP',value:util.getWindowWidth()>1600?'calc(62/1440*100vw)':'80px'},{key:'ko-KR',value:'calc(52/1440*100vw)'},{key:'vi-VN',value:'calc(52/1440*100vw)'},
               {key:'id-ID',value:'calc(52/1440*100vw)'},{key:'th-TH',value:'calc(72/1440*100vw)'}],
         }
   },
