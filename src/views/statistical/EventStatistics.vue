@@ -731,6 +731,8 @@ import AreaSelected from '@/components/AreaSelected';
 import TypeSelectArea from '@/components/TypeSelectArea';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import vm from '@/main.js';
+import PermissionHelper from '@/api/PermissionHelper';
+import { message } from '@/common/singleton-message';
 export default {
   name: 'EventStatistics',
   components: {
@@ -1816,7 +1818,17 @@ export default {
         return params;
     },
     onEvenListNumClick(row){
-      console.log("clcick row:",row);
+      if(!PermissionHelper.enableEventHandle() && 
+          !PermissionHelper.enableEventClose() && 
+          !PermissionHelper.enableEventAdd() && 
+          !PermissionHelper.enableEventReturn()){
+        message({
+            message: this.$i18n.t('route.noEventAuthority'),
+            type: 'error',
+            duration: 5 * 1000
+          });
+        return;
+      }
       const self = this;
       var params = SearchConditionUtil.getSearchCondition('eventManage');
       const rowItem = row.row;

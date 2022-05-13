@@ -86,7 +86,8 @@ export default{
       "patrolItemStat":"巡检项统计",
       "singleStoreStat":"单店分析",
       "noReportAuthority":"无报告检视权限，请联系管理员",
-      "noPatrolCompareStatAuthority":"无巡检同比分析权限，请联系管理员"
+      "noPatrolCompareStatAuthority":"无巡检同比分析权限，请联系管理员",
+      "noEventAuthority":"无事件检视权限，请联系管理员"
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",

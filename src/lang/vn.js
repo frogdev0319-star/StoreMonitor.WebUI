@@ -85,7 +85,8 @@ export default{
       "patrolItemStat":"Thống kê mục kiểm tra",
       "singleStoreStat":"Các thống kê từng cửa hàng",
       "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
-      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator"
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator",
+      "noEventAuthority":"You don't have permission to view events, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"Tỷ lệ nguy hiểm＜60%",
