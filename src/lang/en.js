@@ -83,7 +83,9 @@ export default{
       "patrolCompareStat":"Inspection Compare Statistics",
       "supervisorCalStat":"Store assessment statistics",
       "patrolItemStat":"Inspection item statistics",
-      "singleStoreStat":"Single Store Statistics"
+      "singleStoreStat":"Single Store Statistics",
+      "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"Pool Ratio＜60%",

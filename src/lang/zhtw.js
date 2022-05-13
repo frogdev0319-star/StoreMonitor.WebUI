@@ -84,7 +84,9 @@ export default{
       "patrolCompareStat":"巡檢同比分析",
       "supervisorCalStat":"巡店考評統計",
       "patrolItemStat":"巡檢項統計",
-      "singleStoreStat":"單店分析"
+      "singleStoreStat":"單店分析",
+      "noReportAuthority":"無報告檢視權限，請聯繫管理員",
+      "noPatrolCompareStatAuthority":"無巡檢同比分析權限，請聯繫管理員"
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",

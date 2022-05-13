@@ -84,6 +84,8 @@ export default{
       "supervisorCalStat":"สถิติการประเมินร้านค้า",
       "patrolItemStat":"สถิติรายการในการตรวจสอบ",
       "singleStoreStat":"สถิติร้านค้าเดียว",
+      "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"อัตราส่วนอันตราย ＜60%",

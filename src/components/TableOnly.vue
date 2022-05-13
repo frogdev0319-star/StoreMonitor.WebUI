@@ -170,6 +170,8 @@ import filterString from '@/common/filterString'
 import TabInceptionDetail from '@/components/TabInceptionDetail'
 import IncepItemTop5 from '@/components/IncepItemTop5'
 import EventCommentList from '@/components/EventCommentList'
+import PermissionHelper from '@/api/PermissionHelper';
+import { message } from '@/common/singleton-message';
 export default {
   name:'TableOnly',
   components: {
@@ -358,6 +360,19 @@ export default {
     },
     expandChange(row) {
        console.log("row click:",row);
+       if (this.expandComponent=== 'TabInceptionDetail') {
+        console.log("!PermissionHelper.enableInspectReport():",!PermissionHelper.enableInspectReport());
+        if(!PermissionHelper.enableInspectReport()){
+          message({
+              message: this.$i18n.t('route.noReportAuthority'),
+              type: 'error',
+              duration: 5 * 1000
+            });
+          this.expands="";
+          this.expandRowKeys=[];
+          return;
+        }
+      }
         this.currentRow = row;
         if(this.allowRowExpand){
           if(row.id == this.expands){

@@ -84,7 +84,9 @@ export default {
       "patrolCompareStat":"検査比較統計",
       "supervisorCalStat":"インスペクション評価統計",
       "patrolItemStat":"インスペクションアイテム統計",
-      "singleStoreStat":"単一ストア統計"
+      "singleStoreStat":"単一ストア統計",
+      "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"危険率＜60％",

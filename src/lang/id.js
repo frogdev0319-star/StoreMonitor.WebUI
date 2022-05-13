@@ -83,7 +83,9 @@ export default{
       "patrolCompareStat":"Inspeksi Statistik Perbandingan",
       "supervisorCalStat":"Statistik evaluasi toko",
       "patrolItemStat":"Statistik item inspeksi",
-      "singleStoreStat":"Statistik Satu Toko"
+      "singleStoreStat":"Statistik Satu Toko",
+      "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"Rasio Bahaya＜60%",
