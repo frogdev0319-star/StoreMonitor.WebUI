@@ -82,6 +82,7 @@ import {
     enableWorkflow
   } from '@/api/workflow';
 import { getUserInfo } from '@/api/login';
+import { mapGetters } from 'vuex';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import util from '@/common/util';
@@ -243,10 +244,14 @@ export default {
   created() {
     this.init()
   },
-  computed:{
-    
+  computed: {
+    ...mapGetters({ accountChanged: 'accountChanged' })
   },
   watch:{
+    accountChanged(val) {
+      val !== 0 && this.init();
+    },
+
     // for search
     inputSearchValue(val){
       this.serachData = this.allTableData.filter(item => (
