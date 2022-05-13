@@ -311,7 +311,9 @@ const user = {
           
 
           const eventRoute = navbarRoute.getEventRoute();
-          accessedRoutes.push(eventRoute);
+          if(PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()){
+            accessedRoutes.push(eventRoute);
+          }
           
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
