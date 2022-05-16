@@ -88,8 +88,9 @@
                       <div class="category-name flex-center">
                         <div class="group-left spacer">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
-                          <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex-center">
-                            <div :style="activeSheetName != 2 ? {}: {'visibility': 'hidden'}" style="color: #c60957; width: 40px; text-align: center">{{ item.weight == -1 ? '--' : `${item.weight} %` }}</div> <div>{{ item.name }}（{{ item.groupNum }}）</div>
+                          <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex" style="flex-direction: column; height: 60px; text-align: left; padding-left: 20px;">
+                            <div class="spacer" :style="activeSheetName != 2 ? {}: {'visibility': 'hidden'}" style="color: #c60957; line-height: 30px">{{ item.weight == -1 ? '--' : `${item.weight} %` }}</div> 
+                            <div class="spacer" style="line-height: 30px">{{ item.name }}（{{ item.groupNum }}）</div>
                           </div>
                         </div>
                         <div class="spacer"></div>
@@ -2117,7 +2118,7 @@ export default {
                     }
                 }
                 .groupItem{
-                    line-height: 60px;
+                    // line-height: 60px;
                     position: relative;
                     cursor: pointer;
                     text-align: left;
@@ -2173,12 +2174,14 @@ export default {
                     }
                 }
               .category-list{
+                // height: 60px;
+                // line-height: 60px;
                 display: flex;
                 flex-direction: column;
               }
               .category-name{
-                height: 60px;
-                line-height: 60px;
+                // height: 60px;
+                // line-height: 60px;
                 position: relative;
                 overflow: hidden;
                 border-bottom: 1px solid $border;
@@ -2189,8 +2192,8 @@ export default {
                 margin-top: 5px;
                 overflow: hidden;
                 text-align: left;
-                height: 60px;
-                line-height: 60px;
+                // height: 60px;
+                // line-height: 60px;
                 margin-bottom: 25px;
                 position: relative;
                 .group-name-left{
@@ -2280,8 +2283,8 @@ export default {
             width: 99%;
           }
             .nape-items-title{
-                height: 60px;
-                line-height: 60px;
+                // height: 60px;
+                // line-height: 60px;
                 text-align: left;
                 font-size: 14px;
                 color: $tab;
