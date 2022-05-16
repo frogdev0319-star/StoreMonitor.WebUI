@@ -54,3 +54,11 @@ export const getUserAuthorities = () => {
     method: 'get'
   });
 };
+
+export const getDepart = params => {
+  return request({
+    url: `${version}/user/define/list`,
+    method: 'get',
+    params
+  });
+};

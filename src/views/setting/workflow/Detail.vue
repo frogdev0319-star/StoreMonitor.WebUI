@@ -147,12 +147,16 @@ import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {getNodeList, updateWorkflow} from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
-import { getUserInfo } from '@/api/login';
+import {getUserInfo} from '@/api/login';
+import {getDepartmentList } from '@/api/checkin';
+
+
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 
 import MultiSelect from '@/components/MultiSelect';
 import util from "@/common/util";
+import t from '../../../../static/ezuikit/ezuikit_China/ezuikit';
 export default {
   name: 'WorkflowDetail',
   components: {
@@ -293,6 +297,9 @@ export default {
   
       await this.handleData() //5
       await this.dataToApi() //6
+
+      this.getDepartmentList()
+
     },
 
     getWorkflowInfo(){
@@ -312,6 +319,8 @@ export default {
         console.log('error' + err);
       });
     },
+
+
     // get title
     getTitle(){
       getUserTitleList().then(res=>{
@@ -324,6 +333,20 @@ export default {
         console.log('error' + err);
       });
     },
+
+    // get getDepart
+    async getDepartmentList(){
+      await getDepartmentList({ type: 0 }).then(res=>{
+        console.log('getgetDepart  ------>> ', res);
+
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+
+
+
 
     async getNodeList(id){
       this.isLoadingData = true

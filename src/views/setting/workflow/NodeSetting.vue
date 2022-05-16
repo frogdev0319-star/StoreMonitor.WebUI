@@ -31,12 +31,12 @@
 
                 <div class="title-name">* 添加職務</div>
                 <div class="title-status">
-                  <el-select v-model="managers" placeholder="管理員">
+                  <el-select v-model="managers" placeholder="請選擇部門">
                     <el-option
-                      v-for="item in templateList"
-                      :key="item"
-                      :label="item"
-                      :value="item">
+                      v-for="item in department"
+                      :key="item.defineId"
+                      :label="item.defineName"
+                      :value="item.defineId">
                     </el-option>
                   </el-select>
                 </div>
@@ -221,6 +221,8 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {updateWorkflow} from "@/api/workflow";
+import {getDepartmentList } from '@/api/checkin';
+
 
 import util from "@/common/util";
 export default {
@@ -237,7 +239,7 @@ export default {
 
       dataFromRoute: {},
       workflowDetail: {},
-      templateList: ['管理員','店長','總經理'],
+      department: [],
       managers: '',
       fullscreenLoading: false,
       basicList: [],
@@ -270,7 +272,18 @@ export default {
     async init(){
       await this.getNodeInfo() 
       await this.getWorkflowInfo()
+      await this.getDepartmentList()
     }, 
+
+    // get getDepart
+    async getDepartmentList(){
+      await getDepartmentList({ type: 0 }).then(res=>{
+        this.department = res.data
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
