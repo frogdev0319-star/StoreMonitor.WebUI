@@ -89,7 +89,7 @@ export default{
       "workflowDetail":"流程配置",
       "nodeSetting":"添加審核節點",
 
-      "AuditManage":"簽核管理"
+      "AuditManage":"簽核管理",
 
       "noReportAuthority":"無報告檢視權限，請聯繫管理員",
       "noPatrolCompareStatAuthority":"無巡檢同比分析權限，請聯繫管理員",
