@@ -2138,7 +2138,7 @@ export default {
                         span{
                             float: left;
                             width: 70%;
-                            margin-left: calc(50/1920*100vw);
+                            margin-left: calc(20/1920*100vw);
                             text-overflow: ellipsis;
                             overflow: hidden;
                             white-space: nowrap;
@@ -2180,8 +2180,8 @@ export default {
                 flex-direction: column;
               }
               .category-name{
-                // height: 60px;
-                // line-height: 60px;
+                height: 60px;
+                line-height: 60px;
                 position: relative;
                 overflow: hidden;
                 border-bottom: 1px solid $border;
