@@ -595,7 +595,7 @@ export default{
       "enterListName":"Nhập tên danh mục",
       "enterListNameRuletip":"Nhập tối đa 250 ký tự",
       "enterName":"Nhập tên danh mục",
-      "enterNameRuletip":"Nhập tối đa 30 ký tự",
+      "enterNameRuletip":"Nhập tối đa 50 ký tự",
       "enterScore":"Vui lòng nhập điểm",
       "enterSelfListName":"Vui lòng nhập tên danh mục tùy chỉnh",
       "evaluationType":"Đang chấm điểm",

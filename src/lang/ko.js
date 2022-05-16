@@ -596,7 +596,7 @@ export default {
       "enterListName":"목록 이름을 입력하기",
       "enterListNameRuletip":"최대 250자까지 입력할 수 있습니다.",
       "enterName":"범주 이름 입력",
-      "enterNameRuletip":"최대 30자까지 입력할 수 있습니다.",
+      "enterNameRuletip":"최대 50자까지 입력할 수 있습니다.",
       "enterScore":"점수를 입력하십시오",
       "enterSelfListName":"제목이 비어있으면 안된다",
       "evaluationType":"채점에 참여",

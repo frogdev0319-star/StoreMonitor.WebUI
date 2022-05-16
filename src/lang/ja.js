@@ -596,7 +596,7 @@ export default {
       "enterListName":"リスト名を入力してください",
       "enterListNameRuletip":"最大250文字まで入力できます",
       "enterName":"カテゴリネームを入力してください",
-      "enterNameRuletip":"最大30文字まで入力できます",
+      "enterNameRuletip":"最大50文字まで入力できます",
       "enterScore":"スコアを入力してください",
       "enterSelfListName":"タイトルをエンプティーにすることはできません。",
       "evaluationType":"スコアリングへの参加",
