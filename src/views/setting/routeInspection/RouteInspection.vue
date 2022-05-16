@@ -243,30 +243,34 @@
         <div class="dialog-content">
           <div class="flex-center margin-bottom-sm">
             <div class="spacer">{{$t('insSettingView.inspectName')}}</div>
-            <div class="spacer">{{$t('insSettingView.weight')}}</div>
+            <div class="spacer flex">{{$t('insSettingView.weight')}}
+              <div class="spacer"></div>
+              <el-switch
+                style="margin-right: 10px"
+                v-model="isAllWeight"
+                @change="handleWeightSwitch"
+              >
+              </el-switch>
+              {{ $t('insSettingView.weightSetting') }}
+            </div>
           </div>
-          <div v-for="item in weightOptions" :key="item.id" class="flex-center margin-bottom-sm">
-            <span class="spacer">{{item.name}}</span>
-            <el-checkbox
-              style="margin-right: 20px"
-              @change="e => changeItemWeight(e, item)"
-              v-model="item.setWeight"
-              class="storevue-checkbox-outlined"
-              :label="$t('insSettingView.weightSetting')"
-            />
-            <el-input
-              v-if="item.setWeight"
-              class="spacer"
-              type="number"
-              v-model="item.weight"
-            />
-            <el-input
-              v-else
-              class="spacer"
-              type="text"
-              value="--"
-              disabled
-            />
+          <div style="height: 400px; overflow: auto">
+            <div v-for="item in weightOptions" :key="item.id" class="flex-center margin-bottom-sm">
+              <span class="spacer">{{item.name}}</span>
+              <el-input
+                v-if="item.weight != -1"
+                class="spacer"
+                type="number"
+                v-model="item.weight"
+              />
+              <el-input
+                v-else
+                class="spacer"
+                type="text"
+                value="--"
+                disabled
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -343,6 +347,7 @@ export default {
       importCount: 0,
       allScoreWeightEmpty: true,
       allPassWeightEmpty: true,
+      weightSwitch: false,
       btnList: [
         {
           id: 0,
@@ -394,7 +399,10 @@ export default {
   },
 
   computed: {
-    ...mapGetters({ accountChanged: 'accountChanged' })
+    ...mapGetters({ accountChanged: 'accountChanged' }),
+    isAllWeight () {
+      return this.weightOptions.some(item => item.weight != -1)
+    }
   },
 
   watch: {
@@ -460,6 +468,9 @@ export default {
   },
 
   methods: {
+    handleWeightSwitch (val) {
+      this.weightOptions = this.weightOptions.map(item => ({ ...item, weight: val ? 0 : -1 }))
+    },
     changeItemWeight (val, item) {
       item.weight = val ? 0 : -1
     },
@@ -472,8 +483,9 @@ export default {
       groups.forEach(group => {
         if (group.weight != -1) count += group.weight
       })
+      const isAllWeightEmpty = this.weightOptions.every(group => group.weight == -1)
       const self = this;
-      if (count === 100) {
+      if (count === 100 || isAllWeightEmpty) {
         inpectRESTful.updateGroupWeight({ groups }).then(() => {
           util.notify(self.$t('titleView.saveSuss'), 'success', 3000)
           this.showWeightSetting = false;

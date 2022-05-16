@@ -56,7 +56,7 @@
           <div class="catergy-title">
             <el-checkbox v-model="item.checked" class="storevue-checkbox-outlined" @change="checkItemsOfCatergy(item)"/>
             <div style="display: inline-flex;flex-direction: column;font-size: 14px;font-weight: bold;color: #424151; padding-left: calc(38/1920*100vw); margin-left: 10px">
-              <div v-if="sheetIndex != 2" style="color: #c60957">{{ item.groupWeight == -1 ? '--' : `${item.groupWeight}%` }}</div>
+              <div v-if="sheetIndex != 2 && item.groupWeight != -1">{{ `${item.groupWeight}%` }}</div>
               <div>{{ item.groupName }}（{{ item.itemCount }}）</div>
             </div>
           </div>

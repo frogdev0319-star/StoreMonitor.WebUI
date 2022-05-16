@@ -300,7 +300,7 @@
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
                     <div>
-                      <div style="color: #c60957;">{{ categoryItem.weight == -1 ? '--' : categoryItem.weight + '%' }}</div>
+                      <div v-if="categoryItem.weight != -1">{{ categoryItem.weight + '%' }}</div>
                       <div>{{ categoryItem.groupName }}</div>
                     </div>
                   </td>
