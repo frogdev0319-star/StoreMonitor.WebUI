@@ -91,6 +91,9 @@ export default{
 
       "AuditManage":"簽核管理"
 
+      "noReportAuthority":"無報告檢視權限，請聯繫管理員",
+      "noPatrolCompareStatAuthority":"無巡檢同比分析權限，請聯繫管理員",
+      "noEventAuthority":"無事件檢視權限，請聯繫管理員"
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -298,9 +301,9 @@ export default{
       "confirmChangeBind":"巡檢表尚未送出，是否確認切換巡檢表？",
       "confirmIgnore":"確認是否忽略當前巡檢項？",
       "confirmSum":"完成巡檢",
-      "confirmSwitch":"本次巡店尚未完成，確認是否切換檔前門店？",
-      "confirmSwitchBrand":"本次巡店尚未完成，確認是否切換檔前品牌？",
-      "confirmSwitchInspect":"本次巡店尚未完成，確認是否切換檔前巡檢表？",
+      "confirmSwitch":"本次巡店尚未完成，確認是否切換當前門店？",
+      "confirmSwitchBrand":"本次巡店尚未完成，確認是否切換當前品牌？",
+      "confirmSwitchInspect":"本次巡店尚未完成，確認是否切換當前巡檢表？",
       "contactInfo":"請聯繫設備所有者獲取密碼進行查看",
       "copy":"發送",
       "country":"國家/地區",
@@ -599,7 +602,7 @@ export default{
     "enterListName":"請輸入巡檢表名稱",
     "enterListNameRuletip":"最多可輸入250個字元",
     "enterName":"輸入巡檢類別名稱",
-    "enterNameRuletip":"最多可輸入30個字元",
+    "enterNameRuletip":"最多可輸入50個字元",
     "enterScore":"請輸入分值",
     "enterSelfListName":"請輸入自訂巡檢表名稱！",
     "evaluationType":"參與評分",

@@ -47,6 +47,8 @@ import {getEventList} from '@/api/event';
 import TablePagination_V2 from '@/components/TablePagination_V2';
 import util from '@/common/util';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import PermissionHelper from '@/api/PermissionHelper';
+import { message } from '@/common/singleton-message';
 export default {
     name:'IncepItemTop5',
     components: {
@@ -179,6 +181,17 @@ export default {
         },
         cellClick(row,prop){
             //console.log("row:",row);
+            if(!PermissionHelper.enableEventHandle() && 
+                !PermissionHelper.enableEventClose() && 
+                !PermissionHelper.enableEventAdd() && 
+                !PermissionHelper.enableEventReturn()){
+                message({
+                    message: this.$i18n.t('route.noEventAuthority'),
+                    type: 'error',
+                    duration: 5 * 1000
+                    });
+                return;
+            }
             const self = this;
             var params = SearchConditionUtil.getSearchCondition('eventManage');
             const statics_params = SearchConditionUtil.getSearchCondition('eventStatistics');

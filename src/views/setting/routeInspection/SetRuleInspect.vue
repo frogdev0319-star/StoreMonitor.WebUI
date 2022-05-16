@@ -239,7 +239,7 @@
         </div>
       </setting-table>
     </el-col>
-    <el-col :span="24" class="el-rute-content">
+    <!-- <el-col :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.eventTimeoutReminder')">
         <div slot="tableDetail" class="setting-config rule-item">
           <div>
@@ -263,7 +263,7 @@
           </div>
         </div>
       </setting-table>
-    </el-col>
+    </el-col> -->
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionCheckin')">
         <div slot="tableDetail" class="setting-config rule-item">

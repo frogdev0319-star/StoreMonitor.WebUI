@@ -1709,9 +1709,9 @@ export default {
           let OthersCopy = deepClone(Others);
           const tableVersion = _this.getTableVersonBasedOnWeight(PassFail, Score, Others);
 
-          outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
+         outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
-          outdata.Others = _this.getOthersSheetJsonData(wb, Others, tableVersion);
+          outdata.Others = _this.getPassAndFailSheetJsonData(wb, Others, tableVersion);
 
           if (outdata.PassFail.length > 0) {
             if (!outdata.PassFail[0].catergyName) {
@@ -1819,7 +1819,7 @@ export default {
 
     getPassAndFailSheetJsonData(workbook, sheet, tableVersion) {
       if (sheet) {
-        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.G1;
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         var names = {};
@@ -1828,18 +1828,14 @@ export default {
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
           if (tableVersion === 1) {
             rowDataObj.subCatergyName = '';
-            rowDataObj.weight = _item.__EMPTY_1;
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.score = _item.__EMPTY_2;
+            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+          } else {
+            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
             rowDataObj.score = _item.__EMPTY_3;
             rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
-            rowDataObj.required = _item.__EMPTY_4;
-          } else {
-            rowDataObj.weight = _item.__EMPTY_1;
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
-            rowDataObj.score = _item.__EMPTY_4;
-            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
-            rowDataObj.required = _item.__EMPTY_5;
           }
           
           if (names[rowDataObj.catergyName] === undefined || rowDataObj.catergyName === '') {
@@ -1885,29 +1881,26 @@ export default {
 
     getScoreSheetJsonData(workbook, sheet, tableVersion) {
       if (sheet) {
-        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1; delete sheet.G1;
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1; delete sheet.F1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         sheetArray.forEach((_item) => {
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
-          rowDataObj.weight = _item.__EMPTY_1;
           if (tableVersion === 1) {
             rowDataObj.subCatergyName = '';
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.totalScore = _item.__EMPTY_3;
-            rowDataObj.scoreThreshold = _item.__EMPTY_4;
-            rowDataObj.score = this.getTableCellData(_item.__EMPTY_5);
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
-            rowDataObj.required = _item.__EMPTY_7;
-          } else {
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.totalScore = _item.__EMPTY_2;
+            rowDataObj.scoreThreshold = _item.__EMPTY_3;
             rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
-            rowDataObj.scoreThreshold = _item.__EMPTY_5;
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_5);
+          } else {
+            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
+            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+            rowDataObj.score = this.getTableCellData(_item.__EMPTY_3);
+            rowDataObj.scoreThreshold = _item.__EMPTY_4;
             rowDataObj.totalScore = Infinity;
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_7);
-            rowDataObj.required = _item.__EMPTY_8;
+            rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
           }
 
           rowDataArray.push(rowDataObj);
@@ -1978,10 +1971,11 @@ export default {
           }
         }
       });
-      
+      // if (count !== 100) passFailFlagObj.flags.flagGroupWeightTotal = true;
       return passFailFlagObj;
     },
 
+    
     validateScoreData(scoreArr, tableVersion) {
       const ITEMSLENGTH = 250;
       const _this = this;
@@ -1999,8 +1993,7 @@ export default {
           flagScoreItemType: false,
           flagDesLengthScore: false,
           flagScoreItemEmpty: false,
-          flagFullScoreLimitation: false,
-          flagGroupWeightTotal: false
+          flagFullScoreLimitation: false
         }
       };
       if (scoreArr.length === 0) {

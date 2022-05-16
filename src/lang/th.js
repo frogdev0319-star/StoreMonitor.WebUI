@@ -84,6 +84,9 @@ export default{
       "supervisorCalStat":"สถิติการประเมินร้านค้า",
       "patrolItemStat":"สถิติรายการในการตรวจสอบ",
       "singleStoreStat":"สถิติร้านค้าเดียว",
+      "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator",
+      "noEventAuthority":"You don't have permission to view events, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"อัตราส่วนอันตราย ＜60%",
@@ -248,7 +251,7 @@ export default{
       "daysww":"XX",
       "weeks":"สัปดาห์",
       "pageSize":"การแสดงผลต่อหน้า",
-      "pageSizeUnit":"รายการ"
+      "pageSizeUnit":"รายการ",
   },
   "remotePatrol":{
       "InspectionDetail":"ส่งออกรายงาน",
@@ -592,7 +595,7 @@ export default{
       "enterListName":"ป้อนชื่อรายชื่อ",
       "enterListNameRuletip":"ป้อนไม่เกิน 250 ตัวอักขระ",
       "enterName":"ป้อนชื่อหมวดหมู่",
-      "enterNameRuletip":"ป้อนไม่เกิน 30 ตัวอักขระ",
+      "enterNameRuletip":"ป้อนไม่เกิน 50 ตัวอักขระ",
       "enterScore":"โปรดป้อนคะแนน",
       "enterSelfListName":"โปรดป้อนรายชื่อแบบกำหนดเอง",
       "evaluationType":"การมีส่วนร่วมในการให้คะแนน",

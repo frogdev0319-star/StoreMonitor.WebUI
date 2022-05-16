@@ -587,7 +587,7 @@
                       </div>
                       <div v-if="item.itemType === 0">
                         <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="!item.checked">
+                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -596,11 +596,11 @@
                             <el-dropdown-item
                               v-for="(itemDS,indexDs) in item.scoreList" :key="indexDs"
                               style="width:70px;text-align:center;"
-                              @click.native="checkScore({item,itemDS: itemDS,e:0})">{{ itemDS.scoreTitle }}</el-dropdown-item>
+                              @click.native="checkScore({item,itemDS: itemDS,index: index, e:0})">{{ itemDS.scoreTitle }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                         <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="!item.checked">
+                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -610,7 +610,7 @@
                               v-for="itemDS in item.itemScoreLength"
                               :key="itemDS"
                               style="width:70px;text-align:center;"
-                              @click.native="checkScore({item,itemDS: itemDS,e:1})">{{ itemDS }}</el-dropdown-item>
+                              @click.native="checkScore({item,itemDS: itemDS,index: index, e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
                         <div v-if="!item.required" class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
@@ -618,7 +618,7 @@
                     </div>
                   </div>
                   <div style="margin-left: calc(20/1920*100vw)" :style="item.checked?{'background-color':'#f2f9fe'}:{}">
-                    <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="details-content margin-bottom-sm">
+                    <div :class="!item.manualIgnore?'noraml-title':'ignore-title'" style=" word-break: break-all" class="details-content margin-bottom-sm">
                       {{ item.description }}
                     </div>
                     <div v-if="item.lastUnqualifiedNumber > 0" class="details-failed-record margin-bottom-sm">
@@ -1078,10 +1078,16 @@ export default {
           self.playState && self.previewplayer && self.previewplayer.dispose();
           self.$store.dispatch('setPatrolHistory', null);
           self.$store.dispatch('setPatrolComment', null);
+          self.$store.dispatch('setStoreList', []);
+          self.$store.dispatch('setStoreCache', null);
+          this.editCount = 0;
+          this.$store.dispatch('setEditCount', this.editCount);
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
+          self.$store.dispatch('setStoreList', self.storeList);
           self.$store.dispatch('setPatrolHistory', self.historyObj);
+          self.$store.dispatch('setStoreCache', this.curSelStoreId);
         }
         !self.showGuide &&  self.$refs.vendorVideo.stopVideoPlay();
         next();
@@ -1091,12 +1097,17 @@ export default {
     } else {
       if (to.name != 'confirmSum') {
         // from.meta.keepAlive=false;
+        this.editCount = 0;
+        this.$store.dispatch('setEditCount', this.editCount);
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
+        self.$store.dispatch('setStoreList', []);
+        self.$store.dispatch('setStoreCache', null);
         Database.addDataToDB(self.userId, {data: {}, rule: {}});
       } else {
-        // from.meta.keepAlive=true;
         self.$store.dispatch('setPatrolHistory', self.historyObj);
+        self.$store.dispatch('setStoreList', self.storeList);
+        self.$store.dispatch('setStoreCache', this.curSelStoreId);
       }
       !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       next();
@@ -1106,11 +1117,12 @@ export default {
   async mounted() {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
-    
+    const storeListCache = self.$store.getters.storeListCache;
+    if (storeListCache) self.storeList = storeListCache
     if (PatrolHistory != null) {
       self.activeIndex = PatrolHistory.activeIndex;
       self.tabList[Number(self.activeIndex)].storeList = PatrolHistory.storeList;
-      self.storeList = PatrolHistory.storeList
+      // self.storeList = PatrolHistory.storeList
       const indexFeed = PatrolHistory.sheetName.map(x => x.groupId).indexOf('feedBack');
       let getdealnum = 0;
       const sheetName = PatrolHistory.sheetName.slice(0, indexFeed);
@@ -1149,7 +1161,6 @@ export default {
           self.showFeedBack = true;
         }
       } else {
-        console.log('inspectItemList mounted')
         self.inspectItemList = [...PatrolHistory.inspectItemList];
       }
       self.store = PatrolHistory.store;
@@ -1453,12 +1464,12 @@ export default {
       item.dealCount = item.Effective = item.inputCount = 1;
     },
 
-    checkScore({item, itemDS, e}) {
+    checkScore({item, itemDS, index, e}) {
+      this.curItem = {...item};
+      this.curItemIndex = index
+      this.curItemId = item.id;
+      item.disabled = false;
       const self = this;
-      console.log("Check Score")
-      console.log(self.curSheetIndex, self.curGroupIndex,self.curItemIndex)
-      console.log(item);
-      console.log(itemDS)
       item.scoreList.forEach(s_item => {
         s_item.val === itemDS.val ? s_item.isClick = true : s_item.isClick = false;
       });
@@ -1486,6 +1497,8 @@ export default {
           })
         })
         if (!item.manualIgnore && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
+          this.editCount++;
+          this.$store.dispatch('setEditCount', this.editCount);
           self.sheetName[self.curSheetIndex].dealCount++;
           self.sheetName[self.curSheetIndex].Effective++;
           self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].dealCount++;
@@ -1507,7 +1520,6 @@ export default {
           });
         });
       });
-      console.log(hasIgnoretemp)
       hasIgnoretemp.length === 0 ? self.notShowAlert = true : null;
     },
 
@@ -1654,40 +1666,226 @@ export default {
       }
     },
     
+    changeInspect(val) {
+      const self = this;
+      // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
+      if (this.editCount > 0) {
+        self.changeInspectObj.dialogCosed = true;
+        self.beforepatrolstore = val;
+      } else {
+        self.changeInspectList(val);
+      }
+    },
+    changeInspectList(val) {
+      const self = this;
+      if (!self.showGuide && self.$refs.vendorVideo) {
+        self.$refs.vendorVideo.editCount = 0;
+        self.$refs.vendorVideo.stopVideoPlay();
+      };
+      self.isDisabled = false;
+      self.hasIgnoretemp = [];
+      self.tempArr = [];
+      this.editCount = 0;
+      this.$store.dispatch('setEditCount', this.editCount);
+      self.$store.dispatch('setPatrolHistory', null);
+      self.$store.dispatch('setPatrolComment', null);
+      Database.addDataToDB(self.userId, {data: {}, rule: {}});
+      self.isShowWarn = false;
+      self.notShowAlert = false;
+      this.showIgnoreItem = false;
+       this.$emit("listenerChild", false); 
+      self.eventList = [];
+      // self.showChannelBtns = [];
+      self.curSheetIndex = 0;
+      self.curSheet = {};
+      self.PatrolList.forEach(item => {
+        if (item.id == val) {
+          self.patrolstore = item.name;
+        }
+      });
+      const params = {
+        storeId: self.store.storeId,
+        mode: 0,
+        authorizedOnly: 1,
+        tagName: self.patrolstore,
+        inspectId: val
+      };
+      self.inspectItemList = [];
+      checkOutInspectItemV3(params).then(res => {
+        if (res.errCode == 0) {
+          const data = res.data.groups;
+          const inspectSettings = {};
+          res.data.inspectSettings.forEach(item => {
+            switch (item.name) {
+              case 'includedInTotalScoreWithType1':
+                inspectSettings.includedInTotalScoreWithType1 = item.value;
+                break;
+              case 'qualifiedForIgnoredWithType1':
+                inspectSettings.qualifiedForIgnoredWithType1 = item.value;
+                break;
+              case 'qualifiedForIgnoredWithType2':
+                inspectSettings.qualifiedForIgnoredWithType2 = item.value;
+                break;
+              case 'hundredMarkType':
+                inspectSettings.hundredMarkType = item.value.toString();
+                break;
+              case 'minScore':
+                inspectSettings.minScore = item.value;
+                break;
+              case 'maxScore':
+                inspectSettings.maxScore = item.value;
+                break;
+              case 'dangerousOnFailedItem':
+                inspectSettings.dangerousOnFailedItem = item.value;
+                break;
+              case 'baseScore':
+                inspectSettings.baseScore = item.value;
+                break;
+              case 'itemOptionsForType1':
+                inspectSettings.itemOptionsForType1 = item.value;
+                this.itemOptionsForType1 = item.value;
+                break;
+              case 'itemOptionsForType3':
+                inspectSettings.itemOptionsForType3 = item.value;
+                this.itemOptionsForType3 = item.value;
+                break;
+              default:
+                break;
+            }
+          });
+          sessionStorage.setItem('inspectSettings', JSON.stringify(inspectSettings));
+          sessionStorage.setItem('uuid', res.data.uuid);
+          this.checkIfAllItemsAreRemark(data);
+          const temp = [];
+          data.forEach((item, index) => {
+            const obj = {};
+            obj.groupId = item.groupId;
+            obj.mode = item.mode;
+            obj.type = item.type;
+            obj.groupName = item.groupName;
+            obj.dealCount = 0;
+            obj.count = item.items.length;
+            obj.Effective = 0;
+            obj.isHover = false;
+            obj.parentId = item.parentId;
+            obj.lastUnqualifiedNumber = item.lastUnqualifiedNumber;
+            if (index == 0) {
+              obj.isClick = true;
+            } else {
+              obj.isClick = false;
+            }
+            const btnNameArr = this.getTab1AndTab3BtnName(obj.type);
+            const tempItems = [];
+            item.items.forEach((_item, _index) => {
+              const itemObj = {};
+              itemObj.id = _item.id;
+              itemObj.groupId = item.groupId;
+              itemObj.groupName = item.groupName;
+              itemObj.subject = _item.subject;
+              itemObj.description = _item.description;
+              itemObj.itemScore = _item.itemScore;
+              itemObj.required = _item.required;
+              let itemScoreLength = [];
+              if (_item.availableScores.length !== 0) {
+                itemScoreLength = _item.availableScores;
+              } else {
+                for (let i = 0; i < _item.itemScore + 1; i++) {
+                  itemScoreLength.push(i);
+                }
+              }
+              itemScoreLength.sort((a, b) => {
+                return a - b;
+              });
+              itemObj.itemScoreLength = itemScoreLength.reverse();
+              itemObj.itemgetScore = '--';
+              itemObj.isQualified = false;
+              itemObj.qualifiedScore = _item.qualifiedScore;
+              itemObj.type = item.type;
+              itemObj.itemScoreTitle = '--';
+              // itemObj.deviceId=_item.deviceId;
+              itemObj.deviceId = _item.deviceIds;
+              itemObj.inspectInput = '';
+              itemObj.inputCount = 0;
+              itemObj.disabled = true;
+              itemObj.checked = false;
+              itemObj.isIgnore = false;
+              itemObj.Ruletip = false;
+              itemObj.RuleCountTip = false;
+              itemObj.manualIgnore = false;
+              itemObj.sourceList = [];
+              itemObj.groupType = item.type;
+              itemObj.lastUnqualifiedNumber = _item.lastUnqualifiedNumber;
+              itemObj.scoreList = [
+                {val: _item.itemScore, scoreTitle: btnNameArr[0], isClick: false},
+                {val: -1, scoreTitle: btnNameArr[1], isClick: false}
+                ];
+              itemObj.itemType = _item.type;
+              tempItems.push(itemObj);
+            });
+            obj.items = tempItems;
+            temp.push(obj);
+          });
+          const te_temp = [];
+
+          const treeData = temp.filter(item => item.parentId === -1);
+          let handleData = [];
+          treeData.forEach(item => {
+            let obj = {};
+            obj.cateray = item;
+            obj.subcatergy = [];
+            temp.forEach(totalData => {
+              if(item.groupId === totalData.parentId){
+                obj.subcatergy.push(totalData);
+              }
+            })
+            handleData.push(obj);
+          })
+          for (let i = 0; i < handleData.length; i++) {
+            let count = 0, label = '';
+            if (handleData[i].subcatergy.length === 0){
+              count = handleData[i].cateray.items.length;
+              te_temp.push({
+                inspectList: [handleData[i].cateray], dealCount: 0, Effective: 0, count: count, isClick: false,
+                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: false
+              });
+            } else {
+              handleData[i].subcatergy.forEach(item => count += item.items.length);
+              te_temp.push({
+                inspectList: handleData[i].subcatergy, dealCount: 0, Effective: 0, count: count, isClick: false,
+                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: true
+              });
+            }
+          }
+
+          self.sheetName = te_temp.sort((a, b) => {return a.type - b.type});
+          self.sheetName[0].isClick = true;
+          const isCategory = self.sheetName[0].isCategory;
+          self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
+          //bug
+          const feedobj = {groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false, isCategory: true};
+          if (self.sheetName.length != 0) {
+            self.sheetName.push(feedobj);
+            self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
+          }
+          
+        console.log(this.sheetName)
+        }
+      })
+    },
+    changeStoreDialog() {
+      this.changeStoreObj.dialogCosed = false;
+      const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
+      this.changeStore_(storeItem);
+      this.editCount = 0;
+      this.$store.dispatch('setEditCount', this.editCount);
+    },
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
-      const storeItem = this.storeList.find(store => store.storeId === storeData.curSelectedStore)
-      if (this.$refs.vendorVideo && this.$refs.vendorVideo.editCount != 0 && storeItem != undefined) {
-        // this.changeStoreObj.dialogCosed = true;
+      const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
+      if (!this.$store.getters.storeCache) {
+        this.changeStore_(storeItem);
       } else {
-        if (storeItem) {
-          this.changeStore_(storeItem)
-        } else {
-          this.patrolstore = '';
-          this.curSheetIndex = 0;
-          this.curSheet = {};
-          this.inspectItemList = [];
-          this.inspectList = [];
-          this.sheetName = [];
-          this.tempArr = [];
-          this.showChannelBtns = [];
-          this.patrolStoreName = '';
-          this.PatrolList = [];
-          this.hasIgnoretemp = [];
-          this.$store.dispatch('setPatrolHistory', null);
-          this.isShowWarn = false;
-          this.notShowAlert = false;
-          this.showIgnoreItem = false;
-          this.$emit("listenerChild", false);
-          this.showStoreUp = true;
-          this.$refs.vendorVideo && (this.$refs.vendorVideo.editCount = 0);
-          this.$refs.vendorVideo && this.$refs.vendorVideo.stopVideoPlay();
-          this.showError = false;
-          this.curDeviceId = -1;
-          this.showFeedBack = false;
-          this.eventList = [];
-          this.showGuide = true;
-        }
+        this.$store.dispatch('setStoreCache', '');
       }
       
     },
@@ -1722,7 +1920,6 @@ export default {
         self.getInitStoreData(allStoreData);
         const storeData = allStoreData.data.content;
         self.storeList = getStoreTemp(storeData);
-        // console.log('self.storeList', self.storeList)
         const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
         self.changeStore_(storeItem)
       }
@@ -2011,6 +2208,8 @@ export default {
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount == 0) {
           this.sheetName[this.curSheetIndex].dealCount++
           this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++
+          this.editCount++;
+          this.$store.dispatch('setEditCount', this.editCount);
         }
         if (self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].manualIgnore) {
             self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inspectInput = '';
@@ -2280,6 +2479,7 @@ export default {
       };
       this.hasIgnoretemp = [];
       const params = { _id: this.userId, data: obj, rule: inspectSettings };
+      this.$store.dispatch('setStoreList', this.storeList);
       await Database.addDataToDB(this.userId, params);
       this.$router.push({ name: 'confirmSum', params: params });
     },
@@ -2495,12 +2695,6 @@ export default {
     changeBrandDialog() {
       const self = this;
     },
-    changeStoreDialog(val) {
-      const self = this;
-      self.changeStoreObj.dialogCosed = false;
-      const storeItem = this.storeList.find(store => store.storeId === self.curSelStoreId)
-      if (storeItem) self.changeStore_(storeItem)
-    },
     changeInspectDialog() {
       const self = this;
       self.changeInspectObj.dialogCosed = false;
@@ -2626,227 +2820,6 @@ export default {
       self.$nextTick(() => {
         if (self.$refs.vendorVideo) self.$refs.vendorVideo.startVideo(self.channel.ivsId, self.channel.channelId, null);
       });
-    },
-    changeInspect(val) {
-      const self = this;
-      console.log(self.$refs.vendorVideo.editCount)
-      // console.log(self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 0, self.$store.getters.PatrolHistory != null)
-      if ( (self.$refs.vendorVideo && self.$refs.vendorVideo.editCount > 1) ) {
-        self.changeInspectObj.dialogCosed = true;
-        self.beforepatrolstore = val;
-      } else {
-        self.changeInspectList(val);
-      }
-    },
-    changeInspectList(val) {
-      const self = this;
-      if (!self.showGuide && self.$refs.vendorVideo) {
-        self.$refs.vendorVideo.editCount = 0;
-        self.$refs.vendorVideo.stopVideoPlay();
-      };
-      self.isDisabled = false;
-      self.hasIgnoretemp = [];
-      self.tempArr = [];
-      self.$store.dispatch('setPatrolHistory', null);
-      self.$store.dispatch('setPatrolComment', null);
-      Database.addDataToDB(self.userId, {data: {}, rule: {}});
-      self.isShowWarn = false;
-      self.notShowAlert = false;
-      this.showIgnoreItem = false;
-       this.$emit("listenerChild", false); 
-      self.eventList = [];
-      // self.showChannelBtns = [];
-      self.curSheetIndex = 0;
-      self.curSheet = {};
-      self.PatrolList.forEach(item => {
-        if (item.id == val) {
-          self.patrolstore = item.name;
-        }
-      });
-      const params = {
-        storeId: self.store.storeId,
-        mode: 0,
-        authorizedOnly: 1,
-        tagName: encodeURIComponent(self.patrolstore),
-        inspectId: val
-      };
-      self.inspectItemList = [];
-      checkOutInspectItemV3(params).then(res => {
-        if (res.errCode == 0) {
-          const data = res.data.groups;
-          const inspectSettings = {};
-          res.data.inspectSettings.forEach(item => {
-            switch (item.name) {
-              case 'includedInTotalScoreWithType1':
-                inspectSettings.includedInTotalScoreWithType1 = item.value;
-                break;
-              case 'qualifiedForIgnoredWithType1':
-                inspectSettings.qualifiedForIgnoredWithType1 = item.value;
-                break;
-              case 'qualifiedForIgnoredWithType2':
-                inspectSettings.qualifiedForIgnoredWithType2 = item.value;
-                break;
-              case 'hundredMarkType':
-                inspectSettings.hundredMarkType = item.value.toString();
-                break;
-              case 'minScore':
-                inspectSettings.minScore = item.value;
-                break;
-              case 'maxScore':
-                inspectSettings.maxScore = item.value;
-                break;
-              case 'dangerousOnFailedItem':
-                inspectSettings.dangerousOnFailedItem = item.value;
-                break;
-              case 'baseScore':
-                inspectSettings.baseScore = item.value;
-                break;
-              case 'itemOptionsForType1':
-                inspectSettings.itemOptionsForType1 = item.value;
-                this.itemOptionsForType1 = item.value;
-                break;
-              case 'itemOptionsForType3':
-                inspectSettings.itemOptionsForType3 = item.value;
-                this.itemOptionsForType3 = item.value;
-                break;
-              default:
-                break;
-            }
-          });
-          sessionStorage.setItem('inspectSettings', JSON.stringify(inspectSettings));
-          sessionStorage.setItem('uuid', res.data.uuid);
-          this.checkIfAllItemsAreRemark(data);
-          const temp = [];
-          data.forEach((item, index) => {
-            const obj = {};
-            obj.groupId = item.groupId;
-            obj.weight = item.weight;
-            obj.mode = item.mode;
-            obj.type = item.type;
-            obj.groupName = item.groupName;
-            obj.dealCount = 0;
-            obj.count = item.items.length;
-            obj.Effective = 0;
-            obj.isHover = false;
-            obj.parentId = item.parentId;
-            obj.lastUnqualifiedNumber = item.lastUnqualifiedNumber;
-            if (index == 0) {
-              obj.isClick = true;
-            } else {
-              obj.isClick = false;
-            }
-            const btnNameArr = this.getTab1AndTab3BtnName(obj.type);
-            const tempItems = [];
-            item.items.forEach((_item, _index) => {
-              const itemObj = {};
-              itemObj.id = _item.id;
-              itemObj.weight = item.weight;
-              itemObj.groupId = item.groupId;
-              itemObj.groupName = item.groupName;
-              itemObj.subject = _item.subject;
-              itemObj.description = _item.description;
-              itemObj.itemScore = _item.itemScore;
-              itemObj.required = _item.required;
-              let itemScoreLength = [];
-              if (_item.availableScores.length !== 0) {
-                itemScoreLength = _item.availableScores;
-              } else {
-                for (let i = 0; i < _item.itemScore + 1; i++) {
-                  itemScoreLength.push(i);
-                }
-              }
-              itemScoreLength.sort((a, b) => {
-                return a - b;
-              });
-              itemObj.itemScoreLength = itemScoreLength.reverse();
-              itemObj.itemgetScore = '--';
-              itemObj.isQualified = false;
-              itemObj.qualifiedScore = _item.qualifiedScore;
-              itemObj.type = item.type;
-              itemObj.itemScoreTitle = '--';
-              // itemObj.deviceId=_item.deviceId;
-              itemObj.deviceId = _item.deviceIds;
-              itemObj.inspectInput = '';
-              itemObj.inputCount = 0;
-              itemObj.disabled = true;
-              itemObj.checked = false;
-              itemObj.isIgnore = false;
-              itemObj.Ruletip = false;
-              itemObj.RuleCountTip = false;
-              itemObj.manualIgnore = false;
-              itemObj.sourceList = [];
-              itemObj.groupType = item.type;
-              itemObj.lastUnqualifiedNumber = _item.lastUnqualifiedNumber;
-              itemObj.scoreList = [
-                {val: _item.itemScore, scoreTitle: btnNameArr[0], isClick: false},
-                {val: -1, scoreTitle: btnNameArr[1], isClick: false}
-                ];
-              itemObj.itemType = _item.type;
-              tempItems.push(itemObj);
-            });
-            obj.items = tempItems;
-            temp.push(obj);
-          });
-          const te_temp = [];
-
-          const treeData = temp.filter(item => item.parentId === -1);
-          let handleData = [];
-          treeData.forEach(item => {
-            let obj = {};
-            obj.cateray = item;
-            obj.subcatergy = [];
-            temp.forEach(totalData => {
-              if(item.groupId === totalData.parentId){
-                obj.subcatergy.push(totalData);
-              }
-            })
-            handleData.push(obj);
-          })
-          for (let i = 0; i < handleData.length; i++) {
-            let count = 0, label = '';
-            if (handleData[i].subcatergy.length === 0){
-              count = handleData[i].cateray.items.length;
-              te_temp.push({
-                inspectList: [handleData[i].cateray], 
-                dealCount: 0, 
-                Effective: 0, 
-                count: count, 
-                isClick: false,
-                label: handleData[i].cateray.groupName, 
-                type: handleData[i].cateray.type, 
-                isCategory: false,
-                weight: handleData[i].cateray.weight
-              });
-            } else {
-              handleData[i].subcatergy.forEach(item => count += item.items.length);
-              te_temp.push({
-                inspectList: handleData[i].subcatergy, 
-                dealCount: 0, 
-                Effective: 0, 
-                count: count, 
-                isClick: false,
-                label: handleData[i].cateray.groupName, 
-                type: handleData[i].cateray.type, 
-                isCategory: true,
-                weight: handleData[i].cateray.weight
-              });
-            }
-          }
-
-          self.sheetName = te_temp.sort((a, b) => {return a.type - b.type});
-          self.sheetName[0].isClick = true;
-          const isCategory = self.sheetName[0].isCategory;
-          self.inspectList = isCategory ? self.sheetName[0].inspectList : self.sheetName[0].inspectList;
-          //bug
-          const feedobj = {groupId: 'feedBack', label: self.$t('remotePatrol.feedbacks'), isClick: false, isCategory: true};
-          if (self.sheetName.length != 0) {
-            self.sheetName.push(feedobj);
-            self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
-          }
-          
-          
-        }
-      })
     },
 
     getTab1AndTab3BtnName(type){
@@ -3090,6 +3063,8 @@ export default {
           self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
           if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
+              this.editCount++;
+              this.$store.dispatch('setEditCount', this.editCount);
               this.sheetName[this.curSheetIndex].dealCount++;
               this.sheetName[this.curSheetIndex].Effective++;
               this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].dealCount++;
@@ -3209,6 +3184,8 @@ export default {
         item.Ruletip = false;
       }
       if(!this.showIgnoreItem){
+        this.editCount++;
+        this.$store.dispatch('setEditCount', this.editCount);
         this.sheetName[this.curSheetIndex].inspectList.forEach((inspect, idx) => {
           inspect.items.forEach(item_ => {
             if (item_.id === self.curItemId) self.curGroupIndex = idx

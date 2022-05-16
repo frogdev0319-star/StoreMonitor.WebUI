@@ -83,7 +83,10 @@ export default{
       "patrolCompareStat":"Inspection Compare Statistics",
       "supervisorCalStat":"Store assessment statistics",
       "patrolItemStat":"Inspection item statistics",
-      "singleStoreStat":"Single Store Statistics"
+      "singleStoreStat":"Single Store Statistics",
+      "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator",
+      "noEventAuthority":"You don't have permission to view events, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"Pool Ratio＜60%",
@@ -592,7 +595,7 @@ export default{
       "enterListName":"Enter List Name",
       "enterListNameRuletip":"Enter up to 250 characters",
       "enterName":"Enter Category Name",
-      "enterNameRuletip":"Enter up to 30 characters",
+      "enterNameRuletip":"Enter up to 50 characters",
       "enterScore":"Please enter the score",
       "enterSelfListName":"Please Enter Custom List Name",
       "evaluationType":"Participating in scoring",
@@ -1100,7 +1103,7 @@ export default{
       "templateSelection":"Select a template",
       "reportTemplateLabel": "Report template",
       "show":"Show",
-      "noShow":"No show",
+      "noShow":"No show"
   },
   "statistics":{
       "averageCompare":"Average Compare",

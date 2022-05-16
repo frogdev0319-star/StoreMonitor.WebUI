@@ -178,10 +178,12 @@ export default {
     },
 
     async getInspectList() {
+      console.log("*start getInspectList");
       const self = this;
       const newArr = [];
       const inspectList = [];
       const inspectArr = await self.getTagAll();
+      console.log("*middle getInspectList",inspectArr);
       inspectArr.forEach(_item => {
         if (!newArr.includes(_item.id)) {
           newArr.push(_item.id);
@@ -197,6 +199,7 @@ export default {
       } else {
         self.inspectList = '';
       }
+      console.log("*End getInspectList",self.inspectList);
     },
 
     async getCountryStore() {
@@ -247,6 +250,7 @@ export default {
     },
 
     getInspectId() {
+      console.log("*then getInspectList > getInspectId",this.inspectList);
       const length = this.inspectTypeList.length;
       for (let i = 0; i < length; i++) {
         const name = this.inspectTypeList[i].name;
@@ -258,6 +262,7 @@ export default {
           this.params.inspectId = this.inspectList === '-1' ? '' : this.inspectList;
         }
       }
+      console.log("*then getInspectList > getInspectId",this.params.inspectId);
     },
 
     initDaysRange() {

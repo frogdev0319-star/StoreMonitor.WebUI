@@ -35,7 +35,9 @@ const user = {
     collapsed: false,
     templateOptions: [],
     curTemplateIndex: -1,
-    storeCache: null
+    storeCache: null,
+    storeListCache: [],
+    editCount: 0
   },
 
   mutations: {
@@ -43,7 +45,7 @@ const user = {
       state.curTemplateIndex = index
     },
     SET_STORE_CACHE: (state, store) => {
-      state.storeCache = {...store}
+      state.storeCache = store
     },
     SET_TEMPLATE_OPTIONS: (state, options) => {
       state.templateOptions = options
@@ -133,10 +135,21 @@ const user = {
 
     SET_Available_Path_List: (state, pathList) => {
       state.availabePathList = pathList;
+    },
+    SET_STORELIST: (state, storeList) => {
+      state.storeListCache = storeList
+    },
+    SET_EDIT_COUNT: (state, count) => {
+      state.editCount = count
     }
-
   },
   actions: {
+    setEditCount({ commit }, count) {
+      commit('SET_EDIT_COUNT', count);
+    },
+    setStoreList({ commit }, storeList) {
+      commit('SET_STORELIST', storeList);
+    },
     setPatrolHistory({ commit }, PatrolHistory) {
       commit('SET_PatrolHistory', PatrolHistory);
     },
@@ -293,15 +306,17 @@ const user = {
           }
 
           const patrolRoute = navbarRoute.getPatrolRoute();
-          accessedRoutes.length === 0 ? patrolRoute.redirect = patrolRoute.children[0].path : '';
-          accessedRoutes.push(patrolRoute);
+          accessedRoutes.length === 0 ? patrolRoute.redirect = ((patrolRoute.children.length>0)?patrolRoute.children[0].path:'') : '';
+          if (patrolRoute.children.length > 0) accessedRoutes.push(patrolRoute);
 
           const eventRoute = navbarRoute.getEventRoute();
-          accessedRoutes.push(eventRoute);
+          if (PermissionHelper.enableEventHandle() || PermissionHelper.enableEventClose() || PermissionHelper.enableEventAdd() || PermissionHelper.enableEventReturn()) {
+            accessedRoutes.push(eventRoute);
+          }
 
           const statisticsRoute = navbarRoute.getStatisticalRoute();
           statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
-          
+
           const auditRoute = navbarRoute.getAuditRoute();
           accessedRoutes.push(auditRoute);
 

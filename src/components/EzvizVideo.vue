@@ -831,6 +831,8 @@ export default {
       if (!self.channelInfo.id || !self.channelInfo.ivsId) {
         self.showError = true;
         self.errorMsg = self.$t('remotePatrol.lackParams');
+        this.isLoading = false;
+        this.decoder.stop()
         return;
       }
       self.showError = false;
@@ -1403,6 +1405,8 @@ export default {
       if (this.channelInfo === null || Object.keys(this.channelInfo).length === 0) {
         this.showError = true;
         this.errorMsg = this.$t('remotePatrol.lackParams');
+        this.isLoading = false;
+        this.decoder.stop()
         return;
       }
       if (this.videoAuthority === false) {
@@ -1467,20 +1471,21 @@ export default {
     stopRealTime() {
       const self = this;
       if (self.playState) {
-        if (self.fullWindow) {
-          self.fullDecoder.closeSound();
-          self.fullDecoder.stop();
-          self.fullDecoder = null;
-        } else {
-          self.decoder.closeSound();
-          self.decoder.stop();
-          self.decoder = null;
-        }
 
         window.clearInterval(self.timerPlayReal);
         self.realTimeSpeed = 0;
         self.stopVideoTime = false;
         self.timerPlayReal = null;
+      }
+      if (self.fullWindow && self.fullDecoder) {
+        self.fullDecoder.closeSound();
+        self.fullDecoder.stop();
+        self.fullDecoder = null;
+      } 
+      if (self.decoder) {
+        self.decoder.closeSound();
+        self.decoder.stop();
+        self.decoder = null;
       }
       self.muted = true;
       self.showModelContent = false;

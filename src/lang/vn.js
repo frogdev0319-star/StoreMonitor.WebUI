@@ -83,7 +83,10 @@ export default{
       "patrolCompareStat":"So sánh thống kê kiểm tra",
       "supervisorCalStat":"Thống kê đánh giá cửa hàng",
       "patrolItemStat":"Thống kê mục kiểm tra",
-      "singleStoreStat":"Các thống kê từng cửa hàng"
+      "singleStoreStat":"Các thống kê từng cửa hàng",
+      "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator",
+      "noEventAuthority":"You don't have permission to view events, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"Tỷ lệ nguy hiểm＜60%",
@@ -592,7 +595,7 @@ export default{
       "enterListName":"Nhập tên danh mục",
       "enterListNameRuletip":"Nhập tối đa 250 ký tự",
       "enterName":"Nhập tên danh mục",
-      "enterNameRuletip":"Nhập tối đa 30 ký tự",
+      "enterNameRuletip":"Nhập tối đa 50 ký tự",
       "enterScore":"Vui lòng nhập điểm",
       "enterSelfListName":"Vui lòng nhập tên danh mục tùy chỉnh",
       "evaluationType":"Đang chấm điểm",

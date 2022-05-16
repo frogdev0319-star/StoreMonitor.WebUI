@@ -88,6 +88,9 @@ export default{
       "workflowManage":"流程設計",
       "workflowDetail":"流程配置",
       "nodeSetting":"添加審核節點"
+      "noReportAuthority":"无报告检视权限，请联系管理员",
+      "noPatrolCompareStatAuthority":"无巡检同比分析权限，请联系管理员",
+      "noEventAuthority":"无事件检视权限，请联系管理员"
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",
@@ -596,7 +599,7 @@ export default{
     "enterListName":"请输入巡检表名称",
     "enterListNameRuletip":"最多可输入250个字符",
     "enterName":"输入巡检类别名称",
-    "enterNameRuletip":"最多可输入30个字符",
+    "enterNameRuletip":"最多可输入50个字符",
     "enterScore":"请输入分值",
     "enterSelfListName":"请输入自定义巡检表名称！",
     "evaluationType":"参与评分",

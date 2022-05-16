@@ -86,10 +86,11 @@
                       @mouseenter="onShowCategoryEditBtn(index,item)">
                     <div class="category-list">
                       <div class="category-name flex-center">
-                        <div class="group-left">
+                        <div class="group-left spacer">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
-                          <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex-center">
-                            <div :style="activeSheetName != 2 ? {}: {'visibility': 'hidden'}" style="color: #c60957; width: 40px; text-align: center">{{ item.weight == -1 ? '--' : `${item.weight} %` }}</div> <div>{{ item.name }}（{{ item.groupNum }}）</div>
+                          <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex" style="flex-direction: column; height: 60px; text-align: left; padding-left: 20px;">
+                            <div class="spacer" :style="activeSheetName != 2 ? {}: {'visibility': 'hidden'}" style="color: #c60957; line-height: 30px">{{ item.weight == -1 ? '--' : `${item.weight} %` }}</div> 
+                            <div class="spacer" style="line-height: 30px">{{ item.name }}（{{ item.groupNum }}）</div>
                           </div>
                         </div>
                         <div class="spacer"></div>
@@ -111,8 +112,8 @@
                                 class="groupItem" @click.stop="clickSubCategory(index, item.id, childIndex,childItem)"
                                 @mouseenter="onShowSubcategoryEditBtn(childIndex, childItem)">
                               <div v-if="activeChildId === childItem.id" class="proper-flag"/>
-                              <div class="category-name">
-                                <div class="group-left">
+                              <div class="category-name flex">
+                                <div class="group-left spacer">
                                   <div class="subcatergy-item">
                                     <span :style="activeChildId === childItem.id?{'color':'#006ab7'}:{}">
                                       {{ childItem.name }}
@@ -122,14 +123,8 @@
                                 <div class="group-right">
                                   <div class="show-edit">
                                     <div v-if="hoverId === childItem.id" class="nape-items-handle">
-                                      <i
-                                        class="iconfont icon-bianji"
-                                        style="cursor:pointer;"
-                                        @click="editCategory(childIndex,childItem)"/>
-                                      <i
-                                        class="iconfont icon-shanchu"
-                                        style="cursor:pointer;"
-                                        @click="deleteGroup(childIndex, childItem, item)"/>
+                                      <img style="margin-top:15px" :src="`./static/img/table-edit.png`" height="26px" @click="editCategory(childIndex,childItem)"/>
+                                      <img style="margin-top:15px" :src="`./static/img/table-delete.png`" height="26px" @click="deleteGroup(childIndex, childItem, item)"/>
                                     </div>
                                   </div>
                                 </div>
@@ -205,7 +200,7 @@
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
-          <el-form-item>
+          <!-- <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">{{ $t('insSettingView.isRequired') }}</span>
@@ -214,7 +209,7 @@
               <el-radio label="0">非必填</el-radio>
               <el-radio label="1">{{ $t('insSettingView.isRequired') }}</el-radio>
             </el-radio-group>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
@@ -1245,7 +1240,9 @@ export default {
           qualifiedScore = null;
         } else {
           if (parseFloat(self.ItemSheetScore) > 50 || parseFloat(self.ItemSheetScore) < 0.5) {
-            self.PFScoreTip = true;
+            if (self.itemType === 0) {
+              self.PFScoreTip = true;
+            }
           } else {
             itemScore = parseFloat(self.getFloat(self.ItemSheetScore));
             qualifiedScore = null;
@@ -1298,6 +1295,9 @@ export default {
           qualifiedScore = null;
         }
       }
+      console.log({enterItemNameTip : self.enterItemNameTip, PFScoreTip: self.PFScoreTip, ItemTotalScoreTip0 : self.ItemTotalScoreTip0, ItemTotalScoreTip1: self.ItemTotalScoreTip1,
+          ItemMinScoreTip: self.ItemMinScoreTip, OtherScoreTip: self.OtherScoreTip, enterListNameRuletip: self.enterListNameRuletip, OtherScoreTipEmpty: self.OtherScoreTipEmpty,
+          descriptionRuletip: self.descriptionRuletip, ScoreOptionsTips0: self.ScoreOptionsTips0, ScoreOptionsTips1: self.ScoreOptionsTips1 })
       if(self.enterItemNameTip || self.PFScoreTip || self.ItemTotalScoreTip0 || self.ItemTotalScoreTip1 ||
           self.ItemMinScoreTip || self.OtherScoreTip || self.enterListNameRuletip || self.OtherScoreTipEmpty ||
           self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1){
@@ -1321,7 +1321,7 @@ export default {
         qualifiedScore: qualifiedScore,
         availableScores: selectAvailable,
         type: this.itemType,
-        required: this.itemRequired === '1'
+        // required: this.itemRequired === '1'
       };
         temp.push(objItem);
         const obj = {
@@ -1385,7 +1385,7 @@ export default {
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable,
           type: this.itemType,
-          required: this.itemRequired === '1'
+          // required: this.itemRequired === '1'
         };
         temp.push(obj);
         const params = {
@@ -1417,7 +1417,7 @@ export default {
       this.ItemScoreOption = item.availableScoreStr;
       this.ItemDescription = item.napeDep;
       this.itemType = item.type;
-      this.itemRequired = item.required ? '1' : '0'
+      // this.itemRequired = item.required ? '1' : '0'
     },
 
     handleDelete(item) {
@@ -2118,7 +2118,7 @@ export default {
                     }
                 }
                 .groupItem{
-                    line-height: 60px;
+                    // line-height: 60px;
                     position: relative;
                     cursor: pointer;
                     text-align: left;
@@ -2174,12 +2174,14 @@ export default {
                     }
                 }
               .category-list{
+                // height: 60px;
+                // line-height: 60px;
                 display: flex;
                 flex-direction: column;
               }
               .category-name{
-                height: 60px;
-                line-height: 60px;
+                // height: 60px;
+                // line-height: 60px;
                 position: relative;
                 overflow: hidden;
                 border-bottom: 1px solid $border;
@@ -2190,8 +2192,8 @@ export default {
                 margin-top: 5px;
                 overflow: hidden;
                 text-align: left;
-                height: 60px;
-                line-height: 60px;
+                // height: 60px;
+                // line-height: 60px;
                 margin-bottom: 25px;
                 position: relative;
                 .group-name-left{
@@ -2281,8 +2283,8 @@ export default {
             width: 99%;
           }
             .nape-items-title{
-                height: 60px;
-                line-height: 60px;
+                // height: 60px;
+                // line-height: 60px;
                 text-align: left;
                 font-size: 14px;
                 color: $tab;

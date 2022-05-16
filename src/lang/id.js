@@ -83,7 +83,10 @@ export default{
       "patrolCompareStat":"Inspeksi Statistik Perbandingan",
       "supervisorCalStat":"Statistik evaluasi toko",
       "patrolItemStat":"Statistik item inspeksi",
-      "singleStoreStat":"Statistik Satu Toko"
+      "singleStoreStat":"Statistik Satu Toko",
+      "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
+      "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator",
+      "noEventAuthority":"You don't have permission to view events, please contact the administrator"
   },
   "overview":{
       "DangerousLess":"Rasio Bahaya＜60%",
@@ -592,7 +595,7 @@ export default{
       "enterListName":"Masukkan Nama Daftar",
       "enterListNameRuletip":"Masukkan maksimal 250 karakter",
       "enterName":"Masukkan Nama Kategori",
-      "enterNameRuletip":"Masukkan maksimal 30 karakter",
+      "enterNameRuletip":"Masukkan maksimal 50 karakter",
       "enterScore":"Masukkan nilai",
       "enterSelfListName":"Masukkan Daftar Nama Kustom",
       "evaluationType":"Berpartisipasi dalam nilai",

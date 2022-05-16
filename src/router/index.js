@@ -258,7 +258,7 @@ export const navbarRoute = {
         }
       }
     ) && primaryPathesList.push('/patrolItem');
-    statisticsRoute.children.push(
+    PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolPersonStat',
         name: 'patrolPersonStat',
@@ -322,8 +322,6 @@ export const navbarRoute = {
     // ) && primaryPathesList.push('/checkInStatistics');
     return statisticsRoute;
   },
-
-  
   getSystemSettingRoute() {
     const systemSettingRoute = {
       path: '/home',
