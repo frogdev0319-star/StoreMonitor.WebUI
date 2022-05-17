@@ -89,8 +89,9 @@
                         <div class="group-left spacer">
                           <div v-if="activeParentId === item.id && !item.children" class="proper-flag"/>
                           <div :style="activeParentId === item.id?{'color':'#006ab7'}:{}" class="flex" style="flex-direction: column; height: 60px; text-align: left; padding-left: 20px;">
-                            <div class="spacer" :style="activeSheetName != 2 ? {}: {'visibility': 'hidden'}" style="color: #c60957; line-height: 30px">{{ item.weight == -1 ? '--' : `${item.weight} %` }}</div> 
-                            <div class="spacer" style="line-height: 30px">{{ item.name }}（{{ item.groupNum }}）</div>
+                            <div v-if="item.weight != -1" :style="activeSheetName != 2 ? {}: {'visibility': 'hidden'}" style="line-height: 30px">{{ `${item.weight} %` }}</div> 
+                            <div class="spacer"></div>
+                            <div :style="item.weight != -1 ? {'line-height': '30px', 'height': '30px'} : {'line-height': '60px', 'height': '60px'}">{{ item.name }}（{{ item.groupNum }}）</div>
                           </div>
                         </div>
                         <div class="spacer"></div>
