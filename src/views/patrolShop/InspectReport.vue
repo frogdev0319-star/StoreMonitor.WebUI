@@ -299,8 +299,10 @@
               <tbody :key="categoryIndex" :class="hasChart ? 'pdf_font_20': 'pdf_font_16'" class="pdf_font_20">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="categoryItem.children.length + 1" style="vertical-align:middle;">
-                    <span style="color: #c60957;">{{ categoryItem.weight == -1 ? '--' : categoryItem.weight + '%' }}</span>
-                    <span>{{ categoryItem.groupName }}</span>
+                    <div>
+                      <div v-if="categoryItem.weight != -1">{{ categoryItem.weight + '%' }}</div>
+                      <div>{{ categoryItem.groupName }}</div>
+                    </div>
                   </td>
                 </tr>
                 <tr

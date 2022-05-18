@@ -595,7 +595,7 @@ export default{
       "enterListName":"ป้อนชื่อรายชื่อ",
       "enterListNameRuletip":"ป้อนไม่เกิน 250 ตัวอักขระ",
       "enterName":"ป้อนชื่อหมวดหมู่",
-      "enterNameRuletip":"ป้อนไม่เกิน 30 ตัวอักขระ",
+      "enterNameRuletip":"ป้อนไม่เกิน 50 ตัวอักขระ",
       "enterScore":"โปรดป้อนคะแนน",
       "enterSelfListName":"โปรดป้อนรายชื่อแบบกำหนดเอง",
       "evaluationType":"การมีส่วนร่วมในการให้คะแนน",

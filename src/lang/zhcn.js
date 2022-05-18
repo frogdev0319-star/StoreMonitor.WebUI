@@ -596,7 +596,7 @@ export default{
     "enterListName":"请输入巡检表名称",
     "enterListNameRuletip":"最多可输入250个字符",
     "enterName":"输入巡检类别名称",
-    "enterNameRuletip":"最多可输入30个字符",
+    "enterNameRuletip":"最多可输入50个字符",
     "enterScore":"请输入分值",
     "enterSelfListName":"请输入自定义巡检表名称！",
     "evaluationType":"参与评分",

@@ -60,7 +60,7 @@
               <tbody :key="inspectIndex">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
-                    <span style="color: #c60957;">{{ inspectItem.weight == -1 ? '--' : inspectItem.weight + '%' }}</span>
+                    <span v-if="inspectItem.weight != -1">{{ inspectItem.weight + '%' }}</span>
                     <span class="sheet_title">{{ inspectItem.label }}</span>
                     <span class="count-blag">{{inspectItem.count}}</span>
                   </td>

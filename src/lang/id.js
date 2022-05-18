@@ -595,7 +595,7 @@ export default{
       "enterListName":"Masukkan Nama Daftar",
       "enterListNameRuletip":"Masukkan maksimal 250 karakter",
       "enterName":"Masukkan Nama Kategori",
-      "enterNameRuletip":"Masukkan maksimal 30 karakter",
+      "enterNameRuletip":"Masukkan maksimal 50 karakter",
       "enterScore":"Masukkan nilai",
       "enterSelfListName":"Masukkan Daftar Nama Kustom",
       "evaluationType":"Berpartisipasi dalam nilai",

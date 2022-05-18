@@ -596,7 +596,7 @@ export default{
     "enterListName":"請輸入巡檢表名稱",
     "enterListNameRuletip":"最多可輸入250個字元",
     "enterName":"輸入巡檢類別名稱",
-    "enterNameRuletip":"最多可輸入30個字元",
+    "enterNameRuletip":"最多可輸入50個字元",
     "enterScore":"請輸入分值",
     "enterSelfListName":"請輸入自訂巡檢表名稱！",
     "evaluationType":"參與評分",
