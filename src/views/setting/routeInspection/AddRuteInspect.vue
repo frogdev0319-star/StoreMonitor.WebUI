@@ -201,16 +201,16 @@
             <span v-if="enterListNameRuletip" class="rules">{{ $t('insSettingView.enterListNameRuletip') }}</span>
             <span v-if="enterItemNameTip" class="rules">{{ $t('insSettingView.itemTitleEmpty') }}</span>
           </el-form-item>
-          <!-- <el-form-item>
+          <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
               <span class="item_label">{{ $t('insSettingView.isRequired') }}</span>
             </div>
             <el-radio-group class="attribute-group" v-model="itemRequired">
-              <el-radio label="0">非必填</el-radio>
+              <el-radio label="0">{{ $t('insSettingView.notRequired') }}</el-radio>
               <el-radio label="1">{{ $t('insSettingView.isRequired') }}</el-radio>
             </el-radio-group>
-          </el-form-item> -->
+          </el-form-item>
           <el-form-item>
             <div class="score_item">
               <span class="sign">*</span>
@@ -1322,7 +1322,7 @@ export default {
         qualifiedScore: qualifiedScore,
         availableScores: selectAvailable,
         type: this.itemType,
-        // required: this.itemRequired === '1'
+        required: this.itemRequired === '1'
       };
         temp.push(objItem);
         const obj = {
@@ -1386,7 +1386,7 @@ export default {
           qualifiedScore: qualifiedScore,
           availableScores: selectAvailable,
           type: this.itemType,
-          // required: this.itemRequired === '1'
+          required: this.itemRequired === '1'
         };
         temp.push(obj);
         const params = {
@@ -1418,7 +1418,7 @@ export default {
       this.ItemScoreOption = item.availableScoreStr;
       this.ItemDescription = item.napeDep;
       this.itemType = item.type;
-      // this.itemRequired = item.required ? '1' : '0'
+      this.itemRequired = item.required ? '1' : '0'
     },
 
     handleDelete(item) {
