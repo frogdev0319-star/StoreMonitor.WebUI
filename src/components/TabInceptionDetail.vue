@@ -121,6 +121,8 @@ import {GetEventAndCommentList} from '@/api/event';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import util from '@/common/util';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
+import PermissionHelper from '@/api/PermissionHelper';
+import { message } from '@/common/singleton-message';
 export default {
     name:'TabInceptionDetail',
     components: {
@@ -404,7 +406,16 @@ export default {
         });
       },
       handleEmitDetailRowClick(row){ //去巡檢報告詳情
-            console.log("row:",row.id);
+          if(!PermissionHelper.enableInspectReport()){
+            message({
+                message: this.$i18n.t('route.noReportAuthority'),
+                type: 'error',
+                duration: 5 * 1000
+                });
+            this.expands="";
+            this.expandRowKeys=[];
+            return;
+          }
           const self = this;
           const parsObj = {
             id : row.id,
@@ -420,31 +431,63 @@ export default {
            
       },
       handleEmitPersonEventRowClick(row){//进入事件列表界面，展示该门店该人员产生的事件
+        if(!PermissionHelper.enableEventHandle() && 
+          !PermissionHelper.enableEventClose() && 
+          !PermissionHelper.enableEventAdd() && 
+          !PermissionHelper.enableEventReturn()){
+        message({
+            message: this.$i18n.t('route.noEventAuthority'),
+            type: 'error',
+            duration: 5 * 1000
+          });
+        return;
+      }
         const self = this;
-        const params = SearchConditionUtil.getSearchCondition('eventManage');
+        var params = SearchConditionUtil.getSearchCondition('eventManage');
         /*let storeIds=[];
         if (Object.keys(searchParams).length > 0) {
             //this.params = searchParams.searchParams;
             storeIds = searchParams.searchParams.storeIds;
         }*/
         console.log("1.",params)
-            const rowItem = row;
-            //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
-      params.searchParams.clause ={assigner:this.submitter,storeId:[rowItem.id],status:[]};
-      params.filterStoreIds=[rowItem.id];
-      params.curStore=[rowItem.id];
-      params.storeIds=[rowItem.id];
-      params.curCountry = "-1";
-      params.curProvince = [];
-      params.curCity = [];
-      params.inputSearchValue = "";
-      params.curState = [];
-      params.activeName = '4';
-      params.searchParams.filter ={ page: 0, size: 10 };
-      params.beginTs=this.beginTs,
-      params.endTs=this.endTs
-      params.searchFrom='PatrolPersonStat';
+        const rowItem = row;
+      if(Object.keys(params).length > 0){
       
+            //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
+        params.searchParams.clause ={assigner:this.submitter,storeId:[rowItem.id],status:[]};
+        params.filterStoreIds=[rowItem.id];
+        params.curStore=[rowItem.id];
+        params.storeIds=[rowItem.id];
+        params.curCountry = "-1";
+        params.curProvince = [];
+        params.curCity = [];
+        params.inputSearchValue = "";
+        params.curState = [];
+        params.activeName = '4';
+        params.searchParams.filter ={ page: 0, size: 10 };
+        params.beginTs=this.beginTs;
+        params.endTs=this.endTs
+        params.searchFrom='PatrolPersonStat';
+      }else{
+          params ={
+              searchParams:{
+                  filter:{ page: 0, size: 10 },
+                  clause:{assigner:this.submitter,storeId:[rowItem.id],status:[]}
+              },
+              filterStoreIds : rowItem.id,
+              curStore : rowItem.id,
+              storeIds:rowItem.id,
+              curCountry:"-1",
+              curProvince:[],
+              curCity:[],
+              inputSearchValue:"",
+              curState:[],
+              activeName:'4',
+              beginTs:this.beginTs,
+              endTs:this.endTs,
+              searchFrom:'PatrolPersonStat'
+          }
+      }
       console.log("2.",params);
             /*const passObj = {
                 inputSearchValue:"",

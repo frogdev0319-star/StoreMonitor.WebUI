@@ -359,7 +359,7 @@ export default {
       return row.id;
     },
     expandChange(row) {
-       console.log("row click:",row);
+       /*console.log("row click:",row);
        if (this.expandComponent=== 'TabInceptionDetail') {
         console.log("!PermissionHelper.enableInspectReport():",!PermissionHelper.enableInspectReport());
         if(!PermissionHelper.enableInspectReport()){
@@ -372,7 +372,7 @@ export default {
           this.expandRowKeys=[];
           return;
         }
-      }
+      }*/
         this.currentRow = row;
         if(this.allowRowExpand){
           if(row.id == this.expands){
