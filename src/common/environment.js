@@ -1,5 +1,5 @@
 const version = 'v1.0';
-
+import data from "./customdata.json"
 const _Environments = {
   Debug_XA: {
     CHINA_WEBSITE: 'http://172.22.24.90:8082/storemonitor/api/',//http://172.21.81.63:8080/storemonitor/api/',
@@ -39,24 +39,24 @@ const _Environments = {
 
 let environJSON
 let isGlobalWebsite
-if(process.env.BUILD_ENV == 'RC'){
+console.log("Enrionment")
+console.log(data)
+if(data.SITE == 'RC'){
   environJSON = _Environments.RC;
   isGlobalWebsite = true;
 }
-else if(process.env.BUILD_ENV == 'Preview'){
+else if(data.SITE == 'Preview'){
   environJSON = _Environments.Preview;
   isGlobalWebsite = true;
 }
-else if(process.env.BUILD_ENV == 'Portals'){
+else if(data.SITE == 'Portals'){
   environJSON = _Environments.Stable;
-  sGlobalWebsite = true;
-}
-else{
-  environJSON = _Environments.RC;
   isGlobalWebsite = true;
 }
-console.log(process.env )
-console.log(environJSON)
+else{
+  environJSON = _Environments.Preview;
+  isGlobalWebsite = true;
+}
 
 let Environment;
 export default Environment = {
