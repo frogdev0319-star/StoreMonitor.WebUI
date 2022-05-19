@@ -580,7 +580,7 @@
                         :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                         :style="item.checked?{'color':'#006ab7'}:{'color': '#484848'}"
                         class="spacer font-15"
-                        style="text-align: left; font-weight: 500"
+                        style="text-align: left; font-weight: 500; word-break: break-all;"
                         @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
                         <span style="color: #c60957" v-if="item.required">*</span>
                         {{ item.subject }}
