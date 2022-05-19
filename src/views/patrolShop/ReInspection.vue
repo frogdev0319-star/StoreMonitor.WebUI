@@ -537,7 +537,8 @@
               :placeholder="$t('insSettingView.enterInspectFilter')"
               v-model="searchItemValue"
               size="small"
-              class="storevue-input-search fullWidth"
+              class="storevue-input-search"
+              style="width:100%"
             >
               <i
                 slot="prefix"

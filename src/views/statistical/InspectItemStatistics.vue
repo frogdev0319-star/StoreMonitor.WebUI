@@ -2588,8 +2588,8 @@ export default {
       if(this.inspectItem && this.inspectItem.item){
         let item = this.inspectItem.item;
         let name = item.subject?item.subject:item.name
-        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
-        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  item.qualifiedScore + " )";
+        this.inspectSubTitle= name + " "+ this.$t('statistics.itemAverageScore') + "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
+        this.inspectDetailSubTitle= name+ " " + this.$t('statistics.evalDetail')+ "  ( " + this.$t('statistics.totalScore') +  parseFloat(item.qualifiedScore.toFixed(1)) + " )";
       }
     }
   }
