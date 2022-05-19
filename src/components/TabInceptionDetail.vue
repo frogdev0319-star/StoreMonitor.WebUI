@@ -444,16 +444,10 @@ export default {
       }
         const self = this;
         var params = SearchConditionUtil.getSearchCondition('eventManage');
-        /*let storeIds=[];
-        if (Object.keys(searchParams).length > 0) {
-            //this.params = searchParams.searchParams;
-            storeIds = searchParams.searchParams.storeIds;
-        }*/
         console.log("1.",params)
         const rowItem = row;
       if(Object.keys(params).length > 0){
-      
-            //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
+        //searchParams.searchCondition = JSON.parse(JSON.stringify(this.params))
         params.searchParams.clause ={assigner:this.submitter,storeId:[rowItem.id],status:[]};
         params.filterStoreIds=[rowItem.id];
         params.curStore=[rowItem.id];
@@ -488,21 +482,7 @@ export default {
               searchFrom:'PatrolPersonStat'
           }
       }
-      console.log("2.",params);
-            /*const passObj = {
-                inputSearchValue:"",
-                curState:[],
-                activeName:'4',
-                sizeNum:10,
-                page:1,  
-                curStore:[rowItem.id],
-                clause : {assigner:this.submitter,storeId:[rowItem.id]},
-                assigner:this.submitter,
-                searchFrom:'PatrolPersonStat',
-                curStore:rowItem.id,
-                beginTs:this.beginTs,
-                endTs:this.endTs
-            };*/
+      //console.log("2.",params);
             const searchConditon = {
                 path: 'eventManage',
                 params: params
