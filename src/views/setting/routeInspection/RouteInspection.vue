@@ -235,6 +235,7 @@
       :show-close="false"
       :visible="showWeightSetting"
       :isWarning="true"
+      :dialogWidth="'550px'"
       @visibleChangeHandler="showWeightSetting = false"
       @cancelHandler="showWeightSetting = false"
       @confirmHandler="updateGroupWeight"
