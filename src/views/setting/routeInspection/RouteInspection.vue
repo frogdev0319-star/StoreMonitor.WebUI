@@ -1286,7 +1286,7 @@ export default {
           } else if (mapping[key] === 'description') {
             item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
           } else if (mapping[key] === 'required') {
-            item[mapping[key]] = cell.v === 'Y'
+            item[mapping[key]] = cell.v === 'Y' || cell.v === 'y'
           } else {
             item[mapping[key]] = cell.v || '';
           }
