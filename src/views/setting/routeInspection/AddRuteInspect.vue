@@ -1072,6 +1072,7 @@ export default {
         });
       }
       self.showDeleteGroup = false;
+      var index = 0;
       try {
         idItemArr.length > 0 && await self.deleteItemData(idItemArr);
         subCategoryArr.length > 0 && await self.deleteGroupData(subCategoryArr);
@@ -1082,7 +1083,6 @@ export default {
           self.napeList = [];
           self.napeTitle = '';
         } else {
-          let index = 0;
           index = self.groupIndex === 0 ? self.groupIndex : self.groupIndex - 1;
           if(self.curGroup.parentId === -1){
             this.activeParentId = -1;
@@ -1101,13 +1101,13 @@ export default {
               index = self.groupIndex;
             }
           }
-          self.refreshData(index);
         }
         util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
       } catch (e) {
         util.notify(self.$t('insSettingView.deleteFail'), 'warning', 3000);
         return false;
       }
+      self.refreshData(index);
       if (self.typeTemp.length === 1 && self.groupList.length === 0) {
         self.$router.push({ name: 'inspectSetting', params: { val: 'del' }});
       }
@@ -1296,9 +1296,6 @@ export default {
           qualifiedScore = null;
         }
       }
-      console.log({enterItemNameTip : self.enterItemNameTip, PFScoreTip: self.PFScoreTip, ItemTotalScoreTip0 : self.ItemTotalScoreTip0, ItemTotalScoreTip1: self.ItemTotalScoreTip1,
-          ItemMinScoreTip: self.ItemMinScoreTip, OtherScoreTip: self.OtherScoreTip, enterListNameRuletip: self.enterListNameRuletip, OtherScoreTipEmpty: self.OtherScoreTipEmpty,
-          descriptionRuletip: self.descriptionRuletip, ScoreOptionsTips0: self.ScoreOptionsTips0, ScoreOptionsTips1: self.ScoreOptionsTips1 })
       if(self.enterItemNameTip || self.PFScoreTip || self.ItemTotalScoreTip0 || self.ItemTotalScoreTip1 ||
           self.ItemMinScoreTip || self.OtherScoreTip || self.enterListNameRuletip || self.OtherScoreTipEmpty ||
           self.descriptionRuletip || self.ScoreOptionsTips0 || self.ScoreOptionsTips1){
