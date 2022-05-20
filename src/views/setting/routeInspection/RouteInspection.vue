@@ -261,6 +261,8 @@
                 v-if="item.weight != -1"
                 class="spacer"
                 type="number"
+                min="0"
+                max="100"
                 v-model="item.weight"
               />
               <el-input
