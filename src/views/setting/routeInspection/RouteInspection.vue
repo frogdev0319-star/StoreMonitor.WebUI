@@ -263,7 +263,8 @@
                 type="number"
                 min="0"
                 max="100"
-                v-model="item.weight"
+                @input="val => onWeightChange(item, val)"
+                :value="item.weight"
               />
               <el-input
                 v-else
@@ -470,6 +471,16 @@ export default {
   },
 
   methods: {
+    onWeightChange (item, val) {
+      var re = /^[0-9]+$/ ;
+      if (re.test(Number(val))) {
+        if (Number(val) > 100) {
+          item.weight = 100
+        } else {
+          item.weight = val
+        }
+      }
+    },
     handleWeightSwitch (val) {
       this.weightOptions = this.weightOptions.map(item => ({ ...item, weight: val ? 0 : -1 }))
     },
