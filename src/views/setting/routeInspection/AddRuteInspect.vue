@@ -781,8 +781,10 @@ export default {
         if (bindtitleIds.length !== 0) {
           resBindGroup = await self.bindGroup(paramsBind);
         } else if (bindtitleIds.length === 0) {
-          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-          return false;
+          //util.notify(self.$t('deviceView.editFail'), 'warning', 3000);//
+          //return false;
+          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          self.refreshData(self.groupIndex);
         }
       }
       if (resBindGroup.errMsg === 'Success') {
