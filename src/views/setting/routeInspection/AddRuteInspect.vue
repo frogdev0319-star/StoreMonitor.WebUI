@@ -785,6 +785,7 @@ export default {
           //return false;
           util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
           self.refreshData(self.groupIndex);
+          return;
         }
       }
       if (resBindGroup.errMsg === 'Success') {
