@@ -1234,6 +1234,9 @@ export default {
           weight: cell.weight
         };
       });
+      if (addGroupParams.some(p => p.weight)) {
+        addGroupParams = addGroupParams.map(p => ({ ...p, weight: p.weight ? p.weight : 0 }))
+      }
       const primaryResult = await this.addGroup({ groups: addGroupParams });
       if (!primaryResult.data && primaryResult.errMsg) {
         throw new Error(primaryResult.errMsg);
