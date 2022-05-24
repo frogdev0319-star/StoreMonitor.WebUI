@@ -60,9 +60,15 @@
               <tbody :key="inspectIndex">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
-                    <span v-if="inspectItem.weight != -1">{{ inspectItem.weight + '%' }}</span>
-                    <span class="sheet_title">{{ inspectItem.label }}</span>
-                    <span class="count-blag">{{inspectItem.count}}</span>
+                    <div class="flex">
+                      <div class="spacer">
+                        <div v-if="inspectItem.weight != -1">{{ inspectItem.weight + '%' }}</div>
+                        <div class="sheet_title">{{ inspectItem.label }}</div>
+                      </div>
+                      <div class="flex" style="align-items: center">
+                        <span class="count-blag">{{inspectItem.count}}</span>
+                      </div>
+                    </div>
                   </td>
                 </tr>
                 <tr v-for="(item,index) in inspectItem.inspectList" :key="index">
@@ -73,7 +79,7 @@
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
                   <td v-if="inspectItem.type === 1"><span>{{ item.itemScore }}</span></td>
-                  <td><span>{{ item.weight == -1 ? item.itemgetScore : item.itemgetScore * item.weight / 100 }}</span></td>
+                  <td><span>{{ inspectItem.weight == -1 ? item.itemgetScore : item.itemgetScore * inspectItem.weight / 100 }}</span></td>
                 </tr>
               </tbody>
             </template>
