@@ -82,7 +82,7 @@
                           <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
                         </div>
                       </div>
-                      <v-chart ref="itemsChart1" autoresize :options="avgChartOption" class="chart-content" width="1000px"/>
+                      <v-chart ref="itemsChart1" autoresize :options="avgChartOption_pdf" class="chart-content" width="1000px"/>
                     </div>
                   <div else class="pct-panel" v-if="!ispdf && avgChartOption">
                     <div v-show="showNoData" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
@@ -163,7 +163,7 @@
                           <div style="height:25px;font-size:18px;color:#b7c7df">{{$t('statistics.noData')}}</div>
                         </div>
                       </div>
-                      <v-chart ref="itemsChart2" autoresize :options="AssChartOption" :class="ispdf?'chart-content':'chart-content-pdf'"/>
+                      <v-chart ref="itemsChart2" autoresize :options="AssChartOption_pdf" :class="ispdf?'chart-content':'chart-content-pdf'"/>
                     </div>
                   <div else class="pct-panel">
                     <div v-show="showNoData2" style="position: absolute;margin-top:116px;margin-left:503px;width:90px;height:136px;align-item:center;background-color:'gray'">
@@ -399,6 +399,7 @@ export default {
         compareType:'stores',
         Avg12Num:[],
         avgChartOption:null,
+        avgChartOption_pdf:null,
         showNoData:true,
         filterDateRange2:[],
         compareIds2:[],
@@ -406,6 +407,7 @@ export default {
         compareType2:'stores',
         Ass12Num:[],
         AssChartOption:null,
+        AssChartOption_pdf:null,
         showNoData2:true,
         standardRate:'- -',
         storeIds:[],
@@ -434,6 +436,14 @@ export default {
     async accountChanged(val) {
       if (val !== 0) {
         await this.initData();
+      }
+    },
+    ispdf(newVal){
+      if(!newVal){
+        this.doGetAverageScore(this.filterDateRange);
+        if(this.standardRate!='- -'){
+          this.doGetAssessmentScore(this.filterDateRange2);
+        }
       }
     }
   },
@@ -580,7 +590,7 @@ export default {
       this.avgChartOption = this.getAverageBarchartOption();
       //console.log("this.comapareLabels:",this.comapareLabels);
       //console.log("this.compareIds:",this.compareIds);
-      console.log("this.compareIds:",this.compareIds);
+      
       if(this.comapareLabels.length>0 && this.inspectId!=-1){
         let Average12;
         if(region[0].value<3){ //store, area1, area2
@@ -649,6 +659,11 @@ export default {
               this.avgChartOption.series[1].data = AvgChartDataset[1];
             }
           }
+          this.avgChartOption_pdf = JSON.parse(JSON.stringify(this.avgChartOption));
+          this.avgChartOption_pdf.xAxis.axisLabel.rotate = 30;
+          this.avgChartOption_pdf.xAxis.axisLabel.fontSize = 10;
+          this.avgChartOption_pdf.legend.textStyle.fontSize=10;
+      
         }).catch(err => {
           console.log('promisesAvgMap - getInspectStatsDistributionOverRegion: ' + err);
         });
@@ -657,7 +672,8 @@ export default {
         this.showNoData=true;
         this.avgChartOption.yAxis[0].splitLine.show = false;
         this.avgChartOption.series[0].name= "";
-          this.avgChartOption.series[1].name= "";
+        this.avgChartOption.series[1].name= "";
+        this.avgChartOption_pdf = JSON.parse(JSON.stringify(this.avgChartOption));
       }
     },
     doParseAverage12Score(avgData){
@@ -769,6 +785,10 @@ export default {
               this.AssChartOption.series[1].data = AssChartDataset[1];
             }
           }
+          this.AssChartOption_pdf = JSON.parse(JSON.stringify(this.AssChartOption));
+          this.AssChartOption_pdf.xAxis.axisLabel.rotate = 30;
+          this.AssChartOption_pdf.xAxis.axisLabel.fontSize = 10;
+          this.AssChartOption_pdf.legend.textStyle.fontSize=10;
         }).catch(err => {
           console.log('promisesAvgMap - getInspectStatsDistributionOverRegion: ' + err);
         });
@@ -778,6 +798,7 @@ export default {
         this.AssChartOption.yAxis[0].splitLine.show = false;
         this.AssChartOption.series[0].name= "";
         this.AssChartOption.series[1].name= "";
+        this.AssChartOption_pdf = JSON.parse(JSON.stringify(this.AssChartOption));
       }
     },
     doParseAssessment12Score(avgData){
@@ -853,7 +874,7 @@ export default {
           itemWidth: 14,
           itemHeight: 14,
           itemGap: 37,
-          padding: 0,
+          padding: [50,0,0,0],
           icon: 'rect',
           textStyle: {
             color: '#556679',
@@ -867,6 +888,10 @@ export default {
           type: "category",
           axisTick:{
             show:false,
+          },
+          axisLabel:{
+            fontSize:12,
+            rotate:0
           },
           data:[],
         },

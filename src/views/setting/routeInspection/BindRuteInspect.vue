@@ -13,7 +13,7 @@
         <el-input
           :placeholder= "$t('insSettingView.searchPlaceholder')"
           v-model="serachVale"
-          style="width: 200px"
+          style="width: 300px"
           size="mini"
           clearable
           class="storevue-input paper"

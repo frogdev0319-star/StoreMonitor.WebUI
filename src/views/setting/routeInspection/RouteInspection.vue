@@ -237,6 +237,7 @@
       :show-close="false"
       :visible="showWeightSetting"
       :isWarning="true"
+      :dialogWidth="'550px'"
       @visibleChangeHandler="showWeightSetting = false"
       @cancelHandler="showWeightSetting = false"
       @confirmHandler="updateGroupWeight"
@@ -245,30 +246,37 @@
         <div class="dialog-content">
           <div class="flex-center margin-bottom-sm">
             <div class="spacer">{{$t('insSettingView.inspectName')}}</div>
-            <div class="spacer">{{$t('insSettingView.weight')}}</div>
+            <div class="spacer flex">{{$t('insSettingView.weight')}}
+              <div class="spacer"></div>
+              <el-switch
+                style="margin-right: 10px"
+                v-model="isAllWeight"
+                @change="handleWeightSwitch"
+              >
+              </el-switch>
+              {{ $t('insSettingView.weightSetting') }}
+            </div>
           </div>
-          <div v-for="item in weightOptions" :key="item.id" class="flex-center margin-bottom-sm">
-            <span class="spacer">{{item.name}}</span>
-            <el-checkbox
-              style="margin-right: 20px"
-              @change="e => changeItemWeight(e, item)"
-              v-model="item.setWeight"
-              class="storevue-checkbox-outlined"
-              :label="$t('insSettingView.weightSetting')"
-            />
-            <el-input
-              v-if="item.setWeight"
-              class="spacer"
-              type="number"
-              v-model="item.weight"
-            />
-            <el-input
-              v-else
-              class="spacer"
-              type="text"
-              value="--"
-              disabled
-            />
+          <div style="height: 400px; overflow: auto">
+            <div v-for="item in weightOptions" :key="item.id" class="flex-center margin-bottom-sm">
+              <span class="spacer">{{item.name}}</span>
+              <el-input
+                v-if="item.weight != -1"
+                class="spacer"
+                type="number"
+                min="0"
+                max="100"
+                @input="val => onWeightChange(item, val)"
+                :value="item.weight"
+              />
+              <el-input
+                v-else
+                class="spacer"
+                type="text"
+                value="--"
+                disabled
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -345,6 +353,7 @@ export default {
       importCount: 0,
       allScoreWeightEmpty: true,
       allPassWeightEmpty: true,
+      weightSwitch: false,
       btnList: [
         {
           id: 0,
@@ -396,7 +405,10 @@ export default {
   },
 
   computed: {
-    ...mapGetters({ accountChanged: 'accountChanged' })
+    ...mapGetters({ accountChanged: 'accountChanged' }),
+    isAllWeight () {
+      return this.weightOptions.some(item => item.weight != -1)
+    }
   },
 
   watch: {
@@ -462,6 +474,19 @@ export default {
   },
 
   methods: {
+    onWeightChange (item, val) {
+      var re = /^[0-9]+$/ ;
+      if (re.test(Number(val))) {
+        if (Number(val) > 100) {
+          item.weight = 100
+        } else {
+          item.weight = val
+        }
+      }
+    },
+    handleWeightSwitch (val) {
+      this.weightOptions = this.weightOptions.map(item => ({ ...item, weight: val ? 0 : -1 }))
+    },
     changeItemWeight (val, item) {
       item.weight = val ? 0 : -1
     },
@@ -474,8 +499,9 @@ export default {
       groups.forEach(group => {
         if (group.weight != -1) count += group.weight
       })
+      const isAllWeightEmpty = this.weightOptions.every(group => group.weight == -1)
       const self = this;
-      if (count === 100) {
+      if (count === 100 || isAllWeightEmpty) {
         inpectRESTful.updateGroupWeight({ groups }).then(() => {
           util.notify(self.$t('titleView.saveSuss'), 'success', 3000)
           this.showWeightSetting = false;
@@ -1210,6 +1236,9 @@ export default {
           weight: cell.weight
         };
       });
+      if (addGroupParams.some(p => p.weight)) {
+        addGroupParams = addGroupParams.map(p => ({ ...p, weight: p.weight ? p.weight : 0 }))
+      }
       const primaryResult = await this.addGroup({ groups: addGroupParams });
       if (!primaryResult.data && primaryResult.errMsg) {
         throw new Error(primaryResult.errMsg);
@@ -1274,7 +1303,7 @@ export default {
           } else if (mapping[key] === 'description') {
             item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
           } else if (mapping[key] === 'required') {
-            item[mapping[key]] = cell.v === 'Y'
+            item[mapping[key]] = cell.v === 'Y' || cell.v === 'y'
           } else {
             item[mapping[key]] = cell.v || '';
           }
@@ -2341,6 +2370,7 @@ export default {
           return false;
         } else {
           const curData = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
+          console.log("**curData:",curData);
           const passfail = curData.filter(x => x[0].type === 0)[0];
           const score = curData.filter(x => x[0].type === 1)[0];
           const other = curData.filter(x => x[0].type === 2)[0];
@@ -2403,19 +2433,21 @@ export default {
 
     getExcelDataOfSheet(sheetDataArr, type) {
       const tableHeader = this.getExcelTableHeader(type);
-      // console.log(tableHeader)
+      console.log(tableHeader)
       const sheetData = [];
       if (sheetDataArr) {
         const treeData = util.handleInspctionCatergyTree(sheetDataArr);
+        console.log("treeData:",treeData);
         treeData.forEach(item => {
           if (!item.children) {
+            console.log("!item.children");
             if (item.itemData.length !== 0) {
               item.itemData.forEach((_item, _index) => {
                 const obj = {};
                 if (_index === 0) {
                   obj[tableHeader[0]] = item.groupName;
                   if (type !== 2) {
-                    obj[tableHeader[1]] = item.groupWeight;
+                    obj[tableHeader[1]] = (item.groupWeight==-1)?'':item.groupWeight;
                   }
                 } else {
                   obj[tableHeader[0]] = '';
@@ -2447,6 +2479,7 @@ export default {
                 sheetData.push(obj);
               });
             } else {
+              console.log("item.itemData.length==0");
               const obj = {};
               obj[tableHeader[0]] = item.groupName;
               obj[tableHeader[1]] = '';
@@ -2459,49 +2492,88 @@ export default {
               sheetData.push(obj);
             }
           } else {
+            console.log("item.children:",item.children);
             item.children.forEach((child, childIndex) => {
               if (child.itemData.length > 0) {
                 child.itemData.forEach((childItem, childItemIndex) => {
                   const obj = {};
                   if (childIndex === 0 && childItemIndex === 0) {
                     obj[tableHeader[0]] = item.groupName;
+                    if(type!=2){
+                      obj[tableHeader[1]] = (child.groupWeight==-1)?'':child.groupWeight;
+                    }
                   } else {
                     obj[tableHeader[0]] = '';
                   }
                   if (childItemIndex === 0) {
-                    obj[tableHeader[1]] = child.groupName;
+                    if(type!=2){
+                      //obj[tableHeader[1]] = child.groupWeight;
+                      obj[tableHeader[2]] = child.groupName;
+                    }
+                    else{
+                      obj[tableHeader[1]] = child.groupName;
+                    }
                   } else {
-                    obj[tableHeader[1]] = '';
+                    if(type!=2){
+                      obj[tableHeader[1]] = "";
+                      obj[tableHeader[2]] = "";
+                    }
+                    else{
+                      obj[tableHeader[2]] = "";
+                    }
                   }
                   if (type === 0) {
+                    obj[tableHeader[3]] = childItem.name;
+                    obj[tableHeader[4]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
+                    obj[tableHeader[5]] = childItem.description === '---' ? '' : childItem.description;
+                    obj[tableHeader[6]] = childItem.required ? 'Y' : '';
+                  } else if (type === 1) {
+                    obj[tableHeader[3]] = childItem.name;
+                    obj[tableHeader[4]] = childItem.type === 0 ? childItem.availableScores : 0;
+                    obj[tableHeader[5]] = childItem.type === 0 ? childItem.qualifiedScore : 0;
+                    obj[tableHeader[6]] = childItem.description === '---' ? '' : childItem.description;
+                    obj[tableHeader[7]] = childItem.required ? 'Y' : '';
+                  } else {
                     obj[tableHeader[2]] = childItem.name;
                     obj[tableHeader[3]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
                     obj[tableHeader[4]] = childItem.description === '---' ? '' : childItem.description;
-                  } else if (type === 1) {
-                    obj[tableHeader[2]] = childItem.name;
-                    obj[tableHeader[3]] = childItem.type === 0 ? childItem.availableScores : 0;
-                    obj[tableHeader[4]] = childItem.type === 0 ? childItem.qualifiedScore : 0;
-                    obj[tableHeader[5]] = childItem.description === '---' ? '' : childItem.description;
-                  } else {
-                    obj[tableHeader[1]] = childItem.name;
-                    obj[tableHeader[2]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
-                    obj[tableHeader[3]] = childItem.description === '---' ? '' : childItem.description;
                   }
                   sheetData.push(obj);
                 });
               } else {
                 const obj = {};
                 if (childIndex === 0) {
-                  obj[tableHeader[0]] = item.groupName;
+                  if(type==2){
+                    obj[tableHeader[0]] = item.groupName;
+                    obj[tableHeader[1]] = child.groupName;
+                  } 
+                  else{
+                    obj[tableHeader[0]] = item.groupName;
+                    obj[tableHeader[1]] = (child.groupWeight==-1)?'':child.groupWeight;
+                  }
                 } else {
-                  obj[tableHeader[0]] = '';
+                  if(type==2) {
+                    obj[tableHeader[0]] = '';
+                    obj[tableHeader[0]] = '';
+                  }
+                  else{
+                    obj[tableHeader[0]] = '';
+                    obj[tableHeader[1]] = '';
+                  }
                 }
-                obj[tableHeader[1]] = child.groupName;
-                obj[tableHeader[2]] = '';
-                obj[tableHeader[3]] = '';
-                obj[tableHeader[4]] = '';
-                if (type === 1) {
+                if(type!=2){
+                  obj[tableHeader[2]] = child.groupName;
+                  obj[tableHeader[3]] = '';
+                  obj[tableHeader[4]] = '';
                   obj[tableHeader[5]] = '';
+                  obj[tableHeader[6]] = '';
+                }else{
+                  obj[tableHeader[2]] = '';
+                  obj[tableHeader[3]] = '';
+                  obj[tableHeader[4]] = '';
+                }
+                if (type === 1) {
+                  obj[tableHeader[7]] = '';
                 }
                 sheetData.push(obj);
               }

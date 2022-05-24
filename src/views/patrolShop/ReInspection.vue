@@ -537,7 +537,8 @@
               :placeholder="$t('insSettingView.enterInspectFilter')"
               v-model="searchItemValue"
               size="small"
-              class="storevue-input-search fullWidth"
+              class="storevue-input-search"
+              style="width:100%"
             >
               <i
                 slot="prefix"
@@ -580,7 +581,7 @@
                         :class="!item.manualIgnore?'noraml-title':'ignore-title'"
                         :style="item.checked?{'color':'#006ab7'}:{'color': '#484848'}"
                         class="spacer font-15"
-                        style="text-align: left; font-weight: 500"
+                        style="text-align: left; font-weight: 500; word-break: break-all;"
                         @click="clickItem({item,index:showIgnoreItem?item.originIndex:index})">
                         <span style="color: #c60957" v-if="item.required">*</span>
                         {{ item.subject }}
@@ -1760,6 +1761,7 @@ export default {
           data.forEach((item, index) => {
             const obj = {};
             obj.groupId = item.groupId;
+            obj.weight = item.weight;
             obj.mode = item.mode;
             obj.type = item.type;
             obj.groupName = item.groupName;
@@ -1779,6 +1781,7 @@ export default {
             item.items.forEach((_item, _index) => {
               const itemObj = {};
               itemObj.id = _item.id;
+              itemObj.weight = item.weight;
               itemObj.groupId = item.groupId;
               itemObj.groupName = item.groupName;
               itemObj.subject = _item.subject;
@@ -1845,14 +1848,28 @@ export default {
             if (handleData[i].subcatergy.length === 0){
               count = handleData[i].cateray.items.length;
               te_temp.push({
-                inspectList: [handleData[i].cateray], dealCount: 0, Effective: 0, count: count, isClick: false,
-                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: false
+                inspectList: [handleData[i].cateray], 
+                dealCount: 0, 
+                Effective: 0, 
+                count: count, 
+                isClick: false,
+                label: handleData[i].cateray.groupName, 
+                type: handleData[i].cateray.type, 
+                isCategory: false,
+                weight: handleData[i].cateray.weight
               });
             } else {
               handleData[i].subcatergy.forEach(item => count += item.items.length);
               te_temp.push({
-                inspectList: handleData[i].subcatergy, dealCount: 0, Effective: 0, count: count, isClick: false,
-                label: handleData[i].cateray.groupName, type: handleData[i].cateray.type, isCategory: true
+                inspectList: handleData[i].subcatergy, 
+                dealCount: 0, 
+                Effective: 0, 
+                count: count, 
+                isClick: false,
+                label: handleData[i].cateray.groupName, 
+                type: handleData[i].cateray.type, 
+                isCategory: true,
+                weight: handleData[i].cateray.weight
               });
             }
           }
@@ -2495,11 +2512,11 @@ export default {
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
             item.items.forEach((_item, _index) => {
-              // console.log(_item)
               if (!_item.manualIgnore && _item.required) {
+              console.log(_item)
                 if (
-                  _item.itemType === 0 && _item.itemScore === '--' || 
-                  _item.itemType === 1 && _item.sourceList.length === 0
+                  (_item.itemType === 0 && _item.itemgetScore === '--') || 
+                  (_item.itemType === 1 && _item.sourceList.length === 0)
                 ) {
                   requiredValid = true
                 }
