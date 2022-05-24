@@ -60,9 +60,15 @@
               <tbody :key="inspectIndex">
                 <tr style="vertical-align:middle;">
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
-                    <span v-if="inspectItem.weight != -1">{{ inspectItem.weight + '%' }}</span>
-                    <span class="sheet_title">{{ inspectItem.label }}</span>
-                    <span class="count-blag">{{inspectItem.count}}</span>
+                    <div class="flex">
+                      <div class="spacer">
+                        <div v-if="inspectItem.weight != -1">{{ inspectItem.weight + '%' }}</div>
+                        <div class="sheet_title">{{ inspectItem.label }}</div>
+                      </div>
+                      <div class="flex" style="align-items: center">
+                        <span class="count-blag">{{inspectItem.count}}</span>
+                      </div>
+                    </div>
                   </td>
                 </tr>
                 <tr v-for="(item,index) in inspectItem.inspectList" :key="index">
@@ -73,7 +79,7 @@
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
                   <td v-if="inspectItem.type === 1"><span>{{ item.itemScore }}</span></td>
-                  <td><span>{{ item.weight == -1 ? item.itemgetScore : item.itemgetScore * item.weight / 100 }}</span></td>
+                  <td><span>{{ inspectItem.weight == -1 ? item.itemgetScore : item.itemgetScore * inspectItem.weight / 100 }}</span></td>
                 </tr>
               </tbody>
             </template>
@@ -585,11 +591,11 @@ export default {
                 objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
                   inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
               } else {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
-                  inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : inspect[i].inspectList[g].items[j].itemgetScore;
+                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
+                  ? Math.pow(-2, 31)
+                  : inspect[i].inspectList[g].items[j].itemgetScore;
               }
             }
-
             objItem.storeId = self.store.storeId;
             objItem.inspectItemId = inspect[i].inspectList[g].items[j].id;
             const tempFileUrl = [];
@@ -784,15 +790,15 @@ export default {
               }
               s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
               if (p_item.type === 0) {
-                PassFileTS += s_item.itemgetScore;
-                totalScore0 += s_item.itemScore;
+                PassFileTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                totalScore0 += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
                 if (!s_item.isIgnore && !s_item.manualIgnore) {
-                  PassFileX += s_item.itemgetScore;
-                  PassFile_totalScoreX += s_item.itemScore;
-                  tab1GetScoreNoContainedIngored += s_item.itemgetScore;
+                  PassFileX += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                  PassFile_totalScoreX += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  tab1GetScoreNoContainedIngored += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
                 } else {
-                  PassFileN += s_item.itemScore;
-                  tab1GetScoreContainedIgnored += s_item.itemScore;
+                  PassFileN += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  tab1GetScoreContainedIgnored += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
                 }
                 if (inspect.length > 1) {
                   if (!inspectSettings.includedInTotalScoreWithType1) {
@@ -814,16 +820,16 @@ export default {
                   }
                 }
               } else if (p_item.type === 1) {
-                totalScore += s_item.itemScore;
-                ScoreTS += s_item.itemgetScore;
+                totalScore += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                ScoreTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
                 if (!s_item.isIgnore && !s_item.manualIgnore) {
-                  ScoreX += s_item.itemgetScore;
-                  Score_totalScoreX += s_item.itemScore;
-                  notAddIgnoretotalScore += s_item.itemScore;
-                  tab2NotIgnoredItemsGetScore += s_item.itemgetScore;
+                  ScoreX += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                  Score_totalScoreX += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  notAddIgnoretotalScore += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  tab2NotIgnoredItemsGetScore += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
                 } else {
-                  ScoreN += s_item.itemScore;
-                  tab2IgnoredItemsGetScore += s_item.itemScore;
+                  ScoreN += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
+                  tab2IgnoredItemsGetScore += p_item.weight == -1 ? s_item.itemScore : s_item.itemScore * p_item.weight / 100;
                 }
                 if (s_item.isIgnore || s_item.manualIgnore) {
                   s_item.showTotalScore = inspectSettings.qualifiedForIgnoredWithType2;
@@ -831,7 +837,7 @@ export default {
                   s_item.showTotalScore = true;
                 }
               } else if (p_item.type === 2 && !s_item.isIgnore) {
-                OtherTS += s_item.itemgetScore;
+                OtherTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
                 s_item.showTotalScore = true;
               }
               inspectPic += s_item.sourceList.length;
@@ -876,18 +882,18 @@ export default {
               }
             }
             if (p_item.type === 0) {
-              PassFileTotalScoreSystem = PassFileTS * p_item.weight;
-              PassFileXS = PassFileX * p_item.weight;
-              PassFileXN = (PassFileN + PassFileX) * p_item.weight;
-              PassFileTotalScore = totalScore0 * p_item.weight;
-              PassFileTotalScoreX = PassFile_totalScoreX * p_item.weight;
+              PassFileTotalScoreSystem = PassFileTS
+              PassFileXS = PassFileX
+              PassFileXN = (PassFileN + PassFileX)
+              PassFileTotalScore = totalScore0
+              PassFileTotalScoreX = PassFile_totalScoreX
             }
             if (p_item.type === 1) {
               CurAddScoreB += totalScore;
-              allScoreB = CurAddScoreB * p_item.weight;
-              ScoreTotalScoreSystem = ScoreTS * p_item.weight;
-              ScoreXN = (ScoreX + ScoreN) * p_item.weight;
-              ScoreTotalScoreX = Score_totalScoreX * p_item.weight;
+              allScoreB = CurAddScoreB
+              ScoreTotalScoreSystem = ScoreTS
+              ScoreXN = (ScoreX + ScoreN)
+              ScoreTotalScoreX = Score_totalScoreX
               item['itemgetScore'] =
                 inspectSettings.qualifiedForIgnoredWithType2
                   ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
@@ -895,8 +901,8 @@ export default {
             }
             if (p_item.type === 2) {
               CurOtherTotalScore += totalGetscore;
-              otherGetscoreTotal = CurOtherTotalScore * p_item.weight;
-              OtherTotalScoreSystem = OtherTS * p_item.weight;
+              otherGetscoreTotal = CurOtherTotalScore
+              OtherTotalScoreSystem = OtherTS
             }
           });
           if (p_item.type === 0) {
