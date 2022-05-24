@@ -91,3 +91,20 @@ export const unbindWorkflow = data => {
     data
   });
 };
+
+export const workflowItems = data => {
+  return request({
+    url: `${version}/workflow/simple/info/list`,
+    method: 'get',
+    data
+  });
+};
+
+// 簽核管理 -- 我已提交
+export const workflowInstanceMine = data => {
+  return request({
+    url: `${version}/workflow/instance/mine`,
+    method: 'psot',
+    data
+  });
+};

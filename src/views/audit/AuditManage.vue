@@ -1,788 +1,1234 @@
 <template>
-  <div class="flex-column" style="height: calc(100% - 20px)">
-    <h2>簽核管理</h2>
+  <div :style="{'minHeight':windowHeight-118+'px'}" class="el-event-content">
+    <div class="el-event-header">
+      <div class="el-area">
+        <store-filter
+          :cached-params="searchParams"
+          path = "eventManage"
+          @storeChange = "onStoreChange"
+        >
+        </store-filter>
+      </div>
+      <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
+        <div class="flex-center">
+          <date-time-selector 
+            ref="eventTimePicker"
+            :dateTimeValue = dateValue
+            @change="dateChange"
+          />
+        </div>
+        <!--<div class="flex-center">
+          <span style="margin-right: 10px; white-space:nowrap;">{{ $t('eventView.status') }}</span>
+          <multi-select
+            ref="multiState"
+            :selected="curState"
+            :alltype="0"
+            :options="eventStatesList"
+            :disabled="activeName!=='4'"
+            @changeInput="handleStateChange"/>
+        </div>-->
+        <div class="flex-center">
+          <span style="margin-right: 10px; white-space:nowrap;">{{ $t('remotePatrol.keywords') }}</span>
+          <el-input
+            v-model="inputSearchValue"
+            size="small"
+            class="search-input shadow-light"
+            clearable/>
+        </div>
+        <delay-button
+          class="search-button"
+          style="background-color:#556679;border:none;"
+          type="primary"
+          size="mini"
+          @click="searchEventList"
+        >
+          <span>{{ $t('remotePatrol.search') }}</span>
+        </delay-button>
+      </div>
+      <!--<selected-stores :store-str="storeFilterObj.storeStr"/>-->
+    </div>
+
+
+    <!-- table content -->
+    <div class="el-table-content">
+      <el-tabs :id="getLangStyleValue(tabContentId)"  v-model="activeName" @tab-click="handleTabClick">
+        <el-tab-pane
+          v-for="(item,index) in tableDataList"
+          :key="index"
+          :label="`${item.label} （${item.eventCount}）`">
+          <div class="el-table-panel">
+            <el-table
+              :data="item.tableData"
+              :highlight-current-row="true"
+              :height="553"
+              :header-row-style="{width:'1920px'}"
+              :header-cell-style="{fontSize:'calc(12/1920*100vw)',color:'#7d8cad',height: '47px'}"
+              :cell-style="cellStyle"
+              empty-text="没有事件数据"
+              align="left"
+              style="width:auto"
+              class="table-content tbl-checkbox"
+              @sort-change="sortChange"
+              @row-click="rowClickItem"
+              @selection-change="handleSelectionChange"
+              @cell-click="cellClickItem"
+            >
+
+              <el-table-column
+                :label="$t('eventView.name')"
+                :class-name = "selfClassName"
+                prop="subject"
+                min-width="200"
+                align="left"
+              />
+              <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="150" />
+              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="100" :render-header="renderHeader">
+                <template slot-scope="scope">
+                  <div v-if="scope.row.attachment.length!==0">
+                    <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="enclosure-icon" >
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column :label="$t('eventView.submitter')" prop="assignerName" align="left" min-width="80" sortable="custom" :render-header="renderHeader"/>
+              <el-table-column :label="$t('eventView.submitTime')" prop="ts" align="left" width="160" sortable="custom" :render-header="renderHeader"/>
+              <el-table-column :label="$t('remotePatrol.regionI')" prop="province" align="left" width="80" :render-header="renderHeader"/>
+              <el-table-column :label="$t('remotePatrol.regionII')" prop="city" align="left" width="80" :render-header="renderHeader"/>
+              <el-table-column :label="$t('eventView.stores')" prop="storeName" align="left" min-width="100" sortable="custom" :render-header="renderHeader"/>
+              <el-table-column :label="$t('remotePatrol.code')" prop="code" align="left" min-width="70" :render-header="renderHeader"/>
+              <el-table-column
+                :label="$t('eventView.operation')"
+                prop="option"
+                min-width="60"
+                align="left"
+                :render-header="renderHeader"
+                >
+                <template slot-scope="scope">
+                  <img :src="penSrc" class="iconfont icon-gengduo" @click="toEventDetail(scope.row)">
+                </template>
+              </el-table-column>
+              <div slot="empty">
+                <div>
+                  <i class="iconfont icon-zhengque empty-data-icon"/>
+                  <span class="empty-text">{{ $t('eventView.noEvents') }}</span>
+                </div>
+                <!--<div v-else class="empty-content">
+                  <img :src="loadingGif" class="loading_rotate">
+                  <span class="empty-text">{{ $t('remotePatrol.loading') }}</span>
+                </div>-->
+              </div>
+            </el-table>
+          </div>
+          <div style="width:100%; margin-top:12px;height:31px;">
+            <delay-button v-if="showCloseBtn"
+              class="btn-close"
+              style="color:#FFF;"
+              type="primary"
+              size="mini"
+              @click="doBachCloseEvent"
+            >
+              <span>{{ $t('eventView.closing') }}</span>
+            </delay-button>
+            <tbl-pagination-only
+              :total="total"
+              :current-page="page"
+              :page-size="sizeNum"
+              layout = "prev,pager, next,sizes,slot"
+              @sizeChange="sizeChange"
+              @currentChange="currentChange"
+            />
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+    <dialog-vue 
+    :dialog-title="$t('eventView.confirmBachClose')" 
+    :show-info="$t('eventView.closeSelectedEvent')" 
+    :is-warning=true 
+    :dialog-closed="showBachCloseDialog" 
+    @confirmed="confirmBachClose" 
+    @canceled="showBachCloseDialog = false"/>
   </div>
 </template>
+
 <script>
-import { getInspectReportList, GetInspectTagList } from '@/api/inspect';
-import util from '@/common/util';
+
+import util from '@/common/util.js';
+import { workflowInstanceMine } from '@/api/workflow';
+import { eventRESTful } from '@/api/index';
+import { getCookie } from '@/common/auth';
+import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
-import StoreFilter from '@/components/StoreFilter';
-import DelayButton from '@/components/DelayButton';
+import { getBriefStoreList } from '@/api/store';
+
+import MultiSelect from '@/components/MultiSelect';
+import RegionMultiSelect from '@/components/RegionMultiSelect';
+import LimitSelect from '@/components/LimitSelect';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
+import DelayButton from '@/components/DelayButton';
+import StoreFilter from '@/components/StoreFilter';
 import DateTimeSelector from '@/components/DateTimeSelector';
-import SelectedStores from "@/components/SelectedStores";
+import SelectedStores from '@/components/SelectedStores';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
-import { getInspectReportInfo } from '@/api/inspect';//為了取是否有設置評分
-import TableOnly from '@/components/TableOnly';
+import DialogVue from '@/components/DialogVue';
+import PermissionHelper from '@/api/PermissionHelper';
+
 export default {
-  name: 'InspectReportList',
+  name: 'EventManage',
   components: {
     DateTimeSelector,
     SelectedStores,
-    DelayButton,
     StoreFilter,
+    DelayButton,
+    LimitSelect,
+    MultiSelect,
+    RegionMultiSelect,
     TblPaginationOnly,
-    TableOnly
+    DialogVue
   },
+
   data() {
     return {
-      varyWindowWidth: window.innerWidth,
-      varyWindowHeight: window.innerHeight,
-      videoSrc: require('../../../static/img/monitor.png'),
-      remoteIcon: require('../../../static/img/remote.png'),
-      onsiteIcon: require('../../../static/img/onsite.png'),
-      searchContent: false,
-      exportPng: require('../../../static/img/excel.png'),
-      reportList: [],
-      curSortType: 0,
-      ShowCard: true,
-      isHoverList: false,
-      isHoverCard: false,
-      sortTypeList: [
-        {
-          id: 0,
-          name: this.$t('remotePatrol.rankTime')
-        },
-        {
-          id: 1,
-          name: this.$t('remotePatrol.rankScore')
-        },
-        {
-          id: 2,
-          name: this.$t('remotePatrol.rankStore')
-        }
-      ],
-      reportInfoTable: [
-        {
-          'prop': 'province',
-          'label': this.$t('remotePatrol.regionI'),
-          'sortable': false,
-          'width': 60,
-          'maxWidth': 60,
-          'isExpand': false
-        },
-        {
-          'prop': 'city',
-          'label': this.$t('remotePatrol.regionII'),
-          'sortable': false,
-          'width': 60,
-          'maxWidth': 60,
-          'isExpand': false
-
-        },
-        {
-          'prop': 'storeName',
-          'label': this.$t('remotePatrol.patrolStore'),
-          'sortable': false,
-          'width': 80,
-          'maxWidth': 80,
-          'isExpand': false
-        },
-        {
-          'prop': 'code',
-          'label': this.$t('remotePatrol.code'),
-          'sortable': false,
-          'width': 60,
-          'maxWidth': 60,
-          'isExpand': false
-        },
-        {
-          'prop': 'storeType',
-          'label': this.$t('remotePatrol.storeType'),
-          'sortable': false,
-          'width': 60,
-          'maxWidth': 60,
-          'isExpand': false
-        },
-        {
-          'prop': 'submitterName',
-          'label': this.$t('scheduleView.InspectPerson'),
-          'sortable': false,
-          'width': 100,
-          'maxWidth': 100,
-          'isExpand': false
-        },
-        {
-          'prop': 'tagName',
-          'label': this.$t('overview.patrolLists'),
-          'sortable': false,
-          'width': 100,
-          'maxWidth': 100,
-          'isExpand': false
-        },
-        {
-          'prop': 'modeText',
-          'label': this.$t('remotePatrol.patrolWay'),
-          'sortable': false,
-          'width': 65,
-          'maxWidth': 65,
-          'isExpand': false,
-        },
-        {
-          'prop': 'status',
-          'label': this.$t('remotePatrol.patrolResult'),
-          'sortable': false,
-          'width': 60,
-          'maxWidth': 60,
-          'isExpand': false
-        },
-        {
-          'prop': 'totalScore',
-          'label': this.$t('remotePatrol.patrolScore'),
-          'sortable': true,
-          'width': 65,
-          'maxWidth': 65,
-          'minWidth': 65,
-          'isExpand': false
-        },
-        {
-          'prop': 'datestr',
-          'label': this.$t('remotePatrol.patrolDate'),
-          'sortable': true,
-          'width': 100,
-          'maxWidth': 100,
-          'isExpand': false
-        },
-        {
-          'prop': 'operator',
-          'label': this.$t('titleView.operation'),
-          'sortable': false,
-          'width': 50,
-          'maxWidth': 50,
-          'isExpand': false,
-          'isCellClick':true,
-          'align': 'left',
-          'customIcon': true,
-          'src' : require('@/../static/img/icon_pen.png'),
-          'methods': 'set'
-        }
-      ],
-      columnOperationData: {
-        label: this.$t('titleView.operation'),
-        minWidth: '60',
-        align: 'left',
-        customIcon: true,
-        src : require('@/../static/img/icon_pen.png'),
-        methods: 'set'
-        /*operation: [
-          {
-            lable: '',
-            src : 'penSrc',
-            methods: 'set'
-          }
-        ]*/
-      },
-      storeList: [],
-      searchInput: '',
-      sizeNum: 10,
+      loadingGif: require('../../../static/img/loading.svg'),
+      first:true,
       dateValue: [],
-      curReportType: -1,
-      reportTypeList: [
-        { 'mode': -1, 'label': this.$t('remotePatrol.all') },
-        { 'mode': 0, 'label': this.$t('remotePatrol.remotePatrol') },
-        { 'mode': 1, 'label': this.$t('remotePatrol.onsitePatrol') }
+      toolTipClass: 'page-login-toolTipClass',
+      eventStatesList: [
+        { value: 0, label: this.$t('eventView.pending'), disabled: false },
+        { value: 1, label: this.$t('eventView.handled'), disabled: false },
+        { value: 2, label: this.$t('eventView.closed'), disabled: false },
+        { value: 3, label: this.$t('eventView.returnStatus'), disabled: false }
       ],
-      curAppraise: -2,
-      appraiseList: [
-        { 'status': -1, 'label': this.$t('remotePatrol.all') },
-        { 'status': 0, 'label': this.$t('remotePatrol.dangerous') }, //poor
-        { 'status': 1, 'label': this.$t('remotePatrol.improve') }, //fair
-        { 'status': 2, 'label': this.$t('overview.echartGood') } //good
+      curState: [0],
+      value: 0,
+      inputSearchValue: '',
+      serachData: '',
+      tableDataList: [
+        {
+          label: "待我审批的",
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
+        },
+        {
+          label: "我已审批的",
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
+        },
+        {
+          label: "我已提交的",
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
+        },
+        {
+          label: "抄送我的",
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
+        },
+        {
+          label: this.$t('eventView.allEvents'),
+          eventCount: 0,
+          tableData: [],
+          total: 0,
+          sizeNum: 10,
+          page: 1
+        }
       ],
-      storeStr: '',
+      activeName: '0',
+      videoSrc: require('../../../static/img/monitor.png'),
+      inspectSrc: require('../../../static/img/remote_patrol.png'),
+      insiteInspectSrc: require('../../../static/img/onsite_patrol.png'),
+      attachmentVideo: require('../../../static/img/photo.png'),
+      attachmentImg: require('../../../static/img/photo.png'),
+      attachmentAudio: require('../../../static/img/voice.png'),
+      penSrc:require('../../../static/img/icon_pen.png'),
       total: 0,
       page: 1,
+      sizeNum: 10,
       params: {},
-      storeDataList: [],
-      storeIdList: [],
+      exportDataList: [],
+      exportDataHeader: [
+        this.$t('eventView.name'),
+        this.$t('overview.patrolLists'),
+        this.$t('eventView.submitter'),
+        this.$t('eventView.submitTime'),
+        this.$t('remotePatrol.regionI'),
+        this.$t('remotePatrol.regionII'),
+        this.$t('eventView.stores'),
+        this.$t('remotePatrol.code')],
+      windowHeight: window.innerHeight,
+      userId: '',
       lang: this.$i18n.locale,
       isFirstLoad: false,
-      storeName: '',
-      showMonthDrap: false,
-      showStoreContent: false,
-      checkAllStore: false,
-      noData: '',
-      showStoreInfo: false,
-      cellClass: 'report-cell-class',
-      headerClass: 'report-header-class',
-      exportReportHeader: [this.$t('remotePatrol.regionI'),
-        this.$t('remotePatrol.regionII'),
-        this.$t('remotePatrol.patrolStore'),
-        this.$t('remotePatrol.code'),
-        this.$t('remotePatrol.storeType'),
-        this.$t('scheduleView.InspectPerson'),
-        this.$t('overview.patrolLists'),
-        this.$t('remotePatrol.patrolWay'),
-        this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.patrolScore'),
-        this.$t('remotePatrol.patrolDate')],
-      inspectId: '',
-      inspectTableList: [],
-      isLoading: false,
-      ifSaveParams: false,
+      order: '',
+      ifChangeAccount: false,
+      numberOfElements: 0,
+      totalElements: 0,
+      sortColumnOfTab: [
+        { tabIndex: 0, sortType: { prop: '', order: '' }},
+        { tabIndex: 1, sortType: { prop: '', order: '' }},
+        { tabIndex: 2, sortType: { prop: '', order: '' }},
+        { tabIndex: 3, sortType: { prop: '', order: '' }},
+        { tabIndex: 4, sortType: { prop: '', order: '' }}
+      ],
+      exportPng: require('../../../static/img/excel.png'),
+      selfClassName: 'self-class-name',
       ifGetParamsFromCash: false,
-      inspectCatch: '',
+      ifSaveParams: false,
       storeFilterObj: {},
       searchParams: {},
       ifSearchData: true,
-      isScore:true,
+      showCloseBtn:false,
+      closingEventId:[],
+      stopRowClick:false,
+      showBachCloseDialog:false,
+      exportBtnClass:[
+                {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
+                {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
+                {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
+            ],
+      tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
+        {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
+        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
     };
   },
 
-  created() {
-    this.isFirstLoad = true;
-  },
-
   computed: {
-    iconSrcHeight() {
-      return (this.varyWindowWidth / 1920) * 50;
+    tableHieght() {
+      if (this.windowHeight > 800) {
+        return this.windowHeight * 0.85;
+      } else if (this.windowHeight > 700) {
+        return this.windowHeight * 0.58;
+      } else {
+        return this.windowHeight * 0.7;
+      }
     },
+
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
 
   watch: {
     accountChanged(val) {
       const self = this;
+      for(let i=0; i<5;i++){
+        self.tableDataList[i].tableData =[];
+        self.tableDataList[i].eventCount = 0;
+      }
+      
       if (val !== 0) {
-        self.storeDataList = [];
-        self.initData();
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
         },
         300);
-        self.ifSaveParams = true;
+        //self.initData();
+        self.ifChangeAccount = true;
+        self.ifSaveParams = false;
         self.ifSearchData = true;
+        
       }
+    },
+
+    numberOfElements(val) {
+      const self = this;
+      if (val === 0 && self.totalElements > 0) {
+        self.params.filter.page -= 1;
+        console.log('numberofElements');
+        // self.getEventList();
+      }
+    }
+  },
+
+  created() {
+    this.isFirstLoad = true;
+  },
+
+  async mounted() {
+    const self = this;
+    self.userId = getCookie('UserId');
+    const windowHeight = window.innerHeight;
+    if (windowHeight > 800) {
+      self.tableHeight = 770 + 'px';
     }
   },
 
   activated() {
     const self = this;
+    self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
       self.initData();
+    } else {
+      console.log("Activate")
+      // self.getEventList('Back');
+      // self.getEventCount();
+      self.$route.meta.isBack = false;
+      self.isFirstLoad = false;
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
+  }, 
+  beforeDestroy() {
+    //console.log('searchFrom:',this.searchParams['searchFrom']);
+    if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+        //console.log("in beforeDestroy");
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+        this.ifSaveParams && this.saveSearchParams(true);
+    }else if(this.searchParams['searchFrom']=='EventStatistics'){
+        console.log("in beforeDestroy");
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+        this.ifSaveParams && this.saveSearchParams(true);
+    }
   },
-
+  deactivated() {
+      console.log('deactivated');
+      //console.log('searchFrom:',this.searchParams['searchFrom']);
+      
+      if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+          //console.log("in deactivated");
+          delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+          this.searchParams['searchFrom'] = '';
+          this.ifSaveParams && this.saveSearchParams(true);
+      }else if(this.searchParams['searchFrom']=='EventStatistics'){
+        //console.log("in beforeDestroy");
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+        this.ifSaveParams && this.saveSearchParams(true);
+    }
+  },
   methods: {
-    initData() {
+    init(){
+      console.log('go init ~~~~~>> ');
+      this.workflowInstanceMine()
+    },
+    // for Audit
+    handleTabClick(val) {
       const self = this;
-      self.isLoading = true;
-      this.searchInput = '';
-      self.storeStr = '';
-      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24,
-        new Date(this.$moment(new Date()).endOf('day'))];
-      self.reportList = [];
-      self.curSortType = 0;
-      self.storeName = '';
-      self.showMonthDrap = false;
-      self.showStoreContent = false;
-      self.checkAllStore = false;
-      self.curReportType = -1;
-      self.getSearchParams();
-      self.getInspectList();
+      if (Number(val.index) < 4) {
+        self.curState = Number(val.index) === 2 ? [2, 4] : [Number(val.index)];
+        console.log('self.curState1 ~~~~~>>>> ', self.curState);
+      } else {
+        const stateArr = [];
+        self.eventStatesList.forEach(item => {
+          stateArr.push(item.value);
+        });
+        self.curState = stateArr;
+        self.curState.unshift('-1');
+        console.log('self.curState2 ~~~~~>>>> ', self.curState);
+
+      }
+      self.getEventList();
     },
 
-    async export2Excel() {
-      const that = this;
-      if (that.reportList.length === 0) {
-        util.notify(that.$t('remotePatrol.emptyReportList'), 'warning', 3000);
-        return false;
+    // get table data
+    async workflowInstanceMine(){
+      this.isLoadingData = true
+      var param = {
+          "page": 0,
+          "size": 10
       }
-      // const start = typeof (that.dateValue[0]) === 'object' ? that.dateValue[0].getTime() : that.dateValue[0];
-      // const end = typeof (that.dateValue[1]) === 'object' ? that.dateValue[1].getTime() : that.dateValue[1];
-      // that.params.beginTs = start;
-      // that.params.endTs = end;
-      // that.params.filter = { page: 0, size: that.total };
-      // const storeIds = this.storeFilterObj.filterStoreIds;
-      // that.params.clause = { storeId: storeIds };
-      // console.log(that.params)
-      require.ensure([], async() => {
-        const { export_json_to_excel } = require('@/excel/Export2Excel');
-        const tHeader = that.exportReportHeader;
-        const filterVal = ['province', 'city', 'storeName', 'code', 'storeType', 'submitterName', 'tagName',
-          'modeText', 'status', 'totalScore', 'datestr'];
-        let curData = [];
-        curData = await that.getReportList_({...that.params, filter: {page: 0, size: 1000}});
-        const data = that.formatJson(filterVal, curData);
-        const fileName = that.$t('remotePatrol.reportExcelList') + '-' + util.getCurDateStr();
-        sessionStorage.setItem('!merge', true);
-        export_json_to_excel(tHeader, data, fileName);
-        sessionStorage.removeItem('!merge');
+
+      await workflowInstanceMine(param).then(res=>{
+        console.log('res ~~~>> ', res);
+      
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
       });
     },
 
-    formatJson(filterVal, jsonData) {
-      return jsonData.map(v => filterVal.map(j => v[j]));
-    },
 
+    // =================
+
+
+
+
+
+
+
+    getLangStyleValue(langArray){
+      return util.getLangStyleValue(langArray);
+    },
+    renderHeader(h, { column, $index }) {
+      if(util.getWindowWidth()>1366){
+        let realWidth = 0;
+        let span = document.createElement('span');
+
+        span.style.display = 'inline-block';
+        span.innerText = column.label;
+        document.body.appendChild(span);
+
+        realWidth = span.clientWidth;
+        if(column.sortable == 'custom') realWidth = realWidth;
+        else column.minWidth = realWidth;
+        //console.log(column.label+":"+column.minWidth);
+        //console.log(column.label+" realWidth:"+realWidth);
+        if(column.minWidth<realWidth) column.minWidth = realWidth;
+
+        document.body.removeChild(span);
+      }
+      return h('span', {}, [column.label]);
+    },
     cellStyle({ row, column, rowIndex, columnIndex }) {
-      let obj = {};
-      if (columnIndex === 0) {
-        obj = { 'border-left': '1px solid #e3e9f4', 'border-right': '1px solid #e3e9f4' };
+      let obj = {'border-bottom': '1px solid #acaeb1'};
+      /*if (columnIndex === 0) {
+        obj = { 'border-bottom': '1px solid #acaeb1', 'border-right': '1px solid #e3e9f4' };
       } else {
         obj = { 'border-right': '1px solid #e3e9f4' };
-      }
+      }*/
       return obj;
     },
-   getReportList_(p) {
-      console.log("Get Report List")
-      console.log(p)
-      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
-      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
-      const self = this;
-      params.endTs = params.endTs - params.endTs % 1000 + 999;
-      if (params.clause.storeId.length === 0) {
-        console.log("No Data")
-        this.setNoData();
-        return;
-      }
-      return new Promise((resolve) => {
-        //console.log("params:",params);
-        getInspectReportList(params).then(async(res) => {
-          const errCode = res.errCode;
-          let data = [];
-          if (errCode === 0) {
-            data = res.data.content;
-          }
-          const temp = [];
-          // self.isLoading = true;
-          for(const item of data){
-          //data.forEach(async (item,index) => {
-            const reportObj = {};
-            reportObj.province = item.province;
-            reportObj.city = item.city;
-            reportObj.id = item.id;
-            reportObj.datestr = util.getDateStr(item.ts);
-            reportObj.storeName = item.storeName;
-            reportObj.tagName = item.tagName;
-            reportObj.submitterName = item.submitterName;
-            reportObj.submitter = item.submitter;
-            reportObj.routeObj = item;
-            reportObj.mode = item.mode;
-            reportObj.totalScore = item.type === 1 ? "--" : item.totalScore;
-            reportObj.code = item.code !== null ? item.code : '--';
-            reportObj.standard = item.standard;
-            reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
-            reportObj.statusCode = item.status; 
-            if (item.mode === 0) {
-              reportObj.modeText = self.$t('overview.remotePatrol');
-            } else if (item.mode === 1) {
-              reportObj.modeText = self.$t('overview.onsitePatrol');
-            }
-            let storeType = '';
-            item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
-              const isuu = _index === item.tags.length - 1 ? '' : ',';
-              storeType += _item + isuu;
-            }) : storeType = '--';
-            reportObj.storeType = storeType;
-            self.storeList.forEach(_item => {
-              if (item.storeId === _item.storeId) {
-                reportObj.province = _item.province;
-                reportObj.city = _item.city;
-              }
-            });
-            const statusAndIconObj = self.getIconSrc(item.status);
-            reportObj.status = statusAndIconObj.status;
-            reportObj.iconSrc = statusAndIconObj.iconSrc;
-            temp.push(reportObj);
-          }
-          //);
-          // self.reportList = temp;
-          // self.total = Math.ceil(res.data.totalElements/self.sizeNum);
-          // self.isLoading = false;
-          // if (temp.length === 0) {
-          //   self.noData = self.$t('deviceView.noData');
-          // }
-          resolve(temp);
-        }).catch(err => {
-        });
-      });
-    },
-   getReportList(p) {
-      console.log("Get Report List")
-      console.log(p)
-      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
-      inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
-      const self = this;
-      params.endTs = params.endTs - params.endTs % 1000 + 999;
-      if (params.clause.storeId.length === 0) {
-        console.log("No Data")
-        this.setNoData();
-        return;
-      }
-      return new Promise((resolve) => {
-        //console.log("params:",params);
-        getInspectReportList(params).then(async(res) => {
-          const errCode = res.errCode;
-          let data = [];
-          if (errCode === 0) {
-            data = res.data.content;
-          }
-          const temp = [];
-          self.isLoading = true;
-          for(const item of data){
-          //data.forEach(async (item,index) => {
-            const reportObj = {};
-            reportObj.province = item.province;
-            reportObj.city = item.city;
-            reportObj.id = item.id;
-            reportObj.datestr = util.getDateStr(item.ts);
-            reportObj.storeName = item.storeName;
-            reportObj.tagName = item.tagName;
-            reportObj.submitterName = item.submitterName;
-            reportObj.submitter = item.submitter;
-            reportObj.routeObj = item;
-            reportObj.mode = item.mode;
-            reportObj.totalScore = item.type === 1 ? "--" : item.totalScore;
-            reportObj.code = item.code !== null ? item.code : '--';
-            reportObj.standard = item.standard;
-            reportObj.standardMsg = util.setStandardMsg(reportObj.standard);
-            reportObj.statusCode = item.status; 
-            if (item.mode === 0) {
-              reportObj.modeText = self.$t('overview.remotePatrol');
-            } else if (item.mode === 1) {
-              reportObj.modeText = self.$t('overview.onsitePatrol');
-            }
-            let storeType = '';
-            item.tags.length !== 0 ? item.tags.forEach((_item, _index) => {
-              const isuu = _index === item.tags.length - 1 ? '' : ',';
-              storeType += _item + isuu;
-            }) : storeType = '--';
-            reportObj.storeType = storeType;
-            self.storeList.forEach(_item => {
-              if (item.storeId === _item.storeId) {
-                reportObj.province = _item.province;
-                reportObj.city = _item.city;
-              }
-            });
-            const statusAndIconObj = self.getIconSrc(item.status);
-            reportObj.status = statusAndIconObj.status;
-            reportObj.iconSrc = statusAndIconObj.iconSrc;
-            temp.push(reportObj);
-          }
-          //);
-          self.reportList = temp;
-          self.total = Math.ceil(res.data.totalElements/self.sizeNum);
-          self.isLoading = false;
-          if (temp.length === 0) {
-            self.noData = self.$t('deviceView.noData');
-          }
-          resolve(temp);
-        }).catch(err => {
-        });
-      });
-    },
 
-    getReportInfo(reportId){
-      return new Promise((resolve) => {
-        getInspectReportInfo({ reportIds: [reportId] }).then(res=>{
-          var allRemarkItemsFlag = true;
-          if (res.errCode === 0 && res.data.length > 0) {
-            allRemarkItemsFlag = (res.data[0].info.type != 1);
-          }
-          resolve(allRemarkItemsFlag);
-        }).catch(err => {
-          console.log('InspectReportList-getReportInfo: ' + err);
-        });
-      });
-    },
-
-    getIconSrc(status) {
-      const statusAndLangAndIconMap = [
-        {
-          status: 0,
-          statusStr: this.$t('overview.danger'), // Poor
-          children: [{
-            'zh': require('../../../static/img/dangerous_cn.png'),
-            'zhtw': require('../../../static/img/dangerous_tw.png'),
-            'en': require('../../../static/img/dangerous_en.png'),
-            'ja-JP': require('../../../static/img/dangerous_ja.png'),
-            'ko-KR': require('../../../static/img/dangerous_ko.png')
-          }]
-        },
-        {
-          status: 1,
-          statusStr: this.$t('overview.improve'), // Fair
-          children: [{
-            'zh': require('../../../static/img/improved_cn.png'),
-            'zhtw': require('../../../static/img/improved_cn.png'),
-            'en': require('../../../static/img/improved_en.png'),
-            'ja-JP': require('../../../static/img/improved_ja.png'),
-            'ko-KR': require('../../../static/img/improved_ko.png')
-          }]
-        },
-        {
-          status: 2,
-          statusStr: this.$t('overview.echartGood'), // Good
-          children: [{
-            'zh': require('../../../static/img/good_cn.png'),
-            'zhtw': require('../../../static/img/good_cn.png'),
-            'en': require('../../../static/img/good_en.png'),
-            'ja-JP': require('../../../static/img/good_ja.png'),
-            'ko-KR': require('../../../static/img/good_ko.png')
-          }]
-        }
-      ];
-
-      const statusAndIconObj = {};
-      const filterMap = statusAndLangAndIconMap.filter(map => map.status === status);
-      if (filterMap.length > 0) {
-        statusAndIconObj.status = filterMap[0].statusStr;
-        for (const lang in filterMap[0].children[0]) {
-          if (lang === this.lang) {
-            statusAndIconObj.iconSrc = filterMap[0].children[0][lang];
-          }
-        }
-      }
-      return statusAndIconObj;
-    },
-
-    getInitReportList() {
-      this.getReportList(this.params);
-    },
-
-    dateChange(val) {
-      const self = this;
-      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
-      self.dateValue[1] = self.dateValue[1];
-      self.inputSearchValue = '';
-    },
-
-    currentChange(val) {
-      const self = this;
-      self.page = val.page;
-      self.params.filter = { page: val.page - 1, size: self.sizeNum };
-      self.getReportList(self.params);
-    },
-
-    sizeChange(val) {
-      const self = this;
-      self.sizeNum = val.size;
-      self.params.filter = { page: 0, size: val.size };
-      self.getReportList(self.params);
-    },
-
-    searchData() {
-      console.log("Search Data" +this.dateValue)
-      const self = this;
-      const val = self.dateValue;
-      if (val.length === 0) return;
-      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
-      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
-      self.params["beginTs"] = start;
-      self.params["endTs"] = end;
-      self.page = 1;
-      const clause = {};
-      clause.storeId = this.storeFilterObj.filterStoreIds;
-      if (self.curReportType != null && self.curReportType !== -1) {
-        clause.mode = self.curReportType;
-      }
-      if (self.curAppraise != null && self.curAppraise !== -1) {
-        clause.status = self.curAppraise;
-      }
-      self.params.clause = clause;
-      self.params.inspectTagId = self.inspectId === '-1' ? '' : self.inspectId;
-      typeof (self.params.inspectTagId) === 'string' && delete self.params.inspectTagId;
-      const search = self.searchInput.trim();
-      if (search.length !== 0) {
-        self.params.like = {
-          tagName: search,
-          submitterName: search,
-          storeName: search
-        };
-      } else {
-        self.params.like = {};
-      }
-      console.log("SearchParams")
-      console.log(self.params)
-      self.params.filter = { page: 0, size: self.sizeNum };
-      self.saveSearchParams();
-      self.getReportList(self.params);
-    },
-
-    setNoData() {
-      this.reportList = [];
-      this.total = 0;
-      this.isLoading = false;
-      this.noData = this.$t('deviceView.noData');
-    },
-
-    checkSortType(typeId,notupdate) {
-      const self = this;
-      switch (typeId) {
-        case 0: self.params.order = { direction: 'desc', property: 'ts' }; break;
-        case 1: self.params.order = { direction: 'asc', property: 'status' }; break;
-        case 2: self.params.order = { direction: 'asc', property: 'storeName' }; break;
-      }
-      if(!notupdate)
-        self.getReportList(self.params);
-    },
-
-    clickReport(item, index) {
-      const self = this;
-      sessionStorage.setItem('report_data', JSON.stringify(item.routeObj));
-      self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
-    },
-
-    sortChange(col) {
-      const self = this;
-      const order = col.order;
-      if (order === 'ascending') {
-        self.params.order = {
-          'direction': 'asc',
-          'property': col.column.property === 'datestr' ? 'ts' : col.column.property
-        };
-      } else if (order === 'descending') {
-        self.params.order = {
-          'direction': 'desc',
-          'property': col.column.property === 'datestr' ? 'ts' : col.column.property
-        };
-      } else {
-        self.params.order = {};
-      }
-      self.searchData();
-    },
-
-    getTagAll() {
+    getBriefStoreData() {
       return new Promise((resolve, reject) => {
-        GetInspectTagList().then(res => {
-          const data = res.data;
-          resolve(data);
+        getBriefStoreList().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg != undefined && errMsg === 'Success') {
+            resolve(res);
+          }
         }).catch(err => {
           reject(err);
         });
       });
     },
 
-    async getInspectList() {
+    // handleStateChange(val) {
+    //   const self = this;
+    //   self.curState = val;
+    // },
+
+    dateChange(val) {
+      console.log("dateChange");
       const self = this;
-      const inspectArr = await self.getTagAll();
-      const newArr = [];
-      const inspectList = [];
-      inspectArr.forEach(_item => {
-        if (self.curReportType === -1) {
-          if (!newArr.includes(_item.id)) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        } else if (self.curReportType === 0) {
-          if (!newArr.includes(_item.id) && _item.mode === 0) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        } else if (self.curReportType === 1) {
-          if (!newArr.includes(_item.id) && _item.mode === 1) {
-            newArr.push(_item.id);
-            inspectList.push(_item);
-          }
-        }
-      });
-      self.inspectTableList = inspectList;
-      self.inspectTableList.length > 0 && self.inspectTableList.unshift({ id: '-1', name: self.$t('remotePatrol.all') });
-      if (inspectList.length !== 0) {
-        self.inspectId = self.ifGetParamsFromCash ? self.inspectCatch : self.inspectTableList[0].id;
-      } else {
-        self.inspectId = '';
-      }
-      self.getInitReportList();
+      const tabIndex = Number(self.activeName);
+      const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
+      const end = typeof (val[1]) === 'object' ? val[1].getTime() : val[1];
+      self.dateValue = [new Date().setTime(start), new Date().setTime(end)];
+      self.dateValue[1] = self.dateValue[1];
+      self.inputSearchValue = '';
+      self.tableDataList[tabIndex].page = 1;
     },
 
-    saveSearchParams() {
-      console.log("Save Search Params")
-      let tempsearchParamsObj = this.storeFilterObj;
-      tempsearchParamsObj.curReportType = this.curReportType;
-      if(!tempsearchParamsObj.clause){
-        tempsearchParamsObj.clause={
-          storeId: this.storeFilterObj.filterStoreIds,status:this.curAppraise
+    
+
+    searchEventList() {
+      //this.saveSearchParams(false);
+      console.log("searchEventList page:",this.tableDataList[Number(this.activeName)].page)
+      this.tableDataList[Number(this.activeName)].page = 1;
+      if(this.searchParams['searchFrom']=='PatrolPersonStat'){
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+      }else if(this.searchParams['searchFrom']=='EventStatistics'){
+        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+        this.searchParams['searchFrom'] = '';
+    }
+      this.getEventListAndCount();
+    },
+
+    searchData() {
+      console.log("SearchData")
+      this.tableDataList[Number(this.activeName)].page = 1;
+      this.getEventListAndCount();
+    },
+
+    getEventListAndCount() {
+      console.log("Get Event List and Count")
+      if (this.dateValue.length === 0) return;
+      this.getEventList('');
+      this.getEventCount();
+    },
+
+    rowClickItem(row) {
+      console.log("rowClickItem",row);
+      if(!this.stopRowClick){
+        this.event = row;
+        console.log("rowClickItem:",this.event);
+        sessionStorage.setItem('event', JSON.stringify(this.event));
+        sessionStorage.setItem('queryparams', JSON.stringify(this.params));
+        this.$router.push({ name: 'eventDetails', params: { event: this.event }});
+      }else{
+        this.stopRowClick = false;
+      }
+    },
+    cellClickItem(row, column, cell, event){
+      //console.log("column:",column);
+      if(column.type == "selection"){
+        //console.log("cell in");
+        this.stopRowClick = true;
+      }
+    },
+
+    toEventDetail(row) {
+      this.event = row;
+      sessionStorage.setItem('event', JSON.stringify(this.event));
+      sessionStorage.setItem('queryparams', JSON.stringify(this.params));
+      this.$router.push({ name: 'eventDetails', params: { event: this.event }});
+    },
+
+    sortChange(col) {
+      const self = this;
+      const tabIndex = Number(self.activeName);
+      console.log("sortChange page:",self.tableDataList[tabIndex].page);
+      self.tableDataList[tabIndex].page = 1;
+      const order = col.order;
+      self.order = order;
+      let prop = '';
+      let tempOrder = '';
+      if (order === 'ascending') {
+        self.params.order = {
+          'direction': 'asc',
+          'property': col.column.property
+        };
+        prop = col.column.property;
+        tempOrder = 'asc';
+      } else if (order === 'descending') {
+        self.params.order = {
+          'direction': 'desc',
+          'property': col.column.property
+        };
+        prop = col.column.property;
+        tempOrder = 'desc';
+      } else {
+        self.params.order = {};
+      }
+      self.sortColumnOfTab[tabIndex].sortType.prop = prop;
+      self.sortColumnOfTab[tabIndex].sortType.order = tempOrder;
+      self.getEventList();
+    },
+
+
+
+
+
+
+
+
+    async getEventList(val) {
+      const self = this;
+      const tabIndex = Number(this.activeName);
+      // console.log('self.tableDataList ~~~~~>> ', self.tableDataList);
+      for(var k in self.tableDataList){
+        self.tableDataList[k].tableData =[];
+        self.tableDataList[k].total =0;
+        //self.tableDataList[k].eventCount = 0;
+      }
+      /*const routeParams = sessionStorage.getItem('event_manage');
+      console.log("routeParams:",routeParams);
+      if(routeParams!=''){
+        const routeData = JSON.parse(routeParams);
+        this.getRouterData(routeData);
+      }else{*/
+      await self.getEventListRequestParams(val);
+      
+      //}
+      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
+        //return ;
+        /*this.tableDataList[tabIndex].tableData = [];
+        this.tableDataList[tabIndex].total = 0;
+        this.tableDataList[tabIndex].eventCount = 0;
+        this.totalElements = 0;
+        this.numberOfElements = 0;
+        */
+        delete self.params.clause.storeId;
+        return;
+      }
+      // console.log("@@@self.params:",self.params);
+      eventRESTful.getEventList(self.params).then((res) => {
+        const data = res.data.content;
+        //console.log("data:",data);
+        const temp = [];
+        data.forEach(item => {
+          const attachment = [];
+          if (item.initialComment.attachment.length !== 0) {
+            item.initialComment.attachment.some(x => x.mediaType === 0) ? attachment.push({ url: self.attachmentAudio }) : '';
+            item.initialComment.attachment.some(x => (x.mediaType === 1||x.mediaType === 2)) ? attachment.push({ url: self.attachmentVideo }) : '';
+            //item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
+          }
+          const obj = {
+            id: item.id,
+            ts: util.getDateTime(item.ts),
+            updateTs:(item.status==4)?util.getDateTime(item.updateTs):"",
+            assignee: item.assignee,
+            assignerName: item.assignerName,
+            assigneeName: item.assigneeName,
+            deviceId: item.deviceId,
+            status: item.status,
+            storeId: item.storeId,
+            storeName: item.storeName,
+            inspectTagName: item.inspectTagName,
+            subject: item.subject,
+            score: item.score,
+            sourceType: item.sourceType,
+            attachment: attachment,
+            initialComment: item.initialComment,
+            relatedDeviceIds: item.relatedDeviceIds,
+            province: item.province,
+            city: item.city,
+            code: item.code
+          };
+          temp.push(obj);
+        });
+        // console.log("Set ",tabIndex,temp)
+        self.tableDataList[tabIndex].tableData = temp;
+        self.tableDataList[tabIndex].total = res.data.totalPages;
+        self.tableDataList[tabIndex].eventCount = res.data.totalElements;
+        console.log("res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
+        self.tableDataList[tabIndex].page = res.data.pageable.pageNumber+1;
+        self.totalElements = res.data.totalElements;
+        if(tabIndex == this.activeName){
+          console.log("@@res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
+          self.page = (res.data.pageable.pageNumber+1);
+          self.total = res.data.totalPages;
+        }
+        self.numberOfElements = res.data.numberOfElements;
+        //self.handleTabClick(this.activeName);
+      }).catch(err => {
+        console.log('EventManagement-getEventList:' + err);
+      });
+    },
+    
+    getEventListRequestParams(val) {
+      const tabIndex = Number(this.activeName);
+      let like = {};
+      if (this.inputSearchValue.trim().length !== 0) {
+        const inputValue = this.inputSearchValue.trim();
+        like = {
+          subject: inputValue,
+          assignerName: inputValue,
+          storeName: inputValue
+        };
+      } else {
+        like = {};
+      }
+      let storeId = null;
+      var p = Object.assign({}, this.params);
+      console.log("*p:",p)
+      //if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics")
+        storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause'))?p.clause.storeId:'-1';
+      /*else{
+        if(p.clause){
+          var tempStore = (p.clause.storeId)?p.clause.storeId:[];
+          console.log("tempStore:",tempStore);
+        }
+        storeId =  (tempStore!="-1")? tempStore :((Object.keys(this.storeFilterObj).length > 0) ? this.storeFilterObj.filterStoreIds :'-1');
+      }*/
+      console.log("getEventListRequestParams > storeId:",storeId);
+      let status = [];
+      if (this.curState.length !== 0) {
+        if (this.curState.length === 1) {
+          status = this.curState[0];
+        } else {
+          const allStatus = this.curState.some(item => item === '-1');
+          if (allStatus) {
+            status = [];
+          } else {
+            status = this.curState;
+          }
+        }
+      } else {
+        if(typeof this.searchParams.curState!="undefined" &&  this.searchParams.curState.length>0){
+          status = this.searchParams.curState;
+        }else{
+          status = [];
+        }
+        x
+      }
+      console.log('status ~~~~~>> ', status);
+      let page = 0;
+      if (val === 'currentChange') {
+        console.log('currentChange',this.tableDataList[tabIndex].page);
+        page = this.tableDataList[tabIndex].page-1;
+      }
+      if (val === 'Back') {
+        page = this.params.filter.page;
+      }
+      let start = '', end = '';
+      if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics"){
+         //storeId = this.searchParams.clause.storeId;
+        start = this.searchParams.beginTs;
+        end = this.searchParams.endTs;
+      }else{
+        if (val === 0) {
+          start = this.$moment(this.dateValue[0]).valueOf();
+          end = this.$moment(this.dateValue[1]).valueOf();
+        } else {
+          start = this.$moment(this.dateValue[0]).valueOf();
+          const endTime = this.dateValue[1];
+          end = this.$moment(endTime);
         }
       }
-      else{
-        tempsearchParamsObj.clause = this.params.clause
+      end = end - end % 1000 + 999;
+      var params = {
+          beginTs: start,
+          endTs: end,
+          clause: {
+            status: status
+          },
+          filter: {
+            page: page,
+            size: this.tableDataList[tabIndex].sizeNum
+          },
+          like: like
       }
-      tempsearchParamsObj.inspectTagId = this.inspectId;
-      //
-      const searchParamsObj = {
-        path: 'inspectReport',
-        params: tempsearchParamsObj
+      console.log("1.this.params:",params);
+      if(storeId && storeId!='-1' && storeId!=""){
+        console.log("storeId:",storeId);
+        params.clause['storeId'] = storeId;
+      }
+      console.log("2.this.params:",params);
+      console.log("this.searchParams:",this.searchParams);
+      if(this.searchParams.hasOwnProperty('searchParams')){
+        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='PatrolPersonStat'){
+          params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+        }
+        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='EventStatistics'){
+          params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
+        }
+      }
+      //console.log("this.params:",this.params);
+      const curTabSortColumn = this.sortColumnOfTab[tabIndex];
+      const order = curTabSortColumn.sortType.order;
+      const prop = curTabSortColumn.sortType.prop;
+      if (order.length > 0 && prop.length > 0) {
+        params.order = {
+          direction: order,
+          property: prop
+        };
+      } else {
+        params.order = {
+          direction: 'desc',
+          property: 'ts'
+        };
+      }
+      this.order = params.order;
+      this.params = params;
+      this.ifSaveParams && this.saveSearchParams(false);
+      this.ifSaveParams = true;
+    },
+
+
+
+
+
+
+
+
+    sizeChange(val) {
+      const self = this;
+      self.tableDataList[Number(self.activeName)].sizeNum = val.size;
+      self.tableDataList[Number(self.activeName)].page = 1;
+      self.sizeNum = val.size;
+      self.getEventList();
+    },
+
+    currentChange(val) {
+      const self = this;
+      console.log("currentChange val:",val);
+      self.tableDataList[Number(self.activeName)].page = val.page;
+      self.page = val.page;
+      self.getEventList('currentChange');
+
+      const dom = document.getElementsByClassName('el-table__body-wrapper is-scrolling-left')[0];
+      const offestTop = dom.offsetTop;
+      if (dom != undefined) {
+        document.getElementsByClassName('el-table__body-wrapper is-scrolling-left')[0].scrollTop = 0;
+      }
+    },
+
+    handleSelectionChange(val){
+      console.log("handleSelectionChange:",val);
+      this.closingEventId = [];
+      if(val.length>0){
+        this.showCloseBtn = true;
+        val.map((item)=>{
+          this.closingEventId.push(item.id);
+        })
+      }else{
+        this.showCloseBtn = false;
+      }
+    },
+
+    handleDisable(row, index){
+      if (row.status==2 || row.status==4 || !PermissionHelper.enableEventClose() ) {
+        return false
+      } else {
+        return true
+      }
+    },
+
+    getEventCount() {
+      const self = this;
+      let start = this.$moment(self.dateValue[0]).valueOf();
+      let endTime = this.$moment(self.dateValue[1]).valueOf();
+      let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
+      end = end - end % 1000 + 999;
+      if(self.searchParams['searchFrom']=='PatrolPersonStat'|| this.searchParams['searchFrom']=="EventStatistics"){
+         //storeId = this.searchParams.clause.storeId;
+        start = self.searchParams.beginTs;
+        end = self.searchParams.endTs;
+      }
+      //self.getEventListRequestParams('currentChange');
+      //}
+      console.log("Get Event Count")
+      //console.log(self.params)
+      //console.log(self.params.clause.storeId);
+      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
+        delete self.params.clause.storeId;
+        return;
+      }
+      //console.log("self.params:",self.params);
+      //console.log("self.storeFilterObj:",self.storeFilterObj);
+      //let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds?self.storeFilterObj.filterStoreIds:self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
+      
+      //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
+      let storeId = null;
+      //if(self.searchParams['searchFrom']=='PatrolPersonStat' || self.searchParams['searchFrom']=="EventStatistics")
+        storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:'-1';
+      /*else
+        storeId =  (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds :'-1';
+      */
+      console.log("getEventCount > storeId:",storeId)
+      let like = {};
+      if (self.inputSearchValue.trim().length !== 0) {
+        const inputValue = self.inputSearchValue.trim();
+        like = {
+          subject: inputValue,
+          assignerName: inputValue,
+          storeName: inputValue
+        };
+      } else {
+        like = {};
+      }
+      const params = {
+        beginTs: start,
+        endTs: end,
+        clause: {
+          storeId: storeId
+        },
+        like: like
       };
-      SearchConditionUtil.saveSearchCondition(searchParamsObj);
+      if(storeId!='-1'){
+        params['clause']['storeId'] = storeId
+      }
+      console.log("820: params",params);
+      if(this.searchParams.hasOwnProperty('searchParams')){
+        if(this.searchParams.searchParams.hasOwnProperty('clause')  && this.searchParams['searchFrom']=='PatrolPersonStat'){
+          params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+        }
+        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='EventStatistics'){
+          params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
+        }
+      }
+      
+      //delete params.clause['status'];
+      if (storeId.length === 0) {
+        for (let i = 0; i < 4; i++) {
+          self.tableDataList[i].eventCount = 0;
+        }
+        self.tableDataList[4].eventCount = 0;
+      } else {
+        eventRESTful.GetEventCountByStatus(params).then(res => {
+          const data = res.data;
+          console.log("GetEventCountByStatus > data:",data);
+          let numOfEventTotal = 0;
+          for (let i = 0; i < 4; i++) {
+            self.tableDataList[i].eventCount = data[i].numOfEvent;
+            numOfEventTotal += data[i].numOfEvent;
+          }
+          self.tableDataList[2].eventCount += data[4].numOfEvent;
+          self.tableDataList[4].eventCount = numOfEventTotal + data[4].numOfEvent;
+        }).catch(err => {
+          console.log('EventManagement-getEventCount:' + err);
+        });
+      }
+    },
+
+    getExportDataSize() {
+      const self = this;
+      const params = self.params;
+      params.filter = {};
+      return new Promise((resolve, reject) => {
+        eventRESTful.getEventList(params).then((res) => {
+          const size = res.data.totalElements;
+          resolve(size);
+        }).catch((error) => {
+          reject(error);
+        });
+      });
+    },
+
+    async getExportData() {
+      const self = this;
+      const size = await self.getExportDataSize();
+      self.params.filter = {
+        'page': 0,
+        'size': size
+      };
+      return new Promise((resolve, reject) => {
+        eventRESTful.getEventList(self.params).then((res) => {
+          const data = res.data.content;
+          const temp = [];
+          data.forEach(item => {
+            const obj = {};
+            obj.subject = item.subject;
+            obj.storeName = item.storeName;
+            obj.inspectTagName = item.inspectTagName;
+            obj.assignerName = item.assignerName;
+            obj.ts = util.getDateTime(item.ts);
+            obj.province = item.province;
+            obj.city = item.city;
+            obj.code = item.code;
+            temp.push(obj);
+          });
+          resolve(temp);
+        }).catch(err => {
+          console.log('EventMangement-getExportData:' + err);
+        });
+      });
+    },
+
+    getExportFileName() {
+      const self = this;
+      const tabIndex = Number(self.activeName);
+      let label = '';
+      switch (tabIndex) {
+        case 0: label = this.$t('eventView.pendingEve'); break;
+        case 1: label = this.$t('eventView.ProcessedEvent'); break;
+        case 2: label = this.$t('eventView.ClosedEvent'); break;
+        case 3: label = this.$t('eventView.ReturnEvent'); break;
+        case 4: label = this.$t('eventView.allEvents'); break;
+        default: console.error('error tab pages！'); break;
+      }
+      const fileName = label + '-' + util.getCurDateStr();
+      return fileName;
+    },
+
+    // async export2Excel() {
+    //   const that = this;
+    //   try {
+    //     const ret = await that.isLoginIn();
+    //     if (ret.data != undefined && ret.data.isLogin) {
+    //       const tabIndex = Number(that.activeName);
+    //       if (that.tableDataList[tabIndex].tableData.length === 0) {
+    //         util.notify(this.$t('eventView.noEvents'), 'warning', 3 * 1000);
+    //         return false;
+    //       }
+    //       require.ensure([], async() => {
+    //         const { export_json_to_excel } = require('@/excel/Export2Excel');
+    //         const tHeader = that.exportDataHeader;
+    //         const filterVal = ['subject', 'inspectTagName', 'assignerName', 'ts', 'province', 'city', 'storeName', 'code'];
+    //         const curData = await that.getExportData();
+    //         const data = that.formatJson(filterVal, curData);
+    //         export_json_to_excel(tHeader, data, that.getExportFileName());
+    //       });
+    //     } else {
+    //       const url = sessionStorage.getItem('LoginURL');
+    //       window.location.href = url;
+    //     }
+    //   } catch (err) {
+    //     console.log('EventManagement-export2Excel' + err);
+    //   }
+    // },
+
+    // formatJson(filterVal, jsonData) {
+    //   return jsonData.map(v => filterVal.map(j => v[j]));
+    // },
+
+    isLoginIn() {
+      return new Promise((resolve, reject) => {
+        isLoginIn().then(res => {
+          resolve(res);
+        }).catch(err => {
+          reject(err);
+        });
+      });
+    },
+
+    initData() {
+      //console.log('init');
+      const self = this;
+      self.activeName = '0';
+      self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
+      self.inputSearchValue = '';
+      self.total = 0;
+      self.getSearchParams();
+      const windowHeight = window.innerHeight;
+      if (windowHeight > 800) {
+        self.tableHeight = 770 + 'px';
+      }
+      this.tableDataList[Number(this.activeName)].page = 1;
+      this.getEventListAndCount() ;
+    },
+
+    getRouterData(routeData) {
+      console.log("1.eventManage routeData:", routeData);
+      let start = '', end = '';
+      start = this.$moment(this.dateValue[0]).valueOf();
+      const endTime = this.dateValue[1];
+      end = this.$moment(endTime);
+      this.params = {
+          beginTs: start,
+          endTs: end,
+          clause: {
+            status:[0],
+            storeId: routeData.storeId,
+            assigner : routeData.assigner
+          },
+          filter: {
+            page: 1,
+            size: 10
+          },
+        };
+        console.log("eventManage params:", this.params);
+        sessionStorage.setItem('event_manage', '');
+        console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
+        this.getEventList('Back');
+    },
+    saveSearchParams(isLeave=false) {
+      console.log("saveSearchParams:",this.storeFilterObj);
+      const params = this.storeFilterObj;
+      const { clause, filter, like, order } = { ...this.params };
+      if(isLeave){
+        let tempClause = clause;
+        delete clause["assigner"];
+        params.searchParams = { clause:tempClause, filter, like, order };
+        console.log("leave searchParams:",params.searchParams);
+      }else{
+        //params.curStore = this.storeFilterObj.filterStoreIds;
+        params.searchParams = { clause, filter, like, order };
+        params.searchParams.clause.storeId = this.storeFilterObj.filterStoreIds;
+      }
+      
+      params.filterStoreIds = this.storeFilterObj.filterStoreIds;
+      params.inputSearchValue = this.inputSearchValue;
+      params.dateValue = this.dateValue;
+      params.curState = this.curState;
+      params.activeName = this.activeName;
+      params.sizeNum = this.params.filter.size;
+      params.page = this.params.filter.page;
+      params.order = this.order;
+      const searchConditon = {
+        path: 'eventManage',
+        params: params
+      };
+      console.log("save params:",params);
+      SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
     getSearchParams() {
-      // console.log("Get SEarch Parameter");
-      let searchParams = JSON.parse(JSON.stringify(SearchConditionUtil.getSearchCondition('inspectReport')));
       
-      this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-   
-   
-      if (Object.keys(searchParams).length > 0) {
-         
-        this.storeFilterObj = searchParams;
-        this.params = searchParams;
-        console.log("Get Old Params")
-        console.log(searchParams)
-        this.order = searchParams.order;
-        this.filter = searchParams.filter;
-       
-        this.checkSortType(this.curSortType,true);
-        this.curAppraise = searchParams.clause.status;
-        this.curReportType = searchParams.curReportType;
-        this.inspectCatch = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
-        this.searchParams = searchParams;
-        this.ifGetParamsFromCash = true;
-        this.inspectId = !searchParams.inspectTagId ? '-1' : searchParams.inspectTagId;
-        if(!searchParams.curProvince){
-          searchParams.curProvince =[];
+        const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
+        console.log("EventMange > getSearchParams > searchParams:",searchParams);
+        if (Object.keys(searchParams).length > 0) {
+          
+          if(searchParams['searchFrom']=='PatrolPersonStat'){
+            //this.dateValue =[searchParams.];
+            this.storeFilterObj.filterStoreIds = searchParams.curStore;
+            this.storeFilterObj.curStore=searchParams.curStore;
+            this.storeFilterObj.storeIds=searchParams.curStore;
+            this.storeFilterObj.curCountry = "-1";
+            this.storeFilterObj.curProvince = ["-1"];
+            this.storeFilterObj.curCity = ["-1"];
+            this.params.beginTs = searchParams.beginTs;
+            this.params.endTs = searchParams.endTs;
+            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
+            //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
+            //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+          }else if(searchParams['searchFrom']=="EventStatistics"){
+            this.params.beginTs = searchParams.beginTs;
+            this.params.endTs = searchParams.endTs;
+            this.storeFilterObj.filterStoreIds = searchParams.curStore;
+            this.storeFilterObj.curStore=searchParams.curStore;
+            this.storeFilterObj.storeIds=searchParams.curStore;
+            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
+            //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
+          }else{
+            this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
+            this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+            //console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
+            this.params.beginTs = this.dateValue[0].valueOf();
+            this.params.endTs = this.dateValue[1].valueOf();
+          }
+          this.inputSearchValue = searchParams.inputSearchValue;
+          this.curState = searchParams.curState;
+          this.curStore = searchParams.curStore;
+          this.activeName = searchParams.activeName;
+          this.sizeNum = searchParams.sizeNum;
+          this.page = searchParams.page;
+          this.order = searchParams.order;
+          this.tableDataList[Number(this.activeName)].page = searchParams.page;
+          this.params = searchParams.searchParams;
+          this.searchParams = searchParams;
+          this.ifGetParamsFromCash = true;
+        } else {
+          this.searchParams = {};
+          this.curState = [0];
+          this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+          this.params.beginTs = this.dateValue[0].valueOf();
+          this.params.endTs = this.dateValue[1].valueOf();
         }
-        if(!searchParams.curCity){
-          searchParams.curCity =[];
-        }
-    
-        if(searchParams.jump){
-          console.log("Jump to ")
-          this.params.jump = false;
-          this.dateValue = [new Date().setTime(this.params.beginTs), new Date().setTime(this.params.endTs)];
-          this.saveSearchParams();
-          this.searchData();
-        }
-        
-      } else {
-        this.params.filter = { page: 0, size: this.sizeNum };
-        this.params.clause = { storeId: [] };
-        this.ifGetParamsFromCash = false;
-        this.curAppraise =-1;
-        this.searchParams = {};
-      }
-      if(!this.params.beginTs)this.params.beginTs = this.dateValue[0].valueOf();
-      if(!this.params.endTs)this.params.endTs = this.dateValue[1].valueOf();
-  
-  
+      
     },
-    
 
     onStoreChange(storeObj) {
-      console.log("On Store Changed")
-      // console.log(storeObj)
-      this.storeStr = storeObj.storeStr;
+      console.log("onStoreChange>storeFilterObj",storeObj);
       this.storeFilterObj = storeObj;
-      this.ifSearchData && this.searchData();
+      this.ifSearchData && this.getEventListAndCount();
       this.ifSearchData = false;
     },
-
-    getReportListOfCard() {
-      this.ShowCard = true;
-      this.checkSortType(this.curSortType);
+    doBachCloseEvent(){
+      this.showBachCloseDialog = true;
+    },
+    confirmBachClose(){
+      const self = this;
+      //const eventIds = [];
+      //eventIds.push(self.event.id);
+      //console.log("this.closingEventId:",this.closingEventId);
+      const comments = {
+        ts: new Date().getTime(),
+        //description: this.$t('eventView.closing'),
+        status: 2
+      };
+      const params = {
+        eventIds: this.closingEventId,
+        comment: comments
+      };
+      eventRESTful.addComment(params).then(res => {
+        self.showBachCloseDialog = false;
+        const errMsg = res.errMsg;
+        if (errMsg === 'Success') {
+          util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
+          setTimeout(() => {
+            self.searchData();
+            /*self.commentList.forEach((_item, _index) => {
+              self.getCommentDuration(_item);
+            });*/
+          }, 3000);
+        } else {
+          util.notify(this.$t('storeView.failSubmit'), 'warning', 3000);
+          return false;
+        }
+      }).catch(err => {
+        console.log('EventDetail-addComment:' + err);
+      });
     }
+
   },
 
   beforeRouteEnter(to, from, next) {
     to.meta.keepAlive = true;
-    if (from.name === 'reportDetails' && to.name === 'reports') {
+    if (from.name === 'eventDetails' && to.name === 'eventManage') {
       to.meta.isBack = true;
       next();
     } else {
@@ -792,7 +1238,7 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    if (to.name !== 'reportDetails') {
+    if (to.name !== 'eventDetails') {
       from.meta.keepAlive = false;
       next();
     } else {
@@ -803,382 +1249,340 @@ export default {
 
 };
 </script>
+
 <style lang="scss" scoped>
+@import '../../assets/css/textstyle.css';
+@import '../../assets/css/importfile.css';
 $red:#f31d65;
 $black:#182752;
 $border:#e3e9f4;
 $background:#f4f5f9;
 $tab:#7d8cad;
 $h1:#292e36;
-$qualified:#6097F3;
-$noqualied:#FDBA40;
-$suggestBack:#F1F6FE;
-$filterWidth: (100%-706);
-.el-radio {
-  >>> .el-radio__inner {
-    border-color: #d9dde1;
-    background: #fff;
-    width: calc(16/1920*100vw);
-    height: calc(16/1920*100vw);
-  }
-  &.is-checked {
-    >>> .el-radio__inner {
-      border-color: #2c90d9;
-      background: #e0f2ff;
-      width: calc(16/1920*100vw);
-      height: calc(16/1920*100vw);
+@function rem($val){
+    @return $val/16+rem;
+}
+@function checkRem($val){
+    @if($val==auto){@return auto;}
+    @else if($val==0){@return 0;}
+    @else{@return rem($val);}
+}
+@mixin point($poi,$val){
+    #{$poi}:checkRem($val);
+}
+.el-event-content{
+    width: 100%;
+    position: relative;
+    // border: 1px solid #e3e9f4;
+    /*overflow: hidden;*/
+    .sourceType-icon{
+        margin-right: calc(20/1920*100vw);
+        float: left;
+        height: 20px;
+        width: 20px;
     }
-    >>> .el-radio__inner::after {
-      width: 8px;
-      height: 8px;
-      background: #2c90d9;
+    .enclosure-icon{
+        margin-right: calc(8/1920*100vw);
+        float: left;
+        height: 16px;
+        width: 16px;
     }
-  }
-  >>> span {
-    font-size: calc(15/1920*100vw);
-  }
-}
-.search-label{
-  min-width: 45px;
-  text-align: left;
-  align-self: center;
-  font-family: NotoSansCJKTC;
-  font-size: 15px;
-  font-weight: normal;
-  word-break: keep-all;
-  padding-right: 16px;
-  
-}
-.report-type-area{
-    width:calc(346/1440*100vw);
-    height: 36px;
-    background-color: #FFF;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-}
-#el-containter{
-    
-    .report-header{
-        margin-top: 20px;
-        margin-bottom: 20px;
-        .header-details{
+    .icon-span{
+        display:inline-block;
+        min-width:68px;
+        height:24px;
+        font-size: calc(12/1920*100vw);
+        border-radius: 5px;
+        white-space: nowrap;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .ja-icon{
+      @extend .icon-span;
+      width: 90px;
+    }
+    .icon-gengduo{
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+    .search-label {
+      width: calc(76/1440*100vw);
+      text-align: left;
+      align-self: center;
+      font-family: NotoSansCJKTC;
+      font-size: calc(15/1920*100vw);
+      font-weight: normal;
+      margin-left:-10px;
+    }
+    .el-event-header{
+        // text-align: left;
+        // position: relative;
+        // background-color: #fff;
+        // border-bottom: 1px solid #e3e9f4;
+        // font-size: calc(14/1920*100vw);
+        // color: $black;
+        .el-area{
+          // padding: 30px calc(20/1920*100vw) 0 calc(30/1920*100vw);
+            overflow: hidden;
+        }
+        .el-date >>> .el-select-dropdown__item{
+            padding: 0 20px 0 50px !important;
+            /*color: #7d8cad;*/
+        }
+        .el-date >>> .el-select-dropdown.is-multiple .el-select-dropdown__item.selected::after{
+            font-family: "iconfont" !important;
+            content: '\e6a2';
+            left: 20px;
+            font-size: calc(14/1920*100vw);
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .el-date >>> .el-select-dropdown.is-multiple .el-select-dropdown__item::after{
+            font-family: "iconfont" !important;
+            position: absolute;
+            left: 20px;
+            content: "\e64a";
+            font-weight: 700;
+            -webkit-font-smoothing: antialiased;
+            font-size: calc(14/1920*100vw);
+            font-style: normal;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .el-date{
             text-align: left;
-            padding-left: calc(30/1920*100vw);
-            position: relative;
-            .search-content{
-                display: inline-block;
+            padding: 0 calc(20/1920*100vw) 15px calc(30/1920*100vw);
+            .date-title{
+                margin-right:20px;
+            }
+            .iconbangzhu{
+                margin-left:10px;
+                font-size: calc(20/1920*100vw);
+                position:relative;
+                top:2px;
+                color:$tab;
             }
             .date-range{
                 width:300px;
             }
-            .iconbangzhu{
-              font-size: calc(20/1920*100vw);
-              margin-right: calc(20/1920*100vw);
-              @media screen and (min-width: 1280px) and (max-width: 1560px){
-                margin-right: 10px;
-              };
-              @media screen and (min-width: 1024px) and (max-width: 1280px){
-                margin-right: 5px;
-              };
-            }
-            span{
-                font-size: calc(14/1920*100vw);
-                margin-right: calc(20/1920*100vw);
-              @media screen and (min-width: 1280px) and (max-width: 1560px){
-                margin-right: 10px;
-              };
-            }
-            
-            .el-province{
-                width: calc(160/1920*100vw);
-                min-width: 85px;
-                margin-right: calc(15/1920*100vw);
-                @media screen and (min-width: 1280px) and (max-width: 1360px){
-                  width: 85px;
-                };
-                @media screen and (max-width: 1022px){
-                  margin-right: 10px;
-                };
-            }
-          >>> .content .el-select.el-select--medium{
-            @media screen and (min-width: 1280px) and (max-width: 1360px){
-              width: 85px;
-            };
-            @media screen and (max-width: 1022px){
-              margin-right: 10px;
-            };
-          }
-            .search-input{
-                width: calc(160/1920*100vw);
-                @media screen and (min-width: 1280px) and (max-width: 1360px){
-                  width: 85px;
-                };
-            }
         }
-      .header-details{
-        padding-bottom: 15px;
-        padding-right: calc(20/1920*100vw);
-      }
-      .header-details:nth-child(1){
-        padding-bottom: 0px;
-      }
-    }
-    .report-content{
-        // padding-right: calc(20/1920*100vw);
-        // padding-left: calc(20/1920*100vw);
-        .card-content{
-          padding: calc(32/1920*100vw) calc(24/1920*100vw);
-        }
-        .empty-content{
-          font-size: 16px;
-          color: $tab;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-        }
-        .card-header{
-            text-align: left;
-            padding: 0 calc(8/1920*100vw);
-            padding-right: 0;
-            margin-bottom: 15px;
-            .list_card{
-              float: right;
-              display: flex;
-              align-items: center;
-              .pattern_btn{
-                display: inline-block;
-                height: calc(36/1920*100vw);
-                line-height: calc(36/1920*100vw);
-                color:#7d8cad;
-                cursor: pointer;
-                vertical-align: middle;
-                .iconCard{
-                  font-size: calc(18/1920*100vw);
-                  margin-right:calc(10/1920*100vw);
-                  vertical-align: middle;
-                }
-                .text-pattern{
-                  font-size: calc(15/1920*100vw);
-                  vertical-align: middle;
-                }
-              }
-              .export-report-btn{
-                background-color: #fff;
-                color: #006ab7;
-                font-size: calc(15/1920*100vw);
-                margin-left: calc(30/1920*100vw);
-              }
-            }
-        }
-    }
-    
-    .showCardHeight{
-      flex-wrap: wrap;
-      height: calc(450/1440*100vw);
-      overflow: auto;
-    }
-    .list-table{
-      margin-bottom: 20px;
-    }
-    .list-table >>> .report-cell-class .cell{
-      padding-left: calc(20/1920*100vw) !important;
-    }
-    .list-table >>> .report-header-class .cell{
-      padding-left: calc(20/1920*100vw) !important;
-    }
-    .list-table{
-      
-      .table-white {
-        /deep/
-        .el-table{
-          box-shadow: none !important;
-          border: none !important;
-          background-color: #fff;
-          padding-left: 12px;
-          padding-right: 12px;
-        }
-      }
-    }
-    
-    .report-card{
-        margin-bottom: calc(20/1440*100vw);
-        .cards{
-          .card-title {
-            width: calc(150/1440*100vw);
-            overflow:hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-             font-size: calc(15/1440*100vw);
-             margin-right: calc(10/1440*100vw);
-          }
-          div {
-            text-align: left;
-          }
-            padding: calc(15/1440*100vw);
-            cursor: pointer;
-            margin-right: calc(20/1440*100vw);
-            border: 1px solid #e3e9f4;
-            font-size: calc(12/1440*100vw);
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-            width: calc(200/1440*100vw);
-            height: calc(210/1440*100vw);
-            position: relative;
-            color: #69727c;
-            min-height: calc(160/1440*100vw);
-            .item-img{
-              position: absolute;
-              right: 1px;
-              top: 1px;
-            }
-          .item-flex{
-            display: flex;
-            flex-direction: column;
-            padding-top: calc(40/1440*100vw);
-            justify-content: space-around;
-          }
-            .item-header{
-                width: 100%;
-                //margin-top: calc(40/1920*100vw);
-                overflow: hidden;
-                .inspect-img{
-                    margin-left: calc(20/1920*100vw);
-                    float: left;
-                }
-                .store-name{
-                    float: left;
-                    width: calc(120/1920*100vw);
-                    margin-left: calc(20/1920*100vw);
-                    text-align: left;
-                    width: calc(100% - 40/1920*100vw);
-                    white-space: nowrap;
+        .store-handle{
+            height: 30px;
+            line-height: calc(30/1920*100vw);
+            .choice-store{
+                color: $tab;
+                white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    .name{
-                        font-size: calc(18/1920*100vw);
-                        font-weight: bold;
-                        display: block;
-                        color: $black;
-                        overflow: hidden;
-                        text-overflow: ellipsis
+                    float:left;
+                    width: 98%;
+                i{
+                    margin-right: calc(15/1920*100vw);
                 }
-                .inspect{
-                    font-size: calc(12/1920*100vw);
-                    color: $tab;
+                .icon-tishi1{
+                    font-size: calc(16/1920*100vw);
                 }
             }
         }
-        .item-icon{
-          text-align: left;
-          padding-left: calc(20/1920*100vw);
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-right: calc(20/1920*100vw);
-        }
-        .inspectIcon{
-          font-size: calc(60/1920*100vw);
-          color: $border;
-        }
-        .score {
-          font-size: calc(32/1440*100vw); 
-          margin-right: calc(5/1440*100vw);
-          margin-bottom: calc(30/1440*100vw);
-        }
-        .status-tag {
-          border-radius: calc(5/1440*100vw); 
-          padding: calc(2/1440*100vw) calc(15/1440*100vw);
-        }
-        .status-tag-en{
-          font-size: 14px;
-          border-radius: calc(5/1440*100vw); 
-          padding: calc(2/1440*100vw) calc(15/1440*100vw);
-        }
-        .margin-bottom-5 {
-          margin-bottom: calc(5/1440*100vw);
-        }
-        .item-score{
-          color: $tab;
-        }
-        .score-num{
-          font-size: calc(40/1440*100vw);
-        }
-        .score-unit{
-          font-size: 12px;
-        }
-        .item-content{
-            text-align: left;
-            padding-left: calc(20/1920*100vw);
-            span{
-              font-size: calc(14/1920*100vw);
-              color: $tab;
-              display: block;
-              margin-bottom: calc(15/1920*100vw);
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
+        .search-button{
+          float: right;
+          color:#FFF;
+          &:hover{
+            background-color: #3d4854;
+            color:#FFF;
+          }
         }
     }
-}
-.el-pat{
-    //position: absolute;
-    height: 30px;
-    margin-top: -10px;
-    .el-pag{
-        position: absolute;
-        //float: right;
-        right: calc(20/1920*100vw);
-        bottom: 0px;
+    .dialog-footer{
+        @include point(margin-top,20);
+        .file-content-btn{
+            position: relative;
+            left: 60%;
+        }
     }
-}
-}
-.standard-btn{
-  position: absolute;
-  top: 0;
-}
-.last-row{
-      display: flex;
-      flex-direction: row;
-      width:100%;
-      margin-left: 42px;
-      height: 36px;
-      align-items: flex-start;
-      align-items:center;
-      justify-content: space-between;
-      padding-right: (180/1920*100vw);
-}
-    .time-selector{
-      margin-right: calc(30/1920*100vw);
+    .el-table-content{
+      width: 100%;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+      position: relative;
+      padding-top: calc(30/1920*100vw);
+      .table-content{
+            width:1900px;
+            text-align: center;
+            border: none;
+            overflow-x: auto;
+            /*height:300px;*/
+            /*float:left;*/
+          &.el-table{
+            font-size: calc(15/1920*100vw);
+          }
+        }
+      .btn-close{
+        background-color:#c60957;border:none;float:left;margin-left:24px;
+        &:hover{
+          background-color:#ae0048;
+          color: #fff;
+        }
+      }
     }
-</style>
-<style scoped>
-
-    #el-menuscrollbar .el-scrollbar__wrap {
-      overflow-x: hidden;
+    .expiretag{
+      font-family: NotoSansCJKTC;
+      font-size: calc(10/1920*100vw);
+      color: #556679;
     }
-    /* width */
-    ::-webkit-scrollbar {
-      width: 4px;
+    #tabs-content  .el-tabs__item {
+      padding: 0 0;
+      font-size: calc(14/1920*100vw);
+      width: 160px;
+    }
+    #tabs-content  .el-tabs__nav-scroll{
+      margin-left:40px;
+    }
+    #tabs-content .el-tabs__active-bar{
       height: 4px;
     }
+  .el-table-panel{
+    /*@include point(margin-left,15);
+    @include point(margin-right,15);*/
+    margin-left:24px;
+    margin-right:24px;
+  }
+  .clearfix{
+    content: "";
+    display: block;
+    height: 0;
+    clear:both;
+    overflow: auto;
+  }
+}
+.empty-data-icon{
+    @include point(font-size,22);
+    color: #53c247;
+}
+#dateinput{
+    width: calc(300/1920*100vw);
+    height: calc(24/1920*100vw);
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    padding-left: 30px;
+    font-size: calc(12/1920*100vw);
+}
 
-    /* Track */
-    ::-webkit-scrollbar-track {
-      background: rgb(255, 255, 255);
-      border-radius: 8px;
+  .el-search{
+    @include point(margin-right,20);
+    width: calc(160/1920*100vw);
+  }
+  /deep/
+  .el-table th .el-checkbox__input {
+      display: inline-block;
+  }
+  /deep/
+  .el-table th .cell{
+      word-wrap: normal;
+      white-space: nowrap !important;
+      text-overflow: clip;
     }
+   /deep/
+    .el-table
+    .el-table__header-wrapper
+    .el-table-column--selection
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #acaeb1;
+      background-color: #edf0f2;
+      &::before{
+        display:none;
+      }
+    }
+    /deep/
+    .el-table
+    .el-table__header-wrapper
+    .el-table-column--selection
+    .is-checked
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #2c90d9;
+      background-color: #2c90d9;
+    }
+    /deep/
+    .el-table
+    .el-table__body-wrapper
+    .el-table-column--selection
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #acaeb1;
+      background-color: #fff;
+    }
+    /deep/
+    .el-table
+    .el-table__body-wrapper
+    .el-table-column--selection
+    .is-checked
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #2c90d9;
+      background-color: #e0f2ff;
+      color:#2c90d9;
+      &::after{
+       border-color:#2c90d9;
+      }
+    }
+    /deep/
+    .el-table__fixed-body-wrapper .el-table__body {
+  padding-bottom: 6px; // 6px为横向滚动条高度
+}
 
-    /* Handle */
-    ::-webkit-scrollbar-thumb {
-      background: rgb(201, 201, 202);
-      border-radius: 8px;
+</style>
+<style scoped>
+    .el-select >>> .el-input__inner{
+        background: #F4F5F9 !important;
+        /*border-radius: 0px !important;*/
+        /*border: 0 !important;*/
     }
-
-    /* Handle on hover */
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgb(162, 162, 163);
-    }
+    
 </style>
 <style>
-@import '../../assets/css/pagination.css';
+ @import '../../assets/css/pagination.css';
+ @import '../../assets/css/tabsItem.css';
+    .el-table::before{
+        height: 0px !important;
+    }
+    .page-login-toolTipClass.el-tooltip__popper.is-light{
+        background: #FEE4E7 !important;
+        color: #f31d65 !important;
+        border: 1px solid #f31d65 !important;
+    }
+    .date-picker-poper .el-button--text{
+        visibility: hidden !important;
+    }
+     .select-poper .el-select-dropdown__item.hover{
+        background-color:#FEE4E7;
+    }
+   .self-class-name .cell{
+     display: flex ;
+     align-items: center;
+   }
+   .table-content.el-table__body tr:hover>td{
+    background-color: #f2f9fe !important;
+  }
+  
+  /*.el-table__header{
+    width:auto !important;
+  }*/
+  /*.tbl-checkbox.el-checkbox__input.is-checked .el-checkbox__inner{
+    background-color: #edf0f2;
+    border-color: #acaeb1;
+  }
+  .tbl-checkbox.el-checkbox__input.is-checked .el-checkbox__inner {
+    background-color: #e0f2ff;
+    border-color: #2c90d9;
+}*/
 </style>
+

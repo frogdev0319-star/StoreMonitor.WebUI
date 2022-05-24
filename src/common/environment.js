@@ -52,7 +52,7 @@ else if(process.env.BUILD_ENV == 'Portals'){
   isGlobalWebsite = true;
 }
 else{
-  environJSON = _Environments.RC;
+  environJSON = _Environments.Preview;
   isGlobalWebsite = true;
 }
 console.log(process.env )

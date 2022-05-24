@@ -302,7 +302,7 @@
 
 <script>
 import { inpectRESTful } from '@/api/index';
-import { getWorkflowList, bindWorkflow, unbindWorkflow} from '@/api/workflow';
+import { workflowItems, bindWorkflow, unbindWorkflow} from '@/api/workflow';
 import util from '@/common/util';
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
@@ -339,19 +339,8 @@ export default {
       otherBtnAttr: '',
       standardScore: 100,
       MinScoreMsg:false,
+
       workFlowToBind:'',
-      apiBody: {
-          "page": 0,
-          "size": 1000,
-          "direction": "DESC",
-          "property": "createdTs",
-          // "name": "test",
-          // "type": 0,
-          "state": [
-              0,
-              1,
-          ]
-      },
       workFlowList:[],
       bindWorkFlowData:{},
       workFlowInfoValue:{}
@@ -374,12 +363,15 @@ export default {
     workFlowToBind(processDefinitionKey){
       this.bindWorkFlowData.processDefinitionKey = processDefinitionKey
       this.bindWorkFlowData.type = 0
-      this.bindWorkFlowData.formId = this.inspectId
+      this.bindWorkFlowData.inspectTagId = this.inspectId
+      
+      console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
+
     },
   },
   mounted() {
     this.getRule();
-    this.getWorkflowList(this.apiBody)
+    this.workflowItems()
   },
 
   methods: {
@@ -532,7 +524,6 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
-          
           const tempArry = res.data.filter(list => list.name == "workflow")
           this.workFlowInfoValue = tempArry[0].value
         }).catch(err => {
@@ -612,15 +603,18 @@ export default {
       this.standardScore = score;
     },
     
-    async getWorkflowList(param){
-      await getWorkflowList(param).then(res=>{
-        this.workFlowList = res.data.content
+
+    async workflowItems(){
+      await workflowItems().then(res=>{
+        this.workFlowList = res.data
+        // console.log('this.workFlowList ~~~~>> ', this.workFlowList);
+        // console.log('workFlowInfoValue :>> ', this.workFlowInfoValue);
         if(this.workFlowInfoValue !== null){
           const firstObj = {
             processDefinitionKey: -1,
             name: "無",
           }
-          this.workFlowList = [firstObj, ...res.data.content]
+          this.workFlowList = [firstObj, ...res.data]
           this.workFlowToBind = this.workFlowInfoValue.processDefinitionKey
         }
         
