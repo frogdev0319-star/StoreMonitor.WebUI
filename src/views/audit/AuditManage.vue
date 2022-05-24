@@ -6,14 +6,13 @@
           :cached-params="searchParams"
           path = "eventManage"
           @storeChange = "onStoreChange"
-        >
-        </store-filter>
+        />
       </div>
       <div class="flex-center" style="justify-content: space-between; margin: 20px 0 20px 0px;font-size:calc(16/1920*100vw)">
         <div class="flex-center">
-          <date-time-selector 
+          <date-time-selector
             ref="eventTimePicker"
-            :dateTimeValue = dateValue
+            :date-time-value = "dateValue"
             @change="dateChange"
           />
         </div>
@@ -48,10 +47,9 @@
       <!--<selected-stores :store-str="storeFilterObj.storeStr"/>-->
     </div>
 
-
     <!-- table content -->
     <div class="el-table-content">
-      <el-tabs :id="getLangStyleValue(tabContentId)"  v-model="activeName" @tab-click="handleTabClick">
+      <el-tabs :id="getLangStyleValue(tabContentId)" v-model="activeName" @tab-click="handleTabClick">
         <el-tab-pane
           v-for="(item,index) in tableDataList"
           :key="index"
@@ -82,26 +80,26 @@
                 align="left"
               />
               <el-table-column :label="$t('overview.patrolLists')" prop="inspectTagName" align="left" min-width="150" />
-              <el-table-column :label="$t('eventView.enclosure')" align="left" min-width="100" :render-header="renderHeader">
+              <el-table-column :label="$t('eventView.enclosure')" :render-header="renderHeader" align="left" min-width="100">
                 <template slot-scope="scope">
                   <div v-if="scope.row.attachment.length!==0">
                     <img v-for="(item,index) in scope.row.attachment" :key="index" :src="item.url" class="enclosure-icon" >
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column :label="$t('eventView.submitter')" prop="assignerName" align="left" min-width="80" sortable="custom" :render-header="renderHeader"/>
-              <el-table-column :label="$t('eventView.submitTime')" prop="ts" align="left" width="160" sortable="custom" :render-header="renderHeader"/>
-              <el-table-column :label="$t('remotePatrol.regionI')" prop="province" align="left" width="80" :render-header="renderHeader"/>
-              <el-table-column :label="$t('remotePatrol.regionII')" prop="city" align="left" width="80" :render-header="renderHeader"/>
-              <el-table-column :label="$t('eventView.stores')" prop="storeName" align="left" min-width="100" sortable="custom" :render-header="renderHeader"/>
-              <el-table-column :label="$t('remotePatrol.code')" prop="code" align="left" min-width="70" :render-header="renderHeader"/>
+              <el-table-column :label="$t('eventView.submitter')" :render-header="renderHeader" prop="assignerName" align="left" min-width="80" sortable="custom"/>
+              <el-table-column :label="$t('eventView.submitTime')" :render-header="renderHeader" prop="ts" align="left" width="160" sortable="custom"/>
+              <el-table-column :label="$t('remotePatrol.regionI')" :render-header="renderHeader" prop="province" align="left" width="80"/>
+              <el-table-column :label="$t('remotePatrol.regionII')" :render-header="renderHeader" prop="city" align="left" width="80"/>
+              <el-table-column :label="$t('eventView.stores')" :render-header="renderHeader" prop="storeName" align="left" min-width="100" sortable="custom"/>
+              <el-table-column :label="$t('remotePatrol.code')" :render-header="renderHeader" prop="code" align="left" min-width="70"/>
               <el-table-column
                 :label="$t('eventView.operation')"
+                :render-header="renderHeader"
                 prop="option"
                 min-width="60"
                 align="left"
-                :render-header="renderHeader"
-                >
+              >
                 <template slot-scope="scope">
                   <img :src="penSrc" class="iconfont icon-gengduo" @click="toEventDetail(scope.row)">
                 </template>
@@ -119,7 +117,8 @@
             </el-table>
           </div>
           <div style="width:100%; margin-top:12px;height:31px;">
-            <delay-button v-if="showCloseBtn"
+            <delay-button
+              v-if="showCloseBtn"
               class="btn-close"
               style="color:#FFF;"
               type="primary"
@@ -140,13 +139,13 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-    <dialog-vue 
-    :dialog-title="$t('eventView.confirmBachClose')" 
-    :show-info="$t('eventView.closeSelectedEvent')" 
-    :is-warning=true 
-    :dialog-closed="showBachCloseDialog" 
-    @confirmed="confirmBachClose" 
-    @canceled="showBachCloseDialog = false"/>
+    <dialog-vue
+      :dialog-title="$t('eventView.confirmBachClose')"
+      :show-info="$t('eventView.closeSelectedEvent')"
+      :is-warning="true"
+      :dialog-closed="showBachCloseDialog"
+      @confirmed="confirmBachClose"
+      @canceled="showBachCloseDialog = false"/>
   </div>
 </template>
 
@@ -189,7 +188,7 @@ export default {
   data() {
     return {
       loadingGif: require('../../../static/img/loading.svg'),
-      first:true,
+      first: true,
       dateValue: [],
       toolTipClass: 'page-login-toolTipClass',
       eventStatesList: [
@@ -204,7 +203,7 @@ export default {
       serachData: '',
       tableDataList: [
         {
-          label: "待我审批的",
+          label: '待我审批的',
           eventCount: 0,
           tableData: [],
           total: 0,
@@ -212,7 +211,7 @@ export default {
           page: 1
         },
         {
-          label: "我已审批的",
+          label: '我已审批的',
           eventCount: 0,
           tableData: [],
           total: 0,
@@ -220,7 +219,7 @@ export default {
           page: 1
         },
         {
-          label: "我已提交的",
+          label: '我已提交的',
           eventCount: 0,
           tableData: [],
           total: 0,
@@ -228,7 +227,7 @@ export default {
           page: 1
         },
         {
-          label: "抄送我的",
+          label: '抄送我的',
           eventCount: 0,
           tableData: [],
           total: 0,
@@ -251,7 +250,7 @@ export default {
       attachmentVideo: require('../../../static/img/photo.png'),
       attachmentImg: require('../../../static/img/photo.png'),
       attachmentAudio: require('../../../static/img/voice.png'),
-      penSrc:require('../../../static/img/icon_pen.png'),
+      penSrc: require('../../../static/img/icon_pen.png'),
       total: 0,
       page: 1,
       sizeNum: 10,
@@ -288,18 +287,18 @@ export default {
       storeFilterObj: {},
       searchParams: {},
       ifSearchData: true,
-      showCloseBtn:false,
-      closingEventId:[],
-      stopRowClick:false,
-      showBachCloseDialog:false,
-      exportBtnClass:[
-                {key:'en',value:'en-export-btn'},{key:'zh',value:'zh-export-btn'},{key:'zhtw',value:'zhTW-export-btn'},
-                {key:'ja-JP',value:'ja-export-btn'},{key:'ko-KR',value:'ko-export-btn'},{key:'vi-VN',value:'vi-export-btn'},
-                {key:'id-ID',value:'id-export-btn'},{key:'th-TH',value:'th-export-btn'}
-            ],
-      tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
-        {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
-        {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
+      showCloseBtn: false,
+      closingEventId: [],
+      stopRowClick: false,
+      showBachCloseDialog: false,
+      exportBtnClass: [
+        { key: 'en', value: 'en-export-btn' }, { key: 'zh', value: 'zh-export-btn' }, { key: 'zhtw', value: 'zhTW-export-btn' },
+        { key: 'ja-JP', value: 'ja-export-btn' }, { key: 'ko-KR', value: 'ko-export-btn' }, { key: 'vi-VN', value: 'vi-export-btn' },
+        { key: 'id-ID', value: 'id-export-btn' }, { key: 'th-TH', value: 'th-export-btn' }
+      ],
+      tabContentId: [{ key: 'en', value: '#en-tabs-content' }, { key: 'zh', value: '#en-tabs-content' }, { key: 'zhtw', value: '#en-tabs-content' },
+        { key: 'ja-JP', value: '#en-tabs-content' }, { key: 'ko-KR', value: '#en-tabs-content' }, { key: 'vi-VN', value: '#en-tabs-content' },
+        { key: 'id-ID', value: '#en-tabs-content' }, { key: 'th-TH', value: '#th-tabs-content' }]
     };
   },
 
@@ -320,21 +319,20 @@ export default {
   watch: {
     accountChanged(val) {
       const self = this;
-      for(let i=0; i<5;i++){
-        self.tableDataList[i].tableData =[];
+      for (let i = 0; i < 5; i++) {
+        self.tableDataList[i].tableData = [];
         self.tableDataList[i].eventCount = 0;
       }
-      
+
       if (val !== 0) {
         window.setTimeout(function() {
           self.$route.meta.keepAlive = true;
         },
         300);
-        //self.initData();
+        // self.initData();
         self.ifChangeAccount = true;
         self.ifSaveParams = false;
         self.ifSearchData = true;
-        
       }
     },
 
@@ -367,7 +365,7 @@ export default {
     if (!self.$route.meta.isBack || self.isFirstLoad) {
       self.initData();
     } else {
-      console.log("Activate")
+      console.log('Activate');
       // self.getEventList('Back');
       // self.getEventCount();
       self.$route.meta.isBack = false;
@@ -375,41 +373,41 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
-  }, 
+  },
   beforeDestroy() {
-    //console.log('searchFrom:',this.searchParams['searchFrom']);
-    if(this.searchParams['searchFrom']=='PatrolPersonStat'){
-        //console.log("in beforeDestroy");
-        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
-        this.searchParams['searchFrom'] = '';
-        this.ifSaveParams && this.saveSearchParams(true);
-    }else if(this.searchParams['searchFrom']=='EventStatistics'){
-        console.log("in beforeDestroy");
-        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
-        this.searchParams['searchFrom'] = '';
-        this.ifSaveParams && this.saveSearchParams(true);
+    // console.log('searchFrom:',this.searchParams['searchFrom']);
+    if (this.searchParams['searchFrom'] == 'PatrolPersonStat') {
+      // console.log("in beforeDestroy");
+      delete this.searchParams['searchParams']['clause']; // 重新搜尋要把跳轉帶來的刪掉
+      this.searchParams['searchFrom'] = '';
+      this.ifSaveParams && this.saveSearchParams(true);
+    } else if (this.searchParams['searchFrom'] == 'EventStatistics') {
+      console.log('in beforeDestroy');
+      delete this.searchParams['searchParams']['clause']; // 重新搜尋要把跳轉帶來的刪掉
+      this.searchParams['searchFrom'] = '';
+      this.ifSaveParams && this.saveSearchParams(true);
     }
   },
   deactivated() {
-      console.log('deactivated');
-      //console.log('searchFrom:',this.searchParams['searchFrom']);
-      
-      if(this.searchParams['searchFrom']=='PatrolPersonStat'){
-          //console.log("in deactivated");
-          delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
-          this.searchParams['searchFrom'] = '';
-          this.ifSaveParams && this.saveSearchParams(true);
-      }else if(this.searchParams['searchFrom']=='EventStatistics'){
-        //console.log("in beforeDestroy");
-        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
-        this.searchParams['searchFrom'] = '';
-        this.ifSaveParams && this.saveSearchParams(true);
+    console.log('deactivated');
+    // console.log('searchFrom:',this.searchParams['searchFrom']);
+
+    if (this.searchParams['searchFrom'] == 'PatrolPersonStat') {
+      // console.log("in deactivated");
+      delete this.searchParams['searchParams']['clause']; // 重新搜尋要把跳轉帶來的刪掉
+      this.searchParams['searchFrom'] = '';
+      this.ifSaveParams && this.saveSearchParams(true);
+    } else if (this.searchParams['searchFrom'] == 'EventStatistics') {
+      // console.log("in beforeDestroy");
+      delete this.searchParams['searchParams']['clause']; // 重新搜尋要把跳轉帶來的刪掉
+      this.searchParams['searchFrom'] = '';
+      this.ifSaveParams && this.saveSearchParams(true);
     }
   },
   methods: {
-    init(){
+    init() {
       console.log('go init ~~~~~>> ');
-      this.workflowInstanceMine()
+      this.workflowInstanceMine();
     },
     // for Audit
     handleTabClick(val) {
@@ -425,64 +423,56 @@ export default {
         self.curState = stateArr;
         self.curState.unshift('-1');
         console.log('self.curState2 ~~~~~>>>> ', self.curState);
-
       }
       self.getEventList();
     },
 
     // get table data
-    async workflowInstanceMine(){
-      this.isLoadingData = true
+    async workflowInstanceMine() {
+      this.isLoadingData = true;
       var param = {
-          "page": 0,
-          "size": 10
-      }
+        'page': 0,
+        'size': 10
+      };
 
-      await workflowInstanceMine(param).then(res=>{
+      await workflowInstanceMine(param).then(res => {
         console.log('res ~~~>> ', res);
-      
-        this.isLoadingData = false
+
+        this.isLoadingData = false;
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
       });
     },
 
-
     // =================
 
-
-
-
-
-
-
-    getLangStyleValue(langArray){
+    getLangStyleValue(langArray) {
       return util.getLangStyleValue(langArray);
     },
     renderHeader(h, { column, $index }) {
-      if(util.getWindowWidth()>1366){
+      if (util.getWindowWidth() > 1366) {
         let realWidth = 0;
-        let span = document.createElement('span');
+        const span = document.createElement('span');
 
         span.style.display = 'inline-block';
         span.innerText = column.label;
         document.body.appendChild(span);
 
         realWidth = span.clientWidth;
-        if(column.sortable == 'custom') realWidth = realWidth;
+        if (column.sortable == 'custom') realWidth = realWidth;
         else column.minWidth = realWidth;
-        //console.log(column.label+":"+column.minWidth);
-        //console.log(column.label+" realWidth:"+realWidth);
-        if(column.minWidth<realWidth) column.minWidth = realWidth;
+        // console.log(column.label+":"+column.minWidth);
+        // console.log(column.label+" realWidth:"+realWidth);
+        if (column.minWidth < realWidth) column.minWidth = realWidth;
 
         document.body.removeChild(span);
       }
       return h('span', {}, [column.label]);
     },
     cellStyle({ row, column, rowIndex, columnIndex }) {
-      let obj = {'border-bottom': '1px solid #acaeb1'};
-      /*if (columnIndex === 0) {
+      const obj = { 'border-bottom': '1px solid #acaeb1' };
+      /* if (columnIndex === 0) {
         obj = { 'border-bottom': '1px solid #acaeb1', 'border-right': '1px solid #e3e9f4' };
       } else {
         obj = { 'border-right': '1px solid #e3e9f4' };
@@ -509,7 +499,7 @@ export default {
     // },
 
     dateChange(val) {
-      console.log("dateChange");
+      console.log('dateChange');
       const self = this;
       const tabIndex = Number(self.activeName);
       const start = typeof (val[0]) === 'object' ? val[0].getTime() : val[0];
@@ -520,51 +510,49 @@ export default {
       self.tableDataList[tabIndex].page = 1;
     },
 
-    
-
     searchEventList() {
-      //this.saveSearchParams(false);
-      console.log("searchEventList page:",this.tableDataList[Number(this.activeName)].page)
+      // this.saveSearchParams(false);
+      console.log('searchEventList page:', this.tableDataList[Number(this.activeName)].page);
       this.tableDataList[Number(this.activeName)].page = 1;
-      if(this.searchParams['searchFrom']=='PatrolPersonStat'){
-        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+      if (this.searchParams['searchFrom'] == 'PatrolPersonStat') {
+        delete this.searchParams['searchParams']['clause']; // 重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
-      }else if(this.searchParams['searchFrom']=='EventStatistics'){
-        delete this.searchParams['searchParams']['clause']; //重新搜尋要把跳轉帶來的刪掉
+      } else if (this.searchParams['searchFrom'] == 'EventStatistics') {
+        delete this.searchParams['searchParams']['clause']; // 重新搜尋要把跳轉帶來的刪掉
         this.searchParams['searchFrom'] = '';
-    }
+      }
       this.getEventListAndCount();
     },
 
     searchData() {
-      console.log("SearchData")
+      console.log('SearchData');
       this.tableDataList[Number(this.activeName)].page = 1;
       this.getEventListAndCount();
     },
 
     getEventListAndCount() {
-      console.log("Get Event List and Count")
+      console.log('Get Event List and Count');
       if (this.dateValue.length === 0) return;
       this.getEventList('');
       this.getEventCount();
     },
 
     rowClickItem(row) {
-      console.log("rowClickItem",row);
-      if(!this.stopRowClick){
+      console.log('rowClickItem', row);
+      if (!this.stopRowClick) {
         this.event = row;
-        console.log("rowClickItem:",this.event);
+        console.log('rowClickItem:', this.event);
         sessionStorage.setItem('event', JSON.stringify(this.event));
         sessionStorage.setItem('queryparams', JSON.stringify(this.params));
         this.$router.push({ name: 'eventDetails', params: { event: this.event }});
-      }else{
+      } else {
         this.stopRowClick = false;
       }
     },
-    cellClickItem(row, column, cell, event){
-      //console.log("column:",column);
-      if(column.type == "selection"){
-        //console.log("cell in");
+    cellClickItem(row, column, cell, event) {
+      // console.log("column:",column);
+      if (column.type == 'selection') {
+        // console.log("cell in");
         this.stopRowClick = true;
       }
     },
@@ -579,7 +567,7 @@ export default {
     sortChange(col) {
       const self = this;
       const tabIndex = Number(self.activeName);
-      console.log("sortChange page:",self.tableDataList[tabIndex].page);
+      console.log('sortChange page:', self.tableDataList[tabIndex].page);
       self.tableDataList[tabIndex].page = 1;
       const order = col.order;
       self.order = order;
@@ -607,34 +595,27 @@ export default {
       self.getEventList();
     },
 
-
-
-
-
-
-
-
     async getEventList(val) {
       const self = this;
       const tabIndex = Number(this.activeName);
       // console.log('self.tableDataList ~~~~~>> ', self.tableDataList);
-      for(var k in self.tableDataList){
-        self.tableDataList[k].tableData =[];
-        self.tableDataList[k].total =0;
-        //self.tableDataList[k].eventCount = 0;
+      for (var k in self.tableDataList) {
+        self.tableDataList[k].tableData = [];
+        self.tableDataList[k].total = 0;
+        // self.tableDataList[k].eventCount = 0;
       }
-      /*const routeParams = sessionStorage.getItem('event_manage');
+      /* const routeParams = sessionStorage.getItem('event_manage');
       console.log("routeParams:",routeParams);
       if(routeParams!=''){
         const routeData = JSON.parse(routeParams);
         this.getRouterData(routeData);
       }else{*/
       await self.getEventListRequestParams(val);
-      
-      //}
-      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
-        //return ;
-        /*this.tableDataList[tabIndex].tableData = [];
+
+      // }
+      if (self.params.clause.storeId && self.params.clause.storeId.length === 0) {
+        // return ;
+        /* this.tableDataList[tabIndex].tableData = [];
         this.tableDataList[tabIndex].total = 0;
         this.tableDataList[tabIndex].eventCount = 0;
         this.totalElements = 0;
@@ -646,19 +627,19 @@ export default {
       // console.log("@@@self.params:",self.params);
       eventRESTful.getEventList(self.params).then((res) => {
         const data = res.data.content;
-        //console.log("data:",data);
+        // console.log("data:",data);
         const temp = [];
         data.forEach(item => {
           const attachment = [];
           if (item.initialComment.attachment.length !== 0) {
             item.initialComment.attachment.some(x => x.mediaType === 0) ? attachment.push({ url: self.attachmentAudio }) : '';
-            item.initialComment.attachment.some(x => (x.mediaType === 1||x.mediaType === 2)) ? attachment.push({ url: self.attachmentVideo }) : '';
-            //item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
+            item.initialComment.attachment.some(x => (x.mediaType === 1 || x.mediaType === 2)) ? attachment.push({ url: self.attachmentVideo }) : '';
+            // item.initialComment.attachment.some(x => x.mediaType === 2) ? attachment.push({ url: self.attachmentImg }) : '';
           }
           const obj = {
             id: item.id,
             ts: util.getDateTime(item.ts),
-            updateTs:(item.status==4)?util.getDateTime(item.updateTs):"",
+            updateTs: (item.status == 4) ? util.getDateTime(item.updateTs) : '',
             assignee: item.assignee,
             assignerName: item.assignerName,
             assigneeName: item.assigneeName,
@@ -683,21 +664,21 @@ export default {
         self.tableDataList[tabIndex].tableData = temp;
         self.tableDataList[tabIndex].total = res.data.totalPages;
         self.tableDataList[tabIndex].eventCount = res.data.totalElements;
-        console.log("res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
-        self.tableDataList[tabIndex].page = res.data.pageable.pageNumber+1;
+        console.log('res.data.pageable.pageNumber:', res.data.pageable.pageNumber);
+        self.tableDataList[tabIndex].page = res.data.pageable.pageNumber + 1;
         self.totalElements = res.data.totalElements;
-        if(tabIndex == this.activeName){
-          console.log("@@res.data.pageable.pageNumber:",res.data.pageable.pageNumber);
-          self.page = (res.data.pageable.pageNumber+1);
+        if (tabIndex == this.activeName) {
+          console.log('@@res.data.pageable.pageNumber:', res.data.pageable.pageNumber);
+          self.page = (res.data.pageable.pageNumber + 1);
           self.total = res.data.totalPages;
         }
         self.numberOfElements = res.data.numberOfElements;
-        //self.handleTabClick(this.activeName);
+        // self.handleTabClick(this.activeName);
       }).catch(err => {
         console.log('EventManagement-getEventList:' + err);
       });
     },
-    
+
     getEventListRequestParams(val) {
       const tabIndex = Number(this.activeName);
       let like = {};
@@ -713,17 +694,17 @@ export default {
       }
       let storeId = null;
       var p = Object.assign({}, this.params);
-      console.log("*p:",p)
-      //if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics")
-        storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause'))?p.clause.storeId:'-1';
-      /*else{
+      console.log('*p:', p);
+      // if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics")
+      storeId = Object.keys(this.storeFilterObj).length > 0 ? this.storeFilterObj.filterStoreIds : (p.hasOwnProperty('clause')) ? p.clause.storeId : '-1';
+      /* else{
         if(p.clause){
           var tempStore = (p.clause.storeId)?p.clause.storeId:[];
           console.log("tempStore:",tempStore);
         }
         storeId =  (tempStore!="-1")? tempStore :((Object.keys(this.storeFilterObj).length > 0) ? this.storeFilterObj.filterStoreIds :'-1');
       }*/
-      console.log("getEventListRequestParams > storeId:",storeId);
+      console.log('getEventListRequestParams > storeId:', storeId);
       let status = [];
       if (this.curState.length !== 0) {
         if (this.curState.length === 1) {
@@ -737,28 +718,28 @@ export default {
           }
         }
       } else {
-        if(typeof this.searchParams.curState!="undefined" &&  this.searchParams.curState.length>0){
+        if (typeof this.searchParams.curState !== 'undefined' && this.searchParams.curState.length > 0) {
           status = this.searchParams.curState;
-        }else{
+        } else {
           status = [];
         }
-        x
+        x;
       }
       console.log('status ~~~~~>> ', status);
       let page = 0;
       if (val === 'currentChange') {
-        console.log('currentChange',this.tableDataList[tabIndex].page);
-        page = this.tableDataList[tabIndex].page-1;
+        console.log('currentChange', this.tableDataList[tabIndex].page);
+        page = this.tableDataList[tabIndex].page - 1;
       }
       if (val === 'Back') {
         page = this.params.filter.page;
       }
       let start = '', end = '';
-      if(this.searchParams['searchFrom']=='PatrolPersonStat' || this.searchParams['searchFrom']=="EventStatistics"){
-         //storeId = this.searchParams.clause.storeId;
+      if (this.searchParams['searchFrom'] == 'PatrolPersonStat' || this.searchParams['searchFrom'] == 'EventStatistics') {
+        // storeId = this.searchParams.clause.storeId;
         start = this.searchParams.beginTs;
         end = this.searchParams.endTs;
-      }else{
+      } else {
         if (val === 0) {
           start = this.$moment(this.dateValue[0]).valueOf();
           end = this.$moment(this.dateValue[1]).valueOf();
@@ -770,33 +751,33 @@ export default {
       }
       end = end - end % 1000 + 999;
       var params = {
-          beginTs: start,
-          endTs: end,
-          clause: {
-            status: status
-          },
-          filter: {
-            page: page,
-            size: this.tableDataList[tabIndex].sizeNum
-          },
-          like: like
-      }
-      console.log("1.this.params:",params);
-      if(storeId && storeId!='-1' && storeId!=""){
-        console.log("storeId:",storeId);
+        beginTs: start,
+        endTs: end,
+        clause: {
+          status: status
+        },
+        filter: {
+          page: page,
+          size: this.tableDataList[tabIndex].sizeNum
+        },
+        like: like
+      };
+      console.log('1.this.params:', params);
+      if (storeId && storeId != '-1' && storeId != '') {
+        console.log('storeId:', storeId);
         params.clause['storeId'] = storeId;
       }
-      console.log("2.this.params:",params);
-      console.log("this.searchParams:",this.searchParams);
-      if(this.searchParams.hasOwnProperty('searchParams')){
-        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='PatrolPersonStat'){
-          params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+      console.log('2.this.params:', params);
+      console.log('this.searchParams:', this.searchParams);
+      if (this.searchParams.hasOwnProperty('searchParams')) {
+        if (this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom'] == 'PatrolPersonStat') {
+          params.clause['assigner'] = this.searchParams.searchParams.clause.assigner;
         }
-        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='EventStatistics'){
-          params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
+        if (this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom'] == 'EventStatistics') {
+          params.clause['subject'] = this.searchParams.searchParams.clause.subject;
         }
       }
-      //console.log("this.params:",this.params);
+      // console.log("this.params:",this.params);
       const curTabSortColumn = this.sortColumnOfTab[tabIndex];
       const order = curTabSortColumn.sortType.order;
       const prop = curTabSortColumn.sortType.prop;
@@ -817,13 +798,6 @@ export default {
       this.ifSaveParams = true;
     },
 
-
-
-
-
-
-
-
     sizeChange(val) {
       const self = this;
       self.tableDataList[Number(self.activeName)].sizeNum = val.size;
@@ -834,7 +808,7 @@ export default {
 
     currentChange(val) {
       const self = this;
-      console.log("currentChange val:",val);
+      console.log('currentChange val:', val);
       self.tableDataList[Number(self.activeName)].page = val.page;
       self.page = val.page;
       self.getEventList('currentChange');
@@ -846,59 +820,59 @@ export default {
       }
     },
 
-    handleSelectionChange(val){
-      console.log("handleSelectionChange:",val);
+    handleSelectionChange(val) {
+      console.log('handleSelectionChange:', val);
       this.closingEventId = [];
-      if(val.length>0){
+      if (val.length > 0) {
         this.showCloseBtn = true;
-        val.map((item)=>{
+        val.map((item) => {
           this.closingEventId.push(item.id);
-        })
-      }else{
+        });
+      } else {
         this.showCloseBtn = false;
       }
     },
 
-    handleDisable(row, index){
-      if (row.status==2 || row.status==4 || !PermissionHelper.enableEventClose() ) {
-        return false
+    handleDisable(row, index) {
+      if (row.status == 2 || row.status == 4 || !PermissionHelper.enableEventClose()) {
+        return false;
       } else {
-        return true
+        return true;
       }
     },
 
     getEventCount() {
       const self = this;
       let start = this.$moment(self.dateValue[0]).valueOf();
-      let endTime = this.$moment(self.dateValue[1]).valueOf();
+      const endTime = this.$moment(self.dateValue[1]).valueOf();
       let end = endTime.constructor === Date ? new Date(endTime).getTime() : endTime;
       end = end - end % 1000 + 999;
-      if(self.searchParams['searchFrom']=='PatrolPersonStat'|| this.searchParams['searchFrom']=="EventStatistics"){
-         //storeId = this.searchParams.clause.storeId;
+      if (self.searchParams['searchFrom'] == 'PatrolPersonStat' || this.searchParams['searchFrom'] == 'EventStatistics') {
+        // storeId = this.searchParams.clause.storeId;
         start = self.searchParams.beginTs;
         end = self.searchParams.endTs;
       }
-      //self.getEventListRequestParams('currentChange');
-      //}
-      console.log("Get Event Count")
-      //console.log(self.params)
-      //console.log(self.params.clause.storeId);
-      if ( self.params.clause.storeId && self.params.clause.storeId.length === 0) {
+      // self.getEventListRequestParams('currentChange');
+      // }
+      console.log('Get Event Count');
+      // console.log(self.params)
+      // console.log(self.params.clause.storeId);
+      if (self.params.clause.storeId && self.params.clause.storeId.length === 0) {
         delete self.params.clause.storeId;
         return;
       }
-      //console.log("self.params:",self.params);
-      //console.log("self.storeFilterObj:",self.storeFilterObj);
-      //let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds?self.storeFilterObj.filterStoreIds:self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
-      
-      //const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
+      // console.log("self.params:",self.params);
+      // console.log("self.storeFilterObj:",self.storeFilterObj);
+      // let storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds?self.storeFilterObj.filterStoreIds:self.storeFilterObj.curStore : (this.params.hasOwnProperty('clause'))?this.params.clause.storeId:'-1';
+
+      // const storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.params.hasOwnProperty('clause') && self.params.clause.hasOwnProperty('storeId'))?self.params.clause.storeId:'-1';
       let storeId = null;
-      //if(self.searchParams['searchFrom']=='PatrolPersonStat' || self.searchParams['searchFrom']=="EventStatistics")
-        storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:'-1';
-      /*else
+      // if(self.searchParams['searchFrom']=='PatrolPersonStat' || self.searchParams['searchFrom']=="EventStatistics")
+      storeId = Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds : (self.searchParams.hasOwnProperty('clause')) ? self.searchParams.clause.storeId : '-1';
+      /* else
         storeId =  (self.searchParams.hasOwnProperty('clause'))?self.searchParams.clause.storeId:Object.keys(self.storeFilterObj).length > 0 ? self.storeFilterObj.filterStoreIds :'-1';
       */
-      console.log("getEventCount > storeId:",storeId)
+      console.log('getEventCount > storeId:', storeId);
       let like = {};
       if (self.inputSearchValue.trim().length !== 0) {
         const inputValue = self.inputSearchValue.trim();
@@ -918,20 +892,20 @@ export default {
         },
         like: like
       };
-      if(storeId!='-1'){
-        params['clause']['storeId'] = storeId
+      if (storeId != '-1') {
+        params['clause']['storeId'] = storeId;
       }
-      console.log("820: params",params);
-      if(this.searchParams.hasOwnProperty('searchParams')){
-        if(this.searchParams.searchParams.hasOwnProperty('clause')  && this.searchParams['searchFrom']=='PatrolPersonStat'){
-          params.clause['assigner'] =  this.searchParams.searchParams.clause.assigner;
+      console.log('820: params', params);
+      if (this.searchParams.hasOwnProperty('searchParams')) {
+        if (this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom'] == 'PatrolPersonStat') {
+          params.clause['assigner'] = this.searchParams.searchParams.clause.assigner;
         }
-        if(this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom']=='EventStatistics'){
-          params.clause['subject'] =  this.searchParams.searchParams.clause.subject;
+        if (this.searchParams.searchParams.hasOwnProperty('clause') && this.searchParams['searchFrom'] == 'EventStatistics') {
+          params.clause['subject'] = this.searchParams.searchParams.clause.subject;
         }
       }
-      
-      //delete params.clause['status'];
+
+      // delete params.clause['status'];
       if (storeId.length === 0) {
         for (let i = 0; i < 4; i++) {
           self.tableDataList[i].eventCount = 0;
@@ -940,7 +914,7 @@ export default {
       } else {
         eventRESTful.GetEventCountByStatus(params).then(res => {
           const data = res.data;
-          console.log("GetEventCountByStatus > data:",data);
+          console.log('GetEventCountByStatus > data:', data);
           let numOfEventTotal = 0;
           for (let i = 0; i < 4; i++) {
             self.tableDataList[i].eventCount = data[i].numOfEvent;
@@ -1056,7 +1030,7 @@ export default {
     },
 
     initData() {
-      //console.log('init');
+      // console.log('init');
       const self = this;
       self.activeName = '0';
       self.dateValue = [new Date(new Date().toLocaleDateString()).getTime() - 3600 * 1000 * 24, this.$moment(new Date()).endOf('day')];
@@ -1068,48 +1042,48 @@ export default {
         self.tableHeight = 770 + 'px';
       }
       this.tableDataList[Number(this.activeName)].page = 1;
-      this.getEventListAndCount() ;
+      this.getEventListAndCount();
     },
 
     getRouterData(routeData) {
-      console.log("1.eventManage routeData:", routeData);
+      console.log('1.eventManage routeData:', routeData);
       let start = '', end = '';
       start = this.$moment(this.dateValue[0]).valueOf();
       const endTime = this.dateValue[1];
       end = this.$moment(endTime);
       this.params = {
-          beginTs: start,
-          endTs: end,
-          clause: {
-            status:[0],
-            storeId: routeData.storeId,
-            assigner : routeData.assigner
-          },
-          filter: {
-            page: 1,
-            size: 10
-          },
-        };
-        console.log("eventManage params:", this.params);
-        sessionStorage.setItem('event_manage', '');
-        console.log("2.eventManage routeData:", sessionStorage.getItem('event_manage'));
-        this.getEventList('Back');
+        beginTs: start,
+        endTs: end,
+        clause: {
+          status: [0],
+          storeId: routeData.storeId,
+          assigner: routeData.assigner
+        },
+        filter: {
+          page: 1,
+          size: 10
+        }
+      };
+      console.log('eventManage params:', this.params);
+      sessionStorage.setItem('event_manage', '');
+      console.log('2.eventManage routeData:', sessionStorage.getItem('event_manage'));
+      this.getEventList('Back');
     },
-    saveSearchParams(isLeave=false) {
-      console.log("saveSearchParams:",this.storeFilterObj);
+    saveSearchParams(isLeave = false) {
+      console.log('saveSearchParams:', this.storeFilterObj);
       const params = this.storeFilterObj;
       const { clause, filter, like, order } = { ...this.params };
-      if(isLeave){
-        let tempClause = clause;
-        delete clause["assigner"];
-        params.searchParams = { clause:tempClause, filter, like, order };
-        console.log("leave searchParams:",params.searchParams);
-      }else{
-        //params.curStore = this.storeFilterObj.filterStoreIds;
+      if (isLeave) {
+        const tempClause = clause;
+        delete clause['assigner'];
+        params.searchParams = { clause: tempClause, filter, like, order };
+        console.log('leave searchParams:', params.searchParams);
+      } else {
+        // params.curStore = this.storeFilterObj.filterStoreIds;
         params.searchParams = { clause, filter, like, order };
         params.searchParams.clause.storeId = this.storeFilterObj.filterStoreIds;
       }
-      
+
       params.filterStoreIds = this.storeFilterObj.filterStoreIds;
       params.inputSearchValue = this.inputSearchValue;
       params.dateValue = this.dateValue;
@@ -1122,82 +1096,79 @@ export default {
         path: 'eventManage',
         params: params
       };
-      console.log("save params:",params);
+      console.log('save params:', params);
       SearchConditionUtil.saveSearchCondition(searchConditon);
     },
 
     getSearchParams() {
-      
-        const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
-        console.log("EventMange > getSearchParams > searchParams:",searchParams);
-        if (Object.keys(searchParams).length > 0) {
-          
-          if(searchParams['searchFrom']=='PatrolPersonStat'){
-            //this.dateValue =[searchParams.];
-            this.storeFilterObj.filterStoreIds = searchParams.curStore;
-            this.storeFilterObj.curStore=searchParams.curStore;
-            this.storeFilterObj.storeIds=searchParams.curStore;
-            this.storeFilterObj.curCountry = "-1";
-            this.storeFilterObj.curProvince = ["-1"];
-            this.storeFilterObj.curCity = ["-1"];
-            this.params.beginTs = searchParams.beginTs;
-            this.params.endTs = searchParams.endTs;
-            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
-            //console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
-            //util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
-          }else if(searchParams['searchFrom']=="EventStatistics"){
-            this.params.beginTs = searchParams.beginTs;
-            this.params.endTs = searchParams.endTs;
-            this.storeFilterObj.filterStoreIds = searchParams.curStore;
-            this.storeFilterObj.curStore=searchParams.curStore;
-            this.storeFilterObj.storeIds=searchParams.curStore;
-            this.dateValue = [util.getDates(searchParams.beginTs),util.getDates(searchParams.endTs)];
-            //console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
-          }else{
-            this.storeFilterObj.filterStoreIds = (searchParams.curStore)?searchParams.curStore:[];
-            this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-            //console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
-            this.params.beginTs = this.dateValue[0].valueOf();
-            this.params.endTs = this.dateValue[1].valueOf();
-          }
-          this.inputSearchValue = searchParams.inputSearchValue;
-          this.curState = searchParams.curState;
-          this.curStore = searchParams.curStore;
-          this.activeName = searchParams.activeName;
-          this.sizeNum = searchParams.sizeNum;
-          this.page = searchParams.page;
-          this.order = searchParams.order;
-          this.tableDataList[Number(this.activeName)].page = searchParams.page;
-          this.params = searchParams.searchParams;
-          this.searchParams = searchParams;
-          this.ifGetParamsFromCash = true;
+      const searchParams = SearchConditionUtil.getSearchCondition('eventManage');
+      console.log('EventMange > getSearchParams > searchParams:', searchParams);
+      if (Object.keys(searchParams).length > 0) {
+        if (searchParams['searchFrom'] == 'PatrolPersonStat') {
+          // this.dateValue =[searchParams.];
+          this.storeFilterObj.filterStoreIds = searchParams.curStore;
+          this.storeFilterObj.curStore = searchParams.curStore;
+          this.storeFilterObj.storeIds = searchParams.curStore;
+          this.storeFilterObj.curCountry = '-1';
+          this.storeFilterObj.curProvince = ['-1'];
+          this.storeFilterObj.curCity = ['-1'];
+          this.params.beginTs = searchParams.beginTs;
+          this.params.endTs = searchParams.endTs;
+          this.dateValue = [util.getDates(searchParams.beginTs), util.getDates(searchParams.endTs)];
+          // console.log("1.EventMange > getSearchParams > dateValue:",this.dateValue);
+          // util.getDates(this.params.beginTs) + '-' + util.getDates(this.params.endTs);
+        } else if (searchParams['searchFrom'] == 'EventStatistics') {
+          this.params.beginTs = searchParams.beginTs;
+          this.params.endTs = searchParams.endTs;
+          this.storeFilterObj.filterStoreIds = searchParams.curStore;
+          this.storeFilterObj.curStore = searchParams.curStore;
+          this.storeFilterObj.storeIds = searchParams.curStore;
+          this.dateValue = [util.getDates(searchParams.beginTs), util.getDates(searchParams.endTs)];
+          // console.log("1..EventMange > getSearchParams > dateValue:",this.dateValue);
         } else {
-          this.searchParams = {};
-          this.curState = [0];
+          this.storeFilterObj.filterStoreIds = (searchParams.curStore) ? searchParams.curStore : [];
           this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+          // console.log("2.EventMange > getSearchParams > dateValue:",this.dateValue);
           this.params.beginTs = this.dateValue[0].valueOf();
           this.params.endTs = this.dateValue[1].valueOf();
         }
-      
+        this.inputSearchValue = searchParams.inputSearchValue;
+        this.curState = searchParams.curState;
+        this.curStore = searchParams.curStore;
+        this.activeName = searchParams.activeName;
+        this.sizeNum = searchParams.sizeNum;
+        this.page = searchParams.page;
+        this.order = searchParams.order;
+        this.tableDataList[Number(this.activeName)].page = searchParams.page;
+        this.params = searchParams.searchParams;
+        this.searchParams = searchParams;
+        this.ifGetParamsFromCash = true;
+      } else {
+        this.searchParams = {};
+        this.curState = [0];
+        this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+        this.params.beginTs = this.dateValue[0].valueOf();
+        this.params.endTs = this.dateValue[1].valueOf();
+      }
     },
 
     onStoreChange(storeObj) {
-      console.log("onStoreChange>storeFilterObj",storeObj);
+      console.log('onStoreChange>storeFilterObj', storeObj);
       this.storeFilterObj = storeObj;
       this.ifSearchData && this.getEventListAndCount();
       this.ifSearchData = false;
     },
-    doBachCloseEvent(){
+    doBachCloseEvent() {
       this.showBachCloseDialog = true;
     },
-    confirmBachClose(){
+    confirmBachClose() {
       const self = this;
-      //const eventIds = [];
-      //eventIds.push(self.event.id);
-      //console.log("this.closingEventId:",this.closingEventId);
+      // const eventIds = [];
+      // eventIds.push(self.event.id);
+      // console.log("this.closingEventId:",this.closingEventId);
       const comments = {
         ts: new Date().getTime(),
-        //description: this.$t('eventView.closing'),
+        // description: this.$t('eventView.closing'),
         status: 2
       };
       const params = {
@@ -1211,7 +1182,7 @@ export default {
           util.notify(this.$t('storeView.successSubmit'), 'success', 3000);
           setTimeout(() => {
             self.searchData();
-            /*self.commentList.forEach((_item, _index) => {
+            /* self.commentList.forEach((_item, _index) => {
               self.getCommentDuration(_item);
             });*/
           }, 3000);
@@ -1489,7 +1460,7 @@ $h1:#292e36;
     .el-table
     .el-table__header-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -1503,7 +1474,7 @@ $h1:#292e36;
     .el-table__header-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #2c90d9;
@@ -1513,7 +1484,7 @@ $h1:#292e36;
     .el-table
     .el-table__body-wrapper
     .el-table-column--selection
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #acaeb1;
@@ -1524,7 +1495,7 @@ $h1:#292e36;
     .el-table__body-wrapper
     .el-table-column--selection
     .is-checked
-    .el-checkbox__inner 
+    .el-checkbox__inner
     {
       border-radius: 1px;
       border: solid 1px #2c90d9;
@@ -1546,7 +1517,7 @@ $h1:#292e36;
         /*border-radius: 0px !important;*/
         /*border: 0 !important;*/
     }
-    
+
 </style>
 <style>
  @import '../../assets/css/pagination.css';
@@ -1572,7 +1543,7 @@ $h1:#292e36;
    .table-content.el-table__body tr:hover>td{
     background-color: #f2f9fe !important;
   }
-  
+
   /*.el-table__header{
     width:auto !important;
   }*/
