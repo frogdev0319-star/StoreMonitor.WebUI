@@ -2368,6 +2368,7 @@ export default {
           return false;
         } else {
           const curData = that.elTableData[Number(that.activeName)].data[Number(that.patrolActive)].allRoutedata;
+          console.log("**curData:",curData);
           const passfail = curData.filter(x => x[0].type === 0)[0];
           const score = curData.filter(x => x[0].type === 1)[0];
           const other = curData.filter(x => x[0].type === 2)[0];
@@ -2430,19 +2431,21 @@ export default {
 
     getExcelDataOfSheet(sheetDataArr, type) {
       const tableHeader = this.getExcelTableHeader(type);
-      // console.log(tableHeader)
+      console.log(tableHeader)
       const sheetData = [];
       if (sheetDataArr) {
         const treeData = util.handleInspctionCatergyTree(sheetDataArr);
+        console.log("treeData:",treeData);
         treeData.forEach(item => {
           if (!item.children) {
+            console.log("!item.children");
             if (item.itemData.length !== 0) {
               item.itemData.forEach((_item, _index) => {
                 const obj = {};
                 if (_index === 0) {
                   obj[tableHeader[0]] = item.groupName;
                   if (type !== 2) {
-                    obj[tableHeader[1]] = item.groupWeight;
+                    obj[tableHeader[1]] = (item.groupWeight==-1)?'':item.groupWeight;
                   }
                 } else {
                   obj[tableHeader[0]] = '';
@@ -2474,6 +2477,7 @@ export default {
                 sheetData.push(obj);
               });
             } else {
+              console.log("item.itemData.length==0");
               const obj = {};
               obj[tableHeader[0]] = item.groupName;
               obj[tableHeader[1]] = '';
@@ -2486,49 +2490,88 @@ export default {
               sheetData.push(obj);
             }
           } else {
+            console.log("item.children:",item.children);
             item.children.forEach((child, childIndex) => {
               if (child.itemData.length > 0) {
                 child.itemData.forEach((childItem, childItemIndex) => {
                   const obj = {};
                   if (childIndex === 0 && childItemIndex === 0) {
                     obj[tableHeader[0]] = item.groupName;
+                    if(type!=2){
+                      obj[tableHeader[1]] = (child.groupWeight==-1)?'':child.groupWeight;
+                    }
                   } else {
                     obj[tableHeader[0]] = '';
                   }
                   if (childItemIndex === 0) {
-                    obj[tableHeader[1]] = child.groupName;
+                    if(type!=2){
+                      //obj[tableHeader[1]] = child.groupWeight;
+                      obj[tableHeader[2]] = child.groupName;
+                    }
+                    else{
+                      obj[tableHeader[1]] = child.groupName;
+                    }
                   } else {
-                    obj[tableHeader[1]] = '';
+                    if(type!=2){
+                      obj[tableHeader[1]] = "";
+                      obj[tableHeader[2]] = "";
+                    }
+                    else{
+                      obj[tableHeader[2]] = "";
+                    }
                   }
                   if (type === 0) {
+                    obj[tableHeader[3]] = childItem.name;
+                    obj[tableHeader[4]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
+                    obj[tableHeader[5]] = childItem.description === '---' ? '' : childItem.description;
+                    obj[tableHeader[6]] = childItem.required ? 'Y' : '';
+                  } else if (type === 1) {
+                    obj[tableHeader[3]] = childItem.name;
+                    obj[tableHeader[4]] = childItem.type === 0 ? childItem.availableScores : 0;
+                    obj[tableHeader[5]] = childItem.type === 0 ? childItem.qualifiedScore : 0;
+                    obj[tableHeader[6]] = childItem.description === '---' ? '' : childItem.description;
+                    obj[tableHeader[7]] = childItem.required ? 'Y' : '';
+                  } else {
                     obj[tableHeader[2]] = childItem.name;
                     obj[tableHeader[3]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
                     obj[tableHeader[4]] = childItem.description === '---' ? '' : childItem.description;
-                  } else if (type === 1) {
-                    obj[tableHeader[2]] = childItem.name;
-                    obj[tableHeader[3]] = childItem.type === 0 ? childItem.availableScores : 0;
-                    obj[tableHeader[4]] = childItem.type === 0 ? childItem.qualifiedScore : 0;
-                    obj[tableHeader[5]] = childItem.description === '---' ? '' : childItem.description;
-                  } else {
-                    obj[tableHeader[1]] = childItem.name;
-                    obj[tableHeader[2]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
-                    obj[tableHeader[3]] = childItem.description === '---' ? '' : childItem.description;
                   }
                   sheetData.push(obj);
                 });
               } else {
                 const obj = {};
                 if (childIndex === 0) {
-                  obj[tableHeader[0]] = item.groupName;
+                  if(type==2){
+                    obj[tableHeader[0]] = item.groupName;
+                    obj[tableHeader[1]] = child.groupName;
+                  } 
+                  else{
+                    obj[tableHeader[0]] = item.groupName;
+                    obj[tableHeader[1]] = (child.groupWeight==-1)?'':child.groupWeight;
+                  }
                 } else {
-                  obj[tableHeader[0]] = '';
+                  if(type==2) {
+                    obj[tableHeader[0]] = '';
+                    obj[tableHeader[0]] = '';
+                  }
+                  else{
+                    obj[tableHeader[0]] = '';
+                    obj[tableHeader[1]] = '';
+                  }
                 }
-                obj[tableHeader[1]] = child.groupName;
-                obj[tableHeader[2]] = '';
-                obj[tableHeader[3]] = '';
-                obj[tableHeader[4]] = '';
-                if (type === 1) {
+                if(type!=2){
+                  obj[tableHeader[2]] = child.groupName;
+                  obj[tableHeader[3]] = '';
+                  obj[tableHeader[4]] = '';
                   obj[tableHeader[5]] = '';
+                  obj[tableHeader[6]] = '';
+                }else{
+                  obj[tableHeader[2]] = '';
+                  obj[tableHeader[3]] = '';
+                  obj[tableHeader[4]] = '';
+                }
+                if (type === 1) {
+                  obj[tableHeader[7]] = '';
                 }
                 sheetData.push(obj);
               }
