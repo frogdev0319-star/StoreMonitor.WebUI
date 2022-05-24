@@ -53,7 +53,7 @@
         <el-tab-pane
           v-for="(item,index) in tableDataList"
           :key="index"
-          :label="`${item.label} （${item.eventCount}）`">
+          :label="`${item.label} (${item.eventCount})`">
           <div class="el-table-panel">
             <el-table
               :data="item.tableData"
@@ -117,16 +117,6 @@
             </el-table>
           </div>
           <div style="width:100%; margin-top:12px;height:31px;">
-            <delay-button
-              v-if="showCloseBtn"
-              class="btn-close"
-              style="color:#FFF;"
-              type="primary"
-              size="mini"
-              @click="doBachCloseEvent"
-            >
-              <span>{{ $t('eventView.closing') }}</span>
-            </delay-button>
             <tbl-pagination-only
               :total="total"
               :current-page="page"
@@ -139,13 +129,7 @@
         </el-tab-pane>
       </el-tabs>
     </div>
-    <dialog-vue
-      :dialog-title="$t('eventView.confirmBachClose')"
-      :show-info="$t('eventView.closeSelectedEvent')"
-      :is-warning="true"
-      :dialog-closed="showBachCloseDialog"
-      @confirmed="confirmBachClose"
-      @canceled="showBachCloseDialog = false"/>
+
   </div>
 </template>
 
@@ -411,20 +395,21 @@ export default {
     },
     // for Audit
     handleTabClick(val) {
-      const self = this;
-      if (Number(val.index) < 4) {
-        self.curState = Number(val.index) === 2 ? [2, 4] : [Number(val.index)];
-        console.log('self.curState1 ~~~~~>>>> ', self.curState);
-      } else {
-        const stateArr = [];
-        self.eventStatesList.forEach(item => {
-          stateArr.push(item.value);
-        });
-        self.curState = stateArr;
-        self.curState.unshift('-1');
-        console.log('self.curState2 ~~~~~>>>> ', self.curState);
-      }
-      self.getEventList();
+      console.log('val~~~~>', val.label)
+      // const self = this;
+      // if (Number(val.index) < 4) {
+      //   self.curState = Number(val.index) === 2 ? [2, 4] : [Number(val.index)];
+      //   console.log('self.curState1 ~~~~~>>>> ', self.curState);
+      // } else {
+      //   const stateArr = [];
+      //   self.eventStatesList.forEach(item => {
+      //     stateArr.push(item.value);
+      //   });
+      //   self.curState = stateArr;
+      //   self.curState.unshift('-1');
+      //   console.log('self.curState2 ~~~~~>>>> ', self.curState);
+      // }
+      // self.getEventList();
     },
 
     // get table data
@@ -444,6 +429,20 @@ export default {
         console.log('error' + err);
       });
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // =================
 
@@ -484,7 +483,7 @@ export default {
       return new Promise((resolve, reject) => {
         getBriefStoreList().then(res => {
           const errMsg = res.errMsg;
-          if (errMsg != undefined && errMsg === 'Success') {
+          if (errMsg !== undefined && errMsg === 'Success') {
             resolve(res);
           }
         }).catch(err => {
@@ -734,7 +733,8 @@ export default {
       if (val === 'Back') {
         page = this.params.filter.page;
       }
-      let start = '', end = '';
+      let start = '';
+      let end = '';
       if (this.searchParams['searchFrom'] == 'PatrolPersonStat' || this.searchParams['searchFrom'] == 'EventStatistics') {
         // storeId = this.searchParams.clause.storeId;
         start = this.searchParams.beginTs;
