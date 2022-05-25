@@ -989,9 +989,15 @@ export default {
       }
       var names_ = {}
       primaryColumnCells.filter(cell => cell.v).forEach((cell, i) => {
+        console.log(cell)
         if (names_[cell.v] === undefined) {
-          names_[cell.v] = cell.v
-          primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
+          if (cell.id) {
+            names_[cell.v] = cell.v
+            primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
+          } else {
+            names_[cell.v] = cell.v
+            primaryGroupCelss.push({ ...cell });
+          }
         }
         
         let next, current = sheet[cell.cellRef];
@@ -1451,11 +1457,11 @@ export default {
 
     watchName(val) {
       const self = this;
-      const content = filterString.all(val, 30);
+      const content = filterString.all(val, 50);
       const length = filterString.getContentLength(val);
       self.ImportName = val.replace(/[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig, '');
       self.ImportName = content;
-      if (length > 30) {
+      if (length > 50) {
         self.isShowWarning = true;
         self.warningContent = self.$t('insSettingView.enterNameRuletip');
       } else {
@@ -1769,7 +1775,8 @@ export default {
           _this.importCount = 0;
           var passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
           var scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
-          const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
+          var otherSheetFlagObj = _this.validateOtherData(outdata.Others);
+          console.log(otherSheetFlagObj)
           passFailSheetFlagObj.flags.flagGroupWeightTotal = false;
           scoreSheetFlagObj.flags.flagGroupWeightTotal = false;
           if (_this.importCount === 100) {
