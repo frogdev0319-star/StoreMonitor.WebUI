@@ -79,7 +79,7 @@
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
                   <td v-if="inspectItem.type === 1"><span>{{ item.itemScore }}</span></td>
-                  <td><span>{{ inspectItem.weight == -1 ? item.itemgetScore : item.itemgetScore * inspectItem.weight / 100 }}</span></td>
+                  <td><span>{{ item.itemgetScore }}</span></td>
                 </tr>
               </tbody>
             </template>
@@ -785,7 +785,7 @@ export default {
                   item.unqualifiedItems.push(s_item);
                 }
                 if (s_item.itemgetScore !== '--') {
-                  totalGetscore += s_item.itemgetScore;
+                  totalGetscore += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
                 }
               }
               s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
@@ -857,7 +857,7 @@ export default {
             if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
               item['itemgetScore'] = '--';
             } else {
-              item['itemgetScore'] = util.isDouble(totalGetscore);
+              item['itemgetScore'] = totalGetscore;
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
@@ -865,7 +865,7 @@ export default {
                 item['numOfQualified'] = item['numOfQualified'];
                 item['numIgnore'] = 0;
               } else {
-                item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored);
+                item['itemgetScore'] = tab1GetScoreNoContainedIngored;
               }
             } else {
               if (inspectSettings.includedInTotalScoreWithType1) {
@@ -873,7 +873,7 @@ export default {
                   item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored +
                                           tab1GetScoreNoContainedIngored);
                 } else {
-                  if (p_item.type === 1) item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored);
+                  if (p_item.type === 1) item['itemgetScore'] = tab1GetScoreNoContainedIngored;
                 }
               }
               if (inspectSettings.qualifiedForIgnoredWithType1) {
