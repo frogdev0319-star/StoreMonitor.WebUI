@@ -1968,12 +1968,12 @@ export default {
         if (typeof item.weight === 'number') self.allPassWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length > 0) {
           passFailFlagObj.indexArrPassFail.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 50) {
             passFailFlagObj.flags.flagGroupLengthPassFail = true;
           }
         }
         if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 50) {
             passFailFlagObj.flags.flagSubGroupLengthPassFail = true;
           }
         }
@@ -2032,13 +2032,13 @@ export default {
         if (typeof item.weight === 'number') _this.allScoreWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 50) {
             scoreFlagObj.flags.flagGroupLengthScore = true;
           }
         }
         if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
           scoreFlagObj.indexSubCatergyScore.push(index);
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 50) {
             scoreFlagObj.flags.flagSubGroupLengthScore = true;
           }
         }
@@ -2157,13 +2157,13 @@ export default {
       othersArr.forEach((item, index) => {
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           otherFlagObj.indexArrOthers.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 50) {
             otherFlagObj.flags.flagGroupLengthOthers = true;
           }
         }
         if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
           otherFlagObj.indexSubCatergyOthers.push(index);
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 50) {
             otherFlagObj.flags.flagSubGroupLengthOthers = true;
           }
         }

@@ -39,24 +39,8 @@ const _Environments = {
 
 let environJSON
 let isGlobalWebsite
-if(process.env.BUILD_ENV == 'RC'){
-  environJSON = _Environments.RC;
-  isGlobalWebsite = true;
-}
-else if(process.env.BUILD_ENV == 'Preview'){
-  environJSON = _Environments.Preview;
-  isGlobalWebsite = true;
-}
-else if(process.env.BUILD_ENV == 'Portals'){
-  environJSON = _Environments.Stable;
-  isGlobalWebsite = true;
-}
-else{
-  environJSON = _Environments.RC;
-  isGlobalWebsite = true;
-}
-console.log(process.env )
-console.log(environJSON)
+environJSON = _Environments.Preview;
+isGlobalWebsite = true;
 
 let Environment;
 export default Environment = {
