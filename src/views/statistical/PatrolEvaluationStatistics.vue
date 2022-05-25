@@ -215,13 +215,18 @@
                     </delay-button>
                 </div>
             </div>
-            <el-col class="partition" style="overflow-x:auto;position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 80px)" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
-                <v-chart v-if="part2.storeMode==1" ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
-                <div v-else style="main-rgtop:20.5px;height:100%;overflow-x:auto;" :style="{width:ispdf?'1024px':null}">
+            <el-col class="partition" style="position:absolute;height:430px;padding-top:32px;margin-left:20px;padding-right:40px;width:calc(100% - 80px)" :style="{width:ispdf?'900px':'calc(100% - 90px)'}">
+                <div v-if="part2.storeMode==1"  style="overflow-y:hidden;overflow-x:auto;height:430px;width:100%" :style="{width:ispdf?'900px':null}">
+                    <div style="height:100%;">
+                        <v-chart ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
+                    </div>
+                </div>
+                
+                <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
                         <table-only ref="elTP" :column-data="part2StoreInfoTableCol" :table-data="part2.storeTableData" :total="part2.table.total" :highlight-current-row="true" :pagesize="sizeNum" :current-page="page" :is-event="false" :default-sort="defaultSort" :allowRowExpand="true" :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" :tableHeight="300" :isexportPDF="ispdf" layout="prev,pager,next,sizes" expand-component="IncepItemTop5" :expandCompProperties="componentsProps" @handleChange="handlePageAndSizeChangePart2" @sortChange="handleSortChangePart2" @onCellClick="onEvenListNumClickPart2" />
                     </div>
-                    <div style="width:100%; margin-top:12px;height:31px;">
+                    <div style="width:100%; margin-top:12px;height:31px;" :style="{width:ispdf?'1024px':null}">
                         <tbl-pagination-only :total="part2.table.total" :pagesize="part2.table.sizeNum" :current-page="part2.table.page" layout="prev,pager, next,sizes,slot" @sizeChange="handlePageAndSizeChangePart2" @currentChange="handlePageAndSizeChangePart2" />
                     </div>
                 </div>

@@ -13,7 +13,7 @@
                 </div>
                 <div v-for="(att,index) in item.attachment" :key="index" style="margin-top:10px;">
                     <div class="att-content" v-if="att.mediaType==3">
-                        <div style="width:440px;">{{att.url}}</div>
+                        <div style="width:45%;">{{att.url}}</div>
                     </div>
                 </div>
                 <div v-if="item.showAudio" class="att-content">
@@ -23,7 +23,7 @@
                         />
                </div>
             </div>
-            <div class="attachment" > 
+            <div class="attachment" :style="isexportPDF?{width:'200px'}:{}"> 
                 <div  v-for="(att,index) in item.attachment" :key="index">
                     <img v-if="att.mediaType==2" class="att-img" :src="att.url" />
                     <div v-else-if="att.mediaType==1" class="att-content">
@@ -93,13 +93,16 @@ export default {
         itemId:{
             type:Number,
             require:true
-        }
+        },
+        isexportPDF: {
+            type: Boolean,
+            default: false
+        },
     },
     data(){
         return{
             clause:{storeId:this.storeId,itemId:this.itemId},
             CommentList:[],
-            isexportPDF:false,
             startIcon: require('../../static/img/play_icon.png'),
             videoImgSrc: require('../../static/img/video_thumbnail.png'),
             dialogCommentVideo:false
@@ -214,11 +217,11 @@ export default {
         display: flex;
         flex-direction: row;
         .comment{
-            width: calc(400/1440*100vw);
+            width: 41%;//calc(400/1440*100vw);
             margin-top: 16px;
             margin-bottom: 16px;
             .account{
-                width: calc(400/1440*100vw);
+                width: 100%;//calc(400/1440*100vw);
                 height: 30px;
                 display: flex;
                 flex-direction: row;
@@ -236,7 +239,7 @@ export default {
                 }
             }
             .att-content{
-                width: calc(400/1440*100vw);
+                width: 100%;//calc(400/1440*100vw);
                 font-family: NotoSansCJKtc;
                 font-size: 15px;
                 color:#484848;
@@ -258,7 +261,7 @@ export default {
             }
         .attachment{
             margin-top: 16px;
-            width: calc(568/1440*100vw);
+            width: 59%;//calc(568/1440*100vw);
             display: flex;
             flex-direction: row;
             margin-top: 21px;

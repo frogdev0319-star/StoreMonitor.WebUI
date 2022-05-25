@@ -9,7 +9,7 @@
               :cell-style="{height:'62px', backgroundColor: '#EFF3F5',border:'none',fontSize:'15px',borderBottom:'1px solid rgba(172,174,177,0.3)',color:'#484848'}"
               :empty-text="$t('deviceView.noData')"
               align="left"
-              style="width: 100%"
+              :style="isexportPDF ? {'width':'800px'}:{'width': '100%'}"
               class="tbl-IncepItemTop5"
             >
                 <el-table-column
@@ -17,7 +17,7 @@
                     :key="_index"
                     :prop="_item.prop"
                     :label="_item.label"
-                    :min-width="_item.width"
+                    :min-width="isexportPDF ? _item.pdfwidth : _item.width "
                 >
                 <template slot-scope="{row}">
                     <template v-if="_item.isCellClick">
@@ -66,7 +66,11 @@ export default {
         endTs:{
             type:Number,
             required: true
-        }
+        },
+        isexportPDF: {
+            type: Boolean,
+            default: false
+        },
     },
     data(){
         return{

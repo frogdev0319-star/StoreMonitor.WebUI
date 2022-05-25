@@ -307,13 +307,13 @@ export default {
     currentProperties: function() {
       console.log(this.expandComponent);
       if (this.expandComponent=== 'TabInceptionDetail') {
-        return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs }
+        return { submitter: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF }
       }else if(this.expandComponent=== 'IncepItemTop5'){
         //console.log("this.expandCompProperties:",this.expandCompProperties);
-        return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs }
+        return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,isexportPDF:this.isexportPDF }
       }else if(this.expandComponent=== 'EventCommentList'){
         //console.log("this.expands:",this.expands);
-        return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,itemId:this.expandCompProperties.itemId }
+        return { storeId: this.expands,beginTs:this.expandCompProperties.beginTs,endTs:this.expandCompProperties.endTs,itemId:this.expandCompProperties.itemId,isexportPDF:this.isexportPDF }
       }
     }
   },
