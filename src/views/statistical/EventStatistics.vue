@@ -86,9 +86,9 @@
                       <img :src='barchartOrder=="desc"?descPng:incPng' style="width:16px;height:16px;margin-left:5px"/>
                   </div>    
               </div>
-              <div v-if="ispdf" style="overflow-x:auto;overflow-y:hidden;height:100%;width:1000px">
-                <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" width="800px"
-                :style="{width:'800px',height:'100%'}"
+              <div v-if="ispdf" style="overflow-x:auto;overflow-y:hidden;height:100%;width:1024px">
+                <v-chart ref="itemsChart1" autoresize :options="barchartOption" class="chart-content" width="900px"
+                :style="{width:'900px',height:'100%'}"
                 @click="barchartClick"/>
               </div>
               <div v-else style="overflow-x:auto;overflow-y:hidden;height:100%;">
@@ -1526,7 +1526,6 @@ export default {
             smooth: true,
             data: [0,0,0,0,0,0,0,0,0,0,0,0],
             color:'#D7F3F9',
-            barGap:0,
             emphasis: {
               focus:'none',
               itemStyle:{
@@ -1583,9 +1582,11 @@ export default {
         else{
            //option.grid.width = 'calc(1479/1980*100vw)';
            if(this.ispdf){
-             option.width = 'calc(800/1980*100vw)';
-              option.grid.width = '800px';
-              this.barchartWidth = 'calc(800/1980*100vw)';
+             option.width = '1024px';
+              option.grid.width = '850px';
+              option.series[0].barCategoryGap='10',
+              option.series[0].barWidth='10',
+              this.barchartWidth = '850px';
            }else{
             option.width = 'calc(1479/1980*100vw)';
             option.grid.width = '100%';
@@ -2273,6 +2274,7 @@ export default {
         return false;
       }
       self.ispdf = true;
+      self.setBarchartData();
       this.$nextTick(() => {
         const img_amount = document.getElementById('imgTest_amount');
         const img_first = document.getElementById('imgTest_first');
@@ -2291,9 +2293,10 @@ export default {
             self.pdfSrc_second = oGrayImg3;
           });
           setTimeout(() => {
-             self.$print(self.$refs.printPDF,null,self.$t('route.eventStat')+ util.getCurrentTime());
+            self.$print(self.$refs.printPDF,null,self.$t('route.eventStat')+ util.getCurrentTime());
             self.ispdf = false;
-          }, 1000);
+            self.setBarchartData();
+          }, 2000);
         }, 5000);
       });
     },
