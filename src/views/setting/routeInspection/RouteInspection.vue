@@ -954,9 +954,9 @@ export default {
       return cells;
     },
 
-    getSecondaryColumnHeadCell({ sheet }) {
+    getSecondaryColumnHeadCell({ type, sheet }) {
       const range = XLSX.utils.decode_range(sheet['!ref']);
-      const secondaryColumnCellAddress = { c: range.s.c + 1, r: range.s.r };
+      const secondaryColumnCellAddress = { c: range.s.c + (type === 'Others' ? 1 : 2), r: range.s.r };
       const cell = sheet[XLSX.utils.encode_cell(secondaryColumnCellAddress)];
       const subCategoryArr = this.getAllTranslationBasedOnKey('insSettingView.subCategory');
       return cell && subCategoryArr.includes(cell.tag) && cell;
@@ -992,8 +992,13 @@ export default {
       var names_ = {}
       primaryColumnCells.filter(cell => cell.v).forEach((cell, i) => {
         if (names_[cell.v] === undefined) {
-          names_[cell.v] = cell.v
-          primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
+          if (cell.id) {
+            names_[cell.v] = cell.v
+            primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
+          } else {
+            names_[cell.v] = cell.v
+            primaryGroupCelss.push({ ...cell });
+          }
         }
         
         let next, current = sheet[cell.cellRef];
@@ -1002,8 +1007,7 @@ export default {
           next = sheet[primaryColumnCells.filter(cell => cell.v)[i + 1].cellRef];
           sheet[cell.cellRef].next = sheet[primaryColumnCells.filter(cell => cell.v)[i + 1].cellRef];
         }
-
-        const secondaryColumnHeadCell = this.getSecondaryColumnHeadCell({ sheet });
+        const secondaryColumnHeadCell = this.getSecondaryColumnHeadCell({ type, sheet });
         let secondaryColumnCells = [];
         if (secondaryColumnHeadCell) {
           if (next && next.v) {
@@ -1011,11 +1015,11 @@ export default {
               sheet,
               range: {
                 s: {
-                  c: current.cellAddress.c + 1,
+                  c: current.cellAddress.c + (type === 'Others' ? 1 : 2),
                   r: current.cellAddress.r
                 },
                 e: {
-                  c: current.cellAddress.c + 1,
+                  c: current.cellAddress.c + (type === 'Others' ? 1 : 2),
                   r: next.cellAddress.r - 1
                 }
               }
@@ -1025,11 +1029,11 @@ export default {
               sheet,
               range: {
                 s: {
-                  c: current.cellAddress.c + 1,
+                  c: current.cellAddress.c + (type === 'Others' ? 1 : 2),
                   r: current.cellAddress.r
                 },
                 e: {
-                  c: current.cellAddress.c + 1,
+                  c: current.cellAddress.c + (type === 'Others' ? 1 : 2),
                   r: current.parent && current.parent.next ? current.parent.next.cellAddress.r - 1 : range.e.r
                 }
               }
@@ -1042,11 +1046,11 @@ export default {
                 sheet,
                 range: {
                   s: {
-                    c: current.cellAddress.c + 1,
+                    c: current.cellAddress.c + (type === 'Others' ? 1 : 2),
                     r: current.cellAddress.r
                   },
                   e: {
-                    c: current.cellAddress.c + 1,
+                    c: current.cellAddress.c + (type === 'Others' ? 1 : 2),
                     r: next.cellAddress.r - 1
                   }
                 },
@@ -1065,11 +1069,11 @@ export default {
                 sheet,
                 range: {
                   s: {
-                    c: current.cellAddress.c + 1,
+                    c: current.cellAddress.c + (type === 'Others' ? 1 : 2),
                     r: current.cellAddress.r
                   },
                   e: {
-                    c: current.cellAddress.c + 1,
+                    c: current.cellAddress.c + (type === 'Others' ? 1 : 2),
                     r: range.e.r
                   }
                 },
@@ -1078,7 +1082,6 @@ export default {
                     ...sheet[cellRef],
                     parent: sheet[cell.cellRef]
                   };
-
                   if (sheet[cellRef].v) {
                     secondaryGroupCells.push(sheet[cellRef]);
                   }
@@ -1453,11 +1456,11 @@ export default {
 
     watchName(val) {
       const self = this;
-      const content = filterString.all(val, 30);
+      const content = filterString.all(val, 50);
       const length = filterString.getContentLength(val);
       self.ImportName = val.replace(/[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig, '');
       self.ImportName = content;
-      if (length > 30) {
+      if (length > 50) {
         self.isShowWarning = true;
         self.warningContent = self.$t('insSettingView.enterNameRuletip');
       } else {
@@ -1741,7 +1744,7 @@ export default {
           outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
           outdata.Others = _this.getOthersSheetJsonData(wb, Others, tableVersion);
-
+          
           if (outdata.PassFail.length > 0) {
             if (!outdata.PassFail[0].catergyName) {
               PassFailCopy.A2 = {
@@ -1771,7 +1774,8 @@ export default {
           _this.importCount = 0;
           var passFailSheetFlagObj = _this.validatePassFailData(outdata.PassFail);
           var scoreSheetFlagObj = _this.validateScoreData(outdata.Score, tableVersion);
-          const otherSheetFlagObj = _this.validateOtherData(outdata.Others);
+          var otherSheetFlagObj = _this.validateOtherData(outdata.Others);
+          
           passFailSheetFlagObj.flags.flagGroupWeightTotal = false;
           scoreSheetFlagObj.flags.flagGroupWeightTotal = false;
           if (_this.importCount === 100) {
@@ -1853,21 +1857,27 @@ export default {
         sheetArray.forEach((_item) => {
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
-          if (tableVersion === 1) {
-            rowDataObj.subCatergyName = '';
-            rowDataObj.weight = _item.__EMPTY_1;
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.score = _item.__EMPTY_3;
-            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
-            rowDataObj.required = _item.__EMPTY_4;
-          } else {
-            rowDataObj.weight = _item.__EMPTY_1;
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
-            rowDataObj.score = _item.__EMPTY_4;
-            rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
-            rowDataObj.required = _item.__EMPTY_5;
-          }
+          rowDataObj.weight = _item.__EMPTY_1;
+          rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
+          rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
+          rowDataObj.score = _item.__EMPTY_4;
+          rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+          rowDataObj.required = _item.__EMPTY_5;
+          // if (tableVersion === 1) {
+          //   rowDataObj.subCatergyName = '';
+          //   rowDataObj.weight = _item.__EMPTY_1;
+          //   rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+          //   rowDataObj.score = _item.__EMPTY_3;
+          //   rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+          //   rowDataObj.required = _item.__EMPTY_4;
+          // } else {
+          //   rowDataObj.weight = _item.__EMPTY_1;
+          //   rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
+          //   rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
+          //   rowDataObj.score = _item.__EMPTY_4;
+          //   rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
+          //   rowDataObj.required = _item.__EMPTY_5;
+          // }
 
           rowDataArray.push(rowDataObj);
         });
@@ -1912,23 +1922,30 @@ export default {
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
           rowDataObj.weight = _item.__EMPTY_1;
-          if (tableVersion === 1) {
-            rowDataObj.subCatergyName = '';
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.totalScore = _item.__EMPTY_3;
-            rowDataObj.scoreThreshold = _item.__EMPTY_4;
-            rowDataObj.score = this.getTableCellData(_item.__EMPTY_5);
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
-            rowDataObj.required = _item.__EMPTY_7;
-          } else {
-            rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
-            rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
-            rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
-            rowDataObj.scoreThreshold = _item.__EMPTY_5;
-            rowDataObj.totalScore = Infinity;
-            rowDataObj.description = this.getTableCellData(_item.__EMPTY_7);
-            rowDataObj.required = _item.__EMPTY_8;
-          }
+          rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
+          rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
+          rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
+          rowDataObj.scoreThreshold = _item.__EMPTY_5;
+          rowDataObj.totalScore = Infinity;
+          rowDataObj.description = this.getTableCellData(_item.__EMPTY_7);
+          rowDataObj.required = _item.__EMPTY_8;
+          // if (tableVersion === 1) {
+          //   rowDataObj.subCatergyName = '';
+          //   rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
+          //   rowDataObj.totalScore = _item.__EMPTY_3;
+          //   rowDataObj.scoreThreshold = _item.__EMPTY_4;
+          //   rowDataObj.score = this.getTableCellData(_item.__EMPTY_5);
+          //   rowDataObj.description = this.getTableCellData(_item.__EMPTY_6);
+          //   rowDataObj.required = _item.__EMPTY_7;
+          // } else {
+          //   rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_2);
+          //   rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
+          //   rowDataObj.score = this.getTableCellData(_item.__EMPTY_4);
+          //   rowDataObj.scoreThreshold = _item.__EMPTY_5;
+          //   rowDataObj.totalScore = Infinity;
+          //   rowDataObj.description = this.getTableCellData(_item.__EMPTY_7);
+          //   rowDataObj.required = _item.__EMPTY_8;
+          // }
 
           rowDataArray.push(rowDataObj);
         });
@@ -1970,12 +1987,12 @@ export default {
         if (typeof item.weight === 'number') self.allPassWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length > 0) {
           passFailFlagObj.indexArrPassFail.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 50) {
             passFailFlagObj.flags.flagGroupLengthPassFail = true;
           }
         }
         if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 50) {
             passFailFlagObj.flags.flagSubGroupLengthPassFail = true;
           }
         }
@@ -2034,13 +2051,13 @@ export default {
         if (typeof item.weight === 'number') _this.allScoreWeightEmpty = false;
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           scoreFlagObj.indexArrScore.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 50) {
             scoreFlagObj.flags.flagGroupLengthScore = true;
           }
         }
         if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
           scoreFlagObj.indexSubCatergyScore.push(index);
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 50) {
             scoreFlagObj.flags.flagSubGroupLengthScore = true;
           }
         }
@@ -2159,13 +2176,13 @@ export default {
       othersArr.forEach((item, index) => {
         if (item.catergyName != undefined && item.catergyName.length != 0) {
           otherFlagObj.indexArrOthers.push(index);
-          if (filterString.getContentLength(item.catergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.catergyName.toString().trim()) > 50) {
             otherFlagObj.flags.flagGroupLengthOthers = true;
           }
         }
         if (item.subCatergyName != undefined && item.subCatergyName.length > 0) {
           otherFlagObj.indexSubCatergyOthers.push(index);
-          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 30) {
+          if (filterString.getContentLength(item.subCatergyName.toString().trim()) > 50) {
             otherFlagObj.flags.flagSubGroupLengthOthers = true;
           }
         }

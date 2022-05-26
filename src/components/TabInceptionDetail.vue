@@ -89,7 +89,7 @@
                     :key="_index"
                     :prop="_item.prop"
                     :label="_item.label"
-                    :min-width="_item.width"
+                    :min-width="isexportPDF ? _item.pdfwidth : _item.width "
                 >
                 <template slot-scope="{row}">
                     <template v-if="_item.isCellClick">
@@ -140,7 +140,11 @@ export default {
         endTs:{
             type:Number,
             required: true
-        }
+        },
+        isexportPDF: {
+            type: Boolean,
+            default: false
+        },
     },
     data(){
         return{
