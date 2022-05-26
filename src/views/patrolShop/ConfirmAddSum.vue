@@ -698,6 +698,7 @@ export default {
             isSuccess: true,
             user: data.notifiedTo
           };
+          self.$store.dispatch('setEditCount', 0);
         } else {
           routeData = {
             isSuccess: false,
