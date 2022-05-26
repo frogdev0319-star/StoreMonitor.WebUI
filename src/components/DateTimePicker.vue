@@ -3,7 +3,7 @@
     <el-date-picker
       ref="datePicker"
       v-bind="$attrs"
-      v-model="dateTimeValue"
+      v-model="newDateTimeValue"
       :clearable="false"
       :editable="false"
       :disabled="diablePick"
@@ -49,6 +49,7 @@ export default {
   },
   data() {
     return {
+      newDateTimeValue:[],
       poperClass: 'date-picker-poper',
       elTooltipClass: 'el-tooltip-class',
       dateOpt: {
@@ -62,11 +63,12 @@ export default {
           return time.getTime() > this.$moment(new Date()).endOf('d').toDate();
         },
         onPick:({ maxDate, minDate })=>{
-            console.log("maxDate:"+maxDate+", minDate:"+minDate);
+            console.log("maxDate:"+ maxDate + ", minDate:"+minDate);
+
             if(maxDate==null){
               maxDate = moment();
             }
-            this.dateTimeValue = [minDate, maxDate];
+            this.newDateTimeValue = [minDate, maxDate];
         }
         /*shortcuts: [{
           text: this.$t('overview.last3Days'),
@@ -132,7 +134,7 @@ export default {
       }
     },
     dateRange(val){
-      console.log("dateRange changed:",val);
+      // console.log("dateRange changed:",val);
       this.getDateRange(val);
     }
   },
@@ -143,19 +145,21 @@ export default {
 
   methods: {
     getDefaultTimeList() {
-      console.log("dateTimeValue:",this.dateTimeValue);
-      if(this.dateTimeValue.length==0){
-        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      // console.log("dateTimeValue:",this.dateTimeValue);
+      if(this.newDateTimeValue.length==0){
+        this.newDateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
       //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       }
       //this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
     },
 
     dateChange(val) {
-      console.log("dateChange:",val)
+      // console.log("dateChange:",val)
       let start = this.$moment(val[0]).valueOf();
       const end = this.$moment(val[1]).valueOf();
       const daysDiff = this.$moment(end).diff(start, 'days');
+
+
       if (daysDiff > 364) {
         this.$message({
           message: this.$t('overview.changeTimeRange'),
@@ -163,44 +167,48 @@ export default {
         });
         start = end - 3600 * 24 * 364 * 1000;
         start  = this.$moment(start).startOf('d').toDate().valueOf();
-        this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
+        this.newDateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
       } else {
-        this.dateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
+        this.newDateTimeValue = [this.$moment(start).startOf('d').toDate(), new Date().setTime(end)];
       }
       const endTimeStamp = this.$moment(end).endOf('d').valueOf();
-      this.$emit('change', [this.dateTimeValue[0], endTimeStamp]);
+
+      this.$emit('change', [this.newDateTimeValue[0], endTimeStamp]);
     },
+
+
+
     getDateRange(val){
         if (this.dateRange == 3) {
-            this.dateTimeValue = [this.$moment().subtract(2, 'days'), this.$moment()];
-            console.log("this.dateTimeValue:",this.dateTimeValue);
+            this.newDateTimeValue = [this.$moment().subtract(2, 'days'), this.$moment()];
+            console.log("this.newDateTimeValue:",this.newDateTimeValue);
             //this.dateFormat = this.$moment(this.date).startOf('week').format("YYYY/MM/DD");
             //const paramDate = { start_date: this.$moment(this.date).startOf('week'), end_date: this.$moment(this.date).endOf('week'),range_type:'week' }
             //this.$emit('emitFilterDateRange', paramDate );
         } else if (this.dateRange == 7) {
-            this.dateTimeValue = [this.$moment().subtract(6, 'days'), this.$moment()];
-            console.log("this.dateTimeValue:",this.dateTimeValue);
+            this.newDateTimeValue = [this.$moment().subtract(6, 'days'), this.$moment()];
+            console.log("this.newDateTimeValue:",this.newDateTimeValue);
         }else if (this.dateRange == 30) {
-            this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
-            console.log("this.dateTimeValue:",this.dateTimeValue);
+            this.newDateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+            console.log("this.newDateTimeValue:",this.newDateTimeValue);
         }else if (this.dateRange == 90) {
-            this.dateTimeValue = [this.$moment().subtract(89, 'days'), this.$moment()];
-            console.log("this.dateTimeValue:",this.dateTimeValue);
+            this.newDateTimeValue = [this.$moment().subtract(89, 'days'), this.$moment()];
+            console.log("this.newDateTimeValue:",this.newDateTimeValue);
         }else if (this.dateRange == 0) {
-            this.dateTimeValue = [this.$moment(new Date()).startOf('month').toDate(), this.$moment()];
-            console.log("this.dateTimeValue:",this.dateTimeValue);
+            this.newDateTimeValue = [this.$moment(new Date()).startOf('month').toDate(), this.$moment()];
+            console.log("this.newDateTimeValue:",this.newDateTimeValue);
         }else if (this.dateRange == 1) {
             const end = moment().subtract(1, 'month').endOf('month').startOf('d').toDate();
             const start = moment().subtract(1, 'month').startOf('month').toDate();
-            this.dateTimeValue = [start, end];
-            console.log("this.dateTimeValue:",this.dateTimeValue);
+            this.newDateTimeValue = [start, end];
+            console.log("this.newDateTimeValue:",this.newDateTimeValue);
         }else if (this.dateRange == 2) {
             const end = moment();
             const start = moment().startOf('quarter').toDate();
-            this.dateTimeValue = [start, end];
-            console.log("this.dateTimeValue:",this.dateTimeValue);
+            this.newDateTimeValue = [start, end];
+            console.log("this.newDateTimeValue:",this.newDateTimeValue);
         }
-        this.dateChange(this.dateTimeValue)
+        this.dateChange(this.newDateTimeValue)
     }
   }
 };

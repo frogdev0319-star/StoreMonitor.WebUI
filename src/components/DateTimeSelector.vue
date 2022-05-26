@@ -14,7 +14,6 @@
         :dateRange="dateRange" 
         :poper-class="date-range" 
         :diablePick="diablePick" 
-        :dateTimeValue="dateTimeValue"
         :showTooltips="showTooltips"
         @change="dateChange"/>
     </div>
@@ -49,6 +48,8 @@ export default {
   },
   data() {
     return {
+      date:'',
+      range:'',
       dateRangeItems:[{value:3,label:this.$t('overview.last3Days')},{value:7,label:this.$t('overview.last7Days')},
                       {value:30,label:this.$t('overview.last30Days')},{value:90,label:this.$t('overview.last90Days')},
                       {value:0,label:this.$t('overview.thisMonth')},{value:1,label:this.$t('overview.lastMonth')},
