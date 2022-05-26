@@ -1057,9 +1057,9 @@ export default {
       const arr = Array.isArray(jsonArr) ? jsonArr : [jsonArr];
       let sum = 0;
       if (arr.length > 1) {
-        sum = arr.reduce((prev, cur) => {
-          return prev[key] + cur[key];
-        });
+        sum = arr.reduce((accumulator, cur) => {
+          return accumulator + cur[key];
+        },0); 
       } else {
         sum = arr[0][key];
       }
