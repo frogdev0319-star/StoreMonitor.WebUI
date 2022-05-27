@@ -1064,7 +1064,7 @@ export default {
       if (arr.length > 1) {
         sum = arr.reduce((accumulator, cur) => {
           return accumulator + cur[key];
-        },0);
+        },0); 
       } else {
         sum = arr[0][key];
       }

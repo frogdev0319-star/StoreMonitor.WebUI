@@ -318,8 +318,8 @@ export default {
     }
   },
   mounted() {
-    console.log(this.columnData)
-    console.log(this.tableData)
+    //console.log(this.columnData)
+    //console.log(this.tableData)
   },
   methods: {
     renderHeader(h, { column, $index }) {
