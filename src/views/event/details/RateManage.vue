@@ -812,38 +812,21 @@ export default {
       this.addDescriptionList.forEach(att=>{
         attachment_des.push({mediaType:3,url:att});
       })
-      if (self.subBtnList[0].isActive) {
-        if (status = self.subBtnList[0].order === 0) {
+      var activeBtn = self.subBtnList.filter(btn=> btn.isActive);
+      //console.log("activBtn:",activeBtn);
+      if (activeBtn[0].order === 0) {
           status = 1;
-        } else if (self.subBtnList[0].order === 1) {
-          status = 2;
-        } else {
-          status = self.curStatus;
-        }
-      } else if (self.subBtnList[1].isActive) {
-        if (self.subBtnList[1].order === 1) {
+        } else if (activeBtn[0].order === 1) {
           status = 2;
           this.isEdit = false;
-          self.subBtnList[1].isShow=false;
-        } else {
-          status = self.curStatus;
-        }
-      } else if (self.subBtnList[2].isActive) {
-        if (self.subBtnList[2].order === 3) {
+          self.subBtnList.map(btn=>{btn.isShow=false;});
+        } else if (activeBtn[0].order === 3) {
           status = 3;
-        } else {
+        }else {
           status = self.curStatus;
         }
-      } else if (self.subBtnList[3].isActive) {
-        if (self.subBtnList[3].order === 3) {
-          status = 3;
-        } else {
-          status = self.curStatus;
-        }
-      } else {
-        status = self.curStatus;
-      }
-      self.addComment(status, attachment_des);
+        //console.log("status:",status);
+       self.addComment(status, attachment_des);
     },
 
     checkFull() {

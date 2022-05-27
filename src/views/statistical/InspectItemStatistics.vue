@@ -229,6 +229,7 @@ export default {
   mixins: [resize],
   data() {
     return {
+      path:"inspectItemStatistics",
       pdfSrc_avg1:"",
       inspectSubTitle: this.$t('statistics.itemAverageScore'),
       inspectDetailSubTitle: this.$t('statistics.evalDetail'),
@@ -2025,20 +2026,22 @@ export default {
          params.groupIds  = users;
          params.groupMode = 5;
       }
-       console.log(params)
+       
       if(this.inspectItem){
+        console.log("this.inspectItem:",this.inspectItem);
         params.itemIds = this.inspectItem.item.ids
       }
       let totalReport = 0;
       let totalStandard = 0;
       
       if(params.groupIds.length==0  ){
-        console.log("No group");
+        //console.log("No group");
         this.part3.content =[];
          this.drawPart3RegionBar();
         return;
       }
         params.filter = { page: 0, size: params.groupIds.length };
+        console.log(params)
         if( !params.hasOwnProperty('itemIds') ||params.itemIds.length==0 || params.storeIds.length ==0)return
         console.log("********************************")
         console.log("getPart3RegionBar params",params)
@@ -2141,7 +2144,7 @@ export default {
         option.width = '100%'
       }
       this.part3.barRegionOption = option;
-      console.log(option)
+      //console.log(option)
       await this.getPart3StoreBar();
     },
     async getPart3StoreBar(){
@@ -2345,6 +2348,33 @@ export default {
     initData() {
       this.params = SearchConditionUtil.getSearchCondition(this.path);
       this.params.filter = { page: 0, size: this.sizeNumStore };
+      console.log("*initData > this.params",this.params);
+      if(this.params.inspectId && this.params.inspectId!=''){
+          console.log("*initData > Get InpectItemList "+this.params.inspectId);
+          this.inspectItemList =[];
+          this.getInspectItemList(this.params.inspectId).then(result =>{
+            console.log(result)
+            if(result.errCode==0 && result.data){
+              let tempList = [];
+              result.data.forEach(function(item){
+                  if(item.parentId == -1){
+                    tempList.push(item);
+                  }
+              })
+              result.data.forEach(function(item){
+                  tempList.forEach(function(subitem){
+                      if(item.parentId == subitem.id){
+                        subitem.items.push(item);
+                      }
+                  });
+
+              })
+              this.inspectItemList = tempList ;
+              this.curInspectId = this.params.inspectId
+            }
+          });
+
+      }
     },
 
     adjustChart() {
@@ -2393,7 +2423,7 @@ export default {
                   });
 
               })
-              console.log("Change inspect Itemlist")
+             // console.log("Change inspect Itemlist")
             // console.log(this.inspectItemList);
               this.inspectItemList = tempList ;
               this.curInspectId = searchParams.inspectId
@@ -2552,8 +2582,7 @@ export default {
       });
     },
     emitItemChanged(item){
-       console.log("Emit Item Changed")
-       console.log(item);
+       console.log("Emit Item Changed:",item);
        this.inspectItem = item;
        this.getItemSubtitle();
        console.log("2.getPart3RegionBar");

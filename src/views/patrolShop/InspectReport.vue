@@ -1040,6 +1040,7 @@ export default {
     getCategorySummary(summary) {
       util.sortArrayByKeyAsc(summary, 'type');
       const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
+      //console.log("1.summaryTree:",summaryTree);
       summaryTree.forEach(summaryItem => {
         if (summaryItem.children) {
           summaryItem.numOfIgnored = this.addChildrenDataToParent(summaryItem.children, 'numOfIgnored');
@@ -1052,6 +1053,7 @@ export default {
           summaryItem.numOfCommentItems = this.addChildrenDataToParent(summaryItem.children, 'numOfCommentItems');
         }
       });
+      //console.log("2.summaryTree:",summaryTree);
       const filterTree = summaryTree.filter(item => item.numOfTotalItems !== item.numOfCommentItems);
       return filterTree;
     },
@@ -1060,9 +1062,9 @@ export default {
       const arr = Array.isArray(jsonArr) ? jsonArr : [jsonArr];
       let sum = 0;
       if (arr.length > 1) {
-        sum = arr.reduce((prev, cur) => {
-          return prev[key] + cur[key];
-        });
+        sum = arr.reduce((accumulator, cur) => {
+          return accumulator + cur[key];
+        },0); 
       } else {
         sum = arr[0][key];
       }
@@ -1364,12 +1366,10 @@ export default {
         obj.value > 0 && seriesData.push(obj);
       });
       const lableData = [];
-      console.log("totalItem:",totalItem);
       seriesData.forEach(item => {
         const objl = {};
         objl.name = item.name;
         objl.value = ((item.value/totalItem)*100).toFixed(1);
-        console.log("totalItem:",objl.value);
         objl.value > 0 && lableData.push(objl);
       });
       this.chartLabelArr = lableData;
