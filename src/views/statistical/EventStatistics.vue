@@ -364,18 +364,18 @@
         </el-row>
       </el-col>
     </div>
-    <div id="pdf-area" ref="printPDF" v-if="ispdf" >
+    <div id="pdf-area" ref="printPDF" v-if="ispdf">
       <div class="el-overview-content" style="height: 194px;box-shadow:none;">
         <div id="img_amount" class="amout_row">
           <img :src="pdfSrc_amount">
         </div>
       </div>
-      <div class="el-overview-content" style="height: 700px;margin-top:24px;box-shadow:none;">
+      <div class="el-overview-content" style="height: auto;margin-top:24px;box-shadow:none;">
         <div id="img_first"  class="first-row" >
             <img :src="pdfSrc_first">
         </div>
       </div>
-      <div class="el-overview-content" style="height: 700px;margin-top:24px;box-shadow:none;">
+      <div class="el-overview-content" style="height: auto;margin-top:24px;box-shadow:none;">
         <div id="img_second"  class="second-row" >
             <img :src="pdfSrc_second">
         </div>
