@@ -78,8 +78,8 @@
                   </td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
-                  <td v-if="inspectItem.type === 1"><span>{{ item.itemScore }}</span></td>
-                  <td><span>{{ item.itemgetScore }}</span></td>
+                  <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }}</span></td>
+                  <td><span>{{ getDoubleNum(item.itemgetScore) }}</span></td>
                 </tr>
               </tbody>
             </template>
@@ -458,6 +458,9 @@ export default {
     self.getOssInfo();
   },
   methods: {
+    getDoubleNum (num) {
+      return Math.round(num * 100) / 100  
+    },
     stopCommentVideo() {
       var video = document.getElementById('previewVideo');
       this.previewplayer = videojs(video);
@@ -862,7 +865,7 @@ export default {
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['itemgetScore'] = tab1GetScoreContainedIgnored + util.isDouble(tab1GetScoreNoContainedIngored);
+                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
                 item['numOfQualified'] = item['numOfQualified'];
                 item['numIgnore'] = 0;
               } else {
@@ -871,8 +874,8 @@ export default {
             } else {
               if (inspectSettings.includedInTotalScoreWithType1) {
                 if (inspectSettings.qualifiedForIgnoredWithType1 && (p_item.type === 0 || p_item.type === 1)) {
-                  item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored +
-                                          tab1GetScoreNoContainedIngored);
+                  item['itemgetScore'] = tab1GetScoreContainedIgnored +
+                                          tab1GetScoreNoContainedIngored;
                 } else {
                   if (p_item.type === 1) item['itemgetScore'] = tab1GetScoreNoContainedIngored;
                 }
@@ -898,7 +901,7 @@ export default {
               item['itemgetScore'] =
                 inspectSettings.qualifiedForIgnoredWithType2
                   ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
-              item['itemgetScore'] = util.isDouble(item['itemgetScore']);
+              item['itemgetScore'] = item['itemgetScore'];
             }
             if (p_item.type === 2) {
               CurOtherTotalScore += totalGetscore;
