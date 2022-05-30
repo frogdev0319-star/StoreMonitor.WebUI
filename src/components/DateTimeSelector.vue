@@ -78,10 +78,10 @@ export default {
   },
   watch:{
     async accountChanged(val) {
-      if (val !== 0) {
-        this.dateRange = 4;
-        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
-      }
+      // if (val !== 0) {
+      //   this.dateRange = 4;
+      //   this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      // }
     },
   },
   mounted() {
@@ -89,9 +89,9 @@ export default {
     this.getDefaultTimeList();
   },
   created(){
-    if(this.dateTimeValue==[]){
-      this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-    }
+    // if(this.dateTimeValue==[]){
+    //   this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+    // }
   },
   activated(){
       //console.log('dateRange activated');
@@ -107,11 +107,9 @@ export default {
     },
     getDefaultTimeList() {
       //console.log("2.dateTimeValue:",this.dateTimeValue);
-      if(this.dateTimeValue.length==0){
-        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
-      //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-      }
-      //this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      // if(this.dateTimeValue.length==0){
+      //   this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      // }
     },
     dateChange(val) {
       this.$emit('change', val);
