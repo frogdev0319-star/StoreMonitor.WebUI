@@ -77,7 +77,7 @@ export default {
   },
   computed:{
     pageSizeOption(){
-      console.log("pageSizeArray:",this.pageSizeArray)
+      //console.log("pageSizeArray:",this.pageSizeArray)
       if(this.pageSizeArray.length>0){
         console.log("pageSizeArray:",this.pageSizeArray)
         return this.pageSizeArray;

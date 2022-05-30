@@ -134,7 +134,7 @@ export default {
       }
     },
     dateRange(val){
-      // console.log("dateRange changed:",val);
+      //console.log("dateRange changed:",val);
       this.getDateRange(val);
     }
   },
@@ -145,16 +145,16 @@ export default {
 
   methods: {
     getDefaultTimeList() {
-      // console.log("dateTimeValue:",this.dateTimeValue);
-      if(this.newDateTimeValue.length==0){
-        this.newDateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      //console.log("dateTimeValue:",this.dateTimeValue);
+      if(this.dateTimeValue.length==0){
+        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
       //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
       }
       //this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
     },
 
     dateChange(val) {
-      // console.log("dateChange:",val)
+      //console.log("dateChange:",val)
       let start = this.$moment(val[0]).valueOf();
       const end = this.$moment(val[1]).valueOf();
       const daysDiff = this.$moment(end).diff(start, 'days');
