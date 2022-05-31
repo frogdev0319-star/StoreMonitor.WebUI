@@ -62,7 +62,7 @@
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
                     <div class="flex">
                       <div class="spacer">
-                        <div v-if="inspectItem.weight != -1">{{ inspectItem.weight + '%' }}</div>
+                        <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }}</div>
                         <div class="sheet_title">{{ inspectItem.label }}</div>
                       </div>
                       <div class="flex" style="align-items: center">
