@@ -2266,7 +2266,23 @@ export default {
       
     },
     /*End 事件涉及門店 */
-    
+    getBase64(url,width,height,callback){
+    //通過建構函式來建立的 img 例項，在賦予 src 值後就會立刻下載圖片，相比 createElement() 建立 <img> 省去了 append()，也就避免了文件冗餘和汙染
+      var Img = new Image(),
+      dataURL='';
+      console.log("url:",url)
+      Img.src=url;
+      Img.onload=function(){ //要先確保圖片完整獲取到，這是個非同步事件
+        var canvas = document.createElement("canvas"); //建立canvas元素
+        canvas.width=width;
+        canvas.height=height;
+        canvas.getContext("2d").drawImage(Img,0,0,width,height); //將圖片繪製到canvas中
+        dataURL=canvas.toDataURL('image/jpeg'); //轉換圖片為dataURL
+        
+        callback?callback(dataURL):null; //呼叫回撥函式
+      };
+      
+    },
     handleDown() {
       const self = this;
       if (self.eventTableData.length === 0) {
@@ -2275,10 +2291,35 @@ export default {
       }
       self.ispdf = true;
       self.setBarchartData();
-      this.$nextTick(() => {
+      this.$nextTick(async () => {
         const img_amount = document.getElementById('imgTest_amount');
         const img_first = document.getElementById('imgTest_first');
         const img_second = document.getElementById('imgTest_second');
+        //var attImg = img_second.querySelectorAll('.att-img');
+        var attImg = img_second.getElementsByTagName("img");
+        console.log("secImg:",attImg);
+        for(var i=0; i<attImg.length;i++){
+          if(attImg[i]['_prevClass']=='att-img' ){
+            //console.log("attImg[i]['width']",attImg[i]['src']);
+            let width = attImg[i]['width'];
+            let height = attImg[i]['heigth'];
+            let imgUrl = attImg[i]['src'];
+            
+            //let imageURL = 
+            this.getBase64(imgUrl,width,height,(imageURL)=>{
+              console.log("imageURL:",imageURL);
+              var img = document.createElement("img");
+              img.src = imageURL;
+              img.setAttribute('class', 'att-img');
+              img.width = width;
+              img.height = height;
+              img.id = 'isNeedRemove';
+              attImg[i].parentNode.insertBefore(img,attImg[i].nextElementSibling);
+            });
+          
+            
+          }
+        }
         setTimeout(() => {
           html2canvas(img_amount).then(function(canvas) {
             var oGrayImg1 = canvas.toDataURL('image/jpeg');
@@ -2289,6 +2330,7 @@ export default {
             self.pdfSrc_first = oGrayImg2;
           });
           html2canvas(img_second).then(function(canvas) {
+            console.log("canvas:",canvas);
             var oGrayImg3 = canvas.toDataURL('image/jpeg');
             self.pdfSrc_second = oGrayImg3;
           });

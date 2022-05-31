@@ -177,7 +177,7 @@
                       :key="child.path">
                       <template slot="title">
                         <div class="item-icon"></div>
-                        <span  class="span4" style="margin-left: 15px">{{ $t(`route.${child.name}`) }}</span>
+                        <span  class="span4" :style="collapsed?{'margin-left':'0px'} : {'margin-left':'15px'}">{{ $t(`route.${child.name}`) }}</span>
                       </template>
                       <div v-for="grandChild in child.children" :key="grandChild.path">
                         <el-menu-item
@@ -248,7 +248,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.3.5
+                v3.0.3.6
                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
