@@ -79,7 +79,7 @@
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
                   <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }}</span></td>
-                  <td><span>{{ getDoubleNum(item.itemgetScore) }}</span></td>
+                  <td><span>{{ item.itemgetScore == '--' ? '--' : getDoubleNum(item.itemgetScore) }}</span></td>
                 </tr>
               </tbody>
             </template>
