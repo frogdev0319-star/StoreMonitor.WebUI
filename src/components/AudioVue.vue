@@ -15,7 +15,7 @@
         </div>
         <div class="btnPlay">
           <img v-show="!audioItem.isPlaying" :src="imgPlay" style="width:14px;height:14px;" @click="startAudio(audioItem, audioIndex)">
-          <img v-show="audioItem.isPlaying" :src="imgPause" class="width:10px;height:13px;">
+          <img v-show="audioItem.isPlaying" :src="imgPause" class="width:10px;height:13px;" @click="startAudio(audioItem, audioIndex)">
         </div>
       </div>
       <!--<div :class="isExportPdf ? 'pdf_speech_info' : 'speech-info'" @click="startAudio(audioItem, audioIndex)">
@@ -62,15 +62,17 @@ export default {
 
   methods: {
     startAudio(audioItem, audioIndex) {
-      this.audioList.forEach((audio, index) => {
-        audio.isPlaying = false;
-        this.$refs[`ref${index}`][0].pause();
-      });
+      // this.audioList.forEach((audio, index) => {
+      //   audio.isPlaying = false;
+      //   this.$refs[`ref${index}`][0].pause();
+      // });
       audioItem.hasNotPlayAudio = false;
       if (!audioItem.isPlaying) {
+        console.log('play')
         this.$refs[`ref${audioIndex}`][0].play();
         audioItem.isPlaying = true;
       } else {
+        console.log('pause')
         this.$refs[`ref${audioIndex}`][0].pause();
         audioItem.isPlaying = false;
       }

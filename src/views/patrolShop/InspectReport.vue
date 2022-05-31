@@ -315,8 +315,8 @@
                   </td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
-                  <td v-if="subcategory.type === 1"><span>{{ subcategory.totalScore }}</span></td>
-                  <td><span>{{ categoryItem.weight == -1 ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100 | filterScore }}</span></td>
+                  <td v-if="subcategory.type === 1"><span>{{ getDoubleNum(categoryItem.weight == -1 ? subcategory.totalScore : subcategory.totalScore * categoryItem.weight / 100) }}</span></td>
+                  <td><span>{{ getDoubleNum(categoryItem.weight == -1 ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100) }}</span></td>
                 </tr>
               </tbody>
             </template>
@@ -616,6 +616,9 @@ export default {
   },
 
   methods: {
+    getDoubleNum (num) {
+      return Math.round(num * 100) / 100  
+    },
     getReportTemplateAndInfo() {
       const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
       const reportInfoPromise = getInspectReportInfo({ reportIds: [this.report.reportId] });
