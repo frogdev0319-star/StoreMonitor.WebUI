@@ -1886,7 +1886,7 @@ export default {
 
     getOthersSheetJsonData(workbook, sheet, tableVersion) {
       if (sheet) {
-        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1;
+        delete sheet.A1; delete sheet.B1; delete sheet.C1; delete sheet.D1; delete sheet.E1;
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         sheetArray.forEach((_item) => {
@@ -1896,11 +1896,13 @@ export default {
             rowDataObj.subCatergyName = '';
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.score = _item.__EMPTY_2;
+            rowDataObj.required = _item.__EMPTY_3;
             rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
           } else {
             rowDataObj.subCatergyName = this.getTableCellData(_item.__EMPTY_1);
             rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_2);
             rowDataObj.score = _item.__EMPTY_3;
+            rowDataObj.required = _item.__EMPTY_4;
             rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
           }
 
@@ -2488,6 +2490,9 @@ export default {
                 if (type === 1) {
                   obj[tableHeader[7]] = _item.required ? 'Y' : '';
                 }
+                if (type === 2) {
+                  obj[tableHeader[5]] = _item.required ? 'Y' : '';
+                }
                 sheetData.push(obj);
               });
             } else {
@@ -2546,6 +2551,7 @@ export default {
                     obj[tableHeader[2]] = childItem.name;
                     obj[tableHeader[3]] = childItem.type === 0 ? childItem.score : type === 0 ? '' : 0;
                     obj[tableHeader[4]] = childItem.description === '---' ? '' : childItem.description;
+                    obj[tableHeader[5]] = childItem.required ? 'Y' : '';
                   }
                   sheetData.push(obj);
                 });
@@ -2625,7 +2631,8 @@ export default {
         this.$t('insSettingView.subCategoryHeader'),
         this.$t('insSettingView.tHeaderB'), 
         this.$t('insSettingView.sheetscore2'),
-        this.$t('insSettingView.tHeaderD')
+        this.$t('insSettingView.tHeaderD'),
+        this.$t('insSettingView.tHeaderH')
       ];
       let tableHeader = [];
       return tableHeader = type === 0 ? sheet1TableHeader : type === 1 ? sheet2TableHeader : sheet3TableHeader;
