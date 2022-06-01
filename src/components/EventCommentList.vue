@@ -161,7 +161,7 @@ export default {
                     this.CommentList.push(obj);
                 });
             });
-            util.sortArrayByKeyDesc(eventItem,"num");
+            //util.sortArrayByKeyDesc(eventItem,"num");
         },
         doMapSourceType(type){
             if(type==0){
