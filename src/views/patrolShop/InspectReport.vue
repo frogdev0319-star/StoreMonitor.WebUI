@@ -316,7 +316,7 @@
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfQualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 0||subcategory.type === 2"><span>{{ subcategory.numOfUnqualifiedItems }}</span></td>
                   <td v-if="subcategory.type === 1"><span>{{ getDoubleNum(categoryItem.weight == -1 ? subcategory.totalScore : subcategory.totalScore * categoryItem.weight / 100) }}</span></td>
-                  <td><span>{{ getDoubleNum(categoryItem.weight == -1 ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100) == Infinity ? '--' : getDoubleNum(categoryItem.weight == -1 ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100)}}</span></td>
+                  <td><span>{{ getDoubleNum(subcategory.actualScore) == Infinity ? '--' : getDoubleNum(categoryItem.weight == -1 ? subcategory.actualScore : subcategory.actualScore * categoryItem.weight / 100) }}</span></td>
                 </tr>
               </tbody>
             </template>
@@ -617,6 +617,7 @@ export default {
 
   methods: {
     getDoubleNum (num) {
+      num = util.isDouble(num);
       return Math.round(num * 100) / 100  
     },
     getReportTemplateAndInfo() {

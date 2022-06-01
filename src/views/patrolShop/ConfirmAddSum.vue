@@ -861,23 +861,23 @@ export default {
             if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
               item['itemgetScore'] = '--';
             } else {
-              item['itemgetScore'] = totalGetscore;
+              item['itemgetScore'] = util.isDouble(totalGetscore);
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored);
                 item['numOfQualified'] = item['numOfQualified'];
                 item['numIgnore'] = 0;
               } else {
-                item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored);
               }
             } else {
               if (inspectSettings.includedInTotalScoreWithType1) {
                 if (inspectSettings.qualifiedForIgnoredWithType1 && (p_item.type === 0 || p_item.type === 1)) {
-                  item['itemgetScore'] = tab1GetScoreContainedIgnored +
-                                          tab1GetScoreNoContainedIngored;
+                  item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored +
+                                          tab1GetScoreNoContainedIngored);
                 } else {
-                  if (p_item.type === 1) item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                  if (p_item.type === 1) item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored);
                 }
               }
               if (inspectSettings.qualifiedForIgnoredWithType1) {
@@ -899,9 +899,9 @@ export default {
               ScoreXN = (ScoreX + ScoreN)
               ScoreTotalScoreX = Score_totalScoreX
               item['itemgetScore'] =
-                inspectSettings.qualifiedForIgnoredWithType2
-                  ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
-              item['itemgetScore'] = item['itemgetScore'];
+                util.isDouble(inspectSettings.qualifiedForIgnoredWithType2
+                  ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore);
+              item['itemgetScore'] = util.isDouble(item['itemgetScore']);
             }
             if (p_item.type === 2) {
               CurOtherTotalScore += totalGetscore;
