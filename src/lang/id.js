@@ -567,6 +567,7 @@ export default{
       "confirmDelData":"Konfirmasi untuk menghapus daftar inspeksi?",
       "confirmDelete":"Konfirmasi Penghapusan",
       "confirmSelecDel":"Konfirmasi hapus item yang dipilih?",
+      "confirmSelecDel_":"(Please readjust the weight value after deletion)",
       "confirmToBindData":"Daftar inspeksi tidak terkait dengan peran sistem.",
       "confirmToSetRule":"Berhasil diimpor! Tetapkan aturan inspeksi sekarang?",
       "contains":"berisi ",

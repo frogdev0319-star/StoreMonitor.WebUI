@@ -990,12 +990,12 @@ export default {
       var names_ = {}
       primaryColumnCells.filter(cell => cell.v).forEach((cell, i) => {
         if (names_[cell.v] === undefined) {
-          if (cell.id) {
-            names_[cell.v] = cell.v
-            primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
-          } else {
+          if (type === 'Others') {
             names_[cell.v] = cell.v
             primaryGroupCelss.push({ ...cell });
+          } else {
+            names_[cell.v] = cell.v
+            primaryGroupCelss.push({ ...cell, weight: sheet['B' + cell.cellRef.slice(1)].v });
           }
         }
         

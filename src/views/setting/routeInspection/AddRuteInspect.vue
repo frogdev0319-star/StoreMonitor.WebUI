@@ -313,7 +313,10 @@
       @confirmHandler="confirmDeleteGroup"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">{{ $t('insSettingView.deleteGroup') }}</div>
+        <div class="dialog-content">
+          <div>{{ $t('insSettingView.deleteGroup') }}</div>
+          <div>{{ $t('insSettingView.confirmSelecDel_') }}</div>
+        </div>
       </div>
     </dialog-pop>
     <dialog-pop

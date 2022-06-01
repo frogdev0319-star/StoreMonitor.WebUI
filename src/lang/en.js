@@ -567,6 +567,7 @@ export default{
       "confirmDelData":"Confirm to delete the inspection list?",
       "confirmDelete":"Confirm Delete",
       "confirmSelecDel":"Confirm delete selected items?",
+      "confirmSelecDel_":"(Please readjust the weight value after deletion)",
       "confirmToBindData":"The inspection list is not associated with the system role.",
       "confirmToSetRule":"Imported successfully! Do you want to set inspection rules now?",
       "contains":"contains ",

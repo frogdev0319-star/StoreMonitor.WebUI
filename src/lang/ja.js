@@ -568,6 +568,7 @@ export default {
       "confirmDelData":"インスペクションリストをデリートすることを確認しますか？",
       "confirmDelete":"削除を確認します",
       "confirmSelecDel":"選択されたアイテムを確認しますか？",
+      "confirmSelecDel_":"(Please readjust the weight value after deletion)",
       "confirmToBindData":"インスペクションリストはシステム役割に関連付けられていません。",
       "confirmToSetRule":"正常にインポートされました！今すぐインスペクションルールを設定しますか？",
       "contains":"含む",

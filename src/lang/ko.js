@@ -568,6 +568,7 @@ export default {
       "confirmDelData":"검사 목록 삭제를 확인합니까?",
       "confirmDelete":"삭제 확인",
       "confirmSelecDel":"선택한 항목을 확인합니까?",
+      "confirmSelecDel_":"(Please readjust the weight value after deletion)",
       "confirmToBindData":"이 검사 목록이 시스템 역할와 연결하지 않다.",
       "confirmToSetRule":" 성공적으로가져왔다! 지금 검사 규칙을 설치합니까?",
       "contains":"포함",
