@@ -567,6 +567,7 @@ export default{
       "confirmDelData":"Xác nhận để xóa danh mục kiểm tra?",
       "confirmDelete":"Xác nhận xóa",
       "confirmSelecDel":"Xác nhận xóa các mục đã chọn?",
+      "confirmSelecDel_":"(Please readjust the weight value after deletion)",
       "confirmToBindData":"Danh mục kiểm tra không liên kết với vai trò hệ thống.",
       "confirmToSetRule":"Nhập thành công! Bạn có muốn thiết lập quy tắc kiểm tra không?",
       "contains":"bao gồm ",

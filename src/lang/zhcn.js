@@ -568,6 +568,7 @@ export default{
     "confirmDelData":"确认删除当前巡检表?",
     "confirmDelete":"确认删除",
     "confirmSelecDel":"确认是否删除勾选的巡检项？",
+    "confirmSelecDel_":"(删除后请重新调整权重值)",
     "confirmToBindData":"巡检表尚未与职务关联",
     "confirmToSetRule":"巡检表导入成功，是否现在设置巡检考评规则？",
     "contains":"共分",
