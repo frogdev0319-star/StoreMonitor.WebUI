@@ -1081,8 +1081,7 @@ export default {
           self.$store.dispatch('setPatrolComment', null);
           self.$store.dispatch('setStoreList', []);
           self.$store.dispatch('setStoreCache', null);
-          this.editCount = 0;
-          this.$store.dispatch('setEditCount', this.editCount);
+          this.$store.dispatch('setEditCount', 0);
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
