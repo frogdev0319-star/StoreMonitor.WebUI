@@ -2282,8 +2282,8 @@ export default {
       self.CancleIgnoreInspectObj.dialogCosed = false;
     },
     ignoreItem({item, index, e}) {
-      console.log("item:",item);
-      console.log(" index:", index);
+      //console.log("item:",item);
+      //console.log(" index:", index);
       const self = this;
       self.curItemIndex = index;
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
