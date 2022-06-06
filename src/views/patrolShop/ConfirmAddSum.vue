@@ -658,6 +658,11 @@ export default {
             obj.url = item;
             commentTemp.push(obj);
           })
+        }else{
+          let obj = {};
+            obj.mediaType = 3;
+            obj.url = "";
+            commentTemp.push(obj);
         }
         if (self.eventList[i].sourceObj != null) { 
           await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
