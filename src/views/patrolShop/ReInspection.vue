@@ -2516,6 +2516,7 @@ export default {
       const sheetName = self.sheetName.slice(0, indexFeed);
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
+            
             item.items.forEach((_item, _index) => {
               if (!_item.manualIgnore && _item.required) {
               console.log(_item)
@@ -2530,16 +2531,21 @@ export default {
           });
         });
       if (self.hasIgnoretemp.length === 0) {
+        console.log("self.hasIgnoretemp:",self.hasIgnoretemp);
         sheetName.forEach(s_item => {
-          dealCount = dealCount + s_item.dealCount;
+          console.log("s_item:",s_item);
+          console.log("s_item.ignoreCount:",(s_item.ignoreCount)?s_item.ignoreCount:0);
+          dealCount = dealCount + s_item.dealCount+((s_item.ignoreCount)?s_item.ignoreCount:0);
+          console.log("dealCount:",dealCount);
           count = count + s_item.count;
         });
       } else {
         sheetName.forEach(s_item => {
           const dealtemp = [];
           s_item.inspectList.forEach(item => {
+            console.log("3.item:",item);
             item.items.forEach((_item, _index) => {
-              if (_item.inputCount != 0 || _item.manualIgnore) {
+              if (_item.inputCount != 0 || _item.manualIgnore || !_item.ignore) {
                 const obj = {};
                 obj.dealCount = 1;
                 dealtemp.push(obj);
@@ -2892,10 +2898,12 @@ export default {
           item.items.forEach((_item, _index) => {
             _item.originIndex = _index;
             if (_item.inputCount == 0 && !_item.manualIgnore) {
+              console.log("1._item:",_item);
               ignoreCount++;
               _item.ignore = true;
             //  hasIgnoretemp.push(_item);
             } else  {
+              console.log("2._item:",_item);
               _item.ignore  = false;
            //   self.tempArr.push(_item.type);
             }
