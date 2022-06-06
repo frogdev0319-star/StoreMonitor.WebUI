@@ -202,7 +202,7 @@ var fragmentYUVShader = [
         }
 
         var canvas = this.canvasElement;
-
+        console.log("****this.canvasElement",this.canvasElement);
         this.nWindowWidth = canvas.width;
         this.nWindowHeight = canvas.height;
         

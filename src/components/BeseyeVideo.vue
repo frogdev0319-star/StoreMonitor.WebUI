@@ -1608,7 +1608,7 @@ export default {
   .video-content {
     height: auto;
     position: relative;
-    min-height: 420px;
+    max-height: 420px;
     background-color: #000;
     z-index: 100;
     .getvideo-content {
