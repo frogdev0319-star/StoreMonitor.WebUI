@@ -2282,18 +2282,24 @@ export default {
       self.CancleIgnoreInspectObj.dialogCosed = false;
     },
     ignoreItem({item, index, e}) {
+      console.log("item:",item);
+      console.log(" index:", index);
       const self = this;
+      self.curItemIndex = index;
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
-        inspect.items.forEach(item_ => {
-          if (item_.id === item.id) self.curGroupIndex = idx
+        inspect.items.forEach((item_,itemIdx) => {
+          if (item_.id === item.id) {
+            self.curGroupIndex = idx;
+            self.curItemIndex = itemIdx;
+          }
         })
       })
-   
-        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
-        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
+      console.log(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex]);
+      self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].checked = false;
+      self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].disabled = false;
 
       if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount++;
-      self.curItemIndex = index;
+      //self.curItemIndex = index;
       self.curItem = item;
       if (item.deviceId === -1) {
         self.noBindDeviceObj.dialogCosed = true;
