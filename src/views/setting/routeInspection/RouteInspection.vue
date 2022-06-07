@@ -1223,23 +1223,35 @@ export default {
           }
         }
       });
-      // console.log(primaryGroupCelss)
+       //console.log(primaryGroupCelss)
       // console.log(secondaryGroupCells)
       // console.log(groupItemCells)
       const groupType = this.getGroupType(type);
       let addGroupParams = primaryGroupCelss.filter(cell => cell.v).map(cell => {
-        return {
-          name: cell.v,
-          mode: this.activeName === '0' ? 1 : 0,
-          parentId: cell.parent && cell.parent.id ? cell.parent.id : -1,
-          type: groupType,
-          tag: this.ImportName,
-          weight: cell.weight
-        };
+        if(cell.weight==''){
+          return {
+            name: cell.v,
+            mode: this.activeName === '0' ? 1 : 0,
+            parentId: cell.parent && cell.parent.id ? cell.parent.id : -1,
+            type: groupType,
+            tag: this.ImportName
+          };
+        }else{
+          return {
+            name: cell.v,
+            mode: this.activeName === '0' ? 1 : 0,
+            parentId: cell.parent && cell.parent.id ? cell.parent.id : -1,
+            type: groupType,
+            tag: this.ImportName,
+            weight: cell.weight
+          };
+        }
       });
       if (addGroupParams.some(p => p.weight)) {
+        //console.log("p.weight:",p.weight);
         addGroupParams = addGroupParams.map(p => ({ ...p, weight: p.weight ? p.weight : 0 }))
       }
+      //console.log("addGroupParams:",addGroupParams);
       const primaryResult = await this.addGroup({ groups: addGroupParams });
       if (!primaryResult.data && primaryResult.errMsg) {
         throw new Error(primaryResult.errMsg);
