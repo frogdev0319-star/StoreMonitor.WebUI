@@ -797,7 +797,7 @@ export default {
                   item.unqualifiedItems.push(s_item);
                 }
                 if (s_item.itemgetScore !== '--') {
-                  totalGetscore += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                  totalGetscore += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * (s_item.type==2 ? 1 :(p_item.weight / 100));
                 }
               }
               s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
@@ -849,7 +849,7 @@ export default {
                   s_item.showTotalScore = true;
                 }
               } else if (p_item.type === 2 && !s_item.isIgnore) {
-                OtherTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                OtherTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore;// * p_item.weight / 100;
                 s_item.showTotalScore = true;
               }
               inspectPic += s_item.sourceList.length;
