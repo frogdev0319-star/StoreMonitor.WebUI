@@ -54,7 +54,7 @@ else if(data.SITE == 'Portals'){
   isGlobalWebsite = true;
 }
 else{
-  environJSON = _Environments.Preview;
+  environJSON = _Environments.RC;
   isGlobalWebsite = true;
 }
 

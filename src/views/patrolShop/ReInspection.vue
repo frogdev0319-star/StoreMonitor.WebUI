@@ -1492,8 +1492,11 @@ export default {
       }
       if (item.itemScoreTitle !== '--') {
         self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
-          inspect.items.forEach(item => {
-            if (item.id === self.curItemId) self.curGroupIndex = idx
+          inspect.items.forEach((item_,itemIdx) => {
+            if (item_.id === self.curItemId) {
+              self.curGroupIndex = idx;
+              self.curItemIndex = itemIdx;
+            }
           })
         })
         if (!item.manualIgnore && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
@@ -2531,21 +2534,20 @@ export default {
           });
         });
       if (self.hasIgnoretemp.length === 0) {
-        console.log("self.hasIgnoretemp:",self.hasIgnoretemp);
         sheetName.forEach(s_item => {
-          console.log("s_item:",s_item);
-          console.log("s_item.ignoreCount:",(s_item.ignoreCount)?s_item.ignoreCount:0);
-          dealCount = dealCount + s_item.dealCount+((s_item.ignoreCount)?s_item.ignoreCount:0);
-          console.log("dealCount:",dealCount);
+          //console.log("s_item:",s_item);
+          //console.log("s_item.ignoreCount:",(s_item.ignoreCount)?s_item.ignoreCount:0);
+          dealCount = dealCount + s_item.dealCount;//+((s_item.ignoreCount)?s_item.ignoreCount:0);
           count = count + s_item.count;
         });
       } else {
+        console.log("self.hasIgnoretemp:",self.hasIgnoretemp);
         sheetName.forEach(s_item => {
           const dealtemp = [];
           s_item.inspectList.forEach(item => {
             console.log("3.item:",item);
             item.items.forEach((_item, _index) => {
-              if (_item.inputCount != 0 || _item.manualIgnore || !_item.ignore) {
+              if (_item.inputCount != 0 || _item.manualIgnore) {
                 const obj = {};
                 obj.dealCount = 1;
                 dealtemp.push(obj);
@@ -2898,12 +2900,10 @@ export default {
           item.items.forEach((_item, _index) => {
             _item.originIndex = _index;
             if (_item.inputCount == 0 && !_item.manualIgnore) {
-              console.log("1._item:",_item);
               ignoreCount++;
               _item.ignore = true;
             //  hasIgnoretemp.push(_item);
             } else  {
-              console.log("2._item:",_item);
               _item.ignore  = false;
            //   self.tempArr.push(_item.type);
             }
