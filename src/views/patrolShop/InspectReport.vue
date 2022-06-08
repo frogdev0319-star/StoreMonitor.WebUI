@@ -617,7 +617,7 @@ export default {
 
   methods: {
     getDoubleNum (num) {
-      num = util.isDouble(num);
+      num = util.isDouble(num,2);
       return Math.round(num * 100) / 100  
     },
     getReportTemplateAndInfo() {
