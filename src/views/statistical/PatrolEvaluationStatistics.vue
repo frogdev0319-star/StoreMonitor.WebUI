@@ -72,7 +72,22 @@
                         {{ $t('statistics.titles.distribution') }}
                     </span>
                 </div>
-                <TypeSelectArea path="inspectEvalutionStatistics" ref="typeSelectArea1" :allow-all=true :allow-person=true :region-array1="params.curProvince" :region-array2="params.curCity" :cur-store-group="params.curStoreGroup" :cur-store-type="params.curStoreType" :cur-stores="params.storeIds" :inspect-id="params.inspectId" :cached-params="params" :cur-country="curCountry" @emitTypeChanged="emitTypeChangedPart1"></TypeSelectArea>
+                <TypeSelectArea 
+                    path="inspectEvalutionStatistics" 
+                    ref="typeSelectArea1" 
+                    :allow-all=true 
+                    :allow-person=true 
+                    :region-array1="params.curProvince" 
+                    :region-array2="params.curCity" 
+                    :cur-store-group="params.curStoreGroup" 
+                    :cur-store-type="params.curStoreType" 
+                    :cur-stores="params.storeIds" 
+                    :inspect-id="params.inspectId" 
+                    :cached-params="params" 
+                    :cur-country="curCountry" 
+                    compare-type="area1"
+                    @emitTypeChanged="emitTypeChangedPart1">
+                </TypeSelectArea>
             </div>
             <el-row :span="24" class="partition" style="height:320px">
                 <el-col :span="24" style="height:100%">
@@ -159,7 +174,20 @@
                         {{ $t('statistics.titles.scoreDistribution') }}
                     </span>
                 </div>
-                <TypeSelectArea path="inspectEvalutionStatistics" :allow-all=true :allow-person=true :region-array1="params.curProvince" :region-array2="params.curCity" :cur-store-group="params.curStoreGroup" :cur-store-type="params.curStoreType" :cur-stores="params.storeIds" :cached-params="params" :inspect-id="params.inspectId" :cur-country="curCountry" @emitTypeChanged="emitTypeChangedPart2"></TypeSelectArea>
+                <TypeSelectArea 
+                    path="inspectEvalutionStatistics" 
+                    :allow-all=true 
+                    :allow-person=true 
+                    :region-array1="params.curProvince" 
+                    :region-array2="params.curCity" 
+                    :cur-store-group="params.curStoreGroup" 
+                    :cur-store-type="params.curStoreType" 
+                    :cur-stores="params.storeIds" 
+                    :cached-params="params" 
+                    :inspect-id="params.inspectId" 
+                    :cur-country="curCountry" 
+                    @emitTypeChanged="emitTypeChangedPart2">
+                </TypeSelectArea>
             </div>
             <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
                 <el-col v-if='part2.standardScore!=-9999' :span="10" class="division">
@@ -254,7 +282,19 @@
                         {{ $t('statistics.score')+")" }}
                     </span>
                 </div>
-                <TypeSelectArea path="inspectEvalutionStatistics" :allow-all=true :allow-person=true :region-array1="params.curProvince" :region-array2="params.curCity" :cur-store-group="params.curStoreGroup" :cur-store-type="params.curStoreType" :cur-stores="params.storeIds" :inspect-id="params.inspectId" :cached-params="params" :cur-country="curCountry" @emitTypeChanged="emitTypeChangedPart3"></TypeSelectArea>
+                <TypeSelectArea 
+                    path="inspectEvalutionStatistics" 
+                    :allow-all=true :allow-person=true 
+                    :region-array1="params.curProvince" 
+                    :region-array2="params.curCity" 
+                    :cur-store-group="params.curStoreGroup" 
+                    :cur-store-type="params.curStoreType" 
+                    :cur-stores="params.storeIds" 
+                    :inspect-id="params.inspectId" 
+                    :cached-params="params" 
+                    :cur-country="curCountry" 
+                    @emitTypeChanged="emitTypeChangedPart3">
+                </TypeSelectArea>
             </div>
             <el-row :span="24" class="region-overview" style="margin-left:40px;width:400px">
                 <el-col :span="10" class="division">
