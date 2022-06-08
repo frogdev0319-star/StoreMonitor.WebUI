@@ -537,8 +537,9 @@ export default {
         this.compareType='stores';
         this.compareIds2  = this.params.storeIds;
         this.compareType2='stores',*/
+        /*console.log("1.**doGetAverageScore:");
         this.doGetAverageScore(this.filterDateRange); 
-        this.doGetAssessmentScore(this.filterDateRange2);
+        this.doGetAssessmentScore(this.filterDateRange2);*/
         if(this.params.inspectId!=-1){
           this.doGetAssessmentStandardScore();
         }
@@ -555,8 +556,9 @@ export default {
         this.Ass12Num=[];
         this.AssChartOption=null;
         this.standardRate='- -';
-        this.doGetAverageScore(this.filterDateRange); 
-        this.doGetAssessmentScore(this.filterDateRange2);
+        //console.log("1.**doGetAverageScore:");
+        //this.doGetAverageScore(this.filterDateRange); 
+        //this.doGetAssessmentScore(this.filterDateRange2);
       }
     },
     doGetPre12DateRange(start_date,end_date,range_type){
@@ -574,7 +576,7 @@ export default {
     emitFilterDateRange({start_date,end_date,range_type}){
       //console.log("**1."+start_date+", "+end_date);
       this.doGetPre12DateRange(start_date,end_date,range_type);
-      //console.log("DateRangeFilter:",DateRangeFilter);
+      
       this.doGetAverageScore(this.filterDateRange);
     },
     emitTypeChanged({compareType,compareArr,selectedLabels,selStoreIdArr}){ //劃分類型選擇
@@ -585,6 +587,7 @@ export default {
       this.doGetAverageScore(this.filterDateRange);
     },
     async doGetAverageScore(DateRangeFilter){ //同比時間區間選擇
+      
       let region = this.areaMode.filter((r)=>{ return r.key==this.compareType});
       this.Avg12Num = [];
       this.avgChartOption = this.getAverageBarchartOption();
@@ -601,8 +604,8 @@ export default {
         
 
         const areaAverage = await this.getInspectStatsDistributionOverRegion(Average12);
-        //console.log("**Average12:",areaAverage);
         if(areaAverage.errCode==0){ //上方顯示12周/月 的評均分
+          
           this.doParseAverage12Score(areaAverage.data.content);
         }
         let date_xAxis=[];
@@ -678,14 +681,13 @@ export default {
     },
     doParseAverage12Score(avgData){
       const self = this;
-      
+      self.Avg12Num = [];
+     // console.log("self.Avg12Num:",self.Avg12Num)
       this.comapareLabels.forEach(label=>{
-        console.log("label:",label)
         let avg = avgData.filter(data=>{
           console.log("data:",data)
           return (data.groupName==label)
         });
-        console.log("avg:",avg)
         if(avg.length>0){
           self.Avg12Num.push({name:avg[0].groupName,score:parseInt(avg[0].averageScore).toString()});
         }else{
