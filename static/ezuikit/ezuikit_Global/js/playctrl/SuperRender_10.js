@@ -202,10 +202,9 @@ var fragmentYUVShader = [
         }
 
         var canvas = this.canvasElement;
-        console.log("****this.canvasElement",this.canvasElement);
+        if(canvas){
         this.nWindowWidth = canvas.width;
         this.nWindowHeight = canvas.height;
-        
         var nWindowWidth = this.nWindowWidth;
         var nWindowHeight = this.nWindowHeight;
 
@@ -239,6 +238,9 @@ var fragmentYUVShader = [
         gl.disableVertexAttribArray(texturePosRef);
 
         gl.useProgram(null);
+        }else{
+            console.log("*****canvasElement:",this.canvasElement);
+        }
     };
 
     /**

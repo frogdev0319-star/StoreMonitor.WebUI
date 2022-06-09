@@ -658,7 +658,6 @@ export default {
     },
 
     onPlayerWaiting(e) {
-      console.log('video is loading');
       this.paused = true;
       this.showModelContent = false;
       this.isLoading = true;
@@ -909,7 +908,8 @@ export default {
           }
         };
         self.peerConnection.ontrack = function(event) {
-          console.log('gotRemoteTrack: kind:' + event.track.kind + ' stream:' + event.streams[0]);
+          console.log('gotRemoteTrack: kind:', event.track.kind);
+          console.log(' stream:' , event.streams[0]);
           try {
             self.beseyeVideo.srcObject = event.streams[0];
           } catch (error) {
@@ -1009,8 +1009,10 @@ export default {
     },
 
     sendPlayGetOffer() {
-      this.wsConnection.send('{"direction":"play", "command":"getOffer", "streamInfo":' +
-        JSON.stringify(this.streamInfo) + ', "userData":' + JSON.stringify(this.userData) + '}');
+      if(this.wsConnection.readyState === 1){
+        this.wsConnection.send('{"direction":"play", "command":"getOffer", "streamInfo":' +
+          JSON.stringify(this.streamInfo) + ', "userData":' + JSON.stringify(this.userData) + '}');
+      }
     },
 
     enhanceSDP(sdpStr) {

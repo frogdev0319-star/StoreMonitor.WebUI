@@ -1683,7 +1683,8 @@ export default {
       const self = this;
       if (!self.showGuide && self.$refs.vendorVideo) {
         self.$refs.vendorVideo.editCount = 0;
-        self.$refs.vendorVideo.stopVideoPlay();
+        //console.log("vendorVideo:",self.$refs.vendorVideo);
+        //self.$refs.vendorVideo.stopVideoPlay();
       };
       self.isDisabled = false;
       self.hasIgnoretemp = [];
