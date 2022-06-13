@@ -108,7 +108,10 @@
       @cancelHandler="hideDeleteContentDialog('showDeleteContent')"
       @confirmHandler="confirmDelete">
       <div class="dialog-slot">
-        <div class="dialog-content">{{ $t('insSettingView.confirmSelecDel') }} </div>
+        <div class="dialog-content">
+          <div>{{ $t('insSettingView.confirmSelecDel') }}</div>
+          <div v-if="isWeight">{{ $t('insSettingView.confirmSelecDel_') }}</div>
+        </div>
       </div>
     </dialog-pop>
 
@@ -177,6 +180,7 @@ export default {
           'label': '现场巡检'
         }
       ],
+      isWeight: false,
       addPatrol: '自定义巡检表',
       tabNameLang: '',
       tabNameInput: '',
@@ -437,6 +441,12 @@ export default {
     async deleteNapes() {
       const self = this;
       const selectedIdsJson = this.getSelectedCategoryIdList();
+      this.isWeight = false;
+      this.inspectCategoryList.forEach(category => {
+        if(category.checked){
+          if (category.weight != -1) self.isWeight = true
+        }
+      });
       const selectIds = [...Object.values(selectedIdsJson).flat()];
       if (selectIds.length === 0) {
         util.notify(self.$t('insSettingView.selectItems'), 'warning', 3000);
@@ -484,6 +494,7 @@ export default {
       const self = this;
       util.notify(self.$t('insSettingView.deleteSuss'), 'success', 3000);
       self.showDeleteContent = false;
+      this.isWeight = false;
       const val = 'del';
       self.$emit('refreshList', val, self.curSheet);
     },

@@ -62,7 +62,7 @@
                   <td :rowspan="inspectItem.inspectList.length+1" style="vertical-align:middle;">
                     <div class="flex">
                       <div class="spacer">
-                        <div v-if="inspectItem.weight != -1">{{ inspectItem.weight + '%' }}</div>
+                        <div v-if="inspectItem.weight != -1 && inspectItem.type != 2">{{ inspectItem.weight + '%' }}</div>
                         <div class="sheet_title">{{ inspectItem.label }}</div>
                       </div>
                       <div class="flex" style="align-items: center">
@@ -79,7 +79,7 @@
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfQualified }}</span></td>
                   <td v-if="inspectItem.type === 0||inspectItem.type === 2"><span>{{ item.numOfUnqualified }}</span></td>
                   <td v-if="inspectItem.type === 1"><span>{{ getDoubleNum(item.itemScore) }}</span></td>
-                  <td><span>{{ getDoubleNum(item.itemgetScore) }}</span></td>
+                  <td><span>{{ item.itemgetScore == '--' ? '--' : getDoubleNum(item.itemgetScore) }}</span></td>
                 </tr>
               </tbody>
             </template>
@@ -444,6 +444,9 @@ export default {
     if (to.name !== 'remotePatrol') {
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
+      self.$store.dispatch('setStoreList', []);
+      self.$store.dispatch('setStoreCache', null);
+      this.$store.dispatch('setEditCount', 0);
       Database.addDataToDB(self.userId, { data: {}, rule: {}});
       next();
     } else {
@@ -655,6 +658,11 @@ export default {
             obj.url = item;
             commentTemp.push(obj);
           })
+        }else{
+          let obj = {};
+            obj.mediaType = 3;
+            obj.url = "";
+            commentTemp.push(obj);
         }
         if (self.eventList[i].sourceObj != null) { 
           await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
@@ -789,7 +797,7 @@ export default {
                   item.unqualifiedItems.push(s_item);
                 }
                 if (s_item.itemgetScore !== '--') {
-                  totalGetscore += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                  totalGetscore += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * (s_item.type==2 ? 1 :(p_item.weight / 100));
                 }
               }
               s_item.itemgetScore === '--' ? s_item.itemgetScore = 0 : null;
@@ -841,7 +849,7 @@ export default {
                   s_item.showTotalScore = true;
                 }
               } else if (p_item.type === 2 && !s_item.isIgnore) {
-                OtherTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore * p_item.weight / 100;
+                OtherTS += p_item.weight == -1 ? s_item.itemgetScore : s_item.itemgetScore;// * p_item.weight / 100;
                 s_item.showTotalScore = true;
               }
               inspectPic += s_item.sourceList.length;
@@ -861,23 +869,22 @@ export default {
             if (p_item.type === 0 && !inspectSettings.includedInTotalScoreWithType1 && !isOnlyTab1) {
               item['itemgetScore'] = '--';
             } else {
-              item['itemgetScore'] = totalGetscore;
+              item['itemgetScore'] = util.isDouble(totalGetscore,2);
             }
             if (inspect.length === 1 && inspect[0].type === 0) {
               if (inspectSettings.qualifiedForIgnoredWithType1) {
-                item['itemgetScore'] = tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored + tab1GetScoreNoContainedIngored,2);
                 item['numOfQualified'] = item['numOfQualified'];
                 item['numIgnore'] = 0;
               } else {
-                item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored,2);
               }
             } else {
               if (inspectSettings.includedInTotalScoreWithType1) {
                 if (inspectSettings.qualifiedForIgnoredWithType1 && (p_item.type === 0 || p_item.type === 1)) {
-                  item['itemgetScore'] = tab1GetScoreContainedIgnored +
-                                          tab1GetScoreNoContainedIngored;
+                  item['itemgetScore'] = util.isDouble(tab1GetScoreContainedIgnored +tab1GetScoreNoContainedIngored,2);
                 } else {
-                  if (p_item.type === 1) item['itemgetScore'] = tab1GetScoreNoContainedIngored;
+                  if (p_item.type === 1) item['itemgetScore'] = util.isDouble(tab1GetScoreNoContainedIngored,2);
                 }
               }
               if (inspectSettings.qualifiedForIgnoredWithType1) {
@@ -899,9 +906,9 @@ export default {
               ScoreXN = (ScoreX + ScoreN)
               ScoreTotalScoreX = Score_totalScoreX
               item['itemgetScore'] =
-                inspectSettings.qualifiedForIgnoredWithType2
-                  ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore;
-              item['itemgetScore'] = item['itemgetScore'];
+                util.isDouble(inspectSettings.qualifiedForIgnoredWithType2
+                  ? (tab2NotIgnoredItemsGetScore + tab2IgnoredItemsGetScore) : tab2NotIgnoredItemsGetScore,2);
+              item['itemgetScore'] = util.isDouble(item['itemgetScore'],2);
             }
             if (p_item.type === 2) {
               CurOtherTotalScore += totalGetscore;

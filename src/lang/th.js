@@ -567,6 +567,7 @@ export default{
       "confirmDelData":"ยืนยันว่าจะลบรายการของการตรวจสอบหรือไม่",
       "confirmDelete":"ยืนยันการลบ",
       "confirmSelecDel":"ยืนยันการลบรายการที่เลือกหรือไม่",
+      "confirmSelecDel_":"(Please readjust the weight value after deletion)",
       "confirmToBindData":"รายการของการตรวจสอบไม่ได้เชื่อมโยงกับบทบาทของระบบ",
       "confirmToSetRule":"นำเข้าสำเร็จ! คุณต้องการตั้งค่ากฎการตรวจสอบตอนนี้หรือไม่",
       "contains":"มี ",

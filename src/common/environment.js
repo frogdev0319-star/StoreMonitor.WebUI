@@ -34,7 +34,13 @@ const _Environments = {
     GLOBAL_WEBSITE: 'https://rc-inspect.wise-apps.com/storemonitor/api',
     VERSION: version,
     clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
-  }
+  },
+  NewPortals:{
+    CHINA_WEBSITE: 'http://47.103.135.242:8081/storemonitor/api/',
+    GLOBAL_WEBSITE: 'https://inspection.storevue.com/storemonitor/api',
+    VERSION: version,
+    clientId: 'c96573eb5b721ebd133963de5007ee5c9c86c733e288710a61db2b574683e94a'
+  },
 };
 
 let environJSON
@@ -53,8 +59,12 @@ else if(data.SITE == 'Portals'){
   environJSON = _Environments.Stable;
   isGlobalWebsite = true;
 }
+else if(data.SITE == 'NewPortals'){
+  environJSON = _Environments.NewPortals;
+  isGlobalWebsite = true;
+}
 else{
-  environJSON = _Environments.Preview;
+  environJSON = _Environments.RC;
   isGlobalWebsite = true;
 }
 

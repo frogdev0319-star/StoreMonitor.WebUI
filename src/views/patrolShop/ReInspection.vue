@@ -1081,8 +1081,7 @@ export default {
           self.$store.dispatch('setPatrolComment', null);
           self.$store.dispatch('setStoreList', []);
           self.$store.dispatch('setStoreCache', null);
-          this.editCount = 0;
-          this.$store.dispatch('setEditCount', this.editCount);
+          this.$store.dispatch('setEditCount', 0);
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
@@ -1493,8 +1492,11 @@ export default {
       }
       if (item.itemScoreTitle !== '--') {
         self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
-          inspect.items.forEach(item => {
-            if (item.id === self.curItemId) self.curGroupIndex = idx
+          inspect.items.forEach((item_,itemIdx) => {
+            if (item_.id === self.curItemId) {
+              self.curGroupIndex = idx;
+              self.curItemIndex = itemIdx;
+            }
           })
         })
         if (!item.manualIgnore && self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].inputCount === 0) {
@@ -1681,7 +1683,8 @@ export default {
       const self = this;
       if (!self.showGuide && self.$refs.vendorVideo) {
         self.$refs.vendorVideo.editCount = 0;
-        self.$refs.vendorVideo.stopVideoPlay();
+        //console.log("vendorVideo:",self.$refs.vendorVideo);
+        //self.$refs.vendorVideo.stopVideoPlay();
       };
       self.isDisabled = false;
       self.hasIgnoretemp = [];
@@ -2283,18 +2286,24 @@ export default {
       self.CancleIgnoreInspectObj.dialogCosed = false;
     },
     ignoreItem({item, index, e}) {
+      //console.log("item:",item);
+      //console.log(" index:", index);
       const self = this;
+      self.curItemIndex = index;
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
-        inspect.items.forEach(item_ => {
-          if (item_.id === item.id) self.curGroupIndex = idx
+        inspect.items.forEach((item_,itemIdx) => {
+          if (item_.id === item.id) {
+            self.curGroupIndex = idx;
+            self.curItemIndex = itemIdx;
+          }
         })
       })
-   
-        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].checked = false;
-        self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[index].disabled = false;
+      console.log(self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex]);
+      self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].checked = false;
+      self.sheetName[self.curSheetIndex].inspectList[self.curGroupIndex].items[self.curItemIndex].disabled = false;
 
       if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount++;
-      self.curItemIndex = index;
+      //self.curItemIndex = index;
       self.curItem = item;
       if (item.deviceId === -1) {
         self.noBindDeviceObj.dialogCosed = true;
@@ -2511,6 +2520,7 @@ export default {
       const sheetName = self.sheetName.slice(0, indexFeed);
       sheetName.forEach(s_item => {
           s_item.inspectList.forEach(item => {
+            
             item.items.forEach((_item, _index) => {
               if (!_item.manualIgnore && _item.required) {
               console.log(_item)
@@ -2526,13 +2536,17 @@ export default {
         });
       if (self.hasIgnoretemp.length === 0) {
         sheetName.forEach(s_item => {
-          dealCount = dealCount + s_item.dealCount;
+          //console.log("s_item:",s_item);
+          //console.log("s_item.ignoreCount:",(s_item.ignoreCount)?s_item.ignoreCount:0);
+          dealCount = dealCount + s_item.dealCount;//+((s_item.ignoreCount)?s_item.ignoreCount:0);
           count = count + s_item.count;
         });
       } else {
+        console.log("self.hasIgnoretemp:",self.hasIgnoretemp);
         sheetName.forEach(s_item => {
           const dealtemp = [];
           s_item.inspectList.forEach(item => {
+            console.log("3.item:",item);
             item.items.forEach((_item, _index) => {
               if (_item.inputCount != 0 || _item.manualIgnore) {
                 const obj = {};

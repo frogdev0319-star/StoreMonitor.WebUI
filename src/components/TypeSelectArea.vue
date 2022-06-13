@@ -108,12 +108,17 @@ export default {
             return []
           }
         },
+        compareType:{
+          type:String,
+          default:'stores',
+          required:false
+        }
     },
     data() {//,{value:'position',label:this.$t('overview.position')},{value:'users',label:this.$t('overview.user')}
         return {
             DatePickIconSrc: require('../../static/img/statistics/ic_edit.svg'),
             CalenderIconSrc: require('../../static/img/statistics/ic_calender.svg'),
-            compareType:'stores',
+            //compareType:'stores',
             compareTypeItems:[{value:'area1',label:this.$t('statistics.area1')},{value:'area2',label:this.$t('statistics.area2')},
             {value:'storeGroup',label:this.$t('statistics.storeGroup')},{value:'storeType',label:this.$t('statistics.storeType')},
             {value:'stores',label:this.$t('statistics.stores')}],

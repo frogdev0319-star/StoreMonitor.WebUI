@@ -313,7 +313,10 @@
       @confirmHandler="confirmDeleteGroup"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">{{ $t('insSettingView.deleteGroup') }}</div>
+        <div class="dialog-content">
+          <div>{{ $t('insSettingView.deleteGroup') }}</div>
+          <div v-if="isWeight">{{ $t('insSettingView.confirmSelecDel_') }}</div>
+        </div>
       </div>
     </dialog-pop>
     <dialog-pop
@@ -431,6 +434,7 @@ export default {
       curGroup: '',
       showDeleteItem: false,
       showDeleteGroup: false,
+      isWeight: false,
       deleteItemFlag: '',
       curItemId: '',
       varyWindowHeight: window.innerHeight,
@@ -1019,6 +1023,7 @@ export default {
     },
 
     async deleteGroup(index, item, parentItem) {
+      if (item.weight != -1) this.isWeight = true
       const self = this;
       if (self.groupList.length === 1) {
         if (self.typeTemp.length === 1) {
@@ -1077,6 +1082,7 @@ export default {
         });
       }
       self.showDeleteGroup = false;
+      self.isWeight = false;
       var index = 0;
       try {
         idItemArr.length > 0 && await self.deleteItemData(idItemArr);
@@ -1124,6 +1130,7 @@ export default {
 
     hideDeleteGroupDialog() {
       this.showDeleteGroup = false;
+      this.isWeight = false;
     },
 
     addNape() {
