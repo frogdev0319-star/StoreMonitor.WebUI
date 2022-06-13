@@ -294,57 +294,56 @@ export default {
     ...mapGetters({ accountChanged: 'accountChanged' })
   },
 
-  // watch: {
-  //   accountChanged(val) {
-  //     const self = this;
-  //     for (let i = 0; i < 5; i++) {
-  //       self.tableDataList[i].tableData = [];
-  //       self.tableDataList[i].eventCount = 0;
-  //     }
+  watch: {
+    accountChanged(val) {
+      const self = this;
+      for (let i = 0; i < 5; i++) {
+        self.tableDataList[i].tableData = [];
+        self.tableDataList[i].eventCount = 0;
+      }
 
-  //     if (val !== 0) {
-  //       window.setTimeout(function() {
-  //         self.$route.meta.keepAlive = true;
-  //       },
-  //       300);
-  //       // self.initData();
-  //       self.ifChangeAccount = true;
-  //       self.ifSaveParams = false;
-  //       self.ifSearchData = true;
-  //     }
-  //   },
+      if (val !== 0) {
+        window.setTimeout(function() {
+          self.$route.meta.keepAlive = true;
+        },
+        300);
+        // self.initData();
+        self.ifChangeAccount = true;
+        self.ifSaveParams = false;
+        self.ifSearchData = true;
+      }
+    },
 
-  //   numberOfElements(val) {
-  //     const self = this;
-  //     if (val === 0 && self.totalElements > 0) {
-  //       self.params.filter.page -= 1;
-  //       console.log('numberofElements');
-  //       // self.getEventList();
-  //     }
-  //   }
-  // },
+    numberOfElements(val) {
+      const self = this;
+      if (val === 0 && self.totalElements > 0) {
+        self.params.filter.page -= 1;
+        console.log('numberofElements');
+        // self.getEventList();
+      }
+    }
+  },
 
-  // created() {
-  //   // this.isFirstLoad = true;
-  // },
+  created() {
+    // this.isFirstLoad = true;
+  },
 
-  // async mounted() {
-  //   const self = this;
-  //   self.userId = getCookie('UserId');
-  //   const windowHeight = window.innerHeight;
-  //   if (windowHeight > 800) {
-  //     self.tableHeight = 770 + 'px';
-  //   }
-  // },
+  async mounted() {
+    const self = this;
+    self.userId = getCookie('UserId');
+    const windowHeight = window.innerHeight;
+    if (windowHeight > 800) {
+      self.tableHeight = 770 + 'px';
+    }
+  },
 
   activated() {
     console.log('!!!!!!!!!!! activated:>> ');
     const self = this;
     self.windowHeight = window.innerHeight;
     if (!self.$route.meta.isBack || self.isFirstLoad) {
-        console.log('Activate !?');
-
-      // self.initData();
+      console.log('Activate go!');
+      self.initData();
     } else {
       console.log('Activate');
       // self.getEventList('Back');

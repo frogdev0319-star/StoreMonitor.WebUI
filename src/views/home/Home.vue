@@ -245,7 +245,7 @@
             <footer class="footerInfo">
               <p style="text-align: left">
                 v3.0.3.5
-                 &copy; {{ getFullYear }} Advantech Intelligent City
+                &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
             </footer>
