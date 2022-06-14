@@ -1081,7 +1081,7 @@ export default {
           self.$store.dispatch('setPatrolComment', null);
           self.$store.dispatch('setStoreList', []);
           self.$store.dispatch('setStoreCache', null);
-          this.$store.dispatch('setEditCount', 0);
+          self.$store.dispatch('setEditCount', 0);
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
@@ -1189,6 +1189,7 @@ export default {
   methods: {
     changeStore_(_item) {
       const self = this;
+      
       self.patrolstore = '';
       self.curSheetIndex = 0;
       self.curSheet = {};
@@ -1197,7 +1198,7 @@ export default {
       self.sheetName = [];
       self.tempArr = [];
       self.showChannelBtns = [];
-      self.patrolStoreName = _item.name;
+      self.patrolStoreName = (typeof _item!='undefined')?_item.name:'';
       self.PatrolList = [];
       self.hasIgnoretemp = [];
       self.$store.dispatch('setPatrolHistory', null);
@@ -1205,12 +1206,7 @@ export default {
       self.notShowAlert = false;
       this.showIgnoreItem = false;
       this.$emit("listenerChild", false);
-      _item.authorizedInspect.forEach(au_item => {
-        if (au_item.mode === 0) {
-          self.PatrolList.push(au_item);
-        }
-      });
-      _item.isActive = true;
+      
       self.showStoreUp = true;
       self.$refs.vendorVideo && (self.$refs.vendorVideo.editCount = 0);
       self.$refs.vendorVideo && self.$refs.vendorVideo.stopVideoPlay();
@@ -1219,26 +1215,37 @@ export default {
       self.showFeedBack = false;
       self.eventList = [];
       self.showGuide = true;
-      const obj = {};
-      obj.storeId = _item.storeId;
-      obj.storeName = _item.name;
-      obj.storeTitle = _item.name;
-      obj.storeUp = _item.favorite;
-      obj.device = _item.device;
       self.channel = null;
-      self.getChannelByStore(_item);
-      if (_item.favorite) {
-        obj.storeUpTitle = this.$t('remotePatrol.stared');
-      } else {
-        obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
+      self.store = {};
+      if(typeof _item!='undefined'){
+        _item.authorizedInspect.forEach(au_item => {
+          if (au_item.mode === 0) {
+            self.PatrolList.push(au_item);
+          }
+        });
+        _item.isActive = true;
+        const obj = {};
+        obj.storeId = _item.storeId;
+        obj.storeName = _item.name;
+        obj.storeTitle = _item.name;
+        obj.storeUp = _item.favorite;
+        obj.device = _item.device;
+        
+        self.getChannelByStore(_item);
+        if (_item.favorite) {
+          obj.storeUpTitle = this.$t('remotePatrol.stared');
+        } else {
+          obj.storeUpTitle = this.$t('remotePatrol.clickToStar');
+        }
+        self.store = obj;
+        let curStoreId = '';
+        curStoreId = _item.storeId;
+        const storeObj = {
+          storeId: curStoreId
+        };
+        self.saveStoreObj(storeObj);
       }
-      self.store = obj;
-      let curStoreId = '';
-      curStoreId = _item.storeId;
-      const storeObj = {
-        storeId: curStoreId
-      };
-      self.saveStoreObj(storeObj);
+
     },
     changeBrand() {
       const self = this;
@@ -2107,7 +2114,7 @@ export default {
                 item.favorite = true;
               }
             });
-            self.getStoreList();
+            self.getStoreList_();
           }
         });
       } else {
@@ -2134,7 +2141,7 @@ export default {
                 item.favorite = false;
               }
             });
-            self.getStoreList();
+            self.getStoreList_();
           }
         });
       }

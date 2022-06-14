@@ -22,5 +22,7 @@ const getters = {
   storeCache: state => state.user.storeCache,
   storeListCache: state => state.user.storeListCache,
   editCount: state => state.user.editCount,
+  editCount_storeMonitor: state => state.user.editCount_storeMonitor,
+  favoriteList:state => state.user.favoriteList,
 };
 export default getters;
