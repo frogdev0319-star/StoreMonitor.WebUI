@@ -212,7 +212,7 @@ export default {
       isFavorite: false,
       isChangeAccount:false,
       input:'',
-      
+      checkCurStoreInFavorite:false,
       changeStoreObj: {
         title: this.$t('remotePatrol.confirm'),
         showInfo: this.$t('remotePatrol.confirmSwitch'),
@@ -252,8 +252,42 @@ export default {
 
   methods: {
     changeFavorite () {
+      this.$store.dispatch('setFavoritList',true);
+      /*if(!this.isFavorite){
+        
+        new Promise((resolve,reject)=>{
+          this.getFavoriteStoreData().then(result=>{
+            resolve(result);
+          })}).then(resProm =>{
+            var storeList = resProm;
+            console.log("Favorite storeList:",storeList);
+            var favoritStoreExist = storeList.some( st => st.storeId == this.curSelectedStore);
+            console.log("favoritStoreExist:",favoritStoreExist);
+            if(!favoritStoreExist && (this.$store.getters.editCount != 0 || this.$store.getters.editCount_storeMonitor!=0)){
+              this.checkCurStoreInFavorite = true;
+              this.changeStoreObj.dialogCosed = true;
+            }else{
+              this.isFavorite = true;
+              this.getStoreListAndGroupAndType();
+            }
+          })
+      }else{
+        this.isFavorite = false;
+        this.getStoreListAndGroupAndType();
+      }*/
+      if(this.$store.getters.editCount != 0){
+        this.checkCurStoreInFavorite = true;
+        this.changeStoreObj.dialogCosed = true;
+      }else if(this.$store.getters.editCount_storeMonitor!=0){
+        this.changeStoreObj.showInfo = this.$t('remotePatrol.confirmSwitch'),
+        this.checkCurStoreInFavorite = true;
+        this.changeStoreObj.dialogCosed = true;
+      }else{
       this.isFavorite = !this.isFavorite;
-      this.getStoreListAndGroupAndType()
+        this.getStoreListAndGroupAndType();
+      }
+      //this.isFavorite = !this.isFavorite;
+      //this.getStoreListAndGroupAndType();
     },
     getCountryStore(initFilter) {
       // console.log("getCountryStore:"+initFilter)
@@ -310,7 +344,7 @@ export default {
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        // console.log("storeList~~~~~~~~~>", storeList)
+        //console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -350,23 +384,43 @@ export default {
       this.changeStoreNew(arr);
     },
     canceldChangeStore() {
+      if(this.checkCurStoreInFavorite) {
+        
+        this.checkCurStoreInFavorite= false;
+        //this.getStoreListAndGroupAndType();
+      }
       this.changeStoreObj.dialogCosed = false;
       this.curSelectedStore_ = '';
     },
     changeStoreDialog () {
+      if(this.checkCurStoreInFavorite) {
+        this.isFavorite = !this.isFavorite;
+        this.checkCurStoreInFavorite= false;
+        /*this.isFavorite = true;
+        this.getStoreListAndGroupAndType();
+        this.$store.dispatch('setEditCountStoreMonitor',0);*/
+      }
+      
+      this.getStoreListAndGroupAndType();
+      this.$store.dispatch('setEditCountStoreMonitor',0);
       this.curSelectedStore = this.curSelectedStore_;
       this.curSelectedStore_ = '';
       this.emitParams();
       this.changeStoreObj.dialogCosed = false;
       this.$store.dispatch('setEditCount', 0);
+      
     },
     onChangeSelectedStore(val) {
-      if(this.$store.getters.editCount === 0) {
-        this.curSelectedStore=val
-        this.emitParams();
-      } else {
+      if(this.$store.getters.editCount != 0) {
         this.curSelectedStore_ = val;
         this.changeStoreObj.dialogCosed = true;
+      } else if(this.$store.getters.editCount_storeMonitor!=0){
+        this.curSelectedStore_ = val;
+        this.changeStoreObj.showInfo = this.$t('remotePatrol.confirmSwitch'),
+        this.changeStoreObj.dialogCosed = true;
+      }else {
+        this.curSelectedStore=val
+        this.emitParams();
       }
     },
     getStoreDefineList(type) {
@@ -793,8 +847,20 @@ export default {
       tempsearchParamsObj.curRegionI = this.curRegionI;
       tempsearchParamsObj.curRegionII = this.curRegionII;
       tempsearchParamsObj.regionMode = this.regionMode;
+      if(this.showFavorite && this.isFavorite){
+        var favoritStoreExist = this.storeList.some( st => st.storeId == this.curSelectedStore);
+        //console.log("favoritStoreExist:",favoritStoreExist);
+        if(favoritStoreExist){
       tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
-      // console.log('emitParams:',tempsearchParamsObj)
+        }else{
+          this.curSelectedStore = '';
+          tempsearchParamsObj.curSelectedStore = "";
+      }
+
+      }
+      else
+        tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
+      console.log('emitParams:',tempsearchParamsObj)
       this.$emit('storeChange', tempsearchParamsObj);
     },
 

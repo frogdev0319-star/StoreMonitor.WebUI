@@ -37,7 +37,9 @@ const user = {
     curTemplateIndex: -1,
     storeCache: null,
     storeListCache: [],
-    editCount: 0
+    editCount: 0,
+    editCount_storeMonitor:0,
+    favoriteList:false
   },
 
   mutations: {
@@ -141,11 +143,26 @@ const user = {
     },
     SET_EDIT_COUNT: (state, count) => {
       state.editCount = count
+    },
+    SET_EDIT_COUNT: (state, count) => {
+      state.editCount = count
+    },
+    SET_EDIT_COUNT_StoreMonitor: (state, count) => {
+      state.editCount = count
+    },
+    SET_FAVORIT_LIST:(state,favorit)=>{
+      state.favoriteList = favorit
     }
   },
   actions: {
     setEditCount({ commit }, count) {
       commit('SET_EDIT_COUNT', count);
+    },
+    setEditCountStoreMonitor({ commit }, count) {
+      commit('SET_EDIT_COUNT_StoreMonitor', count);
+    },
+    setFavoritList({ commit }, favorit) {
+      commit('SET_FAVORIT_LIST', favorit);
     },
     setStoreList({ commit }, storeList) {
       commit('SET_STORELIST', storeList);
