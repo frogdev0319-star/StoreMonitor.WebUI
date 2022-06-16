@@ -660,7 +660,8 @@ export default {
         {key:'en',value:'en-backToNow'},{key:'zh',value:'zh-backToNow'},{key:'zhtw',value:'zhTW-backToNow'},
         {key:'ja-JP',value:'ja-backToNow'},{key:'ko-KR',value:'ko-backToNow'},{key:'vi-VN',value:'vi-backToNow'},
         {key:'id-ID',value:'id-backToNow'},{key:'th-TH',value:'th-backToNow'}
-      ]
+      ],
+      editCount_storeMonitor:0,
     };
   },
 
@@ -737,6 +738,8 @@ export default {
     self.isPlayingFlag = -1;
     self.timerPlayReal = null;
     self.timeid = null;
+    self.$store.dispatch('setEditCountStoreMonitor',0);
+    self.$store.dispatch('setFavoritList',false);
     self.$refs.vendorVideo.stopVideoPlay();
     if (to.name !== 'storeSubEvent') {
       from.meta.keepAlive = false;
@@ -788,11 +791,13 @@ export default {
           mediaType: 3,
             src: this.eventDes,
           })
+          self.editCount_storeMonitor+=1;
+        
         } else {
           this.RuleCountTip = true;
         }
       }
-
+      self.$store.dispatch('setEditCountStoreMonitor',self.editCount_storeMonitor);
       this.eventDes = ''
     },
     deleteItemResource({  index }) {
@@ -811,13 +816,36 @@ export default {
     },
     getCurStore(storeData) {
       const self =this
+      //console.log("getCurStore:",storeData)
       this.tempCurSelStoreId = storeData.curSelectedStore;
       this.RuleCountTip = false;
       self.$refs.vendorVideo.stopVideoPlay();
-      if (self.$refs.vendorVideo.playState || self.eventName.length !== 0|| self.sourceList.length>0 ){
-        self.changeStoreObj.dialogCosed = true;
+      /*if ((self.$refs.vendorVideo.playState || self.eventName.length !== 0|| self.sourceList.length>0) && (self.curSelStoreId!=storeData.curSelectedStore) ){
+        console.log("getters.favoriteList:",self.$store.getters.favoriteList);
+        if(!self.$store.getters.favoriteList) {
+          self.changeStoreObj.dialogCosed = true;
+        }else {
+          console.log("getters.editCount_storeMonitor:",self.$store.getters.editCount_storeMonitor);
+          if(self.$store.getters.editCount_storeMonitor == 0){
+            self.curSelStoreId = storeData.curSelectedStore
+            self.store = {};
+            self.channel =null;
+            self.clearTheEventInfo()
+            self.getInitStoreData()
+            self.getEventList();
+          }
+          self.$store.dispatch('setFavoritList',false);
+        }
       } else {
          self.curSelStoreId = storeData.curSelectedStore
+         self.store = {};
+         self.channel =null;
+         self.clearTheEventInfo()
+         self.getInitStoreData()
+         self.getEventList();
+      }*/
+      if(self.$store.getters.editCount_storeMonitor == 0){
+        self.curSelStoreId = storeData.curSelectedStore
          self.store = {};
          self.channel =null;
          self.clearTheEventInfo()
@@ -878,7 +906,6 @@ export default {
         });
       });
     },
-
     async getStoreList() {
       const self = this;
       const getStoreTemp = (data) => {
@@ -942,7 +969,7 @@ export default {
           obj.storeId = item.storeId;
           obj.name = item.name;
           obj.userId = item.userId;
-          obj.favorite = item.favorite == undefined ? true : item.favorite;
+          obj.favorite = item.favorite == undefined ? false : item.favorite;
           obj.device = item.device;
           obj.status = item.status;
           temp.push(obj);
@@ -967,7 +994,7 @@ export default {
         obj.storeTitle = storeData[0].name;
         obj.userName = storeData[0].userName;
         obj.device = storeData[0].device;
-        obj.storeUp = true;
+        obj.storeUp =  storeData[0].favorite;
         obj.storeUpTitle = self.$t('remotePatrol.stared');
         obj.status = storeData[0].status;
         self.store = { ...obj };
@@ -1080,6 +1107,7 @@ export default {
           self.store.storeUp = false;
           self.store.storeUpTitle = self.$t('remotePatrol.clickToStar');
           self.tabList[2].storeList.forEach((item, index) => {
+            
             item.storeList.forEach((_item, _index) => {
               if (self.store.storeId === _item.storeId) {
                 _item.favorite = false;
@@ -1099,6 +1127,7 @@ export default {
             }
           });
           self.getStoreList();
+          //self.getFaStoreData();
         }
       }).catch(err => {
         console.log('StoreMonitor-deleteFavoriteStore: ' + err);
@@ -1960,6 +1989,8 @@ export default {
                       self.store.storeId + '_' + self.channel.channelId + '.jpg';
       obj.file = util.base64ToBlob(obj.src);
       self.sourceList.push(obj);
+      self.editCount_storeMonitor++;
+      self.$store.dispatch('setEditCountStoreMonitor',self.editCount_storeMonitor);
     },
 
     eventNameChanged(val) {
@@ -1972,6 +2003,10 @@ export default {
         this.eventNameRuletip = true;
       } else {
         this.eventNameRuletip = false;
+      }
+      if(length>0){
+        self.editCount_storeMonitor++;
+        self.$store.dispatch('setEditCountStoreMonitor',self.editCount_storeMonitor);
       }
     },
 
