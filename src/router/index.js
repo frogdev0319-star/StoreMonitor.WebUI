@@ -194,24 +194,24 @@ export const navbarRoute = {
   getAuditRoute() {
     const auditRoute = {
       path: '/home',
-      name: 'auditManage',
+      name: 'AuditManage',
       component: Home,
       iconCls: 'iconfont icon-shijian',
       styles: 'font-size:22px',
-      leaf: true,
-      isReadOnly: false,
+      leaf: false,
       hidden: false,
       children: []
     };
     auditRoute.children.push(
       {
         path: '/audit',
-        name: 'AuditManage',
-        component: resolve => require(['@/views/audit/AuditManage'], resolve),
+        name: 'SendAuditManage',
+        component: resolve => require(['@/views/audit/SendAuditManage'], resolve),
         meta: {
           keepAlive: true, // the component is't to be cache.
           requireAuth: true
-        }
+        },
+        isReadOnly: false
       },
       {
         path: '/auditdetail',
@@ -220,6 +220,29 @@ export const navbarRoute = {
         component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
       }
     ) && primaryPathesList.push('/audit', '/auditdetail');
+    /*auditRoute.children.push(
+      {
+        path: '/reinspection',
+        name: 'remotePatrol',
+        component: resolve => require(['@/views/patrolShop/ReInspection'], resolve),
+        meta: {
+          requireAuth: true
+        },
+        isReadOnly: false
+      },
+      {
+        path: '/reinspect/confirmrein',
+        name: 'confirmSum',
+        hidden: true,
+        component: resolve => require(['@/views/patrolShop/ConfirmAddSum'], resolve)
+      },
+      {
+        path: '/reinspect/submit',
+        name: 'submitEvent',
+        hidden: true,
+        component: resolve => require(['@/views/patrolShop/ReInspectDealPage'], resolve)
+      }
+    ) && primaryPathesList.push('/reinspection', '/reinspect/confirmrein', '/reinspect/submit');*/
     return auditRoute;
   },
 

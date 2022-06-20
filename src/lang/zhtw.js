@@ -88,12 +88,12 @@ export default{
       "workflowManage":"流程設計",
       "workflowDetail":"流程配置",
       "nodeSetting":"添加審核節點",
-
-      "AuditManage":"簽核管理",
-
       "noReportAuthority":"無報告檢視權限，請聯繫管理員",
       "noPatrolCompareStatAuthority":"無巡檢同比分析權限，請聯繫管理員",
-      "noEventAuthority":"無事件檢視權限，請聯繫管理員"
+      "noEventAuthority":"無事件檢視權限，請聯繫管理員",
+      //簽核
+      "AuditManage":"簽核管理",
+      "SendAuditManage":"送出簽核"
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -1227,6 +1227,31 @@ export default{
         "rankByNumOfUnqualified":"排名",
         "submitter":"評估人",
         "eventCommand":"事件詳情"
+    }
+  },
+  "audit":{
+    "auditStatus":{
+      "noteYet":"尚未開始",
+      "processing":"處理中",
+      "reject":"駁回",
+      "approved":"簽核通過",
+      "cancel":"取消",
+      "rollback":"撤回"
+    },
+    "sendAudit":{
+      "all":"全部",
+      "processing":"進行中",
+      "completed":"已完成",
+      "storeName":"巡檢門店",
+      "reportName":"巡檢表",
+      "submitTime":"送出時間",
+      "auditStatus":"簽核狀態",
+      "updateTime":'最後更新時間',
+      "owner":"當前處理人",
+      "operation":"操作"
+    },
+    "workFlow":{
+      
     }
   }
 

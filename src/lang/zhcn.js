@@ -90,7 +90,9 @@ export default{
       "nodeSetting":"添加審核節點",
       "noReportAuthority":"无报告检视权限，请联系管理员",
       "noPatrolCompareStatAuthority":"无巡检同比分析权限，请联系管理员",
-      "noEventAuthority":"无事件检视权限，请联系管理员"
+      "noEventAuthority":"无事件检视权限，请联系管理员",
+      //簽核
+      "AuditManage":"签核管理",
   },
   "overview":{
       "DangerousLess":"立即督导＜60%",
@@ -1225,6 +1227,10 @@ export default{
         "submitter":"评估人",
         "eventCommand":"事件详情"
     }
-  }
+  },
+  "audit":{
+    "workFlow":{
 
+    }
+  }
 }

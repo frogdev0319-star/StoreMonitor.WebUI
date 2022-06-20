@@ -86,7 +86,9 @@ export default{
       "singleStoreStat":"Statistik Satu Toko",
       "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
       "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator",
-      "noEventAuthority":"You don't have permission to view events, please contact the administrator"
+      "noEventAuthority":"You don't have permission to view events, please contact the administrator",
+      //簽核
+      "AuditManage":"Sign-off Management",
   },
   "overview":{
       "DangerousLess":"Rasio Bahaya＜60%",
@@ -1219,6 +1221,11 @@ export default{
         "rankByNumOfUnqualified":"Peringkat",
         "submitter":"Pengirim",
         "eventCommand":"Rincian Kejadian"
+    }
+  },
+  "audit":{
+    "workFlow":{
+      
     }
   }
 

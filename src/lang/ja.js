@@ -87,7 +87,9 @@ export default {
       "singleStoreStat":"単一ストア統計",
       "noReportAuthority":"You don't have permission to view reports, please contact the administrator",
       "noPatrolCompareStatAuthority":"You don't have Inspection Compare Statistics, please contact the administrator",
-      "noEventAuthority":"You don't have permission to view events, please contact the administrator"
+      "noEventAuthority":"You don't have permission to view events, please contact the administrator",
+      //簽核
+      "AuditManage":"Sign-off Management",
   },
   "overview":{
       "DangerousLess":"危険率＜60％",
@@ -1220,6 +1222,11 @@ export default {
         "rankByNumOfUnqualified":"ランク",
         "submitter":"送信者",
         "eventCommand":"イベントの詳細"
+    }
+  },
+  "audit":{
+    "workFlow":{
+      
     }
   }
 

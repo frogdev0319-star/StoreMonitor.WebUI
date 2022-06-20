@@ -104,7 +104,15 @@ export const workflowItems = data => {
 export const workflowInstanceMine = data => {
   return request({
     url: `${version}/workflow/instance/mine`,
-    method: 'psot',
+    method: 'post',
+    data
+  });
+};
+
+export const GetlistWorkflowTaskByType = data => {
+  return request({
+    url: `${version}/workflow/task/list`,
+    method: 'post',
     data
   });
 };
