@@ -14,6 +14,7 @@
         :dateRange="dateRange" 
         :poper-class="date-range" 
         :diablePick="diablePick" 
+        :dateTimeValue="dateTimeValue"
         :showTooltips="showTooltips"
         @change="dateChange"/>
     </div>
@@ -48,8 +49,6 @@ export default {
   },
   data() {
     return {
-      date:'',
-      range:'',
       dateRangeItems:[{value:3,label:this.$t('overview.last3Days')},{value:7,label:this.$t('overview.last7Days')},
                       {value:30,label:this.$t('overview.last30Days')},{value:90,label:this.$t('overview.last90Days')},
                       {value:0,label:this.$t('overview.thisMonth')},{value:1,label:this.$t('overview.lastMonth')},
@@ -78,10 +77,10 @@ export default {
   },
   watch:{
     async accountChanged(val) {
-      // if (val !== 0) {
-      //   this.dateRange = 4;
-      //   this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
-      // }
+      if (val !== 0) {
+        this.dateRange = 4;
+        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      }
     },
   },
   mounted() {
@@ -89,9 +88,9 @@ export default {
     this.getDefaultTimeList();
   },
   created(){
-    // if(this.dateTimeValue==[]){
-    //   this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
-    // }
+    if(this.dateTimeValue==[]){
+      this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+    }
   },
   activated(){
       //console.log('dateRange activated');
@@ -107,9 +106,10 @@ export default {
     },
     getDefaultTimeList() {
       //console.log("2.dateTimeValue:",this.dateTimeValue);
-      // if(this.dateTimeValue.length==0){
-      //   this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
-      // }
+      if(this.dateTimeValue.length==0){
+        this.dateTimeValue = [this.$moment().subtract(29, 'days'), this.$moment()];
+      //this.dateTimeValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
+      }
     },
     dateChange(val) {
       this.$emit('change', val);
