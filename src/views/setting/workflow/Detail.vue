@@ -2,61 +2,104 @@
   <div class="page-container report-setting paper" style="height: 100%">
 
     <div class="setting-titles padding flex-center">
-      流程配置
+      {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"/>
       <div class="buttons">
-        <delay-button type="filled" @click="submit">保存並發布</delay-button>
-        <!-- <delay-button
-          type="filled"
-          class="schedule-btn">
-          <div class="button-area">
-            <span>保存並發布</span>
-          </div>
-        </delay-button> -->
+        <delay-button type="filled" @click="submit">  {{$t('audit.workFlows.saveAndPublic')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="template-info">
         <div class="inspect-basic">
-          <setting-table table-name="基本信息">
+          <setting-table :table-name="$t('audit.workFlows.basicInformation')">
             <template slot="tableDetail">
-
               <!-- row -->
-              <div class="setting-config basic-config">
-                <div class="title-name">* 流程名稱</div>
-                <div class="title-status"> 
-                  <el-input
-                    :placeholder="nodeDataToApi.name"
-                    v-model="nodeDataToApi.name"
-                    />
+              <div class="setting-config">
+                <!-- 基本信息 -->
+                <div class="flex-row" style="margin-right: 30px">
+                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.basicInformation')}}</div>
+                  <div class="title-status"> 
+                    <el-input
+                      :placeholder="infoForm.name"
+                      v-model="infoForm.name"
+                      style="width: 250px"
+                      />
+                  </div>
                 </div>
 
-                <div class="title-name">* 流程分類</div>
-                <div class="title-status"> 
-                  <el-select
-                    v-model="curTemplateIndex"
-                    class="device-select"
-                    placeholder="巡檢表單"
-                    :disabled="true"
-                    >
-                    <el-option
-                      v-for="(item, index) in templateList"
-                      :key="index"
-                      :label="item"
-                      :value="item"
-                    />
-                  </el-select>
+                <!-- 分類流程 -->
+                <div class="flex-row" style="margin-right: 30px">
+                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.workFlowClassification')}}</div>
+                  <div class="title-status"> 
+                    <el-select
+                      v-model="curTemplateIndex"
+                      :placeholder="$t('audit.workFlows.inspectionForm')"
+                      :disabled="true"
+                      >
+                      <el-option
+                        v-for="(item, index) in templateList"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
                 </div>
+
+                <!-- 簽核模式 -->
+                <div class="flex-row" style="margin-right: 30px">
+                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.signoffMode')}}</div>
+                      <el-radio-group class="storevue-radio" v-model="signMode">
+                        <div class="flex-row" style="margin-right: 30px">
+                          <el-radio :label="1">{{$t('audit.workFlows.canNotCancel')}}</el-radio>  
+                            <el-tooltip
+                              class="date-time-tooltip"
+                              effect="light"
+                              placement="bottom-end">
+                              <div slot="content">
+                                不可取消簽核： <br> 
+                                送出巡檢報告時同步送出不合格項產生之事件 <br> 
+                                簽核流程無法選擇「取消」<br> 
+                                巡檢報告重新編輯時無法修改不合格項 <br> 
+                                簽核通過後才能檢視巡檢報告 <br> 
+                                </div>
+                              <i class="iconfont icon-bangzhu iconbangzhu"/>
+                            </el-tooltip>
+                        </div>
+
+                        <div class="flex-row">
+                          <el-radio :label="0">{{$t('audit.workFlows.canCancel')}}</el-radio>
+                          <el-tooltip
+                            class="date-time-tooltip"
+                            effect="light"
+                            placement="bottom-end">
+                            <div slot="content">
+                              可取消簽核： <br> 
+                              送出巡檢報告時不會立即產生不合格項之事件，簽核通過時才會產生 <br> 
+                              簽核流程可以選擇「取消」 <br> 
+                              巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項 <br> 
+                              簽核通過後才能檢視巡檢報告 <br> 
+                            </div>
+                            <i class="iconfont icon-bangzhu iconbangzhu"/>
+                          </el-tooltip>
+                        </div>
+                      </el-radio-group>
+                    
+                      <!-- <p>{{$t('audit.workFlows.thisModeWithoutEvent')}}</p> -->
+                </div>
+
               </div>
+
               <!-- row -->
-              <div class="setting-config basic-config">
-                <div class="title-name">流程描述</div>
+              <!-- 流程描述 -->
+              <div class="setting-config">
+                <div class="title-name">{{$t('audit.workFlows.workFlowDescription')}}</div>
                 <div class="title-status"> 
                   <el-input
                     v-model="nodeDataToApi.description"
                     :autosize="{ minRows: 3, maxRows: 5 }"
-                    placeholder="流程描述"
+                    :placeholder="$t('audit.workFlows.workFlowDescription')"
                     class="storevue-textarea"
                     type="textarea"
                     resize="none"
@@ -76,11 +119,11 @@
               class="storevue-button-outlined"
               size="mini" type="primary">
               <i class="iconfont el-icon-plus"/>
-              添加審核節點
+              {{$t('audit.workFlows.addNode')}}
             </el-button>
           </div>
 
-          <setting-table table-name="流程配置">
+          <setting-table :table-name="$t('audit.workFlows.workFlowConfiguration')">
             <template slot="tableDetail" style="padding: 30px">
                 <div class="tablelist flow-setting" v-loading.fullscreen.lock="fullscreenLoading">
                   <table-only
@@ -107,17 +150,14 @@
 
           <!-- row -->
           <div class="setting-config basic-config">
-            <div class="title-name">添加流程抄送人</div>
+            <div class="title-name" style="width: fit-content">{{$t('audit.workFlows.addCC')}}</div>
             <div class="title-status">
-              <el-select v-model="ccTo" multiple placeholder="请选择">
-                <el-option
-                  v-for="item in ccToSelect"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
+              <el-input
+                :placeholder="$t('audit.workFlows.findUser')"
+                />
             </div>
+            <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
+
           </div>
         </div>
       </div>
@@ -136,7 +176,7 @@
       @confirmHandler="confirmDeleteSingle(rowId)"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">確認刪除當前簽核流程節點？ </div>
+        <div class="dialog-content">{{$t('audit.workFlows.comfirmDeleteNode')}}</div>
       </div>
     </dialog-pop>
 
@@ -208,11 +248,11 @@ export default {
         align: 'center',
         move: [
           {
-            text: '上移',
-            methods: 'moveUp'
+            text: this.$t('audit.workFlows.moveUp'),
+            methods: "moveUp"
           },
           {
-            text: '下移',
+            text: this.$t('audit.workFlows.moveDown'),
             methods: 'moveDown'
           },
 
@@ -233,27 +273,27 @@ export default {
       columnData: [
         {
           'prop': 'name',
-          'label': '節點名稱',
+          'label': this.$t('audit.workFlows.nodeName'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'auditByUsers',
-          'label': '審批人',
+          'label': this.$t('audit.workFlows.nodeAuditName'),
           'width': 110,
           'maxWidth': 110,
           'auditByUsers': true,
         },
         {
           'prop': 'auditMethod',
-          'label': '審批方式',
+          'label': this.$t('audit.workFlows.nodeAuditmethod'),
           'width': 100,
           'maxWidth': 100,
           'auditMethod': true,
         },
         {
           'prop': 'signature',
-          'label': '是否需要簽名',
+          'label': this.$t('audit.workFlows.nodeSign'),
           'width': 100,
           'maxWidth': 100,
           'signature': true,
@@ -263,8 +303,8 @@ export default {
       indexType: true,
       penSrc: require('../../../../static/img/table-edit.png'),
       deleteSrc: require('../../../../static/img/table-delete.png'),
-      rowId:''
-
+      rowId:'',
+      signMode: 1
     };
   },
   async created() {
@@ -571,7 +611,15 @@ export default {
 };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
+  .flex-row
+      display: flex
+      flex-direction: row
+      justify-content: flex-start
+      align-items: center
+      width: fit-content
+  .date-time-tooltip
+    margin-left: 8px
 
   .workflow-header
     width: 100%
@@ -591,9 +639,11 @@ export default {
     margin: 30px
   .storevue-textarea
     width: 50vw
+    
   .device-select
-    .el-input__inner
-        height: 30px
+    .el-input
+      .el-input__inner
+          height: 36px
   .icon-gengduo
     width: 24px
     height: 24px
@@ -614,6 +664,24 @@ export default {
     position: absolute
     right: 1%
     top: 3px
+  
+  .search_member
+    height: 36px
+    font-size: 14px
+    color: #006ab7
+    display: flex
+    flex-direction: row
+    justify-content: flex-start
+    align-items: center
+    width: fit-content
+    cursor: pointer
+    margin-left: 20px
+    i 
+      margin-right: 5px
+      color: #006ab7
+
+
+
 </style>
 
 <style scoped>
@@ -669,9 +737,9 @@ export default {
     width: 200px;
     height: 30px;
   }
-  .input-name.el-input--medium >>> .el-input__inner{
-    height: 30px;
-    line-height: 30px;
+  .input-name .el-input--medium >>> .el-input__inner{
+    height: 36px;
+    line-height: 36px;
     font-size: 12px;
   }
 
@@ -743,18 +811,19 @@ export default {
   .basic-config, .basic-header{
     border: none;
     border-bottom: 1px solid #e3e9f4;
-    padding-left: calc(30/1920*100vw);
+    /* padding-left: calc(30/1920*100vw); */
   }
   .basic-config:hover{
     cursor: default;
   }
   .title-name{
-    width: 15%;
+    width: 100px;
     text-align: left;
+    margin-right: 20px;
     margin-left: calc(20/1920*100vw);
   }
   .title-status{
-    width: 20%;
+    /* width: 60%; */
     text-align: left;
   }
 
@@ -775,6 +844,7 @@ export default {
   }
   .el-radio{
     width: 100px;
+    margin-right: 0px
   }
 
   /* .setting-details{
@@ -814,7 +884,7 @@ export default {
     color: #424151;
   }
   >>> .el-radio__input.is-checked + .el-radio__label{
-    color: #424151;
+    color: #514d41;
   }
   .detail-table{
     /* border: 1px solid #e3e9f4;
