@@ -2,13 +2,13 @@
   <div class="page-container report-setting paper" style="height: 100%">
 
     <div class="setting-titles padding flex-center">
-      添加審核節點
+      {{$t('audit.workFlows.addNode')}}
       <div class="spacer"/>
       <delay-button 
         type="filled" 
         @click="saveNode"
         v-loading.fullscreen.lock="fullscreenLoading"
-        >保存</delay-button>
+        >{{$t('audit.workFlows.save')}}</delay-button>
 
     </div>
 
@@ -16,63 +16,64 @@
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="template-info">
         <div class="inspect-basic">
-          <setting-table table-name="基本信息">
+          <setting-table :table-name="$t('audit.workFlows.basicInformation')">
             <template slot="tableDetail">
 
               <!-- row -->
               <div class="setting-config basic-config">
-                <div class="title-name">* 節點名稱</div>
+                <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.nodeName')}}</div>
                 <div class="title-status">
                   <el-input
                     v-model="nodeData.name"
-                    placeholder="请输入节点名称"
+                    :placeholder="$t('audit.workFlows.inputNodeName')"
                     class="input-name"/>
                 </div>
 
-                <div class="title-name">* 添加職務</div>
-                <div class="title-status">
-                  <el-select v-model="managers" placeholder="請選擇部門">
-                    <el-option
-                      v-for="item in department"
-                      :key="item.defineId"
-                      :label="item.defineName"
-                      :value="item.defineId">
-                    </el-option>
-                  </el-select>
-                </div>
-                <!-- <div class="title-status">
-                  <el-select
-                    class="device-select"
-                    size="mini"
-                    placeholder="管理員">
-                    <el-option
-                      v-for="(item, index) in templateList"
-                      :key="index"
-                    />
-                  </el-select>
-                </div> -->
+                <el-radio-group class="select_audit storevue-radio" v-model="TT">
+                  <div class="select_audit_dep">
+                    <el-radio :label="1">{{$t('audit.workFlows.auditDepart')}}</el-radio> 
+                    <el-select v-model="managers" :placeholder="$t('audit.workFlows.selectDepart')" >
+                      <el-option
+                        v-for="item in department"
+                        :key="item.defineId"
+                        :label="item.defineName"
+                        :value="item.defineId">
+                      </el-option>
+                    </el-select>
+                  </div>
+                
+                  <div class="select_audit_dep">
+                  <el-radio :label="0">{{$t('audit.workFlows.auditUser')}}</el-radio>
+                  <el-input
+                    placeholder=""
+                    class="input-name"/>
+                  </div>
+                </el-radio-group>
+              
+                <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
+                
               </div>
 
               <!-- row -->
               <div class="setting-config basic-config">
-                <div class="title-name">審批方式</div>
+                <div class="title-name">{{$t('audit.workFlows.auditMethod')}}</div>
                 <div class="flex">
                   <el-radio-group class="storevue-radio" v-model="nodeData.auditMethod">
-                    <el-radio :label="1">會簽</el-radio>  
+                    <el-radio :label="1" style="margin-right: 0">{{$t('audit.workFlows.countersigned')}}</el-radio>  
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
                       placement="right">
-                      <div slot="content">一人通过，则通过；一人驳回，则驳回</div>
+                      <div slot="content">{{$t('audit.workFlows.rule_countersigned')}}</div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
 
-                    <el-radio :label="0">或簽</el-radio>
+                    <el-radio :label="0" style="margin-right: 0">{{$t('audit.workFlows.coSign')}}</el-radio>
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
                       placement="right">
-                      <div slot="content">一人通过，则通过；一人驳回，则驳回</div>
+                      <div slot="content">{{$t('audit.workFlows.rule_coSign')}}</div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
                   </el-radio-group>
@@ -81,100 +82,52 @@
 
               <!-- row -->
               <div class="setting-config basic-config">
-                <div class="title-name">審批按鈕</div>
+                <div class="title-name">{{$t('audit.workFlows.auditButton')}}</div>
                 <div class="approve">
                     <div class="approve_row">
-                      <el-radio-group class="storevue-radio" v-model="nodeData.customButton[0].type">
-                        <el-radio :label="1">同意</el-radio>  
-                        <el-radio :label="0">自定義名稱</el-radio>
+                      <el-radio-group class="storevue-radio flex-row" v-model="nodeData.customButton[0].type">
+                        <el-radio :label="1">{{$t('audit.workFlows.agree')}}</el-radio>  
+                        <el-radio :label="0">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
-                          placeholder="//自定义属性名称，如通过"
+                          :placeholder="$t('audit.workFlows.defineItem')"
                           class="input-name"/>
                       </el-radio-group>
                     </div>
 
                     <div class="approve_row">
-                      <el-radio-group class="storevue-radio" v-model="nodeData.customButton[1].type">
-                        <el-radio :label="1">拒绝</el-radio>  
-                        <el-radio :label="0">自定義名稱</el-radio>
+                      <el-radio-group class="storevue-radio flex-row"  v-model="nodeData.customButton[1].type">
+                        <el-radio :label="1">{{$t('audit.workFlows.reject')}}</el-radio>  
+                        <el-radio :label="0">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
-                          placeholder="//自定义属性名称，如通过"
+                          :placeholder="$t('audit.workFlows.defineItem')"
                           class="input-name"/>
                       </el-radio-group>
                     </div>
-                  
 
 
-
-
-
-                  <!-- <div class="approve_row" v-for="(item, index) in nodeData.customButton" :key="item.index">
-                    <el-checkbox
-                      v-model="nodeData.customButton[index].enable"
-                      class="storevue-checkbox-outlined"
-                      :label="item.text"/>
-                    <el-input
-                      placeholder="//自定义属性名称，如通过"
-                      class="input-name"/>
-                  </div> -->
-
-
-                  <!-- <div class="approve_row">
-                    <el-checkbox
-                      v-model="this.nodeData.customButton[0].enable"
-                      class="storevue-checkbox-outlined"
-                      label="同意"/>
-                    <el-input
-                      placeholder="//自定义属性名称，如通过"
-                      class="input-name"/>
-                  </div>
-                  <div class="approve_row">  
-                    <el-checkbox
-                      v-model="this.nodeData.customButton[1].enable"
-                      class="storevue-checkbox-outlined"
-                      label="拒絕"/>
-                    <el-input
-                      placeholder="//自定义属性名称，如通过"
-                      class="input-name"/>
-                  </div>
-                  <div class="approve_row">  
-                    <el-checkbox
-                      class="storevue-checkbox-outlined"
-                      label="撤回"/>
-                    <el-input
-                      placeholder="//自定义属性名称，如通过"
-                      class="input-name"/>
-                  </div> -->
+                    <div class="approve_row">
+                      <el-radio-group class="storevue-radio flex-row"  v-model="nodeData.customButton[1].type">
+                        <el-radio :label="1">{{$t('audit.workFlows.withdraw')}}</el-radio>  
+                        <el-radio :label="0">{{$t('audit.workFlows.define')}}</el-radio>
+                        <el-input
+                          :placeholder="$t('audit.workFlows.defineItem')"
+                          class="input-name"/>
+                      </el-radio-group>
+                    </div>
+                
                 </div>
               </div>
 
               <!-- row -->
               <div class="setting-config basic-config">
-                <div class="title-name">簽名</div>
+                <div class="title-name"> {{$t('audit.workFlows.nodeSign')}} </div>
                 <div class="title-status">
                   <el-checkbox
                     v-model="nodeData.signature"
                     class="storevue-checkbox-outlined"
-                    label="簽名"/>
+                    :label="$t('audit.workFlows.nodeSign')"/>
                 </div>
               </div>
-
-
-              <!-- row -->
-              <!-- <div class="setting-config basic-config">
-                <div class="title-name">流程描述</div>
-                <div class="title-status">
-                  <el-input
-                    v-model="workflowDescription"
-                    :autosize="{ minRows: 3, maxRows: 5 }"
-                    placeholder="流程描述"
-                    size="mini"
-                    class="storevue-textarea"
-                    type="textarea"
-                    resize="none"
-                  />
-                </div>
-              </div> -->
             </template>
           </setting-table>
         </div>
@@ -186,7 +139,7 @@
     <div v-loading="isLoadingData" class="setting-details self-loading">
       <div class="template-info">
         <div class="inspect-basic">
-          <setting-table table-name="節點停留時間">
+          <setting-table :table-name="$t('audit.workFlows.nodeStayTime')">
             <template slot="tableDetail">
 
               <!-- row -->
@@ -194,18 +147,18 @@
                 <div class="title-status">
                   <el-checkbox
                     class="storevue-checkbox-outlined"
-                    label="超時發送訊息提醒"/>
+                    :label="$t('audit.workFlows.alertAtOverTime')"/>
                 </div>
               </div>
               
               <!-- row -->
               <div class="setting-config basic-config">
                 <div class="title-status">
-                  停留超過
+                  {{$t('audit.workFlows.stayOver')}}
                   <el-input
                     placeholder=""
                     class="input-name_short"/>
-                  天
+                  {{$t('audit.workFlows.day')}}
                 </div>
               </div>
 
@@ -245,7 +198,7 @@ export default {
       basicList: [],
       isLoadingData: false,
       workflowDescription: '',
-      aa:''
+      TT: 1
     };
   },
   mounted() {
@@ -346,7 +299,39 @@ export default {
 };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
+  
+  .flex-row
+    flex-direction: row
+    justify-content: flex-start
+    align-items: center
+    // width: fit-content
+
+  .select_audit
+    display: flex
+    flex-direction: row
+    justify-content: flex-start
+    align-items: center
+    width: fit-content
+    .select_audit_dep
+      height: 36px
+      margin-right: 30px
+  .search_member
+    height: 36px
+    font-size: 14px
+    color: #006ab7
+    display: flex
+    flex-direction: row
+    justify-content: flex-start
+    align-items: center
+    width: fit-content
+    cursor: pointer
+    i 
+      margin-right: 5px
+      color: #006ab7
+
+  
+  
 
   .workflow-header
     width: 100%
@@ -454,10 +439,10 @@ export default {
 
   .input-name{
     width: 200px;
-    height: 30px;
+    /* height: 36px; */
   }
   .input-name.el-input--medium >>> .el-input__inner{
-    height: 30px;
+    height: 36px;
     line-height: 30px;
     font-size: 12px;
   }
@@ -546,8 +531,9 @@ export default {
     cursor: default;
   }
   .title-name{
-    width: 15%;
+    width: 100px;
     text-align: left;
+    margin-right: 20px;
     margin-left: calc(20/1920*100vw);
   }
   .title-status{
@@ -576,6 +562,7 @@ export default {
   }
   .el-tooltip{
     margin-right: 30px;
+    margin-left: 10px;
   }
   /* .setting-details{
     margin: 0 30px;

@@ -8,14 +8,15 @@
             size="small"
             prefix-icon="el-icon-search"
             class="search-input shadow-light"
-            placeholder="搜尋流程名稱"
+            :placeholder="$t('audit.workFlows.searchPlaceholder')"
             clearable/>
         </div>
 
+        <!-- 新增流程 -->
         <delay-button @click="creadNewFlow">
           <div class="button-area">
             <i class="iconfont el-icon-plus"/>
-            <span>添加流程</span>
+            <span>{{$t('audit.workFlows.addWorkFlow')}}</span>
           </div>
         </delay-button>
 
@@ -66,7 +67,7 @@
       @confirmHandler="confirmDeleteSingle(deletedProcessDefinitionKey)"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">確認刪除當前簽核流程？ </div>
+        <div class="dialog-content">{{$t('audit.workFlows.comfirmDelete')}} </div>
       </div>
     </dialog-pop>
 
@@ -108,7 +109,7 @@ export default {
       deletedProcessDefinitionKey: '',
       columnOperationData: {
         label: this.$t('deviceView.operation'),
-        minWidth: '134',
+        minWidth: '100',
         align: 'center',
         operation: [
           {
@@ -140,38 +141,44 @@ export default {
         // },
         {
           'prop': 'name',
-          'label': '名稱',
-          'width': 180,
-          'maxWidth': 150,
+          'label': '流程名稱',
+          'width': 200,
+          'maxWidth': 200,
         },
         {
           'prop': 'type',
           'label': '流程分類',
-          'width': 100,
-          'maxWidth': 100,
+          'width': 50,
+          'maxWidth': 50,
         },
         {
           'prop': 'createdUser',
-          'label': '創建人',
+          'label': '建立人',
           'width': 110,
           'maxWidth': 110,
         },
         {
           'prop': 'description',
           'label': '流程描述',
-          'width': 130,
-          'maxWidth': 130,
+          'width': 230,
+          'maxWidth': 230,
         },
         {
           'prop': 'createdTs',
-          'label': '創建時間',
+          'label': '建立時間',
           'width': 130,
           'maxWidth': 130
         },
         {
+          'prop': 'updateTs',
+          'label': '最後更新時間',
+          'width': 100,
+          'maxWidth': 100
+        },
+        {
           'prop': 'state',
-          'label': '綁定狀態',
-          'width': 80,
+          'label': '狀態',
+          'width': 100,
           'maxWidth': 100,
           'forWorkflowsSwitch': true,
         },
@@ -261,7 +268,6 @@ export default {
   },
   methods: {
     async init(){      
-
       await this.getUserInfo()
       const data = sessionStorage.getItem('pageInfo')
       const pageInfo = JSON.parse(data)
@@ -293,6 +299,7 @@ export default {
             if(d.createdUser === user.userId){
               d.createdUser = user.userName
               d.createdTs = new Date(d.createdTs).toLocaleString()
+              d.updateTs = new Date(d.updateTs).toLocaleString()
               d.type = "巡檢表單"
               d.index = res.data.content.indexOf(d) + 1
             }
@@ -325,15 +332,18 @@ export default {
           second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
         }
       const createTime = t.year + "-" + t.month + "-" + t.date + " " + t.hour + ":" + t.minute + ":" + t.second
-      this.newFlow.name = "新增流程 " + createTime
+      this.newFlow.name = this.$t('audit.workFlows.addWorkFlow')
 
-      creadNewFlow(this.newFlow).then(res=>{
-          this.newFlow.processDefinitionKey = res.data
-          sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
-          this.$router.push({name: 'workflowDetail'})
-        }).catch(err => {
-          console.log('error' + err);
-      });
+      this.$router.push({name: 'workflowDetail'})
+      sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
+
+      // creadNewFlow(this.newFlow).then(res=>{
+      //     this.newFlow.processDefinitionKey = res.data
+      //     sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
+      //     this.$router.push({name: 'workflowDetail'})
+      //   }).catch(err => {
+      //     console.log('error' + err);
+      // });
     
     },
     
@@ -355,7 +365,7 @@ export default {
           }else{
             this.$message({
               type: 'error',
-              message: '已綁定簽核流程無法刪除'
+              message: this.$t('audit.workFlows.canNotDelete')
             }); 
           }
           
@@ -382,7 +392,7 @@ export default {
         console.log('res :>> ', res);
         this.$message({
           type: 'success',
-          message: '已成功複製流程'
+          message: this.$t('audit.workFlows.dulplicateScuccess')
         });  
         this.init()
       }).catch(err => {
@@ -401,7 +411,7 @@ export default {
         this.showSingleDeleteContent = false
         this.$message({
           type: 'success',
-          message: '删除成功!'
+          message: this.$t('audit.workFlows.deleteScuccess')
         })
       
       }).catch(err => {
@@ -410,7 +420,7 @@ export default {
         console.log('error' + err);
         this.$message({
           type: 'error',
-          message: '删除失敗!'
+          message: this.$t('audit.workFlows.deleteFail')
         })
       })
     },

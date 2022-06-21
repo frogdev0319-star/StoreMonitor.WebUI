@@ -70,14 +70,16 @@
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
 
           <!-- switch -->
-          <template v-else-if="_item.isSwitch">
-            <el-switch :disabled="row[_item.switchProp]" :value="row[_item.prop]" @change="$emit('handleSwitchChange', { checked: $event, target: row })"></el-switch>
+          <template v-else-if="_item.forWorkflowsSwitch">
+            {{row.state}}
+            <el-switch  :value="row.state ? true : false"  @change="$emit('handleSwitchChange', { checked: $event, target: row })"></el-switch>
           </template>
 
-          <template v-else-if="_item.forWorkflowsSwitch">
-            <el-switch :disabled="row[_item.switchProp]" :value="row.isBind ? true : false" />
-            <!-- ohohoh - {{row.state}} -->
-          </template>
+          <!-- <template v-else-if="_item.forWorkflowsSwitch">
+            <el-switch 
+              :value="_item.state"
+              v-model="_item.state" />
+          </template> -->
 
           
           <!-- workflow auditByUsers -->
@@ -89,16 +91,16 @@
           <!-- workflow auditMethod -->
           <template v-else-if="_item.auditMethod">
             <el-radio-group class="storevue-radio" v-model="row.auditMethod" v-if="row.name !=='提交人'">
-              <el-radio :label="1">會簽</el-radio>
-              <el-radio :label="0">或簽</el-radio>
+              <el-radio :label="1">{{$t('audit.workFlows.countersigned')}}</el-radio>
+              <el-radio :label="0">{{$t('audit.workFlows.coSign')}}</el-radio>
             </el-radio-group>
           </template>
 
           <!-- workflow signature -->
           <template v-else-if="_item.signature" >
             <el-radio-group class="storevue-radio" v-model="row.signature" v-if="row.name !=='提交人'">
-              <el-radio :label="true">需要</el-radio>
-              <el-radio :label="false">不需要</el-radio>
+              <el-radio :label="true">{{$t('audit.workFlows.need')}}</el-radio>
+              <el-radio :label="false">{{$t('audit.workFlows.unnecessary')}}</el-radio>
             </el-radio-group>
           </template>
 
