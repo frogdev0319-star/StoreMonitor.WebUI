@@ -93,7 +93,9 @@ export default{
       "noEventAuthority":"無事件檢視權限，請聯繫管理員",
       //簽核
       "AuditManage":"簽核管理",
-      "SendAuditManage":"送出簽核"
+      "SendAuditManage":"送出簽核",
+      "WaitAuditManage":"待簽核",
+      "TranscriptNotify":"副本通知"
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -1248,7 +1250,10 @@ export default{
       "auditStatus":"簽核狀態",
       "updateTime":'最後更新時間',
       "owner":"當前處理人",
-      "operation":"操作"
+      "operation":"操作",
+      "waiting":"待簽核",
+      "approved":"已簽核",
+      "submitterName":"送出人"
     },
     "workFlow":{
       

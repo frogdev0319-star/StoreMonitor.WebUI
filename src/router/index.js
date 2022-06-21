@@ -220,29 +220,28 @@ export const navbarRoute = {
         component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
       }
     ) && primaryPathesList.push('/audit', '/auditdetail');
-    /*auditRoute.children.push(
+    auditRoute.children.push(
       {
-        path: '/reinspection',
-        name: 'remotePatrol',
-        component: resolve => require(['@/views/patrolShop/ReInspection'], resolve),
+        path: '/waitaudit',
+        name: 'WaitAuditManage',
+        component: resolve => require(['@/views/audit/WaitAuditManage'], resolve),
         meta: {
           requireAuth: true
         },
         isReadOnly: false
       },
+    ) && primaryPathesList.push('/waitaudit');
+    auditRoute.children.push(
       {
-        path: '/reinspect/confirmrein',
-        name: 'confirmSum',
-        hidden: true,
-        component: resolve => require(['@/views/patrolShop/ConfirmAddSum'], resolve)
+        path: '/transcriptnotify',
+        name: 'TranscriptNotify',
+        component: resolve => require(['@/views/audit/TranscriptNotify'], resolve),
+        meta: {
+          requireAuth: true
+        },
+        isReadOnly: false
       },
-      {
-        path: '/reinspect/submit',
-        name: 'submitEvent',
-        hidden: true,
-        component: resolve => require(['@/views/patrolShop/ReInspectDealPage'], resolve)
-      }
-    ) && primaryPathesList.push('/reinspection', '/reinspect/confirmrein', '/reinspect/submit');*/
+    ) && primaryPathesList.push('/transcriptnotify');
     return auditRoute;
   },
 

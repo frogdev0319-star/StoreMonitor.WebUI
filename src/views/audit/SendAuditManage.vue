@@ -57,36 +57,34 @@
                             :is-loading-data="isLoading"
                             :allowRowExpand = "false"
                             :showBorder = "false"
-                            :default-sort = "{prop: 'ts', order: 'descending'}"
+                            :default-sort = "defaultSort"
                             :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '6px',}" 
                             :tableHeight = "760"
                             :cellStyle="{backgroundColor: '#fff !important'}"
-                            @handleOperation="clickDetail"
+                            @onCellClick="clickDetail"
                             @sortChange="sortChange"
-                            @row-click = "clickDetail"
+                        />
+                    </div>
+                    <div class="page-area">
+                        <tbl-pagination-only
+                        :btn-style="{backgroundColor:'transparent'}"
+                        :total="curTotalPage"
+                        :current-page="curPage"
+                        :page-size.sync="curSizeNum"
+                        layout = "prev,pager, next,sizes,slot"
+                        @sizeChange="sizeChange"
+                        @currentChange="currentChange"
                         />
                     </div>
                 </el-tab-pane>
             </el-tabs>
         </div>
-        <div class="page-area">
-            <tbl-pagination-only
-            :btn-style="{backgroundColor:'transparent'}"
-            :total="curTotalPage"
-            :current-page="curPage"
-            :page-size="curSizeNum"
-            layout = "prev,pager, next,sizes,slot"
-            @sizeChange="sizeChange"
-            @currentChange="currentChange"
-            />
-        </div>
+        
     </div>
 </template>
 <script>
 import util from '@/common/util.js';
 import { workflowRESTful } from '@/api/index';
-import { getCookie } from '@/common/auth';
-import { isLoginIn } from '@/api/login';
 import { mapGetters } from 'vuex';
 import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DelayButton from '@/components/DelayButton';
@@ -123,6 +121,7 @@ export default{
             curTotalPage:0,
             curPage:1,
             curSizeNum:10,
+            defaultSort:{order:'descending',prop:'processLastUpdateTs'},
             curOrder:{
                       direction:'desc',
                       property:'processLastUpdateTs'
@@ -175,7 +174,7 @@ export default{
                       'isExpand': false
                     },
                     {
-                      'prop': 'owner',
+                      'prop': 'taskOwner',
                       'label': this.$t('audit.sendAudit.owner'),
                       'sortable': true,
                       'width': 65,
@@ -192,8 +191,7 @@ export default{
                       'isExpand': false,
                       'isCellClick':true,
                       'align': 'left',
-                      'customIcon': true,
-                      'src' : require('@/../static/img/icon_pen.png'),
+                      'customIcon': false,
                       'methods': 'set'
                     }
                   ],
@@ -251,7 +249,7 @@ export default{
                       'isExpand': false
                     },
                     {
-                      'prop': 'owner',
+                      'prop': 'taskOwner',
                       'label': this.$t('audit.sendAudit.owner'),
                       'sortable': true,
                       'width': 65,
@@ -268,8 +266,7 @@ export default{
                       'isExpand': false,
                       'isCellClick':true,
                       'align': 'left',
-                      'customIcon': true,
-                      'src' : require('@/../static/img/icon_pen.png'),
+                      'customIcon': false,
                       'methods': 'set'
                     }
                   ],
@@ -327,7 +324,7 @@ export default{
                       'isExpand': false
                     },
                     {
-                      'prop': 'owner',
+                      'prop': 'taskOwner',
                       'label': this.$t('audit.sendAudit.owner'),
                       'sortable': true,
                       'width': 65,
@@ -344,8 +341,7 @@ export default{
                       'isExpand': false,
                       'isCellClick':true,
                       'align': 'left',
-                      'customIcon': true,
-                      'src' : require('@/../static/img/icon_pen.png'),
+                      'customIcon': false,
                       'methods': 'set'
                     }
                   ],
@@ -389,6 +385,9 @@ export default{
         self.$route.meta.isBack = false;
         self.isFirstLoad = false;
     },
+    deactivated() {
+        this.saveSearchParams();
+    },
     methods: {
         getLangStyleValue(langArray){
             return util.getLangStyleValue(langArray);
@@ -400,10 +399,7 @@ export default{
             self.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
             self.inputSearchValue = '';
             self.total = 0;
-            for (let i = 0; i < 3; i++) {
-                self.tableDataList[i].tableData = [];
-                self.tableDataList[i].taskCount = 0;
-            }
+            
             self.getSearchParams();
             //this.tableDataList[Number(this.activeName)].page = 1;
             self.getAllTask()
@@ -448,8 +444,7 @@ export default{
                 this.curTabIndx = searchParams.curTabIndx;
                 this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
                 this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processLastUpdateTs'}:searchParams.order;
-                //this.tableDataList[this.curTabIndx].page = searchParams.page;
-                //this.params = searchParams.searchParams;
+                this.defaultSort = {order:(this.curOrder.direction=='desc')?'descending':'ascending',prop:this.curOrder.property};
                 this.searchParams = searchParams;
                 this.saveSearchParams();
             } else {
@@ -476,20 +471,14 @@ export default{
         },
         onTabClick(val) {
             console.log('onTabClick',val);
-            const self = this;
-            self.curTabIndx = Number(val.index);
-            self.activeName = val.name;
-            /*if (Number(val.index) < 4) {
-                self.curState = Number(val.index) === 2 ? [2, 4] : [Number(val.index)];
-            } else {
-                const stateArr = [];
-                self.eventStatesList.forEach(item => {
-                stateArr.push(item.value);
-                });
-                self.curState = stateArr;
-                self.curState.unshift('-1');
-            }
-            self.getEventList();*/
+            //const self = this;
+            this.curTabIndx = Number(val.index);
+            this.activeName = val.name;
+            //console.log("cur ", this.tableDataList[this.curTabIndx]);
+            this.curTotalPage = this.tableDataList[this.curTabIndx].totalPage;
+            this.curSizeNum = this.tableDataList[this.curTabIndx].sizeNum;
+            this.curOrder = this.tableDataList[this.curTabIndx].order;
+            this.getAllTask();
         },
         currentChange(val) {
             const self = this;
@@ -502,6 +491,7 @@ export default{
             const self = this;
             self.curSizeNum = val.size;
             self.curPage = 1;
+            
             self.tableDataList[self.curTabIndx].sizeNum = val.size;
             //self.params.filter = { page: 0, size: val.size };
             self.getAllTask();
@@ -520,12 +510,20 @@ export default{
                     'property': col.column.property
                 };
             } else {
-                self.curOrder = {};
+                self.curOrder = {
+                    'direction': 'desc',
+                    'property': 'processLastUpdateTs'
+                };
             }
             self.tableDataList[self.curTabIndx].order = self.curOrder;
             self.getAllTask();
         },
         getAllTask(){
+            for (let i = 0; i < 3; i++) {
+                this.tableDataList[i].tableData = [];
+                this.tableDataList[i].taskCount = 0;
+                this.tableDataList[i].totalPage = 0;
+            }
             var params = {
                 beginTs:this.dateValue[0].valueOf(),
                 endTs:this.dateValue[1].valueOf(),
@@ -535,10 +533,17 @@ export default{
                     page:this.curPage-1,
                     size:this.curSizeNum
                 },
-                order:this.curOrder
             };
+            if(this.curTabIndx==1){//進行中
+                params['auditState'] = [2,3,6];
+            }else if(this.curTabIndx==2){//已完成
+                params['auditState'] = [4,5] 
+            }
             if(this.inputSearchValue.trim()!=''){
                 params['keyword'] = this.inputSearchValue;
+            }
+            if(Object.keys(this.curOrder).length>0){
+                params['order'] = this.curOrder;
             }
             console.log("params:",params);
             const self =this;
@@ -550,43 +555,47 @@ export default{
                         data = res.data.content;
                     }
                     const tempAll = [];
-                    const tempProcessing = [];
-                    const tempCompleted = [];
-                    var processingCount=0, completedCount=0;
+                    //const tempProcessing = [];
+                    //const tempCompleted = [];
+                    //var processingCount=0, completedCount=0;
                     self.isLoading = true;
                     for(const task of data){
                         var taskObj = {...task};
                         taskObj.processStartTs =  util.getDateStr(task.processStartTs);
                         taskObj.processLastUpdateTs =  util.getDateStr(task.processLastUpdateTs);
                         taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
+                        taskObj['operator']=this.$t('statistics.check');
                         if(task.auditState==2 || task.auditState==3 || task.auditState==6){//進行中
-                            processingCount+=1;
-                            if(task.auditState==2){
-                                taskObj['owner'] = '??';
-                            }else{
-                                completedCount+=1;
-                                taskObj['owner'] = task.submitterName;
+                            //processingCount+=1;
+                            //tempProcessing.push(taskObj);
+                            if(task.auditState==3 || task.auditState==6){
+                                taskObj.taskOwner =  task.submitterName;//若狀態為駁回 或 撤回 則當前處理人為 送出人
                             }
-                            tempProcessing.push(taskObj);
                         }else if(task.auditState==4 || task.auditState==5){//已完成
-                            completedCount+=1;
-                            taskObj['owner'] = "--";
-                            tempCompleted.push(taskObj);
+                            //completedCount+=1;
+                            taskObj.taskOwner = "--";
+                            //tempCompleted.push(taskObj);
                         }
                         tempAll.push(taskObj);
                     }
-                    self.tableDataList[0].tableData = tempAll;
-                    self.tableDataList[0].taskCount = res.numberOfElements;
-                    self.tableDataList[0].totalPage = res.totalPages;
-                    self.tableDataList[1].tableData = tempProcessing;
-                    self.tableDataList[1].taskCount = processingCount;
-                    self.tableDataList[1].totalPage = Math.ceil(processingCount/self.curSizeNum);
+                    self.tableDataList[self.curTabIndx].tableData = tempAll;
+                    self.tableDataList[self.curTabIndx].taskCount = res.data.numberOfElements;
+                    self.tableDataList[self.curTabIndx].totalPage = res.data.totalPages;
+                    
+                    /*self.tableDataList[1].tableData = tempProcessing;
+                    if(tempProcessing.length>0){
+                        self.tableDataList[1].taskCount = processingCount;
+                        self.tableDataList[1].totalPage = Math.ceil(processingCount/self.curSizeNum);
+                    }
                     self.tableDataList[2].tableData = tempCompleted;
-                    self.tableDataList[2].taskCount = completedCount;
-                    self.tableDataList[2].totalPage = Math.ceil(completedCount/self.curSizeNum);
+                    if(tempCompleted.length>0){
+                        self.tableDataList[2].taskCount = completedCount;
+                        self.tableDataList[2].totalPage = Math.ceil(completedCount/self.curSizeNum);
+                    }*/
                     self.curTotalPage = self.tableDataList[self.curTabIndx].totalPage;
                     self.curSizeNum = self.tableDataList[self.curTabIndx].sizeNum;
                     self.curOrder = self.tableDataList[self.curTabIndx].order;
+                    console.log("curTotalPage:",self.curTotalPage);
                     resolve(tempAll);
                 }).then(result=>{
                     self.isLoading = false;
@@ -595,7 +604,12 @@ export default{
                 });
             });
         },
-        clickDetail(){},
+        clickDetail(item, index) {
+            const self = this;
+            console.log("clickDetail:",item);
+            //sessionStorage.setItem('audit_detail', JSON.stringify(item.routeObj));
+            //self.$router.push({ name: 'auditDetails', params: { data: item.routeObj }});
+        },
     },
     
 }
