@@ -414,7 +414,11 @@ export default{
         onStoreChange(storeObj) {
             console.log('onStoreChange>storeFilterObj', storeObj);
             this.storeFilterObj = storeObj;
-            //this.ifSearchData && this.getEventListAndCount();
+            if(!this.curStoreIds){
+                this.searchParams = this.storeFilterObj;
+                this.curStoreIds = storeObj.filterStoreIds;
+                this.ifSearchData && this.getAllTask();
+            }
             this.ifSearchData = false;
         },
         onDateChange(val) {
@@ -610,6 +614,7 @@ export default{
                 }).then(result=>{
                     self.isLoading = false;
                 }).catch(err => {
+                    self.isLoading = false;
                     console.log("getMyworkflowTask error:",err);
                 });
             });
