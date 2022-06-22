@@ -107,6 +107,8 @@ export default{
     },
     data() {
         return {
+            lang: this.$i18n.locale,
+            isFirstLoad: false,
             isLoading:false,
             storeFilterObj:{},
             ifSearchData: true,
@@ -303,15 +305,20 @@ export default{
             }
         },
     },
+    created() {
+        this.isFirstLoad = true;
+    },
     activated() {
         const self = this;
+        console.log('wait actived isFirstLoad:',self.isFirstLoad);
         if (!self.$route.meta.isBack || self.isFirstLoad) {
-        self.initData();
+            self.initData();
         }
         self.$route.meta.isBack = false;
         self.isFirstLoad = false;
     },
     deactivated() {
+        console.log('wait deactivated');
         this.saveSearchParams();
     },
     methods: {
@@ -324,7 +331,7 @@ export default{
             self.curTabIndx = 0;
             self.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
             self.inputSearchValue = '';
-            self.total = 0;
+            self.curTotalPage = 0;
             
             self.getSearchParams();
             //this.tableDataList[Number(this.activeName)].page = 1;
@@ -368,11 +375,11 @@ export default{
                 //this.curState = searchParams.curState;
                 this.curStoreIds = searchParams.filterStoreIds;
                 this.curTabIndx = searchParams.curTabIndx;
+                this.activeName = searchParams.curTabIndx.toString();
                 this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
                 this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processLastUpdateTs'}:searchParams.order;
                 this.defaultSort = {order:(this.curOrder.direction=='desc')?'descending':'ascending',prop:this.curOrder.property};
                 this.searchParams = searchParams;
-                this.saveSearchParams();
             } else {
                 this.searchParams = {};
                 this.curStoreIds = this.storeFilterObj.filterStoreIds;
@@ -382,17 +389,18 @@ export default{
             }
         },
         saveSearchParams() {
-            // console.log('saveSearchParams:', this.storeFilterObj);
+            
             const params = {...this.searchParams};
             params['inputSearchValue'] = this.inputSearchValue;
             params['curTabIndx'] = this.curTabIndx;
             params['sizeNum'] = this.curSizeNum;
             params['order'] = this.curOrder;
+            console.log('saveSearchParams:', params);
             const searchConditon = {
                 path: 'waitAuditManage',
                 params: params
             };
-            // console.log('save params:', params);
+            console.log("wait saveSearchParams:",params);
             SearchConditionUtil.saveSearchCondition(searchConditon);
         },
         onTabClick(val) {
@@ -452,8 +460,7 @@ export default{
                 filter:{
                     page:this.curPage-1,
                     size:this.curSizeNum
-                },
-                order:this.curOrder
+                }
             };
             if(this.curTabIndx==0){//待簽核
                 params['type'] = 1;
@@ -461,6 +468,9 @@ export default{
             }else if(this.curTabIndx==1){//已簽核
                 params['type'] = 2;
                 params['auditState'] = [3,4] 
+            }
+            if(Object.keys(this.curOrder).length>0){
+                params['order'] = this.curOrder;
             }
             if(this.inputSearchValue.trim()!=''){
                 params['keyword'] = this.inputSearchValue;
@@ -484,7 +494,6 @@ export default{
                         taskObj.processStartTs =  util.getDateStr(task.processStartTs);
                         taskObj.processLastUpdateTs =  util.getDateStr(task.processLastUpdateTs);
                         taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
-                        taskObj['operator']=this.$t('statistics.check');
                         if(task.auditState==4){//已完成
                             //completedCount+=1;
                             taskObj.taskOwner = "--";

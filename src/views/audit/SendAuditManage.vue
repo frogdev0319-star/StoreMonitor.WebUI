@@ -107,6 +107,8 @@ export default{
     },
     data() {
         return {
+            lang: this.$i18n.locale,
+            isFirstLoad: false,
             isLoading:false,
             storeFilterObj:{},
             ifSearchData: true,
@@ -377,15 +379,20 @@ export default{
             }
         },
     },
+    created(){
+        this.isFirstLoad = true;
+    },
     activated() {
+        console.log('send actived isFirstLoad:',this.isFirstLoad);
         const self = this;
         if (!self.$route.meta.isBack || self.isFirstLoad) {
-        self.initData();
+            self.initData();
         }
         self.$route.meta.isBack = false;
         self.isFirstLoad = false;
     },
     deactivated() {
+        console.log('send deactivated');
         this.saveSearchParams();
     },
     methods: {
@@ -398,7 +405,7 @@ export default{
             self.curTabIndx = 0;
             self.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
             self.inputSearchValue = '';
-            self.total = 0;
+            self.curTotalPage = 0;
             
             self.getSearchParams();
             //this.tableDataList[Number(this.activeName)].page = 1;
@@ -442,11 +449,12 @@ export default{
                 //this.curState = searchParams.curState;
                 this.curStoreIds = searchParams.filterStoreIds;
                 this.curTabIndx = searchParams.curTabIndx;
+                this.activeName = searchParams.curTabIndx.toString();
                 this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
                 this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processLastUpdateTs'}:searchParams.order;
                 this.defaultSort = {order:(this.curOrder.direction=='desc')?'descending':'ascending',prop:this.curOrder.property};
                 this.searchParams = searchParams;
-                this.saveSearchParams();
+                //this.saveSearchParams();
             } else {
                 this.searchParams = {};
                 this.curStoreIds = this.storeFilterObj.filterStoreIds;
@@ -524,6 +532,7 @@ export default{
                 this.tableDataList[i].taskCount = 0;
                 this.tableDataList[i].totalPage = 0;
             }
+            console.log("this.curTabIndx:",this.curTabIndx);
             var params = {
                 beginTs:this.dateValue[0].valueOf(),
                 endTs:this.dateValue[1].valueOf(),
@@ -534,6 +543,7 @@ export default{
                     size:this.curSizeNum
                 },
             };
+            
             if(this.curTabIndx==1){//進行中
                 params['auditState'] = [2,3,6];
             }else if(this.curTabIndx==2){//已完成

@@ -226,7 +226,8 @@ export const navbarRoute = {
         name: 'WaitAuditManage',
         component: resolve => require(['@/views/audit/WaitAuditManage'], resolve),
         meta: {
-          requireAuth: true
+          requireAuth: true,
+          keepAlive: true
         },
         isReadOnly: false
       },
@@ -237,7 +238,8 @@ export const navbarRoute = {
         name: 'TranscriptNotify',
         component: resolve => require(['@/views/audit/TranscriptNotify'], resolve),
         meta: {
-          requireAuth: true
+          requireAuth: true,
+          keepAlive: true
         },
         isReadOnly: false
       },
