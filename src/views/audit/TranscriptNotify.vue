@@ -168,8 +168,8 @@ export default{
                 'isExpand': false,
                 'isCellClick':true,
                 'align': 'left',
-                'customIcon': true,
-                'src' : require('@/../static/img/icon_audit.png'),
+                'customIcon': false,
+                'methods': 'set'
               }
             ],
             tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
@@ -358,6 +358,7 @@ export default{
                         taskObj.processStartTs =  util.getDateStr(task.processStartTs);
                         taskObj.processLastUpdateTs =  util.getDateStr(task.processLastUpdateTs);
                         taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
+                        taskObj['operator']=this.$t('statistics.check');
                         tempAll.push(taskObj);
                     }
                     self.tableData = tempAll;
