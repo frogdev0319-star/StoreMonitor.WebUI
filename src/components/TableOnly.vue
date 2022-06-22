@@ -69,18 +69,17 @@
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
 
-          <!-- switch -->
+          <!-- workflow switch state -->
           <template v-else-if="_item.forWorkflowsSwitch">
-            {{row.state}}
-            <el-switch  :value="row.state ? true : false"  @change="$emit('handleSwitchChange', { checked: $event, target: row })"></el-switch>
+            <el-switch   
+              v-model = "row.state"
+              active-value="1"
+              inactive-value="0"
+              :disabled = "row.isBind"
+              @click.native.prevent="canNotClose"
+              @change="$emit('handleSwitchChange', { checked: $event, target: row })"
+              />
           </template>
-
-          <!-- <template v-else-if="_item.forWorkflowsSwitch">
-            <el-switch 
-              :value="_item.state"
-              v-model="_item.state" />
-          </template> -->
-
           
           <!-- workflow auditByUsers -->
           <template v-else-if="_item.auditByUsers">
@@ -382,6 +381,7 @@ export default {
       loadingGif: require('../../static/img/loading.svg'),
       expands: "",
       expandRowKeys: [],
+      
     };
   },
   filters:{
@@ -409,16 +409,19 @@ export default {
     },
     maxIndex(){
       return this.tableData.length - 1
-    }
+    },
   },
   created() {
-  
+
   },
   mounted() {
     //console.log(this.columnData)
-    //console.log(this.tableData)
   },
   methods: {
+    canNotClose(){
+      util.notify('此流程無法關閉，請確認以下巡檢表是否正在使用流程: 現場巡檢表、遠端巡檢表、衛生環評表', 'error', 3000);
+    },
+    
     renderHeader(h, { column, $index }) {
       if(util.getWindowWidth()>1366){
       let realWidth = 0;

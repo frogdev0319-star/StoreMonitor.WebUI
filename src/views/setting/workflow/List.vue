@@ -27,7 +27,7 @@
           ref="elTP"
           class="table-white"
           :column-data="columnData"
-          :table-data="serachData"
+          :table-data="searchData"
           :table-operation ="columnOperationData"
           :highlight-current-row= "false"
           :is-loading-data="isLoadingData"
@@ -102,7 +102,7 @@ export default {
   data() {
     return {
       inputSearchValue: '',
-      serachData: [],
+      searchData: [],
       authorizedDevicesNum: 0,
       isLoadingData: false,
       showSingleDeleteContent: false,
@@ -261,7 +261,7 @@ export default {
 
     // for search
     inputSearchValue(val){
-      this.serachData = this.allTableData.filter(item => (
+      this.searchData = this.allTableData.filter(item => (
         item.name.indexOf(val) > -1
       ))
     }
@@ -302,17 +302,19 @@ export default {
               d.updateTs = new Date(d.updateTs).toLocaleString()
               d.type = "巡檢表單"
               d.index = res.data.content.indexOf(d) + 1
+              d.state = d.state.toString()
             }
           })
         ))
 
         this.allTableData = res.data.content
-        this.serachData = this.allTableData
+        this.searchData = this.allTableData
+
 
         this.total = res.data.totalPages
 
         console.log('this.total :>> ', this.total);
-        console.log('getWorkflowList 2 ======>> ', res.data.content);
+        console.log('getWorkflowList 2 ======>> ', this.searchData );
 
         this.isLoadingData = false
       }).catch(err => {
@@ -332,18 +334,15 @@ export default {
           second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
         }
       const createTime = t.year + "-" + t.month + "-" + t.date + " " + t.hour + ":" + t.minute + ":" + t.second
-      this.newFlow.name = this.$t('audit.workFlows.addWorkFlow')
-
-      this.$router.push({name: 'workflowDetail'})
-      sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
-
-      // creadNewFlow(this.newFlow).then(res=>{
-      //     this.newFlow.processDefinitionKey = res.data
-      //     sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
-      //     this.$router.push({name: 'workflowDetail'})
-      //   }).catch(err => {
-      //     console.log('error' + err);
-      // });
+      
+      creadNewFlow(this.newFlow).then(res=>{
+          this.newFlow.name = this.$t('audit.workFlows.addWorkFlow')
+          this.newFlow.processDefinitionKey = res.data
+          sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
+          this.$router.push({name: 'workflowDetail'})
+        }).catch(err => {
+          console.log('error' + err);
+      });
     
     },
     
@@ -485,7 +484,14 @@ export default {
 
 
     handleSwitchChange({ checked, target }) {
-      if (checked) {
+      console.log('checked :>> ', checked);
+      console.log('target :>> ', target);
+      if(target.isBind == true){
+        alert('NONONONO')
+      }
+
+
+      if (checked == 1 ) {
         enableWorkflow({
           processDefinitionKeys: [target.processDefinitionKey]
         }).then((res) => {

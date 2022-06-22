@@ -607,6 +607,7 @@ export default {
     async workflowItems(){
       await workflowItems().then(res=>{
         this.workFlowList = res.data
+          console.log('res.data :>> ', res.data);
         // console.log('this.workFlowList ~~~~>> ', this.workFlowList);
         // console.log('workFlowInfoValue :>> ', this.workFlowInfoValue);
         if(this.workFlowInfoValue !== null){

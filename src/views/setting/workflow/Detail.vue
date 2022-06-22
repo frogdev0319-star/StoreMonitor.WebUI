@@ -21,8 +21,8 @@
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.basicInformation')}}</div>
                   <div class="title-status"> 
                     <el-input
-                      :placeholder="infoForm.name"
-                      v-model="infoForm.name"
+                      :placeholder="nodeDataToApi.name"
+                      v-model="nodeDataToApi.name"
                       style="width: 250px"
                       />
                   </div>
@@ -112,7 +112,7 @@
 
         <!-- 流程配置 -->
         <div class="inspect-basic">
-          <!-- btn -->
+          <!-- 新增審核節點 btn -->
           <div class="buttons add-node-btn">
             <el-button
               @click="addNode"
@@ -384,10 +384,6 @@ export default {
       });
     },
 
-
-
-
-
     async getNodeList(id){
       this.isLoadingData = true
       await getNodeList(id).then(res=>{
@@ -456,7 +452,7 @@ export default {
     },
     addNode() {
       const newNode = {
-            "name": "",
+            "name": "新增節點",
             "auditMethod": 0,
             "signature": false,
             "customButton": [
@@ -603,6 +599,8 @@ export default {
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
+        util.notify('此簽核流程名稱已存在', 'error', 3000);
+
       });
 
     }
