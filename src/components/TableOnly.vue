@@ -76,28 +76,33 @@
               active-value="1"
               inactive-value="0"
               :disabled = "row.isBind"
-              @click.native.prevent="canNotClose"
               @change="$emit('handleSwitchChange', { checked: $event, target: row })"
               />
           </template>
           
           <!-- workflow auditByUsers -->
           <template v-else-if="_item.auditByUsers">
-            <div class="audit-user-row">
+            <!-- auditTargetType == 0 顯示為使用者 -->
+            <div class="audit-user-row" v-if="row.auditTargetType == 0">
               <div class="audit-user" v-for="(item, index) in row.auditByUsers" :key="index">{{item}}</div>
             </div>
+            <!-- auditTargetType == 1 顯示為部門（auditByGroups） -->
+            <div class="audit-user-row" v-if="row.auditTargetType == 1">
+              <div class="audit-user" v-for="(item, index) in row.auditByGroups" :key="index">{{item}}</div>
+            </div>
           </template>
+
           <!-- workflow auditMethod -->
           <template v-else-if="_item.auditMethod">
-            <el-radio-group class="storevue-radio" v-model="row.auditMethod" v-if="row.name !=='提交人'">
-              <el-radio :label="1">{{$t('audit.workFlows.countersigned')}}</el-radio>
-              <el-radio :label="0">{{$t('audit.workFlows.coSign')}}</el-radio>
+            <el-radio-group class="storevue-radio" v-model="row.auditMethod" v-if="row.name !== $t('audit.workFlows.submitAudit') ">
+              <el-radio :label="0">{{$t('audit.workFlows.countersigned')}}</el-radio>
+              <el-radio :label="1">{{$t('audit.workFlows.coSign')}}</el-radio>
             </el-radio-group>
           </template>
 
           <!-- workflow signature -->
           <template v-else-if="_item.signature" >
-            <el-radio-group class="storevue-radio" v-model="row.signature" v-if="row.name !=='提交人'">
+            <el-radio-group class="storevue-radio" v-model="row.signature" v-if="row.name !==  $t('audit.workFlows.submitAudit') ">
               <el-radio :label="true">{{$t('audit.workFlows.need')}}</el-radio>
               <el-radio :label="false">{{$t('audit.workFlows.unnecessary')}}</el-radio>
             </el-radio-group>
@@ -418,9 +423,7 @@ export default {
     //console.log(this.columnData)
   },
   methods: {
-    canNotClose(){
-      util.notify('此流程無法關閉，請確認以下巡檢表是否正在使用流程: 現場巡檢表、遠端巡檢表、衛生環評表', 'error', 3000);
-    },
+    
     
     renderHeader(h, { column, $index }) {
       if(util.getWindowWidth()>1366){
