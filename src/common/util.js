@@ -745,7 +745,7 @@ export default {
       case 3:
         return i18n.t('audit.auditStatus.reject');
       case 4:
-        return i18n.t('audit.auditStatus.completed');
+        return i18n.t('audit.auditStatus.approved');
       case 5:
         return i18n.t('audit.auditStatus.cancel');
       case 6:

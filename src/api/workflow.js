@@ -116,3 +116,11 @@ export const GetlistWorkflowTaskByType = data => {
     data
   });
 };
+//簽核管理 -- 確認總結
+export const SubmitWorkflow = data =>{
+  return request({
+    url: `${version}/workflow/submit`,
+    method: 'post',
+    data
+  });
+};

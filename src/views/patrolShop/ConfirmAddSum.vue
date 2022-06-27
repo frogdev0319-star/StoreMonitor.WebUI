@@ -31,6 +31,79 @@
         <span v-if="adviceInfoRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
       </div>
     </el-col>
+    <el-col v-if="isBindWorkflow" :span="24" class="sum-submit paper">
+      <div class="submit-header flex-center margin-bottom-md">
+        <span>{{ $t('audit.inceptionRpt.sendAudit') }}</span>
+      </div>
+      <div class="audit-content">
+        <span class="sug-label" >{{ $t('audit.inceptionRpt.addAttach') }}</span>
+        <div v-if="pdfFileList.length>0" class="attach-area" style="margin-bottom:10px;">
+          <div v-for="(pdfItem,index) in pdfFileList" :key="'pdf'+index" class="source-details" >
+            <div class="img-content">
+              <i class="el-icon-close icondelete" @click="deleteImg({item:pdfItem,index})" />
+              <div class="pdf-content">
+                <span>{{pdfItem.fileName}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="attach-area" >
+          <div v-for="(imgItem,index) in imgFileList" :key="'img'+index" class="source-details" >
+            <div class="img-content">
+              <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+              <el-image
+                :src="imgItem.src"
+                style="width:140px;height:100px"
+                :preview-src-list="getAuditImgList(index)"/>
+            </div>
+          </div>
+          <div v-if="auditFileCount<10" class="attach-add" @click="$refs.auditfile.click()">
+            <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
+            <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
+              <img src="../../../static/img/icon_attachment.svg" widht="16px" height="16px" style="border-radius:10px;"/>
+              <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px;">
+          <span class="sug-label margin-bottom-md" >{{ $t('audit.inceptionRpt.auditNote') }}</span>
+          <el-input
+            :autosize="{ minRows: 2, maxRows: 7}"
+            v-model="auditNote"
+            type="textarea"
+            resize="none"
+            class="sug-input"
+            @input="auditNoteChanged"
+            @blur="notShowAuditNoteRuleTips"
+          />
+          <span v-if="auditNoteRuletip" class="rules">{{ $t('remotePatrol.comentRuletip_suggest') }}</span>
+        </div>
+        <div class="next-audit">
+          <div style="width:47%;">
+            <span class="sug-label margin-bottom-md">{{ $t('audit.inceptionRpt.nextAuditor') }}</span>
+            <el-input
+              :autosize="{ minRows: 3, maxRows: 3}"
+              v-model="workflowInfo.nextAuditUser"
+              type="textarea"
+              resize="none"
+              class="person-audit"
+              disabled="true"
+            />
+          </div>
+          <div style="width:47%;">
+            <span class="sug-label margin-bottom-md">{{ $t('audit.inceptionRpt.ccPeople') }}</span>
+            <el-input
+              :autosize="{ minRows: 3, maxRows: 3}"
+              v-model="workflowInfo.copyToUsers"
+              type="textarea"
+              resize="none"
+              class="person-audit"
+              disabled="true"
+            />
+          </div>
+        </div>
+      </div>
+    </el-col>
     <el-col v-if="!allRemarkItemsFlag" :span="24" class="sum-data">
       <span style="font-size: 18px; font-weight: bold">{{ $t('remotePatrol.preview') }}</span>
       <div class="paper" style="margin-top: 15px; padding: 0 15px">
@@ -353,8 +426,10 @@
 <script>
 import { getStorageInfo } from '@/api/event';
 import { submitInspectItem1 } from '@/api/inspect';
+import {SubmitWorkflow,getWorkflowInfo} from '@/api/workflow';
 import util from '@/common/util';
 import { getCookie } from '@/common/auth';
+import { getDepartmentList } from '@/api/checkin';
 import { getUserInfo } from '@/api/login';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
@@ -416,7 +491,17 @@ export default {
       adviceInfoRuletip: false,
       tab1BtnArr: [],
       tab3BtnArr: [],
-      allRemarkItemsFlag: true
+      allRemarkItemsFlag: true,
+      isBindWorkflow:false,
+      auditNote:'',
+      auditNoteRuletip:false,
+      pdfFileList:[],
+      imgFileList:[],
+      auditFileCount:0,
+      workflowInfo:{copyToUsers:"",nextAuditUser:""},
+      userDataList:[],
+      positionsList:[],
+      bucketPdf:''
     };
   },
   computed: {
@@ -439,6 +524,14 @@ export default {
       };
     }
   },
+  watch:{
+    pdfFileList(){
+      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+    },
+    imgFileList(){
+      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+    },
+  },
   beforeRouteLeave(to, from, next) {
     const self = this;
     if (to.name !== 'remotePatrol') {
@@ -456,6 +549,7 @@ export default {
   },
   mounted() {
     const self = this;
+    
     self.getRouteData();
     self.getUpLoadBucketInfo();
     self.getOssInfo();
@@ -566,6 +660,7 @@ export default {
       let status = 0;
       let flag = false;
       self.uploadingnumOfPic = 0;
+      self.totalnumOfPic += self.imgFileList.length + self.pdfFileList.length; 
       self.resultList.forEach(item => {
         if (item.isActive) {
           flag = true;
@@ -689,6 +784,44 @@ export default {
         obj.attachment = commentTemp;
         feedEventList.push(obj);
       }
+      //上傳簽核附件
+      var auditAttachment = [];
+      //if(self.imgFileList.length>0){
+      for(let idx=0; idx<self.imgFileList.length;idx++){
+        await self.upLoadFile(self.imgFileList[idx]).then((url) => {
+          console.log("upload file url:",url);
+          self.uploadingnumOfPic++;
+          const auditImgObj = {
+            mediaType: 2,
+            url: url,
+            ts: Date.now()
+          };
+          auditAttachment.push(auditImgObj);
+        }).catch((err) => {
+          console.log("uploade file error:",err)
+          upload++;
+        });
+        
+      }
+      for(let idx=0; idx<self.pdfFileList.length; idx++){
+        await self.upLoadFile(self.pdfFileList[idx]).then((url) => {
+          self.uploadingnumOfPic++;
+          const auditImgObj = {
+            mediaType: 4,
+            url: url,
+            ts: Date.now()
+          };
+          auditAttachment .push(auditImgObj);
+        }).catch((err) => {
+          console.log("uploade file error:",err)
+          upload++;
+        });
+      }
+      if (upload !== 0) {
+          self.uploadProgress = false;
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        }
       let curSumIndex = [];
       curSumIndex = self.resultList.filter(x => x.isActive);
       status = curSumIndex[0].label;
@@ -705,18 +838,44 @@ export default {
         if (res.errCode === 0) {
           const data = res.data;
           self.editFlag = true;
-          routeData = {
-            isSuccess: true,
-            user: data.notifiedTo
-          };
-          self.$store.dispatch('setEditCount', 0);
+          
+          const inspectId = data.inspectId; //取得報告ID
+          const wfParams={
+            inspectReportId:inspectId,
+            comment:{
+              description:self.auditNote,
+              attachment:auditAttachment
+            }
+          }
+          SubmitWorkflow(wfParams).then(wfRes=>{
+            console.log("SubmitWorkflow res:",res);
+            if(wfRes.errCode == 0){
+              self.$store.dispatch('setEditCount', 0);
+              routeData = {
+                  isSuccess: true,
+                  user: data.notifiedTo
+              };
+            }else{
+              routeData = {
+                isSuccess: false,
+                reLoadData: self.$route.params
+              };
+            }
+            self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+          }).catch(err=>{
+            console.log("err:",err);
+            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+            return false;}
+          );
+          
         } else {
           routeData = {
             isSuccess: false,
             reLoadData: self.$route.params
           };
         }
-        self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+        if(!self.isBindWorkflow)
+          self.$router.push({ name: 'submitEvent', params: { data: routeData }});
       }).catch(err => {
         util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
         return false;
@@ -732,6 +891,7 @@ export default {
       }
       Database.getDataFromDB(getCookie('UserId')).then(res => {
         const inpectResult = res;
+        console.log("***inspect:",inpectResult);
         const routeData = inpectResult.data;
         const inspectSettings = inpectResult.rule;
         const inspect = routeData.inspect;
@@ -741,6 +901,9 @@ export default {
         self.inspectList = routeData.inspect;
         self.eventList = routeData.event;
         self.allRemarkItemsFlag = routeData.allRemarkItemsFlag;
+        self.isBindWorkflow = routeData.isBindWorkflow;
+        console.log('**inspectSettings.workflowInfo',inspectSettings.workflowInfo);
+        this.doGetWorkflowInfo(inspectSettings.workflowInfo);
         this.getTab1AndTab3BtnName(inspectSettings);
         const allTypeArr = new Set();
         let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];
@@ -1123,6 +1286,7 @@ export default {
       const userId = getCookie('UserId');
       return new Promise((resolve, reject) => {
         getUserInfo().then(res => {
+          self.userDataList = res.data;
           res.data.forEach(item => {
             if (item.userId === userId) {
               const accountId = item.accountId.toLowerCase();
@@ -1143,6 +1307,7 @@ export default {
       const self = this;
       self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
       self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+      self.bucketPdf = 'pdf' + '/' + util.getCurDate2Str();
     },
 
     notShowInputRuleTips() {
@@ -1185,8 +1350,136 @@ export default {
         { name: this.$t('remotePatrol.TableTotal'), width: 'width:24%;' },
         { name: this.$t('remotePatrol.TableGet'), width: 'width:12%;' }
       ];
-    }
+    },
+    
+    auditNoteChanged(val) {
+      const self = this;
+      const content = filterString.all(val, 600);
+      const length = filterString.getContentLength(val);
+      self.auditNote = content;
+      if (length > 600) {
+        this.auditNoteRuletip = true;
+      } else {
+        this.auditNoteRuletip = false;
+      }
+    },
+    notShowAuditNoteRuleTips() {
+      this.auditNoteRuletip = false;
+    },
+    doAddAttachment(e){
+      const self = this;
+      const maxSize = 4*1024*1024; //不能超過4MB
+      var files = e.target.files || e.dataTransfer.files;
+      //console.log("choose file:",files);
+      if (!files.length)
+        return;
+      if(self.auditFileCount==10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("pdf") && files[0].size > maxSize){
+        util.notify(self.$t('audit.inceptionRpt.maxFileSizeAlert'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("image")){
+        var objImg={
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${files[0].name}`,
+          src:'',
+          file:'',
+          type:files[0].type,
+          size:files[0].size
+        };
+        self.createFile(files[0],objImg);
+        self.imgFileList.push(objImg);
+      }else if(files[0].type.includes("pdf")){
+        var objpdf={
+          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${files[0].name}`,
+          src:'',
+          file:'',
+          type:'pdf',
+          size:files[0].size,
+        }
+        self.createFile(files[0],objpdf);
+        self.pdfFileList.push(objpdf);
+      }
+    },
+    createFile(file, objFile) {
+      //var image = new Image();
+      var reader = new FileReader();
 
+      reader.onload = (e) => {
+        objFile.src = e.target.result;
+        objFile.file = util.base64ToBlob(e.target.result);
+        console.log(objFile.file);
+      };
+      reader.readAsDataURL(file);
+    },
+
+    deleteImg({item, index}) {
+      const self = this;
+      if(item.type==='pdf')
+        self.pdfFileList.splice(index, 1);
+      else
+        self.imgFileList.splice(index, 1);
+    },
+    getAuditImgList(index) {
+      const arr = [];
+      let i = 0;
+      for (i; i < this.imgFileList.length; i++) {
+        arr.push(this.imgFileList[i + index]);
+        if (i + index >= this.imgFileList.length - 1) {
+          index = 0 - (i + 1);
+        }
+      }
+      return arr.map(source => source.src);
+    },
+    async doGetWorkflowInfo(workflow){
+      var wfi = {copyToUsers:"",nextAuditUser:""}
+      const workflowPromise = getWorkflowInfo({processDefinitionKey:workflow.processDefinitionKey});
+      const userPosition = getDepartmentList({ type: 1 }); //取得職務
+      const userPromise = getUserInfo();
+      try {
+        const result = await Promise.all([userPosition, userPromise, workflowPromise]);
+        this.userDataList = result[1].data;
+        this.positionsList = result[0].data;
+        const data = result[2].data;
+        
+        wfi.copyToUsers = this.getUserName(data.createdUser);
+        if(data.nextAuditNode && data.nextAuditNode.nextAuditNode){
+          var auditType = data.nextAuditNode.nextAuditNode.auditTargetType;
+          if(auditType == 0) //audit by person
+            wfi.nextAuditUser = this.getUserName(data.nextAuditNode.nextAuditNode.auditByUsers);
+          else if(auditType == 1) //audit by group
+            wfi.nextAuditUser = this.getUserPositionList(data.nextAuditNode.nextAuditNode.auditByGroups);
+        }
+        
+        //console.log('*wfi:',wfi);
+        this.workflowInfo = wfi;
+        //return wfi;
+      } catch (e) {
+        console.log(e);
+        //return wfi;
+      }
+    },
+    getUserName(userIds){
+      console.log("userIds",userIds);
+      console.log("self.userDataList:",this.userDataList);
+      const self = this;
+      var users = self.userDataList.filter(item=> {return userIds.includes(item.userId);});
+      var auditUsers = "";
+      users.forEach( u=>{
+        auditUsers += u.userName+',';
+      })
+      //console.log('auditUsers:', auditUsers);
+      return auditUsers.slice(0,auditUsers.length-1);
+    },
+    getUserPositionList(groupIds) {
+      var groups = this.positionsList.filter(item => {return groupIds.includes(item.defineId);});
+      var auditGroups="";
+      groups.forEach(g=> auditGroups +=g.defineName+',');
+      //console.log(' auditGroups:', auditGroups);
+      return auditGroups.slice(0,auditGroups.length-1);
+    },
   }
 };
 </script>
@@ -1398,7 +1691,107 @@ export default {
           }
         }
       }
-
+      
+      /*簽核*/
+      .audit-content{
+        .sug-label{
+          font-size: calc(12/1920*100vw);
+          display: block;
+          margin-bottom: 16px;
+        }
+        .rules{
+          font-size: 10px;
+          color:#ff2400;
+          font-weight: 400;
+          line-height: 12px;
+        }
+        .sug-input{
+          width: 99.5%;
+          >>> textarea {
+            background-color: #f4f6f7;
+            border: none;
+          }
+        }
+        .attach-area{
+          display:flex;
+          align-content:flex-start;
+          align-self: flex-start;
+          .attach-add{
+            height:100px;
+            width:161px;
+            border-radius: 10px;
+            box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+            display:flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            .att-txt{
+              font-size: 14px;
+              color: #006ab7;
+              margin-left: 3px;
+            }
+          }
+          .source-details{
+            display: inline-block;
+            margin-right: 15px;
+            position: relative;
+            .icondelete{
+              position: absolute;
+              font-size: 14px;
+              right: 5px;
+              margin-top: 8px;
+              z-index: 2;
+              color: #fff;
+              cursor: pointer;
+              background-color: rgba($color: $black, $alpha: 0.8);
+              border-radius: 50%;
+            }
+            .img-content{
+              width: 100%;
+              height: 100%;
+              position: relative;
+            }
+            .pdf-content{
+              width: 140px;
+              height: 30px;
+              padding: 1px 0px 1px 12px;
+              border-radius: 5px;
+              box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+              background-color: #fff;
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              justify-content: flex-start;
+              span{
+                display:block;
+                width:110px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size:12px;
+              }
+            }
+          
+          }
+        }
+        .next-audit{
+          display:flex; 
+          flex-direction:row;
+          justify-content:space-between;
+          align-content:stretch;
+          margin-top:16px;
+          height:100px;
+          margin-right: 8px;
+          .person-audit{
+            width: 100%;
+            >>> textarea {
+              background-color: #f4f6f7;
+              border: none;
+            }
+          }
+        }
+      }
     }
     .sum-data{
       padding: 20px;

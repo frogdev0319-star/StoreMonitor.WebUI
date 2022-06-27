@@ -485,7 +485,7 @@ export default{
         "wed":"三"
     },
       "zoneList":"攝影機列表",
-      "commentCountRuleTip":"文字評論最多輸入5則"
+      "commentCountRuleTip":"文字評論最多輸入5則",
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
@@ -1315,6 +1315,15 @@ export default{
       "alertAtOverTime": "超時發送訊息提醒",
       "stayOver": "停留超過",
       "day": "天",
+    },
+    "inceptionRpt":{
+      "sendAudit":"送出簽核",
+      "addAttach":"新增附件 (支援圖片或PDF檔)",
+      "auditNote":"備註",
+      "nextAuditor":"下一級處理人",
+      "ccPeople":"副本通知",
+      "attachment":"附件",
+      "maxFileSizeAlert":"PDF檔案不可大於4MB"
     }
   }
 

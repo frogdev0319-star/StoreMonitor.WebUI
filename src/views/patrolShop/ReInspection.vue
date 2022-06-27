@@ -1022,7 +1022,9 @@ export default {
       curEditIndex: -1,
       feedbackInput: '',
       curEditFeedbackIndex: -1,
-      feedbackSourceList: []
+      feedbackSourceList: [],
+      isBindWorkflow:false,
+      workflowInfo:null
     };
   },
   computed: {
@@ -1760,12 +1762,17 @@ export default {
                 inspectSettings.itemOptionsForType3 = item.value;
                 this.itemOptionsForType3 = item.value;
                 break;
+              case 'workflow':
+                inspectSettings.workflowInfo = item.value;
+                break;
               default:
                 break;
             }
           });
           sessionStorage.setItem('inspectSettings', JSON.stringify(inspectSettings));
           sessionStorage.setItem('uuid', res.data.uuid);
+          self.isBindWorkflow = res.data.isBindWorkflow;
+          sessionStorage.setItem('isBindWorkflow', res.data.isBindWorkflow);
           this.checkIfAllItemsAreRemark(data);
           const temp = [];
           data.forEach((item, index) => {
@@ -2488,7 +2495,8 @@ export default {
         event: this.eventList,
         store: this.store,
         channel: this.channel,
-        allRemarkItemsFlag: this.allRemarkItemsFlag
+        allRemarkItemsFlag: this.allRemarkItemsFlag,
+        isBindWorkflow:this.isBindWorkflow
       };
       this.historyObj = {
         storeList: this.tabList[Number(this.activeIndex)].storeList,
