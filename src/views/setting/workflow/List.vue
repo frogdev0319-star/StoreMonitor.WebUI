@@ -310,7 +310,6 @@ export default {
         this.allTableData = res.data.content
         this.searchData = this.allTableData
 
-
         this.total = res.data.totalPages
 
         console.log('this.total :>> ', this.total);
@@ -486,11 +485,6 @@ export default {
     handleSwitchChange({ checked, target }) {
       console.log('checked :>> ', checked);
       console.log('target :>> ', target);
-      if(target.isBind == true){
-        alert('NONONONO')
-      }
-
-
       if (checked == 1 ) {
         enableWorkflow({
           processDefinitionKeys: [target.processDefinitionKey]
@@ -528,6 +522,8 @@ export default {
           util.notify(this.$t('route.networkError'), 'error', 1000 );
         })
       }
+      
+    
     },
     
 

@@ -4,12 +4,12 @@
     <div class="setting-titles padding flex-center">
       {{$t('audit.workFlows.addNode')}}
       <div class="spacer"/>
+      <!-- 儲存 -->
       <delay-button 
         type="filled" 
         @click="saveNode"
         v-loading.fullscreen.lock="fullscreenLoading"
         >{{$t('audit.workFlows.save')}}</delay-button>
-
     </div>
 
     <!-- 基本信息 -->
@@ -29,24 +29,41 @@
                     class="input-name"/>
                 </div>
 
-                <el-radio-group class="select_audit storevue-radio" v-model="TT">
+                <el-radio-group class="select_audit storevue-radio" v-model="nodeData.auditTargetType">
+                  <!-- 簽核部門 -->
                   <div class="select_audit_dep">
                     <el-radio :label="1">{{$t('audit.workFlows.auditDepart')}}</el-radio> 
-                    <el-select v-model="managers" :placeholder="$t('audit.workFlows.selectDepart')" >
+                    <el-select 
+                      v-model="departmentStatus" 
+                      :placeholder="$t('audit.workFlows.auditDepart')" 
+                      :disabled="nodeData.auditTargetType == 0">
                       <el-option
                         v-for="item in department"
                         :key="item.defineId"
                         :label="item.defineName"
-                        :value="item.defineId">
-                      </el-option>
+                        :value="item.defineId" 
+                        />
                     </el-select>
                   </div>
-                
-                  <div class="select_audit_dep">
-                  <el-radio :label="0">{{$t('audit.workFlows.auditUser')}}</el-radio>
-                  <el-input
-                    placeholder=""
-                    class="input-name"/>
+
+                  <!-- 簽核人員 -->
+                  <div class="select_audit_dep" style="height: auto">
+                    <el-radio :label="0">{{$t('audit.workFlows.auditUser')}}</el-radio>
+                    <el-select
+                      v-model="auditUsers"
+                      filterable
+                      :placeholder="$t('audit.workFlows.auditUser')"
+                      :loading="loading" 
+                      :disabled="nodeData.auditTargetType == 1"
+                      >
+                      
+                      <el-option
+                        v-for="user in userInfo"
+                        :key="user.userId"
+                        :label="user.userName"
+                        :value="user.userId">
+                      </el-option>
+                    </el-select>
                   </div>
                 </el-radio-group>
               
@@ -59,20 +76,20 @@
                 <div class="title-name">{{$t('audit.workFlows.auditMethod')}}</div>
                 <div class="flex">
                   <el-radio-group class="storevue-radio" v-model="nodeData.auditMethod">
-                    <el-radio :label="1" style="margin-right: 0">{{$t('audit.workFlows.countersigned')}}</el-radio>  
+                    <el-radio :label="0" style="margin-right: 0">{{$t('audit.workFlows.countersigned')}}</el-radio>  
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
-                      placement="right">
+                      placement="bottom-end">
                       <div slot="content">{{$t('audit.workFlows.rule_countersigned')}}</div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
 
-                    <el-radio :label="0" style="margin-right: 0">{{$t('audit.workFlows.coSign')}}</el-radio>
+                    <el-radio :label="1" style="margin-right: 0">{{$t('audit.workFlows.coSign')}}</el-radio>
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
-                      placement="right">
+                      placement="bottom-end">
                       <div slot="content">{{$t('audit.workFlows.rule_coSign')}}</div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
@@ -167,7 +184,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 <script>
@@ -175,6 +191,7 @@ import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {updateWorkflow} from "@/api/workflow";
 import {getDepartmentList } from '@/api/checkin';
+import {getUserInfo} from '@/api/login';
 
 
 import util from "@/common/util";
@@ -188,19 +205,50 @@ export default {
     return {
       nodeData: [],
       infoForm: {},
-      apiData: {},
+      apiData: {}, 
+      loading: false,
 
       dataFromRoute: {},
       workflowDetail: {},
       department: [],
-      managers: '',
+      departmentStatus: [],
+      userInfo:[],
+
+
+      // 簽核人員
+      auditUsers:[],
       fullscreenLoading: false,
       basicList: [],
       isLoadingData: false,
       workflowDescription: '',
-      TT: 1
+    
+      sector: 0,
     };
   },
+  watch:{
+
+    // sector(){
+    //   console.log('sector >> ', this.sector);
+    //   this.auditUsers = []
+    // },
+
+    // departmentStatus(sectorName) {
+    //   console.log('this.departmentStatus from select >> ', sectorName);
+    //   sessionStorage.setItem('sectorName', JSON.stringify(sectorName))
+      
+    //   // get audit user with sector
+    //   this.department.forEach(d =>{
+    //     if(d.defineName == sectorName){
+    //       this.auditUsers = [...d.contents]
+    //     }
+    //   })
+    //   console.log('nodeData.name:>> ', this.nodeData.name);
+    //   console.log('auditUsers:>> ', this.auditUsers);
+    //   console.log('this.apiData:>> ', this.apiData);
+    // },
+
+  },
+
   mounted() {
     // this.dataFromRoute = { ...this.$route.params.data }
     // getWorkflowInfo({
@@ -223,9 +271,14 @@ export default {
   },
   methods: {
     async init(){
+      
+
       await this.getNodeInfo() 
       await this.getWorkflowInfo()
-      await this.getDepartmentList()
+      await this.getUserInfo()
+
+
+      
     }, 
 
     // get getDepart
@@ -237,6 +290,16 @@ export default {
       });
     },
 
+    // get user
+    async getUserInfo(){
+      await getUserInfo().then(res=>{
+        this.userInfo = res.data
+        console.log('getWorkflowInfo ------>> ', this.userInfo);
+
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
@@ -244,7 +307,7 @@ export default {
       this.infoForm.type = "巡檢表單"
     },
     
-    getNodeInfo(){
+    async getNodeInfo(){
       const data = sessionStorage.getItem('workflowNode')
       const apiData = sessionStorage.getItem('nodeDataToApi')
 
@@ -252,22 +315,49 @@ export default {
       this.apiData = JSON.parse(apiData)
       console.log('this.nodeData :>> ', this.nodeData);
       console.log('this.apiData :>> ', this.apiData);
+
+      // 簽核人員
+      this.auditUsers = this.nodeData.auditByUsers.toString()
+      console.log('this.auditUsers :>> ', this.auditUsers);
+
+      // 取得部門資訊 & 簽核部門
+      await this.getDepartmentList() 
+      this.departmentStatus = this.nodeData.auditByGroups.toString()
+      console.log('this.departmentStatus :>> ', this.departmentStatus);
+
     },
 
     saveNode(){
       console.log('this.nodeData Adjust:>> ', this.nodeData)
       this.fullscreenLoading = true
-      if(this.nodeData.id == undefined){
-        this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
-      }else{
+      // if(this.nodeData.id == undefined){
+      //   this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
+      // }else{
         // edit
         console.log("this is Editing")
         var apiDataIndex = this.apiData.orderedAuditNodeArray.findIndex(i => i.id == this.nodeData.id)
         console.log('apiDataIndex :>> ', apiDataIndex);
         this.apiData.orderedAuditNodeArray.splice(apiDataIndex, 1 , this.nodeData)
         sessionStorage.setItem('workflowNode', JSON.stringify(this.nodeData))
-      }
-    
+      // }
+
+      this.apiData.orderedAuditNodeArray.forEach(data =>{
+        if(data.name == this.nodeData.name){
+          if(data.auditTargetType == 0){
+              // 切換簽核人員
+              data.auditByUsers = []
+              data.auditByGroups = []
+              data.auditByUsers.push(this.auditUsers)
+          } else if(data.auditTargetType == 1){
+            // 切換簽核部門
+            data.auditByUsers = []
+            data.auditByGroups = []
+            data.auditByGroups.push(this.departmentStatus)
+          }
+        }
+      })
+      console.log('this.apiData call api', this.apiData)
+
       // call api
       updateWorkflow(this.apiData).then(res=>{
         console.log('res :>> ', res);

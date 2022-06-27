@@ -42,6 +42,7 @@
                         :key="index"
                         :label="item"
                         :value="item"
+                        
                       />
                     </el-select>
                   </div>
@@ -50,9 +51,9 @@
                 <!-- 簽核模式 -->
                 <div class="flex-row" style="margin-right: 30px">
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.signoffMode')}}</div>
-                      <el-radio-group class="storevue-radio" v-model="signMode">
+                      <el-radio-group class="storevue-radio" v-model="nodeDataToApi.cancelable" >
                         <div class="flex-row" style="margin-right: 30px">
-                          <el-radio :label="1">{{$t('audit.workFlows.canNotCancel')}}</el-radio>  
+                          <el-radio :label="false">{{$t('audit.workFlows.canNotCancel')}}</el-radio>  
                             <el-tooltip
                               class="date-time-tooltip"
                               effect="light"
@@ -69,7 +70,7 @@
                         </div>
 
                         <div class="flex-row">
-                          <el-radio :label="0">{{$t('audit.workFlows.canCancel')}}</el-radio>
+                          <el-radio :label="true" @change="needNote">{{$t('audit.workFlows.canCancel')}}</el-radio>
                           <el-tooltip
                             class="date-time-tooltip"
                             effect="light"
@@ -103,6 +104,8 @@
                     class="storevue-textarea"
                     type="textarea"
                     resize="none"
+                    maxlength="600"
+                    show-word-limit
                   />
                 </div>
               </div>
@@ -151,10 +154,22 @@
           <!-- row -->
           <div class="setting-config basic-config">
             <div class="title-name" style="width: fit-content">{{$t('audit.workFlows.addCC')}}</div>
-            <div class="title-status">
-              <el-input
-                :placeholder="$t('audit.workFlows.findUser')"
-                />
+            <div class="title-status" >
+                <el-select
+                  v-model="ccToUSer"
+                  multiple
+                  filterable
+                  :placeholder="$t('audit.workFlows.findUser')"
+                  :loading="loading" 
+                  style="300px">
+                  
+                  <el-option
+                    v-for="user in userInfo"
+                    :key="user.userId"
+                    :label="user.userName"
+                    :value="user.userId">
+                  </el-option>
+                </el-select>
             </div>
             <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
 
@@ -207,30 +222,15 @@ export default {
   },
   data() {
     return {
-      ccToSelect: [{
-        value: '總經理',
-        label: '總經理'
-      }, {
-        value: '加盟主 A',
-        label: '加盟主 A'
-      }, {
-        value: '加盟主 B',
-        label: '加盟主 B'
-      }, {
-        value: '加盟主 C',
-        label: '加盟主 C'
-      }, {
-        value: '店長',
-        label: '店長'
-      }],
-      ccTo: [],
-
+      ccToUSer: [],
+    
       showSingleDeleteContent:false,
       dataFromRoute: {},
       workflowDetail: {},
       templateList: ['巡檢表單'],
       curTemplateIndex:'',
       basicList: [],
+      loading: false,
       isLoadingData: false,
       workflowDescription: '',
       infoForm: {},
@@ -304,8 +304,11 @@ export default {
       penSrc: require('../../../../static/img/table-edit.png'),
       deleteSrc: require('../../../../static/img/table-delete.png'),
       rowId:'',
-      signMode: 1
+      signMode: 1,
+      department : ''
     };
+  },
+  watch:{
   },
   async created() {
     await this.init()
@@ -332,14 +335,19 @@ export default {
       await this.getWorkflowInfo() //1 
 
       await this.getNodeList(this.infoForm.processDefinitionKey) //4
+
       await this.getTitle() //3
       await this.getUserInfo() //2
+      await this.getDepartmentList() //7
+
   
       await this.handleData() //5
       await this.dataToApi() //6
 
-      this.getDepartmentList()
+    },
 
+    needNote(){
+      util.notify('※ 此模式不會立即產生事件 ', 'warning', 3000);
     },
 
     getWorkflowInfo(){
@@ -359,8 +367,6 @@ export default {
         console.log('error' + err);
       });
     },
-
-
     // get title
     getTitle(){
       getUserTitleList().then(res=>{
@@ -377,18 +383,22 @@ export default {
     // get getDepart
     async getDepartmentList(){
       await getDepartmentList({ type: 0 }).then(res=>{
-        console.log('getgetDepart  ------>> ', res);
-
+        this.department = res.data
+        console.log('this.department 7 ------>> ', this.department);
       }).catch(err => {
         console.log('error' + err);
       });
     },
 
+
     async getNodeList(id){
       this.isLoadingData = true
       await getNodeList(id).then(res=>{
+
         this.nodeList =  res.data
+        this.ccToUSer = this.nodeList.copyToUsers
         console.log('this.nodeList 4 ------>> ', this.nodeList);
+
         // flat data
         this.flattenData(this.nodeList)
         this.flatNodeData.forEach(d=>{
@@ -396,7 +406,17 @@ export default {
         })
         console.log('this.flatNodeData 4 ------>> ', this.flatNodeData);
         // this.flatNodeData[0].name = this.infoForm.createdUser
-        this.flatNodeData[0].name = "提交人"
+        this.flatNodeData[0].name = this.$t('audit.workFlows.submitAudit')
+        this.flatNodeData[0].auditByUsers.push(this.nodeList.createdUser)
+
+
+
+
+        
+        // var crea
+        // this.flatNodeData[0].auditByUsers.push()
+
+        
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -419,27 +439,37 @@ export default {
     handleData(){
       // deep copy
       this.flatNodeDataView = JSON.parse(JSON.stringify(this.flatNodeData))
-      // const firtData ={
-      //   "name": "提交人",
-      //   "auditByUsers": ['提交人']
-      // }
-      // this.flatNodeDataView = [firtData, ...this.flatNodeDataView]
-      this.flatNodeDataView.forEach(d=>{
+      
+      // switch user id to name 
+      this.flatNodeDataView.forEach(item =>{
         var newArr = []
-        d.auditByUsers.forEach(id=>{
-          this.userInfo.forEach(uu=>{
+        item.auditByUsers.forEach(id =>{
+          this.userInfo.forEach(uu =>{
             if(id == uu.userId){
-              newArr.push(uu.userName + ",")       
+              newArr.push(uu.userName)  
             } 
           })
         })
-        // if(d.auditByUsers[0] !== "提交人") d.auditByUsers = newArr
+        item.auditByUsers = [...newArr ]
       })
 
+      // this.department
+      this.flatNodeDataView.forEach(item =>{
+        var newArr2 = []
+        item.auditByGroups.forEach(id =>{
+          this.department.forEach(d =>{
+            if(id == d.defineId){
+              newArr2.push(d.defineName)  
+            } 
+          })
+        })
+        item.auditByGroups = [...newArr2 ]
+      })
+
+      
       console.log('this.flatNodeDataView 5 ------>> ', this.flatNodeDataView);
     },
     
-
     // data for api submit
     dataToApi(){
       // deep copy
@@ -448,8 +478,11 @@ export default {
       this.nodeDataToApi = this.nodeList
       delete this.nodeDataToApi.nextAuditNode
       this.nodeDataToApi.orderedAuditNodeArray = orderedAuditNodeArray
+      
       sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
     },
+
+
     addNode() {
       const newNode = {
             "name": "新增節點",
@@ -591,6 +624,10 @@ export default {
 
     //保存並發布
     submit() {
+      
+      // setting CC users
+      this.nodeDataToApi.copyToUsers = this.ccToUSer
+
        // call api for update
       updateWorkflow(this.nodeDataToApi).then(res=>{
         console.log('res :>> ', res);
@@ -610,12 +647,20 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+  .is-multiple 
+    .el-select-dropdown__item 
+        padding-left: 10px !important;
+        border-left: solid 1px #FFF;
+    .el-select-dropdown__item.selected 
+        padding-left: 10px !important;
+        border-left: solid 1px rgba(44, 144, 217, 0.34);
+
   .flex-row
-      display: flex
-      flex-direction: row
-      justify-content: flex-start
-      align-items: center
-      width: fit-content
+    display: flex
+    flex-direction: row
+    justify-content: flex-start
+    align-items: center
+    width: fit-content
   .date-time-tooltip
     margin-left: 8px
 
@@ -642,6 +687,7 @@ export default {
     .el-input
       .el-input__inner
           height: 36px
+          
   .icon-gengduo
     width: 24px
     height: 24px
@@ -815,7 +861,7 @@ export default {
     cursor: default;
   }
   .title-name{
-    width: 100px;
+    width: fit-content;
     text-align: left;
     margin-right: 20px;
     margin-left: calc(20/1920*100vw);

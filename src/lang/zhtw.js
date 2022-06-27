@@ -1269,9 +1269,9 @@ export default{
             "thisModeWithoutEvent":" ※ 此模式不會立即產生事件",
             "addNode":" 新增審核節點",
 
-            "nodeIndex":"節點序號",
+            "nodeIndex":"節點編號",
             "nodeName":"節點名稱",
-            "nodeAuditName":"簽核人",
+            "nodeAuditName":"簽核人員",
             "nodeAuditmethod":"簽核方式",
             "nodeSign":"簽名",
             "countersigned":"會簽",
@@ -1304,6 +1304,8 @@ export default{
             "alertAtOverTime": "超時發送訊息提醒",
             "stayOver": "停留超過",
             "day": "天",
+
+            "submitAudit": "送出簽核"
 
 
 
