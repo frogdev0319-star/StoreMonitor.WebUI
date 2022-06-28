@@ -57,7 +57,9 @@
             </el-select>
           </div>
         </div>
+
         <hr class="hr-horizontal">
+
         <el-scrollbar :class="showRolesList? 'showlist-el-menuscrollbar' : 'el-menuscrollbar'">
           <div v-for="(item,index) in roleNameList" :key="index" class="role-group">
             <div class="role-all-checkbox" style="text-align: left">
@@ -307,6 +309,31 @@ export default {
             },
             {
               roleName: this.$t('route.insepctionReportSetting'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            }
+          ]
+        },
+        {
+          roleName: "簽核管理",
+          checked: false,
+          disabled: false,
+          children: [
+            {
+              roleName: "送出簽核",
+              checked: false,
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: "待簽核",
+              checked: false,
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: "副本通知",
               checked: false,
               disabled: false,
               visabled:true
