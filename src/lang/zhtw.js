@@ -1324,7 +1324,12 @@ export default{
       "nextAuditor":"下一級處理人",
       "ccPeople":"副本通知",
       "attachment":"附件",
-      "maxFileSizeAlert":"PDF檔案不可大於4MB"
+      "maxFileSizeAlert":"PDF檔案不可大於4MB",
+      "submitSucess":"提交成功！",
+      "submitFail":"提交失敗！",
+      "goWorkflow":"請前往簽核流程進行流程處理",
+      "backReInspection":"返回遠程巡檢",
+      "goAuditMangement":"前往簽核流程"
     }
   }
 

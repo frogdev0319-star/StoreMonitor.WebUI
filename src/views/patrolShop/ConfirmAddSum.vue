@@ -853,12 +853,14 @@ export default {
               self.$store.dispatch('setEditCount', 0);
               routeData = {
                   isSuccess: true,
-                  user: data.notifiedTo
+                  user: data.notifiedTo,
+                  isBindWorkflow:true
               };
             }else{
               routeData = {
                 isSuccess: false,
-                reLoadData: self.$route.params
+                reLoadData: self.$route.params,
+                isBindWorkflow:true
               };
             }
             self.$router.push({ name: 'submitEvent', params: { data: routeData }});
@@ -871,11 +873,12 @@ export default {
         } else {
           routeData = {
             isSuccess: false,
-            reLoadData: self.$route.params
+            reLoadData: self.$route.params,
+            isBindWorkflow:false
           };
         }
         if(!self.isBindWorkflow)
-          self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+          self.$router.push({ name: 'submitEvent', params: { data: routeData}});
       }).catch(err => {
         util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
         return false;
