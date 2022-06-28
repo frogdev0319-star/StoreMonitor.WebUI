@@ -104,7 +104,23 @@ export const workflowItems = data => {
 export const workflowInstanceMine = data => {
   return request({
     url: `${version}/workflow/instance/mine`,
-    method: 'psot',
+    method: 'post',
+    data
+  });
+};
+
+export const GetlistWorkflowTaskByType = data => {
+  return request({
+    url: `${version}/workflow/task/list`,
+    method: 'post',
+    data
+  });
+};
+//簽核管理 -- 確認總結
+export const SubmitWorkflow = data =>{
+  return request({
+    url: `${version}/workflow/submit`,
+    method: 'post',
     data
   });
 };

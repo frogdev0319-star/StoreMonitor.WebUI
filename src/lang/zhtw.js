@@ -88,12 +88,14 @@ export default{
       "workflowManage":"流程設計",
       "workflowDetail":"流程配置",
       "nodeSetting":"添加審核節點",
-
-      "AuditManage":"簽核管理",
-
       "noReportAuthority":"無報告檢視權限，請聯繫管理員",
       "noPatrolCompareStatAuthority":"無巡檢同比分析權限，請聯繫管理員",
-      "noEventAuthority":"無事件檢視權限，請聯繫管理員"
+      "noEventAuthority":"無事件檢視權限，請聯繫管理員",
+      //簽核
+      "AuditManage":"簽核管理",
+      "SendAuditManage":"送出簽核",
+      "WaitAuditManage":"待簽核",
+      "TranscriptNotify":"副本通知"
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -483,7 +485,7 @@ export default{
         "wed":"三"
     },
       "zoneList":"攝影機列表",
-      "commentCountRuleTip":"文字評論最多輸入5則"
+      "commentCountRuleTip":"文字評論最多輸入5則",
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
@@ -1227,99 +1229,103 @@ export default{
         "rankByNumOfUnqualified":"排名",
         "submitter":"評估人",
         "eventCommand":"事件詳情"
-        }
-    },
-    "audit":{
-        "sendAudit":{
-            "all":"全部",
-            "processing":"進行中",
-            "completed":"已完成"
-        },
-        "workFlows":{
-
-            "workFlowsName":"流程名稱",
-            "workFlowsType":"流程名稱",
-            "workFlowsCreatedUser":"建立人",
-            "workFlowsDescription":"流程描述",
-            "workFlowsCreatedTs":"建立時間",
-            "workFlowsUpdateTs":"建立時間",
-            "workFlowsState":"建立時間",
-
-
-            "searchPlaceholder":"搜尋流程名稱",
-            "addWorkFlow":"新增流程",
-            "comfirmDelete":"確認刪除當前簽核流程？",
-            "comfirmDeleteNode":"確認刪除當前簽核流程節點？",
-            "canNotDelete":"已綁定簽核流程無法刪除",
-            "dulplicateScuccess":"已成功複製流程",
-            "deleteScuccess":"删除成功",
-            "deleteFail":"删除失敗",
-
-            "workFlowConfiguration":"流程配置",
-            "saveAndPublic":"保存並發布",
-            "saveAndPublic":"保存並發布",
-            "basicInformation":"基本信息",
-            "workFlowName":"流程名稱",
-            "workFlowClassification":"流程分類",
-            "inspectionForm":"巡檢表單",
-            "workFlowDescription":"流程描述",
-            "signoffMode":"簽核模式",
-            "canCancel":"可取消簽核",
-            "canNotCancel":"不可取消簽核",
-            "thisModeWithoutEvent":" ※ 此模式不會立即產生事件",
-            "addNode":" 新增審核節點",
-
-            "nodeIndex":"節點編號",
-            "nodeName":"節點名稱",
-            "nodeAuditName":"簽核人員",
-            "nodeAuditmethod":"簽核方式",
-            "nodeSign":"簽名",
-            "countersigned":"會簽",
-            "coSign":"或簽",
-            "need":"需要",
-            "unnecessary":"不需要",
-            "moveUp":"上移",
-            "moveDown":"下移",
-            "addCC":"新增副本通知人員",
-            "findUser":"查詢人員",
-            "save":"儲存",
-            "inputNodeName": "請輸入節點名稱",
-
-            "auditDepart": "簽核部門",
-            "auditUser": "簽核人員",
-            "auditMethod": "簽核方式",
-            "auditButton": "簽核按鈕",
-            "selectDepart": "簽核按鈕",
-
-            "rule_countersigned": "一人通过，则通过；一人驳回，则驳回",
-            "rule_coSign": "一人通过，则通过；一人驳回，则驳回",
-
-            "agree": "同意",
-            "reject": "拒絕",
-            "withdraw": "撤回",
-            "define": "自定義",
-            "defineItem": "自定義名稱",
-
-            "nodeStayTime": "節點停留時間",
-            "alertAtOverTime": "超時發送訊息提醒",
-            "stayOver": "停留超過",
-            "day": "天",
-
-            "submitAudit": "送出簽核"
-
-
-
-
-
-
-
-
-
-
-            
-    
-            
-        }
     }
+  },
+  "audit":{
+    "auditStatus":{
+      "noteYet":"尚未開始",
+      "processing":"處理中",
+      "reject":"駁回",
+      "approved":"簽核通過",
+      "cancel":"取消",
+      "rollback":"撤回"
+    },
+    "sendAudit":{
+      "all":"全部",
+      "processing":"進行中",
+      "completed":"已完成",
+      "storeName":"巡檢門店",
+      "reportName":"巡檢表",
+      "submitTime":"送出時間",
+      "auditStatus":"簽核狀態",
+      "updateTime":'最後更新時間',
+      "owner":"當前處理人",
+      "operation":"操作",
+      "waiting":"待簽核",
+      "approved":"已簽核",
+      "submitterName":"送出人"
+    },
+    "workFlows":{
+      "workFlowsName":"流程名稱",
+      "workFlowsType":"流程名稱",
+      "workFlowsCreatedUser":"建立人",
+      "workFlowsDescription":"流程描述",
+      "workFlowsCreatedTs":"建立時間",
+      "workFlowsUpdateTs":"建立時間",
+      "workFlowsState":"建立時間",
+      "searchPlaceholder":"搜尋流程名稱",
+      "addWorkFlow":"新增流程",
+      "comfirmDelete":"確認刪除當前簽核流程？",
+      "comfirmDeleteNode":"確認刪除當前簽核流程節點？",
+      "canNotDelete":"已綁定簽核流程無法刪除",
+      "dulplicateScuccess":"已成功複製流程",
+      "deleteScuccess":"删除成功",
+      "deleteFail":"删除失敗",
+      "workFlowConfiguration":"流程配置",
+      "saveAndPublic":"保存並發布",
+      "saveAndPublic":"保存並發布",
+      "basicInformation":"基本信息",
+      "workFlowName":"流程名稱",
+      "workFlowClassification":"流程分類",
+      "inspectionForm":"巡檢表單",
+      "workFlowDescription":"流程描述",
+      "signoffMode":"簽核模式",
+      "canCancel":"可取消簽核",
+      "canNotCancel":"不可取消簽核",
+      "thisModeWithoutEvent":" ※ 此模式不會立即產生事件",
+      "addNode":" 新增審核節點",
+      "nodeIndex":"節點編號",
+      "nodeName":"節點名稱",
+      "nodeAuditName":"簽核人員",
+      "nodeAuditmethod":"簽核方式",
+      "nodeSign":"簽名",
+      "countersigned":"會簽",
+      "coSign":"或簽",
+      "need":"需要",
+      "unnecessary":"不需要",
+      "moveUp":"上移",
+      "moveDown":"下移",
+      "addCC":"新增副本通知人員",
+      "findUser":"查詢人員",
+      "save":"儲存",
+      "inputNodeName": "請輸入節點名稱",
+      "auditDepart": "簽核部門",
+      "auditUser": "簽核人員",
+      "auditMethod": "簽核方式",
+      "auditButton": "簽核按鈕",
+      "selectDepart": "簽核按鈕",
+      "rule_countersigned": "一人通过，则通过；一人驳回，则驳回",
+      "rule_coSign": "一人通过，则通过；一人驳回，则驳回",
+      "agree": "同意",
+      "reject": "拒絕",
+      "withdraw": "撤回",
+      "define": "自定義",
+      "defineItem": "自定義名稱",
+      "nodeStayTime": "節點停留時間",
+      "alertAtOverTime": "超時發送訊息提醒",
+      "stayOver": "停留超過",
+      "day": "天",
+      "submitAudit": "送出簽核"
+    },
+    "inceptionRpt":{
+      "sendAudit":"送出簽核",
+      "addAttach":"新增附件 (支援圖片或PDF檔)",
+      "auditNote":"備註",
+      "nextAuditor":"下一級處理人",
+      "ccPeople":"副本通知",
+      "attachment":"附件",
+      "maxFileSizeAlert":"PDF檔案不可大於4MB"
+    }
+  }
 
 }

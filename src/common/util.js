@@ -735,6 +735,22 @@ export default {
     "#FC9741"
     ];
     return colorArr;
+  },
+  getAuditStatusName(val){
+    switch (val){
+      case 1:
+        return i18n.t('audit.auditStatus.noteYet');
+      case 2:
+        return i18n.t('audit.auditStatus.processing');
+      case 3:
+        return i18n.t('audit.auditStatus.reject');
+      case 4:
+        return i18n.t('audit.auditStatus.approved');
+      case 5:
+        return i18n.t('audit.auditStatus.cancel');
+      case 6:
+        return i18n.t('audit.auditStatus.rollback');
+    }
   }
 
 };
@@ -783,6 +799,8 @@ class indexedDB {
       };
     });
   }
+
+  
 
 }
 export { indexedDB };

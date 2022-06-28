@@ -63,7 +63,7 @@
           :options="storeTypeList"
           @changeInput="onChangeStoreType"/>
     </div>
-    
+
   </div>
   <div v-if="showStoreSelected" class="flex-center padding-left" style="text-align: left; margin-top: 20px; justify-content: space-between">
     <div class="paper shadow-light favorite"
@@ -80,9 +80,9 @@
         :placeholder="$t('remotePatrol.stores')"
         :options="storeDataList"
         @changeInput="onChangeStore"/>
-        
+
     <div v-else class="single-select shadow-light">
-      <el-select 
+      <el-select
         :value="curSelectedStore"
         @change="onChangeSelectedStore"
         size="mini">
@@ -106,7 +106,7 @@
         </div>
       </dialog-pop>
     </div>
-    
+
     <div v-if="!multiStore" class="spacer"></div>
     <slot name="others"></slot>
   </div>
@@ -212,7 +212,7 @@ export default {
       isFavorite: false,
       isChangeAccount:false,
       input:'',
-      
+
       checkCurStoreInFavorite:false,
       changeStoreObj: {
         title: this.$t('remotePatrol.confirm'),
@@ -238,7 +238,7 @@ export default {
         //this.getStoreListAndGroupAndType();
         self.getStoreListAndGroupAndType(true);
         //await self.getSearchParams();
-        
+
       }
     },
     cachedParams() {
@@ -255,7 +255,7 @@ export default {
     changeFavorite () {
       this.$store.dispatch('setFavoritList',true);
       /*if(!this.isFavorite){
-        
+
         new Promise((resolve,reject)=>{
           this.getFavoriteStoreData().then(result=>{
             resolve(result);
@@ -284,7 +284,7 @@ export default {
         this.checkCurStoreInFavorite = true;
         this.changeStoreObj.dialogCosed = true;
       }else{
-        this.isFavorite = !this.isFavorite;
+      this.isFavorite = !this.isFavorite;
         this.getStoreListAndGroupAndType();
       }
       //this.isFavorite = !this.isFavorite;
@@ -300,7 +300,7 @@ export default {
           const country = item.country;
           //console.log("2.country:",country);
           //let searchkey = temp.find(x=>{return x.label==country} );
-          
+
           if (temp.map(x => x.label).indexOf(country) === -1) {
             const obj = {
               value: country,
@@ -328,24 +328,24 @@ export default {
         //countryList.unshift({ value: '-1', label: self.$t('remotePatrol.all') });
         templist.push({label:i18n.t('remotePatrol.country'),countryList:countryList,});
         // console.log("4.templist:",templist);
-        
+
         self.countryList = templist;
         // console.log("5.this.countryList:",self.countryList);
       }
       this.curCountry = (!this.ifGetParamsFromCash) ? countryList[0].value : this.curCountry;
       //if(!initFilter)
       this.selectAllProAndCity(this.curCountry,initFilter);
-      
+
     },
 
     getStoreListAndGroupAndType(init) {
-    
+
       const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : this.getBriefStoreData();
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
         var storeList = results[0];
-        // console.log("storeList~~~~~~~~~>", storeList)
+        //console.log(storeList)
         const groupList = results[1];
         const typeList = results[2];
         groupList.map(item => {
@@ -386,7 +386,7 @@ export default {
     },
     canceldChangeStore() {
       if(this.checkCurStoreInFavorite) {
-        
+
         this.checkCurStoreInFavorite= false;
         //this.getStoreListAndGroupAndType();
       }
@@ -401,7 +401,7 @@ export default {
         this.getStoreListAndGroupAndType();
         this.$store.dispatch('setEditCountStoreMonitor',0);*/
       }
-      
+
       this.getStoreListAndGroupAndType();
       this.$store.dispatch('setEditCountStoreMonitor',0);
       this.curSelectedStore = this.curSelectedStore_;
@@ -409,7 +409,7 @@ export default {
       this.emitParams();
       this.changeStoreObj.dialogCosed = false;
       this.$store.dispatch('setEditCount', 0);
-      
+
     },
     onChangeSelectedStore(val) {
       if(this.$store.getters.editCount != 0) {
@@ -441,8 +441,8 @@ export default {
       //this.filterStore();
       // console.log("arr:",arr);
       /*this.filterStoreIds = arr.filter(storeId => storeId !== '-1');
-      
-     
+
+
       console.log(this.filterStoreIds)
       if(this.filterStoreIds){
         let temp=[];
@@ -479,7 +479,7 @@ export default {
 
      // console.log(this.storeList);
      // console.log(this.storeDataList )
-      
+
     },
 
     onChangeProvince(arr) {
@@ -622,7 +622,7 @@ export default {
         //});
         console.log("*this.curStore:",this.curStore);
         console.log("*this.storeList:",this.storeList);
-        
+
         this.storeDataList = temp;
         console.log("*this.storeDataList:",this.storeDataList);
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
@@ -666,14 +666,14 @@ export default {
         //});
         console.log("*this.curStore:",this.curStore);
         console.log("*this.storeList:",this.storeList);
-        
+
         this.storeDataList = temp;
         console.log("*this.storeDataList:",this.storeDataList);
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         if(this.curStore.length != this.filterStoreIds.length){
           this.curStore = this.filterStoreIds;
           if(this.filterStoreIds.length == this.storeDataList.length) {
-            
+
             this.curStore.unshift( '-1');
             console.log("**2.select all:",this.curStore);
           }
@@ -784,7 +784,7 @@ export default {
         console.log("filterStoreId:",filterStoreId);
         if(filterStoreId.length==0){
           this.curStore = filterStoreArray;
-          
+
           /*if(this.curStore.length == filterStoreArray.length){
             this.curStore.unshift({ value: '-1', label: i18n.t('remotePatrol.all') });
           }*/
@@ -799,7 +799,7 @@ export default {
         this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
       }
 
-      
+
       this.getStoreGroupString();
       this.getStoreTypeString();
       if(this.emitChanged){
@@ -809,7 +809,7 @@ export default {
       // console.log("Emit From fitlerstore")
       this.emitParams();
      // console.log("emitChanged:",this.emitChanged);
-      
+
     },
 
     getStoreGroupString() {
@@ -852,7 +852,7 @@ export default {
         var favoritStoreExist = this.storeList.some( st => st.storeId == this.curSelectedStore);
         //console.log("favoritStoreExist:",favoritStoreExist);
         if(favoritStoreExist){
-          tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
+      tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
         }else{
           this.curSelectedStore = '';
           tempsearchParamsObj.curSelectedStore = "";
@@ -873,7 +873,7 @@ export default {
       if (groupArr.length > 0 && typeArr.length === 0) {
         groupIdArr = groupArr.map(group => group.contents);
         //console.log("1.groupIdArr:",groupIdArr);
-        const arrToSet = new Set(groupIdArr.flat()); 
+        const arrToSet = new Set(groupIdArr.flat());
         const uniqueArray = [...arrToSet];
         console.log("group uniqueArray:",uniqueArray);
         return uniqueArray;
@@ -1095,7 +1095,7 @@ export default {
       const searchParams = this.cachedParams;
       // console.log("getSearchParams > searchParams:",searchParams);
       if (Object.keys(searchParams).length > 0) {
-        
+
         if (searchParams.curCountry) {
           this.curCountry = searchParams.curCountry;
           this.curProvince = searchParams.curProvince;
@@ -1122,18 +1122,18 @@ export default {
     /deep/ .el-input__inner {
       border: none;
       font-size: 15px;
-      height: calc(28/1440*100vw); 
-      line-height: calc(28/1440*100vw); 
+      height: calc(28/1440*100vw);
+      line-height: calc(28/1440*100vw);
     }
   }
   .favorite {
-    width: calc(115/1440*100vw); 
-    height: calc(28/1440*100vw); 
+    width: calc(115/1440*100vw);
+    height: calc(28/1440*100vw);
     font-size: calc(15/1920*100vw);
-    line-height: calc(28/1440*100vw); 
-    user-select: none; 
-    cursor: pointer; 
-    margin-right: calc(20/1440*100vw);  
+    line-height: calc(28/1440*100vw);
+    user-select: none;
+    cursor: pointer;
+    margin-right: calc(20/1440*100vw);
     text-align: center;
   }
   .content{
@@ -1171,13 +1171,13 @@ export default {
       margin-right: calc(15/1920*100vw);
       min-width: 85px;
       min-height: 36px;
-      
+
     }
     .region{
       display:inline;
       width: calc(217/1440*100vw);
     }
-    
+
     .normal-span{
       font-size: calc(14/1920*100vw);
       margin-right: calc(20/1920*100vw);
@@ -1251,11 +1251,11 @@ export default {
     width: calc(100% - 30px);
     position: absolute;
     left: 0;
-    
+
   }
   >>> .el-select .el-input--medium .el-input__suffix{
     top:0px !important;
-    
+
   }
   >>> .el-select__tags{
     opacity: 0;

@@ -194,24 +194,24 @@ export const navbarRoute = {
   getAuditRoute() {
     const auditRoute = {
       path: '/home',
-      name: 'auditManage',
+      name: 'AuditManage',
       component: Home,
       iconCls: 'iconfont icon-shijian',
       styles: 'font-size:22px',
-      leaf: true,
-      isReadOnly: false,
+      leaf: false,
       hidden: false,
       children: []
     };
     auditRoute.children.push(
       {
         path: '/audit',
-        name: 'AuditManage',
-        component: resolve => require(['@/views/audit/AuditManage'], resolve),
+        name: 'SendAuditManage',
+        component: resolve => require(['@/views/audit/SendAuditManage'], resolve),
         meta: {
           keepAlive: true, // the component is't to be cache.
           requireAuth: true
-        }
+        },
+        isReadOnly: false
       },
       {
         path: '/auditdetail',
@@ -220,6 +220,30 @@ export const navbarRoute = {
         component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
       }
     ) && primaryPathesList.push('/audit', '/auditdetail');
+    auditRoute.children.push(
+      {
+        path: '/waitaudit',
+        name: 'WaitAuditManage',
+        component: resolve => require(['@/views/audit/WaitAuditManage'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: true
+        },
+        isReadOnly: false
+      },
+    ) && primaryPathesList.push('/waitaudit');
+    auditRoute.children.push(
+      {
+        path: '/transcriptnotify',
+        name: 'TranscriptNotify',
+        component: resolve => require(['@/views/audit/TranscriptNotify'], resolve),
+        meta: {
+          requireAuth: true,
+          keepAlive: true
+        },
+        isReadOnly: false
+      },
+    ) && primaryPathesList.push('/transcriptnotify');
     return auditRoute;
   },
 
