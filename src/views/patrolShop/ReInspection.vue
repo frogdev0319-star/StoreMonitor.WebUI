@@ -1120,6 +1120,8 @@ export default {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
     const storeListCache = self.$store.getters.storeListCache;
+    console.log("*storeList:",storeListCache);
+    console.log("*PatrolHistory:",PatrolHistory);
     if (storeListCache) self.storeList = storeListCache
     if (PatrolHistory != null) {
       self.activeIndex = PatrolHistory.activeIndex;

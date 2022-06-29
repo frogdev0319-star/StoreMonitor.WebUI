@@ -1329,7 +1329,11 @@ export default{
       "submitFail":"提交失敗！",
       "goWorkflow":"請前往簽核流程進行流程處理",
       "backReInspection":"返回遠程巡檢",
-      "goAuditMangement":"前往簽核流程"
+      "goAuditMangement":"前往簽核流程",
+      "edit":"編輯",
+      "cancelAudit":"取消簽核",
+      "confirmCancelAudit":"確認是否取消此報告簽核",
+      "cancelAuditFail":"取消簽核失敗"
     }
   }
 

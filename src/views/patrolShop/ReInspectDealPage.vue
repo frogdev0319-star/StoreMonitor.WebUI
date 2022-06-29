@@ -62,7 +62,7 @@ export default {
   mounted() {
     const self = this;
     self.getRouterData();
-    /*if (self.isSuccess && !self.isBindWorkflow) {
+    /*if (!self.isSuccess) {
       self.timeid = setInterval(function() {
         self.getBackSecond();
       }, 1000);
@@ -87,6 +87,9 @@ export default {
       } else {
         self.$route.matched[self.$route.matched.length - 1].name = 'failSubmit';
         if (!self.isSuccess) {
+          self.timeid = setInterval(function() {
+            self.getBackSecond();
+          }, 1000);
           PubSub.publish('success-page', { changeStyle: true });
         }
       }
@@ -97,7 +100,7 @@ export default {
       self.curSecond--;
       if (self.curSecond === 0) {
         clearInterval(self.timeid);
-        self.$router.push({ name: 'remotePatrol' });
+        //self.$router.push({ name: 'remotePatrol' });
       }
     },
     goBackRemoteInception(){

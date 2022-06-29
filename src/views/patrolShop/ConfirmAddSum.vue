@@ -838,37 +838,44 @@ export default {
         if (res.errCode === 0) {
           const data = res.data;
           self.editFlag = true;
-          
-          const inspectId = data.inspectId; //取得報告ID
-          const wfParams={
-            inspectReportId:inspectId,
-            comment:{
-              description:self.auditNote,
-              attachment:auditAttachment
+          if(self.isBindWorkflow){
+            const inspectId = data.inspectId; //取得報告ID
+            const wfParams={
+              inspectReportId:inspectId,
+              comment:{
+                description:self.auditNote,
+                attachment:auditAttachment
+              }
             }
-          }
-          SubmitWorkflow(wfParams).then(wfRes=>{
-            console.log("SubmitWorkflow res:",res);
-            if(wfRes.errCode == 0){
-              self.$store.dispatch('setEditCount', 0);
-              routeData = {
-                  isSuccess: true,
-                  user: data.notifiedTo,
+            SubmitWorkflow(wfParams).then(wfRes=>{
+              console.log("SubmitWorkflow res:",res);
+              if(wfRes.errCode == 0){
+                self.$store.dispatch('setEditCount', 0);
+                routeData = {
+                    isSuccess: true,
+                    user: data.notifiedTo,
+                    isBindWorkflow:true
+                };
+              }else{
+                routeData = {
+                  isSuccess: false,
+                  reLoadData: self.$route.params,
                   isBindWorkflow:true
-              };
-            }else{
-              routeData = {
-                isSuccess: false,
-                reLoadData: self.$route.params,
-                isBindWorkflow:true
-              };
-            }
-            self.$router.push({ name: 'submitEvent', params: { data: routeData }});
-          }).catch(err=>{
-            console.log("err:",err);
-            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-            return false;}
-          );
+                };
+              }
+              self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+            }).catch(err=>{
+              console.log("err:",err);
+              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+              return false;}
+            );
+          }else{
+            routeData = {
+               isSuccess: true,
+               user: data.notifiedTo,
+               isBindWorkflow:false
+            };
+          }
           
         } else {
           routeData = {
@@ -905,8 +912,10 @@ export default {
         self.eventList = routeData.event;
         self.allRemarkItemsFlag = routeData.allRemarkItemsFlag;
         self.isBindWorkflow = routeData.isBindWorkflow;
-        console.log('**inspectSettings.workflowInfo',inspectSettings.workflowInfo);
-        this.doGetWorkflowInfo(inspectSettings.workflowInfo);
+        if(self.isBindWorkflow){
+          console.log('**inspectSettings.workflowInfo',inspectSettings.workflowInfo);
+          this.doGetWorkflowInfo(inspectSettings.workflowInfo);
+        }
         this.getTab1AndTab3BtnName(inspectSettings);
         const allTypeArr = new Set();
         let tempList = [], feedBackTemp = [], ignoreTemp = [], UnqualifiedTemp = [], dealType = [];

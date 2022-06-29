@@ -124,3 +124,11 @@ export const SubmitWorkflow = data =>{
     data
   });
 };
+
+export const CancelWorkflow = data =>{
+  return request({
+    url: `${version}/workflow/cancel`,
+    method: 'post',
+    data
+  });
+};
