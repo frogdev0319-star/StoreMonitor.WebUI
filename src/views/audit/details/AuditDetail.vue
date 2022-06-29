@@ -1,39 +1,140 @@
 <template>
-  <div class="page-container report-setting paper" style="height: 100%">
-    <p>aaa</p> 
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+  <div class="page-container report-setting paper " style="height: 100%">
+    <div class="audit-section">
+      <!-- audit-header -->
+      <div class="audit-header">
+        <h3>簽核巡檢表</h3>
+        <div class="goto-report">報告詳情</div>
+      </div>
 
-    <!-- 基本信息 -->
-    <div v-loading="isLoadingData" class="setting-details self-loading">
-      <div class="template-info">
-        <div class="inspect-basic">
-          <setting-table :table-name="$t('audit.workFlows.basicInformation')">
-            <template slot="tableDetail">
-              <!-- row -->
-              <div class="setting-config">
-                <!-- 基本信息 -->
-                <div class="flex-row" style="margin-right: 30px">
-                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.basicInformation')}}</div>
-                </div>
+      <!-- audit body -->
+      <div class="audit-flow-body">
+        <p style="text-align: left; margin-bottom: 30px">簽核流程</p>
+
+        <!-- workflow -->
+        <div class="audit-flow-unit">
+          <div class="check"><i class="iconfont el-icon-success iconbangzhu"/></div>
+          <div class="audit-flow-content">
+            <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+              <div class="audit-name">
+                <div class="audit-workflow-name">送出簽核</div>
+                <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
               </div>
-            </template>
-          </setting-table>
+              <div class="audit-situation">
+                <div class="audit-agree">同意</div>
+              </div>
+            </div>
+            <div class="audit-description">
+              <div class="audit-description-comment">這是一個很長很長的故事～</div>
+              <div class="audit-description-data">
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- workflow -->
+        <div class="audit-flow-unit ">
+          <div class="check"><i class="iconfont el-icon-time iconbangzhu"/></div>
+          <div class="audit-flow-content">
+            <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+              <div class="audit-name">
+                <div class="audit-workflow-name">送出簽核</div>
+                <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
+              </div>
+              <div class="audit-situation">
+                <div class="audit-agree">同意</div>
+              </div>
+            </div>
+            <div class="audit-description">
+              <div class="audit-description-comment">這是一個很長很長的故事～</div>
+              <div class="audit-description-data">
+                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
+                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
+                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- workflow -->
+        <div class="audit-flow-unit not-yet">
+          <div class="check"><i class="iconfont el-icon-more iconbangzhu"/></div>
+
+          <div class="audit-flow-content">
+            <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+              <div class="audit-name">
+                <div class="audit-workflow-name">送出簽核</div>
+                <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
+              </div>
+              <div class="audit-situation">
+                <div class="audit-agree">同意</div>
+              </div>
+            </div>
+            <div class="audit-description">
+              <div class="audit-description-comment">這是一個很長很長的故事～</div>
+              <div class="audit-description-data">
+              </div>
+            </div>
+          </div>
+          <div class="audit-flow-content">
+            <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+              <div class="audit-name">
+                <div class="audit-workflow-name">送出簽核</div>
+                <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
+              </div>
+              <div class="audit-situation">
+                <div class="audit-agree">同意</div>
+              </div>
+            </div>
+            <div class="audit-description">
+              <div class="audit-description-comment">這是一個很長很長的故事～</div>
+              <div class="audit-description-data">
+              </div>
+            </div>
+          </div>
+          <div class="audit-flow-content">
+            <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+              <div class="audit-name">
+                <div class="audit-workflow-name">送出簽核</div>
+                <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
+              </div>
+              <div class="audit-situation">
+                <div class="audit-agree">同意</div>
+              </div>
+            </div>
+            <div class="audit-description">
+              <div class="audit-description-comment">這是一個很長很長的故事～</div>
+              <div class="audit-description-data">
+              </div>
+            </div>
+          </div>
+          
+          
+        </div>
+
+
+
       </div>
     </div>
+    
 
 
+
+
+
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
   </div>
 </template>
 <script>
 import DelayButton from '@/components/DelayButton';
-import SettingTable from '@/components/SettingTable';
+// import SettingTable from '@/components/SettingTable';
 // import {getNodeList, updateWorkflow} from "@/api/workflow";
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
@@ -41,7 +142,6 @@ import DialogPop from '@/components/DialogPop';
 export default {
   name: 'WorkflowDetail',
   components: {
-    SettingTable
     
   },
   data() {
@@ -60,243 +160,108 @@ export default {
     // async init(){
     //   await this.getWorkflowInfo() 
     // },
-
-
   }
 }
 </script>
 
+<style lang="sass" scoped>
 
-
-<style scoped>
-  .report-setting{
-    height: 100%;
-    position: relative;
-    font-size: calc(18/1920*100vw);
-    box-sizing: border-box;
-  }
-  /* .setting-titles{
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #e3e9f4;
-  } */
-  .setting-tabs{
-    display: flex;
-    justify-content: flex-start;
-  }
-  .setting-name{
-    cursor: pointer;
-    width: 120px;
-    color: #7d8cad;
-    padding: 15px calc(20/1920*100vw) 0 calc(20/1920*100vw);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .click-setting-btn{
-    color: #f31d65;
-    border-bottom: 4px solid #f31d65;
-  }
-
-  .save-btn{
-    text-align: left;
-    margin-top: 20px;
-  }
-
-  .title-info{
-    text-align: left;
-    padding-bottom: calc(20/1920*100vw);
-    display: flex;
-    align-items: center;
-    margin-top: 20px;
-  }
-  .left-item, .right-item{
-    display: inline-flex;
-    align-items: center;
-    margin-right: 100px;
-  }
-
-  .input-name{
-    width: 200px;
-    height: 30px;
-  }
-  .input-name .el-input--medium >>> .el-input__inner{
-    height: 36px;
-    line-height: 36px;
-    font-size: 12px;
-  }
-
-  .span-font{
-    font-size: 14px;
-    color:#424151;
-    /* width: 200px; */
-    text-align: left;
-  }
-  .name-font{
-    color:#424151;
-    text-align: left;
-    margin-right: calc(45/1920*100vw);
-  }
-  .enable-font{
-    margin-right: 20px;
-  }
-
-  .name-tips{
-    display:flex; 
-    flex-direction:column;
-    
-  }
-  .error-text{
-    font-size: 12px;
-    color: red;
-    position: relative;
-  }
-  .error-text span{
-    position: absolute;
-  }
-  .setting-config, .table-header{
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    /* height: 60px; */
-    padding: 15px 0;
-
-  }
-  .table-header{
-    color: #424151;
-    border: 1px solid #e3e9f4;
-    border-bottom: none;
-    font-weight: bold;
-    background-color: #fff;
-  }
-
-  .detail-setting{
-    /* padding: 0 calc(30/1920*100vw); */
-  }
-  .radio-setting{
-    display: flex;
-    flex-direction: column;
-    height: 60px;
-    justify-content: center;
-    margin-top: 20px;
-  }
-  .radio-setting .el-radio{
-    height: 30px;
-  }
-  .setting-config{
-    /* border-bottom: 1px solid #e3e9f4; */
-    height: auto;
-  }
-
-  .setting-config:hover{
-    cursor: pointer;
-  }
-  .basic-config, .basic-header{
-    border: none;
-    border-bottom: 1px solid #e3e9f4;
-    /* padding-left: calc(30/1920*100vw); */
-  }
-  .basic-config:hover{
-    cursor: default;
-  }
-  .title-name{
-    width: fit-content;
-    text-align: left;
-    margin-right: 20px;
-    margin-left: calc(20/1920*100vw);
-  }
-  .title-status{
-    /* width: 60%; */
-    text-align: left;
-  }
-
-  .title-operation{
-    /* width: 20%; */
-  }
-
-  .sortable-ghost{
-    color: #424151 !important;
-    background: rgba(243, 19, 101, 0.1) !important;
-    border: 1px solid #f31d65;
-  }
-
-  .statis-item{
-    display: flex;
-    height: 40px;
-    align-items: center;
-  }
-  .el-radio{
-    width: 100px;
-    margin-right: 0px
-  }
-
-  /* .setting-details{
-    margin: 0 30px;
-  } */
-  .content-titles{
-    display: flex;
-    align-items: center;
-    height: 60px;
-    font-size: 12px;
-  }
-  .template-select-area{
-    display:flex; 
-    flex-direction:row;
-    height:calc(30/1920*100vw);
-    width:200px;
-    align-items:center;
-    background-color:#f4f6f7;
-    border-radius:5px;
-    font-size: 13px;
-    margin-right: 20px;
-  }
-  .template-select-label{
-      color:#556679;
-      font-family: NotoSansCJKtc;
-      font-size: 13px;
-      width:75px;
-      margin-left:16px;
-      line-height: 15px;
-    }
-  .inspect-basic{
-    margin-bottom: 30px;
-    position: relative;
-  }
-
-  .el-radio{
-    color: #424151;
-  }
-  >>> .el-radio__input.is-checked + .el-radio__label{
-    color: #514d41;
-  }
-  .detail-table{
-    /* border: 1px solid #e3e9f4;
-    padding-bottom: 20px; */
-    background-color: #f7f9fa
-  }
-  .promot-info{
-    position: absolute;
-    right: 0;
-    bottom: 10px;
-    font-size: 12px;
-    color: #7d8cad;
-  }
-</style>
-
-<style lang="sass">
-  .audit-user-row
-    display: flex
-    flex-wrap: wrap
-    flex-direction: row
-    justify-content: flex-start
-    align-items: flex-start
-    .audit-user
-      margin-right: 10px
+  .not-yet
+    color: #c0c0c0 !important
   
-  .el-table__row
-    &:first-child
-      .el-table_1_column_6
-        .cell
-          display: none !important
+  .iconbangzhu 
+    color: #c0c0c0
+    font-size: 23px
+  h3 
+    margin: 0
+    font-size: calc(18/1920*100vw)
+  p
+    margin: 0
+    font-size: 15px
+  .for-flex
+    display: flex
+    flex-direction: row
+    justify-content: flex-start 
+    align-items: flex-end
+  .justify-content_space-between
+    justify-content: space-between
+  
+  
+
+  .report-setting
+    height: 100%
+    position: relative
+    font-size: calc(18/1920*100vw)
+    box-sizing: border-box
+  .audit-section
+    text-align: left
+    .audit-header
+      display: flex
+      flex-direction: row
+      justify-content: space-between
+      align-items: center
+      border-bottom: 1px solid #e3e9f4
+      padding: calc(20/1920*100vw)
+      .goto-report
+        font-size: 15px
+        color: #006ab7
+        cursor: pointer
+        &:hover
+          color: #033860
+          transition: all .3s
+          text-align: left
+
+    .audit-flow-body
+      padding: calc(30/1920*100vw)
+      .audit-flow-unit
+        color: #556679
+        border-left: 2px dotted #ddd
+        margin-left: 20px
+        padding: 0px 20px 30px 30px
+        position: relative
+        .check
+          background: #FFF
+          position: absolute
+          top: 0px
+          left: -13px
+            
+        .audit-flow-content
+          margin-bottom: 20px
+          .audit-name
+            .audit-workflow-name
+              font-size: 15px
+              font-weight: 900
+              margin-bottom: 3px
+            .audit-user-name
+              font-size: 12px
+          .audit-situation
+            .audit-agree
+              width: 120px
+              height: 27px
+              border-radius: 3px
+              color: #59ab22
+              background: #e8f6de
+              font-size: 14px
+              display: flex
+              flex-direction: row
+              justify-content: center
+              align-items: center
+          .audit-description
+            background: #f7f9fa
+            padding: 20px
+            .audit-description-comment
+              font-size: 14px
+            .audit-description-data
+      
+              img
+                margin-top: 10px
+                margin-right: 10px
+                width: 200px
+                border-radius: 4px
+
+
+
+
 </style>
+
+
