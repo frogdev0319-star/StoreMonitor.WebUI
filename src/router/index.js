@@ -214,12 +214,12 @@ export const navbarRoute = {
         isReadOnly: false
       },
       {
-        path: '/auditdetail',
-        name: 'AuditDetail',
+        path: '/auditDetail',
+        name: 'auditDetail',
         hidden: true,
         component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
       }
-    ) && primaryPathesList.push('/audit', '/auditdetail');
+    ) && primaryPathesList.push('/audit', '/auditDetail');
     auditRoute.children.push(
       {
         path: '/waitaudit',

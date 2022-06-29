@@ -79,7 +79,7 @@
                 </el-tab-pane>
             </el-tabs>
         </div>
-        
+
     </div>
 </template>
 <script>
@@ -523,14 +523,21 @@ export default{
         clickDetail(item, index) {
             const self = this;
             console.log("clickDetail:",item);
-            //sessionStorage.setItem('audit_detail', JSON.stringify(item.routeObj));
-            //self.$router.push({ name: 'auditDetails', params: { data: item.routeObj }});
+            sessionStorage.setItem('audit_detail', JSON.stringify(item.routeObj));
+            // this.$router.push({ name: 'auditdetail', params: { data: item.routeObj }});
+            self.$router.push({ name: 'auditDetail', params: { data: item.routeObj }});
         },
     },
-    
 }
 </script>
+
 <style lang="scss" scoped>
+.aaa{
+    width: 50px;
+    height: 50px;
+    background: yellow;
+    cursor: pointer;
+}
 .el-audit-header{
     .search-button{
       float: right;
