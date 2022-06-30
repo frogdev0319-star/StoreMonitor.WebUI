@@ -9,7 +9,15 @@
 
       <!-- audit body -->
       <div class="audit-flow-body">
-        <p style="text-align: left; margin-bottom: 30px">簽核流程</p>
+
+        <div class="audit-flow-ownerhandling">
+          <p>簽核流程</p>
+          <div class="handling">
+            <div class="withdraw">撤回</div>
+            <div class="l-l"> | </div>
+            <div class="cancel">取消</div>
+          </div>
+        </div>
 
         <!-- workflow -->
         <div class="audit-flow-unit">
@@ -35,10 +43,10 @@
         <!-- workflow -->
         <div class="audit-flow-unit ">
           <div class="check"><i class="iconfont el-icon-time iconbangzhu"/></div>
-          <div class="audit-flow-content">
+          <div class="audit-flow-content on-audit">
             <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
               <div class="audit-name">
-                <div class="audit-workflow-name">送出簽核</div>
+                <div class="audit-workflow-name">主管簽核</div>
                 <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
               </div>
               <div class="audit-situation">
@@ -76,7 +84,7 @@
               </div>
             </div>
           </div>
-          <div class="audit-flow-content">
+          <div class="audit-flow-content on-audit">
             <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
               <div class="audit-name">
                 <div class="audit-workflow-name">送出簽核</div>
@@ -165,12 +173,10 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-
   .not-yet
     color: #c0c0c0 !important
-  
   .iconbangzhu 
-    color: #c0c0c0
+    color: #556679
     font-size: 23px
   h3 
     margin: 0
@@ -178,6 +184,11 @@ export default {
   p
     margin: 0
     font-size: 15px
+
+  .on-audit
+    border-top: 2px solid #006ab7
+    border-bottom: 2px solid #006ab7
+
   .for-flex
     display: flex
     flex-direction: row
@@ -186,7 +197,7 @@ export default {
   .justify-content_space-between
     justify-content: space-between
   
-  
+
 
   .report-setting
     height: 100%
@@ -207,26 +218,60 @@ export default {
         color: #006ab7
         cursor: pointer
         &:hover
-          color: #033860
+          color: #17537e
           transition: all .3s
-          text-align: left
 
     .audit-flow-body
       padding: calc(30/1920*100vw)
+      .audit-flow-ownerhandling
+        display: flex
+        flex-direction: row
+        justify-content: space-between
+        align-items: cente
+        .handling
+          display: flex
+          flex-direction: row
+          justify-content: center
+          align-items: center
+          margin-right: 20px
+          margin-bottom: 30px
+          .withdraw, .cancel
+            font-size: 14px
+            font-weight: 900
+            color: #006ab7
+            cursor: pointer
+            &:hover
+              color: #17537e
+              transition: all .3s
+          .l-l
+            margin: 0 10px
+            font-size: 14px
+            color: #006ab7
+
+
       .audit-flow-unit
         color: #556679
         border-left: 2px dotted #ddd
         margin-left: 20px
         padding: 0px 20px 30px 30px
         position: relative
+        &:nth-child(2)
+          .audit-flow-content
+            padding-top: 0px
+          .check
+            top: 0
         .check
           background: #FFF
           position: absolute
-          top: 0px
-          left: -13px
-            
+          top: 10px
+          left: -12px
+        
         .audit-flow-content
+          padding-top: 8px
           margin-bottom: 20px
+
+            // padding-top: 0px !important
+
           .audit-name
             .audit-workflow-name
               font-size: 15px
