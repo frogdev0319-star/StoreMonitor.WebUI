@@ -17,6 +17,24 @@
       </div>
     </div>
     <div class="el-header">
+      <div class="workflow-edit">
+        <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
+          {{ '督导稽核记录表' }}
+        </p>
+        <div style="display:inline-block">
+          <el-button 
+            class="confirm-btn"
+            size="'mini'" type="primary" @click="goBackRemoteInception">
+            {{ $t('audit.inceptionRpt.edit') }}
+          </el-button>
+          <el-button
+            class="storevue-button-filled"
+            size="'mini'" type="primary" @click="doCancelAudit">
+            {{ $t('audit.inceptionRpt.cancelAudit') }}
+          </el-button>
+        </div>   
+      </div>
+      <div class="splitline"></div>
       <div class="left-header">
         <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
         <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
@@ -471,11 +489,20 @@
         </el-dialog>
       </div>
     </div>
+    <dialog-pop
+      v-if="cancelAuditDialogShow"
+      :title="confirmCancelAuditInfo"
+      :isWarning="true"
+      :visible="cancelAuditDialogShow"
+      @cancelHandler="onCancelAudit"
+      @confirmHandler="onConfirmCancelAudit">
+    </dialog-pop>
   </div>
 </template>
 <script>
 import ECharts from 'vue-echarts';
 import { getInspectReportInfo } from '@/api/inspect';
+import { CancelWorkflow } from '@/api/workflow';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -487,6 +514,7 @@ import ReportDetail from '@/components/ReportDetail';
 import DescriptionText from '@/components/DescriptionText';
 import echartResize from '@/components/mixins/echartResize';
 import i18n from '@/lang/index';
+import DialogPop from '@/components/DialogPop.vue';
 
 export default {
   name: 'InspectReport',
@@ -495,6 +523,7 @@ export default {
     ReportDetail,
     AudioVue,
     DelayButton,
+    DialogPop,
     'v-chart': ECharts
   },
 
@@ -573,7 +602,10 @@ export default {
       weatherImg: '',
       chartLabelArr:[],
       pieColorList:['#6184CE', '#7B9FEB', '#7BD8EB', '#4DE197', '#ACF757','#F7D057', '#FF986E', '#EC5F55', '#A156C5', '#ACABAB'],
-      allRemarkItemsFlag: false
+      allRemarkItemsFlag: false,
+      workflowTaskName:'督导稽核记录表',
+      cancelAuditDialogShow:false,
+      confirmCancelAuditInfo:this.$t('audit.inceptionRpt.confirmCancelAudit'),
     };
   },
 
@@ -691,6 +723,7 @@ export default {
     getRouterData() {
       const self = this;
       const routeData = JSON.parse(sessionStorage.getItem('report_data'));
+      console.log("report routeData:",routeData);
       const obj = {};
       obj.reportId = routeData.id;
       obj.storeName = routeData.storeName;
@@ -1542,7 +1575,40 @@ export default {
       }
     },
 
-    adjustChart(){}
+    adjustChart(){},
+
+    goBackRemoteInception(){
+      const self = this;
+      console.log("goBackRemoteInception");
+      /*self.$store.dispatch('setPatrolHistory', self.historyObj);
+      self.$store.dispatch('setStoreList', self.storeList);
+      self.$store.dispatch('setStoreCache', this.curSelStoreId);*/
+    },
+    doCancelAudit(){
+      console.log("doCancelAudit");
+      this.cancelAuditDialogShow=true;
+    },
+    onCancelAudit(){
+      this.cancelAuditDialogShow=false;
+    },
+    onConfirmCancelAudit(){
+      const self = this;
+      CancelWorkflow({inspectReportId:self.report.reportId}).then(res=>{
+        if(res.errCode==0){
+          self.$router.push({ name: 'SendAuditManage' });
+          this.cancelAuditDialogShow=false;
+        }else{
+          this.cancelAuditDialogShow=false;
+          util.notify(self.$t('audit.inceptionRpt.cancelAuditFail'), 'warning', 3000);
+        }
+      }).catch(err =>{
+        console.log("CancelWorkflow fail:",err);
+        this.cancelAuditDialogShow=false;
+        util.notify(self.$t('audit.inceptionRpt.cancelAuditFail'), 'warning', 3000);
+      });
+      
+    },
+
   }
 };
 </script>
@@ -1660,6 +1726,17 @@ export default {
       }
       .nochart-report-title{
         font-size: 20px;
+      }
+      .workflow-edit{
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .splitline{
+          width:100%;
+          border-bottom: 1px solid rgba(172,174,177,.3);
+          margin: 20px 0;
       }
       .left-header{
         width: 100%;
