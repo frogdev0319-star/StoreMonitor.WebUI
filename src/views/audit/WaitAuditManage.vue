@@ -525,7 +525,7 @@ export default{
             console.log("clickDetail:",item);
             sessionStorage.setItem('audit_detail', JSON.stringify(item.routeObj));
             // this.$router.push({ name: 'auditdetail', params: { data: item.routeObj }});
-            self.$router.push({ name: 'auditDetail', params: { data: item.routeObj }});
+            self.$router.push({ name: 'auditHandling', params: { data: item.routeObj }});
         },
     },
 }

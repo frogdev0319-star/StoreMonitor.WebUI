@@ -231,7 +231,13 @@ export const navbarRoute = {
         },
         isReadOnly: false
       },
-    ) && primaryPathesList.push('/waitaudit');
+      {
+        path: '/auditHandling',
+        name: 'auditHandling',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/auditHandling'], resolve)
+      }
+    ) && primaryPathesList.push('/waitaudit', '/auditHandling');
     auditRoute.children.push(
       {
         path: '/transcriptnotify',

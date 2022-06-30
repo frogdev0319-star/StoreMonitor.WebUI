@@ -125,19 +125,6 @@
       </div>
     </div>
     
-
-
-
-
-
-
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
   </div>
 </template>
 <script>
@@ -197,8 +184,6 @@ export default {
   .justify-content_space-between
     justify-content: space-between
   
-
-
   .report-setting
     height: 100%
     position: relative
@@ -303,9 +288,6 @@ export default {
                 margin-right: 10px
                 width: 200px
                 border-radius: 4px
-
-
-
 
 </style>
 
