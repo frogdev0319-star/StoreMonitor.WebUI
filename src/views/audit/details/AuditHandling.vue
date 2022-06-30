@@ -1,12 +1,12 @@
 <template>
 
-	<div class="aaa for-flex">
+	<div class="aaa for-flex justify-content_space-between">
 			<!-- 簽核巡檢表 -->
-		<div class="page-container report-setting paper" style="height: 100%">
+		<div class="page-container report-setting paper" style="height: 100%; width:49.5%">
 			<div class="audit-section">
 				<!-- audit-header -->
 				<div class="audit-header">
-					<h3>簽核巡檢表 auditHandling</h3>
+					<h3>簽核巡檢表</h3>
 					<div class="goto-report">報告詳情</div>
 				</div>
 
@@ -132,18 +132,34 @@
 	
 
 		<!-- edit and comment -->
-		<div class="page-container report-setting paper">
+			<div class="page-container report-setting paper" style="height: 100%; width:49.5%">
 			<div class="audit-section">
 				<!-- audit-header -->
 				<div class="audit-header">
-					<h3>簽核巡檢表 auditHandling</h3>
+					<h3>填寫簽合意見</h3>
 					<div class="goto-report">報告詳情</div>
 				</div>
 
+				<!-- audit body -->
+				<div class="audit-flow-body">
+
+					<div class="audit-flow-ownerhandling" style="width: 100%">
+						<p>簽合處理</p>
+						<div class="handling">
+							<div class="withdraw">撤回</div>
+							<div class="l-l"> | </div>
+							<div class="cancel">取消</div>
+						</div>
+					</div>
+
+					
+				
 
 
-			</div>
+				</div>
+			</div> 
 		</div>
+
 	</div>
 
 </template>
