@@ -24,7 +24,7 @@
 
 					<!-- workflow -->
 					<div class="audit-flow-unit">
-						<div class="check"><i class="iconfont el-icon-success iconbangzhu"/></div>
+						<div class="check"><i class="iconfont el-icon-success"/></div>
 						<div class="audit-flow-content">
 							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
 								<div class="audit-name">
@@ -45,7 +45,7 @@
 
 					<!-- workflow -->
 					<div class="audit-flow-unit ">
-						<div class="check"><i class="iconfont el-icon-time iconbangzhu"/></div>
+						<div class="check"><i class="iconfont el-icon-time"/></div>
 						<div class="audit-flow-content on-audit">
 							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
 								<div class="audit-name">
@@ -137,23 +137,57 @@
 				<!-- audit-header -->
 				<div class="audit-header">
 					<h3>填寫簽合意見</h3>
-					<div class="goto-report">報告詳情</div>
+					<div class="buttons">
+						<delay-button type="filled">送出</delay-button>
+					</div>
 				</div>
 
 				<!-- audit body -->
 				<div class="audit-flow-body">
+          <div class="audit-add-comment">
+            <!-- 簽合意見 -->
+            <p style="margin-bottom: 10px"><span style="color: #c60957">* </span> 簽合意見</p>
+            <div class="comment-btn for-flex">
+              <div class="el-radio-details" style="background-color: rgb(0, 106, 183); color: rgb(255, 255, 255); border-color: rgb(0, 106, 183);">同意</div>
+              <div class="el-radio-details">駁回</div>
+            </div>
+            <div class="comment-input">
+              <el-input
+                :autosize="{ minRows: 3, maxRows: 5 }"
+                :placeholder="請輸入訊息"
+                class="storevue-textarea"
+                type="textarea"
+                resize="none"
+                maxlength="600"
+                show-word-limit
+              />
+            </div>
+          </div>
 
-					<div class="audit-flow-ownerhandling" style="width: 100%">
-						<p>簽合處理</p>
-						<div class="handling">
-							<div class="withdraw">撤回</div>
-							<div class="l-l"> | </div>
-							<div class="cancel">取消</div>
-						</div>
-					</div>
+          <!-- 加入檔案 & 簽名 -->
+          <div class="audit-add-files">
+            <p style="margin-bottom: 10px">加入簽名</p>
+            <div class="upload-data">
+              <i class="iconfont el-icon-document-add iconbangzhu"/> 簽名
+            </div>
+            <div class="upload-imgs">
+                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
+            </div>
+          </div>
 
-					
-				
+          <div class="l--l"></div>
+
+          <div class="audit-add-files">
+            <p style="margin-bottom: 10px">加入附件</p>
+            <div class="upload-data">
+              <i class="iconfont el-icon-folder-add iconbangzhu"/> 圖片
+            </div>
+            <div class="upload-imgs">
+                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
+                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
+                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
+            </div>
+          </div>
 
 
 				</div>
@@ -173,7 +207,7 @@ import DialogPop from '@/components/DialogPop';
 export default {
   name: 'WorkflowDetail',
   components: {
-    
+    DelayButton
   },
   data() {
     return {
@@ -201,6 +235,10 @@ export default {
   .iconbangzhu 
     color: #556679
     font-size: 23px
+  .l--l
+    height: 1px
+    background: #ddd
+    margin: 30px 0
   h3 
     margin: 0
     font-size: calc(18/1920*100vw)
@@ -244,6 +282,7 @@ export default {
 
     .audit-flow-body
       padding: calc(30/1920*100vw)
+
       .audit-flow-ownerhandling
         display: flex
         flex-direction: row
@@ -290,7 +329,6 @@ export default {
         .audit-flow-content
           padding-top: 8px
           margin-bottom: 20px
-
             // padding-top: 0px !important
 
           .audit-name
@@ -318,12 +356,57 @@ export default {
             .audit-description-comment
               font-size: 14px
             .audit-description-data
-      
               img
                 margin-top: 10px
                 margin-right: 10px
                 width: 200px
                 border-radius: 4px
+      .audit-add-comment
+        
+        .comment-btn
+          margin-bottom: 10px
+          .el-radio-details
+            width: calc(160 / 1920 * 100vw)
+            height: calc(40 / 1920 * 100vw)
+            margin: 0 calc(16 / 1920 * 100vw) 0 0
+            line-height: calc(40 / 1920 * 100vw)
+            border: solid 1px #e6e6e6
+            cursor: pointer
+            border-radius: 5px
+            text-align: center
+            font-size: 14px
+        .comment-input
+          margin-bottom: 30px
+      .audit-add-files
+        margin-left: 10px
+        p 
+          font-weight: 900
+        .upload-data
+          width: 120px
+          height: 100px
+          border-radius: 10px
+          margin-bottom: 10px
+          font-size: 13px
+          color: #006ab7
+          display: flex
+          flex-direction: row
+          justify-content: center
+          align-items: center
+          box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.2)
+          cursor: pointer
+          i 
+            color: #006ab7
+            font-size: 15px
+            margin-right: 3px
+        .upload-imgs
+          img
+            margin-top: 10px
+            margin-right: 10px
+            width: 200px
+            border-radius: 4px
+
+
+
 
 </style>
 
