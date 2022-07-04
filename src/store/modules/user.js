@@ -27,6 +27,7 @@ const user = {
     routes: [],
     addRoutes: [],
     PatrolHistory: null,
+    BackPatrolParam:null,
     InspectHistory: null,
     PatrolComment: '',
     videoAuthority: false,
@@ -119,6 +120,10 @@ const user = {
       state.PatrolHistory = PatrolHistory;
     },
 
+    SET_BackPatrolParam: (state, BackPatrolParam) => {
+      state.BackPatrolParam = BackPatrolParam;
+    },
+
     SET_InspectHistory: (state, InspectHistory) => {
       state.InspectHistory = InspectHistory;
     },
@@ -170,7 +175,9 @@ const user = {
     setPatrolHistory({ commit }, PatrolHistory) {
       commit('SET_PatrolHistory', PatrolHistory);
     },
-
+    setBackPatrolParam({ commit }, BackPatrolParam) {
+      commit('SET_BackPatrolParam', BackPatrolParam);
+    },
     setPatrolComment({ commit }, PatrolComment) {
       commit('SET_PatrolComment', PatrolComment);
     },

@@ -606,6 +606,7 @@ export default {
       workflowTaskName:'督导稽核记录表',
       cancelAuditDialogShow:false,
       confirmCancelAuditInfo:this.$t('audit.inceptionRpt.confirmCancelAudit'),
+      backSheetGroup:[],
     };
   },
 
@@ -930,6 +931,7 @@ export default {
 
     getPageDataBasedOnTemplate(data) {
       const map = this.getDetailNameAndHandlerMap(data);
+      
       this.sortArrayByKey(this.templateConfig, 'position');
       const pageData = [];
       this.templateConfig.forEach(config => {
@@ -1052,6 +1054,8 @@ export default {
 
     getReportDetail() {
       const allReportDetails = this.getGroupsItems(-1);
+      this.backSheetGroup = allReportDetails;
+      console.log("this.backSheetGroup:",this.backSheetGroup);
       return { class: 'row-detail', ifExpand: false, itemCount: -1, data: allReportDetails };
     },
 
@@ -1543,7 +1547,6 @@ export default {
           }
         }
       });
-      // console.log('group:',group);
       return group;
     },
 
@@ -1576,13 +1579,98 @@ export default {
     },
 
     adjustChart(){},
-
-    goBackRemoteInception(){
+    doGetFeebackItem(){
+      console.log('this.reportData:',this.reportData);
+      return Promise.all(
+        this.reportData.feedback.map(item=>{
+          var obj={
+            eventName:item.subject,
+            eventDes:(item.attachment.length>0)?item.attachment[0].url:'',
+            sourceObj:null,
+            sourceList:[]
+          }
+          for(var att in item.attachment){
+            if(item.attachment[att].mediaType == 2){
+              var objsource = {
+                mediaType:2,
+                height: '100px',
+                width: '140px',
+                fileName:item.attachment[att].url.substring(item.attachment[att].url.lastIndexOf('/')+1),
+                src:item.attachment[att].url,
+                deviceId:item.attachment[att].deviceId,
+                hasUrl:true
+              }
+             obj['sourceObj']  = objsource;
+            }else{
+              var objAtt = {
+                mediaType:item.attachment[att].mediaType,
+                src:item.attachment[att].url,
+                deviceId:item.attachment[att].deviceId,
+              }
+              obj.sourceList.push(objAtt);
+            }
+            
+          }
+          return obj;
+        })
+      ).then(result=>{
+        console.log("doGetFeebackItem:",result);
+        if(result.length ==  this.reportData.feedback.length)
+          return result;
+      })
+    },
+    doGetSheetName(){
+      console.log("backSheetGroup:",this.backSheetGroup);
+      return Promise.all(
+        this.backSheetGroup.map(item=>{
+          var obj={
+            cateryId:item.groupId, //最上面藍色頁籤
+            cateryLabel:item.groupName,
+            inspectList: (item.children)?item.children:item.cateryItems
+          }
+          /*for(var incep in item.cateryItems){
+            var objincep = {
+               groupId:incep.groupId,
+               groupName:incep.groupName,
+               items:incep.cateryItems
+            }
+            obj.inspectList.push(objincep);
+          }*/
+          return obj;
+        })
+      ).then(result=>{
+        console.log("doGetSheetName:",result);
+        if(result.length ==  this.reportData.feedback.length)
+          return result;
+      })
+    },
+    async goBackRemoteInception(){
       const self = this;
       console.log("goBackRemoteInception");
-      /*self.$store.dispatch('setPatrolHistory', self.historyObj);
-      self.$store.dispatch('setStoreList', self.storeList);
-      self.$store.dispatch('setStoreCache', this.curSelStoreId);*/
+      var BackPatrolParam = {
+        isEdit:true,
+        reportComment:self.reportData.comment,
+        tagId:self.reportData.tagId,
+        tagName : self.reportData.tagName,
+        backSheetGroup:self.backSheetGroup,
+        activeIndex : 0,
+        store:self.reportData.storeId,
+        //hasIgnoretemp:[],//略過的巡檢項內容
+        //inspectItemList:[], //當下巡檢項內容
+        eventList:await self.doGetFeebackItem(), ////問題回饋內容 info.feedback"
+        curSheetIndex:0,
+        curGroupIndex:0,
+        curItemIndex:0,
+        curItemId:0
+      };
+      var params = {
+        isEdit:true,
+        reportComment:this.reportData.comment
+      };
+      self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+      /*self.$store.dispatch('setStoreList', self.storeList);*/
+      self.$store.dispatch('setStoreCache', self.reportData.storeId);
+      this.$router.push({ name: 'remotePatrol', params: params });
     },
     doCancelAudit(){
       console.log("doCancelAudit");
@@ -1687,7 +1775,7 @@ export default {
     }
     .el-header {
       width: 100%;
-      height: 76px;
+      height: auto;
       margin-top:29px;
       text-align: left;
       padding-left: calc(30 / 1920 * 100vw);
