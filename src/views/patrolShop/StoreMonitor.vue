@@ -144,7 +144,7 @@
                   class="el-radio-details"
                   @click="clickEventBtn(item, index)"
                 >
-                  <span>{{ item.name }}</span>
+                  <span>{{ item.name }}aaa</span>
                 </div>
               </div>
             </div>
