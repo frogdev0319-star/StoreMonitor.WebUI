@@ -912,7 +912,8 @@ export default{
       "validateSucc":"Successfully validate!",
       "validationCode":"Validation Code",
       "videoLicenseOverdue":"Video license overdue",
-      "videoMangement":"Video Management"
+      "videoMangement":"Video Management",
+      "deviceOffline":"The device is offline."
   },
   "storeView":{
       "all":"All",

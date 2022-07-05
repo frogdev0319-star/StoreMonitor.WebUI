@@ -913,7 +913,8 @@ export default{
       "validateSucc":"驗證成功！",
       "validationCode":"驗證碼",
       "videoLicenseOverdue":"Video license已逾期",
-      "videoMangement":"影像管理"
+      "videoMangement":"影像管理",
+      "deviceOffline":"設備離線"
   },
   "storeView":{
       "all":"全部",
