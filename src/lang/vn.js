@@ -915,7 +915,7 @@ export default{
       "validationCode":"Mã xác thực",
       "videoLicenseOverdue":"Bản quyền video bị quá hạn",
       "videoMangement":"Quản lý video",
-      
+      "deviceOffline":"The device is offline."
   },
   "storeView":{
       "all":"Tất cả",

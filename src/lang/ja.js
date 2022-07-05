@@ -915,7 +915,8 @@ export default {
       "validateSucc":"検証に成功！",
       "validationCode":"検証コード",
       "videoLicenseOverdue":"Video licenseの延滞",
-      "videoMangement":"ビデオ管理"
+      "videoMangement":"ビデオ管理",
+      "deviceOffline":"The device is offline."
   },
   "storeView":{
       "all":"オール",

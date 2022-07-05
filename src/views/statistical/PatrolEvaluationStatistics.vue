@@ -85,7 +85,7 @@
                     :inspect-id="params.inspectId" 
                     :cached-params="params" 
                     :cur-country="curCountry" 
-                    compare-type="area1"
+                    :compare-type="part1.compareType"
                     @emitTypeChanged="emitTypeChangedPart1">
                 </TypeSelectArea>
             </div>
@@ -1049,7 +1049,7 @@ export default {
 
             ],
             part1: {
-                compareType: 'stores',
+                compareType: 'area1',
                 indexRegion: 0,
                 content: [],
                 selStoreIdArr: [],

@@ -537,9 +537,9 @@ export default {
         this.compareType='stores';
         this.compareIds2  = this.params.storeIds;
         this.compareType2='stores',*/
-        /*console.log("1.**doGetAverageScore:");
+        console.log("1.**doGetAverageScore:");
         this.doGetAverageScore(this.filterDateRange); 
-        this.doGetAssessmentScore(this.filterDateRange2);*/
+        this.doGetAssessmentScore(this.filterDateRange2);
         if(this.params.inspectId!=-1){
           this.doGetAssessmentStandardScore();
         }
@@ -558,7 +558,7 @@ export default {
         this.standardRate='- -';
         //console.log("1.**doGetAverageScore:");
         //this.doGetAverageScore(this.filterDateRange); 
-        //this.doGetAssessmentScore(this.filterDateRange2);
+        this.doGetAssessmentScore(this.filterDateRange2);
       }
     },
     doGetPre12DateRange(start_date,end_date,range_type){
@@ -805,7 +805,7 @@ export default {
     },
     doParseAssessment12Score(avgData){
       const self = this;
-      
+      self.Ass12Num = [];
       this.comapareLabels2.forEach(label=>{
         //console.log("label:",label)
         let avg = avgData.filter(data=>{
