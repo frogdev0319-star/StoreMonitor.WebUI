@@ -805,7 +805,7 @@ export default {
     },
     doParseAssessment12Score(avgData){
       const self = this;
-      
+      self.Ass12Num = [];
       this.comapareLabels2.forEach(label=>{
         //console.log("label:",label)
         let avg = avgData.filter(data=>{
