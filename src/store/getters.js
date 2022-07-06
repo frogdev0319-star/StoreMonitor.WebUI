@@ -11,6 +11,7 @@ const getters = {
   authorities: state => state.user.authorities,
   permission_routes: state => state.user.routes,
   PatrolHistory: state => state.user.PatrolHistory,
+  BackPatrolParam:state => state.user.BackPatrolParam,
   InspectHistory: state => state.user.InspectHistory,
   PatrolComment: state => state.user.PatrolComment,
   videoAuthority: state => state.user.videoAuthority,

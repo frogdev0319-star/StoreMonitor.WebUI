@@ -1024,7 +1024,10 @@ export default {
       curEditFeedbackIndex: -1,
       feedbackSourceList: [],
       isBindWorkflow:false,
-      workflowInfo:null
+      workflowInfo:null,
+      backSheetGroup:null,
+      isEditReport:false,
+      curInspectId:-1
     };
   },
   computed: {
@@ -1076,6 +1079,7 @@ export default {
         cancelButtonClass: 'cancelBtn',
         confirmButtonClass: 'confirmBtn'
       }).then(() => {
+        self.$store.dispatch('setBackPatrolParam', null);
         if (to.name != 'confirmSum') {
           //   from.meta.keepAlive=false;
           self.playState && self.previewplayer && self.previewplayer.dispose();
@@ -1120,7 +1124,8 @@ export default {
     const self = this;
     const PatrolHistory = self.$store.getters.PatrolHistory;
     const storeListCache = self.$store.getters.storeListCache;
-    console.log("*storeList:",storeListCache);
+    const BackPatrolParam = self.$store.getters.BackPatrolParam;
+    console.log("*BackPatrolParam:",BackPatrolParam);
     console.log("*PatrolHistory:",PatrolHistory);
     if (storeListCache) self.storeList = storeListCache
     if (PatrolHistory != null) {
@@ -1174,6 +1179,16 @@ export default {
       if (PatrolHistory.hasIgnoretemp.length === 0) {
         self.notShowAlert = true;
       }
+    }else if(BackPatrolParam != null){
+      self.getAllStore();
+      self.backSheetGroup = BackPatrolParam.backSheetGroup;
+      self.isEditReport = BackPatrolParam.isEdit;
+      self.suggest = BackPatrolParam.reportComment;
+      self.curSelStoreId = BackPatrolParam.store;
+      self.patrolstore = BackPatrolParam.tagName;
+      self.curInspectId = BackPatrolParam.tagId;
+      self.showGuide = false;
+      self.isDisabled = true;
     } else {
       self.getAllStore();
     }
@@ -1248,8 +1263,11 @@ export default {
           storeId: curStoreId
         };
         self.saveStoreObj(storeObj);
+        if(self.backSheetGroup !=null){
+          self.changeInspectList(self.curInspectId); //抓整個全新的巡檢項目,在做分數、附件更新
+        }
       }
-
+      
     },
     changeBrand() {
       const self = this;
@@ -1351,7 +1369,8 @@ export default {
           width: '140px',
           fileName: `${this.bucketImage}/inspect_${util.getCurTimeStr()}_${this.store.storeId}_${this.curItemId}.jpg`,
           file: util.base64ToBlob(src),
-          deviceId: this.channel.id
+          deviceId: this.channel.id,
+          hasUrl : false
         };
 
         const obj = {
@@ -1892,7 +1911,6 @@ export default {
               });
             }
           }
-
           self.sheetName = te_temp.sort((a, b) => {return a.type - b.type});
           self.sheetName[0].isClick = true;
           const isCategory = self.sheetName[0].isCategory;
@@ -1903,10 +1921,107 @@ export default {
             self.sheetName.push(feedobj);
             self.getItemByGroup(self.sheetName[0].inspectList[0], 0);
           }
-          
-        console.log(this.sheetName)
+          if(self.backSheetGroup!=null && self.isEditReport){
+            const BackPatrolParam = self.$store.getters.BackPatrolParam;
+            self.eventList = BackPatrolParam.eventList;
+            self.showFeedBackInfo = self.eventList.length == 0;
+            self.showFeedBack = false;
+            self.doFillHisScorData();
+          }
         }
       })
+    },
+    doFillHisScorData(){ //報告編輯狀態，取得個項目分數和附件
+      const self = this;
+      var hisData = self.backSheetGroup;
+      //sheet 1
+      Promise.all(
+      this.sheetName.map( sheet =>{
+        console.log("sheet:",sheet);
+        if(sheet.groupId!="feedBack"){
+          var tabIncep = hisData.find( hd => hd.groupName==sheet.label );
+          console.log("tabIncep:",tabIncep);
+          if(tabIncep.children){//有三層時的第二層 對應sheet.inspectList
+            var secSheetCat = sheet.inspectList;
+            for(var secCatIdx in tabIncep.children){
+                var secCat = tabIncep.children[secCatIdx];
+                var childIdx = 0;
+                console.log("secCat:",secCat);
+
+                console.log("secSheetCat:",secSheetCat);
+                var sheetItem = secSheetCat.find((sec,idx) => {
+                  if(sec.groupId==secCat.groupId){
+                      childIdx = idx;
+                      return sec;
+                  }
+                });
+                console.log("sheetItem:",sheetItem);
+                sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,secCat.cateryItems,sheetItem.type)
+            }
+          }else{
+            var secSheetCat = sheet.inspectList;
+            var childIdx = 0;
+            var sheetItem = secSheetCat.find((sec,idx) => {
+              if(sec.groupId==tabIncep.groupId){
+                  childIdx = idx;
+                  return sec;
+              }
+            });
+            sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,tabIncep.cateryItems,sheetItem.type);
+          }
+        }
+      })
+      ).then(result =>{
+        self.isDisabled = true;
+        console.log("2.this.sheetName:",this.sheetName)
+      });
+    },
+    doGetcateryItems(sheetItem,cateryItems,type){ //type:0:合格率評分 1:巡檢評分項 2:附加評分項
+      for(let i=0; i<cateryItems.length; i++){
+        if(cateryItems[i].grade===-2147483648){ //略過項
+          sheetItem[i].itemScoreTitle="--";
+          sheetItem[i].isIgnore = true;
+        }else if(type!=1){
+          let scoreIdx = (cateryItems[i].grade==1) ? 0:1;
+          sheetItem[i].itemScoreTitle=sheetItem[i].scoreList[scoreIdx].scoreTitle;
+          sheetItem[i].scoreList[scoreIdx].isClick = true;
+          sheetItem[i].isQualified = (cateryItems[i].grade==1) ? true:false;
+          sheetItem[i].inputCount++;
+        }else{
+          sheetItem[i].itemScoreTitle=cateryItems[i].grade;
+          sheetItem[i].inputCount++;
+        }
+        if(cateryItems[i].showAttachment){
+          sheetItem[i].inputCount++;
+          var att=[];
+          for(let x=0;x<cateryItems[i].descriptionList.length;x++){
+            var desItem = cateryItems[i].descriptionList[x];
+            var desObj = {
+              mediaType:3,
+              src:desItem.description
+            }
+            att.push(desObj);
+          }
+          for(let j=0; j<cateryItems[i].sourceList.length;j++){
+            var attItem = cateryItems[i].sourceList[j];
+            var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1); 
+            var attFile ={
+                mediaType:attItem.mediaType,
+                src:attItem.url,
+                height:'100px',
+                width:'140px',
+                fileName:fileName,
+                deviceId:attItem.deviceId,
+                hasUrl:true
+              }
+            att.push(attFile);
+          }
+          console.log("sourceList:",attFile);
+          sheetItem[i].sourceList = att;
+        }
+      } 
+      console.log("*after fill sheetItem:",sheetItem);
+      return sheetItem;
     },
     changeStoreDialog() {
       this.changeStoreObj.dialogCosed = false;
@@ -1918,7 +2033,7 @@ export default {
     onStoreChange (storeData) {
       this.curSelStoreId = storeData.curSelectedStore
       const storeItem = this.storeList.find(store => store.storeId === this.curSelStoreId);
-      if (!this.$store.getters.storeCache) {
+      if (!this.$store.getters.storeCache && !this.isEditReport) {
         this.changeStore_(storeItem);
       } else {
         this.$store.dispatch('setStoreCache', '');
@@ -1957,7 +2072,7 @@ export default {
         const storeData = allStoreData.data.content;
         self.storeList = getStoreTemp(storeData);
         const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
-        self.changeStore_(storeItem)
+        self.changeStore_(storeItem);
       }
     },
     async getFaStoreData() {
@@ -2433,6 +2548,7 @@ export default {
       const inspectList = [];
       const indexFeed = this.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = this.sheetName.slice(0, indexFeed);
+      console.log("resolveConfoirmSummaryData> sheetName:",sheetName);
       const inspectSettings = JSON.parse(sessionStorage.getItem('inspectSettings'));
       if (this.hasIgnoretemp.length === 0) {
         sheetName.forEach(s_item => {
@@ -2523,6 +2639,7 @@ export default {
       this.hasIgnoretemp = [];
       const params = { _id: this.userId, data: obj, rule: inspectSettings };
       this.$store.dispatch('setStoreList', this.storeList);
+      console.log("submit:",this.historyObj);
       await Database.addDataToDB(this.userId, params);
       this.$router.push({ name: 'confirmSum', params: params });
     },
@@ -2559,11 +2676,9 @@ export default {
           count = count + s_item.count;
         });
       } else {
-        console.log("self.hasIgnoretemp:",self.hasIgnoretemp);
         sheetName.forEach(s_item => {
           const dealtemp = [];
           s_item.inspectList.forEach(item => {
-            console.log("3.item:",item);
             item.items.forEach((_item, _index) => {
               if (_item.inputCount != 0 || _item.manualIgnore) {
                 const obj = {};
@@ -2985,11 +3100,17 @@ export default {
 
     },
     changeSheet(item, index) {
+      console.log("changeSheet:",item);
       const self = this;
       if (item.groupId == 'feedBack') {
         const PatrolHistory = self.$store.getters.PatrolHistory;
         if (PatrolHistory != null) {
           self.eventList = PatrolHistory.eventList;
+          self.showFeedBackInfo = self.eventList.length == 0;
+          self.showFeedBack = true;
+        }else if(self.isEditReport){
+          const BackPatrolParam = self.$store.getters.BackPatrolParam;
+          self.eventList = BackPatrolParam.eventList;
           self.showFeedBackInfo = self.eventList.length == 0;
           self.showFeedBack = true;
         } else {
@@ -3100,6 +3221,7 @@ export default {
       obj.fileName = `${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`;
       obj.file = util.base64ToBlob(obj.src);
       obj.deviceId = self.channel.id;
+      obj.hasUrl = false;
       self.sourceList.push(obj);
       const tempId = self.getIndexById(self.curItemId);
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
@@ -3141,7 +3263,8 @@ export default {
         width: '140px',
         fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`,
         file: util.base64ToBlob(src),
-        deviceId: self.channel.id
+        deviceId: self.channel.id,
+        hasUrl : false
       };
 
       const picObj = {
