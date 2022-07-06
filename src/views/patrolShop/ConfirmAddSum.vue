@@ -736,6 +736,7 @@ export default {
         }
       }
       const feedEventList = [];
+
       for (const i in self.eventList) {
         const obj = {};
         obj.ts = new Date().getTime();
@@ -744,48 +745,38 @@ export default {
         obj.subject = self.eventList[i].eventName;
         // obj.description = self.eventList[i].eventDes;
         const commentTemp = [];
-        
-        if (self.eventList[i].sourceList.length > 0) {
-          let arr = self.eventList[i].sourceList;
+        if (self.eventList[i].eventDes.trim().length > 0) {
+          let arr = self.eventList[i].eventDes.trim().split('|')
           arr.forEach(item => {
             let obj = {};
             obj.mediaType = 3;
-            obj.url = item.src;
+            obj.url = item;
             commentTemp.push(obj);
           })
-          
         }else{
           let obj = {};
             obj.mediaType = 3;
-            obj.url = self.eventList[i].eventDes;
+            obj.url = "";
             commentTemp.push(obj);
         }
         if (self.eventList[i].sourceObj != null) { 
-          if(self.eventList[i].sourceObj.hasUrl){
+          await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
+            self.uploadingnumOfPic++;
             const commentObj = {
-                mediaType: self.eventList[i].sourceObj.mediaType,
-                url: self.eventList[i].sourceObj.src,
-                deviceId: self.eventList[i].sourceObj.deviceId
-              };
-              commentTemp.push(commentObj);
-          }else{
-            await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
-              self.uploadingnumOfPic++;
-              const commentObj = {
-                mediaType: self.eventList[i].sourceObj.mediaType,
-                url: url,
-                deviceId: self.eventList[i].sourceObj.deviceId
-              };
-              commentTemp.push(commentObj);
-            }).catch((err) => {
-              upload++;
-            });
-            if (upload !== 0) {
-              self.uploadProgress = false;
-              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-              return false;
-            }
+              mediaType: self.eventList[i].sourceObj.mediaType,
+              url: url,
+              deviceId: self.eventList[i].sourceObj.deviceId
+            };
+            commentTemp.push(commentObj);
+          }).catch((err) => {
+            upload++;
+          });
+          if (upload !== 0) {
+            self.uploadProgress = false;
+            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+            return false;
           }
+
           obj.deviceId = self.eventList[i].sourceObj.deviceId;
         } else {
           // obj.diviceId=-1;

@@ -126,7 +126,7 @@ export const SubmitWorkflow = data =>{
   });
 };
 
-export const CancelWorkflow = data =>{
+export const CancelWorkflow = data => {
   return request({
     url: `${version}/workflow/cancel`,
     method: 'post',
@@ -134,10 +134,19 @@ export const CancelWorkflow = data =>{
   });
 };
 
-export const GetTaskInfo = data =>{
+export const GetTaskInfo = data => {
   return request({
     url: `${version}/workflow/task/info?inspectReportId=${data}&type=0`,
     method: 'get',
     data
   });
 };
+
+export const taskSummit = data => {
+  return request({
+    url: `${version}/workflow/task/submit`,
+    method: 'post',
+    data
+  });
+};
+
