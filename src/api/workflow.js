@@ -132,3 +132,26 @@ export const CancelWorkflow = data =>{
     data
   });
 };
+
+export const modifyReportWorkflow = data => {
+  return request({
+    url: `${version}/workflow/report/modify`,
+    method: 'post',
+    data
+  });
+};
+
+export const getReportWorkflowTask = params => {
+  return request({
+    url: `${version}/workflow/task/info`,
+    method: 'get',
+    params
+  });
+};
+export const SubmitWorkflowTask = data =>{
+  return request({
+    url: `${version}/workflow/task/submit`,
+    method: 'post',
+    data
+  });
+};
