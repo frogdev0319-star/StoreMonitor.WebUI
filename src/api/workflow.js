@@ -116,7 +116,8 @@ export const GetlistWorkflowTaskByType = data => {
     data
   });
 };
-//簽核管理 -- 確認總結
+
+// 簽核管理 -- 確認總結
 export const SubmitWorkflow = data =>{
   return request({
     url: `${version}/workflow/submit`,
@@ -129,6 +130,14 @@ export const CancelWorkflow = data =>{
   return request({
     url: `${version}/workflow/cancel`,
     method: 'post',
+    data
+  });
+};
+
+export const GetTaskInfo = data =>{
+  return request({
+    url: `${version}/workflow/task/info?inspectReportId=${data}&type=0`,
+    method: 'get',
     data
   });
 };

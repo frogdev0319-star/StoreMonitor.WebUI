@@ -102,9 +102,9 @@
                 <div class="title-name">{{$t('audit.workFlows.auditButton')}}</div>
                 <div class="approve">
                     <div class="approve_row">
-                      <el-radio-group class="storevue-radio flex-row" v-model="nodeData.customButton[0].type">
-                        <el-radio :label="1">{{$t('audit.workFlows.agree')}}</el-radio>  
-                        <el-radio :label="0">{{$t('audit.workFlows.define')}}</el-radio>
+                      <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultName">
+                        <el-radio :label="0">{{$t('audit.workFlows.agree')}}</el-radio>  
+                        <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
                           class="input-name"/>
@@ -112,9 +112,9 @@
                     </div>
 
                     <div class="approve_row">
-                      <el-radio-group class="storevue-radio flex-row"  v-model="nodeData.customButton[1].type">
-                        <el-radio :label="1">{{$t('audit.workFlows.reject')}}</el-radio>  
-                        <el-radio :label="0">{{$t('audit.workFlows.define')}}</el-radio>
+                      <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultName">
+                        <el-radio :label="0">{{$t('audit.workFlows.reject')}}</el-radio>  
+                        <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
                           class="input-name"/>
@@ -123,9 +123,9 @@
 
 
                     <div class="approve_row">
-                      <el-radio-group class="storevue-radio flex-row"  v-model="nodeData.customButton[1].type">
-                        <el-radio :label="1">{{$t('audit.workFlows.withdraw')}}</el-radio>  
-                        <el-radio :label="0">{{$t('audit.workFlows.define')}}</el-radio>
+                      <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultName">
+                        <el-radio :label="0">{{$t('audit.workFlows.withdraw')}}</el-radio>  
+                        <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
                           class="input-name"/>
@@ -223,6 +223,7 @@ export default {
       workflowDescription: '',
     
       sector: 0,
+      btnDefaultName: 0
     };
   },
   watch:{
@@ -328,18 +329,20 @@ export default {
     },
 
     saveNode(){
-      console.log('this.nodeData Adjust:>> ', this.nodeData)
+      // console.log('this.nodeData Adjust~~~~~~~:>> ', this.nodeData)
+      // console.log('this.apiData Adjust~~~~~~~:>> ', this.apiData)
       this.fullscreenLoading = true
-      // if(this.nodeData.id == undefined){
-      //   this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
-      // }else{
+      if(this.nodeData.id == undefined){
+        console.log('this.apiData Adjust new ~~~~~~~:>> ', this.apiData)
+        this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
+      }else{
         // edit
         console.log("this is Editing")
         var apiDataIndex = this.apiData.orderedAuditNodeArray.findIndex(i => i.id == this.nodeData.id)
         console.log('apiDataIndex :>> ', apiDataIndex);
         this.apiData.orderedAuditNodeArray.splice(apiDataIndex, 1 , this.nodeData)
         sessionStorage.setItem('workflowNode', JSON.stringify(this.nodeData))
-      // }
+      }
 
       this.apiData.orderedAuditNodeArray.forEach(data =>{
         if(data.name == this.nodeData.name){

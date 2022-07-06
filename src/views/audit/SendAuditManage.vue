@@ -621,9 +621,9 @@ export default{
         },
         clickDetail(item, index) {
             const self = this;
-            console.log("clickDetail:",item);
-            sessionStorage.setItem('audit_detail', JSON.stringify(item.routeObj));
-            self.$router.push({ name: 'auditDetail', params: { data: item.routeObj }});
+            console.log("clickDetail:",item.row);
+            sessionStorage.setItem('auditDetail', JSON.stringify(item.row));
+            self.$router.push({ name: 'auditDetail', params: { data: item.row }});
         },
     },
     

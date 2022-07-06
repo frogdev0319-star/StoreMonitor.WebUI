@@ -199,18 +199,20 @@ export default {
           ]
       },
       newFlow:{
-        "name": "",
+        "name": "" ,
         "description": "",
         "type": 0,
+        "cancelable": true,
         "copyToUsers": [],
         "copyToGroups": [],
         "nextAuditNode": {
           "name": "default flow",
           "auditMethod": 1,
-          "signature": true,
+          "signature": false,
+          "auditTargetType": 0, // 0 - 個人, 1 - 群組
           "customButton": [
               {
-                  "type": 1,
+                  "type": 0,
                   "text": "同意",
                   "enable": true
               },
@@ -225,10 +227,10 @@ export default {
           "nextAuditNode": {
             "name": "default flow 1",
             "auditMethod": 1,
-            "signature": true,
+            "signature": false,
             "customButton": [
                 {
-                    "type": 1,
+                    "type": 0,
                     "text": "同意",
                     "enable": true
                 },
@@ -242,6 +244,7 @@ export default {
             "auditByGroups": [],
           }
         },
+      
       }
     }
   },
@@ -333,9 +336,9 @@ export default {
           second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
         }
       const createTime = t.year + "-" + t.month + "-" + t.date + " " + t.hour + ":" + t.minute + ":" + t.second
-      
+      this.newFlow.name =  this.$t('audit.workFlows.addWorkFlow') + createTime
+
       creadNewFlow(this.newFlow).then(res=>{
-          this.newFlow.name = this.$t('audit.workFlows.addWorkFlow')
           this.newFlow.processDefinitionKey = res.data
           sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
           this.$router.push({name: 'workflowDetail'})

@@ -1,6 +1,6 @@
 <template>
 
-	<div class="aaa for-flex justify-content_space-between">
+	<div class="for-flex justify-content_space-between">
 			<!-- 簽核巡檢表 -->
 		<div class="page-container report-setting paper" style="height: 100%; width:49.5%">
 			<div class="audit-section">
