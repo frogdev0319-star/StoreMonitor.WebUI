@@ -585,6 +585,7 @@ export default {
       }
       return arr.filter(source => source.mediaType === 2).map(source => source.src);
     },
+    
     getFileUrl(fileName) {
       const self = this;
       const bucketName = self.oss.ossBucketName;

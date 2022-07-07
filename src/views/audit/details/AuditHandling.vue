@@ -275,6 +275,7 @@ export default {
       pdfFileList:[],
       imgFileList:[],
       auditFileCount:0,
+      oss: null,
 
       commentsToApi: {
         "taskId": "",
@@ -361,23 +362,28 @@ export default {
     },
 
     taskSummit(){
-      this.isLoadingData = true
+      // this.isLoadingData = true
       const currentNode = this.taskInfo.filter( i => i.state == 2)
       this.commentsToApi.taskId = currentNode[0].tasks[0].taskId
 
       console.log('currentNode----->> ', currentNode);
       console.log('taskSummit this.commentsToApi----->> ', this.commentsToApi);
 
-      taskSummit(this.commentsToApi).then(res=>{
-        console.log('res :>> ', res);
-        this.isLoadingData = false
-        this.$router.push({ name: 'WaitAuditManage'});
+      var url = this.upLoadFile()
+      console.log('url ~~~~~>> ', url);
 
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
+      // taskSummit(this.commentsToApi).then(res=>{
+      //   console.log('res :>> ', res);
+      //   this.isLoadingData = false
+      //   this.$router.push({ name: 'WaitAuditManage'});
+
+      // }).catch(err => {
+      //   this.isLoadingData = false;
+      //   console.log('error' + err);
+      // });
     },
+
+    
 
     doAddAttachment(e){
       const self = this;
@@ -396,7 +402,7 @@ export default {
       }
       if(files[0].type.includes("image")){
         var objImg={
-          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_???_${files[0].name}`,
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_ooo_${files[0].name}`,
           src:'',
           file:'',
           type:files[0].type,
@@ -406,7 +412,7 @@ export default {
         self.imgFileList.push(objImg);
       }else if(files[0].type.includes("pdf")){
         var objpdf={
-          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_???_${files[0].name}`,
+          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_ooo_${files[0].name}`,
           src:'',
           file:'',
           type:'pdf',
@@ -444,6 +450,79 @@ export default {
         }
       }
       return arr.map(source => source.src);
+    },
+
+
+
+    getImgList(index, sourceList) {
+      const arr = [];
+      let i = 0;
+      for (i; i < sourceList.length; i++) {
+        arr.push(sourceList[i + index]);
+        if (i + index >= sourceList.length - 1) {
+          index = 0 - (i + 1);
+        }
+      }
+      return arr.filter(source => source.mediaType === 2).map(source => source.src);
+    },
+    
+    getFileUrl(fileName) {
+      const self = this;
+      const bucketName = self.oss.ossBucketName;
+      const endpoint = self.oss.ossEndPoint;
+      const key = fileName;
+      if (self.oss.ossVendor === 2) {
+        return `https://${endpoint}/${bucketName}/${fileName}`;
+      } else {
+        return `http://${bucketName}.${endpoint}/${fileName}`;
+      }
+    },
+
+    upLoadFile(fileItem) {
+      const self = this;
+      self.percentage = 0;
+      if (self.oss.ossVendor === null) {
+        self.oss.ossVendor = 1; // 1 -aliyun  2-azure
+      }
+      if (self.oss.ossVendor === 1) {
+        const OSS = require('ali-oss');
+        const client = new OSS({
+          region: self.oss.ossEndPoint.slice(0, self.oss.ossEndPoint.indexOf('.')),
+          accessKeyId: self.oss.ossAccessKeyId,
+          accessKeySecret: self.oss.ossAccessKeySecret,
+          // bucket: 'viumo-'+self.accountId,
+          bucket: self.oss.ossBucketName
+        });
+        const name = fileItem.fileName;
+        return new Promise((resolve, reject) => {
+          client.put(name, fileItem.file, {
+            progress: function * (percentage, cpt) {
+              self.percentage = percentage;
+            }
+          })
+            .then((results) => {
+              const url = self.getFileUrl(results.name);
+              resolve(url);
+            })
+            .catch((err) => {
+              reject(err);
+            });
+        });
+      } else {
+        const url = `https://${self.oss.ossEndPoint}/${self.oss.ossBucketName}${self.oss.ossAccessKeySecret}`;
+        const containerURL = new azblob.ContainerURL(url, azblob.StorageURL.newPipeline(new azblob.AnonymousCredential()));
+        const blockBlobURL = azblob.BlockBlobURL.fromContainerURL(containerURL, fileItem.fileName);
+        return new Promise((resolve, reject) => {
+          azblob.uploadBrowserDataToBlockBlob(azblob.Aborter.none, fileItem.file, blockBlobURL)
+            .then((results) => {
+              const url = self.getFileUrl(fileItem.fileName);
+              resolve(url);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        });
+      }
     },
 
   }
