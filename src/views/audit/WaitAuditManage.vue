@@ -522,10 +522,9 @@ export default{
         },
         clickDetail(item, index) {
             const self = this;
-            console.log("clickDetail:",item);
-            sessionStorage.setItem('audit_detail', JSON.stringify(item.routeObj));
-            // this.$router.push({ name: 'auditdetail', params: { data: item.routeObj }});
-            self.$router.push({ name: 'auditHandling', params: { data: item.routeObj }});
+            console.log('item.routeObj ~~~~>> ', item.row);
+            sessionStorage.setItem('auditDetailHandling', JSON.stringify(item.row));
+            self.$router.push({ name: 'auditHandling', params: { data: item.row }});
         },
     },
 }

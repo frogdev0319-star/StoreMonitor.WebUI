@@ -504,7 +504,7 @@
 <script>
 import ECharts from 'vue-echarts';
 import { getInspectReportInfo } from '@/api/inspect';
-import { CancelWorkflow } from '@/api/workflow';
+import { CancelWorkflow,taskDrawbak } from '@/api/workflow';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -1703,10 +1703,18 @@ export default {
         isEdit:true,
         reportComment:this.reportData.comment
       };
-      self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
-      /*self.$store.dispatch('setStoreList', self.storeList);*/
-      self.$store.dispatch('setStoreCache', self.reportData.storeId);
-      this.$router.push({ name: 'remotePatrol', params: params });
+      var drawbackParam = {inspectReportId:self.report.reportId};
+      taskDrawbak(drawbackParam).then(res=>{
+          self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+        /*self.$store.dispatch('setStoreList', self.storeList);*/
+        self.$store.dispatch('setStoreCache', self.reportData.storeId);
+        this.$router.push({ name: 'remotePatrol', params: params });
+      }).catch(err=>{
+        util.notify(self.$t('audit.inceptionRpt.editAuditFail')+':'+err, 'warning', 3000);
+        self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+        self.$store.dispatch('setStoreCache', self.reportData.storeId);
+        this.$router.push({ name: 'remotePatrol', params: params });
+      });
     },
     doCancelAudit(){
       console.log("doCancelAudit");

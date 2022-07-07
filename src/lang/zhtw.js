@@ -1334,7 +1334,8 @@ export default{
       "edit":"編輯",
       "cancelAudit":"取消簽核",
       "confirmCancelAudit":"確認是否取消此報告簽核",
-      "cancelAuditFail":"取消簽核失敗"
+      "cancelAuditFail":"取消簽核失敗",
+      "editAuditFail":"重送簽核失敗"
     }
   }
 

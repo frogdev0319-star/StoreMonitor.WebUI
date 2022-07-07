@@ -407,16 +407,11 @@ export default {
         console.log('this.flatNodeData 4 ------>> ', this.flatNodeData);
         // this.flatNodeData[0].name = this.infoForm.createdUser
         this.flatNodeData[0].name = this.$t('audit.workFlows.submitAudit')
-        this.flatNodeData[0].auditByUsers.push(this.nodeList.createdUser)
 
-
-
-
-        
-        // var crea
-        // this.flatNodeData[0].auditByUsers.push()
-
-        
+        if(this.flatNodeData[0].auditByUsers.length > 0){
+          this.flatNodeData[0].auditByUsers = []
+          this.flatNodeData[0].auditByUsers.push(this.nodeList.createdUser)
+        }
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;

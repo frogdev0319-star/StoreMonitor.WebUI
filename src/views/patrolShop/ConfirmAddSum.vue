@@ -426,7 +426,7 @@
 <script>
 import { getStorageInfo } from '@/api/event';
 import { submitInspectItem1 } from '@/api/inspect';
-import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,SubmitWorkflowTask,getReportWorkflowTask} from '@/api/workflow';
+import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,taskSummit,getReportWorkflowTask} from '@/api/workflow';
 import util from '@/common/util';
 import { getCookie } from '@/common/auth';
 import { getDepartmentList } from '@/api/checkin';
@@ -687,18 +687,18 @@ export default {
           for (const j in inspect[i].inspectList[g].items) {
             const objItem = {};
             if(this.isEditReport && this.reportId!=-1){
-              objItem.itemId = inspect[i].inspectList[g].items[j].id;
+              objItem.id = inspect[i].inspectList[g].items[j].id;
             }
             objItem.ts = new Date().getTime();
             // objItem.description = inspect[i].inspectList[g].items[j].inspectText.trim();
             if (inspect[i].inspectList[g].items[j].itemType === 1) {
-              objItem.grade = Math.pow(-2, 31);
+              objItem.grade = objItem.score = Math.pow(-2, 31);
             } else {
               if (inspect[i].type === 0 || inspect[i].type === 2) {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
+                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore ||
                   inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
               } else {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
+                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
                   ? Math.pow(-2, 31)
                   : inspect[i].inspectList[g].items[j].itemgetScore;
               }
@@ -948,11 +948,12 @@ export default {
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
         }
-        if(result[1].errCode=0) {
-          let task = result[1].data.find(t=>t.state==0);
-          let taskId = task.tasks.taskId;
+        if(result[1].errCode==0) {
+          let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
+          let taskId = task.tasks[0].taskId;
           var subTaskParam = {
             taskId,
+            result:0,
             comment:{
               description:self.auditNote,
               attachment:auditAttachment
@@ -963,12 +964,11 @@ export default {
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
         }
-        SubmitWorkflowTask(subTaskParam).then(resSubTask => {
+        taskSummit(subTaskParam).then(resSubTask => {
           if(resSubTask.errCode == 0){
             self.$store.dispatch('setEditCount', 0);
             routeData = {
                 isSuccess: true,
-                user: data.notifiedTo,
                 isBindWorkflow:true
             };
           }

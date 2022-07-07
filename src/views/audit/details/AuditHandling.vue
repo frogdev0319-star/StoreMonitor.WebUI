@@ -1,7 +1,8 @@
 <template>
+  <div v-loading="isLoadingData" class="setting-details self-loading">
+	<div class="for-flex justify-content_space-between">
 
-	<div class="aaa for-flex justify-content_space-between">
-			<!-- 簽核巡檢表 -->
+		<!-- 簽核巡檢表 -->
 		<div class="page-container report-setting paper" style="height: 100%; width:49.5%">
 			<div class="audit-section">
 				<!-- audit-header -->
@@ -9,6 +10,7 @@
 					<h3>簽核巡檢表</h3>
 					<div class="goto-report">報告詳情</div>
 				</div>
+        
 
 				<!-- audit body -->
 				<div class="audit-flow-body">
@@ -22,8 +24,34 @@
 						</div>
 					</div>
 
+        <!-- task -->
+        <div class="audit-flow-unit" v-for="taskItem in taskInfo" :key="taskItem.nodeId" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
+          <div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
+          <div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
+          <div class="check" v-else-if="taskItem.state == 2"><i class="iconfont el-icon-time iconbangzhu"/></div>
+          <div class="check" v-else-if="taskItem.state == 3"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
+
+            <div class="audit-flow-content" :class="{ on_audit : taskItem.state == 2 }">
+              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+                <div class="audit-name">
+                  <div class="audit-workflow-name">{{taskItem.nodeName}}</div>
+                  <div class="audit-user-name" v-if="taskItem.tasks[0].assignee !== null && taskItem.tasks[0].auditByUsers.length == 0 ">{{taskItem.tasks[0].assignee.titleName}} -- {{taskItem.tasks[0].assignee.userName}} <span>({{taskItem.tasks[0].startTs}})</span></div>
+                  <div class="audit-user-name" v-else-if="taskItem.tasks[0].assignee == null && taskItem.tasks[0].auditByUsers.length > 0"> {{taskItem.tasks[0].auditByUsers[0].titleName}} -- {{taskItem.tasks[0].auditByUsers[0].userName}} <span>({{taskItem.tasks[0].startTs}})</span></div>
+                </div>
+                <div class="audit-situation"  v-if="taskItem.state == 1">
+                  <div class="audit_agree" v-if="taskItem.tasks[0].comment.result == 0 && taskItem.tasks[0].comment.result !== null"><i class="iconfont el-icon-check"/> 同意</div>
+                  <div class="audit_disagree" v-else-if="taskItem.tasks[0].comment.result == 1 && taskItem.tasks[0].comment.result !== null"><i class="iconfont el-icon-close"/> 駁回</div>
+                </div>
+              </div>
+              <div class="audit-description">
+                <div class="audit-description-comment" v-if="taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
+                <div class="audit-description-data">
+                </div>
+              </div>
+            </div>
+        </div>
 					<!-- workflow -->
-					<div class="audit-flow-unit">
+					<!-- <div class="audit-flow-unit">
 						<div class="check"><i class="iconfont el-icon-success"/></div>
 						<div class="audit-flow-content">
 							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
@@ -41,10 +69,10 @@
 								</div>
 							</div>
 						</div>
-					</div>
+					</div> -->
 
 					<!-- workflow -->
-					<div class="audit-flow-unit ">
+					<!-- <div class="audit-flow-unit ">
 						<div class="check"><i class="iconfont el-icon-time"/></div>
 						<div class="audit-flow-content on-audit">
 							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
@@ -65,10 +93,10 @@
 								</div>
 							</div>
 						</div>
-					</div>
+					</div> -->
 
 					<!-- workflow -->
-					<div class="audit-flow-unit not-yet">
+					<!-- <div class="audit-flow-unit not-yet">
 						<div class="check"><i class="iconfont el-icon-more iconbangzhu"/></div>
 
 						<div class="audit-flow-content">
@@ -121,40 +149,38 @@
 						</div>
 						
 						
-					</div>
-
-
-
+					</div> -->
+          
 				</div>
+
+
 			</div> 
 		</div>
 
-	
-
 		<!-- edit and comment -->
-			<div class="page-container report-setting paper" style="height: 100%; width:49.5%">
+		<div class="page-container report-setting paper" style="height: 100%; width:49.5%">
 			<div class="audit-section">
 				<!-- audit-header -->
 				<div class="audit-header">
 					<h3>填寫簽合意見</h3>
 					<div class="buttons">
-						<delay-button type="filled">送出</delay-button>
+						<delay-button type="filled" @click="taskSummit">送出</delay-button>
 					</div>
 				</div>
-
 				<!-- audit body -->
 				<div class="audit-flow-body">
           <div class="audit-add-comment">
             <!-- 簽合意見 -->
             <p style="margin-bottom: 10px"><span style="color: #c60957">* </span> 簽合意見</p>
             <div class="comment-btn for-flex">
-              <div class="el-radio-details" style="background-color: rgb(0, 106, 183); color: rgb(255, 255, 255); border-color: rgb(0, 106, 183);">同意</div>
-              <div class="el-radio-details">駁回</div>
+              <div class="el-radio-details" :class="{agree : agree == true}" @click="agreeNode">同意</div>
+              <div class="el-radio-details" :class="{reject : agree == false}" @click="rejectNode">駁回</div>
             </div>
             <div class="comment-input">
               <el-input
+                v-model="commentsToApi.comment.description"
                 :autosize="{ minRows: 3, maxRows: 5 }"
-                :placeholder="請輸入訊息"
+                placeholder="請輸入訊息"
                 class="storevue-textarea"
                 type="textarea"
                 resize="none"
@@ -165,7 +191,7 @@
           </div>
 
           <!-- 加入檔案 & 簽名 -->
-          <div class="audit-add-files">
+          <!-- <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入簽名</p>
             <div class="upload-data">
               <i class="iconfont el-icon-document-add iconbangzhu"/> 簽名
@@ -173,20 +199,41 @@
             <div class="upload-imgs">
                 <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
             </div>
-          </div>
+          </div> -->
 
           <div class="l--l"></div>
 
           <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入附件</p>
-            <div class="upload-data">
+
+            <!-- 新增附件 -->
+            <div class="attach-area" >
+              <div v-for="(imgItem,index) in imgFileList" :key="'img'+index" class="source-details" >
+                <div class="img-content">
+                  <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
+                  <el-image
+                    :src="imgItem.src"
+                    style="width:auto;height:100px"
+                    :preview-src-list="getAuditImgList(index)"/>
+                </div>
+              </div>
+              <div v-if="auditFileCount < 10" class="attach-add" @click="$refs.auditfile.click()">
+                <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
+                <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
+                  <img src="../../../../static/img/icon_attachment.svg" widht="16px" height="16px" style="border-radius:10px;"/>
+                  <div class="att-txt">{{ $t('audit.inceptionRpt.attachment') }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- <div class="upload-data">
               <i class="iconfont el-icon-folder-add iconbangzhu"/> 圖片
             </div>
             <div class="upload-imgs">
                 <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
                 <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
                 <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-            </div>
+            </div> -->
           </div>
 
 
@@ -194,18 +241,24 @@
 			</div> 
 		</div>
 
+  </div>
 	</div>
 
 </template>
 <script>
+import {
+    GetTaskInfo,
+    taskSummit,
+  } from '@/api/workflow';
 import DelayButton from '@/components/DelayButton';
+import util from '@/common/util';
 // import SettingTable from '@/components/SettingTable';
 // import {getNodeList, updateWorkflow} from "@/api/workflow";
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 
 export default {
-  name: 'WorkflowDetail',
+  name: 'WorkflowDetailHandling',
   components: {
     DelayButton
   },
@@ -214,23 +267,191 @@ export default {
       loading: false,
       isLoadingData: false,
       fullscreenLoading: false,
-  
+
+      auditDetail:'',
+      taskInfo:'',
+      agree: true,
+      description:'',
+      pdfFileList:[],
+      imgFileList:[],
+      auditFileCount:0,
+
+      commentsToApi: {
+        "taskId": "",
+        "comment": {
+            "description": "",
+            "signature": [
+                {
+                    "type": 0,
+                    "content": ""
+                }
+            ],
+            "attachment": [
+                {
+                    "mediaType": 0,
+                    "url": "",
+                    "ts": 0
+                }
+            ]
+        },
+        "result": 0
+      }
     }
   },
   mounted() {},
   async created() {
-    // await this.init()
+    await this.init()
+  },
+  watch:{
+    pdfFileList(){
+      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+      console.log('this.auditFileCount :>> ', this.auditFileCount);
+      console.log('this.pdfFileList :>> ', this.pdfFileList);
+    },
+    imgFileList(){
+      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+      console.log('this.auditFileCount :>> ', this.auditFileCount);
+      console.log('this.imgFileList :>> ', this.imgFileList);
+
+    },
   },
   methods: {
-    // async init(){
-    //   await this.getWorkflowInfo() 
-    // },
+    async init(){
+      await this.getWorkflowInfo()
+      await this.getTaskInfo(this.auditDetail.inspectReportId)
+    },
+
+    getWorkflowInfo(){
+      const data = sessionStorage.getItem('auditDetailHandling')
+      this.auditDetail = JSON.parse(data)
+      console.log('this.auditDetail 1 ----->> ', this.auditDetail);
+    },
+
+    async getTaskInfo(param){
+      this.isLoadingData = true
+      await GetTaskInfo(param).then(res=>{
+        res.data.forEach(t =>{
+          t.startTs = new Date(t.startTs).toLocaleString()
+          t.endTs = new Date(t.endTs).toLocaleString()
+          t.tasks.forEach(tt =>{
+            tt.startTs = new Date(tt.startTs).toLocaleString()
+            tt.endTs = new Date(tt.endTs).toLocaleString()
+          })
+        })
+        this.taskInfo = res.data
+        console.log('this.taskInfo 2 ----->> ', this.taskInfo);
+
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+
+    agreeNode(){
+      this.agree = true
+      this.commentsToApi.result = 0
+      console.log('this.commentsToApi :>> ', this.commentsToApi);
+    },
+    rejectNode(){
+      this.agree = false
+      this.commentsToApi.result = 1
+      console.log('this.commentsToApi :>> ', this.commentsToApi);
+    },
+
+    taskSummit(){
+      this.isLoadingData = true
+      const currentNode = this.taskInfo.filter( i => i.state == 2)
+      this.commentsToApi.taskId = currentNode[0].tasks[0].taskId
+
+      console.log('currentNode----->> ', currentNode);
+      console.log('taskSummit this.commentsToApi----->> ', this.commentsToApi);
+
+      taskSummit(this.commentsToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+        this.$router.push({ name: 'WaitAuditManage'});
+
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+    doAddAttachment(e){
+      const self = this;
+      const maxSize = 4*1024*1024; //不能超過4MB
+      var files = e.target.files || e.dataTransfer.files;
+      //console.log("choose file:",files);
+      if (!files.length)
+        return;
+      if(self.auditFileCount==10){
+        util.notify(self.$t('remotePatrol.maximumAttach'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("pdf") && files[0].size > maxSize){
+        util.notify(self.$t('audit.inceptionRpt.maxFileSizeAlert'), 'warning', 3000);
+        return;
+      }
+      if(files[0].type.includes("image")){
+        var objImg={
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_???_${files[0].name}`,
+          src:'',
+          file:'',
+          type:files[0].type,
+          size:files[0].size
+        };
+        self.createFile(files[0],objImg);
+        self.imgFileList.push(objImg);
+      }else if(files[0].type.includes("pdf")){
+        var objpdf={
+          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_???_${files[0].name}`,
+          src:'',
+          file:'',
+          type:'pdf',
+          size:files[0].size,
+        }
+        self.createFile(files[0],objpdf);
+        self.pdfFileList.push(objpdf);
+      }
+    },
+    createFile(file, objFile) {
+      //var image = new Image();
+      var reader = new FileReader();
+
+      reader.onload = (e) => {
+        objFile.src = e.target.result;
+        objFile.file = util.base64ToBlob(e.target.result);
+        console.log(objFile.file);
+      };
+      reader.readAsDataURL(file);
+    },
+    deleteImg({item, index}) {
+      const self = this;
+      if(item.type==='pdf')
+        self.pdfFileList.splice(index, 1);
+      else
+        self.imgFileList.splice(index, 1);
+    },
+    getAuditImgList(index) {
+      const arr = [];
+      let i = 0;
+      for (i; i < this.imgFileList.length; i++) {
+        arr.push(this.imgFileList[i + index]);
+        if (i + index >= this.imgFileList.length - 1) {
+          index = 0 - (i + 1);
+        }
+      }
+      return arr.map(source => source.src);
+    },
+
   }
 }
 </script>
 
 <style lang="sass" scoped>
-  .not-yet
+  .not__yet
     color: #c0c0c0 !important
   .iconbangzhu 
     color: #556679
@@ -246,7 +467,7 @@ export default {
     margin: 0
     font-size: 15px
 
-  .on-audit
+  .on_audit
     border-top: 2px solid #006ab7
     border-bottom: 2px solid #006ab7
 
@@ -361,8 +582,11 @@ export default {
                 margin-right: 10px
                 width: 200px
                 border-radius: 4px
+
+
+
+      // comments
       .audit-add-comment
-        
         .comment-btn
           margin-bottom: 10px
           .el-radio-details
@@ -405,6 +629,73 @@ export default {
             width: 200px
             border-radius: 4px
 
+  .agree
+    background-color: rgb(0, 106, 183)
+    color: rgb(255, 255, 255)
+    border-color: rgb(0, 106, 183)
+  .reject
+    color: #fa4600
+    background: #ffefeb
+    border: 1px solid #fa4600 !important
+
+  .attach-area
+    display: flex
+    align-content: flex-start
+    align-self: flex-start
+    .attach-add
+      height: 100px
+      width: 161px
+      border-radius: 10px
+      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1)
+      display: flex
+      flex-direction: row
+      justify-content: center
+      align-items: center
+      cursor: pointer
+      .att-txt
+        font-size: 14px
+        color: #006ab7
+        margin-left: 3px
+    .source-details
+      display: inline-block
+      margin-right: 15px
+      position: relative
+      .icondelete
+        position: absolute
+        font-size: 14px
+        right: 5px
+        margin-top: 8px
+        z-index: 2
+        color: #fff
+        cursor: pointer
+        background-color: rgba(0,0,0, 0.8)
+        border-radius: 50%
+      
+      .img-content
+        width: 100%
+        height: 100%
+        position: relative
+      
+      .pdf-content
+        width: 140px
+        height: 30px
+        padding: 1px 0px 1px 12px
+        border-radius: 5px
+        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1)
+        background-color: #fff
+        display: flex
+        flex-direction: row
+        align-items: center
+        justify-content: flex-start
+        span
+          display: block
+          width: 110px
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
+          font-size: 12px
+      
+      
 
 
 
