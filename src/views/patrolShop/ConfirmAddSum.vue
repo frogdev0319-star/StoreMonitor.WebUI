@@ -687,7 +687,7 @@ export default {
           for (const j in inspect[i].inspectList[g].items) {
             const objItem = {};
             if(this.isEditReport && this.reportId!=-1){
-              objItem.itemId = inspect[i].inspectList[g].items[j].inspectItemId;
+              objItem.itemId = inspect[i].inspectList[g].items[j].id;
             }
             objItem.ts = new Date().getTime();
             // objItem.description = inspect[i].inspectList[g].items[j].inspectText.trim();
@@ -929,13 +929,61 @@ export default {
     },
 
     doModifyReportSubmit(params,auditAttachment){
+      const self = this;
       console.log("submit report params:",params);
       var routeData = {
         isSuccess: false,
         reLoadData: self.$route.params,
         isBindWorkflow:true
       };
-      modifyReportWorkflow(params).then(res => {
+      var resReportModify = modifyReportWorkflow(params);
+      var resWorkflowTask = getReportWorkflowTask({type:0,inspectReportId:self.reportId});
+      Promise.all([resReportModify,resWorkflowTask]).then(result =>{
+        console.log("doModifyReportSubmit result:",result);
+        var data =[]
+        if(result[0].errCode==0){
+          data = result[0].data;
+          self.editFlag = true;
+        }else{
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        }
+        if(result[1].errCode=0) {
+          let task = result[1].data.find(t=>t.state==0);
+          let taskId = task.tasks.taskId;
+          var subTaskParam = {
+            taskId,
+            comment:{
+              description:self.auditNote,
+              attachment:auditAttachment
+            }
+          };
+          console.log("subTaskParam:",subTaskParam);
+        }else{
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        }
+        SubmitWorkflowTask(subTaskParam).then(resSubTask => {
+          if(resSubTask.errCode == 0){
+            self.$store.dispatch('setEditCount', 0);
+            routeData = {
+                isSuccess: true,
+                user: data.notifiedTo,
+                isBindWorkflow:true
+            };
+          }
+        }).catch(errSubTask=>{
+          console.log("errSubTask:",errSubTask);
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        })
+        self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+      }).catch(err=>{
+        console.log("err:",err);
+        util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
+        return false;
+      });
+      /*modifyReportWorkflow(params).then(res => {
         const data = res.data;
         self.editFlag = true;
         if (res.errCode === 0) {
@@ -981,7 +1029,7 @@ export default {
         console.log("err:",err);
         util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
         return false;
-      })
+      })*/
     },
     async getRouteData() {
       const self = this;

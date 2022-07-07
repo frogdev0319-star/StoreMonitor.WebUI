@@ -734,30 +734,44 @@ export default {
       self.showCancelBtn = self.$route.params.canCancel;
       const routeData = JSON.parse(sessionStorage.getItem('report_data'));
       console.log("report routeData:",routeData);
-      const obj = {};
-      console.log("self.$route.params.reportId:",self.$route.params.reportId);
-      obj.reportId = (self.isAuditMode)?self.$route.params.reportId:routeData.id;
-      obj.storeName = routeData.storeName;
-      obj.status = routeData.status;
-      obj.dateStr = util.getDateStr2(routeData.ts);
-      obj.submitterName = routeData.submitterName;
-      obj.tagName = routeData.tagName;
-      obj.iconSrc = this.getIconSrc(routeData.status);
-      switch (routeData.mode) {
-        case 0:
-          obj.inspectSrc = self.inspectSrc;
-          obj.inspectType = self.$t('overview.remotePatrol');
-          break;
-        case 1:
-          obj.inspectSrc = self.insiteInspectSrc;
-          self.isInsiteInspect = true;
-          obj.inspectType = self.$t('overview.onsitePatrol');
-          break;
-        default:
-          obj.inspectSrc = self.videoSrc;
-          break;
+      if(routeData && !self.isAuditMode){
+        const obj = {};
+        console.log("self.$route.params.reportId:",self.$route.params.reportId);
+        obj.reportId = routeData.id;
+        obj.storeName = routeData.storeName;
+        obj.status = routeData.status;
+        obj.dateStr = util.getDateStr2(routeData.ts);
+        obj.submitterName = routeData.submitterName;
+        obj.tagName = routeData.tagName;
+        obj.iconSrc = this.getIconSrc(routeData.status);
+        switch (routeData.mode) {
+          case 0:
+            obj.inspectSrc = self.inspectSrc;
+            obj.inspectType = self.$t('overview.remotePatrol');
+            break;
+          case 1:
+            obj.inspectSrc = self.insiteInspectSrc;
+            self.isInsiteInspect = true;
+            obj.inspectType = self.$t('overview.onsitePatrol');
+            break;
+          default:
+            obj.inspectSrc = self.videoSrc;
+            break;
+        }
+        self.report = obj;
+      }else{
+        const obj = {};
+        obj.reportId = self.$route.params.reportId;
+        obj.storeName = '';
+        obj.status = '';
+        obj.dateStr = '';
+        obj.submitterName = '';
+        obj.tagName = '';
+        obj.iconSrc = '';
+        obj.inspectType = self.$t('overview.remotePatrol');
+        obj.inspectSrc = self.inspectSrc;
+        self.report = obj;
       }
-      self.report = obj;
     },
 
     getIconSrc(status) {
