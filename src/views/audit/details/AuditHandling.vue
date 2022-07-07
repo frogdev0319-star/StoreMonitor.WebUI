@@ -194,9 +194,10 @@
           <!-- 加入檔案 & 簽名 -->
           <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入簽名</p>
-            <div class="upload-data">
+            <div class="upload-data" @click="showSignaturePad = true">
               <i class="iconfont el-icon-document-add iconbangzhu"/> 簽名
             </div>
+            
             <div class="upload-imgs"></div>
           </div>
 
@@ -239,6 +240,24 @@
 			</div> 
 		</div>
 
+
+    <!-- popup -->
+    <dialog-pop
+      title="請簽名"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showSignaturePad"
+      @cancelHandler="clearSignature"
+      @confirmHandler="signSave"
+    >
+      <div style="padding: 0 20px; height: 300px">
+        <VueSignaturePad 
+          id="signature"
+          ref="signaturePad" />
+      </div>
+    </dialog-pop>
+
   </div>
 	</div>
 
@@ -253,15 +272,17 @@ import { getCookie } from '@/common/auth';
 import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
 import { getUserInfo } from '@/api/login';
+import DialogPop from '@/components/DialogPop';
+
 // import SettingTable from '@/components/SettingTable';
 // import {getNodeList, updateWorkflow} from "@/api/workflow";
 import TableOnly from '@/components/TableOnly';
-import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'WorkflowDetailHandling',
   components: {
-    DelayButton
+    DelayButton,
+    DialogPop
   },
   data() {
     return {
@@ -279,6 +300,7 @@ export default {
       oss: null,
       totalnumOfPic: 0,
       uploadingnumOfPic: 0,
+      showSignaturePad: false,
 
       commentsToApi: {
         "taskId": "",
@@ -315,6 +337,24 @@ export default {
     },
   },
   methods: {
+
+    signSave() {
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+      console.log(isEmpty);
+      console.log(data);
+    },
+
+    signUndo() {
+      this.$refs.signaturePad.undoSignature();
+    },
+
+    clearSignature(){
+      this.$refs.signaturePad.clearSignature()
+      this.showSignaturePad = false
+    },
+
+
+
     async init(){
       await this.getWorkflowInfo()
       await this.getTaskInfo(this.auditDetail.inspectReportId)
@@ -749,10 +789,15 @@ export default {
         p 
           font-weight: 900
         .upload-data
-          width: 120px
           height: 100px
+          width: 160px
           border-radius: 10px
-          margin-bottom: 10px
+          display: flex
+          flex-direction: row
+          justify-content: center
+          align-items: center
+          cursor: pointer
+          
           font-size: 13px
           color: #006ab7
           display: flex
@@ -787,9 +832,9 @@ export default {
     align-self: flex-start
     .attach-add
       height: 100px
-      width: 161px
+      width: 160px
       border-radius: 10px
-      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1)
+      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.2)
       display: flex
       flex-direction: row
       justify-content: center
@@ -837,8 +882,19 @@ export default {
           overflow: hidden
           text-overflow: ellipsis
           font-size: 12px
+
+
+
       
-      
+  #signature
+    width: 500px
+    height: 500px
+    border: 1px solid #ddd
+    border-radius: 5px
+    // background-image: linear-gradient(white, white)
+    // background-origin: border-box
+    // background-clip: content-box, border-box
+
 
 
 
