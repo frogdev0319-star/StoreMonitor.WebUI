@@ -44,7 +44,7 @@
                 </div>
               </div>
               <div class="audit-description">
-                <div class="audit-description-comment" v-if="taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
+                <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
                 <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
                   <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
                 </div>
@@ -192,21 +192,18 @@
           </div>
 
           <!-- 加入檔案 & 簽名 -->
-          <!-- <div class="audit-add-files">
+          <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入簽名</p>
             <div class="upload-data">
               <i class="iconfont el-icon-document-add iconbangzhu"/> 簽名
             </div>
-            <div class="upload-imgs">
-                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-            </div>
-          </div> -->
+            <div class="upload-imgs"></div>
+          </div>
 
           <div class="l--l"></div>
 
           <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入附件</p>
-
             <!-- 新增附件 -->
             <div class="attach-area" >
               <div v-for="(imgItem,index) in imgFileList" :key="'img'+index" class="source-details" >

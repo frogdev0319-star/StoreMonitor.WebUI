@@ -41,7 +41,7 @@
                   </div>
                 </div>
                 <div class="audit-description">
-                  <div class="audit-description-comment" v-if="taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
+                  <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
                   <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
                     <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
                   </div>
