@@ -914,7 +914,8 @@ export default{
       "validateSucc":"Validasi Berhasil!",
       "validationCode":"Kode Validasi",
       "videoLicenseOverdue":"Lisensi video sudah lewat waktu",
-      "videoMangement":"Manajemen Video"
+      "videoMangement":"Manajemen Video",
+      "deviceOffline":"The device is offline."
   },
   "storeView":{
       "all":"Semua",

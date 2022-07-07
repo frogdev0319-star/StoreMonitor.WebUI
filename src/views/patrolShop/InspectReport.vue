@@ -17,24 +17,26 @@
       </div>
     </div>
     <div class="el-header">
-      <div class="workflow-edit">
+      <div class="workflow-edit" v-if="isAuditMode">
         <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
           {{ '督导稽核记录表' }}
         </p>
         <div style="display:inline-block">
           <el-button 
+            v-if="showEditBtn"
             class="confirm-btn"
             size="'mini'" type="primary" @click="goBackRemoteInception">
             {{ $t('audit.inceptionRpt.edit') }}
           </el-button>
           <el-button
+            v-if="showCancelBtn"
             class="storevue-button-filled"
             size="'mini'" type="primary" @click="doCancelAudit">
             {{ $t('audit.inceptionRpt.cancelAudit') }}
           </el-button>
         </div>   
       </div>
-      <div class="splitline"></div>
+      <div class="splitline" v-if="isAuditMode"></div>
       <div class="left-header">
         <img :src="report.inspectSrc" :class="isexportPDF ? 'pdf-title-icon' : 'title-icon'">
         <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
@@ -502,7 +504,7 @@
 <script>
 import ECharts from 'vue-echarts';
 import { getInspectReportInfo } from '@/api/inspect';
-import { CancelWorkflow } from '@/api/workflow';
+import { CancelWorkflow,taskDrawbak } from '@/api/workflow';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -607,6 +609,9 @@ export default {
       cancelAuditDialogShow:false,
       confirmCancelAuditInfo:this.$t('audit.inceptionRpt.confirmCancelAudit'),
       backSheetGroup:[],
+      isAuditMode:true,
+      showEditBtn:true,
+      showCancelBtn:false,
     };
   },
 
@@ -655,6 +660,7 @@ export default {
     },
     getReportTemplateAndInfo() {
       const templatePromise = ReportSetting.getInspectReportTemplateList({ enable: true });
+      console.log("this.report.reportId:",this.report.reportId);
       const reportInfoPromise = getInspectReportInfo({ reportIds: [this.report.reportId] });
       Promise.all([templatePromise, reportInfoPromise]).then(results => {
         this.getInspectTemplateList(results[0]);
@@ -723,31 +729,49 @@ export default {
 
     getRouterData() {
       const self = this;
+      self.isAuditMode =self.$route.params.isAuditMode
+      self.showEditBtn = self.$route.params.canEdit;
+      self.showCancelBtn = self.$route.params.canCancel;
       const routeData = JSON.parse(sessionStorage.getItem('report_data'));
       console.log("report routeData:",routeData);
-      const obj = {};
-      obj.reportId = routeData.id;
-      obj.storeName = routeData.storeName;
-      obj.status = routeData.status;
-      obj.dateStr = util.getDateStr2(routeData.ts);
-      obj.submitterName = routeData.submitterName;
-      obj.tagName = routeData.tagName;
-      obj.iconSrc = this.getIconSrc(routeData.status);
-      switch (routeData.mode) {
-        case 0:
-          obj.inspectSrc = self.inspectSrc;
-          obj.inspectType = self.$t('overview.remotePatrol');
-          break;
-        case 1:
-          obj.inspectSrc = self.insiteInspectSrc;
-          self.isInsiteInspect = true;
-          obj.inspectType = self.$t('overview.onsitePatrol');
-          break;
-        default:
-          obj.inspectSrc = self.videoSrc;
-          break;
+      if(routeData && !self.isAuditMode){
+        const obj = {};
+        console.log("self.$route.params.reportId:",self.$route.params.reportId);
+        obj.reportId = routeData.id;
+        obj.storeName = routeData.storeName;
+        obj.status = routeData.status;
+        obj.dateStr = util.getDateStr2(routeData.ts);
+        obj.submitterName = routeData.submitterName;
+        obj.tagName = routeData.tagName;
+        obj.iconSrc = this.getIconSrc(routeData.status);
+        switch (routeData.mode) {
+          case 0:
+            obj.inspectSrc = self.inspectSrc;
+            obj.inspectType = self.$t('overview.remotePatrol');
+            break;
+          case 1:
+            obj.inspectSrc = self.insiteInspectSrc;
+            self.isInsiteInspect = true;
+            obj.inspectType = self.$t('overview.onsitePatrol');
+            break;
+          default:
+            obj.inspectSrc = self.videoSrc;
+            break;
+        }
+        self.report = obj;
+      }else{
+        const obj = {};
+        obj.reportId = self.$route.params.reportId;
+        obj.storeName = '';
+        obj.status = '';
+        obj.dateStr = '';
+        obj.submitterName = '';
+        obj.tagName = '';
+        obj.iconSrc = '';
+        obj.inspectType = self.$t('overview.remotePatrol');
+        obj.inspectSrc = self.inspectSrc;
+        self.report = obj;
       }
-      self.report = obj;
     },
 
     getIconSrc(status) {
@@ -861,6 +885,12 @@ export default {
     async getReportInfo(res) {
       if (res.errCode === 0 && res.data.length > 0) {
         const data = res.data[0].info;  
+        this.report.storeName = data.storeName;
+        this.report.status = data.status;
+        this.report.dateStr = util.getDateStr2(data.ts);
+        this.report.submitterName = data.submitterName;
+        this.report.tagName = data.tagName;
+        this.report.iconSrc = this.getIconSrc(data.status);
         this.totalScore = data.totalScore;
         this.standard = data.standard;
         this.allRemarkItemsFlag = res.data[0].info.type === 1
@@ -888,7 +918,9 @@ export default {
         obj.parentId = groupitem.parentId;
         obj.parentName = '';
         groupitem.items.forEach((item, index) => {
+          console.log("**item:",item);
           const details = {};
+          details.itemId = item.id;
           details.subject = item.subject;
           details.comment = item.comment;
           details.description = item.description;
@@ -1004,6 +1036,7 @@ export default {
       this.getTableHeader();
       const summary = data.summary;
       util.sortArrayByKeyAsc(summary, 'type');
+      console.log("summary:",summary);
       const summaryTree = util.handleInspctionCatergyTree(summary, 'groupId');
       summaryTree.forEach(item => {
         if (!item.children) {
@@ -1129,6 +1162,7 @@ export default {
         this.showFeedBacks = true;
         data.feedback.forEach((item, index) => {
           const obj = {};
+          obj.feedbackId = item.id,
           obj.subject = item.subject;
           obj.description = item.description;
           if (item.attachment.length !== 0) {
@@ -1493,7 +1527,7 @@ export default {
 
     getGroupsItems(status) {
       const treeData = util.handleInspctionCatergyTree(this.groups, 'groupId');
-      // console.log('treeData:',treeData);
+      console.log('treeData:',treeData);
       const group = [];
       treeData.forEach(catergy => {
         const tempGroupItem = {};
@@ -1584,6 +1618,7 @@ export default {
       return Promise.all(
         this.reportData.feedback.map(item=>{
           var obj={
+            id:item.id,
             eventName:item.subject,
             eventDes:(item.attachment.length>0)?item.attachment[0].url:'',
             sourceObj:null,
@@ -1649,6 +1684,7 @@ export default {
       console.log("goBackRemoteInception");
       var BackPatrolParam = {
         isEdit:true,
+        reportId:self.report.reportId,
         reportComment:self.reportData.comment,
         tagId:self.reportData.tagId,
         tagName : self.reportData.tagName,
@@ -1667,10 +1703,18 @@ export default {
         isEdit:true,
         reportComment:this.reportData.comment
       };
-      self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
-      /*self.$store.dispatch('setStoreList', self.storeList);*/
-      self.$store.dispatch('setStoreCache', self.reportData.storeId);
-      this.$router.push({ name: 'remotePatrol', params: params });
+      var drawbackParam = {inspectReportId:self.report.reportId};
+      taskDrawbak(drawbackParam).then(res=>{
+          self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+        /*self.$store.dispatch('setStoreList', self.storeList);*/
+        self.$store.dispatch('setStoreCache', self.reportData.storeId);
+        this.$router.push({ name: 'remotePatrol', params: params });
+      }).catch(err=>{
+        util.notify(self.$t('audit.inceptionRpt.editAuditFail')+':'+err, 'warning', 3000);
+        self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+        self.$store.dispatch('setStoreCache', self.reportData.storeId);
+        this.$router.push({ name: 'remotePatrol', params: params });
+      });
     },
     doCancelAudit(){
       console.log("doCancelAudit");

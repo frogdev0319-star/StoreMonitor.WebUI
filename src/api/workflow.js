@@ -117,7 +117,7 @@ export const GetlistWorkflowTaskByType = data => {
   });
 };
 
-// 簽核管理 -- 確認總結
+//簽核管理 -- 確認總結
 export const SubmitWorkflow = data =>{
   return request({
     url: `${version}/workflow/submit`,
@@ -126,7 +126,7 @@ export const SubmitWorkflow = data =>{
   });
 };
 
-export const CancelWorkflow = data => {
+export const CancelWorkflow = data =>{
   return request({
     url: `${version}/workflow/cancel`,
     method: 'post',
@@ -150,3 +150,27 @@ export const taskSummit = data => {
   });
 };
 
+
+export const modifyReportWorkflow = data => {
+  return request({
+    url: `${version}/workflow/report/modify`,
+    method: 'post',
+    data
+  });
+};
+
+export const getReportWorkflowTask = params => {
+  return request({
+    url: `${version}/workflow/task/info`,
+    method: 'get',
+    params
+  });
+};
+
+export const taskDrawbak = data => {
+  return request({
+    url: `${version}/workflow/drawback`,
+    method: 'post',
+    data
+  });
+};

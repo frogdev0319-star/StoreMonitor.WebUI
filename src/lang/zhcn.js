@@ -919,7 +919,8 @@ export default{
       "validateSucc":"验证成功！",
       "validationCode":"验证码",
       "videoLicenseOverdue":"Video license已过期",
-      "videoMangement":"视频管理"
+      "videoMangement":"视频管理",
+      "deviceOffline":"设备离线"
   },
   "storeView":{
       "all":"全部",

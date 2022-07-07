@@ -426,7 +426,7 @@
 <script>
 import { getStorageInfo } from '@/api/event';
 import { submitInspectItem1 } from '@/api/inspect';
-import {SubmitWorkflow,getWorkflowInfo} from '@/api/workflow';
+import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,taskSummit,getReportWorkflowTask} from '@/api/workflow';
 import util from '@/common/util';
 import { getCookie } from '@/common/auth';
 import { getDepartmentList } from '@/api/checkin';
@@ -501,7 +501,9 @@ export default {
       workflowInfo:{copyToUsers:"",nextAuditUser:""},
       userDataList:[],
       positionsList:[],
-      bucketPdf:''
+      bucketPdf:'',
+      isEditReport:false,
+      reportId:-1
     };
   },
   computed: {
@@ -534,6 +536,7 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     const self = this;
+    console.log("beforeRouteLeave:",to.name)
     if (to.name !== 'remotePatrol') {
       self.$store.dispatch('setPatrolHistory', null);
       self.$store.dispatch('setPatrolComment', null);
@@ -684,16 +687,19 @@ export default {
         for (const g in inspect[i].inspectList) {
           for (const j in inspect[i].inspectList[g].items) {
             const objItem = {};
+            if(this.isEditReport && this.reportId!=-1){
+              objItem.id = inspect[i].inspectList[g].items[j].id;
+            }
             objItem.ts = new Date().getTime();
             // objItem.description = inspect[i].inspectList[g].items[j].inspectText.trim();
             if (inspect[i].inspectList[g].items[j].itemType === 1) {
-              objItem.grade = Math.pow(-2, 31);
+              objItem.grade = objItem.score = Math.pow(-2, 31);
             } else {
               if (inspect[i].type === 0 || inspect[i].type === 2) {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore ||
+                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore ||
                   inspect[i].inspectList[g].items[j].manualIgnore ? Math.pow(-2, 31) : (inspect[i].inspectList[g].items[j].isQualified ? 1 : 0);
               } else {
-                objItem.grade = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
+                objItem.grade = objItem.score = inspect[i].inspectList[g].items[j].isIgnore || inspect[i].inspectList[g].items[j].manualIgnore 
                   ? Math.pow(-2, 31)
                   : inspect[i].inspectList[g].items[j].itemgetScore;
               }
@@ -705,24 +711,31 @@ export default {
               for (const k in inspect[i].inspectList[g].items[j].sourceList) {
                 const obj = {};
                 if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2 || inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
-                  await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
-                    self.uploadingnumOfPic++;
-                    if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
-                      obj.mediaType = 2;
-                      obj.url = url;
-                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
-                    } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
-                      obj.mediaType = 1;
-                      obj.url = url;
-                      obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                  if(inspect[i].inspectList[g].items[j].sourceList[k].hasUrl){ //已經上傳過的檔案
+                    self.uploadingnumOfPic++
+                    obj.mediaType = inspect[i].inspectList[g].items[j].sourceList[k].mediaType;
+                    obj.url = inspect[i].inspectList[g].items[j].sourceList[k].src;
+                    obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                  }else{
+                    await self.upLoadFile(inspect[i].inspectList[g].items[j].sourceList[k]).then((url) => {
+                      self.uploadingnumOfPic++;
+                      if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 2) {
+                        obj.mediaType = 2;
+                        obj.url = url;
+                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                      } else if (inspect[i].inspectList[g].items[j].sourceList[k].mediaType === 1) {
+                        obj.mediaType = 1;
+                        obj.url = url;
+                        obj.deviceId = inspect[i].inspectList[g].items[j].sourceList[k].deviceId;
+                      }
+                    }).catch((err) => {
+                      upload++;
+                    });
+                    if (upload !== 0) {
+                      self.uploadProgress = false;
+                      util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                      return false;
                     }
-                  }).catch((err) => {
-                    upload++;
-                  });
-                  if (upload !== 0) {
-                    self.uploadProgress = false;
-                    util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-                    return false;
                   }
                 } else {
                   obj.mediaType = 3;
@@ -736,48 +749,62 @@ export default {
           }
         }
       }
+      //feedBack
       const feedEventList = [];
-
       for (const i in self.eventList) {
         const obj = {};
+        if(this.isEditReport && self.eventList[i].id!=-1){
+          obj.id = self.eventList[i].id;
+        }
         obj.ts = new Date().getTime();
         obj.storeId = self.store.storeId;
 
         obj.subject = self.eventList[i].eventName;
         // obj.description = self.eventList[i].eventDes;
         const commentTemp = [];
-        if (self.eventList[i].eventDes.trim().length > 0) {
-          let arr = self.eventList[i].eventDes.trim().split('|')
+        
+        if (self.eventList[i].sourceList.length > 0) {
+          let arr = self.eventList[i].sourceList;
           arr.forEach(item => {
             let obj = {};
             obj.mediaType = 3;
-            obj.url = item;
+            obj.url = item.src;
             commentTemp.push(obj);
           })
+          
         }else{
           let obj = {};
             obj.mediaType = 3;
-            obj.url = "";
+            obj.url = self.eventList[i].eventDes;
             commentTemp.push(obj);
         }
         if (self.eventList[i].sourceObj != null) { 
-          await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
+          if(self.eventList[i].sourceObj.hasUrl){
             self.uploadingnumOfPic++;
             const commentObj = {
-              mediaType: self.eventList[i].sourceObj.mediaType,
-              url: url,
-              deviceId: self.eventList[i].sourceObj.deviceId
-            };
-            commentTemp.push(commentObj);
-          }).catch((err) => {
-            upload++;
-          });
-          if (upload !== 0) {
-            self.uploadProgress = false;
-            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-            return false;
+                mediaType: self.eventList[i].sourceObj.mediaType,
+                url: self.eventList[i].sourceObj.src,
+                deviceId: self.eventList[i].sourceObj.deviceId
+              };
+              commentTemp.push(commentObj);
+          }else{
+            await self.upLoadFile(self.eventList[i].sourceObj).then((url) => {
+              self.uploadingnumOfPic++;
+              const commentObj = {
+                mediaType: self.eventList[i].sourceObj.mediaType,
+                url: url,
+                deviceId: self.eventList[i].sourceObj.deviceId
+              };
+              commentTemp.push(commentObj);
+            }).catch((err) => {
+              upload++;
+            });
+            if (upload !== 0) {
+              self.uploadProgress = false;
+              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+              return false;
+            }
           }
-
           obj.deviceId = self.eventList[i].sourceObj.deviceId;
         } else {
           // obj.diviceId=-1;
@@ -785,9 +812,9 @@ export default {
         obj.attachment = commentTemp;
         feedEventList.push(obj);
       }
-      //上傳簽核附件
+      //上傳簽核附件 
       var auditAttachment = [];
-      //if(self.imgFileList.length>0){
+      //upload audit image
       for(let idx=0; idx<self.imgFileList.length;idx++){
         await self.upLoadFile(self.imgFileList[idx]).then((url) => {
           console.log("upload file url:",url);
@@ -804,6 +831,7 @@ export default {
         });
         
       }
+      //upload audit pdf
       for(let idx=0; idx<self.pdfFileList.length; idx++){
         await self.upLoadFile(self.pdfFileList[idx]).then((url) => {
           self.uploadingnumOfPic++;
@@ -812,7 +840,7 @@ export default {
             url: url,
             ts: Date.now()
           };
-          auditAttachment .push(auditImgObj);
+          auditAttachment.push(auditImgObj);
         }).catch((err) => {
           console.log("uploade file error:",err)
           upload++;
@@ -822,7 +850,7 @@ export default {
           self.uploadProgress = false;
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
-        }
+      }
       let curSumIndex = [];
       curSumIndex = self.resultList.filter(x => x.isActive);
       status = curSumIndex[0].label;
@@ -834,66 +862,176 @@ export default {
         items: temp,
         feedback: feedEventList
       };
+      
       let routeData = null;
-      upload === 0 && submitInspectItem1(params).then(res => {
-        if (res.errCode === 0) {
-          const data = res.data;
-          self.editFlag = true;
-          if(self.isBindWorkflow){
-            const inspectId = data.inspectId; //取得報告ID
-            const wfParams={
-              inspectReportId:inspectId,
-              comment:{
-                description:self.auditNote,
-                attachment:auditAttachment
+      if(self.reportId!=-1 && self.isEditReport){
+        params['reportId']=this.reportId;
+        upload === 0 && self.doModifyReportSubmit(params,auditAttachment);
+      } else{
+        upload === 0 && submitInspectItem1(params).then(res => {
+          if (res.errCode === 0) {
+            const data = res.data;
+            self.editFlag = true;
+            if(self.isBindWorkflow){
+              const inspectId = data.inspectId; //取得報告ID
+              const wfParams={
+                inspectReportId:inspectId,
+                comment:{
+                  description:self.auditNote,
+                  attachment:auditAttachment
+                }
               }
-            }
-            SubmitWorkflow(wfParams).then(wfRes=>{
-              console.log("SubmitWorkflow res:",res);
-              if(wfRes.errCode == 0){
-                self.$store.dispatch('setEditCount', 0);
-                routeData = {
-                    isSuccess: true,
-                    user: data.notifiedTo,
+              SubmitWorkflow(wfParams).then(wfRes=>{
+                console.log("SubmitWorkflow res:",res);
+                if(wfRes.errCode == 0){
+                  self.$store.dispatch('setEditCount', 0);
+                  routeData = {
+                      isSuccess: true,
+                      user: data.notifiedTo,
+                      isBindWorkflow:true
+                  };
+                }else{
+                  routeData = {
+                    isSuccess: false,
+                    reLoadData: self.$route.params,
                     isBindWorkflow:true
-                };
-              }else{
-                routeData = {
-                  isSuccess: false,
-                  reLoadData: self.$route.params,
-                  isBindWorkflow:true
-                };
-              }
-              self.$router.push({ name: 'submitEvent', params: { data: routeData }});
-            }).catch(err=>{
-              console.log("err:",err);
-              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-              return false;}
-            );
-          }else{
+                  };
+                }
+                self.$router.push({ name: 'submitEvent', params: { data: routeData }});
+              }).catch(err=>{
+                  console.log("err:",err);
+                  util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                  return false;
+                }
+              );
+            }else{
+              routeData = {
+                isSuccess: true,
+                user: data.notifiedTo,
+                isBindWorkflow:false
+              };
+            }
+            
+          } else {
             routeData = {
-               isSuccess: true,
-               user: data.notifiedTo,
-               isBindWorkflow:false
+              isSuccess: false,
+              reLoadData: self.$route.params,
+              isBindWorkflow:false
             };
           }
-          
-        } else {
+          if(!self.isBindWorkflow)
+            self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+        }).catch(err => {
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        });
+      }
+      self.uploadProgress = false;
+    },
+
+    doModifyReportSubmit(params,auditAttachment){
+      const self = this;
+      console.log("submit report params:",params);
+      var routeData = {
+        isSuccess: false,
+        reLoadData: self.$route.params,
+        isBindWorkflow:true
+      };
+      var resReportModify = modifyReportWorkflow(params);
+      var resWorkflowTask = getReportWorkflowTask({type:0,inspectReportId:self.reportId});
+      Promise.all([resReportModify,resWorkflowTask]).then(result =>{
+        console.log("doModifyReportSubmit result:",result);
+        var data =[]
+        if(result[0].errCode==0){
+          data = result[0].data;
+          self.editFlag = true;
+        }else{
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        }
+        if(result[1].errCode==0) {
+          let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
+          let taskId = task.tasks[0].taskId;
+          var subTaskParam = {
+            taskId,
+            result:0,
+            comment:{
+              description:self.auditNote,
+              attachment:auditAttachment
+            }
+          };
+          console.log("subTaskParam:",subTaskParam);
+        }else{
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        }
+        taskSummit(subTaskParam).then(resSubTask => {
+          if(resSubTask.errCode == 0){
+            self.$store.dispatch('setEditCount', 0);
+            routeData = {
+                isSuccess: true,
+                isBindWorkflow:true
+            };
+          }
+        }).catch(errSubTask=>{
+          console.log("errSubTask:",errSubTask);
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        })
+        self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+      }).catch(err=>{
+        console.log("err:",err);
+        util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
+        return false;
+      });
+      /*modifyReportWorkflow(params).then(res => {
+        const data = res.data;
+        self.editFlag = true;
+        if (res.errCode === 0) {
+          getReportWorkflowTask({type:0,inspectReportId:self.reportId}).then(resTaskInfo=>{
+            if(resTaskInfo.errCode === 0){
+              let task = resTaskInfo.data.find(t=>t.state==0);//要抓status==0 為送出的task
+              console.log("find task:",task);
+              if(task){
+                let taskId = task.tasks.taskId;
+                var subTaskParam = {
+                  taskId,
+                  comment:{
+                    description:self.auditNote,
+                    attachment:auditAttachment
+                  }
+                };
+                SubmitWorkflowTask(subTaskParam).then(resSubTask => {
+                  if(resSubTask.errCode == 0){
+                    self.$store.dispatch('setEditCount', 0);
+                    routeData = {
+                        isSuccess: true,
+                        user: data.notifiedTo,
+                        isBindWorkflow:true
+                    };
+                  }
+                }).catch(errSubTask=>{
+                  console.log("errSubTask:",errSubTask);
+                  util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+                  return false;
+                })
+              }
+            }
+          }); 
+        }else{
           routeData = {
             isSuccess: false,
             reLoadData: self.$route.params,
             isBindWorkflow:false
           };
         }
-        if(!self.isBindWorkflow)
-          self.$router.push({ name: 'submitEvent', params: { data: routeData}});
-      }).catch(err => {
-        util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+        self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+      }).catch(err=>{
+        console.log("err:",err);
+        util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
         return false;
-      });
-      self.uploadProgress = false;
+      })*/
     },
-
     async getRouteData() {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
@@ -913,6 +1051,8 @@ export default {
         self.eventList = routeData.event;
         self.allRemarkItemsFlag = routeData.allRemarkItemsFlag;
         self.isBindWorkflow = routeData.isBindWorkflow;
+        self.isEditReport = routeData.isEditReport;
+        if(self.isEditReport) self.reportId = routeData.reportId;
         if(self.isBindWorkflow){
           console.log('**inspectSettings.workflowInfo',inspectSettings.workflowInfo);
           this.doGetWorkflowInfo(inspectSettings.workflowInfo);

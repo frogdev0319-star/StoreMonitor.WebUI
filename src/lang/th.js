@@ -915,6 +915,7 @@ export default{
       "validationCode":"รหัสการยืนยัน",
       "videoLicenseOverdue":"สิทธิ์การใช้งานวิดีโอหมดอายุ",
       "videoMangement":"การจัดการวิดีโอ",
+      "deviceOffline":"The device is offline."
   },
   "storeView":{
       "all":"ทั้งหมด",

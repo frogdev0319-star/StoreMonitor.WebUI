@@ -922,7 +922,8 @@ export default{
       "validateSucc":"驗證成功！",
       "validationCode":"驗證碼",
       "videoLicenseOverdue":"Video license已逾期",
-      "videoMangement":"影像管理"
+      "videoMangement":"影像管理",
+      "deviceOffline":"設備離線"
   },
   "storeView":{
       "all":"全部",
@@ -1333,7 +1334,8 @@ export default{
       "edit":"編輯",
       "cancelAudit":"取消簽核",
       "confirmCancelAudit":"確認是否取消此報告簽核",
-      "cancelAuditFail":"取消簽核失敗"
+      "cancelAuditFail":"取消簽核失敗",
+      "editAuditFail":"重送簽核失敗"
     }
   }
 

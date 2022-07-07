@@ -1027,7 +1027,8 @@ export default {
       workflowInfo:null,
       backSheetGroup:null,
       isEditReport:false,
-      curInspectId:-1
+      curInspectId:-1,
+      reportId:-1
     };
   },
   computed: {
@@ -1091,6 +1092,7 @@ export default {
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
+
           self.$store.dispatch('setStoreList', self.storeList);
           self.$store.dispatch('setPatrolHistory', self.historyObj);
           self.$store.dispatch('setStoreCache', this.curSelStoreId);
@@ -1111,6 +1113,7 @@ export default {
         self.$store.dispatch('setStoreCache', null);
         Database.addDataToDB(self.userId, {data: {}, rule: {}});
       } else {
+        self.$store.dispatch('setPatrolComment',self.suggest);
         self.$store.dispatch('setPatrolHistory', self.historyObj);
         self.$store.dispatch('setStoreList', self.storeList);
         self.$store.dispatch('setStoreCache', this.curSelStoreId);
@@ -1125,6 +1128,10 @@ export default {
     const PatrolHistory = self.$store.getters.PatrolHistory;
     const storeListCache = self.$store.getters.storeListCache;
     const BackPatrolParam = self.$store.getters.BackPatrolParam;
+    const PatrolComment = self.$store.getters.PatrolComment;
+    if (PatrolComment != null) {
+      self.suggest = PatrolComment;
+    }
     console.log("*BackPatrolParam:",BackPatrolParam);
     console.log("*PatrolHistory:",PatrolHistory);
     if (storeListCache) self.storeList = storeListCache
@@ -1179,9 +1186,14 @@ export default {
       if (PatrolHistory.hasIgnoretemp.length === 0) {
         self.notShowAlert = true;
       }
+      if(PatrolHistory.isEditReport){
+        self.reportId = PatrolHistory.reportId;
+        self.isEditReport = PatrolHistory.isEdit;
+      }
     }else if(BackPatrolParam != null){
       self.getAllStore();
       self.backSheetGroup = BackPatrolParam.backSheetGroup;
+      self.reportId = BackPatrolParam.reportId;
       self.isEditReport = BackPatrolParam.isEdit;
       self.suggest = BackPatrolParam.reportComment;
       self.curSelStoreId = BackPatrolParam.store;
@@ -1978,17 +1990,21 @@ export default {
     },
     doGetcateryItems(sheetItem,cateryItems,type){ //type:0:合格率評分 1:巡檢評分項 2:附加評分項
       for(let i=0; i<cateryItems.length; i++){
+        sheetItem[i].id = cateryItems[i].itemId;
         if(cateryItems[i].grade===-2147483648){ //略過項
           sheetItem[i].itemScoreTitle="--";
           sheetItem[i].isIgnore = true;
         }else if(type!=1){
           let scoreIdx = (cateryItems[i].grade==1) ? 0:1;
           sheetItem[i].itemScoreTitle=sheetItem[i].scoreList[scoreIdx].scoreTitle;
+          sheetItem[i].itemgetScore=(cateryItems[i].grade==1)?sheetItem[i].itemScore:0;
           sheetItem[i].scoreList[scoreIdx].isClick = true;
           sheetItem[i].isQualified = (cateryItems[i].grade==1) ? true:false;
           sheetItem[i].inputCount++;
+          console.log("sheetItem[i]",sheetItem[i]);
         }else{
           sheetItem[i].itemScoreTitle=cateryItems[i].grade;
+          sheetItem[i].itemgetScore=cateryItems[i].grade;
           sheetItem[i].inputCount++;
         }
         if(cateryItems[i].showAttachment){
@@ -2614,7 +2630,9 @@ export default {
         store: this.store,
         channel: this.channel,
         allRemarkItemsFlag: this.allRemarkItemsFlag,
-        isBindWorkflow:this.isBindWorkflow
+        isBindWorkflow:this.isBindWorkflow,
+        isEditReport:this.isEditReport,
+        reportId:this.reportId
       };
       this.historyObj = {
         storeList: this.tabList[Number(this.activeIndex)].storeList,
@@ -2634,7 +2652,9 @@ export default {
         curItemIndex: this.curItemIndex,
         channel: this.channel,
         curItemId: this.curItemId,
-        deviceList: this.deviceList
+        deviceList: this.deviceList,
+        isEditReport:this.isEditReport,
+        reportId:this.reportId
       };
       this.hasIgnoretemp = [];
       const params = { _id: this.userId, data: obj, rule: inspectSettings };
