@@ -45,7 +45,8 @@
               </div>
               <div class="audit-description">
                 <div class="audit-description-comment" v-if="taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
-                <div class="audit-description-data">
+                <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
+                  <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
                 </div>
               </div>
             </div>
@@ -250,8 +251,11 @@ import {
     GetTaskInfo,
     taskSummit,
   } from '@/api/workflow';
+import { getStorageInfo } from '@/api/event';
+import { getCookie } from '@/common/auth';
 import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
+import { getUserInfo } from '@/api/login';
 // import SettingTable from '@/components/SettingTable';
 // import {getNodeList, updateWorkflow} from "@/api/workflow";
 import TableOnly from '@/components/TableOnly';
@@ -276,6 +280,8 @@ export default {
       imgFileList:[],
       auditFileCount:0,
       oss: null,
+      totalnumOfPic: 0,
+      uploadingnumOfPic: 0,
 
       commentsToApi: {
         "taskId": "",
@@ -287,13 +293,7 @@ export default {
                     "content": ""
                 }
             ],
-            "attachment": [
-                {
-                    "mediaType": 0,
-                    "url": "",
-                    "ts": 0
-                }
-            ]
+            "attachment": []
         },
         "result": 0
       }
@@ -302,6 +302,7 @@ export default {
   mounted() {},
   async created() {
     await this.init()
+    
   },
   watch:{
     pdfFileList(){
@@ -320,6 +321,7 @@ export default {
     async init(){
       await this.getWorkflowInfo()
       await this.getTaskInfo(this.auditDetail.inspectReportId)
+      await this.getOssInfo();
     },
 
     getWorkflowInfo(){
@@ -361,30 +363,91 @@ export default {
       console.log('this.commentsToApi :>> ', this.commentsToApi);
     },
 
-    taskSummit(){
+    async taskSummit(){
       // this.isLoadingData = true
+      const self = this;
       const currentNode = this.taskInfo.filter( i => i.state == 2)
       this.commentsToApi.taskId = currentNode[0].tasks[0].taskId
 
       console.log('currentNode----->> ', currentNode);
       console.log('taskSummit this.commentsToApi----->> ', this.commentsToApi);
 
-      var url = this.upLoadFile()
-      console.log('url ~~~~~>> ', url);
 
-      // taskSummit(this.commentsToApi).then(res=>{
-      //   console.log('res :>> ', res);
-      //   this.isLoadingData = false
-      //   this.$router.push({ name: 'WaitAuditManage'});
+      const storageParams = {};
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode === 0) {
+          self.oss = res.data;
+        }
+      });
 
-      // }).catch(err => {
-      //   this.isLoadingData = false;
-      //   console.log('error' + err);
-      // });
+      //上傳簽核附件
+      var auditAttachment = [];
+      if(self.imgFileList.length>0){
+        for(let idx=0; idx <self.imgFileList.length; idx++){
+          await self.upLoadFile(self.imgFileList[idx]).then((url) => {
+            console.log("upload file url:",url);
+            self.uploadingnumOfPic++;
+            const auditImgObj = {
+              mediaType: 2,
+              url: url,
+              ts: Date.now()
+            };
+            this.commentsToApi.comment.attachment.push(auditImgObj);
+          }).catch((err) => {
+            console.log("uploade file error:",err)
+            upload++;
+          });
+        }
+      }
+
+      console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
+      taskSummit(this.commentsToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+        this.$router.push({ name: 'WaitAuditManage'});
+
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
     },
 
-    
 
+    
+    getAccountId() {
+      const self = this;
+      const userId = getCookie('UserId');
+      return new Promise((resolve, reject) => {
+        getUserInfo().then(res => {
+          self.userDataList = res.data;
+          res.data.forEach(item => {
+            if (item.userId === userId) {
+              const accountId = item.accountId.toLowerCase();
+              self.accountId = accountId;
+              localStorage.setItem('oss_bucket', accountId);
+              resolve(accountId);
+            }
+          });
+        });
+      });
+    },
+
+    async getOssInfo() {
+      const self = this;
+      const accountId = await self.getAccountId();
+      self.accountId = localStorage.getItem('oss_bucket');
+    },
+
+    getUpLoadBucketInfo() {
+      const self = this;
+      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
+      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+      self.bucketPdf = 'pdf' + '/' + util.getCurDate2Str();
+    },
+
+
+
+    
     doAddAttachment(e){
       const self = this;
       const maxSize = 4*1024*1024; //不能超過4MB
@@ -656,6 +719,10 @@ export default {
             .audit-description-comment
               font-size: 14px
             .audit-description-data
+              display: flex
+              flex-direction: row
+              justify-content: flex-start
+              align-items: flex-start
               img
                 margin-top: 10px
                 margin-right: 10px

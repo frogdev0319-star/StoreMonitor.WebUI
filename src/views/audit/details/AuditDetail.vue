@@ -42,7 +42,9 @@
                 </div>
                 <div class="audit-description">
                   <div class="audit-description-comment" v-if="taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
-                  <div class="audit-description-data">
+                  <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
+                    <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
+                  </div>
                   </div>
                 </div>
               </div>
@@ -361,7 +363,10 @@ export default {
             .audit-description-comment
               font-size: 14px
             .audit-description-data
-      
+              display: flex
+              flex-direction: row
+              justify-content: flex-start
+              align-items: flex-start
               img
                 margin-top: 10px
                 margin-right: 10px
