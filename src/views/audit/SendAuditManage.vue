@@ -582,9 +582,9 @@ export default{
                         if(task.auditState==2 || task.auditState==3 || task.auditState==6){//進行中
                             //processingCount+=1;
                             //tempProcessing.push(taskObj);
-                            if(task.auditState==3 || task.auditState==6){
-                                taskObj.taskOwner =  task.submitterName;//若狀態為駁回 或 撤回 則當前處理人為 送出人
-                            }
+                            //if(task.auditState==3 || task.auditState==6){
+                            //    taskObj.taskOwner =  task.submitterName;//若狀態為駁回 或 撤回 則當前處理人為 送出人
+                            //}
                         }else if(task.auditState==4 || task.auditState==5){//已完成
                             //completedCount+=1;
                             taskObj.taskOwner = "--";

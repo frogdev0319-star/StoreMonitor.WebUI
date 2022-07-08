@@ -900,6 +900,7 @@ export default {
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.getGroupsData(data.groups);
         this.reportData = data;
+        console.log("this.reportData:",this.reportData);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
         this.getPageDataBasedOnTemplate(this.reportData);
       }

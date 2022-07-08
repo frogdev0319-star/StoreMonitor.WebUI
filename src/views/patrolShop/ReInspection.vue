@@ -1386,6 +1386,7 @@ export default {
         };
 
         const obj = {
+          id:-1,
           eventName: this.eventName,
           eventDes: this.eventDes,
           sourceObj: srcObj,
@@ -1404,6 +1405,7 @@ export default {
     confirmAddTextFeedback() {
       if(this.feedbackIndex == -1){
         const obj = {
+          id:-1,
           eventName: this.eventName,
           eventDes: this.eventDes,
           sourceObj: null,
@@ -1949,6 +1951,7 @@ export default {
       //sheet 1
       Promise.all(
       this.sheetName.map( sheet =>{
+        sheet.Effective = 1;
         console.log("sheet:",sheet);
         if(sheet.groupId!="feedBack"){
           var tabIncep = hisData.find( hd => hd.groupName==sheet.label );
@@ -2630,7 +2633,7 @@ export default {
         store: this.store,
         channel: this.channel,
         allRemarkItemsFlag: this.allRemarkItemsFlag,
-        isBindWorkflow:this.isBindWorkflow,
+        isBindWorkflow:this.isBindWorkflow||self.isEditReport,
         isEditReport:this.isEditReport,
         reportId:this.reportId
       };
@@ -3014,6 +3017,7 @@ export default {
     },
 
     checkIfAllItemsAreRemark(groupsArr){
+      console.log("checkIfAllItemsAreRemark:",groupsArr)
       let tempArr = [];
       groupsArr.forEach(group => {
         tempArr.push(...group.items);
