@@ -411,6 +411,12 @@ export default {
         { curPath: ["/titleSetting"], activePath: "/title" },
         { curPath: ["/workflowDetail"], activePath: "/workflows" },
         { curPath: ["/workflownode"], activePath: "/workflowDetail" },
+
+        { curPath: ["/auditDetail"], activePath: "/audit" },
+        { curPath: ["/auditHandling"], activePath: "/waitaudit" },
+
+
+
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
       if (pathMAP) {
@@ -689,6 +695,19 @@ export default {
           paths: ["/workflownode"],
           parentBread: { path: "/workflowDetail", name: "workflowDetail" },
         },
+
+        {
+          paths: ["/auditDetail"],
+          parentBread: { path: "/audit", name: "AuditManage" },
+        },
+        {
+          paths: ["/auditHandling"],
+          parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
+        },
+
+
+
+
         {
           paths: ["/addroute", "/setroute", "/bindroute"],
           parentBread: { path: "/routeinspection", name: "inspectSetting" },

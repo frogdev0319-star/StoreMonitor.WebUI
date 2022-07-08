@@ -95,7 +95,10 @@ export default{
       "AuditManage":"簽核管理",
       "SendAuditManage":"送出簽核",
       "WaitAuditManage":"待簽核",
-      "TranscriptNotify":"副本通知"
+      "TranscriptNotify":"副本通知",
+      "auditDetail":"簽核內容",
+      "auditHandling":"簽核處理",
+      
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",

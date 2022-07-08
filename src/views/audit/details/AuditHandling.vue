@@ -296,6 +296,8 @@ export default {
       description:'',
       pdfFileList:[],
       imgFileList:[],
+      signatureFileList:[],
+      
       auditFileCount:0,
       oss: null,
       totalnumOfPic: 0,
@@ -324,17 +326,23 @@ export default {
     
   },
   watch:{
-    pdfFileList(){
-      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
-      console.log('this.auditFileCount :>> ', this.auditFileCount);
-      console.log('this.pdfFileList :>> ', this.pdfFileList);
-    },
+    // pdfFileList(){
+    //   this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+    //   console.log('this.auditFileCount :>> ', this.auditFileCount);
+    //   console.log('this.pdfFileList :>> ', this.pdfFileList);
+    // },
     imgFileList(){
-      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+      this.auditFileCount = this.signatureFileList.length+this.imgFileList.length;
       console.log('this.auditFileCount :>> ', this.auditFileCount);
       console.log('this.imgFileList :>> ', this.imgFileList);
-
     },
+    signatureFileList(){
+      this.auditFileCount = this.signatureFileList.length+this.imgFileList.length;
+      console.log('this.auditFileCount :>> ', this.auditFileCount);
+      console.log('this.signatureFileList :>> ', this.signatureFileList);
+    },
+
+    
   },
   methods: {
 
@@ -342,6 +350,10 @@ export default {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
       console.log(isEmpty);
       console.log(data);
+      // if(isEmpty !== true){
+      //   this.signatureFileList.push(data)
+      // }
+      
     },
 
     signUndo() {
@@ -551,8 +563,6 @@ export default {
       }
       return arr.map(source => source.src);
     },
-
-
 
     getImgList(index, sourceList) {
       const arr = [];
