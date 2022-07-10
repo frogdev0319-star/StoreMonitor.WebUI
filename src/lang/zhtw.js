@@ -1311,7 +1311,7 @@ export default{
       "rule_countersigned": "一人通过，则通过；一人驳回，则驳回",
       "rule_coSign": "一人通过，则通过；一人驳回，则驳回",
       "agree": "同意",
-      "reject": "拒絕",
+      "reject": "駁回",
       "withdraw": "撤回",
       "define": "自定義",
       "defineItem": "自定義名稱",

@@ -101,28 +101,33 @@
               <div class="setting-config basic-config">
                 <div class="title-name">{{$t('audit.workFlows.auditButton')}}</div>
                 <div class="approve">
+
                     <div class="approve_row">
-                      <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultName">
+                      <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultAgree">
                         <el-radio :label="0">{{$t('audit.workFlows.agree')}}</el-radio>  
                         <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
+                          :disabled="btnDefaultAgree == 0"
+                          v-model="defineAgree"
                           class="input-name"/>
                       </el-radio-group>
                     </div>
 
                     <div class="approve_row">
-                      <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultName">
+                      <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultReject">
                         <el-radio :label="0">{{$t('audit.workFlows.reject')}}</el-radio>  
                         <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
+                          :disabled="btnDefaultReject == 0"
+                          v-model="defineReject"
                           class="input-name"/>
                       </el-radio-group>
                     </div>
 
 
-                    <div class="approve_row">
+                    <!-- <div class="approve_row">
                       <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultName">
                         <el-radio :label="0">{{$t('audit.workFlows.withdraw')}}</el-radio>  
                         <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
@@ -130,7 +135,7 @@
                           :placeholder="$t('audit.workFlows.defineItem')"
                           class="input-name"/>
                       </el-radio-group>
-                    </div>
+                    </div> -->
                 
                 </div>
               </div>
@@ -223,10 +228,24 @@ export default {
       workflowDescription: '',
     
       sector: 0,
-      btnDefaultName: 0
+      btnDefaultAgree: 0,
+      btnDefaultReject: 0,
+      defineAgree: '',
+      defineReject: ''
     };
   },
-  watch:{
+  watch:{ 
+    btnDefaultAgree(){
+      if(this.btnDefaultAgree == 1){
+        this.nodeData.customButton[0].text = this.defineAgree
+      }   
+      if(this.btnDefaultReject == 1){
+        this.nodeData.customButton[1].text = this.defineReject
+      }
+      console.log('this.btnDefaultName :>> ', this.btnDefaultName);
+      console.log('this.btnDefaultAgree :>> ', this.btnDefaultAgree);
+      console.log('this.nodeData :>> ', this.nodeData);
+    }
 
     // sector(){
     //   console.log('sector >> ', this.sector);
@@ -278,7 +297,7 @@ export default {
       await this.getWorkflowInfo()
       await this.getUserInfo()
 
-
+      console.log('this.apiData  starting', this.apiData)
       
     }, 
 
@@ -317,6 +336,17 @@ export default {
       console.log('this.nodeData :>> ', this.nodeData);
       console.log('this.apiData :>> ', this.apiData);
 
+
+      if(this.nodeData.customButton[0].text !== this.$t('audit.workFlows.agree')){
+        this.btnDefaultAgree = 1
+        this.defineAgree = this.nodeData.customButton[0].text
+      }
+      if(this.nodeData.customButton[1].text !== this.$t('audit.workFlows.reject')){
+        this.btnDefaultReject = 1
+        this.defineReject = this.nodeData.customButton[1].text
+      }
+
+
       // 簽核人員
       this.auditUsers = this.nodeData.auditByUsers.toString()
       console.log('this.auditUsers :>> ', this.auditUsers);
@@ -329,14 +359,29 @@ export default {
     },
 
     saveNode(){
-      // console.log('this.nodeData Adjust~~~~~~~:>> ', this.nodeData)
-      // console.log('this.apiData Adjust~~~~~~~:>> ', this.apiData)
       this.fullscreenLoading = true
+
+      // handle btn naming
+      if(this.btnDefaultAgree == 1){
+        this.nodeData.customButton[0].text = this.defineAgree
+      }else{
+        this.nodeData.customButton[0].text = ''
+        this.nodeData.customButton[0].text = this.$t('audit.workFlows.agree')
+      }
+      if(this.btnDefaultReject == 1){
+        this.nodeData.customButton[1].text = this.defineReject
+      }else{
+        this.nodeData.customButton[1].text = ''
+        this.nodeData.customButton[1].text = this.$t('audit.workFlows.reject')
+      }
+
+
       if(this.nodeData.id == undefined){
+        // add node
         console.log('this.apiData Adjust new ~~~~~~~:>> ', this.apiData)
         this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
       }else{
-        // edit
+        // edit ndoe
         console.log("this is Editing")
         var apiDataIndex = this.apiData.orderedAuditNodeArray.findIndex(i => i.id == this.nodeData.id)
         console.log('apiDataIndex :>> ', apiDataIndex);
@@ -372,6 +417,7 @@ export default {
       });
     },
 
+    
     // submit() {
     //   let array = this.workflowDetail.nextNodes;
     //   let object = { ...array[0] };

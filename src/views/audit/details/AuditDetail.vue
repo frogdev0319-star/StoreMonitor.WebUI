@@ -7,7 +7,7 @@
         <h3>簽核巡檢表</h3>
         <div class="goto-report">報告詳情</div>
       </div>
-      
+    
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <!-- audit body -->
         <div class="audit-flow-body">
