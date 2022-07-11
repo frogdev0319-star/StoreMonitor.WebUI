@@ -221,7 +221,7 @@ export const navbarRoute = {
       },
       {
         path: '/audit/auditDetail/reportdetails',
-        name: 'reportDetails',
+        name: 'auditReportdetails',
         hidden: true,
         meta: {
           keepAlive: false

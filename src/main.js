@@ -1,4 +1,5 @@
 import Vue from 'vue';
+
 import App from './App';
 import './assets/font/iconfont.css';
 import '../static/Roboto/css.css';
@@ -20,6 +21,10 @@ import htmlToPdf from '@/plugins/htmlToPdf';
 import './assets/sass/index.scss';
 import { getAccountList } from '@/api/login';
 
+import VueSignaturePad from 'vue-signature-pad';
+
+
+
 Vue.use(ProgressPlugin);
 Vue.use(elCascaderMulti);
 Vue.use(htmlToPdf);
@@ -34,6 +39,7 @@ Vue.config.productionTip = false;
 Vue.prototype.appName = '看门店管理系统';
 Vue.prototype.$message = message;
 Vue.prototype.$showIgnoreItem = true;
+Vue.use(VueSignaturePad);
 
 process.env.MOCK && require('@/mock');
 

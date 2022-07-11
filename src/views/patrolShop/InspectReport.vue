@@ -19,7 +19,7 @@
     <div class="el-header">
       <div class="workflow-edit" v-if="isAuditMode">
         <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
-          {{ '督导稽核记录表' }}
+          {{ $t('audit.inceptionRpt.auditReport') }}
         </p>
         <div style="display:inline-block">
           <el-button 
