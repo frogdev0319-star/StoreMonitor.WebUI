@@ -540,14 +540,16 @@ export default{
             var params = {
                 beginTs:this.dateValue[0].valueOf(),
                 endTs:this.dateValue[1].valueOf(),
-                storeId:(this.curStoreIds==-1)?this.storeFilterObj.filterStoreIds:this.curStoreIds,
+                //storeId:(this.curStoreIds==-1 || this.curStoreIds.includes('-1'))?this.storeFilterObj.filterStoreIds:this.curStoreIds,
                 type:0,//0: 登入user創建的, 我發送的
                 filter:{
                     page:this.curPage-1,
                     size:this.curSizeNum
                 },
             };
-            
+            if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
+                params['storeId'] =this.curStoreIds;
+            }
             if(this.curTabIndx==1){//進行中
                 params['auditState'] = [2,3,6];
             }else if(this.curTabIndx==2){//已完成
