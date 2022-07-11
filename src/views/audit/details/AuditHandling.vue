@@ -44,8 +44,9 @@
                 </div>
               </div>
               <div class="audit-description">
-                <div class="audit-description-comment" v-if="taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
-                <div class="audit-description-data">
+                <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
+                <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
+                  <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
                 </div>
               </div>
             </div>
@@ -191,21 +192,19 @@
           </div>
 
           <!-- 加入檔案 & 簽名 -->
-          <!-- <div class="audit-add-files">
+          <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入簽名</p>
-            <div class="upload-data">
+            <div class="upload-data" @click="showSignaturePad = true">
               <i class="iconfont el-icon-document-add iconbangzhu"/> 簽名
             </div>
-            <div class="upload-imgs">
-                <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-            </div>
-          </div> -->
+            
+            <div class="upload-imgs"></div>
+          </div>
 
           <div class="l--l"></div>
 
           <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入附件</p>
-
             <!-- 新增附件 -->
             <div class="attach-area" >
               <div v-for="(imgItem,index) in imgFileList" :key="'img'+index" class="source-details" >
@@ -241,6 +240,24 @@
 			</div> 
 		</div>
 
+
+    <!-- popup -->
+    <dialog-pop
+      title="請簽名"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showSignaturePad"
+      @cancelHandler="clearSignature"
+      @confirmHandler="signSave"
+    >
+      <div style="padding: 0 20px; height: 300px">
+        <VueSignaturePad 
+          id="signature"
+          ref="signaturePad" />
+      </div>
+    </dialog-pop>
+
   </div>
 	</div>
 
@@ -250,17 +267,22 @@ import {
     GetTaskInfo,
     taskSummit,
   } from '@/api/workflow';
+import { getStorageInfo } from '@/api/event';
+import { getCookie } from '@/common/auth';
 import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
+import { getUserInfo } from '@/api/login';
+import DialogPop from '@/components/DialogPop';
+
 // import SettingTable from '@/components/SettingTable';
 // import {getNodeList, updateWorkflow} from "@/api/workflow";
 import TableOnly from '@/components/TableOnly';
-import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'WorkflowDetailHandling',
   components: {
-    DelayButton
+    DelayButton,
+    DialogPop
   },
   data() {
     return {
@@ -274,8 +296,13 @@ export default {
       description:'',
       pdfFileList:[],
       imgFileList:[],
+      signatureFileList:[],
+      
       auditFileCount:0,
       oss: null,
+      totalnumOfPic: 0,
+      uploadingnumOfPic: 0,
+      showSignaturePad: false,
 
       commentsToApi: {
         "taskId": "",
@@ -287,13 +314,7 @@ export default {
                     "content": ""
                 }
             ],
-            "attachment": [
-                {
-                    "mediaType": 0,
-                    "url": "",
-                    "ts": 0
-                }
-            ]
+            "attachment": []
         },
         "result": 0
       }
@@ -302,24 +323,54 @@ export default {
   mounted() {},
   async created() {
     await this.init()
+    
   },
   watch:{
-    pdfFileList(){
-      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
-      console.log('this.auditFileCount :>> ', this.auditFileCount);
-      console.log('this.pdfFileList :>> ', this.pdfFileList);
-    },
+    // pdfFileList(){
+    //   this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+    //   console.log('this.auditFileCount :>> ', this.auditFileCount);
+    //   console.log('this.pdfFileList :>> ', this.pdfFileList);
+    // },
     imgFileList(){
-      this.auditFileCount = this.pdfFileList.length+this.imgFileList.length;
+      this.auditFileCount = this.signatureFileList.length+this.imgFileList.length;
       console.log('this.auditFileCount :>> ', this.auditFileCount);
       console.log('this.imgFileList :>> ', this.imgFileList);
-
     },
+    signatureFileList(){
+      this.auditFileCount = this.signatureFileList.length+this.imgFileList.length;
+      console.log('this.auditFileCount :>> ', this.auditFileCount);
+      console.log('this.signatureFileList :>> ', this.signatureFileList);
+    },
+
+    
   },
   methods: {
+
+    signSave() {
+      const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
+      console.log(isEmpty);
+      console.log(data);
+      // if(isEmpty !== true){
+      //   this.signatureFileList.push(data)
+      // }
+      
+    },
+
+    signUndo() {
+      this.$refs.signaturePad.undoSignature();
+    },
+
+    clearSignature(){
+      this.$refs.signaturePad.clearSignature()
+      this.showSignaturePad = false
+    },
+
+
+
     async init(){
       await this.getWorkflowInfo()
       await this.getTaskInfo(this.auditDetail.inspectReportId)
+      await this.getOssInfo();
     },
 
     getWorkflowInfo(){
@@ -361,30 +412,91 @@ export default {
       console.log('this.commentsToApi :>> ', this.commentsToApi);
     },
 
-    taskSummit(){
+    async taskSummit(){
       // this.isLoadingData = true
+      const self = this;
       const currentNode = this.taskInfo.filter( i => i.state == 2)
       this.commentsToApi.taskId = currentNode[0].tasks[0].taskId
 
       console.log('currentNode----->> ', currentNode);
       console.log('taskSummit this.commentsToApi----->> ', this.commentsToApi);
 
-      var url = this.upLoadFile()
-      console.log('url ~~~~~>> ', url);
 
-      // taskSummit(this.commentsToApi).then(res=>{
-      //   console.log('res :>> ', res);
-      //   this.isLoadingData = false
-      //   this.$router.push({ name: 'WaitAuditManage'});
+      const storageParams = {};
+      await getStorageInfo(storageParams).then(res => {
+        if (res.errCode === 0) {
+          self.oss = res.data;
+        }
+      });
 
-      // }).catch(err => {
-      //   this.isLoadingData = false;
-      //   console.log('error' + err);
-      // });
+      //上傳簽核附件
+      var auditAttachment = [];
+      if(self.imgFileList.length>0){
+        for(let idx=0; idx <self.imgFileList.length; idx++){
+          await self.upLoadFile(self.imgFileList[idx]).then((url) => {
+            console.log("upload file url:",url);
+            self.uploadingnumOfPic++;
+            const auditImgObj = {
+              mediaType: 2,
+              url: url,
+              ts: Date.now()
+            };
+            this.commentsToApi.comment.attachment.push(auditImgObj);
+          }).catch((err) => {
+            console.log("uploade file error:",err)
+            upload++;
+          });
+        }
+      }
+
+      console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
+      taskSummit(this.commentsToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+        this.$router.push({ name: 'WaitAuditManage'});
+
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
     },
 
-    
 
+    
+    getAccountId() {
+      const self = this;
+      const userId = getCookie('UserId');
+      return new Promise((resolve, reject) => {
+        getUserInfo().then(res => {
+          self.userDataList = res.data;
+          res.data.forEach(item => {
+            if (item.userId === userId) {
+              const accountId = item.accountId.toLowerCase();
+              self.accountId = accountId;
+              localStorage.setItem('oss_bucket', accountId);
+              resolve(accountId);
+            }
+          });
+        });
+      });
+    },
+
+    async getOssInfo() {
+      const self = this;
+      const accountId = await self.getAccountId();
+      self.accountId = localStorage.getItem('oss_bucket');
+    },
+
+    getUpLoadBucketInfo() {
+      const self = this;
+      self.bucketVideo = 'video' + '/' + util.getCurDate2Str();
+      self.bucketImage = 'image' + '/' + util.getCurDate2Str();
+      self.bucketPdf = 'pdf' + '/' + util.getCurDate2Str();
+    },
+
+
+
+    
     doAddAttachment(e){
       const self = this;
       const maxSize = 4*1024*1024; //不能超過4MB
@@ -451,8 +563,6 @@ export default {
       }
       return arr.map(source => source.src);
     },
-
-
 
     getImgList(index, sourceList) {
       const arr = [];
@@ -656,6 +766,10 @@ export default {
             .audit-description-comment
               font-size: 14px
             .audit-description-data
+              display: flex
+              flex-direction: row
+              justify-content: flex-start
+              align-items: flex-start
               img
                 margin-top: 10px
                 margin-right: 10px
@@ -685,10 +799,15 @@ export default {
         p 
           font-weight: 900
         .upload-data
-          width: 120px
           height: 100px
+          width: 160px
           border-radius: 10px
-          margin-bottom: 10px
+          display: flex
+          flex-direction: row
+          justify-content: center
+          align-items: center
+          cursor: pointer
+          
           font-size: 13px
           color: #006ab7
           display: flex
@@ -723,9 +842,9 @@ export default {
     align-self: flex-start
     .attach-add
       height: 100px
-      width: 161px
+      width: 160px
       border-radius: 10px
-      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1)
+      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.2)
       display: flex
       flex-direction: row
       justify-content: center
@@ -773,8 +892,19 @@ export default {
           overflow: hidden
           text-overflow: ellipsis
           font-size: 12px
+
+
+
       
-      
+  #signature
+    width: 500px
+    height: 500px
+    border: 1px solid #ddd
+    border-radius: 5px
+    // background-image: linear-gradient(white, white)
+    // background-origin: border-box
+    // background-clip: content-box, border-box
+
 
 
 
