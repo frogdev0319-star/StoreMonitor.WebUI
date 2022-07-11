@@ -136,6 +136,9 @@ export default class PermissionHelper {
   static enableReportSetting() {
     return this.enableAuthorities(4, 0x0, 0x20);
   }
+  static enableWorkflowSetting() {
+    return this.enableAuthorities(4, 0x0, 0x40);
+  }
 
   // index(5) => ID(32): Video/Message
   static enableVideo() {
@@ -146,5 +149,16 @@ export default class PermissionHelper {
   }
   static getInterget() {
     const big = new Uint64BE(0x1, 0x1);
+  }
+
+  //index(6) => 簽核流程
+  static enableSendAudit() {
+    return this.enableAuthorities(6, 0x0, 0x01);
+  }
+  static enableWaitAudit() {
+    return this.enableAuthorities(6, 0x0, 0x02);
+  }
+  static enableTranscriptNotify() {
+    return this.enableAuthorities(6, 0x0, 0x04);
   }
 }
