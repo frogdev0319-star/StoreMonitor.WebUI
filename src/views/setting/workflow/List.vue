@@ -213,12 +213,12 @@ export default {
           "customButton": [
               {
                   "type": 0,
-                  "text": "同意",
+                  "text": this.$t('audit.workFlows.agree'),
                   "enable": true
               },
               {
                   "type": 1,
-                  "text": "拒絕",
+                  "text": this.$t('audit.workFlows.reject'),
                   "enable": true
               }
           ],
@@ -231,12 +231,12 @@ export default {
             "customButton": [
                 {
                     "type": 0,
-                    "text": "同意",
+                    "text": this.$t('audit.workFlows.agree'),
                     "enable": true
                 },
                 {
                     "type": 1,
-                    "text": "拒絕",
+                    "text": this.$t('audit.workFlows.reject'),
                     "enable": true
                 }
             ],

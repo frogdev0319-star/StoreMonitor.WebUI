@@ -5,7 +5,7 @@
       <!-- audit-header -->
       <div class="audit-header">
         <h3>簽核巡檢表</h3>
-        <div class="goto-report">報告詳情</div>
+        <div class="goto-report" @click="goTorReportdetails">報告詳情</div>
       </div>
     
       <div v-loading="isLoadingData" class="setting-details self-loading">
@@ -187,6 +187,22 @@ export default {
     await this.init()
   },
   methods: {
+    
+    goTorReportdetails(){
+      var reportId = this.auditDetail.inspectReportId
+        this.$router.push(
+          { 
+            name: 'reportDetails', 
+            params: {
+              reportId: reportId, 
+              isAuditMode: true, 
+              canEdit: true,
+              canCancel: true
+              }
+          }
+        );
+    },
+
     async init(){
       await this.getWorkflowInfo()
       await this.getTaskInfo(this.auditDetail.inspectReportId)
