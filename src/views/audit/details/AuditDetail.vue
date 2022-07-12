@@ -50,110 +50,11 @@
                 </div>
               </div>
           </div>
-      
-          <!-- workflow static div-->
-          <!-- <div class="audit-flow-unit">
-            <div class="check"><i class="iconfont el-icon-success iconbangzhu"/></div>
-            <div class="audit-flow-content">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">送出簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="audit-flow-unit ">
-            <div class="check"><i class="iconfont el-icon-time iconbangzhu"/></div>
-            <div class="audit-flow-content on_audit">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">主管簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                  <div class="audit_disagree">駁回</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                  <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-                  <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-                  <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="audit-flow-unit not__yet">
-            <div class="check"><i class="iconfont el-icon-more iconbangzhu"/></div>
-
-            <div class="audit-flow-content">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">送出簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                </div>
-              </div>
-            </div>
-            <div class="audit-flow-content on_audit">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">送出簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                </div>
-              </div>
-            </div>
-            <div class="audit-flow-content">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">送出簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                </div>
-              </div>
-            </div>
-          </div> -->
 
         </div>
       </div>
 
-    </div> 
-  </div>
+  </div> 
   </div>
 </template>
 <script>
@@ -229,7 +130,6 @@ export default {
 
         this.taskInfo = res.data
         console.log('this.taskInfo 2 ----->> ', this.taskInfo);
-
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;

@@ -510,7 +510,7 @@ $sv_red: #c60957;
   }
 }
 .el-select-dropdown__list {
-  padding: 20px 0;
+  padding: 20px 0px;
 }
 // .is-multiple {
 //   .el-select-dropdown__item {
@@ -542,6 +542,7 @@ $sv_red: #c60957;
   }
   .el-select-dropdown__item {
     background-color: #fff!important;
+    padding-left: 20px;
     &::after {
       display: none;
     }
