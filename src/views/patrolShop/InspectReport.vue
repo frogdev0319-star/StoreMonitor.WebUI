@@ -19,7 +19,7 @@
     <div class="el-header">
       <div class="workflow-edit" v-if="isAuditMode">
         <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
-          {{ '督导稽核记录表' }}
+          {{ $t('audit.inceptionRpt.auditReport') }}
         </p>
         <div style="display:inline-block">
           <el-button 
@@ -900,6 +900,7 @@ export default {
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
         this.getGroupsData(data.groups);
         this.reportData = data;
+        console.log("this.reportData:",this.reportData);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
         this.getPageDataBasedOnTemplate(this.reportData);
       }

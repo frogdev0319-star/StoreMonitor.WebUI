@@ -704,7 +704,10 @@ export default {
           paths: ["/auditHandling"],
           parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
         },
-
+        {
+          paths: ["/audit/auditDetail/reportdetails"],
+          parentBread: { path: "/auditDetail", name: "reportdetailsAuditDetail" },
+        },
 
 
 

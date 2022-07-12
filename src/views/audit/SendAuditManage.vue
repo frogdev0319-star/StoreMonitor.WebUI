@@ -540,14 +540,16 @@ export default{
             var params = {
                 beginTs:this.dateValue[0].valueOf(),
                 endTs:this.dateValue[1].valueOf(),
-                storeId:(this.curStoreIds==-1)?this.storeFilterObj.filterStoreIds:this.curStoreIds,
+                //storeId:(this.curStoreIds==-1 || this.curStoreIds.includes('-1'))?this.storeFilterObj.filterStoreIds:this.curStoreIds,
                 type:0,//0: 登入user創建的, 我發送的
                 filter:{
                     page:this.curPage-1,
                     size:this.curSizeNum
                 },
             };
-            
+            if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
+                params['storeId'] =this.curStoreIds;
+            }
             if(this.curTabIndx==1){//進行中
                 params['auditState'] = [2,3,6];
             }else if(this.curTabIndx==2){//已完成
@@ -582,9 +584,9 @@ export default{
                         if(task.auditState==2 || task.auditState==3 || task.auditState==6){//進行中
                             //processingCount+=1;
                             //tempProcessing.push(taskObj);
-                            if(task.auditState==3 || task.auditState==6){
-                                taskObj.taskOwner =  task.submitterName;//若狀態為駁回 或 撤回 則當前處理人為 送出人
-                            }
+                            //if(task.auditState==3 || task.auditState==6){
+                            //    taskObj.taskOwner =  task.submitterName;//若狀態為駁回 或 撤回 則當前處理人為 送出人
+                            //}
                         }else if(task.auditState==4 || task.auditState==5){//已完成
                             //completedCount+=1;
                             taskObj.taskOwner = "--";

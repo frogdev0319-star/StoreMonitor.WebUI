@@ -202,7 +202,7 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    auditRoute.children.push(
+    PermissionHelper.enableSendAudit() && auditRoute.children.push(
       {
         path: '/audit',
         name: 'SendAuditManage',
@@ -221,7 +221,7 @@ export const navbarRoute = {
       },
       {
         path: '/audit/auditDetail/reportdetails',
-        name: 'reportDetails',
+        name: 'auditReportdetails',
         hidden: true,
         meta: {
           keepAlive: false
@@ -229,7 +229,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
     ) && primaryPathesList.push('/audit', '/auditDetail');
-    auditRoute.children.push(
+    PermissionHelper.enableWaitAudit() && auditRoute.children.push(
       {
         path: '/waitaudit',
         name: 'WaitAuditManage',
@@ -247,7 +247,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/audit/details/auditHandling'], resolve)
       }
     ) && primaryPathesList.push('/waitaudit', '/auditHandling');
-    auditRoute.children.push(
+    PermissionHelper.enableTranscriptNotify() && auditRoute.children.push(
       {
         path: '/transcriptnotify',
         name: 'TranscriptNotify',
@@ -475,7 +475,7 @@ export const navbarRoute = {
         hidden: true
       }
     ) && primaryPathesList.push('/title', '/titleSetting');
-    systemSettingRoute.children.push(
+    PermissionHelper.enableWorkflowSetting() && systemSettingRoute.children.push(
       {
         path: '/workflows',
         name: 'workflowManage',

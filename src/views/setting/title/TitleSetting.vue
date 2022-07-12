@@ -279,6 +279,31 @@ export default {
           ]
         },
         {
+          roleName: this.$t('route.AuditManage'),
+          checked: false,
+          disabled: false,
+          children: [
+            {
+              roleName: this.$t('route.SendAuditManage'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: this.$t('route.WaitAuditManage'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            },
+            {
+              roleName: this.$t('route.TranscriptNotify'),
+              checked: false,
+              disabled: false,
+              visabled:true
+            }
+          ]
+        },
+        {
           roleName: this.$t('route.systemSetting'),
           checked: false,
           disabled: false,
@@ -312,28 +337,9 @@ export default {
               checked: false,
               disabled: false,
               visabled:true
-            }
-          ]
-        },
-        {
-          roleName: "簽核管理",
-          checked: false,
-          disabled: false,
-          children: [
-            {
-              roleName: "送出簽核",
-              checked: false,
-              disabled: false,
-              visabled:true
             },
             {
-              roleName: "待簽核",
-              checked: false,
-              disabled: false,
-              visabled:true
-            },
-            {
-              roleName: "副本通知",
+              roleName: this.$t('route.workflowManage'),
               checked: false,
               disabled: false,
               visabled:true
@@ -447,13 +453,19 @@ export default {
       this.roleNameList[3].children[4].checked = !!PermissionHelper.enableSingleStoreStatStatistics();
       this.roleNameList[3].children[5].checked = !!PermissionHelper.enableAppraisalCompareStatistics();
 
-      this.roleNameList[4].children[0].checked = !!PermissionHelper.enableDeviceSetting();
-      this.roleNameList[4].children[1].checked = !!PermissionHelper.enablePatrolSetting();
-      this.roleNameList[4].children[2].checked = !!PermissionHelper.enableStoreSetting();
-      this.roleNameList[4].children[3].checked = !!PermissionHelper.enableScheduleSetting();
-      this.roleNameList[4].children[4].checked = !!PermissionHelper.enableReportSetting();
+      this.roleNameList[5].children[0].checked = !!PermissionHelper.enableDeviceSetting();
+      this.roleNameList[5].children[1].checked = !!PermissionHelper.enablePatrolSetting();
+      this.roleNameList[5].children[2].checked = !!PermissionHelper.enableStoreSetting();
+      this.roleNameList[5].children[3].checked = !!PermissionHelper.enableScheduleSetting();
+      this.roleNameList[5].children[4].checked = !!PermissionHelper.enableReportSetting();
+      this.roleNameList[5].children[5].checked = !!PermissionHelper.enableWorkflowSetting();
 
-      if (authorities.length === 6 && resetFlag) {
+      //auditSetting
+      this.roleNameList[4].children[0].checked = !!PermissionHelper.enableSendAudit();
+      this.roleNameList[4].children[1].checked = !!PermissionHelper.enableWaitAudit();
+      this.roleNameList[4].children[2].checked = !!PermissionHelper.enableTranscriptNotify();
+
+      if (authorities.length === 7 && resetFlag) {
         this.ifAccessVideo = PermissionHelper.enableVideo() === 1;
         this.ifReceiveMes = PermissionHelper.enableMessage() === 2;
       }
@@ -545,8 +557,11 @@ export default {
     getSelectedAuthorities() {
       this.infoForm.authorities = [];
       const decAuthorityNum = Math.pow(2, 32);
-      this.roleNameList.forEach((item, index) => {
-        let tempAuthorityNum = Math.pow(2, index) * decAuthorityNum;
+      const newAuth = this.roleNameList.slice(0);
+      const auditElement = newAuth.splice(4,1)[0];
+      newAuth.push(auditElement);
+      newAuth.forEach((item, index) => {
+        let tempAuthorityNum = Math.pow(2, (index==5)?6:index) * decAuthorityNum;
         item.children.forEach((_item, _index) => {
           if(_item.checked){
             if(index === 4 && _index === 0){
@@ -555,7 +570,9 @@ export default {
               tempAuthorityNum += Math.pow(2, 0);
             } else if(index === 4 && _index === 4){
               tempAuthorityNum += Math.pow(2, 5);
-            } else {
+            } else if(index === 4 && _index === 5){
+              tempAuthorityNum += Math.pow(2, 6);
+            }else {
               tempAuthorityNum += Math.pow(2, _index);
             }
           }

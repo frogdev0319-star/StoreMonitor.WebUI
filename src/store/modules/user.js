@@ -342,7 +342,7 @@ const user = {
           statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
 
           const auditRoute = navbarRoute.getAuditRoute();
-          accessedRoutes.push(auditRoute);
+          auditRoute.children.length >0 ? accessedRoutes.push(auditRoute):'';
 
           const systemSettingRoute = navbarRoute.getSystemSettingRoute();
           systemSettingRoute.children.length > 0 ? accessedRoutes.push(systemSettingRoute) : '';

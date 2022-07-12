@@ -543,6 +543,7 @@ export default {
       self.$store.dispatch('setStoreList', []);
       self.$store.dispatch('setStoreCache', null);
       this.$store.dispatch('setEditCount', 0);
+      console.log("userId:",self.userId);
       Database.addDataToDB(self.userId, { data: {}, rule: {}});
       next();
     } else {
@@ -753,16 +754,14 @@ export default {
       const feedEventList = [];
       for (const i in self.eventList) {
         const obj = {};
-        if(this.isEditReport && self.eventList[i].id!=-1){
-          obj.id = self.eventList[i].id;
-        }
+        obj.id = self.eventList[i].id;
         obj.ts = new Date().getTime();
         obj.storeId = self.store.storeId;
 
         obj.subject = self.eventList[i].eventName;
         // obj.description = self.eventList[i].eventDes;
         const commentTemp = [];
-        
+        console.log("self.eventList:",self.eventList);
         if (self.eventList[i].sourceList.length > 0) {
           let arr = self.eventList[i].sourceList;
           arr.forEach(item => {
@@ -951,6 +950,7 @@ export default {
         }
         if(result[1].errCode==0) {
           let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
+          console.log("task:",task);
           let taskId = task.tasks[0].taskId;
           var subTaskParam = {
             taskId,
@@ -972,13 +972,14 @@ export default {
                 isSuccess: true,
                 isBindWorkflow:true
             };
+            self.$router.push({ name: 'submitEvent', params: { data: routeData}});
           }
         }).catch(errSubTask=>{
           console.log("errSubTask:",errSubTask);
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
         })
-        self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+        
       }).catch(err=>{
         console.log("err:",err);
         util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
@@ -1038,6 +1039,9 @@ export default {
       if (PatrolComment != null) {
         self.suggest = PatrolComment;
       }
+      console.log()
+      self.userId = getCookie('UserId');
+      console.log("getRouteData userid:",self.userId )
       Database.getDataFromDB(getCookie('UserId')).then(res => {
         const inpectResult = res;
         console.log("***inspect:",inpectResult);

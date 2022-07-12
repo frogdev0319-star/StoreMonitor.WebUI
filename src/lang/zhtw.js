@@ -98,7 +98,8 @@ export default{
       "TranscriptNotify":"副本通知",
       "auditDetail":"簽核內容",
       "auditHandling":"簽核處理",
-      
+      "auditReportdetails":"簽核紀錄表詳情",
+      "reportdetailsAuditDetail":"送出簽核｜簽核內容",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -1340,7 +1341,8 @@ export default{
       "cancelAudit":"取消簽核",
       "confirmCancelAudit":"確認是否取消此報告簽核",
       "cancelAuditFail":"取消簽核失敗",
-      "editAuditFail":"重送簽核失敗"
+      "editAuditFail":"重送簽核失敗",
+      "auditReport":"簽核紀錄表"
     }
   }
 

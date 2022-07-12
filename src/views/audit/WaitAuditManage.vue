@@ -460,12 +460,16 @@ export default{
             var params = {
                 beginTs:this.dateValue[0].valueOf(),
                 endTs:this.dateValue[1].valueOf(),
-                storeId:(this.curStoreIds==-1)?this.storeFilterObj.filterStoreIds:this.curStoreIds,
+                //storeId:(this.curStoreIds==-1)?this.storeFilterObj.filterStoreIds:this.curStoreIds,
                 filter:{
                     page:this.curPage-1,
                     size:this.curSizeNum
                 }
             };
+            console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore);
+            if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
+                params['storeId'] =this.curStoreIds;
+            }
             if(this.curTabIndx==0){//待簽核
                 params['type'] = 1;
                 params['auditState'] = [2];
@@ -501,12 +505,13 @@ export default{
                         if(task.auditState==4){//已完成
                             //completedCount+=1;
                             taskObj.taskOwner = "--";
+                            taskObj['operator']=this.$t('statistics.check');
                         }
                         tempAll.push(taskObj);
                     }
-                    self.tableDataList[0].tableData = tempAll;
-                    self.tableDataList[0].taskCount = res.data.numberOfElements;
-                    self.tableDataList[0].totalPage = res.data.totalPages;
+                    self.tableDataList[self.curTabIndx].tableData = tempAll;
+                    self.tableDataList[self.curTabIndx].taskCount = res.data.numberOfElements;
+                    self.tableDataList[self.curTabIndx].totalPage = res.data.totalPages;
                     self.curTotalPage = self.tableDataList[self.curTabIndx].totalPage;
                     self.curSizeNum = self.tableDataList[self.curTabIndx].sizeNum;
                     self.curOrder = self.tableDataList[self.curTabIndx].order;
@@ -523,8 +528,13 @@ export default{
         clickDetail(item, index) {
             const self = this;
             console.log('item.routeObj ~~~~>> ', item.row);
-            sessionStorage.setItem('auditDetailHandling', JSON.stringify(item.row));
-            self.$router.push({ name: 'auditHandling', params: { data: item.row }});
+            if(self.curTabIndx==0){
+                sessionStorage.setItem('auditDetailHandling', JSON.stringify(item.row));
+                self.$router.push({ name: 'auditHandling', params: { data: item.row }});
+            }else{
+                sessionStorage.setItem('auditDetail', JSON.stringify(item.row));
+                self.$router.push({ name: 'auditDetail', params: { data: item.row }});
+            }
         },
     },
 }
