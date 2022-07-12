@@ -410,8 +410,9 @@ export default {
         //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
         { curPath: ["/workflowDetail"], activePath: "/workflows" },
-        { curPath: ["/workflownode"], activePath: "/workflowDetail" },
+        { curPath: ["/createWorkflow"], activePath: "/workflows" },
 
+        { curPath: ["/workflownode"], activePath: "/workflowDetail" },
         { curPath: ["/auditDetail"], activePath: "/audit" },
         { curPath: ["/auditHandling"], activePath: "/waitaudit" },
 
@@ -691,6 +692,11 @@ export default {
           paths: ["/workflowDetail"],
           parentBread: { path: "/workFlows", name: "workflowManage" },
         },
+        {
+          paths: ["/createWorkflow"],
+          parentBread: { path: "/workFlows", name: "workflowManage" },
+        },
+
         {
           paths: ["/workflownode"],
           parentBread: { path: "/workflowDetail", name: "workflowDetail" },

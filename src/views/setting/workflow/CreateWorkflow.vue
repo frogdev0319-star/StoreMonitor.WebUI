@@ -5,7 +5,7 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"/>
       <div class="buttons">
-        <delay-button type="filled" @click="submit">  {{$t('audit.workFlows.saveAndPublic')}}</delay-button>
+        <delay-button type="filled" @click="submit">  {{$t('audit.workFlows.addWorkFlow')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -21,8 +21,8 @@
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.basicInformation')}}</div>
                   <div class="title-status"> 
                     <el-input
-                      :placeholder="nodeDataToApi.name"
-                      v-model="nodeDataToApi.name"
+                      :placeholder="newFlow.name"
+                      v-model="newFlow.name"
                       style="width: 250px"
                       />
                   </div>
@@ -51,7 +51,7 @@
                 <!-- 簽核模式 -->
                 <div class="flex-row" style="margin-right: 30px">
                   <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.signoffMode')}}</div>
-                      <el-radio-group class="storevue-radio" v-model="nodeDataToApi.cancelable" >
+                      <el-radio-group class="storevue-radio" v-model="newFlow.cancelable" >
                         <div class="flex-row" style="margin-right: 30px">
                           <el-radio :label="false">{{$t('audit.workFlows.canNotCancel')}}</el-radio>  
                             <el-tooltip
@@ -98,7 +98,7 @@
                 <div class="title-name">{{$t('audit.workFlows.workFlowDescription')}}</div>
                 <div class="title-status"> 
                   <el-input
-                    v-model="nodeDataToApi.description"
+                    v-model="newFlow.description"
                     :autosize="{ minRows: 3, maxRows: 5 }"
                     :placeholder="$t('audit.workFlows.workFlowDescription')"
                     class="storevue-textarea"
@@ -116,7 +116,7 @@
         <!-- 流程配置 -->
         <div class="inspect-basic">
           <!-- 新增審核節點 btn -->
-          <div class="buttons add-node-btn">
+          <!-- <div class="buttons add-node-btn">
             <el-button
               @click="addNode"
               class="storevue-button-outlined"
@@ -124,7 +124,7 @@
               <i class="iconfont el-icon-plus"/>
               {{$t('audit.workFlows.addNode')}}
             </el-button>
-          </div>
+          </div> -->
 
           <setting-table :table-name="$t('audit.workFlows.workFlowConfiguration')">
             <template slot="tableDetail" style="padding: 30px">
@@ -146,8 +146,6 @@
                     :indexType="indexType"
                     @handleMove="handleEmitMove"
                     @handleOperation="handleEmitOperation"
-                    @handleAuditMethod = "handleEmitAuditMethod"
-                    @handleSignature = "handleEmitSignature"
                   />
                 </div>
             </template>
@@ -202,7 +200,7 @@
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import {getNodeList, updateWorkflow} from "@/api/workflow";
+import {getNodeList, updateWorkflow, creadNewFlow} from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import {getUserInfo} from '@/api/login';
 import {getDepartmentList } from '@/api/checkin';
@@ -307,7 +305,55 @@ export default {
       deleteSrc: require('../../../../static/img/table-delete.png'),
       rowId:'',
       signMode: 1,
-      department : ''
+      department : '',
+      newFlow:{
+        "name": this.$t('audit.workFlows.addWorkFlow'),
+        "description": "",
+        "type": 0,
+        "cancelable": false,
+        "copyToUsers": [],
+        "copyToGroups": [],
+        "nextAuditNode": {
+          "name": "default flow",
+          "auditMethod": 0,
+          "signature": false,
+          "auditTargetType": 0, // 0 - 個人, 1 - 群組
+          "customButton": [
+              {
+                  "type": 0,
+                  "text": this.$t('audit.workFlows.agree'),
+                  "enable": true
+              },
+              {
+                  "type": 1,
+                  "text": this.$t('audit.workFlows.reject'),
+                  "enable": true
+              }
+          ],
+          "auditByUsers": [],
+          "auditByGroups": [],
+          "nextAuditNode": {
+            "name": "default flow 1",
+            "auditMethod": 0,
+            "signature": false,
+            "customButton": [
+                {
+                    "type": 0,
+                    "text": this.$t('audit.workFlows.agree'),
+                    "enable": true
+                },
+                {
+                    "type": 1,
+                    "text": this.$t('audit.workFlows.reject'),
+                    "enable": true
+                }
+            ],
+            "auditByUsers": [],
+            "auditByGroups": [],
+          }
+        },
+      
+      }
     };
   },
   watch:{
@@ -333,19 +379,9 @@ export default {
     // })
   },
   methods: {
-    handleEmitAuditMethod(e){
-      console.log('object :>> ', e);
-    },
-    handleEmitSignature(e){
-      console.log('object :>> ', e);
-    },
-
-    
     async init(){
       await this.getWorkflowInfo() //1 
-
-      await this.getNodeList(this.infoForm.processDefinitionKey) //4
-
+      // await this.getNodeList(this.infoForm.processDefinitionKey) //4
       await this.getTitle() //3
       await this.getUserInfo() //2
       await this.getDepartmentList() //7
@@ -361,7 +397,7 @@ export default {
     },
 
     getWorkflowInfo(){
-      const data = sessionStorage.getItem('workflowDetail')
+      const data = sessionStorage.getItem('newWorkFlow')
       this.infoForm = JSON.parse(data)
       // this.infoForm.type = "巡檢表單"
       console.log('getWorkflowInfo 1 ------>> ', this.infoForm);
@@ -503,7 +539,7 @@ export default {
                 {
                     "type": 1,
                     "text": this.$t('audit.workFlows.reject'),
-                    "enable": true
+                    "enable": false
                 }
             ],
             "auditByUsers": [],
@@ -628,23 +664,30 @@ export default {
       });
     },
 
-    //保存並發布
+
+
+    //addWorkFlow
     submit() {
-      
-      // setting CC users
-      this.nodeDataToApi.copyToUsers = this.ccToUSer
-
-       // call api for update
-      updateWorkflow(this.nodeDataToApi).then(res=>{
-        console.log('res :>> ', res);
-        this.$router.push({name: 'workflowManage'})
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-        util.notify('此簽核流程名稱已存在', 'error', 3000);
-
+      creadNewFlow(this.newFlow).then(res=>{
+          // this.newFlow.processDefinitionKey = res.data
+          // sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
+          console.log('res :>> ', res);
+          this.$router.push({name: 'workflowManage'})
+        }).catch(err => {
+          console.log('error' + err);
       });
+    
+       // call api for update
+      // updateWorkflow(this.nodeDataToApi).then(res=>{
+      //   console.log('res :>> ', res);
+      //   this.$router.push({name: 'workflowManage'})
+      //   this.isLoadingData = false
+      // }).catch(err => {
+      //   this.isLoadingData = false;
+      //   console.log('error' + err);
+      //   util.notify('此簽核流程名稱已存在', 'error', 3000);
+
+      // });
 
     }
   }

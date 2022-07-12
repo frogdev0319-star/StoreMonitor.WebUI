@@ -325,26 +325,31 @@ export default {
       });
     },
     creadNewFlow(){
-      var time = new Date()
-      var theTime = time.getTime()
-      var t = {
-          year: time.getFullYear(),
-          month: ((time.getMonth() + 1) < 10) ? '0' + (time.getMonth() + 1).toString() : (time.getMonth() + 1).toString(),
-          date: (time.getDate() < 10) ? '0' + time.getDate().toString() : time.getDate().toString(),
-          hour: (time.getHours() < 10) ? '0' + time.getHours().toString() : time.getHours().toString(),
-          minute: (time.getMinutes() < 10) ? '0' + time.getMinutes().toString() : time.getMinutes().toString(),
-          second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
-        }
-      const createTime = t.year + "-" + t.month + "-" + t.date + " " + t.hour + ":" + t.minute + ":" + t.second
-      this.newFlow.name =  this.$t('audit.workFlows.addWorkFlow') + createTime
+  
+      // var time = new Date()
+      // var theTime = time.getTime()
+      // var t = {
+      //     year: time.getFullYear(),
+      //     month: ((time.getMonth() + 1) < 10) ? '0' + (time.getMonth() + 1).toString() : (time.getMonth() + 1).toString(),
+      //     date: (time.getDate() < 10) ? '0' + time.getDate().toString() : time.getDate().toString(),
+      //     hour: (time.getHours() < 10) ? '0' + time.getHours().toString() : time.getHours().toString(),
+      //     minute: (time.getMinutes() < 10) ? '0' + time.getMinutes().toString() : time.getMinutes().toString(),
+      //     second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
+      //   }
+      // const createTime = t.year + "-" + t.month + "-" + t.date + " " + t.hour + ":" + t.minute + ":" + t.second
+      // this.newFlow.name =  this.$t('audit.workFlows.addWorkFlow') + createTime
+      // sessionStorage.setItem('newWorkFlow', JSON.stringify(this.newFlow))
+      // console.log('this.newFlow :>> ', this.newFlow);
 
-      creadNewFlow(this.newFlow).then(res=>{
-          this.newFlow.processDefinitionKey = res.data
-          sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
-          this.$router.push({name: 'workflowDetail'})
-        }).catch(err => {
-          console.log('error' + err);
-      });
+      this.$router.push({name: 'createWorkflow'})
+
+      // creadNewFlow(this.newFlow).then(res=>{
+      //     this.newFlow.processDefinitionKey = res.data
+      //     sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
+      //     this.$router.push({name: 'workflowDetail'})
+      //   }).catch(err => {
+      //     console.log('error' + err);
+      // });
     
     },
     

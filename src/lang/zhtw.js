@@ -87,6 +87,7 @@ export default{
       "singleStoreStat":"單店分析",
       "workflowManage":"流程設計",
       "workflowDetail":"流程配置",
+      "createWorkflow":"新增流程",
       "nodeSetting":"添加簽核節點",
       "noReportAuthority":"無報告檢視權限，請聯繫管理員",
       "noPatrolCompareStatAuthority":"無巡檢同比分析權限，請聯繫管理員",
