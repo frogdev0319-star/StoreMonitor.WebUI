@@ -14,7 +14,6 @@
 
 				<!-- audit body -->
 				<div class="audit-flow-body">
-
 					<div class="audit-flow-ownerhandling" style="margin-bottom: 20px">
 						<p>簽核流程</p>
 						<!-- <div class="handling">
@@ -46,6 +45,7 @@
               <div class="audit-description">
                 <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
                 <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
+                  <img :src="blopSign.content" alt="" v-for="blopSign in taskItem.tasks[0].comment.signature" :key="blopSign.ts" style="background: #FFF">
                   <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
                 </div>
               </div>
@@ -194,11 +194,20 @@
           <!-- 加入檔案 & 簽名 -->
           <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入簽名</p>
-            <div class="upload-data" @click="showSignaturePad = true">
-              <i class="iconfont el-icon-document-add iconbangzhu"/> 簽名
-            </div>
-            <div class="upload-imgs">
-                <img src="https://storevuestorage.blob.core.windows.net/storevue-mgmt-portals/undefined/inspect_181259_ooo.png" alt="">
+      
+            <div class="attach-area" >
+              <div v-for="(imgItem,index) in signatureFileList" :key="'img'+index" class="source-details" >
+                <div class="img-content">
+                  <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem, index})" />
+                  <el-image
+                    :src="imgItem.src"
+                    style="width:auto;height:100px; border:1px solid #dedede; border-radius: 5px;"
+                    :preview-src-list="getAuditImgList(index)"/>
+                </div>
+              </div>
+              <div class="upload-data" @click="showSignaturePad = true" v-if="signatureFileList.length == 0">
+                <i class="iconfont el-icon-document-add iconbangzhu" /> 簽名
+              </div>
             </div>
           </div>
 
@@ -240,7 +249,6 @@
 				</div>
 			</div> 
 		</div>
-
 
     <!-- popup -->
     <dialog-pop
@@ -344,11 +352,11 @@ export default {
       console.log('this.auditFileCount :>> ', this.auditFileCount);
       console.log('this.imgFileList :>> ', this.imgFileList);
     },
-    // signatureFileList(){
-    //   this.auditFileCount = this.signatureFileList.length+this.imgFileList.length;
-    //   console.log('this.auditFileCount :>> ', this.auditFileCount);
-    //   console.log('this.signatureFileList :>> ', this.signatureFileList);
-    // },
+    signatureFileList(){
+      this.auditFileCount = this.signatureFileList.length+this.imgFileList.length;
+      console.log('this.auditFileCount :>> ', this.auditFileCount);
+      console.log('this.signatureFileList :>> ', this.signatureFileList);
+    },
 
     
   },
@@ -368,18 +376,16 @@ export default {
         );
     },
 
-
     signSave() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
-      console.log(isEmpty);
-      console.log(data);
-      
+      // console.log(isEmpty);
+      // console.log(data);
       const self = this;
       if(!isEmpty){
         var objSignature ={
           fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_ooo.png`,
           src: data,
-          file:'',
+          file: util.base64ToBlob(data),
           type:'image/png',
           size: ''
         };
@@ -389,8 +395,8 @@ export default {
       }
       console.log('self.signatureFileList :>> ', self.signatureFileList);
       self.showSignaturePad = false
-      
     },
+
     signUndo() {
       this.$refs.signaturePad.undoSignature();
     },
@@ -399,6 +405,7 @@ export default {
       this.showSignaturePad = false
       this.signatureFileList = []
     },
+
 
     async init(){
       await this.getWorkflowInfo()
@@ -507,9 +514,8 @@ export default {
             console.log("upload file url:",url);
             self.uploadingnumOfPic++;
             const signatureObj = {
-              mediaType: 2,
-              url: url,
-              ts: Date.now()
+              type: 1,
+              content: url,
             };
             this.commentsToApi.comment.signature.push(signatureObj);
           }).catch((err) => {
@@ -539,15 +545,15 @@ export default {
       }
 
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
-      // taskSummit(this.commentsToApi).then(res=>{
-      //   console.log('res :>> ', res);
-      //   this.isLoadingData = false
-      //   this.$router.push({ name: 'WaitAuditManage'});
+      taskSummit(this.commentsToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+        this.$router.push({ name: 'WaitAuditManage'});
 
-      // }).catch(err => {
-      //   this.isLoadingData = false;
-      //   console.log('error' + err);
-      // });
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
     },
 
 
@@ -607,17 +613,18 @@ export default {
         };
         self.createFile(files[0],objImg);
         self.imgFileList.push(objImg);
-      }else if(files[0].type.includes("pdf")){
-        var objpdf={
-          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_ooo_${files[0].name}`,
-          src:'',
-          file:'',
-          type:'pdf',
-          size:files[0].size,
-        }
-        self.createFile(files[0],objpdf);
-        self.pdfFileList.push(objpdf);
       }
+      // else if(files[0].type.includes("pdf")){
+      //   var objpdf={
+      //     fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_ooo_${files[0].name}`,
+      //     src:'',
+      //     file:'',
+      //     type:'pdf',
+      //     size:files[0].size,
+      //   }
+      //   self.createFile(files[0],objpdf);
+      //   self.pdfFileList.push(objpdf);
+      // }
     },
     createFile(file, objFile) {
       //var image = new Image();
@@ -632,11 +639,17 @@ export default {
 
     deleteImg({item, index}) {
       const self = this;
-      if(item.type==='pdf')
-        self.pdfFileList.splice(index, 1);
-      else
-        self.imgFileList.splice(index, 1);
+      if(item.type==='image/png'){
+        self.signatureFileList.splice(index, 1);
+        this.$refs.signaturePad.undoSignature();
+        } 
+        else {
+          self.imgFileList.splice(index, 1);
+        }
     },
+
+
+
     getAuditImgList(index) {
       const arr = [];
       let i = 0;
@@ -871,7 +884,8 @@ export default {
               img
                 margin-top: 10px
                 margin-right: 10px
-                width: 200px
+                width: auto
+                height: 120px
                 border-radius: 4px
 
 
@@ -1003,7 +1017,7 @@ export default {
     // background-origin: border-box
     // background-clip: content-box, border-box
 
-
+    
 
 
 </style>

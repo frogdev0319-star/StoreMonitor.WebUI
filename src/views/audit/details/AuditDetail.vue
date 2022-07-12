@@ -43,6 +43,7 @@
                 <div class="audit-description">
                   <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
                   <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
+                    <img :src="blopSign.content" alt="" v-for="blopSign in taskItem.tasks[0].comment.signature" :key="blopSign.ts" style="background: #FFF">
                     <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
                   </div>
                   </div>
@@ -187,7 +188,7 @@ export default {
     await this.init()
   },
   methods: {
-    
+
     goTorReportdetails(){
       var reportId = this.auditDetail.inspectReportId
         this.$router.push(
@@ -321,7 +322,7 @@ export default {
         color: #556679
         border-left: 2px dotted #ddd
         margin-left: 20px
-        padding: 0px 20px 30px 30px
+        padding: 0px 10px 30px 30px
         position: relative
         &:nth-child(2)
           .audit-flow-content
@@ -386,7 +387,8 @@ export default {
               img
                 margin-top: 10px
                 margin-right: 10px
-                width: 200px
+                width: auto
+                height: 120px
                 border-radius: 4px
 
 </style>
