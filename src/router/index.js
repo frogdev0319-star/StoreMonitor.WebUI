@@ -246,6 +246,16 @@ export const navbarRoute = {
         hidden: true,
         component: resolve => require(['@/views/audit/details/auditHandling'], resolve)
       }
+      ,
+      {
+        path: '/audit/auditHandling/reportdetails',
+        name: 'handlingReportdetails',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
+      }
     ) && primaryPathesList.push('/waitaudit', '/auditHandling');
     PermissionHelper.enableTranscriptNotify() && auditRoute.children.push(
       {

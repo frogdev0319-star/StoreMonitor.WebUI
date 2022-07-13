@@ -261,12 +261,12 @@ export default {
       var reportId = this.auditDetail.inspectReportId
         this.$router.push(
           { 
-            name: 'reportDetails', 
+            name: 'handlingReportdetails', 
             params: {
               reportId: reportId, 
               isAuditMode: true, 
-              canEdit: true,
-              canCancel: true
+              canEdit: (this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
+              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
               }
           }
         );
@@ -439,15 +439,14 @@ export default {
       }
 
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
-      // taskSummit(this.commentsToApi).then(res=>{
-      //   console.log('res :>> ', res);
-      //   this.isLoadingData = false
-      //   this.$router.push({ name: 'WaitAuditManage'});
-
-      // }).catch(err => {
-      //   this.isLoadingData = false;
-      //   console.log('error' + err);
-      // });
+      taskSummit(this.commentsToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+        this.$router.push({ name: 'WaitAuditManage'});
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
     },
 
 

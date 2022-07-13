@@ -101,6 +101,8 @@ export default{
       "auditHandling":"簽核處理",
       "auditReportdetails":"簽核紀錄表詳情",
       "reportdetailsAuditDetail":"送出簽核｜簽核內容",
+      "handlingReportdetails":"簽核紀錄表詳情",
+      "reportdetailsAuditHandling":"待簽核｜簽核處理",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",

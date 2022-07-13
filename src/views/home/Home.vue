@@ -714,7 +714,10 @@ export default {
           paths: ["/audit/auditDetail/reportdetails"],
           parentBread: { path: "/auditDetail", name: "reportdetailsAuditDetail" },
         },
-
+        {
+          paths: ["/audit/auditHandling/reportdetails"],
+          parentBread: { path: "/auditHandling", name: "reportdetailsAuditHandling" },
+        },
 
 
         {

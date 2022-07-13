@@ -92,14 +92,15 @@ export default {
 
     goTorReportdetails(){
       var reportId = this.auditDetail.inspectReportId
+      console.log("cancancel:",this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6))
         this.$router.push(
           { 
-            name: 'reportDetails', 
+            name: 'auditReportdetails', 
             params: {
               reportId: reportId, 
               isAuditMode: true, 
-              canEdit: true,
-              canCancel: true
+              canEdit: (this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
+              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
               }
           }
         );

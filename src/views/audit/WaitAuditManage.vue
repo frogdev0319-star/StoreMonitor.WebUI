@@ -475,7 +475,7 @@ export default{
                 params['auditState'] = [2];
             }else if(this.curTabIndx==1){//已簽核
                 params['type'] = 2;
-                params['auditState'] = [3,4] 
+                params['auditState'] = [2,3,4] 
             }
             if(Object.keys(this.curOrder).length>0){
                 params['order'] = this.curOrder;
@@ -502,7 +502,7 @@ export default{
                         taskObj.processStartTs =  util.getDateStr(task.processStartTs);
                         taskObj.processLastUpdateTs =  util.getDateStr(task.processLastUpdateTs);
                         taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
-                        if(task.auditState==4){//已完成
+                        if(task.taskOwner=='***Task Done***'){//已完成
                             //completedCount+=1;
                             taskObj.taskOwner = "--";
                             taskObj['operator']=this.$t('statistics.check');
