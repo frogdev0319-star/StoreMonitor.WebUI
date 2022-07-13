@@ -1312,8 +1312,8 @@ export default{
       "auditMethod": "簽核方式",
       "auditButton": "簽核按鈕",
       "selectDepart": "簽核按鈕",
-      "rule_countersigned": "一人通过，则通过；一人驳回，则驳回",
-      "rule_coSign": "一人通过，则通过；一人驳回，则驳回",
+      "rule_countersigned": "需全部人通過",
+      "rule_coSign": "一人通過，則通過；一人駁回，則駁回",
       "agree": "同意",
       "reject": "駁回",
       "withdraw": "撤回",
@@ -1324,7 +1324,9 @@ export default{
       "stayOver": "停留超過",
       "day": "天",
       "submitAudit": "送出簽核",
-      "addNode": "新增節點"
+      "addNode": "新增節點",
+      "cantEmpty": "簽核人員不可為空，請設定簽核人員"
+
 
     },
     "inceptionRpt":{
