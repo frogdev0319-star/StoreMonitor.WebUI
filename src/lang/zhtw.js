@@ -87,7 +87,8 @@ export default{
       "singleStoreStat":"單店分析",
       "workflowManage":"流程設計",
       "workflowDetail":"流程配置",
-      "nodeSetting":"添加審核節點",
+      "createWorkflow":"新增流程",
+      "nodeSetting":"添加簽核節點",
       "noReportAuthority":"無報告檢視權限，請聯繫管理員",
       "noPatrolCompareStatAuthority":"無巡檢同比分析權限，請聯繫管理員",
       "noEventAuthority":"無事件檢視權限，請聯繫管理員",
@@ -1288,7 +1289,7 @@ export default{
       "canCancel":"可取消簽核",
       "canNotCancel":"不可取消簽核",
       "thisModeWithoutEvent":" ※ 此模式不會立即產生事件",
-      "addNode":" 新增審核節點",
+      "addNode":" 新增簽核節點",
       "nodeIndex":"節點編號",
       "nodeName":"節點名稱",
       "nodeAuditName":"簽核人員",
@@ -1320,7 +1321,9 @@ export default{
       "alertAtOverTime": "超時發送訊息提醒",
       "stayOver": "停留超過",
       "day": "天",
-      "submitAudit": "送出簽核"
+      "submitAudit": "送出簽核",
+      "addNode": "新增節點"
+
     },
     "inceptionRpt":{
       "sendAudit":"送出簽核",

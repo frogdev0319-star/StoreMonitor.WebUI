@@ -410,8 +410,9 @@ export default {
         //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
         { curPath: ["/workflowDetail"], activePath: "/workflows" },
-        { curPath: ["/workflownode"], activePath: "/workflowDetail" },
+        { curPath: ["/createWorkflow"], activePath: "/workflows" },
 
+        { curPath: ["/workflownode"], activePath: "/workflowDetail" },
         { curPath: ["/auditDetail"], activePath: "/audit" },
         { curPath: ["/auditHandling"], activePath: "/waitaudit" },
 
@@ -692,6 +693,11 @@ export default {
           parentBread: { path: "/workFlows", name: "workflowManage" },
         },
         {
+          paths: ["/createWorkflow"],
+          parentBread: { path: "/workFlows", name: "workflowManage" },
+        },
+
+        {
           paths: ["/workflownode"],
           parentBread: { path: "/workflowDetail", name: "workflowDetail" },
         },
@@ -756,7 +762,9 @@ export default {
     fedlogout() {
       Database.destoryDB();
       const url = sessionStorage.getItem("LoginURL");
-      window.location.href = url;
+      // window.location.href = url;
+      this.$router.push({ name: 'Login'})
+
     },
 
     logOut() {

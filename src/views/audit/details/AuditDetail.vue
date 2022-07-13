@@ -5,7 +5,7 @@
       <!-- audit-header -->
       <div class="audit-header">
         <h3>簽核巡檢表</h3>
-        <div class="goto-report">報告詳情</div>
+        <div class="goto-report" @click="goTorReportdetails">報告詳情</div>
       </div>
     
       <div v-loading="isLoadingData" class="setting-details self-loading">
@@ -43,116 +43,18 @@
                 <div class="audit-description">
                   <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
                   <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
+                    <img :src="blopSign.content" alt="" v-for="blopSign in taskItem.tasks[0].comment.signature" :key="blopSign.ts" style="background: #FFF">
                     <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
                   </div>
                   </div>
                 </div>
               </div>
           </div>
-      
-          <!-- workflow static div-->
-          <!-- <div class="audit-flow-unit">
-            <div class="check"><i class="iconfont el-icon-success iconbangzhu"/></div>
-            <div class="audit-flow-content">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">送出簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="audit-flow-unit ">
-            <div class="check"><i class="iconfont el-icon-time iconbangzhu"/></div>
-            <div class="audit-flow-content on_audit">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">主管簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                  <div class="audit_disagree">駁回</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                  <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-                  <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-                  <img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="audit-flow-unit not__yet">
-            <div class="check"><i class="iconfont el-icon-more iconbangzhu"/></div>
-
-            <div class="audit-flow-content">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">送出簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                </div>
-              </div>
-            </div>
-            <div class="audit-flow-content on_audit">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">送出簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                </div>
-              </div>
-            </div>
-            <div class="audit-flow-content">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">送出簽核</div>
-                  <div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-                </div>
-                <div class="audit-situation">
-                  <div class="audit_agree">同意</div>
-                </div>
-              </div>
-              <div class="audit-description">
-                <div class="audit-description-comment">這是一個很長很長的故事～</div>
-                <div class="audit-description-data">
-                </div>
-              </div>
-            </div>
-          </div> -->
 
         </div>
       </div>
 
-    </div> 
-  </div>
+  </div> 
   </div>
 </template>
 <script>
@@ -187,6 +89,22 @@ export default {
     await this.init()
   },
   methods: {
+
+    goTorReportdetails(){
+      var reportId = this.auditDetail.inspectReportId
+        this.$router.push(
+          { 
+            name: 'reportDetails', 
+            params: {
+              reportId: reportId, 
+              isAuditMode: true, 
+              canEdit: true,
+              canCancel: true
+              }
+          }
+        );
+    },
+
     async init(){
       await this.getWorkflowInfo()
       await this.getTaskInfo(this.auditDetail.inspectReportId)
@@ -212,7 +130,6 @@ export default {
 
         this.taskInfo = res.data
         console.log('this.taskInfo 2 ----->> ', this.taskInfo);
-
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -305,7 +222,7 @@ export default {
         color: #556679
         border-left: 2px dotted #ddd
         margin-left: 20px
-        padding: 0px 20px 30px 30px
+        padding: 0px 10px 30px 30px
         position: relative
         &:nth-child(2)
           .audit-flow-content
@@ -370,7 +287,8 @@ export default {
               img
                 margin-top: 10px
                 margin-right: 10px
-                width: 200px
+                width: auto
+                height: 120px
                 border-radius: 4px
 
 </style>

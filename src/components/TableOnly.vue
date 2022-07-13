@@ -94,7 +94,7 @@
 
           <!-- workflow auditMethod -->
           <template v-else-if="_item.auditMethod">
-            <el-radio-group class="storevue-radio" v-model="row.auditMethod" v-if="row.name !== $t('audit.workFlows.submitAudit') ">
+            <el-radio-group class="storevue-radio" @change="changeAuditMethod(row)" v-model="row.auditMethod" v-if="row.name !== $t('audit.workFlows.submitAudit') ">
               <el-radio :label="0">{{$t('audit.workFlows.countersigned')}}</el-radio>
               <el-radio :label="1">{{$t('audit.workFlows.coSign')}}</el-radio>
             </el-radio-group>
@@ -102,7 +102,7 @@
 
           <!-- workflow signature -->
           <template v-else-if="_item.signature" >
-            <el-radio-group class="storevue-radio" v-model="row.signature" v-if="row.name !==  $t('audit.workFlows.submitAudit') ">
+            <el-radio-group class="storevue-radio" @change="changeSignature(row)" v-model="row.signature" v-if="row.name !==  $t('audit.workFlows.submitAudit') ">
               <el-radio :label="true">{{$t('audit.workFlows.need')}}</el-radio>
               <el-radio :label="false">{{$t('audit.workFlows.unnecessary')}}</el-radio>
             </el-radio-group>
@@ -395,7 +395,6 @@ export default {
       return value.substr(0, 10) + '...';
     }
   },
-
   computed: {
     tableSelection() {
       return this.$refs.tablePagination.selection;
@@ -416,15 +415,19 @@ export default {
       return this.tableData.length - 1
     },
   },
-  created() {
-
-  },
+  created() {},
   mounted() {
     //console.log(this.columnData)
   },
   methods: {
-    
-    
+    changeAuditMethod(row){
+      this.$emit('handleAuditMethod', row);
+    },
+  
+    changeSignature(row){
+      this.$emit('handleSignature', row);
+    },
+
     renderHeader(h, { column, $index }) {
       if(util.getWindowWidth()>1366){
       let realWidth = 0;

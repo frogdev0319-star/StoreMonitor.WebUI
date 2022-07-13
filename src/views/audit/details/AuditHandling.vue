@@ -8,153 +8,49 @@
 				<!-- audit-header -->
 				<div class="audit-header">
 					<h3>簽核巡檢表</h3>
-					<div class="goto-report">報告詳情</div>
+					<div class="goto-report" @click="goTorReportdetails">報告詳情</div>
 				</div>
         
 
 				<!-- audit body -->
 				<div class="audit-flow-body">
-
-					<div class="audit-flow-ownerhandling">
+					<div class="audit-flow-ownerhandling" style="margin-bottom: 20px">
 						<p>簽核流程</p>
-						<div class="handling">
+						<!-- <div class="handling">
 							<div class="withdraw">撤回</div>
 							<div class="l-l"> | </div>
 							<div class="cancel">取消</div>
-						</div>
+						</div> -->
 					</div>
+          <!-- task -->
+          <div class="audit-flow-unit" v-for="taskItem in taskInfo" :key="taskItem.nodeId" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
+            <div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
+            <div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
+            <div class="check" v-else-if="taskItem.state == 2"><i class="iconfont el-icon-time iconbangzhu"/></div>
+            <div class="check" v-else-if="taskItem.state == 3"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
 
-        <!-- task -->
-        <div class="audit-flow-unit" v-for="taskItem in taskInfo" :key="taskItem.nodeId" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
-          <div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
-          <div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
-          <div class="check" v-else-if="taskItem.state == 2"><i class="iconfont el-icon-time iconbangzhu"/></div>
-          <div class="check" v-else-if="taskItem.state == 3"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
-
-            <div class="audit-flow-content" :class="{ on_audit : taskItem.state == 2 }">
-              <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                <div class="audit-name">
-                  <div class="audit-workflow-name">{{taskItem.nodeName}}</div>
-                  <div class="audit-user-name" v-if="taskItem.tasks[0].assignee !== null && taskItem.tasks[0].auditByUsers.length == 0 ">{{taskItem.tasks[0].assignee.titleName}} -- {{taskItem.tasks[0].assignee.userName}} <span>({{taskItem.tasks[0].startTs}})</span></div>
-                  <div class="audit-user-name" v-else-if="taskItem.tasks[0].assignee == null && taskItem.tasks[0].auditByUsers.length > 0"> {{taskItem.tasks[0].auditByUsers[0].titleName}} -- {{taskItem.tasks[0].auditByUsers[0].userName}} <span>({{taskItem.tasks[0].startTs}})</span></div>
+              <div class="audit-flow-content" :class="{ on_audit : taskItem.state == 2 }">
+                <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+                  <div class="audit-name">
+                    <div class="audit-workflow-name">{{taskItem.nodeName}}</div>
+                    <div class="audit-user-name" v-if="taskItem.tasks[0].assignee !== null && taskItem.tasks[0].auditByUsers.length == 0 ">{{taskItem.tasks[0].assignee.titleName}} -- {{taskItem.tasks[0].assignee.userName}} <span>({{taskItem.tasks[0].startTs}})</span></div>
+                    <div class="audit-user-name" v-else-if="taskItem.tasks[0].assignee == null && taskItem.tasks[0].auditByUsers.length > 0"> {{taskItem.tasks[0].auditByUsers[0].titleName}} -- {{taskItem.tasks[0].auditByUsers[0].userName}} <span>({{taskItem.tasks[0].startTs}})</span></div>
+                  </div>
+                  <div class="audit-situation"  v-if="taskItem.state == 1">
+                    <div class="audit_agree" v-if="taskItem.tasks[0].comment.result == 0 && taskItem.tasks[0].comment.result !== null"><i class="iconfont el-icon-check"/> 同意</div>
+                    <div class="audit_disagree" v-else-if="taskItem.tasks[0].comment.result == 1 && taskItem.tasks[0].comment.result !== null"><i class="iconfont el-icon-close"/> 駁回</div>
+                  </div>
                 </div>
-                <div class="audit-situation"  v-if="taskItem.state == 1">
-                  <div class="audit_agree" v-if="taskItem.tasks[0].comment.result == 0 && taskItem.tasks[0].comment.result !== null"><i class="iconfont el-icon-check"/> 同意</div>
-                  <div class="audit_disagree" v-else-if="taskItem.tasks[0].comment.result == 1 && taskItem.tasks[0].comment.result !== null"><i class="iconfont el-icon-close"/> 駁回</div>
+                <div class="audit-description">
+                  <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
+                  <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
+                    <img :src="blopSign.content" alt="" v-for="blopSign in taskItem.tasks[0].comment.signature" :key="blopSign.ts" style="background: #FFF">
+                    <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
+                  </div>
                 </div>
               </div>
-              <div class="audit-description">
-                <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{taskItem.tasks[0].comment.description}}</div>
-                <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
-                  <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
-                </div>
-              </div>
-            </div>
-        </div>
-					<!-- workflow -->
-					<!-- <div class="audit-flow-unit">
-						<div class="check"><i class="iconfont el-icon-success"/></div>
-						<div class="audit-flow-content">
-							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-								<div class="audit-name">
-									<div class="audit-workflow-name">送出簽核</div>
-									<div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-								</div>
-								<div class="audit-situation">
-									<div class="audit-agree">同意</div>
-								</div>
-							</div>
-							<div class="audit-description">
-								<div class="audit-description-comment">這是一個很長很長的故事～</div>
-								<div class="audit-description-data">
-								</div>
-							</div>
-						</div>
-					</div> -->
-
-					<!-- workflow -->
-					<!-- <div class="audit-flow-unit ">
-						<div class="check"><i class="iconfont el-icon-time"/></div>
-						<div class="audit-flow-content on-audit">
-							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-								<div class="audit-name">
-									<div class="audit-workflow-name">主管簽核</div>
-									<div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-								</div>
-								<div class="audit-situation">
-									<div class="audit-agree">同意</div>
-								</div>
-							</div>
-							<div class="audit-description">
-								<div class="audit-description-comment">這是一個很長很長的故事～</div>
-								<div class="audit-description-data">
-									<img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-									<img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-									<img src="https://advcloudfiles.advantech.com/cms/1b665e42-c92c-4aa9-8544-fe791ee06795/Resources Featured Image for List Page/Resources-Featured-Image-for-List-Page.jpg" alt="">
-								</div>
-							</div>
-						</div>
-					</div> -->
-
-					<!-- workflow -->
-					<!-- <div class="audit-flow-unit not-yet">
-						<div class="check"><i class="iconfont el-icon-more iconbangzhu"/></div>
-
-						<div class="audit-flow-content">
-							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-								<div class="audit-name">
-									<div class="audit-workflow-name">送出簽核</div>
-									<div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-								</div>
-								<div class="audit-situation">
-									<div class="audit-agree">同意</div>
-								</div>
-							</div>
-							<div class="audit-description">
-								<div class="audit-description-comment">這是一個很長很長的故事～</div>
-								<div class="audit-description-data">
-								</div>
-							</div>
-						</div>
-						<div class="audit-flow-content on-audit">
-							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-								<div class="audit-name">
-									<div class="audit-workflow-name">送出簽核</div>
-									<div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-								</div>
-								<div class="audit-situation">
-									<div class="audit-agree">同意</div>
-								</div>
-							</div>
-							<div class="audit-description">
-								<div class="audit-description-comment">這是一個很長很長的故事～</div>
-								<div class="audit-description-data">
-								</div>
-							</div>
-						</div>
-						<div class="audit-flow-content">
-							<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-								<div class="audit-name">
-									<div class="audit-workflow-name">送出簽核</div>
-									<div class="audit-user-name">管理員 Albert <span>(2022/06/29 11:23:39)</span></div>
-								</div>
-								<div class="audit-situation">
-									<div class="audit-agree">同意</div>
-								</div>
-							</div>
-							<div class="audit-description">
-								<div class="audit-description-comment">這是一個很長很長的故事～</div>
-								<div class="audit-description-data">
-								</div>
-							</div>
-						</div>
-						
-						
-					</div> -->
-          
+          </div>
 				</div>
-
-
 			</div> 
 		</div>
 
@@ -174,8 +70,8 @@
             <!-- 簽合意見 -->
             <p style="margin-bottom: 10px"><span style="color: #c60957">* </span> 簽合意見</p>
             <div class="comment-btn for-flex">
-              <div class="el-radio-details" :class="{agree : agree == true}" @click="agreeNode">同意</div>
-              <div class="el-radio-details" :class="{reject : agree == false}" @click="rejectNode">駁回</div>
+              <div class="el-radio-details" :class="{agree : agree == true}" @click="agreeNode">{{customButton[0].text}}</div>
+              <div class="el-radio-details" :class="{reject : agree == false}" @click="rejectNode">{{customButton[1].text}}</div>
             </div>
             <div class="comment-input">
               <el-input
@@ -194,11 +90,21 @@
           <!-- 加入檔案 & 簽名 -->
           <div class="audit-add-files">
             <p style="margin-bottom: 10px">加入簽名</p>
-            <div class="upload-data" @click="showSignaturePad = true">
-              <i class="iconfont el-icon-document-add iconbangzhu"/> 簽名
+      
+            <div class="attach-area" >
+              <div v-for="(imgItem,index) in signatureFileList" :key="'img'+index" class="source-details" >
+                <div class="img-content">
+                  <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem, index})" />
+                  <el-image
+                    :src="imgItem.src"
+                    style="width:auto;height:100px; border:1px solid #dedede; border-radius: 5px;"
+                    :preview-src-list="getAuditImgList(index)"/>
+                </div>
+              </div>
+              <div class="upload-data" @click="showSignaturePad = true" v-if="signatureFileList.length == 0">
+                <i class="iconfont el-icon-document-add iconbangzhu" /> 簽名
+              </div>
             </div>
-            
-            <div class="upload-imgs"></div>
           </div>
 
           <div class="l--l"></div>
@@ -240,7 +146,6 @@
 			</div> 
 		</div>
 
-
     <!-- popup -->
     <dialog-pop
       title="請簽名"
@@ -273,7 +178,7 @@ import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
 import { getUserInfo } from '@/api/login';
 import DialogPop from '@/components/DialogPop';
-
+import {getNodeList} from "@/api/workflow";
 // import SettingTable from '@/components/SettingTable';
 // import {getNodeList, updateWorkflow} from "@/api/workflow";
 import TableOnly from '@/components/TableOnly';
@@ -303,17 +208,24 @@ export default {
       totalnumOfPic: 0,
       uploadingnumOfPic: 0,
       showSignaturePad: false,
-
+      nodeList:'',
+      flatNodeData: [],
+      customButton:[
+        {
+          "type": 0,
+          "text": this.$t('audit.workFlows.agree'),
+          "enable": true
+        },
+        {
+          "type": 1,
+          "text": this.$t('audit.workFlows.reject'),
+          "enable": true
+        }],
       commentsToApi: {
         "taskId": "",
         "comment": {
             "description": "",
-            "signature": [
-                {
-                    "type": 0,
-                    "content": ""
-                }
-            ],
+            "signature": [],
             "attachment": []
         },
         "result": 0
@@ -345,31 +257,57 @@ export default {
     
   },
   methods: {
+    goTorReportdetails(){
+      var reportId = this.auditDetail.inspectReportId
+        this.$router.push(
+          { 
+            name: 'reportDetails', 
+            params: {
+              reportId: reportId, 
+              isAuditMode: true, 
+              canEdit: true,
+              canCancel: true
+              }
+          }
+        );
+    },
 
     signSave() {
       const { isEmpty, data } = this.$refs.signaturePad.saveSignature();
-      console.log(isEmpty);
-      console.log(data);
-      // if(isEmpty !== true){
-      //   this.signatureFileList.push(data)
-      // }
-      
+      // console.log(isEmpty);
+      // console.log(data);
+      const self = this;
+      if(!isEmpty){
+        var objSignature ={
+          fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_ooo.png`,
+          src: data,
+          file: util.base64ToBlob(data),
+          type:'image/png',
+          size: ''
+        };
+        // self.createFile(files[0],objSignature);
+        self.signatureFileList.push(objSignature);
+        
+      }
+      console.log('self.signatureFileList :>> ', self.signatureFileList);
+      self.showSignaturePad = false
     },
 
     signUndo() {
       this.$refs.signaturePad.undoSignature();
     },
-
     clearSignature(){
       this.$refs.signaturePad.clearSignature()
       this.showSignaturePad = false
+      this.signatureFileList = []
     },
-
 
 
     async init(){
       await this.getWorkflowInfo()
       await this.getTaskInfo(this.auditDetail.inspectReportId)
+      await this.getNodeList(this.auditDetail.processDefinitionKey) 
+
       await this.getOssInfo();
     },
 
@@ -391,8 +329,6 @@ export default {
           })
         })
         this.taskInfo = res.data
-        console.log('this.taskInfo 2 ----->> ', this.taskInfo);
-
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -401,6 +337,42 @@ export default {
     },
 
 
+    // get node
+    async getNodeList(id){
+      await getNodeList(id).then(res=>{
+        this.nodeList =  res.data
+        // flat data
+        this.flattenData(this.nodeList)
+        this.flatNodeData.forEach(d=>{
+          delete d.nextAuditNode
+        })
+        console.log('this.taskInfo 2 ------>> ', this.taskInfo);
+        // console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
+
+        this.taskInfo.forEach(t =>{
+          this.flatNodeData.forEach(n =>{
+            if(t.nodeId === n.id){
+              this.customButton = n.customButton
+            }
+          })
+        })
+        // console.log(' this.customButton ------>> ',  this.customButton);
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    // flatten Data by Recursive
+    flattenData(data, key = 'nextAuditNode') {
+      if(data[key] !== null) {
+          const d = data[key];
+          this.flatNodeData.push(d);
+          this.flattenData(data[key]);
+      } else {
+        return this.flatNodeData;
+      }
+    },
+    
     agreeNode(){
       this.agree = true
       this.commentsToApi.result = 0
@@ -421,7 +393,6 @@ export default {
       console.log('currentNode----->> ', currentNode);
       console.log('taskSummit this.commentsToApi----->> ', this.commentsToApi);
 
-
       const storageParams = {};
       await getStorageInfo(storageParams).then(res => {
         if (res.errCode === 0) {
@@ -430,8 +401,26 @@ export default {
       });
 
       //上傳簽核附件
-      var auditAttachment = [];
-      if(self.imgFileList.length>0){
+      //上傳簽核簽名檔
+      if(self.signatureFileList.length > 0){
+        for(let idx=0; idx < self.signatureFileList.length; idx++){
+          await self.upLoadFile(self.signatureFileList[idx]).then((url) => {
+            console.log("upload file url:",url);
+            self.uploadingnumOfPic++;
+            const signatureObj = {
+              type: 1,
+              content: url,
+            };
+            this.commentsToApi.comment.signature.push(signatureObj);
+          }).catch((err) => {
+            console.log("uploade file error:",err)
+            upload++;
+          });
+        }
+      }
+
+      //上傳簽核圖片
+      if(self.imgFileList.length > 0){
         for(let idx=0; idx <self.imgFileList.length; idx++){
           await self.upLoadFile(self.imgFileList[idx]).then((url) => {
             console.log("upload file url:",url);
@@ -450,19 +439,20 @@ export default {
       }
 
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
-      taskSummit(this.commentsToApi).then(res=>{
-        console.log('res :>> ', res);
-        this.isLoadingData = false
-        this.$router.push({ name: 'WaitAuditManage'});
+      // taskSummit(this.commentsToApi).then(res=>{
+      //   console.log('res :>> ', res);
+      //   this.isLoadingData = false
+      //   this.$router.push({ name: 'WaitAuditManage'});
 
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
+      // }).catch(err => {
+      //   this.isLoadingData = false;
+      //   console.log('error' + err);
+      // });
     },
 
 
-    
+
+
     getAccountId() {
       const self = this;
       const userId = getCookie('UserId');
@@ -494,14 +484,11 @@ export default {
       self.bucketPdf = 'pdf' + '/' + util.getCurDate2Str();
     },
 
-
-
-    
     doAddAttachment(e){
       const self = this;
       const maxSize = 4*1024*1024; //不能超過4MB
       var files = e.target.files || e.dataTransfer.files;
-      //console.log("choose file:",files);
+      console.log("choose file:",files);
       if (!files.length)
         return;
       if(self.auditFileCount==10){
@@ -522,36 +509,43 @@ export default {
         };
         self.createFile(files[0],objImg);
         self.imgFileList.push(objImg);
-      }else if(files[0].type.includes("pdf")){
-        var objpdf={
-          fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_ooo_${files[0].name}`,
-          src:'',
-          file:'',
-          type:'pdf',
-          size:files[0].size,
-        }
-        self.createFile(files[0],objpdf);
-        self.pdfFileList.push(objpdf);
       }
+      // else if(files[0].type.includes("pdf")){
+      //   var objpdf={
+      //     fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_ooo_${files[0].name}`,
+      //     src:'',
+      //     file:'',
+      //     type:'pdf',
+      //     size:files[0].size,
+      //   }
+      //   self.createFile(files[0],objpdf);
+      //   self.pdfFileList.push(objpdf);
+      // }
     },
     createFile(file, objFile) {
       //var image = new Image();
       var reader = new FileReader();
-
       reader.onload = (e) => {
         objFile.src = e.target.result;
         objFile.file = util.base64ToBlob(e.target.result);
-        console.log(objFile.file);
+        console.log('!!!', objFile.file);
       };
       reader.readAsDataURL(file);
     },
+
     deleteImg({item, index}) {
       const self = this;
-      if(item.type==='pdf')
-        self.pdfFileList.splice(index, 1);
-      else
-        self.imgFileList.splice(index, 1);
+      if(item.type==='image/png'){
+        self.signatureFileList.splice(index, 1);
+        this.$refs.signaturePad.clearSignature()
+        } 
+        else {
+          self.imgFileList.splice(index, 1);
+        }
     },
+
+
+
     getAuditImgList(index) {
       const arr = [];
       let i = 0;
@@ -723,7 +717,7 @@ export default {
         color: #556679
         border-left: 2px dotted #ddd
         margin-left: 20px
-        padding: 0px 20px 30px 30px
+        padding: 0px 10px 30px 30px
         position: relative
         &:nth-child(2)
           .audit-flow-content
@@ -749,12 +743,25 @@ export default {
             .audit-user-name
               font-size: 12px
           .audit-situation
-            .audit-agree
+            i 
+              margin-right: 5px
+            .audit_agree
               width: 120px
               height: 27px
               border-radius: 3px
               color: #59ab22
               background: #e8f6de
+              font-size: 14px
+              display: flex
+              flex-direction: row
+              justify-content: center
+              align-items: center
+            .audit_disagree
+              width: 120px
+              height: 27px
+              border-radius: 3px
+              color: #fa4600
+              background: #ffefeb
               font-size: 14px
               display: flex
               flex-direction: row
@@ -773,7 +780,8 @@ export default {
               img
                 margin-top: 10px
                 margin-right: 10px
-                width: 200px
+                width: auto
+                height: 120px
                 border-radius: 4px
 
 
@@ -905,7 +913,7 @@ export default {
     // background-origin: border-box
     // background-clip: content-box, border-box
 
-
+    
 
 
 </style>
