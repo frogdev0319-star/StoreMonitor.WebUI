@@ -1593,7 +1593,7 @@ export default {
     async doGetWorkflowInfo(workflow){
       var wfi = {copyToUsers:"",nextAuditUser:""}
       const workflowPromise = getWorkflowInfo({processDefinitionKey:workflow.processDefinitionKey});
-      const userPosition = getDepartmentList({ type: 1 }); //取得職務
+      const userPosition = getDepartmentList({ type: 0 }); //取得職務
       const userPromise = getUserInfo();
       try {
         const result = await Promise.all([userPosition, userPromise, workflowPromise]);
@@ -1619,8 +1619,6 @@ export default {
       }
     },
     getUserName(userIds){
-      console.log("userIds",userIds);
-      console.log("self.userDataList:",this.userDataList);
       const self = this;
       var users = self.userDataList.filter(item=> {return userIds.includes(item.userId);});
       var auditUsers = "";
