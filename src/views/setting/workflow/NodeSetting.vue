@@ -36,7 +36,7 @@
                     <el-select 
                       v-model="departmentStatus" 
                       :placeholder="$t('audit.workFlows.auditDepart')" 
-                      :disabled="nodeData.auditTargetType == 0">
+                      :disabled="nodeData.auditTargetType == 0 || nodeData.auditTargetType == null">
                       <el-option
                         v-for="item in department"
                         :key="item.defineId"
@@ -54,9 +54,8 @@
                       filterable
                       :placeholder="$t('audit.workFlows.auditUser')"
                       :loading="loading" 
-                      :disabled="nodeData.auditTargetType == 1"
+                      :disabled="nodeData.auditTargetType == 1 || nodeData.auditTargetType == null"
                       >
-                      
                       <el-option
                         v-for="user in userInfo"
                         :key="user.userId"
@@ -378,7 +377,6 @@ export default {
 
       if(this.nodeData.id == undefined){
         // add node
-        console.log('this.apiData Adjust new ~~~~~~~:>> ', this.apiData)
         this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
       }else{
         // edit ndoe
@@ -404,8 +402,15 @@ export default {
           }
         }
       })
-      console.log('this.apiData call api', this.apiData)
 
+      // 簽核人員不可為空
+      if(this.nodeData.auditByUsers[0] == '' || this.nodeData.auditByGroups[0] == ''){
+        util.notify(this.$t('audit.workFlows.cantEmpty'), 'error', 1200 );
+        this.fullscreenLoading = false
+        return
+      }
+      console.log('this.apiData call api', this.apiData)
+      
       // call api
       updateWorkflow(this.apiData).then(res=>{
         console.log('res :>> ', res);

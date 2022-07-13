@@ -146,8 +146,8 @@
                     :indexType="indexType"
                     @handleMove="handleEmitMove"
                     @handleOperation="handleEmitOperation"
-                    @handleAuditMethod = "handleEmitAuditMethod"
-                    @handleSignature = "handleEmitSignature"
+                    @handleAuditMethod = "handleOrderedAuditNodeArray"
+                    @handleSignature = "handleOrderedAuditNodeArray"
                   />
                 </div>
             </template>
@@ -333,11 +333,16 @@ export default {
     // })
   },
   methods: {
-    handleEmitAuditMethod(e){
-      console.log('object :>> ', e);
-    },
-    handleEmitSignature(e){
-      console.log('object :>> ', e);
+    handleOrderedAuditNodeArray(obj){
+      console.log('object :>> ', obj);
+      this.nodeDataToApi.orderedAuditNodeArray.forEach(row =>{
+        if(row.id == obj.id){
+          row.auditMethod = obj.auditMethod;
+          row.signature = obj.signature;
+        }
+      })
+
+      console.log('this.nodeDataToApi new :>> ', this.nodeDataToApi);
     },
 
     
@@ -439,8 +444,6 @@ export default {
       }
     },
 
-
-
     // maping data for page view
     handleData(){
       // deep copy
@@ -488,7 +491,6 @@ export default {
       sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
     },
 
-
     addNode() {
       const newNode = {
             "name": this.$t('audit.workFlows.addNode'),
@@ -507,7 +509,8 @@ export default {
                 }
             ],
             "auditByUsers": [],
-            "auditByGroups": []
+            "auditByGroups": [],
+            "auditTargetType": 0
         }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       this.$router.push({ name: 'nodeSetting' })
