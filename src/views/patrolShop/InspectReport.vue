@@ -504,7 +504,7 @@
 <script>
 import ECharts from 'vue-echarts';
 import { getInspectReportInfo } from '@/api/inspect';
-import { CancelWorkflow,taskDrawbak } from '@/api/workflow';
+import { CancelWorkflow,taskDrawbak,GetTaskInfo } from '@/api/workflow';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -1741,7 +1741,9 @@ export default {
       });
       
     },
-
+    doGetTaskInfo(){
+      var resWorkflowTask = GetTaskInfo(self.report.reportId);
+    },
   }
 };
 </script>

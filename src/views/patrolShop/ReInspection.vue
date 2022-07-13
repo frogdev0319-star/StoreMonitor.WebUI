@@ -1188,7 +1188,8 @@ export default {
       }
       if(PatrolHistory.isEditReport){
         self.reportId = PatrolHistory.reportId;
-        self.isEditReport = PatrolHistory.isEdit;
+        self.isEditReport = PatrolHistory.isEditReport;
+        self.isBindWorkflow = PatrolHistory.isBindWorkflow;
       }
     }else if(BackPatrolParam != null){
       self.getAllStore();
@@ -2656,6 +2657,7 @@ export default {
         channel: this.channel,
         curItemId: this.curItemId,
         deviceList: this.deviceList,
+        isBindWorkflow:this.isBindWorkflow,
         isEditReport:this.isEditReport,
         reportId:this.reportId
       };
