@@ -29,8 +29,9 @@
             <div class="check" v-else-if="taskItem.state == 2"><i class="iconfont el-icon-time iconbangzhu"/></div>
             <div class="check" v-else-if="taskItem.state == 3"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
 
-              <div class="audit-flow-content" :class="{ on_audit : taskItem.state == 2 }">
-                <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+              <div class="audit-flow-content" :class="{ on_audit : taskItem.state == 2 }" v-for=" task in taskItem.tasks" :key="task.taskId">
+                {{task}}
+                <!-- <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
                   <div class="audit-name">
                     <div class="audit-workflow-name">{{taskItem.nodeName}}</div>
                     <div class="audit-user-name" v-if="taskItem.tasks[0].assignee !== null && taskItem.tasks[0].auditByUsers.length == 0 ">{{taskItem.tasks[0].assignee.titleName}} -- {{taskItem.tasks[0].assignee.userName}} <span>({{taskItem.tasks[0].startTs}})</span></div>
@@ -47,8 +48,10 @@
                     <img :src="blopSign.content" alt="" v-for="blopSign in taskItem.tasks[0].comment.signature" :key="blopSign.ts" style="background: #FFF">
                     <img :src="blopImg.url" alt="" v-for="blopImg in taskItem.tasks[0].comment.attachment" :key="blopImg.ts">
                   </div>
-                </div>
+                </div> -->
               </div>
+
+              
           </div>
 				</div>
 			</div> 
@@ -194,6 +197,7 @@ export default {
       loading: false,
       isLoadingData: false,
       fullscreenLoading: false,
+      currentUserInfo:'',
 
       auditDetail:'',
       taskInfo:'',
@@ -235,7 +239,11 @@ export default {
   mounted() {},
   async created() {
     await this.init()
-    
+
+    const resulit = await this.$store.dispatch("GetUserAuthorities");
+    this.currentUserInfo = resulit.data.userId
+
+
   },
   watch:{
     // pdfFileList(){
@@ -349,9 +357,10 @@ export default {
         console.log('this.taskInfo 2 ------>> ', this.taskInfo);
         // console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
 
+
         this.taskInfo.forEach(t =>{
           this.flatNodeData.forEach(n =>{
-            if(t.nodeId === n.id){
+            if(t.nodeId === n.id && t.state == 2){
               this.customButton = n.customButton
             }
           })
@@ -388,10 +397,12 @@ export default {
       // this.isLoadingData = true
       const self = this;
       const currentNode = this.taskInfo.filter( i => i.state == 2)
-      this.commentsToApi.taskId = currentNode[0].tasks[0].taskId
+      // this.commentsToApi.taskId = currentNode[0].tasks[0].taskId
 
-      console.log('currentNode----->> ', currentNode);
-      console.log('taskSummit this.commentsToApi----->> ', this.commentsToApi);
+      //// 判定 userIds 跟 taskId 關聯的 task
+      var getCurrentTask = currentNode[0].tasks.filter(t => t.userIds == this.currentUserInfo)
+      this.commentsToApi.taskId = getCurrentTask[0].taskId
+
 
       const storageParams = {};
       await getStorageInfo(storageParams).then(res => {
@@ -400,7 +411,6 @@ export default {
         }
       });
 
-      //上傳簽核附件
       //上傳簽核簽名檔
       if(self.signatureFileList.length > 0){
         for(let idx=0; idx < self.signatureFileList.length; idx++){
@@ -439,18 +449,16 @@ export default {
       }
 
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
-      // taskSummit(this.commentsToApi).then(res=>{
-      //   console.log('res :>> ', res);
-      //   this.isLoadingData = false
-      //   this.$router.push({ name: 'WaitAuditManage'});
+      taskSummit(this.commentsToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+        this.$router.push({ name: 'WaitAuditManage'});
 
-      // }).catch(err => {
-      //   this.isLoadingData = false;
-      //   console.log('error' + err);
-      // });
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
     },
-
-
 
 
     getAccountId() {

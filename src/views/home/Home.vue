@@ -825,6 +825,7 @@ export default {
       // console.log("Change Routes");
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
+      
       if (result.errCode === 0) {
         await self.$store.dispatch("generateRoutes");
         self.getUserName(result.data);
