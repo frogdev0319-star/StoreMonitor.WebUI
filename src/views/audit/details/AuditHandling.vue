@@ -269,12 +269,12 @@ export default {
       var reportId = this.auditDetail.inspectReportId
         this.$router.push(
           { 
-            name: 'reportDetails', 
+            name: 'handlingReportdetails', 
             params: {
               reportId: reportId, 
               isAuditMode: true, 
-              canEdit: true,
-              canCancel: true
+              canEdit: (this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
+              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
               }
           }
         );

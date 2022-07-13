@@ -612,6 +612,7 @@ export default {
       isAuditMode:true,
       showEditBtn:true,
       showCancelBtn:false,
+      auditState:1,
     };
   },
 
@@ -898,6 +899,8 @@ export default {
         this.checkinInfo = data.checkinRecord ? `${i18n.t('remotePatrol.checkinSuccess')}  ( ${util.getDateStr2(data.checkinRecord.ts)} )`: '';
         this.weatherImg = data.weatherInfo ? data.weatherInfo.icon : '';
         this.signaturesList = this.isInsiteInspect && data.signatures ? data.signatures : [];
+        this.reportData = data;
+        this.auditState = data.auditState;
         this.getGroupsData(data.groups);
         this.reportData = data;
         console.log("this.reportData:",this.reportData);
@@ -1704,18 +1707,25 @@ export default {
         isEdit:true,
         reportComment:this.reportData.comment
       };
-      var drawbackParam = {inspectReportId:self.report.reportId};
-      taskDrawbak(drawbackParam).then(res=>{
+      if(self.auditState!=3 && self.auditState!=6){//撤回跟駁回不需要再drawback
+      console.log("doDrawbak!!!!");
+        var drawbackParam = {inspectReportId:self.report.reportId};
+        taskDrawbak(drawbackParam).then(res=>{
+            self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
+          /*self.$store.dispatch('setStoreList', self.storeList);*/
+          self.$store.dispatch('setStoreCache', self.reportData.storeId);
+          this.$router.push({ name: 'remotePatrol', params: params });
+        }).catch(err=>{
+          util.notify(self.$t('audit.inceptionRpt.editAuditFail')+':'+err, 'warning', 3000);
           self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
-        /*self.$store.dispatch('setStoreList', self.storeList);*/
-        self.$store.dispatch('setStoreCache', self.reportData.storeId);
-        this.$router.push({ name: 'remotePatrol', params: params });
-      }).catch(err=>{
-        util.notify(self.$t('audit.inceptionRpt.editAuditFail')+':'+err, 'warning', 3000);
+          self.$store.dispatch('setStoreCache', self.reportData.storeId);
+          this.$router.push({ name: 'remotePatrol', params: params });
+        });
+      }else{//除非送簽者自己回去編輯
         self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
         self.$store.dispatch('setStoreCache', self.reportData.storeId);
         this.$router.push({ name: 'remotePatrol', params: params });
-      });
+      }
     },
     doCancelAudit(){
       console.log("doCancelAudit");

@@ -1955,6 +1955,7 @@ export default {
         sheet.Effective = 1;
         console.log("sheet:",sheet);
         if(sheet.groupId!="feedBack"){
+          var dealCount=0;
           var tabIncep = hisData.find( hd => hd.groupName==sheet.label );
           console.log("tabIncep:",tabIncep);
           if(tabIncep.children){//有三層時的第二層 對應sheet.inspectList
@@ -1972,8 +1973,15 @@ export default {
                   }
                 });
                 console.log("sheetItem:",sheetItem);
-                sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,secCat.cateryItems,sheetItem.type)
+                
+                sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,secCat.cateryItems,sheetItem.type);
+                sheet.inspectList[childIdx].items.forEach(it=>{
+                  dealCount += it.inputCount;
+                });
+                console.log("1.dealCount:",dealCount);
+                
             }
+            //sheet.dealCount = dealCount;
           }else{
             var secSheetCat = sheet.inspectList;
             var childIdx = 0;
@@ -1984,7 +1992,13 @@ export default {
               }
             });
             sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,tabIncep.cateryItems,sheetItem.type);
+            sheet.inspectList[childIdx].items.forEach(it=>{
+                  dealCount += it.inputCount;
+            });
+            console.log("2.dealCount:",dealCount);
+            
           }
+          sheet.dealCount = dealCount;
         }
       })
       ).then(result =>{
@@ -1993,6 +2007,7 @@ export default {
       });
     },
     doGetcateryItems(sheetItem,cateryItems,type){ //type:0:合格率評分 1:巡檢評分項 2:附加評分項
+      var dealCount=0;
       for(let i=0; i<cateryItems.length; i++){
         sheetItem[i].id = cateryItems[i].itemId;
         if(cateryItems[i].grade===-2147483648){ //略過項
@@ -2005,14 +2020,17 @@ export default {
           sheetItem[i].scoreList[scoreIdx].isClick = true;
           sheetItem[i].isQualified = (cateryItems[i].grade==1) ? true:false;
           sheetItem[i].inputCount++;
+          dealCount++;
           console.log("sheetItem[i]",sheetItem[i]);
         }else{
           sheetItem[i].itemScoreTitle=cateryItems[i].grade;
           sheetItem[i].itemgetScore=cateryItems[i].grade;
           sheetItem[i].inputCount++;
+          dealCount++;
         }
         if(cateryItems[i].showAttachment){
           sheetItem[i].inputCount++;
+          dealCount++;
           var att=[];
           for(let x=0;x<cateryItems[i].descriptionList.length;x++){
             var desItem = cateryItems[i].descriptionList[x];
