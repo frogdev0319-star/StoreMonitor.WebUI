@@ -20,45 +20,14 @@
               <div class="cancel">取消</div>
             </div>
           </div>
-
+          
           <!-- task -->
-          <div class="audit-flow-unit" v-for="taskItem in taskInfo" :key="taskItem.nodeId" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
-            <div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
-            <div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
-            <div class="check" v-else-if="taskItem.state == 2"><i class="iconfont el-icon-time iconbangzhu"/></div>
-            <div class="check" v-else-if="taskItem.state == 3"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
-            
-            <!-- audit task wrapper -->
-            <div class="audit-task-wrapper" :class="{ on_audit : taskItem.state == 2 }" >
-              <div class="audit-workflow-name">{{taskItem.nodeName}}</div>
-              <div class="audit-flow-content"  v-for=" task in taskItem.tasks" :key="task.taskId">
-                <!-- name -->
-                <div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-                  <div class="audit-name">
-                    <div class="audit-user-name" v-if="task.assignee !== null && task.auditByUsers.length == 0 ">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.startTs}})</span></div>
-                    <div class="audit-user-name" v-else-if="task.assignee == null && task.auditByUsers.length > 0"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{taskItem.tasks[0].startTs}})</span></div>
-                  </div>
-                  <div class="audit-situation"  v-if="taskItem.state == 1">
-                    <div class="audit_agree" v-if="task.comment.result == 0 && task.comment.result !== null"><i class="iconfont el-icon-check"/> 同意</div>
-                    <div class="audit_disagree" v-else-if="task.comment.result == 1 && task.comment.result !== null"><i class="iconfont el-icon-close"/> 駁回</div>
-                  </div>
-                </div>
-                <!-- description -->
-                <div class="audit-description">
-                  <div class="audit-description-comment" v-if="task.comment !== null " >{{task.comment.description}}</div>
-                  <div class="audit-description-data" v-if="task.comment !== null ">
-                    <img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts" style="background: #FFF">
-                    <img :src="blopImg.url" alt="" v-for="blopImg in task.comment.attachment" :key="blopImg.ts">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <AuditUnit :taskInfo = "taskInfo"/>
 
-          </div>
-
+        
         </div>
       </div>
+    </div>
   </div> 
   </div>
 </template>
@@ -68,15 +37,13 @@ import {
   } from '@/api/workflow';
 
 import DelayButton from '@/components/DelayButton';
-// import SettingTable from '@/components/SettingTable';
-// import {getNodeList, updateWorkflow} from "@/api/workflow";
-// import TableOnly from '@/components/TableOnly';
-// import DialogPop from '@/components/DialogPop';
+import AuditUnit from '@/components/AuditUnit';
+
 
 export default {
   name: 'WorkflowDetail',
   components: {
-    
+    AuditUnit
   },
   data() {
     return {
@@ -85,7 +52,7 @@ export default {
       fullscreenLoading: false,
 
       auditDetail:'',
-      taskInfo:'',
+      taskInfo: [],
   
     }
   },
@@ -147,7 +114,6 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-
   .not__yet
     color: #c0c0c0 !important
   .iconbangzhu 
@@ -225,78 +191,6 @@ export default {
             color: #006ab7
 
 
-      .audit-flow-unit
-        color: #556679
-        border-left: 2px dotted #ddd
-        margin-left: 20px
-        padding: 0px 10px 30px 30px
-        position: relative
-        &:nth-child(2)
-          .audit-task-wrapper
-            padding-top: 0px
-          .check
-            top: 0
-        .check
-          background: #FFF
-          position: absolute
-          top: 10px
-          left: -12px
-        .audit-task-wrapper
-          padding-top: 10px
-          margin-bottom: 20px
-          .audit-workflow-name
-              font-size: 15px
-              font-weight: 900
-              margin-bottom: 3px
-              
-
-          .audit-flow-content
-            // padding-top: 0px !important
-            margin-bottom: 10px
-            .audit-name
-              .audit-user-name
-                font-size: 12px
-            .audit-situation
-              i 
-                margin-right: 5px
-              .audit_agree
-                width: 120px
-                height: 27px
-                border-radius: 3px
-                color: #59ab22
-                background: #e8f6de
-                font-size: 14px
-                display: flex
-                flex-direction: row
-                justify-content: center
-                align-items: center
-              .audit_disagree
-                width: 120px
-                height: 27px
-                border-radius: 3px
-                color: #fa4600
-                background: #ffefeb
-                font-size: 14px
-                display: flex
-                flex-direction: row
-                justify-content: center
-                align-items: center
-            .audit-description
-              background: #f7f9fa
-              padding: 20px
-              .audit-description-comment
-                font-size: 14px
-              .audit-description-data
-                display: flex
-                flex-direction: row
-                justify-content: flex-start
-                align-items: flex-start
-                img
-                  margin-top: 10px
-                  margin-right: 10px
-                  width: auto
-                  height: 120px
-                  border-radius: 4px
 </style>
 
 
