@@ -45,8 +45,8 @@
                 </div>
                 <!-- description -->
                 <div class="audit-description">
-                  <div class="audit-description-comment" v-if="taskItem.state == 0 || taskItem.state == 1">{{task.comment.description}}</div>
-                  <div class="audit-description-data" v-if="taskItem.state == 0 || taskItem.state == 1">
+                  <div class="audit-description-comment" v-if="task.comment !== null " >{{task.comment.description}}</div>
+                  <div class="audit-description-data" v-if="task.comment !== null ">
                     <img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts" style="background: #FFF">
                     <img :src="blopImg.url" alt="" v-for="blopImg in task.comment.attachment" :key="blopImg.ts">
                   </div>
@@ -59,7 +59,6 @@
 
         </div>
       </div>
-
   </div> 
   </div>
 </template>
@@ -148,6 +147,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+
   .not__yet
     color: #c0c0c0 !important
   .iconbangzhu 
