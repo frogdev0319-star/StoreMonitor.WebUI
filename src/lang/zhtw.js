@@ -1246,7 +1246,8 @@ export default{
       "reject":"駁回",
       "approved":"簽核通過",
       "cancel":"取消",
-      "rollback":"撤回"
+      "rollback":"撤回",
+      "systemRollback":"系統撤回"
     },
     "sendAudit":{
       "all":"全部",

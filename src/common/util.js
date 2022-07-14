@@ -751,6 +751,8 @@ export default {
         return i18n.t('audit.auditStatus.cancel');
       case 6:
         return i18n.t('audit.auditStatus.rollback');
+      case 7:
+        return i18n.t('audit.auditStatus.systemRollback');
     }
   }
 

@@ -551,7 +551,7 @@ export default{
                 params['storeId'] =this.curStoreIds;
             }
             if(this.curTabIndx==1){//進行中
-                params['auditState'] = [2,3,6];
+                params['auditState'] = [2,3,6,7];
             }else if(this.curTabIndx==2){//已完成
                 params['auditState'] = [4,5] 
             }
