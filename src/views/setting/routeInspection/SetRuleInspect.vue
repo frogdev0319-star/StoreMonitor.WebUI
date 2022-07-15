@@ -281,7 +281,7 @@
       <setting-table :table-name="$t('insSettingView.bindWorkFLow')">
         <div slot="tableDetail" class="setting-config rule-item">
           <span style="margin-right: 20px">選擇綁定流程</span>  
-          <el-select v-model="workFlowToBind" placeholder="请选择">
+          <el-select v-model="workFlowToBind" placeholder="請選擇">
               <el-option
                 v-for="item in workFlowList"
                 :key="item.processDefinitionKey"
@@ -369,16 +369,15 @@ export default {
 
     },
   },
-  mounted() {
-    this.getRule();
-    this.workflowItems()
+  async mounted() {
+    await this.getRule();
+    await this.workflowItems()
   },
 
   methods: {
     async submitRule() {
       const self = this;
 
-      // console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
        // handle bind workflow
       if( !!this.workFlowToBind ){
         if(this.bindWorkFlowData.processDefinitionKey == -1){   
@@ -524,8 +523,11 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
+          console.log('res.data ~~~~~~~>> ', res.data);
           const tempArry = res.data.filter(list => list.name == "workflow")
+          console.log('tempArry :>> ', tempArry);
           this.workFlowInfoValue = tempArry[0].value
+
         }).catch(err => {
           reject(err);
         });
@@ -607,9 +609,8 @@ export default {
     async workflowItems(){
       await workflowItems().then(res=>{
         this.workFlowList = res.data
-          console.log('res.data :>> ', res.data);
-        // console.log('this.workFlowList ~~~~>> ', this.workFlowList);
-        // console.log('workFlowInfoValue :>> ', this.workFlowInfoValue);
+        console.log('this.workFlowList ~~~~>> ', this.workFlowList);
+        console.log('this.workFlowInfoValue 2:>> ', this.workFlowInfoValue);
         if(this.workFlowInfoValue !== null){
           const firstObj = {
             processDefinitionKey: -1,
@@ -625,9 +626,10 @@ export default {
     },
 
     async bindWorkflow(param){
+      console.log('param :>> ', param);
       await bindWorkflow(param).then(res=>{
         console.log('bind ~~~~~~>> ', res);
-
+        
         // const firstObj = {
         //   processDefinitionKey: -1,
         //   name: "無",

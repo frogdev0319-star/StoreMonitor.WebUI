@@ -407,7 +407,7 @@ export default {
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
-        console.log('getWorkflowInfo 2 ------>> ', this.userInfo);
+        console.log('this.userInfo ------>> ', this.userInfo);
 
       }).catch(err => {
         console.log('error' + err);
@@ -668,6 +668,9 @@ export default {
 
     //addWorkFlow
     submit() {
+      this.newFlow.nextAuditNode.nextAuditNode.auditByUsers.push(this.userInfo[0].userId)
+      
+      console.log('this.newFlow ~~~~~~~`>> ', this.newFlow);
       creadNewFlow(this.newFlow).then(res=>{
           // this.newFlow.processDefinitionKey = res.data
           // sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 

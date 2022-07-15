@@ -113,12 +113,12 @@ export default{
             curSizeNum:10,
             defaultSort:{order:'descending',prop:'processLastUpdateTs'},
             curOrder:{
-                      direction:'desc',
-                      property:'processLastUpdateTs'
+                direction:'desc',
+                property:'processLastUpdateTs'
             },
             tableData: [],
             tableColumns:[
-              {
+            {
                 'prop': 'storeName',
                 'label': this.$t('audit.sendAudit.storeName'),
                 'sortable': false,
@@ -375,9 +375,8 @@ export default{
         },
         clickDetail(item, index) {
             const self = this;
-            console.log("clickDetail:",item);
-            //sessionStorage.setItem('audit_detail', JSON.stringify(item.routeObj));
-            //self.$router.push({ name: 'auditDetails', params: { data: item.routeObj }});
+            sessionStorage.setItem('auditDetail', JSON.stringify(item.row));
+            self.$router.push({ name: 'auditDetail', params: { data: item.row }});
         },
     },
     
