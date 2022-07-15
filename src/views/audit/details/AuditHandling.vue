@@ -240,7 +240,8 @@ export default {
               reportId: reportId, 
               isAuditMode: true, 
               canEdit: (this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
-              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
+              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
+              auditCancelable:this.auditDetail.cancelable
               }
           }
         );

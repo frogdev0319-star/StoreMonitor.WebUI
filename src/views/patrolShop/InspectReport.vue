@@ -504,7 +504,7 @@
 <script>
 import ECharts from 'vue-echarts';
 import { getInspectReportInfo } from '@/api/inspect';
-import { CancelWorkflow,taskDrawbak,GetTaskInfo } from '@/api/workflow';
+import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
 import 'videojs-contrib-hls';
@@ -1710,7 +1710,7 @@ export default {
       if(self.auditState!=3 && self.auditState!=6){//撤回跟駁回不需要再drawback
       console.log("doDrawbak!!!!");
         var drawbackParam = {inspectReportId:self.report.reportId};
-        taskDrawbak(drawbackParam).then(res=>{
+        taskDrawback(drawbackParam).then(res=>{
             self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
           /*self.$store.dispatch('setStoreList', self.storeList);*/
           self.$store.dispatch('setStoreCache', self.reportData.storeId);

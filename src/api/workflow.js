@@ -174,3 +174,11 @@ export const taskDrawback = data => {
     data
   });
 };
+
+export const ReSubmitWorkflow = data =>{
+  return request({
+    url: `${version}/workflow/systemReject/resubmit`,
+    method: 'post',
+    data
+  });
+};
