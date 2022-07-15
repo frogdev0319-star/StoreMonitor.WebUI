@@ -588,7 +588,7 @@
                       </div>
                       <div v-if="item.itemType === 0">
                         <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore">
+                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore || item.notEdit">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -601,7 +601,7 @@
                           </el-dropdown-menu>
                         </el-dropdown>
                         <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore">
+                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore || item.notEdit">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -1028,7 +1028,9 @@ export default {
       backSheetGroup:null,
       isEditReport:false,
       curInspectId:-1,
-      reportId:-1
+      reportId:-1,
+      auditState:-1,
+      auditCancelable:false,
     };
   },
   computed: {
@@ -1190,18 +1192,22 @@ export default {
         self.reportId = PatrolHistory.reportId;
         self.isEditReport = PatrolHistory.isEditReport;
         self.isBindWorkflow = PatrolHistory.isBindWorkflow;
+        self.auditState = PatrolHistory.auditState;
+        self.auditCancelable = PatrolHistory.auditCancelable;
       }
     }else if(BackPatrolParam != null){
       self.getAllStore();
       self.backSheetGroup = BackPatrolParam.backSheetGroup;
       self.reportId = BackPatrolParam.reportId;
       self.isEditReport = BackPatrolParam.isEdit;
+      self.auditState = BackPatrolParam.auditState;
       self.suggest = BackPatrolParam.reportComment;
       self.curSelStoreId = BackPatrolParam.store;
       self.patrolstore = BackPatrolParam.tagName;
       self.curInspectId = BackPatrolParam.tagId;
       self.showGuide = false;
       self.isDisabled = true;
+      self.auditCancelable = BackPatrolParam.auditCancelable;
     } else {
       self.getAllStore();
     }
@@ -1868,6 +1874,7 @@ export default {
               itemObj.Ruletip = false;
               itemObj.RuleCountTip = false;
               itemObj.manualIgnore = false;
+              itemObj.notEdit = false;
               itemObj.sourceList = [];
               itemObj.groupType = item.type;
               itemObj.lastUnqualifiedNumber = _item.lastUnqualifiedNumber;
@@ -2021,6 +2028,9 @@ export default {
           sheetItem[i].isQualified = (cateryItems[i].grade==1) ? true:false;
           sheetItem[i].inputCount++;
           dealCount++;
+          if(!this.auditCancelable && cateryItems[i].grade==0){//不能取消且不合格，不能編輯
+            sheetItem[i].notEdit = true;
+          }
           console.log("sheetItem[i]",sheetItem[i]);
         }else{
           sheetItem[i].itemScoreTitle=cateryItems[i].grade;
@@ -2654,7 +2664,9 @@ export default {
         allRemarkItemsFlag: this.allRemarkItemsFlag,
         isBindWorkflow:this.isBindWorkflow||self.isEditReport,
         isEditReport:this.isEditReport,
-        reportId:this.reportId
+        reportId:this.reportId,
+        auditState:this.auditState,
+        auditCancelable:this.auditCancelable,
       };
       this.historyObj = {
         storeList: this.tabList[Number(this.activeIndex)].storeList,
@@ -2677,7 +2689,9 @@ export default {
         deviceList: this.deviceList,
         isBindWorkflow:this.isBindWorkflow,
         isEditReport:this.isEditReport,
-        reportId:this.reportId
+        reportId:this.reportId,
+        auditState:this.auditState,
+        auditCancelable:this.auditCancelable,
       };
       this.hasIgnoretemp = [];
       const params = { _id: this.userId, data: obj, rule: inspectSettings };

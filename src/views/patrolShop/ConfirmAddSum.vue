@@ -110,7 +110,7 @@
         <div class="table-content">
           <div class="table-header flex-center">
             <div class="header-store-name">
-              <span v-if="lang=='en' " class="en-store-name">{{ $t('remotePatrol.storeName') }}: </span>
+              <span v-if="lang=='en' " class="en-store-name">{{ $t('remotePatrol.storeName') }}：</span>
               <span v-else class="store-name">{{ $t('remotePatrol.storeName') }}：</span>
               {{ store.storeName }}
             </div>
@@ -426,7 +426,7 @@
 <script>
 import { getStorageInfo } from '@/api/event';
 import { submitInspectItem1 } from '@/api/inspect';
-import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,taskSummit,getReportWorkflowTask} from '@/api/workflow';
+import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,taskSummit,getReportWorkflowTask,ReSubmitWorkflow} from '@/api/workflow';
 import util from '@/common/util';
 import { getCookie } from '@/common/auth';
 import { getDepartmentList } from '@/api/checkin';
@@ -948,7 +948,21 @@ export default {
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
         }
-        if(result[1].errCode==0) {
+        if(result[1].errCode!=0) {
+          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+          return false;
+        }
+        if(self.auditState==7){ //系統撤回重送
+          var subTaskParam = {
+            inspectReportId:self.reportId,
+            comment:{
+              description:self.auditNote,
+              attachment:auditAttachment
+            }
+          }
+          console.log("1.subTaskParam:",subTaskParam);
+          self.doReSubmitWorkflow(subTaskParam);
+        }else{
           let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
           console.log("task:",task);
           let taskId = task.tasks[0].taskId;
@@ -960,78 +974,46 @@ export default {
               attachment:auditAttachment
             }
           };
-          console.log("subTaskParam:",subTaskParam);
-        }else{
-          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-          return false;
+          console.log("2.subTaskParam:",subTaskParam);
+          taskSummit(subTaskParam).then(resSubTask => {
+            if(resSubTask.errCode == 0){
+              self.$store.dispatch('setEditCount', 0);
+              routeData = {
+                  isSuccess: true,
+                  isBindWorkflow:true
+              };
+              self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+            }
+          }).catch(errSubTask=>{
+            console.log("errSubTask:",errSubTask);
+            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+            return false;
+          });
         }
-        taskSummit(subTaskParam).then(resSubTask => {
-          if(resSubTask.errCode == 0){
-            self.$store.dispatch('setEditCount', 0);
-            routeData = {
-                isSuccess: true,
-                isBindWorkflow:true
-            };
-            self.$router.push({ name: 'submitEvent', params: { data: routeData}});
-          }
-        }).catch(errSubTask=>{
-          console.log("errSubTask:",errSubTask);
-          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-          return false;
-        })
-        
       }).catch(err=>{
         console.log("err:",err);
         util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
         return false;
       });
-      /*modifyReportWorkflow(params).then(res => {
-        const data = res.data;
-        self.editFlag = true;
-        if (res.errCode === 0) {
-          getReportWorkflowTask({type:0,inspectReportId:self.reportId}).then(resTaskInfo=>{
-            if(resTaskInfo.errCode === 0){
-              let task = resTaskInfo.data.find(t=>t.state==0);//要抓status==0 為送出的task
-              console.log("find task:",task);
-              if(task){
-                let taskId = task.tasks.taskId;
-                var subTaskParam = {
-                  taskId,
-                  comment:{
-                    description:self.auditNote,
-                    attachment:auditAttachment
-                  }
-                };
-                SubmitWorkflowTask(subTaskParam).then(resSubTask => {
-                  if(resSubTask.errCode == 0){
-                    self.$store.dispatch('setEditCount', 0);
-                    routeData = {
-                        isSuccess: true,
-                        user: data.notifiedTo,
-                        isBindWorkflow:true
-                    };
-                  }
-                }).catch(errSubTask=>{
-                  console.log("errSubTask:",errSubTask);
-                  util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-                  return false;
-                })
-              }
-            }
-          }); 
-        }else{
-          routeData = {
-            isSuccess: false,
-            reLoadData: self.$route.params,
-            isBindWorkflow:false
-          };
-        }
-        self.$router.push({ name: 'submitEvent', params: { data: routeData}});
-      }).catch(err=>{
-        console.log("err:",err);
-        util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
-        return false;
-      })*/
+    },
+    doReSubmitWorkflow(wfParams){
+      const self = this;
+      ReSubmitWorkflow(wfParams).then(wfRes=>{
+          console.log("ReSubmitWorkflow res:",wfRes);
+          if(wfRes.errCode == 0){
+            self.$store.dispatch('setEditCount', 0);
+            var routeData = {
+                isSuccess: true,
+                isBindWorkflow:true
+            };
+            self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+          }
+        }).catch(err=>{
+            console.log("ReSubmitWorkflow err:",err);
+            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+            return false;
+          }
+        );
     },
     async getRouteData() {
       const self = this;
@@ -1041,7 +1023,7 @@ export default {
       }
       console.log()
       self.userId = getCookie('UserId');
-      console.log("getRouteData userid:",self.userId )
+      
       Database.getDataFromDB(getCookie('UserId')).then(res => {
         const inpectResult = res;
         console.log("***inspect:",inpectResult);
@@ -1056,10 +1038,13 @@ export default {
         self.allRemarkItemsFlag = routeData.allRemarkItemsFlag;
         self.isBindWorkflow = routeData.isBindWorkflow;
         self.isEditReport = routeData.isEditReport;
+        
         if(self.isEditReport) self.reportId = routeData.reportId;
         if(self.isBindWorkflow){
           console.log('**inspectSettings.workflowInfo',inspectSettings.workflowInfo);
-          this.doGetWorkflowInfo(inspectSettings.workflowInfo);
+          self.doGetWorkflowInfo(inspectSettings.workflowInfo);
+          self.auditState = routeData.auditState;
+          console.log("getRouteData auditState:",routeData.auditState );
         }
         this.getTab1AndTab3BtnName(inspectSettings);
         const allTypeArr = new Set();
@@ -1600,8 +1585,8 @@ export default {
         this.userDataList = result[1].data;
         this.positionsList = result[0].data;
         const data = result[2].data;
-        
-        wfi.copyToUsers = this.getUserName(data.createdUser);
+        console.log("result[2].data:",result[2].data);
+        wfi.copyToUsers = this.getUserName(data.copyToUsers);
         if(data.nextAuditNode && data.nextAuditNode.nextAuditNode){
           var auditType = data.nextAuditNode.nextAuditNode.auditTargetType;
           if(auditType == 0) //audit by person
@@ -1622,6 +1607,7 @@ export default {
       const self = this;
       var users = self.userDataList.filter(item=> {return userIds.includes(item.userId);});
       var auditUsers = "";
+      console.log("users:",users);
       users.forEach( u=>{
         auditUsers += u.userName+',';
       })

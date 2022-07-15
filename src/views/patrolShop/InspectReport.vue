@@ -613,6 +613,7 @@ export default {
       showEditBtn:true,
       showCancelBtn:false,
       auditState:1,
+      auditCancelable:false,
     };
   },
 
@@ -733,6 +734,7 @@ export default {
       self.isAuditMode =self.$route.params.isAuditMode
       self.showEditBtn = self.$route.params.canEdit;
       self.showCancelBtn = self.$route.params.canCancel;
+      self.auditCancelable = self.$route.params.auditCancelable;
       const routeData = JSON.parse(sessionStorage.getItem('report_data'));
       console.log("report routeData:",routeData);
       if(routeData && !self.isAuditMode){
@@ -1689,6 +1691,7 @@ export default {
       var BackPatrolParam = {
         isEdit:true,
         reportId:self.report.reportId,
+        auditState:self.auditState,
         reportComment:self.reportData.comment,
         tagId:self.reportData.tagId,
         tagName : self.reportData.tagName,
@@ -1701,13 +1704,14 @@ export default {
         curSheetIndex:0,
         curGroupIndex:0,
         curItemIndex:0,
-        curItemId:0
+        curItemId:0,
+        auditCancelable:self.auditCancelable
       };
       var params = {
         isEdit:true,
         reportComment:this.reportData.comment
       };
-      if(self.auditState!=3 && self.auditState!=6){//撤回跟駁回不需要再drawback
+      if(self.auditState!=3 && self.auditState!=6 && self.auditState!=7){//撤回跟駁回不需要再drawback
       console.log("doDrawbak!!!!");
         var drawbackParam = {inspectReportId:self.report.reportId};
         taskDrawbak(drawbackParam).then(res=>{
@@ -1752,7 +1756,7 @@ export default {
       
     },
     doGetTaskInfo(){
-      var resWorkflowTask = GetTaskInfo(self.report.reportId);
+      var resWorkflowTask = GetTaskInfo(this.report.reportId);
     },
   }
 };
