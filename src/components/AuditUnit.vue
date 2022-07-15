@@ -1,5 +1,6 @@
 <template>
     <div>
+			
 			<div class="audit-flow-unit" v-for="(taskItem, index) in taskInfo" :key="index" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
 					<div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
 					<div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
@@ -41,9 +42,10 @@ export default {
 
 	props: {
 		taskInfo: {
-		type: Array,
-    required: true
-		}
+			type: Array,
+			required: true
+		},
+	
 	},
 
 	data() {

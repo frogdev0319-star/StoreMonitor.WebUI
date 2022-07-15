@@ -15,16 +15,18 @@
         <div class="audit-flow-body">
 
           <div class="audit-flow-ownerhandling">
-            <p>簽核流程</p>
-            <div class="handling">
+            <p style="margin-bottom: 30px">簽核流程</p>
+            <div class="handling" v-if="!onEditing">
               <div class="withdraw" @click="taskDrawback">撤回</div>
-              <div class="l-l"> | </div>
-              <div class="cancel" @click="CancelWorkflow ">取消</div>
+              <div class="l-l" v-if="taskInfo.cancelable"> | </div>
+              <div class="cancel" @click="CancelWorkflow " v-if="taskInfo.cancelable">取消</div>
             </div>
           </div>
           
           <!-- task -->
-          <AuditUnit :taskInfo = "taskInfo"/>
+          <AuditUnit 
+            :taskInfo = "taskInfo"
+            />
 
         </div>
       </div>
@@ -57,13 +59,14 @@ export default {
       auditDetail:'',
       taskInfo: [],
       currentUserInfo: '',
-      showingBtn: true
+      showingBtn: true,
+
+      onEditing: false,
   
     }
   },
   
   mounted() {},
-
   async created() {
     await this.init()
     const resulit = await this.$store.dispatch("GetUserAuthorities");
@@ -74,6 +77,7 @@ export default {
     goTorReportdetails(){
       var reportId = this.auditDetail.inspectReportId
       console.log("cancancel:",this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7))
+      console.log("canEdit:",this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7)
         this.$router.push(
           { 
             name: 'auditReportdetails', 
@@ -91,6 +95,7 @@ export default {
     async init(){
       await this.getWorkflowInfo()
       await this.getTaskInfo(this.auditDetail.inspectReportId)
+      await this.isEditing()
     },
 
     getWorkflowInfo(){
@@ -151,14 +156,25 @@ export default {
       const value = {
         "inspectReportId" : this.auditDetail.inspectReportId
         }
-      const id = this.auditDetail.inspectReportId
-      CancelWorkflow(id).then(res=>{
+      CancelWorkflow(value).then(res=>{
         this.isLoadingData = false
+        this.$router.push({name: "AuditManage"})
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
       });
     },
+
+    // 判斷駁回取消按鈕顯示
+    isEditing(){
+      this.taskInfo.forEach(t => {
+        if(t.parentId == -1 && t.state == 2){
+          this.onEditing = true
+          this.auditDetail.auditState = 6
+        }
+      })
+    },
+
   }
 }
 </script>
