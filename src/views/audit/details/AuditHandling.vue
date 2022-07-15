@@ -8,18 +8,21 @@
 				<!-- audit-header -->
 				<div class="audit-header">
 					<h3>簽核巡檢表</h3>
-					<div class="goto-report" @click="goTorReportdetails">報告詳情</div>
+					<div class="goto-report" 
+            @click="goTorReportdetails" 
+            v-if="currentUserInfo == taskInfo[0].tasks[0].assignee.userId"
+            >報告詳情</div>
 				</div>
       
 				<!-- audit body -->
 				<div class="audit-flow-body">
 					<div class="audit-flow-ownerhandling" style="margin-bottom: 20px">
 						<p>簽核流程</p>
-						<!-- <div class="handling">
+						<div class="handling" v-if="currentUserInfo == taskInfo[0].tasks[0].assignee.userId">
 							<div class="withdraw">撤回</div>
 							<div class="l-l"> | </div>
 							<div class="cancel">取消</div>
-						</div> -->
+						</div>
 					</div>
 
           <!-- task -->
@@ -203,7 +206,6 @@ export default {
   mounted() {},
   async created() {
     await this.init()
-
     const resulit = await this.$store.dispatch("GetUserAuthorities");
     this.currentUserInfo = resulit.data.userId
 

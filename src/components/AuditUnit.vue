@@ -1,6 +1,6 @@
 <template>
     <div>
-			<div class="audit-flow-unit" v-for="taskItem in taskInfo" :key="taskItem.nodeId" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
+			<div class="audit-flow-unit" v-for="(taskItem, index) in taskInfo" :key="index" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
 					<div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
 					<div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
 					<div class="check" v-else-if="taskItem.state == 2"><i class="iconfont el-icon-time iconbangzhu"/></div>
@@ -19,6 +19,7 @@
 								<div class="audit-situation"  v-if="taskItem.state == 1">
 									<div class="audit_agree" v-if="task.comment.result == 0 && task.comment.result !== null"><i class="iconfont el-icon-check"/> 同意</div>
 									<div class="audit_disagree" v-else-if="task.comment.result == 1 && task.comment.result !== null"><i class="iconfont el-icon-close"/> 駁回</div>
+									<div class="audit_disagree" v-else-if="task.comment.result == -2"><i class="iconfont el-icon-info"/> 撤回</div>
 								</div>
 							</div>
 							<!-- description -->

@@ -5,9 +5,11 @@
       <!-- audit-header -->
       <div class="audit-header">
         <h3>簽核巡檢表</h3>
-        <div class="goto-report" @click="goTorReportdetails">報告詳情</div>
+        <div class="goto-report" 
+          @click="goTorReportdetails"
+          v-if="showingBtn ">報告詳情</div>
       </div>
-    
+ 
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <!-- audit body -->
         <div class="audit-flow-body">
@@ -15,16 +17,15 @@
           <div class="audit-flow-ownerhandling">
             <p>簽核流程</p>
             <div class="handling">
-              <div class="withdraw">撤回</div>
+              <div class="withdraw" @click="taskDrawback">撤回</div>
               <div class="l-l"> | </div>
-              <div class="cancel">取消</div>
+              <div class="cancel" @click="CancelWorkflow ">取消</div>
             </div>
           </div>
           
           <!-- task -->
           <AuditUnit :taskInfo = "taskInfo"/>
 
-        
         </div>
       </div>
     </div>
@@ -34,6 +35,8 @@
 <script>
 import {
     GetTaskInfo,
+    taskDrawback,
+    CancelWorkflow
   } from '@/api/workflow';
 
 import DelayButton from '@/components/DelayButton';
@@ -53,29 +56,35 @@ export default {
 
       auditDetail:'',
       taskInfo: [],
+      currentUserInfo: '',
+      showingBtn: true
   
     }
   },
+  
   mounted() {},
+
   async created() {
     await this.init()
+    const resulit = await this.$store.dispatch("GetUserAuthorities");
+    this.currentUserInfo = resulit.data.userId
   },
-  methods: {
 
+  methods: {
     goTorReportdetails(){
       var reportId = this.auditDetail.inspectReportId
       console.log("cancancel:",this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6))
-        this.$router.push(
-          { 
-            name: 'auditReportdetails', 
-            params: {
-              reportId: reportId, 
-              isAuditMode: true, 
-              canEdit: (this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
-              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
-              }
-          }
-        );
+      this.$router.push(
+        { 
+          name: 'auditReportdetails', 
+          params: {
+            reportId: reportId, 
+            isAuditMode: true, 
+            canEdit: (this.auditDetail.auditState==3 || this.auditDetail.auditState==6),
+            canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
+            }
+        }
+      );
     },
 
     async init(){
@@ -103,6 +112,46 @@ export default {
 
         this.taskInfo = res.data
         console.log('this.taskInfo 2 ----->> ', this.taskInfo);
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+    
+
+    taskDrawback(){
+      this.isLoadingData = true
+      const value = {
+        "inspectReportId" : this.auditDetail.inspectReportId
+        }
+      taskDrawback(value).then(res=>{
+        this.isLoadingData = false
+        var reportId = this.auditDetail.inspectReportId
+        this.$router.push(
+          { 
+            name: 'auditReportdetails', 
+            params: {
+              reportId: reportId, 
+              isAuditMode: true, 
+              canEdit: true,
+              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
+              }
+          }
+        );
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+    CancelWorkflow(){
+      this.isLoadingData = true
+      const value = {
+        "inspectReportId" : this.auditDetail.inspectReportId
+        }
+      const id = this.auditDetail.inspectReportId
+      CancelWorkflow(id).then(res=>{
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
