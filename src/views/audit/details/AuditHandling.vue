@@ -9,7 +9,7 @@
 				<div class="audit-header">
 					<h3>簽核巡檢表</h3>
 					<div class="goto-report" 
-            @click="goTorReportdetails" 
+            @click="goToReportdetails" 
             v-if="currentUserInfo == taskInfo[0].tasks[0].assignee.userId"
             >報告詳情</div>
 				</div>
@@ -231,7 +231,7 @@ export default {
     
   },
   methods: {
-    goTorReportdetails(){
+    goToReportdetails(){
       var reportId = this.auditDetail.inspectReportId
         this.$router.push(
           { 

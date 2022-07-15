@@ -150,6 +150,7 @@ export default {
 						font-size: 14px
 					.audit-description-data
 						display: flex
+						flex-wrap: wrap
 						flex-direction: row
 						justify-content: flex-start
 						align-items: flex-start

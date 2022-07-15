@@ -2,7 +2,7 @@
   <div class="page-container report-setting paper" style="height: 100%">
 
     <div class="setting-titles padding flex-center">
-      {{$t('audit.workFlows.addNode')}}
+      {{$t('route.nodeSetting')}}
       <div class="spacer"/>
       <!-- 儲存 -->
       <delay-button 
@@ -162,11 +162,11 @@
         <div class="inspect-basic">
           <setting-table :table-name="$t('audit.workFlows.nodeStayTime')">
             <template slot="tableDetail">
-
               <!-- row -->
               <div class="setting-config basic-config">
                 <div class="title-status">
                   <el-checkbox
+                    v-model="nodeData.notify"
                     class="storevue-checkbox-outlined"
                     :label="$t('audit.workFlows.alertAtOverTime')"/>
                 </div>
@@ -178,6 +178,8 @@
                   {{$t('audit.workFlows.stayOver')}}
                   <el-input
                     placeholder=""
+                    v-model="nodeData.unHandleNotifyDay"
+                    :disabled="!nodeData.notify"
                     class="input-name_short"/>
                   {{$t('audit.workFlows.day')}}
                 </div>

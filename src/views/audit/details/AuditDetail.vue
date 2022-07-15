@@ -6,10 +6,10 @@
       <div class="audit-header">
         <h3>簽核巡檢表</h3>
         <div class="goto-report" 
-          @click="goTorReportdetails"
+          @click="goToReportdetails"
           v-if="showingBtn ">報告詳情</div>
       </div>
- 
+    
       <div v-loading="isLoadingData" class="setting-details self-loading">
         <!-- audit body -->
         <div class="audit-flow-body">
@@ -17,9 +17,9 @@
           <div class="audit-flow-ownerhandling">
             <p style="margin-bottom: 30px">簽核流程</p>
             <div class="handling" v-if="!onEditing">
-              <div class="withdraw" @click="taskDrawback">撤回</div>
-              <div class="l-l" v-if="taskInfo.cancelable"> | </div>
-              <div class="cancel" @click="CancelWorkflow " v-if="taskInfo.cancelable">取消</div>
+              <div class="withdraw" @click="taskDrawback" v-if="auditDetail.submitter == currentUserInfo" >撤回</div>
+              <div class="l-l" v-if="taskInfo.cancelable && auditDetail.submitter == currentUserInfo"> | </div>
+              <div class="cancel" @click="CancelWorkflow " v-if="taskInfo.cancelable && auditDetail.submitter == currentUserInfo">取消</div>
             </div>
           </div>
           
@@ -74,17 +74,17 @@ export default {
   },
 
   methods: {
-    goTorReportdetails(){
+    goToReportdetails(){
       var reportId = this.auditDetail.inspectReportId
-      console.log("cancancel:",this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7))
-      console.log("canEdit:",this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7)
+      // console.log("cancancel:",this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7))
+      // console.log("canEdit:",this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7)
         this.$router.push(
           { 
             name: 'auditReportdetails', 
             params: {
               reportId: reportId, 
               isAuditMode: true, 
-              canEdit: (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
+              canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
               canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
               auditCancelable:this.auditDetail.cancelable
               }
