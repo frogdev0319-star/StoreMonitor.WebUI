@@ -113,12 +113,12 @@ export default{
             curSizeNum:10,
             defaultSort:{order:'descending',prop:'processLastUpdateTs'},
             curOrder:{
-                      direction:'desc',
-                      property:'processLastUpdateTs'
+                direction:'desc',
+                property:'processLastUpdateTs'
             },
             tableData: [],
             tableColumns:[
-              {
+            {
                 'prop': 'storeName',
                 'label': this.$t('audit.sendAudit.storeName'),
                 'sortable': false,
