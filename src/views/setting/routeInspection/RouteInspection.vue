@@ -1715,6 +1715,8 @@ export default {
 
     async importfxx(obj) {
       const _this = this;
+      _this.allScoreWeightEmpty= true;
+      _this.allPassWeightEmpty= true;
       const inputDOM = this.$refs.inputer;
       const ITEMSLENGTH = 250;
       _this.FileInfo = [];
