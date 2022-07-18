@@ -1707,7 +1707,7 @@ export default {
         isEdit:true,
         reportComment:this.reportData.comment
       };
-      if(self.auditState!=3 && self.auditState!=6){//撤回跟駁回不需要再drawback
+      if(self.auditState!=3 && self.auditState!=6  && self.auditState!=7){//撤回跟駁回不需要再drawback
       console.log("doDrawbak!!!!");
         var drawbackParam = {inspectReportId:self.report.reportId};
         taskDrawback(drawbackParam).then(res=>{
