@@ -350,6 +350,7 @@ export default {
             ],
             "auditByUsers": [],
             "auditByGroups": [],
+            "auditTargetType": 0
           }
         },
       

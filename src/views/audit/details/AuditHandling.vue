@@ -167,7 +167,7 @@ export default {
       currentUserInfo:'',
 
       auditDetail:'',
-      taskInfo:'',
+      taskInfo: [],
       agree: true,
       description:'',
       pdfFileList:[],
@@ -322,7 +322,7 @@ export default {
           delete d.nextAuditNode
         })
         console.log('this.taskInfo 2 ------>> ', this.taskInfo);
-        // console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
+        console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
 
 
         this.taskInfo.forEach(t =>{
@@ -415,6 +415,16 @@ export default {
         }
       }
 
+      // 比對是否需要簽名檔上傳，前端處理
+      var isSignature  = this.flatNodeData.find(n => n.id == currentNode[0].nodeId)
+      // console.log('isSignature :>> ', isSignature);
+      // console.log('currentNode :>> ', currentNode);
+      if(isSignature.signature == true && this.commentsToApi.comment.signature.length == 0) {
+        util.notify('此簽核需要附加簽名檔案', 'error', 1500);
+        this.commentsToApi.comment.attachment = []
+        return
+      }
+
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
       taskSummit(this.commentsToApi).then(res=>{
         console.log('res :>> ', res);
@@ -428,7 +438,6 @@ export default {
 
       });
     },
-
 
     getAccountId() {
       const self = this;
@@ -510,14 +519,19 @@ export default {
       reader.readAsDataURL(file);
     },
 
+
     deleteImg({item, index}) {
       const self = this;
       if(item.type==='image/png'){
         self.signatureFileList.splice(index, 1);
         this.$refs.signaturePad.clearSignature()
+        this.commentsToApi.comment.signature = []
+        this.commentsToApi.comment.attachment = []
         } 
         else {
           self.imgFileList.splice(index, 1);
+          this.commentsToApi.comment.signature = []
+          this.commentsToApi.comment.attachment = []
         }
     },
 

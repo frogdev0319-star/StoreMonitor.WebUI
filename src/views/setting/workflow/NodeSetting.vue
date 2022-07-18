@@ -66,7 +66,7 @@
                   </div>
                 </el-radio-group>
               
-                <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
+                <!-- <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>   -->
                 
               </div>
 
