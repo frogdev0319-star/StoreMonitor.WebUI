@@ -244,7 +244,7 @@ export const navbarRoute = {
         path: '/auditHandling',
         name: 'auditHandling',
         hidden: true,
-        component: resolve => require(['@/views/audit/details/auditHandling'], resolve)
+        component: resolve => require(['@/views/audit/details/AuditHandling'], resolve)
       }
       ,
       {
@@ -335,7 +335,7 @@ export const navbarRoute = {
       {
         path: '/patrolCompareStat',
         name: 'patrolCompareStat',
-        component: resolve => require(['@/views/statistical/patrolCompareStat'], resolve),
+        component: resolve => require(['@/views/statistical/PatrolCompareStat'], resolve),
         hidden: false,
         meta: {
           requireAuth: true,
