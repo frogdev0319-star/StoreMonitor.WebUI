@@ -1105,6 +1105,7 @@ export default {
         next(false);
       });
     } else {
+      self.$store.dispatch('setBackPatrolParam', null);
       if (to.name != 'confirmSum') {
         // from.meta.keepAlive=false;
         this.editCount = 0;
