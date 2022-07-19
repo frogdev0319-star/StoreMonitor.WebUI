@@ -164,4 +164,11 @@ export default class PermissionHelper {
   static enableTranscriptNotify() {
     return this.enableAuthorities(6, 0x0, 0x04);
   }
+
+  //秘密客權限
+  static enableMimicMode = false;
+  static setShowMimicMode(val){
+    console.log("setShowMimicMode:",val);
+    this.enableMimicMode = val;
+  }
 }

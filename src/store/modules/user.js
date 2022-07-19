@@ -40,7 +40,8 @@ const user = {
     storeListCache: [],
     editCount: 0,
     editCount_storeMonitor:0,
-    favoriteList:false
+    favoriteList:false,
+    mimicMode:false,
   },
 
   mutations: {
@@ -157,7 +158,10 @@ const user = {
     },
     SET_FAVORIT_LIST:(state,favorit)=>{
       state.favoriteList = favorit
-    }
+    },
+    SET_MIMIC_MODE:(state,mode)=>{
+      state.mimicMode = mode
+    },
   },
   actions: {
     setEditCount({ commit }, count) {
@@ -196,6 +200,9 @@ const user = {
     },
     setStoreCache({ commit }, store) {
       commit('SET_STORE_CACHE', store);
+    },
+    setMimicMode({ commit }, mode){
+      commit('SET_MIMIC_MODE',mode)
     },
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {

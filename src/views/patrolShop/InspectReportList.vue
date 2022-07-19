@@ -116,7 +116,27 @@
                 <i class="iconfont icon-liebiao iconCard"/>
                 <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
               </div>
-              <delay-button
+              <el-dropdown 
+                :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
+                class="export-report-btn"
+                style="display:flex; flex-direction: row-reverse; align-items: center">
+                <div class="button-area">
+                  <img :src="exportPng" class="icon-excel">
+                  <span>{{ $t('eventView.exportReport') }}</span>
+                </div>
+                <el-dropdown-menu slot="dropdown" class="dropdown">
+                  <el-dropdown-item
+                    class="dropdown-item"
+                    style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                    @click.native="export2Excel"
+                    >{{ $t('eventView.exportReportDetail') }}</el-dropdown-item>
+                  <el-dropdown-item
+                    class="dropdown-item"
+                    style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
+                    @click.native="export2Excel">{{ $t('eventView.exportEntailReport') }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+              <!--<delay-button
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 class="export-report-btn"
                 type="primary"
@@ -127,7 +147,7 @@
                   <img :src="exportPng" class="icon-excel">
                   <span>{{ $t('eventView.exportReport') }}</span>
                 </div>
-              </delay-button>
+              </delay-button>-->
             </div>
           </div>
           <div v-if="ShowCard" class="showCardHeight flex">

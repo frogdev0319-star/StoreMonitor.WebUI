@@ -257,6 +257,8 @@ export default{
   },
   "remotePatrol":{
       "InspectionDetail":"Xuất báo cáo",
+      "exportPDF":"Export PDF",
+      "exportExcel":"Export EXCEL",
       "Patroltips2":"Tên danh sách kiểm tra này đã tồn tại",
       "TableGet":"Điểm",
       "TableIgnore":"Đã được bỏ qua",
@@ -501,6 +503,8 @@ export default{
       "eventDetails":"Thông tin sự kiện",
       "events":"Các sự kiện",
       "exportReport":"Xuất tệp Excel",
+      "exportReportDetail":"Export Report Detail",
+      "exportEntailReport":"Export Full Report",
       "handled":"Xong",
       "handling":"Xử lý",
       "methods":"Chọn phương pháp xử lý",

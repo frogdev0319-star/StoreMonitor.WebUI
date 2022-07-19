@@ -261,6 +261,8 @@ export default{
   },
   "remotePatrol":{
       "InspectionDetail":"导出报告",
+      "exportPDF":"PDF导出",
+      "exportExcel":"EXCEL导出",
       "Patroltips2":"此巡检表名称已存在",
       "TableGet":"得分",
       "TableIgnore":"不适用",
@@ -505,6 +507,8 @@ export default{
       "eventDetails":"事件详情",
       "events":"处理事件",
       "exportReport":"导出Excel",
+      "exportReportDetail":"报告明细汇出",
+      "exportEntailReport":"报告完整汇出",
       "handled":"已处理",
       "handling":"处理",
       "methods":"选择处理方式",

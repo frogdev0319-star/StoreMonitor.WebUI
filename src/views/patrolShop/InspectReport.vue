@@ -14,6 +14,18 @@
             <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
           </div>
         </delay-button>
+        <delay-button
+          id="downloadExcel"
+          class="exportbtn"
+          type="primary"
+          size="mini"
+          @click="handleDownExcel"
+        >
+          <div class="button-area">
+            <i class="iconfont icon-pdf export"/>
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+          </div>
+        </delay-button>
       </div>
     </div>
     <div class="el-header">
@@ -698,7 +710,9 @@ export default {
       this.getPageDataBasedOnTemplate(this.reportData);
       this.saveTemplateId();
     },
-
+    handleDownExcel(){
+      console.log("download excel!!!");
+    },
     handleDown() {
       const self = this;
       if (self.hasAttachment !== 0) {

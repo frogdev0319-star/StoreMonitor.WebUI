@@ -258,6 +258,8 @@ export default {
   },
   "remotePatrol":{
       "InspectionDetail":"보고사 내보내기",
+      "exportPDF":"Export PDF",
+      "exportExcel":"Export EXCEL",
       "Patroltips2":"검사 목록이 이미 존재하였다",
       "TableGet":"메모리",
       "TableIgnore":"무시",
@@ -502,6 +504,8 @@ export default {
       "eventDetails":"이벤트 세부",
       "events":"이벤트",
       "exportReport":"보고사 내보내기",
+      "exportReportDetail":"Export Report Detail",
+      "exportEntailReport":"Export Full Report",
       "handled":"완료된",
       "handling":"처리",
       "methods":"처리 방법을 선택하기",

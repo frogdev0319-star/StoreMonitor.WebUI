@@ -257,6 +257,8 @@ export default{
   },
   "remotePatrol":{
       "InspectionDetail":"Export report",
+      "exportPDF":"Export PDF",
+      "exportExcel":"Export EXCEL",
       "Patroltips2":"The inspection list name already exists",
       "TableGet":"Score",
       "TableIgnore":"Ignored",
@@ -501,6 +503,8 @@ export default{
       "eventDetails":"Event Details",
       "events":"Events",
       "exportReport":"Export Excel",
+      "exportReportDetail":"Export Report Detail",
+      "exportEntailReport":"Export Full Report",
       "handled":"Done",
       "handling":"Handle",
       "methods":"Select a handling method",

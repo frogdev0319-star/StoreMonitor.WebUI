@@ -258,6 +258,8 @@ export default {
   },
   "remotePatrol":{
       "InspectionDetail":"レポートのエクスポート",
+      "exportPDF":"PDFをエクスポート",
+      "exportExcel":"EXCELをエクスポート",
       "Patroltips2":"インスペクションリスト名はすでに存在します",
       "TableGet":"スコア",
       "TableIgnore":"N/A",
@@ -502,6 +504,8 @@ export default {
       "eventDetails":"イベントの詳細",
       "events":"イベント",
       "exportReport":"Excelにエクスポート",
+      "exportReportDetail":"Export Report Detail",
+      "exportEntailReport":"Export Full Report",
       "handled":"完了",
       "handling":"扱う",
       "methods":"取扱方法を選択してください",

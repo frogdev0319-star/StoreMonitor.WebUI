@@ -48,20 +48,42 @@
           </el-breadcrumb>
         </div>
         <div>
+          <div v-if="$route.path ==='/reportdetails'"
+             style="background-color: transparent; color: #fff; border: none; position:absolute;top:15px;right:24px">
+            <el-dropdown 
+              style="display:flex; flex-direction: row-reverse; align-items: center;color: #fff;">
+              <div class="button-area">
+                <img :src="exportPdf" class="icon-excel" />
+                <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+              </div>
+              <el-dropdown-menu slot="dropdown" class="dropdown">
+                <el-dropdown-item
+                  class="dropdown-item"
+                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="handleDownload"
+                >{{ $t('remotePatrol.exportPDF') }}</el-dropdown-item>
+                <el-dropdown-item
+                  class="dropdown-item"
+                  style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
+                  @click.native="handleDownloadExcel"
+                  >{{ $t('remotePatrol.exportExcel') }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
           <el-button
-            v-if="$route.path === '/patrolPersonStat'
+            v-else-if="$route.path === '/patrolPersonStat'
               || $route.path === '/patrolCompareStat'
               || $route.path ==='/eventStat'
                 || $route.path === '/patrolItem'
-              || $route.path ==='/patrolEvaluation'
-              || $route.path ==='/reportdetails'"
+              || $route.path ==='/patrolEvaluation'"
             style="background-color: transparent; color: #fff; border: none; position:absolute;top:6px;right:24px"
             @click="handleDownload"
           >
-            <div class="button-area">
-              <img :src="exportPdf" class="icon-excel">
-              <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-            </div>
+          
+          <div class="button-area" >
+            <img :src="exportPdf" class="icon-excel" />
+            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
+          </div>
             <!--<div>
               <img :src="exportPdf" class="icon-excel">
               <i class="iconfont icon-pdf export" />
@@ -204,6 +226,10 @@
               <div class="headImg" :style="collapsed?{}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               <el-dropdown-menu slot="dropdown" class="dropdown">
                 <el-dropdown-item
+                  class="dropdown-item"
+                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="changeMimicMode">{{mimicMode? $t('route.generalMode'):$t('route.mimicMode') }}</el-dropdown-item>
+                <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
                   style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
@@ -260,6 +286,7 @@ import { mapGetters } from "vuex";
 import PubSub from 'pubsub-js';
 import Database from '@/common/Database';
 import util from '@/common/util.js';
+import PermissionHelper from '../../api/PermissionHelper';
 export default {
   name: "Home",
   data() {
@@ -299,6 +326,7 @@ export default {
       isMobile: false,
       brandDisabled: false,
       showIgnoreItem:false,
+      mimicMode:false,
     };
   },
 
@@ -334,9 +362,11 @@ export default {
     },
 
     routerList() {
+      //console.log("get routerList:",this.$store.getters.mimicMode);
       const routes = this.$store.state.user.routes
         .slice(1, this.$store.state.user.routes.length)
         .filter((route) => !route.hidden);
+      console.log("get routerList > routes :",routes);
       return routes;
     },
 
@@ -433,7 +463,7 @@ export default {
       return this.$store.state.cachePath;
     },
 
-    ...mapGetters(["token", "name", "availabePathList"]),
+    ...mapGetters(["token", "name", "availabePathList","mimicMode"]),
   },
 
   watch: {
@@ -461,6 +491,9 @@ export default {
     $route() {
       this.getBread();
     },
+    mimicMode(){
+      this.mimicMode = this.$store.getters.mimicMode;
+    }
   },
   created() {
     const self = this;
@@ -488,9 +521,17 @@ export default {
         );
       });
     }
+    this.mimicMode = this.$store.getters.mimicMode;
   },
 
   methods: {
+    changeMimicMode(){
+      var mode = !this.mimicMode;
+      this.mimicMode = !this.mimicMode;
+      PermissionHelper.setShowMimicMode(this.mimicMode);
+      this.$store.dispatch('setMimicMode', mode);
+      this.changeRoutes();
+    },
     listenerChild(reply) {
       //console.log("listenerChil="+reply)
       this.showIgnoreItem = reply;
@@ -502,6 +543,11 @@ export default {
       // console.log(document.getElementById("downloadPdf"))
       // console.log(document.getElementById("downloadPdf").click)
       document.getElementById("downloadPdf").click();
+    },
+    handleDownloadExcel() {
+      // console.log(document.getElementById("downloadPdf"))
+      // console.log(document.getElementById("downloadPdf").click)
+      document.getElementById("downloadExcel").click();
     },
     setBrandListDisabled(booleanFlag) {
       this.brandDisabled = booleanFlag;
