@@ -1317,6 +1317,8 @@ export default{
       "inputNodeName": "請輸入節點名稱",
       "auditDepart": "簽核部門",
       "auditUser": "簽核人員",
+      "selectAuditDepart": "請選擇簽核部門",
+      "selectAuditUser": "請選擇簽核人員",
       "auditMethod": "簽核方式",
       "auditButton": "簽核按鈕",
       "selectDepart": "簽核按鈕",

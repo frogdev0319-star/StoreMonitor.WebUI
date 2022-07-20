@@ -506,9 +506,14 @@ export default {
 
       if( newNode !== null ){
         orinode.push(newNode.orderedAuditNodeArray[0])
+        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
+
         this.newFlatNodeDataView = orinode
       }else{
+        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
         this.newFlatNodeDataView = orinode
+
+
       }
     },
 
@@ -544,7 +549,9 @@ export default {
                   }
               ],
               "auditByUsers": [],
-              "auditByGroups": []
+              "auditByGroups": [],
+              "isEditing": false,
+              "auditTargetType": 0
             }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
@@ -562,10 +569,15 @@ export default {
       const orinode = JSON.parse(reNewNode)
       console.log('orinode :>> ', orinode);
 
-      var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
-      console.log('num :>> ', num);
-      orinode.splice(num, 1 , newNode.orderedAuditNodeArray[0])
-      this.newFlatNodeDataView = orinode
+      if( newNode.orderedAuditNodeArray !== null){
+        var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
+        console.log('num :>> ', num);
+        orinode.splice(num , 1 , newNode.orderedAuditNodeArray[0])
+
+        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
+        this.newFlatNodeDataView = orinode
+      }
+
 
     },
 
@@ -643,13 +655,10 @@ export default {
     },
 
 
-
     // maping data for page view
     handleData(){
-      // deep copy
-      this.flatNodeDataView = JSON.parse(JSON.stringify(this.flatNodeData))
       // switch user id to name 
-      this.flatNodeDataView.forEach(item =>{
+      this.newFlatNodeDataView.forEach(item =>{
         var newArr = []
         item.auditByUsers.forEach(id =>{
           this.userInfo.forEach(uu =>{
@@ -662,7 +671,7 @@ export default {
       })
 
       // this.department
-      this.flatNodeDataView.forEach(item =>{
+      this.newFlatNodeDataView.forEach(item =>{
         var newArr2 = []
         item.auditByGroups.forEach(id =>{
           this.department.forEach(d =>{
@@ -673,11 +682,10 @@ export default {
         })
         item.auditByGroups = [...newArr2 ]
       })
-      // console.log('this.flatNodeDataView 5 ------>> ', this.flatNodeDataView);
+      // console.log('this.flatNodeDataView  ------>> ', this.flatNodeDataView);
     },
 
 
-    
     // data for api submit
     dataToApi(){
       // deep copy
@@ -701,10 +709,13 @@ export default {
       switch(method.method){
         case 'moveUp':{
           this.newFlatNodeDataView.move(method.index, method.index - 1)
+          sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
           break;
         }
         case 'moveDown':{
           this.newFlatNodeDataView.move(method.index, method.index + 1)
+          sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
+
           break;      
         }
         default: {

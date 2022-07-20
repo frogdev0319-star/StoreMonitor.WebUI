@@ -10,13 +10,6 @@
         @click="saveNode"
         v-loading.fullscreen.lock="fullscreenLoading"
         >{{$t('audit.workFlows.save')}}</delay-button>
-
-      <!-- 新增流程用 -->
-      <delay-button 
-        type="filled" 
-        @click="saveNodeToCreate"
-        v-loading.fullscreen.lock="fullscreenLoading"
-        >新增流程用</delay-button>
         
     </div>
 
@@ -43,7 +36,7 @@
                     <el-radio :label="1">{{$t('audit.workFlows.auditDepart')}}</el-radio> 
                     <el-select 
                       v-model="departmentStatus" 
-                      :placeholder="$t('audit.workFlows.auditDepart')" 
+                      :placeholder="$t('audit.workFlows.selectAuditDepart')" 
                       :disabled="nodeData.auditTargetType == 0 || nodeData.auditTargetType == null">
                       <el-option
                         v-for="item in department"
@@ -60,7 +53,7 @@
                     <el-select
                       v-model="auditUsers"
                       filterable
-                      :placeholder="$t('audit.workFlows.auditUser')"
+                      :placeholder="$t('audit.workFlows.selectAuditUser')"
                       :loading="loading" 
                       :disabled="nodeData.auditTargetType == 1 || nodeData.auditTargetType == null"
                       >
@@ -419,6 +412,7 @@ export default {
       }
       console.log('this.apiData call api', this.apiData)
 
+    
       this.$router.push({name: 'createWorkflow'})
       sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
 
@@ -433,11 +427,6 @@ export default {
       // });
     },
 
-
-    saveNodeToCreate(){
-      this.$router.push({name: 'createWorkflow'})
-
-    }
   
   }
 };

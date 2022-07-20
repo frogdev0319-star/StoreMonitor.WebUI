@@ -492,6 +492,7 @@ export default {
             ],
             "auditByUsers": [],
             "auditByGroups": [],
+            "isEditing": false,
             "auditTargetType": 0
         }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
