@@ -10,7 +10,7 @@
 					<h3>簽核巡檢表</h3>
 					<div class="goto-report" 
             @click="goToReportdetails" 
-            v-if="currentUserInfo == taskInfo[0].tasks[0].assignee.userId"
+            v-if="showingBtn "
             >報告詳情</div>
 				</div>
       
@@ -18,11 +18,11 @@
 				<div class="audit-flow-body">
 					<div class="audit-flow-ownerhandling" style="margin-bottom: 20px">
 						<p>簽核流程</p>
-						<div class="handling" v-if="currentUserInfo == taskInfo[0].tasks[0].assignee.userId">
+						<!-- <div class="handling" v-if="currentUserInfo == taskInfo[0].tasks[0].assignee.userId">
 							<div class="withdraw">撤回</div>
 							<div class="l-l"> | </div>
 							<div class="cancel">取消</div>
-						</div>
+						</div> -->
 					</div>
 
           <!-- task -->
@@ -96,8 +96,9 @@
                   <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem,index})" />
                   <el-image
                     :src="imgItem.src"
+                    :preview-src-list="getAuditImgList(index)"
                     style="width:auto;height:100px"
-                    :preview-src-list="getAuditImgList(index)"/>
+                  />
                 </div>
               </div>
               <div v-if="auditFileCount < 10" class="attach-add" @click="$refs.auditfile.click()">
@@ -173,6 +174,7 @@ export default {
       pdfFileList:[],
       imgFileList:[],
       signatureFileList:[],
+      showingBtn: true,
       
       auditFileCount:0,
       oss: null,
@@ -426,17 +428,17 @@ export default {
       }
 
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
-      taskSummit(this.commentsToApi).then(res=>{
-        console.log('res :>> ', res);
-        this.isLoadingData = false
-        this.$router.push({ name: 'WaitAuditManage'});
+      // taskSummit(this.commentsToApi).then(res=>{
+      //   console.log('res :>> ', res);
+      //   this.isLoadingData = false
+      //   this.$router.push({ name: 'WaitAuditManage'});
 
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-        util.notify('此簽核需要附加簽名檔案', 'error', 1500);
+      // }).catch(err => {
+      //   this.isLoadingData = false;
+      //   console.log('error' + err);
+      //   util.notify('此簽核需要附加簽名檔案', 'error', 1500);
 
-      });
+      // });
     },
 
     getAccountId() {
@@ -525,13 +527,11 @@ export default {
       if(item.type==='image/png'){
         self.signatureFileList.splice(index, 1);
         this.$refs.signaturePad.clearSignature()
-        this.commentsToApi.comment.signature = []
-        this.commentsToApi.comment.attachment = []
+        
         } 
         else {
           self.imgFileList.splice(index, 1);
-          this.commentsToApi.comment.signature = []
-          this.commentsToApi.comment.attachment = []
+          
         }
     },
 

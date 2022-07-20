@@ -10,6 +10,14 @@
         @click="saveNode"
         v-loading.fullscreen.lock="fullscreenLoading"
         >{{$t('audit.workFlows.save')}}</delay-button>
+
+      <!-- 新增流程用 -->
+      <delay-button 
+        type="filled" 
+        @click="saveNodeToCreate"
+        v-loading.fullscreen.lock="fullscreenLoading"
+        >新增流程用</delay-button>
+        
     </div>
 
     <!-- 基本信息 -->
@@ -293,7 +301,6 @@ export default {
   methods: {
     async init(){
       
-
       await this.getNodeInfo() 
       await this.getWorkflowInfo()
       await this.getUserInfo()
@@ -315,7 +322,7 @@ export default {
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
-        console.log('getWorkflowInfo ------>> ', this.userInfo);
+        console.log('userInfo ------>> ', this.userInfo);
 
       }).catch(err => {
         console.log('error' + err);
@@ -376,7 +383,6 @@ export default {
         this.nodeData.customButton[1].text = this.$t('audit.workFlows.reject')
       }
 
-
       if(this.nodeData.id == undefined){
         // add node
         this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
@@ -412,35 +418,27 @@ export default {
         return
       }
       console.log('this.apiData call api', this.apiData)
-      
+
+      this.$router.push({name: 'createWorkflow'})
+      sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
+
       // call api
-      updateWorkflow(this.apiData).then(res=>{
-        console.log('res :>> ', res);
-        this.$router.push({name: 'workflowDetail'})
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
+      // updateWorkflow(this.apiData).then(res=>{
+      //   console.log('res :>> ', res);
+      //   this.$router.push({name: 'workflowDetail'})
+      //   this.isLoadingData = false
+      // }).catch(err => {
+      //   this.isLoadingData = false;
+      //   console.log('error' + err);
+      // });
     },
 
-    
-    // submit() {
-    //   let array = this.workflowDetail.nextNodes;
-    //   let object = { ...array[0] };
-    //   let i = array.length - 1;
-    //   while(i >= 0) {
-    //     object['nextAuditNode'] = { ...array[i].nextAuditNode };
-    //     i--;
-    //   }
-    //   let nextAuditNode = JSON.parse(JSON.stringify(object));
-    //   updateWorkflow({
-    //     ...this.workflowDetail,
-    //     nextAuditNode
-    //   }).then(res => {
-    //     console.log(res);
-    //   });
-    // }
+
+    saveNodeToCreate(){
+      this.$router.push({name: 'createWorkflow'})
+
+    }
+  
   }
 };
 </script>

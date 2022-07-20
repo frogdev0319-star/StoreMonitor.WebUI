@@ -206,14 +206,10 @@ import {getNodeList, updateWorkflow} from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import {getUserInfo} from '@/api/login';
 import {getDepartmentList } from '@/api/checkin';
-
-
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 
-import MultiSelect from '@/components/MultiSelect';
 import util from "@/common/util";
-import t from '../../../../static/ezuikit/ezuikit_China/ezuikit';
 export default {
   name: 'WorkflowDetail',
   components: {
@@ -316,21 +312,7 @@ export default {
     await this.init()
   },
   mounted() {
-    // this.dataFromRoute = { ...this.$route.params.data }
-    // getWorkflowInfo({
-    //   processDefinitionKey: this.dataFromRoute.processDefinitionKey
-    // }).then(res => {
-    //   function getNodes (nodes, data) {
-    //     if (data.nextAuditNode) {
-    //       nodes.push(data.nextAuditNode)
-    //       getNodes(nodes, data.nextAuditNode)
-    //     } else return
-    //   }
-    //   let nextNodes = [];
-    //   this.workflowDetail = { ...res.data }
-    //   getNodes(nextNodes, this.workflowDetail)
-    //   this.workflowDetail['nextNodes'] = nextNodes;
-    // })
+  
   },
   methods: {
     handleOrderedAuditNodeArray(obj){
@@ -600,7 +582,7 @@ export default {
       delete row.isEditing
       sessionStorage.setItem('workflowNode', JSON.stringify(oriData[0]))
     },
-          // sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
+    // sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
 
     deleteRow(deleteId){
       this.fullscreenLoading = true
