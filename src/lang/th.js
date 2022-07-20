@@ -257,6 +257,8 @@ export default{
   },
   "remotePatrol":{
       "InspectionDetail":"ส่งออกรายงาน",
+      "exportPDF":"Export PDF",
+      "exportExcel":"Export EXCEL",
       "Patroltips2":"ชื่อรายการของการตรวจสอบที่มีอยู่แล้ว",
       "TableGet":"คะแนน",
       "TableIgnore":"ละเว้นแล้ว",
@@ -501,6 +503,8 @@ export default{
       "eventDetails":"รายละเอียดของเหตุการณ์",
       "events":"เหตุการณ์",
       "exportReport":"ส่งออก Excel",
+      "exportReportDetail":"Export Report Detail",
+      "exportEntailReport":"Export Full Report",
       "handled":"เสร็จสิ้น",
       "handling":"จัดการ",
       "methods":"เลือกวิธีการจัดการ",

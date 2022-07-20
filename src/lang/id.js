@@ -257,6 +257,8 @@ export default{
   },
   "remotePatrol":{
       "InspectionDetail":"Laporan Ekspor",
+      "exportPDF":"PDF Ekspor",
+      "exportExcel":"EXCEL Ekspor",
       "Patroltips2":"Nama daftar inspeksi sudah ada",
       "TableGet":"Nilai",
       "TableIgnore":"Diabaikan",
@@ -501,6 +503,8 @@ export default{
       "eventDetails":"Rincian Kejadian",
       "events":"Kejadian",
       "exportReport":"Ekspor Excel",
+      "exportReportDetail":"Export Report Detail",
+      "exportEntailReport":"Export Full Report",
       "handled":"Selesai",
       "handling":"Tangani",
       "methods":"Pilih metode penanganan",

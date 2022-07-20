@@ -103,6 +103,9 @@ export default{
       "reportdetailsAuditDetail":"送出簽核｜簽核內容",
       "handlingReportdetails":"簽核紀錄表詳情",
       "reportdetailsAuditHandling":"待簽核｜簽核處理",
+      //神秘客
+      "generalMode":"一般模式",
+      "mimicMode":"神秘客模式",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -271,6 +274,8 @@ export default{
   },
   "remotePatrol":{
       "InspectionDetail":"匯出報告",
+      "exportPDF":"PDF匯出",
+      "exportExcel":"EXCEL匯出",
       "Patroltips2":"此巡檢表名稱已存在",
       "TableGet":"得分",
       "TableIgnore":"不適用",
@@ -515,6 +520,8 @@ export default{
       "eventDetails":"事件詳情",
       "events":"處理事件",
       "exportReport":"匯出Excel",
+      "exportReportDetail":"報告明細匯出",
+      "exportEntailReport":"報告完整匯出",
       "handled":"已處理",
       "handling":"處理",
       "methods":"選擇處理方式",
