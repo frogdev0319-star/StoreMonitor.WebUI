@@ -1314,7 +1314,7 @@ export default {
             }
             if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1);
           } else if (mapping[key] === 'description') {
-            item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
+            item[mapping[key]] = cell.v ? cell.v.toString().substring(0, 1200) : '';
           } else if (mapping[key] === 'required') {
             item[mapping[key]] = cell.v === 'Y' || cell.v === 'y'
           } else {
