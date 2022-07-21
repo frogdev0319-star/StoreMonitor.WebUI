@@ -965,6 +965,7 @@ export default {
     async resolveSheetData(sheet, type) {
       const range = XLSX.utils.decode_range(sheet['!ref']);
       sheet.$$type = type;
+      
       this.formatSheetCells({ sheet, range });
       let primaryColumnCells = this.getSheetCells({
         sheet,
@@ -1316,7 +1317,7 @@ export default {
             }
             if (parseFloat(item[mapping[key]]) > parseInt(item[mapping[key]])) item[mapping[key]] = item[mapping[key]].toFixed(1);
           } else if (mapping[key] === 'description') {
-            item[mapping[key]] = cell.v ? cell.v.substring(0, 1200) : '';
+            item[mapping[key]] = cell.v ? cell.v.toString().substring(0, 1200) : '';
           } else if (mapping[key] === 'required') {
             item[mapping[key]] = cell.v === 'Y' || cell.v === 'y'
           } else {
@@ -1326,9 +1327,14 @@ export default {
 
         if (type === 'Score') {
           const availableScore = deepClone(item['availableScores']);
-          const maxAvailableScore = availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
-          item['itemScore'] = maxAvailableScore;
-          item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
+          if(availableScore.length>0){
+            const maxAvailableScore = (availableScore.length==0)? 0:availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
+            item['itemScore'] = maxAvailableScore;
+            item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
+          }else{
+            item['itemScore'] = 0;
+            item['type'] = 1;
+          }
         }
         if (item['subject']) {
           if (names[rowCells.parent.v] === undefined) {
@@ -2149,7 +2155,7 @@ export default {
             scoreFlagObj.flags.flagScoreItemEmpty = true;
           }
           let maxScore = Infinity;
-          if (!scoreFlagObj.flags.flagScoreItemType && !scoreFlagObj.flags.flagScoreItemType) {
+          if (!scoreFlagObj.flags.flagScoreItemType && !scoreFlagObj.flags.flagScoreItemEmpty) {
             maxScore = item.score[item.score.length - 1];
           }
           item.totalScore = maxScore;
@@ -2311,12 +2317,12 @@ export default {
         if (othersFlag.flagOtherScoreType) {
           warningInfo.push('[Others]' + ' ' + this.$t('insSettingView.excelOtherScoreType'));
         }
-        if (scoreFlag.flagScoreItemType) {
+        /*if (scoreFlag.flagScoreItemType) {
           warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelScoreItemType'));
         }
         if (scoreFlag.flagScoreItemEmpty) {
           warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.excelScoreItemEmpty'));
-        }
+        }*/
         if (scoreFlag.flagFullScoreLimitation) {
           warningInfo.push('[Score]' + ' ' + this.$t('insSettingView.totalScoreLimitation'));
         }

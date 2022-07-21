@@ -7,6 +7,7 @@ import * as titleRESTful from './title';
 import * as beseyeRESTful from './beseye';
 import * as skywatchRESTful from './skywatch';
 import * as workflowRESTful from './workflow';
+import * as mysteroRESTful from './mystero'
 export default api;
 
 export {
@@ -17,5 +18,6 @@ export {
   titleRESTful,
   beseyeRESTful,
   skywatchRESTful,
-  workflowRESTful
+  workflowRESTful,
+  mysteroRESTful,
 };
