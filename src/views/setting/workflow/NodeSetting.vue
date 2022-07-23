@@ -67,7 +67,7 @@
                   </div>
                 </el-radio-group>
               
-                <!-- <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>   -->
+                <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
                 
               </div>
 
@@ -197,7 +197,7 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {updateWorkflow} from "@/api/workflow";
-import {getDepartmentList } from '@/api/checkin';
+import {getDepart } from '@/api/login';
 import {getUserInfo} from '@/api/login';
 
 
@@ -304,7 +304,7 @@ export default {
 
     // get getDepart
     async getDepartmentList(){
-      await getDepartmentList({ type: 0 }).then(res=>{
+      await getDepart({ type: 0 }).then(res=>{
         this.department = res.data
       }).catch(err => {
         console.log('error' + err);

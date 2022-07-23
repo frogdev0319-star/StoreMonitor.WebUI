@@ -173,8 +173,8 @@
                   </el-option>
                 </el-select>
             </div>
-            <!-- <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>   -->
-
+            <div class="search_member" @click="handelePopupUserList"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
+                  
           </div>
         </div>
       </div>
@@ -197,15 +197,112 @@
       </div>
     </dialog-pop>
 
+    <!-- search user popup -->
+    <dialog-pop
+      class="popup_width"
+      title="新增簽核人員"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :dialogWidth = "w_width"
+      :visible="showingSearchUser"
+      @cancelHandler="hideDeleteContentDialog('showingSearchUser')"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          <div class="showing_search_user">
+            <div class="filter_section">
+                <!-- 關鍵字 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name">關鍵字</div>
+                  <div class="title-status"> 
+                    <el-input
+                      v-model="inputSearchUser"
+                      placeholder="搜尋人員名稱、信箱"
+                      style="width: 200px"
+                      clearable
+                      />
+                  </div>
+                </div>
+                <!-- 部門 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name"> 部門</div>
+                  <div class="title-status"> 
+                    <el-select
+                      v-model="curTemplateDepartment"
+                      placeholder="部門"
+                      style="width: 180px"
+                      >
+                      <el-option
+                        v-for="(item, index) in departmentAry"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                </div>
+                <!-- 職務 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name"> 職務</div>
+                  <div class="title-status"> 
+                    <el-select
+                      v-model="curTemplateTitleList"
+                      placeholder="職務"
+                      style="width: 180px"
+                      >
+                      <el-option
+                        v-for="(item, index) in titleListAry"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                </div>
+                <div class="summit_filter" >篩選</div>
+            </div>
+            <div class="is_select">
+              <div class="title-name"> 已選擇</div>
+              <div class="user_selected">
+                <el-tag
+                    v-for="tag in tags"
+                    :key="tag.name"
+                    closable
+                    :type="tag.type">
+                    {{tag.name}}
+                  </el-tag>
+              </div>
+            </div>
+            <div class="users">
+              <table-only
+                ref="elTP"
+                class="table-white"
+                :column-data="userColumnData"
+                :table-data="searchUserData"
+                
+                :highlight-current-row= "false"
+                :is-loading-data="isLoadingData"
+                :allowRowExpand = "false"
+                :showBorder = "false"
+                :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :cellStyle="{backgroundColor: '#fff !important'}"
+        
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog-pop>
+
   </div>
 </template>
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import {getNodeList, updateWorkflow} from "@/api/workflow";
-import {getUserTitleList } from "@/api/title";
+import {getNodeList, updateWorkflow, getUserStatus} from "@/api/workflow";
 import {getUserInfo} from '@/api/login';
-import {getDepartmentList } from '@/api/checkin';
+
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 
@@ -220,9 +317,57 @@ export default {
   },
   data() {
     return {
-      ccToUSer: [],
+      w_width: "1000",
+      tags: [
+          { name: 'Albert.Deng1', type: 'info' },
+          { name: 'Albert.Deng2', type: 'info' },
+          { name: 'Albert.Deng3', type: 'info' },
+          { name: 'Albert.Deng4', type: 'info' },
+          { name: 'Albert.jimmy', type: 'info' },
+          { name: 'Albert.Deng', type: 'info' },
+          { name: 'Albert5', type: 'info' },
+          { name: 'Albert.Deng6', type: 'info' },
+          { name: 'Albert.Deng7', type: 'info' },
+          { name: 'Albert.Deng8', type: 'info' },
+          { name: 'Albert.Deng9', type: 'info' },
+          { name: 'Albert.Deng10', type: 'info' },
+        ],
+      userColumnData: [
+        {
+          'prop': 'userName',
+          'label': '姓名',
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
+          'prop': 'email',
+          'label': '信箱',
+          'width': 110,
+          'maxWidth': 110,
+        },
+        {
+          'prop': 'sector',
+          'label': '部門',
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
+          'prop': 'title',
+          'label': '職務',
+          'width': 100,
+          'maxWidth': 100,
+        },
+      ],
+      userData:[],
+      searchUserData:[],
+      inputSearchUser: '',
+
     
-      showSingleDeleteContent:false,
+      ccToUSer: [],
+      showSingleDeleteContent: false,
+      showingSearchUser: false,
+
+
       dataFromRoute: {},
       workflowDetail: {},
       templateList: ['巡檢表單'],
@@ -238,6 +383,13 @@ export default {
       nodeDataToApi:[],
       userInfo:[],
       titleList:[],
+      department : [],
+
+      titleListAry:[],
+      departmentAry:[],
+      curTemplateDepartment: '',
+      curTemplateTitleList: '',
+
       fullscreenLoading: false,
       columnOperationData: {
         label: this.$t('deviceView.operation'),
@@ -303,16 +455,55 @@ export default {
       deleteSrc: require('../../../../static/img/table-delete.png'),
       rowId:'',
       signMode: 1,
-      department : ''
+
+      temp:[]
+      
     };
   },
   watch:{
-  },
-  async created() {
-    await this.init()
+    // for search
+    inputSearchUser(val){
+      console.log('val :>> ', val);
+
+      if(val !== ''){
+        var aaa = this.temp.filter(item => (
+          item.email.indexOf(val) > -1 || item.userName.indexOf(val) > -1 
+        ))
+        this.searchUserData = aaa
+      }else{
+        this.searchUserData = this.temp
+      }
+    },
+
+    curTemplateDepartment(val){
+
+      if(val !== ''){
+        var bbb = this.temp.filter(item => item.sector == val )
+        this.searchUserData = bbb
+      } else {
+        this.searchUserData = this.userData
+        
+      }
+    },
+
+    // curTemplateTitleList(val){
+    //   this.searchUserData = this.userData
+    //   if(val !== ''){
+    //     this.searchUserData = this.searchUserData.filter(item => item.title == val )
+    //   } else {
+    //     this.searchUserData = this.userData
+    //   }
+    // },
+
   },
   mounted() {
-  
+  },
+
+  async created() {
+    await this.init()
+    
+    
+
   },
   methods: {
     handleOrderedAuditNodeArray(obj){
@@ -323,11 +514,9 @@ export default {
           row.signature = obj.signature;
         }
       })
-
       console.log('this.nodeDataToApi new :>> ', this.nodeDataToApi);
     },
 
-    
     async init(){
       await this.getWorkflowInfo() //1 
 
@@ -340,6 +529,8 @@ export default {
   
       await this.handleData() //5
       await this.dataToApi() //6
+
+      
 
     },
 
@@ -358,18 +549,27 @@ export default {
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
+
         console.log('getWorkflowInfo 2 ------>> ', this.userInfo);
 
       }).catch(err => {
         console.log('error' + err);
       });
     },
-    // get title
-    getTitle(){
-      getUserTitleList().then(res=>{
+
+    // get title 職務
+    async getTitle(){
+      await getUserStatus({ type: 1 }).then(res=>{
         this.titleList =  res.data
         console.log('this.titleList 3 ------>> ', this.titleList);
 
+        this.titleListAry = this.titleList.map( i => (
+          i = i.defineName
+        ))
+
+        console.log('this.titleListAry  7:>> ', this.titleListAry);
+
+        
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -377,11 +577,19 @@ export default {
       });
     },
 
-    // get getDepart
+    // get getDepart 部門
     async getDepartmentList(){
-      await getDepartmentList({ type: 0 }).then(res=>{
+      await getUserStatus({ type: 0 }).then(res=>{
         this.department = res.data
         console.log('this.department 7 ------>> ', this.department);
+      
+        this.departmentAry = this.department.map( i => (
+          i = i.defineName
+        ))
+
+        console.log('this.departmentAry  7:>> ', this.departmentAry);
+
+
       }).catch(err => {
         console.log('error' + err);
       });
@@ -574,8 +782,6 @@ export default {
       this.showSingleDeleteContent = false
     },
 
-
-
     settingWorkFlow(row){
       this.$router.push({name: 'nodeSetting'})
       // 刪除  "isEditing": false
@@ -613,6 +819,32 @@ export default {
         console.log('error' + err);
       });
     },
+
+
+    //處理 popup user selected
+    handelePopupUserList(){
+      this.showingSearchUser = true
+      this.userData = this.userInfo
+      
+      
+      
+      this.userData.forEach(user =>{
+        this.titleList.forEach( title =>{
+          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
+        })
+        this.department.forEach( dep =>{
+          if(dep.contents.length !== 0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
+        })
+
+      })
+
+      this.searchUserData = this.userData
+      this.temp = this.searchUserData
+      console.log('this.userData :>> ', this.userData);
+      
+    },
+
+
 
     //保存並發布
     submit() {
@@ -715,6 +947,60 @@ export default {
     i 
       margin-right: 5px
       color: #006ab7
+
+  .dialog-content
+    width: 100%
+    .showing_search_user
+      width: 100%
+      height: 500px
+      
+      .filter_section
+        background: #FFF
+        display: flex
+        flex-wrap: wrap
+        flex-direction: row
+        justify-content: flex-start
+        align-items: center
+        padding: 10px 0 0 0
+        margin-bottom: 10px
+        .summit_filter
+          width: 90px
+          height: 37px
+          border-radius: 3px
+          background: rgb(85, 102, 121)
+          color: #FFF
+          display: flex
+          flex-direction: row
+          justify-content: center
+          align-items: center
+          margin-bottom: 10px
+          margin-left: 20px
+          cursor: pointer
+          transition: all .3s
+          &:hover
+            background: rgb(60, 92, 121)
+      .is_select
+        width: 100% !important
+        padding: 10px 0 5px 0
+        background: #FFF
+        margin-bottom: 10px
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: center
+        width: fit-content
+        .title-name
+          width: 90px
+        .user_selected
+          .el-tag
+            margin-right: 5px 
+            margin-bottom: 5px
+
+      .users
+        height: 335px
+        overflow: auto
+        border-radius: 5px
+
 
 
 
@@ -951,4 +1237,8 @@ export default {
       .el-table_1_column_6
         .cell
           display: none !important
+  .popup_width
+    .el-dialog
+      width: 70% !important
+      background: #f7f9fa
 </style>

@@ -390,7 +390,7 @@ export default {
       await this.getDepartmentList() 
       await this.initBasicData()
       
-    
+
       var status = sessionStorage.getItem('pageAction');
       const pageAction = JSON.parse(status)
 
@@ -405,10 +405,6 @@ export default {
           this.getNodeData()
           break;      
         }
-        // case 'delete':{
-        //   console.log('go delete !!');
-        //   break;      
-        // }
         case 'edit':{
           console.log('go edit !!');
           this.handleEdit()
@@ -482,17 +478,8 @@ export default {
           "unHandleNotifyDay": null
         },
       ]
-      
-    
       this.newFlatNodeDataView = initData
       console.log('this.newFlatNodeDataView 1 :>> ', this.newFlatNodeDataView);
-
-      // if(this.infoForm !== null) {
-      //   const flow = sessionStorage.getItem('newWorkFlow')
-      //   this.infoForm = JSON.parse(flow)
-      //   console.log('this.infoForm :>> ', this.infoForm);
-      // }
-      // this.newFlatNodeDataView.push(this.infoForm.orderedAuditNodeArray[0])
     },
 
     getNodeData(){
@@ -512,11 +499,8 @@ export default {
       }else{
         sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
         this.newFlatNodeDataView = orinode
-
-
       }
     },
-
 
     addNode() {
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
@@ -555,9 +539,10 @@ export default {
             }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
-
+      sessionStorage.removeItem('newWorkFlow')
       this.$router.push({ name: 'nodeSetting' })
     },
+
 
 
     handleEdit(){
@@ -577,7 +562,6 @@ export default {
         sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
         this.newFlatNodeDataView = orinode
       }
-
 
     },
 
@@ -606,7 +590,7 @@ export default {
     },
     // get getDepart
     async getDepartmentList(){
-      await getDepartmentList({ type: 0 }).then(res=>{
+      await getDepart({ type: 0 }).then(res=>{
         this.department = res.data
         // console.log('this.department 4 ------>> ', this.department);
       }).catch(err => {
