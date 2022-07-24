@@ -199,14 +199,15 @@
 
     <!-- search user popup -->
     <dialog-pop
+      ref="dailog"
       class="popup_width"
       title="新增簽核人員"
-      :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
       :dialogWidth = "w_width"
       :visible="showingSearchUser"
-      @cancelHandler="hideDeleteContentDialog('showingSearchUser')"
+      @cancelHandler="hideSearchUsersDialog('showingSearchUser')"
+      @confirmHandler="confirmSearchUsersDialog"
     >
       <div class="dialog-slot">
         <div class="dialog-content">
@@ -260,7 +261,7 @@
                     </el-select>
                   </div>
                 </div>
-                <div class="summit_filter" >篩選</div>
+                <!-- <div class="summit_filter" >篩選</div> -->
             </div>
             <div class="is_select">
               <div class="title-name"> 已選擇</div>
@@ -269,25 +270,27 @@
                     v-for="tag in tags"
                     :key="tag.name"
                     closable
-                    :type="tag.type">
-                    {{tag.name}}
+                    :type="tag.type"
+                    @close="handleClose(tag)">
+                    {{tag.userName}}
                   </el-tag>
               </div>
             </div>
             <div class="users">
               <table-only
-                ref="elTP"
+                ref="usersList"
                 class="table-white"
-                :column-data="userColumnData"
-                :table-data="searchUserData"
+                :column-data ="userColumnData"
+                :table-data ="searchUserData"
+                :showSelectionColumn = showSelectionColumn
                 
-                :highlight-current-row= "false"
-                :is-loading-data="isLoadingData"
+                :highlight-current-row = "false"
+                :is-loading-data ="isLoadingData"
                 :allowRowExpand = "false"
                 :showBorder = "false"
-                :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
-                :cellStyle="{backgroundColor: '#fff !important'}"
-        
+                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :cellStyle ="{backgroundColor: '#fff !important'}"
+                @handleSelectionChange = "handleSelectionChange "
               />
             </div>
           </div>
@@ -318,21 +321,9 @@ export default {
   data() {
     return {
       w_width: "1000",
-      tags: [
-          { name: 'Albert.Deng1', type: 'info' },
-          { name: 'Albert.Deng2', type: 'info' },
-          { name: 'Albert.Deng3', type: 'info' },
-          { name: 'Albert.Deng4', type: 'info' },
-          { name: 'Albert.jimmy', type: 'info' },
-          { name: 'Albert.Deng', type: 'info' },
-          { name: 'Albert5', type: 'info' },
-          { name: 'Albert.Deng6', type: 'info' },
-          { name: 'Albert.Deng7', type: 'info' },
-          { name: 'Albert.Deng8', type: 'info' },
-          { name: 'Albert.Deng9', type: 'info' },
-          { name: 'Albert.Deng10', type: 'info' },
-        ],
+      tags: [],
       userColumnData: [
+        
         {
           'prop': 'userName',
           'label': '姓名',
@@ -456,56 +447,58 @@ export default {
       rowId:'',
       signMode: 1,
 
-      temp:[]
+      temp:[],
+      showSelectionColumn: true,
+      multipleSelection: []
       
     };
   },
   watch:{
+
+    ccToUSer(val){
+      console.log('val', val)
+      console.log('this.ccToUSer', this.ccToUSer)
+    },
+
     // for search
     inputSearchUser(val){
-      console.log('val :>> ', val);
-
-      if(val !== ''){
-        var aaa = this.temp.filter(item => (
-          item.email.indexOf(val) > -1 || item.userName.indexOf(val) > -1 
-        ))
-        this.searchUserData = aaa
-      }else{
-        this.searchUserData = this.temp
-      }
+      console.log('inputSearchUser', val)
+      console.log(' this.temp',  this.temp)
+    
+      this.searchUserData = this.temp.filter(item => 
+        item.email.indexOf(val) > -1 || item.userName.indexOf(val) > -1 
+      )
     },
 
     curTemplateDepartment(val){
-
       if(val !== ''){
-        var bbb = this.temp.filter(item => item.sector == val )
-        this.searchUserData = bbb
-      } else {
-        this.searchUserData = this.userData
-        
-      }
+        this.temp = this.userInfo
+        this.searchUserData = this.temp.filter(item => item.sector == val )
+        console.log(' this.temp',  this.temp)
+      } 
     },
 
-    // curTemplateTitleList(val){
-    //   this.searchUserData = this.userData
-    //   if(val !== ''){
-    //     this.searchUserData = this.searchUserData.filter(item => item.title == val )
-    //   } else {
-    //     this.searchUserData = this.userData
-    //   }
-    // },
+    curTemplateTitleList(val){
+      if(val !== ''){
+        this.temp = this.searchUserData
+        this.searchUserData = this.temp.filter(item => item.title == val )
+      } 
+    },
 
   },
+
   mounted() {
+    this.showingSearchUser = false
   },
 
   async created() {
     await this.init()
     
-    
+
 
   },
   methods: {
+    
     handleOrderedAuditNodeArray(obj){
       console.log('object :>> ', obj);
       this.nodeDataToApi.orderedAuditNodeArray.forEach(row =>{
@@ -530,8 +523,6 @@ export default {
       await this.handleData() //5
       await this.dataToApi() //6
 
-      
-
     },
 
     needNote(){
@@ -549,8 +540,9 @@ export default {
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
-
+        this.userData = this.userInfo
         console.log('getWorkflowInfo 2 ------>> ', this.userInfo);
+        
 
       }).catch(err => {
         console.log('error' + err);
@@ -588,7 +580,6 @@ export default {
         ))
 
         console.log('this.departmentAry  7:>> ', this.departmentAry);
-
 
       }).catch(err => {
         console.log('error' + err);
@@ -775,6 +766,27 @@ export default {
     hideDeleteContentDialog(key) {
       this[key] = false;
     },
+
+
+    confirmSearchUsersDialog(){
+        console.log('this.multipleSelection', this.multipleSelection)
+        this.ccToUSer = this.multipleSelection.map( i => i = i.userId)
+        this.showingSearchUser = false
+    },
+
+    // 關閉 lightbox
+    hideSearchUsersDialog(key){
+      this[key] = false;
+      this.inputSearchUser =''
+      this.curTemplateDepartment = ''
+      this.curTemplateTitleList = ''
+      
+      // 清除所有勾選
+      this.$refs.usersList.clear()
+      this.ccToUSer = []
+
+    },
+
     confirmDeleteSingle(id){
       console.log('Let me delete value', id);
       this.deleteRow(id)
@@ -821,31 +833,53 @@ export default {
     },
 
 
-    //處理 popup user selected
-    handelePopupUserList(){
-      this.showingSearchUser = true
-      this.userData = this.userInfo
-      
-      
-      
-      this.userData.forEach(user =>{
-        this.titleList.forEach( title =>{
-          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
-        })
-        this.department.forEach( dep =>{
-          if(dep.contents.length !== 0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
-        })
 
-      })
+    //popup 表格選取欄位
+    handleSelectionChange(val){
+      this.multipleSelection = val.val
+      console.log(' this.multipleSelection',  this.multipleSelection)
+      this.tags = this.multipleSelection.map(t => (
+        { 
+          userName : t.userName,
+          type: 'info'
+        }
+      ))
+      // console.log('this.tags', this.tags)
+    },
 
-      this.searchUserData = this.userData
-      this.temp = this.searchUserData
-      console.log('this.userData :>> ', this.userData);
-      
+    // 刪除 tag
+    handleClose(tag){
+      this.tags.splice(this.tags.indexOf(tag), 1);
+      this.$refs.usersList.toggleChecked(tag)
     },
 
 
+    
+    //處理 popup user selected
+    handelePopupUserList(){
+      this.showingSearchUser = true
 
+      // [查詢人員]資料
+      this.userData.forEach(user =>{
+          this.titleList.forEach( title =>{
+            if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
+          })
+          this.department.forEach( dep =>{
+            if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
+          })
+        })
+        this.searchUserData = this.userData
+        this.temp = this.searchUserData
+
+
+      // 等待 dialog 生成
+      if(this.ccToUSer.length > 0){
+        setTimeout(() => {
+          var data = this.ccToUSer
+          this.$refs.usersList.fromInputSelect(data)
+        }, 0);
+      }
+    },
     //保存並發布
     submit() {
       
@@ -1000,9 +1034,6 @@ export default {
         height: 335px
         overflow: auto
         border-radius: 5px
-
-
-
 
 </style>
 
@@ -1241,4 +1272,16 @@ export default {
     .el-dialog
       width: 70% !important
       background: #f7f9fa
+  .users
+    .el-checkbox__input.is-checked .el-checkbox__inner
+      background: #2c90d9 !important
+      border-color: #2c90d9 !important
+      &:hover
+        border-color: #dcdfe6 !important
+    .is-focus .el-checkbox__inner      
+      border-color: #dcdfe6 !important
+    
+    .el-checkbox__inner:hover
+      border-color: #190 !important
+
 </style>
