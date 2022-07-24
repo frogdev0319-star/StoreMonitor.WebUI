@@ -1,0 +1,412 @@
+<template>
+    <div style="height: 100%">
+        <div>
+            <div class="mysterio-header">
+                <div class="flex-center">
+                    <el-input
+                        v-model="inputSearchValue"
+                        size="small"
+                        prefix-icon="el-icon-search"
+                        class="search-input shadow-light"
+                        :placeholder="$t('mysterio.searchPlaceholder')"
+                        clearable/>
+                </div>
+                <!-- 新增神秘客 -->
+                <delay-button @click="addNewMysterioPerson">
+                    <div class="button-area">
+                        <i class="iconfont el-icon-plus"/>
+                        <span>{{$t('mysterio.addMysterio')}}</span>
+                    </div>
+                </delay-button>
+            </div>
+            <table-only
+                ref="elTP"
+                class="table-white"
+                table-themes="white"
+                :column-data="columnData"
+                :table-data="tableData"
+                :table-operation ="columnOperationData"
+                :highlight-current-row= "false"
+                :is-loading-data="isLoadingData"
+                :allowRowExpand = "false"
+                :showBorder = "false"
+                :default-sort = "{prop: 'userName', order: 'ascending'}"
+                :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :tableHeight = "760"
+                :cellStyle="{backgroundColor: '#fff !important'}"
+                @handleOperation="handleOperation"                                  
+            />
+        </div>
+        <!--<div style="width:100%; margin-top:12px;height:31px;">
+            <tbl-pagination-only
+                :btn-style="{backgroundColor:'transparent'}"
+                :total="total"
+                :current-page="curPage"
+                :page-size="curSizeNum"
+                layout = "prev,pager, next,sizes,slot"
+                @sizeChange="sizeChange"
+                @currentChange="currentChange"
+            />
+        </div>-->
+        <dialog-pop
+            :is-form="true"
+            :title="$t('mysterio.addPersonTitle')"
+            :append-to-body="true"
+            :close-on-click-modal="false"
+            :isWarning="false"
+            :visible="showAddPersionDialog"
+            :confirm-context="$t('deviceView.confirm')"
+            :show-close="false"
+            dialog-width="900px"
+            @cancelHandler="showAddPersionDialog = false"
+            @confirmHandler="confirmAddPersonDialog">
+            <div style="width:860px;height:516px;margin-left:20px;">
+              <table-only
+                ref="elTP"
+                class="table-white table-person"
+                table-themes="white"
+                :column-data="userColumnData"
+                :table-data="userTableData"
+                :highlight-current-row= "false"
+                :is-loading-data="isLoadingData"
+                :allowRowExpand = "false"
+                :showBorder = "false"
+                :show-selection-column="true"
+                :default-sort = "{prop: 'userName', order: 'ascending'}"
+                :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :tableHeight = "516"
+                :cellStyle="{backgroundColor: '#fff !important'}"
+                @selection-change="selectionChanged">
+              </table-only>
+            </div>
+        </dialog-pop>
+    </div>
+</template>
+<script>
+import { mysteroRESTful } from '@/api/index';
+import { mapGetters } from 'vuex';
+import { getDepartmentList } from '@/api/checkin';
+import { getUserInfo } from '@/api/login';
+import TableOnly from '@/components/TableOnly';
+import TblPaginationOnly from '@/components/TblPaginationOnly';
+import util from '@/common/util';
+import DelayButton from '@/components/DelayButton';
+import DialogPop from '@/components/DialogPop';
+
+export default {
+    name: 'MysterioManage',
+    components: {TableOnly,TblPaginationOnly,DelayButton,DialogPop },
+    data() {
+      return {
+        inputSearchValue: '',
+        allTableData:[],
+        tableData: [],
+        noData: this.$t('deviceView.noData'),
+        isLoadingData: true,
+        columnData: [
+          {
+            'prop': 'userName',
+            'label': this.$t('mysterio.userName'),
+            'sortable': true,
+            'width': 100,
+            'maxWidth': 100,
+            'isExpand': false
+          },
+          {
+            'prop': 'email',
+            'label': this.$t('mysterio.email'),
+            'sortable': false,
+            'width': 250,
+            'maxWidth': 250,
+            'isExpand': false
+          },
+          {
+            'prop': 'position',
+            'label': this.$t('mysterio.position'),
+            'sortable': false,
+            'width': 100,
+            'maxWidth': 100,
+            'isExpand': false
+          },
+          {
+            'prop': 'storeAuth',
+            'label': this.$t('mysterio.storeAuth'),
+            'sortable': false,
+            'width': 30,
+            'maxWidth': 30,
+            'isExpand': false
+          },
+          {
+            'prop': 'updateTs',
+            'label': this.$t('mysterio.lastUpdateTime'),
+            'sortable': true,
+            'width': 130,
+            'maxWidth': 130,
+            'isExpand': false
+          }
+        ],
+        columnOperationData: {
+          label: this.$t('titleView.operation'),
+          minWidth: '50',
+          align: 'left',
+          operation: [
+            {
+                lable: '',
+                icon: 'icon-setting',
+                methods: 'set'
+            }
+          ]
+        },
+        userColumnData:[{
+            'prop': 'userName',
+            'label': this.$t('mysterio.userName'),
+            'sortable': true,
+            'width': 100,
+            'maxWidth': 100,
+            'isExpand': false
+          },
+          {
+            'prop': 'email',
+            'label': this.$t('mysterio.email'),
+            'sortable': false,
+            'width': 250,
+            'maxWidth': 250,
+            'isExpand': false
+          },
+          {
+            'prop': 'position',
+            'label': this.$t('mysterio.position'),
+            'sortable': false,
+            'width': 100,
+            'maxWidth': 100,
+            'isExpand': false
+          }],
+        userTableData:[],
+        headerStyle: 'table-header',
+        total:0,
+        curPage:1,
+        curSizeNum:10,
+        showAddPersionDialog:false,
+        positionsList:[],
+        userList:[],
+        selectedUserList:[],
+        selUserIds:[],
+      };
+    },
+
+    computed: {
+      ...mapGetters({ accountChanged: 'accountChanged' })
+    },
+
+    watch: {
+      accountChanged(val) {
+        val !== 0 && this.getMysterioList();
+      },
+      // for search
+      inputSearchValue(val){
+        this.searchData = this.allTableData.filter(item => (
+            item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1
+        ));
+        this.tableData = this.searchData;
+      }
+    },
+
+    created() {
+      this.getMysterioList();
+    },
+
+    methods: {
+        init(){
+            this.getUserInfolist();
+        },
+        getMysterioList(){
+            console.log("getMysterioList");
+            //util.getDateStr(task.processLastUpdateTs)
+            //this.tableData.push({userName:'Rainney',email:"rainney.chen@advantech.com.tw",position:"系統管理員",storeAuth:"1",updateTs:"2022/07/19 16:48"});
+            this.isLoadingData = false;
+        },
+        addNewMysterioPerson(){
+            this.getUserInfolist();
+            this.showAddPersionDialog=true;
+        },
+        
+        handleOperation({ method, row }) {
+            console.log('List row =====>> ', row);
+            switch(method){
+                case 'copy':{
+                break;
+                }
+                case 'set':{
+                    this.goSettingPage(row)
+                break;      
+                }
+                case 'delete':{
+                break;      
+                }
+                default: {
+                break;
+                }
+            }
+        },
+        goSettingPage(row){
+            this.$router.push({name: 'MysterioSetting',params:{}});
+        },
+        currentChange(val) {
+            const self = this;
+            self.curPage = val.page;
+            //self.params.filter = { page: val.page - 1, size: self.sizeNum };
+            self.getMysterioList();
+        },
+
+        sizeChange(val) {
+            const self = this;
+            self.curSizeNum = val.size;
+            self.curPage = 1;
+            self.getMysterioList();
+        },
+        //Dialog content
+        async getUserInfolist() {
+            const userPosition = getDepartmentList({ type: 1 }); //取得職務
+            const userPromise = getUserInfo();//userList
+            try {
+                const result = await Promise.all([userPosition, userPromise]);
+                this.getUserPositionList(result[0].data);
+                this.getUserList(result[1].data);
+            } catch (e) {
+                console.log("getUserInfolist error:",e);
+            }
+        },
+        getUserPositionList(data) {
+            this.positionsList = [];
+            //const userIdList = [];
+            data.map(department => {
+              const departmentJson = {};
+              departmentJson.label = department.defineName;
+              departmentJson.value = department.defineId;
+              departmentJson.contents = department.contents;
+              //userIdList.push(department.contents);
+              this.positionsList.push(departmentJson);
+            });
+        },
+
+        getUserList(data) {
+            this.userList = [];
+            var tempUserList = [];
+            data.map(user => {
+                var tempU = this.selectedUserList.find(temp=>temp.userId == user.userId);
+                if(typeof tempU=='undefined'){
+                    const userJson = {};
+                    userJson.userName = user.userName;
+                    userJson.userId = user.userId;
+                    userJson.email = user.email;
+                    userJson.position = "";
+                    var position = this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
+                    //console.log("position:",position)
+                    if(position){
+                        userJson.position = position.label;
+                    }
+                    //this.userList.push(userJson);
+                    tempUserList.push(userJson);
+                }
+                
+            });
+            this.userList = tempUserList;
+            this.userTableData = tempUserList;
+        },
+        selectionChanged(val){
+            var selUserId = [];
+            if(val.length>0){
+                val.map((item)=>{
+                    selUserId.push(item.userId);
+                })
+            }
+            this.selUserIds = selUserId;
+        },
+        confirmAddPersonDialog(){
+            this.selUserIds.map(userId =>{
+                var user = this.userList.find(u=>u.userId==userId);
+                if(user){
+                    var obj={
+                        userId:user.userId,
+                        userName:user.userName,
+                        email:user.email,
+                        position:user.position,
+                        storeAuth:"1",
+                        updateTs:util.getDateStr(Date.now()*1000)
+                    };
+
+                    this.tableData.push(obj);
+                    this.selectedUserList.push(obj);
+                }
+                
+            });
+            this.allTableData = this.tableData;
+            this.showAddPersionDialog = false;
+        },
+    }
+}
+</script>
+
+<style scoped lang="scss">
+.title-table{
+    min-height: calc(100% - 75px);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    padding: 0 24px;
+    border-radius: 5px;
+}
+.mysterio-header{
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.table-person{
+    /deep/ .el-table__header-wrapper .el-checkbox{
+        display: none;
+    }
+    /deep/.el-table__body-wrapper .el-checkbox{
+        border: none;
+        .el-checkbox__input.is-checked .el-checkbox__inner {
+            color: #1375bc;
+            font-weight: 400;
+            background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDpub25lIiBkPSJNMCAwaDE2djE2SDB6Ii8+DQogICAgPHBhdGggZD0ibS40IDMgMyA0IDYtNiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMy4xIDQuNSkiIHN0eWxlPSJzdHJva2U6IzJjOTBkOTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjEuNXB4O2ZpbGw6bm9uZSIvPg0KPC9zdmc+DQo=) no-repeat;
+            background-position: center right 20px;
+            border: none;
+        }
+    }
+    
+}
+/deep/
+.el-table
+.el-table__body-wrapper
+.el-table-column--selection
+.el-checkbox__inner 
+{
+  border-radius: 1px;
+  border: solid 1px #acaeb1;
+  background-color: #fff;
+}
+/deep/
+.el-table
+.el-table__body-wrapper
+.el-table-column--selection
+.is-checked
+.el-checkbox__inner 
+{
+  /*border-radius: 1px;
+  border: solid 1px #2c90d9;
+  background-color: #e0f2ff;
+  color:#2c90d9;
+  &::after{
+   border-color:#2c90d9;
+  }*/
+    color: #1375bc;
+    font-weight: 400;
+    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDpub25lIiBkPSJNMCAwaDE2djE2SDB6Ii8+DQogICAgPHBhdGggZD0ibS40IDMgMyA0IDYtNiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMy4xIDQuNSkiIHN0eWxlPSJzdHJva2U6IzJjOTBkOTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjEuNXB4O2ZpbGw6bm9uZSIvPg0KPC9zdmc+DQo=) no-repeat;
+    background-position: center right 0px;
+    border: none;
+}
+</style>

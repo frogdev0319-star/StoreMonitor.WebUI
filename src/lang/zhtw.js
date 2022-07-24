@@ -106,6 +106,8 @@ export default{
       //神秘客
       "generalMode":"一般模式",
       "mimicMode":"神秘客模式",
+      "MysterioManage":"神秘客權限",
+      "MysterioSetting":"新增權限群組",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -1359,6 +1361,17 @@ export default{
       "editAuditFail":"重送簽核失敗",
       "auditReport":"簽核紀錄表"
     }
+  },
+  "mysterio":{
+    "searchPlaceholder":"請輸入關鍵字搜尋用戶",
+    "addMysterio":"新增神秘客",
+    "userName":"用戶名稱",
+    "email":"信箱",
+    "position":"職務",
+    "storeAuth":"門店權限",
+    "lastUpdateTime":"最後更新時間",
+    "addPersonTitle":"加入人員至神秘客",
+    "storeAuthSetting":"門店權限設定"
   }
 
 }

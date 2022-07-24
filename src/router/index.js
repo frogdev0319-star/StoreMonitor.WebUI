@@ -516,6 +516,25 @@ export const navbarRoute = {
         hidden: true,
       }
     ) && primaryPathesList.push('/workflows', '/workflowDetail', '/workflownode', '/createWorkflow');
+    !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
+      {
+        path: '/mysterio',
+        name: 'MysterioManage',
+        isReadOnly: false,
+        component: resolve => require(['@/views/setting/mysterio/MysterioManage'], resolve),
+        hidden: false,
+        meta: {
+          keepAlive: false, // the component is't to be cache.
+          requireAuth: true
+        }
+      },
+      {
+        path: '/mysterioSetting',
+        name: 'MysterioSetting',
+        component: resolve => require(['@/views/setting/mysterio/MysterioSetting'], resolve),
+        hidden: true,
+      },
+    ) && primaryPathesList.push('/mysterio', '/mysteriosetting');
     return systemSettingRoute;
   },
 

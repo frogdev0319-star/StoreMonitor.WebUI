@@ -228,7 +228,7 @@
                 <el-dropdown-item
                   class="dropdown-item"
                   style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
-                  @click.native="changeMimicMode">{{mimicMode? $t('route.generalMode'):$t('route.mimicMode') }}</el-dropdown-item>
+                  @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}</el-dropdown-item>
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
@@ -326,7 +326,7 @@ export default {
       isMobile: false,
       brandDisabled: false,
       showIgnoreItem:false,
-      mimicMode:false,
+      showMimicMode:false,
     };
   },
 
@@ -492,7 +492,7 @@ export default {
       this.getBread();
     },
     mimicMode(){
-      this.mimicMode = this.$store.getters.mimicMode;
+      this.showMimicMode = this.$store.getters.mimicMode;
     }
   },
   created() {
@@ -521,14 +521,14 @@ export default {
         );
       });
     }
-    this.mimicMode = this.$store.getters.mimicMode;
+    this.showMimicMode = this.$store.getters.ShowMimicMode;
   },
 
   methods: {
     changeMimicMode(){
-      var mode = !this.mimicMode;
-      this.mimicMode = !this.mimicMode;
-      PermissionHelper.setShowMimicMode(this.mimicMode);
+      var mode = !this.showMimicMode;
+      this.showMimicMode = !this.showMimicMode;
+      PermissionHelper.setShowMimicMode(this.showMimicMode);
       this.$store.dispatch('setMimicMode', mode);
       this.changeRoutes();
     },
@@ -786,6 +786,12 @@ export default {
           paths: ["/reinspect/confirmrein", "/reinspect/submit"],
           parentBread: { path: "/reinspection", name: "remotePatrol" },
         },
+        //神秘客
+        {
+          paths: ["/mysterioSetting"],
+          parentBread: { path: "/mysterio", name: "MysterioManage" },
+        },
+
       ];
       const pathAndBreadMap = pathAndBreadMaps.find((map) =>
         map.paths.includes(currentRoute)

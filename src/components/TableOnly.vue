@@ -732,6 +732,7 @@ export default {
     padding:0;
     width:100px;
   }
+  
 </style>
 
 <style lang="scss">
@@ -768,6 +769,55 @@ export default {
 /deep/ #el-tablescrollbar .el-scrollbar__wrap {
   overflow-x: auto;
 }
+/deep/
+    .el-table
+    .el-table__header-wrapper
+    .el-table-column--selection
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #acaeb1;
+      background-color: #edf0f2;
+      &::before{
+        display:none;
+      }
+    }
+    /deep/
+    .el-table
+    .el-table__header-wrapper
+    .el-table-column--selection
+    .is-checked
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #2c90d9;
+      background-color: #2c90d9;
+    }
+    /deep/
+    .el-table
+    .el-table__body-wrapper
+    .el-table-column--selection
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #acaeb1;
+      background-color: #fff;
+    }
+    /deep/
+    .el-table
+    .el-table__body-wrapper
+    .el-table-column--selection
+    .is-checked
+    .el-checkbox__inner 
+    {
+      border-radius: 1px;
+      border: solid 1px #2c90d9;
+      background-color: #e0f2ff;
+      color:#2c90d9;
+      &::after{
+       border-color:#2c90d9;
+      }
+    }
 </style>
 
 <style lang="sass" >
