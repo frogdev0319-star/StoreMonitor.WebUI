@@ -42,7 +42,7 @@
             <div class="img-content">
               <i class="el-icon-close icondelete" @click="deleteImg({item:pdfItem,index})" />
               <div class="pdf-content">
-                <span>{{pdfItem.fileName}}</span>
+                <span>{{pdfItem.showName}}</span>
               </div>
             </div>
           </div>
@@ -1512,7 +1512,8 @@ export default {
       const self = this;
       const maxSize = 4*1024*1024; //不能超過4MB
       var files = e.target.files || e.dataTransfer.files;
-      //console.log("choose file:",files);
+      console.log("choose file:",files);
+      var fileName = files[0].name;
       if (!files.length)
         return;
       if(self.auditFileCount==10){
@@ -1534,10 +1535,12 @@ export default {
         self.createFile(files[0],objImg);
         self.imgFileList.push(objImg);
       }else if(files[0].type.includes("pdf")){
+        console.log("choose file:",fileName);
         var objpdf={
           fileName:`${self.bucketPdf}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${files[0].name}`,
+          showName:files[0].name,
           src:'',
-          file:'',
+          file:fileName,
           type:'pdf',
           size:files[0].size,
         }

@@ -445,8 +445,10 @@ export default {
         { curPath: ["/workflownode"], activePath: "/workflowDetail" },
         { curPath: ["/auditDetail"], activePath: "/audit" },
         { curPath: ["/auditHandling"], activePath: "/waitaudit" },
-
-
+        { curPath: ["/audit/auditDetail/reportdetails"], activePath: "/auditDetail" },
+        { curPath: ["/audit/auditHandling/reportdetails"], activePath: "/auditHandling" },
+        //神秘客
+        { curPath: ["/mysterioSetting"], activePath: "/mysterio" },
 
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));

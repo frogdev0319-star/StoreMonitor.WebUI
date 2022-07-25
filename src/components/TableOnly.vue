@@ -43,7 +43,7 @@
       />
       <el-table-column
         v-for="(_item,_index) in columnData"
-        :key="_index"
+        :key="_item.label+_index"
         :prop="_item.prop"
         :label="_item.label"
         :sortable="canSortable&&!isexportPDF ? _item.sortable : false"
