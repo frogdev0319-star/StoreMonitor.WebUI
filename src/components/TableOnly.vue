@@ -590,8 +590,6 @@ export default {
     },
 
 
-    
-
     handleSelectionChange(val){
       console.log('val 1', val)
       this.rows = val
@@ -616,7 +614,7 @@ export default {
     },
 
     fromInputSelect(data){
-      console.log('data~~~>', data)
+      // console.log('data~~~>', data)
       var temp = []
       this.tableData.forEach(element => {
         data.forEach( i =>{
@@ -625,12 +623,11 @@ export default {
           }
         })
       });
+      this.$refs.tablePagination.clearSelection()
       temp.forEach(row => {
-        this.$refs.tablePagination.toggleRowSelection(row);
+        this.$refs.tablePagination.toggleRowSelection(row, true);
       });
-
     }
-    
   }
 };
 </script>

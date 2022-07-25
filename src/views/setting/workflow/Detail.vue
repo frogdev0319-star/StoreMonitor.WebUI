@@ -350,7 +350,7 @@ export default {
         },
       ],
       userData:[],
-      searchUserData:[],
+      // searchUserData:[],
       inputSearchUser: '',
 
     
@@ -452,53 +452,79 @@ export default {
       multipleSelection: []
       
     };
-  },
+  }, 
+
+ 
   watch:{
 
-    ccToUSer(val){
-      console.log('val', val)
-      console.log('this.ccToUSer', this.ccToUSer)
-    },
-
+   
     // for search
-    inputSearchUser(val){
-      console.log('inputSearchUser', val)
-      console.log(' this.temp',  this.temp)
+    // inputSearchUser(val){
+    //   console.log('inputSearchUser', val)
+    //   console.log(' this.temp',  this.temp)
     
-      this.searchUserData = this.temp.filter(item => 
-        item.email.indexOf(val) > -1 || item.userName.indexOf(val) > -1 
-      )
-    },
+    //   this.searchUserData = this.temp.filter(item => 
+    //     item.email.indexOf(val) > -1 || item.userName.indexOf(val) > -1 
+    //   )
+    // },
 
-    curTemplateDepartment(val){
-      if(val !== ''){
-        this.temp = this.userInfo
-        this.searchUserData = this.temp.filter(item => item.sector == val )
-        console.log(' this.temp',  this.temp)
-      } 
-    },
+    // curTemplateDepartment(val){
+    //   if(val !== ''){
+    //     this.temp = this.userInfo
+    //     this.searchUserData = this.temp.filter(item => item.sector == val )
+    //     console.log(' this.temp',  this.temp)
+    //   } 
+    // },
 
-    curTemplateTitleList(val){
-      if(val !== ''){
-        this.temp = this.searchUserData
-        this.searchUserData = this.temp.filter(item => item.title == val )
-      } 
-    },
+    // curTemplateTitleList(val){
+    //   if(val !== ''){
+    //     this.temp = this.searchUserData
+    //     this.searchUserData = this.temp.filter(item => item.title == val )
+    //   } 
+    // },
+  
+ 
 
   },
+  computed: {
+    
+    searchUserData: {
+      get(){
+        return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
+      },
+      // set(val){
+      //   console.log('val!?!?!~~~~~>>>', val)
+      //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
+			// }
+    }
 
+  },
   mounted() {
-    this.showingSearchUser = false
+    this.searchUserData = this.userData
   },
 
   async created() {
     await this.init()
-    
-
-
   },
   methods: {
-    
+
+    filterInputSearchUser(users){
+        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 )
+    },
+    filterCurTemplateDepartment(users){
+        if(this.curTemplateDepartment.length == 0){
+          return users
+        }else{
+          return users.filter(item => item.sector == this.curTemplateDepartment )
+        }
+    },
+    filterCurTemplateTitleList(users){
+      if(this.curTemplateTitleList.length == 0){
+        return users
+      }else{
+        return users.filter(item => item.title == this.curTemplateTitleList )
+      }
+    },    
     handleOrderedAuditNodeArray(obj){
       console.log('object :>> ', obj);
       this.nodeDataToApi.orderedAuditNodeArray.forEach(row =>{
@@ -769,10 +795,12 @@ export default {
 
 
     confirmSearchUsersDialog(){
-        console.log('this.multipleSelection', this.multipleSelection)
+        console.log('this.ccToUSer ~~~~~~~>', this.ccToUSer)
+        console.log('this.multipleSelection ~~~~~~~>', this.multipleSelection)
         this.ccToUSer = this.multipleSelection.map( i => i = i.userId)
         this.showingSearchUser = false
     },
+
 
     // 關閉 lightbox
     hideSearchUsersDialog(key){
@@ -784,8 +812,8 @@ export default {
       // 清除所有勾選
       this.$refs.usersList.clear()
       this.ccToUSer = []
-
     },
+
 
     confirmDeleteSingle(id){
       console.log('Let me delete value', id);
@@ -868,18 +896,19 @@ export default {
             if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
           })
         })
-        this.searchUserData = this.userData
-        this.temp = this.searchUserData
-
-
+      var data = this.ccToUSer
+      console.log('data', data)
       // 等待 dialog 生成
       if(this.ccToUSer.length > 0){
         setTimeout(() => {
-          var data = this.ccToUSer
           this.$refs.usersList.fromInputSelect(data)
         }, 0);
       }
     },
+
+
+
+
     //保存並發布
     submit() {
       
