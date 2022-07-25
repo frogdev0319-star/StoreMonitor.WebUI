@@ -108,16 +108,16 @@ export default {
             'prop': 'userName',
             'label': this.$t('mysterio.userName'),
             'sortable': true,
-            'width': 100,
-            'maxWidth': 100,
+            'width': 200,
+            'maxWidth': 200,
             'isExpand': false
           },
           {
             'prop': 'email',
             'label': this.$t('mysterio.email'),
             'sortable': false,
-            'width': 250,
-            'maxWidth': 250,
+            'width': 300,
+            'maxWidth': 300,
             'isExpand': false
           },
           {
@@ -132,8 +132,8 @@ export default {
             'prop': 'storeAuth',
             'label': this.$t('mysterio.storeAuth'),
             'sortable': false,
-            'width': 30,
-            'maxWidth': 30,
+            'width': 50,
+            'maxWidth': 50,
             'isExpand': false
           },
           {
@@ -161,16 +161,16 @@ export default {
             'prop': 'userName',
             'label': this.$t('mysterio.userName'),
             'sortable': true,
-            'width': 100,
-            'maxWidth': 100,
+            'width': 200,
+            'maxWidth': 200,
             'isExpand': false
           },
           {
             'prop': 'email',
             'label': this.$t('mysterio.email'),
             'sortable': false,
-            'width': 250,
-            'maxWidth': 250,
+            'width': 360,
+            'maxWidth': 360,
             'isExpand': false
           },
           {
@@ -220,11 +220,25 @@ export default {
             this.getUserInfolist();
         },
         getMysterioList(){
-            console.log("getMysterioList");
+            const self = this;
+            mysteroRESTful.getMysterioList().then(res=>{
+              var mysterioData = [];
+              if(res.errCode == 0){
+                res.data.map(item =>{
+                  let obj = {
+
+                  }
+                })
+              }else{
+                console.log("getMysterioList error",errMsg);
+              }
+              self.isLoadingData = false;
+            })
             //util.getDateStr(task.processLastUpdateTs)
-            //this.tableData.push({userName:'Rainney',email:"rainney.chen@advantech.com.tw",position:"系統管理員",storeAuth:"1",updateTs:"2022/07/19 16:48"});
+            this.tableData.push({userId:"qqMQyf9LPE0k",userName:'Rainney',email:"rainney.chen@advantech.com.tw",position:"系統管理員",storeAuth:"1",updateTs:"2022/07/19 16:48"});
             this.isLoadingData = false;
         },
+
         addNewMysterioPerson(){
             this.getUserInfolist();
             this.showAddPersionDialog=true;
@@ -249,7 +263,7 @@ export default {
             }
         },
         goSettingPage(row){
-            this.$router.push({name: 'MysterioSetting',params:{}});
+            this.$router.push({name: 'MysterioSetting',params: {userId:row.userId}});
         },
         currentChange(val) {
             const self = this;
