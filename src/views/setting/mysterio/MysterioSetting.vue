@@ -43,7 +43,7 @@
                             v-model="item.inspectTagId"
                             placeholder="请选择"
                             :disabled="item.tagDisable"
-                            @change="onChangeSelectedInspect(item,index)"
+                            @change="onChangeSelectedInspect(item.inspectTagId,index)"
                             size="mini">
                             <el-option-group
                                 v-for="group in storeDataList[item.selStoreIndex].inspectList"
@@ -191,7 +191,7 @@ export default {
             }
         },
         onChangeSelectedInspect(val,idx){
-            console.log("onChangeSelectedInspect idx:",idx);
+            console.log("onChangeSelectedInspect val:",val);
             this.storeSettingArray[idx].incepId = val;
             this.storeSettingArray[idx].buttonDisabled = false;
         },
