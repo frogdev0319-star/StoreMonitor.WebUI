@@ -326,15 +326,6 @@ export default{
                       'isExpand': false
                     },
                     {
-                      'prop': 'taskOwner',
-                      'label': this.$t('audit.sendAudit.owner'),
-                      'sortable': true,
-                      'width': 65,
-                      'maxWidth': 65,
-                      'minWidth': 65,
-                      'isExpand': false
-                    },
-                    {
                       'prop': 'operator',
                       'label': this.$t('audit.sendAudit.operation'),
                       'sortable': false,

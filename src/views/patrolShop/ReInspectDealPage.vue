@@ -5,7 +5,7 @@
         <img :src="isSuccess?sucSrc:errSrc" class="suc-icon">
         <div>
           <p class="workflowInfo">{{isSuccess?$t('audit.inceptionRpt.submitSucess'):$t('audit.inceptionRpt.submitFail')}}</p>
-          <p v-if="isSuccess" class="workflowInfo">{{$t('audit.inceptionRpt.goWorkflow')}}</p>
+          <p v-if="isSuccess && isBindWorkflow" class="workflowInfo">{{$t('audit.inceptionRpt.goWorkflow')}}</p>
           <div v-if="isSuccess" class="backBtn-area" style="justify-content: center;">
             <el-button 
               class="storevue-button-search"

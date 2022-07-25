@@ -953,7 +953,7 @@ export default {
   }
 </style>
 
-<style lang="sass">
+<style lang="sass" scoped>
   .audit-user-row
     display: flex
     flex-wrap: wrap
