@@ -1189,10 +1189,10 @@ export default {
       if (PatrolHistory.hasIgnoretemp.length === 0) {
         self.notShowAlert = true;
       }
+      self.isBindWorkflow = PatrolHistory.isBindWorkflow;
       if(PatrolHistory.isEditReport){
         self.reportId = PatrolHistory.reportId;
         self.isEditReport = PatrolHistory.isEditReport;
-        self.isBindWorkflow = PatrolHistory.isBindWorkflow;
         self.auditState = PatrolHistory.auditState;
         self.auditCancelable = PatrolHistory.auditCancelable;
       }
