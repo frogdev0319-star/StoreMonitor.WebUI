@@ -1709,6 +1709,7 @@ export default {
         backSheetGroup:self.backSheetGroup,
         activeIndex : 0,
         store:self.reportData.storeId,
+        auditCancelable:self.showCancelBtn,
         //hasIgnoretemp:[],//略過的巡檢項內容
         //inspectItemList:[], //當下巡檢項內容
         eventList:await self.doGetFeebackItem(), ////問題回饋內容 info.feedback"
