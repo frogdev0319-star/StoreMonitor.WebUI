@@ -1752,7 +1752,7 @@ export default {
       const self = this;
       CancelWorkflow({inspectReportId:self.report.reportId}).then(res=>{
         if(res.errCode==0){
-          self.$router.push({ name: 'SendAuditManage' });
+          self.$router.push({ name: 'SendAuditManage',params:{curTabIndx:2} });
           this.cancelAuditDialogShow=false;
         }else{
           this.cancelAuditDialogShow=false;
