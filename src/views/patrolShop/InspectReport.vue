@@ -1709,6 +1709,7 @@ export default {
         backSheetGroup:self.backSheetGroup,
         activeIndex : 0,
         store:self.reportData.storeId,
+        auditCancelable:self.showCancelBtn,
         //hasIgnoretemp:[],//略過的巡檢項內容
         //inspectItemList:[], //當下巡檢項內容
         eventList:await self.doGetFeebackItem(), ////問題回饋內容 info.feedback"
@@ -1752,7 +1753,7 @@ export default {
       const self = this;
       CancelWorkflow({inspectReportId:self.report.reportId}).then(res=>{
         if(res.errCode==0){
-          self.$router.push({ name: 'SendAuditManage' });
+          self.$router.push({ name: 'SendAuditManage',params:{curTabIndx:2} });
           this.cancelAuditDialogShow=false;
         }else{
           this.cancelAuditDialogShow=false;

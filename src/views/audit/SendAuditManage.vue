@@ -438,13 +438,14 @@ export default{
             //this.params.beginTs = this.dateValue[0].valueOf();
             //this.params.endTs = this.dateValue[1].valueOf();
             // console.log('EventMange > getSearchParams > searchParams:', searchParams);
+            console.log("this.$route.params.curTabIndx:",this.$route.params.curTabIndx);
             if (Object.keys(searchParams).length > 0) {
                 this.storeFilterObj = searchParams;
                 this.inputSearchValue = searchParams.inputSearchValue;
                 //this.curState = searchParams.curState;
                 this.curStoreIds = searchParams.filterStoreIds;
-                this.curTabIndx = searchParams.curTabIndx;
-                this.activeName = searchParams.curTabIndx.toString();
+                this.curTabIndx = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx:searchParams.curTabIndx;
+                this.activeName = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx.toString():searchParams.curTabIndx.toString();
                 this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
                 this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processLastUpdateTs'}:searchParams.order;
                 this.defaultSort = {order:(this.curOrder.direction=='desc')?'descending':'ascending',prop:this.curOrder.property};
@@ -452,6 +453,8 @@ export default{
                 //this.saveSearchParams();
             } else {
                 this.searchParams = {};
+                this.curTabIndx = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx:0;
+                this.activeName = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx.toString():'0';
                 this.curStoreIds = this.storeFilterObj.filterStoreIds;
                 this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
                 //this.params.beginTs = this.dateValue[0].valueOf();

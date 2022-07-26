@@ -819,7 +819,7 @@ export default {
     fedlogout() {
       Database.destoryDB();
       const url = sessionStorage.getItem("LoginURL");
-      // window.location.href = url;
+      window.location.href = url;
       this.$router.push({ name: 'Login'})
 
     },

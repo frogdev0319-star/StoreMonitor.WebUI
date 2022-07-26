@@ -1189,10 +1189,10 @@ export default {
       if (PatrolHistory.hasIgnoretemp.length === 0) {
         self.notShowAlert = true;
       }
+      self.isBindWorkflow = PatrolHistory.isBindWorkflow;
       if(PatrolHistory.isEditReport){
         self.reportId = PatrolHistory.reportId;
         self.isEditReport = PatrolHistory.isEditReport;
-        self.isBindWorkflow = PatrolHistory.isBindWorkflow;
         self.auditState = PatrolHistory.auditState;
         self.auditCancelable = PatrolHistory.auditCancelable;
       }
@@ -1208,6 +1208,7 @@ export default {
       self.curInspectId = BackPatrolParam.tagId;
       self.showGuide = false;
       self.isDisabled = true;
+      console.log("BackPatrolParam.auditCancelable:",BackPatrolParam.auditCancelable);
       self.auditCancelable = BackPatrolParam.auditCancelable;
     } else {
       self.getAllStore();
@@ -1971,22 +1972,22 @@ export default {
             for(var secCatIdx in tabIncep.children){
                 var secCat = tabIncep.children[secCatIdx];
                 var childIdx = 0;
-                console.log("secCat:",secCat);
+                //console.log("secCat:",secCat);
 
-                console.log("secSheetCat:",secSheetCat);
+                //console.log("secSheetCat:",secSheetCat);
                 var sheetItem = secSheetCat.find((sec,idx) => {
                   if(sec.groupId==secCat.groupId){
                       childIdx = idx;
                       return sec;
                   }
                 });
-                console.log("sheetItem:",sheetItem);
+                //console.log("sheetItem:",sheetItem);
                 
                 sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,secCat.cateryItems,sheetItem.type);
                 sheet.inspectList[childIdx].items.forEach(it=>{
                   dealCount += it.inputCount;
                 });
-                console.log("1.dealCount:",dealCount);
+                //console.log("1.dealCount:",dealCount);
                 
             }
             //sheet.dealCount = dealCount;
@@ -2003,7 +2004,7 @@ export default {
             sheet.inspectList[childIdx].items.forEach(it=>{
                   dealCount += it.inputCount;
             });
-            console.log("2.dealCount:",dealCount);
+            //console.log("2.dealCount:",dealCount);
             
           }
           sheet.dealCount = dealCount;
@@ -2011,7 +2012,7 @@ export default {
       })
       ).then(result =>{
         self.isDisabled = true;
-        console.log("2.this.sheetName:",this.sheetName)
+        //console.log("2.this.sheetName:",this.sheetName)
       });
     },
     doGetcateryItems(sheetItem,cateryItems,type){ //type:0:合格率評分 1:巡檢評分項 2:附加評分項
@@ -2030,6 +2031,7 @@ export default {
           sheetItem[i].inputCount++;
           dealCount++;
           if(!this.auditCancelable && cateryItems[i].grade==0){//不能取消且不合格，不能編輯
+            console.log("不能取消，不能編輯不合格項");
             sheetItem[i].notEdit = true;
           }
           console.log("sheetItem[i]",sheetItem[i]);
@@ -2065,7 +2067,7 @@ export default {
               }
             att.push(attFile);
           }
-          console.log("sourceList:",attFile);
+          //console.log("sourceList:",attFile);
           sheetItem[i].sourceList = att;
         }
       } 

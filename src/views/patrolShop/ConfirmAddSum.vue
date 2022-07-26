@@ -430,7 +430,7 @@ import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,taskSummit,getReport
 import util from '@/common/util';
 import { getCookie } from '@/common/auth';
 import { getDepartmentList } from '@/api/checkin';
-import { getUserInfo } from '@/api/login';
+import { getUserInfo ,getAllUserInfoNoAuth} from '@/api/login';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
 
@@ -1582,7 +1582,7 @@ export default {
       var wfi = {copyToUsers:"",nextAuditUser:""}
       const workflowPromise = getWorkflowInfo({processDefinitionKey:workflow.processDefinitionKey});
       const userPosition = getDepartmentList({ type: 0 }); //取得職務
-      const userPromise = getUserInfo();
+      const userPromise = getAllUserInfoNoAuth();
       try {
         const result = await Promise.all([userPosition, userPromise, workflowPromise]);
         this.userDataList = result[1].data;
