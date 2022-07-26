@@ -591,7 +591,7 @@ export default {
 
 
     handleSelectionChange(val){
-      console.log('val 1', val)
+      // console.log('val 1', val)
       this.rows = val
       this.$emit('handleSelectionChange',{val});
     },
@@ -601,9 +601,9 @@ export default {
     },
 
     toggleChecked(tag){
-      console.log('unChecked')
-      console.log('tag !!!', tag)
-      console.log('this.tableData !!!', this.tableData)
+      // console.log('unChecked')
+      // console.log('tag !!!', tag)
+      // console.log('this.tableData !!!', this.tableData)
 
       var row = this.tableData.filter(element => 
           element.userName == tag.userName

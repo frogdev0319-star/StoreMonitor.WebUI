@@ -80,7 +80,7 @@
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
-                      placement="bottom-end">
+                      placement="bottom-start">
                       <div slot="content">{{$t('audit.workFlows.rule_countersigned')}}</div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
@@ -89,7 +89,7 @@
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
-                      placement="bottom-end">
+                      placement="bottom-start">
                       <div slot="content">{{$t('audit.workFlows.rule_coSign')}}</div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
