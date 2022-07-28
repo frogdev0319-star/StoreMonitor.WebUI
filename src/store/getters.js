@@ -26,5 +26,6 @@ const getters = {
   editCount_storeMonitor: state => state.user.editCount_storeMonitor,
   favoriteList:state => state.user.favoriteList,
   mimicMode:state => state.user.mimicMode,
+  isMystery:state => state.user.isMystery,
 };
 export default getters;

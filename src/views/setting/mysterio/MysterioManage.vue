@@ -30,14 +30,15 @@
                 :is-loading-data="isLoadingData"
                 :allowRowExpand = "false"
                 :showBorder = "false"
-                :default-sort = "{prop: 'userName', order: 'ascending'}"
+                :default-sort = "defaultSort"
                 :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
                 :tableHeight = "760"
                 :cellStyle="{backgroundColor: '#fff !important'}"
-                @handleOperation="handleOperation"                                  
+                @handleOperation="handleOperation"  
+                @sortChange="handleSortChange"                                
             />
         </div>
-        <!--<div style="width:100%; margin-top:12px;height:31px;">
+        <div style="width:100%; margin-top:12px;height:31px;">
             <tbl-pagination-only
                 :btn-style="{backgroundColor:'transparent'}"
                 :total="total"
@@ -47,7 +48,7 @@
                 @sizeChange="sizeChange"
                 @currentChange="currentChange"
             />
-        </div>-->
+        </div>
         <dialog-pop
             :is-form="true"
             :title="$t('mysterio.addPersonTitle')"
@@ -79,6 +80,13 @@
                 @selection-change="selectionChanged">
               </table-only>
             </div>
+        </dialog-pop>
+        <dialog-pop
+            :title="$t('mysterio.comfirmDelMysterio')"
+            :isWarning="true"
+            :visible="showShowConfirmDialog"
+            @cancelHandler = "onCancelDelete"
+            @confirmHandler="onConfirmDelete">
         </dialog-pop>
     </div>
 </template>
@@ -115,7 +123,7 @@ export default {
           {
             'prop': 'email',
             'label': this.$t('mysterio.email'),
-            'sortable': false,
+            'sortable': true,
             'width': 300,
             'maxWidth': 300,
             'isExpand': false
@@ -131,7 +139,7 @@ export default {
           {
             'prop': 'storeAuth',
             'label': this.$t('mysterio.storeAuth'),
-            'sortable': false,
+            'sortable': true,
             'width': 50,
             'maxWidth': 50,
             'isExpand': false
@@ -154,6 +162,11 @@ export default {
                 lable: '',
                 icon: 'icon-setting',
                 methods: 'set'
+            },
+            {
+              lable: '',
+              icon: 'icon-delete',
+              methods: 'delete'
             }
           ]
         },
@@ -168,7 +181,7 @@ export default {
           {
             'prop': 'email',
             'label': this.$t('mysterio.email'),
-            'sortable': false,
+            'sortable': true,
             'width': 360,
             'maxWidth': 360,
             'isExpand': false
@@ -186,11 +199,15 @@ export default {
         total:0,
         curPage:1,
         curSizeNum:10,
+        defaultSort:{prop: 'userName', order: 'ascending'},
         showAddPersionDialog:false,
         positionsList:[],
         userList:[],
         selectedUserList:[],
         selUserIds:[],
+        allUserList:[],
+        showShowConfirmDialog:false,
+        delUserId:null,
       };
     },
 
@@ -212,73 +229,16 @@ export default {
     },
 
     created() {
+      this.init();
+    },
+    mounted(){
       this.getMysterioList();
     },
-
     methods: {
-        init(){
-            this.getUserInfolist();
+        async init(){
+          await this.getUserInfolist();
+          this.getMysterioList();
         },
-        getMysterioList(){
-            const self = this;
-            mysteroRESTful.getMysterioList().then(res=>{
-              var mysterioData = [];
-              if(res.errCode == 0){
-                res.data.map(item =>{
-                  let obj = {
-
-                  }
-                })
-              }else{
-                console.log("getMysterioList error",errMsg);
-              }
-              self.isLoadingData = false;
-            })
-            //util.getDateStr(task.processLastUpdateTs)
-            this.tableData.push({userId:"qqMQyf9LPE0k",userName:'Rainney',email:"rainney.chen@advantech.com.tw",position:"系統管理員",storeAuth:"1",updateTs:"2022/07/19 16:48"});
-            this.isLoadingData = false;
-        },
-
-        addNewMysterioPerson(){
-            this.getUserInfolist();
-            this.showAddPersionDialog=true;
-        },
-        
-        handleOperation({ method, row }) {
-            console.log('List row =====>> ', row);
-            switch(method){
-                case 'copy':{
-                break;
-                }
-                case 'set':{
-                    this.goSettingPage(row)
-                break;      
-                }
-                case 'delete':{
-                break;      
-                }
-                default: {
-                break;
-                }
-            }
-        },
-        goSettingPage(row){
-            this.$router.push({name: 'MysterioSetting',params: {userId:row.userId}});
-        },
-        currentChange(val) {
-            const self = this;
-            self.curPage = val.page;
-            //self.params.filter = { page: val.page - 1, size: self.sizeNum };
-            self.getMysterioList();
-        },
-
-        sizeChange(val) {
-            const self = this;
-            self.curSizeNum = val.size;
-            self.curPage = 1;
-            self.getMysterioList();
-        },
-        //Dialog content
         async getUserInfolist() {
             const userPosition = getDepartmentList({ type: 1 }); //取得職務
             const userPromise = getUserInfo();//userList
@@ -302,30 +262,140 @@ export default {
               this.positionsList.push(departmentJson);
             });
         },
-
         getUserList(data) {
-            this.userList = [];
+            this.allUserList = [];
             var tempUserList = [];
             data.map(user => {
-                var tempU = this.selectedUserList.find(temp=>temp.userId == user.userId);
-                if(typeof tempU=='undefined'){
-                    const userJson = {};
-                    userJson.userName = user.userName;
-                    userJson.userId = user.userId;
-                    userJson.email = user.email;
-                    userJson.position = "";
-                    var position = this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
-                    //console.log("position:",position)
-                    if(position){
-                        userJson.position = position.label;
-                    }
-                    //this.userList.push(userJson);
-                    tempUserList.push(userJson);
-                }
-                
+              const userJson = {};
+              userJson.userName = user.userName;
+              userJson.userId = user.userId;
+              userJson.email = user.email;
+              userJson.position = "";
+              var position = this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
+              //console.log("position:",position)
+              if(position){
+                  userJson.position = position.label;
+              }
+              tempUserList.push(userJson);
             });
-            this.userList = tempUserList;
-            this.userTableData = tempUserList;
+            this.allUserList = tempUserList;
+        },
+        doMapUser(userId){
+          console.log("allUserList:",this.allUserList);
+          return this.allUserList.find(user => user.userId == userId);
+        },
+        getMysterioList(){
+            const self = this;
+            const params={
+              filter:{
+                page:this.curPage-1,
+                size:this.curSizeNum
+              },
+              order:{
+                direction:this.defaultSort.order=='ascending'? 'asc':'desc',
+                property:this.defaultSort.prop,
+              }
+            }
+            mysteroRESTful.getMysterioMemberList(params).then(res=>{
+              var mysterioData = [];
+              if(res.errCode == 0){
+                res.data.content.map(item =>{
+                  //const mapUser = self.doMapUser(item.userId);
+                  //console.log("mapUser:",mapUser);
+                  let obj = {...item};
+                  obj['updateTs']=util.getDateStr(item.updateTime),
+                  obj['storeAuth']=item.permissionStores,
+                  mysterioData.push(obj);
+                  this.selectedUserList.push(obj);
+                });
+                this.tableData = mysterioData;
+              }else{
+                util.notify(self.$t('mysterio.getMysterioMemberFail'), 'error', 3000);
+              }
+              self.isLoadingData = false;
+            }).catch(err=>{
+              console.log("getMysterioList error",err);
+              util.notify(self.$t('mysterio.getMysterioMemberFail')+',error:'+err, 'error', 3000);
+              this.isLoadingData = false;
+            });
+            //util.getDateStr(task.processLastUpdateTs)
+            //this.tableData.push({userId:"qqMQyf9LPE0k",userName:'Rainney',email:"rainney.chen@advantech.com.tw",position:"系統管理員",storeAuth:"1",updateTs:"2022/07/19 16:48"});
+            //this.isLoadingData = false;
+        },
+        handleOperation({ method, row }) {
+            console.log('List row =====>> ', row);
+            switch(method){
+                case 'copy':{
+                break;
+                }
+                case 'set':{
+                  this.goSettingPage(row);
+                break;      
+                }
+                case 'delete':{
+                  this.deleteMysterioMember(row);
+                break;      
+                }
+                default: {
+                break;
+                }
+            }
+        },
+        goSettingPage(row){
+          this.$router.push({name: 'MysterioSetting',params: {userId:row.userId}});
+        },
+        deleteMysterioMember(row){
+          this.delUserId = row.userId;
+          this.showShowConfirmDialog = true;
+        },
+        onCancelDelete(){
+          this.showShowConfirmDialog = false;
+        },
+        onConfirmDelete(){
+          const self= this;
+          mysteroRESTful.removeMysterioPerson({userId:this.delUserId}).then(res=>{
+            if(res.errCode==0){
+              self.getMysterioList();
+            }else{
+              util.notify(self.$t('mysterio.delMysterioMemberFail'), 'error', 3000);
+            }
+            self.showShowConfirmDialog = false;
+          });
+        },
+        handleSortChange(order, defaultSort) {
+          this.defaultSort = { ...defaultSort };
+          //this.order = this.params.order = order;
+          this.getMysterioList();
+        },
+        currentChange(val) {
+            const self = this;
+            self.curPage = val.page;
+            //self.params.filter = { page: val.page - 1, size: self.sizeNum };
+            self.getMysterioList();
+        },
+
+        sizeChange(val) {
+            const self = this;
+            self.curSizeNum = val.size;
+            self.curPage = 1;
+            self.getMysterioList();
+        },
+        //Dialog content
+        addNewMysterioPerson(){
+            this.getAddUserList();
+            this.showAddPersionDialog=true;
+        },
+        getAddUserList(){
+          this.userList = [];
+          var tempUserList = [];
+          this.allUserList.map(user=>{
+            var tempU = this.selectedUserList.find(temp=>temp.userId == user.userId);
+            if(typeof tempU=='undefined'){
+              tempUserList.push(user);
+            }
+          });
+          this.userList = tempUserList;
+          this.userTableData = tempUserList;
         },
         selectionChanged(val){
             var selUserId = [];
@@ -337,25 +407,34 @@ export default {
             this.selUserIds = selUserId;
         },
         confirmAddPersonDialog(){
-            this.selUserIds.map(userId =>{
-                var user = this.userList.find(u=>u.userId==userId);
-                if(user){
-                    var obj={
-                        userId:user.userId,
-                        userName:user.userName,
-                        email:user.email,
-                        position:user.position,
-                        storeAuth:"1",
-                        updateTs:util.getDateStr(Date.now()*1000)
-                    };
-
-                    this.tableData.push(obj);
-                    this.selectedUserList.push(obj);
-                }
+          const self = this;
+            var userIdList=self.selUserIds;
+            self.selUserIds.map(userId =>{
+              var user = this.userList.find(u=>u.userId==userId);
+              if(user){
+                  var obj={
+                      userId:user.userId,
+                      userName:user.userName,
+                      email:user.email,
+                      position:user.position,
+                      storeAuth:"1",
+                      updateTs:util.getDateStr(Date.now()*1000)
+                  };
+                  //this.tableData.push(obj);
+                  this.selectedUserList.push(obj);
+              }
                 
             });
-            this.allTableData = this.tableData;
-            this.showAddPersionDialog = false;
+            console.log("userIdList:",userIdList);
+            mysteroRESTful.addMysterioPerson({userIdList}).then(res=>{
+              if(res.errCode==0){
+                //this.allTableData = this.tableData;
+                self.getMysterioList();
+              }else{
+                util.notify(self.$t('mysterio.addMysterioMemberFail'), 'error', 3000);
+              }
+              this.showAddPersionDialog = false;
+            });
         },
     }
 }

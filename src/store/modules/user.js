@@ -3,6 +3,7 @@ import { getDashServerInfo } from '@/api/device';
 import { getToken, setToken, removeToken, getCookie, setCookie } from '@/common/auth';
 import PermissionHelper from '@/api/PermissionHelper';
 import { resetRouter, constantRoutes, navbarRoute } from '@/router';
+import {isMysteryMode} from  '@/api/mystero'
 
 const user = {
   state: {
@@ -42,6 +43,7 @@ const user = {
     editCount_storeMonitor:0,
     favoriteList:false,
     mimicMode:false,
+    isMystery:false,
   },
 
   mutations: {
@@ -162,6 +164,10 @@ const user = {
     SET_MIMIC_MODE:(state,mode)=>{
       state.mimicMode = mode
     },
+    SET_ISMYSTERY:(state,mode)=>{
+      console.log("SET_ISMYSTERY:",mode);
+      state.isMystery = mode;
+    }
   },
   actions: {
     setEditCount({ commit }, count) {
@@ -366,7 +372,22 @@ const user = {
         }
         resolve(accessedRoutes);
       });
-    }
+    },
+    GetIsMysteryMode({ commit }){
+      console.log("GetIsMysteryMode");
+      return new Promise((resolve, reject) => {
+        isMysteryMode().then(res=>{
+          console.log("GetIsMysteryMode:",res);
+          if(res.errCode==0){
+            commit('SET_ISMYSTERY',res.data.isMysteryModeOn);
+          }
+        });
+        resolve(res.data.isMysteryModeOn);
+      }).catch(error => {
+        reject(error);
+      });
+    },
+
   }
 };
 

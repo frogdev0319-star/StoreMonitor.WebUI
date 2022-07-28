@@ -1369,7 +1369,17 @@ export default{
     "storeAuth":"門店權限",
     "lastUpdateTime":"最後更新時間",
     "addPersonTitle":"加入人員至神秘客",
-    "storeAuthSetting":"門店權限設定"
+    "storeAuthSetting":"門店權限設定",
+    "getMysterioMemberFail":"無法取得神秘客成員列表",
+    "delMysterioMemberFail":"刪除神秘客失敗",
+    "addMysterioMemberFail":"新增神秘客失敗",
+    "addAuth":"新增",
+    "authList":"已新增列表",
+    "authDelete":"刪除",
+    "authExited":"門店、巡檢表已存在",
+    "pleaseChooseStore":"請選擇門店",
+    "pleaseChooseTag":"請選擇巡檢表",
+    "comfirmDelMysterio":"確定刪除此神秘客成員",
   }
 
 }

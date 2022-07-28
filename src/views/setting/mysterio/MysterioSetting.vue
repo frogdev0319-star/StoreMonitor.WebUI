@@ -18,56 +18,89 @@
                     </delay-button>
                 </div>
             </div>
-            <div class="mysterio-body" v-for="(item,index) in storeSettingArray" :key="item.id">
+            <div class="mysterio-body">
                 <div class="store-item">
-                    <span style="color:'#C60957'">*</span>
-                    <div class="item-label">{{$t('remotePatrol.stores')}}</div>
-                    <div class="item-selection shadow-light">
+                    <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('remotePatrol.stores')}}</div>
+                    <div class="item-selection">
                         <el-select
-                            v-model="item.storeId"
-                            @change="onChangeSelectedStore(item.storeId,index)"
+                            v-model="selStoreValue"
+                            @change="onChangeSelectedStore"
                             size="mini">
                             <el-option v-for="(sitem) in storeDataList"
                                 :key="sitem.storeId"
                                 :label="sitem.label"
-                                :value="sitem.storeId"
+                                :value="{value:sitem.storeId,label:sitem.label}"
                         />
                         </el-select>
                     </div>
                 </div>
                 <div class="store-item">
-                    <span style="color:'#C60957'">*</span>
-                    <div class="item-label">{{$t('overview.patrolLists')}}</div>
-                    <div class="item-selection shadow-light">
+                    <div class="item-label"><span style="color:'#C60957'">*</span>{{$t('overview.patrolLists')}}</div>
+                    <div class="item-selection">
                         <el-select
-                            v-model="item.inspectTagId"
-                            placeholder="请选择"
-                            :disabled="item.tagDisable"
-                            @change="onChangeSelectedInspect(item.inspectTagId,index)"
+                            v-model="selInspectVaule"
+                            @change="onChangeSelectedInspect"
                             size="mini">
                             <el-option-group
-                                v-for="group in storeDataList[item.selStoreIndex].inspectList"
+                                v-for="group in storeDataList[selStoreIndex].inspectList"
                                 :key="group.label"
                                 :label="group.label">
                                 <el-option v-for="(sitem) in group.options"
                                     :key="sitem.inspId"
                                     :label="sitem.label"
-                                    :value="sitem.inspId"
+                                    :value="{value:sitem.inspId,label:sitem.label}"
                                 />
                             </el-option-group>
                         </el-select>
                     </div>
                 </div>
-                <el-button class="img-div"
-                    type="primary" 
-                    size="mini"
-                    :disabled="item.buttonDisabled"
-                    @click="(index==storeSettingArray.length-1)?addAuth(index):deleteAuth(item.id)"
-                >
-                    <img class="img-add" :src="(index==storeSettingArray.length-1)? iconAdd:iconDelete" width="40" height="40" />
-                </el-button>
+                <delay-button @click="addAuth" style="margin-left:32px;height:36px; margin-top:35px ;">
+                    <div class="button-area">
+                        <i class="iconfont el-icon-plus"/>
+                        <span>{{$t('mysterio.addAuth')}}</span>
+                    </div>
+                </delay-button>
+            </div>
+            <div class="addList">
+                <div style="border-left:4px solid #2c90d9;text-align: left;margin-bottom:17px ;"><span style="margin-left:12px;">{{$t('mysterio.authList')}}</span></div>
+                <table-only
+                    ref="elTP"
+                    class="table-white"
+                    table-themes="white"
+                    :column-data="columnData"
+                    :table-data="tableData"
+                    :table-operation ="columnOperationData"
+                    :highlight-current-row= "false"
+                    :is-loading-data="isLoadingData"
+                    :allowRowExpand = "false"
+                    :showBorder = "false"
+                    :default-sort = "defaultSort"
+                    :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                    :tableHeight = "760"
+                    :cellStyle="{'backgroundColor': '#fff !important'}"    
+                     @sortChange="handleSortChange"         
+                     @handleOperation="handleOperation"             
+                />
+                <div style="width:100%; margin-top:12px;height:31px;">
+                    <tbl-pagination-only
+                        :btn-style="{'backgroundColor':'transparent'}"
+                        :total="total"
+                        :current-page="curPage"
+                        :page-size="curSizeNum"
+                        layout = "prev,pager, next,sizes,slot"
+                        @sizeChange="sizeChange"
+                        @currentChange="currentChange"
+                    />
+                </div>
             </div>
         </div>
+        <dialog-pop
+            :title="warnningTitle"
+            :isWarning="true"
+            :visible="showItemExitedDialog"
+            @cancelHandler = "onShowItemExitedDialogClose"
+            @confirmHandler="onShowItemExitedDialogClose">
+        </dialog-pop>
     </div>
 </template>
 <script>
@@ -82,7 +115,7 @@ import DialogPop from '@/components/DialogPop';
 
 export default {
     name: 'MysterioSetting',
-    components: {DelayButton,DialogPop },
+    components: {DelayButton,DialogPop,TableOnly,TblPaginationOnly },
     data() {
       return {
         isLoadingData: true,
@@ -91,12 +124,51 @@ export default {
         iconAdd:require('@/../static/img/add_icon.png'),
         storeSettingArray:[],
         storeDataList:[],
+        selStoreValue:{value:null,label:""},
         selStoreId:null,
+        selStoreName:"",
         selStoreIndex:0,
+        selInspectVaule:{value:null,label:""},
         selInspectId:null,
+        selInspecName:"",
         userId:null,
         inspectDisable:true,
-
+        total:0,
+        curPage:1,
+        curSizeNum:10,
+        defaultSort:{prop: 'storeName', order: 'ascending'},
+        allTableData:[],
+        tableData:[],
+        columnData:[{
+            'prop': 'storeName',
+            'label': this.$t('remotePatrol.stores'),
+            'sortable': true,
+            'width': 200,
+            'maxWidth': 200,
+            'isExpand': false
+          },
+          {
+            'prop': 'incetionTag',
+            'label': this.$t('overview.patrolLists'),
+            'sortable': true,
+            'width': 360,
+            'maxWidth': 360,
+            'isExpand': false
+          }],
+          columnOperationData: {
+          label: this.$t('mysterio.authDelete'),
+          minWidth: '50',
+          align: 'left',
+          operation: [
+            {
+              lable: '',
+              icon: 'icon-delete',
+              methods: 'delete'
+            }
+          ]
+        },
+        showItemExitedDialog:false,
+        warnningTitle:"",
       };
     },
 
@@ -122,7 +194,7 @@ export default {
         },
         init(){
             this.getGetStoreData();
-            this.getAuthList();
+            
         },
         getGetStoreData() {
             const self = this;
@@ -167,40 +239,150 @@ export default {
                     storeList.push(storeObj);
                 })).then(res =>{
                     self.storeDataList = storeList;
-                    self.isLoadingData = false;
-                    }
-                )
+                    self.getAuthList();
+                })
             });
         },
+        doMapStoreAndTag(storeId,inspId){
+            var mapData = {storeId:-1,storeName:"",inspId:-1,incetionTag:""};
+            var storeInfo = this.storeDataList.find(store => store.storeId == storeId);
+            if(storeInfo!=null){
+                mapData.storeId = storeInfo.storeId;
+                mapData.storeName = storeInfo.label;
+                var tag=null;
+                tag = storeInfo.inspectList.remote.options.find(it=>it.inspId==inspId);
+                if(tag==null){
+                    tag = storeInfo.inspectList.onSite.options.find(it=>it.inspId==inspId);
+                    if(tag){
+                        mapData.inspId = tag.inspId;
+                        mapData.incetionTag = tag.label;
+                    }
+                }else{
+                    mapData.inspId = tag.inspId;
+                    mapData.incetionTag = tag.label;
+                }
+            }
+            return mapData;
+        },
         getAuthList(){
-            this.storeSettingArray = [
-                {id:1,storeId:"",storeName:"",selStoreIndex:0,incepId:"",incepName:"",tagDisable:true,buttonDisabled:true}
-            ]
+            const self = this;
+            mysteroRESTful.getMysterySetting({userId:this.userId}).then(res=>{
+                var tempAuthLit = [];
+                if(res.errCode==0){
+                    res.data.map(setting=>{
+                        var obj = self.doMapStoreAndTag(setting.storeId,setting.inspectTagId);
+                        obj['id']=setting.id;
+                        tempAuthLit.push(obj);
+                    });
+                }
+                self.allTableData = tempAuthLit;
+                self.total = Math.ceil( self.allTableData.length/self.curSizeNum);
+                self.setDataTable();
+                self.isLoadingData = false;
+            });
+        },
+        setDataTable(){
+            this.orderAllTableData();
+            this.tableData = [];
+            let page = this.curPage;
+            let sizeNum = this.curSizeNum;
+            this.tableData = [...this.allTableData.slice( (page - 1)* sizeNum, page* sizeNum)];
+        },
+        orderAllTableData(){
+            let key = this.defaultSort.prop;
+            key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
+            this.defaultSort.order === 'descending' ? this.allTableData.sort((a,b) => { return b[key] - a[key] })
+                                    : this.allTableData.sort((a,b) => { return a[key] - b[key] });
         },
         saveAuth(){},
-        onChangeSelectedStore(val,idx){
+        onChangeSelectedStore(val){
             console.log("onChangeSelectedStore idx:",val);
             if(val){
-                this.storeSettingArray[idx].tagDisable = false;
-                this.storeSettingArray[idx].selStoreId = val;
-                var storeIndex = this.storeDataList.findIndex((store) =>store.value == val);
-                console.log("storeIndex:",storeIndex);
-                this.storeSettingArray[idx].selStoreIndex = storeIndex;
-                
-                
+                this.selStoreValue = val;
+                this.selInspectVaule = null;
+                this.selStoreId = val.value;
+                this.selStoreName=val.label;
+                var storeIndex = this.storeDataList.findIndex((store) =>store.value == val.value);
+                this.selStoreIndex = storeIndex;
             }
         },
-        onChangeSelectedInspect(val,idx){
+        onChangeSelectedInspect(val){
             console.log("onChangeSelectedInspect val:",val);
-            this.storeSettingArray[idx].incepId = val;
-            this.storeSettingArray[idx].buttonDisabled = false;
+            this.selInspectId = val.value;
+            this.selInspectName = val.label;
+            this.selInspectVaule = val;
         },
-        addAuth(index){
-            console.log("add item index:",index);
+        clearSelection(){
+            this.selStoreValue = {value:null,label:""};
+            this.selInspectVaule = {value:null,label:""};
+            this.selStoreId = null;
+            this.selInspectId = null;
         },
-        deleteAuth(itemId){
-            console.log("delete item id:",itemId)
+        addAuth(){
+            if(this.selStoreId==null){
+                this.warnningTitle = this.$t('mysterio.pleaseChooseStore');
+                this.showItemExitedDialog = true;
+                return;
+            }
+            if(!this.selInspectId){
+               this.warnningTitle = this.$t('mysterio.pleaseChooseTag');
+                this.showItemExitedDialog = true;
+                return;
+            }
+            const exitedItem = this.allTableData.find(item => (item.storeId==this.selStoreId && item.inspId == this.selInspectId));
+            if(exitedItem){
+                this.warnningTitle = this.$t('mysterio.authExited');
+                this.showItemExitedDialog = true;
+                return;
+            }else{
+                var maxid = Math.max.apply(null, this.allTableData.map(function (o) {
+                    return o.id;
+                }))
+                this.allTableData.push({id:maxid+1,storeId:this.selStoreId,storeName:this.selStoreName,inspId:this.selInspectId,incetionTag:this.selInspectName});
+                this.total = Math.ceil( this.allTableData.length/this.curSizeNum); 
+                this.setDataTable();
+                this.clearSelection();
+            }
         },
+        handleOperation({ method, row }) {
+            console.log('List row =====>> ', row);
+            switch(method){
+                case 'delete':{
+                  this.deleteAuth(row);
+                break;      
+                }
+                default: {
+                break;
+                }
+            }
+        },
+        deleteAuth(row){
+            console.log("delete item row:",row);
+            var delIndex = this.allTableData.findIndex(item=>item.id==row.id);
+            this.allTableData.splice(delIndex,1);
+            this.total = Math.ceil( this.allTableData.length/this.curSizeNum); 
+            this.setDataTable();
+        },
+        currentChange(val) {
+            const self = this;
+            self.curPage = val.page;
+            //self.params.filter = { page: val.page - 1, size: self.sizeNum };
+            self.setDataTable();
+        },
+        sizeChange(val) {
+            const self = this;
+            self.curSizeNum = val.size;
+            self.curPage = 1;
+            self.total = Math.ceil( self.allTableData.length/self.curSizeNum);
+            self.setDataTable();
+        },
+        handleSortChange(order, defaultSort){
+            this.defaultSort={...defaultSort};
+            this.setDataTable();
+        },
+        onShowItemExitedDialogClose(){
+            this.showItemExitedDialog = false;
+        }
     }
 }
 </script>
@@ -223,56 +405,47 @@ export default {
   }
 }
 .mysterio-body{
-    padding: 40px;
+    width:auto;
+    margin-top: 32px;
+    margin-bottom: 27px;
+    margin-right: 32px;
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     .store-item{
-        width:auto;
-        height: 40px;
+        flex:1;
+        height: 74px;
         align-content: center;
         align-self: center;
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        margin-left: 40px;
+        flex-direction: column;
+        align-items:flex-start;
+        margin-left: 32px;
+        
         span{
                 color:#C60957;
                 font-size: 12px;
             }
-        .item-label{
-            
-        }
         .item-selection{
-            margin-left: 20px;
+            margin-top: 6px;
+            display: flex;
+            flex:1;
+            width: 100%;
+            .el-select{
+                width:100%
+            }
             /deep/ .el-input__inner {
-                border: none;
+                flex:1;
                 font-size: 15px;
-                height: calc(28/1440*100vw);
+                height: 46px;
                 line-height: calc(28/1440*100vw);
+                width:100%;
             }
         }
     }
-    .img-div{
-        min-width:40px;
-        height: 40px;
-        align-content: center;
-        align-self: center;
-        display: flex;
-        align-items: center;
-        margin-left:20px;
-        border:none;
-    }
-    .el-button--primary{
-        background-color: #006ab7;
-        min-width:40px;
-    }
-    .el-button--primary:hover{
-        background-color:  #2c5a7d;
-        min-width:40px;
-    }
-    .el-button--mini {
-        padding: 0px 5px;
-    }
+}
+.addList{
+    padding:0 32px;
 }
 .el-scrollbar .el-select-group__wrap{
         

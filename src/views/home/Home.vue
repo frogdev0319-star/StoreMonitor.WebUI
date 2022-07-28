@@ -226,6 +226,7 @@
               <div class="headImg" :style="collapsed?{}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               <el-dropdown-menu slot="dropdown" class="dropdown">
                 <el-dropdown-item
+                  v-if="hasMystery"
                   class="dropdown-item"
                   style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                   @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}</el-dropdown-item>
@@ -327,6 +328,7 @@ export default {
       brandDisabled: false,
       showIgnoreItem:false,
       showMimicMode:false,
+      hasMystery:false
     };
   },
 
@@ -465,7 +467,7 @@ export default {
       return this.$store.state.cachePath;
     },
 
-    ...mapGetters(["token", "name", "availabePathList","mimicMode"]),
+    ...mapGetters(["token", "name", "availabePathList","mimicMode","isMystery"]),
   },
 
   watch: {
@@ -495,6 +497,10 @@ export default {
     },
     mimicMode(){
       this.showMimicMode = this.$store.getters.mimicMode;
+    },
+    isMystery(){
+      this.hasMystery = this.$store.getters.isMystery;
+      console.log("hasMystery:",this.hasMystery);
     }
   },
   created() {
@@ -509,6 +515,7 @@ export default {
         
       }
     });
+    
     window.addEventListener("resize", this.$_isMobile);
     self.$_isMobile();
     this.getBrandList();
@@ -523,7 +530,9 @@ export default {
         );
       });
     }
+    this.$store.dispatch("GetIsMysteryMode");
     this.showMimicMode = this.$store.getters.ShowMimicMode;
+    this.hasMystery = this.$store.getters.isMystery;
   },
 
   methods: {
@@ -870,12 +879,14 @@ export default {
           sessionStorage.setItem("accountId", this.accountId);
           self.changeRoutes();
           self.$route.meta.keepAlive = false;
+          self.$store.dispatch("GetIsMysteryMode");
         }
         else{
           this.accountId = this.orgAccountId
           util.notify(self.$t('route.accountTerminated'), 'warning', 3000);
         }
       });
+      
     },
 
     async changeRoutes() {
