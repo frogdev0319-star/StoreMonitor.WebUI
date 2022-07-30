@@ -4,16 +4,24 @@ const version = Environment.VERSION;
 
 export const addMysterioPerson = data => {
   return request({
-    url: `${version}/mystery/setting/add`,
+    url: `${version}/mystery/member/add`,
     method: 'post',
     data
   });
 };
 
-export const getMysterioList = data => {
+export const getMysterioMemberList = data => {
   return request({
-    url: `${version}/mystery/setting/list`,
-    method: 'get',
+    url: `${version}/mystery/member/list`,
+    method: 'post',
+    data
+  });
+};
+
+export const removeMysterioPerson = data => {
+  return request({
+    url: `${version}/mystery/member/remove`,
+    method: 'post',
     data
   });
 };
@@ -22,6 +30,30 @@ export const isMysteryMode = data => {
   return request({
     url: `${version}/mystery/isMysteryMode`,
     method: 'get',
+    data
+  });
+};
+
+export const addMysterySetting = data => {
+  return request({
+    url: `${version}/mystery/setting/add`,
+    method: 'post',
+    data
+  });
+};
+
+export const removeMysterySetting = data => {
+  return request({
+    url: `${version}/mystery/setting/remove`,
+    method: 'post',
+    data
+  });
+};
+
+export const getMysterySetting = data => {
+  return request({
+    url: `${version}/mystery/setting/list`,
+    method: 'post',
     data
   });
 };

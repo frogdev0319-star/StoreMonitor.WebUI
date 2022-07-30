@@ -5,6 +5,7 @@ import AuthRedirect from '@/views/login/AuthRedirect';
 import Home from '@/views/home/Home';
 import PermissionHelper from '@/api/PermissionHelper';
 import util from '../common/util';
+import store from '@/store';
 
 Vue.use(Router);
 /**
@@ -305,8 +306,17 @@ export const navbarRoute = {
           requireAuth: true,
           keepAlive: false
         }
+      },
+      {
+        path: '/patrolItem_old',
+        name: 'patrolItem_old',
+        component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
       }
-    ) && primaryPathesList.push('/patrolItem');
+    ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
     !PermissionHelper.enableMimicMode && PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolPersonStat',
@@ -342,7 +352,19 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    ) && primaryPathesList.push('/patrolCompareStat');
+    ) && primaryPathesList.push('/patrolCompareStat');//InspectItemStatistics_old
+    statisticsRoute.children.push(
+      {
+        path: '/InspectItemStatistics_old',
+        name: 'InspectItemStatistics_old',
+        component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
+        hidden: true,
+        meta: {
+          requireAuth: false,
+          keepAlive: false
+        }
+      }
+    ) ;
     /*
     PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
@@ -516,7 +538,7 @@ export const navbarRoute = {
         hidden: true,
       }
     ) && primaryPathesList.push('/workflows', '/workflowDetail', '/workflownode', '/createWorkflow');
-    !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
+    (store.getters.roleId==1) && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
       {
         path: '/mysterio',
         name: 'MysterioManage',
