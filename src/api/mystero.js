@@ -57,3 +57,11 @@ export const getMysterySetting = data => {
     data
   });
 };
+
+export const batchAddMysterySetting = data => {
+  return request({
+    url: `${version}/mystery/setting/batchAdd`,
+    method: 'post',
+    data
+  });
+};

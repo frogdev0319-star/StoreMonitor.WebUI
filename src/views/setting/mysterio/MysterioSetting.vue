@@ -286,15 +286,33 @@ export default {
             this.tableData = [];
             let page = this.curPage;
             let sizeNum = this.curSizeNum;
-            this.tableData = [...this.allTableData.slice( (page - 1)* sizeNum, page* sizeNum)];
+            let tempTable = this.allTableData.slice( (page - 1)* sizeNum, page* sizeNum);
+            this.tableData = [...tempTable];
         },
+        
         orderAllTableData(){
             let key = this.defaultSort.prop;
-            key = key.indexOf('Str') > -1 ? key.substr(0, key.indexOf('Str')) : key;
-            this.defaultSort.order === 'descending' ? this.allTableData.sort((a,b) => { return b[key] - a[key] })
-                                    : this.allTableData.sort((a,b) => { return a[key] - b[key] });
+            this.allTableData = util.sort_by_key(this.allTableData,key,this.defaultSort.order );
         },
-        saveAuth(){},
+        saveAuth(){
+            const self = this;
+            var settingList=[];
+            self.allTableData.map(auth =>{
+                let obj={
+                    userId:self.userId,
+                    storeId:auth.storeId,
+                    inspectTagId:auth.inspId
+                };
+                settingList.push(obj);
+            });
+            mysteroRESTful.batchAddMysterySetting({settingList}).then(res=>{
+                if(res.errCode==0){
+                    this.$router.push({name: 'MysterioManage'});
+                }else{
+                    util.notify(self.$t('mysterio.saveMysterioSettingFail'), 'error', 3000);
+                }
+            });
+        },
         onChangeSelectedStore(val){
             console.log("onChangeSelectedStore idx:",val);
             if(val){
@@ -377,6 +395,7 @@ export default {
             self.setDataTable();
         },
         handleSortChange(order, defaultSort){
+            console.log(order,defaultSort);
             this.defaultSort={...defaultSort};
             this.setDataTable();
         },

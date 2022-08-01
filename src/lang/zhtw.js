@@ -1380,6 +1380,7 @@ export default{
     "pleaseChooseStore":"請選擇門店",
     "pleaseChooseTag":"請選擇巡檢表",
     "comfirmDelMysterio":"確定刪除此神秘客成員",
+    "saveMysterioSettingFail":"儲存權限群組失敗"
   }
 
 }
