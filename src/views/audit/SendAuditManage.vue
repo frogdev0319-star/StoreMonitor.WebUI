@@ -450,7 +450,7 @@ export default{
                 this.curStoreIds = searchParams.filterStoreIds;
                 this.curTabIndx = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx:searchParams.curTabIndx;
                 this.activeName = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx.toString():searchParams.curTabIndx.toString();
-                this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
+                //this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
                 this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processLastUpdateTs'}:searchParams.order;
                 this.defaultSort = {order:(this.curOrder.direction=='desc')?'descending':'ascending',prop:this.curOrder.property};
                 this.searchParams = searchParams;
