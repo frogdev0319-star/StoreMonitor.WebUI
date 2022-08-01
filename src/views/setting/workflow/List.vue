@@ -283,6 +283,8 @@ export default {
         // console.log('newApiBody :>> ', newApiBody);
         await this.getWorkflowList(newApiBody);
       }
+
+      sessionStorage.removeItem('pageAction')
     },
 
     async getUserInfo(){

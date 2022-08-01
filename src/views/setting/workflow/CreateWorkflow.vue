@@ -5,7 +5,7 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"/>
       <div class="buttons">
-        <delay-button type="filled" @click="addNewFlow">  {{$t('audit.workFlows.addWorkFlow')}}</delay-button>
+        <delay-button type="filled" @click="addNewFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -18,12 +18,15 @@
               <div class="setting-config">
                 <!-- 基本信息 -->
                 <div class="flex-row" style="margin-right: 30px">
-                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.basicInformation')}}</div>
+                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.workFlowName')}}</div>
                   <div class="title-status"> 
                     <el-input
+                      ref="workflowName"
                       :placeholder="workflowDetail.name"
                       v-model="workflowDetail.name"
                       style="width: 250px"
+                      maxlength="50"
+                      show-word-limit
                       />
                   </div>
                 </div>
@@ -113,7 +116,7 @@
           </setting-table>
         </div>
 
-        <!-- 流程配置 -->
+        <!-- 流程設定 -->
         <div class="inspect-basic">
           <!-- 新增審核節點 btn -->
           <div class="buttons add-node-btn">
@@ -126,7 +129,7 @@
             </el-button>
           </div>
 
-          <setting-table :table-name="$t('audit.workFlows.workFlowConfiguration')">
+          <setting-table :table-name="$t('audit.workFlows.workFlowSetting')">
             <template slot="tableDetail" style="padding: 30px">
                 <div class="tablelist flow-setting" v-loading.fullscreen.lock="fullscreenLoading">
                   <table-only
@@ -355,13 +358,16 @@ export default {
         //   }
         // },
       },
-      pageAction: "init"
+      pageAction: "init",
+      currentUser:''
     };
   },
   watch:{
   },
   async created() {
+    
     await this.init()
+
   },
   mounted() {
     // this.dataFromRoute = { ...this.$route.params.data }
@@ -383,12 +389,18 @@ export default {
   methods: {
     async init(){
       // await this.getNodeList(this.infoForm.processDefinitionKey) 
-  
+
       await this.getTitle() 
       await this.getUserInfo() 
       await this.getDepartmentList() 
       await this.initBasicData()
       
+
+      const result = await this.$store.dispatch("GetUserAuthorities");
+      this.currentUser = result.data.userId
+      console.log('result @@', result)
+      console.log('this.currentUser 1 @@', this.currentUser)
+
 
       var status = sessionStorage.getItem('pageAction');
       const pageAction = JSON.parse(status)
@@ -415,7 +427,6 @@ export default {
       }
       
       await this.handleData() 
-      await this.dataToApi() 
 
     },
 
@@ -477,12 +488,14 @@ export default {
           "unHandleNotifyDay": null
         },
       ]
+      
+      console.log('this.currentUser 2', this.currentUser)
+      initData[0].auditByUsers.push(this.currentUser)
       this.newFlatNodeDataView = initData
       console.log('this.newFlatNodeDataView 1 :>> ', this.newFlatNodeDataView);
     },
 
     getNodeData(){
-      
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
       console.log('newNode :>> ', newNode);
@@ -502,12 +515,31 @@ export default {
         sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
         this.newFlatNodeDataView = orinode
       }
-
       sessionStorage.removeItem('newWorkFlow')
     },
     
 
     addNode() {
+      // name or group convert id
+      this.newFlatNodeDataView.forEach(d =>{
+        if(d.auditTargetType == 0){
+            this.userInfo.forEach(n =>{
+              if(d.auditByUsers.length !== 0 && d.auditByUsers[0] == n.userName){
+                d.auditByUsers = []
+                d.auditByUsers.push(n.userId)
+              }
+            })
+        }else if(d.auditTargetType == 1){
+          this.department.forEach(g =>{
+            if(d.auditByGroups.length !== 0 && d.auditByGroups[0] == g.defineName){
+              d.auditByGroups = []
+              d.auditByGroups.push(g.defineId)
+            }
+          })
+          }
+      })
+
+
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
       var time = new Date()
@@ -540,15 +572,13 @@ export default {
               "auditByUsers": [],
               "auditByGroups": [],
               "isEditing": false,
-              "auditTargetType": 0
+              "auditTargetType": 1
             }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
       sessionStorage.removeItem('newWorkFlow')
       this.$router.push({ name: 'nodeSetting' })
     },
-
-
 
     handleEdit(){
       const data = sessionStorage.getItem('newWorkFlow')
@@ -570,9 +600,6 @@ export default {
 
       sessionStorage.removeItem('newWorkFlow')
     },
-
-
-
 
 
     // get user
@@ -649,7 +676,6 @@ export default {
     // maping data for page view
     handleData(){
       // switch user id to name 
-
       console.log('this.newFlatNodeDataView  handele ------>> ', this.newFlatNodeDataView);
       this.newFlatNodeDataView.forEach(item =>{
         var newArr = []
@@ -661,7 +687,6 @@ export default {
         item.auditByUsers = newArr
       })
 
-      // this.department
       this.newFlatNodeDataView.forEach(item =>{
         var newArr2 = []
         item.auditByGroups.forEach(id =>{
@@ -671,22 +696,10 @@ export default {
             } 
           })
         })
-        item.auditByGroups = [...newArr2 ]
+        item.auditByGroups = newArr2
       })
     },
 
-
-    // data for api submit
-    dataToApi(){
-      // deep copy
-      var orderedAuditNodeArray = JSON.parse(JSON.stringify(this.flatNodeData))
-
-      this.nodeDataToApi = this.nodeList
-      delete this.nodeDataToApi.nextAuditNode
-      this.nodeDataToApi.orderedAuditNodeArray = orderedAuditNodeArray
-      
-      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
-    },
 
 
 
@@ -748,9 +761,17 @@ export default {
       console.log('go edit  :>> ', row);
       console.log('this.userInfo ------>> ', this.userInfo);
 
-      var currentUser = this.userInfo.filter(u => u.userName == row.auditByUsers[0])
-      row.auditByUsers = []
-      row.auditByUsers.push(currentUser[0].userId)
+      if(row.auditByUsers.length !== 0){
+        var currentUser = this.userInfo.filter(u => u.userName == row.auditByUsers[0])
+        row.auditByUsers = []
+        row.auditByUsers.push(currentUser[0].userId)
+      } else {
+        var currentGroup = this.department.filter(u => u.defineName == row.auditByGroups[0])
+        row.auditByGroups = []
+        row.auditByGroups.push(currentGroup[0].defineId)
+      }
+      
+
 
       sessionStorage.setItem('workflowNode', JSON.stringify(row))
       sessionStorage.setItem('pageAction', JSON.stringify("edit"))
@@ -775,20 +796,13 @@ export default {
     //addWorkFlow
     addNewFlow() {
 
-
-      
       this.newFlatNodeDataView.forEach(d =>{
         delete d.id 
-        this.userInfo.forEach(n =>{
-            if(d.auditByUsers.length !== 0 && d.auditByUsers[0] == n.userName){
-              d.auditByUsers = []
-              d.auditByUsers.push(n.userId)
-            }
-        })
       })
+      
+      console.log('this.newFlatNodeDataView !!!!!!', this.newFlatNodeDataView)
+
       this.newFlatNodeDataView.push('null')
-
-
       let result = {};
       let nestedObj = result;
 
@@ -802,13 +816,24 @@ export default {
         }
       });
 
-      console.log('result ', result)
-
+      // console.log('result ', result)
       var toApiData = {...this.workflowDetail, ...result}
       creadNewFlow(toApiData).then(res=>{
           this.$router.push({name: 'workflowManage'})
+          console.log('res', res)
         }).catch(err => {
           console.log('error' + err);
+
+          if(this.workflowDetail.name == ''){
+            util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
+            this.$refs.workflowName.focus()
+          } else {
+            util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+            this.$refs.workflowName.focus()
+          }
+          
+          this.newFlatNodeDataView.pop()
+          
       });
 
     }
@@ -858,6 +883,7 @@ export default {
     .el-input
       .el-input__inner
           height: 36px
+          padding-right: 50px
           
   .icon-gengduo
     width: 24px
@@ -1130,4 +1156,7 @@ export default {
       .el-table_1_column_6
         .cell
           display: none !important
+  .title-status
+    .el-input__count-inner
+      margin-top: 55px
 </style>

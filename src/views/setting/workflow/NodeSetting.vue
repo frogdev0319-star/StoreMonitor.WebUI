@@ -25,9 +25,13 @@
                 <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.nodeName')}}</div>
                 <div class="title-status">
                   <el-input
+                    ref="nodeName"
                     v-model="nodeData.name"
                     :placeholder="$t('audit.workFlows.inputNodeName')"
-                    class="input-name"/>
+                    class="input-name"
+                    maxlength="20"
+                    show-word-limit
+                    />
                 </div>
 
                 <el-radio-group class="select_audit storevue-radio" v-model="nodeData.auditTargetType">
@@ -110,7 +114,10 @@
                           :placeholder="$t('audit.workFlows.defineItem')"
                           :disabled="btnDefaultAgree == 0"
                           v-model="defineAgree"
-                          class="input-name"/>
+                          class="input-name"
+                          maxlength="8"
+                          show-word-limit
+                          />
                       </el-radio-group>
                     </div>
 
@@ -122,7 +129,10 @@
                           :placeholder="$t('audit.workFlows.defineItem')"
                           :disabled="btnDefaultReject == 0"
                           v-model="defineReject"
-                          class="input-name"/>
+                          class="input-name"
+                          maxlength="8"
+                          show-word-limit
+                          />
                       </el-radio-group>
                     </div>
 
@@ -218,7 +228,7 @@ export default {
       dataFromRoute: {},
       workflowDetail: {},
       department: [],
-      departmentStatus: [],
+      departmentStatus: "",
       userInfo:[],
 
 
@@ -306,6 +316,7 @@ export default {
     async getDepartmentList(){
       await getDepart({ type: 0 }).then(res=>{
         this.department = res.data
+        console.log('this.department ~~~~~>', this.department)
       }).catch(err => {
         console.log('error' + err);
       });
@@ -354,7 +365,8 @@ export default {
 
       // 取得部門資訊 & 簽核部門
       await this.getDepartmentList() 
-      this.departmentStatus = this.nodeData.auditByGroups.toString()
+      // this.departmentStatus = this.nodeData.auditByGroups.toString()
+      this.departmentStatus = this.department[0].defineId
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
     },
@@ -411,23 +423,30 @@ export default {
         return
       }
 
+      var status = sessionStorage.getItem('pageAction');
+      const pageAction = JSON.parse(status)
+      // console.log('pageAction', pageAction)
     
-      this.$router.push({name: 'createWorkflow'})
-      sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
-      console.log('this.apiData call api', this.apiData.orderedAuditNodeArray)
-
-      // call api
-      // updateWorkflow(this.apiData).then(res=>{
-      //   console.log('res :>> ', res);
-      //   this.$router.push({name: 'workflowDetail'})
-      //   this.isLoadingData = false
-      // }).catch(err => {
-      //   this.isLoadingData = false;
-      //   console.log('error' + err);
-      // });
+      if(pageAction == "create" || pageAction == "edit"  ){
+        this.$router.push({name: 'createWorkflow'})
+        sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
+        console.log('this.apiData call api', this.apiData.orderedAuditNodeArray)
+      } else if(pageAction == "set"){
+        // call api
+        updateWorkflow(this.apiData).then(res=>{
+          console.log('res :>> ', res);
+          this.$router.push({name: 'workflowDetail'})
+          this.isLoadingData = false
+        }).catch(err => {
+          this.isLoadingData = false;
+          
+          console.log('error' , err);
+          util.notify(this.$t('audit.workFlows.cantRepeatName'), 'error', 2000 );
+          this.$refs.workflowName.focus()
+          reject(err);
+        });
+      }
     },
-
-  
   }
 };
 </script>
@@ -520,6 +539,13 @@ export default {
     .el-input
       margin-left: 10px
 </style>
+
+<style lang="sass">
+  .title-status
+    .el-input__count-inner
+      margin-top: 55px
+</style>
+
 
 <style scoped>
   .report-setting{

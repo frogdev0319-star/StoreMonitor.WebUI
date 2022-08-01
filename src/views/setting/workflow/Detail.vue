@@ -5,7 +5,7 @@
       {{$t('audit.workFlows.workFlowConfiguration')}}
       <div class="spacer"/>
       <div class="buttons">
-        <delay-button type="filled" @click="submit">  {{$t('audit.workFlows.saveAndPublic')}}</delay-button>
+        <delay-button type="filled" @click="submit">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
     </div>
     <!-- 基本信息 -->
@@ -18,12 +18,15 @@
               <div class="setting-config">
                 <!-- 基本信息 -->
                 <div class="flex-row" style="margin-right: 30px">
-                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.basicInformation')}}</div>
+                  <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.workFlowName')}}</div>
                   <div class="title-status"> 
                     <el-input
+                      ref="workflowName"
                       :placeholder="nodeDataToApi.name"
                       v-model="nodeDataToApi.name"
-                      style="width: 250px"
+                      style="width: 250px;"
+                      maxlength="50"
+                      show-word-limit
                       />
                   </div>
                 </div>
@@ -113,7 +116,7 @@
           </setting-table>
         </div>
 
-        <!-- 流程配置 -->
+        <!-- 流程設定 -->
         <div class="inspect-basic">
           <!-- 新增審核節點 btn -->
           <div class="buttons add-node-btn">
@@ -126,7 +129,7 @@
             </el-button>
           </div>
 
-          <setting-table :table-name="$t('audit.workFlows.workFlowConfiguration')">
+          <setting-table :table-name="$t('audit.workFlows.workFlowSetting')">
             <template slot="tableDetail" style="padding: 30px">
                 <div class="tablelist flow-setting" v-loading.fullscreen.lock="fullscreenLoading">
                   <table-only
@@ -483,8 +486,6 @@ export default {
     //   } 
     // },
   
- 
-
   },
   computed: {
     
@@ -718,9 +719,10 @@ export default {
             "auditByUsers": [],
             "auditByGroups": [],
             "isEditing": false,
-            "auditTargetType": 0
+            "auditTargetType": 1
         }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
+      sessionStorage.setItem('pageAction', JSON.stringify("set"))
       this.$router.push({ name: 'nodeSetting' })
     },
 
@@ -828,6 +830,7 @@ export default {
       var oriData = this.flatNodeData.filter(f => row.id === f.id)
       delete row.isEditing
       sessionStorage.setItem('workflowNode', JSON.stringify(oriData[0]))
+      sessionStorage.setItem('pageAction', JSON.stringify("set"))
     },
     // sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
 
@@ -896,10 +899,11 @@ export default {
             if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
           })
         })
-      var data = this.ccToUSer
+      
       console.log('data', data)
       // 等待 dialog 生成
       if(this.ccToUSer.length > 0){
+        var data = this.ccToUSer
         setTimeout(() => {
           this.$refs.usersList.fromInputSelect(data)
         }, 0);
@@ -907,11 +911,8 @@ export default {
     },
 
 
-
-
     //保存並發布
     submit() {
-      
       // setting CC users
       this.nodeDataToApi.copyToUsers = this.ccToUSer
 
@@ -922,9 +923,14 @@ export default {
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
-        console.log('error' + err);
-        util.notify('此簽核流程名稱已存在', 'error', 3000);
-
+        console.log('error' , err);
+        if(this.nodeDataToApi.name == ''){
+          util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
+          this.$refs.workflowName.focus()
+        } else {
+            util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+            this.$refs.workflowName.focus()
+          }
       });
 
     }
@@ -974,6 +980,7 @@ export default {
     .el-input
       .el-input__inner
           height: 36px
+          
           
   .icon-gengduo
     width: 24px
@@ -1123,6 +1130,7 @@ export default {
     height: 36px;
     line-height: 36px;
     font-size: 12px;
+    
   }
 
   .span-font{
@@ -1312,5 +1320,9 @@ export default {
     
     .el-checkbox__inner:hover
       border-color: #190 !important
+      
+  .title-status
+    .el-input__count-inner
+      margin-top: 55px
 
 </style>
