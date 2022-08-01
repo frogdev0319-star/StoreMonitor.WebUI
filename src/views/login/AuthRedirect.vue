@@ -19,7 +19,7 @@ export default{
         const paramsArray = hash.split('&');
         if (paramsArray.toString().length !== 0) {
           const obj = self.queryURL(hash);
-          console.log(obj);
+          console.log('$$$',obj);
           this.$store.commit('SET_TOKEN', obj.token);
           if (obj.ezvizProtocol === 'true') {
             this.$store.commit('SET_ISEZVIZ', true);

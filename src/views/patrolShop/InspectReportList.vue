@@ -288,6 +288,7 @@ import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
 import { getInspectReportInfo } from '@/api/inspect';//為了取是否有設置評分
 import TableOnly from '@/components/TableOnly';
+import PermissionHelper from '@/api/PermissionHelper';
 export default {
   name: 'InspectReportList',
   components: {
@@ -511,7 +512,7 @@ export default {
     iconSrcHeight() {
       return (this.varyWindowWidth / 1920) * 50;
     },
-    ...mapGetters({ accountChanged: 'accountChanged' })
+    ...mapGetters({ accountChanged: 'accountChanged',mimicModeChanged:'mimicMode' })
   },
 
   watch: {
@@ -527,7 +528,12 @@ export default {
         self.ifSaveParams = true;
         self.ifSearchData = true;
       }
+    },
+    mimicModeChanged(val){
+        console.log("mimicMode val:",val);
+        this.initData();
     }
+    
   },
 
   activated() {
@@ -685,6 +691,11 @@ export default {
         console.log("No Data")
         this.setNoData();
         return;
+      }
+      console.log("***current user:",this.$store.getters.userId);
+      if(PermissionHelper.enableMimicMode){
+        
+        params['submitter'] = this.$store.getters.userId; 
       }
       return new Promise((resolve) => {
         //console.log("params:",params);

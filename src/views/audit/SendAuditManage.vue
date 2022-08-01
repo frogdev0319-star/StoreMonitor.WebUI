@@ -352,7 +352,7 @@ export default{
             };
     },
     computed: {
-        ...mapGetters({ accountChanged: 'accountChanged' })
+        ...mapGetters({ accountChanged: 'accountChanged', mimicModeChanged:'mimicMode' })
     },
     watch: {
         accountChanged(val) {
@@ -369,6 +369,10 @@ export default{
                 self.ifSearchData = true;
             }
         },
+        mimicModeChanged(val){
+            console.log("mimicMode val:",val);
+            this.initData();
+        }
     },
     created(){
         this.isFirstLoad = true;
@@ -540,6 +544,7 @@ export default{
                     page:this.curPage-1,
                     size:this.curSizeNum
                 },
+                isMysteryMode:PermissionHelper.enableMimicMode,
             };
             if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
                 params['storeId'] =this.curStoreIds;

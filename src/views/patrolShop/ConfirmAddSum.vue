@@ -433,6 +433,7 @@ import { getDepartmentList } from '@/api/checkin';
 import { getUserInfo ,getAllUserInfoNoAuth} from '@/api/login';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
+import PermissionHelper from '@/api/PermissionHelper';
 
 export default {
   name: 'ConfirmAddSum',
@@ -859,7 +860,8 @@ export default {
         status: status,
         comment: self.suggest.trim(),
         items: temp,
-        feedback: feedEventList
+        feedback: feedEventList,
+        isMysteryMode:PermissionHelper.enableMimicMode,
       };
       
       let routeData = null;
