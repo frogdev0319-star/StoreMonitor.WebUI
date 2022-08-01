@@ -360,7 +360,7 @@ export default {
     },
 
     saveNode(){
-      this.fullscreenLoading = true
+      // this.fullscreenLoading = true
 
       // handle btn naming
       if(this.btnDefaultAgree == 1){
@@ -410,11 +410,11 @@ export default {
         this.fullscreenLoading = false
         return
       }
-      console.log('this.apiData call api', this.apiData)
 
     
       this.$router.push({name: 'createWorkflow'})
       sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
+      console.log('this.apiData call api', this.apiData.orderedAuditNodeArray)
 
       // call api
       // updateWorkflow(this.apiData).then(res=>{

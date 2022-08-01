@@ -200,10 +200,9 @@
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import {getNodeList, updateWorkflow, creadNewFlow} from "@/api/workflow";
+import {getNodeList, updateWorkflow, creadNewFlow,getUserStatus} from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import {getUserInfo} from '@/api/login';
-import {getDepartmentList } from '@/api/checkin';
 
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
@@ -483,24 +482,30 @@ export default {
     },
 
     getNodeData(){
+      
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
       console.log('newNode :>> ', newNode);
 
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
-      console.log('orinode :>> ', orinode);
+      console.log('orinode 1 >> ', orinode);
 
       if( newNode !== null ){
         orinode.push(newNode.orderedAuditNodeArray[0])
         sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
 
         this.newFlatNodeDataView = orinode
+        console.log('orinode 2 >> ', orinode);
+        
       }else{
         sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
         this.newFlatNodeDataView = orinode
       }
+
+      sessionStorage.removeItem('newWorkFlow')
     },
+    
 
     addNode() {
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
@@ -548,11 +553,11 @@ export default {
     handleEdit(){
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
-      console.log('newNode :>> ', newNode.orderedAuditNodeArray);
+      console.log('newNode  ~~~~~>> ', newNode.orderedAuditNodeArray);
 
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
-      console.log('orinode :>> ', orinode);
+      console.log('orinode ~~~~~>> ', orinode);
 
       if( newNode.orderedAuditNodeArray !== null){
         var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
@@ -563,7 +568,9 @@ export default {
         this.newFlatNodeDataView = orinode
       }
 
+      sessionStorage.removeItem('newWorkFlow')
     },
+
 
 
 
@@ -590,7 +597,7 @@ export default {
     },
     // get getDepart
     async getDepartmentList(){
-      await getDepart({ type: 0 }).then(res=>{
+      await getUserStatus({ type: 0 }).then(res=>{
         this.department = res.data
         // console.log('this.department 4 ------>> ', this.department);
       }).catch(err => {
@@ -642,16 +649,16 @@ export default {
     // maping data for page view
     handleData(){
       // switch user id to name 
+
+      console.log('this.newFlatNodeDataView  handele ------>> ', this.newFlatNodeDataView);
       this.newFlatNodeDataView.forEach(item =>{
         var newArr = []
-        item.auditByUsers.forEach(id =>{
-          this.userInfo.forEach(uu =>{
-            if(id == uu.userId){
-              newArr.push(uu.userName)  
-            } 
-          })
+        this.userInfo.forEach( u =>{
+          if(item.auditByUsers[0] == u.userId || item.auditByUsers[0] == u.userName){
+            newArr.push(u.userName)
+          }
         })
-        item.auditByUsers = [...newArr ]
+        item.auditByUsers = newArr
       })
 
       // this.department
@@ -666,7 +673,6 @@ export default {
         })
         item.auditByGroups = [...newArr2 ]
       })
-      // console.log('this.flatNodeDataView  ------>> ', this.flatNodeDataView);
     },
 
 
@@ -739,7 +745,13 @@ export default {
 
     // edit node
     settingWorkFlow(row){
-      console.log('row :>> ', row);
+      console.log('go edit  :>> ', row);
+      console.log('this.userInfo ------>> ', this.userInfo);
+
+      var currentUser = this.userInfo.filter(u => u.userName == row.auditByUsers[0])
+      row.auditByUsers = []
+      row.auditByUsers.push(currentUser[0].userId)
+
       sessionStorage.setItem('workflowNode', JSON.stringify(row))
       sessionStorage.setItem('pageAction', JSON.stringify("edit"))
       this.$router.push({name: 'nodeSetting'})
@@ -762,16 +774,42 @@ export default {
 
     //addWorkFlow
     addNewFlow() {
-      // this.newFlow.nextAuditNode.nextAuditNode.auditByUsers.push(this.userInfo[0].userId)
-      console.log('this.newFlow ~~~~~~~>> ', this.newFlow);
-      // creadNewFlow(this.newFlow).then(res=>{
-      //     // this.newFlow.processDefinitionKey = res.data
-      //     // sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
-      //     console.log('res :>> ', res);
-      //     this.$router.push({name: 'workflowManage'})
-      //   }).catch(err => {
-      //     console.log('error' + err);
-      // });
+
+
+      
+      this.newFlatNodeDataView.forEach(d =>{
+        delete d.id 
+        this.userInfo.forEach(n =>{
+            if(d.auditByUsers.length !== 0 && d.auditByUsers[0] == n.userName){
+              d.auditByUsers = []
+              d.auditByUsers.push(n.userId)
+            }
+        })
+      })
+      this.newFlatNodeDataView.push('null')
+
+
+      let result = {};
+      let nestedObj = result;
+
+      this.newFlatNodeDataView.forEach((element) => {
+        if(element !== "null"){
+          nestedObj['nextAuditNode'] = element;
+          nestedObj = nestedObj['nextAuditNode']
+        } else {
+          nestedObj['nextAuditNode'] = null;
+          nestedObj = nestedObj['nextAuditNode']
+        }
+      });
+
+      console.log('result ', result)
+
+      var toApiData = {...this.workflowDetail, ...result}
+      creadNewFlow(toApiData).then(res=>{
+          this.$router.push({name: 'workflowManage'})
+        }).catch(err => {
+          console.log('error' + err);
+      });
 
     }
   }
@@ -782,11 +820,11 @@ export default {
 <style lang="sass" scoped>
   .is-multiple 
     .el-select-dropdown__item 
-        padding-left: 10px !important;
-        border-left: solid 1px #FFF;
+        padding-left: 10px !important
+        border-left: solid 1px #FFF
     .el-select-dropdown__item.selected 
-        padding-left: 10px !important;
-        border-left: solid 1px rgba(44, 144, 217, 0.34);
+        padding-left: 10px !important
+        border-left: solid 1px rgba(44, 144, 217, 0.34)
 
   .flex-row
     display: flex

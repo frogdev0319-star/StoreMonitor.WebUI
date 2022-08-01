@@ -345,8 +345,8 @@ export default {
 
       sessionStorage.removeItem('workflowDetail')
       sessionStorage.removeItem('newWorkFlow')
-      sessionStorage.setItem('pageAction', JSON.stringify("init"))
 
+      sessionStorage.setItem('pageAction', JSON.stringify("init"))
       this.$router.push({name: 'createWorkflow'})
 
       // creadNewFlow(this.newFlow).then(res=>{

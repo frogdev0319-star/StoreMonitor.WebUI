@@ -384,7 +384,7 @@ const user = {
         });
         resolve(res.data.isMysteryModeOn);
       }).catch(error => {
-        reject(error);
+        // reject(error);
       });
     },
 

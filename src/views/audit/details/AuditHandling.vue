@@ -37,7 +37,7 @@
 			<div class="audit-section">
 				<!-- audit-header -->
 				<div class="audit-header">
-					<h3>填寫簽合意見</h3>
+					<h3>填寫簽核意見</h3>
 					<div class="buttons">
 						<delay-button type="filled" @click="taskSummit">送出</delay-button>
 					</div>
@@ -45,8 +45,8 @@
 				<!-- audit body -->
 				<div class="audit-flow-body">
           <div class="audit-add-comment">
-            <!-- 簽合意見 -->
-            <p style="margin-bottom: 10px"><span style="color: #c60957">* </span> 簽合意見</p>
+            <!-- 簽核意見 -->
+            <p style="margin-bottom: 10px"><span style="color: #c60957">* </span> 簽核意見</p>
             <div class="comment-btn for-flex">
               <div class="el-radio-details" :class="{agree : agree == true}" @click="agreeNode">{{customButton[0].text}}</div>
               <div class="el-radio-details" :class="{reject : agree == false}" @click="rejectNode">{{customButton[1].text}}</div>
