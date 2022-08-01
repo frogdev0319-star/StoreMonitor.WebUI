@@ -8,6 +8,7 @@ import {isMysteryMode} from  '@/api/mystero'
 const user = {
   state: {
     user: '',
+    userId:'',
     status: '',
     code: '',
     token: getToken(),
@@ -62,7 +63,9 @@ const user = {
     SET_CODE: (state, code) => {
       state.code = code;
     },
-
+    SET_USERID: (state, userId) => {
+      state.userId = userId;
+    },
     SET_TOKEN: (state, token) => {
       state.token = token;
     },
@@ -268,6 +271,7 @@ const user = {
           // console.log(res);
           const data = res.data;
           if (res.data) {
+            
             commit('SET_TOKEN', data.token);
             setToken(data.token);
           }
@@ -306,13 +310,16 @@ const user = {
       return new Promise((resolve, reject) => {
         getUserAuthorities().then((res) => {
           if (res.data && (!res.data.services || res.data.services.includes('Custom_Inspection'))) {
+            console.log('@@@@',res.data.userId);
             commit('SET_AUTHORITY', res.data.authorities);
             commit('SET_ROLES', [res.data.title]);
             commit('SET_ROLE_ID', res.data.roleId);
+            commit('SET_USERID',res.data.userId);
           } else {
             commit('SET_AUTHORITY', []);
             commit('SET_ROLES', []);
             commit('SET_ROLE_ID', 0);
+            commit('SET_USERID','');
           }
           resolve(res);
         }).catch(error => {
@@ -352,7 +359,7 @@ const user = {
           }
 
           const statisticsRoute = navbarRoute.getStatisticalRoute();
-          statisticsRoute.children.length > 0 ? accessedRoutes.push(statisticsRoute) : '';
+          if(statisticsRoute.children.length > 0 && !PermissionHelper.enableMimicMode) accessedRoutes.push(statisticsRoute);
 
           const auditRoute = navbarRoute.getAuditRoute();
           auditRoute.children.length >0 ? accessedRoutes.push(auditRoute):'';

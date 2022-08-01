@@ -311,10 +311,7 @@ export const navbarRoute = {
         path: '/patrolItem_old',
         name: 'patrolItem_old',
         component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
-        hidden: true,
-        meta: {
-          keepAlive: false
-        },
+        hidden: true
       }
     ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
     !PermissionHelper.enableMimicMode && PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
