@@ -137,7 +137,7 @@ export default{
               {
                 'prop': 'submitterName',
                 'label': this.$t('audit.sendAudit.submitterName'),
-                'sortable': true,
+                'sortable': false,
                 'width': 65,
                 'maxWidth': 65,
                 'minWidth': 65,
@@ -154,7 +154,7 @@ export default{
               {
                 'prop': 'processLastUpdateTs',
                 'label': this.$t('audit.sendAudit.updateTime'),
-                'sortable': true,
+                'sortable': false,
                 'width': 100,
                 'maxWidth': 100,
                 'isExpand': false

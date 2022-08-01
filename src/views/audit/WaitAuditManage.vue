@@ -154,7 +154,7 @@ export default{
                     {
                       'prop': 'submitterName',
                       'label': this.$t('audit.sendAudit.submitterName'),
-                      'sortable': true,
+                      'sortable': false,
                       'width': 65,
                       'maxWidth': 65,
                       'minWidth': 65,
@@ -221,7 +221,7 @@ export default{
                     {
                       'prop': 'submitterName',
                       'label': this.$t('audit.sendAudit.submitterName'),
-                      'sortable': true,
+                      'sortable': false,
                       'width': 65,
                       'maxWidth': 65,
                       'minWidth': 65,
@@ -254,7 +254,7 @@ export default{
                     {
                       'prop': 'taskOwner',
                       'label': this.$t('audit.sendAudit.owner'),
-                      'sortable': true,
+                      'sortable': false,
                       'width': 65,
                       'maxWidth': 65,
                       'minWidth': 65,
@@ -434,10 +434,11 @@ export default{
             //self.params.filter = { page: 0, size: val.size };
             self.getAllTask();
         },
-        sortChange(col){
+        sortChange(order, defaultSort){
             const self = this;
-            const order = col.order;
-            if (order === 'ascending') {
+            console.log("order:",order);
+            self.curOrder = order;
+            /*if (order === 'ascending') {
                 self.curOrder = {
                     'direction': 'asc',
                     'property': col.column.property
@@ -449,7 +450,8 @@ export default{
                 };
             } else {
                 self.curOrder = {};
-            }
+            }*/
+            console.log("self.curOrder:",self.curOrder);
             self.tableDataList[self.curTabIndx].order = self.curOrder;
             self.getAllTask();
         },
@@ -478,7 +480,7 @@ export default{
                 params['auditState'] = [2,3,4] 
             }
             if(Object.keys(this.curOrder).length>0){
-                params['order'] = this.curOrder;
+                params['order'] = this.curOrder;//this.curOrder;
             }
             if(this.inputSearchValue.trim()!=''){
                 params['keyword'] = this.inputSearchValue;
