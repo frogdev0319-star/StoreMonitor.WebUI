@@ -178,7 +178,7 @@ export default{
                     {
                       'prop': 'taskOwner',
                       'label': this.$t('audit.sendAudit.owner'),
-                      'sortable': true,
+                      'sortable': false,
                       'width': 65,
                       'maxWidth': 65,
                       'minWidth': 65,
@@ -253,7 +253,7 @@ export default{
                     {
                       'prop': 'taskOwner',
                       'label': this.$t('audit.sendAudit.owner'),
-                      'sortable': true,
+                      'sortable': false,
                       'width': 65,
                       'maxWidth': 65,
                       'minWidth': 65,
@@ -450,7 +450,7 @@ export default{
                 this.curStoreIds = searchParams.filterStoreIds;
                 this.curTabIndx = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx:searchParams.curTabIndx;
                 this.activeName = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx.toString():searchParams.curTabIndx.toString();
-                this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
+                //this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
                 this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processLastUpdateTs'}:searchParams.order;
                 this.defaultSort = {order:(this.curOrder.direction=='desc')?'descending':'ascending',prop:this.curOrder.property};
                 this.searchParams = searchParams;
@@ -506,25 +506,10 @@ export default{
             //self.params.filter = { page: 0, size: val.size };
             self.getAllTask();
         },
-        sortChange(col){
+        sortChange(order, defaultSort){
             const self = this;
-            const order = col.order;
-            if (order === 'ascending') {
-                self.curOrder = {
-                    'direction': 'asc',
-                    'property': col.column.property
-                };
-            } else if (order === 'descending') {
-                self.curOrder = {
-                    'direction': 'desc',
-                    'property': col.column.property
-                };
-            } else {
-                self.curOrder = {
-                    'direction': 'desc',
-                    'property': 'processLastUpdateTs'
-                };
-            }
+            console.log("order:",order);
+            self.curOrder = order;
             self.tableDataList[self.curTabIndx].order = self.curOrder;
             self.getAllTask();
         },
@@ -544,6 +529,7 @@ export default{
                     page:this.curPage-1,
                     size:this.curSizeNum
                 },
+                order:this.curOrder,
                 isMysteryMode:PermissionHelper.enableMimicMode,
             };
             if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
@@ -557,9 +543,9 @@ export default{
             if(this.inputSearchValue.trim()!=''){
                 params['keyword'] = this.inputSearchValue;
             }
-            if(Object.keys(this.curOrder).length>0){
+            /*if(Object.keys(this.curOrder).length>0){
                 params['order'] = this.curOrder;
-            }
+            }*/
             console.log("params:",params);
             const self =this;
             return new Promise((resolve) => {

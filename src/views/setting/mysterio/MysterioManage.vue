@@ -217,7 +217,7 @@ export default {
 
     watch: {
       accountChanged(val) {
-        val !== 0 && this.getMysterioList();
+        val !== 0 && this.init();
       },
       // for search
       inputSearchValue(val){
@@ -312,6 +312,7 @@ export default {
               }else{
                 util.notify(self.$t('mysterio.getMysterioMemberFail'), 'error', 3000);
               }
+              self.total = res.data.totalPages;
               self.isLoadingData = false;
             }).catch(err=>{
               console.log("getMysterioList error",err);
