@@ -3337,6 +3337,7 @@ export default {
       const self = this;
       // self.sourceList = [];
       const obj = {};
+      console.log("***editEzvizCanvas:",src)
       obj.mediaType = 2;
       obj.src = src;
       obj.height = '100px';
@@ -3353,6 +3354,7 @@ export default {
         })
       })
       if (tempId != null) {
+        console.log("***tempId != null");
           self.inspectList[0].items[tempId.itemIndex].sourceList.push(obj);
           if(self.inspectList[0].items[tempId.itemIndex].itemType === 1){
             if (this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount === 0) {
@@ -3366,7 +3368,8 @@ export default {
             this.sheetName[this.curSheetIndex].inspectList[this.curGroupIndex].items[this.curItemIndex].inputCount++;
           }
       } else {
-        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList = self.sourceList;
+        console.log("***tempId == null");
+        self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.push(obj);// = self.sourceList;
       }
       if (!this.showIgnoreItem) {
         self.sourceListLength = self.inspectList[self.curGroupIndex].items[self.curItemIndex].sourceList.length;
