@@ -913,7 +913,8 @@ export default {
       "validateSucc":"성공적으로 확인!",
       "validationCode":"유효성 검사 코드",
       "videoLicenseOverdue":"Video license 기한이 만료됨",
-      "videoMangement":"영상 관리"
+      "videoMangement":"영상 관리",
+      "deviceOffline":"The device is offline."
   },
   "storeView":{
       "all":"전부",

@@ -224,8 +224,17 @@ export const navbarRoute = {
           requireAuth: true,
           keepAlive: false
         }
+      },
+      {
+        path: '/patrolItem_old',
+        name: 'InspectItemStatistics_old',
+        component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
       }
-    ) && primaryPathesList.push('/patrolItem');
+    ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
     PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
         path: '/patrolPersonStat',

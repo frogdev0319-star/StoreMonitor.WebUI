@@ -680,7 +680,8 @@ export default {
       { ret: 'hasAdded', match: ['设备已被别人添加'] },
       { ret: 'noDeviceLicense', match: ['Not Device License'] },
       { ret: 'accountExist', match: ['Account already exists'] },
-      { ret: 'deviceExist', match: ['NVR ID already existed'] }
+      { ret: 'deviceExist', match: ['NVR ID already existed'] },
+      { ret: 'deviceOffline', match: ['The device is offline'] }
     ];
     const result = msgMap.find(item => item.match.some(matchItem => msg.indexOf(matchItem) > -1));
     if (!result) {
