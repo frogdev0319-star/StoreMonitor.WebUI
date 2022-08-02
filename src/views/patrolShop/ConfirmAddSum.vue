@@ -946,52 +946,16 @@ export default {
         if(result[0].errCode==0){
           data = result[0].data;
           self.editFlag = true;
+          var routeData = {
+                isSuccess: true,
+                isBindWorkflow:false
+            };
+          self.$router.push({ name: 'submitEvent', params: { data: routeData}});
         }else{
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
         }
-        if(result[1].errCode!=0) {
-          util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-          return false;
-        }
-        if(self.auditState==7){ //系統撤回重送
-          var subTaskParam = {
-            inspectReportId:self.reportId,
-            comment:{
-              description:self.auditNote,
-              attachment:auditAttachment
-            }
-          }
-          console.log("1.subTaskParam:",subTaskParam);
-          self.doReSubmitWorkflow(subTaskParam);
-        }else{
-          let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
-          console.log("task:",task);
-          let taskId = task.tasks[0].taskId;
-          var subTaskParam = {
-            taskId,
-            result:0,
-            comment:{
-              description:self.auditNote,
-              attachment:auditAttachment
-            }
-          };
-          console.log("2.subTaskParam:",subTaskParam);
-          taskSummit(subTaskParam).then(resSubTask => {
-            if(resSubTask.errCode == 0){
-              self.$store.dispatch('setEditCount', 0);
-              routeData = {
-                  isSuccess: true,
-                  isBindWorkflow:true
-              };
-              self.$router.push({ name: 'submitEvent', params: { data: routeData}});
-            }
-          }).catch(errSubTask=>{
-            console.log("errSubTask:",errSubTask);
-            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-            return false;
-          });
-        }
+        
       }).catch(err=>{
         console.log("err:",err);
         util.notify(self.$t('remotePatrol.sentFail')+':'+err, 'error', 3000);
