@@ -920,6 +920,7 @@ export default {
         console.log("this.reportData:",this.reportData);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
         this.getPageDataBasedOnTemplate(this.reportData);
+        this.backSheetGroup = this.getGroupsItems(-1);
       }
     },
 
@@ -1105,7 +1106,6 @@ export default {
 
     getReportDetail() {
       const allReportDetails = this.getGroupsItems(-1);
-      this.backSheetGroup = allReportDetails;
       console.log("this.backSheetGroup:",this.backSheetGroup);
       return { class: 'row-detail', ifExpand: false, itemCount: -1, data: allReportDetails };
     },

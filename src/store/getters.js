@@ -28,5 +28,6 @@ const getters = {
   favoriteList:state => state.user.favoriteList,
   mimicMode:state => state.user.mimicMode,
   isMystery:state => state.user.isMystery,
+  editReport:state => state.user.editReport,
 };
 export default getters;

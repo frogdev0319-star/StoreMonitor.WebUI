@@ -269,6 +269,18 @@
           </div>
         </dialog-pop>
         <dialog-pop
+          v-if="EditRptchangeBrandObj.dialogCosed"
+          :title="EditRptchangeBrandObjtitle"
+          :isWarning="EditRptchangeBrandObj.isWarning"
+          :visible="EditRptchangeBrandObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="canceldChangeBrand"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeBrandObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
           v-if="changeStoreObj.dialogCosed"
           :title="changeStoreObj.title"
           :isWarning="changeStoreObj.isWarning"
@@ -290,6 +302,18 @@
           >
           <div class="dialog-slot">
             {{changeInspectObj.showInfo}}
+          </div>
+        </dialog-pop>
+        <dialog-pop
+          v-if="EditRptchangeInspectObj.dialogCosed"
+          :title="EditRptchangeInspectObj.title"
+          :isWarning="EditRptchangeInspectObj.isWarning"
+          :visible="EditRptchangeInspectObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="canceldChangeInspect"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeInspectObj.showInfo}}
           </div>
         </dialog-pop>
         <dialog-pop
@@ -588,7 +612,7 @@
                       </div>
                       <div v-if="item.itemType === 0">
                         <el-dropdown v-if="item.groupType !== 1" :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore || item.notEdit">
+                                      trigger="click" class="item-score" size="small" :disabled="(item.manualIgnore || item.notEdit)">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -601,7 +625,7 @@
                           </el-dropdown-menu>
                         </el-dropdown>
                         <el-dropdown v-else :class="!item.manualIgnore?'noraml-title':'ignore-title'"
-                                      trigger="click" class="item-score" size="small" :disabled="item.manualIgnore || item.notEdit">
+                                      trigger="click" class="item-score" size="small" :disabled="(item.manualIgnore || item.notEdit)">
                           <span class="el-dropdown-link">
                             {{ `${$t('remotePatrol.scoreUnit')}${item.itemScoreTitle}` }}
                             <i class="el-icon-arrow-down el-icon--right"/>
@@ -614,7 +638,9 @@
                               @click.native="checkScore({item,itemDS: itemDS,index: index, e:1})">{{ itemDS }}</el-dropdown-item>
                           </el-dropdown-menu>
                         </el-dropdown>
-                        <div v-if="!item.required" class="cancel-text" @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
+                        <div v-if="!item.required" class="cancel-text" 
+                          :style="(item.notEdit && isEditReport)?{'pointer-events':'none'}:{'pointer-events':'auto'}"
+                          @click="item.manualIgnore ? CancleIgnoreItem({item,index}) : ignoreItem({item,index,e:0})">{{item.manualIgnore ? $t('remotePatrol.cancel') : $t('remotePatrol.ignore')}}</div>
                       </div>
                     </div>
                   </div>
@@ -968,6 +994,18 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
+      EditRptchangeInspectObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.cannotSwitchInspect'),
+        isWarning: false,
+        dialogCosed: false
+      },
+      EditRptchangeBrandObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.cannotSwitchBrand'),
+        isWarning: false,
+        dialogCosed: false
+      },
       recorder: null,
       videoCanvasSrc: '',
       isRecordingStarted: false,
@@ -1091,6 +1129,7 @@ export default {
           self.$store.dispatch('setStoreList', []);
           self.$store.dispatch('setStoreCache', null);
           self.$store.dispatch('setEditCount', 0);
+          self.$store.dispatch('setEditReport', false);
           Database.addDataToDB(self.userId, {data: {}, rule: {}});
         } else {
           //   from.meta.keepAlive = true;
@@ -1098,6 +1137,7 @@ export default {
           self.$store.dispatch('setStoreList', self.storeList);
           self.$store.dispatch('setPatrolHistory', self.historyObj);
           self.$store.dispatch('setStoreCache', this.curSelStoreId);
+          self.$store.dispatch('setEditReport', self.isEditReport);
         }
         !self.showGuide &&  self.$refs.vendorVideo.stopVideoPlay();
         next();
@@ -1110,6 +1150,7 @@ export default {
         // from.meta.keepAlive=false;
         this.editCount = 0;
         this.$store.dispatch('setEditCount', this.editCount);
+         self.$store.dispatch('setEditReport', false);
         self.$store.dispatch('setPatrolHistory', null);
         self.$store.dispatch('setPatrolComment', null);
         self.$store.dispatch('setStoreList', []);
@@ -1120,6 +1161,7 @@ export default {
         self.$store.dispatch('setPatrolHistory', self.historyObj);
         self.$store.dispatch('setStoreList', self.storeList);
         self.$store.dispatch('setStoreCache', this.curSelStoreId);
+         self.$store.dispatch('setEditReport', self.isEditReport);
       }
       !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       next();
@@ -1213,6 +1255,8 @@ export default {
     } else {
       self.getAllStore();
     }
+    self.$store.dispatch('setEditReport', self.isEditReport);
+    console.log("this.$store.getters.editReport:",this.$store.getters.editReport);
     document.onmouseup = self.mouseUpAction;
     self.getUpLoadBucketInfo();
     self.getOssInfo();
@@ -1728,7 +1772,10 @@ export default {
       if (self.$store.getters.editCount > 0) {
         self.changeInspectObj.dialogCosed = true;
         self.beforepatrolstore = val;
-      } else {
+      } if(self.isEditReport){
+        self.EditRptchangeInspectObj.dialogCosed = true;
+        self.beforepatrolstore = val;
+      }else {
         self.changeInspectList(val);
       }
     },
@@ -1964,7 +2011,7 @@ export default {
         sheet.Effective = 1;
         console.log("sheet:",sheet);
         if(sheet.groupId!="feedBack"){
-          var dealCount=0;
+          
           var tabIncep = hisData.find( hd => hd.groupName==sheet.label );
           console.log("tabIncep:",tabIncep);
           if(tabIncep.children){//有三層時的第二層 對應sheet.inspectList
@@ -1982,15 +2029,15 @@ export default {
                   }
                 });
                 //console.log("sheetItem:",sheetItem);
-                
+                var dealCount=0;
                 sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,secCat.cateryItems,sheetItem.type);
                 sheet.inspectList[childIdx].items.forEach(it=>{
                   dealCount += it.inputCount;
                 });
-                //console.log("1.dealCount:",dealCount);
-                
+                console.log("1.dealCount:",dealCount);
+                sheet.inspectList[childIdx].dealCount = dealCount;
             }
-            //sheet.dealCount = dealCount;
+            sheet.dealCount = dealCount;
           }else{
             var secSheetCat = sheet.inspectList;
             var childIdx = 0;
@@ -2000,12 +2047,13 @@ export default {
                   return sec;
               }
             });
+            var dealCount=0;
             sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,tabIncep.cateryItems,sheetItem.type);
             sheet.inspectList[childIdx].items.forEach(it=>{
                   dealCount += it.inputCount;
             });
-            //console.log("2.dealCount:",dealCount);
-            
+            console.log("2.dealCount:",dealCount);
+            sheet.inspectList[childIdx].dealCount = dealCount;
           }
           sheet.dealCount = dealCount;
         }
@@ -2029,20 +2077,21 @@ export default {
           sheetItem[i].scoreList[scoreIdx].isClick = true;
           sheetItem[i].isQualified = (cateryItems[i].grade==1) ? true:false;
           sheetItem[i].inputCount++;
-          dealCount++;
+          //dealCount++;
           if(!this.auditCancelable && cateryItems[i].grade==0){//不能取消且不合格，不能編輯
             console.log("不能取消，不能編輯不合格項");
             sheetItem[i].notEdit = true;
+            dealCount++;
           }
           console.log("sheetItem[i]",sheetItem[i]);
         }else{
           sheetItem[i].itemScoreTitle=cateryItems[i].grade;
           sheetItem[i].itemgetScore=cateryItems[i].grade;
           sheetItem[i].inputCount++;
-          dealCount++;
+          if(cateryItems[i].grade==1) dealCount++;
         }
         if(cateryItems[i].showAttachment){
-          sheetItem[i].inputCount++;
+          sheetItem[i].dealCount++;
           dealCount++;
           var att=[];
           for(let x=0;x<cateryItems[i].descriptionList.length;x++){
@@ -2926,15 +2975,25 @@ export default {
     },
     canceldChangeInspect() {
       const self = this;
-      self.changeInspectObj.dialogCosed = false;
+       if(self.isEditReport)  self.EditRptchangeInspectObj.dialogCosed = false;
+       else self.changeInspectObj.dialogCosed = false;
     },
     canceldChangeStore() {
       const self = this;
-      self.changeStoreObj.dialogCosed = false;
+      if(self.isEditReport){
+        self.EditRptchangeStoreObj.dialogCosed = false;
+      }else{
+        self.changeStoreObj.dialogCosed = false;
+      }
+      
     },
     canceldChangeBrand() {
       const self = this;
-      self.changeBrandObj.dialogCosed = false;
+      if(self.isEditReport){
+        self.EditRptchangeBrandObj.dialogCosed = false;
+      }else{
+        self.changeBrandObj.dialogCosed = false;
+      }
     },
 
     lastBar() {
@@ -3233,6 +3292,7 @@ export default {
       });
     },
     clickStore(item, index, _item, _index) {
+      
       const self = this;
       if (!_item.hasInspect && _item.hasInspect != undefined) {
         return false;
@@ -3248,7 +3308,9 @@ export default {
       if ( (!self.showGuide && self.$refs.vendorVideo && self.$refs.vendorVideo.editCount != 0)
           || (self.$store.getters.PatrolHistory != null) ) {
         self.changeStoreObj.dialogCosed = true;
-      } else {
+      } else if(self.isEditReport){
+        self.EditRptchangeStoreObj.dialogCosed = true;
+      }else {
         self.changeStore(item, index, _item, _index);
       }
     },
