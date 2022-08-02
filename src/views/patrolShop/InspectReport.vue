@@ -29,23 +29,23 @@
       </div>
     </div>
     <div class="el-header">
-      <div class="workflow-edit" v-if="isAuditMode">
+      <div class="workflow-edit">
         <p :class="{'pdf-report-title': isexportPDF, 'report-title': !isexportPDF, 'nochart-report-title': !hasChart}">
           {{ $t('audit.inceptionRpt.auditReport') }}
         </p>
         <div style="display:inline-block">
           <el-button 
-            v-if="showEditBtn"
+            v-if="true"
             class="confirm-btn"
             size="'mini'" type="primary" @click="goBackRemoteInception">
             {{ $t('audit.inceptionRpt.edit') }}
           </el-button>
-          <el-button
+          <!--<el-button
             v-if="showCancelBtn"
             class="storevue-button-filled"
             size="'mini'" type="primary" @click="doCancelAudit">
             {{ $t('audit.inceptionRpt.cancelAudit') }}
-          </el-button>
+          </el-button>-->
         </div>   
       </div>
       <div class="splitline" v-if="isAuditMode"></div>
