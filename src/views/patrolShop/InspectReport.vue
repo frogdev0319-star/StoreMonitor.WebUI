@@ -1722,25 +1722,11 @@ export default {
         isEdit:true,
         reportComment:this.reportData.comment
       };
-      if(self.auditState!=3 && self.auditState!=6  && self.auditState!=7){//撤回跟駁回不需要再drawback
-      console.log("doDrawbak!!!!");
-        var drawbackParam = {inspectReportId:self.report.reportId};
-        taskDrawback(drawbackParam).then(res=>{
-            self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
-          /*self.$store.dispatch('setStoreList', self.storeList);*/
-          self.$store.dispatch('setStoreCache', self.reportData.storeId);
-          this.$router.push({ name: 'remotePatrol', params: params });
-        }).catch(err=>{
-          util.notify(self.$t('audit.inceptionRpt.editAuditFail')+':'+err, 'warning', 3000);
-          self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
-          self.$store.dispatch('setStoreCache', self.reportData.storeId);
-          this.$router.push({ name: 'remotePatrol', params: params });
-        });
-      }else{//除非送簽者自己回去編輯
+      
         self.$store.dispatch('setBackPatrolParam', BackPatrolParam);
         self.$store.dispatch('setStoreCache', self.reportData.storeId);
         this.$router.push({ name: 'remotePatrol', params: params });
-      }
+      
     },
     doCancelAudit(){
       console.log("doCancelAudit");
