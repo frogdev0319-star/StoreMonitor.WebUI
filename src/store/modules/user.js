@@ -344,7 +344,7 @@ const user = {
         }
         commit('SET_ROUTES', accessedRoutes);
         commit('SET_Available_Path_List', navbarRoute.getAvailablePath());
-        if (user.state.authorities.length >= 6) {
+        if (user.state.authorities.length === 6) {
           const videoAccess = !!PermissionHelper.enableVideo();
           commit('SET_Video_Authority', videoAccess);
         }

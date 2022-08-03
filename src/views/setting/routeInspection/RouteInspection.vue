@@ -1327,7 +1327,7 @@ export default {
           if(availableScore.length>0){
             const maxAvailableScore = (availableScore.length==0)? 0:availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
             item['itemScore'] = maxAvailableScore;
-            item['qualifiedScore'] = (typeof item['qualifiedScore']==='undefined' || item['qualifiedScore'].length === 0) ? maxAvailableScore : item['qualifiedScore'];
+            item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
           }else{
             item['itemScore'] = 0;
             item['type'] = 1;
