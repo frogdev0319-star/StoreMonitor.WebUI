@@ -62,7 +62,6 @@ export default {
       showingBtn: true,
 
       onEditing: false,
-  
     }
   },
   

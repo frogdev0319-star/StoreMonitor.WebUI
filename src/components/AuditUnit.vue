@@ -27,8 +27,13 @@
 							<div class="audit-description">
 								<div class="audit-description-comment" v-if="task.comment !== null " >{{task.comment.description}}</div>
 								<div class="audit-description-data" v-if="task.comment !== null ">
-									<img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts" style="background: #FFF">
-									<img :src="blopImg.url" alt="" v-for="blopImg in task.comment.attachment" :key="blopImg.ts">
+									<img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts" style="background: #FFF" >
+
+									<div class="iimg"  v-for="blopImg in task.comment.attachment" :key="blopImg.ts">
+										<img :src="blopImg.url" alt="" v-if="blopImg.mediaType == 2">
+										<a class="pdfLink" :href="blopImg.url" v-if="blopImg.mediaType == 4"></a>
+									</div>
+									
 								</div>
 							</div>
 						</div>
@@ -160,5 +165,20 @@ export default {
 							width: auto
 							height: 120px
 							border-radius: 4px
-  
+						.pdfLink
+							display: block
+							margin-top: 10px
+							margin-right: 10px
+							width: 80px
+							height: 120px
+							background: #190
+							border-radius: 4px
+							display: flex
+							flex-direction: row
+							justify-content: center
+							align-items: center
+							background: url("~@/../static/img/PDF_file_icon.svg") center
+							background-size: contain
+							background-repeat: no-repeat
+							
 </style>

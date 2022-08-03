@@ -387,6 +387,8 @@ export default {
       loadingGif: require('../../static/img/loading.svg'),
       expands: "",
       expandRowKeys: [],
+
+  
       
     };
   },
@@ -586,8 +588,45 @@ export default {
     indexMethod(index){
       return index 
     },
+
+
     handleSelectionChange(val){
-      this.$emit('selectionChanged', val);
+      // console.log('val 1', val)
+      this.rows = val
+      this.$emit('handleSelectionChange',{val});
+    },
+
+    clear(){
+      this.$refs.tablePagination.clearSelection()
+    },
+
+    toggleChecked(tag){
+      // console.log('unChecked')
+      // console.log('tag !!!', tag)
+      // console.log('this.tableData !!!', this.tableData)
+
+      var row = this.tableData.filter(element => 
+          element.userName == tag.userName
+      );
+      console.log('row', row)
+      this.$refs.tablePagination.toggleRowSelection(row[0])
+      
+    },
+
+    fromInputSelect(data){
+      // console.log('data~~~>', data)
+      var temp = []
+      this.tableData.forEach(element => {
+        data.forEach( i =>{
+          if(element.userId == i){
+            temp.push(element)
+          }
+        })
+      });
+      this.$refs.tablePagination.clearSelection()
+      temp.forEach(row => {
+        this.$refs.tablePagination.toggleRowSelection(row, true);
+      });
     }
   }
 };

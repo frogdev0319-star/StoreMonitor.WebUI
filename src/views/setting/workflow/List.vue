@@ -198,54 +198,54 @@ export default {
               1,
           ]
       },
-      newFlow:{
-        "name": "" ,
-        "description": "",
-        "type": 0,
-        "cancelable": true,
-        "copyToUsers": [],
-        "copyToGroups": [],
-        // "nextAuditNode": {
-        //   "name": "default flow",
-        //   "auditMethod": 1,
-        //   "signature": false,
-        //   "auditTargetType": 0, // 0 - 個人, 1 - 群組
-        //   "customButton": [
-        //       {
-        //           "type": 0,
-        //           "text": this.$t('audit.workFlows.agree'),
-        //           "enable": true
-        //       },
-        //       {
-        //           "type": 1,
-        //           "text": this.$t('audit.workFlows.reject'),
-        //           "enable": true
-        //       }
-        //   ],
-        //   "auditByUsers": [],
-        //   "auditByGroups": [],
-        //   "nextAuditNode": {
-        //     "name": "default flow 1",
-        //     "auditMethod": 1,
-        //     "signature": false,
-        //     "customButton": [
-        //         {
-        //             "type": 0,
-        //             "text": this.$t('audit.workFlows.agree'),
-        //             "enable": true
-        //         },
-        //         {
-        //             "type": 1,
-        //             "text": this.$t('audit.workFlows.reject'),
-        //             "enable": true
-        //         }
-        //     ],
-        //     "auditByUsers": [],
-        //     "auditByGroups": [],
-        //   }
-        // },
+      // newFlow:{
+      //   "name": "" ,
+      //   "description": "",
+      //   "type": 0,
+      //   "cancelable": true,
+      //   "copyToUsers": [],
+      //   "copyToGroups": [],
+      //   "nextAuditNode": {
+      //     "name": "default flow",
+      //     "auditMethod": 1,
+      //     "signature": false,
+      //     "auditTargetType": 0, // 0 - 個人, 1 - 群組
+      //     "customButton": [
+      //         {
+      //             "type": 0,
+      //             "text": this.$t('audit.workFlows.agree'),
+      //             "enable": true
+      //         },
+      //         {
+      //             "type": 1,
+      //             "text": this.$t('audit.workFlows.reject'),
+      //             "enable": true
+      //         }
+      //     ],
+      //     "auditByUsers": [],
+      //     "auditByGroups": [],
+      //     "nextAuditNode": {
+      //       "name": "default flow 1",
+      //       "auditMethod": 1,
+      //       "signature": false,
+      //       "customButton": [
+      //           {
+      //               "type": 0,
+      //               "text": this.$t('audit.workFlows.agree'),
+      //               "enable": true
+      //           },
+      //           {
+      //               "type": 1,
+      //               "text": this.$t('audit.workFlows.reject'),
+      //               "enable": true
+      //           }
+      //       ],
+      //       "auditByUsers": [],
+      //       "auditByGroups": [],
+      //     }
+      //   },
       
-      }
+      // }
     }
   },
   mounted() {
@@ -283,6 +283,8 @@ export default {
         // console.log('newApiBody :>> ', newApiBody);
         await this.getWorkflowList(newApiBody);
       }
+
+      sessionStorage.removeItem('pageAction')
     },
 
     async getUserInfo(){
@@ -325,7 +327,6 @@ export default {
       });
     },
     creadNewFlow(){
-  
       // var time = new Date()
       // var theTime = time.getTime()
       // var t = {
@@ -341,6 +342,13 @@ export default {
       // sessionStorage.setItem('newWorkFlow', JSON.stringify(this.newFlow))
       // console.log('this.newFlow :>> ', this.newFlow);
 
+
+
+
+      sessionStorage.removeItem('workflowDetail')
+      sessionStorage.removeItem('newWorkFlow')
+
+      sessionStorage.setItem('pageAction', JSON.stringify("init"))
       this.$router.push({name: 'createWorkflow'})
 
       // creadNewFlow(this.newFlow).then(res=>{

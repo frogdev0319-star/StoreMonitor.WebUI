@@ -6,6 +6,7 @@
     :height="dialogHeight"
     :show-close="false"
     :class="isForm ? 'storevue-form-dialog' : 'storevue-dialog'"
+    
   >
   <template slot="title">
 
@@ -101,7 +102,9 @@ export default {
       }
     }
   },
-
+  mounted() {
+    ; //方法
+    },
   methods: {
     cancelHandler() {
       this.$emit('cancelHandler');
@@ -114,6 +117,9 @@ export default {
     hasIgnoreHandler() {
       this.$emit('hasIgnoreHandler');
     },
+
+  
+
   }
 };
 </script>

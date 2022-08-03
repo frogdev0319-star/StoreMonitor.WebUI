@@ -10,6 +10,7 @@
         @click="saveNode"
         v-loading.fullscreen.lock="fullscreenLoading"
         >{{$t('audit.workFlows.save')}}</delay-button>
+        
     </div>
 
     <!-- 基本信息 -->
@@ -24,9 +25,13 @@
                 <div class="title-name"><span style="color: #c60957">* </span> {{$t('audit.workFlows.nodeName')}}</div>
                 <div class="title-status">
                   <el-input
+                    ref="nodeName"
                     v-model="nodeData.name"
                     :placeholder="$t('audit.workFlows.inputNodeName')"
-                    class="input-name"/>
+                    class="input-name"
+                    maxlength="20"
+                    show-word-limit
+                    />
                 </div>
 
                 <el-radio-group class="select_audit storevue-radio" v-model="nodeData.auditTargetType">
@@ -35,7 +40,7 @@
                     <el-radio :label="1">{{$t('audit.workFlows.auditDepart')}}</el-radio> 
                     <el-select 
                       v-model="departmentStatus" 
-                      :placeholder="$t('audit.workFlows.auditDepart')" 
+                      :placeholder="$t('audit.workFlows.selectAuditDepart')" 
                       :disabled="nodeData.auditTargetType == 0 || nodeData.auditTargetType == null">
                       <el-option
                         v-for="item in department"
@@ -52,7 +57,7 @@
                     <el-select
                       v-model="auditUsers"
                       filterable
-                      :placeholder="$t('audit.workFlows.auditUser')"
+                      :placeholder="$t('audit.workFlows.selectAuditUser')"
                       :loading="loading" 
                       :disabled="nodeData.auditTargetType == 1 || nodeData.auditTargetType == null"
                       >
@@ -66,7 +71,7 @@
                   </div>
                 </el-radio-group>
               
-                <!-- <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>   -->
+                <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
                 
               </div>
 
@@ -79,7 +84,7 @@
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
-                      placement="bottom-end">
+                      placement="bottom-start">
                       <div slot="content">{{$t('audit.workFlows.rule_countersigned')}}</div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
@@ -88,7 +93,7 @@
                     <el-tooltip
                       class="date-time-tooltip"
                       effect="light"
-                      placement="bottom-end">
+                      placement="bottom-start">
                       <div slot="content">{{$t('audit.workFlows.rule_coSign')}}</div>
                       <i class="iconfont icon-bangzhu iconbangzhu"/>
                     </el-tooltip>
@@ -109,7 +114,10 @@
                           :placeholder="$t('audit.workFlows.defineItem')"
                           :disabled="btnDefaultAgree == 0"
                           v-model="defineAgree"
-                          class="input-name"/>
+                          class="input-name"
+                          maxlength="8"
+                          show-word-limit
+                          />
                       </el-radio-group>
                     </div>
 
@@ -121,7 +129,10 @@
                           :placeholder="$t('audit.workFlows.defineItem')"
                           :disabled="btnDefaultReject == 0"
                           v-model="defineReject"
-                          class="input-name"/>
+                          class="input-name"
+                          maxlength="8"
+                          show-word-limit
+                          />
                       </el-radio-group>
                     </div>
 
@@ -196,7 +207,7 @@
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {updateWorkflow} from "@/api/workflow";
-import {getDepartmentList } from '@/api/checkin';
+import {getDepart } from '@/api/login';
 import {getUserInfo} from '@/api/login';
 
 
@@ -217,7 +228,7 @@ export default {
       dataFromRoute: {},
       workflowDetail: {},
       department: [],
-      departmentStatus: [],
+      departmentStatus: "",
       userInfo:[],
 
 
@@ -293,7 +304,6 @@ export default {
   methods: {
     async init(){
       
-
       await this.getNodeInfo() 
       await this.getWorkflowInfo()
       await this.getUserInfo()
@@ -304,8 +314,9 @@ export default {
 
     // get getDepart
     async getDepartmentList(){
-      await getDepartmentList({ type: 0 }).then(res=>{
+      await getDepart({ type: 0 }).then(res=>{
         this.department = res.data
+        console.log('this.department ~~~~~>', this.department)
       }).catch(err => {
         console.log('error' + err);
       });
@@ -315,7 +326,7 @@ export default {
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
-        console.log('getWorkflowInfo ------>> ', this.userInfo);
+        console.log('userInfo ------>> ', this.userInfo);
 
       }).catch(err => {
         console.log('error' + err);
@@ -354,13 +365,14 @@ export default {
 
       // 取得部門資訊 & 簽核部門
       await this.getDepartmentList() 
-      this.departmentStatus = this.nodeData.auditByGroups.toString()
+      // this.departmentStatus = this.nodeData.auditByGroups.toString()
+      this.departmentStatus = this.department[0].defineId
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
     },
 
     saveNode(){
-      this.fullscreenLoading = true
+      // this.fullscreenLoading = true
 
       // handle btn naming
       if(this.btnDefaultAgree == 1){
@@ -375,7 +387,6 @@ export default {
         this.nodeData.customButton[1].text = ''
         this.nodeData.customButton[1].text = this.$t('audit.workFlows.reject')
       }
-
 
       if(this.nodeData.id == undefined){
         // add node
@@ -411,36 +422,31 @@ export default {
         this.fullscreenLoading = false
         return
       }
-      console.log('this.apiData call api', this.apiData)
-      
-      // call api
-      updateWorkflow(this.apiData).then(res=>{
-        console.log('res :>> ', res);
-        this.$router.push({name: 'workflowDetail'})
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
-    },
 
+      var status = sessionStorage.getItem('pageAction');
+      const pageAction = JSON.parse(status)
+      // console.log('pageAction', pageAction)
     
-    // submit() {
-    //   let array = this.workflowDetail.nextNodes;
-    //   let object = { ...array[0] };
-    //   let i = array.length - 1;
-    //   while(i >= 0) {
-    //     object['nextAuditNode'] = { ...array[i].nextAuditNode };
-    //     i--;
-    //   }
-    //   let nextAuditNode = JSON.parse(JSON.stringify(object));
-    //   updateWorkflow({
-    //     ...this.workflowDetail,
-    //     nextAuditNode
-    //   }).then(res => {
-    //     console.log(res);
-    //   });
-    // }
+      if(pageAction == "create" || pageAction == "edit"  ){
+        this.$router.push({name: 'createWorkflow'})
+        sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
+        console.log('this.apiData call api', this.apiData.orderedAuditNodeArray)
+      } else if(pageAction == "set"){
+        // call api
+        updateWorkflow(this.apiData).then(res=>{
+          console.log('res :>> ', res);
+          this.$router.push({name: 'workflowDetail'})
+          this.isLoadingData = false
+        }).catch(err => {
+          this.isLoadingData = false;
+          
+          console.log('error' , err);
+          util.notify(this.$t('audit.workFlows.cantRepeatName'), 'error', 2000 );
+          this.$refs.workflowName.focus()
+          reject(err);
+        });
+      }
+    },
   }
 };
 </script>
@@ -533,6 +539,13 @@ export default {
     .el-input
       margin-left: 10px
 </style>
+
+<style lang="sass">
+  .title-status
+    .el-input__count-inner
+      margin-top: 55px
+</style>
+
 
 <style scoped>
   .report-setting{

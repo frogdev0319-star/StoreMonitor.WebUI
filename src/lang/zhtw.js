@@ -1286,6 +1286,7 @@ export default{
       "workFlowsState":"建立時間",
       "searchPlaceholder":"搜尋流程名稱",
       "addWorkFlow":"新增流程",
+      "saveAndEnable":"儲存並啟用",
       "comfirmDelete":"確認刪除當前簽核流程？",
       "comfirmDeleteNode":"確認刪除當前簽核流程節點？",
       "canNotDelete":"已綁定簽核流程無法刪除",
@@ -1293,9 +1294,10 @@ export default{
       "deleteScuccess":"删除成功",
       "deleteFail":"删除失敗",
       "workFlowConfiguration":"流程配置",
+      "workFlowSetting":"流程設定",
       "saveAndPublic":"保存並發布",
       "saveAndPublic":"保存並發布",
-      "basicInformation":"基本信息",
+      "basicInformation":"基本資訊",
       "workFlowName":"流程名稱",
       "workFlowClassification":"流程分類",
       "inspectionForm":"巡檢表單",
@@ -1322,11 +1324,13 @@ export default{
       "inputNodeName": "請輸入節點名稱",
       "auditDepart": "簽核部門",
       "auditUser": "簽核人員",
+      "selectAuditDepart": "請選擇簽核部門",
+      "selectAuditUser": "請選擇簽核人員",
       "auditMethod": "簽核方式",
       "auditButton": "簽核按鈕",
       "selectDepart": "簽核按鈕",
-      "rule_countersigned": "需全部人通過",
-      "rule_coSign": "一人通過，則通過；一人駁回，則駁回",
+      "rule_countersigned": "每個處理人都要同意才可以到下一級；只要有一個處理人駁回就駁回 ",
+      "rule_coSign": "只要有一個處理人同意即可到下一級；每個處理人都要駁回才算駁回",
       "agree": "同意",
       "reject": "駁回",
       "withdraw": "撤回",
@@ -1338,7 +1342,11 @@ export default{
       "day": "天",
       "submitAudit": "送出簽核",
       "addNode": "新增節點",
-      "cantEmpty": "簽核人員不可為空，請設定簽核人員"
+      "cantEmpty": "簽核人員不可為空，請設定簽核人員",
+      "cantRepeatName": "節點名稱不可重複",
+      "cantRepeatWorkflowName": "流程名稱不可重複",
+      "cantEmptyWorkflowName": "流程名稱不可以為空"
+
 
 
     },
