@@ -1303,6 +1303,7 @@ export default {
         const item = {};
         rowCells.forEach(cell => {
           const key = cell.header && cell.header.tag;
+          console.log("mapping[key]:",mapping[key])
           if (!mapping[key]) return;
           if (mapping[key] === 'availableScores') {
             item[mapping[key]] = cell.v ? cell.v.split('/').map(item => Number(item)) : cell.v === 0 ? [0] : [];
@@ -1315,6 +1316,8 @@ export default {
           } else if (mapping[key] === 'description') {
             item[mapping[key]] = cell.v ? cell.v.toString().substring(0, 1200) : '';
           } else if (mapping[key] === 'required') {
+            console.log("mapping[key] === 'required'")
+            console.log("cell.v:",cell.v)
             item[mapping[key]] = cell.v === 'Y' || cell.v === 'y'
           } else {
             item[mapping[key]] = cell.v || '';
@@ -1326,7 +1329,7 @@ export default {
           if(availableScore.length>0){
             const maxAvailableScore = (availableScore.length==0)? 0:availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
             item['itemScore'] = maxAvailableScore;
-            item['qualifiedScore'] = (typeof item['qualifiedScore']==='undefined' || item['qualifiedScore'].length === 0) ? maxAvailableScore : item['qualifiedScore'];
+            item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
           }else{
             item['itemScore'] = 0;
             item['type'] = 1;
@@ -1754,12 +1757,13 @@ export default {
           let ScoreCopy = deepClone(Score);
           let OthersCopy = deepClone(Others);
           const tableVersion = _this.getTableVersonBasedOnWeight(PassFail, Score, Others);
-
+          console.log('**tableVersion:',tableVersion);
           outdata.PassFail = _this.getPassAndFailSheetJsonData(wb, PassFail, tableVersion);
           outdata.Score = _this.getScoreSheetJsonData(wb, Score, tableVersion);
           outdata.Others = _this.getOthersSheetJsonData(wb, Others, tableVersion);
           
           if (outdata.PassFail.length > 0) {
+            console.log("outdata.PassFail:",outdata.PassFail)
             if (!outdata.PassFail[0].catergyName) {
               PassFailCopy.A2 = {
                 h: _this.$t('insSettingView.Ratingitems'),
@@ -1869,6 +1873,7 @@ export default {
         const sheetArray = XLSX.utils.sheet_to_json(sheet);
         const rowDataArray = [];
         sheetArray.forEach((_item) => {
+          
           const rowDataObj = {};
           rowDataObj.catergyName = this.getTableCellData(_item.__EMPTY);
           rowDataObj.weight = _item.__EMPTY_1;
@@ -1876,7 +1881,8 @@ export default {
           rowDataObj.itemName = this.getTableCellData(_item.__EMPTY_3);
           rowDataObj.score = _item.__EMPTY_4;
           rowDataObj.description = this.getTableCellData(_item['巡檢項目詳細說明（選填，1200字元）']);
-          rowDataObj.required = _item.__EMPTY_5;
+          console.log('**_item.__EMPTY_5:',_item.__EMPTY_5);
+          rowDataObj.required = (typeof _item.__EMPTY_5=='undefined')?'':_item.__EMPTY_5;
           // if (tableVersion === 1) {
           //   rowDataObj.subCatergyName = '';
           //   rowDataObj.weight = _item.__EMPTY_1;
@@ -1895,6 +1901,7 @@ export default {
 
           rowDataArray.push(rowDataObj);
         });
+        console.log('**rowDataArray:',rowDataArray);
         return rowDataArray;
       }
       return [];
@@ -2339,6 +2346,7 @@ export default {
           }
         }
       }
+      console.log("**passFailSheet:",passFailSheet);
       return passFailSheet;
     },
 
