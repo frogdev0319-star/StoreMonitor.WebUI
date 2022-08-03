@@ -887,7 +887,7 @@ export default {
         Score && await this.resolveSheetData(Score, 'Score');
         Others && await this.resolveSheetData(Others, 'Others');
         await this.getTagList('add');
-      } catch (e) {
+      }catch (e) {
         util.notify(this.$t('insSettingView.importFail'), 'warning', 3000);
         console.log('importFile -' + e);
       }
@@ -1259,7 +1259,6 @@ export default {
       primaryGroupCelss.map((cell, i) => {
         sheet[cell.cellRef].id = primaryResult.data[i];
       });
-
       if (secondaryGroupCells.length) {
         addGroupParams = secondaryGroupCells.map(cell => {
           return {
@@ -1327,7 +1326,7 @@ export default {
           if(availableScore.length>0){
             const maxAvailableScore = (availableScore.length==0)? 0:availableScore.sort((a, b) => { return a - b; })[availableScore.length - 1];
             item['itemScore'] = maxAvailableScore;
-            item['qualifiedScore'] = item['qualifiedScore'].length === 0 ? maxAvailableScore : item['qualifiedScore'];
+            item['qualifiedScore'] = (typeof item['qualifiedScore']==='undefined' || item['qualifiedScore'].length === 0) ? maxAvailableScore : item['qualifiedScore'];
           }else{
             item['itemScore'] = 0;
             item['type'] = 1;
