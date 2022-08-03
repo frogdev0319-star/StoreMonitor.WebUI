@@ -499,7 +499,10 @@ export default{
         "wed":"三"
     },
       "zoneList":"攝影機列表",
-      "commentCountRuleTip":"文字評論最多輸入5則",
+    "commentCountRuleTip":"文字評論最多輸入5則",
+    "cannotSwitch":"正在編輯報告，不能切換當前門店？",
+    "cannotSwitchBrand":"正在編輯報告，不能切換當前品牌？",
+    "cannotSwitchInspect":"正在編輯報告，不能切換當前巡檢表"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",

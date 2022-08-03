@@ -45,6 +45,7 @@ const user = {
     favoriteList:false,
     mimicMode:false,
     isMystery:false,
+    editReport:false,
   },
 
   mutations: {
@@ -170,7 +171,10 @@ const user = {
     SET_ISMYSTERY:(state,mode)=>{
       console.log("SET_ISMYSTERY:",mode);
       state.isMystery = mode;
-    }
+    },
+    SET_EDIT_REPORT:(state,mode)=>{
+      state.editReport = mode;
+    },
   },
   actions: {
     setEditCount({ commit }, count) {
@@ -212,6 +216,9 @@ const user = {
     },
     setMimicMode({ commit }, mode){
       commit('SET_MIMIC_MODE',mode)
+    },
+    setEditReport({ commit }, mode){
+      commit('SET_EDIT_REPORT',mode)
     },
     GetDash({ commit }) {
       return new Promise((resolve, reject) => {
@@ -373,7 +380,7 @@ const user = {
         }
         commit('SET_ROUTES', accessedRoutes);
         commit('SET_Available_Path_List', navbarRoute.getAvailablePath());
-        if (user.state.authorities.length === 6) {
+        if (user.state.authorities.length >= 6) {
           const videoAccess = !!PermissionHelper.enableVideo();
           commit('SET_Video_Authority', videoAccess);
         }

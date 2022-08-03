@@ -105,6 +105,18 @@
           {{changeStoreObj.showInfo}}
         </div>
       </dialog-pop>
+      <dialog-pop
+          v-if="EditRptchangeStoreObj.dialogCosed"
+          :title="EditRptchangeStoreObj.title"
+          :isWarning="EditRptchangeStoreObj.isWarning"
+          :visible="EditRptchangeStoreObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="canceldChangeStore"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeStoreObj.showInfo}}
+          </div>
+        </dialog-pop>
     </div>
 
     <div v-if="!multiStore" class="spacer"></div>
@@ -220,6 +232,12 @@ export default {
         isWarning: true,
         dialogCosed: false
       },
+      EditRptchangeStoreObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.cannotSwitch'),
+        isWarning: false,
+        dialogCosed: false
+      },
     };
   },
 
@@ -283,6 +301,9 @@ export default {
         this.changeStoreObj.showInfo = this.$t('remotePatrol.confirmSwitch'),
         this.checkCurStoreInFavorite = true;
         this.changeStoreObj.dialogCosed = true;
+      }else if(this.$store.getters.editReport){
+        this.checkCurStoreInFavorite = true;
+        this.EditRptchangeStoreObj.dialogCosed = true;
       }else{
       this.isFavorite = !this.isFavorite;
         this.getStoreListAndGroupAndType();
@@ -390,7 +411,10 @@ export default {
         this.checkCurStoreInFavorite= false;
         //this.getStoreListAndGroupAndType();
       }
-      this.changeStoreObj.dialogCosed = false;
+      if(this.$store.getters.editReport){
+        this.EditRptchangeStoreObj.dialogCosed = false;
+      }else
+        this.changeStoreObj.dialogCosed = false;
       this.curSelectedStore_ = '';
     },
     changeStoreDialog () {
@@ -419,6 +443,9 @@ export default {
         this.curSelectedStore_ = val;
         this.changeStoreObj.showInfo = this.$t('remotePatrol.confirmSwitch'),
         this.changeStoreObj.dialogCosed = true;
+      }else if(this.$store.getters.editReport){
+        this.curSelectedStore_ = val;
+        this.EditRptchangeStoreObj.dialogCosed = true;
       }else {
         this.curSelectedStore=val
         this.emitParams();
