@@ -889,15 +889,16 @@ export default {
                   routeData = {
                       isSuccess: true,
                       user: data.notifiedTo,
-                      isBindWorkflow:true
+                      isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableWaitAudit() || !!PermissionHelper.enableTranscriptNotify()
                   };
                 }else{
                   routeData = {
                     isSuccess: false,
                     reLoadData: self.$route.params,
-                    isBindWorkflow:true
+                    isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableWaitAudit() || !!PermissionHelper.enableTranscriptNotify()
                   };
                 }
+                
                 self.$router.push({ name: 'submitEvent', params: { data: routeData }});
               }).catch(err=>{
                   console.log("err:",err);
@@ -936,7 +937,7 @@ export default {
       var routeData = {
         isSuccess: false,
         reLoadData: self.$route.params,
-        isBindWorkflow:true
+        isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableWaitAudit() || !!PermissionHelper.enableTranscriptNotify()
       };
       var resReportModify = modifyReportWorkflow(params);
       var resWorkflowTask = getReportWorkflowTask({type:0,inspectReportId:self.reportId});
@@ -982,8 +983,9 @@ export default {
               self.$store.dispatch('setEditCount', 0);
               routeData = {
                   isSuccess: true,
-                  isBindWorkflow:true
+                  isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableWaitAudit() || !!PermissionHelper.enableTranscriptNotify()
               };
+              console.log("routeData:",routeData);
               self.$router.push({ name: 'submitEvent', params: { data: routeData}});
             }
           }).catch(errSubTask=>{
@@ -1006,7 +1008,7 @@ export default {
             self.$store.dispatch('setEditCount', 0);
             var routeData = {
                 isSuccess: true,
-                isBindWorkflow:true
+                isBindWorkflow:!!PermissionHelper.enableSendAudit() || !!PermissionHelper.enableWaitAudit() || !!PermissionHelper.enableTranscriptNotify()
             };
             self.$router.push({ name: 'submitEvent', params: { data: routeData}});
           }
