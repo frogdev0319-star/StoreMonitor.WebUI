@@ -2033,6 +2033,7 @@ export default {
                 sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,secCat.cateryItems,sheetItem.type);
                 sheet.inspectList[childIdx].items.forEach(it=>{
                   dealCount += it.inputCount;
+                  it.isIgnore = false;
                 });
                 console.log("1.dealCount:",dealCount);
                 sheet.inspectList[childIdx].dealCount = dealCount;
@@ -2051,6 +2052,7 @@ export default {
             sheet.inspectList[childIdx].items = this.doGetcateryItems(sheetItem.items,tabIncep.cateryItems,sheetItem.type);
             sheet.inspectList[childIdx].items.forEach(it=>{
                   dealCount += it.inputCount;
+                  it.isIgnore = false;
             });
             console.log("2.dealCount:",dealCount);
             sheet.inspectList[childIdx].dealCount = dealCount;
