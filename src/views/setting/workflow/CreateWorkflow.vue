@@ -165,7 +165,6 @@
                   :placeholder="$t('audit.workFlows.findUser')"
                   :loading="loading" 
                   style="300px">
-                  
                   <el-option
                     v-for="user in userInfo"
                     :key="user.userId"
@@ -174,7 +173,7 @@
                   </el-option>
                 </el-select>
             </div>
-            <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
+            <div class="search_member" @click="handelePopupUserList"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
 
           </div>
         </div>
@@ -195,6 +194,108 @@
     >
       <div class="dialog-slot">
         <div class="dialog-content">{{$t('audit.workFlows.comfirmDeleteNode')}}</div>
+      </div>
+    </dialog-pop>
+
+
+    <!-- search user popup -->
+    <dialog-pop
+      ref="dailog"
+      class="popup_width"
+      title="新增簽核人員"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :dialogWidth = "w_width"
+      :visible="showingSearchUser"
+      @cancelHandler="hideSearchUsersDialog('showingSearchUser')"
+      @confirmHandler="confirmSearchUsersDialog"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          <div class="showing_search_user">
+            <div class="filter_section">
+                <!-- 關鍵字 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name">關鍵字</div>
+                  <div class="title-status"> 
+                    <el-input
+                      v-model="inputSearchUser"
+                      placeholder="搜尋人員名稱、信箱"
+                      style="width: 200px"
+                      clearable
+                      />
+                  </div>
+                </div>
+                <!-- 部門 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name"> 部門</div>
+                  <div class="title-status"> 
+                    <el-select
+                      v-model="curTemplateDepartment"
+                      placeholder="部門"
+                      style="width: 180px"
+                      >
+                      <el-option
+                        v-for="(item, index) in departmentAry"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                </div>
+                <!-- 職務 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name"> 職務</div>
+                  <div class="title-status"> 
+                    <el-select
+                      v-model="curTemplateTitleList"
+                      placeholder="職務"
+                      style="width: 180px"
+                      >
+                      <el-option
+                        v-for="(item, index) in titleListAry"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                </div>
+                <!-- <div class="summit_filter" >篩選</div> -->
+            </div>
+            <div class="is_select">
+              <div class="title-name"> 已選擇</div>
+              <div class="user_selected">
+                <el-tag
+                    v-for="tag in tags"
+                    :key="tag.name"
+                    closable
+                    :type="tag.type"
+                    @close="handleClose(tag)">
+                    {{tag.userName}}
+                  </el-tag>
+              </div>
+            </div>
+            <div class="users">
+              <table-only
+                ref="usersList"
+                class="table-white"
+                :column-data ="userColumnData"
+                :table-data ="searchUserData"
+                :showSelectionColumn = showSelectionColumn
+                
+                :highlight-current-row = "false"
+                :is-loading-data ="isLoadingData"
+                :allowRowExpand = "false"
+                :showBorder = "false"
+                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :cellStyle ="{backgroundColor: '#fff !important'}"
+                @handleSelectionChange = "handleSelectionChange "
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </dialog-pop>
 
@@ -234,13 +335,54 @@ export default {
       infoForm: {},
       nodeList:{},
 
-
       flatNodeData:[],
       flatNodeDataView:[],
 
-    
       nodeDataToApi:[],
       userInfo:[],
+
+      // ======
+      w_width: "1000",
+      tags: [],
+      userColumnData: [
+        {
+          'prop': 'userName',
+          'label': '姓名',
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
+          'prop': 'email',
+          'label': '信箱',
+          'width': 110,
+          'maxWidth': 110,
+        },
+        {
+          'prop': 'sector',
+          'label': '部門',
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
+          'prop': 'title',
+          'label': '職務',
+          'width': 100,
+          'maxWidth': 100,
+        },
+      ],
+      userData:[],
+      inputSearchUser: '',
+      showSelectionColumn: true,
+  
+      showingSearchUser: false,
+      inputSearchUser: '',
+      titleList:[],
+      titleListAry:[],
+      departmentAry:[],
+      curTemplateDepartment: '',
+      curTemplateTitleList: '',
+    // ======
+
       titleList:[],
       fullscreenLoading: false,
       columnOperationData: {
@@ -310,66 +452,17 @@ export default {
       department : '',
 
       newFlatNodeDataView:[],
-      newFlow:{
-        // "name": this.$t('audit.workFlows.addWorkFlow'),
-        // "description": "",
-        // "type": 0,
-        // "cancelable": false,
-        // "copyToUsers": [],
-        // "copyToGroups": [],
-        // "nextAuditNode": {
-        //   "name": "default flow",
-        //   "auditMethod": 0,
-        //   "signature": false,
-        //   "auditTargetType": 0, // 0 - 個人, 1 - 群組
-        //   "customButton": [
-        //       {
-        //           "type": 0,
-        //           "text": this.$t('audit.workFlows.agree'),
-        //           "enable": true
-        //       },
-        //       {
-        //           "type": 1,
-        //           "text": this.$t('audit.workFlows.reject'),
-        //           "enable": true
-        //       }
-        //   ],
-        //   "auditByUsers": [],
-        //   "auditByGroups": [],
-        //   "nextAuditNode": {
-        //     "name": "default flow 1",
-        //     "auditMethod": 0,
-        //     "signature": false,
-        //     "customButton": [
-        //         {
-        //             "type": 0,
-        //             "text": this.$t('audit.workFlows.agree'),
-        //             "enable": true
-        //         },
-        //         {
-        //             "type": 1,
-        //             "text": this.$t('audit.workFlows.reject'),
-        //             "enable": true
-        //         }
-        //     ],
-        //     "auditByUsers": [],
-        //     "auditByGroups": [],
-        //     "auditTargetType": 0
-        //   }
-        // },
-      },
       pageAction: "init",
       currentUser:''
     };
   },
-  watch:{
-  },
-  async created() {
-    
-    await this.init()
 
+  watch:{},
+  async created() {
+    await this.init()
   },
   mounted() {
+    this.searchUserData = this.userData
     // this.dataFromRoute = { ...this.$route.params.data }
     // getWorkflowInfo({
     //   processDefinitionKey: this.dataFromRoute.processDefinitionKey
@@ -386,6 +479,19 @@ export default {
     //   this.workflowDetail['nextNodes'] = nextNodes;
     // })
   },
+
+  computed: {
+    searchUserData: {
+      get(){
+        return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
+      },
+      // set(val){
+      //   console.log('val!?!?!~~~~~>>>', val)
+      //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
+			// }
+    }
+  },
+
   methods: {
     async init(){
       // await this.getNodeList(this.infoForm.processDefinitionKey) 
@@ -538,8 +644,6 @@ export default {
           })
           }
       })
-
-
       sessionStorage.setItem('workflowDetail', JSON.stringify(this.workflowDetail))
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
       var time = new Date()
@@ -606,16 +710,20 @@ export default {
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
+        this.userData = this.userInfo
         // console.log('this.userInfo ------>> ', this.userInfo);
       }).catch(err => {
         console.log('error' + err);
       });
     },
     // get title
-    getTitle(){
-      getUserTitleList().then(res=>{
+    async getTitle(){
+      await getUserStatus({ type: 1 }).then(res=>{
         this.titleList =  res.data
-        // console.log('this.titleList 3 ------>> ', this.titleList);
+        this.titleListAry = this.titleList.map( i => (
+          i = i.defineName
+        ))
+        
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -627,10 +735,95 @@ export default {
       await getUserStatus({ type: 0 }).then(res=>{
         this.department = res.data
         // console.log('this.department 4 ------>> ', this.department);
+        this.departmentAry = this.department.map( i => (
+          i = i.defineName
+        ))
       }).catch(err => {
         console.log('error' + err);
       });
     },
+
+    //======================================
+    filterInputSearchUser(users){
+        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 )
+    },
+    filterCurTemplateDepartment(users){
+        if(this.curTemplateDepartment.length == 0){
+          return users
+        }else{
+          return users.filter(item => item.sector == this.curTemplateDepartment )
+        }
+    },
+    filterCurTemplateTitleList(users){
+      if(this.curTemplateTitleList.length == 0){
+        return users
+      }else{
+        return users.filter(item => item.title == this.curTemplateTitleList )
+      }
+    },  
+    confirmSearchUsersDialog(){
+        console.log('this.ccToUSer ~~~~~~~>', this.ccToUSer)
+        console.log('this.multipleSelection ~~~~~~~>', this.multipleSelection)
+        this.ccToUSer = this.multipleSelection.map( i => i = i.userId)
+        this.showingSearchUser = false
+    },
+
+    // 關閉 lightbox
+    hideSearchUsersDialog(key){
+      this[key] = false;
+      this.inputSearchUser =''
+      this.curTemplateDepartment = ''
+      this.curTemplateTitleList = ''
+      
+      // 清除所有勾選
+      this.$refs.usersList.clear()
+    },
+
+     //popup 表格選取欄位
+    handleSelectionChange(val){
+      this.multipleSelection = val.val
+      console.log(' this.multipleSelection',  this.multipleSelection)
+      this.tags = this.multipleSelection.map(t => (
+        { 
+          userName : t.userName,
+          type: 'info'
+        }
+      ))
+      // console.log('this.tags', this.tags)
+    },
+
+    // 刪除 tag
+    handleClose(tag){
+      console.log('tag--->', tag)
+      this.tags.splice(this.tags.indexOf(tag), 1);
+      this.$refs.usersList.toggleChecked(tag)
+    },
+
+
+    //處理 popup user selected
+    handelePopupUserList(){
+      this.showingSearchUser = true
+
+      // [查詢人員]資料
+      this.userData.forEach(user =>{
+        this.titleList.forEach( title =>{
+          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
+        })
+        this.department.forEach( dep =>{
+          if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
+        })
+      })
+      
+       // 等待 dialog 生成
+      if(this.ccToUSer.length > 0){
+        var data = this.ccToUSer
+        setTimeout(() => {
+          this.$refs.usersList.fromInputSelect(data)
+        }, 0);
+      }
+    },
+
+    //======================================
 
 
     // async getNodeList(id){
@@ -701,9 +894,6 @@ export default {
     },
 
 
-
-
-
     handleEmitMove(method){
       // console.log('List method ', method);
       Array.prototype.move = function (from, to) {
@@ -771,8 +961,6 @@ export default {
         row.auditByGroups.push(currentGroup[0].defineId)
       }
       
-
-
       sessionStorage.setItem('workflowNode', JSON.stringify(row))
       sessionStorage.setItem('pageAction', JSON.stringify("edit"))
       this.$router.push({name: 'nodeSetting'})
@@ -795,9 +983,17 @@ export default {
 
     //addWorkFlow
     addNewFlow() {
-
       this.newFlatNodeDataView.forEach(d =>{
         delete d.id 
+        if(d.auditByUsers.length !== 0){
+          var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
+          d.auditByUsers = []
+          d.auditByUsers.push(currentUser[0].userId)
+        } else {
+          var currentGroup = this.department.filter(u => u.defineName == d.auditByGroups[0])
+          d.auditByGroups = []
+          d.auditByGroups.push(currentGroup[0].defineId)
+        }
       })
       
       console.log('this.newFlatNodeDataView !!!!!!', this.newFlatNodeDataView)
@@ -816,24 +1012,18 @@ export default {
         }
       });
 
-      // console.log('result ', result)
+
       var toApiData = {...this.workflowDetail, ...result}
+      toApiData.copyToUsers = this.ccToUSer
+
       creadNewFlow(toApiData).then(res=>{
           this.$router.push({name: 'workflowManage'})
           console.log('res', res)
         }).catch(err => {
           console.log('error' + err);
 
-          if(this.workflowDetail.name == ''){
-            util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
-            this.$refs.workflowName.focus()
-          } else {
-            util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
-            this.$refs.workflowName.focus()
-          }
-          
-          this.newFlatNodeDataView.pop()
-          
+              
+        
       });
 
     }
@@ -920,6 +1110,59 @@ export default {
     i 
       margin-right: 5px
       color: #006ab7
+  
+  .dialog-content
+    width: 100%
+    .showing_search_user
+      width: 100%
+      height: 500px
+      
+      .filter_section
+        background: #FFF
+        display: flex
+        flex-wrap: wrap
+        flex-direction: row
+        justify-content: flex-start
+        align-items: center
+        padding: 10px 0 0 0
+        margin-bottom: 10px
+        .summit_filter
+          width: 90px
+          height: 37px
+          border-radius: 3px
+          background: rgb(85, 102, 121)
+          color: #FFF
+          display: flex
+          flex-direction: row
+          justify-content: center
+          align-items: center
+          margin-bottom: 10px
+          margin-left: 20px
+          cursor: pointer
+          transition: all .3s
+          &:hover
+            background: rgb(60, 92, 121)
+      .is_select
+        width: 100% !important
+        padding: 10px 0 5px 0
+        background: #FFF
+        margin-bottom: 10px
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: center
+        width: fit-content
+        .title-name
+          width: 90px
+        .user_selected
+          .el-tag
+            margin-right: 5px 
+            margin-bottom: 5px
+
+      .users
+        height: 335px
+        overflow: auto
+        border-radius: 5px
 
 
 
@@ -1156,6 +1399,25 @@ export default {
       .el-table_1_column_6
         .cell
           display: none !important
+  .title-status
+    .el-input__count-inner
+      margin-top: 55px
+  .popup_width
+    .el-dialog
+      width: 70% !important
+      background: #f7f9fa
+  .users
+    .el-checkbox__input.is-checked .el-checkbox__inner
+      background: #2c90d9 !important
+      border-color: #2c90d9 !important
+      &:hover
+        border-color: #dcdfe6 !important
+    .is-focus .el-checkbox__inner      
+      border-color: #dcdfe6 !important
+    
+    .el-checkbox__inner:hover
+      border-color: #190 !important
+      
   .title-status
     .el-input__count-inner
       margin-top: 55px

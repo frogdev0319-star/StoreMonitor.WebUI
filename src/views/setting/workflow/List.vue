@@ -33,7 +33,7 @@
           :is-loading-data="isLoadingData"
           :allowRowExpand = "false"
           :showBorder = "false"
-          :default-sort = "{prop: 'createTime', order: 'descending'}"
+          :default-sort = "{prop: 'createdTs', order: 'descending'}"
           :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
           :tableHeight = "760"
           :cellStyle="{backgroundColor: '#fff !important'}"
@@ -167,13 +167,15 @@ export default {
           'prop': 'createdTs',
           'label': '建立時間',
           'width': 130,
-          'maxWidth': 130
+          'maxWidth': 130,
+          'sortable': true
         },
         {
           'prop': 'updateTs',
           'label': '最後更新時間',
           'width': 100,
-          'maxWidth': 100
+          'maxWidth': 100,
+          'sortable': true
         },
         {
           'prop': 'state',
@@ -277,13 +279,11 @@ export default {
       if(pageInfo == undefined){
         await this.getWorkflowList(this.apiBody);
       }else{
-        const newApiBody = {...this.apiBody, size:pageInfo.size, page: pageInfo.page - 1}
-
+        const newApiBody = {...this.apiBody, size: 10, page: pageInfo.page - 1}
         this.currentPage = pageInfo.page
         // console.log('newApiBody :>> ', newApiBody);
         await this.getWorkflowList(newApiBody);
       }
-
       sessionStorage.removeItem('pageAction')
     },
 
@@ -317,8 +317,8 @@ export default {
 
         this.total = res.data.totalPages
 
-        console.log('this.total :>> ', this.total);
-        console.log('getWorkflowList 2 ======>> ', this.searchData );
+        // console.log('this.total :>> ', this.total);
+        // console.log('getWorkflowList 2 ======>> ', this.searchData );
 
         this.isLoadingData = false
       }).catch(err => {
@@ -327,26 +327,12 @@ export default {
       });
     },
     creadNewFlow(){
-      // var time = new Date()
-      // var theTime = time.getTime()
-      // var t = {
-      //     year: time.getFullYear(),
-      //     month: ((time.getMonth() + 1) < 10) ? '0' + (time.getMonth() + 1).toString() : (time.getMonth() + 1).toString(),
-      //     date: (time.getDate() < 10) ? '0' + time.getDate().toString() : time.getDate().toString(),
-      //     hour: (time.getHours() < 10) ? '0' + time.getHours().toString() : time.getHours().toString(),
-      //     minute: (time.getMinutes() < 10) ? '0' + time.getMinutes().toString() : time.getMinutes().toString(),
-      //     second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
-      //   }
-      // const createTime = t.year + "-" + t.month + "-" + t.date + " " + t.hour + ":" + t.minute + ":" + t.second
-      // this.newFlow.name =  this.$t('audit.workFlows.addWorkFlow') + createTime
-      // sessionStorage.setItem('newWorkFlow', JSON.stringify(this.newFlow))
-      // console.log('this.newFlow :>> ', this.newFlow);
-
-
-
-
       sessionStorage.removeItem('workflowDetail')
       sessionStorage.removeItem('newWorkFlow')
+
+      // CreateWorkflow 新增節點需要狀態
+      var createNewNodeNeed = {"orderedAuditNodeArray":[]}
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(createNewNodeNeed))
 
       sessionStorage.setItem('pageAction', JSON.stringify("init"))
       this.$router.push({name: 'createWorkflow'})

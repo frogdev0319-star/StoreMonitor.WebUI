@@ -71,7 +71,7 @@
                   </div>
                 </el-radio-group>
               
-                <div class="search_member"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
+                <div class="search_member" @click="handelePopupUserList" :class="{clickable : nodeData.auditTargetType == 0}"><i class="iconfont el-icon-view iconbangzhu"/> {{$t('audit.workFlows.findUser')}}</div>  
                 
               </div>
 
@@ -113,6 +113,7 @@
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
                           :disabled="btnDefaultAgree == 0"
+                          :validate-event ="false"
                           v-model="defineAgree"
                           class="input-name"
                           maxlength="8"
@@ -128,6 +129,7 @@
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
                           :disabled="btnDefaultReject == 0"
+                          :validate-event="false"
                           v-model="defineReject"
                           class="input-name"
                           maxlength="8"
@@ -201,6 +203,108 @@
         </div>
       </div>
     </div>
+
+    <!-- search user popup -->
+    <dialog-pop
+      ref="dailog"
+      class="popup_width"
+      title="新增簽核人員"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :dialogWidth = "w_width"
+      :visible="showingSearchUser"
+      @cancelHandler="hideSearchUsersDialog('showingSearchUser')"
+      @confirmHandler="confirmSearchUsersDialog"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          <div class="showing_search_user">
+            <div class="filter_section">
+                <!-- 關鍵字 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name" style="width: fit-content;">關鍵字</div>
+                  <div class="title-status"> 
+                    <el-input
+                      v-model="inputSearchUser"
+                      placeholder="搜尋人員名稱、信箱"
+                      style="width: 200px"
+                      clearable
+                      />
+                  </div>
+                </div>
+                <!-- 部門 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name" style="width: fit-content;"> 部門</div>
+                  <div class="title-status"> 
+                    <el-select
+                      v-model="curTemplateDepartment"
+                      placeholder="部門"
+                      style="width: 180px"
+                      >
+                      <el-option
+                        v-for="(item, index) in departmentAry"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                </div>
+                <!-- 職務 -->
+                <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
+                  <div class="title-name" style="width: fit-content;"> 職務</div>
+                  <div class="title-status"> 
+                    <el-select
+                      v-model="curTemplateTitleList"
+                      placeholder="職務"
+                      style="width: 180px"
+                      >
+                      <el-option
+                        v-for="(item, index) in titleListAry"
+                        :key="index"
+                        :label="item"
+                        :value="item"
+                      />
+                    </el-select>
+                  </div>
+                </div>
+                <!-- <div class="summit_filter" >篩選</div> -->
+            </div>
+            <div class="is_select">
+              <div class="title-name"> 已選擇</div>
+              <div class="user_selected">
+                <el-tag
+                    v-for="tag in tags"
+                    :key="tag.name"
+                    closable
+                    :type="tag.type"
+                    @close="handleClose(tag)">
+                    {{tag.userName}}
+                  </el-tag>
+              </div>
+            </div>
+            <div class="users">
+              <table-only
+                ref="usersList"
+                class="table-white"
+                :column-data ="userColumnData"
+                :table-data ="searchUserData"
+                :showSelectionColumn = showSelectionColumn
+                
+                :highlight-current-row = "false"
+                :is-loading-data ="isLoadingData"
+                :allowRowExpand = "false"
+                :showBorder = "false"
+                :headerStyle ="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
+                :cellStyle ="{backgroundColor: '#fff !important'}"
+                @handleSelectionChange = "handleSelectionChange "
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog-pop>
+
   </div>
 </template>
 <script>
@@ -209,6 +313,9 @@ import SettingTable from '@/components/SettingTable';
 import {updateWorkflow} from "@/api/workflow";
 import {getDepart } from '@/api/login';
 import {getUserInfo} from '@/api/login';
+import TableOnly from '@/components/TableOnly';
+import DialogPop from '@/components/DialogPop';
+
 
 
 import util from "@/common/util";
@@ -216,7 +323,9 @@ export default {
   name: 'WorkflowDetail',
   components: {
     DelayButton,
-    SettingTable
+    SettingTable,
+    TableOnly,
+    DialogPop
   },
   data() {
     return {
@@ -231,6 +340,48 @@ export default {
       departmentStatus: "",
       userInfo:[],
 
+      // ======
+      w_width: "1000",
+      tags: [],
+      userColumnData: [
+        {
+          'prop': 'userName',
+          'label': '姓名',
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
+          'prop': 'email',
+          'label': '信箱',
+          'width': 110,
+          'maxWidth': 110,
+        },
+        {
+          'prop': 'sector',
+          'label': '部門',
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
+          'prop': 'title',
+          'label': '職務',
+          'width': 100,
+          'maxWidth': 100,
+        },
+      ],
+      userData:[],
+      inputSearchUser: '',
+      showSelectionColumn: true,
+  
+      showingSearchUser: false,
+      inputSearchUser: '',
+      titleList:[],
+      titleListAry:[],
+      departmentAry:[],
+      curTemplateDepartment: '',
+      curTemplateTitleList: '',
+      
+ // ======
 
       // 簽核人員
       auditUsers:[],
@@ -256,7 +407,7 @@ export default {
       }
       console.log('this.btnDefaultName :>> ', this.btnDefaultName);
       console.log('this.btnDefaultAgree :>> ', this.btnDefaultAgree);
-      console.log('this.nodeData :>> ', this.nodeData);
+      console.log('this.nodeData 1:>> ', this.nodeData);
     }
 
     // sector(){
@@ -282,6 +433,8 @@ export default {
   },
 
   mounted() {
+    this.searchUserData = this.userData
+
     // this.dataFromRoute = { ...this.$route.params.data }
     // getWorkflowInfo({
     //   processDefinitionKey: this.dataFromRoute.processDefinitionKey
@@ -301,37 +454,78 @@ export default {
   async created() {
     await this.init()
   },
+  computed: {
+    searchUserData: {
+      get(){
+        return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
+      },
+      // set(val){
+      //   console.log('val!?!?!~~~~~>>>', val)
+      //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
+			// }
+    }
+  },
+
   methods: {
     async init(){
-      
       await this.getNodeInfo() 
       await this.getWorkflowInfo()
       await this.getUserInfo()
-
-      console.log('this.apiData  starting', this.apiData)
       
+      await this.getTitle()
+      console.log('this.apiData  starting', this.apiData)
+
     }, 
 
-    // get getDepart
-    async getDepartmentList(){
-      await getDepart({ type: 0 }).then(res=>{
-        this.department = res.data
-        console.log('this.department ~~~~~>', this.department)
-      }).catch(err => {
-        console.log('error' + err);
-      });
-    },
-
+    
     // get user
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
+        this.userData = this.userInfo
         console.log('userInfo ------>> ', this.userInfo);
 
       }).catch(err => {
         console.log('error' + err);
       });
     },
+
+
+
+     // get title 職務
+    async getTitle(){
+      await getDepart({ type: 1 }).then(res=>{
+        this.titleList =  res.data
+        this.titleListAry = this.titleList.map( i => (
+          i = i.defineName
+        ))
+        console.log('this.titleListAry  7:>> ', this.titleListAry);
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+    // get getDepart
+    async getDepartmentList(){
+      await getDepart({ type: 0 }).then(res=>{
+        this.department = res.data
+        console.log('this.department ~~~~~>', this.department)
+        this.departmentAry = this.department.map( i => (
+          i = i.defineName
+        ))
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    
+
+
+
+
+
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
@@ -345,7 +539,7 @@ export default {
 
       this.nodeData = JSON.parse(data)
       this.apiData = JSON.parse(apiData)
-      console.log('this.nodeData :>> ', this.nodeData);
+      console.log('this.nodeData 2:>> ', this.nodeData);
       console.log('this.apiData :>> ', this.apiData);
 
 
@@ -371,8 +565,107 @@ export default {
 
     },
 
+
+
+    //======================================
+    filterInputSearchUser(users){
+        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 )
+    },
+    filterCurTemplateDepartment(users){
+        if(this.curTemplateDepartment.length == 0){
+          return users
+        }else{
+          return users.filter(item => item.sector == this.curTemplateDepartment )
+        }
+    },
+    filterCurTemplateTitleList(users){
+      if(this.curTemplateTitleList.length == 0){
+        return users
+      }else{
+        return users.filter(item => item.title == this.curTemplateTitleList )
+      }
+    },  
+
+    confirmSearchUsersDialog(){
+        console.log('this.multipleSelection ~~~~~~~>', this.multipleSelection)
+        this.auditUsers = this.multipleSelection[0].userId
+        console.log('this.auditUsers', this.auditUsers)
+        this.showingSearchUser = false
+    },
+
+
+    // 關閉 lightbox
+    hideSearchUsersDialog(key){
+      this[key] = false;
+      this.inputSearchUser =''
+      this.curTemplateDepartment = ''
+      this.curTemplateTitleList = ''
+      
+      // 清除所有勾選
+      this.$refs.usersList.clear()
+    },
+
+    //popup 表格選取欄位(只能選一位)
+    handleSelectionChange(val){
+
+      this.multipleSelection = val.val
+      console.log(' this.multipleSelection',  this.multipleSelection)
+      this.tags = this.multipleSelection.map(t => (
+        { 
+          userName : t.userName,
+          type: 'info'
+        }
+      ))
+      if(this.multipleSelection.length > 1) {
+        this.$refs.usersList.toggleChecked(this.tags[0])
+      } 
+    },
+
+    // 刪除 tag
+    handleClose(tag){
+      console.log('tag--->', tag)
+      this.tags.splice(this.tags.indexOf(tag), 1);
+      this.$refs.usersList.toggleChecked(tag)
+    },
+
+
+    //處理 popup user selected
+    handelePopupUserList(){
+      this.showingSearchUser = true
+
+      // [查詢人員]資料
+      this.userData.forEach(user =>{
+        this.titleList.forEach( title =>{
+          if(title.contents.length !== 0 && title.contents.includes(user.userId)) user.title = title.defineName 
+        })
+        this.department.forEach( dep =>{
+          if(dep.contents.length !==  0 && dep.contents.includes(user.userId)) user.sector = dep.defineName 
+        })
+      })
+      
+       // 等待 dialog 生成
+      // if(this.ccToUSer.length > 0){
+      //   var data = this.ccToUSer
+      //   setTimeout(() => {
+      //     this.$refs.usersList.fromInputSelect(data)
+      //   }, 0);
+      // }
+    },
+
+    //======================================
+
+
+
     saveNode(){
       // this.fullscreenLoading = true
+
+      //  節點名稱不可為空
+      if(this.nodeData.name == ''){
+        util.notify(this.$t('audit.workFlows.cantEmptyNodeName'), 'error', 2000 );
+        return 
+      }
+
+
 
       // handle btn naming
       if(this.btnDefaultAgree == 1){
@@ -388,11 +681,43 @@ export default {
         this.nodeData.customButton[1].text = this.$t('audit.workFlows.reject')
       }
 
+         //自定簽核按鈕不可為空
+
+      console.log('this.nodeData 3', this.nodeData)
+      if(this.defineAgree == '' && this.btnDefaultAgree == 1 ){
+        util.notify(this.$t('audit.workFlows.cantEmptyBtnName'), 'error', 2000 );
+        return
+      }
+      if(this.defineReject == '' && this.btnDefaultReject == 1){
+        util.notify(this.$t('audit.workFlows.cantEmptyBtnName'), 'error', 2000 );
+        return
+      }
+
+      var status = sessionStorage.getItem('pageAction');
+      const pageAction = JSON.parse(status)
+      // console.log('pageAction', pageAction)
+
       if(this.nodeData.id == undefined){
         // add node
+        //  節點名稱不可為重複
+        var checkNameResult = this.apiData.orderedAuditNodeArray.filter(i => i.name == this.nodeData.name )
+        if(checkNameResult.length > 0) {
+          util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+          console.log('!!!1')
+          return
+          }
         this.apiData.orderedAuditNodeArray = [...this.apiData.orderedAuditNodeArray, this.nodeData]
-      }else{
+      }else {
+        // !!!!!!!!!!!!!!!!!
         // edit ndoe
+        // if(pageAction == "set"){
+        // var checkNameResult = this.apiData.orderedAuditNodeArray.filter(i => i.name == this.nodeData.name )
+        // if(checkNameResult.length > 0) {
+        //   util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+        //   console.log('!!!2')
+        //   return
+        //   }
+        // }
         console.log("this is Editing")
         var apiDataIndex = this.apiData.orderedAuditNodeArray.findIndex(i => i.id == this.nodeData.id)
         console.log('apiDataIndex :>> ', apiDataIndex);
@@ -417,20 +742,41 @@ export default {
       })
 
       // 簽核人員不可為空
-      if(this.nodeData.auditByUsers[0] == '' || this.nodeData.auditByGroups[0] == ''){
-        util.notify(this.$t('audit.workFlows.cantEmpty'), 'error', 1200 );
-        this.fullscreenLoading = false
-        return
-      }
-
-      var status = sessionStorage.getItem('pageAction');
-      const pageAction = JSON.parse(status)
-      // console.log('pageAction', pageAction)
-    
-      if(pageAction == "create" || pageAction == "edit"  ){
-        this.$router.push({name: 'createWorkflow'})
+      // if(this.nodeData.auditByUsers[0] == '' || this.nodeData.auditByGroups[0] == ''){
+      //   util.notify(this.$t('audit.workFlows.cantEmpty'), 'error', 1200 );
+      //   this.fullscreenLoading = false
+      //   return
+      // }
+      
+      console.log('newWorkFlow 1', this.apiData)
+      if(pageAction == "create" || pageAction == "edit" ){
+      
+        //  節點名稱不可為重複
+        var status = sessionStorage.getItem('reNewNode');
+        const reNewNode = JSON.parse(status)
+        // console.log('reNewNode !!!', reNewNode)
+        // console.log('this.nodeData !!!', this.nodeData)
+        var checkNameResult = reNewNode.filter(i => i.name == this.nodeData.name )
+        // create
+        if(checkNameResult.length > 0 && pageAction == "create") {
+          util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+          return
+        }
+        // edit
+        if(checkNameResult.length > 0 && pageAction == "edit") {
+          var tt = reNewNode.find(i=>{
+            i.name == this.nodeData.name
+          })
+          if(tt !== ''){
+            util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+            return
+          }
+        }
         sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
-        console.log('this.apiData call api', this.apiData.orderedAuditNodeArray)
+        console.log('newWorkFlow 2', this.apiData)
+        this.$router.push({name: 'createWorkflow'})
+        
+
       } else if(pageAction == "set"){
         // call api
         updateWorkflow(this.apiData).then(res=>{
@@ -438,14 +784,10 @@ export default {
           this.$router.push({name: 'workflowDetail'})
           this.isLoadingData = false
         }).catch(err => {
-          this.isLoadingData = false;
-          
           console.log('error' , err);
-          util.notify(this.$t('audit.workFlows.cantRepeatName'), 'error', 2000 );
-          this.$refs.workflowName.focus()
-          reject(err);
         });
       }
+
     },
   }
 };
@@ -454,11 +796,13 @@ export default {
 <style lang="sass" scoped>
   
   .flex-row
+    display: flex
     flex-direction: row
     justify-content: flex-start
     align-items: center
     // width: fit-content
 
+  
   .select_audit
     display: flex
     flex-direction: row
@@ -471,16 +815,24 @@ export default {
   .search_member
     height: 36px
     font-size: 14px
-    color: #006ab7
+    color: #d5d5d5
     display: flex
     flex-direction: row
     justify-content: flex-start
     align-items: center
     width: fit-content
-    cursor: pointer
+    pointer-events: none
+
     i 
       margin-right: 5px
+      color: #d5d5d5
+  .clickable
+    color: #006ab7
+    cursor: pointer
+    pointer-events: auto !important
+    i 
       color: #006ab7
+
 
   
   
@@ -538,9 +890,81 @@ export default {
     align-items: center
     .el-input
       margin-left: 10px
+  
+  .dialog-content
+    width: 100%
+    .showing_search_user
+      width: 100%
+      height: 500px
+      
+      .filter_section
+        background: #FFF
+        display: flex
+        flex-wrap: wrap
+        flex-direction: row
+        justify-content: flex-start
+        align-items: center
+        padding: 10px 0 0 0
+        margin-bottom: 10px
+        .summit_filter
+          width: 90px
+          height: 37px
+          border-radius: 3px
+          background: rgb(85, 102, 121)
+          color: #FFF
+          display: flex
+          flex-direction: row
+          justify-content: center
+          align-items: center
+          margin-bottom: 10px
+          margin-left: 20px
+          cursor: pointer
+          transition: all .3s
+          &:hover
+            background: rgb(60, 92, 121)
+      .is_select
+        width: 100% !important
+        padding: 10px 0 5px 0
+        background: #FFF
+        margin-bottom: 10px
+        display: flex
+        flex-direction: row
+        justify-content: flex-start
+        align-items: center
+        width: fit-content
+        .title-name
+          width: 90px
+        .user_selected
+          .el-tag
+            margin-right: 5px 
+            margin-bottom: 5px
+
+      .users
+        height: 335px
+        overflow: auto
+        border-radius: 5px
 </style>
 
 <style lang="sass">
+  .title-status
+    .el-input__count-inner
+      margin-top: 55px
+  .popup_width
+    .el-dialog
+      width: 70% !important
+      background: #f7f9fa
+  .users
+    .el-checkbox__input.is-checked .el-checkbox__inner
+      background: #2c90d9 !important
+      border-color: #2c90d9 !important
+      &:hover
+        border-color: #dcdfe6 !important
+    .is-focus .el-checkbox__inner      
+      border-color: #dcdfe6 !important
+    
+    .el-checkbox__inner:hover
+      border-color: #190 !important
+      
   .title-status
     .el-input__count-inner
       margin-top: 55px

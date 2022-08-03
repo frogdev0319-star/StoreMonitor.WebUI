@@ -601,9 +601,9 @@ export default {
     },
 
     toggleChecked(tag){
-      // console.log('unChecked')
-      // console.log('tag !!!', tag)
-      // console.log('this.tableData !!!', this.tableData)
+      console.log('unChecked')
+      console.log('tag !!!', tag)
+      console.log('this.tableData !!!', this.tableData)
 
       var row = this.tableData.filter(element => 
           element.userName == tag.userName

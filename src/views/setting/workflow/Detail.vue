@@ -167,7 +167,6 @@
                   :placeholder="$t('audit.workFlows.findUser')"
                   :loading="loading" 
                   style="300px">
-                  
                   <el-option
                     v-for="user in userInfo"
                     :key="user.userId"
@@ -326,7 +325,6 @@ export default {
       w_width: "1000",
       tags: [],
       userColumnData: [
-        
         {
           'prop': 'userName',
           'label': '姓名',
@@ -457,38 +455,9 @@ export default {
     };
   }, 
 
- 
-  watch:{
 
-   
-    // for search
-    // inputSearchUser(val){
-    //   console.log('inputSearchUser', val)
-    //   console.log(' this.temp',  this.temp)
-    
-    //   this.searchUserData = this.temp.filter(item => 
-    //     item.email.indexOf(val) > -1 || item.userName.indexOf(val) > -1 
-    //   )
-    // },
-
-    // curTemplateDepartment(val){
-    //   if(val !== ''){
-    //     this.temp = this.userInfo
-    //     this.searchUserData = this.temp.filter(item => item.sector == val )
-    //     console.log(' this.temp',  this.temp)
-    //   } 
-    // },
-
-    // curTemplateTitleList(val){
-    //   if(val !== ''){
-    //     this.temp = this.searchUserData
-    //     this.searchUserData = this.temp.filter(item => item.title == val )
-    //   } 
-    // },
-  
-  },
+  watch:{},
   computed: {
-    
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
@@ -498,11 +467,12 @@ export default {
       //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
 			// }
     }
-
   },
   mounted() {
     this.searchUserData = this.userData
+
   },
+
 
   async created() {
     await this.init()
@@ -526,6 +496,8 @@ export default {
         return users.filter(item => item.title == this.curTemplateTitleList )
       }
     },    
+
+
     handleOrderedAuditNodeArray(obj){
       console.log('object :>> ', obj);
       this.nodeDataToApi.orderedAuditNodeArray.forEach(row =>{
@@ -581,14 +553,10 @@ export default {
       await getUserStatus({ type: 1 }).then(res=>{
         this.titleList =  res.data
         console.log('this.titleList 3 ------>> ', this.titleList);
-
         this.titleListAry = this.titleList.map( i => (
           i = i.defineName
         ))
-
         console.log('this.titleListAry  7:>> ', this.titleListAry);
-
-        
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -605,7 +573,6 @@ export default {
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
-
         console.log('this.departmentAry  7:>> ', this.departmentAry);
 
       }).catch(err => {
@@ -863,8 +830,6 @@ export default {
       });
     },
 
-
-
     //popup 表格選取欄位
     handleSelectionChange(val){
       this.multipleSelection = val.val
@@ -884,11 +849,11 @@ export default {
       this.$refs.usersList.toggleChecked(tag)
     },
 
-
-    
     //處理 popup user selected
     handelePopupUserList(){
       this.showingSearchUser = true
+      console.log('this.searchUserData !!!', this.searchUserData)
+
 
       // [查詢人員]資料
       this.userData.forEach(user =>{
@@ -900,7 +865,6 @@ export default {
           })
         })
       
-      console.log('data', data)
       // 等待 dialog 生成
       if(this.ccToUSer.length > 0){
         var data = this.ccToUSer
@@ -909,6 +873,8 @@ export default {
         }, 0);
       }
     },
+
+
 
 
     //保存並發布

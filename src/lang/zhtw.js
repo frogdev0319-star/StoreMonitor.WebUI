@@ -1329,7 +1329,7 @@ export default{
       "rule_countersigned": "每個處理人都要同意才可以到下一級；只要有一個處理人駁回就駁回 ",
       "rule_coSign": "只要有一個處理人同意即可到下一級；每個處理人都要駁回才算駁回",
       "agree": "同意",
-      "reject": "駁回",
+      "reject": "拒絕",
       "withdraw": "撤回",
       "define": "自定義",
       "defineItem": "自定義名稱",
@@ -1342,9 +1342,10 @@ export default{
       "cantEmpty": "簽核人員不可為空，請設定簽核人員",
       "cantRepeatName": "節點名稱不可重複",
       "cantRepeatWorkflowName": "流程名稱不可重複",
-      "cantEmptyWorkflowName": "流程名稱不可以為空"
-
-
+      "cantEmptyWorkflowName": "流程名稱不可以為空",
+      "cantEmptyNodeName": "節點名稱不可以為空",
+      "cantRepeatNodeName": "節點名稱不可重複",
+      "cantEmptyBtnName": "自定義簽核按鈕名稱不可為空"
 
     },
     "inceptionRpt":{
