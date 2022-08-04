@@ -477,7 +477,7 @@ export default{
                 params['auditState'] = [2];
             }else if(this.curTabIndx==1){//已簽核
                 params['type'] = 2;
-                params['auditState'] = [2,3,4] 
+                params['auditState'] = [2,3,4,5,6,7] 
             }
             if(Object.keys(this.curOrder).length>0){
                 params['order'] = this.curOrder;//this.curOrder;

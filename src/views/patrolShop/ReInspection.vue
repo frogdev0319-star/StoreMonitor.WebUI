@@ -1069,6 +1069,7 @@ export default {
       reportId:-1,
       auditState:-1,
       auditCancelable:false,
+      reportStatus:-1,
     };
   },
   computed: {
@@ -1157,11 +1158,11 @@ export default {
         self.$store.dispatch('setStoreCache', null);
         Database.addDataToDB(self.userId, {data: {}, rule: {}});
       } else {
-        self.$store.dispatch('setPatrolComment',self.suggest);
+        self.$store.dispatch('setPatrolComment',{suggest:self.suggest,status:self.reportStatus});
         self.$store.dispatch('setPatrolHistory', self.historyObj);
         self.$store.dispatch('setStoreList', self.storeList);
         self.$store.dispatch('setStoreCache', this.curSelStoreId);
-         self.$store.dispatch('setEditReport', self.isEditReport);
+        self.$store.dispatch('setEditReport', self.isEditReport);
       }
       !self.showGuide && this.$refs.vendorVideo.stopVideoPlay();
       next();
@@ -1175,7 +1176,8 @@ export default {
     const BackPatrolParam = self.$store.getters.BackPatrolParam;
     const PatrolComment = self.$store.getters.PatrolComment;
     if (PatrolComment != null) {
-      self.suggest = PatrolComment;
+      self.suggest = PatrolComment.suggest;
+      self.reportStatus = PatrolComment.status;
     }
     console.log("*BackPatrolParam:",BackPatrolParam);
     console.log("*PatrolHistory:",PatrolHistory);
@@ -1237,11 +1239,13 @@ export default {
         self.isEditReport = PatrolHistory.isEditReport;
         self.auditState = PatrolHistory.auditState;
         self.auditCancelable = PatrolHistory.auditCancelable;
+        
       }
     }else if(BackPatrolParam != null){
       self.getAllStore();
       self.backSheetGroup = BackPatrolParam.backSheetGroup;
       self.reportId = BackPatrolParam.reportId;
+      self.reportStatus = BackPatrolParam.reportStaus;
       self.isEditReport = BackPatrolParam.isEdit;
       self.auditState = BackPatrolParam.auditState;
       self.suggest = BackPatrolParam.reportComment;
@@ -2075,7 +2079,15 @@ export default {
         }else if(type!=1){
           let scoreIdx = (cateryItems[i].grade==1) ? 0:1;
           sheetItem[i].itemScoreTitle=sheetItem[i].scoreList[scoreIdx].scoreTitle;
-          sheetItem[i].itemgetScore=(cateryItems[i].grade==1)?sheetItem[i].itemScore:0;
+          if(type == 2){
+            if(sheetItem[i].itemScore<0){
+              sheetItem[i].itemgetScore=(cateryItems[i].grade==1)?0:sheetItem[i].itemScore;
+            }else{
+              sheetItem[i].itemgetScore=(cateryItems[i].grade==1)?sheetItem[i].itemScore:0;
+            }
+          }else{
+            sheetItem[i].itemgetScore=(cateryItems[i].grade==1)?sheetItem[i].itemScore:0;
+          }
           sheetItem[i].scoreList[scoreIdx].isClick = true;
           sheetItem[i].isQualified = (cateryItems[i].grade==1) ? true:false;
           sheetItem[i].inputCount++;
@@ -2106,17 +2118,17 @@ export default {
           }
           for(let j=0; j<cateryItems[i].sourceList.length;j++){
             var attItem = cateryItems[i].sourceList[j];
-            var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1); 
-            var attFile ={
-                mediaType:attItem.mediaType,
-                src:attItem.url,
-                height:'100px',
-                width:'140px',
-                fileName:fileName,
-                deviceId:attItem.deviceId,
-                hasUrl:true
-              }
-            att.push(attFile);
+              var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1); 
+              var attFile ={
+                  mediaType:attItem.mediaType,
+                  src:attItem.url,
+                  height:'100px',
+                  width:'140px',
+                  fileName:fileName,
+                  deviceId:attItem.deviceId,
+                  hasUrl:true
+                }
+              att.push(attFile);
           }
           //console.log("sourceList:",attFile);
           sheetItem[i].sourceList = att;

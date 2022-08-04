@@ -916,7 +916,6 @@ export default {
         this.reportData = data;
         this.auditState = data.auditState;
         this.getGroupsData(data.groups);
-        this.reportData = data;
         console.log("this.reportData:",this.reportData);
         this.getTab1AndTab3BtnName(res.data[0].inspectSettings);
         this.getPageDataBasedOnTemplate(this.reportData);
@@ -1703,6 +1702,7 @@ export default {
       var BackPatrolParam = {
         isEdit:true,
         reportId:self.report.reportId,
+        reportStaus:self.reportData.status,
         reportComment:self.reportData.comment,
         tagId:self.reportData.tagId,
         tagName : self.reportData.tagName,
@@ -1718,6 +1718,7 @@ export default {
         curItemIndex:0,
         curItemId:0
       };
+      self.$store.dispatch('setPatrolComment', {suggest:self.reportData.comment, status:self.reportData.status});
       var params = {
         isEdit:true,
         reportComment:this.reportData.comment

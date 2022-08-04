@@ -504,7 +504,8 @@ export default {
       positionsList:[],
       bucketPdf:'',
       isEditReport:false,
-      reportId:-1
+      reportId:-1,
+      reportStatus:-1,
     };
   },
   computed: {
@@ -548,7 +549,7 @@ export default {
       Database.addDataToDB(self.userId, { data: {}, rule: {}});
       next();
     } else {
-      self.$store.dispatch('setPatrolComment', self.suggest);
+      self.$store.dispatch('setPatrolComment', {suggest:self.suggest,status:self.curSumIndex});
       next();
     }
   },
@@ -766,10 +767,12 @@ export default {
         if (self.eventList[i].sourceList.length > 0) {
           let arr = self.eventList[i].sourceList;
           arr.forEach(item => {
-            let obj = {};
-            obj.mediaType = 3;
-            obj.url = item.src;
-            commentTemp.push(obj);
+            if(item.mediaType==3){
+              let obj = {};
+              obj.mediaType = 3;
+              obj.url = item.src;
+              commentTemp.push(obj);
+            }
           })
           
         }else{
@@ -858,7 +861,7 @@ export default {
       const params = {
         uuid: uuid,
         status: status,
-        comment: self.suggest.trim(),
+        comment: (self.suggest)?self.suggest.trim():"",
         items: temp,
         feedback: feedEventList,
         isMysteryMode:PermissionHelper.enableMimicMode,
@@ -1023,7 +1026,11 @@ export default {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
       if (PatrolComment != null) {
-        self.suggest = PatrolComment;
+        self.suggest = PatrolComment.suggest;
+        self.curSumIndex = PatrolComment.status;
+        self.resultList.map(x => {
+            if(x.label==self.curSumIndex) x.isActive=true;
+          });
       }
       console.log()
       self.userId = getCookie('UserId');
@@ -1307,7 +1314,7 @@ export default {
         if (!Tab0Status && dealType.length !== 1 && inspect[0].type === 0 || inspect[0].type !== 0) {
           self.resultList.forEach(item => {
             item.isShow = true;
-            item.isActive = false;
+            item.isActive = (item.label==self.curSumIndex)?true:false;
           });
         }
         if (inspectSettings.hundredMarkType === '1') {

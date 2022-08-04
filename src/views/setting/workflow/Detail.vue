@@ -1265,12 +1265,12 @@ export default {
     align-items: flex-start
     .audit-user
       margin-right: 10px
-  
-  .el-table__row
-    &:first-child
-      .el-table_1_column_6
-        .cell
-          display: none !important
+  .flow-setting
+    .el-table__row
+      &:first-child
+        .el-table_1_column_6
+          .cell
+            display: none !important
   .popup_width
     .el-dialog
       width: 70% !important
