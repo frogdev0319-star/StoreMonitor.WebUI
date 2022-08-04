@@ -504,7 +504,8 @@ export default {
       positionsList:[],
       bucketPdf:'',
       isEditReport:false,
-      reportId:-1
+      reportId:-1,
+      reportStatus:-1,
     };
   },
   computed: {
@@ -548,7 +549,7 @@ export default {
       Database.addDataToDB(self.userId, { data: {}, rule: {}});
       next();
     } else {
-      self.$store.dispatch('setPatrolComment', self.suggest);
+      self.$store.dispatch('setPatrolComment', {suggest:self.suggest,status:self.curSumIndex});
       next();
     }
   },
@@ -1023,7 +1024,11 @@ export default {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
       if (PatrolComment != null) {
-        self.suggest = PatrolComment;
+        self.suggest = PatrolComment.suggest;
+        self.curSumIndex = PatrolComment.status;
+        self.resultList.map(x => {
+            if(x.label==self.curSumIndex) x.isActive=true;
+          });
       }
       console.log()
       self.userId = getCookie('UserId');
@@ -1307,7 +1312,7 @@ export default {
         if (!Tab0Status && dealType.length !== 1 && inspect[0].type === 0 || inspect[0].type !== 0) {
           self.resultList.forEach(item => {
             item.isShow = true;
-            item.isActive = false;
+            item.isActive = (item.label==self.curSumIndex)?true:false;
           });
         }
         if (inspectSettings.hundredMarkType === '1') {
