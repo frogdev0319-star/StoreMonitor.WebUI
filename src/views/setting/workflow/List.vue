@@ -178,6 +178,12 @@ export default {
           'sortable': true
         },
         {
+          'prop': 'updatedUser',
+          'label': '最後更新人',
+          'width': 100,
+          'maxWidth': 100,
+        },
+        {
           'prop': 'state',
           'label': '狀態',
           'width': 100,
@@ -303,6 +309,8 @@ export default {
           this.userInfo.forEach(user => {
             if(d.createdUser === user.userId){
               d.createdUser = user.userName
+              d.updatedUser = user.userName
+              
               d.createdTs = new Date(d.createdTs).toLocaleString()
               d.updateTs = new Date(d.updateTs).toLocaleString()
               d.type = "巡檢表單"
@@ -524,17 +532,22 @@ export default {
           util.notify(this.$t('route.networkError'), 'error', 1000 );
         })
       }
-      
     
     },
     
-
-
   },
 };
 </script>
 
 <style lang="sass" >
+  .tablelist
+    .el-table__header
+      width: auto !important
+
+    .el-table__body
+      width: auto !important
+    
+
   .workflow-header
     width: 100%
     // height: 150px

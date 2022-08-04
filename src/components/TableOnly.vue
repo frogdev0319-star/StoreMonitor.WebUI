@@ -16,7 +16,6 @@
       :max-height="tableHeight"
       :empty-text="$t('deviceView.noData')"
       align="left"
-      style="width:auto"
       size="mini"
       v-on="$listeners"
       :row-key="getRowKeys"
@@ -727,7 +726,7 @@ export default {
   }
   .cell-class.el-table__expand-column .cell{
     padding:0;
-    width:100px;
+    width: 0px;
   }
   
 </style>
