@@ -767,10 +767,12 @@ export default {
         if (self.eventList[i].sourceList.length > 0) {
           let arr = self.eventList[i].sourceList;
           arr.forEach(item => {
-            let obj = {};
-            obj.mediaType = 3;
-            obj.url = item.src;
-            commentTemp.push(obj);
+            if(item.mediaType==3){
+              let obj = {};
+              obj.mediaType = 3;
+              obj.url = item.src;
+              commentTemp.push(obj);
+            }
           })
           
         }else{
@@ -859,7 +861,7 @@ export default {
       const params = {
         uuid: uuid,
         status: status,
-        comment: self.suggest.trim(),
+        comment: (self.suggest)?self.suggest.trim():"",
         items: temp,
         feedback: feedEventList,
         isMysteryMode:PermissionHelper.enableMimicMode,

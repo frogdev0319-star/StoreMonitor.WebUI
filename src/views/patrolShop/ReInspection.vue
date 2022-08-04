@@ -2118,17 +2118,17 @@ export default {
           }
           for(let j=0; j<cateryItems[i].sourceList.length;j++){
             var attItem = cateryItems[i].sourceList[j];
-            var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1); 
-            var attFile ={
-                mediaType:attItem.mediaType,
-                src:attItem.url,
-                height:'100px',
-                width:'140px',
-                fileName:fileName,
-                deviceId:attItem.deviceId,
-                hasUrl:true
-              }
-            att.push(attFile);
+              var fileName = attItem.url.substring(attItem.url.lastIndexOf('/')+1); 
+              var attFile ={
+                  mediaType:attItem.mediaType,
+                  src:attItem.url,
+                  height:'100px',
+                  width:'140px',
+                  fileName:fileName,
+                  deviceId:attItem.deviceId,
+                  hasUrl:true
+                }
+              att.push(attFile);
           }
           //console.log("sourceList:",attFile);
           sheetItem[i].sourceList = att;
