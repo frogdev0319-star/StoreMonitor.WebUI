@@ -839,6 +839,7 @@ export default {
         await self.upLoadFile(self.pdfFileList[idx]).then((url) => {
           self.uploadingnumOfPic++;
           const auditImgObj = {
+            fileName:self.pdfFileList[idx].showName,
             mediaType: 4,
             url: url,
             ts: Date.now()

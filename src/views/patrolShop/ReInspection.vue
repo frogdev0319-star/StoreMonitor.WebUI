@@ -2,7 +2,7 @@
   <div>
     <store-filter
       :multiStore="false"
-      :showFavorite="true"
+      :showFavorite="enableMimicMode?false:true"
       @storeChange="onStoreChange"
     ></store-filter>
     <div class="el-container" style="margin-top: 20px" :class="{'flex-column': isFullScreenMode}">
@@ -12,7 +12,7 @@
         
       >
         <div class="el-header-title flex-center">
-          <img :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="cursor: pointer">
+          <img v-if="enableMimicMode?false:true" :src="store.storeUp? starYellowIcon : starGreyIcon"  @click="addStoreUp" style="cursor: pointer">
           <span v-if="showStoreUp" class="lside-title store-title">
             {{ store.storeTitle }}
           </span>
@@ -805,6 +805,7 @@
 import { checkOutInspectItemV3 } from '@/api/inspect';
 import util from '@/common/util';
 import { getStoreList, addFavoriteStore, deleteFavoriteStore, getStoreInfo } from '@/api/store';
+import {ListMysteryModeStoreInfo} from '@/api/mystero';
 import { getUserInfo } from '@/api/login';
 import { mapGetters } from 'vuex';
 import InspectionItem from '@/components/InspectionItem.vue';
@@ -819,6 +820,7 @@ import DashVideo from '@/components/DashVideo';
 import EzvizVideo from '@/components/EzvizVideo';
 import BeseyeVideo from '@/components/BeseyeVideo';
 import StoreFilter from '@/components/StoreFilter';
+import PermissionHelper from '@/api/PermissionHelper';
 
 export default {
   name: 'ReInspection',
@@ -1070,6 +1072,7 @@ export default {
       auditState:-1,
       auditCancelable:false,
       reportStatus:-1,
+      enableMimicMode:false,
     };
   },
   computed: {
@@ -1078,7 +1081,8 @@ export default {
     },
     ...mapGetters({
       accountChanged: 'accountChanged',
-      videoAuthority: 'videoAuthority'
+      videoAuthority: 'videoAuthority',
+      mimicMode:'mimicMode'
     }),
     storeUpClass() {
       return {
@@ -1106,7 +1110,12 @@ export default {
     },
     vendor(){
       this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor] || 'EzvizVideo';
-    }
+    },
+    mimicMode(){
+      this.enableMimicMode = this.$store.getters.mimicMode;
+      this.getAllStore();
+      console.log("enableMimicMode:",this.enableMimicMode)
+    },
   },
 
   beforeRouteLeave(to, from, next) {
@@ -1171,6 +1180,7 @@ export default {
 
   async mounted() {
     const self = this;
+    this.enableMimicMode = this.$store.getters.mimicMode;
     const PatrolHistory = self.$store.getters.PatrolHistory;
     const storeListCache = self.$store.getters.storeListCache;
     const BackPatrolParam = self.$store.getters.BackPatrolParam;
@@ -1634,11 +1644,20 @@ export default {
           'size': 2000
         }
       };
-      return new Promise((resolve, reject) => {
-        getStoreList(params).then(res => {
-          resolve(res);
+      if(PermissionHelper.enableMimicMode){
+        return new Promise((resolve, reject) => {
+          ListMysteryModeStoreInfo().then(res => {
+            resolve(res);
+          });
         });
-      });
+        
+      }else{
+        return new Promise((resolve, reject) => {
+          getStoreList(params).then(res => {
+            resolve(res);
+          });
+        });
+      }
     },
     saveStoreObj(storeObj) {
       const self = this;
@@ -2181,9 +2200,10 @@ export default {
         return temp;
       };
       const allStoreData = await self.getAllStoreList();
+      console.log("allStoreData:",allStoreData);
       if (allStoreData.errCode === 0) {
         self.getInitStoreData(allStoreData);
-        const storeData = allStoreData.data.content;
+        const storeData = (PermissionHelper.enableMimicMode)?allStoreData.data:allStoreData.data.content;
         self.storeList = getStoreTemp(storeData);
         const storeItem = self.storeList.find(store => store.storeId === self.curSelStoreId)
         self.changeStore_(storeItem);
@@ -2218,7 +2238,8 @@ export default {
       const allStoreData = await self.getAllStoreList();
       if (allStoreData.errCode === 0) {
         self.getInitStoreData(allStoreData);
-        const storeData = allStoreData.data.content.filter(store => store.favorite === true);
+        var allStores =  (PermissionHelper.enableMimicMode)?data.data:data.data.content;
+        const storeData = allStores.filter(store => store.favorite === true);
         self.tabList[0].storeList = getStoreTemp(storeData);
         if (storeData.length === 0) {
           self.showStoreUp = false;
@@ -2304,7 +2325,7 @@ export default {
         return storeListTemp;
       };
       if (data.errCode == 0) {
-        const storeData = data.data.content;
+        const storeData = (PermissionHelper.enableMimicMode)?data.data:data.data.content;
         self.allInitStoreList = storeData;
         if (storeData.length == 0) {
           self.tabList[2].storeList = [];

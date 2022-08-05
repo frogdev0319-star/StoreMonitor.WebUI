@@ -65,3 +65,11 @@ export const batchAddMysterySetting = data => {
     data
   });
 };
+
+export const ListMysteryModeStoreInfo = data => {
+  return request({
+    url: `${version}/mystery/store/list`,
+    method: 'get',
+    data
+  });
+};
