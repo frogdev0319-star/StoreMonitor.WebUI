@@ -133,9 +133,11 @@ import MultiSelect from '@/components/MultiSelect';
 import RegionMultiSelect from '@/components/RegionMultiSelect';
 import { mapGetters } from 'vuex';
 import { getBriefStoreList, getStoreDefineGroup, getStoreList, getFavoriteStoreList } from '@/api/store';
+import {ListMysteryModeStoreInfo} from '@/api/mystero'
 import util from '@/common/util.js';
 import DialogPop from '@/components/DialogPop.vue';
 import i18n from '@/lang/index'
+import PermissionHelper from '../api/PermissionHelper';
 
 export default {
   name: 'StoreFilter',
@@ -238,11 +240,13 @@ export default {
         isWarning: false,
         dialogCosed: false
       },
+      enableMimicMode:false,
+      mysterStoreIds:[],
     };
   },
 
   computed: {
-    ...mapGetters({ accountChanged: 'accountChanged' })
+    ...mapGetters({ accountChanged: 'accountChanged',mimicMode:'mimicMode' })
   },
 
   watch: {
@@ -261,14 +265,26 @@ export default {
     },
     cachedParams() {
       this.getSearchParams();
-    }
+    },
+    mimicMode(){
+      this.enableMimicMode = this.$store.getters.mimicMode;
+      if(this.enableMimicMode) this.getMysteryStore();
+      this.curSelectedStore = "";
+      this.getStoreListAndGroupAndType(true);
+    },
   },
 
   created() {
+    this.enableMimicMode = this.$store.getters.mimicMode;
+    if(this.enableMimicMode) this.getMysteryStore();
     this.getSearchParams();
     this.getStoreListAndGroupAndType(true);
+    this.hasFavoritedStar = this.showFavorite;
   },
-
+  mounted(){
+    this.enableMimicMode = this.$store.getters.mimicMode;
+    if(this.enableMimicMode) this.getMysteryStore();
+  },
   methods: {
     changeFavorite () {
       this.$store.dispatch('setFavoritList',true);
@@ -736,6 +752,19 @@ export default {
       this.curStoreType = this.filterArr(this.curStoreType, this.storeTypeList);
     },
 
+    getMysteryStore(){
+        ListMysteryModeStoreInfo().then(res => {
+          var mimicStore = [];
+          if (res.errCode==0) {
+            res.data.map(store=>{
+              mimicStore.push(store.storeId);
+            });
+            this.mysterStoreIds = mimicStore;
+          }
+        }).catch(err => {
+          console.log("getMysteryStore error:",err);
+        });
+    },
     filterStore() {
       // console.log("Filter Store=>>")
       let filterStoreId = [];
@@ -744,6 +773,13 @@ export default {
       if (this.curStoreGroup.length === 0 && this.curStoreType.length === 0) {
         // console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
         filterStoreId = this.curStore;
+        //秘密客模式可選門店取交集
+        if(this.enableMimicMode){//秘密客模式可選門店
+          //console.log("MysteryStoreList:",this.mysterStoreIds);
+          var tempStoreList = filterStoreId.slice(0) ;
+          filterStoreId  = util.getIntersectionOfArrs(this.mysterStoreIds,tempStoreList);
+          console.log("**mimic this.filterStoreIds:",filterStoreId);
+        }
         let temp=[];
         filterStoreId.forEach(storeId => {
           this.storeList.forEach(store => {
@@ -757,13 +793,11 @@ export default {
                 temp.push(obj);
             }
           });
+          this.storeDataList = temp;
         });
-        // console.log("this.curStore:",this.curStore);
-        // console.log("this.storeList:",this.storeList);
-        // console.log("this.storeDataList:",this.storeDataList);
+
         if(this.storeDataList.length==0)
           this.storeDataList = temp;
-        //this.storeDataList = temp;
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
       } else {
@@ -772,11 +806,17 @@ export default {
         console.log("groupIdArray:",groupIdArray);
         const typeIdArr = this.storeTypeList.filter(typeItem => this.curStoreType.find(typeId => typeId === typeItem.value));
         console.log("typeIdArr:",typeIdArr);
-        const filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
+        var filterStoreArray = this.getStoreIdsOfGroupAndType(groupIdArray, typeIdArr);
         console.log("filterStoreArray:",filterStoreArray);
         console.log("this.curStore:",this.curStore);
         console.log("this.storeDataList:",this.storeDataList);
-        //let tempstoreList = filterStoreArray;//util.getIntersectionOfArrs(this.storeDataList, filterStoreArray);
+        //已經跟部門群組和類型交集完的結果
+        if(this.enableMimicMode){//秘密客模式可選門店
+          //console.log("MysteryStoreList:",this.mysterStoreIds);
+          var tempStoreList = filterStoreArray.slice(0) ;
+          filterStoreArray  = util.getIntersectionOfArrs(tempStoreList, this.mysterStoreIds);
+          console.log("**mimic this.filterStoreIds:",this.filterStoreIds);
+        }
         let temp=[];
 
         filterStoreArray.forEach(storeId => {
@@ -825,7 +865,7 @@ export default {
         console.log("2.curStore:",this.curStore);
         this.storeStr = (filterStoreId.length==0)?allfilterStoreStr.substr(0, filterStoreStr.length - 1) :filterStoreStr.substr(0, filterStoreStr.length - 1);
       }
-
+        
 
       this.getStoreGroupString();
       this.getStoreTypeString();
@@ -879,11 +919,11 @@ export default {
         var favoritStoreExist = this.storeList.some( st => st.storeId == this.curSelectedStore);
         //console.log("favoritStoreExist:",favoritStoreExist);
         if(favoritStoreExist){
-      tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
+          tempsearchParamsObj.curSelectedStore = this.curSelectedStore;
         }else{
-          this.curSelectedStore = '';
-          tempsearchParamsObj.curSelectedStore = "";
-      }
+            this.curSelectedStore = '';
+            tempsearchParamsObj.curSelectedStore = "";
+        }
 
       }
       else
