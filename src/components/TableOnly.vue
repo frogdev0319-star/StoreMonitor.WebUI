@@ -16,6 +16,7 @@
       :max-height="tableHeight"
       :empty-text="$t('deviceView.noData')"
       align="left"
+      style="width:auto"
       size="mini"
       v-on="$listeners"
       :row-key="getRowKeys"
@@ -68,6 +69,16 @@
             </div>
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
+
+
+          <!-- workflow switch state -->
+          <template v-else-if="_item.forDescription">
+            <div class="forDescription">
+              <div class="shortdescription">{{row.description}}</div> 
+              <div class="showDescription" v-if="row.description.length > 13"> {{row.description}}</div>
+            </div>
+            
+          </template>
 
           <!-- workflow switch state -->
           <template v-else-if="_item.forWorkflowsSwitch">
@@ -838,6 +849,8 @@ export default {
   .moveup_disable, .movedown_disable
     opacity: 0.3 !important
     pointer-events: none !important
-    
+  
+
+
 </style>
 

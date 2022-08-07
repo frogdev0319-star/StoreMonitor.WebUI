@@ -162,6 +162,7 @@ export default {
           'label': '流程描述',
           'width': 230,
           'maxWidth': 230,
+          'forDescription': true
         },
         {
           'prop': 'createdTs',
@@ -326,7 +327,7 @@ export default {
         this.total = res.data.totalPages
 
         // console.log('this.total :>> ', this.total);
-        // console.log('getWorkflowList 2 ======>> ', this.searchData );
+        console.log('getWorkflowList 2 ======>> ', this.searchData );
 
         this.isLoadingData = false
       }).catch(err => {
@@ -440,7 +441,6 @@ export default {
     confirmDeleteSingle(value){
       console.log('Let me delete value', value);
       this.deleteRow(value)
-      
     },
     // open lightbox
     // open(processDefinitionKey) {
@@ -564,4 +564,49 @@ export default {
   //   color: #fff
   //   background-color: #190
   //   border-color: #190
+
+  .el-table__header
+    .el-table__cell
+      &:nth-child(4)
+        width: 250px
+      &:nth-child(5)
+        width: 250px
+
+  .el-table__row
+    .el-table__cell
+      &:nth-child(4)
+        // width: 220px
+        .cell
+            overflow: visible
+            cursor: default
+      &:nth-child(5)
+        width: 250px
+          
+  .forDescription
+    position: relative
+    &:hover
+      .showDescription
+        display: block
+    .shortdescription
+      overflow: hidden
+      text-overflow: ellipsis
+      white-space: nowrap
+      width: 200px
+    .showDescription
+      position: absolute
+      width: 350px
+      height: auto
+      font-size: 13px
+      line-height: 1.5
+      padding: 10px
+      background: rgba(0,0,0,.75)
+      color: #fff
+      border-radius: 3px
+      top: -10px
+      left: 101%
+      z-index: 1000
+      display: none
+      
+    
+
 </style>

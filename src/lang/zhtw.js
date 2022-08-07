@@ -1348,7 +1348,21 @@ export default{
       "cantEmptyWorkflowName": "流程名稱不可以為空",
       "cantEmptyNodeName": "節點名稱不可以為空",
       "cantRepeatNodeName": "節點名稱不可重複",
-      "cantEmptyBtnName": "自定義簽核按鈕名稱不可為空"
+      "cantEmptyBtnName": "自定義簽核按鈕名稱不可為空",
+
+      "cantCancel": "不可取消簽核：",
+      "tooltipListcant1": "送出巡檢報告時同步送出不合格項產生之事件",
+      "tooltipListcant2": "簽核流程無法選擇「取消」",
+      "tooltipListcant3": "巡檢報告重新編輯時無法修改不合格項",
+      "tooltipListcant4": "簽核通過後才能檢視巡檢報告",
+
+      "canCancel": "可取消簽核：",
+      "tooltipListcant1": "送出巡檢報告時不會立即產生不合格項之事件，簽核通過時才會產生",
+      "tooltipListcant2": "簽核流程可以選擇「取消」",
+      "tooltipListcant3": "巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項",
+      "tooltipListcant4": "簽核通過後才能檢視巡檢報告",
+
+
 
     },
     "inceptionRpt":{

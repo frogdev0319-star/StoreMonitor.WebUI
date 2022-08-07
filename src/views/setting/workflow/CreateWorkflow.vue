@@ -62,12 +62,16 @@
                               effect="light"
                               placement="bottom-end">
                               <div slot="content">
-                                不可取消簽核： <br> 
-                                送出巡檢報告時同步送出不合格項產生之事件 <br> 
-                                簽核流程無法選擇「取消」<br> 
-                                巡檢報告重新編輯時無法修改不合格項 <br> 
-                                簽核通過後才能檢視巡檢報告 <br> 
+                                <div class="tip">
+                                  {{$t('audit.workFlows.cantCancel')}}
+                                  <ul>
+                                    <li> {{$t('audit.workFlows.tooltipListcant1')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant2')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant3')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant4')}}</li>
+                                  </ul>
                                 </div>
+                              </div>
                               <i class="iconfont icon-bangzhu iconbangzhu"/>
                             </el-tooltip>
                         </div>
@@ -79,11 +83,15 @@
                             effect="light"
                             placement="bottom-end">
                             <div slot="content">
-                              可取消簽核： <br> 
-                              送出巡檢報告時不會立即產生不合格項之事件，簽核通過時才會產生 <br> 
-                              簽核流程可以選擇「取消」 <br> 
-                              巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項 <br> 
-                              簽核通過後才能檢視巡檢報告 <br> 
+                              <div class="tip">
+                                {{$t('audit.workFlows.canCancel')}}
+                                <ul>
+                                    <li> {{$t('audit.workFlows.tooltipListcant1')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant2')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant3')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant4')}}</li>
+                                </ul>
+                              </div>
                             </div>
                             <i class="iconfont icon-bangzhu iconbangzhu"/>
                           </el-tooltip>
@@ -1049,6 +1057,13 @@ export default {
     width: fit-content
   .date-time-tooltip
     margin-left: 8px
+  .tip
+    ul
+      padding-left: 0
+
+      li 
+        margin-left: 18px
+        line-height: 1.5
 
   .workflow-header
     width: 100%
