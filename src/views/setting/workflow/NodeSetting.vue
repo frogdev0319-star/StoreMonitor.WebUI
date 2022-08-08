@@ -105,7 +105,7 @@
               <div class="setting-config basic-config">
                 <div class="title-name">{{$t('audit.workFlows.auditButton')}}</div>
                 <div class="approve">
-
+                    <!-- 定義同意 -->
                     <div class="approve_row">
                       <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultAgree">
                         <el-radio :label="0">{{$t('audit.workFlows.agree')}}</el-radio>  
@@ -121,7 +121,7 @@
                           />
                       </el-radio-group>
                     </div>
-
+                    <!-- 定義拒絕 -->
                     <div class="approve_row">
                       <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultReject">
                         <el-radio :label="0">{{$t('audit.workFlows.reject')}}</el-radio>  
@@ -138,16 +138,21 @@
                       </el-radio-group>
                     </div>
 
-
-                    <!-- <div class="approve_row">
-                      <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultName">
+                    <!-- 定義撤回 -->
+                    <div class="approve_row" style="margin-top: 3px">
+                      <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultDrawback">
                         <el-radio :label="0">{{$t('audit.workFlows.withdraw')}}</el-radio>  
                         <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
-                          class="input-name"/>
+                          :disabled="btnDefaultDrawback == 0"
+                          :validate-event="false"
+                          v-model="defineDrawback"
+                          class="input-name"
+                          maxlength="8"
+                          show-word-limit/>
                       </el-radio-group>
-                    </div> -->
+                    </div>
                 
                 </div>
               </div>
@@ -393,8 +398,10 @@ export default {
       sector: 0,
       btnDefaultAgree: 0,
       btnDefaultReject: 0,
+      btnDefaultDrawback: 0,
       defineAgree: '',
-      defineReject: ''
+      defineReject: '',
+      defineDrawback: ''
     };
   },
   watch:{ 
@@ -405,6 +412,10 @@ export default {
       if(this.btnDefaultReject == 1){
         this.nodeData.customButton[1].text = this.defineReject
       }
+      if(this.btnDefaultDrawback == 1){
+        this.nodeData.customButton[1].text = this.defineDrawback
+      }
+
       console.log('this.btnDefaultName :>> ', this.btnDefaultName);
       console.log('this.btnDefaultAgree :>> ', this.btnDefaultAgree);
       console.log('this.nodeData 1:>> ', this.nodeData);
@@ -459,10 +470,9 @@ export default {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
       },
-      // set(val){
-      //   console.log('val!?!?!~~~~~>>>', val)
-      //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
-			// }
+      set(val){
+        console.log('val!?!?!~~~~~>>>', val)
+			}
     }
   },
 
@@ -521,11 +531,6 @@ export default {
     },
 
     
-
-
-
-
-
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
@@ -665,8 +670,6 @@ export default {
         return 
       }
 
-
-
       // handle btn naming
       if(this.btnDefaultAgree == 1){
         this.nodeData.customButton[0].text = this.defineAgree
@@ -748,7 +751,7 @@ export default {
       //   return
       // }
       
-      console.log('newWorkFlow 1', this.apiData)
+      console.log('to API', this.apiData)
       if(pageAction == "create" || pageAction == "edit" ){
       
         //  節點名稱不可為重複

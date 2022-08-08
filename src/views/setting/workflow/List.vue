@@ -395,8 +395,8 @@ export default {
     duplicateRow(processDefinitionKey){
       const postforms = new FormData()
       postforms.append('processDefinitionKey', processDefinitionKey)
-      // console.log('postforms0000 :>> ', postforms);
-      // console.log('processDefinitionKey :>> ', processDefinitionKey);
+      console.log('postforms0000 :>> ', postforms);
+      console.log('processDefinitionKey :>> ', processDefinitionKey);
       duplicateRow(postforms).then(res=>{
         console.log('res :>> ', res);
         this.$message({
@@ -569,8 +569,9 @@ export default {
     .el-table__cell
       &:nth-child(4)
         width: 250px
-      &:nth-child(5)
+      &:nth-child(5), &:nth-child(6)
         width: 250px
+ 
 
   .el-table__row
     .el-table__cell
@@ -579,7 +580,7 @@ export default {
         .cell
             overflow: visible
             cursor: default
-      &:nth-child(5)
+      &:nth-child(5), &:nth-child(6)
         width: 250px
           
   .forDescription
@@ -606,7 +607,11 @@ export default {
       left: 101%
       z-index: 1000
       display: none
-      
+  .forWorkflowsSwitch
+    display: flex
+    flex-direction: row
+    justify-content: center
+    align-items: center
     
 
 </style>

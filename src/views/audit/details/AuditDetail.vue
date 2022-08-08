@@ -155,7 +155,9 @@ export default {
           t.startTs = new Date(t.startTs).toLocaleString()
           t.endTs = new Date(t.endTs).toLocaleString()
           t.tasks.forEach(tt =>{
+            if(tt.startTs !== null)
             tt.startTs = new Date(tt.startTs).toLocaleString()
+            if(tt.endTs !== null)
             tt.endTs = new Date(tt.endTs).toLocaleString()
           })
         })

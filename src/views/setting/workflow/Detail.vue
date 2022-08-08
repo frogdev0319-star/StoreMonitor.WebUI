@@ -361,7 +361,6 @@ export default {
       userData:[],
       // searchUserData:[],
       inputSearchUser: '',
-
     
       ccToUSer: [],
       showSingleDeleteContent: false,
@@ -464,23 +463,26 @@ export default {
   }, 
 
 
-  watch:{},
+  watch:{
+    ccToUSer(){
+      this.nodeDataToApi.copyToUsers = this.ccToUSer
+    },
+  },
   computed: {
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
       },
-      // set(val){
-      //   console.log('val!?!?!~~~~~>>>', val)
-      //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
-			// }
+      set(){
+        // console.log('val!?!?!~~~~~>>>', val)
+        // console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
+			}
     }
   },
   mounted() {
     this.searchUserData = this.userData
 
   },
-
 
   async created() {
     await this.init()
@@ -696,7 +698,15 @@ export default {
         }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("set"))
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
+  
       this.$router.push({ name: 'nodeSetting' })
+      // call api for update
+      updateWorkflow(this.nodeDataToApi).then(res=>{
+        console.log('res :>> ', res);
+      }).catch(err => {
+        console.log('error' + err);
+      });
     },
 
     handleEmitMove(method){
@@ -789,7 +799,6 @@ export default {
       this.ccToUSer = []
     },
 
-
     confirmDeleteSingle(id){
       console.log('Let me delete value', id);
       this.deleteRow(id)
@@ -798,14 +807,22 @@ export default {
     },
 
     settingWorkFlow(row){
-      this.$router.push({name: 'nodeSetting'})
       // 刪除  "isEditing": false
       var oriData = this.flatNodeData.filter(f => row.id === f.id)
       delete row.isEditing
       sessionStorage.setItem('workflowNode', JSON.stringify(oriData[0]))
       sessionStorage.setItem('pageAction', JSON.stringify("set"))
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
+
+      this.$router.push({name: 'nodeSetting'})
+      // call api for update
+      updateWorkflow(this.nodeDataToApi).then(res=>{
+        console.log('res :>> ', res);
+      }).catch(err => {
+        console.log('error' + err);
+      });
+
     },
-    // sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
 
     deleteRow(deleteId){
       this.fullscreenLoading = true
@@ -880,14 +897,8 @@ export default {
       }
     },
 
-
-
-
     //保存並發布
     submit() {
-      // setting CC users
-      this.nodeDataToApi.copyToUsers = this.ccToUSer
-
        // call api for update
       updateWorkflow(this.nodeDataToApi).then(res=>{
         console.log('res :>> ', res);
@@ -904,7 +915,6 @@ export default {
             this.$refs.workflowName.focus()
           }
       });
-
     }
   }
 

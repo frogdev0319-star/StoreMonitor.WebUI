@@ -82,13 +82,15 @@
 
           <!-- workflow switch state -->
           <template v-else-if="_item.forWorkflowsSwitch">
-            <el-switch   
-              v-model = "row.state"
-              active-value="1"
-              inactive-value="0"
-              :disabled = "row.isBind"
-              @change="$emit('handleSwitchChange', { checked: $event, target: row })"
-              />
+            <div class="forWorkflowsSwitch" >
+              <el-switch
+                v-model = "row.state"
+                active-value="1"
+                inactive-value="0"
+                :disabled = "row.isBind"
+                @change="$emit('handleSwitchChange', { checked: $event, target: row })"
+                />
+              </div>
           </template>
           
           <!-- workflow auditByUsers -->
@@ -850,7 +852,6 @@ export default {
     opacity: 0.3 !important
     pointer-events: none !important
   
-
 
 </style>
 
