@@ -73,10 +73,11 @@
                 :allowRowExpand = "false"
                 :showBorder = "false"
                 :show-selection-column="true"
-                :default-sort = "{prop: 'userName', order: 'ascending'}"
+                :default-sort = "defaultSort_popup"
                 :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
                 :tableHeight = "516"
                 :cellStyle="{backgroundColor: '#fff !important'}"
+                @sortChange="handleSortChange_dialogUser"    
                 @selection-change="selectionChanged">
               </table-only>
             </div>
@@ -208,6 +209,7 @@ export default {
         allUserList:[],
         showShowConfirmDialog:false,
         delUserId:null,
+        defaultSort_popup:{prop: 'userName', order: 'ascending'}
       };
     },
 
@@ -221,22 +223,30 @@ export default {
       },
       // for search
       inputSearchValue(val){
-        this.searchData = this.allTableData.filter(item => (
-            item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1
-        ));
-        this.tableData = this.searchData;
+        if(val.trim()==""){
+          this.getMysterioList();
+        }else{
+          this.searchData = this.allTableData.filter(item => (
+              item.userName.indexOf(val) > -1 || item.email.indexOf(val) > -1
+          ));
+          this.tableData = this.searchData;
+        }
+        
       }
     },
 
     created() {
-      this.init();
+      //this.init();
     },
     mounted(){
-      this.getMysterioList();
+      //this.getMysterioList();
+      this.init();
     },
     methods: {
         async init(){
+          
           await this.getUserInfolist();
+          this.getMysterioList(true);
           this.getMysterioList();
         },
         async getUserInfolist() {
@@ -284,12 +294,12 @@ export default {
           console.log("allUserList:",this.allUserList);
           return this.allUserList.find(user => user.userId == userId);
         },
-        getMysterioList(){
+        getMysterioList(getAll=false){
             const self = this;
             const params={
               filter:{
                 page:this.curPage-1,
-                size:this.curSizeNum
+                size:(getAll)?500:this.curSizeNum
               },
               order:{
                 direction:this.defaultSort.order=='ascending'? 'asc':'desc',
@@ -298,6 +308,7 @@ export default {
             }
             mysteroRESTful.getMysterioMemberList(params).then(res=>{
               var mysterioData = [];
+              
               if(res.errCode == 0){
                 res.data.content.map(item =>{
                   //const mapUser = self.doMapUser(item.userId);
@@ -306,14 +317,24 @@ export default {
                   obj['updateTs']=util.getDateStr(item.updateTime),
                   obj['storeAuth']=item.permissionStores,
                   mysterioData.push(obj);
-                  this.selectedUserList.push(obj);
                 });
-                this.tableData = mysterioData;
+                if(getAll) {
+                  this.selectedUserList =[];
+                  this.allTableData = [];
+                  this.allTableData = mysterioData;
+                  this.selectedUserList = mysterioData;
+                }
+                else{
+                  this.tableData = [];
+                  this.tableData = mysterioData;
+                  self.total = res.data.totalPages;
+                  self.isLoadingData = false;
+                } 
+                
               }else{
                 util.notify(self.$t('mysterio.getMysterioMemberFail'), 'error', 3000);
               }
-              self.total = res.data.totalPages;
-              self.isLoadingData = false;
+              
             }).catch(err=>{
               console.log("getMysterioList error",err);
               util.notify(self.$t('mysterio.getMysterioMemberFail')+',error:'+err, 'error', 3000);
@@ -356,6 +377,9 @@ export default {
           const self= this;
           mysteroRESTful.removeMysterioPerson({userId:this.delUserId}).then(res=>{
             if(res.errCode==0){
+              let delIdx = self.allTableData.findIndex(user=>user.userId==this.delUserId);
+              self.allTableData.splice(delIdx,1);
+              //self.getMysterioList(true);
               self.getMysterioList();
             }else{
               util.notify(self.$t('mysterio.delMysterioMemberFail'), 'error', 3000);
@@ -395,8 +419,11 @@ export default {
               tempUserList.push(user);
             }
           });
+          tempUserList = util.sort_by_key(tempUserList,this.defaultSort_popup.prop,this.defaultSort_popup.order );
           this.userList = tempUserList;
+          
           this.userTableData = tempUserList;
+          console.log("userTableData:",this.userTableData);
         },
         selectionChanged(val){
             var selUserId = [];
@@ -418,10 +445,10 @@ export default {
                       userName:user.userName,
                       email:user.email,
                       position:user.position,
-                      storeAuth:"1",
+                      storeAuth:0,
                       updateTs:util.getDateStr(Date.now()*1000)
                   };
-                  //this.tableData.push(obj);
+                  this.allTableData.push(obj);
                   this.selectedUserList.push(obj);
               }
                 
@@ -429,7 +456,8 @@ export default {
             console.log("userIdList:",userIdList);
             mysteroRESTful.addMysterioPerson({userIdList}).then(res=>{
               if(res.errCode==0){
-                //this.allTableData = this.tableData;
+                self.curPage = 1;
+                //self.getMysterioList(true);
                 self.getMysterioList();
               }else{
                 util.notify(self.$t('mysterio.addMysterioMemberFail'), 'error', 3000);
@@ -437,6 +465,14 @@ export default {
               this.showAddPersionDialog = false;
             });
         },
+        handleSortChange_dialogUser(order,defaultSort){
+          this.defaultSort_popup={...defaultSort};
+          let key = this.defaultSort_popup.prop;
+          var tempUserList = util.sort_by_key(this.userTableData,key,this.defaultSort_popup.order );
+          console.log("tempUserList:",tempUserList);
+          this.userTableData = tempUserList;
+          
+        }
     }
 }
 </script>

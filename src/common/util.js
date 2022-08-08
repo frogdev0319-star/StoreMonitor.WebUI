@@ -611,16 +611,17 @@ export default {
   },
   sort_by_key(array, key, order)
   {
+    console.log("order:",order);
       if(order==='descending'){
           return array.sort(function(a, b)
           {
-              var x = a[key]; var y = b[key];
+              var x = a[key].toLowerCase(); var y = b[key].toLowerCase();
               return ((x > y) ? -1 : ((x < y) ? 1 : 0));
           });
       }else{
           return array.sort(function(a, b)
           {
-              var x = a[key]; var y = b[key];
+              var x = a[key].toLowerCase(); var y = b[key].toLowerCase();
               return ((x < y) ? -1 : ((x > y) ? 1 : 0));
           });
       }
