@@ -767,6 +767,7 @@ export default {
     },
     filterStore() {
       // console.log("Filter Store=>>")
+      console.log("this.storeDataList:",this.storeDataList);
       let filterStoreId = [];
       let filterStoreStr = '';
       let allfilterStoreStr = '';
@@ -796,7 +797,7 @@ export default {
           this.storeDataList = temp;
         });
 
-        if(this.storeDataList.length==0)
+        if(this.storeDataList.length==0 || this.enableMimicMode)
           this.storeDataList = temp;
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);

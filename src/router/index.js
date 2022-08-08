@@ -96,7 +96,7 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    PermissionHelper.enableRemoteInspect() && patrolRoute.children.push(
+    (PermissionHelper.enableMimicMode || PermissionHelper.enableRemoteInspect()) && patrolRoute.children.push(
       {
         path: '/reinspection',
         name: 'remotePatrol',
@@ -137,7 +137,7 @@ export const navbarRoute = {
         component: resolve => require(['@/views/patrolShop/StoreSuccessPage'], resolve)
       }
     ) && primaryPathesList.push('/storemonitor', '/storemonitor/submit');
-    PermissionHelper.enableInspectReport() && patrolRoute.children.push(
+    (PermissionHelper.enableMimicMode || PermissionHelper.enableInspectReport()) && patrolRoute.children.push(
       {
         path: '/report',
         name: 'reports',
@@ -203,7 +203,7 @@ export const navbarRoute = {
       hidden: false,
       children: []
     };
-    PermissionHelper.enableSendAudit() && auditRoute.children.push(
+    (PermissionHelper.enableMimicMode || PermissionHelper.enableSendAudit()) && auditRoute.children.push(
       {
         path: '/audit',
         name: 'SendAuditManage',
