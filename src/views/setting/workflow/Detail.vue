@@ -62,12 +62,16 @@
                               effect="light"
                               placement="bottom-end">
                               <div slot="content">
-                                不可取消簽核： <br> 
-                                送出巡檢報告時同步送出不合格項產生之事件 <br> 
-                                簽核流程無法選擇「取消」<br> 
-                                巡檢報告重新編輯時無法修改不合格項 <br> 
-                                簽核通過後才能檢視巡檢報告 <br> 
+                                <div class="tip">
+                                  {{$t('audit.workFlows.cantCancel')}}
+                                  <ul>
+                                    <li> {{$t('audit.workFlows.tooltipListcant1')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant2')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant3')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant4')}}</li>
+                                  </ul>
                                 </div>
+                              </div>
                               <i class="iconfont icon-bangzhu iconbangzhu"/>
                             </el-tooltip>
                         </div>
@@ -79,11 +83,15 @@
                             effect="light"
                             placement="bottom-end">
                             <div slot="content">
-                              可取消簽核： <br> 
-                              送出巡檢報告時不會立即產生不合格項之事件，簽核通過時才會產生 <br> 
-                              簽核流程可以選擇「取消」 <br> 
-                              巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項 <br> 
-                              簽核通過後才能檢視巡檢報告 <br> 
+                              <div class="tip">
+                                {{$t('audit.workFlows.canCancel')}}
+                                <ul>
+                                    <li> {{$t('audit.workFlows.tooltipListcant1')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant2')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant3')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcant4')}}</li>
+                                </ul>
+                              </div>
                             </div>
                             <i class="iconfont icon-bangzhu iconbangzhu"/>
                           </el-tooltip>
@@ -167,7 +175,6 @@
                   :placeholder="$t('audit.workFlows.findUser')"
                   :loading="loading" 
                   style="300px">
-                  
                   <el-option
                     v-for="user in userInfo"
                     :key="user.userId"
@@ -326,7 +333,6 @@ export default {
       w_width: "1000",
       tags: [],
       userColumnData: [
-        
         {
           'prop': 'userName',
           'label': '姓名',
@@ -457,38 +463,9 @@ export default {
     };
   }, 
 
- 
-  watch:{
 
-   
-    // for search
-    // inputSearchUser(val){
-    //   console.log('inputSearchUser', val)
-    //   console.log(' this.temp',  this.temp)
-    
-    //   this.searchUserData = this.temp.filter(item => 
-    //     item.email.indexOf(val) > -1 || item.userName.indexOf(val) > -1 
-    //   )
-    // },
-
-    // curTemplateDepartment(val){
-    //   if(val !== ''){
-    //     this.temp = this.userInfo
-    //     this.searchUserData = this.temp.filter(item => item.sector == val )
-    //     console.log(' this.temp',  this.temp)
-    //   } 
-    // },
-
-    // curTemplateTitleList(val){
-    //   if(val !== ''){
-    //     this.temp = this.searchUserData
-    //     this.searchUserData = this.temp.filter(item => item.title == val )
-    //   } 
-    // },
-  
-  },
+  watch:{},
   computed: {
-    
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
@@ -498,11 +475,12 @@ export default {
       //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
 			// }
     }
-
   },
   mounted() {
     this.searchUserData = this.userData
+
   },
+
 
   async created() {
     await this.init()
@@ -526,6 +504,8 @@ export default {
         return users.filter(item => item.title == this.curTemplateTitleList )
       }
     },    
+
+
     handleOrderedAuditNodeArray(obj){
       console.log('object :>> ', obj);
       this.nodeDataToApi.orderedAuditNodeArray.forEach(row =>{
@@ -581,14 +561,10 @@ export default {
       await getUserStatus({ type: 1 }).then(res=>{
         this.titleList =  res.data
         console.log('this.titleList 3 ------>> ', this.titleList);
-
         this.titleListAry = this.titleList.map( i => (
           i = i.defineName
         ))
-
         console.log('this.titleListAry  7:>> ', this.titleListAry);
-
-        
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -605,7 +581,6 @@ export default {
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
-
         console.log('this.departmentAry  7:>> ', this.departmentAry);
 
       }).catch(err => {
@@ -682,8 +657,6 @@ export default {
         })
         item.auditByGroups = [...newArr2 ]
       })
-
-      
       console.log('this.flatNodeDataView 5 ------>> ', this.flatNodeDataView);
     },
     
@@ -863,8 +836,6 @@ export default {
       });
     },
 
-
-
     //popup 表格選取欄位
     handleSelectionChange(val){
       this.multipleSelection = val.val
@@ -884,11 +855,11 @@ export default {
       this.$refs.usersList.toggleChecked(tag)
     },
 
-
-    
     //處理 popup user selected
     handelePopupUserList(){
       this.showingSearchUser = true
+      console.log('this.searchUserData !!!', this.searchUserData)
+
 
       // [查詢人員]資料
       this.userData.forEach(user =>{
@@ -900,7 +871,6 @@ export default {
           })
         })
       
-      console.log('data', data)
       // 等待 dialog 生成
       if(this.ccToUSer.length > 0){
         var data = this.ccToUSer
@@ -909,6 +879,8 @@ export default {
         }, 0);
       }
     },
+
+
 
 
     //保存並發布
@@ -956,6 +928,14 @@ export default {
     width: fit-content
   .date-time-tooltip
     margin-left: 8px
+  .tip
+    ul
+      padding-left: 0
+
+      li 
+        margin-left: 18px
+        line-height: 1.5
+
 
   .workflow-header
     width: 100%
@@ -1299,12 +1279,12 @@ export default {
     align-items: flex-start
     .audit-user
       margin-right: 10px
-  .flow-setting
-    .el-table__row
-      &:first-child
-        .el-table_1_column_6
-          .cell
-            display: none !important
+  
+  .el-table__row
+    &:first-child
+      .el-table_1_column_6
+        .cell
+          display: none !important
   .popup_width
     .el-dialog
       width: 70% !important

@@ -7,7 +7,7 @@
 			<div class="audit-section">
 				<!-- audit-header -->
 				<div class="audit-header">
-					<h3>簽核巡檢表</h3>
+					<h3>{{auditDetail.reportName}}</h3>
 					<div class="goto-report" 
             @click="goToReportdetails" 
             v-if="showingBtn "
@@ -18,11 +18,11 @@
 				<div class="audit-flow-body">
 					<div class="audit-flow-ownerhandling" style="margin-bottom: 20px">
 						<p>簽核流程</p>
-						<!-- <div class="handling" v-if="currentUserInfo == taskInfo[0].tasks[0].assignee.userId">
-							<div class="withdraw">撤回</div>
-							<div class="l-l"> | </div>
-							<div class="cancel">取消</div>
-						</div> -->
+						<div class="handling" v-if="!onEditing">
+							<div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo"> 撤回</div>
+                <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo"> | </div>
+              <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo">取消</div>
+						</div>
 					</div>
 
           <!-- task -->
@@ -67,7 +67,7 @@
 
           <!-- 加入檔案 & 簽名 -->
           <div class="audit-add-files">
-            <p style="margin-bottom: 10px">加入簽名</p>
+            <p style="margin-bottom: 10px"><span style="color: #c60957" v-if="isSignature">* </span>加入簽名</p>
       
             <div class="attach-area" >
               <div v-for="(imgItem,index) in signatureFileList" :key="'img'+index" class="source-details" >
@@ -133,6 +133,39 @@
       </div>
     </dialog-pop>
 
+    <dialog-pop
+      title="撤回報告簽核？"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showDoalogTaskDrawback"
+      :isWarning="true"
+      @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showDoalogTaskDrawback')"
+      @cancelHandler="hideDeleteContentDialog('showDoalogTaskDrawback')"
+      @confirmHandler="confirmTaskDrawback()"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">確認是否撤回此報告簽核？ </div>
+      </div>
+    </dialog-pop>
+
+    <dialog-pop
+      title="取消簽核？"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="showDoalogTaskCancel"
+      :isWarning="true"
+      @visibleChangeHandler="updateDeleteContentDialogFlag($event, 'showDoalogTaskCancel')"
+      @cancelHandler="hideDeleteContentDialog('showDoalogTaskCancel')"
+      @confirmHandler="cancelWorkflow()"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">確認是否取消此報告簽核？ </div>
+      </div>
+    </dialog-pop>
+
+
   </div>
 	</div>
 
@@ -141,6 +174,8 @@
 import {
     GetTaskInfo,
     taskSummit,
+    taskDrawback,
+    CancelWorkflow
   } from '@/api/workflow';
 import { getStorageInfo } from '@/api/event';
 import { getCookie } from '@/common/auth';
@@ -158,7 +193,8 @@ export default {
   components: {
     DelayButton,
     DialogPop,
-    AuditUnit
+    AuditUnit,
+
   },
   data() {
     return {
@@ -169,7 +205,7 @@ export default {
 
       auditDetail:'',
       taskInfo: [],
-      agree: true,
+      agree: null,
       description:'',
       pdfFileList:[],
       imgFileList:[],
@@ -202,7 +238,12 @@ export default {
             "attachment": []
         },
         "result": 0
-      }
+      },
+      isSignature: false,
+
+      onEditing: false,
+      showDoalogTaskDrawback : false,
+      showDoalogTaskCancel: false
     }
   },
   mounted() {},
@@ -233,6 +274,166 @@ export default {
     
   },
   methods: {
+    async init(){
+      await this.getWorkflowInfo()
+      await this.getTaskInfo(this.auditDetail.inspectReportId)
+      await this.getNodeList(this.auditDetail.processDefinitionKey) 
+
+      await this.getOssInfo();
+    },
+
+    getWorkflowInfo(){
+      const data = sessionStorage.getItem('auditDetailHandling')
+      this.auditDetail = JSON.parse(data)
+      console.log('this.auditDetail 1 ----->> ', this.auditDetail);
+    },
+
+    async getTaskInfo(param){
+      this.isLoadingData = true
+      await GetTaskInfo(param).then(res=>{
+        res.data.forEach(t =>{
+          t.startTs = new Date(t.startTs).toLocaleString()
+          t.endTs = new Date(t.endTs).toLocaleString()
+          t.tasks.forEach(tt =>{
+            tt.startTs = new Date(tt.startTs).toLocaleString()
+            tt.endTs = new Date(tt.endTs).toLocaleString()
+          })
+        })
+        this.taskInfo = res.data
+        
+        // 刪除撤回前的 task
+        var drawbackNum = this.taskInfo.findLastIndex(i => {
+          if(i.tasks[0].comment !== null){
+            return i.tasks[0].comment.description == "drawback"
+          }
+        })
+        var totalNum = this.taskInfo.length
+        this.taskInfo = this.taskInfo.slice(drawbackNum - totalNum + 1 )
+
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+
+    // get node
+    async getNodeList(id){
+      await getNodeList(id).then(res=>{
+        this.nodeList =  res.data
+        // flat data
+        this.flattenData(this.nodeList)
+        this.flatNodeData.forEach(d=>{
+          delete d.nextAuditNode
+        })
+        console.log('this.taskInfo 2 ------>> ', this.taskInfo);
+        console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
+
+        const currentNode = this.taskInfo.filter( i => i.state == 2)
+        var isSignature  = this.flatNodeData.find(n => n.id == currentNode[0].nodeId)
+        this.isSignature = isSignature.signature
+
+        this.taskInfo.forEach(t =>{
+          this.flatNodeData.forEach(n =>{
+            if(t.nodeId === n.id && t.state == 2){
+              this.customButton = n.customButton
+            }
+          })
+        })
+        // console.log(' this.customButton ------>> ',  this.customButton);
+      
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    // flatten Data by Recursive
+    flattenData(data, key = 'nextAuditNode') {
+      if(data[key] !== null) {
+          const d = data[key];
+          this.flatNodeData.push(d);
+          this.flattenData(data[key]);
+      } else {
+        return this.flatNodeData;
+      }
+    },
+    
+    agreeNode(){
+      this.agree = true
+      this.commentsToApi.result = 0
+      console.log('this.commentsToApi :>> ', this.commentsToApi);
+    },
+    rejectNode(){
+      this.agree = false
+      this.commentsToApi.result = 1
+      console.log('this.commentsToApi :>> ', this.commentsToApi);
+    },
+
+    hideDeleteContentDialog(key) {
+      this[key] = false;
+    },
+
+    // 判斷駁回取消按鈕顯示
+    isEditing(){
+      this.taskInfo.forEach(t => {
+        if(t.parentId == -1 && t.state == 2){
+          this.onEditing = true
+          this.auditDetail.auditState = 6
+        }
+      })
+    },
+
+    confirmTaskDrawback(){
+      console.log('Let me taskDrawback this task');
+      this.taskDrawback()
+    },
+
+    // 撤回報告簽核
+    taskDrawback(){
+      this.isLoadingData = true
+      const value = {
+        "inspectReportId" : this.auditDetail.inspectReportId
+        }
+      console.log('value', value)
+      taskDrawback(value).then(res=>{
+        this.isLoadingData = false
+        var reportId = this.auditDetail.inspectReportId
+        this.$router.push({name: "SendAuditManage"})
+        // this.$router.push(
+        //   { 
+        //     name: 'auditReportdetails', 
+        //     params: {
+        //       reportId: reportId, 
+        //       isAuditMode: true, 
+        //       canEdit: true,
+        //       canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
+        //       }
+        //   }
+        // );
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+    // 取消報告簽核
+    cancelWorkflow(){
+      const value = {
+        "inspectReportId" : this.auditDetail.inspectReportId
+        }
+      console.log('cencel')
+      CancelWorkflow(value).then(res=>{
+        this.isLoadingData = false
+        this.$router.push({name: "SendAuditManage"})
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
+    
+
     goToReportdetails(){
       var reportId = this.auditDetail.inspectReportId
         this.$router.push(
@@ -278,89 +479,7 @@ export default {
       this.showSignaturePad = false
       this.signatureFileList = []
     },
-
-
-    async init(){
-      await this.getWorkflowInfo()
-      await this.getTaskInfo(this.auditDetail.inspectReportId)
-      await this.getNodeList(this.auditDetail.processDefinitionKey) 
-
-      await this.getOssInfo();
-    },
-
-    getWorkflowInfo(){
-      const data = sessionStorage.getItem('auditDetailHandling')
-      this.auditDetail = JSON.parse(data)
-      console.log('this.auditDetail 1 ----->> ', this.auditDetail);
-    },
-
-    async getTaskInfo(param){
-      this.isLoadingData = true
-      await GetTaskInfo(param).then(res=>{
-        res.data.forEach(t =>{
-          t.startTs = new Date(t.startTs).toLocaleString()
-          t.endTs = new Date(t.endTs).toLocaleString()
-          t.tasks.forEach(tt =>{
-            tt.startTs = new Date(tt.startTs).toLocaleString()
-            tt.endTs = new Date(tt.endTs).toLocaleString()
-          })
-        })
-        this.taskInfo = res.data
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
-    },
-
-
-    // get node
-    async getNodeList(id){
-      await getNodeList(id).then(res=>{
-        this.nodeList =  res.data
-        // flat data
-        this.flattenData(this.nodeList)
-        this.flatNodeData.forEach(d=>{
-          delete d.nextAuditNode
-        })
-        console.log('this.taskInfo 2 ------>> ', this.taskInfo);
-        console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
-
-
-        this.taskInfo.forEach(t =>{
-          this.flatNodeData.forEach(n =>{
-            if(t.nodeId === n.id && t.state == 2){
-              this.customButton = n.customButton
-            }
-          })
-        })
-        // console.log(' this.customButton ------>> ',  this.customButton);
-      }).catch(err => {
-        console.log('error' + err);
-      });
-    },
-
-    // flatten Data by Recursive
-    flattenData(data, key = 'nextAuditNode') {
-      if(data[key] !== null) {
-          const d = data[key];
-          this.flatNodeData.push(d);
-          this.flattenData(data[key]);
-      } else {
-        return this.flatNodeData;
-      }
-    },
     
-    agreeNode(){
-      this.agree = true
-      this.commentsToApi.result = 0
-      console.log('this.commentsToApi :>> ', this.commentsToApi);
-    },
-    rejectNode(){
-      this.agree = false
-      this.commentsToApi.result = 1
-      console.log('this.commentsToApi :>> ', this.commentsToApi);
-    },
 
     async taskSummit(){
       // this.isLoadingData = true
@@ -417,28 +536,33 @@ export default {
         }
       }
 
+
+      if(this.agree == null){
+        util.notify('請選擇簽核意見', 'error', 2000);
+        return
+      }
+
       // 比對是否需要簽名檔上傳，前端處理
-      var isSignature  = this.flatNodeData.find(n => n.id == currentNode[0].nodeId)
       // console.log('isSignature :>> ', isSignature);
       // console.log('currentNode :>> ', currentNode);
-      if(isSignature.signature == true && this.commentsToApi.comment.signature.length == 0) {
+      if(this.isSignature == true && this.commentsToApi.comment.signature.length == 0) {
         util.notify('此簽核需要附加簽名檔案', 'error', 1500);
         this.commentsToApi.comment.attachment = []
         return
       }
-
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
-      // taskSummit(this.commentsToApi).then(res=>{
-      //   console.log('res :>> ', res);
-      //   this.isLoadingData = false
-      //   this.$router.push({ name: 'WaitAuditManage'});
 
-      // }).catch(err => {
-      //   this.isLoadingData = false;
-      //   console.log('error' + err);
-      //   util.notify('此簽核需要附加簽名檔案', 'error', 1500);
+      taskSummit(this.commentsToApi).then(res=>{
+        console.log('res :>> ', res);
+        this.isLoadingData = false
+        this.$router.push({ name: 'WaitAuditManage'});
 
-      // });
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+        util.notify('此簽核需要附加簽名檔案', 'error', 1500);
+
+      });
     },
 
     getAccountId() {
@@ -534,8 +658,6 @@ export default {
           
         }
     },
-
-
 
     getAuditImgList(index) {
       const arr = [];
@@ -763,8 +885,10 @@ export default {
 
   .attach-area
     display: flex
+    flex-wrap: wrap
     align-content: flex-start
     align-self: flex-start
+
     .attach-add
       height: 100px
       width: 160px

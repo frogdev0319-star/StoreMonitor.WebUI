@@ -33,7 +33,7 @@
           :is-loading-data="isLoadingData"
           :allowRowExpand = "false"
           :showBorder = "false"
-          :default-sort = "{prop: 'createTime', order: 'descending'}"
+          :default-sort = "{prop: 'createdTs', order: 'descending'}"
           :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
           :tableHeight = "760"
           :cellStyle="{backgroundColor: '#fff !important'}"
@@ -162,18 +162,27 @@ export default {
           'label': '流程描述',
           'width': 230,
           'maxWidth': 230,
+          'forDescription': true
         },
         {
           'prop': 'createdTs',
           'label': '建立時間',
           'width': 130,
-          'maxWidth': 130
+          'maxWidth': 130,
+          'sortable': true
         },
         {
           'prop': 'updateTs',
           'label': '最後更新時間',
           'width': 100,
-          'maxWidth': 100
+          'maxWidth': 100,
+          'sortable': true
+        },
+        {
+          'prop': 'updatedUser',
+          'label': '最後更新人',
+          'width': 100,
+          'maxWidth': 100,
         },
         {
           'prop': 'state',
@@ -277,13 +286,11 @@ export default {
       if(pageInfo == undefined){
         await this.getWorkflowList(this.apiBody);
       }else{
-        const newApiBody = {...this.apiBody, size:pageInfo.size, page: pageInfo.page - 1}
-
+        const newApiBody = {...this.apiBody, size: 10, page: pageInfo.page - 1}
         this.currentPage = pageInfo.page
         // console.log('newApiBody :>> ', newApiBody);
         await this.getWorkflowList(newApiBody);
       }
-
       sessionStorage.removeItem('pageAction')
     },
 
@@ -303,6 +310,8 @@ export default {
           this.userInfo.forEach(user => {
             if(d.createdUser === user.userId){
               d.createdUser = user.userName
+              d.updatedUser = user.userName
+              
               d.createdTs = new Date(d.createdTs).toLocaleString()
               d.updateTs = new Date(d.updateTs).toLocaleString()
               d.type = "巡檢表單"
@@ -317,7 +326,7 @@ export default {
 
         this.total = res.data.totalPages
 
-        console.log('this.total :>> ', this.total);
+        // console.log('this.total :>> ', this.total);
         console.log('getWorkflowList 2 ======>> ', this.searchData );
 
         this.isLoadingData = false
@@ -327,26 +336,12 @@ export default {
       });
     },
     creadNewFlow(){
-      // var time = new Date()
-      // var theTime = time.getTime()
-      // var t = {
-      //     year: time.getFullYear(),
-      //     month: ((time.getMonth() + 1) < 10) ? '0' + (time.getMonth() + 1).toString() : (time.getMonth() + 1).toString(),
-      //     date: (time.getDate() < 10) ? '0' + time.getDate().toString() : time.getDate().toString(),
-      //     hour: (time.getHours() < 10) ? '0' + time.getHours().toString() : time.getHours().toString(),
-      //     minute: (time.getMinutes() < 10) ? '0' + time.getMinutes().toString() : time.getMinutes().toString(),
-      //     second: (time.getSeconds() < 10) ? '0' + time.getSeconds().toString() : time.getSeconds().toString()
-      //   }
-      // const createTime = t.year + "-" + t.month + "-" + t.date + " " + t.hour + ":" + t.minute + ":" + t.second
-      // this.newFlow.name =  this.$t('audit.workFlows.addWorkFlow') + createTime
-      // sessionStorage.setItem('newWorkFlow', JSON.stringify(this.newFlow))
-      // console.log('this.newFlow :>> ', this.newFlow);
-
-
-
-
       sessionStorage.removeItem('workflowDetail')
       sessionStorage.removeItem('newWorkFlow')
+
+      // CreateWorkflow 新增節點需要狀態
+      var createNewNodeNeed = {"orderedAuditNodeArray":[]}
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(createNewNodeNeed))
 
       sessionStorage.setItem('pageAction', JSON.stringify("init"))
       this.$router.push({name: 'createWorkflow'})
@@ -446,7 +441,6 @@ export default {
     confirmDeleteSingle(value){
       console.log('Let me delete value', value);
       this.deleteRow(value)
-      
     },
     // open lightbox
     // open(processDefinitionKey) {
@@ -538,17 +532,22 @@ export default {
           util.notify(this.$t('route.networkError'), 'error', 1000 );
         })
       }
-      
     
     },
     
-
-
   },
 };
 </script>
 
 <style lang="sass" >
+  .tablelist
+    .el-table__header
+      width: auto !important
+
+    .el-table__body
+      width: auto !important
+    
+
   .workflow-header
     width: 100%
     // height: 150px
@@ -565,4 +564,49 @@ export default {
   //   color: #fff
   //   background-color: #190
   //   border-color: #190
+
+  .el-table__header
+    .el-table__cell
+      &:nth-child(4)
+        width: 250px
+      &:nth-child(5)
+        width: 250px
+
+  .el-table__row
+    .el-table__cell
+      &:nth-child(4)
+        // width: 220px
+        .cell
+            overflow: visible
+            cursor: default
+      &:nth-child(5)
+        width: 250px
+          
+  .forDescription
+    position: relative
+    &:hover
+      .showDescription
+        display: block
+    .shortdescription
+      overflow: hidden
+      text-overflow: ellipsis
+      white-space: nowrap
+      width: 200px
+    .showDescription
+      position: absolute
+      width: 350px
+      height: auto
+      font-size: 13px
+      line-height: 1.5
+      padding: 10px
+      background: rgba(0,0,0,.75)
+      color: #fff
+      border-radius: 3px
+      top: -10px
+      left: 101%
+      z-index: 1000
+      display: none
+      
+    
+
 </style>

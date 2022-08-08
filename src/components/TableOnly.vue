@@ -70,6 +70,16 @@
           </template>
           <span v-else-if="_item.formatter" v-html="_item.formatter(row)"/>
 
+
+          <!-- workflow switch state -->
+          <template v-else-if="_item.forDescription">
+            <div class="forDescription">
+              <div class="shortdescription">{{row.description}}</div> 
+              <div class="showDescription" v-if="row.description.length > 13"> {{row.description}}</div>
+            </div>
+            
+          </template>
+
           <!-- workflow switch state -->
           <template v-else-if="_item.forWorkflowsSwitch">
             <el-switch   
@@ -601,9 +611,9 @@ export default {
     },
 
     toggleChecked(tag){
-      // console.log('unChecked')
-      // console.log('tag !!!', tag)
-      // console.log('this.tableData !!!', this.tableData)
+      console.log('unChecked')
+      console.log('tag !!!', tag)
+      console.log('this.tableData !!!', this.tableData)
 
       var row = this.tableData.filter(element => 
           element.userName == tag.userName
@@ -727,7 +737,7 @@ export default {
   }
   .cell-class.el-table__expand-column .cell{
     padding:0;
-    width:100px;
+    width: 0px;
   }
   
 </style>
@@ -839,6 +849,8 @@ export default {
   .moveup_disable, .movedown_disable
     opacity: 0.3 !important
     pointer-events: none !important
-    
+  
+
+
 </style>
 
