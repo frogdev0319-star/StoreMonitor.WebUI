@@ -91,8 +91,22 @@ export default {
       immediate: false, 
       deep: true,
       handler (val) {
+        console.log("page total:",val);
+        console.log("this.currentPage:",this.currentPage);
           this.total = val;
-          this.currentPage;
+          if(this.total< this.currentPage) {
+            this.currentPage = this.currentPage-1;
+            this.handleCurrentChange(this.currentPage);
+          }
+          
+      }
+    },
+    currentPage:{
+      immediate: false, 
+      deep: true,
+      handler (val) {
+        console.log("currentPage:",val);
+          this.currentPage = val;
       }
     }
   },
