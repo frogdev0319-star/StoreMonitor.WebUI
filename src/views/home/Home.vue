@@ -457,7 +457,9 @@ export default {
       if (pathMAP) {
         path = pathMAP.activePath;
         this.setBrandListDisabled(true);
-      } else {
+      } else if(this.showMimicMode){
+        this.setBrandListDisabled(true);
+      }else {
         this.setBrandListDisabled(false);
       }
       return path;
@@ -497,11 +499,7 @@ export default {
     },
     mimicMode(){
       this.showMimicMode = this.$store.getters.mimicMode;
-      if(this.showMimicMode){
-        this.setBrandListDisabled(true);
-      }else{
-        this.setBrandListDisabled(false);
-      }
+      
     },
     isMystery(){
       this.hasMystery = this.$store.getters.isMystery;

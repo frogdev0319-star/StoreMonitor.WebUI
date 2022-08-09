@@ -1835,7 +1835,8 @@ export default {
         mode: 0,
         authorizedOnly: 1,
         tagName: self.patrolstore,
-        inspectId: val
+        inspectId: val,
+        isMysteryMode:this.enableMimicMode
       };
       self.inspectItemList = [];
       checkOutInspectItemV3(params).then(res => {

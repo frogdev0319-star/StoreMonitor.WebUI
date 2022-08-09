@@ -268,7 +268,7 @@ export default {
     },
     mimicMode(){
       this.enableMimicMode = this.$store.getters.mimicMode;
-      if(this.enableMimicMode) this.getMysteryStore();
+      if(this.enableMimicMode) this.ifGetParamsFromCash=false;
       this.curSelectedStore = "";
       this.getStoreListAndGroupAndType(true);
     },
@@ -276,14 +276,14 @@ export default {
 
   created() {
     this.enableMimicMode = this.$store.getters.mimicMode;
-    if(this.enableMimicMode) this.getMysteryStore();
+    if(this.enableMimicMode) this.ifGetParamsFromCash=false;
     this.getSearchParams();
     this.getStoreListAndGroupAndType(true);
     this.hasFavoritedStar = this.showFavorite;
   },
   mounted(){
     this.enableMimicMode = this.$store.getters.mimicMode;
-    if(this.enableMimicMode) this.getMysteryStore();
+    if(this.enableMimicMode) this.ifGetParamsFromCash=false;
   },
   methods: {
     changeFavorite () {
@@ -328,7 +328,6 @@ export default {
       //this.getStoreListAndGroupAndType();
     },
     getCountryStore(initFilter) {
-      // console.log("getCountryStore:"+initFilter)
       let temp = [];
       if (this.storeList.length !== 0) {
         // console.log("2.getCountryStore");
@@ -377,7 +376,7 @@ export default {
 
     getStoreListAndGroupAndType(init) {
 
-      const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : this.getBriefStoreData();
+      const storeListPromise = this.isFavorite ? this.getFavoriteStoreData() : ((this.enableMimicMode)? this.getMysteryStore():this.getBriefStoreData());
       const storeGroupPromise = this.getStoreDefineList(1);
       const storeTypePromise = this.getStoreDefineList(0);
       Promise.all([storeListPromise, storeGroupPromise, storeTypePromise]).then(results => {
@@ -753,7 +752,17 @@ export default {
     },
 
     getMysteryStore(){
+      return new Promise((resolve, reject) => {
         ListMysteryModeStoreInfo().then(res => {
+          const errMsg = res.errMsg;
+          if (errMsg && errMsg === 'Success') {
+            resolve(res.data);
+          }
+        }).catch(err => {
+          reject(err);
+        });
+      });
+        /*ListMysteryModeStoreInfo().then(res => {
           var mimicStore = [];
           if (res.errCode==0) {
             res.data.map(store=>{
@@ -763,7 +772,7 @@ export default {
           }
         }).catch(err => {
           console.log("getMysteryStore error:",err);
-        });
+        });*/
     },
     filterStore() {
       // console.log("Filter Store=>>")
@@ -775,12 +784,12 @@ export default {
         // console.log("Filter Store=>>curStoreGroup and curStoreType length ==0")
         filterStoreId = this.curStore;
         //秘密客模式可選門店取交集
-        if(this.enableMimicMode){//秘密客模式可選門店
+        /*if(this.enableMimicMode){//秘密客模式可選門店
           //console.log("MysteryStoreList:",this.mysterStoreIds);
           var tempStoreList = filterStoreId.slice(0) ;
           filterStoreId  = util.getIntersectionOfArrs(this.mysterStoreIds,tempStoreList);
           console.log("**mimic this.filterStoreIds:",filterStoreId);
-        }
+        }*/
         let temp=[];
         filterStoreId.forEach(storeId => {
           this.storeList.forEach(store => {
@@ -794,11 +803,12 @@ export default {
                 temp.push(obj);
             }
           });
-          this.storeDataList = temp;
+          //this.storeDataList = temp;
         });
 
-        if(this.storeDataList.length==0 || this.enableMimicMode)
+        if(this.storeDataList.length==0){
           this.storeDataList = temp;
+        }
         this.filterStoreIds = filterStoreId.filter(storeId => storeId !== '-1');
         this.storeStr = filterStoreStr.substr(0, filterStoreStr.length - 1);
       } else {
@@ -812,12 +822,12 @@ export default {
         console.log("this.curStore:",this.curStore);
         console.log("this.storeDataList:",this.storeDataList);
         //已經跟部門群組和類型交集完的結果
-        if(this.enableMimicMode){//秘密客模式可選門店
+        /*if(this.enableMimicMode){//秘密客模式可選門店
           //console.log("MysteryStoreList:",this.mysterStoreIds);
           var tempStoreList = filterStoreArray.slice(0) ;
           filterStoreArray  = util.getIntersectionOfArrs(tempStoreList, this.mysterStoreIds);
           console.log("**mimic this.filterStoreIds:",this.filterStoreIds);
-        }
+        }*/
         let temp=[];
 
         filterStoreArray.forEach(storeId => {
@@ -1162,7 +1172,7 @@ export default {
     getSearchParams() {
       const searchParams = this.cachedParams;
       // console.log("getSearchParams > searchParams:",searchParams);
-      if (Object.keys(searchParams).length > 0) {
+      if (Object.keys(searchParams).length > 0 && !this.enableMimicMode) {
 
         if (searchParams.curCountry) {
           this.curCountry = searchParams.curCountry;
