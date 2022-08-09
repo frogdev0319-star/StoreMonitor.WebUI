@@ -4,10 +4,21 @@
       <div class="submit-header flex-center margin-bottom-md">
         <span>{{ $t('remotePatrol.summary') }}</span>
         <div class="spacer"></div>
-        <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit">
-          {{ $t('remotePatrol.submit') }}
-        </el-button>
+        <div v-if="false"><!--isEditReport-->
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="confirm-btn" type="primary" @click="submit">
+            {{ $t('audit.inceptionRpt.saveReport') }}
+          </el-button>
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit">
+            {{ $t('audit.inceptionRpt.submitReport') }}
+          </el-button>
+        </div>
+        <div v-else>
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit">
+            {{ $t('remotePatrol.submit') }}
+          </el-button>
+        </div>
       </div>
+
       <div class="submit-content">
         <div class="submit-radio margin-bottom-md">
           <span v-for="(item,index) in resultList" :key="index">
@@ -429,7 +440,7 @@ import { submitInspectItem1 } from '@/api/inspect';
 import {SubmitWorkflow,getWorkflowInfo,modifyReportWorkflow,taskSummit,getReportWorkflowTask,ReSubmitWorkflow} from '@/api/workflow';
 import util from '@/common/util';
 import { getCookie } from '@/common/auth';
-import { getDepartmentList } from '@/api/checkin';
+import { getDepartmentListAll } from '@/api/checkin';
 import { getUserInfo ,getAllUserInfoNoAuth} from '@/api/login';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
@@ -1593,7 +1604,7 @@ export default {
     async doGetWorkflowInfo(workflow){
       var wfi = {copyToUsers:"",nextAuditUser:""}
       const workflowPromise = getWorkflowInfo({processDefinitionKey:workflow.processDefinitionKey});
-      const userPosition = getDepartmentList({ type: 0 }); //取得職務
+      const userPosition = getDepartmentListAll({ type: 0 }); //取得職務
       const userPromise = getAllUserInfoNoAuth();
       try {
         const result = await Promise.all([userPosition, userPromise, workflowPromise]);

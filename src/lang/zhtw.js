@@ -1383,7 +1383,9 @@ export default{
       "confirmCancelAudit":"確認是否取消此報告簽核",
       "cancelAuditFail":"取消簽核失敗",
       "editAuditFail":"重送簽核失敗",
-      "auditReport":"簽核紀錄表"
+      "auditReport":"簽核紀錄表",
+      "saveReport":"儲存",
+      "submitReport":"儲存並送出"
     }
   },
   "mysterio":{

@@ -497,6 +497,11 @@ export default {
     },
     mimicMode(){
       this.showMimicMode = this.$store.getters.mimicMode;
+      if(this.showMimicMode){
+        this.setBrandListDisabled(true);
+      }else{
+        this.setBrandListDisabled(false);
+      }
     },
     isMystery(){
       this.hasMystery = this.$store.getters.isMystery;
