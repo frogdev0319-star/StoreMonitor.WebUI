@@ -94,7 +94,7 @@ export default {
         console.log("page total:",val);
         console.log("this.currentPage:",this.currentPage);
           this.total = val;
-          if(this.total< this.currentPage) {
+          if(this.currentPage!=1 && this.total< this.currentPage) {
             this.currentPage = this.currentPage-1;
             this.handleCurrentChange(this.currentPage);
           }
@@ -106,7 +106,8 @@ export default {
       deep: true,
       handler (val) {
         console.log("currentPage:",val);
-          this.currentPage = val;
+        if(val>0)this.currentPage = val;
+        else this.currentPage =1;
       }
     }
   },
