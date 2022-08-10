@@ -146,7 +146,7 @@ export default{
               {
                 'prop': 'processStartTs',
                 'label': this.$t('audit.sendAudit.submitTime'),
-                'sortable': true,
+                'sortable': 'custom',
                 'width': 100,
                 'maxWidth': 100,
                 'isExpand': false
@@ -154,7 +154,7 @@ export default{
               {
                 'prop': 'processLastUpdateTs',
                 'label': this.$t('audit.sendAudit.updateTime'),
-                'sortable': false,
+                'sortable': 'custom',
                 'width': 100,
                 'maxWidth': 100,
                 'isExpand': false
