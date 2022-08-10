@@ -199,7 +199,7 @@ export default {
           "page": 0,
           "size": 10,
           "direction": "DESC",
-          "property": "createdTs",
+          "property": "updateTs",
           // "name": "test",
           // "type": 0,
           "state": [
@@ -294,6 +294,23 @@ export default {
       sessionStorage.removeItem('pageAction')
     },
 
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+
+    getdate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + "/"+ month +"/"+ day +"/"+ hour +":"+ min +":"+ sec
+
+    },
+
+
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
           this.userInfo = res.data
@@ -303,6 +320,7 @@ export default {
         });
     },
 
+    
     async getWorkflowList(param){
       this.isLoadingData = true
       await getWorkflowList(param).then(res=>{
@@ -312,8 +330,10 @@ export default {
               d.createdUser = user.userName
               d.updatedUser = user.userName
               
-              d.createdTs = new Date(d.createdTs).toLocaleString()
-              d.updateTs = new Date(d.updateTs).toLocaleString()
+
+              d.createdTs = this.getdate(d.createdTs)
+              d.updateTs = this.getdate(d.updateTs)
+
               d.type = "巡檢表單"
               d.index = res.data.content.indexOf(d) + 1
               d.state = d.state.toString()
@@ -495,43 +515,43 @@ export default {
     handleSwitchChange({ checked, target }) {
       console.log('checked :>> ', checked);
       console.log('target :>> ', target);
-      // if (checked == 1 ) {
-      //   enableWorkflow({
-      //     processDefinitionKeys: [target.processDefinitionKey]
-      //   }).then((res) => {
-      //     if (res.errCode === 0) {
-      //       this.tableData = this.tableData.map(row => {
-      //         return row.processDefinitionKey === target.processDefinitionKey
-      //           ? {
-      //             ...row,
-      //             state: true
-      //           }
-      //           : { ...row }
-      //       })
-      //       util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
-      //     }
-      //   }).catch(e => {
-      //     util.notify(this.$t('route.networkError'), 'error', 1000 );
-      //   })
-      // } else {
-      //   disableWorkflow({
-      //     processDefinitionKeys: [target.processDefinitionKey]
-      //   }).then((res) => {
-      //     if (res.errCode === 0) {
-      //       this.tableData = this.tableData.map(row => {
-      //         return row.processDefinitionKey === target.processDefinitionKey
-      //           ? {
-      //             ...row,
-      //             state: false
-      //           }
-      //           : { ...row }
-      //       })
-      //       util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
-      //     }
-      //   }).catch(e => {
-      //     util.notify(this.$t('route.networkError'), 'error', 1000 );
-      //   })
-      // }
+      if (checked == 1 ) {
+        enableWorkflow({
+          processDefinitionKeys: [target.processDefinitionKey]
+        }).then((res) => {
+          if (res.errCode === 0) {
+            this.tableData = this.tableData.map(row => {
+              return row.processDefinitionKey === target.processDefinitionKey
+                ? {
+                  ...row,
+                  state: true
+                }
+                : { ...row }
+            })
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+          }
+        }).catch(e => {
+          util.notify(this.$t('route.networkError'), 'error', 1000 );
+        })
+      } else {
+        disableWorkflow({
+          processDefinitionKeys: [target.processDefinitionKey]
+        }).then((res) => {
+          if (res.errCode === 0) {
+            this.tableData = this.tableData.map(row => {
+              return row.processDefinitionKey === target.processDefinitionKey
+                ? {
+                  ...row,
+                  state: false
+                }
+                : { ...row }
+            })
+            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+          }
+        }).catch(e => {
+          util.notify(this.$t('route.networkError'), 'error', 1000 );
+        })
+      }
     
     },
     
