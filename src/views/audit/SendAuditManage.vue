@@ -154,7 +154,7 @@ export default{
                     {
                       'prop': 'processStartTs',
                       'label': this.$t('audit.sendAudit.submitTime'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -170,7 +170,7 @@ export default{
                     {
                       'prop': 'processLastUpdateTs',
                       'label': this.$t('audit.sendAudit.updateTime'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -229,7 +229,7 @@ export default{
                     {
                       'prop': 'processStartTs',
                       'label': this.$t('audit.sendAudit.submitTime'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -245,7 +245,7 @@ export default{
                     {
                       'prop': 'processLastUpdateTs',
                       'label': this.$t('audit.sendAudit.updateTime'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -304,7 +304,7 @@ export default{
                     {
                       'prop': 'processStartTs',
                       'label': this.$t('audit.sendAudit.submitTime'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -320,7 +320,7 @@ export default{
                     {
                       'prop': 'processLastUpdateTs',
                       'label': this.$t('audit.sendAudit.updateTime'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -508,8 +508,8 @@ export default{
         },
         sortChange(order, defaultSort){
             const self = this;
-            console.log("order:",order);
             self.curOrder = order;
+            console.log("self.curOrder:",self.curOrder);
             self.tableDataList[self.curTabIndx].order = self.curOrder;
             self.getAllTask();
         },
@@ -562,8 +562,8 @@ export default{
                     self.isLoading = true;
                     for(const task of data){
                         var taskObj = {...task};
-                        taskObj.processStartTs =  util.getDateStr(task.processStartTs);
-                        taskObj.processLastUpdateTs =  util.getDateStr(task.processLastUpdateTs);
+                        taskObj['processStartTs'] =  util.getDateStr(task.processStartTs);
+                        taskObj['processLastUpdateTs'] =  util.getDateStr(task.processLastUpdateTs);
                         taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
                         taskObj['operator']=this.$t('statistics.check');
                         if(task.auditState==2 || task.auditState==3 || task.auditState==6){//進行中

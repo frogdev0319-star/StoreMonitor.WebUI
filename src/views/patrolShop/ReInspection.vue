@@ -743,6 +743,7 @@
                       {{ `${index+1}. ${item.eventName}` }}
                       <div class="spacer"></div>
                       <button
+                        v-if="item.showDelBtn"
                         class="feedback-delete-btn"
                         @click="deleteEvent(item,index)"
                       >
@@ -753,6 +754,7 @@
                       v-for="(source, idx) in item.sourceList"
                       :key="idx">
                       <img
+                        v-if="item.showDelBtn"
                         :src="deleteInspectIcon"
                         alt="delete"
                         @click="editFeedback(item, index)"
@@ -763,8 +765,9 @@
                         <div style="flex: 1; text-align: left; margin: 5px">
                           {{source.src}}
                         </div>
-                        <hr class="hr-vertical" />
+                        <hr v-if = "item.showDelBtn" class="hr-vertical" />
                         <img
+                          v-if = "item.showDelBtn"
                           :src="editInspectIcon"
                           alt="edit"
                           style="margin: 5px"
@@ -1457,12 +1460,14 @@ export default {
           eventName: this.eventName,
           eventDes: this.eventDes,
           sourceObj: srcObj,
-          sourceList: this.feedbackSourceList
+          sourceList: this.feedbackSourceList,
+          showDelBtn:true
         };
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
         this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
+        this.eventList[this.feedbackIndex].showDelBtn = true;
         // this.eventList[this.feedbackIndex].eventDes = this.eventDes;
       }
       this.showFeedDialog2 = false;
@@ -1476,7 +1481,8 @@ export default {
           eventName: this.eventName,
           eventDes: this.eventDes,
           sourceObj: null,
-          sourceList: this.feedbackSourceList
+          sourceList: this.feedbackSourceList,
+          showDelBtn:true
         };
         if (this.eventName.trim().length == 0) {
           this.showEventNameInfo = true;
@@ -1485,7 +1491,8 @@ export default {
         this.eventList.push(obj);
       } else {
         this.eventList[this.feedbackIndex].eventName = this.eventName;
-        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList;
+        this.eventList[this.feedbackIndex].sourceList = this.feedbackSourceList; 
+        this.eventList[this.feedbackIndex].showDelBtn = true;
       }
       this.showAddTextFeedbackDialog = false;
       this.showFeedBackInfo = false;
@@ -1835,7 +1842,8 @@ export default {
         mode: 0,
         authorizedOnly: 1,
         tagName: self.patrolstore,
-        inspectId: val
+        inspectId: val,
+        isMysteryMode:this.enableMimicMode
       };
       self.inspectItemList = [];
       checkOutInspectItemV3(params).then(res => {
@@ -2021,9 +2029,20 @@ export default {
             self.showFeedBackInfo = self.eventList.length == 0;
             self.showFeedBack = false;
             self.doFillHisScorData();
+            if(self.eventList.length >0) self.doFillFeedBackData();
           }
         }
       })
+    },
+    doFillFeedBackData(){
+      this.eventList.map(event=>{
+        if(!this.auditCancelable){//不能取消的簽核，不能刪除反饋
+          event['showDelBtn'] = false;
+        }else{
+          event['showDelBtn'] = true;
+        }
+      });
+      console.log("self.eventList:",this.eventList);
     },
     doFillHisScorData(){ //報告編輯狀態，取得個項目分數和附件
       const self = this;
@@ -3432,7 +3451,8 @@ export default {
         eventName: obj.eventName,
         eventDes: obj.eventDes,
         sourceObj: srcObj,
-        sourceList: obj.sourceList
+        sourceList: obj.sourceList,
+        showDelBtn:true
       };
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;

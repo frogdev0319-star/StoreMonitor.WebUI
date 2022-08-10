@@ -413,7 +413,7 @@ export default {
         {
           'prop': 'datestr',
           'label': this.$t('remotePatrol.patrolDate'),
-          'sortable': true,
+          'sortable': 'custom',
           'width': 100,
           'maxWidth': 100,
           'isExpand': false
@@ -606,8 +606,8 @@ export default {
       }
       return obj;
     },
-   getReportList_(p) {
-      console.log("Get Report List")
+   /*getReportList_(p) {
+      console.log("2.Get Report List")
       console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
       inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
@@ -679,9 +679,9 @@ export default {
         }).catch(err => {
         });
       });
-    },
+    },*/
    getReportList(p) {
-      console.log("Get Report List")
+      console.log("1.Get Report List")
       console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
       inspectTagId:p.inspectTagId!='-1'?p.inspectTagId:null}
@@ -918,18 +918,20 @@ export default {
       self.$router.push({ name: 'reportDetails', params: { data: item.routeObj }});
     },
 
-    sortChange(col) {
+    sortChange(sortOrder) {
       const self = this;
-      const order = col.order;
-      if (order === 'ascending') {
+      const order = sortOrder.direction;
+      console.log("report sort:",sortOrder);
+      console.log("report order:",order);
+      if (order === 'asc') {
         self.params.order = {
           'direction': 'asc',
-          'property': col.column.property === 'datestr' ? 'ts' : col.column.property
+          'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
         };
-      } else if (order === 'descending') {
+      } else if (order === 'desc') {
         self.params.order = {
           'direction': 'desc',
-          'property': col.column.property === 'datestr' ? 'ts' : col.column.property
+          'property': sortOrder.property === 'datestr' ? 'ts' : sortOrder.property
         };
       } else {
         self.params.order = {};

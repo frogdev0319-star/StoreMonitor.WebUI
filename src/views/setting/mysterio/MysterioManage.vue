@@ -148,7 +148,7 @@ export default {
           {
             'prop': 'updateTs',
             'label': this.$t('mysterio.lastUpdateTime'),
-            'sortable': true,
+            'sortable': 'custom',
             'width': 130,
             'maxWidth': 130,
             'isExpand': false

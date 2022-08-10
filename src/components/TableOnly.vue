@@ -528,6 +528,7 @@ export default {
     handleSortChange(col) {
       const self = this;
       const order = col.order;
+      console.log("col.order:",col.order);
       if (!order) {
         self.getOrderBasedOnDefaultSort();
       } else {
@@ -536,6 +537,7 @@ export default {
         self.defaultSort.prop = property;
         self.defaultSort.order = order;
         if (!self.isEvent) {
+          console.log("property:",property);
           if (property.indexOf('Str') > -1) {
             self.order.property = property.substr(0, property.indexOf('Str'));
           } else {

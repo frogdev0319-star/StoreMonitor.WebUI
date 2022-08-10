@@ -34,3 +34,11 @@ export const getDepartmentList = params => {
     params
   });
 }
+
+export const getDepartmentListAll = params => {
+  return request({
+    url: `${version}/user/define/list/all`,
+    method: 'get',
+    params
+  });
+}

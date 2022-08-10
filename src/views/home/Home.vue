@@ -233,7 +233,10 @@
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
-                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);">{{ $t('route.my') }}</el-dropdown-item>
+                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  @click.native="changePWD"
+                >{{ $t('route.changePWD') }}
+                </el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
                   style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
@@ -457,7 +460,9 @@ export default {
       if (pathMAP) {
         path = pathMAP.activePath;
         this.setBrandListDisabled(true);
-      } else {
+      } else if(this.showMimicMode){
+        this.setBrandListDisabled(true);
+      }else {
         this.setBrandListDisabled(false);
       }
       return path;
@@ -497,6 +502,7 @@ export default {
     },
     mimicMode(){
       this.showMimicMode = this.$store.getters.mimicMode;
+      
     },
     isMystery(){
       this.hasMystery = this.$store.getters.isMystery;
@@ -828,11 +834,16 @@ export default {
     fedlogout() {
       Database.destoryDB();
       const url = sessionStorage.getItem("LoginURL");
-      window.location.href = url;
+      let nowHref = window.location.href;
+      if(!nowHref.includes("http://localhost:8088/"))
+        window.location.href = url;
       this.$router.push({ name: 'Login'})
 
     },
-
+    changePWD(){
+      const url = sessionStorage.getItem("LoginURL")+"/changepwd";
+      window.location.href = url;
+    },
     logOut() {
       const self = this;
       self.$store.dispatch("logout").then(() => {});

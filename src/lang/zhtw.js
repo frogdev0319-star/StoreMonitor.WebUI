@@ -31,7 +31,8 @@ export default{
       "inspectingSettingOfSchedule":"巡檢配置（巡檢排程）",
       "itemSetting":"巡檢項設置",
       "leftBracket":"（",
-      "logOut":"登出",
+      "logOut":"登出系統",
+      "changePWD":"修改密碼",
       "loginAbnormal":"登入信息異常，請重新登入！",
       "meta":"智慧巡檢",
       "mgt":"智慧巡檢",
@@ -1384,7 +1385,9 @@ export default{
       "confirmCancelAudit":"確認是否取消此報告簽核",
       "cancelAuditFail":"取消簽核失敗",
       "editAuditFail":"重送簽核失敗",
-      "auditReport":"簽核紀錄表"
+      "auditReport":"簽核紀錄表",
+      "saveReport":"儲存",
+      "submitReport":"儲存並送出"
     }
   },
   "mysterio":{
