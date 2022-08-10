@@ -14,8 +14,8 @@
 						<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
 							<div class="audit-name">
 								<div class="audit-user-name" v-if="task.assignee !== null && task.auditByUsers.length == 0 ">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
-
 								<div class="audit-user-name" v-else-if="task.assignee == null && task.auditByUsers.length > 0"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span v-if="task.endTs !== null">({{task.endTs}})</span></div>
+								<div class="audit-user-name" v-else-if="taskItem.state == 3 && taskItem.auditTargetName !== null"> {{taskItem.auditTargetName}} </div>
 							</div>
 							<div class="audit-situation"  v-if="taskItem.state == 1 || taskItem.state == 4">
 								<div class="audit_agree" v-if="task.comment.result == 0 && task.comment.result !== null"><i class="iconfont el-icon-check"/> 同意</div>
@@ -85,8 +85,6 @@ export default {
 			}
 			return this.urlList = arr
 		},
-		
-		
 	}
 };
 </script>

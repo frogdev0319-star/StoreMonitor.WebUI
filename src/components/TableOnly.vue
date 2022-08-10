@@ -82,7 +82,7 @@
 
           <!-- workflow switch state -->
           <template v-else-if="_item.forWorkflowsSwitch">
-            <div class="forWorkflowsSwitch" >
+            <div class="forWorkflowsSwitch" @click="needAlert(row)">
               <el-switch
                 v-model = "row.state"
                 active-value="1"
@@ -639,7 +639,19 @@ export default {
       temp.forEach(row => {
         this.$refs.tablePagination.toggleRowSelection(row, true);
       });
+    },
+    
+    needAlert(row){
+      console.log('needAlert :>> ');
+      console.log('row :>> ', row);
+      if(row.isBind == true){
+          util.notify(`${this.$t('audit.workFlows.isBind')} ${row.inspectTagName} ${this.$t('audit.workFlows.cantClose')}`, 'error', 3000);
+      }else{
+        return
+      }
+
     }
+    
   }
 };
 </script>

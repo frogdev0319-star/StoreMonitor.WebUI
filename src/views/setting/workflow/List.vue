@@ -82,7 +82,7 @@ import {
     disableWorkflow, 
     enableWorkflow
   } from '@/api/workflow';
-import { getUserInfo } from '@/api/login';
+import { getUserInfo, getAllUserInfoNoAuth} from '@/api/login';
 import { mapGetters } from 'vuex';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -295,7 +295,7 @@ export default {
     },
 
     async getUserInfo(){
-      await getUserInfo().then(res=>{
+      await getAllUserInfoNoAuth().then(res=>{
           this.userInfo = res.data
           console.log('this.userInfo 1 ======>> ', this.userInfo);
         }).catch(err => {
@@ -372,13 +372,13 @@ export default {
             this.showSingleDeleteContent = true
             this.deletedProcessDefinitionKey = row.processDefinitionKey
           }else{
+            console.log('row !!! :>> ', row);
             this.$message({
               type: 'error',
-              message: this.$t('audit.workFlows.canNotDelete')
+              message: `已綁定巡檢表「 ${row.inspectTagName} 」${this.$t('audit.workFlows.canNotDelete')}`
+              // message: 
             }); 
           }
-          
-          console.log('row :>> ', row);
           break;      
         }
         default: {
@@ -495,43 +495,43 @@ export default {
     handleSwitchChange({ checked, target }) {
       console.log('checked :>> ', checked);
       console.log('target :>> ', target);
-      if (checked == 1 ) {
-        enableWorkflow({
-          processDefinitionKeys: [target.processDefinitionKey]
-        }).then((res) => {
-          if (res.errCode === 0) {
-            this.tableData = this.tableData.map(row => {
-              return row.processDefinitionKey === target.processDefinitionKey
-                ? {
-                  ...row,
-                  state: true
-                }
-                : { ...row }
-            })
-            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
-          }
-        }).catch(e => {
-          util.notify(this.$t('route.networkError'), 'error', 1000 );
-        })
-      } else {
-        disableWorkflow({
-          processDefinitionKeys: [target.processDefinitionKey]
-        }).then((res) => {
-          if (res.errCode === 0) {
-            this.tableData = this.tableData.map(row => {
-              return row.processDefinitionKey === target.processDefinitionKey
-                ? {
-                  ...row,
-                  state: false
-                }
-                : { ...row }
-            })
-            util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
-          }
-        }).catch(e => {
-          util.notify(this.$t('route.networkError'), 'error', 1000 );
-        })
-      }
+      // if (checked == 1 ) {
+      //   enableWorkflow({
+      //     processDefinitionKeys: [target.processDefinitionKey]
+      //   }).then((res) => {
+      //     if (res.errCode === 0) {
+      //       this.tableData = this.tableData.map(row => {
+      //         return row.processDefinitionKey === target.processDefinitionKey
+      //           ? {
+      //             ...row,
+      //             state: true
+      //           }
+      //           : { ...row }
+      //       })
+      //       util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+      //     }
+      //   }).catch(e => {
+      //     util.notify(this.$t('route.networkError'), 'error', 1000 );
+      //   })
+      // } else {
+      //   disableWorkflow({
+      //     processDefinitionKeys: [target.processDefinitionKey]
+      //   }).then((res) => {
+      //     if (res.errCode === 0) {
+      //       this.tableData = this.tableData.map(row => {
+      //         return row.processDefinitionKey === target.processDefinitionKey
+      //           ? {
+      //             ...row,
+      //             state: false
+      //           }
+      //           : { ...row }
+      //       })
+      //       util.notify(this.$t('deviceView.editSuss'), 'success', 3000);
+      //     }
+      //   }).catch(e => {
+      //     util.notify(this.$t('route.networkError'), 'error', 1000 );
+      //   })
+      // }
     
     },
     
