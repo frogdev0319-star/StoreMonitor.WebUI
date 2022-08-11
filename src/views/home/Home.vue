@@ -444,11 +444,19 @@ export default {
         { curPath: ["/beseyeDeviceSetting"], activePath: "/beseyeAccount" },
         //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
-        { curPath: ["/workflowDetail"], activePath: "/workflows" },
-        { curPath: ["/createWorkflow"], activePath: "/workflows" },
 
-        { curPath: ["/workflownode"], activePath: "/workflowDetail" },
-        { curPath: ["/auditDetail"], activePath: "/audit" },
+        { curPath: ["/workflows/createWorkflow"], activePath: "/workflows" },
+        { curPath: ["/workflows/workflowDetail"], activePath: "/workflows" },
+
+        { curPath: ["/createWorkflow/workflownode"], activePath: "/createWorkflow" },
+        { curPath: ["/workflowDetail/workflownode"], activePath: "/workflowDetail" },
+
+
+        { curPath: ["/audit/auditDetail"], activePath: "/audit" },
+        { curPath: ["/waitaudit/auditDetail"], activePath: "/waitaudit" },
+        { curPath: ["/transcriptnotify/auditDetail"], activePath: "/transcriptnotify" },
+        
+
         { curPath: ["/auditHandling"], activePath: "/waitaudit" },
         { curPath: ["/audit/auditDetail/reportdetails"], activePath: "/auditDetail" },
         { curPath: ["/audit/auditHandling/reportdetails"], activePath: "/auditHandling" },
@@ -757,18 +765,40 @@ export default {
         },
         {
           paths: ["/createWorkflow"],
-          parentBread: { path: "/workFlows", name: "workflowManage" },
+          parentBread: { path: "/workFlows", name: "workflowDetail" },
         },
 
         {
-          paths: ["/workflownode"],
+          paths: ["/createWorkflow/workflownode"],
+          parentBread: { path: "/createWorkflow", name: "createWorkflow" },
+        },
+        {
+          paths: ["/workflowDetail/workflownode"],
           parentBread: { path: "/workflowDetail", name: "workflowDetail" },
         },
 
+
+        // {
+        //   paths: ["/auditDetail"],
+        //   parentBread: { path: "/audit", name: "AuditManage" },
+        // },
+      
         {
-          paths: ["/auditDetail"],
-          parentBread: { path: "/audit", name: "AuditManage" },
+          paths: ["/audit/auditDetail"],
+          parentBread: { path: "/audit", name: "SendAuditManage" },
         },
+        {
+          paths: ["/waitaudit/auditDetail"],
+          parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
+        },
+        {
+          paths: ["/transcriptnotify/auditDetail"],
+          parentBread: { path: "/transcriptnotify", name: "TranscriptNotify" },
+        },
+
+
+
+
         {
           paths: ["/auditHandling"],
           parentBread: { path: "/waitaudit", name: "WaitAuditManage" },

@@ -535,7 +535,7 @@ export default{
                 self.$router.push({ name: 'auditHandling', params: { data: item.row }});
             }else{
                 sessionStorage.setItem('auditDetail', JSON.stringify(item.row));
-                self.$router.push({ name: 'auditDetail', params: { data: item.row }});
+                self.$router.push({ name: 'WaitAuditDetail', params: { data: item.row }});
             }
         },
     },

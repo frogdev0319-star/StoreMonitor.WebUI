@@ -87,19 +87,30 @@ export default{
       "patrolItemStat":"巡檢項統計",
       "singleStoreStat":"單店分析",
       "workflowManage":"流程設計",
-      "workflowDetail":"流程配置",
+
+      "workflowDetail":"編輯流程",
       "createWorkflow":"新增流程",
+
+      "createNodeSetting":"設定節點",
       "nodeSetting":"設定節點",
+
       "noReportAuthority":"無報告檢視權限，請聯繫管理員",
       "noPatrolCompareStatAuthority":"無巡檢同比分析權限，請聯繫管理員",
       "noEventAuthority":"無事件檢視權限，請聯繫管理員",
       //簽核
       "AuditManage":"簽核管理",
+
+      "auditDetail":"簽核內容",
+      "WaitAuditDetail":"簽核內容",
+      "TranscriptnotifyDetail":"簽核內容",
+      
       "SendAuditManage":"送出簽核",
       "WaitAuditManage":"待簽核",
       "TranscriptNotify":"副本通知",
-      "auditDetail":"簽核內容",
+      
       "auditHandling":"簽核處理",
+
+      
       "auditReportdetails":"簽核紀錄表詳情",
       "reportdetailsAuditDetail":"送出簽核｜簽核內容",
       "handlingReportdetails":"簽核紀錄表詳情",
@@ -1351,6 +1362,7 @@ export default{
       "cantEmptyNodeName": "節點名稱不可以為空",
       "cantRepeatNodeName": "節點名稱不可重複",
       "cantEmptyBtnName": "自定義簽核按鈕名稱不可為空",
+      "cantDisabledEdit": "禁用流程無法編輯",
 
       "cantCancel": "不可取消簽核：",
       "tooltipListcant1": "送出巡檢報告時同步送出不合格項產生之事件",

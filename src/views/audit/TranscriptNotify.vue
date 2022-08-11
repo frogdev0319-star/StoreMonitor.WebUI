@@ -376,7 +376,7 @@ export default{
         clickDetail(item, index) {
             const self = this;
             sessionStorage.setItem('auditDetail', JSON.stringify(item.row));
-            self.$router.push({ name: 'auditDetail', params: { data: item.row }});
+            self.$router.push({ name: 'TranscriptnotifyDetail', params: { data: item.row }});
         },
     },
     
