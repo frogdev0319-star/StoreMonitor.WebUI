@@ -249,7 +249,7 @@
         </el-table-column>
       </template>
       <div slot="empty">
-        <div v-if="!isLoadingData">
+        <div v-if="!isLoading">
           <i class="iconfont icon-zhengque empty-data-icon"/>
           <span class="empty-text">{{ $t('deviceView.noData') }}</span>
         </div>
@@ -399,9 +399,7 @@ export default {
       loadingGif: require('../../static/img/loading.svg'),
       expands: "",
       expandRowKeys: [],
-
-  
-      
+      isLoading:false,
     };
   },
   filters:{
@@ -429,6 +427,11 @@ export default {
     maxIndex(){
       return this.tableData.length - 1
     },
+  },
+  watch:{
+    isLoadingData(val){
+      this.isLoading = val;
+    }
   },
   created() {},
   mounted() {

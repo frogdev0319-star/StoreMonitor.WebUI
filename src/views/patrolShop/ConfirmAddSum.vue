@@ -4,16 +4,16 @@
       <div class="submit-header flex-center margin-bottom-md">
         <span>{{ $t('remotePatrol.summary') }}</span>
         <div class="spacer"></div>
-        <div v-if="false"><!--isEditReport-->
-          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="confirm-btn" type="primary" @click="submit">
+        <div v-if="isEditReport"><!--isEditReport-->
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="confirm-btn" type="primary" @click="submit(false)">
             {{ $t('audit.inceptionRpt.saveReport') }}
           </el-button>
-          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit">
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit(true)">
             {{ $t('audit.inceptionRpt.submitReport') }}
           </el-button>
         </div>
         <div v-else>
-          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit">
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit(true)">
             {{ $t('remotePatrol.submit') }}
           </el-button>
         </div>
@@ -517,6 +517,7 @@ export default {
       isEditReport:false,
       reportId:-1,
       reportStatus:-1,
+      auditCancelable:false,
     };
   },
   computed: {
@@ -670,7 +671,7 @@ export default {
       });
       self.curSumIndex = item.label;
     },
-    async submit() {
+    async submit(sendEvent) {
       const self = this;
       let upload = 0;
       const inspect = self.inspectList;
@@ -767,7 +768,7 @@ export default {
       const feedEventList = [];
       for (const i in self.eventList) {
         const obj = {};
-        obj.id = self.eventList[i].id;
+        obj.id = (self.eventList[i].id)?self.eventList[i].id:-1;
         obj.ts = new Date().getTime();
         obj.storeId = self.store.storeId;
 
@@ -877,12 +878,13 @@ export default {
         items: temp,
         feedback: feedEventList,
         isMysteryMode:PermissionHelper.enableMimicMode,
+        isCreateEvent:sendEvent
       };
       
       let routeData = null;
       if(self.reportId!=-1 && self.isEditReport){
         params['reportId']=this.reportId;
-        upload === 0 && self.doModifyReportSubmit(params,auditAttachment);
+        upload === 0 && self.doModifyReportSubmit(params,auditAttachment,sendEvent);
       } else{
         upload === 0 && submitInspectItem1(params).then(res => {
           if (res.errCode === 0) {
@@ -946,7 +948,7 @@ export default {
       self.uploadProgress = false;
     },
 
-    doModifyReportSubmit(params,auditAttachment){
+    doModifyReportSubmit(params,auditAttachment,sendEvent){
       const self = this;
       console.log("submit report params:",params);
       var routeData = {
@@ -970,44 +972,56 @@ export default {
           util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
           return false;
         }
-        if(self.auditState==7){ //系統撤回重送
-          var subTaskParam = {
-            inspectReportId:self.reportId,
-            comment:{
-              description:self.auditNote,
-              attachment:auditAttachment
-            }
-          }
-          console.log("1.subTaskParam:",subTaskParam);
-          self.doReSubmitWorkflow(subTaskParam);
-        }else{
-          let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
-          console.log("task:",task);
-          let taskId = task.tasks[0].taskId;
-          var subTaskParam = {
-            taskId,
-            result:0,
-            comment:{
-              description:self.auditNote,
-              attachment:auditAttachment
-            }
+        if(!sendEvent){//儲存，非送出報告，不用submit簽核
+          routeData = {
+            reportId: self.reportId, 
+            isAuditMode: true, 
+            canEdit: true,
+            canCancel: this.auditCancelable,
+            auditCancelable:this.auditCancelable
           };
-          console.log("2.subTaskParam:",subTaskParam);
-          taskSummit(subTaskParam).then(resSubTask => {
-            if(resSubTask.errCode == 0){
-              self.$store.dispatch('setEditCount', 0);
-              routeData = {
-                  isSuccess: true,
-                  isBindWorkflow:!!PermissionHelper.enableSendAudit()
-              };
-              console.log("routeData:",routeData);
-              self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+          console.log("routeData:",routeData);
+          self.$router.push({ name: 'auditReportdetails', params: routeData});
+        }else{
+          if(self.auditState==7){ //系統撤回重送
+            var subTaskParam = {
+              inspectReportId:self.reportId,
+              comment:{
+                description:self.auditNote,
+                attachment:auditAttachment
+              }
             }
-          }).catch(errSubTask=>{
-            console.log("errSubTask:",errSubTask);
-            util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
-            return false;
-          });
+            console.log("1.subTaskParam:",subTaskParam);
+            self.doReSubmitWorkflow(subTaskParam);
+          }else{
+            let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
+            console.log("task:",task);
+            let taskId = task.tasks[0].taskId;
+            var subTaskParam = {
+              taskId,
+              result:0,
+              comment:{
+                description:self.auditNote,
+                attachment:auditAttachment
+              }
+            };
+            console.log("2.subTaskParam:",subTaskParam);
+            taskSummit(subTaskParam).then(resSubTask => {
+              if(resSubTask.errCode == 0){
+                self.$store.dispatch('setEditCount', 0);
+                routeData = {
+                    isSuccess: true,
+                    isBindWorkflow:!!PermissionHelper.enableSendAudit()
+                };
+                console.log("routeData:",routeData);
+                self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+              }
+            }).catch(errSubTask=>{
+              console.log("errSubTask:",errSubTask);
+              util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
+              return false;
+            });
+          }
         }
       }).catch(err=>{
         console.log("err:",err);
@@ -1061,7 +1075,8 @@ export default {
         self.allRemarkItemsFlag = routeData.allRemarkItemsFlag;
         self.isBindWorkflow = routeData.isBindWorkflow;
         self.isEditReport = routeData.isEditReport;
-        
+        self.auditCancelable = routeData.auditCancelable;
+
         if(self.isEditReport) self.reportId = routeData.reportId;
         if(self.isBindWorkflow){
           console.log('**inspectSettings.workflowInfo',inspectSettings.workflowInfo);

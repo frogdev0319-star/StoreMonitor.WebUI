@@ -162,7 +162,7 @@ export default{
                     {
                       'prop': 'auditStatusName',
                       'label': this.$t('audit.sendAudit.auditStatus'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -237,7 +237,7 @@ export default{
                     {
                       'prop': 'auditStatusName',
                       'label': this.$t('audit.sendAudit.auditStatus'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -312,7 +312,7 @@ export default{
                     {
                       'prop': 'auditStatusName',
                       'label': this.$t('audit.sendAudit.auditStatus'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -372,7 +372,7 @@ export default{
         mimicModeChanged(val){
             console.log("mimicMode val:",val);
             this.initData();
-        }
+        },
     },
     created(){
         this.isFirstLoad = true;
@@ -508,12 +508,16 @@ export default{
         },
         sortChange(order, defaultSort){
             const self = this;
+            if(order.property == "auditStatusName"){
+                order.property = "auditState";
+            }
             self.curOrder = order;
             console.log("self.curOrder:",self.curOrder);
             self.tableDataList[self.curTabIndx].order = self.curOrder;
             self.getAllTask();
         },
         getAllTask(){
+            this.isLoading = true;
             for (let i = 0; i < 3; i++) {
                 this.tableDataList[i].tableData = [];
                 this.tableDataList[i].taskCount = 0;
@@ -559,7 +563,7 @@ export default{
                     //const tempProcessing = [];
                     //const tempCompleted = [];
                     //var processingCount=0, completedCount=0;
-                    self.isLoading = true;
+                    
                     for(const task of data){
                         var taskObj = {...task};
                         taskObj['processStartTs'] =  util.getDateStr(task.processStartTs);

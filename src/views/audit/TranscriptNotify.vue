@@ -320,6 +320,7 @@ export default{
             self.getAllTask();
         },
         getAllTask(){
+            this.isLoading = true;
             this.tableData = [];
             this.totalPage = 0;
             var params = {
@@ -352,7 +353,7 @@ export default{
                     //const tempProcessing = [];
                     //const tempCompleted = [];
                     //var processingCount=0, completedCount=0;
-                    self.isLoading = true;
+                    
                     for(const task of data){
                         var taskObj = {...task};
                         taskObj.processStartTs =  util.getDateStr(task.processStartTs);
