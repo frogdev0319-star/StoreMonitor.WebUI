@@ -238,7 +238,7 @@ export default{
                     {
                       'prop': 'auditStatusName',
                       'label': this.$t('audit.sendAudit.auditStatus'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -436,22 +436,10 @@ export default{
         },
         sortChange(order, defaultSort){
             const self = this;
-            console.log("order:",order);
+            if(order.property == "auditStatusName"){
+                order.property = "auditState";
+            }
             self.curOrder = order;
-            /*if (order === 'ascending') {
-                self.curOrder = {
-                    'direction': 'asc',
-                    'property': col.column.property
-                };
-            } else if (order === 'descending') {
-                self.curOrder = {
-                    'direction': 'desc',
-                    'property': col.column.property
-                };
-            } else {
-                self.curOrder = {};
-            }*/
-            console.log("self.curOrder:",self.curOrder);
             self.tableDataList[self.curTabIndx].order = self.curOrder;
             self.getAllTask();
         },

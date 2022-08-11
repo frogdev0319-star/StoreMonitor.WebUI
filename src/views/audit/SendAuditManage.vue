@@ -162,7 +162,7 @@ export default{
                     {
                       'prop': 'auditStatusName',
                       'label': this.$t('audit.sendAudit.auditStatus'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -237,7 +237,7 @@ export default{
                     {
                       'prop': 'auditStatusName',
                       'label': this.$t('audit.sendAudit.auditStatus'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -312,7 +312,7 @@ export default{
                     {
                       'prop': 'auditStatusName',
                       'label': this.$t('audit.sendAudit.auditStatus'),
-                      'sortable': true,
+                      'sortable': 'custom',
                       'width': 100,
                       'maxWidth': 100,
                       'isExpand': false
@@ -508,6 +508,9 @@ export default{
         },
         sortChange(order, defaultSort){
             const self = this;
+            if(order.property == "auditStatusName"){
+                order.property = "auditState";
+            }
             self.curOrder = order;
             console.log("self.curOrder:",self.curOrder);
             self.tableDataList[self.curTabIndx].order = self.curOrder;
