@@ -372,7 +372,7 @@ export default{
         mimicModeChanged(val){
             console.log("mimicMode val:",val);
             this.initData();
-        }
+        },
     },
     created(){
         this.isFirstLoad = true;
@@ -517,6 +517,7 @@ export default{
             self.getAllTask();
         },
         getAllTask(){
+            this.isLoading = true;
             for (let i = 0; i < 3; i++) {
                 this.tableDataList[i].tableData = [];
                 this.tableDataList[i].taskCount = 0;
@@ -562,7 +563,7 @@ export default{
                     //const tempProcessing = [];
                     //const tempCompleted = [];
                     //var processingCount=0, completedCount=0;
-                    self.isLoading = true;
+                    
                     for(const task of data){
                         var taskObj = {...task};
                         taskObj['processStartTs'] =  util.getDateStr(task.processStartTs);

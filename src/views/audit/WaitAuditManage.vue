@@ -444,6 +444,7 @@ export default{
             self.getAllTask();
         },
         getAllTask(){
+            this.isLoading = true;
             this.tableDataList[this.curTabIndx].tableData = [];
             this.tableDataList[this.curTabIndx].taskCount = 0;
             this.tableDataList[this.curTabIndx].totalPage = 0;
@@ -486,7 +487,7 @@ export default{
                     //const tempProcessing = [];
                     //const tempCompleted = [];
                     //var processingCount=0, completedCount=0;
-                    self.isLoading = true;
+                    
                     for(const task of data){
                         var taskObj = {...task};
                         taskObj.processStartTs =  util.getDateStr(task.processStartTs);
