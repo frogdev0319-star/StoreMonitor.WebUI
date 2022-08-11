@@ -361,7 +361,6 @@ export default {
       userData:[],
       // searchUserData:[],
       inputSearchUser: '',
-
     
       ccToUSer: [],
       showSingleDeleteContent: false,
@@ -458,29 +457,33 @@ export default {
 
       temp:[],
       showSelectionColumn: true,
-      multipleSelection: []
+      multipleSelection: [],
+      auditMember: {}
       
     };
   }, 
 
 
-  watch:{},
+  watch:{
+    ccToUSer(){
+      this.nodeDataToApi.copyToUsers = this.ccToUSer
+    },
+  },
   computed: {
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
       },
-      // set(val){
-      //   console.log('val!?!?!~~~~~>>>', val)
-      //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
-			// }
+      set(){
+        // console.log('val!?!?!~~~~~>>>', val)
+        // console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
+			}
     }
   },
   mounted() {
     this.searchUserData = this.userData
 
   },
-
 
   async created() {
     await this.init()
@@ -526,10 +529,11 @@ export default {
       await this.getUserInfo() //2
       await this.getDepartmentList() //7
 
-  
       await this.handleData() //5
       await this.dataToApi() //6
 
+      await this.getPickedMember() //8
+  
     },
 
     needNote(){
@@ -549,8 +553,6 @@ export default {
         this.userInfo = res.data
         this.userData = this.userInfo
         console.log('getWorkflowInfo 2 ------>> ', this.userInfo);
-        
-
       }).catch(err => {
         console.log('error' + err);
       });
@@ -672,7 +674,37 @@ export default {
       sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
     },
 
+
+    getPickedMember(){
+      console.log('this.flatNodeDataView 8>> ', this.flatNodeDataView);
+
+      var handleFlatNodeDataView = [...this.flatNodeData]
+      handleFlatNodeDataView.shift()
+
+      var auditMembers = {        
+        "auditByUsers": [],
+        "auditByGroups": []
+      }
+      handleFlatNodeDataView.forEach(i=>{
+        if(i.auditByUsers.length !== 0){
+          auditMembers.auditByUsers.push(i.auditByUsers[0])
+        }
+        if(i.auditByGroups.length !== 0){
+          auditMembers.auditByGroups.push(i.auditByGroups[0])
+        }
+      })
+
+      // 刪除重複
+      auditMembers.auditByUsers = [... new Set(auditMembers.auditByUsers)]
+      auditMembers.auditByGroups = [... new Set(auditMembers.auditByGroups)]
+      
+      console.log('auditMembers :>> ', auditMembers);
+      sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
+    },
+
+
     addNode() {
+
       const newNode = {
             "name": this.$t('audit.workFlows.addNode'),
             "auditMethod": 0,
@@ -696,7 +728,15 @@ export default {
         }
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("set"))
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
+  
       this.$router.push({ name: 'nodeSetting' })
+      // call api for update
+      updateWorkflow(this.nodeDataToApi).then(res=>{
+        console.log('res :>> ', res);
+      }).catch(err => {
+        console.log('error' + err);
+      });
     },
 
     handleEmitMove(method){
@@ -789,7 +829,6 @@ export default {
       this.ccToUSer = []
     },
 
-
     confirmDeleteSingle(id){
       console.log('Let me delete value', id);
       this.deleteRow(id)
@@ -798,14 +837,22 @@ export default {
     },
 
     settingWorkFlow(row){
-      this.$router.push({name: 'nodeSetting'})
       // 刪除  "isEditing": false
       var oriData = this.flatNodeData.filter(f => row.id === f.id)
       delete row.isEditing
       sessionStorage.setItem('workflowNode', JSON.stringify(oriData[0]))
       sessionStorage.setItem('pageAction', JSON.stringify("set"))
+      sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
+
+      this.$router.push({name: 'nodeSetting'})
+      // call api for update
+      updateWorkflow(this.nodeDataToApi).then(res=>{
+        console.log('res :>> ', res);
+      }).catch(err => {
+        console.log('error' + err);
+      });
+
     },
-    // sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
 
     deleteRow(deleteId){
       this.fullscreenLoading = true
@@ -880,14 +927,8 @@ export default {
       }
     },
 
-
-
-
     //保存並發布
     submit() {
-      // setting CC users
-      this.nodeDataToApi.copyToUsers = this.ccToUSer
-
        // call api for update
       updateWorkflow(this.nodeDataToApi).then(res=>{
         console.log('res :>> ', res);
@@ -904,7 +945,6 @@ export default {
             this.$refs.workflowName.focus()
           }
       });
-
     }
   }
 
@@ -1279,16 +1319,20 @@ export default {
     align-items: flex-start
     .audit-user
       margin-right: 10px
-  
-  .el-table__row
-    &:first-child
-      .el-table_1_column_6
-        .cell
-          display: none !important
+      
+  .tablelist
+    .el-table__row
+      &:first-child
+        .el-table_1_column_6
+          .cell
+            display: none !important
+
   .popup_width
     .el-dialog
       width: 70% !important
       background: #f7f9fa
+
+      
   .users
     .el-checkbox__input.is-checked .el-checkbox__inner
       background: #2c90d9 !important

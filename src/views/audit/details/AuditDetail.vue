@@ -17,7 +17,7 @@
             <div class="audit-flow-ownerhandling">
               <p style="margin-bottom: 30px">簽核流程</p>
               <div class="handling" v-if="!onEditing && auditDetail.auditState < 4">
-                <div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo" >撤回</div>
+                <div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo" >{{customButton[2].text}}</div>
                 <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo"> | </div>
                 <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo">取消</div>
               </div>
@@ -70,7 +70,8 @@
 import {
     GetTaskInfo,
     taskDrawback,
-    CancelWorkflow
+    CancelWorkflow,
+    getNodeList
   } from '@/api/workflow';
 
 import DelayButton from '@/components/DelayButton';
@@ -95,6 +96,25 @@ export default {
       currentUserInfo: '',
       showingBtn: true,
 
+      flatNodeData: [],
+      customButton:[
+        {
+          "type": 0,
+          "text": this.$t('audit.workFlows.agree'),
+          "enable": true
+        },
+        {
+          "type": 1,
+          "text": this.$t('audit.workFlows.reject'),
+          "enable": true
+        },
+        {
+          "type": 2,
+          "text": this.$t('audit.workFlows.withdraw'),
+          "enable": true
+        },
+      ],
+
       onEditing: false,
       showDoalogTaskDrawback : false,
       showDoalogTaskCancel : false
@@ -104,6 +124,8 @@ export default {
   mounted() {},
   async created() {
     await this.init()
+    await this.getNodeList(this.auditDetail.processDefinitionKey) 
+
     const resulit = await this.$store.dispatch("GetUserAuthorities");
     this.currentUserInfo = resulit.data.userId
   },
@@ -155,22 +177,35 @@ export default {
           t.startTs = new Date(t.startTs).toLocaleString()
           t.endTs = new Date(t.endTs).toLocaleString()
           t.tasks.forEach(tt =>{
-            tt.startTs = new Date(tt.startTs).toLocaleString()
-            tt.endTs = new Date(tt.endTs).toLocaleString()
+            if(tt.startTs !== null) tt.startTs = new Date(tt.startTs).toLocaleString()
+            if(tt.endTs !== null) tt.endTs = new Date(tt.endTs).toLocaleString()
           })
         })
 
         this.taskInfo = res.data
-        console.log('this.taskInfo 2 ----->> ', this.taskInfo);
+        console.log('this.taskInfo ori ----->> ', this.taskInfo);
 
-        // 刪除撤回前的 task
+        var totalNum = this.taskInfo.length
+        // 撤回前的 task 
         var drawbackNum = this.taskInfo.findLastIndex(i => {
           if(i.tasks[0].comment !== null){
             return i.tasks[0].comment.description == "drawback"
           }
         })
-        var totalNum = this.taskInfo.length
-        this.taskInfo = this.taskInfo.slice(drawbackNum - totalNum + 1 )
+        if(drawbackNum > -1) this.taskInfo = this.taskInfo.slice(drawbackNum - totalNum + 1 )
+        console.log('drawbackNum :>> ', drawbackNum);
+        console.log('this.taskInfo done1! ----->> ', this.taskInfo);
+
+
+        // 駁回的 task
+        // var rejectNum = this.taskInfo.findLastIndex( i => {
+        //   if(i.tasks[0].comment !== null){
+        //     return i.tasks[0].comment.result == 1
+        //   }
+        // })
+        // if(rejectNum > -1) this.taskInfo = this.taskInfo.splice(0, rejectNum + 1)
+        // console.log('rejectNum :>> ', rejectNum);
+        // console.log('this.taskInfo done2! ----->> ', this.taskInfo);
 
         this.isLoadingData = false
       }).catch(err => {
@@ -179,6 +214,48 @@ export default {
       });
     },
     
+    // get node
+    async getNodeList(id){
+      await getNodeList(id).then(res=>{
+        this.nodeList =  res.data
+        // flat data
+        this.flattenData(this.nodeList)
+        this.flatNodeData.forEach(d=>{
+          delete d.nextAuditNode
+        })
+        console.log('this.taskInfo 2 ------>> ', this.taskInfo);
+        console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
+
+        const currentNode = this.taskInfo.filter( i => i.state == 2)
+        var isSignature  = this.flatNodeData.find(n => n.id == currentNode[0].nodeId)
+        this.isSignature = isSignature.signature
+
+        this.taskInfo.forEach(t =>{
+          this.flatNodeData.forEach(n =>{
+            if(t.nodeId === n.id && t.state == 2 && n.customButton[2] !== undefined){
+              this.customButton = n.customButton
+            }
+          })
+        })
+        console.log(' this.customButton ------>> ',  this.customButton);
+      
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+
+    // flatten Data by Recursive
+    flattenData(data, key = 'nextAuditNode') {
+      if(data[key] !== null) {
+          const d = data[key];
+          this.flatNodeData.push(d);
+          this.flattenData(data[key]);
+      } else {
+        return this.flatNodeData;
+      }
+    },
+
+
 
     taskDrawback(){
       const value = {

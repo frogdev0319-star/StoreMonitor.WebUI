@@ -105,7 +105,7 @@
               <div class="setting-config basic-config">
                 <div class="title-name">{{$t('audit.workFlows.auditButton')}}</div>
                 <div class="approve">
-
+                    <!-- 定義同意 -->
                     <div class="approve_row">
                       <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultAgree">
                         <el-radio :label="0">{{$t('audit.workFlows.agree')}}</el-radio>  
@@ -121,7 +121,7 @@
                           />
                       </el-radio-group>
                     </div>
-
+                    <!-- 定義拒絕 -->
                     <div class="approve_row">
                       <el-radio-group class="storevue-radio flex-row" v-model="btnDefaultReject">
                         <el-radio :label="0">{{$t('audit.workFlows.reject')}}</el-radio>  
@@ -138,16 +138,21 @@
                       </el-radio-group>
                     </div>
 
-
-                    <!-- <div class="approve_row">
-                      <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultName">
+                    <!-- 定義撤回 -->
+                    <div class="approve_row" style="margin-top: 3px">
+                      <el-radio-group class="storevue-radio flex-row"  v-model="btnDefaultDrawback">
                         <el-radio :label="0">{{$t('audit.workFlows.withdraw')}}</el-radio>  
                         <el-radio :label="1">{{$t('audit.workFlows.define')}}</el-radio>
                         <el-input
                           :placeholder="$t('audit.workFlows.defineItem')"
-                          class="input-name"/>
+                          :disabled="btnDefaultDrawback == 0"
+                          :validate-event="false"
+                          v-model="defineDrawback"
+                          class="input-name"
+                          maxlength="8"
+                          show-word-limit/>
                       </el-radio-group>
-                    </div> -->
+                    </div>
                 
                 </div>
               </div>
@@ -393,8 +398,12 @@ export default {
       sector: 0,
       btnDefaultAgree: 0,
       btnDefaultReject: 0,
+      btnDefaultDrawback: 0,
       defineAgree: '',
-      defineReject: ''
+      defineReject: '',
+      defineDrawback: '',
+
+      auditMembers: {}
     };
   },
   watch:{ 
@@ -405,9 +414,9 @@ export default {
       if(this.btnDefaultReject == 1){
         this.nodeData.customButton[1].text = this.defineReject
       }
-      console.log('this.btnDefaultName :>> ', this.btnDefaultName);
-      console.log('this.btnDefaultAgree :>> ', this.btnDefaultAgree);
-      console.log('this.nodeData 1:>> ', this.nodeData);
+      if(this.btnDefaultDrawback == 1){
+        this.nodeData.customButton[2].text = this.defineDrawback
+      }
     }
 
     // sector(){
@@ -433,7 +442,7 @@ export default {
   },
 
   mounted() {
-    this.searchUserData = this.userData
+    
 
     // this.dataFromRoute = { ...this.$route.params.data }
     // getWorkflowInfo({
@@ -459,40 +468,54 @@ export default {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
       },
-      // set(val){
-      //   console.log('val!?!?!~~~~~>>>', val)
-      //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
-			// }
+      set(val){
+        console.log('val!?!?!~~~~~>>>', val)
+			}
     }
   },
 
   methods: {
     async init(){
+
+      const data = sessionStorage.getItem('auditMembers')
+      this.auditMembers = JSON.parse(data)
+      console.log('this.auditMembers :>> ', this.auditMembers);
+
       await this.getNodeInfo() 
       await this.getWorkflowInfo()
       await this.getUserInfo()
       
       await this.getTitle()
-      console.log('this.apiData  starting', this.apiData)
-
     }, 
 
-    
     // get user
     async getUserInfo(){
       await getUserInfo().then(res=>{
         this.userInfo = res.data
-        this.userData = this.userInfo
+        
         console.log('userInfo ------>> ', this.userInfo);
+        console.log('this.nodeData :>> ', this.nodeData);
+
+        let newAuditByUsersArr = []
+        if(this.auditMembers !== null){
+          if(this.nodeData.auditByUsers.length !== 0){  
+            this.auditMembers.auditByUsers = this.auditMembers.auditByUsers.filter(i => i !== this.nodeData.auditByUsers[0])
+          }
+          newAuditByUsersArr = this.userInfo.filter(i => !this.auditMembers.auditByUsers.includes(i.userId))
+          this.userInfo = newAuditByUsersArr
+        }
+
+        this.userData = this.userInfo
+        console.log('newAuditByUsersArr :>> ', newAuditByUsersArr);
+        console.log('this.userData :>> ', this.userData);
+
 
       }).catch(err => {
         console.log('error' + err);
       });
     },
 
-
-
-     // get title 職務
+    // get title 職務
     async getTitle(){
       await getDepart({ type: 1 }).then(res=>{
         this.titleList =  res.data
@@ -510,8 +533,32 @@ export default {
     // get getDepart
     async getDepartmentList(){
       await getDepart({ type: 0 }).then(res=>{
-        this.department = res.data
-        console.log('this.department ~~~~~>', this.department)
+        // this.department = res.data
+        console.log('res.data ~~~~~>', res.data)
+        
+        let newAuditByGroupsArr = []
+        if(this.nodeData.auditByGroups.length == 0){
+          this.departmentStatus = res.data[0].defineId
+          newAuditByGroupsArr = res.data.filter( i => !this.auditMembers.auditByGroups.includes(i.defineId))
+        }else{
+          this.departmentStatus = this.nodeData.auditByGroups[0]
+          newAuditByGroupsArr = res.data
+        }
+
+        // if(this.auditMembers.auditByGroups.length !== 0){
+        //   newauditByGroupsArr = res.data.filter(i => !this.auditMembers.auditByGroups.includes(i.defineId))
+        // }
+
+        console.log('newAuditByGroupsArr :>> ', newAuditByGroupsArr);
+        if(newAuditByGroupsArr.length == 0){
+          this.departmentStatus = ''
+          this.department = []
+        }else{
+          this.department = newAuditByGroupsArr
+        }
+        
+
+
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
@@ -521,9 +568,6 @@ export default {
     },
 
     
-
-
-
 
 
 
@@ -542,6 +586,15 @@ export default {
       console.log('this.nodeData 2:>> ', this.nodeData);
       console.log('this.apiData :>> ', this.apiData);
 
+      if(this.nodeData.customButton.length < 3){
+        const drawBackBtn = {
+            type: 2, 
+            text: this.$t('audit.workFlows.withdraw'), 
+            enable: true
+        }
+        this.nodeData.customButton.push(drawBackBtn)
+      }
+      
 
       if(this.nodeData.customButton[0].text !== this.$t('audit.workFlows.agree')){
         this.btnDefaultAgree = 1
@@ -551,6 +604,10 @@ export default {
         this.btnDefaultReject = 1
         this.defineReject = this.nodeData.customButton[1].text
       }
+      if(this.nodeData.customButton[2].text !== this.$t('audit.workFlows.withdraw')){
+        this.btnDefaultDrawback = 1
+        this.defineDrawback = this.nodeData.customButton[2].text
+      }
 
 
       // 簽核人員
@@ -559,8 +616,7 @@ export default {
 
       // 取得部門資訊 & 簽核部門
       await this.getDepartmentList() 
-      // this.departmentStatus = this.nodeData.auditByGroups.toString()
-      this.departmentStatus = this.department[0].defineId
+      // this.departmentStatus = this.department[0].defineId
       console.log('this.departmentStatus :>> ', this.departmentStatus);
 
     },
@@ -665,8 +721,6 @@ export default {
         return 
       }
 
-
-
       // handle btn naming
       if(this.btnDefaultAgree == 1){
         this.nodeData.customButton[0].text = this.defineAgree
@@ -674,6 +728,7 @@ export default {
         this.nodeData.customButton[0].text = ''
         this.nodeData.customButton[0].text = this.$t('audit.workFlows.agree')
       }
+
       if(this.btnDefaultReject == 1){
         this.nodeData.customButton[1].text = this.defineReject
       }else{
@@ -681,7 +736,14 @@ export default {
         this.nodeData.customButton[1].text = this.$t('audit.workFlows.reject')
       }
 
-         //自定簽核按鈕不可為空
+      if(this.btnDefaultDrawback == 1){
+        this.nodeData.customButton[2].text = this.defineDrawback
+      }else{
+        this.nodeData.customButton[2].text = ''
+        this.nodeData.customButton[2].text = this.$t('audit.workFlows.withdraw')
+      }
+
+        //自定簽核按鈕不可為空
 
       console.log('this.nodeData 3', this.nodeData)
       if(this.defineAgree == '' && this.btnDefaultAgree == 1 ){
@@ -689,6 +751,10 @@ export default {
         return
       }
       if(this.defineReject == '' && this.btnDefaultReject == 1){
+        util.notify(this.$t('audit.workFlows.cantEmptyBtnName'), 'error', 2000 );
+        return
+      }
+      if(this.defineDrawback == '' && this.btnDefaultDrawback == 1){
         util.notify(this.$t('audit.workFlows.cantEmptyBtnName'), 'error', 2000 );
         return
       }
@@ -748,7 +814,7 @@ export default {
       //   return
       // }
       
-      console.log('newWorkFlow 1', this.apiData)
+      console.log('to API', this.apiData)
       if(pageAction == "create" || pageAction == "edit" ){
       
         //  節點名稱不可為重複
@@ -775,8 +841,6 @@ export default {
         sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
         console.log('newWorkFlow 2', this.apiData)
         this.$router.push({name: 'createWorkflow'})
-        
-
       } else if(pageAction == "set"){
         // call api
         updateWorkflow(this.apiData).then(res=>{

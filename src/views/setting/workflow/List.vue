@@ -82,7 +82,7 @@ import {
     disableWorkflow, 
     enableWorkflow
   } from '@/api/workflow';
-import { getUserInfo } from '@/api/login';
+import { getUserInfo, getAllUserInfoNoAuth} from '@/api/login';
 import { mapGetters } from 'vuex';
 import TableOnly from '@/components/TableOnly';
 import TblPaginationOnly from '@/components/TblPaginationOnly';
@@ -199,7 +199,7 @@ export default {
           "page": 0,
           "size": 10,
           "direction": "DESC",
-          "property": "createdTs",
+          "property": "updateTs",
           // "name": "test",
           // "type": 0,
           "state": [
@@ -294,8 +294,25 @@ export default {
       sessionStorage.removeItem('pageAction')
     },
 
+    pad2(n){
+      return (n < 10 ? '0' : '') + n;
+    },
+
+    getdate(t){
+      var date = new Date(t);
+      var month = this.pad2(date.getMonth()+1);
+      var day = this.pad2(date.getDate());
+      var year= date.getFullYear();
+      var hour = this.pad2(date.getHours())
+      var min = this.pad2(date.getMinutes())
+      var sec = this.pad2(date.getSeconds())
+      return year + "/"+ month +"/"+ day +"/"+ hour +":"+ min +":"+ sec
+
+    },
+
+
     async getUserInfo(){
-      await getUserInfo().then(res=>{
+      await getAllUserInfoNoAuth().then(res=>{
           this.userInfo = res.data
           console.log('this.userInfo 1 ======>> ', this.userInfo);
         }).catch(err => {
@@ -303,6 +320,7 @@ export default {
         });
     },
 
+    
     async getWorkflowList(param){
       this.isLoadingData = true
       await getWorkflowList(param).then(res=>{
@@ -312,8 +330,10 @@ export default {
               d.createdUser = user.userName
               d.updatedUser = user.userName
               
-              d.createdTs = new Date(d.createdTs).toLocaleString()
-              d.updateTs = new Date(d.updateTs).toLocaleString()
+
+              d.createdTs = this.getdate(d.createdTs)
+              d.updateTs = this.getdate(d.updateTs)
+
               d.type = "巡檢表單"
               d.index = res.data.content.indexOf(d) + 1
               d.state = d.state.toString()
@@ -372,13 +392,13 @@ export default {
             this.showSingleDeleteContent = true
             this.deletedProcessDefinitionKey = row.processDefinitionKey
           }else{
+            console.log('row !!! :>> ', row);
             this.$message({
               type: 'error',
-              message: this.$t('audit.workFlows.canNotDelete')
+              message: `已綁定巡檢表「 ${row.inspectTagName} 」${this.$t('audit.workFlows.canNotDelete')}`
+              // message: 
             }); 
           }
-          
-          console.log('row :>> ', row);
           break;      
         }
         default: {
@@ -395,8 +415,8 @@ export default {
     duplicateRow(processDefinitionKey){
       const postforms = new FormData()
       postforms.append('processDefinitionKey', processDefinitionKey)
-      // console.log('postforms0000 :>> ', postforms);
-      // console.log('processDefinitionKey :>> ', processDefinitionKey);
+      console.log('postforms0000 :>> ', postforms);
+      console.log('processDefinitionKey :>> ', processDefinitionKey);
       duplicateRow(postforms).then(res=>{
         console.log('res :>> ', res);
         this.$message({
@@ -569,8 +589,9 @@ export default {
     .el-table__cell
       &:nth-child(4)
         width: 250px
-      &:nth-child(5)
+      &:nth-child(5), &:nth-child(6)
         width: 250px
+ 
 
   .el-table__row
     .el-table__cell
@@ -579,7 +600,7 @@ export default {
         .cell
             overflow: visible
             cursor: default
-      &:nth-child(5)
+      &:nth-child(5), &:nth-child(6)
         width: 250px
           
   .forDescription
@@ -606,7 +627,11 @@ export default {
       left: 101%
       z-index: 1000
       display: none
-      
+  .forWorkflowsSwitch
+    display: flex
+    flex-direction: row
+    justify-content: center
+    align-items: center
     
 
 </style>

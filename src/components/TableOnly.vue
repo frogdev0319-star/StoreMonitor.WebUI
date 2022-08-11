@@ -82,13 +82,15 @@
 
           <!-- workflow switch state -->
           <template v-else-if="_item.forWorkflowsSwitch">
-            <el-switch   
-              v-model = "row.state"
-              active-value="1"
-              inactive-value="0"
-              :disabled = "row.isBind"
-              @change="$emit('handleSwitchChange', { checked: $event, target: row })"
-              />
+            <div class="forWorkflowsSwitch" @click="needAlert(row)">
+              <el-switch
+                v-model = "row.state"
+                active-value="1"
+                inactive-value="0"
+                :disabled = "row.isBind"
+                @change="$emit('handleSwitchChange', { checked: $event, target: row })"
+                />
+              </div>
           </template>
           
           <!-- workflow auditByUsers -->
@@ -639,7 +641,19 @@ export default {
       temp.forEach(row => {
         this.$refs.tablePagination.toggleRowSelection(row, true);
       });
+    },
+    
+    needAlert(row){
+      console.log('needAlert :>> ');
+      console.log('row :>> ', row);
+      if(row.isBind == true){
+          util.notify(`${this.$t('audit.workFlows.isBind')} ${row.inspectTagName} ${this.$t('audit.workFlows.cantClose')}`, 'error', 3000);
+      }else{
+        return
+      }
+
     }
+    
   }
 };
 </script>
@@ -852,7 +866,6 @@ export default {
     opacity: 0.3 !important
     pointer-events: none !important
   
-
 
 </style>
 

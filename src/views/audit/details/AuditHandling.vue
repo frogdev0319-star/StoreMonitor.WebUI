@@ -18,11 +18,11 @@
 				<div class="audit-flow-body">
 					<div class="audit-flow-ownerhandling" style="margin-bottom: 20px">
 						<p>簽核流程</p>
-						<div class="handling" v-if="!onEditing">
-							<div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo"> 撤回</div>
+						<!-- <div class="handling" v-if="!onEditing">
+							<div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo">{{customButton[2].text}}</div>
                 <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo"> | </div>
               <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo">取消</div>
-						</div>
+						</div> -->
 					</div>
 
           <!-- task -->
@@ -175,7 +175,8 @@ import {
     GetTaskInfo,
     taskSummit,
     taskDrawback,
-    CancelWorkflow
+    CancelWorkflow,
+    getNodeList
   } from '@/api/workflow';
 import { getStorageInfo } from '@/api/event';
 import { getCookie } from '@/common/auth';
@@ -183,7 +184,6 @@ import DelayButton from '@/components/DelayButton';
 import util from '@/common/util';
 import { getUserInfo } from '@/api/login';
 import DialogPop from '@/components/DialogPop';
-import {getNodeList} from "@/api/workflow";
 
 import AuditUnit from '@/components/AuditUnit';
 
@@ -229,7 +229,13 @@ export default {
           "type": 1,
           "text": this.$t('audit.workFlows.reject'),
           "enable": true
-        }],
+        },
+        {
+          "type": 2,
+          "text": this.$t('audit.workFlows.withdraw'),
+          "enable": true
+        },
+      ],
       commentsToApi: {
         "taskId": "",
         "comment": {
@@ -295,8 +301,8 @@ export default {
           t.startTs = new Date(t.startTs).toLocaleString()
           t.endTs = new Date(t.endTs).toLocaleString()
           t.tasks.forEach(tt =>{
-            tt.startTs = new Date(tt.startTs).toLocaleString()
-            tt.endTs = new Date(tt.endTs).toLocaleString()
+            if(tt.startTs !== null) tt.startTs = new Date(tt.startTs).toLocaleString()
+            if(tt.endTs !== null) tt.endTs = new Date(tt.endTs).toLocaleString()
           })
         })
         this.taskInfo = res.data
@@ -341,7 +347,7 @@ export default {
             }
           })
         })
-        // console.log(' this.customButton ------>> ',  this.customButton);
+        console.log(' this.customButton ------>> ',  this.customButton);
       
       }).catch(err => {
         console.log('error' + err);
@@ -359,6 +365,8 @@ export default {
       }
     },
     
+
+
     agreeNode(){
       this.agree = true
       this.commentsToApi.result = 0

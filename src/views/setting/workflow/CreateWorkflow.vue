@@ -471,21 +471,6 @@ export default {
   },
   mounted() {
     this.searchUserData = this.userData
-    // this.dataFromRoute = { ...this.$route.params.data }
-    // getWorkflowInfo({
-    //   processDefinitionKey: this.dataFromRoute.processDefinitionKey
-    // }).then(res => {
-    //   function getNodes (nodes, data) {
-    //     if (data.nextAuditNode) {
-    //       nodes.push(data.nextAuditNode)
-    //       getNodes(nodes, data.nextAuditNode)
-    //     } else return
-    //   }
-    //   let nextNodes = [];
-    //   this.workflowDetail = { ...res.data }
-    //   getNodes(nextNodes, this.workflowDetail)
-    //   this.workflowDetail['nextNodes'] = nextNodes;
-    // })
   },
 
   computed: {
@@ -1409,11 +1394,13 @@ export default {
     .audit-user
       margin-right: 10px
   
-  .el-table__row
-    &:first-child
-      .el-table_1_column_6
-        .cell
-          display: none !important
+  .tablelist
+    .el-table__row
+      &:first-child
+        .el-table_1_column_6
+          .cell
+            display: none !important
+            
   .title-status
     .el-input__count-inner
       margin-top: 55px
