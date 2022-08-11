@@ -18,7 +18,7 @@
 								<div class="audit-user-name" v-else-if="taskItem.state == 3 && taskItem.auditTargetName !== null"> {{taskItem.auditTargetName}} </div>
 							</div>
 							<div class="audit-situation"  v-if="taskItem.state == 1 || taskItem.state == 4">
-								<div class="audit_agree" v-if="task.comment.result == 0 && task.comment.result !== null"><i class="iconfont el-icon-check"/> 同意</div>
+								<div class="audit_agree" v-if="task.comment.result == 0 && task.comment.result !== null && taskItem.parentId !== -1"><i class="iconfont el-icon-check"/> 同意</div>
 								<div class="audit_disagree" v-else-if="task.comment.result == 1 && task.comment.result !== null"><i class="iconfont el-icon-close"/> 駁回</div>
 								<div class="audit_disagree" v-else-if="task.comment.result == -2"><i class="iconfont el-icon-info"/> 撤回</div>
 								<div class="audit_disagree" v-else-if="task.comment.result == -1"><i class="iconfont el-icon-info"/> 取消</div>

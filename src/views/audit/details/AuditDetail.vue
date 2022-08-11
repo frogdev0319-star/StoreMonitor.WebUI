@@ -189,7 +189,7 @@ export default {
         // 撤回前的 task 
         var drawbackNum = this.taskInfo.findLastIndex(i => {
           if(i.tasks[0].comment !== null){
-            return i.tasks[0].comment.description == "drawback"
+            return i.tasks[0].comment.result == -2
           }
         })
         if(drawbackNum > -1) this.taskInfo = this.taskInfo.slice(drawbackNum - totalNum + 1 )
@@ -197,15 +197,21 @@ export default {
         console.log('this.taskInfo done1! ----->> ', this.taskInfo);
 
 
+
         // 駁回的 task
-        // var rejectNum = this.taskInfo.findLastIndex( i => {
-        //   if(i.tasks[0].comment !== null){
-        //     return i.tasks[0].comment.result == 1
-        //   }
-        // })
-        // if(rejectNum > -1) this.taskInfo = this.taskInfo.splice(0, rejectNum + 1)
-        // console.log('rejectNum :>> ', rejectNum);
-        // console.log('this.taskInfo done2! ----->> ', this.taskInfo);
+        var aaaNum = this.taskInfo.findLastIndex( i =>  i.parentId == -1 && i.state == 1)
+        console.log('aaaNum :>> ', aaaNum);
+        console.log('totalNum :>> ', totalNum);
+        if(aaaNum > -1) this.taskInfo = this.taskInfo.splice(aaaNum, totalNum)
+
+
+
+        var rejectNum = this.taskInfo.findLastIndex( i =>  i.state == 1 && i.tasks[0].comment.result == 1)
+        console.log('rejectNum :>> ', rejectNum);
+
+        if(rejectNum > -1) this.taskInfo = this.taskInfo.splice(0, rejectNum + 1 )
+        console.log('this.taskInfo done2! ----->> ', this.taskInfo);
+
 
         this.isLoadingData = false
       }).catch(err => {
@@ -223,8 +229,8 @@ export default {
         this.flatNodeData.forEach(d=>{
           delete d.nextAuditNode
         })
-        console.log('this.taskInfo 2 ------>> ', this.taskInfo);
-        console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
+        // console.log('this.taskInfo 2 ------>> ', this.taskInfo);
+        // console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
 
         const currentNode = this.taskInfo.filter( i => i.state == 2)
         var isSignature  = this.flatNodeData.find(n => n.id == currentNode[0].nodeId)
@@ -236,9 +242,7 @@ export default {
               this.customButton = n.customButton
             }
           })
-        })
-        console.log(' this.customButton ------>> ',  this.customButton);
-      
+        })      
       }).catch(err => {
         console.log('error' + err);
       });
