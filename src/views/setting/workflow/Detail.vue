@@ -313,7 +313,12 @@
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import {getNodeList, updateWorkflow, getUserStatus} from "@/api/workflow";
+import {
+  getWorkflowList, 
+  getNodeList, 
+  updateWorkflow, 
+  getUserStatus,
+  } from "@/api/workflow";
 import {getUserInfo} from '@/api/login';
 
 import TableOnly from '@/components/TableOnly';
@@ -458,7 +463,18 @@ export default {
       temp:[],
       showSelectionColumn: true,
       multipleSelection: [],
-      auditMember: {}
+      auditMember: {},
+      allTableData: [],
+      apiBody: {
+          "page": 0,
+          "size": 5000,
+          "direction": "DESC",
+          "property": "updateTs",
+          "state": [
+              0,
+              1,
+          ]
+      },
       
     };
   }, 
@@ -489,7 +505,6 @@ export default {
     await this.init()
   },
   methods: {
-
     filterInputSearchUser(users){
         return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 )
     },
@@ -521,24 +536,44 @@ export default {
     },
 
     async init(){
-      await this.getWorkflowInfo() //1 
+      
+      await this.getWorkflowInfo() 
 
-      await this.getNodeList(this.infoForm.processDefinitionKey) //4
+      await this.getNodeList(this.infoForm.processDefinitionKey) 
 
-      await this.getTitle() //3
-      await this.getUserInfo() //2
-      await this.getDepartmentList() //7
+      await this.getTitle() 
+      await this.getUserInfo() 
+      await this.getDepartmentList() 
 
-      await this.handleData() //5
-      await this.dataToApi() //6
+      await this.handleData() 
+      await this.dataToApi() 
 
-      await this.getPickedMember() //8
+      await this.getWorkflowList(this.apiBody)
+
+      await this.getPickedMember() 
   
     },
 
     needNote(){
       util.notify('※ 此模式不會立即產生事件 ', 'warning', 3000);
     },
+
+    async getWorkflowList(param){
+      this.isLoadingData = true
+      await getWorkflowList(param).then(res=>{
+        this.allTableData = res.data.content
+
+        const n = this.allTableData.findIndex( i => i.name == this.nodeDataToApi.name)
+        this.allTableData.splice(n, 1)
+        console.log('n === ', n);
+        console.log('this.allTableData ======>> ',  this.allTableData );
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
@@ -929,22 +964,32 @@ export default {
 
     //保存並發布
     submit() {
-       // call api for update
-      updateWorkflow(this.nodeDataToApi).then(res=>{
-        console.log('res :>> ', res);
-        this.$router.push({name: 'workflowManage'})
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' , err);
-        if(this.nodeDataToApi.name == ''){
-          util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
-          this.$refs.workflowName.focus()
-        } else {
-            util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
-            this.$refs.workflowName.focus()
-          }
-      });
+      var repeatResult = this.allTableData.some(i=>
+        i.name == this.nodeDataToApi.name
+      )
+      console.log('repeatResult~~~~ :>> ', repeatResult);
+
+      if(this.nodeDataToApi.name == ''){
+        util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
+        this.$refs.workflowName.focus()
+        return
+      }
+
+      if(repeatResult == true){
+        util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+        this.$refs.workflowName.focus()
+        return
+      }else{
+        // call api for update
+        updateWorkflow(this.nodeDataToApi).then(res=>{
+          console.log('res :>> ', res);
+          this.$router.push({name: 'workflowManage'})
+          this.isLoadingData = false
+        }).catch(err => {
+          this.isLoadingData = false;
+          console.log('error' , err);
+        });
+      }
     }
   }
 

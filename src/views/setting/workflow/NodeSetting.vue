@@ -509,7 +509,6 @@ export default {
         console.log('newAuditByUsersArr :>> ', newAuditByUsersArr);
         console.log('this.userData :>> ', this.userData);
 
-
       }).catch(err => {
         console.log('error' + err);
       });
@@ -534,12 +533,13 @@ export default {
     async getDepartmentList(){
       await getDepart({ type: 0 }).then(res=>{
         // this.department = res.data
-        console.log('res.data ~~~~~>', res.data)
+        // console.log('res.data ~~~~~>', res.data)
         
         let newAuditByGroupsArr = []
         if(this.nodeData.auditByGroups.length == 0){
-          this.departmentStatus = res.data[0].defineId
+          
           newAuditByGroupsArr = res.data.filter( i => !this.auditMembers.auditByGroups.includes(i.defineId))
+          this.departmentStatus = newAuditByGroupsArr[0].defineId
         }else{
           this.departmentStatus = this.nodeData.auditByGroups[0]
           newAuditByGroupsArr = res.data
@@ -556,9 +556,7 @@ export default {
         }else{
           this.department = newAuditByGroupsArr
         }
-        
-
-
+  
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
