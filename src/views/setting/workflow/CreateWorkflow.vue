@@ -312,7 +312,13 @@
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import {getNodeList, updateWorkflow, creadNewFlow,getUserStatus} from "@/api/workflow";
+import {
+  getNodeList, 
+  updateWorkflow,   
+  getWorkflowList, 
+  creadNewFlow,
+  getUserStatus
+  } from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import {getUserInfo} from '@/api/login';
 
@@ -461,7 +467,18 @@ export default {
 
       newFlatNodeDataView:[],
       pageAction: "init",
-      currentUser:''
+      currentUser:'',
+      allTableData: [],
+      apiBody: {
+          "page": 0,
+          "size": 5000,
+          "direction": "DESC",
+          "property": "updateTs",
+          "state": [
+              0,
+              1,
+          ]
+      },
     };
   },
 
@@ -492,14 +509,13 @@ export default {
       await this.getUserInfo() 
       await this.getDepartmentList() 
       await this.initBasicData()
-      await this.getPickedMember()
-      
 
+      await this.getPickedMember()
+      await this.getWorkflowList(this.apiBody)
+
+      
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.currentUser = result.data.userId
-      console.log('result @@', result)
-      console.log('this.currentUser 1 @@', this.currentUser)
-
 
       var status = sessionStorage.getItem('pageAction');
       const pageAction = JSON.parse(status)
@@ -766,6 +782,17 @@ export default {
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
     },
 
+    async getWorkflowList(param){
+      this.isLoadingData = true
+      await getWorkflowList(param).then(res=>{
+        this.allTableData = res.data.content
+        console.log('this.allTableData ======>> ',  this.allTableData );
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
 
 
     //======================================
@@ -1008,14 +1035,38 @@ export default {
 
     //addWorkFlow
     addNewFlow() {
+      console.log('this.newFlatNodeDataView :>> ', this.newFlatNodeDataView);
+      console.log('this.workflowDetail :>> ', this.workflowDetail);
+      
+      var repeatResult = this.allTableData.some(i=>i.name == this.workflowDetail.name)
+      console.log('repeatResult~~~~ :>> ', repeatResult);
+
+      if(this.workflowDetail.name == "") {
+        util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
+        this.$refs.workflowName.focus()
+        return
+      }
+
+      if(repeatResult == true){
+        util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+        this.$refs.workflowName.focus()
+        return
+      }
+      
+
       this.newFlatNodeDataView.forEach(d =>{
         delete d.id 
         if(d.auditByUsers.length !== 0){
+          console.log('aaa :>> ');
           var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
+          console.log('currentUser :>> ', currentUser);
           d.auditByUsers = []
           d.auditByUsers.push(currentUser[0].userId)
         } else {
+          console.log('bbb :>> ');
           var currentGroup = this.department.filter(u => u.defineName == d.auditByGroups[0])
+          console.log('currentGroup :>> ', currentGroup);
+
           d.auditByGroups = []
           d.auditByGroups.push(currentGroup[0].defineId)
         }
@@ -1037,15 +1088,14 @@ export default {
         }
       });
 
-
       var toApiData = {...this.workflowDetail, ...result}
       toApiData.copyToUsers = this.ccToUSer
 
       creadNewFlow(toApiData).then(res=>{
-          this.$router.push({name: 'workflowManage'})
-          console.log('res', res)
-        }).catch(err => {
-          console.log('error' + err);
+        this.$router.push({name: 'workflowManage'})
+        console.log('res', res)
+      }).catch(err => {
+        console.log('error' + err);
       });
 
     }
