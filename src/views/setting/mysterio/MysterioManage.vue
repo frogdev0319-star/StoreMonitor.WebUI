@@ -296,6 +296,7 @@ export default {
         },
         getMysterioList(getAll=false){
             const self = this;
+            self.isLoadingData = true;
             const params={
               filter:{
                 page:this.curPage-1,
