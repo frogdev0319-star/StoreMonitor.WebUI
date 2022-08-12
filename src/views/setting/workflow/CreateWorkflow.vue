@@ -478,10 +478,9 @@ export default {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
       },
-      // set(val){
-      //   console.log('val!?!?!~~~~~>>>', val)
-      //   console.log('searchUserData!?!?!~~~~~>>>', this.searchUserData)
-			// }
+      set(val){
+        console.log('val', val)
+			}
     }
   },
 
@@ -493,6 +492,7 @@ export default {
       await this.getUserInfo() 
       await this.getDepartmentList() 
       await this.initBasicData()
+      await this.getPickedMember()
       
 
       const result = await this.$store.dispatch("GetUserAuthorities");
@@ -674,7 +674,7 @@ export default {
       sessionStorage.setItem('workflowNode', JSON.stringify(newNode))
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
       sessionStorage.removeItem('newWorkFlow')
-      this.$router.push({ name: 'nodeSetting' })
+      this.$router.push({ name: 'createNodeSetting' })
     },
 
     handleEdit(){
@@ -735,6 +735,38 @@ export default {
         console.log('error' + err);
       });
     },
+
+    getPickedMember(){
+      
+      const reNewNode = sessionStorage.getItem('reNewNode')
+      const orinode = JSON.parse(reNewNode)
+      console.log('orinode 1 >> ', orinode);
+      
+      var handleFlatNodeDataView = [...orinode]
+      handleFlatNodeDataView.shift()
+
+      var auditMembers = {        
+        "auditByUsers": [],
+        "auditByGroups": []
+      }
+      handleFlatNodeDataView.forEach(i=>{
+        if(i.auditByUsers.length !== 0){
+          auditMembers.auditByUsers.push(i.auditByUsers[0])
+        }
+        if(i.auditByGroups.length !== 0){
+          auditMembers.auditByGroups.push(i.auditByGroups[0])
+        }
+      })
+
+      // 刪除重複
+      auditMembers.auditByUsers = [... new Set(auditMembers.auditByUsers)]
+      auditMembers.auditByGroups = [... new Set(auditMembers.auditByGroups)]
+      
+      console.log('auditMembers :>> ', auditMembers);
+      sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
+    },
+
+
 
     //======================================
     filterInputSearchUser(users){
@@ -1014,9 +1046,6 @@ export default {
           console.log('res', res)
         }).catch(err => {
           console.log('error' + err);
-
-              
-        
       });
 
     }

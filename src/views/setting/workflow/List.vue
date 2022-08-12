@@ -33,7 +33,7 @@
           :is-loading-data="isLoadingData"
           :allowRowExpand = "false"
           :showBorder = "false"
-          :default-sort = "{prop: 'createdTs', order: 'descending'}"
+          :default-sort = "{prop: 'updateTs', order: 'descending'}"
           :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
           :tableHeight = "760"
           :cellStyle="{backgroundColor: '#fff !important'}"
@@ -132,6 +132,7 @@ export default {
       userInfo: [],
       allTableData:[],
       tableData: [],
+      
       columnData: [
         // {
         //   'prop': 'index',
@@ -176,7 +177,7 @@ export default {
           'label': '最後更新時間',
           'width': 100,
           'maxWidth': 100,
-          'sortable': true
+          'sortable': 'custom'
         },
         {
           'prop': 'updatedUser',
@@ -408,8 +409,13 @@ export default {
     },
 
     settingWorkFlow(row){
-      this.$router.push({name: 'workflowDetail'})
-      sessionStorage.setItem('workflowDetail', JSON.stringify(row))
+      if(row.state == 0){
+        util.notify(this.$t('audit.workFlows.cantDisabledEdit'), 'error', 2000 );
+        return
+      } else {
+        this.$router.push({name: 'workflowDetail'})
+        sessionStorage.setItem('workflowDetail', JSON.stringify(row))
+      }
     },
 
     duplicateRow(processDefinitionKey){

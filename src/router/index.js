@@ -215,11 +215,24 @@ export const navbarRoute = {
         isReadOnly: false
       },
       {
-        path: '/auditDetail',
+        path: '/audit/auditDetail',
         name: 'auditDetail',
         hidden: true,
         component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
       },
+      {
+        path: '/waitaudit/auditDetail',
+        name: 'WaitAuditDetail',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
+      },
+      {
+        path: '/transcriptnotify/auditDetail',
+        name: 'TranscriptnotifyDetail',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
+      },
+
       {
         path: '/audit/auditDetail/reportdetails',
         name: 'auditReportdetails',
@@ -516,6 +529,8 @@ export const navbarRoute = {
           requireAuth: true
         }
       },
+
+
       {
         path: '/workflowDetail',
         name: 'workflowDetail',
@@ -523,17 +538,27 @@ export const navbarRoute = {
         hidden: true,
       },
       {
-        path: '/workflownode',
-        name: 'nodeSetting',
-        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
-        hidden: true,
-      },
-      {
         path: '/createWorkflow',
         name: 'createWorkflow',
         component: resolve => require(['@/views/setting/workflow/CreateWorkflow'], resolve),
         hidden: true,
+      },
+
+
+
+      {
+        path: '/createWorkflow/workflownode',
+        name: 'createNodeSetting',
+        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
+        hidden: true,
+      },
+      {
+        path: '/workflowDetail/workflownode',
+        name: 'nodeSetting',
+        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
+        hidden: true,
       }
+      
     ) && primaryPathesList.push('/workflows', '/workflowDetail', '/workflownode', '/createWorkflow');
     (store.getters.roleId==1) && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
       {
