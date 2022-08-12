@@ -510,15 +510,16 @@ export default {
       await this.getDepartmentList() 
       await this.initBasicData()
 
-      await this.getPickedMember()
+      
       await this.getWorkflowList(this.apiBody)
-
+      
       
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.currentUser = result.data.userId
 
       var status = sessionStorage.getItem('pageAction');
       const pageAction = JSON.parse(status)
+      console.log('pageAction', pageAction)
 
       switch(pageAction){
         case 'init':{
@@ -540,7 +541,7 @@ export default {
           break;
         }
       }
-      
+      await this.getPickedMember()
       await this.handleData() 
 
     },
@@ -697,6 +698,7 @@ export default {
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
       console.log('newNode  ~~~~~>> ', newNode.orderedAuditNodeArray);
+      
 
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
@@ -753,11 +755,12 @@ export default {
     },
 
     getPickedMember(){
-      
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
       console.log('orinode 1 >> ', orinode);
-      
+
+      if(reNewNode == null) return
+
       var handleFlatNodeDataView = [...orinode]
       handleFlatNodeDataView.shift()
 
@@ -765,6 +768,8 @@ export default {
         "auditByUsers": [],
         "auditByGroups": []
       }
+
+
       handleFlatNodeDataView.forEach(i=>{
         if(i.auditByUsers.length !== 0){
           auditMembers.auditByUsers.push(i.auditByUsers[0])
@@ -1037,6 +1042,7 @@ export default {
     addNewFlow() {
       console.log('this.newFlatNodeDataView :>> ', this.newFlatNodeDataView);
       console.log('this.workflowDetail :>> ', this.workflowDetail);
+
       
       var repeatResult = this.allTableData.some(i=>i.name == this.workflowDetail.name)
       console.log('repeatResult~~~~ :>> ', repeatResult);
@@ -1072,7 +1078,7 @@ export default {
         }
       })
       
-      console.log('this.newFlatNodeDataView !!!!!!', this.newFlatNodeDataView)
+      // console.log('this.newFlatNodeDataView !!!!!!', this.newFlatNodeDataView)
 
       this.newFlatNodeDataView.push('null')
       let result = {};
@@ -1096,6 +1102,11 @@ export default {
         console.log('res', res)
       }).catch(err => {
         console.log('error' + err);
+        this.newFlatNodeDataView.pop()
+        this.handleData()
+        util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+        
+
       });
 
     }

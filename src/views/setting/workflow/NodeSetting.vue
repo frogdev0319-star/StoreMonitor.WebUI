@@ -840,14 +840,19 @@ export default {
         console.log('newWorkFlow 2', this.apiData)
         this.$router.push({name: 'createWorkflow'})
       } else if(pageAction == "set"){
+  
+        var repeat = this.apiData.orderedAuditNodeArray.some((i, index) => i.name == index);
+        console.log('repeat', repeat)
+        console.log('this.apiData', this.apiData)
+
         // call api
-        updateWorkflow(this.apiData).then(res=>{
-          console.log('res :>> ', res);
-          this.$router.push({name: 'workflowDetail'})
-          this.isLoadingData = false
-        }).catch(err => {
-          console.log('error' , err);
-        });
+        // updateWorkflow(this.apiData).then(res=>{
+        //   console.log('res :>> ', res);
+        //   this.$router.push({name: 'workflowDetail'})
+        //   this.isLoadingData = false
+        // }).catch(err => {
+        //   console.log('error' , err);
+        // });
       }
 
     },
