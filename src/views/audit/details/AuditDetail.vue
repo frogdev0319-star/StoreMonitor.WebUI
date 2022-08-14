@@ -402,7 +402,7 @@ export default {
         display: flex
         flex-direction: row
         justify-content: space-between
-        align-items: cente
+        align-items: center
         .handling
           display: flex
           flex-direction: row

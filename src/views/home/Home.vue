@@ -449,6 +449,8 @@ export default {
         { curPath: ["/workflows/workflowDetail"], activePath: "/workflows" },
 
         { curPath: ["/createWorkflow/createWorkflownode"], activePath: "/createWorkflow" },
+        { curPath: ["/createWorkflow/createEditWorkflownode"], activePath: "/createWorkflow" },
+
         { curPath: ["/workflowDetail/workflownode"], activePath: "/workflowDetail" },
 
 
@@ -770,11 +772,15 @@ export default {
         },
         {
           paths: ["/createWorkflow"],
-          parentBread: { path: "/workFlows", name: "workflowDetail" },
+          parentBread: { path: "/workFlows", name: "workflowManage" },
         },
 
         {
           paths: ["/createWorkflownode"],
+          parentBread: { path: "/createWorkflow", name: "createWorkflow" },
+        },
+        {
+          paths: ["/createEditWorkflownode"],
           parentBread: { path: "/createWorkflow", name: "createWorkflow" },
         },
         {

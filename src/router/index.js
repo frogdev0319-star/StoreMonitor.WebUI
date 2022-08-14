@@ -564,13 +564,19 @@ export const navbarRoute = {
         hidden: true,
       },
       {
+        path: '/createEditWorkflownode',
+        name: 'createEditNodeSetting',
+        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
+        hidden: true,
+      },
+      {
         path: '/workflownode',
         name: 'nodeSetting',
         component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
         hidden: true,
       }
       
-    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/createWorkflownode', '/workflownode', '/createWorkflow');
+    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/createWorkflownode', '/workflownode', '/createWorkflow','/createEditWorkflownode');
     (store.getters.roleId==1) && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
       {
         path: '/mysterio',

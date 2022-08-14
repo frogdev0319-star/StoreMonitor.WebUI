@@ -87,9 +87,10 @@ export default{
       "patrolItemStat":"巡檢項統計",
       "singleStoreStat":"單店分析",
       "workflowManage":"流程設計",
-
-      "workflowDetail":"編輯流程",
       "createWorkflow":"新增流程",
+      "createEditNodeSetting":"編輯流程",
+      "workflowDetail":"編輯流程",
+    
 
       "createNodeSetting":"設定節點",
       "nodeSetting":"設定節點",

@@ -324,6 +324,7 @@ import DialogPop from '@/components/DialogPop';
 
 
 import util from "@/common/util";
+import { ColorPicker } from 'element-ui';
 export default {
   name: 'WorkflowDetail',
   components: {
@@ -825,16 +826,26 @@ export default {
 
         // create
         if(checkNameResult.length > 0 && pageAction == "create") {
+          console.log('1111')
           util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
           return
         }
 
         // edit
         if(checkNameResult.length > 0 && pageAction == "edit") {
-          var tt = reNewNode.find(i=>{
+          console.log('222')
+
+          console.log(' this.nodeData',  this.nodeData)
+          console.log('reNewNode', reNewNode)
+
+          var tempAry = reNewNode.filter( i => i.id !== this.nodeData.id)
+          console.log('tempAry', tempAry)
+
+          var tt = tempAry.some(i =>
             i.name == this.nodeData.name
-          })
-          if(tt !== ''){
+          )
+          console.log('tt', tt)
+          if(tt){
             util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
             return
           }

@@ -612,6 +612,8 @@ export default {
     },
 
     getNodeData(){
+      console.log('newNode' , newNode)
+
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
       console.log('newNode :>> ', newNode);
@@ -634,6 +636,69 @@ export default {
       sessionStorage.removeItem('newWorkFlow')
     },
     
+    handleEdit(){
+      console.log('this is Edit')
+
+      const data = sessionStorage.getItem('newWorkFlow')
+      const newNode = JSON.parse(data)
+      
+      const reNewNode = sessionStorage.getItem('reNewNode')
+      const orinode = JSON.parse(reNewNode)
+
+      console.log("newNode", newNode)
+
+      if( newNode !== null){
+        var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
+        console.log('num :>> ', num);
+        orinode.splice(num , 1 , newNode.orderedAuditNodeArray[0])
+
+        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
+        this.newFlatNodeDataView = orinode
+      } else {
+        this.newFlatNodeDataView = orinode
+      }
+      
+      sessionStorage.removeItem('newWorkFlow')
+      console.log('this away ok')
+    },
+
+
+    // get user
+    async getUserInfo(){
+      await getUserInfo().then(res=>{
+        this.userInfo = res.data
+        this.userData = this.userInfo
+        // console.log('this.userInfo ------>> ', this.userInfo);
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+    // get title
+    async getTitle(){
+      await getUserStatus({ type: 1 }).then(res=>{
+        this.titleList =  res.data
+        this.titleListAry = this.titleList.map( i => (
+          i = i.defineName
+        ))
+        
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+    // get getDepart
+    async getDepartmentList(){
+      await getUserStatus({ type: 0 }).then(res=>{
+        this.department = res.data
+        // console.log('this.department 4 ------>> ', this.department);
+        this.departmentAry = this.department.map( i => (
+          i = i.defineName
+        ))
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
 
     addNode() {
       // name or group convert id
@@ -692,68 +757,6 @@ export default {
       sessionStorage.setItem('pageAction', JSON.stringify("create"))
       sessionStorage.removeItem('newWorkFlow')
       this.$router.push({ name: 'createNodeSetting' })
-    },
-
-    handleEdit(){
-      console.log('newNode 111 ~~~~~>> ', newNode.orderedAuditNodeArray);
-
-      const data = sessionStorage.getItem('newWorkFlow')
-      const newNode = JSON.parse(data)
-      console.log('newNode  ~~~~~>> ', newNode.orderedAuditNodeArray);
-      
-
-      const reNewNode = sessionStorage.getItem('reNewNode')
-      const orinode = JSON.parse(reNewNode)
-      console.log('orinode ~~~~~>> ', orinode);
-
-      if( newNode.orderedAuditNodeArray !== null){
-        var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
-        console.log('num :>> ', num);
-        orinode.splice(num , 1 , newNode.orderedAuditNodeArray[0])
-
-        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
-        this.newFlatNodeDataView = orinode
-      }
-
-      sessionStorage.removeItem('newWorkFlow')
-    },
-
-
-    // get user
-    async getUserInfo(){
-      await getUserInfo().then(res=>{
-        this.userInfo = res.data
-        this.userData = this.userInfo
-        // console.log('this.userInfo ------>> ', this.userInfo);
-      }).catch(err => {
-        console.log('error' + err);
-      });
-    },
-    // get title
-    async getTitle(){
-      await getUserStatus({ type: 1 }).then(res=>{
-        this.titleList =  res.data
-        this.titleListAry = this.titleList.map( i => (
-          i = i.defineName
-        ))
-        
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
-    },
-    // get getDepart
-    async getDepartmentList(){
-      await getUserStatus({ type: 0 }).then(res=>{
-        this.department = res.data
-        // console.log('this.department 4 ------>> ', this.department);
-        this.departmentAry = this.department.map( i => (
-          i = i.defineName
-        ))
-      }).catch(err => {
-        console.log('error' + err);
-      });
     },
 
     getPickedMember(){
@@ -1022,7 +1025,7 @@ export default {
       
       sessionStorage.setItem('workflowNode', JSON.stringify(row))
       sessionStorage.setItem('pageAction', JSON.stringify("edit"))
-      this.$router.push({name: 'createNodeSetting'})
+      this.$router.push({name: 'createEditNodeSetting'})
     },
 
 
