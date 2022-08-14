@@ -695,6 +695,8 @@ export default {
     },
 
     handleEdit(){
+      console.log('newNode 111 ~~~~~>> ', newNode.orderedAuditNodeArray);
+
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
       console.log('newNode  ~~~~~>> ', newNode.orderedAuditNodeArray);
@@ -1020,7 +1022,7 @@ export default {
       
       sessionStorage.setItem('workflowNode', JSON.stringify(row))
       sessionStorage.setItem('pageAction', JSON.stringify("edit"))
-      this.$router.push({name: 'nodeSetting'})
+      this.$router.push({name: 'createNodeSetting'})
     },
 
 
