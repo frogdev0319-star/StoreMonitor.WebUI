@@ -31,7 +31,8 @@
 								<img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts" 
 								style="background: #FFF;" >
 
-								<div class="iimg" v-for="blopImg in task.comment.attachment" :key="blopImg.ts">
+								<div class="iimg" v-for="(blopImg, index) in task.comment.attachment" :key="blopImg.ts">
+								
 									<el-image
 										:src="blopImg.url"
 										v-if="blopImg.mediaType == 2"
@@ -56,16 +57,13 @@ export default {
 			type: Array,
 			required: true
 		},
-	
 	},
-
 	data() {
 		return {
 			imgListAry: [],
 			urlList: []
 		};
 	},
-
 	mounted() {
 	},
 	methods: {
