@@ -196,6 +196,7 @@ const user = {
       commit('SET_BackPatrolParam', BackPatrolParam);
     },
     setPatrolComment({ commit }, PatrolComment) {
+      console.log("@@setPatrolComment:",PatrolComment);
       commit('SET_PatrolComment', PatrolComment);
     },
 

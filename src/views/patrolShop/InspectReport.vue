@@ -1699,6 +1699,7 @@ export default {
     async goBackRemoteInception(){
       const self = this;
       console.log("goBackRemoteInception");
+      self.$store.dispatch('setPatrolComment', {suggest:self.reportData.comment, status:self.reportData.status});
       var BackPatrolParam = {
         isEdit:true,
         reportId:self.report.reportId,
@@ -1718,7 +1719,7 @@ export default {
         curItemIndex:0,
         curItemId:0
       };
-      self.$store.dispatch('setPatrolComment', {suggest:self.reportData.comment, status:self.reportData.status});
+      
       var params = {
         isEdit:true,
         reportComment:this.reportData.comment

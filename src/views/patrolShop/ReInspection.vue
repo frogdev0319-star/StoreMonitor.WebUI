@@ -1189,6 +1189,7 @@ export default {
     const BackPatrolParam = self.$store.getters.BackPatrolParam;
     const PatrolComment = self.$store.getters.PatrolComment;
     if (PatrolComment != null) {
+      console.log("PatrolComment:",PatrolComment);
       self.suggest = PatrolComment.suggest;
       self.reportStatus = PatrolComment.status;
     }
@@ -1226,10 +1227,10 @@ export default {
       self.channel = PatrolHistory.channel;
       self.curItemId = PatrolHistory.curItemId;
       self.vendor = self.channel.vendor;
+      self.eventList = PatrolHistory.eventList;
       const isClick = self.sheetName[self.sheetName.length - 1].isClick;
       if (isClick) {
         if (PatrolHistory.eventList.length > 0) {
-          self.eventList = PatrolHistory.eventList;
           self.showFeedBackInfo = false;
           self.showFeedBack = true;
         } else {

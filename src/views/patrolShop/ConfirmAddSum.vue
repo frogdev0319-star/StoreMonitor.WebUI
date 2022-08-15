@@ -780,6 +780,7 @@ export default {
           let arr = self.eventList[i].sourceList;
           arr.forEach(item => {
             if(item.mediaType==3){
+              console.log("***item:",item);
               let obj = {};
               obj.mediaType = 3;
               obj.url = item.src;
@@ -788,6 +789,7 @@ export default {
           })
           
         }else{
+          console.log("***self.eventList[i]:",self.eventList[i]);
           let obj = {};
             obj.mediaType = 3;
             obj.url = self.eventList[i].eventDes;
@@ -1051,6 +1053,7 @@ export default {
     async getRouteData() {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
+      console.log("PatrolComment:",PatrolComment);
       if (PatrolComment != null) {
         self.suggest = PatrolComment.suggest;
         self.curSumIndex = PatrolComment.status;
