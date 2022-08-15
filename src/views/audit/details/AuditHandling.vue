@@ -490,7 +490,6 @@ export default {
     
 
     async taskSummit(){
-      this.isLoadingData = true
 
       if(this.agree == null){
         util.notify('請選擇簽核意見', 'error', 2000);
