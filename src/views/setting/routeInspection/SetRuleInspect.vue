@@ -158,31 +158,43 @@
             </span>
           </el-checkbox>
 
-          <div class="signatrue_section">
-            
-            <p>自定義簽名顯示名稱</p>
-            <el-button
-              @click="addSignature"
-              class="storevue-button-outlined"
-              size="mini" type="primary">
-              <i class="iconfont el-icon-plus"/>新增簽名
-            </el-button>
-
-            <div class="signatrue_row"  v-for="item in signatureData.extra" :key="item.index">
-              負責人 
+          <div class="signatrue_section" v-if="onSiteSignature">
+            <div class="define_sign">
+              <div class="title">自定義簽名顯示名稱</div> 
+              <el-button
+                @click="addSignature"
+                v-if="signatureData.extra.length < 4"
+                class="addsign_button_outlined"
+                size="mini" type="primary">
+                <i class="iconfont el-icon-plus"/>新增簽名
+              </el-button>
+            </div>
+            <div class="signatrue_row"  v-for="(item, index) in signatureData.extra" :key="index">
+              負責人
               <el-input
+                placeholder="請輸入負責人"
                 v-model="item.header"
                 ref="workflowName"
                 style="width: 250px;  margin: 0 20px ;"
-                maxlength="50"
+                maxlength="20"
                 show-word-limit
                 />
               <el-radio-group class="storevue-radio" v-model="item.optional" >
                 <el-radio :label="true">必簽</el-radio> 
-                <el-radio :label="false">非必簽</el-radio> 
+                <el-radio :label="false" v-if="index !== 0">非必簽</el-radio> 
               </el-radio-group>
+              <div class="delete_sign">
+                <img 
+                  v-if="index !== 0"
+                  :key="index"
+                  class="child-space"
+                  :src="`./static/img/table-delete.png`" 
+                  height="24px"
+                  width="24px"
+                  @click="deleteSign(index)"
+              />
+              </div>
             </div>
-    
           </div>
           
         </div>
@@ -372,20 +384,16 @@ export default {
       workFlowList:[],
       bindWorkFlowData:{},
       workFlowInfoValue:{},
-
       signatureData:{
           "name": "onSiteSignature",
           "value": true,
           "extra": [
               {
-                  "optional": true,
-                  "header": "AAAA"
+                "optional": true,
+                "header": ""
               }
           ]
         },
-      
-
-
     };
   },
   watch: {
@@ -410,6 +418,18 @@ export default {
       console.log('this.workFlowToBind ~~~~>> ', this.workFlowToBind);
 
     },
+    onSiteSignature(){
+      if(!this.onSiteSignature)  this.signatureData = {
+          "name": "onSiteSignature",
+          "value": true,
+          "extra": [
+              {
+                "optional": true,
+                "header": ""
+              }
+          ]
+        }
+    }
   },
   async mounted() {
     await this.getRule();
@@ -470,19 +490,16 @@ export default {
           ]
         };
 
-        params.ruleItems.push(this.signatureData)
-
+        if(this.onSiteSignature) params.ruleItems.push(this.signatureData)
         console.log('params', params)
-
-
-        // const res = await self.updateInspectRule(params);
-        // if (res.errCode === 0) {
-        //   util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-        //   return false;
-        // } else {
-        //   util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-        //   return false;
-        // }
+        const res = await self.updateInspectRule(params);
+        if (res.errCode === 0) {
+          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+          return false;
+        } else {
+          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+          return false;
+        }
       }
 
     },
@@ -705,6 +722,11 @@ export default {
           "header": ""
       }
       if(this.signatureData.extra.length < 4) this.signatureData.extra.push(addObj)
+    },
+    deleteSign(index){
+      console.log('index :>> ', index);
+      this.signatureData.extra.splice(index, 1)
+
     }
 
   }
@@ -732,16 +754,45 @@ $itemHeight:50px;
     #{$poi}:checkRem($val);
 }
 .signatrue_section{
-  width: 90%;
+  width: 100%;
   background: #f7f9fa;
   margin-bottom: 20px;
   padding: 20px;
+  .define_sign{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    .title{
+      margin-right: 20px;
+    }
+    .addsign_button_outlined{
+      border: 1px solid #f31d65;
+      color: #f31d65;
+      background: #FFF;
+      &:hover{
+        background: rgba(243,29,101, .08);
+      }
+    }
+  }
   .signatrue_row{
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-  
+    .delete_sign{
+      background: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      margin-left: 20px;
+      transition: all .3s;
+      &:hover{
+        transform: scale(1.2);
+      }
+    }
   }
 }
 
@@ -848,6 +899,7 @@ $itemHeight:50px;
       }
       .setting-config.rule-item{
         padding-left: calc(30/1920*100vw);
+        padding-right: calc(30/1920*100vw);
       }
       .dialog-form-item{
         height: auto;
