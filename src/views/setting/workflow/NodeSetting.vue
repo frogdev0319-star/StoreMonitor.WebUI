@@ -742,8 +742,10 @@ export default {
         this.nodeData.customButton[2].text = this.$t('audit.workFlows.withdraw')
       }
 
-        //自定簽核按鈕不可為空
+      
+      console.log('this.nodeData !!!!~~~~~~>> ', this.nodeData);
 
+      //自定簽核按鈕不可為空
       console.log('this.nodeData 3', this.nodeData)
       if(this.defineAgree == '' && this.btnDefaultAgree == 1 ){
         util.notify(this.$t('audit.workFlows.cantEmptyBtnName'), 'error', 2000 );
@@ -758,6 +760,20 @@ export default {
         return
       }
 
+      
+
+      console.log('this.departmentStatus :>> ', this.departmentStatus);
+      console.log('this.auditUsers :>> ', this.auditUsers);
+
+      // 簽核人員不可為空
+      if(this.departmentStatus == '' && this.auditUsers == ''){
+        util.notify(this.$t('audit.workFlows.cantEmpty'), 'error', 1200 );
+        this.fullscreenLoading = false
+        return
+      }
+
+
+
       var status = sessionStorage.getItem('pageAction');
       const pageAction = JSON.parse(status)
       // console.log('pageAction', pageAction)
@@ -765,8 +781,12 @@ export default {
       if(this.nodeData.id == undefined){
         // add node
         //  節點名稱不可為重複
-        var checkNameResult = this.apiData.orderedAuditNodeArray.filter(i => i.name == this.nodeData.name )
-        if(checkNameResult.length > 0) {
+        var checkNameResult = this.apiData.orderedAuditNodeArray.some(i => i.name == this.nodeData.name )
+        console.log('checkNameResult', checkNameResult)
+        console.log('this.apiData.orderedAuditNodeArray :>> ', this.apiData.orderedAuditNodeArray);
+        console.log('this.nodeData.name :>> ', this.nodeData.name);
+
+        if(checkNameResult) {
           util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
           console.log('!!!1')
           return
@@ -790,6 +810,7 @@ export default {
         sessionStorage.setItem('workflowNode', JSON.stringify(this.nodeData))
       }
 
+      
       this.apiData.orderedAuditNodeArray.forEach(data =>{
         if(data.name == this.nodeData.name){
           if(data.auditTargetType == 0){
@@ -805,13 +826,7 @@ export default {
           }
         }
       })
-
-      // 簽核人員不可為空
-      // if(this.nodeData.auditByUsers[0] == '' || this.nodeData.auditByGroups[0] == ''){
-      //   util.notify(this.$t('audit.workFlows.cantEmpty'), 'error', 1200 );
-      //   this.fullscreenLoading = false
-      //   return
-      // }
+      
       
       console.log('to API', this.apiData)
       if(pageAction == "create" || pageAction == "edit" ){

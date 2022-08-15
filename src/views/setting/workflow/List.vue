@@ -583,6 +583,8 @@ export default {
     flex-direction: row
     justify-content: space-between
     align-items: flex-start
+  .button-area
+    height: 18px
   .el-table
     border: none !important
     
@@ -638,6 +640,7 @@ export default {
     flex-direction: row
     justify-content: center
     align-items: center
+
     
 
 </style>

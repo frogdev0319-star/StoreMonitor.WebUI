@@ -72,7 +72,7 @@
             <div class="attach-area" >
               <div v-for="(imgItem,index) in signatureFileList" :key="'img'+index" class="source-details" >
                 <div class="img-content">
-                  <i class="el-icon-close icondelete" @click="deleteImg({item:imgItem, index})" />
+                  <i class="el-icon-close icondelete" @click="deleteSign({item:imgItem, index})" />
                   <el-image
                     :src="imgItem.src"
                     style="width:auto;height:100px; border:1px solid #dedede; border-radius: 5px;"
@@ -101,7 +101,7 @@
                   />
                 </div>
               </div>
-              <div v-if="auditFileCount < 10" class="attach-add" @click="$refs.auditfile.click()">
+              <div v-if="(signatureFileList.length !== 0 && auditFileCount < 11) || (signatureFileList.length == 0 && auditFileCount < 10)" class="attach-add" @click="$refs.auditfile.click()">
                 <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
                 <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
                   <img src="../../../../static/img/icon_attachment.svg" widht="16px" height="16px" style="border-radius:10px;"/>
@@ -490,10 +490,19 @@ export default {
     
 
     async taskSummit(){
-      // this.isLoadingData = true
+      this.isLoadingData = true
+
+      if(this.agree == null){
+        util.notify('請選擇簽核意見', 'error', 2000);
+        this.isLoadingData = false
+
+        return
+      }
+
       const self = this;
       const currentNode = this.taskInfo.filter( i => i.state == 2)
-      // this.commentsToApi.taskId = currentNode[0].tasks[0].taskId
+
+      
 
       //// 判定 userIds 跟 taskId 關聯的 task
       var getCurrentTask = currentNode[0].tasks.filter(t => t.userIds == this.currentUserInfo)
@@ -545,10 +554,7 @@ export default {
       }
 
 
-      if(this.agree == null){
-        util.notify('請選擇簽核意見', 'error', 2000);
-        return
-      }
+      
 
       // 比對是否需要簽名檔上傳，前端處理
       // console.log('isSignature :>> ', isSignature);
@@ -656,16 +662,16 @@ export default {
 
     deleteImg({item, index}) {
       const self = this;
-      if(item.type==='image/png'){
-        self.signatureFileList.splice(index, 1);
-        this.$refs.signaturePad.clearSignature()
-        
-        } 
-        else {
-          self.imgFileList.splice(index, 1);
-          
-        }
+      self.imgFileList.splice(index, 1);
     },
+
+    deleteSign({item, index}) {
+      const self = this;
+      self.signatureFileList = []
+      this.$refs.signaturePad.clearSignature()
+    
+    },
+
 
     getAuditImgList(index) {
       const arr = [];
