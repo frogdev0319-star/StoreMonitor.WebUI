@@ -133,8 +133,10 @@ export default {
   methods: {
     goToReportdetails(){
       var reportId = this.auditDetail.inspectReportId
+      console.log('this.$router.currentRoute :>> ', this.$router.currentRoute.fullPath);
       // console.log("cancancel:",this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7))
       // console.log("canEdit:",this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7)
+      if(this.$router.currentRoute.fullPath == "/auditDetail") {
         this.$router.push(
           { 
             name: 'auditReportdetails', 
@@ -147,6 +149,35 @@ export default {
               }
           }
         );
+      } else if(this.$router.currentRoute.fullPath == "/waitAuditDetail"){
+        this.$router.push(
+          { 
+            name: 'WaitAuditReportdetails', 
+            params: {
+              reportId: reportId, 
+              isAuditMode: true, 
+              canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
+              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
+              auditCancelable:this.auditDetail.cancelable
+              }
+          }
+        );
+      } else if(this.$router.currentRoute.fullPath =="/transcriptnotifyAuditDetail"){
+        console.log('hahaah :>> ');
+        this.$router.push(
+          { 
+            name: 'transcriptnotifyReportdetails', 
+            params: {
+              reportId: reportId, 
+              isAuditMode: true, 
+              canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
+              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
+              auditCancelable:this.auditDetail.cancelable
+              }
+          }
+        );
+      }
+      
     },
 
     hideDeleteContentDialog(key) {
@@ -371,7 +402,7 @@ export default {
         display: flex
         flex-direction: row
         justify-content: space-between
-        align-items: cente
+        align-items: center
         .handling
           display: flex
           flex-direction: row

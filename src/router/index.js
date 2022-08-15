@@ -215,26 +215,13 @@ export const navbarRoute = {
         isReadOnly: false
       },
       {
-        path: '/audit/auditDetail',
+        path: '/auditDetail',
         name: 'auditDetail',
         hidden: true,
         component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
       },
       {
-        path: '/waitaudit/auditDetail',
-        name: 'WaitAuditDetail',
-        hidden: true,
-        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
-      },
-      {
-        path: '/transcriptnotify/auditDetail',
-        name: 'TranscriptnotifyDetail',
-        hidden: true,
-        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
-      },
-
-      {
-        path: '/audit/auditDetail/reportdetails',
+        path: '/auditReportdetails',
         name: 'auditReportdetails',
         hidden: true,
         meta: {
@@ -242,7 +229,7 @@ export const navbarRoute = {
         },
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
-    ) && primaryPathesList.push('/audit', '/auditDetail');
+    ) && primaryPathesList.push('/audit', '/auditDetail','/auditReportdetails');
     !PermissionHelper.enableMimicMode && PermissionHelper.enableWaitAudit() && auditRoute.children.push(
       {
         path: '/waitaudit',
@@ -259,10 +246,24 @@ export const navbarRoute = {
         name: 'auditHandling',
         hidden: true,
         component: resolve => require(['@/views/audit/details/AuditHandling'], resolve)
-      }
-      ,
+      },
       {
-        path: '/audit/auditHandling/reportdetails',
+        path: '/waitAuditDetail',
+        name: 'WaitAuditDetail',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
+      },
+      {
+        path: '/waitAuditReportdetails',
+        name: 'WaitAuditReportdetails',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
+      },
+      {
+        path: '/handingReportdetails',
         name: 'handlingReportdetails',
         hidden: true,
         meta: {
@@ -270,7 +271,7 @@ export const navbarRoute = {
         },
         component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
       }
-    ) && primaryPathesList.push('/waitaudit', '/auditHandling');
+    ) && primaryPathesList.push('/waitaudit', '/auditHandling','/waitAuditDetail','/waitAuditReportdetails','/handingReportdetails');
     !PermissionHelper.enableMimicMode && PermissionHelper.enableTranscriptNotify() && auditRoute.children.push(
       {
         path: '/transcriptnotify',
@@ -282,7 +283,22 @@ export const navbarRoute = {
         },
         isReadOnly: false
       },
-    ) && primaryPathesList.push('/transcriptnotify');
+      {
+        path: '/transcriptnotifyAuditDetail',
+        name: 'TranscriptnotifyDetail',
+        hidden: true,
+        component: resolve => require(['@/views/audit/details/AuditDetail'], resolve)
+      },
+      {
+        path: '/transcriptnotifyReportdetails',
+        name: 'transcriptnotifyReportdetails',
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
+        component: resolve => require(['@/views/patrolShop/InspectReport'], resolve)
+      }
+    ) && primaryPathesList.push('/transcriptnotify','/transcriptnotifyAuditDetail','/transcriptnotifyReportdetails');
     return auditRoute;
   },
 
@@ -529,8 +545,12 @@ export const navbarRoute = {
           requireAuth: true
         }
       },
-
-
+      {
+        path: '/createWorkflow',
+        name: 'createWorkflow',
+        component: resolve => require(['@/views/setting/workflow/CreateWorkflow'], resolve),
+        hidden: true,
+      },
       {
         path: '/workflowDetail',
         name: 'workflowDetail',
@@ -538,28 +558,25 @@ export const navbarRoute = {
         hidden: true,
       },
       {
-        path: '/createWorkflow',
-        name: 'createWorkflow',
-        component: resolve => require(['@/views/setting/workflow/CreateWorkflow'], resolve),
-        hidden: true,
-      },
-
-
-
-      {
-        path: '/createWorkflow/workflownode',
+        path: '/createWorkflownode',
         name: 'createNodeSetting',
         component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
         hidden: true,
       },
       {
-        path: '/workflowDetail/workflownode',
+        path: '/createEditWorkflownode',
+        name: 'createEditNodeSetting',
+        component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
+        hidden: true,
+      },
+      {
+        path: '/workflownode',
         name: 'nodeSetting',
         component: resolve => require(['@/views/setting/workflow/NodeSetting'], resolve),
         hidden: true,
       }
       
-    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/workflownode', '/createWorkflow');
+    ) && primaryPathesList.push('/workflows', '/workflowDetail', '/createWorkflownode', '/workflownode', '/createWorkflow','/createEditWorkflownode');
     (store.getters.roleId==1) && !PermissionHelper.enableMimicMode && systemSettingRoute.children.push(
       {
         path: '/mysterio',

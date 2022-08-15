@@ -151,12 +151,40 @@
     </el-col>
     <el-col v-if="mode === 1" :span="24" class="el-rute-content">
       <setting-table :table-name="$t('insSettingView.inspectionSignature')">
-        <div slot="tableDetail" class="setting-config rule-item">
-          <el-checkbox class="storevue-checkbox-outlined" v-model="onSiteSignature">
+        <div slot="tableDetail" class="setting-config rule-item" style="flex-direction: column; align-items: flex-start">
+          <el-checkbox class="storevue-checkbox-outlined" v-model="onSiteSignature" >
             <span>
               {{ $t('insSettingView.needSignatrue') }}
             </span>
           </el-checkbox>
+
+          <div class="signatrue_section">
+            
+            <p>自定義簽名顯示名稱</p>
+            <el-button
+              @click="addSignature"
+              class="storevue-button-outlined"
+              size="mini" type="primary">
+              <i class="iconfont el-icon-plus"/>新增簽名
+            </el-button>
+
+            <div class="signatrue_row"  v-for="item in signatureData.extra" :key="item.index">
+              負責人 
+              <el-input
+                v-model="item.header"
+                ref="workflowName"
+                style="width: 250px;  margin: 0 20px ;"
+                maxlength="50"
+                show-word-limit
+                />
+              <el-radio-group class="storevue-radio" v-model="item.optional" >
+                <el-radio :label="true">必簽</el-radio> 
+                <el-radio :label="false">非必簽</el-radio> 
+              </el-radio-group>
+            </div>
+    
+          </div>
+          
         </div>
       </setting-table>
     </el-col>
@@ -343,7 +371,21 @@ export default {
       workFlowToBind:'',
       workFlowList:[],
       bindWorkFlowData:{},
-      workFlowInfoValue:{}
+      workFlowInfoValue:{},
+
+      signatureData:{
+          "name": "onSiteSignature",
+          "value": true,
+          "extra": [
+              {
+                  "optional": true,
+                  "header": "AAAA"
+              }
+          ]
+        },
+      
+
+
     };
   },
   watch: {
@@ -427,14 +469,20 @@ export default {
             }
           ]
         };
-        const res = await self.updateInspectRule(params);
-        if (res.errCode === 0) {
-          util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
-          return false;
-        } else {
-          util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
-          return false;
-        }
+
+        params.ruleItems.push(this.signatureData)
+
+        console.log('params', params)
+
+
+        // const res = await self.updateInspectRule(params);
+        // if (res.errCode === 0) {
+        //   util.notify(self.$t('deviceView.editSuss'), 'success', 3000);
+        //   return false;
+        // } else {
+        //   util.notify(self.$t('deviceView.editFail'), 'warning', 3000);
+        //   return false;
+        // }
       }
 
     },
@@ -651,6 +699,14 @@ export default {
       });
     },
 
+    addSignature(){
+      var addObj = {
+          "optional": true,
+          "header": ""
+      }
+      if(this.signatureData.extra.length < 4) this.signatureData.extra.push(addObj)
+    }
+
   }
 };
 </script>
@@ -675,6 +731,22 @@ $itemHeight:50px;
 @mixin point($poi,$val){
     #{$poi}:checkRem($val);
 }
+.signatrue_section{
+  width: 90%;
+  background: #f7f9fa;
+  margin-bottom: 20px;
+  padding: 20px;
+  .signatrue_row{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  
+  }
+}
+
+
+
 .el-setRule{
     width: 100%;
     height: 100%;

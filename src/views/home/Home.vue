@@ -49,7 +49,7 @@
         </div>
         <div>
           <div v-if="$route.path ==='/reportdetails'"
-             style="background-color: transparent; color: #fff; border: none; position:absolute;top:15px;right:24px">
+              style="background-color: transparent; color: #fff; border: none; position:absolute;top:15px;right:24px">
             <el-dropdown 
               style="display:flex; flex-direction: row-reverse; align-items: center;color: #fff;">
               <div class="button-area">
@@ -448,17 +448,24 @@ export default {
         { curPath: ["/workflows/createWorkflow"], activePath: "/workflows" },
         { curPath: ["/workflows/workflowDetail"], activePath: "/workflows" },
 
-        { curPath: ["/createWorkflow/workflownode"], activePath: "/createWorkflow" },
+        { curPath: ["/createWorkflow/createWorkflownode"], activePath: "/createWorkflow" },
+        { curPath: ["/createWorkflow/createEditWorkflownode"], activePath: "/createWorkflow" },
+
         { curPath: ["/workflowDetail/workflownode"], activePath: "/workflowDetail" },
 
 
         { curPath: ["/audit/auditDetail"], activePath: "/audit" },
-        { curPath: ["/waitaudit/auditDetail"], activePath: "/waitaudit" },
-        { curPath: ["/transcriptnotify/auditDetail"], activePath: "/transcriptnotify" },
+        { curPath: ["/audit/auditDetail/auditReportdetails"], activePath: "/auditDetail" },
+
+        { curPath: ["/waitaudit/waitAuditDetail"], activePath: "/waitaudit" },
+        { curPath: ["/audit/waitAuditDetail/waitAuditReportdetails"], activePath: "/waitAuditDetail" },
+
+        
+        { curPath: ["/transcriptnotify/transcriptnotifyAuditDetail"], activePath: "/transcriptnotify" },
+        { curPath: ["/transcriptnotify/transcriptnotifyAuditDetail/transcriptnotifyReportdetails"], activePath: "/transcriptnotifyAuditDetail" },
         
 
         { curPath: ["/auditHandling"], activePath: "/waitaudit" },
-        { curPath: ["/audit/auditDetail/reportdetails"], activePath: "/auditDetail" },
         { curPath: ["/audit/auditHandling/reportdetails"], activePath: "/auditHandling" },
         //神秘客
         { curPath: ["/mysterioSetting"], activePath: "/mysterio" },
@@ -765,36 +772,68 @@ export default {
         },
         {
           paths: ["/createWorkflow"],
-          parentBread: { path: "/workFlows", name: "workflowDetail" },
+          parentBread: { path: "/workFlows", name: "workflowManage" },
         },
 
         {
-          paths: ["/createWorkflow/workflownode"],
+          paths: ["/createWorkflownode"],
           parentBread: { path: "/createWorkflow", name: "createWorkflow" },
         },
         {
-          paths: ["/workflowDetail/workflownode"],
+          paths: ["/createEditWorkflownode"],
+          parentBread: { path: "/createWorkflow", name: "createWorkflow" },
+        },
+        {
+          paths: ["/workflownode"],
           parentBread: { path: "/workflowDetail", name: "workflowDetail" },
         },
 
 
-        // {
-        //   paths: ["/auditDetail"],
-        //   parentBread: { path: "/audit", name: "AuditManage" },
-        // },
-      
+
         {
-          paths: ["/audit/auditDetail"],
+          paths: ["/auditDetail"],
           parentBread: { path: "/audit", name: "SendAuditManage" },
         },
         {
-          paths: ["/waitaudit/auditDetail"],
+          paths: ["/auditReportdetails"],
+          parentBread: { path: "/auditDetail", name: "reportdetailsAuditDetail" },
+        },
+
+        {
+          paths: ["/waitAuditDetail"],
           parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
         },
+
         {
-          paths: ["/transcriptnotify/auditDetail"],
+          paths: ["/waitAuditReportdetails"],
+          parentBread: { path: "/waitAuditDetail", name: "reportdetailsAuditHandling" },
+        },
+
+        {
+          paths: ["/transcriptnotifyAuditDetail"],
           parentBread: { path: "/transcriptnotify", name: "TranscriptNotify" },
         },
+
+        {
+          paths: ["/transcriptnotifyReportdetails"],
+          parentBread: { path: "/transcriptnotifyAuditDetail", name: "reportdetailsAuditTranscriptnotify" },
+        },
+
+
+
+
+        // {
+        //   paths: ["/waitaudit/auditDetail"],
+        //   parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
+        // },
+
+
+        
+        // {
+        //   paths: ["/transcriptnotify/auditDetail"],
+        //   parentBread: { path: "/transcriptnotify", name: "TranscriptNotify" },
+        // },
+        
 
 
 

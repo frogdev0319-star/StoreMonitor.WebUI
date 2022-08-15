@@ -312,7 +312,13 @@
 <script>
 import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
-import {getNodeList, updateWorkflow, creadNewFlow,getUserStatus} from "@/api/workflow";
+import {
+  getNodeList, 
+  updateWorkflow,   
+  getWorkflowList, 
+  creadNewFlow,
+  getUserStatus
+  } from "@/api/workflow";
 import {getUserTitleList } from "@/api/title";
 import {getUserInfo} from '@/api/login';
 
@@ -461,7 +467,18 @@ export default {
 
       newFlatNodeDataView:[],
       pageAction: "init",
-      currentUser:''
+      currentUser:'',
+      allTableData: [],
+      apiBody: {
+          "page": 0,
+          "size": 5000,
+          "direction": "DESC",
+          "property": "updateTs",
+          "state": [
+              0,
+              1,
+          ]
+      },
     };
   },
 
@@ -492,17 +509,17 @@ export default {
       await this.getUserInfo() 
       await this.getDepartmentList() 
       await this.initBasicData()
-      await this.getPickedMember()
-      
 
+      
+      await this.getWorkflowList(this.apiBody)
+      
+      
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.currentUser = result.data.userId
-      console.log('result @@', result)
-      console.log('this.currentUser 1 @@', this.currentUser)
-
 
       var status = sessionStorage.getItem('pageAction');
       const pageAction = JSON.parse(status)
+      console.log('pageAction', pageAction)
 
       switch(pageAction){
         case 'init':{
@@ -524,7 +541,7 @@ export default {
           break;
         }
       }
-      
+      await this.getPickedMember()
       await this.handleData() 
 
     },
@@ -595,6 +612,8 @@ export default {
     },
 
     getNodeData(){
+      console.log('newNode' , newNode)
+
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
       console.log('newNode :>> ', newNode);
@@ -617,6 +636,69 @@ export default {
       sessionStorage.removeItem('newWorkFlow')
     },
     
+    handleEdit(){
+      console.log('this is Edit')
+
+      const data = sessionStorage.getItem('newWorkFlow')
+      const newNode = JSON.parse(data)
+      
+      const reNewNode = sessionStorage.getItem('reNewNode')
+      const orinode = JSON.parse(reNewNode)
+
+      console.log("newNode", newNode)
+
+      if( newNode !== null){
+        var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
+        console.log('num :>> ', num);
+        orinode.splice(num , 1 , newNode.orderedAuditNodeArray[0])
+
+        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
+        this.newFlatNodeDataView = orinode
+      } else {
+        this.newFlatNodeDataView = orinode
+      }
+      
+      sessionStorage.removeItem('newWorkFlow')
+      console.log('this away ok')
+    },
+
+
+    // get user
+    async getUserInfo(){
+      await getUserInfo().then(res=>{
+        this.userInfo = res.data
+        this.userData = this.userInfo
+        // console.log('this.userInfo ------>> ', this.userInfo);
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
+    // get title
+    async getTitle(){
+      await getUserStatus({ type: 1 }).then(res=>{
+        this.titleList =  res.data
+        this.titleListAry = this.titleList.map( i => (
+          i = i.defineName
+        ))
+        
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+    // get getDepart
+    async getDepartmentList(){
+      await getUserStatus({ type: 0 }).then(res=>{
+        this.department = res.data
+        // console.log('this.department 4 ------>> ', this.department);
+        this.departmentAry = this.department.map( i => (
+          i = i.defineName
+        ))
+      }).catch(err => {
+        console.log('error' + err);
+      });
+    },
 
     addNode() {
       // name or group convert id
@@ -677,71 +759,13 @@ export default {
       this.$router.push({ name: 'createNodeSetting' })
     },
 
-    handleEdit(){
-      const data = sessionStorage.getItem('newWorkFlow')
-      const newNode = JSON.parse(data)
-      console.log('newNode  ~~~~~>> ', newNode.orderedAuditNodeArray);
-
-      const reNewNode = sessionStorage.getItem('reNewNode')
-      const orinode = JSON.parse(reNewNode)
-      console.log('orinode ~~~~~>> ', orinode);
-
-      if( newNode.orderedAuditNodeArray !== null){
-        var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
-        console.log('num :>> ', num);
-        orinode.splice(num , 1 , newNode.orderedAuditNodeArray[0])
-
-        sessionStorage.setItem('reNewNode', JSON.stringify(orinode))
-        this.newFlatNodeDataView = orinode
-      }
-
-      sessionStorage.removeItem('newWorkFlow')
-    },
-
-
-    // get user
-    async getUserInfo(){
-      await getUserInfo().then(res=>{
-        this.userInfo = res.data
-        this.userData = this.userInfo
-        // console.log('this.userInfo ------>> ', this.userInfo);
-      }).catch(err => {
-        console.log('error' + err);
-      });
-    },
-    // get title
-    async getTitle(){
-      await getUserStatus({ type: 1 }).then(res=>{
-        this.titleList =  res.data
-        this.titleListAry = this.titleList.map( i => (
-          i = i.defineName
-        ))
-        
-        this.isLoadingData = false
-      }).catch(err => {
-        this.isLoadingData = false;
-        console.log('error' + err);
-      });
-    },
-    // get getDepart
-    async getDepartmentList(){
-      await getUserStatus({ type: 0 }).then(res=>{
-        this.department = res.data
-        // console.log('this.department 4 ------>> ', this.department);
-        this.departmentAry = this.department.map( i => (
-          i = i.defineName
-        ))
-      }).catch(err => {
-        console.log('error' + err);
-      });
-    },
-
     getPickedMember(){
-      
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
       console.log('orinode 1 >> ', orinode);
-      
+
+      if(reNewNode == null) return
+
       var handleFlatNodeDataView = [...orinode]
       handleFlatNodeDataView.shift()
 
@@ -749,6 +773,8 @@ export default {
         "auditByUsers": [],
         "auditByGroups": []
       }
+
+
       handleFlatNodeDataView.forEach(i=>{
         if(i.auditByUsers.length !== 0){
           auditMembers.auditByUsers.push(i.auditByUsers[0])
@@ -766,6 +792,17 @@ export default {
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
     },
 
+    async getWorkflowList(param){
+      this.isLoadingData = true
+      await getWorkflowList(param).then(res=>{
+        this.allTableData = res.data.content
+        console.log('this.allTableData ======>> ',  this.allTableData );
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
 
 
     //======================================
@@ -988,7 +1025,7 @@ export default {
       
       sessionStorage.setItem('workflowNode', JSON.stringify(row))
       sessionStorage.setItem('pageAction', JSON.stringify("edit"))
-      this.$router.push({name: 'nodeSetting'})
+      this.$router.push({name: 'createEditNodeSetting'})
     },
 
 
@@ -1008,20 +1045,45 @@ export default {
 
     //addWorkFlow
     addNewFlow() {
+      console.log('this.newFlatNodeDataView :>> ', this.newFlatNodeDataView);
+      console.log('this.workflowDetail :>> ', this.workflowDetail);
+
+      
+      var repeatResult = this.allTableData.some(i=>i.name == this.workflowDetail.name)
+      console.log('repeatResult~~~~ :>> ', repeatResult);
+
+      if(this.workflowDetail.name == "") {
+        util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
+        this.$refs.workflowName.focus()
+        return
+      }
+
+      if(repeatResult == true){
+        util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+        this.$refs.workflowName.focus()
+        return
+      }
+      
+
       this.newFlatNodeDataView.forEach(d =>{
         delete d.id 
         if(d.auditByUsers.length !== 0){
+          console.log('aaa :>> ');
           var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
+          console.log('currentUser :>> ', currentUser);
           d.auditByUsers = []
           d.auditByUsers.push(currentUser[0].userId)
         } else {
+          console.log('bbb :>> ');
           var currentGroup = this.department.filter(u => u.defineName == d.auditByGroups[0])
+          console.log('currentGroup :>> ', currentGroup);
+
           d.auditByGroups = []
           d.auditByGroups.push(currentGroup[0].defineId)
         }
       })
       
-      console.log('this.newFlatNodeDataView !!!!!!', this.newFlatNodeDataView)
+      // console.log('this.newFlatNodeDataView !!!!!!', this.newFlatNodeDataView)
 
       this.newFlatNodeDataView.push('null')
       let result = {};
@@ -1037,15 +1099,19 @@ export default {
         }
       });
 
-
       var toApiData = {...this.workflowDetail, ...result}
       toApiData.copyToUsers = this.ccToUSer
 
       creadNewFlow(toApiData).then(res=>{
-          this.$router.push({name: 'workflowManage'})
-          console.log('res', res)
-        }).catch(err => {
-          console.log('error' + err);
+        this.$router.push({name: 'workflowManage'})
+        console.log('res', res)
+      }).catch(err => {
+        console.log('error' + err);
+        this.newFlatNodeDataView.pop()
+        this.handleData()
+        util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+        
+
       });
 
     }

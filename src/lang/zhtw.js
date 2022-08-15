@@ -87,9 +87,10 @@ export default{
       "patrolItemStat":"巡檢項統計",
       "singleStoreStat":"單店分析",
       "workflowManage":"流程設計",
-
-      "workflowDetail":"編輯流程",
       "createWorkflow":"新增流程",
+      "createEditNodeSetting":"編輯流程",
+      "workflowDetail":"編輯流程",
+    
 
       "createNodeSetting":"設定節點",
       "nodeSetting":"設定節點",
@@ -110,11 +111,15 @@ export default{
       
       "auditHandling":"簽核處理",
 
-      
       "auditReportdetails":"簽核紀錄表詳情",
+      "WaitAuditReportdetails":"簽核紀錄表詳情",
+      "transcriptnotifyReportdetails":"簽核紀錄表詳情",
+
       "reportdetailsAuditDetail":"送出簽核｜簽核內容",
       "handlingReportdetails":"簽核紀錄表詳情",
       "reportdetailsAuditHandling":"待簽核｜簽核處理",
+      "reportdetailsAuditTranscriptnotify":"副本通知｜簽核內容",
+
       //神秘客
       "generalMode":"一般模式",
       "mimicMode":"神秘客模式",

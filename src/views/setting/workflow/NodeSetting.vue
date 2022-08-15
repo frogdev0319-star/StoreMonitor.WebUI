@@ -324,6 +324,7 @@ import DialogPop from '@/components/DialogPop';
 
 
 import util from "@/common/util";
+import { ColorPicker } from 'element-ui';
 export default {
   name: 'WorkflowDetail',
   components: {
@@ -509,7 +510,6 @@ export default {
         console.log('newAuditByUsersArr :>> ', newAuditByUsersArr);
         console.log('this.userData :>> ', this.userData);
 
-
       }).catch(err => {
         console.log('error' + err);
       });
@@ -534,12 +534,13 @@ export default {
     async getDepartmentList(){
       await getDepart({ type: 0 }).then(res=>{
         // this.department = res.data
-        console.log('res.data ~~~~~>', res.data)
+        // console.log('res.data ~~~~~>', res.data)
         
         let newAuditByGroupsArr = []
         if(this.nodeData.auditByGroups.length == 0){
-          this.departmentStatus = res.data[0].defineId
+          
           newAuditByGroupsArr = res.data.filter( i => !this.auditMembers.auditByGroups.includes(i.defineId))
+          this.departmentStatus = newAuditByGroupsArr[0].defineId
         }else{
           this.departmentStatus = this.nodeData.auditByGroups[0]
           newAuditByGroupsArr = res.data
@@ -556,9 +557,7 @@ export default {
         }else{
           this.department = newAuditByGroupsArr
         }
-        
-
-
+  
         this.departmentAry = this.department.map( i => (
           i = i.defineName
         ))
@@ -816,24 +815,37 @@ export default {
       
       console.log('to API', this.apiData)
       if(pageAction == "create" || pageAction == "edit" ){
+        console.log('pageAction ---->', pageAction)
       
         //  節點名稱不可為重複
         var status = sessionStorage.getItem('reNewNode');
         const reNewNode = JSON.parse(status)
-        // console.log('reNewNode !!!', reNewNode)
-        // console.log('this.nodeData !!!', this.nodeData)
+
         var checkNameResult = reNewNode.filter(i => i.name == this.nodeData.name )
+        console.log('checkNameResult', checkNameResult)
+
         // create
         if(checkNameResult.length > 0 && pageAction == "create") {
+          console.log('1111')
           util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
           return
         }
+
         // edit
         if(checkNameResult.length > 0 && pageAction == "edit") {
-          var tt = reNewNode.find(i=>{
+          console.log('222')
+
+          console.log(' this.nodeData',  this.nodeData)
+          console.log('reNewNode', reNewNode)
+
+          var tempAry = reNewNode.filter( i => i.id !== this.nodeData.id)
+          console.log('tempAry', tempAry)
+
+          var tt = tempAry.some(i =>
             i.name == this.nodeData.name
-          })
-          if(tt !== ''){
+          )
+          console.log('tt', tt)
+          if(tt){
             util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
             return
           }
@@ -841,15 +853,29 @@ export default {
         sessionStorage.setItem('newWorkFlow', JSON.stringify(this.apiData))
         console.log('newWorkFlow 2', this.apiData)
         this.$router.push({name: 'createWorkflow'})
+
+
       } else if(pageAction == "set"){
-        // call api
-        updateWorkflow(this.apiData).then(res=>{
-          console.log('res :>> ', res);
-          this.$router.push({name: 'workflowDetail'})
-          this.isLoadingData = false
-        }).catch(err => {
-          console.log('error' , err);
-        });
+        console.log('pageAction', pageAction)
+        console.log('this.apiData', this.apiData)
+        console.log('this.nodeData', this.nodeData)
+        var checkRepeatArry = this.apiData.orderedAuditNodeArray.map(i => i = i.name)
+        console.log('checkRepeatArry', checkRepeatArry)
+        
+        const repeat = checkRepeatArry.some( (item, index, arr) => arr.indexOf(item) !== index)
+        console.log('repeat', repeat)
+        if(repeat){
+          util.notify(this.$t('audit.workFlows.cantRepeatNodeName'), 'error', 2000 );
+        }else{
+          // call api
+          updateWorkflow(this.apiData).then(res=>{
+            console.log('res :>> ', res);
+            this.$router.push({name: 'workflowDetail'})
+            this.isLoadingData = false
+          }).catch(err => {
+            console.log('error' , err);
+          });
+        }
       }
 
     },
