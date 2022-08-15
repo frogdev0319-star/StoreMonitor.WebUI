@@ -101,7 +101,7 @@
                   />
                 </div>
               </div>
-              <div v-if="auditFileCount < 10" class="attach-add" @click="$refs.auditfile.click()">
+              <div v-if="(signatureFileList.length !== 0 && auditFileCount < 11) || (auditFileCount < 10)" class="attach-add" @click="$refs.auditfile.click()">
                 <input type="file" style="display: none" accept="image/png,image/jpeg,application/pdf" max-size="2" @change="doAddAttachment" ref="auditfile" />
                 <div style="height:16px;display: flex;flex-direction: row;align-items: center;">
                   <img src="../../../../static/img/icon_attachment.svg" widht="16px" height="16px" style="border-radius:10px;"/>
