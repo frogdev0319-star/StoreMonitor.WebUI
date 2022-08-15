@@ -116,7 +116,7 @@
                 <i class="iconfont icon-liebiao iconCard"/>
                 <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
               </div>
-              <el-dropdown 
+              <!--<el-dropdown 
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 class="export-report-btn"
                 style="display:flex; flex-direction: row-reverse; align-items: center">
@@ -133,10 +133,10 @@
                   <el-dropdown-item
                     class="dropdown-item"
                     style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
-                    @click.native="export2Excel">{{ $t('eventView.exportEntailReport') }}</el-dropdown-item>
+                    @click.native="export2ExcelAll">{{ $t('eventView.exportEntailReport') }}</el-dropdown-item>
                 </el-dropdown-menu>
-              </el-dropdown>
-              <!--<delay-button
+              </el-dropdown>-->
+              <delay-button
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 class="export-report-btn"
                 type="primary"
@@ -147,7 +147,7 @@
                   <img :src="exportPng" class="icon-excel">
                   <span>{{ $t('eventView.exportReport') }}</span>
                 </div>
-              </delay-button>-->
+              </delay-button>
             </div>
           </div>
           <div v-if="ShowCard" class="showCardHeight flex">
@@ -274,10 +274,21 @@
           </div>
       </div>
     </div>
+    <dialog-pop
+      :title="$t('remotePatrol.exportExcelAllWarning')"
+      :isWarning="true"
+      :visible="showExportAllWarn"
+      :showCancelbtn="false"
+      @confirmHandler="showExportAllWarn = false"
+      >
+      <div class="dialog-slot">
+        {{$t('remotePatrol.selectOnlyOneInspect')}}
+      </div>
+    </dialog-pop>
   </div>
 </template>
 <script>
-import { getInspectReportList, GetInspectTagList } from '@/api/inspect';
+import { getInspectReportList, GetInspectTagList,downLoadInspectReportEntireDetail } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -289,6 +300,7 @@ import TblPaginationOnly from '@/components/TblPaginationOnly';
 import { getInspectReportInfo } from '@/api/inspect';//為了取是否有設置評分
 import TableOnly from '@/components/TableOnly';
 import PermissionHelper from '@/api/PermissionHelper';
+import DialogPop from '@/components/DialogPop';
 export default {
   name: 'InspectReportList',
   components: {
@@ -297,7 +309,8 @@ export default {
     DelayButton,
     StoreFilter,
     TblPaginationOnly,
-    TableOnly
+    TableOnly,
+    DialogPop
   },
   data() {
     return {
@@ -501,6 +514,7 @@ export default {
       searchParams: {},
       ifSearchData: true,
       isScore:true,
+      showExportAllWarn:false,
     };
   },
 
@@ -592,7 +606,62 @@ export default {
         sessionStorage.removeItem('!merge');
       });
     },
-
+    async export2ExcelAll(){
+      const self = this;
+      if(self.inspectId == -1){
+        self.showExportAllWarn = true;
+        return;
+      }
+      const params = {
+        beginTs:self.params.beginTs,
+        endTs:self.params.endTs,
+        inspectTagId:self.params.inspectTagId
+      };
+      const tHeader = [
+        this.$t('remotePatrol.patrolStore'),
+        this.$t('remotePatrol.patrolWay'),//報表類型
+        this.$t('overview.patrolLists'),//巡檢表名稱
+        this.$t('remotePatrol.category'),
+        this.$t('insSettingView.subCategory'),
+        this.$t('overview.items'),
+        this.$t('remotePatrol.patrolScore'),
+        this.$t('remotePatrol.patrolResult'),
+        this.$t('inceptionRpt.attachment'),
+        this.$t('remotePatrol.patrolScore'),
+        this.$t('remotePatrol.commentDetail'),
+        this.$t('remotePatrol.patrolDate')];
+      downLoadInspectReportEntireDetail(params).then(res => {
+        console.log("res:",res);
+        const that = this;
+        require.ensure([], async() => {
+          const { export_json_to_excel } = require('@/excel/Export2Excel');
+          const filterVal = ['storename', 'type', 'tagname', 'item', 'inspectitem', 'totalscore','result', 'detail', 'url','score','comment',
+            'reportts'];
+          const curData = res.data;
+          const data = that.formatJson(filterVal, curData);
+          const fileName = this.compareType+'_Inspection event' + '_' + util.getCurDateStr();
+          export_json_to_excel(tHeader, data, fileName);
+        });
+        /*const blob = new Blob([res], {
+          type: 'text/plain'//'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            console.log("e:",e.target.result);
+        }
+        reader.readAsText(blob)
+        const objectUrl = URL.createObjectURL(blob);
+        console.log(objectUrl);
+        const url = objectUrl;
+        self.downLoadSrc = url;
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = "temp.csv";
+        link.click();*/
+      }).catch(err => {
+        console.log('RouteInspection-downItem: ' + err);
+      });
+    },
     formatJson(filterVal, jsonData) {
       return jsonData.map(v => filterVal.map(j => v[j]));
     },
@@ -606,7 +675,7 @@ export default {
       }
       return obj;
     },
-   /*getReportList_(p) {
+   getReportList_(p) {
       console.log("2.Get Report List")
       console.log(p)
       var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,filter:p.filter,order:p.order,
@@ -679,7 +748,7 @@ export default {
         }).catch(err => {
         });
       });
-    },*/
+    },
    getReportList(p) {
       console.log("1.Get Report List")
       console.log(p)

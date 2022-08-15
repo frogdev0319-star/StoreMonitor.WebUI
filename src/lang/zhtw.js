@@ -514,7 +514,9 @@ export default{
     "commentCountRuleTip":"文字評論最多輸入5則",
     "cannotSwitch":"正在編輯報告，不能切換當前門店？",
     "cannotSwitchBrand":"正在編輯報告，不能切換當前品牌？",
-    "cannotSwitchInspect":"正在編輯報告，不能切換當前巡檢表"
+    "cannotSwitchInspect":"正在編輯報告，不能切換當前巡檢表",
+    "exportExcelAllWarning":"匯出完整報告提示",
+    "selectOnlyOneInspect":"匯出完整報告時僅能選擇單一巡檢表"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",

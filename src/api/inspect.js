@@ -264,3 +264,11 @@ export const getNotInspectStoresByPerson = data => {
     data
   });
 };
+
+export const downLoadInspectReportEntireDetail = data => {
+  return request({
+    url: `${version}/inspect/report/export/entire/json`,
+    method: 'post',
+    data
+  });
+};
