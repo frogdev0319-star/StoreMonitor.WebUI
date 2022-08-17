@@ -521,7 +521,8 @@ export default{
     "cannotSwitchBrand":"正在編輯報告，不能切換當前品牌？",
     "cannotSwitchInspect":"正在編輯報告，不能切換當前巡檢表",
     "exportExcelAllWarning":"匯出完整報告提示",
-    "selectOnlyOneInspect":"匯出完整報告時僅能選擇單一巡檢表"
+    "selectOnlyOneInspect":"匯出完整報告時僅能選擇單一巡檢表",
+    "entailReportExcelList":"完整報告明細單",
   },
   "eventView":{
       "ClosedEvent":"已結案事件",

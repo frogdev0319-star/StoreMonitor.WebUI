@@ -116,7 +116,7 @@
                 <i class="iconfont icon-liebiao iconCard"/>
                 <span class="text-pattern">{{ $t('remotePatrol.listStyle') }}</span>
               </div>
-              <!--<el-dropdown 
+              <el-dropdown 
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 class="export-report-btn"
                 style="display:flex; flex-direction: row-reverse; align-items: center">
@@ -135,8 +135,8 @@
                     style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
                     @click.native="export2ExcelAll">{{ $t('eventView.exportEntailReport') }}</el-dropdown-item>
                 </el-dropdown-menu>
-              </el-dropdown>-->
-              <delay-button
+              </el-dropdown>
+              <!--<delay-button
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
                 class="export-report-btn"
                 type="primary"
@@ -147,7 +147,7 @@
                   <img :src="exportPng" class="icon-excel">
                   <span>{{ $t('eventView.exportReport') }}</span>
                 </div>
-              </delay-button>
+              </delay-button>-->
             </div>
           </div>
           <div v-if="ShowCard" class="showCardHeight flex">
@@ -288,7 +288,7 @@
   </div>
 </template>
 <script>
-import { getInspectReportList, GetInspectTagList,downLoadInspectReportEntireDetail } from '@/api/inspect';
+import { getInspectReportList, GetInspectTagList,downLoadInspectReportEntireDetail,getAllReportIds } from '@/api/inspect';
 import util from '@/common/util';
 import { mapGetters } from 'vuex';
 import StoreFilter from '@/components/StoreFilter';
@@ -297,7 +297,7 @@ import SearchConditionUtil from '@/common/SearchConditionUtil';
 import DateTimeSelector from '@/components/DateTimeSelector';
 import SelectedStores from "@/components/SelectedStores";
 import TblPaginationOnly from '@/components/TblPaginationOnly';
-import { getInspectReportInfo } from '@/api/inspect';//為了取是否有設置評分
+import { getInspectReportInfo} from '@/api/inspect';//為了取是否有設置評分
 import TableOnly from '@/components/TableOnly';
 import PermissionHelper from '@/api/PermissionHelper';
 import DialogPop from '@/components/DialogPop';
@@ -606,40 +606,62 @@ export default {
         sessionStorage.removeItem('!merge');
       });
     },
+    async doGetSearchConditionsReportIds(){
+      const self = this;
+      var reportIds = [];
+      var p = self.params;
+      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,inspectTagId:p.inspectTagId}
+      params.endTs = params.endTs - params.endTs % 1000 + 999;
+      if (params.clause.storeId.length === 0) {
+        console.log("No Data")
+        this.setNoData();
+        return [];
+      }
+      console.log("SearchParams:",params);
+      const result = await getAllReportIds(self.params);
+      if(result.errCode == 0){
+          reportIds = result.data;
+      }
+      return reportIds;
+    },
     async export2ExcelAll(){
       const self = this;
-      if(self.inspectId == -1){
+      if(self.inspectId == -1 || self.params.inspectTagId==null){
         self.showExportAllWarn = true;
         return;
       }
+      const reportIds = await this.doGetSearchConditionsReportIds();
+      console.log("reportIds:",reportIds);
       const params = {
         beginTs:self.params.beginTs,
         endTs:self.params.endTs,
-        inspectTagId:self.params.inspectTagId
+        inspectTagId:self.params.inspectTagId,
+        reportIds:reportIds
       };
       const tHeader = [
         this.$t('remotePatrol.patrolStore'),
-        this.$t('remotePatrol.patrolWay'),//報表類型
         this.$t('overview.patrolLists'),//巡檢表名稱
         this.$t('remotePatrol.category'),
         this.$t('insSettingView.subCategory'),
         this.$t('overview.items'),
-        this.$t('remotePatrol.patrolScore'),
         this.$t('remotePatrol.patrolResult'),
-        this.$t('inceptionRpt.attachment'),
         this.$t('remotePatrol.patrolScore'),
         this.$t('remotePatrol.commentDetail'),
+        this.$t('audit.inceptionRpt.attachment'),
+        this.$t('titleView.description'),
         this.$t('remotePatrol.patrolDate')];
+      
       downLoadInspectReportEntireDetail(params).then(res => {
         console.log("res:",res);
         const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['storename', 'type', 'tagname', 'item', 'inspectitem', 'totalscore','result', 'detail', 'url','score','comment',
+          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','result', 'totlascore', 'detail', 'attachment','comment',
             'reportts'];
           const curData = res.data;
+          const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
           const data = that.formatJson(filterVal, curData);
-          const fileName = this.compareType+'_Inspection event' + '_' + util.getCurDateStr();
+          const fileName = tagName+'_'+that.$t('remotePatrol.entailReportExcelList') + '_' + util.getCurDateStr();
           export_json_to_excel(tHeader, data, fileName);
         });
         /*const blob = new Blob([res], {

@@ -272,3 +272,11 @@ export const downLoadInspectReportEntireDetail = data => {
     data
   });
 };
+
+export const getAllReportIds = data => {
+  return request({
+    url: `${version}/inspect/report/list/allReportIds`,
+    method: 'post',
+    data
+  });
+};
