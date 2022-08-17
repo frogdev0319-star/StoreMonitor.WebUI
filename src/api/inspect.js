@@ -1,5 +1,5 @@
 import request from '@/common/request';
-import { serviceAxios } from '@/common/request';
+import { serviceAxios,serviceRpt } from '@/common/request';
 const base = 'http://172.21.84.62:8085';
 const itempath = '/storemonitor/api/v1.0';
 
@@ -266,7 +266,7 @@ export const getNotInspectStoresByPerson = data => {
 };
 
 export const downLoadInspectReportEntireDetail = data => {
-  return request({
+  return serviceRpt({
     url: `${version}/inspect/report/export/entire/json`,
     method: 'post',
     data
@@ -274,7 +274,7 @@ export const downLoadInspectReportEntireDetail = data => {
 };
 
 export const getAllReportIds = data => {
-  return request({
+  return serviceRpt({
     url: `${version}/inspect/report/list/allReportIds`,
     method: 'post',
     data

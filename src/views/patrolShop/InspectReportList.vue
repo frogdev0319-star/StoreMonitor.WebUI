@@ -610,7 +610,7 @@ export default {
       const self = this;
       var reportIds = [];
       var p = self.params;
-      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,inspectTagId:p.inspectTagId}
+      var params = {beginTs:p.beginTs,endTs:p.endTs,clause:p.clause,like:p.like,inspectTagId:p.inspectTagId,filter:p.filter}
       params.endTs = params.endTs - params.endTs % 1000 + 999;
       if (params.clause.storeId.length === 0) {
         console.log("No Data")
@@ -618,7 +618,7 @@ export default {
         return [];
       }
       console.log("SearchParams:",params);
-      const result = await getAllReportIds(self.params);
+      const result = await getAllReportIds(params);
       if(result.errCode == 0){
           reportIds = result.data;
       }
