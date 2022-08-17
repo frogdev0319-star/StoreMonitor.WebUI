@@ -510,9 +510,7 @@ export default {
       await this.getDepartmentList() 
       await this.initBasicData()
 
-      
       await this.getWorkflowList(this.apiBody)
-      
       
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.currentUser = result.data.userId
@@ -608,19 +606,17 @@ export default {
       console.log('this.currentUser 2', this.currentUser)
       initData[0].auditByUsers.push(this.currentUser)
       this.newFlatNodeDataView = initData
-      console.log('this.newFlatNodeDataView 1 :>> ', this.newFlatNodeDataView);
     },
 
     getNodeData(){
-      console.log('newNode' , newNode)
 
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
-      console.log('newNode :>> ', newNode);
+      // console.log('newNode :>> ', newNode);
 
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
-      console.log('orinode 1 >> ', orinode);
+      // console.log('orinode 1 >> ', orinode);
 
       if( newNode !== null ){
         orinode.push(newNode.orderedAuditNodeArray[0])
@@ -645,8 +641,6 @@ export default {
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
 
-      console.log("newNode", newNode)
-
       if( newNode !== null){
         var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
         console.log('num :>> ', num);
@@ -659,7 +653,6 @@ export default {
       }
       
       sessionStorage.removeItem('newWorkFlow')
-      console.log('this away ok')
     },
 
 
