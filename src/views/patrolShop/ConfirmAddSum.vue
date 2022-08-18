@@ -1053,7 +1053,6 @@ export default {
     async getRouteData() {
       const self = this;
       const PatrolComment = self.$store.getters.PatrolComment;
-      console.log("PatrolComment:",PatrolComment);
       if (PatrolComment != null) {
         self.suggest = PatrolComment.suggest;
         self.curSumIndex = PatrolComment.status;

@@ -118,8 +118,8 @@
               </div>
               <el-dropdown 
                 :class="lang.indexOf('ja') !== -1 ? 'ja-export-btn' : lang.indexOf('zh') === -1 ? 'en-export-btn':'export-btn'"
-                class="export-report-btn"
-                style="display:flex; flex-direction: row-reverse; align-items: center">
+                class="export-report-btn dropdown"
+                style="display:flex; flex-direction: row-reverse; align-items: center;cursor:pointer;">
                 <div class="button-area">
                   <img :src="exportPng" class="icon-excel">
                   <span>{{ $t('eventView.exportReport') }}</span>
@@ -282,7 +282,19 @@
       @confirmHandler="showExportAllWarn = false"
       >
       <div class="dialog-slot">
-        {{$t('remotePatrol.selectOnlyOneInspect')}}
+        {{this.$t('remotePatrol.selectOnlyOneInspect')}}
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :title="$t('remotePatrol.exportExcelAllWarning')"
+      :isWarning="false"
+      :visible="showExportAllNotice"
+      :showCancelbtn="false"
+      @confirmHandler="showExportAllNotice = false"
+      >
+      <div class="noticeDialog">
+        {{this.$t('remotePatrol.exportExcelAllNotice1')}}<br/>
+        {{this.$t('remotePatrol.exportExcelAllNotice2')}}
       </div>
     </dialog-pop>
   </div>
@@ -515,6 +527,7 @@ export default {
       ifSearchData: true,
       isScore:true,
       showExportAllWarn:false,
+      showExportAllNotice:false,
     };
   },
 
@@ -557,6 +570,7 @@ export default {
     }
     self.$route.meta.isBack = false;
     self.isFirstLoad = false;
+    
   },
 
   methods: {
@@ -627,9 +641,11 @@ export default {
     async export2ExcelAll(){
       const self = this;
       if(self.inspectId == -1 || self.params.inspectTagId==null){
+        self.ExportAllMsg = this.$t('remotePatrol.selectOnlyOneInspect');
         self.showExportAllWarn = true;
         return;
       }
+      self.showExportAllNotice = true;
       const reportIds = await this.doGetSearchConditionsReportIds();
       console.log("reportIds:",reportIds);
       const params = {
@@ -639,24 +655,25 @@ export default {
         reportIds:reportIds
       };
       const tHeader = [
-        this.$t('remotePatrol.patrolStore'),
-        this.$t('overview.patrolLists'),//巡檢表名稱
+        this.$t('remotePatrol.storeName'),
+        this.$t('remotePatrol.inspectName'),//巡檢表名稱
         this.$t('remotePatrol.category'),
         this.$t('insSettingView.subCategory'),
         this.$t('overview.items'),
+        this.$t('remotePatrol.inspectItemScore'),
         this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.patrolScore'),
-        this.$t('remotePatrol.commentDetail'),
+        this.$t('remotePatrol.inspectTotalScore'),
+        this.$t('remotePatrol.exportAllDetail'),
         this.$t('audit.inceptionRpt.attachment'),
         this.$t('titleView.description'),
-        this.$t('remotePatrol.patrolDate')];
+        this.$t('remotePatrol.createRptDT')];
       
       downLoadInspectReportEntireDetail(params).then(res => {
         console.log("res:",res);
         const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','result', 'totlascore', 'detail', 'attachment','comment',
+          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 'totlascore', 'detail', 'attachment','comment',
             'reportts'];
           const curData = res.data;
           const tagName = that.inspectTableList.find(item=>item.id ==self.params.inspectTagId ).name;
@@ -1551,6 +1568,10 @@ $filterWidth: (100%-706);
     .time-selector{
       margin-right: calc(30/1920*100vw);
     }
+.noticeDialog{
+  text-align: left;
+  margin-left: calc(20/1920*100vw);
+}
 </style>
 <style scoped>
 
@@ -1579,6 +1600,7 @@ $filterWidth: (100%-706);
     ::-webkit-scrollbar-thumb:hover {
       background: rgb(162, 162, 163);
     }
+
 </style>
 <style>
 @import '../../assets/css/pagination.css';

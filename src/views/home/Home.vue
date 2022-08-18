@@ -51,7 +51,7 @@
           <div v-if="$route.path ==='/reportdetails'"
               style="background-color: transparent; color: #fff; border: none; position:absolute;top:15px;right:24px">
             <el-dropdown 
-              style="display:flex; flex-direction: row-reverse; align-items: center;color: #fff;">
+              style="display:flex; flex-direction: row-reverse; align-items: center;color: #fff;cursor: pointer;">
               <div class="button-area">
                 <img :src="exportPdf" class="icon-excel" />
                 <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
