@@ -4,27 +4,13 @@
       <div class="no-print">
         <delay-button
           id="downloadPdf"
-          class="exportbtn"
-          type="primary"
-          size="mini"
           @click="handleDown"
         >
-          <div class="button-area">
-            <i class="iconfont icon-pdf export"/>
-            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-          </div>
         </delay-button>
         <delay-button
           id="downloadExcel"
-          class="exportbtn"
-          type="primary"
-          size="mini"
           @click="handleDownExcel"
         >
-          <div class="button-area">
-            <i class="iconfont icon-pdf export"/>
-            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-          </div>
         </delay-button>
       </div>
     </div>
