@@ -1189,7 +1189,6 @@ export default {
     const BackPatrolParam = self.$store.getters.BackPatrolParam;
     const PatrolComment = self.$store.getters.PatrolComment;
     if (PatrolComment != null) {
-      console.log("PatrolComment:",PatrolComment);
       self.suggest = PatrolComment.suggest;
       self.reportStatus = PatrolComment.status;
     }

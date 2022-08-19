@@ -4,27 +4,13 @@
       <div class="no-print">
         <delay-button
           id="downloadPdf"
-          class="exportbtn"
-          type="primary"
-          size="mini"
           @click="handleDown"
         >
-          <div class="button-area">
-            <i class="iconfont icon-pdf export"/>
-            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-          </div>
         </delay-button>
         <delay-button
           id="downloadExcel"
-          class="exportbtn"
-          type="primary"
-          size="mini"
           @click="handleDownExcel"
         >
-          <div class="button-area">
-            <i class="iconfont icon-pdf export"/>
-            <span>{{ $t('remotePatrol.InspectionDetail') }}</span>
-          </div>
         </delay-button>
       </div>
     </div>
@@ -515,7 +501,7 @@
 </template>
 <script>
 import ECharts from 'vue-echarts';
-import { getInspectReportInfo } from '@/api/inspect';
+import { getInspectReportInfo,downLoadInspectReportEntireDetail } from '@/api/inspect';
 import { CancelWorkflow,taskDrawback,GetTaskInfo } from '@/api/workflow';
 import util from '@/common/util';
 import videojs from '../../../static/video.js';
@@ -710,8 +696,47 @@ export default {
       this.getPageDataBasedOnTemplate(this.reportData);
       this.saveTemplateId();
     },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
     handleDownExcel(){
       console.log("download excel!!!");
+      console.log("reportIds:",this.report.reportId);
+      const params = {
+        beginTs:this.reportData.ts,
+        endTs:this.reportData.ts,
+        inspectTagId:this.reportData.tagId,
+        reportIds:[this.report.reportId]
+      };
+      const tHeader = [
+        this.$t('remotePatrol.patrolStore'),
+        this.$t('overview.patrolLists'),//巡檢表名稱
+        this.$t('remotePatrol.category'),
+        this.$t('insSettingView.subCategory'),
+        this.$t('overview.items'),
+        this.$t('remotePatrol.patrolResult'),
+        this.$t('remotePatrol.patrolScore'),
+        this.$t('remotePatrol.commentDetail'),
+        this.$t('audit.inceptionRpt.attachment'),
+        this.$t('titleView.description'),
+        this.$t('remotePatrol.patrolDate')];
+      
+      downLoadInspectReportEntireDetail(params).then(res => {
+        console.log("res:",res);
+        const that = this;
+        require.ensure([], async() => {
+          const { export_json_to_excel } = require('@/excel/Export2Excel');
+          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','result', 'totlascore', 'detail', 'attachment','comment',
+            'reportts'];
+          const curData = res.data;
+          const tagName = this.report.tagName;
+          const data = that.formatJson(filterVal, curData);
+          const fileName = this.report.storeName+'_'+tagName+'_'+that.$t('remotePatrol.details') + '_' + util.getCurDateStr();
+          export_json_to_excel(tHeader, data, fileName);
+        });
+      }).catch(err => {
+        console.log('RouteInspection-downItem: ' + err);
+      });
     },
     handleDown() {
       const self = this;

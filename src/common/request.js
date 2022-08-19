@@ -14,6 +14,10 @@ const service = axios.create({
   baseURL: baseUrl,
   timeout: 30000
 });
+const serviceRpt = axios.create({
+  baseURL: baseUrl,
+  timeout: 180000
+});
 // download file axios
 const serviceAxios = axios.create({
   baseURL: baseUrl,
@@ -185,5 +189,69 @@ service.interceptors.request.use(
   }
 );
 
+serviceRpt.interceptors.request.use(
+  config => {
+    if (store.getters.token) {
+      config.headers = {
+        'token': getToken(),
+        'Accept': 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8'
+
+      };
+    }
+    return config;
+  },
+  error => {
+    console.log(error);
+    Promise.reject(error);
+  }
+);
+
+serviceRpt.interceptors.response.use(
+  response => {
+    return response.data;
+  }, err => {
+    if (err.code === 'ECONNABORTED' || err.message === 'Network Error') {
+      message({
+        message: i18n.t('route.networkError'),
+        type: 'error',
+        duration: 5 * 1000
+      });
+    }
+    if (err.response) {
+      const errCode = err.response.data.errCode;
+      const errMsg = err.response.data.errMsg;
+      if (errCode === 500 && (errMsg == 'Invalid token' ||
+                errMsg == 'Failed to verify token' || errMsg == 'User does not exist')) {
+        const url = sessionStorage.getItem('LoginURL');
+        window.location.href = url;
+        message({
+          message: i18n.t('route.loginAbnormal'),
+          type: 'error',
+          duration: 5 * 1000
+        });
+      } else if (errCode === 500 && errMsg == 'Token does not exist') {
+        const url = sessionStorage.getItem('LoginURL');
+        window.location.href = url;
+      } else if (errCode === 500 && errMsg == 'No authority') {
+        router.push('/home');
+        message({
+          message: i18n.t('route.noAuthority'),
+          type: 'error',
+          duration: 5 * 1000
+        });
+      }
+      if (err.response.status != undefined && err.response.status == 404) {
+        message({
+          message: i18n.t('route.serverException'),
+          type: 'error',
+          duration: 5 * 1000
+        });
+      }
+    }
+    return Promise.reject(err);
+  }
+);
+
 export default service;
-export { serviceAxios, serviceLogout };
+export { serviceAxios, serviceLogout, serviceRpt };
