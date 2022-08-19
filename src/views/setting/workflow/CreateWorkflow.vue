@@ -25,7 +25,7 @@
                       :placeholder="workflowDetail.name"
                       v-model="workflowDetail.name"
                       style="width: 250px"
-                      maxlength="50"
+                      maxlength="10"
                       show-word-limit
                       />
                   </div>
@@ -45,7 +45,6 @@
                         :key="index"
                         :label="item"
                         :value="item"
-                        
                       />
                     </el-select>
                   </div>
@@ -337,7 +336,7 @@ export default {
     return {
       ccToUSer: [],
     
-      showSingleDeleteContent:false,
+      showSingleDeleteContent: false,
       dataFromRoute: {},
       workflowDetail: {},
       templateList: ['巡檢表單'],
@@ -479,10 +478,15 @@ export default {
               1,
           ]
       },
+      ttt: 0
+      
     };
   },
 
-  watch:{},
+  watch:{
+  
+
+  },
   async created() {
     await this.init()
   },
@@ -491,6 +495,7 @@ export default {
   },
 
   computed: {
+  
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
@@ -548,6 +553,16 @@ export default {
       util.notify('※ 此模式不會立即產生事件 ', 'warning', 3000);
     },
 
+    strignBytes(str) {
+      if (str == null) return 0;
+      if (typeof str != 'string'){
+        str = '';
+      }
+      return str.replace(/[^\x00-\xff]/g,'01').length;
+    },
+
+
+
     initBasicData(){
       // 初始基本訊息
       var initBasicData = {
@@ -559,12 +574,16 @@ export default {
       }
       var data = sessionStorage.getItem('workflowDetail')
       var workflowDetail = JSON.parse(data)
+
+      
       
       if(workflowDetail == null){
         this.workflowDetail = initBasicData
       } else {
         this.workflowDetail = workflowDetail
       }
+
+      console.log(' this.workflowDetail !!!!!!!tt>> ',  this.workflowDetail);
     },
     initFirstNode(){
       var time = new Date()
@@ -766,7 +785,6 @@ export default {
         "auditByUsers": [],
         "auditByGroups": []
       }
-
 
       handleFlatNodeDataView.forEach(i=>{
         if(i.auditByUsers.length !== 0){
@@ -1095,18 +1113,24 @@ export default {
       var toApiData = {...this.workflowDetail, ...result}
       toApiData.copyToUsers = this.ccToUSer
 
-      creadNewFlow(toApiData).then(res=>{
-        this.$router.push({name: 'workflowManage'})
-        console.log('res', res)
-      }).catch(err => {
-        console.log('error' + err);
+      console.log('toApiData :>> ', toApiData);
+
+      if(toApiData.nextAuditNode.nextAuditNode == null) {
         this.newFlatNodeDataView.pop()
         this.handleData()
-        util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
-        
-
-      });
-
+        util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
+        return
+      } else {
+        creadNewFlow(toApiData).then(res=>{
+          this.$router.push({name: 'workflowManage'})
+          console.log('res', res)
+          }).catch(err => {
+            console.log('error' + err);
+            this.newFlatNodeDataView.pop()
+            this.handleData()
+            util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+          });
+      }
     }
   }
 

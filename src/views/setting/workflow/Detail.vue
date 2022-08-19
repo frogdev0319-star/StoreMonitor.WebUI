@@ -409,7 +409,6 @@ export default {
             text: this.$t('audit.workFlows.moveDown'),
             methods: 'moveDown'
           },
-
         ],
         operation: [
           {
@@ -557,6 +556,8 @@ export default {
     needNote(){
       util.notify('※ 此模式不會立即產生事件 ', 'warning', 3000);
     },
+
+    
 
     async getWorkflowList(param){
       this.isLoadingData = true
@@ -967,19 +968,19 @@ export default {
       var repeatResult = this.allTableData.some(i=>
         i.name == this.nodeDataToApi.name
       )
-      console.log('repeatResult~~~~ :>> ', repeatResult);
-
       if(this.nodeDataToApi.name == ''){
         util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         return
-      }
-
-      if(repeatResult == true){
+      } else if(this.nodeDataToApi.orderedAuditNodeArray.length == 1){
+        util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
+        return
+      } else if(repeatResult == true){
         util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         return
-      }else{
+      } else {
+        console.log('gogogo :>> ');
         // call api for update
         updateWorkflow(this.nodeDataToApi).then(res=>{
           console.log('res :>> ', res);
@@ -1282,10 +1283,7 @@ export default {
     text-align: left;
   }
 
-  .title-operation{
-    /* width: 20%; */
-  }
-
+ 
   .sortable-ghost{
     color: #424151 !important;
     background: rgba(243, 19, 101, 0.1) !important;

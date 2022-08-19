@@ -1372,6 +1372,10 @@ export default{
       "cantEmptyBtnName": "自定義簽核按鈕名稱不可為空",
       "cantDisabledEdit": "禁用流程無法編輯",
 
+      "mustCreateOneNode": "需要至少新增一個簽核節點",
+
+
+
       "cantCancel": "不可取消簽核：",
       "tooltipListcant1": "送出巡檢報告時同步送出不合格項產生之事件",
       "tooltipListcant2": "簽核流程無法選擇「取消」",

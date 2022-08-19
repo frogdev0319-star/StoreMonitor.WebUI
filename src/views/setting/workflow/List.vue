@@ -195,7 +195,7 @@ export default {
       ],
       total: 5,
       currentPage: 1,
-      sizeNum: 10,
+      sizeNum: 50,
       apiBody: {
           "page": 0,
           "size": 10,
@@ -287,7 +287,7 @@ export default {
       if(pageInfo == undefined){
         await this.getWorkflowList(this.apiBody);
       }else{
-        const newApiBody = {...this.apiBody, size: 10, page: pageInfo.page - 1}
+        const newApiBody = {...this.apiBody, page: pageInfo.page - 1}
         this.currentPage = pageInfo.page
         // console.log('newApiBody :>> ', newApiBody);
         await this.getWorkflowList(newApiBody);
@@ -308,9 +308,7 @@ export default {
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
       return year + "/"+ month +"/"+ day +"/"+ hour +":"+ min +":"+ sec
-
     },
-
 
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
@@ -321,7 +319,6 @@ export default {
         });
     },
 
-    
     async getWorkflowList(param){
       this.isLoadingData = true
       await getWorkflowList(param).then(res=>{
@@ -329,9 +326,7 @@ export default {
           this.userInfo.forEach(user => {
             if(d.createdUser === user.userId){
               d.createdUser = user.userName
-              d.updatedUser = user.userName
-              
-
+              // d.updatedUser = user.userName
               d.createdTs = this.getdate(d.createdTs)
               d.updateTs = this.getdate(d.updateTs)
 
@@ -339,8 +334,13 @@ export default {
               d.index = res.data.content.indexOf(d) + 1
               d.state = d.state.toString()
             }
+            if(d.updatedUser === user.userId){
+              d.updatedUser = user.userName
+            }
           })
         ))
+
+        console.log('res.data 2 ======>> ', res.data);
 
         this.allTableData = res.data.content
         this.searchData = this.allTableData
@@ -409,13 +409,13 @@ export default {
     },
 
     settingWorkFlow(row){
-      if(row.state == 0){
-        util.notify(this.$t('audit.workFlows.cantDisabledEdit'), 'error', 2000 );
-        return
-      } else {
+      // if(row.state == 0){
+      //   util.notify(this.$t('audit.workFlows.cantDisabledEdit'), 'error', 2000 );
+      //   return
+      // } else {
         this.$router.push({name: 'workflowDetail'})
         sessionStorage.setItem('workflowDetail', JSON.stringify(row))
-      }
+      // }
     },
 
     duplicateRow(processDefinitionKey){
