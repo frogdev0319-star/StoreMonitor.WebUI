@@ -114,7 +114,7 @@ export default{
             defaultSort:{order:'descending',prop:'processLastUpdateTs'},
             curOrder:{
                 direction:'desc',
-                property:'processLastUpdateTs'
+                property:'processStartTs'
             },
             tableData: [],
             tableColumns:[
@@ -154,7 +154,7 @@ export default{
               {
                 'prop': 'processLastUpdateTs',
                 'label': this.$t('audit.sendAudit.updateTime'),
-                'sortable': 'custom',
+                'sortable': false,
                 'width': 100,
                 'maxWidth': 100,
                 'isExpand': false
