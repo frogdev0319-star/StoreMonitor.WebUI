@@ -133,9 +133,8 @@ export default {
   methods: {
     goToReportdetails(){
       var reportId = this.auditDetail.inspectReportId
-      console.log('this.$router.currentRoute :>> ', this.$router.currentRoute.fullPath);
-      // console.log("cancancel:",this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7))
-      // console.log("canEdit:",this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7)
+      var canCancel = (this.auditDetail.submitter == this.currentUserInfo) && this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7);
+      console.log("canCancel:",canCancel);
       if(this.$router.currentRoute.fullPath == "/auditDetail") {
         this.$router.push(
           { 
@@ -144,7 +143,7 @@ export default {
               reportId: reportId, 
               isAuditMode: true, 
               canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
-              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
+              canCancel: canCancel,
               auditCancelable:this.auditDetail.cancelable
               }
           }
@@ -157,7 +156,7 @@ export default {
               reportId: reportId, 
               isAuditMode: true, 
               canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
-              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
+              canCancel: canCancel,
               auditCancelable:this.auditDetail.cancelable
               }
           }
@@ -171,7 +170,7 @@ export default {
               reportId: reportId, 
               isAuditMode: true, 
               canEdit: (this.auditDetail.submitter == this.currentUserInfo) && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
-              canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==3 || this.auditDetail.auditState==6 || this.auditDetail.auditState==7),
+              canCancel: canCancel,
               auditCancelable:this.auditDetail.cancelable
               }
           }
