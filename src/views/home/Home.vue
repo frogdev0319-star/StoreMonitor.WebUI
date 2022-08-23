@@ -888,7 +888,7 @@ export default {
       let nowHref = window.location.href;
       if(!nowHref.includes("http://localhost:8088/"))
         window.location.href = url;
-      this.$router.push({ name: 'Login'})
+      else this.$router.push({ name: 'Login'})
 
     },
     changePWD(){

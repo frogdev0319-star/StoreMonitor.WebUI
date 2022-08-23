@@ -114,7 +114,7 @@ export default{
             defaultSort:{order:'descending',prop:'processLastUpdateTs'},
             curOrder:{
                 direction:'desc',
-                property:'processLastUpdateTs'
+                property:'processStartTs'
             },
             tableData: [],
             tableColumns:[
@@ -154,7 +154,7 @@ export default{
               {
                 'prop': 'processLastUpdateTs',
                 'label': this.$t('audit.sendAudit.updateTime'),
-                'sortable': 'custom',
+                'sortable': false,
                 'width': 100,
                 'maxWidth': 100,
                 'isExpand': false
@@ -262,7 +262,7 @@ export default{
                 this.inputSearchValue = searchParams.inputSearchValue;
                 //this.curState = searchParams.curState;
                 this.curStoreIds = searchParams.filterStoreIds;
-                this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
+                //this.curSizeNum = (typeof searchParams.sizeNum=='undefined')?10:searchParams.sizeNum;
                 this.curOrder = (typeof searchParams.order=='undefined')?{direction:'desc',property:'processLastUpdateTs'}:searchParams.order;
                 this.defaultSort = {order:(this.curOrder.direction=='desc')?'descending':'ascending',prop:this.curOrder.property};
                 this.searchParams = searchParams;

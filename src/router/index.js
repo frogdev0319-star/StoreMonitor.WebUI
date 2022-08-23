@@ -340,7 +340,10 @@ export const navbarRoute = {
         path: '/patrolItem_old',
         name: 'patrolItem_old',
         component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
-        hidden: true
+        hidden: true,
+        meta: {
+          keepAlive: false
+        },
       }
     ) && primaryPathesList.push('/patrolItem','/patrolItem_old');
     !PermissionHelper.enableMimicMode && PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
@@ -378,19 +381,7 @@ export const navbarRoute = {
           keepAlive: false
         }
       }
-    ) && primaryPathesList.push('/patrolCompareStat');//InspectItemStatistics_old
-    statisticsRoute.children.push(
-      {
-        path: '/InspectItemStatistics_old',
-        name: 'InspectItemStatistics_old',
-        component: resolve => require(['@/views/statistical/InspectItemStatistics_old'], resolve),
-        hidden: true,
-        meta: {
-          requireAuth: false,
-          keepAlive: false
-        }
-      }
-    ) ;
+    ) && primaryPathesList.push('/patrolCompareStat');
     /*
     PermissionHelper.enableSupervisionEffStatistics() && statisticsRoute.children.push(
       {
