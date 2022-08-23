@@ -3,7 +3,7 @@
 
     <div class="setting-titles padding flex-center">
       {{$t('audit.workFlows.workFlowConfiguration')}}
-      <div class="spacer"/>
+      <div class="spacer"></div>
       <div class="buttons">
         <delay-button type="filled" @click="addNewFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
@@ -96,10 +96,7 @@
                           </el-tooltip>
                         </div>
                       </el-radio-group>
-                    
-                      <!-- <p>{{$t('audit.workFlows.thisModeWithoutEvent')}}</p> -->
                 </div>
-
               </div>
 
               <!-- row -->
@@ -209,7 +206,7 @@
     <dialog-pop
       ref="dailog"
       class="popup_width"
-      title="新增簽核人員"
+      :title= "$t('audit.workFlows.addCC')"
       :close-on-click-modal="false"
       :show-close="false"
       :dialogWidth = "w_width"
@@ -223,11 +220,11 @@
             <div class="filter_section">
                 <!-- 關鍵字 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name">關鍵字</div>
+                  <div class="title-name">{{$t('audit.workFlows.keywords')}}</div>
                   <div class="title-status"> 
                     <el-input
                       v-model="inputSearchUser"
-                      placeholder="搜尋人員名稱、信箱"
+                      :placeholder="$t('audit.workFlows.searchNameMail')"
                       style="width: 200px"
                       clearable
                       />
@@ -235,11 +232,11 @@
                 </div>
                 <!-- 部門 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name"> 部門</div>
+                  <div class="title-name">  {{$t('audit.workFlows.depart')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateDepartment"
-                      placeholder="部門"
+                      :placeholder="$t('audit.workFlows.depart')"
                       style="width: 180px"
                       >
                       <el-option
@@ -253,11 +250,11 @@
                 </div>
                 <!-- 職務 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name"> 職務</div>
+                  <div class="title-name"> {{$t('audit.workFlows.position')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateTitleList"
-                      placeholder="職務"
+                      :placeholder="$t('audit.workFlows.position')"
                       style="width: 180px"
                       >
                       <el-option
@@ -272,7 +269,7 @@
                 <!-- <div class="summit_filter" >篩選</div> -->
             </div>
             <div class="is_select">
-              <div class="title-name"> 已選擇</div>
+              <div class="title-name"> {{$t('audit.workFlows.selected')}}</div>
               <div class="user_selected">
                 <el-tag
                     v-for="tag in tags"
@@ -360,25 +357,25 @@ export default {
       userColumnData: [
         {
           'prop': 'userName',
-          'label': '姓名',
+          'label': this.$t('audit.workFlows.name'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'email',
-          'label': '信箱',
+          'label': this.$t('audit.workFlows.email'),
           'width': 110,
           'maxWidth': 110,
         },
         {
           'prop': 'sector',
-          'label': '部門',
+          'label': this.$t('audit.workFlows.depart'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'title',
-          'label': '職務',
+          'label': this.$t('audit.workFlows.position'),
           'width': 100,
           'maxWidth': 100,
         },
@@ -478,15 +475,10 @@ export default {
               1,
           ]
       },
-      ttt: 0
-      
     };
   },
 
-  watch:{
-  
-
-  },
+  watch:{},
   async created() {
     await this.init()
   },
@@ -550,7 +542,7 @@ export default {
     },
 
     needNote(){
-      util.notify('※ 此模式不會立即產生事件 ', 'warning', 3000);
+      util.notify(this.$t('audit.workFlows.thisModeWithoutEvent'), 'warning', 2000 );
     },
 
     strignBytes(str) {
@@ -560,8 +552,6 @@ export default {
       }
       return str.replace(/[^\x00-\xff]/g,'01').length;
     },
-
-
 
     initBasicData(){
       // 初始基本訊息
@@ -599,18 +589,18 @@ export default {
       var initData = [
           {
           "id": createTime,
-          "name": "送出簽核",
+          "name": this.$t('audit.workFlows.submitAudit'),
           "auditMethod": 0,
           "signature": false,
           "customButton": [
               {
                   "type": 0,
-                  "text": "同意",
+                  "text": this.$t('audit.workFlows.agree'),
                   "enable": true
               },
               {
                   "type": 1,
-                  "text": "駁回",
+                  "text": this.$t('audit.workFlows.reject'),
                   "enable": true
               }
           ],

@@ -7,7 +7,7 @@
           <h3>{{auditDetail.reportName}}</h3>
           <div class="goto-report" 
             @click="goToReportdetails"
-            v-if="showingBtn ">報告詳情</div>
+            v-if="showingBtn "> {{$t('route.reportDetails')}}</div>
         </div>
       
         <div v-loading="isLoadingData" class="setting-details self-loading">
@@ -15,11 +15,11 @@
           <div class="audit-flow-body">
 
             <div class="audit-flow-ownerhandling">
-              <p style="margin-bottom: 30px">簽核流程</p>
+              <p style="margin-bottom: 30px"> {{$t('audit.workFlows.auditFlow')}}</p>
               <div class="handling" v-if="!onEditing && auditDetail.auditState < 4">
                 <div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo" >{{customButton[2].text}}</div>
                 <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo"> | </div>
-                <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo">取消</div>
+                <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo">{{$t('audit.auditStatus.cancel')}}</div>
               </div>
             </div>
             
@@ -34,7 +34,7 @@
     </div> 
     <!-- popup -->
     <dialog-pop
-      title="撤回簽核？"
+      :title=" $t('audit.auditStatus.ifDraback')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -45,12 +45,12 @@
       @confirmHandler="confirmTaskDrawback()"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">確認是否撤回此報告簽核？ </div>
+        <div class="dialog-content"> {{$t('audit.auditStatus.confirmDraback')}} </div>
       </div>
     </dialog-pop>
 
     <dialog-pop
-      title="取消簽核？"
+      title="$t('audit.auditStatus.ifCancel')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -61,7 +61,7 @@
       @confirmHandler="cancelWorkflow()"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">確認是否取消此報告簽核？ </div>
+        <div class="dialog-content">{{$t('audit.auditStatus.confirmCancel')}} </div>
       </div>
     </dialog-pop>
   </div>
@@ -227,15 +227,11 @@ export default {
         console.log('drawbackNum :>> ', drawbackNum);
         console.log('this.taskInfo done1! ----->> ', this.taskInfo);
 
-
-
         // 駁回的 task
         var aaaNum = this.taskInfo.findLastIndex( i =>  i.parentId == -1 && i.state == 1)
         console.log('aaaNum :>> ', aaaNum);
         console.log('totalNum :>> ', totalNum);
         if(aaaNum > -1) this.taskInfo = this.taskInfo.splice(aaaNum, totalNum)
-
-
 
         var rejectNum = this.taskInfo.findLastIndex( i =>  i.state == 1 && i.tasks[0].comment.result == 1)
         console.log('rejectNum :>> ', rejectNum);
