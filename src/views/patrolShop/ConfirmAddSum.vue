@@ -442,6 +442,16 @@
         <div class="dialog-content">{{ $t('remotePatrol.resubmiteRpt')+'?' }} </div>
       </div>
     </dialog-pop>
+    <dialog-pop
+      :title="$t('remotePatrol.systemReject')"
+      :isWarning="true"
+      :visible="showSystemReject"
+      :showCancelbtn="false"
+      @confirmHandler="onshowSystemRejectConfirm">
+      <div class="dialog-slot">
+        <div class="dialog-content">{{ $t('remotePatrol.systemRejectMsg') }} </div>
+      </div>
+    </dialog-pop>
   </el-row>
 </template>
 <script>
@@ -530,7 +540,8 @@ export default {
       reportId:-1,
       reportStatus:-1,
       auditCancelable:false,
-      showConfirmSubmitMsg:false
+      showConfirmSubmitMsg:false,
+      showSystemReject:false
     };
   },
   computed: {
@@ -922,6 +933,10 @@ export default {
               SubmitWorkflow(wfParams).then(wfRes=>{
                 console.log("SubmitWorkflow res:",res);
                 if(wfRes.errCode == 0){
+                  if(wfRes.data.isSystemReject){
+                    self.showSystemReject = true;
+                    return;
+                  }
                   self.$store.dispatch('setEditCount', 0);
                   routeData = {
                       isSuccess: true,
@@ -1054,6 +1069,10 @@ export default {
       ReSubmitWorkflow(wfParams).then(wfRes=>{
           console.log("ReSubmitWorkflow res:",wfRes);
           if(wfRes.errCode == 0){
+            if(wfRes.data.isSystemReject){
+              self.showSystemReject = true;
+              return;
+            }
             self.$store.dispatch('setEditCount', 0);
             var routeData = {
                 isSuccess: true,
@@ -1067,6 +1086,15 @@ export default {
             return false;
           }
         );
+    },
+    onshowSystemRejectConfirm(){
+      this.showSystemReject = false;
+      this.$store.dispatch('setEditCount', 0);
+      var routeData = {
+          isSuccess: true,
+          isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+      };
+      this.$router.push({ name: 'submitEvent', params: { data: routeData}});
     },
     async getRouteData() {
       const self = this;
