@@ -8,7 +8,7 @@
           <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="confirm-btn" type="primary" @click="submit(false)">
             {{ $t('audit.inceptionRpt.saveReport') }}
           </el-button>
-          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit(true)">
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="showConfirmSubmitMsg=true">
             {{ $t('audit.inceptionRpt.submitReport') }}
           </el-button>
         </div>
@@ -432,6 +432,16 @@
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>
+    <dialog-pop
+      :title="$t('remotePatrol.resubmiteRpt')"
+      :isWarning="true"
+      :visible="showConfirmSubmitMsg"
+      @cancelHandler = "showConfirmSubmitMsg=false"
+      @confirmHandler="onConfirmSubmitMsgOk">
+      <div class="dialog-slot">
+        <div class="dialog-content">{{ $t('remotePatrol.resubmiteRpt')+'?' }} </div>
+      </div>
+    </dialog-pop>
   </el-row>
 </template>
 <script>
@@ -445,9 +455,11 @@ import { getUserInfo ,getAllUserInfoNoAuth} from '@/api/login';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
 import PermissionHelper from '@/api/PermissionHelper';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'ConfirmAddSum',
+  components: {DialogPop},
   data() {
     return {
       dialogCommentVideo: false,
@@ -518,6 +530,7 @@ export default {
       reportId:-1,
       reportStatus:-1,
       auditCancelable:false,
+      showConfirmSubmitMsg:false
     };
   },
   computed: {
@@ -671,6 +684,11 @@ export default {
       });
       self.curSumIndex = item.label;
     },
+    onConfirmSubmitMsgOk(){
+      this.showConfirmSubmitMsg = false;
+      this.submit(true);
+    },
+
     async submit(sendEvent) {
       const self = this;
       let upload = 0;

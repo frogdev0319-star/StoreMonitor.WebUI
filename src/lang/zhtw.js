@@ -530,6 +530,7 @@ export default{
     "inspectTotalScore":"報告總分",
     "exportAllDetail":"詳情",
     "createRptDT":"報告產生時間",
+    "resubmiteRpt":"確認送出報告"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",
