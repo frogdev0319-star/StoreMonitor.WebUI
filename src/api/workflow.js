@@ -178,7 +178,7 @@ export const taskDrawback = data => {
 export const ReSubmitWorkflow = data =>{
   return request({
     url: `${version}/workflow/systemReject/resubmit`,
-    method: 'get',
+    method: 'post',
     data
   });
 };

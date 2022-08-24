@@ -84,8 +84,9 @@ export const navbarRoute = {
     }) && primaryPathesList.push('/eventOverview');
     return overviewRoute;
   },
-
+  
   getPatrolRoute() {
+    console.log("PermissionHelper.enableInspectReport()",PermissionHelper.enableInspectReport());
     const patrolRoute = {
       path: '/home',
       name: 'patrolManage',

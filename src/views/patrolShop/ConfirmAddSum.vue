@@ -985,7 +985,7 @@ export default {
           console.log("routeData:",routeData);
           self.$router.push({ name: 'auditReportdetails', params: routeData});
         }else{
-          if(self.auditState==7){ //系統撤回重送
+          //if(self.auditState==7){ **3.0.4.2 不用判斷都使用reSubmit//系統撤回重送
             var subTaskParam = {
               inspectReportId:self.reportId,
               comment:{
@@ -995,7 +995,7 @@ export default {
             }
             console.log("1.subTaskParam:",subTaskParam);
             self.doReSubmitWorkflow(subTaskParam);
-          }else{
+          /*}else{
             let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
             console.log("task:",task);
             let taskId = task.tasks[0].taskId;
@@ -1023,7 +1023,7 @@ export default {
               util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
               return false;
             });
-          }
+          }*/
         }
       }).catch(err=>{
         console.log("err:",err);
