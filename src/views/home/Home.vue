@@ -811,6 +811,11 @@ export default {
         },
 
         {
+          paths: ["/handingReportdetails"],
+          parentBread: { path: "/auditHandling", name: "reportdetailsAuditHandling" },
+        },
+
+        {
           paths: ["/transcriptnotifyAuditDetail"],
           parentBread: { path: "/transcriptnotify", name: "TranscriptNotify" },
         },
