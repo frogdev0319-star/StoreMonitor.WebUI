@@ -217,13 +217,12 @@
             </el-menu>
           </el-scrollbar>
           <div class="spacer"></div>
-          <div class="headUrl-content flex-center">
-            <el-dropdown class="el-user-drop" style="display:flex; flex-direction: row-reverse; align-items: center">
-              <span v-if="!collapsed" class="username">
-                {{ userName }}
-                <i class="el-icon-arrow-down el-icon--right"/>
+          <div class="headUrl-content flex-center" :style="collapsed?{'justify-content':'center'}:{}">
+            <el-dropdown class="el-user-drop" >
+              <span class="el-dropdown-link" style="display:flex; flex-direction: row-reverse; align-items: center">
+                <div v-if="!collapsed"  class="username">{{ userName }}</div>
+                <div class="headImg" :style="collapsed?{'margin-left':'calc(-20/1920*100vw)'}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               </span>
-              <div class="headImg" :style="collapsed?{}:{'margin-right':'calc(16/1920*100vw)'}">{{iconName}}</div>
               <el-dropdown-menu slot="dropdown" class="dropdown">
                 <el-dropdown-item
                   v-if="hasMystery"
