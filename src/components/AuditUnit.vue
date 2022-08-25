@@ -1,10 +1,11 @@
 <template>
     <div>
+		{{auditStates}}
 		<div class="audit-flow-unit" v-for="(taskItem, index) in taskInfo" :key="index" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
 				<div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
 				<div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
-				<div class="check" v-else-if="taskItem.state == 2 || taskItem.state == 4 "><i class="iconfont el-icon-time iconbangzhu"/></div>
-				<div class="check" v-else-if="taskItem.state == 3"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
+				<div class="check" v-else-if="taskItem.state == 2 || taskItem.state == 4 || taskItem.state == 6 "><i class="iconfont el-icon-time iconbangzhu"/></div>
+				<div class="check" v-else-if="taskItem.state == 3 || taskItem.state == 7"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
 				
 				<!-- audit task wrapper -->
 				<div class="audit-task-wrapper" :class="{ on_audit : taskItem.state == 2 }" >
@@ -13,15 +14,21 @@
 						<!-- name -->
 						<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
 							<div class="audit-name">
-								<div class="audit-user-name" v-if="task.assignee !== null && task.auditByUsers.length == 0 ">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
-								<div class="audit-user-name" v-else-if="task.assignee == null && task.auditByUsers.length > 0"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span v-if="task.endTs !== null">({{task.endTs}})</span></div>
-								<div class="audit-user-name" v-else-if="taskItem.state == 3 && taskItem.auditTargetName !== null"> {{taskItem.auditTargetName}} </div>
+								<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == 0">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
+								<div class="audit-user-name" v-else-if="taskItem.parentId == -1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
+								<div class="audit-user-name" v-else-if="taskItem.state == 1 && task.comment.result == 1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
+								<div class="audit-user-name" v-else-if="taskItem.state == 6 && task.comment.result == -2"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>
+
+								<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment == null"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{taskItem.startTs}})</span></div>
+								<div class="audit-user-name" v-else-if="taskItem.state == 3"> {{taskItem.auditTargetName}}</div>
+								<div class="audit-user-name" v-else-if="taskItem.state == 7 && task.assignee == null"> <span>({{task.endTs}})</span> </div>
 							</div>
-							<div class="audit-situation"  v-if="taskItem.state == 1 || taskItem.state == 4">
-								<div class="audit_agree" v-if="task.comment.result == 0 && task.comment.result !== null && taskItem.parentId !== -1"><i class="iconfont el-icon-check"/> 同意</div>
-								<div class="audit_disagree" v-else-if="task.comment.result == 1 && task.comment.result !== null"><i class="iconfont el-icon-close"/> 駁回</div>
-								<div class="audit_disagree" v-else-if="task.comment.result == -2"><i class="iconfont el-icon-info"/> 撤回</div>
-								<div class="audit_disagree" v-else-if="task.comment.result == -1"><i class="iconfont el-icon-info"/> 取消</div>
+							<div class="audit-situation"  v-if="taskItem.parentId !== -1 ">
+								<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == 0"><i class="iconfont el-icon-check"/> 同意</div>
+								<div class="audit_disagree" v-else-if="taskItem.state == 1 && task.comment.result == 1"><i class="iconfont el-icon-close"/> 駁回</div>
+								<div class="audit_disagree" v-else-if="taskItem.state == 6 && task.comment.result == -2"><i class="iconfont el-icon-info"/> 撤回</div>
+								<!-- <div class="audit_disagree" v-else-if="task.comment.result == -1"><i class="iconfont el-icon-info"/> 取消</div> -->
+								<div class="audit_disagree" v-else-if="taskItem.state == 7 && task.comment.result == -3"><i class="iconfont el-icon-info"/> 系統撤回</div>
 							</div>
 						</div>
 						<!-- description -->
@@ -36,7 +43,7 @@
 									<el-image
 										:src="blopImg.url"
 										v-if="blopImg.mediaType == 2"
-										:preview-src-list = "getImgSrc(index)"
+										:preview-src-list = "getImgSrc(index, blopImg)"
 										/>
 									<a class="pdfLink" :href="blopImg.url" v-if="blopImg.mediaType == 4"></a>
 								</div>
@@ -57,6 +64,10 @@ export default {
 			type: Array,
 			required: true
 		},
+		auditStates:{
+			type: Number,
+			default: 0
+		}
 	},
 	data() {
 		return {
@@ -64,23 +75,33 @@ export default {
 			urlList: []
 		};
 	},
-	mounted() {
-	},
+	mounted() {},
 	methods: {
-		getImgSrc(index){
-			console.log('index', index)
+		getImgSrc(index, blopImg){
 			var arr = []
-			if(this.taskInfo[index].tasks.length > 1){
-				this.taskInfo[index].tasks.forEach( t => {
-					var rulResult = t.comment.attachment.map( i => i = i.url )
-					arr.push(rulResult[0])
-				});
-			} else if(this.taskInfo[index].tasks.length = 1){
-				this.taskInfo[index].tasks.forEach( t => {
-					var rulResult = t.comment.attachment.map( i => i = i.url )
-					arr = rulResult
-				});
-			}
+			arr.push(blopImg.url)
+		
+			// if(this.taskInfo[index].tasks.length > 1){
+			// 	this.taskInfo[index].tasks.forEach( t => {
+			// 		var rulResult = t.comment.attachment.map( i => i = i.url )
+			// 		arr.push(rulResult[0])
+			// 	});
+			// }
+			// else 
+			
+			// if(this.taskInfo[index].tasks.length === 1){
+				
+			// 	var rulResult = this.taskInfo[1].tasks[0].comment.attachment.map( i => i = i.url )
+			// 	arr = rulResult
+
+			// 	// this.taskInfo[index].tasks.forEach( t => {
+			// 	// 	if(this.taskInfo[index].parentId !== -1 && t.comment !== null){
+			// 	// 		var rulResult = t.comment.attachment.map( i => i = i.url )
+			// 	// 		arr = rulResult
+			// 	// 	}
+			// 	// });
+			// } 
+			// console.log('arr :>> ', arr);
 			return this.urlList = arr
 		},
 	}
@@ -142,7 +163,7 @@ export default {
 
 			.audit-flow-content
 				// padding-top: 0px !important
-				margin-bottom: 10px
+				margin-bottom: 30px
 				.audit-name
 					.audit-user-name
 						font-size: 12px
@@ -160,6 +181,7 @@ export default {
 						flex-direction: row
 						justify-content: center
 						align-items: center
+						margin-top: -10px
 					.audit_disagree
 						width: 120px
 						height: 27px
@@ -171,6 +193,7 @@ export default {
 						flex-direction: row
 						justify-content: center
 						align-items: center
+						margin-top: -10px
 				.audit-description
 					background: #f7f9fa
 					padding: 20px

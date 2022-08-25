@@ -297,7 +297,7 @@ export default {
     async getTaskInfo(param){
       this.isLoadingData = true
       await GetTaskInfo(param).then(res=>{
-        res.data.forEach(t =>{
+        res.data.taskList.forEach(t =>{
           t.startTs = new Date(t.startTs).toLocaleString()
           t.endTs = new Date(t.endTs).toLocaleString()
           t.tasks.forEach(tt =>{
@@ -305,7 +305,8 @@ export default {
             if(tt.endTs !== null) tt.endTs = new Date(tt.endTs).toLocaleString()
           })
         })
-        this.taskInfo = res.data
+        this.auditStates = res.data.auditStates
+        this.taskInfo = res.data.taskList
         
         // 刪除撤回前的 task
         var drawbackNum = this.taskInfo.findLastIndex(i => {
@@ -490,7 +491,7 @@ export default {
     
 
     async taskSummit(){
-
+      this.isLoadingData = true
       if(this.agree == null){
         util.notify('請選擇簽核意見', 'error', 2000);
         this.isLoadingData = false
@@ -500,8 +501,6 @@ export default {
 
       const self = this;
       const currentNode = this.taskInfo.filter( i => i.state == 2)
-
-      
 
       //// 判定 userIds 跟 taskId 關聯的 task
       var getCurrentTask = currentNode[0].tasks.filter(t => t.userIds == this.currentUserInfo)
@@ -551,9 +550,6 @@ export default {
           });
         }
       }
-
-
-      
 
       // 比對是否需要簽名檔上傳，前端處理
       // console.log('isSignature :>> ', isSignature);

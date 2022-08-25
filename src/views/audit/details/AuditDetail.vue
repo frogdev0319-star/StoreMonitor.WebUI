@@ -26,6 +26,7 @@
             <!-- task -->
             <AuditUnit 
               :taskInfo = "taskInfo"
+              :auditStates = auditStates
               />
 
           </div>
@@ -74,7 +75,6 @@ import {
     getNodeList
   } from '@/api/workflow';
 
-import DelayButton from '@/components/DelayButton';
 import AuditUnit from '@/components/AuditUnit';
 import DialogPop from '@/components/DialogPop';
 
@@ -93,6 +93,7 @@ export default {
 
       auditDetail:'',
       taskInfo: [],
+      auditStates: 0,
       currentUserInfo: '',
       showingBtn: true,
 
@@ -197,13 +198,13 @@ export default {
     getWorkflowInfo(){
       const data = sessionStorage.getItem('auditDetail')
       this.auditDetail = JSON.parse(data)
-      console.log('this.auditDetail 1 ----->> ', this.auditDetail);
+      // console.log('this.auditDetail 1 ----->> ', this.auditDetail);
     },
 
     async getTaskInfo(param){
       this.isLoadingData = true
       await GetTaskInfo(param).then(res=>{
-        res.data.forEach(t =>{
+        res.data.taskList.forEach(t =>{
           t.startTs = new Date(t.startTs).toLocaleString()
           t.endTs = new Date(t.endTs).toLocaleString()
           t.tasks.forEach(tt =>{
@@ -211,32 +212,33 @@ export default {
             if(tt.endTs !== null) tt.endTs = new Date(tt.endTs).toLocaleString()
           })
         })
-
-        this.taskInfo = res.data
+        this.auditStates = res.data.auditStates
+        this.taskInfo = res.data.taskList
+        console.log('this.auditStates ----->> ', this.auditStates);
         console.log('this.taskInfo ori ----->> ', this.taskInfo);
 
-        var totalNum = this.taskInfo.length
-        // 撤回前的 task 
-        var drawbackNum = this.taskInfo.findLastIndex(i => {
-          if(i.tasks[0].comment !== null){
-            return i.tasks[0].comment.result == -2
-          }
-        })
-        if(drawbackNum > -1) this.taskInfo = this.taskInfo.slice(drawbackNum - totalNum + 1 )
-        console.log('drawbackNum :>> ', drawbackNum);
-        console.log('this.taskInfo done1! ----->> ', this.taskInfo);
+        // var totalNum = this.taskInfo.length
+        // // 撤回前的 task 
+        // var drawbackNum = this.taskInfo.findLastIndex(i => {
+        //   if(i.tasks[0].comment !== null){
+        //     return i.tasks[0].comment.result == -2
+        //   }
+        // })
+        // if(drawbackNum > -1) this.taskInfo = this.taskInfo.slice(drawbackNum - totalNum + 1 )
+        // console.log('drawbackNum :>> ', drawbackNum);
+        // console.log('this.taskInfo done1! ----->> ', this.taskInfo);
 
-        // 駁回的 task
-        var aaaNum = this.taskInfo.findLastIndex( i =>  i.parentId == -1 && i.state == 1)
-        console.log('aaaNum :>> ', aaaNum);
-        console.log('totalNum :>> ', totalNum);
-        if(aaaNum > -1) this.taskInfo = this.taskInfo.splice(aaaNum, totalNum)
+        // // 駁回的 task
+        // var aaaNum = this.taskInfo.findLastIndex( i =>  i.parentId == -1 && i.state == 1)
+        // console.log('aaaNum :>> ', aaaNum);
+        // console.log('totalNum :>> ', totalNum);
+        // if(aaaNum > -1) this.taskInfo = this.taskInfo.splice(aaaNum, totalNum)
 
-        var rejectNum = this.taskInfo.findLastIndex( i =>  i.state == 1 && i.tasks[0].comment.result == 1)
-        console.log('rejectNum :>> ', rejectNum);
+        // var rejectNum = this.taskInfo.findLastIndex( i =>  i.state == 1 && i.tasks[0].comment.result == 1)
+        // console.log('rejectNum :>> ', rejectNum);
 
-        if(rejectNum > -1) this.taskInfo = this.taskInfo.splice(0, rejectNum + 1 )
-        console.log('this.taskInfo done2! ----->> ', this.taskInfo);
+        // if(rejectNum > -1) this.taskInfo = this.taskInfo.splice(0, rejectNum + 1 )
+        // console.log('this.taskInfo done2! ----->> ', this.taskInfo);
 
 
         this.isLoadingData = false
