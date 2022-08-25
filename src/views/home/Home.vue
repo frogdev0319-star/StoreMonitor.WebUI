@@ -424,8 +424,8 @@ export default {
 
     activePath() {
       let path = this.$route.path;
-      // console.log("activePath:",path);
-      // console.log("active rout name:",this.$route.name);
+      console.log("activePath:",path);
+      console.log("active rout name:",this.$route.name);
       const pathMapArr = [
         {
           curPath: ["/reinspect/confirmrein", "/reinspect/submit"],
@@ -444,34 +444,36 @@ export default {
         //   { curPath: ["/skywatchDeviceSetting"], activePath: "/skywatchAccount" },
         { curPath: ["/titleSetting"], activePath: "/title" },
 
-        { curPath: ["/workflows/createWorkflow"], activePath: "/workflows" },
-        { curPath: ["/workflows/workflowDetail"], activePath: "/workflows" },
+        { curPath: ["/createWorkflow"], activePath: "/workflows" },
+        { curPath: ["/workflowDetail"], activePath: "/workflows" },
 
-        { curPath: ["/createWorkflow/createWorkflownode"], activePath: "/createWorkflow" },
-        { curPath: ["/createWorkflow/createEditWorkflownode"], activePath: "/createWorkflow" },
+        { curPath: ["/createWorkflownode"], activePath: "/createWorkflow" },
+        { curPath: ["/createEditWorkflownode"], activePath: "/createWorkflow" },
 
-        { curPath: ["/workflowDetail/workflownode"], activePath: "/workflowDetail" },
+        { curPath: ["/workflownode"], activePath: "/workflowDetail" },
 
 
-        { curPath: ["/audit/auditDetail"], activePath: "/audit" },
-        { curPath: ["/audit/auditDetail/auditReportdetails"], activePath: "/auditDetail" },
+        { curPath: ["/auditDetail"], activePath: "/audit" },
+        { curPath: ["/auditReportdetails"], activePath: "/auditDetail" },
 
-        { curPath: ["/waitaudit/waitAuditDetail"], activePath: "/waitaudit" },
-        { curPath: ["/audit/waitAuditDetail/waitAuditReportdetails"], activePath: "/waitAuditDetail" },
-        { curPath: ["/audit/waitAuditDetail/handlingReportdetails"], activePath: "/handlingReportdetails" },
+        { curPath: ["/waitAuditDetail"], activePath: "/waitaudit" },
+        { curPath: ["/waitAuditReportdetails"], activePath: "/waitAuditDetail" },
+        { curPath: ["/handlingReportdetails"], activePath: "/handlingReportdetails" },
 
         
-        { curPath: ["/transcriptnotify/transcriptnotifyAuditDetail"], activePath: "/transcriptnotify" },
-        { curPath: ["/transcriptnotify/transcriptnotifyAuditDetail/transcriptnotifyReportdetails"], activePath: "/transcriptnotifyAuditDetail" },
+        { curPath: ["/transcriptnotifyAuditDetail"], activePath: "/transcriptnotify" },
+        { curPath: ["/transcriptnotifyReportdetails"], activePath: "/transcriptnotifyAuditDetail" },
         
 
         { curPath: ["/auditHandling"], activePath: "/waitaudit" },
-        { curPath: ["/audit/auditHandling/reportdetails"], activePath: "/auditHandling" },
+        { curPath: ["/reportdetails"], activePath: "/auditHandling" },
         //神秘客
         { curPath: ["/mysterioSetting"], activePath: "/mysterio" },
 
       ];
       const pathMAP = pathMapArr.find((item) => item.curPath.includes(path));
+      console.log('pathMAP :>> ', pathMAP);
+
       if (pathMAP) {
         path = pathMAP.activePath;
         this.setBrandListDisabled(true);
@@ -788,8 +790,6 @@ export default {
           parentBread: { path: "/workflowDetail", name: "workflowDetail" },
         },
 
-
-
         {
           paths: ["/auditDetail"],
           parentBread: { path: "/audit", name: "SendAuditManage" },
@@ -823,26 +823,7 @@ export default {
           paths: ["/transcriptnotifyReportdetails"],
           parentBread: { path: "/transcriptnotifyAuditDetail", name: "reportdetailsAuditTranscriptnotify" },
         },
-
-
-
-
-        // {
-        //   paths: ["/waitaudit/auditDetail"],
-        //   parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
-        // },
-
-
         
-        // {
-        //   paths: ["/transcriptnotify/auditDetail"],
-        //   parentBread: { path: "/transcriptnotify", name: "TranscriptNotify" },
-        // },
-        
-
-
-
-
         {
           paths: ["/auditHandling"],
           parentBread: { path: "/waitaudit", name: "WaitAuditManage" },

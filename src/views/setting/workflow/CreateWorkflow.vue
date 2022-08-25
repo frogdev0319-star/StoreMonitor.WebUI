@@ -3,7 +3,7 @@
 
     <div class="setting-titles padding flex-center">
       {{$t('audit.workFlows.workFlowConfiguration')}}
-      <div class="spacer"/>
+      <div class="spacer"></div>
       <div class="buttons">
         <delay-button type="filled" @click="addNewFlow">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
@@ -25,7 +25,7 @@
                       :placeholder="workflowDetail.name"
                       v-model="workflowDetail.name"
                       style="width: 250px"
-                      maxlength="50"
+                      maxlength="10"
                       show-word-limit
                       />
                   </div>
@@ -45,7 +45,6 @@
                         :key="index"
                         :label="item"
                         :value="item"
-                        
                       />
                     </el-select>
                   </div>
@@ -97,10 +96,7 @@
                           </el-tooltip>
                         </div>
                       </el-radio-group>
-                    
-                      <!-- <p>{{$t('audit.workFlows.thisModeWithoutEvent')}}</p> -->
                 </div>
-
               </div>
 
               <!-- row -->
@@ -210,7 +206,7 @@
     <dialog-pop
       ref="dailog"
       class="popup_width"
-      title="新增簽核人員"
+      :title= "$t('audit.workFlows.addCC')"
       :close-on-click-modal="false"
       :show-close="false"
       :dialogWidth = "w_width"
@@ -224,11 +220,11 @@
             <div class="filter_section">
                 <!-- 關鍵字 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name">關鍵字</div>
+                  <div class="title-name">{{$t('audit.workFlows.keywords')}}</div>
                   <div class="title-status"> 
                     <el-input
                       v-model="inputSearchUser"
-                      placeholder="搜尋人員名稱、信箱"
+                      :placeholder="$t('audit.workFlows.searchNameMail')"
                       style="width: 200px"
                       clearable
                       />
@@ -236,11 +232,11 @@
                 </div>
                 <!-- 部門 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name"> 部門</div>
+                  <div class="title-name">  {{$t('audit.workFlows.depart')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateDepartment"
-                      placeholder="部門"
+                      :placeholder="$t('audit.workFlows.depart')"
                       style="width: 180px"
                       >
                       <el-option
@@ -254,11 +250,11 @@
                 </div>
                 <!-- 職務 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name"> 職務</div>
+                  <div class="title-name"> {{$t('audit.workFlows.position')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateTitleList"
-                      placeholder="職務"
+                      :placeholder="$t('audit.workFlows.position')"
                       style="width: 180px"
                       >
                       <el-option
@@ -273,7 +269,7 @@
                 <!-- <div class="summit_filter" >篩選</div> -->
             </div>
             <div class="is_select">
-              <div class="title-name"> 已選擇</div>
+              <div class="title-name"> {{$t('audit.workFlows.selected')}}</div>
               <div class="user_selected">
                 <el-tag
                     v-for="tag in tags"
@@ -337,7 +333,7 @@ export default {
     return {
       ccToUSer: [],
     
-      showSingleDeleteContent:false,
+      showSingleDeleteContent: false,
       dataFromRoute: {},
       workflowDetail: {},
       templateList: ['巡檢表單'],
@@ -361,25 +357,25 @@ export default {
       userColumnData: [
         {
           'prop': 'userName',
-          'label': '姓名',
+          'label': this.$t('audit.workFlows.name'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'email',
-          'label': '信箱',
+          'label': this.$t('audit.workFlows.email'),
           'width': 110,
           'maxWidth': 110,
         },
         {
           'prop': 'sector',
-          'label': '部門',
+          'label': this.$t('audit.workFlows.depart'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'title',
-          'label': '職務',
+          'label': this.$t('audit.workFlows.position'),
           'width': 100,
           'maxWidth': 100,
         },
@@ -491,6 +487,7 @@ export default {
   },
 
   computed: {
+  
     searchUserData: {
       get(){
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
@@ -510,9 +507,7 @@ export default {
       await this.getDepartmentList() 
       await this.initBasicData()
 
-      
       await this.getWorkflowList(this.apiBody)
-      
       
       const result = await this.$store.dispatch("GetUserAuthorities");
       this.currentUser = result.data.userId
@@ -547,7 +542,15 @@ export default {
     },
 
     needNote(){
-      util.notify('※ 此模式不會立即產生事件 ', 'warning', 3000);
+      util.notify(this.$t('audit.workFlows.thisModeWithoutEvent'), 'warning', 2000 );
+    },
+
+    strignBytes(str) {
+      if (str == null) return 0;
+      if (typeof str != 'string'){
+        str = '';
+      }
+      return str.replace(/[^\x00-\xff]/g,'01').length;
     },
 
     initBasicData(){
@@ -561,12 +564,16 @@ export default {
       }
       var data = sessionStorage.getItem('workflowDetail')
       var workflowDetail = JSON.parse(data)
+
+      
       
       if(workflowDetail == null){
         this.workflowDetail = initBasicData
       } else {
         this.workflowDetail = workflowDetail
       }
+
+      console.log(' this.workflowDetail !!!!!!!tt>> ',  this.workflowDetail);
     },
     initFirstNode(){
       var time = new Date()
@@ -582,18 +589,18 @@ export default {
       var initData = [
           {
           "id": createTime,
-          "name": "送出簽核",
+          "name": this.$t('audit.workFlows.submitAudit'),
           "auditMethod": 0,
           "signature": false,
           "customButton": [
               {
                   "type": 0,
-                  "text": "同意",
+                  "text": this.$t('audit.workFlows.agree'),
                   "enable": true
               },
               {
                   "type": 1,
-                  "text": "駁回",
+                  "text": this.$t('audit.workFlows.reject'),
                   "enable": true
               }
           ],
@@ -608,19 +615,17 @@ export default {
       console.log('this.currentUser 2', this.currentUser)
       initData[0].auditByUsers.push(this.currentUser)
       this.newFlatNodeDataView = initData
-      console.log('this.newFlatNodeDataView 1 :>> ', this.newFlatNodeDataView);
     },
 
     getNodeData(){
-      console.log('newNode' , newNode)
 
       const data = sessionStorage.getItem('newWorkFlow')
       const newNode = JSON.parse(data)
-      console.log('newNode :>> ', newNode);
+      // console.log('newNode :>> ', newNode);
 
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
-      console.log('orinode 1 >> ', orinode);
+      // console.log('orinode 1 >> ', orinode);
 
       if( newNode !== null ){
         orinode.push(newNode.orderedAuditNodeArray[0])
@@ -645,8 +650,6 @@ export default {
       const reNewNode = sessionStorage.getItem('reNewNode')
       const orinode = JSON.parse(reNewNode)
 
-      console.log("newNode", newNode)
-
       if( newNode !== null){
         var num = orinode.findIndex(n => newNode.orderedAuditNodeArray[0].id == n.id)
         console.log('num :>> ', num);
@@ -659,7 +662,6 @@ export default {
       }
       
       sessionStorage.removeItem('newWorkFlow')
-      console.log('this away ok')
     },
 
 
@@ -773,7 +775,6 @@ export default {
         "auditByUsers": [],
         "auditByGroups": []
       }
-
 
       handleFlatNodeDataView.forEach(i=>{
         if(i.auditByUsers.length !== 0){
@@ -1102,18 +1103,24 @@ export default {
       var toApiData = {...this.workflowDetail, ...result}
       toApiData.copyToUsers = this.ccToUSer
 
-      creadNewFlow(toApiData).then(res=>{
-        this.$router.push({name: 'workflowManage'})
-        console.log('res', res)
-      }).catch(err => {
-        console.log('error' + err);
+      console.log('toApiData :>> ', toApiData);
+
+      if(toApiData.nextAuditNode.nextAuditNode == null) {
         this.newFlatNodeDataView.pop()
         this.handleData()
-        util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
-        
-
-      });
-
+        util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
+        return
+      } else {
+        creadNewFlow(toApiData).then(res=>{
+          this.$router.push({name: 'workflowManage'})
+          console.log('res', res)
+          }).catch(err => {
+            console.log('error' + err);
+            this.newFlatNodeDataView.pop()
+            this.handleData()
+            util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
+          });
+      }
     }
   }
 

@@ -11,7 +11,6 @@
             :placeholder="$t('audit.workFlows.searchPlaceholder')"
             clearable/>
         </div>
-
         <!-- 新增流程 -->
         <delay-button @click="creadNewFlow">
           <div class="button-area">
@@ -19,10 +18,8 @@
             <span>{{$t('audit.workFlows.addWorkFlow')}}</span>
           </div>
         </delay-button>
-
       </div>
-      <div class="tablelist">
-        
+      <div class="tablelist_workflows">
         <table-only
           ref="elTP"
           class="table-white"
@@ -131,6 +128,7 @@ export default {
       },
       userInfo: [],
       allTableData:[],
+      allWorkflowList:[],
       tableData: [],
       
       columnData: [
@@ -142,52 +140,52 @@ export default {
         // },
         {
           'prop': 'name',
-          'label': '流程名稱',
+          'label': this.$t('audit.workFlows.workFlowsName'),
           'width': 200,
           'maxWidth': 200,
         },
         {
           'prop': 'type',
-          'label': '流程分類',
+          'label': this.$t('audit.workFlows.workFlowClassification'),
           'width': 50,
           'maxWidth': 50,
         },
         {
           'prop': 'createdUser',
-          'label': '建立人',
+          'label': this.$t('audit.workFlows.workFlowsCreatedUser'),
           'width': 110,
           'maxWidth': 110,
         },
         {
           'prop': 'description',
-          'label': '流程描述',
+          'label': this.$t('audit.workFlows.workFlowsDescription'),
           'width': 230,
           'maxWidth': 230,
           'forDescription': true
         },
         {
           'prop': 'createdTs',
-          'label': '建立時間',
+          'label': this.$t('audit.workFlows.workFlowsCreatedTs'),
           'width': 130,
           'maxWidth': 130,
           'sortable': true
         },
         {
           'prop': 'updateTs',
-          'label': '最後更新時間',
+          'label': this.$t('audit.workFlows.workFlowsUpdateTs'),
           'width': 100,
           'maxWidth': 100,
           'sortable': true
         },
         {
           'prop': 'updatedUser',
-          'label': '最後更新人',
+          'label': this.$t('audit.workFlows.workFlowsUpdateUser'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'state',
-          'label': '狀態',
+          'label': this.$t('audit.workFlows.workFlowsStauts'),
           'width': 100,
           'maxWidth': 100,
           'forWorkflowsSwitch': true,
@@ -195,12 +193,12 @@ export default {
       ],
       total: 5,
       currentPage: 1,
-      sizeNum: 10,
+      sizeNum: 50,
       apiBody: {
           "page": 0,
           "size": 10,
           "direction": "DESC",
-          // "property": "updateTs",
+          "property": "updateTs",
           // "name": "test",
           // "type": 0,
           "state": [
@@ -208,54 +206,7 @@ export default {
               1,
           ]
       },
-      // newFlow:{
-      //   "name": "" ,
-      //   "description": "",
-      //   "type": 0,
-      //   "cancelable": true,
-      //   "copyToUsers": [],
-      //   "copyToGroups": [],
-      //   "nextAuditNode": {
-      //     "name": "default flow",
-      //     "auditMethod": 1,
-      //     "signature": false,
-      //     "auditTargetType": 0, // 0 - 個人, 1 - 群組
-      //     "customButton": [
-      //         {
-      //             "type": 0,
-      //             "text": this.$t('audit.workFlows.agree'),
-      //             "enable": true
-      //         },
-      //         {
-      //             "type": 1,
-      //             "text": this.$t('audit.workFlows.reject'),
-      //             "enable": true
-      //         }
-      //     ],
-      //     "auditByUsers": [],
-      //     "auditByGroups": [],
-      //     "nextAuditNode": {
-      //       "name": "default flow 1",
-      //       "auditMethod": 1,
-      //       "signature": false,
-      //       "customButton": [
-      //           {
-      //               "type": 0,
-      //               "text": this.$t('audit.workFlows.agree'),
-      //               "enable": true
-      //           },
-      //           {
-      //               "type": 1,
-      //               "text": this.$t('audit.workFlows.reject'),
-      //               "enable": true
-      //           }
-      //       ],
-      //       "auditByUsers": [],
-      //       "auditByGroups": [],
-      //     }
-      //   },
-      
-      // }
+
     }
   },
   mounted() {
@@ -274,25 +225,32 @@ export default {
 
     // for search
     inputSearchValue(val){
-      this.searchData = this.allTableData.filter(item => (
-        item.name.indexOf(val) > -1
-      ))
+      if(val){
+        this.searchData =this.allWorkflowList.filter(item => (
+          item.name.indexOf(val) > -1
+        ))
+      } else {
+        this.searchData = this.allTableData
+      }
     }
   },
   methods: {
     async init(){      
       await this.getUserInfo()
+
       const data = sessionStorage.getItem('pageInfo')
       const pageInfo = JSON.parse(data)
       if(pageInfo == undefined){
         await this.getWorkflowList(this.apiBody);
       }else{
-        const newApiBody = {...this.apiBody, size: 10, page: pageInfo.page - 1}
+        const newApiBody = {...this.apiBody, page: pageInfo.page - 1}
         this.currentPage = pageInfo.page
         // console.log('newApiBody :>> ', newApiBody);
         await this.getWorkflowList(newApiBody);
       }
       sessionStorage.removeItem('pageAction')
+
+      await this.getAllWorkflowList()
     },
 
     pad2(n){
@@ -308,9 +266,7 @@ export default {
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
       return year + "/"+ month +"/"+ day +"/"+ hour +":"+ min +":"+ sec
-
     },
-
 
     async getUserInfo(){
       await getAllUserInfoNoAuth().then(res=>{
@@ -321,7 +277,6 @@ export default {
         });
     },
 
-    
     async getWorkflowList(param){
       this.isLoadingData = true
       await getWorkflowList(param).then(res=>{
@@ -329,19 +284,19 @@ export default {
           this.userInfo.forEach(user => {
             if(d.createdUser === user.userId){
               d.createdUser = user.userName
-              d.updatedUser = user.userName
-              
-
               d.createdTs = this.getdate(d.createdTs)
               d.updateTs = this.getdate(d.updateTs)
-
-              d.type = "巡檢表單"
+              d.type =  this.$t('audit.workFlows.inspectionForm')
               d.index = res.data.content.indexOf(d) + 1
               d.state = d.state.toString()
+            }
+            if(d.updatedUser === user.userId){
+              d.updatedUser = user.userName
             }
           })
         ))
 
+        console.log('res.data 2 ======>> ', res.data);
         this.allTableData = res.data.content
         this.searchData = this.allTableData
 
@@ -356,25 +311,52 @@ export default {
         console.log('error' + err);
       });
     },
+
+    async getAllWorkflowList(){
+      const allList = {
+        "page": 0,
+        "size": 10000,
+        "direction": "DESC",
+        "property": "createdTs",
+        "state": [
+            0,
+            1
+        ]
+      }
+      await getWorkflowList(allList).then(res=>{
+        res.data.content.map(d => (
+          this.userInfo.forEach(user => {
+            if(d.createdUser === user.userId){
+              d.createdUser = user.userName
+              d.createdTs = this.getdate(d.createdTs)
+              d.updateTs = this.getdate(d.updateTs)
+              d.type = this.$t('audit.workFlows.inspectionForm')
+              d.index = res.data.content.indexOf(d) + 1
+              d.state = d.state.toString()
+            }
+            if(d.updatedUser === user.userId){
+              d.updatedUser = user.userName
+            }
+          })
+        ))
+        this.allWorkflowList = res.data.content
+        console.log('this.allWorkflowList :>> ', this.allWorkflowList);
+        this.isLoadingData = false
+      }).catch(err => {
+        this.isLoadingData = false;
+        console.log('error' + err);
+      });
+    },
+
     creadNewFlow(){
       sessionStorage.removeItem('workflowDetail')
       sessionStorage.removeItem('newWorkFlow')
-
       // CreateWorkflow 新增節點需要狀態
       var createNewNodeNeed = {"orderedAuditNodeArray":[]}
       sessionStorage.setItem('nodeDataToApi', JSON.stringify(createNewNodeNeed))
 
       sessionStorage.setItem('pageAction', JSON.stringify("init"))
       this.$router.push({name: 'createWorkflow'})
-
-      // creadNewFlow(this.newFlow).then(res=>{
-      //     this.newFlow.processDefinitionKey = res.data
-      //     sessionStorage.setItem('workflowDetail', JSON.stringify(this.newFlow)) 
-      //     this.$router.push({name: 'workflowDetail'})
-      //   }).catch(err => {
-      //     console.log('error' + err);
-      // });
-    
     },
     
     handleEmitOperation({ method, row }) {
@@ -396,7 +378,7 @@ export default {
             console.log('row !!! :>> ', row);
             this.$message({
               type: 'error',
-              message: `已綁定巡檢表「 ${row.inspectTagName} 」${this.$t('audit.workFlows.canNotDelete')}`
+              message: `${this.$t('audit.workFlows.isBind')} ${row.inspectTagName} ${this.$t('audit.workFlows.canNotDelete')}`
               // message: 
             }); 
           }
@@ -409,13 +391,13 @@ export default {
     },
 
     settingWorkFlow(row){
-      if(row.state == 0){
-        util.notify(this.$t('audit.workFlows.cantDisabledEdit'), 'error', 2000 );
-        return
-      } else {
+      // if(row.state == 0){
+      //   util.notify(this.$t('audit.workFlows.cantDisabledEdit'), 'error', 2000 );
+      //   return
+      // } else {
         this.$router.push({name: 'workflowDetail'})
         sessionStorage.setItem('workflowDetail', JSON.stringify(row))
-      }
+      // }
     },
 
     duplicateRow(processDefinitionKey){
@@ -468,28 +450,6 @@ export default {
       console.log('Let me delete value', value);
       this.deleteRow(value)
     },
-    // open lightbox
-    // open(processDefinitionKey) {
-    //   this.$confirm('此操作将永久删除该文件, 是否继续?', {
-    //     confirmButtonText: '确定',
-    //     cancelButtonText: '取消',
-    //     type: 'warning'
-    //   }).then(() => {
-    //     this.deleteRow(processDefinitionKey)
-    //     this.$message({
-    //       type: 'success',
-    //       message: '删除成功!'
-    //     });
-    //   }).catch(() => {
-    //     // this.$message({
-    //     //   type: 'info',
-    //     //   message: '已取消删除'
-    //     // });          
-    //   });
-    // },
-
-
-
 
     handlePagination(pageInfo){
       sessionStorage.setItem('pageInfo', JSON.stringify(pageInfo))
@@ -558,7 +518,6 @@ export default {
           util.notify(this.$t('route.networkError'), 'error', 1000 );
         })
       }
-    
     },
     
   },
@@ -566,7 +525,7 @@ export default {
 </script>
 
 <style lang="sass" >
-  .tablelist
+  .tablelist_workflows
     .el-table__header
       width: auto !important
 

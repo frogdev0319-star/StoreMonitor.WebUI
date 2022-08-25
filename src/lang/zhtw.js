@@ -1289,7 +1289,21 @@ export default{
       "approved":"簽核通過",
       "cancel":"取消",
       "rollback":"撤回",
-      "systemRollback":"系統撤回"
+      "systemRollback":"系統撤回",
+      "ifDraback":"撤回簽核？ ",
+      "ifCancel":"取消簽核？ ",
+      "confirmDraback":"確認是否撤回此報告簽核？ ",
+      "confirmCancel":"確認是否取消此報告簽核？",
+      "auditComment":"填寫簽核意見",
+      "comment":"填寫簽核意見",
+      "taskSummit":"送出",
+      "sign":"簽名",
+      "addSign":"加入簽名",
+      "addAttachment":"加入附件",
+      "pleaseSign":"請簽名",
+      "needSign":"此簽核需要附加簽名檔案",
+      
+
     },
     "sendAudit":{
       "all":"全部",
@@ -1310,16 +1324,17 @@ export default{
       "workFlowsName":"流程名稱",
       "workFlowsType":"流程名稱",
       "workFlowsCreatedUser":"建立人",
+      "workFlowsUpdateUser":"最後更新人",
       "workFlowsDescription":"流程描述",
       "workFlowsCreatedTs":"建立時間",
-      "workFlowsUpdateTs":"建立時間",
-      "workFlowsState":"建立時間",
+      "workFlowsUpdateTs":"最後更新時間",
+      "workFlowsStauts":"狀態",
       "searchPlaceholder":"搜尋流程名稱",
       "addWorkFlow":"新增流程",
       "saveAndEnable":"儲存並啟用",
       "comfirmDelete":"確認刪除當前簽核流程？",
       "comfirmDeleteNode":"確認刪除當前簽核流程節點？",
-      "canNotDelete":"此簽核流程無法刪除",
+      "canNotDelete":"」此簽核流程無法刪除",
       'isBind':"已綁定巡檢表「",
       'cantClose': "」無法禁用",
       "dulplicateScuccess":"已成功複製流程",
@@ -1352,6 +1367,15 @@ export default{
       "addCC":"新增副本通知人員",
       "findUser":"查詢人員",
       "save":"儲存",
+      "keywords":"關鍵字",
+      "depart":"部門",
+      "position":"職務",
+      "searchNameMail":"搜尋人員名稱、信箱",
+      "selected":"已選擇",
+      "name":"姓名",
+      "email":"信箱",
+      "addAuditUser":"新增簽核人員",
+
       "inputNodeName": "請輸入節點名稱",
       "auditDepart": "簽核部門",
       "auditUser": "簽核人員",
@@ -1381,6 +1405,9 @@ export default{
       "cantRepeatNodeName": "節點名稱不可重複",
       "cantEmptyBtnName": "自定義簽核按鈕名稱不可為空",
       "cantDisabledEdit": "禁用流程無法編輯",
+      "orderModified": "流程順序已修改。",
+
+      "mustCreateOneNode": "需要至少新增一個簽核節點",
 
       "cantCancel": "不可取消簽核：",
       "tooltipListcant1": "送出巡檢報告時同步送出不合格項產生之事件",
@@ -1393,9 +1420,9 @@ export default{
       "tooltipListcant2": "簽核流程可以選擇「取消」",
       "tooltipListcant3": "巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項",
       "tooltipListcant4": "簽核通過後才能檢視巡檢報告",
-
-
-
+      "auditFlow":"簽核流程",
+  
+    
     },
     "inceptionRpt":{
       "sendAudit":"送出簽核",

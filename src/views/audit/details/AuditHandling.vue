@@ -11,13 +11,13 @@
 					<div class="goto-report" 
             @click="goToReportdetails" 
             v-if="showingBtn "
-            >報告詳情</div>
+            > {{$t('route.reportDetails')}}</div>
 				</div>
       
 				<!-- audit body -->
 				<div class="audit-flow-body">
 					<div class="audit-flow-ownerhandling" style="margin-bottom: 20px">
-						<p>簽核流程</p>
+						<p>{{$t('audit.workFlows.auditFlow')}}</p>
 						<!-- <div class="handling" v-if="!onEditing">
 							<div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo">{{customButton[2].text}}</div>
                 <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo"> | </div>
@@ -37,16 +37,16 @@
 			<div class="audit-section">
 				<!-- audit-header -->
 				<div class="audit-header">
-					<h3>填寫簽核意見</h3>
+					<h3>{{$t('audit.auditStatus.auditComment')}}</h3>
 					<div class="buttons">
-						<delay-button type="filled" @click="taskSummit">送出</delay-button>
+						<delay-button type="filled" @click="taskSummit">{{$t('audit.auditStatus.taskSummit')}}</delay-button>
 					</div>
 				</div>
 				<!-- audit body -->
 				<div class="audit-flow-body">
           <div class="audit-add-comment">
             <!-- 簽核意見 -->
-            <p style="margin-bottom: 10px"><span style="color: #c60957">* </span> 簽核意見</p>
+            <p style="margin-bottom: 10px"><span style="color: #c60957">* </span> {{$t('audit.auditStatus.comment')}}</p>
             <div class="comment-btn for-flex">
               <div class="el-radio-details" :class="{agree : agree == true}" @click="agreeNode">{{customButton[0].text}}</div>
               <div class="el-radio-details" :class="{reject : agree == false}" @click="rejectNode">{{customButton[1].text}}</div>
@@ -55,7 +55,7 @@
               <el-input
                 v-model="commentsToApi.comment.description"
                 :autosize="{ minRows: 3, maxRows: 5 }"
-                placeholder="請輸入訊息"
+                :placeholder="$t('remotePatrol.enterDesc')"
                 class="storevue-textarea"
                 type="textarea"
                 resize="none"
@@ -67,7 +67,7 @@
 
           <!-- 加入檔案 & 簽名 -->
           <div class="audit-add-files">
-            <p style="margin-bottom: 10px"><span style="color: #c60957" v-if="isSignature">* </span>加入簽名</p>
+            <p style="margin-bottom: 10px"><span style="color: #c60957" v-if="isSignature">* </span> {{$t('audit.auditStatus.addSign')}}</p>
       
             <div class="attach-area" >
               <div v-for="(imgItem,index) in signatureFileList" :key="'img'+index" class="source-details" >
@@ -80,7 +80,7 @@
                 </div>
               </div>
               <div class="upload-data" @click="showSignaturePad = true" v-if="signatureFileList.length == 0">
-                <i class="iconfont el-icon-document-add iconbangzhu" /> 簽名
+                <i class="iconfont el-icon-document-add iconbangzhu" />  {{$t('audit.auditStatus.sign')}}
               </div>
             </div>
           </div>
@@ -88,7 +88,7 @@
           <div class="l--l"></div>
 
           <div class="audit-add-files">
-            <p style="margin-bottom: 10px">加入附件</p>
+            <p style="margin-bottom: 10px"> {{$t('audit.auditStatus.addAttachment')}}</p>
             <!-- 新增附件 -->
             <div class="attach-area" >
               <div v-for="(imgItem,index) in imgFileList" :key="'img'+index" class="source-details" >
@@ -118,7 +118,7 @@
 
     <!-- popup -->
     <dialog-pop
-      title="請簽名"
+      :title= "$t('audit.auditStatus.pleaseSign')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -134,7 +134,7 @@
     </dialog-pop>
 
     <dialog-pop
-      title="撤回報告簽核？"
+      :title="$t('audit.auditStatus.ifDraback')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -145,12 +145,12 @@
       @confirmHandler="confirmTaskDrawback()"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">確認是否撤回此報告簽核？ </div>
+        <div class="dialog-content">{{$t('audit.auditStatus.confirmDraback')}} </div>
       </div>
     </dialog-pop>
 
     <dialog-pop
-      title="取消簽核？"
+      :title="$t('audit.auditStatus.ifCancel')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -161,7 +161,7 @@
       @confirmHandler="cancelWorkflow()"
     >
       <div class="dialog-slot">
-        <div class="dialog-content">確認是否取消此報告簽核？ </div>
+        <div class="dialog-content"> {{$t('audit.auditStatus.confirmCancel')}} </div>
       </div>
     </dialog-pop>
 
@@ -560,7 +560,7 @@ export default {
       // console.log('isSignature :>> ', isSignature);
       // console.log('currentNode :>> ', currentNode);
       if(this.isSignature == true && this.commentsToApi.comment.signature.length == 0) {
-        util.notify('此簽核需要附加簽名檔案', 'error', 1500);
+        util.notify(this.$t('audit.auditStatus.needSign'), 'error', 1500);
         this.commentsToApi.comment.attachment = []
         return
       }
@@ -574,7 +574,7 @@ export default {
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
-        util.notify('此簽核需要附加簽名檔案', 'error', 1500);
+        util.notify(this.$t('audit.auditStatus.needSign'), 'error', 1500);
 
       });
     },

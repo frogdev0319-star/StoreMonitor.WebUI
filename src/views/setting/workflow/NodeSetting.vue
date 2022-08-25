@@ -213,7 +213,7 @@
     <dialog-pop
       ref="dailog"
       class="popup_width"
-      title="新增簽核人員"
+      :title="$t('audit.workFlows.addAuditUser')"
       :close-on-click-modal="false"
       :show-close="false"
       :dialogWidth = "w_width"
@@ -227,11 +227,11 @@
             <div class="filter_section">
                 <!-- 關鍵字 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name" style="width: fit-content;">關鍵字</div>
+                  <div class="title-name" style="width: fit-content;">{{$t('audit.workFlows.keywords')}} </div>
                   <div class="title-status"> 
                     <el-input
                       v-model="inputSearchUser"
-                      placeholder="搜尋人員名稱、信箱"
+                      :placeholder="$t('audit.workFlows.searchNameMail')"
                       style="width: 200px"
                       clearable
                       />
@@ -239,11 +239,11 @@
                 </div>
                 <!-- 部門 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name" style="width: fit-content;"> 部門</div>
+                  <div class="title-name" style="width: fit-content;"> {{$t('audit.workFlows.depart')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateDepartment"
-                      placeholder="部門"
+                      :placeholder="$t('audit.workFlows.depart')"
                       style="width: 180px"
                       >
                       <el-option
@@ -257,11 +257,11 @@
                 </div>
                 <!-- 職務 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name" style="width: fit-content;"> 職務</div>
+                  <div class="title-name" style="width: fit-content;"> {{$t('audit.workFlows.position')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateTitleList"
-                      placeholder="職務"
+                      :placeholder="$t('audit.workFlows.position')"
                       style="width: 180px"
                       >
                       <el-option
@@ -276,7 +276,7 @@
                 <!-- <div class="summit_filter" >篩選</div> -->
             </div>
             <div class="is_select">
-              <div class="title-name"> 已選擇</div>
+              <div class="title-name"> {{$t('audit.workFlows.selected')}}</div>
               <div class="user_selected">
                 <el-tag
                     v-for="tag in tags"
@@ -321,10 +321,7 @@ import {getUserInfo} from '@/api/login';
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 
-
-
 import util from "@/common/util";
-import { ColorPicker } from 'element-ui';
 export default {
   name: 'WorkflowDetail',
   components: {
@@ -346,31 +343,30 @@ export default {
       departmentStatus: "",
       userInfo:[],
 
-      // ======
       w_width: "1000",
       tags: [],
       userColumnData: [
         {
           'prop': 'userName',
-          'label': '姓名',
+          'label': this.$t('audit.workFlows.name'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'email',
-          'label': '信箱',
+          'label': this.$t('audit.workFlows.email'),
           'width': 110,
           'maxWidth': 110,
         },
         {
           'prop': 'sector',
-          'label': '部門',
+          'label': this.$t('audit.workFlows.depart'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'title',
-          'label': '職務',
+          'label': this.$t('audit.workFlows.position'),
           'width': 100,
           'maxWidth': 100,
         },
@@ -387,7 +383,6 @@ export default {
       curTemplateDepartment: '',
       curTemplateTitleList: '',
       
- // ======
 
       // 簽核人員
       auditUsers:[],
@@ -419,48 +414,9 @@ export default {
         this.nodeData.customButton[2].text = this.defineDrawback
       }
     }
-
-    // sector(){
-    //   console.log('sector >> ', this.sector);
-    //   this.auditUsers = []
-    // },
-
-    // departmentStatus(sectorName) {
-    //   console.log('this.departmentStatus from select >> ', sectorName);
-    //   sessionStorage.setItem('sectorName', JSON.stringify(sectorName))
-      
-    //   // get audit user with sector
-    //   this.department.forEach(d =>{
-    //     if(d.defineName == sectorName){
-    //       this.auditUsers = [...d.contents]
-    //     }
-    //   })
-    //   console.log('nodeData.name:>> ', this.nodeData.name);
-    //   console.log('auditUsers:>> ', this.auditUsers);
-    //   console.log('this.apiData:>> ', this.apiData);
-    // },
-
   },
 
-  mounted() {
-    
-
-    // this.dataFromRoute = { ...this.$route.params.data }
-    // getWorkflowInfo({
-    //   processDefinitionKey: this.dataFromRoute.processDefinitionKey
-    // }).then(res => {
-    //   function getNodes (nodes, data) {
-    //     if (data.nextAuditNode) {
-    //       nodes.push(data.nextAuditNode)
-    //       getNodes(nodes, data.nextAuditNode)
-    //     } else return
-    //   }
-    //   let nextNodes = [];
-    //   this.workflowDetail = { ...res.data }
-    //   getNodes(nextNodes, this.workflowDetail)
-    //   this.workflowDetail['nextNodes'] = nextNodes;
-    // })
-  },
+  mounted() {},
   async created() {
     await this.init()
   },
@@ -470,7 +426,7 @@ export default {
         return this.filterInputSearchUser(this.filterCurTemplateDepartment(this.filterCurTemplateTitleList(this.userData)))
       },
       set(val){
-        console.log('val!?!?!~~~~~>>>', val)
+        console.log('val', val)
 			}
     }
   },
@@ -566,14 +522,11 @@ export default {
       });
     },
 
-    
-
-
 
     getWorkflowInfo(){
       const data = sessionStorage.getItem('workflowDetail')
       this.infoForm = JSON.parse(data)
-      this.infoForm.type = "巡檢表單"
+      this.infoForm.type = this.$t('audit.workFlows.inspectionForm')
     },
     
     async getNodeInfo(){
@@ -620,8 +573,6 @@ export default {
 
     },
 
-
-
     //======================================
     filterInputSearchUser(users){
         return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 )
@@ -647,7 +598,6 @@ export default {
         console.log('this.auditUsers', this.auditUsers)
         this.showingSearchUser = false
     },
-
 
     // 關閉 lightbox
     hideSearchUsersDialog(key){
@@ -937,10 +887,6 @@ export default {
     pointer-events: auto !important
     i 
       color: #006ab7
-
-
-  
-  
 
   .workflow-header
     width: 100%

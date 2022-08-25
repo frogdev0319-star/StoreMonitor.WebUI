@@ -3,7 +3,7 @@
 
     <div class="setting-titles padding flex-center">
       {{$t('audit.workFlows.workFlowConfiguration')}}
-      <div class="spacer"/>
+      <div class="spacer"></div>
       <div class="buttons">
         <delay-button type="filled" @click="submit">  {{$t('audit.workFlows.saveAndEnable')}}</delay-button>
       </div>
@@ -25,7 +25,7 @@
                       :placeholder="nodeDataToApi.name"
                       v-model="nodeDataToApi.name"
                       style="width: 250px;"
-                      maxlength="50"
+                      :maxlength="50"
                       show-word-limit
                       />
                   </div>
@@ -45,7 +45,6 @@
                         :key="index"
                         :label="item"
                         :value="item"
-                        
                       />
                     </el-select>
                   </div>
@@ -97,10 +96,7 @@
                           </el-tooltip>
                         </div>
                       </el-radio-group>
-                    
-                      <!-- <p>{{$t('audit.workFlows.thisModeWithoutEvent')}}</p> -->
                 </div>
-
               </div>
 
               <!-- row -->
@@ -211,7 +207,7 @@
     <dialog-pop
       ref="dailog"
       class="popup_width"
-      title="新增簽核人員"
+      :title= "$t('audit.workFlows.addCC')"
       :close-on-click-modal="false"
       :show-close="false"
       :dialogWidth = "w_width"
@@ -225,11 +221,11 @@
             <div class="filter_section">
                 <!-- 關鍵字 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name">關鍵字</div>
+                  <div class="title-name">{{$t('audit.workFlows.keywords')}}</div>
                   <div class="title-status"> 
                     <el-input
                       v-model="inputSearchUser"
-                      placeholder="搜尋人員名稱、信箱"
+                      :placeholder="$t('audit.workFlows.searchNameMail')"
                       style="width: 200px"
                       clearable
                       />
@@ -237,11 +233,11 @@
                 </div>
                 <!-- 部門 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name"> 部門</div>
+                  <div class="title-name"> {{$t('audit.workFlows.depart')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateDepartment"
-                      placeholder="部門"
+                      :placeholder="$t('audit.workFlows.depart')"
                       style="width: 180px"
                       >
                       <el-option
@@ -255,11 +251,11 @@
                 </div>
                 <!-- 職務 -->
                 <div class="flex-row" style="margin-right: .5%; margin-bottom: 10px;">
-                  <div class="title-name"> 職務</div>
+                  <div class="title-name"> {{$t('audit.workFlows.position')}}</div>
                   <div class="title-status"> 
                     <el-select
                       v-model="curTemplateTitleList"
-                      placeholder="職務"
+                      :placeholder="$t('audit.workFlows.position')"
                       style="width: 180px"
                       >
                       <el-option
@@ -274,7 +270,7 @@
                 <!-- <div class="summit_filter" >篩選</div> -->
             </div>
             <div class="is_select">
-              <div class="title-name"> 已選擇</div>
+              <div class="title-name"> {{$t('audit.workFlows.selected')}}</div>
               <div class="user_selected">
                 <el-tag
                     v-for="tag in tags"
@@ -340,25 +336,25 @@ export default {
       userColumnData: [
         {
           'prop': 'userName',
-          'label': '姓名',
+          'label': this.$t('audit.workFlows.name'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'email',
-          'label': '信箱',
+          'label': this.$t('audit.workFlows.email'),
           'width': 110,
           'maxWidth': 110,
         },
         {
           'prop': 'sector',
-          'label': '部門',
+          'label': this.$t('audit.workFlows.depart'),
           'width': 100,
           'maxWidth': 100,
         },
         {
           'prop': 'title',
-          'label': '職務',
+          'label': this.$t('audit.workFlows.position'),
           'width': 100,
           'maxWidth': 100,
         },
@@ -370,7 +366,6 @@ export default {
       ccToUSer: [],
       showSingleDeleteContent: false,
       showingSearchUser: false,
-
 
       dataFromRoute: {},
       workflowDetail: {},
@@ -409,7 +404,6 @@ export default {
             text: this.$t('audit.workFlows.moveDown'),
             methods: 'moveDown'
           },
-
         ],
         operation: [
           {
@@ -475,12 +469,16 @@ export default {
               1,
           ]
       },
-      
     };
   }, 
 
 
   watch:{
+    'nodeDataToApi.name'(value){
+      var nnn = value.replace(/[^\x00-\xff]/g,"xx").length
+      console.log('nnn :>> ', nnn);
+    },
+    
     ccToUSer(){
       this.nodeDataToApi.copyToUsers = this.ccToUSer
     },
@@ -538,7 +536,6 @@ export default {
     async init(){
       
       await this.getWorkflowInfo() 
-
       await this.getNodeList(this.infoForm.processDefinitionKey) 
 
       await this.getTitle() 
@@ -549,15 +546,13 @@ export default {
       await this.dataToApi() 
 
       await this.getWorkflowList(this.apiBody)
-
       await this.getPickedMember() 
-  
+
     },
 
     needNote(){
-      util.notify('※ 此模式不會立即產生事件 ', 'warning', 3000);
+      util.notify(this.$t('audit.workFlows.thisModeWithoutEvent'), 'warning', 2000 );
     },
-
     async getWorkflowList(param){
       this.isLoadingData = true
       await getWorkflowList(param).then(res=>{
@@ -565,8 +560,8 @@ export default {
 
         const n = this.allTableData.findIndex( i => i.name == this.nodeDataToApi.name)
         this.allTableData.splice(n, 1)
-        console.log('n === ', n);
-        console.log('this.allTableData ======>> ',  this.allTableData );
+        // console.log('n === ', n);
+        // console.log('this.allTableData ======>> ',  this.allTableData );
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -831,7 +826,7 @@ export default {
         this.fullscreenLoading = false
         this.$message({
           type: 'success',
-          message: '流程順序已修改。'
+          message: this.$t('audit.workFlows.orderModified')
         })
       }).catch(err => {
         this.fullscreenLoading = false
@@ -843,14 +838,12 @@ export default {
       this[key] = false;
     },
 
-
     confirmSearchUsersDialog(){
         console.log('this.ccToUSer ~~~~~~~>', this.ccToUSer)
         console.log('this.multipleSelection ~~~~~~~>', this.multipleSelection)
         this.ccToUSer = this.multipleSelection.map( i => i = i.userId)
         this.showingSearchUser = false
     },
-
 
     // 關閉 lightbox
     hideSearchUsersDialog(key){
@@ -867,7 +860,6 @@ export default {
     confirmDeleteSingle(id){
       console.log('Let me delete value', id);
       this.deleteRow(id)
-      
       this.showSingleDeleteContent = false
     },
 
@@ -909,7 +901,7 @@ export default {
         this.fullscreenLoading = false;
         this.$message({
           type: 'success',
-          message: '删除成功!'
+          message: this.$t('audit.workFlows.deleteScuccess')
         })
 
       }).catch(err => {
@@ -967,19 +959,19 @@ export default {
       var repeatResult = this.allTableData.some(i=>
         i.name == this.nodeDataToApi.name
       )
-      console.log('repeatResult~~~~ :>> ', repeatResult);
-
       if(this.nodeDataToApi.name == ''){
         util.notify(this.$t('audit.workFlows.cantEmptyWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         return
-      }
-
-      if(repeatResult == true){
+      } else if(this.nodeDataToApi.orderedAuditNodeArray.length == 1){
+        util.notify(this.$t('audit.workFlows.mustCreateOneNode'), 'error', 2000 );
+        return
+      } else if(repeatResult == true){
         util.notify(this.$t('audit.workFlows.cantRepeatWorkflowName'), 'error', 2000 );
         this.$refs.workflowName.focus()
         return
-      }else{
+      } else {
+        console.log('gogogo :>> ');
         // call api for update
         updateWorkflow(this.nodeDataToApi).then(res=>{
           console.log('res :>> ', res);
@@ -1282,10 +1274,7 @@ export default {
     text-align: left;
   }
 
-  .title-operation{
-    /* width: 20%; */
-  }
-
+ 
   .sortable-ghost{
     color: #424151 !important;
     background: rgba(243, 19, 101, 0.1) !important;
