@@ -657,6 +657,7 @@
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType == 3" class="flex-center">
                           <img
+                            v-if="_item.showDelBtn"
                             :src="deleteInspectIcon"
                             alt="delete"
                             @click="deleteItemResource({ item, index: _index })"
@@ -668,8 +669,9 @@
                             <div style="flex: 1; text-align: left; margin: 5px">
                               {{ _item.src }}
                             </div>
-                            <hr class="hr-vertical" />
+                            <hr v-if="_item.showDelBtn" class="hr-vertical" />
                             <img
+                              v-if="_item.showDelBtn"
                               :src="editInspectIcon"
                               alt="edit"
                               style="margin: 5px"
@@ -682,7 +684,7 @@
                     <div v-if="item.sourceList.length!=0" :class="!item.manualIgnore?'noraml-title':'ignore-title'" class="img-source-content">
                       <div v-for="(_item,_index) in item.sourceList" :key="_index" class="source-details">
                         <div v-if="_item.mediaType==2" class="img-content">
-                          <i class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
+                          <i v-if="_item.showDelBtn" class="el-icon-close icondelete" @click="deleteImg({item,index: _index})" />
                           <el-image
                             :src="_item.src"
                             :style="{width: _item.width, height: _item.height}"
@@ -2109,7 +2111,9 @@ export default {
     },
     doGetcateryItems(sheetItem,cateryItems,type){ //type:0:合格率評分 1:巡檢評分項 2:附加評分項
       var dealCount=0;
+      
       for(let i=0; i<cateryItems.length; i++){
+        var showDelBtn = true;
         sheetItem[i].id = cateryItems[i].itemId;
         if(cateryItems[i].grade===-2147483648){ //略過項
           sheetItem[i].itemScoreTitle="--";
@@ -2134,13 +2138,18 @@ export default {
             console.log("不能取消，不能編輯不合格項");
             sheetItem[i].notEdit = true;
             dealCount++;
+            showDelBtn = false;
           }
           console.log("sheetItem[i]",sheetItem[i]);
         }else{
           sheetItem[i].itemScoreTitle=cateryItems[i].grade;
           sheetItem[i].itemgetScore=cateryItems[i].grade;
           sheetItem[i].inputCount++;
-          if(cateryItems[i].grade==1) dealCount++;
+          if(!this.auditCancelable && cateryItems[i].grade<cateryItems[i].qualifiedScore) {
+            sheetItem[i].notEdit = true;
+            showDelBtn = false;
+            dealCount++;
+          }
         }
         if(cateryItems[i].showAttachment){
           sheetItem[i].dealCount++;
@@ -2150,7 +2159,8 @@ export default {
             var desItem = cateryItems[i].descriptionList[x];
             var desObj = {
               mediaType:3,
-              src:desItem.description
+              src:desItem.description,
+              showDelBtn :showDelBtn
             }
             att.push(desObj);
           }
@@ -2164,7 +2174,8 @@ export default {
                   width:'140px',
                   fileName:fileName,
                   deviceId:attItem.deviceId,
-                  hasUrl:true
+                  hasUrl:true,
+                  showDelBtn :showDelBtn
                 }
               att.push(attFile);
           }
@@ -3400,6 +3411,7 @@ export default {
       obj.file = util.base64ToBlob(obj.src);
       obj.deviceId = self.channel.id;
       obj.hasUrl = false;
+      obj.showDelBtn = true;
       self.sourceList.push(obj);
       const tempId = self.getIndexById(self.curItemId);
       self.sheetName[self.curSheetIndex].inspectList.forEach((inspect, idx) => {
@@ -3444,7 +3456,8 @@ export default {
         fileName:`${self.bucketImage}/inspect_${util.getCurTimeStr()}_${self.store.storeId}_${self.curItemId}.jpg`,
         file: util.base64ToBlob(src),
         deviceId: self.channel.id,
-        hasUrl : false
+        hasUrl : false,
+        showDelBtn : true,
       };
 
       const picObj = {
@@ -3475,6 +3488,7 @@ export default {
           item.sourceList.push({
             mediaType: 3,
             src: item.inspectInput,
+            showDelBtn : true,
           })
         } else {
           item.RuleCountTip = true;

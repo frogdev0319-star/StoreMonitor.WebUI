@@ -517,8 +517,8 @@ export default{
     },
       "zoneList":"攝影機列表",
     "commentCountRuleTip":"文字評論最多輸入5則",
-    "cannotSwitch":"正在編輯報告，不能切換當前門店？",
-    "cannotSwitchBrand":"正在編輯報告，不能切換當前品牌？",
+    "cannotSwitch":"正在編輯報告，不能切換當前門店",
+    "cannotSwitchBrand":"正在編輯報告，不能切換當前品牌",
     "cannotSwitchInspect":"正在編輯報告，不能切換當前巡檢表",
     "exportExcelAllWarning":"匯出完整報告提示",
     "selectOnlyOneInspect":"匯出完整報告時僅能選擇單一巡檢表",
@@ -530,6 +530,9 @@ export default{
     "inspectTotalScore":"報告總分",
     "exportAllDetail":"詳情",
     "createRptDT":"報告產生時間",
+    "resubmiteRpt":"確認送出報告",
+    "systemReject":"系統撤回",
+    "systemRejectMsg":"無可簽核人員，請重新確認"
   },
   "eventView":{
       "ClosedEvent":"已結案事件",

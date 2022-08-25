@@ -8,7 +8,7 @@
           <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="confirm-btn" type="primary" @click="submit(false)">
             {{ $t('audit.inceptionRpt.saveReport') }}
           </el-button>
-          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="submit(true)">
+          <el-button :size="varyWindowWidth > 1680 ? 'small' : 'mini'" class="storevue-button-filled" type="primary" @click="showConfirmSubmitMsg=true">
             {{ $t('audit.inceptionRpt.submitReport') }}
           </el-button>
         </div>
@@ -432,6 +432,26 @@
         <el-progress :percentage="Math.round(uploadingnumOfPic/totalnumOfPic*100)"/>
       </div>
     </el-dialog>
+    <dialog-pop
+      :title="$t('remotePatrol.resubmiteRpt')"
+      :isWarning="true"
+      :visible="showConfirmSubmitMsg"
+      @cancelHandler = "showConfirmSubmitMsg=false"
+      @confirmHandler="onConfirmSubmitMsgOk">
+      <div class="dialog-slot">
+        <div class="dialog-content">{{ $t('remotePatrol.resubmiteRpt')+'?' }} </div>
+      </div>
+    </dialog-pop>
+    <dialog-pop
+      :title="$t('remotePatrol.systemReject')"
+      :isWarning="true"
+      :visible="showSystemReject"
+      :showCancelbtn="false"
+      @confirmHandler="onshowSystemRejectConfirm">
+      <div class="dialog-slot">
+        <div class="dialog-content">{{ $t('remotePatrol.systemRejectMsg') }} </div>
+      </div>
+    </dialog-pop>
   </el-row>
 </template>
 <script>
@@ -445,9 +465,11 @@ import { getUserInfo ,getAllUserInfoNoAuth} from '@/api/login';
 import filterString from '@/common/filterString.js';
 import Database from '@/common/Database.js';
 import PermissionHelper from '@/api/PermissionHelper';
+import DialogPop from '@/components/DialogPop';
 
 export default {
   name: 'ConfirmAddSum',
+  components: {DialogPop},
   data() {
     return {
       dialogCommentVideo: false,
@@ -518,6 +540,8 @@ export default {
       reportId:-1,
       reportStatus:-1,
       auditCancelable:false,
+      showConfirmSubmitMsg:false,
+      showSystemReject:false
     };
   },
   computed: {
@@ -671,6 +695,11 @@ export default {
       });
       self.curSumIndex = item.label;
     },
+    onConfirmSubmitMsgOk(){
+      this.showConfirmSubmitMsg = false;
+      this.submit(true);
+    },
+
     async submit(sendEvent) {
       const self = this;
       let upload = 0;
@@ -904,6 +933,10 @@ export default {
               SubmitWorkflow(wfParams).then(wfRes=>{
                 console.log("SubmitWorkflow res:",res);
                 if(wfRes.errCode == 0){
+                  if(wfRes.data.isSystemReject){
+                    self.showSystemReject = true;
+                    return;
+                  }
                   self.$store.dispatch('setEditCount', 0);
                   routeData = {
                       isSuccess: true,
@@ -985,7 +1018,7 @@ export default {
           console.log("routeData:",routeData);
           self.$router.push({ name: 'auditReportdetails', params: routeData});
         }else{
-          if(self.auditState==7){ //系統撤回重送
+          //if(self.auditState==7){ **3.0.4.2 不用判斷都使用reSubmit//系統撤回重送
             var subTaskParam = {
               inspectReportId:self.reportId,
               comment:{
@@ -995,7 +1028,7 @@ export default {
             }
             console.log("1.subTaskParam:",subTaskParam);
             self.doReSubmitWorkflow(subTaskParam);
-          }else{
+          /*}else{
             let task = result[1].data.find(t=>t.parentId==-1 && t.state==2);
             console.log("task:",task);
             let taskId = task.tasks[0].taskId;
@@ -1023,7 +1056,7 @@ export default {
               util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
               return false;
             });
-          }
+          }*/
         }
       }).catch(err=>{
         console.log("err:",err);
@@ -1036,6 +1069,10 @@ export default {
       ReSubmitWorkflow(wfParams).then(wfRes=>{
           console.log("ReSubmitWorkflow res:",wfRes);
           if(wfRes.errCode == 0){
+            if(wfRes.data.isSystemReject){
+              self.showSystemReject = true;
+              return;
+            }
             self.$store.dispatch('setEditCount', 0);
             var routeData = {
                 isSuccess: true,
@@ -1049,6 +1086,15 @@ export default {
             return false;
           }
         );
+    },
+    onshowSystemRejectConfirm(){
+      this.showSystemReject = false;
+      this.$store.dispatch('setEditCount', 0);
+      var routeData = {
+          isSuccess: true,
+          isBindWorkflow:!!PermissionHelper.enableSendAudit() 
+      };
+      this.$router.push({ name: 'submitEvent', params: { data: routeData}});
     },
     async getRouteData() {
       const self = this;

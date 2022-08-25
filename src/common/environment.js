@@ -74,7 +74,7 @@ else if(data.SITE == 'Dev'){
   isGlobalWebsite = true;
 }
 else{
-  environJSON = _Environments.Preview;
+  environJSON = _Environments.Dev;
   isGlobalWebsite = true;
 }
 
