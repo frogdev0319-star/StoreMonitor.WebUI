@@ -525,6 +525,10 @@ export default {
 </script>
 
 <style lang="sass" >
+  .button-area
+    height: 23px
+    padding: 0 5px
+
   .tablelist_workflows
     .el-table__header
       width: auto !important

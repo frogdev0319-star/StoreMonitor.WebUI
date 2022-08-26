@@ -458,7 +458,7 @@ export default {
 
         { curPath: ["/waitAuditDetail"], activePath: "/waitaudit" },
         { curPath: ["/waitAuditReportdetails"], activePath: "/waitAuditDetail" },
-        { curPath: ["/handlingReportdetails"], activePath: "/handlingReportdetails" },
+        { curPath: ["/handlingReportdetails"], activePath: "/auditHandling" },
 
         
         { curPath: ["/transcriptnotifyAuditDetail"], activePath: "/transcriptnotify" },
@@ -630,7 +630,7 @@ export default {
         this.setSystemNavbarBread(matched, currentRoute);
       this.breadList = matched;
 
-      // console.log('breadList ------>> ', this.breadList);
+      console.log('breadList ------>> ', this.breadList);
     },
 
     setScheduleBread(matched, currentRoute) {
@@ -799,6 +799,7 @@ export default {
           parentBread: { path: "/auditDetail", name: "reportdetailsAuditDetail" },
         },
 
+
         {
           paths: ["/waitAuditDetail"],
           parentBread: { path: "/waitaudit", name: "WaitAuditManage" },
@@ -810,9 +811,11 @@ export default {
         },
 
         {
-          paths: ["/handingReportdetails"],
+          paths: ["/handlingReportdetails"],
           parentBread: { path: "/auditHandling", name: "reportdetailsAuditHandling" },
         },
+        
+
 
         {
           paths: ["/transcriptnotifyAuditDetail"],

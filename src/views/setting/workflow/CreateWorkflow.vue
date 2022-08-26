@@ -25,7 +25,7 @@
                       :placeholder="workflowDetail.name"
                       v-model="workflowDetail.name"
                       style="width: 250px"
-                      maxlength="10"
+                      maxlength="50"
                       show-word-limit
                       />
                   </div>
