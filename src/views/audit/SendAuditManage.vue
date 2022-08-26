@@ -348,8 +348,10 @@ export default{
             ],
             tabContentId:[{key:'en',value:'#en-tabs-content'},{key:'zh',value:'#en-tabs-content'},{key:'zhtw',value:'#en-tabs-content'},
                 {key:'ja-JP',value:'#en-tabs-content'},{key:'ko-KR',value:'#en-tabs-content'},{key:'vi-VN',value:'#en-tabs-content'},
-                {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}]
-            };
+                {key:'id-ID',value:'#en-tabs-content'},{key:'th-TH',value:'#th-tabs-content'}],
+            isMimicMode:false,
+        };
+            
     },
     computed: {
         ...mapGetters({ accountChanged: 'accountChanged', mimicModeChanged:'mimicMode' })
@@ -371,7 +373,9 @@ export default{
         },
         mimicModeChanged(val){
             console.log("mimicMode val:",val);
-            this.initData();
+            //this.onSearchClick();
+            this.isMimicMode = val;
+            this.ifSearchData = true;
         },
     },
     created(){
@@ -408,10 +412,11 @@ export default{
         },
         onStoreChange(storeObj) {
             console.log('onStoreChange>storeFilterObj', storeObj);
+            console.log('this.ifSearchData', this.ifSearchData);
             this.storeFilterObj = storeObj;
-            if(!this.curStoreIds){
+            if(this.curStoreIds){
                 this.searchParams = this.storeFilterObj;
-                this.curStoreIds = storeObj.filterStoreIds;
+                this.curStoreIds = storeObj.filterStoreIds.filter(item=>item!='-1');
                 this.ifSearchData && this.getAllTask();
             }
             this.ifSearchData = false;
@@ -430,7 +435,7 @@ export default{
         },
         onSearchClick() {
             this.searchParams = this.storeFilterObj;
-            this.curStoreIds = this.storeFilterObj.filterStoreIds;
+            this.curStoreIds = this.storeFilterObj.filterStoreIds.filter(item=>item!='-1');
             this.tableDataList[this.curTabIndx].page = 1;
             this.curPage=1;
             this.getAllTask();
@@ -442,7 +447,8 @@ export default{
             //this.params.beginTs = this.dateValue[0].valueOf();
             //this.params.endTs = this.dateValue[1].valueOf();
             // console.log('EventMange > getSearchParams > searchParams:', searchParams);
-            console.log("this.$route.params.curTabIndx:",this.$route.params.curTabIndx);
+            //console.log("this.$route.params.curTabIndx:",this.$route.params.curTabIndx);
+            console.log("*isMimicMode:",this.isMimicMode);
             if (Object.keys(searchParams).length > 0) {
                 this.storeFilterObj = searchParams;
                 this.inputSearchValue = searchParams.inputSearchValue;
@@ -534,9 +540,11 @@ export default{
                     size:this.curSizeNum
                 },
                 order:this.curOrder,
-                isMysteryMode:PermissionHelper.enableMimicMode,
+                isMysteryMode:this.isMimicMode,//PermissionHelper.enableMimicMode,
             };
-            if(this.curStoreIds!=-1 && !this.storeFilterObj.curStore.includes('-1')){
+            console.log("this.storeFilterObj.curStore:",this.storeFilterObj.curStore)
+            if(this.curStoreIds!=-1){// && !this.storeFilterObj.curStore.includes('-1')){
+
                 params['storeId'] =this.curStoreIds;
             }
             if(this.curTabIndx==1){//進行中
