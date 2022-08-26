@@ -305,7 +305,7 @@ export default {
                 };
                 settingList.push(obj);
             });
-            mysteroRESTful.batchAddMysterySetting({settingList}).then(res=>{
+            mysteroRESTful.batchAddMysterySetting({userId:self.userId,settingList}).then(res=>{
                 if(res.errCode==0){
                     this.$router.push({name: 'MysterioManage'});
                 }else{

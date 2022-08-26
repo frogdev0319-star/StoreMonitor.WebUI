@@ -709,24 +709,25 @@ export default {
         reportIds:[this.report.reportId]
       };
       const tHeader = [
-        this.$t('remotePatrol.patrolStore'),
-        this.$t('overview.patrolLists'),//巡檢表名稱
+        this.$t('remotePatrol.storeName'),
+        this.$t('remotePatrol.inspectName'),//巡檢表名稱
         this.$t('remotePatrol.category'),
         this.$t('insSettingView.subCategory'),
         this.$t('overview.items'),
+        this.$t('remotePatrol.inspectItemScore'),
         this.$t('remotePatrol.patrolResult'),
-        this.$t('remotePatrol.patrolScore'),
-        this.$t('remotePatrol.commentDetail'),
+        this.$t('remotePatrol.inspectTotalScore'),
+        this.$t('remotePatrol.exportAllDetail'),
         this.$t('audit.inceptionRpt.attachment'),
         this.$t('titleView.description'),
-        this.$t('remotePatrol.patrolDate')];
+        this.$t('remotePatrol.createRptDT')];
       
       downLoadInspectReportEntireDetail(params).then(res => {
         console.log("res:",res);
         const that = this;
         require.ensure([], async() => {
           const { export_json_to_excel } = require('@/excel/Export2Excel');
-          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','result', 'totlascore', 'detail', 'attachment','comment',
+          const filterVal = ['storename', 'tagname', 'group', 'item', 'inspectitem','itemscore','result', 'totlascore', 'detail', 'attachment','comment',
             'reportts'];
           const curData = res.data;
           const tagName = this.report.tagName;
