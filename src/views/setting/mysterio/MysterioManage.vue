@@ -380,6 +380,7 @@ export default {
             if(res.errCode==0){
               let delIdx = self.allTableData.findIndex(user=>user.userId==this.delUserId);
               self.allTableData.splice(delIdx,1);
+              self.selectedUserList = self.allTableData.slice(0,self.allTableData.length-1);
               //self.getMysterioList(true);
               self.getMysterioList();
             }else{
