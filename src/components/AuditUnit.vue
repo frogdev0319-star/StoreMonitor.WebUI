@@ -1,58 +1,65 @@
 <template>
     <div>
-		{{auditStates}}
 		<div class="audit-flow-unit" v-for="(taskItem, index) in taskInfo" :key="index" :class="{ not__yet: taskItem.tasks[0].taskId == null }">
-				<div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
-				<div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
-				<div class="check" v-else-if="taskItem.state == 2 || taskItem.state == 4 || taskItem.state == 6 "><i class="iconfont el-icon-time iconbangzhu"/></div>
-				<div class="check" v-else-if="taskItem.state == 3 || taskItem.state == 7"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
-				
-				<!-- audit task wrapper -->
-				<div class="audit-task-wrapper" :class="{ on_audit : taskItem.state == 2 }" >
-					<div class="audit-workflow-name">{{taskItem.nodeName}}</div>
-					<div class="audit-flow-content"  v-for=" task in taskItem.tasks" :key="task.taskId">
-						<!-- name -->
-						<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
-							<div class="audit-name">
-								<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == 0">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
-								<div class="audit-user-name" v-else-if="taskItem.parentId == -1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
-								<div class="audit-user-name" v-else-if="taskItem.state == 1 && task.comment.result == 1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
-								<div class="audit-user-name" v-else-if="taskItem.state == 6 && task.comment.result == -2"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>
+			<div class="check" v-if="taskItem.state == 0"><i class="iconfont el-icon-success iconbangzhu"/></div>
+			<div class="check" v-else-if="taskItem.state == 1"><i class="iconfont el-icon-success iconbangzhu"/></div>
+			<div class="check" v-else-if="taskItem.state == 2 || taskItem.state == 4 || taskItem.state == 6 "><i class="iconfont el-icon-time iconbangzhu"/></div>
+			<div class="check" v-else-if="taskItem.state == 3 || taskItem.state == 7"><i class="iconfont el-icon-more iconbangzhu need_grey"/></div>
+			
+			<!-- audit task wrapper -->
+			<div class="audit-task-wrapper" :class="{ on_audit : taskItem.state == 2 }" >
+				<div class="audit-workflow-name">{{taskItem.nodeName}}</div>
+				<div class="audit-flow-content"  v-for=" task in taskItem.tasks" :key="task.taskId">
+					<!-- name -->
+					<div class="for-flex justify-content_space-between" style="margin-bottom: 10px">
+						<div class="audit-name">
+							
+							<div class="audit-user-name" v-if="taskItem.state == 1 && task.comment.result == 0">{{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
+							<div class="audit-user-name" v-else-if="taskItem.parentId == -1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
+							<div class="audit-user-name" v-else-if="taskItem.state == 1 && task.comment.result == 1"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
+							
+							<div class="audit-user-name" v-else-if="taskItem.state == 1 && task.comment.result == -999"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{task.endTs}})</span></div>
 
-								<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment == null"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{taskItem.startTs}})</span></div>
-								<div class="audit-user-name" v-else-if="taskItem.state == 3"> {{taskItem.auditTargetName}}</div>
-								<div class="audit-user-name" v-else-if="taskItem.state == 7 && task.assignee == null"> <span>({{task.endTs}})</span> </div>
-							</div>
-							<div class="audit-situation"  v-if="taskItem.parentId !== -1 ">
-								<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == 0"><i class="iconfont el-icon-check"/> 同意</div>
-								<div class="audit_disagree" v-else-if="taskItem.state == 1 && task.comment.result == 1"><i class="iconfont el-icon-close"/> 駁回</div>
-								<div class="audit_disagree" v-else-if="taskItem.state == 6 && task.comment.result == -2"><i class="iconfont el-icon-info"/> 撤回</div>
-								<!-- <div class="audit_disagree" v-else-if="task.comment.result == -1"><i class="iconfont el-icon-info"/> 取消</div> -->
-								<div class="audit_disagree" v-else-if="taskItem.state == 7 && task.comment.result == -3"><i class="iconfont el-icon-info"/> 系統撤回</div>
-							</div>
+							<div class="audit-user-name" v-else-if="taskItem.state == 6 && task.comment.result == -2"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>
+							<div class="audit-user-name" v-else-if="taskItem.state == 5 && task.comment.result == -1"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{task.endTs}})</span></div>
+
+							<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment == null"> {{task.auditByUsers[0].titleName}} -- {{task.auditByUsers[0].userName}} <span>({{taskItem.startTs}})</span></div>
+							<div class="audit-user-name" v-else-if="taskItem.state == 2 && task.comment !== null"> {{task.assignee.titleName}} -- {{task.assignee.userName}} <span>({{taskItem.startTs}})</span></div>
+							<div class="audit-user-name" v-else-if="taskItem.state == 3"> {{taskItem.auditTargetName}}</div>
+							<div class="audit-user-name" v-else-if="taskItem.state == 7 && task.assignee == null"> <span>({{task.endTs}})</span> </div>
 						</div>
-						<!-- description -->
-						<div class="audit-description">
-							<div class="audit-description-comment" v-if="task.comment !== null " >{{task.comment.description}}</div>
-							<div class="audit-description-data" v-if="task.comment !== null ">
-								<img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts" 
-								style="background: #FFF;" >
+						<div class="audit-situation"  v-if="taskItem.parentId !== -1 ">
+							<div class="audit_agree" v-if="taskItem.state == 1 &&  task.comment.result == 0"><i class="iconfont el-icon-check"/> 同意</div>
+							<div class="audit_agree" v-if="taskItem.state == 2 && task.assignee !== null"><i class="iconfont el-icon-check"/> 同意</div>
 
-								<div class="iimg" v-for="(blopImg, index) in task.comment.attachment" :key="blopImg.ts">
-								
-									<el-image
-										:src="blopImg.url"
-										v-if="blopImg.mediaType == 2"
-										:preview-src-list = "getImgSrc(index, blopImg)"
-										/>
-									<a class="pdfLink" :href="blopImg.url" v-if="blopImg.mediaType == 4"></a>
-								</div>
-								
+							<div class="audit_disagree" v-else-if="taskItem.state == 1 && task.comment.result == 1"><i class="iconfont el-icon-close"/> 駁回</div>
+							<div class="audit_disagree" v-else-if="taskItem.state == 6 && task.comment.result == -2"><i class="iconfont el-icon-info"/> 撤回</div>
+							<div class="audit_disagree" v-else-if="taskItem.state == 5 && task.comment.result == -1"><i class="iconfont el-icon-info"/> 取消</div>
+							<div class="audit_disagree" v-else-if="taskItem.state == 7 && task.comment.result == -3"><i class="iconfont el-icon-info"/> 系統撤回</div>
+						</div>
+					</div>
+					<!-- description -->
+					<div class="audit-description">
+						<div class="audit-description-comment" v-if="task.comment !== null " >{{task.comment.description}}</div>
+						<div class="audit-description-data" v-if="task.comment !== null ">
+							<img :src="blopSign.content" alt="" v-for="blopSign in task.comment.signature" :key="blopSign.ts" 
+							style="background: #FFF;" >
+
+							<div class="iimg" v-for="(blopImg, index) in task.comment.attachment" :key="blopImg.ts">
+							
+								<el-image
+									:src="blopImg.url"
+									v-if="blopImg.mediaType == 2"
+									:preview-src-list = "getImgSrc(index, blopImg)"
+									/>
+								<a class="pdfLink" :href="blopImg.url" v-if="blopImg.mediaType == 4"></a>
 							</div>
+							
 						</div>
 					</div>
 				</div>
 			</div>
+		</div>
     </div>
 </template>
 <script>
