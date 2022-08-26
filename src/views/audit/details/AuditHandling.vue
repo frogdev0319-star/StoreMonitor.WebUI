@@ -26,7 +26,10 @@
 					</div>
 
           <!-- task -->
-          <AuditUnit :taskInfo = "taskInfo"/>
+          <AuditUnit 
+            :taskInfo = "taskInfo"
+            :auditStates = auditStates
+            />
 
 				</div>
 			</div> 
@@ -205,6 +208,7 @@ export default {
 
       auditDetail:'',
       taskInfo: [],
+      auditStates: 0,
       agree: null,
       description:'',
       pdfFileList:[],

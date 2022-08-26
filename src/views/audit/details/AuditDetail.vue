@@ -51,7 +51,7 @@
     </dialog-pop>
 
     <dialog-pop
-      title="$t('audit.auditStatus.ifCancel')"
+      :title="$t('audit.auditStatus.ifCancel')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
