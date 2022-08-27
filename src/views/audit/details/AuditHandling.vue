@@ -312,15 +312,6 @@ export default {
         this.auditStates = res.data.auditStates
         this.taskInfo = res.data.taskList
         
-        // 刪除撤回前的 task
-        var drawbackNum = this.taskInfo.findLastIndex(i => {
-          if(i.tasks[0].comment !== null){
-            return i.tasks[0].comment.description == "drawback"
-          }
-        })
-        var totalNum = this.taskInfo.length
-        this.taskInfo = this.taskInfo.slice(drawbackNum - totalNum + 1 )
-
         this.isLoadingData = false
       }).catch(err => {
         this.isLoadingData = false;
@@ -370,8 +361,6 @@ export default {
       }
     },
     
-
-
     agreeNode(){
       this.agree = true
       this.commentsToApi.result = 0
@@ -568,6 +557,7 @@ export default {
 
       taskSummit(this.commentsToApi).then(res=>{
         console.log('res :>> ', res);
+        // if(res.data.isSystemReject == true) util.notify("無可簽核人員，請重新確認", 'error', 1500);
         this.isLoadingData = false
         this.$router.push({ name: 'WaitAuditManage'});
 

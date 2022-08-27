@@ -986,6 +986,10 @@ export default {
         .title-name
           width: 90px
         .user_selected
+          display: flex
+          flex-wrap: wrap
+          flex-direction: row
+          justify-content: flex-start
           .el-tag
             margin-right: 5px 
             margin-bottom: 5px
@@ -1004,6 +1008,12 @@ export default {
     .el-dialog
       width: 70% !important
       background: #f7f9fa
+      .el-table th
+        &:first-child
+          .cell
+            width: 50px
+            margin-left: -28px
+
   .users
     .el-checkbox__input.is-checked .el-checkbox__inner
       background: #2c90d9 !important
