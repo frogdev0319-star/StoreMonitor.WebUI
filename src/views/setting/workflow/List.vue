@@ -227,7 +227,7 @@ export default {
     inputSearchValue(val){
       if(val){
         this.searchData =this.allWorkflowList.filter(item => (
-          item.name.indexOf(val) > -1
+          item.name.indexOf(val) > -1 
         ))
       } else {
         this.searchData = this.allTableData
@@ -351,6 +351,7 @@ export default {
     creadNewFlow(){
       sessionStorage.removeItem('workflowDetail')
       sessionStorage.removeItem('newWorkFlow')
+
       // CreateWorkflow 新增節點需要狀態
       var createNewNodeNeed = {"orderedAuditNodeArray":[]}
       sessionStorage.setItem('nodeDataToApi', JSON.stringify(createNewNodeNeed))

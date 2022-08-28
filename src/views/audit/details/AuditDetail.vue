@@ -16,10 +16,10 @@
 
             <div class="audit-flow-ownerhandling">
               <p style="margin-bottom: 30px"> {{$t('audit.workFlows.auditFlow')}}</p>
-              <div class="handling" v-if="!onEditing && auditDetail.auditState < 4">
-                <div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo" >{{customButton[2].text}}</div>
-                <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo"> | </div>
-                <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo">{{$t('audit.auditStatus.cancel')}}</div>
+              <div class="handling" v-if="!onEditing && auditDetail.auditState < 4"> 
+                <div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo && auditStates !== 3" >{{customButton[2].text}}</div>
+                <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo && auditStates !== 3"> | </div>
+                <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo && auditStates !== 3">{{$t('audit.auditStatus.cancel')}}</div>
               </div>
             </div>
             
@@ -125,7 +125,7 @@ export default {
   mounted() {},
   async created() {
     await this.init()
-    await this.getNodeList(this.auditDetail.processDefinitionKey) 
+    // await this.getNodeList(this.auditDetail.processDefinitionKey) 
 
     const resulit = await this.$store.dispatch("GetUserAuthorities");
     this.currentUserInfo = resulit.data.userId
@@ -214,32 +214,9 @@ export default {
         })
         this.auditStates = res.data.auditStates
         this.taskInfo = res.data.taskList
+
         console.log('this.auditStates ----->> ', this.auditStates);
         console.log('this.taskInfo ori ----->> ', this.taskInfo);
-
-        // var totalNum = this.taskInfo.length
-        // // 撤回前的 task 
-        // var drawbackNum = this.taskInfo.findLastIndex(i => {
-        //   if(i.tasks[0].comment !== null){
-        //     return i.tasks[0].comment.result == -2
-        //   }
-        // })
-        // if(drawbackNum > -1) this.taskInfo = this.taskInfo.slice(drawbackNum - totalNum + 1 )
-        // console.log('drawbackNum :>> ', drawbackNum);
-        // console.log('this.taskInfo done1! ----->> ', this.taskInfo);
-
-        // // 駁回的 task
-        // var aaaNum = this.taskInfo.findLastIndex( i =>  i.parentId == -1 && i.state == 1)
-        // console.log('aaaNum :>> ', aaaNum);
-        // console.log('totalNum :>> ', totalNum);
-        // if(aaaNum > -1) this.taskInfo = this.taskInfo.splice(aaaNum, totalNum)
-
-        // var rejectNum = this.taskInfo.findLastIndex( i =>  i.state == 1 && i.tasks[0].comment.result == 1)
-        // console.log('rejectNum :>> ', rejectNum);
-
-        // if(rejectNum > -1) this.taskInfo = this.taskInfo.splice(0, rejectNum + 1 )
-        // console.log('this.taskInfo done2! ----->> ', this.taskInfo);
-
 
         this.isLoadingData = false
       }).catch(err => {
@@ -258,7 +235,7 @@ export default {
           delete d.nextAuditNode
         })
         // console.log('this.taskInfo 2 ------>> ', this.taskInfo);
-        // console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
+        console.log('this.flatNodeData 3 ------>> ', this.flatNodeData);
 
         const currentNode = this.taskInfo.filter( i => i.state == 2)
         var isSignature  = this.flatNodeData.find(n => n.id == currentNode[0].nodeId)
@@ -286,8 +263,6 @@ export default {
         return this.flatNodeData;
       }
     },
-
-
 
     taskDrawback(){
       const value = {
@@ -318,7 +293,6 @@ export default {
       const value = {
         "inspectReportId" : this.auditDetail.inspectReportId
         }
-      console.log('cencel')
       CancelWorkflow(value).then(res=>{
         this.isLoadingData = false
         this.$router.push({name: "SendAuditManage"})
@@ -327,7 +301,6 @@ export default {
         console.log('error' + err);
       });
     },
-
 
     // 判斷駁回取消按鈕顯示
     isEditing(){
@@ -419,8 +392,6 @@ export default {
             margin: 0 10px
             font-size: 14px
             color: #006ab7
-
-
 </style>
 
 

@@ -1416,10 +1416,10 @@ export default{
       "tooltipListcant4": "簽核通過後才能檢視巡檢報告",
 
       "canCancel": "可取消簽核：",
-      "tooltipListcant1": "送出巡檢報告時不會立即產生不合格項之事件，簽核通過時才會產生",
-      "tooltipListcant2": "簽核流程可以選擇「取消」",
-      "tooltipListcant3": "巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項",
-      "tooltipListcant4": "簽核通過後才能檢視巡檢報告",
+      "tooltipListcan1": "送出巡檢報告時不會立即產生不合格項之事件，簽核通過時才會產生",
+      "tooltipListcan2": "簽核流程可以選擇「取消」",
+      "tooltipListcan3": "巡檢報告重新編輯時可以編輯不合格項、合格項及忽略項",
+      "tooltipListcan4": "簽核通過後才能檢視巡檢報告",
       "auditFlow":"簽核流程",
   
     

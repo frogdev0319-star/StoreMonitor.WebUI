@@ -85,10 +85,10 @@
                               <div class="tip">
                                 {{$t('audit.workFlows.canCancel')}}
                                 <ul>
-                                    <li> {{$t('audit.workFlows.tooltipListcant1')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant2')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant3')}}</li>
-                                    <li> {{$t('audit.workFlows.tooltipListcant4')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan1')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan2')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan3')}}</li>
+                                    <li> {{$t('audit.workFlows.tooltipListcan4')}}</li>
                                 </ul>
                               </div>
                             </div>
@@ -504,7 +504,7 @@ export default {
   },
   methods: {
     filterInputSearchUser(users){
-        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 )
+        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
     },
     filterCurTemplateDepartment(users){
         if(this.curTemplateDepartment.length == 0){
@@ -1119,6 +1119,10 @@ export default {
         .title-name
           width: 90px
         .user_selected
+          display: flex
+          flex-wrap: wrap
+          flex-direction: row
+          justify-content: flex-start
           .el-tag
             margin-right: 5px 
             margin-bottom: 5px
@@ -1365,6 +1369,16 @@ export default {
     .el-dialog
       width: 70% !important
       background: #f7f9fa
+      .el-table th
+        
+        &:first-child
+          .cell
+            width: 50px
+            margin-left: -28px
+            
+            
+
+
 
       
   .users
