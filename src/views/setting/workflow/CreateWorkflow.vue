@@ -808,7 +808,7 @@ export default {
 
     //======================================
     filterInputSearchUser(users){
-        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 )
+        return  users.filter( item => item.userName.indexOf(this.inputSearchUser) > -1 || item.email.indexOf(this.inputSearchUser) > -1)
     },
     filterCurTemplateDepartment(users){
         if(this.curTemplateDepartment.length == 0){

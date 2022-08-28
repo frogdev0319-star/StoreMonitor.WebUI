@@ -19,7 +19,7 @@
               <div class="handling" v-if="!onEditing && auditDetail.auditState < 4"> 
                 <div class="withdraw" @click="showDoalogTaskDrawback = true" v-if="auditDetail.submitter == currentUserInfo && auditStates !== 3" >{{customButton[2].text}}</div>
                 <div class="l-l" v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo && auditStates !== 3"> | </div>
-                <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo">{{$t('audit.auditStatus.cancel')}}</div>
+                <div class="cancel" @click="showDoalogTaskCancel = true " v-if="auditDetail.cancelable && auditDetail.submitter == currentUserInfo && auditStates !== 3">{{$t('audit.auditStatus.cancel')}}</div>
               </div>
             </div>
             
@@ -392,8 +392,6 @@ export default {
             margin: 0 10px
             font-size: 14px
             color: #006ab7
-
-
 </style>
 
 
