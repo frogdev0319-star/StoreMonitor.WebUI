@@ -280,12 +280,7 @@ export default {
               userJson.userName = user.userName;
               userJson.userId = user.userId;
               userJson.email = user.email;
-              userJson.position = "";
-              var position = this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
-              //console.log("position:",position)
-              if(position){
-                  userJson.position = position.label;
-              }
+              userJson.position = this.positionsList.find(pos=>{return pos.contents.includes(user.userId)}).label;
               tempUserList.push(userJson);
             });
             this.allUserList = tempUserList;
@@ -315,6 +310,7 @@ export default {
                   //const mapUser = self.doMapUser(item.userId);
                   //console.log("mapUser:",mapUser);
                   let obj = {...item};
+                  obj['position'] = this.positionsList.find(pos=>{return pos.contents.includes(item.userId)}).label;
                   obj['updateTs']=util.getDateStr(item.updateTime),
                   obj['storeAuth']=item.permissionStores,
                   mysterioData.push(obj);
