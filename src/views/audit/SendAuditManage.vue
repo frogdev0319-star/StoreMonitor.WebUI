@@ -394,6 +394,9 @@ export default{
         console.log('send deactivated');
         this.saveSearchParams();
     },
+    mounted() {
+        this.isMimicMode = this.$store.getters.mimicMode;
+    },
     methods: {
         getLangStyleValue(langArray){
             return util.getLangStyleValue(langArray);
