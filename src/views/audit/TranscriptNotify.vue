@@ -301,10 +301,9 @@ export default{
             //self.params.filter = { page: 0, size: val.size };
             self.getAllTask();
         },
-        sortChange(col){
+        sortChange(order, defaultSort){
             const self = this;
-            const order = col.order;
-            if (order === 'ascending') {
+            /*if (order === 'ascending') {
                 self.curOrder = {
                     'direction': 'asc',
                     'property': col.column.property
@@ -316,7 +315,8 @@ export default{
                 };
             } else {
                 self.curOrder = {};
-            }
+            }*/
+            self.curOrder = order;
             self.getAllTask();
         },
         getAllTask(){
