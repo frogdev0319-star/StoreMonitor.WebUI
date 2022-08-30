@@ -1082,7 +1082,7 @@ export default {
         const self = this;
         const data = that.formatJson(filterVal, content);
         const name = self.params.inspectId==='' ? 'All' : self.storePatrolLists;
-        const fileName = this.part3.content[this.part3.indexRegion].groupName + '_Inspection item score_' + util.getCurrentTime();
+        const fileName = (this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName ) + '_Inspection item score_' + util.getCurrentTime();
         export_json_to_excel(tHeader, data, fileName);
       });
     },

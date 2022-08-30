@@ -72,19 +72,19 @@
                         {{ $t('statistics.titles.distribution') }}
                     </span>
                 </div>
-                <TypeSelectArea 
-                    path="inspectEvalutionStatistics" 
-                    ref="typeSelectArea1" 
-                    :allow-all=true 
-                    :allow-person=true 
-                    :region-array1="params.curProvince" 
-                    :region-array2="params.curCity" 
-                    :cur-store-group="params.curStoreGroup" 
-                    :cur-store-type="params.curStoreType" 
-                    :cur-stores="params.storeIds" 
-                    :inspect-id="params.inspectId" 
-                    :cached-params="params" 
-                    :cur-country="curCountry" 
+                <TypeSelectArea
+                    path="inspectEvalutionStatistics"
+                    ref="typeSelectArea1"
+                    :allow-all=true
+                    :allow-person=true
+                    :region-array1="params.curProvince"
+                    :region-array2="params.curCity"
+                    :cur-store-group="params.curStoreGroup"
+                    :cur-store-type="params.curStoreType"
+                    :cur-stores="params.storeIds"
+                    :inspect-id="params.inspectId"
+                    :cached-params="params"
+                    :cur-country="curCountry"
                     :compare-type="part1.compareType"
                     @emitTypeChanged="emitTypeChangedPart1">
                 </TypeSelectArea>
@@ -174,18 +174,18 @@
                         {{ $t('statistics.titles.scoreDistribution') }}
                     </span>
                 </div>
-                <TypeSelectArea 
-                    path="inspectEvalutionStatistics" 
-                    :allow-all=true 
-                    :allow-person=true 
-                    :region-array1="params.curProvince" 
-                    :region-array2="params.curCity" 
-                    :cur-store-group="params.curStoreGroup" 
-                    :cur-store-type="params.curStoreType" 
-                    :cur-stores="params.storeIds" 
-                    :cached-params="params" 
-                    :inspect-id="params.inspectId" 
-                    :cur-country="curCountry" 
+                <TypeSelectArea
+                    path="inspectEvalutionStatistics"
+                    :allow-all=true
+                    :allow-person=true
+                    :region-array1="params.curProvince"
+                    :region-array2="params.curCity"
+                    :cur-store-group="params.curStoreGroup"
+                    :cur-store-type="params.curStoreType"
+                    :cur-stores="params.storeIds"
+                    :cached-params="params"
+                    :inspect-id="params.inspectId"
+                    :cur-country="curCountry"
                     @emitTypeChanged="emitTypeChangedPart2">
                 </TypeSelectArea>
             </div>
@@ -249,7 +249,7 @@
                         <v-chart ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
                     </div>
                 </div>
-                
+
                 <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
                         <table-only ref="elTP" :column-data="part2StoreInfoTableCol" :table-data="part2.storeTableData" :total="part2.table.total" :highlight-current-row="true" :pagesize="sizeNum" :current-page="page" :is-event="false" :default-sort="defaultSort" :allowRowExpand="true" :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" :tableHeight="300" :isexportPDF="ispdf" layout="prev,pager,next,sizes" expand-component="IncepItemTop5" :expandCompProperties="componentsProps" @handleChange="handlePageAndSizeChangePart2" @sortChange="handleSortChangePart2" @onCellClick="onEvenListNumClickPart2" />
@@ -282,17 +282,17 @@
                         {{ $t('statistics.score')+")" }}
                     </span>
                 </div>
-                <TypeSelectArea 
-                    path="inspectEvalutionStatistics" 
-                    :allow-all=true :allow-person=true 
-                    :region-array1="params.curProvince" 
-                    :region-array2="params.curCity" 
-                    :cur-store-group="params.curStoreGroup" 
-                    :cur-store-type="params.curStoreType" 
-                    :cur-stores="params.storeIds" 
-                    :inspect-id="params.inspectId" 
-                    :cached-params="params" 
-                    :cur-country="curCountry" 
+                <TypeSelectArea
+                    path="inspectEvalutionStatistics"
+                    :allow-all=true :allow-person=true
+                    :region-array1="params.curProvince"
+                    :region-array2="params.curCity"
+                    :cur-store-group="params.curStoreGroup"
+                    :cur-store-type="params.curStoreType"
+                    :cur-stores="params.storeIds"
+                    :inspect-id="params.inspectId"
+                    :cached-params="params"
+                    :cur-country="curCountry"
                     @emitTypeChanged="emitTypeChangedPart3">
                 </TypeSelectArea>
             </div>
@@ -1591,7 +1591,7 @@ export default {
             params.groupMode = 0;
             //this.part2.compareType == 'stores'
            // console.log(this.part1.content[this.part1.indexRegion])
-            params.storeIds =this.part1.indexRegion==-1?this.parame.storeIds:this.part1.compareType == 'stores' ? [this.part1.content[this.part1.indexRegion].innerId] : this.part1.content[this.part1.indexRegion].list;
+            params.storeIds =this.part1.indexRegion==-1?this.params.storeIds:this.part1.compareType == 'stores' ? [this.part1.content[this.part1.indexRegion].innerId] : this.part1.content[this.part1.indexRegion].list;
             if (this.part1.compareType == 'position' || this.part1.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
                 params.submitters = self.part1.indexRegion==-1?[]:[self.part1.content[self.part1.indexRegion].innerId];
@@ -1632,7 +1632,7 @@ export default {
                     'numOfDangerous'
                 ];
                 const data = that.formatJson(filterVal, content);
-                const fileName = this.part1.content[this.part1.indexRegion].groupName + '_Inspection evaluation result_' + util.getCurrentTime();
+                const fileName = (this.part1.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part1.content[this.part1.indexRegion].groupName) + '_Inspection evaluation result_' + util.getCurrentTime();
                 export_json_to_excel(tHeader, data, fileName);
             });
         },
@@ -1688,7 +1688,7 @@ export default {
                 const tHeader = that.exportPart2DataHeader;
                 const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'averageScore', 'rank'];
                 const data = that.formatJson(filterVal, content);
-                const fileName = this.part2.content[this.part2.indexRegion].groupName + '_Inspection score_' + util.getCurrentTime();
+                const fileName = (this.part2.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part2.content[this.part2.indexRegion].groupName )+ '_Inspection score_' + util.getCurrentTime();
                 export_json_to_excel(tHeader, data, fileName);
             });
         },
@@ -1747,7 +1747,7 @@ export default {
                 ];
                 const self = this;
                 const data = that.formatJson(filterVal, content);
-                const fileName = this.part3.content[this.part3.indexRegion].groupName + '_Inspection compliance_' + util.getCurrentTime();
+                const fileName =(this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName )+ '_Inspection compliance_' + util.getCurrentTime();
                 export_json_to_excel(tHeader, data, fileName);
             });
         },
@@ -2454,7 +2454,7 @@ export default {
                     else{
                         content = [this.part1.content[this.part1.indexRegion]];
                     }
-                   
+
                 } else {
                     const params = {};
                     params.beginTs = self.params.beginTs;
@@ -3297,7 +3297,7 @@ export default {
                 else{
                         this.part1.indexType = index;
                 }
-                
+
                 this.part1.indexRegion = -1;
                 await this.drawPart1RegionBar();
             }

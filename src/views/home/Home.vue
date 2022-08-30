@@ -248,7 +248,7 @@
           <el-col :sapn="24" class="footercontent">
             <footer class="footerInfo">
               <p style="text-align: left">
-                v3.0.3.18
+                v3.0.3.19-alpha
                  &copy; {{ getFullYear }} Advantech Intelligent City
                 Services Co., Ltd. (AiCS) All Rights Reserved.
               </p>
@@ -908,10 +908,10 @@ export default {
     }
   }
   span {
-    
+
     color:#a5a5a5;
     margin-left: 15px;
-    @media screen and (max-width:1367px) { 
+    @media screen and (max-width:1367px) {
       font-size: 10px;
     }
     @media screen and(min-width: 1367px){
@@ -1710,14 +1710,14 @@ $collapseWidth: 5.5%;
   i {display: none;}
   width: calc(150/1920*100vw) !important;
   .el-input__inner {
-    @media screen and (max-width:1367px) { 
+    @media screen and (max-width:1367px) {
       width: calc(160/1920*100vw);
     }
     @media screen and(min-width: 1367px){
       width: calc(150/1920*100vw);
     }
     height: calc(36/1920*100vw);
-    
+
     color: #484848;
     font-size: calc(15/1920*100vw);
     border-color: #e6e6e6;
