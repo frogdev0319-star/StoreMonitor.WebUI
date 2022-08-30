@@ -492,8 +492,18 @@ export default {
     align-items: flex-start;
 }
 .table-person{
+  .cell{
+    padding-left: 0px;
+  }
     /deep/ .el-table__header-wrapper .el-checkbox{
-        display: none;
+        display:block;
+        .el-checkbox__input.is-checked .el-checkbox__inner {
+            color: #1375bc;
+            font-weight: 400;
+            background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDpub25lIiBkPSJNMCAwaDE2djE2SDB6Ii8+DQogICAgPHBhdGggZD0ibS40IDMgMyA0IDYtNiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMy4xIDQuNSkiIHN0eWxlPSJzdHJva2U6IzJjOTBkOTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjEuNXB4O2ZpbGw6bm9uZSIvPg0KPC9zdmc+DQo=) no-repeat;
+            background-position: center right 0px;
+            border: none;
+        }
     }
     /deep/.el-table__body-wrapper .el-checkbox{
         border: none;

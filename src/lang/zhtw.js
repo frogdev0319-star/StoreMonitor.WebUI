@@ -124,7 +124,7 @@ export default{
       "generalMode":"一般模式",
       "mimicMode":"神秘客模式",
       "MysterioManage":"神秘客權限",
-      "MysterioSetting":"新增權限群組",
+      "MysterioSetting":"門店權限設定",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
