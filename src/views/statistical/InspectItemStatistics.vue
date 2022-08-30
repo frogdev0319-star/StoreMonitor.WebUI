@@ -2117,7 +2117,7 @@ export default {
            regionLabel.push(this.maxLabel(item.groupName))
         });
         if(count>0){
-          totalAvgScore = Math.round(totalAvgScore/count);
+          totalAvgScore = (totalAvgScore/count).toFixed(1);
           this.totalAvgScore =totalAvgScore;
         }
       }
