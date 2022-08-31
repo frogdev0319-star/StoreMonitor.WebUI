@@ -13,7 +13,7 @@
                         type="filled"
                         @click="saveAuth">
                         <div class="button-area">
-                            <span>{{ $t('titleView.save') }}</span>
+                            <span>{{ $t('audit.workFlows.save') }}</span>
                         </div>
                     </delay-button>
                 </div>
@@ -215,6 +215,7 @@ export default {
                 });
             }).then(result =>{
                 var storeList = [];
+                console.log("result:",result);
                 Promise.all( result.content.map(store=>{
 
                     var storeObj = {
@@ -339,6 +340,7 @@ export default {
         addAuth(){
             if(this.selStoreId==null){
                 this.warnningTitle = this.$t('mysterio.pleaseChooseStore');
+                this.selInspectId = null;
                 this.showItemExitedDialog = true;
                 return;
             }

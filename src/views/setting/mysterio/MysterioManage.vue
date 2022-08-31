@@ -492,8 +492,17 @@ export default {
     align-items: flex-start;
 }
 .table-person{
-  .cell{
-    padding-left: 0px;
+  /deep/ .el-table__header-wrapper .el-table-column--selection{
+    padding-left: 0px !important;
+    font-size: 14px !important;
+  }
+  /deep/.el-table__header-wrapper
+  .el-table-column--selection
+  .el-checkbox__inner 
+  {
+    border-radius: 1px;
+    border: solid 1px #acaeb1;
+    background-color: #fff;
   }
     /deep/ .el-table__header-wrapper .el-checkbox{
         display:block;
@@ -516,6 +525,10 @@ export default {
         }
     }
     
+}
+/deep/
+  .el-table th .cell{
+  padding-left: 0px !important;
 }
 /deep/
 .el-table
