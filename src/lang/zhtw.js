@@ -523,7 +523,7 @@ export default{
     "exportExcelAllWarning":"匯出完整報告提示",
     "selectOnlyOneInspect":"匯出完整報告時僅能選擇單一巡檢表",
     "entailReportExcelList":"完整報告明細單",
-    "exportExcelAllNotice1":"報告匯出執行中，匯出完成將自動下載擋案",
+    "exportExcelAllNotice1":"報告匯出執行中，匯出完成將自動下載檔案",
     "exportExcelAllNotice2":"於執行時間您仍可繼續操作系統功能",
     "inspectName":"巡檢表名稱",
     "inspectItemScore":"巡檢項分數",
