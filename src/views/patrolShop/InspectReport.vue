@@ -184,6 +184,7 @@
                                 :src="sourceitem.url"
                                 class="imgLittle imgInner">
                               <el-image
+                                v-else
                                 :style="isexportPDF ? exportImageStyle :imageStyle"
                                 :src="sourceitem.url"
                                 :preview-src-list="getImgList(index, item.sourceList)"
