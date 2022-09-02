@@ -280,12 +280,9 @@ export default {
               userJson.userName = user.userName;
               userJson.userId = user.userId;
               userJson.email = user.email;
-              userJson.position = "";
-              var position = this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
-              //console.log("position:",position)
-              if(position){
-                  userJson.position = position.label;
-              }
+              var position =  this.positionsList.find(pos=>{return pos.contents.includes(user.userId)});
+              //console.log("position:",position);
+              userJson.position = (position)?position.label:'';
               tempUserList.push(userJson);
             });
             this.allUserList = tempUserList;
@@ -315,6 +312,8 @@ export default {
                   //const mapUser = self.doMapUser(item.userId);
                   //console.log("mapUser:",mapUser);
                   let obj = {...item};
+                  var position = this.positionsList.find(pos=>{return pos.contents.includes(item.userId)})
+                  obj['position'] = (position)? position.label:"";
                   obj['updateTs']=util.getDateStr(item.updateTime),
                   obj['storeAuth']=item.permissionStores,
                   mysterioData.push(obj);
@@ -496,8 +495,36 @@ export default {
     align-items: flex-start;
 }
 .table-person{
+  /deep/ .el-table__header-wrapper .el-table-column--selection{
+    padding-left: 0px !important;
+    font-size: 14px !important;
+  }
+  /deep/.el-table__header-wrapper
+  .el-table-column--selection
+  .el-checkbox__inner 
+  {
+    border-radius: 1px;
+    border: solid 1px #acaeb1;
+    background-color: #fff;
+    &:hover{
+      border-color: #dcdfe6 !important;
+    }
+  }
     /deep/ .el-table__header-wrapper .el-checkbox{
-        display: none;
+        display:block;
+        .el-checkbox__input.is-checked .el-checkbox__inner {
+            color: #1375bc;
+            font-weight: 400;
+            background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4NCiAgICA8cGF0aCBzdHlsZT0iZmlsbDpub25lIiBkPSJNMCAwaDE2djE2SDB6Ii8+DQogICAgPHBhdGggZD0ibS40IDMgMyA0IDYtNiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMy4xIDQuNSkiIHN0eWxlPSJzdHJva2U6IzJjOTBkOTtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjEuNXB4O2ZpbGw6bm9uZSIvPg0KPC9zdmc+DQo=) no-repeat;
+            background-position: center right 0px;
+            border: none;
+        }
+        .el-checkbox__input.is-focus .el-checkbox__inner {
+          border-color: #2c90d9;
+        }
+        .el-checkbox__inner:hover {
+          border-color: #2c90d9;
+        }
     }
     /deep/.el-table__body-wrapper .el-checkbox{
         border: none;
@@ -510,6 +537,10 @@ export default {
         }
     }
     
+}
+/deep/
+  .el-table th .cell{
+  padding-left: 0px !important;
 }
 /deep/
 .el-table
@@ -541,4 +572,5 @@ export default {
     background-position: center right 0px;
     border: none;
 }
+      
 </style>

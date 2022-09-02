@@ -944,6 +944,7 @@ export default {
                       isBindWorkflow:!!PermissionHelper.enableSendAudit()
                   };
                 }else{
+                  util.notify(wfRes.errMsg, 'error', 3000);
                   routeData = {
                     isSuccess: false,
                     reLoadData: self.$route.params,
@@ -967,6 +968,7 @@ export default {
             }
             
           } else {
+            util.notify(res.errMsg, 'error', 3000);
             routeData = {
               isSuccess: false,
               reLoadData: self.$route.params,
@@ -1079,6 +1081,8 @@ export default {
                 isBindWorkflow:!!PermissionHelper.enableSendAudit() 
             };
             self.$router.push({ name: 'submitEvent', params: { data: routeData}});
+          }else{
+            util.notify(wfRes.errMsg, 'error', 3000);
           }
         }).catch(err=>{
             console.log("ReSubmitWorkflow err:",err);

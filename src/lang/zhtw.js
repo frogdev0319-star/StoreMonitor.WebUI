@@ -124,7 +124,7 @@ export default{
       "generalMode":"一般模式",
       "mimicMode":"神秘客模式",
       "MysterioManage":"神秘客權限",
-      "MysterioSetting":"新增權限群組",
+      "MysterioSetting":"門店權限設定",
   },
   "overview":{
       "DangerousLess":"立即督導＜60%",
@@ -523,7 +523,7 @@ export default{
     "exportExcelAllWarning":"匯出完整報告提示",
     "selectOnlyOneInspect":"匯出完整報告時僅能選擇單一巡檢表",
     "entailReportExcelList":"完整報告明細單",
-    "exportExcelAllNotice1":"報告匯出執行中，匯出完成將自動下載擋案",
+    "exportExcelAllNotice1":"報告匯出執行中，匯出完成將自動下載檔案",
     "exportExcelAllNotice2":"於執行時間您仍可繼續操作系統功能",
     "inspectName":"巡檢表名稱",
     "inspectItemScore":"巡檢項分數",
