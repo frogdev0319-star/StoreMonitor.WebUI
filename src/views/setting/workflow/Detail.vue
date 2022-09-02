@@ -689,6 +689,9 @@ export default {
         })
         item.auditByGroups = [...newArr2 ]
       })
+
+      this.flatNodeDataView[0].auditByUsers = []
+      this.flatNodeDataView[0].auditByUsers.push(this.$t('audit.workFlows.submitterName'))
       console.log('this.flatNodeDataView 5 ------>> ', this.flatNodeDataView);
     },
     
@@ -800,7 +803,6 @@ export default {
           break;      
         }
         case 'delete':{
-          // this.deleteRow(row.id)
           this.rowId = row.id
           this.showSingleDeleteContent = true
           break;      
@@ -892,9 +894,21 @@ export default {
       var deleteNode = this.nodeDataToApi.orderedAuditNodeArray.filter( e =>(
         e.id !== deleteId
       ))
-      this.nodeDataToApi.orderedAuditNodeArray = deleteNode
+
+      // 處理簽核人員下拉選單顯示(清除已選狀況)
+      var tempDeleteNode = [...deleteNode]
+      tempDeleteNode.shift()
       
+      var auditMembers  = {}
+      auditMembers.auditByUsers = tempDeleteNode.map(u => u = u.auditByUsers[0])
+      auditMembers.auditByGroups = tempDeleteNode.map(g => g = g.auditByGroups[0])
+      sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
+
+
+      this.nodeDataToApi.orderedAuditNodeArray = deleteNode
       sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))
+
+
       // call api for update
       updateWorkflow(this.nodeDataToApi).then(res=>{
         console.log('res :>> ', res);

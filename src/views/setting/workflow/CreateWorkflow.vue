@@ -612,8 +612,9 @@ export default {
         },
       ]
       
-      console.log('this.currentUser 2', this.currentUser)
-      initData[0].auditByUsers.push(this.currentUser)
+      // console.log('this.currentUser 2', this.currentUser)
+      // initData[0].auditByUsers.push(this.currentUser)
+      initData[0].auditByUsers.push(this.$t('audit.workFlows.submitterName'))
       this.newFlatNodeDataView = initData
     },
 
@@ -775,6 +776,8 @@ export default {
         "auditByUsers": [],
         "auditByGroups": []
       }
+      
+      console.log('handleFlatNodeDataView ===--->> ', handleFlatNodeDataView);
 
       handleFlatNodeDataView.forEach(i=>{
         if(i.auditByUsers.length !== 0){
@@ -932,13 +935,18 @@ export default {
     // maping data for page view
     handleData(){
       // switch user id to name 
+      var tempNewFlatNodeDataView = [...this.newFlatNodeDataView]
+      console.log('tempNewFlatNodeDataView  handele ------>> ', tempNewFlatNodeDataView);
       console.log('this.newFlatNodeDataView  handele ------>> ', this.newFlatNodeDataView);
+
       this.newFlatNodeDataView.forEach(item =>{
         var newArr = []
+        if(item.auditByUsers[0] == this.$t('audit.workFlows.submitterName')) newArr.push( this.$t('audit.workFlows.submitterName'))
+        
         this.userInfo.forEach( u =>{
-          if(item.auditByUsers[0] == u.userId || item.auditByUsers[0] == u.userName){
+          if( item.auditByUsers[0] == u.userId || item.auditByUsers[0] == u.userName){
             newArr.push(u.userName)
-          }
+          } 
         })
         item.auditByUsers = newArr
       })
@@ -954,6 +962,7 @@ export default {
         })
         item.auditByGroups = newArr2
       })
+      
     },
 
 
@@ -1036,10 +1045,32 @@ export default {
       var rowPosition = this.newFlatNodeDataView.findIndex( e =>(
         e.id == id
       ))
+
       this.newFlatNodeDataView.splice(rowPosition , 1)
       sessionStorage.removeItem('newWorkFlow')
       sessionStorage.setItem('reNewNode', JSON.stringify(this.newFlatNodeDataView))
 
+      // 處理簽核人員下拉選單顯示(清除已選狀況)
+      var tempDeleteNode = [...this.newFlatNodeDataView]
+      tempDeleteNode.shift()
+      var auditMembers  = {}
+      auditMembers.auditByUsers = []
+      auditMembers.auditByGroups = []
+
+      var aaa = tempDeleteNode.map(u => u = u.auditByUsers[0])
+      aaa.forEach( i =>{
+        this.userInfo.forEach(u=>{
+          if( i == u.userName) auditMembers.auditByUsers.push(u.userId)
+        })
+      })
+      var bbb = tempDeleteNode.map(g => g = g.auditByGroups[0])
+      bbb.forEach( i =>{
+        this.department.forEach(u=>{
+          if( i == u.userName) auditMembers.auditByGroups.push(u.userId)
+        })
+      })
+
+      sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
       this.fullscreenLoading = false
     },
 
@@ -1068,14 +1099,14 @@ export default {
 
       this.newFlatNodeDataView.forEach(d =>{
         delete d.id 
-        if(d.auditByUsers.length !== 0){
-          console.log('aaa :>> ');
+        if(d.auditByUsers.length !== 0 ){
+
           var currentUser = this.userInfo.filter(u => u.userName == d.auditByUsers[0])
           console.log('currentUser :>> ', currentUser);
           d.auditByUsers = []
-          d.auditByUsers.push(currentUser[0].userId)
+          if(currentUser.length > 0) d.auditByUsers.push(currentUser[0].userId)
+
         } else {
-          console.log('bbb :>> ');
           var currentGroup = this.department.filter(u => u.defineName == d.auditByGroups[0])
           console.log('currentGroup :>> ', currentGroup);
 

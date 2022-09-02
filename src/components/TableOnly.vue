@@ -75,7 +75,10 @@
           <template v-else-if="_item.forDescription">
             <div class="forDescription">
               <div class="shortdescription">{{row.description}}</div> 
-              <div class="showDescription" v-if="row.description.length > 13"> {{row.description}}</div>
+              <div class="showDescription" 
+                :class ="{ 'width-fit': row.description.length < 50}"
+                v-if="row.description.length > 13" 
+                > {{row.description}}</div>
             </div>
             
           </template>
@@ -647,10 +650,11 @@ export default {
     },
     
     needAlert(row){
-      console.log('needAlert :>> ');
-      console.log('row :>> ', row);
+      // console.log('needAlert :>> ');
+      // console.log('row :>> ', row);
       if(row.isBind == true){
-          util.notify(`${this.$t('audit.workFlows.isBind')} ${row.inspectTagName} ${this.$t('audit.workFlows.cantClose')}`, 'error', 3000);
+          this.$emit('cantCloseAlertPopup', row);
+          // util.notify(`${this.$t('audit.workFlows.isBind')} ${row.inspectTagName} ${this.$t('audit.workFlows.cantClose')}`, 'error', 3000);
       }else{
         return
       }

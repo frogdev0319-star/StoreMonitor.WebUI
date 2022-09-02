@@ -380,6 +380,7 @@ export default{
     },
     created(){
         this.isFirstLoad = true;
+        
     },
     activated() {
         console.log('send actived isFirstLoad:',this.isFirstLoad);
@@ -608,7 +609,7 @@ export default{
                     self.curTotalPage = self.tableDataList[self.curTabIndx].totalPage;
                     self.curSizeNum = self.tableDataList[self.curTabIndx].sizeNum;
                     self.curOrder = self.tableDataList[self.curTabIndx].order;
-                    console.log("curTotalPage:",self.curTotalPage);
+                    // console.log("curTotalPage:",self.curTotalPage);
                     resolve(tempAll);
                 }).then(result=>{
                     self.isLoading = false;

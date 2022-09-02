@@ -36,6 +36,7 @@
           :cellStyle="{backgroundColor: '#fff !important'}"
           @handleOperation="handleEmitOperation"
           @handleSwitchChange="handleSwitchChange"
+          @cantCloseAlertPopup = "cantCloseAlertPopup"
         />
       </div>
     </div>
@@ -53,7 +54,7 @@
 
     <!-- popup -->
     <dialog-pop
-      :title="$t('insSettingView.confirmDelete')"
+      :title="$t('audit.workFlows.comfirmDelete')"
       :append-to-body="true"
       :close-on-click-modal="false"
       :show-close="false"
@@ -67,6 +68,46 @@
         <div class="dialog-content">{{$t('audit.workFlows.comfirmDelete')}} </div>
       </div>
     </dialog-pop>
+
+    <dialog-pop
+      :title="$t('audit.workFlows.canNotDelete')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="cantDeleteAlert"
+      :isWarning="true"
+      :showCancelbtn = "false"
+      class="alert-popup"
+      @confirmHandler="cantDeleteAlert = false"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content"> 
+          {{$t('audit.workFlows.makeSureUsign')}}<br>
+          <b> 「 {{cantDeleteList}} 」</b>
+          
+        </div>
+      </div>
+    </dialog-pop>
+
+  <dialog-pop
+      :title="$t('audit.workFlows.canNotClose')"
+      :append-to-body="true"
+      :close-on-click-modal="false"
+      :show-close="false"
+      :visible="cantCloseAlert"
+      :isWarning="true"
+      :showCancelbtn = "false"
+      class="alert-popup"
+      @confirmHandler="cantCloseAlert = false"
+    >
+      <div class="dialog-slot">
+        <div class="dialog-content">
+          {{$t('audit.workFlows.makeSureUsign')}} <br>
+          <b> 「 {{cantCloseList}} 」</b>
+        </div>
+      </div>
+    </dialog-pop>
+
 
   </div>
 </template>
@@ -103,6 +144,11 @@ export default {
       authorizedDevicesNum: 0,
       isLoadingData: false,
       showSingleDeleteContent: false,
+      cantDeleteAlert: false,
+      cantCloseAlert: false,
+      cantDeleteList: '',
+      cantCloseList:'',
+
       deletedProcessDefinitionKey: '',
       columnOperationData: {
         label: this.$t('deviceView.operation'),
@@ -351,6 +397,11 @@ export default {
     creadNewFlow(){
       sessionStorage.removeItem('workflowDetail')
       sessionStorage.removeItem('newWorkFlow')
+      sessionStorage.removeItem('reNewNode')
+
+      // CreateWorkflow 判斷是否選過的簽核人員或部門，預設狀態
+      var default_auditMembers = {"auditByUsers":[],"auditByGroups":[]}
+      sessionStorage.setItem('auditMembers', JSON.stringify(default_auditMembers))
 
       // CreateWorkflow 新增節點需要狀態
       var createNewNodeNeed = {"orderedAuditNodeArray":[]}
@@ -361,7 +412,6 @@ export default {
     },
     
     handleEmitOperation({ method, row }) {
-      console.log('List row =====>> ', row);
       switch(method){
         case 'copy':{
           this.duplicateRow(row.processDefinitionKey)
@@ -376,12 +426,9 @@ export default {
             this.showSingleDeleteContent = true
             this.deletedProcessDefinitionKey = row.processDefinitionKey
           }else{
-            console.log('row !!! :>> ', row);
-            this.$message({
-              type: 'error',
-              message: `${this.$t('audit.workFlows.isBind')} ${row.inspectTagName} ${this.$t('audit.workFlows.canNotDelete')}`
-              // message: 
-            }); 
+            this.cantDeleteAlert = true
+            this.cantDeleteList = row.inspectTagName.replaceAll(',', '、')
+            
           }
           break;      
         }
@@ -389,6 +436,11 @@ export default {
           break;
         }
       }
+    },
+
+    cantCloseAlertPopup(row){
+      this.cantCloseAlert = true
+      this.cantCloseList = row.inspectTagName.replaceAll(',', '、')
     },
 
     settingWorkFlow(row){
@@ -478,6 +530,7 @@ export default {
     //   console.log('this.tableData :>> ', this.tableData);
     // },
 
+    
 
     handleSwitchChange({ checked, target }) {
       console.log('checked :>> ', checked);
@@ -526,6 +579,10 @@ export default {
 </script>
 
 <style lang="sass" >
+  
+  .alert-popup
+    .el-dialog__header
+      color: #c60957
   .button-area
     height: 23px
     padding: 0 5px
@@ -561,7 +618,6 @@ export default {
         width: 250px
       &:nth-child(5), &:nth-child(6)
         width: 250px
- 
 
   .el-table__row
     .el-table__cell
@@ -572,36 +628,45 @@ export default {
             cursor: default
       &:nth-child(5), &:nth-child(6)
         width: 250px
-          
-  .forDescription
-    position: relative
-    &:hover
+
+    .forDescription
+      position: relative
+      &:hover
+        .showDescription
+          display: block
+      .shortdescription
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+        width: 200px
       .showDescription
-        display: block
-    .shortdescription
-      overflow: hidden
-      text-overflow: ellipsis
-      white-space: nowrap
-      width: 200px
-    .showDescription
-      position: absolute
-      width: 350px
-      height: auto
-      font-size: 13px
-      line-height: 1.5
-      padding: 10px
-      background: rgba(0,0,0,.75)
-      color: #fff
-      border-radius: 3px
-      top: -10px
-      left: 101%
-      z-index: 1000
-      display: none
+        position: absolute
+        width: 500px
+        height: fit-content
+        font-size: 13px
+        line-height: 1.5
+        padding: 10px
+        background: rgba(0,0,0,.75)
+        color: #fff
+        border-radius: 3px
+        bottom: -10px
+        left: 95%
+        z-index: 1000
+        display: none
+    &:nth-child(-n+5)
+      .showDescription
+        top: -10px
+
+    
+
+
+
   .forWorkflowsSwitch
     display: flex
     flex-direction: row
     justify-content: center
     align-items: center
     
-
+  .width-fit
+    width: max-content !important
 </style>

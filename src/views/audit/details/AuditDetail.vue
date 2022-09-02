@@ -265,6 +265,7 @@ export default {
     },
 
     taskDrawback(){
+      
       const value = {
         "inspectReportId" : this.auditDetail.inspectReportId
         }
@@ -272,17 +273,6 @@ export default {
         this.isLoadingData = false
         var reportId = this.auditDetail.inspectReportId
         this.$router.push({name: "SendAuditManage"})
-        // this.$router.push(
-        //   { 
-        //     name: 'auditReportdetails', 
-        //     params: {
-        //       reportId: reportId, 
-        //       isAuditMode: true, 
-        //       canEdit: true,
-        //       canCancel: this.auditDetail.cancelable && (this.auditDetail.auditState==2 ||this.auditDetail.auditState==3 || this.auditDetail.auditState==6)
-        //       }
-        //   }
-        // );
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);

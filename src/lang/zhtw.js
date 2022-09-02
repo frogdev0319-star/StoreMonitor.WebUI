@@ -1334,9 +1334,12 @@ export default{
       "saveAndEnable":"儲存並啟用",
       "comfirmDelete":"確認刪除當前簽核流程？",
       "comfirmDeleteNode":"確認刪除當前簽核流程節點？",
-      "canNotDelete":"」此簽核流程無法刪除",
-      'isBind':"已綁定巡檢表「",
-      'cantClose': "」無法禁用",
+      "submitterName":"送出人",
+
+      "canNotDelete":"此流程無法刪除",
+      "canNotClose":"此流程無法關閉",
+      "makeSureUsign":"請確認以下巡檢表是否正在使用流程:",
+
       "dulplicateScuccess":"已成功複製流程",
       "deleteScuccess":"删除成功",
       "deleteFail":"删除失敗",

@@ -91,8 +91,8 @@ export default {
       immediate: false, 
       deep: true,
       handler (val) {
-        console.log("page total:",val);
-        console.log("this.currentPage:",this.currentPage);
+        // console.log("page total:",val);
+        // console.log("this.currentPage:",this.currentPage);
           this.total = val;
           if(this.currentPage!=1 && this.total< this.currentPage) {
             this.currentPage = this.currentPage-1;
