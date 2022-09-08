@@ -780,6 +780,16 @@ export default {
     tr{
       background-color: #f7f9fa !important;
     }
+    /**** body的scrollbar
+    .el-table__body-wrapper::-webkit-scrollbar {
+	      width: 4px; 
+	      height: 150px; 
+    }
+    .el-table__body-wrapper::-webkit-scrollbar-thumb {
+        box-shadow: 0px 1px 3px #acaeb1 inset; 
+        border-radius: 2px; 
+        background-color: #acaeb1; 
+    }*/
   }
   .table-white {
     .el-table{
@@ -788,6 +798,16 @@ export default {
       border: solid 1px #f5f5f5;
       background-color: #fff;
     }
+    /**** body的scrollbar
+    .el-table__body-wrapper::-webkit-scrollbar {
+	      width: 4px; 
+	      height: 150px; 
+    }
+    .el-table__body-wrapper::-webkit-scrollbar-thumb {
+        box-shadow: 0px 1px 3px #acaeb1 inset; 
+        border-radius: 2px; 
+        background-color: #acaeb1; 
+    }*/
   }
   #el-tablescrollbar {
   height: calc(100% - 225px);
@@ -844,6 +864,8 @@ export default {
        border-color:#2c90d9;
       }
     }
+    
+    
 </style>
 
 <style lang="sass" >
