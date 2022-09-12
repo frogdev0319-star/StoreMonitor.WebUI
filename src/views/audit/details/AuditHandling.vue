@@ -169,6 +169,17 @@
     </dialog-pop>
 
 
+    <dialog-pop
+      :title="$t('remotePatrol.systemReject')"
+      :isWarning="true"
+      :visible="isSystemRejectDialog"
+      :showCancelbtn="false"
+      @confirmHandler="isSystemRejectDialogConfirm">
+      <div class="dialog-slot">
+        <div class="dialog-content">{{ $t('remotePatrol.systemRejectMsg') }} </div>
+      </div>
+    </dialog-pop>
+    
   </div>
 	</div>
 
@@ -253,7 +264,9 @@ export default {
 
       onEditing: false,
       showDoalogTaskDrawback : false,
-      showDoalogTaskCancel: false
+      showDoalogTaskCancel: false,
+
+      isSystemRejectDialog : false
     }
   },
   mounted() {},
@@ -554,19 +567,29 @@ export default {
         return
       }
       console.log('this.commentsToApi ready to Api -------->> ', this.commentsToApi);
-
       taskSummit(this.commentsToApi).then(res=>{
         console.log('res :>> ', res);
-        // if(res.data.isSystemReject == true) util.notify("無可簽核人員，請重新確認", 'error', 1500);
         this.isLoadingData = false
-        this.$router.push({ name: 'WaitAuditManage'});
-
+        console.log('res.data.isSystemReject :>> ', res.data.isSystemReject);
+        if(res.data.isSystemReject == true) {
+          console.log('aaaaaaa :>> ');
+          this.isSystemRejectDialog = true
+          return
+        }else {
+          console.log('bbbbbbb :>> ');
+          this.$router.push({ name: 'WaitAuditManage'});
+        }
       }).catch(err => {
         this.isLoadingData = false;
         console.log('error' + err);
         util.notify(this.$t('audit.auditStatus.needSign'), 'error', 1500);
 
       });
+    },
+
+    isSystemRejectDialogConfirm(){
+        this.isLoadingData = false;
+        this.$router.push({ name: 'WaitAuditManage'});
     },
 
     getAccountId() {

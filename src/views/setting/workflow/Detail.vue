@@ -315,7 +315,10 @@ import {
   updateWorkflow, 
   getUserStatus,
   } from "@/api/workflow";
-import {getUserInfo} from '@/api/login';
+import {
+  getUserInfo,
+  getAllUserInfoNoAuth
+  } from '@/api/login';
 
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
@@ -579,7 +582,7 @@ export default {
     
     // get user
     async getUserInfo(){
-      await getUserInfo().then(res=>{
+      await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
         this.userData = this.userInfo
         console.log('getWorkflowInfo 2 ------>> ', this.userInfo);
@@ -903,7 +906,6 @@ export default {
       auditMembers.auditByUsers = tempDeleteNode.map(u => u = u.auditByUsers[0])
       auditMembers.auditByGroups = tempDeleteNode.map(g => g = g.auditByGroups[0])
       sessionStorage.setItem('auditMembers', JSON.stringify(auditMembers))
-
 
       this.nodeDataToApi.orderedAuditNodeArray = deleteNode
       sessionStorage.setItem('nodeDataToApi', JSON.stringify(this.nodeDataToApi))

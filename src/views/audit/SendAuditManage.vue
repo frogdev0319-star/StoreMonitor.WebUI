@@ -380,6 +380,7 @@ export default{
     },
     created(){
         this.isFirstLoad = true;
+        console.log('this.$route.meta.isBack :::::::>> ', this.$route.meta.isBack);
         
     },
     activated() {
@@ -409,7 +410,7 @@ export default{
             self.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
             self.inputSearchValue = '';
             self.curTotalPage = 0;
-            
+            console.log("self.curTabIndx @@?",self.curTabIndx);
             self.getSearchParams();
             //this.tableDataList[Number(this.activeName)].page = 1;
             self.getAllTask()
@@ -470,6 +471,7 @@ export default{
                 this.curTabIndx = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx:0;
                 this.activeName = (this.$route.params.curTabIndx)? this.$route.params.curTabIndx.toString():'0';
                 this.curStoreIds = this.storeFilterObj.filterStoreIds;
+                
                 this.dateValue = [this.$moment().subtract(29, 'days').startOf('d').toDate(), this.$moment().endOf('d').toDate()];
                 //this.params.beginTs = this.dateValue[0].valueOf();
                 //this.params.endTs = this.dateValue[1].valueOf();
@@ -528,12 +530,13 @@ export default{
         },
         getAllTask(){
             this.isLoading = true;
+
             for (let i = 0; i < 3; i++) {
                 this.tableDataList[i].tableData = [];
                 this.tableDataList[i].taskCount = 0;
                 this.tableDataList[i].totalPage = 0;
             }
-            console.log("this.curTabIndx:",this.curTabIndx);
+            console.log("this.curTabIndx ::::: >>",this.curTabIndx);
             var params = {
                 beginTs:this.dateValue[0].valueOf(),
                 endTs:this.dateValue[1].valueOf(),

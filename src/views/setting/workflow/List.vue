@@ -30,13 +30,15 @@
           :is-loading-data="isLoadingData"
           :allowRowExpand = "false"
           :showBorder = "false"
-          :default-sort = "{prop: 'updateTs', order: 'descending'}"
+          :default-sort = defaultSort
           :headerStyle="{height:'47px',backgroundColor: '#fff',border:'none',fontSize:'12px',paddingLeft: '12px',}" 
           :tableHeight = "760"
           :cellStyle="{backgroundColor: '#fff !important'}"
           @handleOperation="handleEmitOperation"
           @handleSwitchChange="handleSwitchChange"
           @cantCloseAlertPopup = "cantCloseAlertPopup"
+          @sortChange="sortChange"
+
         />
       </div>
     </div>
@@ -176,7 +178,7 @@ export default {
       allTableData:[],
       allWorkflowList:[],
       tableData: [],
-      
+      defaultSort:{order:'descending', prop:'updateTs'},
       columnData: [
         // {
         //   'prop': 'index',
@@ -245,8 +247,6 @@ export default {
           "size": 10,
           "direction": "DESC",
           "property": "updateTs",
-          // "name": "test",
-          // "type": 0,
           "state": [
               0,
               1,
@@ -311,7 +311,7 @@ export default {
       var hour = this.pad2(date.getHours())
       var min = this.pad2(date.getMinutes())
       var sec = this.pad2(date.getSeconds())
-      return year + "/"+ month +"/"+ day +"/"+ hour +":"+ min +":"+ sec
+      return year + "-"+ month +"-"+ day +" "+ hour +":"+ min +":"+ sec
     },
 
     async getUserInfo(){
@@ -410,6 +410,46 @@ export default {
       sessionStorage.setItem('pageAction', JSON.stringify("init"))
       this.$router.push({name: 'createWorkflow'})
     },
+
+
+
+    sortChange(order, defaultSort){
+
+        // console.log('order ~~~~~>> ', order);
+        // console.log('defaultSort ~~~~~>> ', defaultSort);
+        this.isLoadingData = true
+        this.apiBody.direction = order.direction.toUpperCase()
+        this.apiBody.property = order.property
+
+        console.log('this.apiBody sss ~~~~~>> ', this.apiBody);
+
+        this.getWorkflowList(this.apiBody);
+    },
+
+
+      handlePagination(pageInfo){
+      // sessionStorage.setItem('pageInfo', JSON.stringify(pageInfo))
+
+      // const newApiBody = {...this.apiBody, size:pageInfo.size, page: pageInfo.page - 1}
+      // this.apiBody = []
+      // this.apiBody = newApiBody
+
+      console.log('pageInfo ppp ~~~~~>> ', pageInfo);
+
+      this.currentPage = pageInfo.page
+      this.inputSearchValue = ''
+      this.apiBody.page =  pageInfo.page - 1
+      this.apiBody.size =  pageInfo.size
+
+      console.log('this.apiBody ~~~~~>> ', this.apiBody);
+
+      // this.init()
+      this.getWorkflowList(this.apiBody);
+    },
+
+
+
+
     
     handleEmitOperation({ method, row }) {
       switch(method){
@@ -504,17 +544,7 @@ export default {
       this.deleteRow(value)
     },
 
-    handlePagination(pageInfo){
-      sessionStorage.setItem('pageInfo', JSON.stringify(pageInfo))
-      const newApiBody = {...this.apiBody, size:pageInfo.size, page: pageInfo.page - 1}
-      this.apiBody = []
-      this.apiBody = newApiBody
-      this.currentPage = pageInfo.page
-      this.inputSearchValue = ''
-      // console.log('pageInfo :>> ', pageInfo);
-      console.log('this.apiBody :>> ', this.apiBody);
-      this.init()
-    },
+  
 
     // handlePageAndSizeChange(pageObj) {
     //   const self = this;

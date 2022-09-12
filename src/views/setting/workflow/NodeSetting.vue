@@ -317,7 +317,10 @@ import DelayButton from '@/components/DelayButton';
 import SettingTable from '@/components/SettingTable';
 import {updateWorkflow} from "@/api/workflow";
 import {getDepart } from '@/api/login';
-import {getUserInfo} from '@/api/login';
+import {
+  getUserInfo,
+  getAllUserInfoNoAuth
+  } from '@/api/login';
 import TableOnly from '@/components/TableOnly';
 import DialogPop from '@/components/DialogPop';
 
@@ -447,7 +450,7 @@ export default {
 
     // get user
     async getUserInfo(){
-      await getUserInfo().then(res=>{
+      await getAllUserInfoNoAuth().then(res=>{
         this.userInfo = res.data
         
         console.log('userInfo ------>> ', this.userInfo);

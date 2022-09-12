@@ -588,7 +588,12 @@ export default {
       return new Promise((resolve, reject) => {
         inpectRESTful.GetInspectRuleSettings(params).then(res => {
           resolve(res);
-          console.log('res.data ~~~~~~~>> ', res.data);
+          console.log('res.data ~~~~~~~::>> ', res.data);
+          
+          var tempSign = res.data.filter(i => i.name == "onSiteSignature")
+          console.log('tempSign :>> ', tempSign);
+          this.signatureData = tempSign[0]
+
           const tempArry = res.data.filter(list => list.name == "workflow")
           console.log('tempArry :>> ', tempArry);
           this.workFlowInfoValue = tempArry[0].value
@@ -726,7 +731,6 @@ export default {
     deleteSign(index){
       console.log('index :>> ', index);
       this.signatureData.extra.splice(index, 1)
-
     }
 
   }

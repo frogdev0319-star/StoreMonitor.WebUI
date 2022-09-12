@@ -78,7 +78,10 @@
 									v-if="blopImg.mediaType == 2"
 									:preview-src-list = "getImgSrc(index, blopImg)"
 									/>
-								<a class="pdfLink" :href="blopImg.url" v-if="blopImg.mediaType == 4"></a>
+								<a class="pdfLink" :href="blopImg.url" v-if="blopImg.mediaType == 4">
+																	<p class="pdf_name" v-if="blopImg.mediaType == 4">{{blopImg.fileName}}</p>
+
+								</a>
 							</div>
 							
 						</div>
@@ -271,29 +274,40 @@ export default {
 									height: 120px
 									border-radius: 4px
 									cursor: pointer !important
+						
 						img
-								margin-top: 10px
-								margin-right: 10px
-								border-radius: 4px
-								width: auto
-								height: 120px
-								border-radius: 4px
-								cursor: pointer !important
+							margin-top: 10px
+							margin-right: 10px
+							border-radius: 4px
+							width: auto
+							height: 120px
+							border-radius: 4px
+							cursor: pointer !important
 						.pdfLink
 							display: block
 							margin-top: 10px
 							margin-right: 10px
 							width: 80px
 							height: 120px
+							text-decoration: none
 							background: #190
 							border-radius: 4px
 							display: flex
 							flex-direction: row
 							justify-content: center
-							align-items: center
-							background: url("~@/../static/img/PDF_file_icon.svg") center
+							align-items: flex-end
+							background: url("~@/../static/img/PDF_file_icon.svg") top
 							background-size: contain
 							background-repeat: no-repeat
+							.pdf_name
+								text-align: center
+								font-size: 12px
+								overflow: hidden
+								text-overflow: ellipsis
+								white-space: nowrap
+								width: 80px
+								text-decoration: none
+								color: #888
 
 </style>
 <style lang="sass">
