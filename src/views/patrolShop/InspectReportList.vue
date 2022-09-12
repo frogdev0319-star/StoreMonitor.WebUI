@@ -558,7 +558,9 @@ export default {
     },
     mimicModeChanged(val){
         console.log("mimicMode val:",val);
-        this.initData();
+        this.isLoading = true;
+        this.ifSearchData = true;
+        //this.initData();
     }
     
   },

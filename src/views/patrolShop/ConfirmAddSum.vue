@@ -904,6 +904,7 @@ export default {
         }else{
           self.uploadingnumOfPic++;
             const auditImgObj = {
+              fileName:self.pdfFileList[idx].showName,
               mediaType: 4,
               url: self.pdfFileList[idx].src,
               ts: Date.now()
