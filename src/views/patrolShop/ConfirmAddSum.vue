@@ -862,36 +862,55 @@ export default {
       var auditAttachment = [];
       //upload audit image
       for(let idx=0; idx<self.imgFileList.length;idx++){
-        await self.upLoadFile(self.imgFileList[idx]).then((url) => {
-          console.log("upload file url:",url);
+        if(!self.imgFileList[idx].hasUrl){
+          await self.upLoadFile(self.imgFileList[idx]).then((url) => {
+            self.uploadingnumOfPic++;
+            const auditImgObj = {
+              mediaType: 2,
+              url: url,
+              ts: Date.now()
+            };
+            auditAttachment.push(auditImgObj);
+          }).catch((err) => {
+            console.log("uploade file error:",err)
+            upload++;
+          });
+        }else{
           self.uploadingnumOfPic++;
-          const auditImgObj = {
-            mediaType: 2,
-            url: url,
-            ts: Date.now()
-          };
-          auditAttachment.push(auditImgObj);
-        }).catch((err) => {
-          console.log("uploade file error:",err)
-          upload++;
-        });
-        
+            const auditImgObj = {
+              mediaType: 2,
+              url: self.imgFileList[idx].src,
+              ts: Date.now()
+            };
+            auditAttachment.push(auditImgObj);
+        }
       }
       //upload audit pdf
       for(let idx=0; idx<self.pdfFileList.length; idx++){
-        await self.upLoadFile(self.pdfFileList[idx]).then((url) => {
+        if(!self.pdfFileList[idx].hasUrl){
+          await self.upLoadFile(self.pdfFileList[idx]).then((url) => {
+            self.uploadingnumOfPic++;
+            const auditImgObj = {
+              fileName:self.pdfFileList[idx].showName,
+              mediaType: 4,
+              url: url,
+              ts: Date.now()
+            };
+            auditAttachment.push(auditImgObj);
+          }).catch((err) => {
+            console.log("uploade file error:",err)
+            upload++;
+          });
+        }else{
           self.uploadingnumOfPic++;
-          const auditImgObj = {
-            fileName:self.pdfFileList[idx].showName,
-            mediaType: 4,
-            url: url,
-            ts: Date.now()
-          };
-          auditAttachment.push(auditImgObj);
-        }).catch((err) => {
-          console.log("uploade file error:",err)
-          upload++;
-        });
+            const auditImgObj = {
+              fileName:self.pdfFileList[idx].showName,
+              mediaType: 4,
+              url: self.pdfFileList[idx].src,
+              ts: Date.now()
+            };
+            auditAttachment.push(auditImgObj);
+        }
       }
       if (upload !== 0) {
           self.uploadProgress = false;
@@ -1091,6 +1110,51 @@ export default {
           }
         );
     },
+    doGetReportWorkflowTask(){
+      getReportWorkflowTask({type:0,inspectReportId:this.reportId}).then(result=>{
+        console.log("getReportWorkflowTask result:",result);
+        if(result.errCode==0){
+          const tasks = result.data.taskList[0].tasks;
+          console.log("tasks:",tasks);
+          if(tasks.length>0){
+            this.auditNote = tasks[0].comment.description;
+            var imgList = [];
+            var pdfList = [];
+            const attachments = tasks[0].comment.attachment.map(att=>{
+              if(att.mediaType==2){//image
+                imgList.push(
+                  {
+                    fileName:att.fileName,
+                    src:att.url,
+                    file:att.url,
+                    type:'img',
+                    size:0,
+                    hasUrl:true
+                  }
+                );
+              }else if(att.mediaType==4){//pdf
+                pdfList.push({
+                  fileName:att.fileName,
+                  showName:att.fileName,
+                  src:att.url,
+                  file:att.fileName,
+                  type:'pdf',
+                  size:0,
+                  hasUrl:true
+                });
+              }
+              
+            });
+            this.imgFileList = imgList;
+            this.pdfFileList = pdfList;
+          }
+          
+          
+        }else{
+          console.log("getReportWorkflowTask error:",result.errMsg);
+        }
+      })
+    },
     onshowSystemRejectConfirm(){
       this.showSystemReject = false;
       this.$store.dispatch('setEditCount', 0);
@@ -1129,7 +1193,11 @@ export default {
         self.isEditReport = routeData.isEditReport;
         self.auditCancelable = routeData.auditCancelable;
 
-        if(self.isEditReport) self.reportId = routeData.reportId;
+        if(self.isEditReport) {
+          self.reportId = routeData.reportId;
+          console.log("isEditReport");
+          self.doGetReportWorkflowTask();
+        };
         if(self.isBindWorkflow){
           console.log('**inspectSettings.workflowInfo',inspectSettings.workflowInfo);
           self.doGetWorkflowInfo(inspectSettings.workflowInfo);

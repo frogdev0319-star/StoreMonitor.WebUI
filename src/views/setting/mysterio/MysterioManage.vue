@@ -536,7 +536,22 @@ export default {
             border: none;
         }
     }
-    
+  /deep/ .el-table__body-wrapper::-webkit-scrollbar {
+	    width: 4px; /*滚动条宽度*/
+	    height: 150px; /*滚动条高度*/
+	}
+	/*定义滚动条轨道 内阴影+圆角*/
+	/deep/ .el-table__body-wrapper::-webkit-scrollbar-track {
+	    /*box-shadow: 0px 1px 3px #071e4a inset; 滚动条的背景区域的内阴影*/
+	    border-radius: 10px; /*滚动条的背景区域的圆角*/
+	    background-color: #FFF; /*滚动条的背景颜色*/
+	}
+	/*定义滑块 内阴影+圆角*/
+	/deep/ .el-table__body-wrapper::-webkit-scrollbar-thumb {
+	    box-shadow: 0px 1px 3px #acaeb1 inset; /*滚动条的内阴影*/
+	    border-radius: 2px; /*滚动条的圆角*/
+	    background-color: #acaeb1; /*滚动条的背景颜色*/
+	}
 }
 /deep/
   .el-table th .cell{
