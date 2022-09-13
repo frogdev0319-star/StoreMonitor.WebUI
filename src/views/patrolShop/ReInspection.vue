@@ -1506,7 +1506,7 @@ export default {
       let tempId = null;
       const indexFeed = self.sheetName.map(x => x.groupId).indexOf('feedBack');
       const sheetName = self.sheetName.slice(0, indexFeed);
-  
+      
         sheetName.forEach((s_item, s_index) => {
           s_item.inspectList[0].items.forEach((item, index) => {
             if (item.id === id) {
@@ -3474,9 +3474,9 @@ export default {
       self.eventList.push(picObj);
       self.showFeedBackInfo = false;
     },
-    submitItemResource({ item, index }) {
+    submitItemResource({ item}) {
       const self = this;
-      this.curItemIndex = index;
+      //this.curItemIndex = index;
       if (item.inspectInput.trim().length === 0) return
       if (this.curEditIndex > -1) {
         item.sourceList = item.sourceList.map((source, idx) => {
