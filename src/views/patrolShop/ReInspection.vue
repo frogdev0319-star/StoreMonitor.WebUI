@@ -1117,9 +1117,10 @@ export default {
       this.currentVideoComponent = ['DashVideo', 'EzvizVideo', 'BeseyeVideo', 'SkywatchVideo'][this.vendor] || 'EzvizVideo';
     },
     mimicMode(){
-      this.enableMimicMode = this.$store.getters.mimicMode;
-      this.getAllStore();
-      console.log("enableMimicMode:",this.enableMimicMode)
+      const self = this;
+      self.enableMimicMode = this.$store.getters.mimicMode;
+      self.getAllStore();
+      //console.log("enableMimicMode:",this.enableMimicMode);
     },
   },
 
@@ -2102,6 +2103,8 @@ export default {
             sheet.inspectList[childIdx].dealCount = dealCount;
           }
           sheet.dealCount = dealCount;
+          this.editCount = dealCount;
+          this.$store.dispatch('setEditCount', this.editCount);
         }
       })
       ).then(result =>{
@@ -2682,6 +2685,7 @@ export default {
       const self = this;
       self.leaveObj.dialogCosed = false;
       if (self.$refs.vendorVideo) self.$refs.vendorVideo.editCount = 0;
+      
     },
     cancelLeave() {
       const self = this;

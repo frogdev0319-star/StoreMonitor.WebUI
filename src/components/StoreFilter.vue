@@ -310,16 +310,17 @@ export default {
         this.isFavorite = false;
         this.getStoreListAndGroupAndType();
       }*/
-      if(this.$store.getters.editCount != 0){
+      if(this.$store.getters.editReport){
+        this.checkCurStoreInFavorite = true;
+        this.EditRptchangeStoreObj.dialogCosed = true;
+      }
+      else if(this.$store.getters.editCount != 0){
         this.checkCurStoreInFavorite = true;
         this.changeStoreObj.dialogCosed = true;
       }else if(this.$store.getters.editCount_storeMonitor!=0){
         this.changeStoreObj.showInfo = this.$t('remotePatrol.confirmSwitch'),
         this.checkCurStoreInFavorite = true;
         this.changeStoreObj.dialogCosed = true;
-      }else if(this.$store.getters.editReport){
-        this.checkCurStoreInFavorite = true;
-        this.EditRptchangeStoreObj.dialogCosed = true;
       }else{
       this.isFavorite = !this.isFavorite;
         this.getStoreListAndGroupAndType();
@@ -451,16 +452,17 @@ export default {
 
     },
     onChangeSelectedStore(val) {
-      if(this.$store.getters.editCount != 0) {
+      if(this.$store.getters.editReport){
+        this.curSelectedStore_ = val;
+        this.EditRptchangeStoreObj.dialogCosed = true;
+      }
+      else if(this.$store.getters.editCount != 0) {
         this.curSelectedStore_ = val;
         this.changeStoreObj.dialogCosed = true;
       } else if(this.$store.getters.editCount_storeMonitor!=0){
         this.curSelectedStore_ = val;
         this.changeStoreObj.showInfo = this.$t('remotePatrol.confirmSwitch'),
         this.changeStoreObj.dialogCosed = true;
-      }else if(this.$store.getters.editReport){
-        this.curSelectedStore_ = val;
-        this.EditRptchangeStoreObj.dialogCosed = true;
       }else {
         this.curSelectedStore=val
         this.emitParams();

@@ -532,7 +532,8 @@ export default{
     "createRptDT":"報告產生時間",
     "resubmiteRpt":"確認送出報告",
     "systemReject":"系統撤回",
-    "systemRejectMsg":"無可簽核人員，請重新確認"
+    "systemRejectMsg":"無可簽核人員，請重新確認",
+    "cannotSwitchMimicMode":"正在編輯報告，不能切換模式",
   },
   "eventView":{
       "ClosedEvent":"已結案事件",

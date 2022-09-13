@@ -282,6 +282,30 @@
         </section>
       </el-col>
     </el-row>
+    <dialog-pop
+      v-if="leaveObj.dialogCosed"
+      :title="leaveObj.title"
+      :isWarning="leaveObj.isWarning"
+      :visible="leaveObj.dialogCosed"
+      @cancelHandler="cancelLeave"
+      @confirmHandler="leaveDialog"
+      >
+      <div class="dialog-slot">
+        {{leaveObj.showInfo}}
+      </div>
+    </dialog-pop>
+    <dialog-pop
+          v-if="EditRptchangeStoreObj.dialogCosed"
+          :title="EditRptchangeStoreObj.title"
+          :isWarning="EditRptchangeStoreObj.isWarning"
+          :visible="EditRptchangeStoreObj.dialogCosed"
+          :showCancelbtn="false"
+          @confirmHandler="()=>EditRptchangeStoreObj.dialogCosed=false"
+          >
+          <div class="dialog-slot">
+            {{EditRptchangeStoreObj.showInfo}}
+          </div>
+        </dialog-pop>
   </div>
 </template>
 <script>
@@ -290,8 +314,12 @@ import PubSub from 'pubsub-js';
 import Database from '@/common/Database';
 import util from '@/common/util.js';
 import PermissionHelper from '../../api/PermissionHelper';
+import DialogPop from '@/components/DialogPop.vue';
 export default {
   name: "Home",
+  components: {
+    DialogPop
+  },
   data() {
     return {
       showTag: false,
@@ -330,7 +358,19 @@ export default {
       brandDisabled: false,
       showIgnoreItem:false,
       showMimicMode:false,
-      hasMystery:false
+      hasMystery:false,
+      leaveObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.changPageInfo'),
+        isWarning: true,
+        dialogCosed: false
+      },
+      EditRptchangeStoreObj: {
+        title: this.$t('remotePatrol.prompt'),
+        showInfo: this.$t('remotePatrol.cannotSwitchMimicMode'),
+        isWarning: false,
+        dialogCosed: false
+      },
     };
   },
 
@@ -560,11 +600,32 @@ export default {
 
   methods: {
     changeMimicMode(){
+      if(this.$route.path=="/reinspection" && this.$store.getters.editReport){
+        this.EditRptchangeStoreObj.dialogCosed = true;
+      }else if(this.$route.path=="/reinspection" && this.$store.getters.editCount != 0){
+        this.leaveObj.dialogCosed = true;
+      }
+      else{
+        var mode = !this.showMimicMode;
+        this.showMimicMode = !this.showMimicMode;
+        PermissionHelper.setShowMimicMode(this.showMimicMode);
+        this.$store.dispatch('setMimicMode', mode);
+        this.changeRoutes(true);
+      }
+    },
+    leaveDialog() {
       var mode = !this.showMimicMode;
       this.showMimicMode = !this.showMimicMode;
       PermissionHelper.setShowMimicMode(this.showMimicMode);
       this.$store.dispatch('setMimicMode', mode);
-      this.changeRoutes();
+      this.$store.dispatch('setEditCount', 0);
+      this.leaveObj.dialogCosed = false;
+      this.changeRoutes(true);
+
+    },
+    cancelLeave() {
+      const self = this;
+      self.leaveObj.dialogCosed = false;
     },
     listenerChild(reply) {
       //console.log("listenerChil="+reply)
@@ -958,8 +1019,8 @@ export default {
       
     },
 
-    async changeRoutes() {
-      // console.log("Change Routes");
+    async changeRoutes(mimicModeChanged=false) {
+      //console.log("*Change Routes mimicModeChanged:",mimicModeChanged);
       const self = this;
       const result = await self.$store.dispatch("GetUserAuthorities");
       
@@ -971,7 +1032,13 @@ export default {
           this.$router.push("/noRight");
         } else if (!availablePathesList.includes(this.$route.path)) {
           this.$router.push(availablePathesList[0]);
-        } else {
+        } else if(mimicModeChanged && this.$route.path=="/auditDetail" || this.$route.path=="/auditReportdetails"){
+          this.$router.push("/audit");
+        //this.$router.path = "/audit";
+        }else if(mimicModeChanged && this.$route.path=="/reportdetails"){
+        this.$router.push("/report");
+        //this.$router.path = "/report";
+        }else {
           // console.log(this.$route.path);
           this.$router.push(this.$route.path);
         }
@@ -1752,6 +1819,11 @@ $collapseWidth: 5.5%;
 }
 /deep/ #el-menuscrollbar .el-scrollbar__wrap .el-scrollbar__bar.is-horizontal {
   display: none !important;
+}
+.dialog-slot{
+  margin: 0 calc(20/1920*100vw) calc(20/1920*100vw);
+  display: flex;
+  align-items: center;
 }
 </style>
 <style  lang="scss">
