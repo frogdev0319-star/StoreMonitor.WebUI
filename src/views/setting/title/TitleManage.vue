@@ -156,7 +156,7 @@ export default {
     },
     setPagingTableData(){
       this.tableData = [];
-      this.tableData = [...this.allTableData.slice( (self.page - 1)* this.sizeNum, this.page* this.sizeNum)];
+      this.tableData = [...this.allTableData.slice( (this.page - 1)* this.sizeNum, this.page* this.sizeNum)];
       console.log('this.tableData :>> ', this.tableData);
     },
     updateTitle(row) {
