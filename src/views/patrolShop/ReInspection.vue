@@ -1843,7 +1843,7 @@ export default {
       const params = {
         storeId: self.store.storeId,
         mode: 0,
-        authorizedOnly: 1,
+        authorizedOnly: this.enableMimicMode?0:1,
         tagName: self.patrolstore,
         inspectId: val,
         isMysteryMode:this.enableMimicMode
