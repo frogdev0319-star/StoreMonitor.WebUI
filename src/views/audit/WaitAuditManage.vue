@@ -494,9 +494,10 @@ export default{
                         taskObj.processLastUpdateTs =  util.getDateStr(task.processLastUpdateTs);
                         taskObj['auditStatusName'] = util.getAuditStatusName(task.auditState);
                         taskObj['operator']=this.$t('statistics.check');
-                        if(task.taskOwner=='***Task Done***'){//已完成
+                        if(task.auditState==4 || task.auditState==5){//已完成
                             //completedCount+=1;
                             taskObj.taskOwner = "--";
+                            //tempCompleted.push(taskObj);
                         }
                         tempAll.push(taskObj);
                     }
