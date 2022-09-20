@@ -845,7 +845,7 @@ export default {
             }).catch((err) => {
               upload++;
             });
-            if (upload !== 0) {
+            if (upload !== 0) {imgFileList
               self.uploadProgress = false;
               util.notify(self.$t('remotePatrol.sentFail'), 'error', 3000);
               return false;
@@ -1014,7 +1014,7 @@ export default {
       };
       var resReportModify = modifyReportWorkflow(params);
       var resWorkflowTask = getReportWorkflowTask({type:0,inspectReportId:self.reportId});
-      Promise.all([resReportModify,resWorkflowTask]).then(result =>{
+      Promise.all([resReportModify,resWorkflowTask]).then( async (result) =>{
         console.log("doModifyReportSubmit result:",result);
         var data =[]
         if(result[0].errCode==0){
@@ -1036,6 +1036,13 @@ export default {
             canCancel: this.auditCancelable,
             auditCancelable:this.auditCancelable
           };
+          const workflowParams={
+            _id:'rpt'+self.reportId,
+            description:self.auditNote,
+            attachment:auditAttachment
+          };
+          console.log("save db:",workflowParams);
+          await Database.addDataToDB('rpt'+self.reportId, workflowParams);
           console.log("routeData:",routeData);
           self.$router.push({ name: 'auditReportdetails', params: routeData});
         }else{
@@ -1099,6 +1106,7 @@ export default {
                 isSuccess: true,
                 isBindWorkflow:!!PermissionHelper.enableSendAudit() 
             };
+            Database.removeDataFromDB('rpt'+self.reportId);
             self.$router.push({ name: 'submitEvent', params: { data: routeData}});
           }else{
             util.notify(wfRes.errMsg, 'error', 3000);
@@ -1111,49 +1119,57 @@ export default {
         );
     },
     doGetReportWorkflowTask(){
-      getReportWorkflowTask({type:0,inspectReportId:this.reportId}).then(result=>{
-        console.log("getReportWorkflowTask result:",result);
-        if(result.errCode==0){
-          const tasks = result.data.taskList[0].tasks;
-          console.log("tasks:",tasks);
-          if(tasks.length>0){
-            this.auditNote = tasks[0].comment.description;
-            var imgList = [];
-            var pdfList = [];
-            const attachments = tasks[0].comment.attachment.map(att=>{
-              if(att.mediaType==2){//image
-                imgList.push(
-                  {
-                    fileName:att.fileName,
-                    src:att.url,
-                    file:att.url,
-                    type:'img',
-                    size:0,
-                    hasUrl:true
-                  }
-                );
-              }else if(att.mediaType==4){//pdf
-                pdfList.push({
-                  fileName:att.fileName,
-                  showName:att.fileName,
-                  src:att.url,
-                  file:att.fileName,
-                  type:'pdf',
-                  size:0,
-                  hasUrl:true
-                });
-              }
-              
-            });
-            this.imgFileList = imgList;
-            this.pdfFileList = pdfList;
+      Database.getDataFromDB('rpt'+this.reportId).then(res => {
+        console.log("**getDataFromDB:",res);
+        this.auditNote = res.description;
+        this.doGetAuditAttachList(res.attachment);
+      }).catch(err=>{ //local DB 已刪除
+        console.log("**getDataFromDB err:",err)
+        getReportWorkflowTask({type:0,inspectReportId:this.reportId}).then(result=>{
+          console.log("getReportWorkflowTask result:",result);
+          if(result.errCode==0){
+            const tasks = result.data.taskList[0].tasks;
+            console.log("tasks:",tasks);
+            if(tasks.length>0){
+              this.auditNote = tasks[0].comment.description;
+              this.doGetAuditAttachList(tasks[0].comment.attachment);
+            }
+          }else{
+            console.log("getReportWorkflowTask error:",result.errMsg);
           }
-          
-          
-        }else{
-          console.log("getReportWorkflowTask error:",result.errMsg);
+        })
+      }
+      );
+    },
+    doGetAuditAttachList(attachments){
+      var imgList = [];
+      var pdfList = [];
+      attachments.map(att=>{
+        if(att.mediaType==2){//image
+          imgList.push(
+            {
+              fileName:att.fileName,
+              src:att.url,
+              file:att.url,
+              type:'img',
+              size:0,
+              hasUrl:true
+            }
+          );
+        }else if(att.mediaType==4){//pdf
+          pdfList.push({
+            fileName:att.fileName,
+            showName:att.fileName,
+            src:att.url,
+            file:att.fileName,
+            type:'pdf',
+            size:0,
+            hasUrl:true
+          });
         }
-      })
+      });
+        this.imgFileList = imgList;
+        this.pdfFileList = pdfList;
     },
     onshowSystemRejectConfirm(){
       this.showSystemReject = false;
