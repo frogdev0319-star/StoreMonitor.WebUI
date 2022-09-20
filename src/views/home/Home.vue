@@ -1103,7 +1103,7 @@ export default {
     font-size: calc(22/1920*100vw);
     background-color: #FFF;
     color: #484848;
-    height: calc(40/1920*100vw);
+    height: calc(40/1920*100vw) !important;
   }
     /deep/
     .el-select__caret{
