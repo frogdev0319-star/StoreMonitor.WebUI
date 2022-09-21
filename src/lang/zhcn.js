@@ -1332,9 +1332,13 @@ export default{
         "saveAndEnable":"储存并启用",
         "comfirmDelete":"确认删除当前签核流程？",
         "comfirmDeleteNode":"确认删除当前签核流程节点？",
-        "canNotDelete":"」此签核流程无法删除",
-        "isBind":"已绑定巡检表「",
-        "cantClose":"」无法禁用",
+
+        "submitterName":"送出人",
+        "canNotDelete":"此签核流程无法删除",
+        "canNotClose":"此流程无法关闭",
+        "makeSureUsign":"请确认以下巡检表是否正在使用流程:",
+
+
         "dulplicateScuccess":"已成功复制流程",
         "deleteScuccess":"删除成功",
         "deleteFail":"删除失败",
@@ -1350,7 +1354,7 @@ export default{
         "canCancel":"可取消签核：",
         "canNotCancel":"不可取消签核",
         "thisModeWithoutEvent":" ※ 此模式不会立即产生事件",
-        "addNode":"新增节点",
+        "addNode":"新增签核节点",
         "nodeIndex":"节点编号",
         "nodeName":"节点名称",
         "nodeAuditName":"签核人员",
@@ -1366,6 +1370,10 @@ export default{
         "findUser":"查询人员",
         "save":"保存",
         "keywords":"关键词",
+
+        "allPosition":"所有职务",
+        "allDepart":"所有部门",
+
         "depart":"部门",
         "position":"职务",
         "searchNameMail":"搜寻人员名称、信箱",
