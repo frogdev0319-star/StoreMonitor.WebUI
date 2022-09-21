@@ -127,12 +127,12 @@
                 <el-dropdown-menu slot="dropdown" class="dropdown">
                   <el-dropdown-item
                     class="dropdown-item"
-                    style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                    style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                     @click.native="export2Excel"
                     >{{ $t('eventView.exportReportDetail') }}</el-dropdown-item>
                   <el-dropdown-item
                     class="dropdown-item"
-                    style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
+                    style=" width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
                     @click.native="export2ExcelAll">{{ $t('eventView.exportEntailReport') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
