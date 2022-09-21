@@ -72,19 +72,19 @@
                         {{ $t('statistics.titles.distribution') }}
                     </span>
                 </div>
-                <TypeSelectArea 
-                    path="inspectEvalutionStatistics" 
-                    ref="typeSelectArea1" 
-                    :allow-all=true 
-                    :allow-person=true 
-                    :region-array1="params.curProvince" 
-                    :region-array2="params.curCity" 
-                    :cur-store-group="params.curStoreGroup" 
-                    :cur-store-type="params.curStoreType" 
-                    :cur-stores="params.storeIds" 
-                    :inspect-id="params.inspectId" 
-                    :cached-params="params" 
-                    :cur-country="curCountry" 
+                <TypeSelectArea
+                    path="inspectEvalutionStatistics"
+                    ref="typeSelectArea1"
+                    :allow-all=true
+                    :allow-person=true
+                    :region-array1="params.curProvince"
+                    :region-array2="params.curCity"
+                    :cur-store-group="params.curStoreGroup"
+                    :cur-store-type="params.curStoreType"
+                    :cur-stores="params.storeIds"
+                    :inspect-id="params.inspectId"
+                    :cached-params="params"
+                    :cur-country="curCountry"
                     :compare-type="part1.compareType"
                     @emitTypeChanged="emitTypeChangedPart1">
                 </TypeSelectArea>
@@ -174,18 +174,18 @@
                         {{ $t('statistics.titles.scoreDistribution') }}
                     </span>
                 </div>
-                <TypeSelectArea 
-                    path="inspectEvalutionStatistics" 
-                    :allow-all=true 
-                    :allow-person=true 
-                    :region-array1="params.curProvince" 
-                    :region-array2="params.curCity" 
-                    :cur-store-group="params.curStoreGroup" 
-                    :cur-store-type="params.curStoreType" 
-                    :cur-stores="params.storeIds" 
-                    :cached-params="params" 
-                    :inspect-id="params.inspectId" 
-                    :cur-country="curCountry" 
+                <TypeSelectArea
+                    path="inspectEvalutionStatistics"
+                    :allow-all=true
+                    :allow-person=true
+                    :region-array1="params.curProvince"
+                    :region-array2="params.curCity"
+                    :cur-store-group="params.curStoreGroup"
+                    :cur-store-type="params.curStoreType"
+                    :cur-stores="params.storeIds"
+                    :cached-params="params"
+                    :inspect-id="params.inspectId"
+                    :cur-country="curCountry"
                     @emitTypeChanged="emitTypeChangedPart2">
                 </TypeSelectArea>
             </div>
@@ -249,7 +249,7 @@
                         <v-chart ref="storeChart" :id="part2-region-line-chart" :options="part2.barStoreOption" autoresize :style="{width:part2.barStoreOption?part2.barStoreOption.width :'100%',height:'100%'}" />
                     </div>
                 </div>
-                
+
                 <div v-else style="main-rgtop:20.5px;height:100%;" :style="{width:ispdf?'1024px':null}">
                     <div style="margin-top:20.5px;padding-right:10px;">
                         <table-only ref="elTP" :column-data="part2StoreInfoTableCol" :table-data="part2.storeTableData" :total="part2.table.total" :highlight-current-row="true" :pagesize="sizeNum" :current-page="page" :is-event="false" :default-sort="defaultSort" :allowRowExpand="true" :headerStyle="{height:'47px',backgroundColor: '#f7f9fa',border:'none',fontSize:'12px'}" :tableHeight="300" :isexportPDF="ispdf" layout="prev,pager,next,sizes" expand-component="IncepItemTop5" :expandCompProperties="componentsProps" @handleChange="handlePageAndSizeChangePart2" @sortChange="handleSortChangePart2" @onCellClick="onEvenListNumClickPart2" />
@@ -282,17 +282,17 @@
                         {{ $t('statistics.score')+")" }}
                     </span>
                 </div>
-                <TypeSelectArea 
-                    path="inspectEvalutionStatistics" 
-                    :allow-all=true :allow-person=true 
-                    :region-array1="params.curProvince" 
-                    :region-array2="params.curCity" 
-                    :cur-store-group="params.curStoreGroup" 
-                    :cur-store-type="params.curStoreType" 
-                    :cur-stores="params.storeIds" 
-                    :inspect-id="params.inspectId" 
-                    :cached-params="params" 
-                    :cur-country="curCountry" 
+                <TypeSelectArea
+                    path="inspectEvalutionStatistics"
+                    :allow-all=true :allow-person=true
+                    :region-array1="params.curProvince"
+                    :region-array2="params.curCity"
+                    :cur-store-group="params.curStoreGroup"
+                    :cur-store-type="params.curStoreType"
+                    :cur-stores="params.storeIds"
+                    :inspect-id="params.inspectId"
+                    :cached-params="params"
+                    :cur-country="curCountry"
                     @emitTypeChanged="emitTypeChangedPart3">
                 </TypeSelectArea>
             </div>
@@ -1050,13 +1050,13 @@ export default {
             ],
             part1: {
                 compareType: 'area1',
-                indexRegion: 0,
+                indexRegion: -1,
                 content: [],
                 selStoreIdArr: [],
                 compareIds: [],
                 comapareLabels: [],
                 originArray: [],
-                indexType: 0,
+                indexType: -1,
                 regionOrder: "desc",
                 storeOrder: "desc",
                 storeMode: 0,
@@ -1080,13 +1080,13 @@ export default {
                 standardScore: -9999,
                 averageScore: -9999,
                 compareType: 'stores',
-                indexRegion: 0,
+                indexRegion: -1,
                 content: [],
                 selStoreIdArr: [],
                 compareIds: [],
                 comapareLabels: [],
                 originArray: [],
-                indexType: 0,
+                indexType: -1,
                 regionOrder: "desc",
                 storeOrder: "desc",
                 storeMode: 0,
@@ -1110,13 +1110,13 @@ export default {
                 standardScore: -9999,
                 averageScore: -9999,
                 compareType: 'stores',
-                indexRegion: 0,
+                indexRegion: -1,
                 content: [],
                 selStoreIdArr: [],
                 compareIds: [],
                 comapareLabels: [],
                 originArray: [],
-                indexType: 0,
+                indexType: -1,
                 regionOrder: "desc",
                 storeOrder: "desc",
                 storeMode: 0,
@@ -1590,11 +1590,11 @@ export default {
             params.endTs = self.params.endTs;
             params.groupMode = 0;
             //this.part2.compareType == 'stores'
-            console.log(this.part1.content[this.part1.indexRegion])
-            params.storeIds = this.part1.compareType == 'stores' ? [this.part1.content[this.part1.indexRegion].innerId] : this.part1.content[this.part1.indexRegion].list;
+           // console.log(this.part1.content[this.part1.indexRegion])
+            params.storeIds =this.part1.indexRegion==-1?this.params.storeIds:this.part1.compareType == 'stores' ? [this.part1.content[this.part1.indexRegion].innerId] : this.part1.content[this.part1.indexRegion].list;
             if (this.part1.compareType == 'position' || this.part1.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters = [self.part1.content[self.part1.indexRegion].innerId];
+                params.submitters = self.part1.indexRegion==-1?[]:[self.part1.content[self.part1.indexRegion].innerId];
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -1632,7 +1632,7 @@ export default {
                     'numOfDangerous'
                 ];
                 const data = that.formatJson(filterVal, content);
-                const fileName = this.part1.content[this.part1.indexRegion].groupName + '_Inspection evaluation result_' + util.getCurrentTime();
+                const fileName = (this.part1.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part1.content[this.part1.indexRegion].groupName) + '_Inspection evaluation result_' + util.getCurrentTime();
                 export_json_to_excel(tHeader, data, fileName);
             });
         },
@@ -1649,10 +1649,10 @@ export default {
                 property: "averageScore",
             }
             console.log(this.part2.content[this.part2.indexRegion])
-            params.storeIds = this.part2.compareType == 'stores' ? [this.part2.content[this.part2.indexRegion].innerId] : this.part2.content[this.part2.indexRegion].list;
+            params.storeIds =this.part2.indexRegion==-1?this.params.storeIds: this.part2.compareType == 'stores' ? [this.part2.content[this.part2.indexRegion].innerId] : this.part2.content[this.part2.indexRegion].list;
             if (this.part2.compareType == 'position' || this.part2.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters = [self.part1.content[self.part1.indexRegion].innerId];
+                params.submitters =self.part2.indexRegion==-1?[]: [self.part1.content[self.part2.indexRegion].innerId];
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -1688,7 +1688,7 @@ export default {
                 const tHeader = that.exportPart2DataHeader;
                 const filterVal = ['province', 'city', 'groupName', 'storeGroup', 'storeType', 'code', 'submitters', 'numOfReport', 'averageScore', 'rank'];
                 const data = that.formatJson(filterVal, content);
-                const fileName = this.part2.content[this.part2.indexRegion].groupName + '_Inspection score_' + util.getCurrentTime();
+                const fileName = (this.part2.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part2.content[this.part2.indexRegion].groupName )+ '_Inspection score_' + util.getCurrentTime();
                 export_json_to_excel(tHeader, data, fileName);
             });
         },
@@ -1705,10 +1705,10 @@ export default {
                 property: "standardScore",
             }
             // console.log(this.part3.content[this.part3.indexRegion])
-            params.storeIds = this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId] : this.part3.content[this.part3.indexRegion].list;
+            params.storeIds = this.part3.indexRegion==-1?this.params.storeIds:this.part3.compareType == 'stores' ? [this.part3.content[this.part3.indexRegion].innerId] : this.part3.content[this.part3.indexRegion].list;
             if (this.part3.compareType == 'position' || this.part3.compareType == 'users') {
                 params.storeIds = self.params.storeIds;
-                params.submitters = [self.part1.content[self.part1.indexRegion].innerId];
+                params.submitters = self.part3.indexRegion==-1?[]:[self.part3.content[self.part3.indexRegion].innerId];
                 params.groupIds = [];
                 params.groupMode = 0;
             }
@@ -1747,7 +1747,7 @@ export default {
                 ];
                 const self = this;
                 const data = that.formatJson(filterVal, content);
-                const fileName = this.part3.content[this.part3.indexRegion].groupName + '_Inspection compliance_' + util.getCurrentTime();
+                const fileName =(this.part3.indexRegion==-1?this.$t('statistics.event.seeAll'):this.part3.content[this.part3.indexRegion].groupName )+ '_Inspection compliance_' + util.getCurrentTime();
                 export_json_to_excel(tHeader, data, fileName);
             });
         },
@@ -2344,8 +2344,8 @@ export default {
 
             for (var k in seriesData) {
                 if (seriesData[k].value > 0) {
-                    this.part1.indexType = parseInt(k);
-                    console.log("Init RegionIndex=" + this.part1.indexType)
+                    //this.part1.indexType = parseInt(k);
+                    //console.log("Init RegionIndex=" + this.part1.indexType)
                     break;
                 }
             }
@@ -2366,13 +2366,16 @@ export default {
             if (this.part1.content) {
                 this.part1.content.map((item, index) => {
                     let value = 0;
-                    var arr = [item.numOfDangerous, item.numOfImproved, item.numOfQualified]
+                    var arr = [item.numOfDangerous, item.numOfImproved, item.numOfQualified,item.numOfReport]
                     if (this.part1.indexType == 0) {
                         value = util.getPercentValue(arr, 0, 2)
                     } else if (this.part1.indexType == 1) {
                         value = util.getPercentValue(arr, 1, 2)
                     } else if (this.part1.indexType == 2) {
                         value = util.getPercentValue(arr, 2, 2)
+                    }
+                    else{
+                        value = util.getPercentValue(arr, 3, 2)
                     }
                     item.value = parseFloat(value);
                 });
@@ -2383,11 +2386,11 @@ export default {
                         return a.value - b.value;
                 })
                 this.part1.content.map((item, index) => {
-                    if (this.part1.indexRegion < 0 && item.value > 0) {
-                        this.part1.indexRegion = index;
-                    }
+                    //if (this.part1.indexRegion < 0 && item.value > 0) {
+                    //    this.part1.indexRegion = index;
+                    //}
 
-                    if (this.part1.indexRegion == index) {
+                    if (this.part1.indexRegion==-1 || (this.part1.indexRegion == index)) {
                         regionData.push({
                             value: item.value,
                             itemStyle: {
@@ -2441,25 +2444,34 @@ export default {
             const regionLabel = [];
 
             let content = [];
-            console.log("getPart1StoreBar > this.part1.indexRegion:", this.part1.indexRegion);
-            console.log("getPart1StoreBar > this.part1.content:", this.part1.content);
-            if (this.part1.content && this.part1.content[this.part1.indexRegion]) {
+            //console.log("getPart1StoreBar > this.part1.indexRegion:", this.part1.indexRegion);
+            //console.log("getPart1StoreBar > this.part1.content:", this.part1.content);
+            if (this.part1.content && (this.part1.content[this.part1.indexRegion] || this.part1.indexRegion==-1)) {
                 if (this.part1.compareType == 'stores') {
-                    content = [this.part1.content[this.part1.indexRegion]];
+                    if(this.part1.indexRegion==-1){
+                        content = this.part1.content;
+                    }
+                    else{
+                        content = [this.part1.content[this.part1.indexRegion]];
+                    }
+
                 } else {
                     const params = {};
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds = this.part1.content[this.part1.indexRegion].list;
+                    params.storeIds = this.part1.indexRegion==-1? this.params.storeIds:this.part1.content[this.part1.indexRegion].list;
                     if (this.part1.compareType == 'users' || this.part1.compareType == 'position') {
                         params.storeIds = self.params.storeIds;
-                        params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
+                        if(this.part1.indexRegion==-1)
+                              params.submitters = []
+                        else
+                              params.submitters = [self.part1.content[self.part1.indexRegion].innerId]
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
                         direction: (this.part1.storeMode == 1) ? this.part1.storeOrder : this.part1.table.order,
-                        property: (this.part1.storeMode == 1) ? (this.part1.indexType == 0 ? "numOfDangerous" : this.part1.indexType == 1 ? "numOfImproved" : "numOfQualified") : this.part1.table.property,
+                        property: (this.part1.storeMode == 1) ? (this.part1.indexType == 0 ? "numOfDangerous" : this.part1.indexType == 1 ? "numOfImproved" : this.part1.indexType == 2 ? "numOfQualified":"numOfREport") : this.part1.table.property,
                     }
                     params.filter = {
                         page: (this.part1.storeMode == 1) ? 0 : this.part1.table.page - 1,
@@ -2482,6 +2494,7 @@ export default {
 
                 console.log("Content store bar")
                 content.forEach((item, index) => {
+                    console.log(item)
                     item.storeGroup = item.storeRegion.toString();
                     item.storeType = item.storeBranchType.toString();
                     if (item.submitters) item.storeSubmitters = item.submitters.toString();
@@ -2489,13 +2502,16 @@ export default {
                     if (item.storeGroup == '') item.storeGroup = '- -'
                     if (item.storeType == '') item.storeType = '- -'
                     let value = 0;
-                    var arr = [item.numOfDangerous, item.numOfImproved, item.numOfQualified]
+                    var arr = [item.numOfDangerous, item.numOfImproved, item.numOfQualified,item.numOfReport]
                     if (this.part1.indexType == 0) {
                         value = util.getPercentValue(arr, 0, 2)
                     } else if (this.part1.indexType == 1) {
                         value = util.getPercentValue(arr, 1, 2)
                     } else if (this.part1.indexType == 2) {
                         value = util.getPercentValue(arr, 2, 2)
+                    }
+                    else {
+                        value = util.getPercentValue(arr, 3, 2)
                     }
                     item.value = value;
                 });
@@ -2620,11 +2636,11 @@ export default {
             if (this.part2.content) {
                 this.part2.content.map((item, index) => {
                     let value = item.averageScore;
-                    if (this.part2.indexRegion < 0 && value > 0) {
-                        this.part2.indexRegion = index;
-                    }
+                    //if (this.part2.indexRegion < 0 && value > 0) {
+                    //    this.part2.indexRegion = index;
+                   // }
 
-                    if (this.part2.indexRegion == index) {
+                    if (this.part2.indexRegion == index ||this.part2.indexRegion ==-1 ) {
                         regionData.push({
                             value: value,
                             itemStyle: {
@@ -2670,23 +2686,30 @@ export default {
             await this.getPart2StoreBar();
         },
         async getPart2StoreBar() {
+            console.log("getPart2StoreBar")
             const self = this;
             const option = this.getInspectLineOption();
             const regionData = [];
             const regionLabel = [];
             let content = [];
-            if (this.part2.content && this.part2.content[this.part2.indexRegion]) {
-                if (this.part2.compareType == 'stores') {
-                    content = [this.part2.content[this.part2.indexRegion]];
+            if (this.part2.content ) {
+                console.log("getPart2StoreBar"+this.part2.compareType)
+                if (this.part2.compareType == 'stores' && this.part2.indexRegion!=-1) {
+                    if(this.part2.indexRegion==-1){
+                        content = this.part2.content;
+                    }
+                    else{
+                        content = [this.part2.content[this.part2.indexRegion]];
+                    }
                 } else {
                     const params = {};
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds = this.part2.content[this.part2.indexRegion].list;
+                    params.storeIds =this.part2.indexRegion==-1?this.params.storeIds: this.part2.content[this.part2.indexRegion].list;
                     if (this.part2.compareType == 'users' || this.part2.compareType == 'position') {
                         params.storeIds = self.params.storeIds;
-                        params.submitters = [self.part2.content[self.part2.indexRegion].innerId]
+                        params.submitters = this.part2.indexRegion==-1?[]:[self.part2.content[self.part2.indexRegion].innerId]
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -2701,6 +2724,8 @@ export default {
                         ;
                         return false;
                     }
+                    console.log("Get Store Part2")
+                    console.log(params)
                     const storeResult = await this.getInspectStatsOverviewWithGroup(params);
                     if (storeResult.errCode === 0) {
                         const result = storeResult.data;
@@ -2820,7 +2845,7 @@ export default {
 
         },
         async drawPart3RegionBar() {
-            console.log("drawPart2RegionBar")
+            console.log("drawPart3RegionBar")
             const option = this.getInspectLineOption();
             const regionData = [];
             const regionLabel = [];
@@ -2828,11 +2853,11 @@ export default {
                 console.log(this.part3.content)
                 this.part3.content.map((item, index) => {
                     let value = item.standardRate;
-                    if (this.part3.indexRegion < 0 && value > 0) {
-                        this.part3.indexRegion = index;
-                    }
+                    //if (this.part3.indexRegion < 0 && value > 0) {
+                    //    this.part3.indexRegion = index;
+                    //}
 
-                    if (this.part3.indexRegion == index) {
+                    if (this.part3.indexRegion == index ||this.part3.indexRegion == index ) {
                         regionData.push({
                             value: value,
                             itemStyle: {
@@ -2883,18 +2908,18 @@ export default {
             const regionData = [];
             const regionLabel = [];
             let content = [];
-            if (this.part3.content && this.part3.content[this.part3.indexRegion]) {
-                if (this.part3.compareType == 'stores') {
+            if (this.part3.content ) {
+                if (this.part3.compareType == 'stores' && this.part3.indexRegion!=-1) {
                     content = [this.part3.content[this.part3.indexRegion]];
                 } else {
                     const params = {};
                     params.beginTs = self.params.beginTs;
                     params.endTs = self.params.endTs;
                     params.groupMode = 0;
-                    params.storeIds = this.part3.content[this.part3.indexRegion].list;
+                    params.storeIds = this.part3.indexRegion==-1? this.params.storeIds:this.part3.content[this.part3.indexRegion].list;
                     if (this.part3.compareType == 'users' || this.part3.compareType == 'position') {
                         params.storeIds = self.params.storeIds;
-                        params.submitters = [self.part3.content[self.part3.indexRegion].innerId]
+                        params.submitters =this.part3.indexRegion==-1?[]: [self.part3.content[self.part3.indexRegion].innerId]
                     }
                     params.inspectTagId = self.params.inspectId;
                     params.order = {
@@ -2995,22 +3020,47 @@ export default {
             return pieOption;
         },
         async clickPart1Pie(event) {
+            console.log("clickPart1Pie")
             if (this.part1.pieOption.series[0].data[event.dataIndex].value > 0) {
-                this.part1.indexType = event.dataIndex
+                if(this.part1.indexType == event.dataIndex){
+                        this.part1.indexType = -1;
+                }
+                else{
+                        this.part1.indexType = event.dataIndex;
+                }
                 this.part1.indexRegion = -1;
+                this.part1.table.page = 1;
                 await this.drawPart1RegionBar();
             }
         },
         async clickPart1Bar(event) {
-            this.part1.indexRegion = event.dataIndex;
+            if(this.part1.indexRegion == event.dataIndex){
+                this.part1.indexRegion = -1;
+            }
+            else{
+                this.part1.indexRegion = event.dataIndex;
+            }
+            this.part1.table.page = 1;
             await this.drawPart1RegionBar();
         },
         async clickPart2Bar(event) {
-            this.part2.indexRegion = event.dataIndex;
+               if(this.part2.indexRegion == event.dataIndex){
+                this.part2.indexRegion = -1;
+            }
+            else{
+                this.part2.indexRegion = event.dataIndex;
+            }
+              this.part2.table.page = 1;
             await this.drawPart2RegionBar();
         },
         async clickPart3Bar(event) {
-            this.part3.indexRegion = event.dataIndex;
+             if(this.part3.indexRegion == event.dataIndex){
+                this.part3.indexRegion = -1;
+            }
+            else{
+                this.part3.indexRegion = event.dataIndex;
+            }
+            this.part3.table.page = 1;
             await this.drawPart3RegionBar();
         },
 
@@ -3241,7 +3291,13 @@ export default {
         },
         async setPart1Type(index) {
             if (this.part1.pieOption.series[0].data[index].value > 0) {
-                this.part1.indexType = index;
+                if(this.part1.indexType == index){
+                        this.part1.indexType = -1;
+                }
+                else{
+                        this.part1.indexType = index;
+                }
+
                 this.part1.indexRegion = -1;
                 await this.drawPart1RegionBar();
             }
