@@ -685,12 +685,15 @@ export default{
       "moreThan":"超过",
       "needSignature":"须进行现场签名",
 
-      "defineTitle":"自定義簽名顯示名稱", //921
-      "addSignature":"新增簽名", //921
-      "principal":"負責人", //921
-      "mustSignature":"必簽", //921
-      "principal":"非必簽",//921
-
+      "defineTitle":"自定义签名显示名称",
+      "addSignature":"新增签名",
+      "principal":"负责人",
+      "mustSignature":"必签",
+      "uncertainSignature":"非必签",
+      "inputData":"请输入负责人",
+      "signatureOne":"签名 1",
+      "bindWorkflow":"选择绑定流程",
+      "select":"请选择",
 
       "no":"无",
       "notallowA":"合格率评估项和附加评分项",
