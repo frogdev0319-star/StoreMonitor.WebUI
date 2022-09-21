@@ -49,7 +49,7 @@
         </div>
         <div>
           <div v-if="$route.path ==='/reportdetails'"
-              style="background-color: transparent; color: #fff; border: none; position:absolute;top:15px;right:24px">
+              style="background-color: transparent; color: #fff; border: none; position:absolute;top:15px;right:24px;">
             <el-dropdown 
               style="display:flex; flex-direction: row-reverse; align-items: center;color: #fff;cursor: pointer;">
               <div class="button-area">
@@ -59,12 +59,12 @@
               <el-dropdown-menu slot="dropdown" class="dropdown">
                 <el-dropdown-item
                   class="dropdown-item"
-                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                   @click.native="handleDownload"
                 >{{ $t('remotePatrol.exportPDF') }}</el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
-                  style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
+                  style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
                   @click.native="handleDownloadExcel"
                   >{{ $t('remotePatrol.exportExcel') }}</el-dropdown-item>
               </el-dropdown-menu>
@@ -227,18 +227,18 @@
                 <el-dropdown-item
                   v-if="hasMystery"
                   class="dropdown-item"
-                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  style="width:auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                   @click.native="changeMimicMode">{{showMimicMode? $t('route.generalMode'):$t('route.mimicMode') }}</el-dropdown-item>
                 <el-dropdown-item
                   :disabeled="true"
                   class="dropdown-item"
-                  style="width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
+                  style="width: auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw);font-size:calc(14/1920*100vw);"
                   @click.native="changePWD"
                 >{{ $t('route.changePWD') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   class="dropdown-item"
-                  style=" width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
+                  style=" width: auto;min-width: calc(140/1920*100vw); padding-left: calc(20/1920*100vw); font-size:calc(14/1920*100vw);"
                   @click.native="fedlogout">{{ $t('route.logOut') }}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
